@@ -2,55 +2,55 @@
 
 exports[`AlphaTexLexerTest basic-tokens 1`] = `
 Array [
-  DotToken (1,1) -> (1,1),
+  Dot (1,1) -> (1,1),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 2`] = `
 Array [
-  ColonToken (1,1) -> (1,1),
+  Colon (1,1) -> (1,1),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 3`] = `
 Array [
-  ParenthesisOpenToken (1,1) -> (1,1),
+  LParen (1,1) -> (1,1),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 4`] = `
 Array [
-  ParenthesisCloseToken (1,1) -> (1,1),
+  RParen (1,1) -> (1,1),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 5`] = `
 Array [
-  BraceOpenToken (1,1) -> (1,1),
+  LBrace (1,1) -> (1,1),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 6`] = `
 Array [
-  BraceCloseToken (1,1) -> (1,1),
+  RBrace (1,1) -> (1,1),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 7`] = `
 Array [
-  PipeToken (1,1) -> (1,1),
+  Pipe (1,1) -> (1,1),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 8`] = `
 Array [
-  AsteriskToken (1,1) -> (1,1),
+  Asterisk (1,1) -> (1,1),
 ]
 `;
 
 exports[`AlphaTexLexerTest errors at001 1`] = `
 Array [
-  Identifier "a" (1,2) -> (1,3),
+  Ident "a" (1,2) -> (1,3),
 ]
 `;
 
@@ -71,7 +71,7 @@ Array [
 
 exports[`AlphaTexLexerTest errors at002 1`] = `
 Array [
-  StringLiteral "Test" (1,3) -> (1,8),
+  String "Test" (1,3) -> (1,8),
 ]
 `;
 
@@ -109,7 +109,7 @@ Array [
 
 exports[`AlphaTexLexerTest errors at004 1`] = `
 Array [
-  Identifier "X" (1,7) -> (1,8),
+  Ident "X" (1,7) -> (1,8),
 ]
 `;
 
@@ -130,7 +130,7 @@ Array [
 
 exports[`AlphaTexLexerTest errors at005 1`] = `
 Array [
-  Identifier "b01010101" (1,3) -> (1,12),
+  Ident "b01010101" (1,3) -> (1,12),
 ]
 `;
 
@@ -185,166 +185,166 @@ Array [
 
 exports[`AlphaTexLexerTest floats 1`] = `
 Array [
-  NumberLiteral "1.1" (1,1) -> (1,4),
+  Number "1.1" (1,1) -> (1,4),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 2`] = `
 Array [
-  NumberLiteral "11.22" (1,1) -> (1,6),
-  NumberLiteral "33.44" (1,7) -> (1,12),
+  Number "11.22" (1,1) -> (1,6),
+  Number "33.44" (1,7) -> (1,12),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 3`] = `
 Array [
-  NumberLiteral "1.1" (1,1) -> (1,4),
-  DotToken (1,4) -> (1,4),
-  NumberLiteral "4" (1,5) -> (1,6),
+  Number "1.1" (1,1) -> (1,4),
+  Dot (1,4) -> (1,4),
+  Number "4" (1,5) -> (1,6),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 4`] = `
 Array [
-  NumberLiteral "1.1" (1,1) -> (1,4),
-  DotToken (1,5) -> (1,5),
-  NumberLiteral "4" (1,6) -> (1,7),
+  Number "1.1" (1,1) -> (1,4),
+  Dot (1,5) -> (1,5),
+  Number "4" (1,6) -> (1,7),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 5`] = `
 Array [
-  NumberLiteral "1" (1,1) -> (1,2),
-  DotToken (1,3) -> (1,3),
-  NumberLiteral "1.4" (1,4) -> (1,7),
+  Number "1" (1,1) -> (1,2),
+  Dot (1,3) -> (1,3),
+  Number "1.4" (1,4) -> (1,7),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 6`] = `
 Array [
-  NumberLiteral "-1.1" (1,1) -> (1,5),
+  Number "-1.1" (1,1) -> (1,5),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 7`] = `
 Array [
-  Identifier "-" (1,1) -> (1,2),
-  DotToken (1,2) -> (1,2),
-  NumberLiteral "1" (1,3) -> (1,4),
+  Ident "-" (1,1) -> (1,2),
+  Dot (1,2) -> (1,2),
+  Number "1" (1,3) -> (1,4),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 8`] = `
 Array [
-  NumberLiteral "1.1" (1,1) -> (1,4),
-  ParenthesisOpenToken (1,4) -> (1,4),
+  Number "1.1" (1,1) -> (1,4),
+  LParen (1,4) -> (1,4),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 9`] = `
 Array [
-  NumberLiteral "1.1" (1,1) -> (1,4),
-  BraceOpenToken (1,4) -> (1,4),
+  Number "1.1" (1,1) -> (1,4),
+  LBrace (1,4) -> (1,4),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 10`] = `
 Array [
-  NumberLiteral "1.1" (1,1) -> (1,4),
-  PipeToken (1,4) -> (1,4),
+  Number "1.1" (1,1) -> (1,4),
+  Pipe (1,4) -> (1,4),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 11`] = `
 Array [
-  NumberLiteral "1" (1,1) -> (1,2),
-  DotToken (1,2) -> (1,2),
-  Identifier "1a" (1,3) -> (1,5),
+  Number "1" (1,1) -> (1,2),
+  Dot (1,2) -> (1,2),
+  Ident "1a" (1,3) -> (1,5),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 12`] = `
 Array [
-  Identifier "1a" (1,1) -> (1,3),
-  DotToken (1,3) -> (1,3),
-  NumberLiteral "1" (1,4) -> (1,5),
+  Ident "1a" (1,1) -> (1,3),
+  Dot (1,3) -> (1,3),
+  Number "1" (1,4) -> (1,5),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 13`] = `
 Array [
-  NumberLiteral "1.1" (1,1) -> (1,4),
-  MetaDataTag "test" (1,4) -> (1,9) {
-    prefix: BackSlashToken (1,4) -> (1,5),
-    tag: Identifier "test" (1,5) -> (1,9),
+  Number "1.1" (1,1) -> (1,4),
+  Tag "test" (1,4) -> (1,9) {
+    prefix: Backslash (1,4) -> (1,5),
+    tag: Ident "test" (1,5) -> (1,9),
   },
 ]
 `;
 
 exports[`AlphaTexLexerTest identifiers 1`] = `
 Array [
-  Identifier "true" (1,1) -> (1,5),
+  Ident "true" (1,1) -> (1,5),
 ]
 `;
 
 exports[`AlphaTexLexerTest identifiers 2`] = `
 Array [
-  Identifier "false" (1,1) -> (1,6),
+  Ident "false" (1,1) -> (1,6),
 ]
 `;
 
 exports[`AlphaTexLexerTest identifiers 3`] = `
 Array [
-  Identifier "HelloWorld" (1,1) -> (1,11),
+  Ident "HelloWorld" (1,1) -> (1,11),
 ]
 `;
 
 exports[`AlphaTexLexerTest identifiers 4`] = `
 Array [
-  Identifier "C4" (1,1) -> (1,3),
+  Ident "C4" (1,1) -> (1,3),
 ]
 `;
 
 exports[`AlphaTexLexerTest identifiers 5`] = `
 Array [
-  Identifier "C#4" (1,1) -> (1,4),
+  Ident "C#4" (1,1) -> (1,4),
 ]
 `;
 
 exports[`AlphaTexLexerTest identifiers 6`] = `
 Array [
-  Identifier "Cb4" (1,1) -> (1,4),
+  Ident "Cb4" (1,1) -> (1,4),
 ]
 `;
 
 exports[`AlphaTexLexerTest identifiers 7`] = `
 Array [
-  Identifier "electricpiano1" (1,1) -> (1,15),
+  Ident "electricpiano1" (1,1) -> (1,15),
 ]
 `;
 
 exports[`AlphaTexLexerTest identifiers 8`] = `
 Array [
-  Identifier "Unicodeöäü" (1,1) -> (1,11),
-  Identifier "Unicode😸" (1,12) -> (1,20),
-  Identifier "Utf16🤘🏻" (1,21) -> (1,28),
+  Ident "Unicodeöäü" (1,1) -> (1,11),
+  Ident "Unicode😸" (1,12) -> (1,20),
+  Ident "Utf16🤘🏻" (1,21) -> (1,28),
 ]
 `;
 
 exports[`AlphaTexLexerTest identifiers 9`] = `
 Array [
-  Identifier "dashed-identifier" (1,1) -> (1,18),
+  Ident "dashed-identifier" (1,1) -> (1,18),
 ]
 `;
 
 exports[`AlphaTexLexerTest leading-comments 1`] = `
 Array [
-  Identifier "true" (2,10) -> (3,1) {
+  Ident "true" (2,10) -> (3,1) {
     leadingComments: Array [
       "// Single",
     ],
   },
-  Identifier "false" (6,10) -> (7,1) {
+  Ident "false" (6,10) -> (7,1) {
     leadingComments: Array [
       "/** Multi **/",
       "/** Multi2 **/",
@@ -356,153 +356,153 @@ Array [
 
 exports[`AlphaTexLexerTest meta-command 1`] = `
 Array [
-  MetaDataTag "title" (1,1) -> (1,7) {
-    prefix: BackSlashToken (1,1) -> (1,2),
-    tag: Identifier "title" (1,2) -> (1,7),
+  Tag "title" (1,1) -> (1,7) {
+    prefix: Backslash (1,1) -> (1,2),
+    tag: Ident "title" (1,2) -> (1,7),
   },
 ]
 `;
 
 exports[`AlphaTexLexerTest meta-command 2`] = `
 Array [
-  MetaDataTag "double" (1,1) -> (1,9) {
-    prefix: DoubleBackSlashToken (1,1) -> (1,3),
-    tag: Identifier "double" (1,3) -> (1,9),
+  Tag "double" (1,1) -> (1,9) {
+    prefix: DoubleBackslash (1,1) -> (1,3),
+    tag: Ident "double" (1,3) -> (1,9),
   },
 ]
 `;
 
 exports[`AlphaTexLexerTest meta-command 3`] = `
 Array [
-  MetaDataTag "withNumber123" (1,1) -> (1,15) {
-    prefix: BackSlashToken (1,1) -> (1,2),
-    tag: Identifier "withNumber123" (1,2) -> (1,15),
+  Tag "withNumber123" (1,1) -> (1,15) {
+    prefix: Backslash (1,1) -> (1,2),
+    tag: Ident "withNumber123" (1,2) -> (1,15),
   },
 ]
 `;
 
 exports[`AlphaTexLexerTest meta-command 4`] = `
 Array [
-  MetaDataTag "withUnicode😼" (1,1) -> (1,14) {
-    prefix: BackSlashToken (1,1) -> (1,2),
-    tag: Identifier "withUnicode😼" (1,2) -> (1,14),
+  Tag "withUnicode😼" (1,1) -> (1,14) {
+    prefix: Backslash (1,1) -> (1,2),
+    tag: Ident "withUnicode😼" (1,2) -> (1,14),
   },
 ]
 `;
 
 exports[`AlphaTexLexerTest meta-command 5`] = `
 Array [
-  MetaDataTag "withUnicode😼" (1,1) -> (1,14) {
-    prefix: BackSlashToken (1,1) -> (1,2),
-    tag: Identifier "withUnicode😼" (1,2) -> (1,14),
+  Tag "withUnicode😼" (1,1) -> (1,14) {
+    prefix: Backslash (1,1) -> (1,2),
+    tag: Ident "withUnicode😼" (1,2) -> (1,14),
   },
-  DotToken (1,15) -> (1,15),
-  MetaDataTag "withNumber123" (1,17) -> (1,31) {
-    prefix: BackSlashToken (1,17) -> (1,18),
-    tag: Identifier "withNumber123" (1,18) -> (1,31),
+  Dot (1,15) -> (1,15),
+  Tag "withNumber123" (1,17) -> (1,31) {
+    prefix: Backslash (1,17) -> (1,18),
+    tag: Ident "withNumber123" (1,18) -> (1,31),
   },
 ]
 `;
 
 exports[`AlphaTexLexerTest numbers 1`] = `
 Array [
-  NumberLiteral "1" (1,1) -> (1,2),
+  Number "1" (1,1) -> (1,2),
 ]
 `;
 
 exports[`AlphaTexLexerTest numbers 2`] = `
 Array [
-  NumberLiteral "1234" (1,1) -> (1,5),
+  Number "1234" (1,1) -> (1,5),
 ]
 `;
 
 exports[`AlphaTexLexerTest numbers 3`] = `
 Array [
-  NumberLiteral "-1" (1,1) -> (1,3),
+  Number "-1" (1,1) -> (1,3),
 ]
 `;
 
 exports[`AlphaTexLexerTest numbers 4`] = `
 Array [
-  NumberLiteral "-1234" (1,1) -> (1,6),
+  Number "-1234" (1,1) -> (1,6),
 ]
 `;
 
 exports[`AlphaTexLexerTest numbers 5`] = `
 Array [
-  NumberLiteral "1234" (1,1) -> (1,5),
-  NumberLiteral "5678" (1,6) -> (1,10),
+  Number "1234" (1,1) -> (1,5),
+  Number "5678" (1,6) -> (1,10),
 ]
 `;
 
 exports[`AlphaTexLexerTest strings 1`] = `
 Array [
-  StringLiteral "Double Quoted" (1,1) -> (1,15),
+  String "Double Quoted" (1,1) -> (1,15),
 ]
 `;
 
 exports[`AlphaTexLexerTest strings 2`] = `
 Array [
-  StringLiteral "Single Quoted" (1,1) -> (1,15),
+  String "Single Quoted" (1,1) -> (1,15),
 ]
 `;
 
 exports[`AlphaTexLexerTest strings 3`] = `
 Array [
-  StringLiteral "Multiple" (1,1) -> (1,10),
-  StringLiteral "Strings" (1,12) -> (1,20),
+  String "Multiple" (1,1) -> (1,10),
+  String "Strings" (1,12) -> (1,20),
 ]
 `;
 
 exports[`AlphaTexLexerTest strings 4`] = `
 Array [
-  StringLiteral "Double \\"Quoted\\"" (1,1) -> (1,19),
+  String "Double \\"Quoted\\"" (1,1) -> (1,19),
 ]
 `;
 
 exports[`AlphaTexLexerTest strings 5`] = `
 Array [
-  StringLiteral "Single 'Quoted'" (1,1) -> (1,19),
+  String "Single 'Quoted'" (1,1) -> (1,19),
 ]
 `;
 
 exports[`AlphaTexLexerTest strings 6`] = `
 Array [
-  StringLiteral "\\r\\n\\t" (1,1) -> (1,8),
+  String "\\r\\n\\t" (1,1) -> (1,8),
 ]
 `;
 
 exports[`AlphaTexLexerTest strings 7`] = `
 Array [
-  StringLiteral "\\r\\n\\t" (1,1) -> (1,8),
+  String "\\r\\n\\t" (1,1) -> (1,8),
 ]
 `;
 
 exports[`AlphaTexLexerTest strings 8`] = `
 Array [
-  StringLiteral "😸" (1,1) -> (1,14),
+  String "😸" (1,1) -> (1,14),
 ]
 `;
 
 exports[`AlphaTexLexerTest strings 9`] = `
 Array [
-  StringLiteral "😸🤘🏻" (1,1) -> (1,5),
+  String "😸🤘🏻" (1,1) -> (1,5),
 ]
 `;
 
 exports[`AlphaTexLexerTest trailing-comments 1`] = `
 Array [
-  Identifier "true" (1,10) -> (1,14) {
+  Ident "true" (1,10) -> (1,14) {
     trailingComments: Array [
       "// Single After",
     ],
   },
-  Identifier "false" (2,10) -> (2,15) {
+  Ident "false" (2,10) -> (2,15) {
     trailingComments: Array [
       "/** Multi After **/",
     ],
   },
-  Identifier "true" (3,23) -> (3,27) {
+  Ident "true" (3,23) -> (3,27) {
     leadingComments: Array [
       "/** before **/",
     ],
@@ -510,7 +510,7 @@ Array [
       "/** middle **/",
     ],
   },
-  Identifier "false" (3,41) -> (3,46) {
+  Ident "false" (3,41) -> (3,46) {
     trailingComments: Array [
       "// after",
     ],
@@ -520,7 +520,7 @@ Array [
 
 exports[`AlphaTexLexerTest whitespace 1`] = `
 Array [
-  DotToken (1,3) -> (1,3),
-  DotToken (2,8) -> (2,8),
+  Dot (1,3) -> (1,3),
+  Dot (2,8) -> (2,8),
 ]
 `;

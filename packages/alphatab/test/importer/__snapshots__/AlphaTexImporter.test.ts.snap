@@ -4999,7 +4999,7 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected additional value 'NumberLiteral', expected: required(StringLiteral|Identifier),optional(StringLiteral|Identifier)",
+    "message" => "Unexpected additional value 'Number', expected: required(String|Ident),optional(String|Ident)",
     "start" => Map {
       "col" => 18,
       "line" => 1,
@@ -5018,7 +5018,7 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected required value 'StringLiteral', expected: required(NumberLiteral)",
+    "message" => "Unexpected required value 'String', expected: required(Number)",
     "start" => Map {
       "col" => 10,
       "line" => 1,
@@ -5037,7 +5037,7 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected barre shape value 'invalid', expected: full,half",
+    "message" => "Unexpected barre shape value 'invalid', expected: none,full,half",
     "start" => Map {
       "col" => 21,
       "line" => 1,
@@ -5094,7 +5094,7 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected bend style value 'invalid', expected: gradual,fast,default",
+    "message" => "Unexpected bend style value 'invalid', expected: default,gradual,fast",
     "start" => Map {
       "col" => 19,
       "line" => 1,
@@ -5341,7 +5341,7 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected rasgueado pattern value 'invalid', expected: ii,mi,miitriplet,miianapaest,pmptriplet,pmpanapaest,peitriplet,peianapaest,paitriplet,paianapaest,amitriplet,amianapaest,ppp,amii,amip,eami,eamii,peami",
+    "message" => "Unexpected rasgueado pattern value 'invalid', expected: none,ii,mi,miitriplet,miianapaest,pmptriplet,pmpanapaest,peitriplet,peianapaest,paitriplet,paianapaest,amitriplet,amianapaest,ppp,amii,amip,eami,eamii,peami",
     "start" => Map {
       "col" => 17,
       "line" => 1,
@@ -5360,7 +5360,7 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected additional value 'NumberLiteral', expected: required(StringLiteral|Identifier),optional(StringLiteral|Identifier),optional(StringLiteral|Identifier)",
+    "message" => "Unexpected additional value 'Number', expected: required(String|Ident),optional(String|Ident),optional(String|Ident)",
     "start" => Map {
       "col" => 18,
       "line" => 1,
@@ -5379,7 +5379,7 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected required value 'NumberLiteral', expected: required(StringLiteral|Identifier)",
+    "message" => "Unexpected required value 'Number', expected: required(String|Ident)",
     "start" => Map {
       "col" => 10,
       "line" => 1,
@@ -5493,7 +5493,7 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected whammy style value 'invalid', expected: gradual,fast,default",
+    "message" => "Unexpected whammy style value 'invalid', expected: default,gradual,fast",
     "start" => Map {
       "col" => 20,
       "line" => 1,
@@ -5531,7 +5531,7 @@ Array [
   Map {
     "code" => 210,
     "severity" => 2,
-    "message" => "Missing values. Expected following values: required(NumberLiteral)",
+    "message" => "Missing values. Expected following values: required(Number)",
     "start" => Map {
       "col" => 9,
       "line" => 1,
@@ -5550,7 +5550,7 @@ Array [
   Map {
     "code" => 210,
     "severity" => 2,
-    "message" => "Missing values. Expected following values: required(NumberLiteral)",
+    "message" => "Missing values. Expected following values: required(Number)",
     "start" => Map {
       "col" => 10,
       "line" => 1,
@@ -5569,7 +5569,7 @@ Array [
   Map {
     "code" => 210,
     "severity" => 2,
-    "message" => "Missing values. Expected following values: required(StringLiteral|Identifier)",
+    "message" => "Missing values. Expected following values: required(String|Ident)",
     "start" => Map {
       "col" => 10,
       "line" => 1,

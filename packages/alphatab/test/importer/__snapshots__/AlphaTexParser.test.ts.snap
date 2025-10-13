@@ -5,14 +5,14 @@ Score (1,1) -> (1,19) {
   bars: Array [
     Bar (1,1) -> (1,19) {
       metaData: Array [
-        MetaData (1,1) -> (1,12) {
-          tag: MetaDataTag "tempo" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "tempo" (1,2) -> (1,7),
+        Meta (1,1) -> (1,12) {
+          tag: Tag "tempo" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "tempo" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,12) {
+          values: Values (1,8) -> (1,12) {
             values: Array [
-              NumberLiteral "120" (1,8) -> (1,11),
+              Number "120" (1,8) -> (1,11),
             ],
           },
         },
@@ -22,9 +22,9 @@ Score (1,1) -> (1,19) {
           notes: NoteList (1,12) -> (1,16) {
             notes: Array [
               Note (1,12) -> (1,16) {
-                noteValue: NumberLiteral "3" (1,12) -> (1,13),
-                noteStringDot: DotToken (1,13) -> (1,13),
-                noteString: NumberLiteral "3" (1,14) -> (1,15),
+                noteValue: Number "3" (1,12) -> (1,13),
+                noteStringDot: Dot (1,13) -> (1,13),
+                noteString: Number "3" (1,14) -> (1,15),
               },
             ],
           },
@@ -33,9 +33,9 @@ Score (1,1) -> (1,19) {
           notes: NoteList (1,16) -> (1,19) {
             notes: Array [
               Note (1,16) -> (1,19) {
-                noteValue: NumberLiteral "3" (1,16) -> (1,17),
-                noteStringDot: DotToken (1,17) -> (1,17),
-                noteString: NumberLiteral "4" (1,18) -> (1,19),
+                noteValue: Number "3" (1,16) -> (1,17),
+                noteStringDot: Dot (1,17) -> (1,17),
+                noteString: Number "4" (1,18) -> (1,19),
               },
             ],
           },
@@ -55,15 +55,15 @@ Score (1,1) -> (1,26) {
   bars: Array [
     Bar (1,1) -> (1,26) {
       metaData: Array [
-        MetaData (1,1) -> (1,23) {
-          tag: MetaDataTag "tempo" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "tempo" (1,2) -> (1,7),
+        Meta (1,1) -> (1,23) {
+          tag: Tag "tempo" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "tempo" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,23) {
+          values: Values (1,8) -> (1,23) {
             values: Array [
-              NumberLiteral "120" (1,8) -> (1,11),
-              StringLiteral "Moderate" (1,12) -> (1,21),
+              Number "120" (1,8) -> (1,11),
+              String "Moderate" (1,12) -> (1,21),
             ],
           },
         },
@@ -73,9 +73,9 @@ Score (1,1) -> (1,26) {
           notes: NoteList (1,23) -> (1,26) {
             notes: Array [
               Note (1,23) -> (1,26) {
-                noteValue: NumberLiteral "3" (1,23) -> (1,24),
-                noteStringDot: DotToken (1,24) -> (1,24),
-                noteString: NumberLiteral "4" (1,25) -> (1,26),
+                noteValue: Number "3" (1,23) -> (1,24),
+                noteStringDot: Dot (1,24) -> (1,24),
+                noteString: Number "4" (1,25) -> (1,26),
               },
             ],
           },
@@ -95,18 +95,18 @@ Score (1,1) -> (3,10) {
   bars: Array [
     Bar (1,1) -> (3,10) {
       metaData: Array [
-        MetaData (3,3) -> (3,10) {
-          tag: MetaDataTag "ts" (3,3) -> (3,6) {
+        Meta (3,3) -> (3,10) {
+          tag: Tag "ts" (3,3) -> (3,6) {
             leadingComments: Array [
               "// Single ",
             ],
-            prefix: BackSlashToken (3,3) -> (3,4),
-            tag: Identifier "ts" (3,4) -> (3,6),
+            prefix: Backslash (3,3) -> (3,4),
+            tag: Ident "ts" (3,4) -> (3,6),
           },
-          values: ValueList (3,7) -> (3,10) {
+          values: Values (3,7) -> (3,10) {
             values: Array [
-              NumberLiteral "3" (3,7) -> (3,8),
-              NumberLiteral "4" (3,9) -> (3,10),
+              Number "3" (3,7) -> (3,8),
+              Number "4" (3,9) -> (3,10),
             ],
           },
         },
@@ -125,19 +125,19 @@ Score (1,1) -> (3,16) {
   bars: Array [
     Bar (1,1) -> (3,16) {
       metaData: Array [
-        MetaData (3,9) -> (3,16) {
-          tag: MetaDataTag "ts" (3,9) -> (3,12) {
+        Meta (3,9) -> (3,16) {
+          tag: Tag "ts" (3,9) -> (3,12) {
             leadingComments: Array [
               "/** multi
 line**/",
             ],
-            prefix: BackSlashToken (3,9) -> (3,10),
-            tag: Identifier "ts" (3,10) -> (3,12),
+            prefix: Backslash (3,9) -> (3,10),
+            tag: Ident "ts" (3,10) -> (3,12),
           },
-          values: ValueList (3,13) -> (3,16) {
+          values: Values (3,13) -> (3,16) {
             values: Array [
-              NumberLiteral "3" (3,13) -> (3,14),
-              NumberLiteral "4" (3,15) -> (3,16),
+              Number "3" (3,13) -> (3,14),
+              Number "4" (3,15) -> (3,16),
             ],
           },
         },
@@ -152,20 +152,20 @@ Score (1,1) -> (3,10) {
   bars: Array [
     Bar (1,1) -> (3,10) {
       metaData: Array [
-        MetaData (2,2) -> (3,10) {
-          tag: MetaDataTag "ts" (2,2) -> (2,5) {
-            prefix: BackSlashToken (2,2) -> (2,3),
-            tag: Identifier "ts" (2,3) -> (2,5),
+        Meta (2,2) -> (3,10) {
+          tag: Tag "ts" (2,2) -> (2,5) {
+            prefix: Backslash (2,2) -> (2,3),
+            tag: Ident "ts" (2,3) -> (2,5),
           },
-          values: ValueList (2,6) -> (3,10) {
+          values: Values (2,6) -> (3,10) {
             values: Array [
-              NumberLiteral "3" (2,6) -> (2,7) {
+              Number "3" (2,6) -> (2,7) {
                 trailingComments: Array [
                   "/** multi
 line**/",
                 ],
               },
-              NumberLiteral "4" (3,9) -> (3,10),
+              Number "4" (3,9) -> (3,10),
             ],
           },
         },
@@ -190,13 +190,13 @@ Score (1,1) -> (3,12) {
       beats: Array [
         Beat (1,3) -> (3,12) {
           notes: NoteList (1,3) -> (3,12) {
-            openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
+            openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
               Note (1,4) -> (3,9) {
-                noteValue: Identifier "C4" (1,4) -> (2,1),
+                noteValue: Ident "C4" (1,4) -> (2,1),
               },
               Note (3,9) -> (3,11) {
-                noteValue: Identifier "C5" (3,9) -> (3,11) {
+                noteValue: Ident "C5" (3,9) -> (3,11) {
                   leadingComments: Array [
                     "/** multi
 line**/",
@@ -204,7 +204,7 @@ line**/",
                 },
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (3,11) -> (3,11),
+            closeParenthesis: RParen (3,11) -> (3,11),
           },
         },
       ],
@@ -224,20 +224,20 @@ Score (1,1) -> (3,6) {
       beats: Array [
         Beat (1,3) -> (3,6) {
           notes: NoteList (1,3) -> (3,6) {
-            openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
+            openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
               Note (1,4) -> (3,3) {
-                noteValue: Identifier "C4" (1,4) -> (2,1),
+                noteValue: Ident "C4" (1,4) -> (2,1),
               },
               Note (3,3) -> (3,5) {
-                noteValue: Identifier "C5" (3,3) -> (3,5) {
+                noteValue: Ident "C5" (3,3) -> (3,5) {
                   leadingComments: Array [
                     "// Single ",
                   ],
                 },
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (3,5) -> (3,5),
+            closeParenthesis: RParen (3,5) -> (3,5),
           },
         },
       ],
@@ -259,7 +259,7 @@ Score (1,1) -> (3,11) {
           notes: NoteList (1,3) -> (3,9) {
             notes: Array [
               Note (1,3) -> (3,9) {
-                noteValue: Identifier "C4" (1,3) -> (2,1),
+                noteValue: Ident "C4" (1,3) -> (2,1),
               },
             ],
           },
@@ -268,7 +268,7 @@ Score (1,1) -> (3,11) {
           notes: NoteList (3,9) -> (3,11) {
             notes: Array [
               Note (3,9) -> (3,11) {
-                noteValue: Identifier "C5" (3,9) -> (3,11) {
+                noteValue: Ident "C5" (3,9) -> (3,11) {
                   leadingComments: Array [
                     "/** multi
 line**/",
@@ -297,7 +297,7 @@ Score (1,1) -> (3,5) {
           notes: NoteList (1,3) -> (3,3) {
             notes: Array [
               Note (1,3) -> (3,3) {
-                noteValue: Identifier "C4" (1,3) -> (2,1),
+                noteValue: Ident "C4" (1,3) -> (2,1),
               },
             ],
           },
@@ -306,7 +306,7 @@ Score (1,1) -> (3,5) {
           notes: NoteList (3,3) -> (3,5) {
             notes: Array [
               Note (3,3) -> (3,5) {
-                noteValue: Identifier "C5" (3,3) -> (3,5) {
+                noteValue: Ident "C5" (3,3) -> (3,5) {
                   leadingComments: Array [
                     "// Single ",
                   ],
@@ -332,21 +332,21 @@ Score (1,1) -> (3,10) {
       beats: Array [
         Beat (1,3) -> (3,10) {
           notes: NoteList (1,3) -> (1,10) {
-            openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
+            openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
               Note (1,4) -> (1,7) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+                noteValue: Ident "C4" (1,4) -> (1,6),
               },
               Note (1,7) -> (1,9) {
-                noteValue: Identifier "C5" (1,7) -> (1,9),
+                noteValue: Ident "C5" (1,7) -> (1,9),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,9) -> (1,9),
+            closeParenthesis: RParen (1,9) -> (1,9),
           },
-          beatEffects: Properties (1,11) -> (3,10) {
-            openBrace: BraceOpenToken (1,11) -> (1,11),
+          beatEffects: Props (1,11) -> (3,10) {
+            openBrace: LBrace (1,11) -> (1,11),
             properties: Array [],
-            closeBrace: BraceCloseToken (3,9) -> (3,9) {
+            closeBrace: RBrace (3,9) -> (3,9) {
               leadingComments: Array [
                 "/** multi
 line**/",
@@ -371,21 +371,21 @@ Score (1,1) -> (3,5) {
       beats: Array [
         Beat (1,3) -> (3,4) {
           notes: NoteList (1,3) -> (1,10) {
-            openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
+            openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
               Note (1,4) -> (1,7) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+                noteValue: Ident "C4" (1,4) -> (1,6),
               },
               Note (1,7) -> (1,9) {
-                noteValue: Identifier "C5" (1,7) -> (1,9),
+                noteValue: Ident "C5" (1,7) -> (1,9),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,9) -> (1,9),
+            closeParenthesis: RParen (1,9) -> (1,9),
           },
-          beatEffects: Properties (1,11) -> (3,4) {
-            openBrace: BraceOpenToken (1,11) -> (1,11),
+          beatEffects: Props (1,11) -> (3,4) {
+            openBrace: LBrace (1,11) -> (1,11),
             properties: Array [],
-            closeBrace: BraceCloseToken (3,3) -> (3,3) {
+            closeBrace: RBrace (3,3) -> (3,3) {
               leadingComments: Array [
                 "// Single ",
               ],
@@ -409,14 +409,14 @@ Score (1,1) -> (3,14) {
       beats: Array [
         Beat (1,3) -> (3,14) {
           notes: NoteList (1,3) -> (3,14) {
-            openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
+            openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
               Note (1,4) -> (3,10) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
-                noteEffects: Properties (1,9) -> (3,10) {
-                  openBrace: BraceOpenToken (1,9) -> (1,9),
+                noteValue: Ident "C4" (1,4) -> (1,6),
+                noteEffects: Props (1,9) -> (3,10) {
+                  openBrace: LBrace (1,9) -> (1,9),
                   properties: Array [],
-                  closeBrace: BraceCloseToken (3,9) -> (3,9) {
+                  closeBrace: RBrace (3,9) -> (3,9) {
                     leadingComments: Array [
                       "/** multi
 line**/",
@@ -425,10 +425,10 @@ line**/",
                 },
               },
               Note (3,11) -> (3,13) {
-                noteValue: Identifier "C5" (3,11) -> (3,13),
+                noteValue: Ident "C5" (3,11) -> (3,13),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (3,13) -> (3,13),
+            closeParenthesis: RParen (3,13) -> (3,13),
           },
         },
       ],
@@ -448,14 +448,14 @@ Score (1,1) -> (3,8) {
       beats: Array [
         Beat (1,3) -> (3,8) {
           notes: NoteList (1,3) -> (3,8) {
-            openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
+            openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
               Note (1,4) -> (3,4) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
-                noteEffects: Properties (1,7) -> (3,4) {
-                  openBrace: BraceOpenToken (1,7) -> (1,7),
+                noteValue: Ident "C4" (1,4) -> (1,6),
+                noteEffects: Props (1,7) -> (3,4) {
+                  openBrace: LBrace (1,7) -> (1,7),
                   properties: Array [],
-                  closeBrace: BraceCloseToken (3,3) -> (3,3) {
+                  closeBrace: RBrace (3,3) -> (3,3) {
                     leadingComments: Array [
                       "// Single ",
                     ],
@@ -463,10 +463,10 @@ Score (1,1) -> (3,8) {
                 },
               },
               Note (3,5) -> (3,7) {
-                noteValue: Identifier "C5" (3,5) -> (3,7),
+                noteValue: Ident "C5" (3,5) -> (3,7),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (3,7) -> (3,7),
+            closeParenthesis: RParen (3,7) -> (3,7),
           },
         },
       ],
@@ -484,18 +484,18 @@ Score (1,1) -> (2,22) {
   bars: Array [
     Bar (2,9) -> (2,22) {
       metaData: Array [
-        MetaData (2,9) -> (2,22) {
-          tag: MetaDataTag "title" (2,9) -> (2,15) {
+        Meta (2,9) -> (2,22) {
+          tag: Tag "title" (2,9) -> (2,15) {
             leadingComments: Array [
               "/** multi
 line**/",
             ],
-            prefix: BackSlashToken (2,9) -> (2,10),
-            tag: Identifier "title" (2,10) -> (2,15),
+            prefix: Backslash (2,9) -> (2,10),
+            tag: Ident "title" (2,10) -> (2,15),
           },
-          values: ValueList (2,16) -> (2,22) {
+          values: Values (2,16) -> (2,22) {
             values: Array [
-              StringLiteral "Test" (2,16) -> (2,21),
+              String "Test" (2,16) -> (2,21),
             ],
           },
         },
@@ -510,18 +510,18 @@ Score (1,1) -> (2,15) {
   bars: Array [
     Bar (1,1) -> (2,15) {
       metaData: Array [
-        MetaData (1,1) -> (2,15) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
+        Meta (1,1) -> (2,15) {
+          tag: Tag "title" (1,1) -> (1,7) {
             trailingComments: Array [
               "/** multi
 line**/",
             ],
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (2,9) -> (2,15) {
+          values: Values (2,9) -> (2,15) {
             values: Array [
-              StringLiteral "Test" (2,9) -> (2,14),
+              String "Test" (2,9) -> (2,14),
             ],
           },
         },
@@ -544,17 +544,17 @@ Score (1,1) -> (2,16) {
   bars: Array [
     Bar (2,3) -> (2,16) {
       metaData: Array [
-        MetaData (2,3) -> (2,16) {
-          tag: MetaDataTag "title" (2,3) -> (2,9) {
+        Meta (2,3) -> (2,16) {
+          tag: Tag "title" (2,3) -> (2,9) {
             leadingComments: Array [
               "// Single ",
             ],
-            prefix: BackSlashToken (2,3) -> (2,4),
-            tag: Identifier "title" (2,4) -> (2,9),
+            prefix: Backslash (2,3) -> (2,4),
+            tag: Ident "title" (2,4) -> (2,9),
           },
-          values: ValueList (2,10) -> (2,16) {
+          values: Values (2,10) -> (2,16) {
             values: Array [
-              StringLiteral "Test" (2,10) -> (2,15),
+              String "Test" (2,10) -> (2,15),
             ],
           },
         },
@@ -575,17 +575,17 @@ Score (1,1) -> (1,9) {
       beats: Array [
         Beat (1,1) -> (1,9) {
           notes: NoteList (1,1) -> (1,6) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,5) {
-                noteValue: NumberLiteral "3" (1,2) -> (1,3),
-                noteStringDot: DotToken (1,3) -> (1,3),
-                noteString: NumberLiteral "3" (1,4) -> (1,5),
+                noteValue: Number "3" (1,2) -> (1,3),
+                noteStringDot: Dot (1,3) -> (1,3),
+                noteString: Number "3" (1,4) -> (1,5),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,5) -> (1,5),
+            closeParenthesis: RParen (1,5) -> (1,5),
           },
-          beatMultiplier: AsteriskToken (1,7) -> (1,7),
+          beatMultiplier: Asterisk (1,7) -> (1,7),
         },
       ],
     },
@@ -617,23 +617,23 @@ Score (1,1) -> (1,10) {
       beats: Array [
         Beat (1,1) -> (1,9) {
           notes: NoteList (1,1) -> (1,6) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,5) {
-                noteValue: NumberLiteral "3" (1,2) -> (1,3),
-                noteStringDot: DotToken (1,3) -> (1,3),
-                noteString: NumberLiteral "3" (1,4) -> (1,5),
+                noteValue: Number "3" (1,2) -> (1,3),
+                noteStringDot: Dot (1,3) -> (1,3),
+                noteString: Number "3" (1,4) -> (1,5),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,5) -> (1,5),
+            closeParenthesis: RParen (1,5) -> (1,5),
           },
-          beatMultiplier: AsteriskToken (1,7) -> (1,7),
+          beatMultiplier: Asterisk (1,7) -> (1,7),
         },
         Beat (1,9) -> (1,10) {
           notes: NoteList (1,9) -> (1,10) {
             notes: Array [
               Note (1,9) -> (1,10) {
-                noteValue: Identifier "A" (1,9) -> (1,10),
+                noteValue: Ident "A" (1,9) -> (1,10),
               },
             ],
           },
@@ -699,7 +699,7 @@ Score (1,1) -> (1,3) {
           notes: NoteList (1,2) -> (1,3) {
             notes: Array [
               Note (1,2) -> (1,3) {
-                noteValue: Identifier "A" (1,2) -> (1,3),
+                noteValue: Ident "A" (1,2) -> (1,3),
               },
             ],
           },
@@ -736,7 +736,7 @@ Array [
   Map {
     "code" => 202,
     "severity" => 2,
-    "message" => "Unexpected 'Identifier' token. Expected one of following: NumberLiteral",
+    "message" => "Unexpected 'Ident' token. Expected one of following: Number",
     "start" => Map {
       "col" => 7,
       "line" => 1,
@@ -755,7 +755,7 @@ Array [
   Map {
     "code" => 202,
     "severity" => 2,
-    "message" => "Unexpected 'NumberLiteral' token. Expected one of following: StringLiteral,Identifier",
+    "message" => "Unexpected 'Number' token. Expected one of following: String,Ident",
     "start" => Map {
       "col" => 10,
       "line" => 1,
@@ -774,7 +774,7 @@ Array [
   Map {
     "code" => 202,
     "severity" => 2,
-    "message" => "Unexpected 'Identifier' token. Expected one of following: NumberLiteral",
+    "message" => "Unexpected 'Ident' token. Expected one of following: Number",
     "start" => Map {
       "col" => 4,
       "line" => 1,
@@ -793,7 +793,7 @@ Array [
   Map {
     "code" => 202,
     "severity" => 2,
-    "message" => "Unexpected 'MetaDataTag' token. Expected one of following: NumberLiteral,StringLiteral,Identifier",
+    "message" => "Unexpected 'Tag' token. Expected one of following: Number,String,Ident",
     "start" => Map {
       "col" => 16,
       "line" => 1,
@@ -808,15 +808,15 @@ Score (1,1) -> (1,19) {
   bars: Array [
     Bar (1,1) -> (1,19) {
       metaData: Array [
-        MetaData (1,1) -> (1,19) {
-          tag: MetaDataTag "meta" (1,1) -> (1,6) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "meta" (1,2) -> (1,6),
+        Meta (1,1) -> (1,19) {
+          tag: Tag "meta" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "meta" (1,2) -> (1,6),
           },
-          values: ValueList (1,7) -> (1,19) {
-            openParenthesis: ParenthesisOpenToken (1,7) -> (1,7),
+          values: Values (1,7) -> (1,19) {
+            openParenthesis: LParen (1,7) -> (1,7),
             values: Array [],
-            closeParenthesis: ParenthesisCloseToken (1,18) -> (1,18),
+            closeParenthesis: RParen (1,18) -> (1,18),
           },
         },
       ],
@@ -832,7 +832,7 @@ Array [
   Map {
     "code" => 202,
     "severity" => 2,
-    "message" => "Unexpected 'MetaDataTag' token. Expected one of following: Identifier,StringLiteral,NumberLiteral",
+    "message" => "Unexpected 'Tag' token. Expected one of following: Ident,String,Number",
     "start" => Map {
       "col" => 18,
       "line" => 1,
@@ -1039,10 +1039,10 @@ Score (1,1) -> (1,4) {
       beats: Array [
         Beat (1,1) -> (1,4) {
           notes: NoteList (1,1) -> (1,4) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,4) {
-                noteValue: Identifier "C4" (1,2) -> (1,4),
+                noteValue: Ident "C4" (1,2) -> (1,4),
               },
             ],
           },
@@ -1075,24 +1075,24 @@ Score (1,1) -> (1,26) {
   bars: Array [
     Bar (1,1) -> (1,26) {
       metaData: Array [
-        MetaData (1,1) -> (1,26) {
-          tag: MetaDataTag "track" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "track" (1,2) -> (1,7),
+        Meta (1,1) -> (1,26) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,15) {
+          values: Values (1,8) -> (1,15) {
             values: Array [
-              StringLiteral "Test" (1,8) -> (1,13),
+              String "Test" (1,8) -> (1,13),
             ],
           },
-          properties: Properties (1,15) -> (1,26) {
-            openBrace: BraceOpenToken (1,15) -> (1,15),
+          properties: Props (1,15) -> (1,26) {
+            openBrace: LBrace (1,15) -> (1,15),
             properties: Array [
-              Property (1,17) -> (1,26) {
-                property: Identifier "color" (1,17) -> (1,22),
-                properties: ValueList (1,23) -> (1,26) {
+              Prop (1,17) -> (1,26) {
+                property: Ident "color" (1,17) -> (1,22),
+                properties: Values (1,23) -> (1,26) {
                   values: Array [
-                    Identifier "red" (1,23) -> (1,26),
+                    Ident "red" (1,23) -> (1,26),
                   ],
                 },
               },
@@ -1127,15 +1127,15 @@ Score (1,1) -> (1,15) {
   bars: Array [
     Bar (1,1) -> (1,15) {
       metaData: Array [
-        MetaData (1,1) -> (1,15) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+        Meta (1,1) -> (1,15) {
+          tag: Tag "title" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,15) {
-            openParenthesis: ParenthesisOpenToken (1,8) -> (1,8),
+          values: Values (1,8) -> (1,15) {
+            openParenthesis: LParen (1,8) -> (1,8),
             values: Array [
-              StringLiteral "Test" (1,9) -> (1,14),
+              String "Test" (1,9) -> (1,14),
             ],
           },
         },
@@ -1167,15 +1167,15 @@ Score (1,1) -> (1,28) {
   bars: Array [
     Bar (1,1) -> (1,28) {
       metaData: Array [
-        MetaData (1,3) -> (1,25) {
-          tag: MetaDataTag "tempo" (1,3) -> (1,9) {
-            prefix: BackSlashToken (1,3) -> (1,4),
-            tag: Identifier "tempo" (1,4) -> (1,9),
+        Meta (1,3) -> (1,25) {
+          tag: Tag "tempo" (1,3) -> (1,9) {
+            prefix: Backslash (1,3) -> (1,4),
+            tag: Ident "tempo" (1,4) -> (1,9),
           },
-          values: ValueList (1,10) -> (1,25) {
+          values: Values (1,10) -> (1,25) {
             values: Array [
-              NumberLiteral "120" (1,10) -> (1,13),
-              StringLiteral "Moderate" (1,14) -> (1,23),
+              Number "120" (1,10) -> (1,13),
+              String "Moderate" (1,14) -> (1,23),
             ],
           },
         },
@@ -1185,9 +1185,9 @@ Score (1,1) -> (1,28) {
           notes: NoteList (1,25) -> (1,28) {
             notes: Array [
               Note (1,25) -> (1,28) {
-                noteValue: NumberLiteral "0" (1,25) -> (1,26),
-                noteStringDot: DotToken (1,26) -> (1,26),
-                noteString: NumberLiteral "5" (1,27) -> (1,28),
+                noteValue: Number "0" (1,25) -> (1,26),
+                noteStringDot: Dot (1,26) -> (1,26),
+                noteString: Number "5" (1,27) -> (1,28),
               },
             ],
           },
@@ -1203,19 +1203,19 @@ Score (1,1) -> (1,30) {
   bars: Array [
     Bar (1,1) -> (1,30) {
       metaData: Array [
-        MetaData (1,3) -> (1,30) {
-          tag: MetaDataTag "tempo" (1,3) -> (1,9) {
-            prefix: BackSlashToken (1,3) -> (1,4),
-            tag: Identifier "tempo" (1,4) -> (1,9),
+        Meta (1,3) -> (1,30) {
+          tag: Tag "tempo" (1,3) -> (1,9) {
+            prefix: Backslash (1,3) -> (1,4),
+            tag: Ident "tempo" (1,4) -> (1,9),
           },
-          values: ValueList (1,10) -> (1,30) {
-            openParenthesis: ParenthesisOpenToken (1,10) -> (1,10),
+          values: Values (1,10) -> (1,30) {
+            openParenthesis: LParen (1,10) -> (1,10),
             values: Array [
-              NumberLiteral "120" (1,11) -> (1,14),
-              StringLiteral "Moderate" (1,15) -> (1,24),
-              NumberLiteral "0.5" (1,26) -> (1,29),
+              Number "120" (1,11) -> (1,14),
+              String "Moderate" (1,15) -> (1,24),
+              Number "0.5" (1,26) -> (1,29),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,29) -> (1,29),
+            closeParenthesis: RParen (1,29) -> (1,29),
           },
         },
       ],
@@ -1237,14 +1237,14 @@ Score (1,1) -> (1,13) {
   bars: Array [
     Bar (1,1) -> (1,13) {
       metaData: Array [
-        MetaData (1,3) -> (1,13) {
-          tag: MetaDataTag "scale" (1,3) -> (1,9) {
-            prefix: BackSlashToken (1,3) -> (1,4),
-            tag: Identifier "scale" (1,4) -> (1,9),
+        Meta (1,3) -> (1,13) {
+          tag: Tag "scale" (1,3) -> (1,9) {
+            prefix: Backslash (1,3) -> (1,4),
+            tag: Ident "scale" (1,4) -> (1,9),
           },
-          values: ValueList (1,10) -> (1,13) {
+          values: Values (1,10) -> (1,13) {
             values: Array [
-              NumberLiteral "0.5" (1,10) -> (1,13),
+              Number "0.5" (1,10) -> (1,13),
             ],
           },
         },
@@ -1259,18 +1259,18 @@ Score (1,1) -> (1,19) {
   bars: Array [
     Bar (1,1) -> (1,19) {
       metaData: Array [
-        MetaData (1,1) -> (1,19) {
-          tag: MetaDataTag "unknown" (1,1) -> (1,9) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "unknown" (1,2) -> (1,9),
+        Meta (1,1) -> (1,19) {
+          tag: Tag "unknown" (1,1) -> (1,9) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "unknown" (1,2) -> (1,9),
           },
-          values: ValueList (1,10) -> (1,19) {
-            openParenthesis: ParenthesisOpenToken (1,10) -> (1,10),
+          values: Values (1,10) -> (1,19) {
+            openParenthesis: LParen (1,10) -> (1,10),
             values: Array [
-              NumberLiteral "1.2" (1,11) -> (1,14),
-              NumberLiteral "2.3" (1,15) -> (1,18),
+              Number "1.2" (1,11) -> (1,14),
+              Number "2.3" (1,15) -> (1,18),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,18) -> (1,18),
+            closeParenthesis: RParen (1,18) -> (1,18),
           },
         },
       ],
@@ -1292,14 +1292,14 @@ Score (1,1) -> (1,50) {
   bars: Array [
     Bar (1,1) -> (1,50) {
       metaData: Array [
-        MetaData (1,1) -> (1,16) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+        Meta (1,1) -> (1,16) {
+          tag: Tag "title" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,16) {
             values: Array [
-              StringLiteral "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14),
             ],
           },
         },
@@ -1309,34 +1309,34 @@ Score (1,1) -> (1,50) {
           notes: NoteList (1,18) -> (1,34) {
             notes: Array [
               Note (1,18) -> (1,34) {
-                noteValue: Identifier "C4" (1,18) -> (1,20),
-                noteEffects: Properties (1,21) -> (1,34) {
-                  openBrace: BraceOpenToken (1,21) -> (1,21),
+                noteValue: Ident "C4" (1,18) -> (1,20),
+                noteEffects: Props (1,21) -> (1,34) {
+                  openBrace: LBrace (1,21) -> (1,21),
                   properties: Array [
-                    Property (1,23) -> (1,33) {
-                      property: Identifier "slur" (1,23) -> (1,27),
-                      properties: ValueList (1,28) -> (1,33) {
+                    Prop (1,23) -> (1,33) {
+                      property: Ident "slur" (1,23) -> (1,27),
+                      properties: Values (1,28) -> (1,33) {
                         values: Array [
-                          StringLiteral "S1" (1,28) -> (1,31),
+                          String "S1" (1,28) -> (1,31),
                         ],
                       },
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,33) -> (1,33),
+                  closeBrace: RBrace (1,33) -> (1,33),
                 },
               },
             ],
           },
-          durationDot: DotToken (1,35) -> (1,35),
-          durationValue: NumberLiteral "4" (1,37) -> (1,38),
-          beatEffects: Properties (1,39) -> (1,50) {
-            openBrace: BraceOpenToken (1,39) -> (1,39),
+          durationDot: Dot (1,35) -> (1,35),
+          durationValue: Number "4" (1,37) -> (1,38),
+          beatEffects: Props (1,39) -> (1,50) {
+            openBrace: LBrace (1,39) -> (1,39),
             properties: Array [
-              Property (1,41) -> (1,50) {
-                property: Identifier "rasg" (1,41) -> (1,45),
-                properties: ValueList (1,46) -> (1,50) {
+              Prop (1,41) -> (1,50) {
+                property: Ident "rasg" (1,41) -> (1,45),
+                properties: Values (1,46) -> (1,50) {
                   values: Array [
-                    StringLiteral "i" (1,46) -> (1,48),
+                    String "i" (1,46) -> (1,48),
                   ],
                 },
               },
@@ -1371,24 +1371,24 @@ Score (1,1) -> (1,25) {
   bars: Array [
     Bar (1,1) -> (1,25) {
       metaData: Array [
-        MetaData (1,1) -> (1,25) {
-          tag: MetaDataTag "track" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "track" (1,2) -> (1,7),
+        Meta (1,1) -> (1,25) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,12) {
+          values: Values (1,8) -> (1,12) {
             values: Array [
-              StringLiteral "X" (1,8) -> (1,10),
+              String "X" (1,8) -> (1,10),
             ],
           },
-          properties: Properties (1,12) -> (1,25) {
-            openBrace: BraceOpenToken (1,12) -> (1,12),
+          properties: Props (1,12) -> (1,25) {
+            openBrace: LBrace (1,12) -> (1,12),
             properties: Array [
-              Property (1,14) -> (1,25) {
-                property: Identifier "color" (1,14) -> (1,19),
-                properties: ValueList (1,20) -> (1,25) {
+              Prop (1,14) -> (1,25) {
+                property: Ident "color" (1,14) -> (1,19),
+                properties: Values (1,20) -> (1,25) {
                   values: Array [
-                    StringLiteral "red" (1,20) -> (1,24),
+                    String "red" (1,20) -> (1,24),
                   ],
                 },
               },
@@ -1423,14 +1423,14 @@ Score (1,1) -> (1,32) {
   bars: Array [
     Bar (1,1) -> (1,32) {
       metaData: Array [
-        MetaData (1,1) -> (1,16) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+        Meta (1,1) -> (1,16) {
+          tag: Tag "title" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,16) {
             values: Array [
-              StringLiteral "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14),
             ],
           },
         },
@@ -1440,15 +1440,15 @@ Score (1,1) -> (1,32) {
           notes: NoteList (1,18) -> (1,32) {
             notes: Array [
               Note (1,18) -> (1,32) {
-                noteValue: Identifier "C4" (1,18) -> (1,20),
-                noteEffects: Properties (1,21) -> (1,32) {
-                  openBrace: BraceOpenToken (1,21) -> (1,21),
+                noteValue: Ident "C4" (1,18) -> (1,20),
+                noteEffects: Props (1,21) -> (1,32) {
+                  openBrace: LBrace (1,21) -> (1,21),
                   properties: Array [
-                    Property (1,23) -> (1,32) {
-                      property: Identifier "slur" (1,23) -> (1,27),
-                      properties: ValueList (1,28) -> (1,32) {
+                    Prop (1,23) -> (1,32) {
+                      property: Ident "slur" (1,23) -> (1,27),
+                      properties: Values (1,28) -> (1,32) {
                         values: Array [
-                          StringLiteral "S1" (1,28) -> (1,31),
+                          String "S1" (1,28) -> (1,31),
                         ],
                       },
                     },
@@ -1486,14 +1486,14 @@ Score (1,1) -> (1,36) {
   bars: Array [
     Bar (1,1) -> (1,36) {
       metaData: Array [
-        MetaData (1,1) -> (1,16) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+        Meta (1,1) -> (1,16) {
+          tag: Tag "title" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,16) {
             values: Array [
-              StringLiteral "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14),
             ],
           },
         },
@@ -1503,25 +1503,25 @@ Score (1,1) -> (1,36) {
           notes: NoteList (1,18) -> (1,34) {
             notes: Array [
               Note (1,18) -> (1,34) {
-                noteValue: Identifier "C4" (1,18) -> (1,20),
-                noteEffects: Properties (1,21) -> (1,34) {
-                  openBrace: BraceOpenToken (1,21) -> (1,21),
+                noteValue: Ident "C4" (1,18) -> (1,20),
+                noteEffects: Props (1,21) -> (1,34) {
+                  openBrace: LBrace (1,21) -> (1,21),
                   properties: Array [
-                    Property (1,23) -> (1,33) {
-                      property: Identifier "slur" (1,23) -> (1,27),
-                      properties: ValueList (1,28) -> (1,33) {
+                    Prop (1,23) -> (1,33) {
+                      property: Ident "slur" (1,23) -> (1,27),
+                      properties: Values (1,28) -> (1,33) {
                         values: Array [
-                          StringLiteral "S1" (1,28) -> (1,31),
+                          String "S1" (1,28) -> (1,31),
                         ],
                       },
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,33) -> (1,33),
+                  closeBrace: RBrace (1,33) -> (1,33),
                 },
               },
             ],
           },
-          durationDot: DotToken (1,35) -> (1,35),
+          durationDot: Dot (1,35) -> (1,35),
         },
       ],
     },
@@ -1589,14 +1589,14 @@ Score (1,1) -> (1,41) {
   bars: Array [
     Bar (1,1) -> (1,41) {
       metaData: Array [
-        MetaData (1,1) -> (1,16) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+        Meta (1,1) -> (1,16) {
+          tag: Tag "title" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,16) {
             values: Array [
-              StringLiteral "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14),
             ],
           },
         },
@@ -1606,28 +1606,28 @@ Score (1,1) -> (1,41) {
           notes: NoteList (1,18) -> (1,34) {
             notes: Array [
               Note (1,18) -> (1,34) {
-                noteValue: Identifier "C4" (1,18) -> (1,20),
-                noteEffects: Properties (1,21) -> (1,34) {
-                  openBrace: BraceOpenToken (1,21) -> (1,21),
+                noteValue: Ident "C4" (1,18) -> (1,20),
+                noteEffects: Props (1,21) -> (1,34) {
+                  openBrace: LBrace (1,21) -> (1,21),
                   properties: Array [
-                    Property (1,23) -> (1,33) {
-                      property: Identifier "slur" (1,23) -> (1,27),
-                      properties: ValueList (1,28) -> (1,33) {
+                    Prop (1,23) -> (1,33) {
+                      property: Ident "slur" (1,23) -> (1,27),
+                      properties: Values (1,28) -> (1,33) {
                         values: Array [
-                          StringLiteral "S1" (1,28) -> (1,31),
+                          String "S1" (1,28) -> (1,31),
                         ],
                       },
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,33) -> (1,33),
+                  closeBrace: RBrace (1,33) -> (1,33),
                 },
               },
             ],
           },
-          durationDot: DotToken (1,35) -> (1,35),
-          durationValue: NumberLiteral "4" (1,37) -> (1,38),
-          beatEffects: Properties (1,39) -> (1,41) {
-            openBrace: BraceOpenToken (1,39) -> (1,39),
+          durationDot: Dot (1,35) -> (1,35),
+          durationValue: Number "4" (1,37) -> (1,38),
+          beatEffects: Props (1,39) -> (1,41) {
+            openBrace: LBrace (1,39) -> (1,39),
             properties: Array [],
           },
         },
@@ -1680,18 +1680,18 @@ Score (1,1) -> (1,13) {
   bars: Array [
     Bar (1,1) -> (1,13) {
       metaData: Array [
-        MetaData (1,1) -> (1,13) {
-          tag: MetaDataTag "track" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "track" (1,2) -> (1,7),
+        Meta (1,1) -> (1,13) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,12) {
+          values: Values (1,8) -> (1,12) {
             values: Array [
-              StringLiteral "X" (1,8) -> (1,10),
+              String "X" (1,8) -> (1,10),
             ],
           },
-          properties: Properties (1,12) -> (1,13) {
-            openBrace: BraceOpenToken (1,12) -> (1,12),
+          properties: Props (1,12) -> (1,13) {
+            openBrace: LBrace (1,12) -> (1,12),
             properties: Array [],
           },
         },
@@ -1874,14 +1874,14 @@ Score (1,1) -> (1,23) {
   bars: Array [
     Bar (1,1) -> (1,23) {
       metaData: Array [
-        MetaData (1,1) -> (1,16) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+        Meta (1,1) -> (1,16) {
+          tag: Tag "title" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,16) {
             values: Array [
-              StringLiteral "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14),
             ],
           },
         },
@@ -1891,9 +1891,9 @@ Score (1,1) -> (1,23) {
           notes: NoteList (1,18) -> (1,23) {
             notes: Array [
               Note (1,18) -> (1,23) {
-                noteValue: Identifier "C4" (1,18) -> (1,20),
-                noteEffects: Properties (1,21) -> (1,23) {
-                  openBrace: BraceOpenToken (1,21) -> (1,21),
+                noteValue: Ident "C4" (1,18) -> (1,20),
+                noteEffects: Props (1,21) -> (1,23) {
+                  openBrace: LBrace (1,21) -> (1,21),
                   properties: Array [],
                 },
               },
@@ -1928,14 +1928,14 @@ Score (1,1) -> (1,19) {
   bars: Array [
     Bar (1,1) -> (1,19) {
       metaData: Array [
-        MetaData (1,1) -> (1,16) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+        Meta (1,1) -> (1,16) {
+          tag: Tag "title" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,16) {
             values: Array [
-              StringLiteral "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14),
             ],
           },
         },
@@ -1945,7 +1945,7 @@ Score (1,1) -> (1,19) {
           notes: NoteList (1,18) -> (1,19) {
             notes: Array [
               Note (1,18) -> (1,19) {
-                noteValue: Identifier "C" (1,18) -> (1,19),
+                noteValue: Ident "C" (1,18) -> (1,19),
               },
             ],
           },
@@ -1965,15 +1965,15 @@ Score (1,1) -> (1,17) {
   bars: Array [
     Bar (1,1) -> (1,13) {
       metaData: Array [
-        MetaData (1,1) -> (1,9) {
-          tag: MetaDataTag "ts" (1,1) -> (1,4) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "ts" (1,2) -> (1,4),
+        Meta (1,1) -> (1,9) {
+          tag: Tag "ts" (1,1) -> (1,4) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "ts" (1,2) -> (1,4),
           },
-          values: ValueList (1,5) -> (1,8) {
+          values: Values (1,5) -> (1,8) {
             values: Array [
-              NumberLiteral "3" (1,5) -> (1,6),
-              NumberLiteral "4" (1,7) -> (1,8),
+              Number "3" (1,5) -> (1,6),
+              Number "4" (1,7) -> (1,8),
             ],
           },
         },
@@ -1983,13 +1983,13 @@ Score (1,1) -> (1,17) {
           notes: NoteList (1,9) -> (1,12) {
             notes: Array [
               Note (1,9) -> (1,12) {
-                noteValue: Identifier "C4" (1,9) -> (1,11),
+                noteValue: Ident "C4" (1,9) -> (1,11),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,12) -> (1,12),
+      pipe: Pipe (1,12) -> (1,12),
     },
     Bar (1,14) -> (1,17) {
       beats: Array [
@@ -1997,7 +1997,7 @@ Score (1,1) -> (1,17) {
           notes: NoteList (1,14) -> (1,17) {
             notes: Array [
               Note (1,14) -> (1,17) {
-                noteValue: Identifier "C4" (1,14) -> (1,16),
+                noteValue: Ident "C4" (1,14) -> (1,16),
               },
             ],
           },
@@ -2017,15 +2017,15 @@ Score (1,1) -> (1,30) {
   bars: Array [
     Bar (1,1) -> (1,26) {
       metaData: Array [
-        MetaData (1,3) -> (1,12) {
-          tag: MetaDataTag "ts" (1,3) -> (1,6) {
-            prefix: BackSlashToken (1,3) -> (1,4),
-            tag: Identifier "ts" (1,4) -> (1,6),
+        Meta (1,3) -> (1,12) {
+          tag: Tag "ts" (1,3) -> (1,6) {
+            prefix: Backslash (1,3) -> (1,4),
+            tag: Ident "ts" (1,4) -> (1,6),
           },
-          values: ValueList (1,7) -> (1,10) {
+          values: Values (1,7) -> (1,10) {
             values: Array [
-              NumberLiteral "3" (1,7) -> (1,8),
-              NumberLiteral "4" (1,9) -> (1,10),
+              Number "3" (1,7) -> (1,8),
+              Number "4" (1,9) -> (1,10),
             ],
           },
         },
@@ -2033,26 +2033,26 @@ Score (1,1) -> (1,30) {
       beats: Array [
         Beat (1,12) -> (1,22) {
           notes: NoteList (1,12) -> (1,21) {
-            openParenthesis: ParenthesisOpenToken (1,12) -> (1,12),
+            openParenthesis: LParen (1,12) -> (1,12),
             notes: Array [
               Note (1,13) -> (1,20) {
-                noteValue: StringLiteral "Value" (1,13) -> (1,19),
+                noteValue: String "Value" (1,13) -> (1,19),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,20) -> (1,20),
+            closeParenthesis: RParen (1,20) -> (1,20),
           },
         },
         Beat (1,22) -> (1,25) {
           notes: NoteList (1,22) -> (1,25) {
             notes: Array [
               Note (1,22) -> (1,25) {
-                noteValue: Identifier "C4" (1,22) -> (1,24),
+                noteValue: Ident "C4" (1,22) -> (1,24),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,25) -> (1,25),
+      pipe: Pipe (1,25) -> (1,25),
     },
     Bar (1,27) -> (1,30) {
       beats: Array [
@@ -2060,7 +2060,7 @@ Score (1,1) -> (1,30) {
           notes: NoteList (1,27) -> (1,30) {
             notes: Array [
               Note (1,27) -> (1,30) {
-                noteValue: Identifier "C4" (1,27) -> (1,29),
+                noteValue: Ident "C4" (1,27) -> (1,29),
               },
             ],
           },
@@ -2080,17 +2080,17 @@ Score (1,1) -> (1,32) {
   bars: Array [
     Bar (1,1) -> (1,28) {
       metaData: Array [
-        MetaData (1,1) -> (1,24) {
-          tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "notExisting" (1,2) -> (1,13),
+        Meta (1,1) -> (1,24) {
+          tag: Tag "notExisting" (1,1) -> (1,13) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: ValueList (1,14) -> (1,23) {
-            openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+          values: Values (1,14) -> (1,23) {
+            openParenthesis: LParen (1,14) -> (1,14),
             values: Array [
-              StringLiteral "Value" (1,15) -> (1,21),
+              String "Value" (1,15) -> (1,21),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
+            closeParenthesis: RParen (1,22) -> (1,22),
           },
         },
       ],
@@ -2099,13 +2099,13 @@ Score (1,1) -> (1,32) {
           notes: NoteList (1,24) -> (1,27) {
             notes: Array [
               Note (1,24) -> (1,27) {
-                noteValue: Identifier "C4" (1,24) -> (1,26),
+                noteValue: Ident "C4" (1,24) -> (1,26),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,27) -> (1,27),
+      pipe: Pipe (1,27) -> (1,27),
     },
     Bar (1,29) -> (1,32) {
       beats: Array [
@@ -2113,7 +2113,7 @@ Score (1,1) -> (1,32) {
           notes: NoteList (1,29) -> (1,32) {
             notes: Array [
               Note (1,29) -> (1,32) {
-                noteValue: Identifier "C4" (1,29) -> (1,31),
+                noteValue: Ident "C4" (1,29) -> (1,31),
               },
             ],
           },
@@ -2133,17 +2133,17 @@ Score (1,1) -> (1,34) {
   bars: Array [
     Bar (1,1) -> (1,30) {
       metaData: Array [
-        MetaData (1,3) -> (1,26) {
-          tag: MetaDataTag "notExisting" (1,3) -> (1,15) {
-            prefix: BackSlashToken (1,3) -> (1,4),
-            tag: Identifier "notExisting" (1,4) -> (1,15),
+        Meta (1,3) -> (1,26) {
+          tag: Tag "notExisting" (1,3) -> (1,15) {
+            prefix: Backslash (1,3) -> (1,4),
+            tag: Ident "notExisting" (1,4) -> (1,15),
           },
-          values: ValueList (1,16) -> (1,25) {
-            openParenthesis: ParenthesisOpenToken (1,16) -> (1,16),
+          values: Values (1,16) -> (1,25) {
+            openParenthesis: LParen (1,16) -> (1,16),
             values: Array [
-              StringLiteral "Value" (1,17) -> (1,23),
+              String "Value" (1,17) -> (1,23),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,24) -> (1,24),
+            closeParenthesis: RParen (1,24) -> (1,24),
           },
         },
       ],
@@ -2152,13 +2152,13 @@ Score (1,1) -> (1,34) {
           notes: NoteList (1,26) -> (1,29) {
             notes: Array [
               Note (1,26) -> (1,29) {
-                noteValue: Identifier "C4" (1,26) -> (1,28),
+                noteValue: Ident "C4" (1,26) -> (1,28),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,29) -> (1,29),
+      pipe: Pipe (1,29) -> (1,29),
     },
     Bar (1,31) -> (1,34) {
       beats: Array [
@@ -2166,7 +2166,7 @@ Score (1,1) -> (1,34) {
           notes: NoteList (1,31) -> (1,34) {
             notes: Array [
               Note (1,31) -> (1,34) {
-                noteValue: Identifier "C4" (1,31) -> (1,33),
+                noteValue: Ident "C4" (1,31) -> (1,33),
               },
             ],
           },
@@ -2190,13 +2190,13 @@ Score (1,1) -> (1,12) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,4) -> (1,4),
+      pipe: Pipe (1,4) -> (1,4),
     },
     Bar (1,6) -> (1,10) {
       beats: Array [
@@ -2204,13 +2204,13 @@ Score (1,1) -> (1,12) {
           notes: NoteList (1,6) -> (1,9) {
             notes: Array [
               Note (1,6) -> (1,9) {
-                noteValue: Identifier "C4" (1,6) -> (1,8),
+                noteValue: Ident "C4" (1,6) -> (1,8),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,9) -> (1,9),
+      pipe: Pipe (1,9) -> (1,9),
     },
   ],
 }
@@ -2229,13 +2229,13 @@ Score (1,1) -> (1,17) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,4) -> (1,4),
+      pipe: Pipe (1,4) -> (1,4),
     },
     Bar (1,6) -> (1,10) {
       beats: Array [
@@ -2243,22 +2243,22 @@ Score (1,1) -> (1,17) {
           notes: NoteList (1,6) -> (1,9) {
             notes: Array [
               Note (1,6) -> (1,9) {
-                noteValue: Identifier "C4" (1,6) -> (1,8),
+                noteValue: Ident "C4" (1,6) -> (1,8),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,9) -> (1,9),
+      pipe: Pipe (1,9) -> (1,9),
     },
     Bar (1,11) -> (1,12) {
-      pipe: PipeToken (1,11) -> (1,11),
+      pipe: Pipe (1,11) -> (1,11),
     },
     Bar (1,13) -> (1,14) {
-      pipe: PipeToken (1,13) -> (1,13),
+      pipe: Pipe (1,13) -> (1,13),
     },
     Bar (1,15) -> (1,16) {
-      pipe: PipeToken (1,15) -> (1,15),
+      pipe: Pipe (1,15) -> (1,15),
     },
   ],
 }
@@ -2273,13 +2273,13 @@ Score (1,1) -> (1,20) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,4) -> (1,4),
+      pipe: Pipe (1,4) -> (1,4),
     },
     Bar (1,6) -> (1,10) {
       beats: Array [
@@ -2287,22 +2287,22 @@ Score (1,1) -> (1,20) {
           notes: NoteList (1,6) -> (1,9) {
             notes: Array [
               Note (1,6) -> (1,9) {
-                noteValue: Identifier "C4" (1,6) -> (1,8),
+                noteValue: Ident "C4" (1,6) -> (1,8),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,9) -> (1,9),
+      pipe: Pipe (1,9) -> (1,9),
     },
     Bar (1,11) -> (1,12) {
-      pipe: PipeToken (1,11) -> (1,11),
+      pipe: Pipe (1,11) -> (1,11),
     },
     Bar (1,13) -> (1,14) {
-      pipe: PipeToken (1,13) -> (1,13),
+      pipe: Pipe (1,13) -> (1,13),
     },
     Bar (1,15) -> (1,16) {
-      pipe: PipeToken (1,15) -> (1,15),
+      pipe: Pipe (1,15) -> (1,15),
     },
     Bar (1,17) -> (1,20) {
       beats: Array [
@@ -2310,7 +2310,7 @@ Score (1,1) -> (1,20) {
           notes: NoteList (1,17) -> (1,20) {
             notes: Array [
               Note (1,17) -> (1,20) {
-                noteValue: Identifier "C4" (1,17) -> (1,19),
+                noteValue: Ident "C4" (1,17) -> (1,19),
               },
             ],
           },
@@ -2338,13 +2338,13 @@ Score (1,1) -> (1,10) {
           notes: NoteList (1,2) -> (1,5) {
             notes: Array [
               Note (1,2) -> (1,5) {
-                noteValue: Identifier "C4" (1,2) -> (1,4),
+                noteValue: Ident "C4" (1,2) -> (1,4),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,5) -> (1,5),
+      pipe: Pipe (1,5) -> (1,5),
     },
     Bar (1,7) -> (1,10) {
       beats: Array [
@@ -2352,7 +2352,7 @@ Score (1,1) -> (1,10) {
           notes: NoteList (1,7) -> (1,10) {
             notes: Array [
               Note (1,7) -> (1,10) {
-                noteValue: Identifier "C4" (1,7) -> (1,9),
+                noteValue: Ident "C4" (1,7) -> (1,9),
               },
             ],
           },
@@ -2372,14 +2372,14 @@ Score (1,1) -> (1,25) {
   bars: Array [
     Bar (1,1) -> (1,21) {
       metaData: Array [
-        MetaData (1,1) -> (1,15) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+        Meta (1,1) -> (1,15) {
+          tag: Tag "title" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,15) {
+          values: Values (1,8) -> (1,15) {
             values: Array [
-              StringLiteral "Test" (1,8) -> (1,13),
+              String "Test" (1,8) -> (1,13),
             ],
           },
         },
@@ -2389,13 +2389,13 @@ Score (1,1) -> (1,25) {
           notes: NoteList (1,17) -> (1,20) {
             notes: Array [
               Note (1,17) -> (1,20) {
-                noteValue: Identifier "C4" (1,17) -> (1,19),
+                noteValue: Ident "C4" (1,17) -> (1,19),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,20) -> (1,20),
+      pipe: Pipe (1,20) -> (1,20),
     },
     Bar (1,22) -> (1,25) {
       beats: Array [
@@ -2403,7 +2403,7 @@ Score (1,1) -> (1,25) {
           notes: NoteList (1,22) -> (1,25) {
             notes: Array [
               Note (1,22) -> (1,25) {
-                noteValue: Identifier "C4" (1,22) -> (1,24),
+                noteValue: Ident "C4" (1,22) -> (1,24),
               },
             ],
           },
@@ -2427,16 +2427,16 @@ Score (1,1) -> (1,8) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
-          durationDot: DotToken (1,3) -> (1,3),
-          durationValue: NumberLiteral "8" (1,4) -> (1,5),
-          beatEffects: Properties (1,6) -> (1,8) {
-            openBrace: BraceOpenToken (1,6) -> (1,6),
+          durationDot: Dot (1,3) -> (1,3),
+          durationValue: Number "8" (1,4) -> (1,5),
+          beatEffects: Props (1,6) -> (1,8) {
+            openBrace: LBrace (1,6) -> (1,6),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,7) -> (1,7),
+            closeBrace: RBrace (1,7) -> (1,7),
           },
         },
       ],
@@ -2458,26 +2458,26 @@ Score (1,1) -> (1,14) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
-          durationDot: DotToken (1,3) -> (1,3),
-          durationValue: NumberLiteral "8" (1,4) -> (1,5),
-          beatEffects: Properties (1,6) -> (1,14) {
-            openBrace: BraceOpenToken (1,6) -> (1,6),
+          durationDot: Dot (1,3) -> (1,3),
+          durationValue: Number "8" (1,4) -> (1,5),
+          beatEffects: Props (1,6) -> (1,14) {
+            openBrace: LBrace (1,6) -> (1,6),
             properties: Array [
-              Property (1,7) -> (1,13) {
-                property: Identifier "tu" (1,7) -> (1,9),
-                properties: ValueList (1,10) -> (1,13) {
+              Prop (1,7) -> (1,13) {
+                property: Ident "tu" (1,7) -> (1,9),
+                properties: Values (1,10) -> (1,13) {
                   values: Array [
-                    NumberLiteral "2" (1,10) -> (1,11),
-                    NumberLiteral "3" (1,12) -> (1,13),
+                    Number "2" (1,10) -> (1,11),
+                    Number "3" (1,12) -> (1,13),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,13) -> (1,13),
+            closeBrace: RBrace (1,13) -> (1,13),
           },
         },
       ],
@@ -2495,29 +2495,29 @@ Score (1,1) -> (1,19) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
-          durationDot: DotToken (1,3) -> (1,3),
-          durationValue: NumberLiteral "8" (1,4) -> (1,5),
-          beatEffects: Properties (1,6) -> (1,19) {
-            openBrace: BraceOpenToken (1,6) -> (1,6),
+          durationDot: Dot (1,3) -> (1,3),
+          durationValue: Number "8" (1,4) -> (1,5),
+          beatEffects: Props (1,6) -> (1,19) {
+            openBrace: LBrace (1,6) -> (1,6),
             properties: Array [
-              Property (1,7) -> (1,18) {
-                property: Identifier "tb" (1,7) -> (1,9),
-                properties: ValueList (1,10) -> (1,18) {
-                  openParenthesis: ParenthesisOpenToken (1,10) -> (1,10),
+              Prop (1,7) -> (1,18) {
+                property: Ident "tb" (1,7) -> (1,9),
+                properties: Values (1,10) -> (1,18) {
+                  openParenthesis: LParen (1,10) -> (1,10),
                   values: Array [
-                    NumberLiteral "0" (1,11) -> (1,12),
-                    NumberLiteral "-2" (1,13) -> (1,15),
-                    NumberLiteral "0" (1,16) -> (1,17),
+                    Number "0" (1,11) -> (1,12),
+                    Number "-2" (1,13) -> (1,15),
+                    Number "0" (1,16) -> (1,17),
                   ],
-                  closeParenthesis: ParenthesisCloseToken (1,17) -> (1,17),
+                  closeParenthesis: RParen (1,17) -> (1,17),
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,18) -> (1,18),
+            closeBrace: RBrace (1,18) -> (1,18),
           },
         },
       ],
@@ -2543,41 +2543,41 @@ Score (1,1) -> (1,30) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
-          durationDot: DotToken (1,3) -> (1,3),
-          durationValue: NumberLiteral "8" (1,4) -> (1,5),
-          beatEffects: Properties (1,6) -> (1,30) {
-            openBrace: BraceOpenToken (1,6) -> (1,6),
+          durationDot: Dot (1,3) -> (1,3),
+          durationValue: Number "8" (1,4) -> (1,5),
+          beatEffects: Props (1,6) -> (1,30) {
+            openBrace: LBrace (1,6) -> (1,6),
             properties: Array [
-              Property (1,7) -> (1,11) {
-                property: Identifier "cre" (1,7) -> (1,10),
+              Prop (1,7) -> (1,11) {
+                property: Ident "cre" (1,7) -> (1,10),
               },
-              Property (1,11) -> (1,22) {
-                property: Identifier "tb" (1,11) -> (1,13),
-                properties: ValueList (1,14) -> (1,22) {
-                  openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+              Prop (1,11) -> (1,22) {
+                property: Ident "tb" (1,11) -> (1,13),
+                properties: Values (1,14) -> (1,22) {
+                  openParenthesis: LParen (1,14) -> (1,14),
                   values: Array [
-                    NumberLiteral "0" (1,15) -> (1,16),
-                    NumberLiteral "-2" (1,17) -> (1,19),
-                    NumberLiteral "0" (1,20) -> (1,21),
+                    Number "0" (1,15) -> (1,16),
+                    Number "-2" (1,17) -> (1,19),
+                    Number "0" (1,20) -> (1,21),
                   ],
-                  closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+                  closeParenthesis: RParen (1,21) -> (1,21),
                 },
               },
-              Property (1,23) -> (1,29) {
-                property: Identifier "tu" (1,23) -> (1,25),
-                properties: ValueList (1,26) -> (1,29) {
+              Prop (1,23) -> (1,29) {
+                property: Ident "tu" (1,23) -> (1,25),
+                properties: Values (1,26) -> (1,29) {
                   values: Array [
-                    NumberLiteral "3" (1,26) -> (1,27),
-                    NumberLiteral "2" (1,28) -> (1,29),
+                    Number "3" (1,26) -> (1,27),
+                    Number "2" (1,28) -> (1,29),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,29) -> (1,29),
+            closeBrace: RBrace (1,29) -> (1,29),
           },
         },
       ],
@@ -2599,29 +2599,29 @@ Score (1,1) -> (1,23) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
-          durationDot: DotToken (1,3) -> (1,3),
-          durationValue: NumberLiteral "8" (1,4) -> (1,5),
-          beatEffects: Properties (1,6) -> (1,23) {
-            openBrace: BraceOpenToken (1,6) -> (1,6),
+          durationDot: Dot (1,3) -> (1,3),
+          durationValue: Number "8" (1,4) -> (1,5),
+          beatEffects: Props (1,6) -> (1,23) {
+            openBrace: LBrace (1,6) -> (1,6),
             properties: Array [
-              Property (1,7) -> (1,22) {
-                property: Identifier "unknown" (1,7) -> (1,14),
-                properties: ValueList (1,15) -> (1,22) {
-                  openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
+              Prop (1,7) -> (1,22) {
+                property: Ident "unknown" (1,7) -> (1,14),
+                properties: Values (1,15) -> (1,22) {
+                  openParenthesis: LParen (1,15) -> (1,15),
                   values: Array [
-                    NumberLiteral "1" (1,16) -> (1,17),
-                    NumberLiteral "2" (1,18) -> (1,19),
-                    NumberLiteral "3" (1,20) -> (1,21),
+                    Number "1" (1,16) -> (1,17),
+                    Number "2" (1,18) -> (1,19),
+                    Number "3" (1,20) -> (1,21),
                   ],
-                  closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+                  closeParenthesis: RParen (1,21) -> (1,21),
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,22) -> (1,22),
+            closeBrace: RBrace (1,22) -> (1,22),
           },
         },
       ],
@@ -2643,9 +2643,9 @@ Score (1,1) -> (1,8) {
           notes: NoteList (1,1) -> (1,5) {
             notes: Array [
               Note (1,1) -> (1,5) {
-                noteValue: NumberLiteral "3" (1,1) -> (1,2),
-                noteStringDot: DotToken (1,2) -> (1,2),
-                noteString: NumberLiteral "3" (1,3) -> (1,4),
+                noteValue: Number "3" (1,1) -> (1,2),
+                noteStringDot: Dot (1,2) -> (1,2),
+                noteString: Number "3" (1,3) -> (1,4),
               },
             ],
           },
@@ -2654,9 +2654,9 @@ Score (1,1) -> (1,8) {
           notes: NoteList (1,5) -> (1,8) {
             notes: Array [
               Note (1,5) -> (1,8) {
-                noteValue: NumberLiteral "4" (1,5) -> (1,6),
-                noteStringDot: DotToken (1,6) -> (1,6),
-                noteString: NumberLiteral "2" (1,7) -> (1,8),
+                noteValue: Number "4" (1,5) -> (1,6),
+                noteStringDot: Dot (1,6) -> (1,6),
+                noteString: Number "2" (1,7) -> (1,8),
               },
             ],
           },
@@ -2677,40 +2677,40 @@ Score (1,1) -> (1,26) {
     Bar (1,1) -> (1,26) {
       beats: Array [
         Beat (1,1) -> (1,26) {
-          durationChange: BeatDurationChange (1,1) -> (1,4) {
-            colon: ColonToken (1,1) -> (1,1),
-            value: NumberLiteral "2" (1,2) -> (1,3),
+          durationChange: Duration (1,1) -> (1,4) {
+            colon: Colon (1,1) -> (1,1),
+            value: Number "2" (1,2) -> (1,3),
           },
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
-                noteValue: NumberLiteral "3" (1,4) -> (1,5),
-                noteStringDot: DotToken (1,5) -> (1,5),
-                noteString: NumberLiteral "3" (1,6) -> (1,7),
+                noteValue: Number "3" (1,4) -> (1,5),
+                noteStringDot: Dot (1,5) -> (1,5),
+                noteString: Number "3" (1,6) -> (1,7),
               },
             ],
           },
-          durationDot: DotToken (1,7) -> (1,7),
-          durationValue: NumberLiteral "8" (1,8) -> (1,9),
-          beatMultiplier: AsteriskToken (1,10) -> (1,10),
-          beatMultiplierValue: NumberLiteral "2" (1,12) -> (1,13),
-          beatEffects: Properties (1,14) -> (1,26) {
-            openBrace: BraceOpenToken (1,14) -> (1,14),
+          durationDot: Dot (1,7) -> (1,7),
+          durationValue: Number "8" (1,8) -> (1,9),
+          beatMultiplier: Asterisk (1,10) -> (1,10),
+          beatMultiplierValue: Number "2" (1,12) -> (1,13),
+          beatEffects: Props (1,14) -> (1,26) {
+            openBrace: LBrace (1,14) -> (1,14),
             properties: Array [
-              Property (1,15) -> (1,19) {
-                property: Identifier "cre" (1,15) -> (1,18),
+              Prop (1,15) -> (1,19) {
+                property: Ident "cre" (1,15) -> (1,18),
               },
-              Property (1,19) -> (1,25) {
-                property: Identifier "tu" (1,19) -> (1,21),
-                properties: ValueList (1,22) -> (1,25) {
+              Prop (1,19) -> (1,25) {
+                property: Ident "tu" (1,19) -> (1,21),
+                properties: Values (1,22) -> (1,25) {
                   values: Array [
-                    NumberLiteral "3" (1,22) -> (1,23),
-                    NumberLiteral "2" (1,24) -> (1,25),
+                    Number "3" (1,22) -> (1,23),
+                    Number "2" (1,24) -> (1,25),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,25) -> (1,25),
+            closeBrace: RBrace (1,25) -> (1,25),
           },
         },
       ],
@@ -2732,27 +2732,27 @@ Score (1,1) -> (1,12) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
-                noteValue: NumberLiteral "3" (1,1) -> (1,2),
-                noteStringDot: DotToken (1,2) -> (1,2),
-                noteString: NumberLiteral "3" (1,3) -> (1,4),
+                noteValue: Number "3" (1,1) -> (1,2),
+                noteStringDot: Dot (1,2) -> (1,2),
+                noteString: Number "3" (1,3) -> (1,4),
               },
             ],
           },
-          durationDot: DotToken (1,4) -> (1,4),
-          durationValue: NumberLiteral "4" (1,5) -> (1,6),
+          durationDot: Dot (1,4) -> (1,4),
+          durationValue: Number "4" (1,5) -> (1,6),
         },
         Beat (1,7) -> (1,12) {
           notes: NoteList (1,7) -> (1,10) {
             notes: Array [
               Note (1,7) -> (1,10) {
-                noteValue: NumberLiteral "4" (1,7) -> (1,8),
-                noteStringDot: DotToken (1,8) -> (1,8),
-                noteString: NumberLiteral "2" (1,9) -> (1,10),
+                noteValue: Number "4" (1,7) -> (1,8),
+                noteStringDot: Dot (1,8) -> (1,8),
+                noteString: Number "2" (1,9) -> (1,10),
               },
             ],
           },
-          durationDot: DotToken (1,10) -> (1,10),
-          durationValue: NumberLiteral "8" (1,11) -> (1,12),
+          durationDot: Dot (1,10) -> (1,10),
+          durationValue: Number "8" (1,11) -> (1,12),
         },
       ],
     },
@@ -2766,31 +2766,31 @@ Score (1,1) -> (1,14) {
     Bar (1,1) -> (1,14) {
       beats: Array [
         Beat (1,1) -> (1,8) {
-          durationChange: BeatDurationChange (1,1) -> (1,4) {
-            colon: ColonToken (1,1) -> (1,1),
-            value: NumberLiteral "2" (1,2) -> (1,3),
+          durationChange: Duration (1,1) -> (1,4) {
+            colon: Colon (1,1) -> (1,1),
+            value: Number "2" (1,2) -> (1,3),
           },
           notes: NoteList (1,4) -> (1,8) {
             notes: Array [
               Note (1,4) -> (1,8) {
-                noteValue: NumberLiteral "3" (1,4) -> (1,5),
-                noteStringDot: DotToken (1,5) -> (1,5),
-                noteString: NumberLiteral "3" (1,6) -> (1,7),
+                noteValue: Number "3" (1,4) -> (1,5),
+                noteStringDot: Dot (1,5) -> (1,5),
+                noteString: Number "3" (1,6) -> (1,7),
               },
             ],
           },
         },
         Beat (1,8) -> (1,14) {
-          durationChange: BeatDurationChange (1,8) -> (1,11) {
-            colon: ColonToken (1,8) -> (1,8),
-            value: NumberLiteral "4" (1,9) -> (1,10),
+          durationChange: Duration (1,8) -> (1,11) {
+            colon: Colon (1,8) -> (1,8),
+            value: Number "4" (1,9) -> (1,10),
           },
           notes: NoteList (1,11) -> (1,14) {
             notes: Array [
               Note (1,11) -> (1,14) {
-                noteValue: NumberLiteral "4" (1,11) -> (1,12),
-                noteStringDot: DotToken (1,12) -> (1,12),
-                noteString: NumberLiteral "2" (1,13) -> (1,14),
+                noteValue: Number "4" (1,11) -> (1,12),
+                noteStringDot: Dot (1,12) -> (1,12),
+                noteString: Number "2" (1,13) -> (1,14),
               },
             ],
           },
@@ -2818,36 +2818,36 @@ Score (1,1) -> (1,18) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
-                noteValue: NumberLiteral "3" (1,1) -> (1,2),
-                noteStringDot: DotToken (1,2) -> (1,2),
-                noteString: NumberLiteral "3" (1,3) -> (1,4),
+                noteValue: Number "3" (1,1) -> (1,2),
+                noteStringDot: Dot (1,2) -> (1,2),
+                noteString: Number "3" (1,3) -> (1,4),
               },
             ],
           },
-          durationDot: DotToken (1,4) -> (1,4),
-          durationValue: NumberLiteral "4" (1,5) -> (1,6),
-          beatEffects: Properties (1,7) -> (1,9) {
-            openBrace: BraceOpenToken (1,7) -> (1,7),
+          durationDot: Dot (1,4) -> (1,4),
+          durationValue: Number "4" (1,5) -> (1,6),
+          beatEffects: Props (1,7) -> (1,9) {
+            openBrace: LBrace (1,7) -> (1,7),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,8) -> (1,8),
+            closeBrace: RBrace (1,8) -> (1,8),
           },
         },
         Beat (1,10) -> (1,18) {
           notes: NoteList (1,10) -> (1,13) {
             notes: Array [
               Note (1,10) -> (1,13) {
-                noteValue: NumberLiteral "4" (1,10) -> (1,11),
-                noteStringDot: DotToken (1,11) -> (1,11),
-                noteString: NumberLiteral "2" (1,12) -> (1,13),
+                noteValue: Number "4" (1,10) -> (1,11),
+                noteStringDot: Dot (1,11) -> (1,11),
+                noteString: Number "2" (1,12) -> (1,13),
               },
             ],
           },
-          durationDot: DotToken (1,13) -> (1,13),
-          durationValue: NumberLiteral "4" (1,14) -> (1,15),
-          beatEffects: Properties (1,16) -> (1,18) {
-            openBrace: BraceOpenToken (1,16) -> (1,16),
+          durationDot: Dot (1,13) -> (1,13),
+          durationValue: Number "4" (1,14) -> (1,15),
+          beatEffects: Props (1,16) -> (1,18) {
+            openBrace: LBrace (1,16) -> (1,16),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,17) -> (1,17),
+            closeBrace: RBrace (1,17) -> (1,17),
           },
         },
       ],
@@ -2869,56 +2869,56 @@ Score (1,1) -> (1,31) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
-                noteValue: NumberLiteral "3" (1,1) -> (1,2),
-                noteStringDot: DotToken (1,2) -> (1,2),
-                noteString: NumberLiteral "3" (1,3) -> (1,4),
+                noteValue: Number "3" (1,1) -> (1,2),
+                noteStringDot: Dot (1,2) -> (1,2),
+                noteString: Number "3" (1,3) -> (1,4),
               },
             ],
           },
-          durationDot: DotToken (1,4) -> (1,4),
-          durationValue: NumberLiteral "4" (1,5) -> (1,6),
-          beatEffects: Properties (1,7) -> (1,12) {
-            openBrace: BraceOpenToken (1,7) -> (1,7),
+          durationDot: Dot (1,4) -> (1,4),
+          durationValue: Number "4" (1,5) -> (1,6),
+          beatEffects: Props (1,7) -> (1,12) {
+            openBrace: LBrace (1,7) -> (1,7),
             properties: Array [
-              Property (1,8) -> (1,10) {
-                property: Identifier "v" (1,8) -> (1,9),
+              Prop (1,8) -> (1,10) {
+                property: Ident "v" (1,8) -> (1,9),
               },
-              Property (1,10) -> (1,11) {
-                property: Identifier "f" (1,10) -> (1,11),
+              Prop (1,10) -> (1,11) {
+                property: Ident "f" (1,10) -> (1,11),
               },
             ],
-            closeBrace: BraceCloseToken (1,11) -> (1,11),
+            closeBrace: RBrace (1,11) -> (1,11),
           },
         },
         Beat (1,13) -> (1,31) {
           notes: NoteList (1,13) -> (1,16) {
             notes: Array [
               Note (1,13) -> (1,16) {
-                noteValue: NumberLiteral "4" (1,13) -> (1,14),
-                noteStringDot: DotToken (1,14) -> (1,14),
-                noteString: NumberLiteral "2" (1,15) -> (1,16),
+                noteValue: Number "4" (1,13) -> (1,14),
+                noteStringDot: Dot (1,14) -> (1,14),
+                noteString: Number "2" (1,15) -> (1,16),
               },
             ],
           },
-          durationDot: DotToken (1,16) -> (1,16),
-          durationValue: NumberLiteral "4" (1,17) -> (1,18),
-          beatEffects: Properties (1,19) -> (1,31) {
-            openBrace: BraceOpenToken (1,19) -> (1,19),
+          durationDot: Dot (1,16) -> (1,16),
+          durationValue: Number "4" (1,17) -> (1,18),
+          beatEffects: Props (1,19) -> (1,31) {
+            openBrace: LBrace (1,19) -> (1,19),
             properties: Array [
-              Property (1,20) -> (1,24) {
-                property: Identifier "cre" (1,20) -> (1,23),
+              Prop (1,20) -> (1,24) {
+                property: Ident "cre" (1,20) -> (1,23),
               },
-              Property (1,24) -> (1,30) {
-                property: Identifier "tu" (1,24) -> (1,26),
-                properties: ValueList (1,27) -> (1,30) {
+              Prop (1,24) -> (1,30) {
+                property: Ident "tu" (1,24) -> (1,26),
+                properties: Values (1,27) -> (1,30) {
                   values: Array [
-                    NumberLiteral "3" (1,27) -> (1,28),
-                    NumberLiteral "2" (1,29) -> (1,30),
+                    Number "3" (1,27) -> (1,28),
+                    Number "2" (1,29) -> (1,30),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,30) -> (1,30),
+            closeBrace: RBrace (1,30) -> (1,30),
           },
         },
       ],
@@ -2940,27 +2940,27 @@ Score (1,1) -> (1,12) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
-                noteValue: NumberLiteral "3" (1,1) -> (1,2),
-                noteStringDot: DotToken (1,2) -> (1,2),
-                noteString: NumberLiteral "3" (1,3) -> (1,4),
+                noteValue: Number "3" (1,1) -> (1,2),
+                noteStringDot: Dot (1,2) -> (1,2),
+                noteString: Number "3" (1,3) -> (1,4),
               },
             ],
           },
-          beatMultiplier: AsteriskToken (1,4) -> (1,4),
-          beatMultiplierValue: NumberLiteral "4" (1,5) -> (1,6),
+          beatMultiplier: Asterisk (1,4) -> (1,4),
+          beatMultiplierValue: Number "4" (1,5) -> (1,6),
         },
         Beat (1,7) -> (1,12) {
           notes: NoteList (1,7) -> (1,10) {
             notes: Array [
               Note (1,7) -> (1,10) {
-                noteValue: NumberLiteral "4" (1,7) -> (1,8),
-                noteStringDot: DotToken (1,8) -> (1,8),
-                noteString: NumberLiteral "2" (1,9) -> (1,10),
+                noteValue: Number "4" (1,7) -> (1,8),
+                noteStringDot: Dot (1,8) -> (1,8),
+                noteString: Number "2" (1,9) -> (1,10),
               },
             ],
           },
-          beatMultiplier: AsteriskToken (1,10) -> (1,10),
-          beatMultiplierValue: NumberLiteral "2" (1,11) -> (1,12),
+          beatMultiplier: Asterisk (1,10) -> (1,10),
+          beatMultiplierValue: Number "2" (1,11) -> (1,12),
         },
       ],
     },
@@ -2981,17 +2981,17 @@ Score (1,1) -> (1,37) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
-                noteValue: NumberLiteral "3" (1,1) -> (1,2),
-                noteStringDot: DotToken (1,2) -> (1,2),
-                noteString: NumberLiteral "3" (1,3) -> (1,4),
+                noteValue: Number "3" (1,1) -> (1,2),
+                noteStringDot: Dot (1,2) -> (1,2),
+                noteString: Number "3" (1,3) -> (1,4),
               },
             ],
           },
-          durationDot: DotToken (1,4) -> (1,4),
-          durationValue: NumberLiteral "8" (1,5) -> (1,6),
+          durationDot: Dot (1,4) -> (1,4),
+          durationValue: Number "8" (1,5) -> (1,6),
         },
       ],
-      pipe: PipeToken (1,7) -> (1,7),
+      pipe: Pipe (1,7) -> (1,7),
     },
     Bar (1,9) -> (1,20) {
       beats: Array [
@@ -2999,17 +2999,17 @@ Score (1,1) -> (1,37) {
           notes: NoteList (1,9) -> (1,15) {
             notes: Array [
               Note (1,9) -> (1,15) {
-                noteValue: NumberLiteral "3" (1,9) -> (1,10),
-                noteStringDot: DotToken (1,11) -> (1,11),
-                noteString: NumberLiteral "3" (1,13) -> (1,14),
+                noteValue: Number "3" (1,9) -> (1,10),
+                noteStringDot: Dot (1,11) -> (1,11),
+                noteString: Number "3" (1,13) -> (1,14),
               },
             ],
           },
-          durationDot: DotToken (1,15) -> (1,15),
-          durationValue: NumberLiteral "8" (1,17) -> (1,18),
+          durationDot: Dot (1,15) -> (1,15),
+          durationValue: Number "8" (1,17) -> (1,18),
         },
       ],
-      pipe: PipeToken (1,19) -> (1,19),
+      pipe: Pipe (1,19) -> (1,19),
     },
     Bar (1,21) -> (1,29) {
       beats: Array [
@@ -3017,17 +3017,17 @@ Score (1,1) -> (1,37) {
           notes: NoteList (1,21) -> (1,25) {
             notes: Array [
               Note (1,21) -> (1,25) {
-                noteValue: NumberLiteral "3" (1,21) -> (1,22),
-                noteStringDot: DotToken (1,22) -> (1,22),
-                noteString: NumberLiteral "3" (1,23) -> (1,24),
+                noteValue: Number "3" (1,21) -> (1,22),
+                noteStringDot: Dot (1,22) -> (1,22),
+                noteString: Number "3" (1,23) -> (1,24),
               },
             ],
           },
-          durationDot: DotToken (1,25) -> (1,25),
-          durationValue: NumberLiteral "8" (1,26) -> (1,27),
+          durationDot: Dot (1,25) -> (1,25),
+          durationValue: Number "8" (1,26) -> (1,27),
         },
       ],
-      pipe: PipeToken (1,28) -> (1,28),
+      pipe: Pipe (1,28) -> (1,28),
     },
     Bar (1,30) -> (1,37) {
       beats: Array [
@@ -3035,14 +3035,14 @@ Score (1,1) -> (1,37) {
           notes: NoteList (1,30) -> (1,35) {
             notes: Array [
               Note (1,30) -> (1,35) {
-                noteValue: NumberLiteral "3" (1,30) -> (1,31),
-                noteStringDot: DotToken (1,32) -> (1,32),
-                noteString: NumberLiteral "3" (1,34) -> (1,35),
+                noteValue: Number "3" (1,30) -> (1,31),
+                noteStringDot: Dot (1,32) -> (1,32),
+                noteString: Number "3" (1,34) -> (1,35),
               },
             ],
           },
-          durationDot: DotToken (1,35) -> (1,35),
-          durationValue: NumberLiteral "8" (1,36) -> (1,37),
+          durationDot: Dot (1,35) -> (1,35),
+          durationValue: Number "8" (1,36) -> (1,37),
         },
       ],
     },
@@ -3063,7 +3063,7 @@ Score (1,1) -> (1,6) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
@@ -3072,7 +3072,7 @@ Score (1,1) -> (1,6) {
           notes: NoteList (1,4) -> (1,6) {
             notes: Array [
               Note (1,4) -> (1,6) {
-                noteValue: Identifier "C5" (1,4) -> (1,6),
+                noteValue: Ident "C5" (1,4) -> (1,6),
               },
             ],
           },
@@ -3093,38 +3093,38 @@ Score (1,1) -> (1,25) {
     Bar (1,1) -> (1,25) {
       beats: Array [
         Beat (1,1) -> (1,25) {
-          durationChange: BeatDurationChange (1,1) -> (1,4) {
-            colon: ColonToken (1,1) -> (1,1),
-            value: NumberLiteral "2" (1,2) -> (1,3),
+          durationChange: Duration (1,1) -> (1,4) {
+            colon: Colon (1,1) -> (1,1),
+            value: Number "2" (1,2) -> (1,3),
           },
           notes: NoteList (1,4) -> (1,6) {
             notes: Array [
               Note (1,4) -> (1,6) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+                noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
           },
-          durationDot: DotToken (1,6) -> (1,6),
-          durationValue: NumberLiteral "8" (1,7) -> (1,8),
-          beatMultiplier: AsteriskToken (1,9) -> (1,9),
-          beatMultiplierValue: NumberLiteral "2" (1,11) -> (1,12),
-          beatEffects: Properties (1,13) -> (1,25) {
-            openBrace: BraceOpenToken (1,13) -> (1,13),
+          durationDot: Dot (1,6) -> (1,6),
+          durationValue: Number "8" (1,7) -> (1,8),
+          beatMultiplier: Asterisk (1,9) -> (1,9),
+          beatMultiplierValue: Number "2" (1,11) -> (1,12),
+          beatEffects: Props (1,13) -> (1,25) {
+            openBrace: LBrace (1,13) -> (1,13),
             properties: Array [
-              Property (1,14) -> (1,18) {
-                property: Identifier "cre" (1,14) -> (1,17),
+              Prop (1,14) -> (1,18) {
+                property: Ident "cre" (1,14) -> (1,17),
               },
-              Property (1,18) -> (1,24) {
-                property: Identifier "tu" (1,18) -> (1,20),
-                properties: ValueList (1,21) -> (1,24) {
+              Prop (1,18) -> (1,24) {
+                property: Ident "tu" (1,18) -> (1,20),
+                properties: Values (1,21) -> (1,24) {
                   values: Array [
-                    NumberLiteral "3" (1,21) -> (1,22),
-                    NumberLiteral "2" (1,23) -> (1,24),
+                    Number "3" (1,21) -> (1,22),
+                    Number "2" (1,23) -> (1,24),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,24) -> (1,24),
+            closeBrace: RBrace (1,24) -> (1,24),
           },
         },
       ],
@@ -3146,23 +3146,23 @@ Score (1,1) -> (1,10) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
-          durationDot: DotToken (1,3) -> (1,3),
-          durationValue: NumberLiteral "4" (1,4) -> (1,5),
+          durationDot: Dot (1,3) -> (1,3),
+          durationValue: Number "4" (1,4) -> (1,5),
         },
         Beat (1,6) -> (1,10) {
           notes: NoteList (1,6) -> (1,8) {
             notes: Array [
               Note (1,6) -> (1,8) {
-                noteValue: Identifier "C5" (1,6) -> (1,8),
+                noteValue: Ident "C5" (1,6) -> (1,8),
               },
             ],
           },
-          durationDot: DotToken (1,8) -> (1,8),
-          durationValue: NumberLiteral "8" (1,9) -> (1,10),
+          durationDot: Dot (1,8) -> (1,8),
+          durationValue: Number "8" (1,9) -> (1,10),
         },
       ],
     },
@@ -3176,27 +3176,27 @@ Score (1,1) -> (1,12) {
     Bar (1,1) -> (1,12) {
       beats: Array [
         Beat (1,1) -> (1,7) {
-          durationChange: BeatDurationChange (1,1) -> (1,4) {
-            colon: ColonToken (1,1) -> (1,1),
-            value: NumberLiteral "2" (1,2) -> (1,3),
+          durationChange: Duration (1,1) -> (1,4) {
+            colon: Colon (1,1) -> (1,1),
+            value: Number "2" (1,2) -> (1,3),
           },
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+                noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
           },
         },
         Beat (1,7) -> (1,12) {
-          durationChange: BeatDurationChange (1,7) -> (1,10) {
-            colon: ColonToken (1,7) -> (1,7),
-            value: NumberLiteral "4" (1,8) -> (1,9),
+          durationChange: Duration (1,7) -> (1,10) {
+            colon: Colon (1,7) -> (1,7),
+            value: Number "4" (1,8) -> (1,9),
           },
           notes: NoteList (1,10) -> (1,12) {
             notes: Array [
               Note (1,10) -> (1,12) {
-                noteValue: Identifier "C5" (1,10) -> (1,12),
+                noteValue: Ident "C5" (1,10) -> (1,12),
               },
             ],
           },
@@ -3224,32 +3224,32 @@ Score (1,1) -> (1,16) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
-          durationDot: DotToken (1,3) -> (1,3),
-          durationValue: NumberLiteral "4" (1,4) -> (1,5),
-          beatEffects: Properties (1,6) -> (1,8) {
-            openBrace: BraceOpenToken (1,6) -> (1,6),
+          durationDot: Dot (1,3) -> (1,3),
+          durationValue: Number "4" (1,4) -> (1,5),
+          beatEffects: Props (1,6) -> (1,8) {
+            openBrace: LBrace (1,6) -> (1,6),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,7) -> (1,7),
+            closeBrace: RBrace (1,7) -> (1,7),
           },
         },
         Beat (1,9) -> (1,16) {
           notes: NoteList (1,9) -> (1,11) {
             notes: Array [
               Note (1,9) -> (1,11) {
-                noteValue: Identifier "C5" (1,9) -> (1,11),
+                noteValue: Ident "C5" (1,9) -> (1,11),
               },
             ],
           },
-          durationDot: DotToken (1,11) -> (1,11),
-          durationValue: NumberLiteral "4" (1,12) -> (1,13),
-          beatEffects: Properties (1,14) -> (1,16) {
-            openBrace: BraceOpenToken (1,14) -> (1,14),
+          durationDot: Dot (1,11) -> (1,11),
+          durationValue: Number "4" (1,12) -> (1,13),
+          beatEffects: Props (1,14) -> (1,16) {
+            openBrace: LBrace (1,14) -> (1,14),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,15) -> (1,15),
+            closeBrace: RBrace (1,15) -> (1,15),
           },
         },
       ],
@@ -3271,52 +3271,52 @@ Score (1,1) -> (1,29) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
-          durationDot: DotToken (1,3) -> (1,3),
-          durationValue: NumberLiteral "4" (1,4) -> (1,5),
-          beatEffects: Properties (1,6) -> (1,11) {
-            openBrace: BraceOpenToken (1,6) -> (1,6),
+          durationDot: Dot (1,3) -> (1,3),
+          durationValue: Number "4" (1,4) -> (1,5),
+          beatEffects: Props (1,6) -> (1,11) {
+            openBrace: LBrace (1,6) -> (1,6),
             properties: Array [
-              Property (1,7) -> (1,9) {
-                property: Identifier "v" (1,7) -> (1,8),
+              Prop (1,7) -> (1,9) {
+                property: Ident "v" (1,7) -> (1,8),
               },
-              Property (1,9) -> (1,10) {
-                property: Identifier "f" (1,9) -> (1,10),
+              Prop (1,9) -> (1,10) {
+                property: Ident "f" (1,9) -> (1,10),
               },
             ],
-            closeBrace: BraceCloseToken (1,10) -> (1,10),
+            closeBrace: RBrace (1,10) -> (1,10),
           },
         },
         Beat (1,12) -> (1,29) {
           notes: NoteList (1,12) -> (1,14) {
             notes: Array [
               Note (1,12) -> (1,14) {
-                noteValue: Identifier "C5" (1,12) -> (1,14),
+                noteValue: Ident "C5" (1,12) -> (1,14),
               },
             ],
           },
-          durationDot: DotToken (1,14) -> (1,14),
-          durationValue: NumberLiteral "4" (1,15) -> (1,16),
-          beatEffects: Properties (1,17) -> (1,29) {
-            openBrace: BraceOpenToken (1,17) -> (1,17),
+          durationDot: Dot (1,14) -> (1,14),
+          durationValue: Number "4" (1,15) -> (1,16),
+          beatEffects: Props (1,17) -> (1,29) {
+            openBrace: LBrace (1,17) -> (1,17),
             properties: Array [
-              Property (1,18) -> (1,22) {
-                property: Identifier "cre" (1,18) -> (1,21),
+              Prop (1,18) -> (1,22) {
+                property: Ident "cre" (1,18) -> (1,21),
               },
-              Property (1,22) -> (1,28) {
-                property: Identifier "tu" (1,22) -> (1,24),
-                properties: ValueList (1,25) -> (1,28) {
+              Prop (1,22) -> (1,28) {
+                property: Ident "tu" (1,22) -> (1,24),
+                properties: Values (1,25) -> (1,28) {
                   values: Array [
-                    NumberLiteral "3" (1,25) -> (1,26),
-                    NumberLiteral "2" (1,27) -> (1,28),
+                    Number "3" (1,25) -> (1,26),
+                    Number "2" (1,27) -> (1,28),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,28) -> (1,28),
+            closeBrace: RBrace (1,28) -> (1,28),
           },
         },
       ],
@@ -3338,23 +3338,23 @@ Score (1,1) -> (1,10) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
+                noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
           },
-          beatMultiplier: AsteriskToken (1,3) -> (1,3),
-          beatMultiplierValue: NumberLiteral "4" (1,4) -> (1,5),
+          beatMultiplier: Asterisk (1,3) -> (1,3),
+          beatMultiplierValue: Number "4" (1,4) -> (1,5),
         },
         Beat (1,6) -> (1,10) {
           notes: NoteList (1,6) -> (1,8) {
             notes: Array [
               Note (1,6) -> (1,8) {
-                noteValue: Identifier "C5" (1,6) -> (1,8),
+                noteValue: Ident "C5" (1,6) -> (1,8),
               },
             ],
           },
-          beatMultiplier: AsteriskToken (1,8) -> (1,8),
-          beatMultiplierValue: NumberLiteral "2" (1,9) -> (1,10),
+          beatMultiplier: Asterisk (1,8) -> (1,8),
+          beatMultiplierValue: Number "2" (1,9) -> (1,10),
         },
       ],
     },
@@ -3373,38 +3373,38 @@ Score (1,1) -> (1,20) {
       beats: Array [
         Beat (1,1) -> (1,11) {
           notes: NoteList (1,1) -> (1,10) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,6) {
-                noteValue: NumberLiteral "3" (1,2) -> (1,3),
-                noteStringDot: DotToken (1,3) -> (1,3),
-                noteString: NumberLiteral "3" (1,4) -> (1,5),
+                noteValue: Number "3" (1,2) -> (1,3),
+                noteStringDot: Dot (1,3) -> (1,3),
+                noteString: Number "3" (1,4) -> (1,5),
               },
               Note (1,6) -> (1,9) {
-                noteValue: NumberLiteral "4" (1,6) -> (1,7),
-                noteStringDot: DotToken (1,7) -> (1,7),
-                noteString: NumberLiteral "2" (1,8) -> (1,9),
+                noteValue: Number "4" (1,6) -> (1,7),
+                noteStringDot: Dot (1,7) -> (1,7),
+                noteString: Number "2" (1,8) -> (1,9),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,9) -> (1,9),
+            closeParenthesis: RParen (1,9) -> (1,9),
           },
         },
         Beat (1,11) -> (1,20) {
           notes: NoteList (1,11) -> (1,20) {
-            openParenthesis: ParenthesisOpenToken (1,11) -> (1,11),
+            openParenthesis: LParen (1,11) -> (1,11),
             notes: Array [
               Note (1,12) -> (1,16) {
-                noteValue: NumberLiteral "1" (1,12) -> (1,13),
-                noteStringDot: DotToken (1,13) -> (1,13),
-                noteString: NumberLiteral "2" (1,14) -> (1,15),
+                noteValue: Number "1" (1,12) -> (1,13),
+                noteStringDot: Dot (1,13) -> (1,13),
+                noteString: Number "2" (1,14) -> (1,15),
               },
               Note (1,16) -> (1,19) {
-                noteValue: NumberLiteral "6" (1,16) -> (1,17),
-                noteStringDot: DotToken (1,17) -> (1,17),
-                noteString: NumberLiteral "1" (1,18) -> (1,19),
+                noteValue: Number "6" (1,16) -> (1,17),
+                noteStringDot: Dot (1,17) -> (1,17),
+                noteString: Number "1" (1,18) -> (1,19),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,19) -> (1,19),
+            closeParenthesis: RParen (1,19) -> (1,19),
           },
         },
       ],
@@ -3423,47 +3423,47 @@ Score (1,1) -> (1,32) {
     Bar (1,1) -> (1,32) {
       beats: Array [
         Beat (1,1) -> (1,32) {
-          durationChange: BeatDurationChange (1,1) -> (1,4) {
-            colon: ColonToken (1,1) -> (1,1),
-            value: NumberLiteral "2" (1,2) -> (1,3),
+          durationChange: Duration (1,1) -> (1,4) {
+            colon: Colon (1,1) -> (1,1),
+            value: Number "2" (1,2) -> (1,3),
           },
           notes: NoteList (1,4) -> (1,13) {
-            openParenthesis: ParenthesisOpenToken (1,4) -> (1,4),
+            openParenthesis: LParen (1,4) -> (1,4),
             notes: Array [
               Note (1,5) -> (1,9) {
-                noteValue: NumberLiteral "3" (1,5) -> (1,6),
-                noteStringDot: DotToken (1,6) -> (1,6),
-                noteString: NumberLiteral "3" (1,7) -> (1,8),
+                noteValue: Number "3" (1,5) -> (1,6),
+                noteStringDot: Dot (1,6) -> (1,6),
+                noteString: Number "3" (1,7) -> (1,8),
               },
               Note (1,9) -> (1,12) {
-                noteValue: NumberLiteral "4" (1,9) -> (1,10),
-                noteStringDot: DotToken (1,10) -> (1,10),
-                noteString: NumberLiteral "2" (1,11) -> (1,12),
+                noteValue: Number "4" (1,9) -> (1,10),
+                noteStringDot: Dot (1,10) -> (1,10),
+                noteString: Number "2" (1,11) -> (1,12),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,12) -> (1,12),
+            closeParenthesis: RParen (1,12) -> (1,12),
           },
-          durationDot: DotToken (1,13) -> (1,13),
-          durationValue: NumberLiteral "8" (1,14) -> (1,15),
-          beatMultiplier: AsteriskToken (1,16) -> (1,16),
-          beatMultiplierValue: NumberLiteral "2" (1,18) -> (1,19),
-          beatEffects: Properties (1,20) -> (1,32) {
-            openBrace: BraceOpenToken (1,20) -> (1,20),
+          durationDot: Dot (1,13) -> (1,13),
+          durationValue: Number "8" (1,14) -> (1,15),
+          beatMultiplier: Asterisk (1,16) -> (1,16),
+          beatMultiplierValue: Number "2" (1,18) -> (1,19),
+          beatEffects: Props (1,20) -> (1,32) {
+            openBrace: LBrace (1,20) -> (1,20),
             properties: Array [
-              Property (1,21) -> (1,25) {
-                property: Identifier "cre" (1,21) -> (1,24),
+              Prop (1,21) -> (1,25) {
+                property: Ident "cre" (1,21) -> (1,24),
               },
-              Property (1,25) -> (1,31) {
-                property: Identifier "tu" (1,25) -> (1,27),
-                properties: ValueList (1,28) -> (1,31) {
+              Prop (1,25) -> (1,31) {
+                property: Ident "tu" (1,25) -> (1,27),
+                properties: Values (1,28) -> (1,31) {
                   values: Array [
-                    NumberLiteral "3" (1,28) -> (1,29),
-                    NumberLiteral "2" (1,30) -> (1,31),
+                    Number "3" (1,28) -> (1,29),
+                    Number "2" (1,30) -> (1,31),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,31) -> (1,31),
+            closeBrace: RBrace (1,31) -> (1,31),
           },
         },
       ],
@@ -3483,43 +3483,43 @@ Score (1,1) -> (1,24) {
       beats: Array [
         Beat (1,1) -> (1,13) {
           notes: NoteList (1,1) -> (1,10) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,6) {
-                noteValue: NumberLiteral "3" (1,2) -> (1,3),
-                noteStringDot: DotToken (1,3) -> (1,3),
-                noteString: NumberLiteral "3" (1,4) -> (1,5),
+                noteValue: Number "3" (1,2) -> (1,3),
+                noteStringDot: Dot (1,3) -> (1,3),
+                noteString: Number "3" (1,4) -> (1,5),
               },
               Note (1,6) -> (1,9) {
-                noteValue: NumberLiteral "4" (1,6) -> (1,7),
-                noteStringDot: DotToken (1,7) -> (1,7),
-                noteString: NumberLiteral "2" (1,8) -> (1,9),
+                noteValue: Number "4" (1,6) -> (1,7),
+                noteStringDot: Dot (1,7) -> (1,7),
+                noteString: Number "2" (1,8) -> (1,9),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,9) -> (1,9),
+            closeParenthesis: RParen (1,9) -> (1,9),
           },
-          durationDot: DotToken (1,10) -> (1,10),
-          durationValue: NumberLiteral "4" (1,11) -> (1,12),
+          durationDot: Dot (1,10) -> (1,10),
+          durationValue: Number "4" (1,11) -> (1,12),
         },
         Beat (1,13) -> (1,24) {
           notes: NoteList (1,13) -> (1,22) {
-            openParenthesis: ParenthesisOpenToken (1,13) -> (1,13),
+            openParenthesis: LParen (1,13) -> (1,13),
             notes: Array [
               Note (1,14) -> (1,18) {
-                noteValue: NumberLiteral "1" (1,14) -> (1,15),
-                noteStringDot: DotToken (1,15) -> (1,15),
-                noteString: NumberLiteral "2" (1,16) -> (1,17),
+                noteValue: Number "1" (1,14) -> (1,15),
+                noteStringDot: Dot (1,15) -> (1,15),
+                noteString: Number "2" (1,16) -> (1,17),
               },
               Note (1,18) -> (1,21) {
-                noteValue: NumberLiteral "6" (1,18) -> (1,19),
-                noteStringDot: DotToken (1,19) -> (1,19),
-                noteString: NumberLiteral "1" (1,20) -> (1,21),
+                noteValue: Number "6" (1,18) -> (1,19),
+                noteStringDot: Dot (1,19) -> (1,19),
+                noteString: Number "1" (1,20) -> (1,21),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+            closeParenthesis: RParen (1,21) -> (1,21),
           },
-          durationDot: DotToken (1,22) -> (1,22),
-          durationValue: NumberLiteral "8" (1,23) -> (1,24),
+          durationDot: Dot (1,22) -> (1,22),
+          durationValue: Number "8" (1,23) -> (1,24),
         },
       ],
     },
@@ -3533,47 +3533,47 @@ Score (1,1) -> (1,26) {
     Bar (1,1) -> (1,26) {
       beats: Array [
         Beat (1,1) -> (1,14) {
-          durationChange: BeatDurationChange (1,1) -> (1,4) {
-            colon: ColonToken (1,1) -> (1,1),
-            value: NumberLiteral "2" (1,2) -> (1,3),
+          durationChange: Duration (1,1) -> (1,4) {
+            colon: Colon (1,1) -> (1,1),
+            value: Number "2" (1,2) -> (1,3),
           },
           notes: NoteList (1,4) -> (1,13) {
-            openParenthesis: ParenthesisOpenToken (1,4) -> (1,4),
+            openParenthesis: LParen (1,4) -> (1,4),
             notes: Array [
               Note (1,5) -> (1,9) {
-                noteValue: NumberLiteral "3" (1,5) -> (1,6),
-                noteStringDot: DotToken (1,6) -> (1,6),
-                noteString: NumberLiteral "3" (1,7) -> (1,8),
+                noteValue: Number "3" (1,5) -> (1,6),
+                noteStringDot: Dot (1,6) -> (1,6),
+                noteString: Number "3" (1,7) -> (1,8),
               },
               Note (1,9) -> (1,12) {
-                noteValue: NumberLiteral "4" (1,9) -> (1,10),
-                noteStringDot: DotToken (1,10) -> (1,10),
-                noteString: NumberLiteral "2" (1,11) -> (1,12),
+                noteValue: Number "4" (1,9) -> (1,10),
+                noteStringDot: Dot (1,10) -> (1,10),
+                noteString: Number "2" (1,11) -> (1,12),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,12) -> (1,12),
+            closeParenthesis: RParen (1,12) -> (1,12),
           },
         },
         Beat (1,14) -> (1,26) {
-          durationChange: BeatDurationChange (1,14) -> (1,17) {
-            colon: ColonToken (1,14) -> (1,14),
-            value: NumberLiteral "4" (1,15) -> (1,16),
+          durationChange: Duration (1,14) -> (1,17) {
+            colon: Colon (1,14) -> (1,14),
+            value: Number "4" (1,15) -> (1,16),
           },
           notes: NoteList (1,17) -> (1,26) {
-            openParenthesis: ParenthesisOpenToken (1,17) -> (1,17),
+            openParenthesis: LParen (1,17) -> (1,17),
             notes: Array [
               Note (1,18) -> (1,22) {
-                noteValue: NumberLiteral "1" (1,18) -> (1,19),
-                noteStringDot: DotToken (1,19) -> (1,19),
-                noteString: NumberLiteral "2" (1,20) -> (1,21),
+                noteValue: Number "1" (1,18) -> (1,19),
+                noteStringDot: Dot (1,19) -> (1,19),
+                noteString: Number "2" (1,20) -> (1,21),
               },
               Note (1,22) -> (1,25) {
-                noteValue: NumberLiteral "6" (1,22) -> (1,23),
-                noteStringDot: DotToken (1,23) -> (1,23),
-                noteString: NumberLiteral "1" (1,24) -> (1,25),
+                noteValue: Number "6" (1,22) -> (1,23),
+                noteStringDot: Dot (1,23) -> (1,23),
+                noteString: Number "1" (1,24) -> (1,25),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,25) -> (1,25),
+            closeParenthesis: RParen (1,25) -> (1,25),
           },
         },
       ],
@@ -3597,52 +3597,52 @@ Score (1,1) -> (1,30) {
       beats: Array [
         Beat (1,1) -> (1,15) {
           notes: NoteList (1,1) -> (1,10) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,6) {
-                noteValue: NumberLiteral "3" (1,2) -> (1,3),
-                noteStringDot: DotToken (1,3) -> (1,3),
-                noteString: NumberLiteral "3" (1,4) -> (1,5),
+                noteValue: Number "3" (1,2) -> (1,3),
+                noteStringDot: Dot (1,3) -> (1,3),
+                noteString: Number "3" (1,4) -> (1,5),
               },
               Note (1,6) -> (1,9) {
-                noteValue: NumberLiteral "4" (1,6) -> (1,7),
-                noteStringDot: DotToken (1,7) -> (1,7),
-                noteString: NumberLiteral "2" (1,8) -> (1,9),
+                noteValue: Number "4" (1,6) -> (1,7),
+                noteStringDot: Dot (1,7) -> (1,7),
+                noteString: Number "2" (1,8) -> (1,9),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,9) -> (1,9),
+            closeParenthesis: RParen (1,9) -> (1,9),
           },
-          durationDot: DotToken (1,10) -> (1,10),
-          durationValue: NumberLiteral "4" (1,11) -> (1,12),
-          beatEffects: Properties (1,13) -> (1,15) {
-            openBrace: BraceOpenToken (1,13) -> (1,13),
+          durationDot: Dot (1,10) -> (1,10),
+          durationValue: Number "4" (1,11) -> (1,12),
+          beatEffects: Props (1,13) -> (1,15) {
+            openBrace: LBrace (1,13) -> (1,13),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,14) -> (1,14),
+            closeBrace: RBrace (1,14) -> (1,14),
           },
         },
         Beat (1,16) -> (1,30) {
           notes: NoteList (1,16) -> (1,25) {
-            openParenthesis: ParenthesisOpenToken (1,16) -> (1,16),
+            openParenthesis: LParen (1,16) -> (1,16),
             notes: Array [
               Note (1,17) -> (1,21) {
-                noteValue: NumberLiteral "1" (1,17) -> (1,18),
-                noteStringDot: DotToken (1,18) -> (1,18),
-                noteString: NumberLiteral "2" (1,19) -> (1,20),
+                noteValue: Number "1" (1,17) -> (1,18),
+                noteStringDot: Dot (1,18) -> (1,18),
+                noteString: Number "2" (1,19) -> (1,20),
               },
               Note (1,21) -> (1,24) {
-                noteValue: NumberLiteral "6" (1,21) -> (1,22),
-                noteStringDot: DotToken (1,22) -> (1,22),
-                noteString: NumberLiteral "1" (1,23) -> (1,24),
+                noteValue: Number "6" (1,21) -> (1,22),
+                noteStringDot: Dot (1,22) -> (1,22),
+                noteString: Number "1" (1,23) -> (1,24),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,24) -> (1,24),
+            closeParenthesis: RParen (1,24) -> (1,24),
           },
-          durationDot: DotToken (1,25) -> (1,25),
-          durationValue: NumberLiteral "4" (1,26) -> (1,27),
-          beatEffects: Properties (1,28) -> (1,30) {
-            openBrace: BraceOpenToken (1,28) -> (1,28),
+          durationDot: Dot (1,25) -> (1,25),
+          durationValue: Number "4" (1,26) -> (1,27),
+          beatEffects: Props (1,28) -> (1,30) {
+            openBrace: LBrace (1,28) -> (1,28),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,29) -> (1,29),
+            closeBrace: RBrace (1,29) -> (1,29),
           },
         },
       ],
@@ -3662,72 +3662,72 @@ Score (1,1) -> (1,43) {
       beats: Array [
         Beat (1,1) -> (1,18) {
           notes: NoteList (1,1) -> (1,10) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,6) {
-                noteValue: NumberLiteral "3" (1,2) -> (1,3),
-                noteStringDot: DotToken (1,3) -> (1,3),
-                noteString: NumberLiteral "3" (1,4) -> (1,5),
+                noteValue: Number "3" (1,2) -> (1,3),
+                noteStringDot: Dot (1,3) -> (1,3),
+                noteString: Number "3" (1,4) -> (1,5),
               },
               Note (1,6) -> (1,9) {
-                noteValue: NumberLiteral "4" (1,6) -> (1,7),
-                noteStringDot: DotToken (1,7) -> (1,7),
-                noteString: NumberLiteral "2" (1,8) -> (1,9),
+                noteValue: Number "4" (1,6) -> (1,7),
+                noteStringDot: Dot (1,7) -> (1,7),
+                noteString: Number "2" (1,8) -> (1,9),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,9) -> (1,9),
+            closeParenthesis: RParen (1,9) -> (1,9),
           },
-          durationDot: DotToken (1,10) -> (1,10),
-          durationValue: NumberLiteral "4" (1,11) -> (1,12),
-          beatEffects: Properties (1,13) -> (1,18) {
-            openBrace: BraceOpenToken (1,13) -> (1,13),
+          durationDot: Dot (1,10) -> (1,10),
+          durationValue: Number "4" (1,11) -> (1,12),
+          beatEffects: Props (1,13) -> (1,18) {
+            openBrace: LBrace (1,13) -> (1,13),
             properties: Array [
-              Property (1,14) -> (1,16) {
-                property: Identifier "v" (1,14) -> (1,15),
+              Prop (1,14) -> (1,16) {
+                property: Ident "v" (1,14) -> (1,15),
               },
-              Property (1,16) -> (1,17) {
-                property: Identifier "f" (1,16) -> (1,17),
+              Prop (1,16) -> (1,17) {
+                property: Ident "f" (1,16) -> (1,17),
               },
             ],
-            closeBrace: BraceCloseToken (1,17) -> (1,17),
+            closeBrace: RBrace (1,17) -> (1,17),
           },
         },
         Beat (1,19) -> (1,43) {
           notes: NoteList (1,19) -> (1,28) {
-            openParenthesis: ParenthesisOpenToken (1,19) -> (1,19),
+            openParenthesis: LParen (1,19) -> (1,19),
             notes: Array [
               Note (1,20) -> (1,24) {
-                noteValue: NumberLiteral "1" (1,20) -> (1,21),
-                noteStringDot: DotToken (1,21) -> (1,21),
-                noteString: NumberLiteral "2" (1,22) -> (1,23),
+                noteValue: Number "1" (1,20) -> (1,21),
+                noteStringDot: Dot (1,21) -> (1,21),
+                noteString: Number "2" (1,22) -> (1,23),
               },
               Note (1,24) -> (1,27) {
-                noteValue: NumberLiteral "6" (1,24) -> (1,25),
-                noteStringDot: DotToken (1,25) -> (1,25),
-                noteString: NumberLiteral "1" (1,26) -> (1,27),
+                noteValue: Number "6" (1,24) -> (1,25),
+                noteStringDot: Dot (1,25) -> (1,25),
+                noteString: Number "1" (1,26) -> (1,27),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,27) -> (1,27),
+            closeParenthesis: RParen (1,27) -> (1,27),
           },
-          durationDot: DotToken (1,28) -> (1,28),
-          durationValue: NumberLiteral "4" (1,29) -> (1,30),
-          beatEffects: Properties (1,31) -> (1,43) {
-            openBrace: BraceOpenToken (1,31) -> (1,31),
+          durationDot: Dot (1,28) -> (1,28),
+          durationValue: Number "4" (1,29) -> (1,30),
+          beatEffects: Props (1,31) -> (1,43) {
+            openBrace: LBrace (1,31) -> (1,31),
             properties: Array [
-              Property (1,32) -> (1,36) {
-                property: Identifier "cre" (1,32) -> (1,35),
+              Prop (1,32) -> (1,36) {
+                property: Ident "cre" (1,32) -> (1,35),
               },
-              Property (1,36) -> (1,42) {
-                property: Identifier "tu" (1,36) -> (1,38),
-                properties: ValueList (1,39) -> (1,42) {
+              Prop (1,36) -> (1,42) {
+                property: Ident "tu" (1,36) -> (1,38),
+                properties: Values (1,39) -> (1,42) {
                   values: Array [
-                    NumberLiteral "3" (1,39) -> (1,40),
-                    NumberLiteral "2" (1,41) -> (1,42),
+                    Number "3" (1,39) -> (1,40),
+                    Number "2" (1,41) -> (1,42),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,42) -> (1,42),
+            closeBrace: RBrace (1,42) -> (1,42),
           },
         },
       ],
@@ -3747,43 +3747,43 @@ Score (1,1) -> (1,24) {
       beats: Array [
         Beat (1,1) -> (1,13) {
           notes: NoteList (1,1) -> (1,10) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,6) {
-                noteValue: NumberLiteral "3" (1,2) -> (1,3),
-                noteStringDot: DotToken (1,3) -> (1,3),
-                noteString: NumberLiteral "3" (1,4) -> (1,5),
+                noteValue: Number "3" (1,2) -> (1,3),
+                noteStringDot: Dot (1,3) -> (1,3),
+                noteString: Number "3" (1,4) -> (1,5),
               },
               Note (1,6) -> (1,9) {
-                noteValue: NumberLiteral "4" (1,6) -> (1,7),
-                noteStringDot: DotToken (1,7) -> (1,7),
-                noteString: NumberLiteral "2" (1,8) -> (1,9),
+                noteValue: Number "4" (1,6) -> (1,7),
+                noteStringDot: Dot (1,7) -> (1,7),
+                noteString: Number "2" (1,8) -> (1,9),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,9) -> (1,9),
+            closeParenthesis: RParen (1,9) -> (1,9),
           },
-          beatMultiplier: AsteriskToken (1,10) -> (1,10),
-          beatMultiplierValue: NumberLiteral "4" (1,11) -> (1,12),
+          beatMultiplier: Asterisk (1,10) -> (1,10),
+          beatMultiplierValue: Number "4" (1,11) -> (1,12),
         },
         Beat (1,13) -> (1,24) {
           notes: NoteList (1,13) -> (1,22) {
-            openParenthesis: ParenthesisOpenToken (1,13) -> (1,13),
+            openParenthesis: LParen (1,13) -> (1,13),
             notes: Array [
               Note (1,14) -> (1,18) {
-                noteValue: NumberLiteral "1" (1,14) -> (1,15),
-                noteStringDot: DotToken (1,15) -> (1,15),
-                noteString: NumberLiteral "2" (1,16) -> (1,17),
+                noteValue: Number "1" (1,14) -> (1,15),
+                noteStringDot: Dot (1,15) -> (1,15),
+                noteString: Number "2" (1,16) -> (1,17),
               },
               Note (1,18) -> (1,21) {
-                noteValue: NumberLiteral "6" (1,18) -> (1,19),
-                noteStringDot: DotToken (1,19) -> (1,19),
-                noteString: NumberLiteral "1" (1,20) -> (1,21),
+                noteValue: Number "6" (1,18) -> (1,19),
+                noteStringDot: Dot (1,19) -> (1,19),
+                noteString: Number "1" (1,20) -> (1,21),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+            closeParenthesis: RParen (1,21) -> (1,21),
           },
-          beatMultiplier: AsteriskToken (1,22) -> (1,22),
-          beatMultiplierValue: NumberLiteral "2" (1,23) -> (1,24),
+          beatMultiplier: Asterisk (1,22) -> (1,22),
+          beatMultiplierValue: Number "2" (1,23) -> (1,24),
         },
       ],
     },
@@ -3802,23 +3802,23 @@ Score (1,1) -> (4,19) {
       beats: Array [
         Beat (1,14) -> (4,19) {
           notes: NoteList (1,14) -> (4,15) {
-            openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+            openParenthesis: LParen (1,14) -> (1,14),
             notes: Array [
               Note (2,18) -> (3,18) {
-                noteValue: NumberLiteral "3" (2,18) -> (2,19),
-                noteStringDot: DotToken (2,19) -> (2,19),
-                noteString: NumberLiteral "3" (2,20) -> (2,21),
+                noteValue: Number "3" (2,18) -> (2,19),
+                noteStringDot: Dot (2,19) -> (2,19),
+                noteString: Number "3" (2,20) -> (2,21),
               },
               Note (3,18) -> (4,14) {
-                noteValue: NumberLiteral "3" (3,18) -> (3,19),
-                noteStringDot: DotToken (3,20) -> (3,20),
-                noteString: NumberLiteral "3" (3,22) -> (4,1),
+                noteValue: Number "3" (3,18) -> (3,19),
+                noteStringDot: Dot (3,20) -> (3,20),
+                noteString: Number "3" (3,22) -> (4,1),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (4,14) -> (4,14),
+            closeParenthesis: RParen (4,14) -> (4,14),
           },
-          durationDot: DotToken (4,16) -> (4,16),
-          durationValue: NumberLiteral "8" (4,18) -> (4,19),
+          durationDot: Dot (4,16) -> (4,16),
+          durationValue: Number "8" (4,18) -> (4,19),
         },
       ],
     },
@@ -3837,30 +3837,30 @@ Score (1,1) -> (1,16) {
       beats: Array [
         Beat (1,1) -> (1,9) {
           notes: NoteList (1,1) -> (1,8) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,5) {
-                noteValue: Identifier "C4" (1,2) -> (1,4),
+                noteValue: Ident "C4" (1,2) -> (1,4),
               },
               Note (1,5) -> (1,7) {
-                noteValue: Identifier "C5" (1,5) -> (1,7),
+                noteValue: Ident "C5" (1,5) -> (1,7),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,7) -> (1,7),
+            closeParenthesis: RParen (1,7) -> (1,7),
           },
         },
         Beat (1,9) -> (1,16) {
           notes: NoteList (1,9) -> (1,16) {
-            openParenthesis: ParenthesisOpenToken (1,9) -> (1,9),
+            openParenthesis: LParen (1,9) -> (1,9),
             notes: Array [
               Note (1,10) -> (1,13) {
-                noteValue: Identifier "D4" (1,10) -> (1,12),
+                noteValue: Ident "D4" (1,10) -> (1,12),
               },
               Note (1,13) -> (1,15) {
-                noteValue: Identifier "D5" (1,13) -> (1,15),
+                noteValue: Ident "D5" (1,13) -> (1,15),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,15) -> (1,15),
+            closeParenthesis: RParen (1,15) -> (1,15),
           },
         },
       ],
@@ -3879,43 +3879,43 @@ Score (1,1) -> (1,30) {
     Bar (1,1) -> (1,30) {
       beats: Array [
         Beat (1,1) -> (1,30) {
-          durationChange: BeatDurationChange (1,1) -> (1,4) {
-            colon: ColonToken (1,1) -> (1,1),
-            value: NumberLiteral "2" (1,2) -> (1,3),
+          durationChange: Duration (1,1) -> (1,4) {
+            colon: Colon (1,1) -> (1,1),
+            value: Number "2" (1,2) -> (1,3),
           },
           notes: NoteList (1,4) -> (1,11) {
-            openParenthesis: ParenthesisOpenToken (1,4) -> (1,4),
+            openParenthesis: LParen (1,4) -> (1,4),
             notes: Array [
               Note (1,5) -> (1,8) {
-                noteValue: Identifier "C4" (1,5) -> (1,7),
+                noteValue: Ident "C4" (1,5) -> (1,7),
               },
               Note (1,8) -> (1,10) {
-                noteValue: Identifier "C5" (1,8) -> (1,10),
+                noteValue: Ident "C5" (1,8) -> (1,10),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,10) -> (1,10),
+            closeParenthesis: RParen (1,10) -> (1,10),
           },
-          durationDot: DotToken (1,11) -> (1,11),
-          durationValue: NumberLiteral "8" (1,12) -> (1,13),
-          beatMultiplier: AsteriskToken (1,14) -> (1,14),
-          beatMultiplierValue: NumberLiteral "2" (1,16) -> (1,17),
-          beatEffects: Properties (1,18) -> (1,30) {
-            openBrace: BraceOpenToken (1,18) -> (1,18),
+          durationDot: Dot (1,11) -> (1,11),
+          durationValue: Number "8" (1,12) -> (1,13),
+          beatMultiplier: Asterisk (1,14) -> (1,14),
+          beatMultiplierValue: Number "2" (1,16) -> (1,17),
+          beatEffects: Props (1,18) -> (1,30) {
+            openBrace: LBrace (1,18) -> (1,18),
             properties: Array [
-              Property (1,19) -> (1,23) {
-                property: Identifier "cre" (1,19) -> (1,22),
+              Prop (1,19) -> (1,23) {
+                property: Ident "cre" (1,19) -> (1,22),
               },
-              Property (1,23) -> (1,29) {
-                property: Identifier "tu" (1,23) -> (1,25),
-                properties: ValueList (1,26) -> (1,29) {
+              Prop (1,23) -> (1,29) {
+                property: Ident "tu" (1,23) -> (1,25),
+                properties: Values (1,26) -> (1,29) {
                   values: Array [
-                    NumberLiteral "3" (1,26) -> (1,27),
-                    NumberLiteral "2" (1,28) -> (1,29),
+                    Number "3" (1,26) -> (1,27),
+                    Number "2" (1,28) -> (1,29),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,29) -> (1,29),
+            closeBrace: RBrace (1,29) -> (1,29),
           },
         },
       ],
@@ -3935,35 +3935,35 @@ Score (1,1) -> (1,20) {
       beats: Array [
         Beat (1,1) -> (1,11) {
           notes: NoteList (1,1) -> (1,8) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,5) {
-                noteValue: Identifier "C4" (1,2) -> (1,4),
+                noteValue: Ident "C4" (1,2) -> (1,4),
               },
               Note (1,5) -> (1,7) {
-                noteValue: Identifier "C5" (1,5) -> (1,7),
+                noteValue: Ident "C5" (1,5) -> (1,7),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,7) -> (1,7),
+            closeParenthesis: RParen (1,7) -> (1,7),
           },
-          durationDot: DotToken (1,8) -> (1,8),
-          durationValue: NumberLiteral "4" (1,9) -> (1,10),
+          durationDot: Dot (1,8) -> (1,8),
+          durationValue: Number "4" (1,9) -> (1,10),
         },
         Beat (1,11) -> (1,20) {
           notes: NoteList (1,11) -> (1,18) {
-            openParenthesis: ParenthesisOpenToken (1,11) -> (1,11),
+            openParenthesis: LParen (1,11) -> (1,11),
             notes: Array [
               Note (1,12) -> (1,15) {
-                noteValue: Identifier "D4" (1,12) -> (1,14),
+                noteValue: Ident "D4" (1,12) -> (1,14),
               },
               Note (1,15) -> (1,17) {
-                noteValue: Identifier "D5" (1,15) -> (1,17),
+                noteValue: Ident "D5" (1,15) -> (1,17),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,17) -> (1,17),
+            closeParenthesis: RParen (1,17) -> (1,17),
           },
-          durationDot: DotToken (1,18) -> (1,18),
-          durationValue: NumberLiteral "8" (1,19) -> (1,20),
+          durationDot: Dot (1,18) -> (1,18),
+          durationValue: Number "8" (1,19) -> (1,20),
         },
       ],
     },
@@ -3977,39 +3977,39 @@ Score (1,1) -> (1,22) {
     Bar (1,1) -> (1,22) {
       beats: Array [
         Beat (1,1) -> (1,12) {
-          durationChange: BeatDurationChange (1,1) -> (1,4) {
-            colon: ColonToken (1,1) -> (1,1),
-            value: NumberLiteral "2" (1,2) -> (1,3),
+          durationChange: Duration (1,1) -> (1,4) {
+            colon: Colon (1,1) -> (1,1),
+            value: Number "2" (1,2) -> (1,3),
           },
           notes: NoteList (1,4) -> (1,11) {
-            openParenthesis: ParenthesisOpenToken (1,4) -> (1,4),
+            openParenthesis: LParen (1,4) -> (1,4),
             notes: Array [
               Note (1,5) -> (1,8) {
-                noteValue: Identifier "C4" (1,5) -> (1,7),
+                noteValue: Ident "C4" (1,5) -> (1,7),
               },
               Note (1,8) -> (1,10) {
-                noteValue: Identifier "C5" (1,8) -> (1,10),
+                noteValue: Ident "C5" (1,8) -> (1,10),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,10) -> (1,10),
+            closeParenthesis: RParen (1,10) -> (1,10),
           },
         },
         Beat (1,12) -> (1,22) {
-          durationChange: BeatDurationChange (1,12) -> (1,15) {
-            colon: ColonToken (1,12) -> (1,12),
-            value: NumberLiteral "4" (1,13) -> (1,14),
+          durationChange: Duration (1,12) -> (1,15) {
+            colon: Colon (1,12) -> (1,12),
+            value: Number "4" (1,13) -> (1,14),
           },
           notes: NoteList (1,15) -> (1,22) {
-            openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
+            openParenthesis: LParen (1,15) -> (1,15),
             notes: Array [
               Note (1,16) -> (1,19) {
-                noteValue: Identifier "D4" (1,16) -> (1,18),
+                noteValue: Ident "D4" (1,16) -> (1,18),
               },
               Note (1,19) -> (1,21) {
-                noteValue: Identifier "D5" (1,19) -> (1,21),
+                noteValue: Ident "D5" (1,19) -> (1,21),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+            closeParenthesis: RParen (1,21) -> (1,21),
           },
         },
       ],
@@ -4033,40 +4033,40 @@ Score (1,1) -> (1,22) {
       beats: Array [
         Beat (1,1) -> (1,11) {
           notes: NoteList (1,1) -> (1,8) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,5) {
-                noteValue: Identifier "C4" (1,2) -> (1,4),
+                noteValue: Ident "C4" (1,2) -> (1,4),
               },
               Note (1,5) -> (1,7) {
-                noteValue: Identifier "C5" (1,5) -> (1,7),
+                noteValue: Ident "C5" (1,5) -> (1,7),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,7) -> (1,7),
+            closeParenthesis: RParen (1,7) -> (1,7),
           },
-          beatEffects: Properties (1,9) -> (1,11) {
-            openBrace: BraceOpenToken (1,9) -> (1,9),
+          beatEffects: Props (1,9) -> (1,11) {
+            openBrace: LBrace (1,9) -> (1,9),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,10) -> (1,10),
+            closeBrace: RBrace (1,10) -> (1,10),
           },
         },
         Beat (1,12) -> (1,22) {
           notes: NoteList (1,12) -> (1,19) {
-            openParenthesis: ParenthesisOpenToken (1,12) -> (1,12),
+            openParenthesis: LParen (1,12) -> (1,12),
             notes: Array [
               Note (1,13) -> (1,16) {
-                noteValue: Identifier "D4" (1,13) -> (1,15),
+                noteValue: Ident "D4" (1,13) -> (1,15),
               },
               Note (1,16) -> (1,18) {
-                noteValue: Identifier "D5" (1,16) -> (1,18),
+                noteValue: Ident "D5" (1,16) -> (1,18),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,18) -> (1,18),
+            closeParenthesis: RParen (1,18) -> (1,18),
           },
-          beatEffects: Properties (1,20) -> (1,22) {
-            openBrace: BraceOpenToken (1,20) -> (1,20),
+          beatEffects: Props (1,20) -> (1,22) {
+            openBrace: LBrace (1,20) -> (1,20),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,21) -> (1,21),
+            closeBrace: RBrace (1,21) -> (1,21),
           },
         },
       ],
@@ -4086,60 +4086,60 @@ Score (1,1) -> (1,35) {
       beats: Array [
         Beat (1,1) -> (1,14) {
           notes: NoteList (1,1) -> (1,8) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,5) {
-                noteValue: Identifier "C4" (1,2) -> (1,4),
+                noteValue: Ident "C4" (1,2) -> (1,4),
               },
               Note (1,5) -> (1,7) {
-                noteValue: Identifier "C5" (1,5) -> (1,7),
+                noteValue: Ident "C5" (1,5) -> (1,7),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,7) -> (1,7),
+            closeParenthesis: RParen (1,7) -> (1,7),
           },
-          beatEffects: Properties (1,9) -> (1,14) {
-            openBrace: BraceOpenToken (1,9) -> (1,9),
+          beatEffects: Props (1,9) -> (1,14) {
+            openBrace: LBrace (1,9) -> (1,9),
             properties: Array [
-              Property (1,10) -> (1,12) {
-                property: Identifier "v" (1,10) -> (1,11),
+              Prop (1,10) -> (1,12) {
+                property: Ident "v" (1,10) -> (1,11),
               },
-              Property (1,12) -> (1,13) {
-                property: Identifier "f" (1,12) -> (1,13),
+              Prop (1,12) -> (1,13) {
+                property: Ident "f" (1,12) -> (1,13),
               },
             ],
-            closeBrace: BraceCloseToken (1,13) -> (1,13),
+            closeBrace: RBrace (1,13) -> (1,13),
           },
         },
         Beat (1,15) -> (1,35) {
           notes: NoteList (1,15) -> (1,22) {
-            openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
+            openParenthesis: LParen (1,15) -> (1,15),
             notes: Array [
               Note (1,16) -> (1,19) {
-                noteValue: Identifier "D4" (1,16) -> (1,18),
+                noteValue: Ident "D4" (1,16) -> (1,18),
               },
               Note (1,19) -> (1,21) {
-                noteValue: Identifier "D5" (1,19) -> (1,21),
+                noteValue: Ident "D5" (1,19) -> (1,21),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+            closeParenthesis: RParen (1,21) -> (1,21),
           },
-          beatEffects: Properties (1,23) -> (1,35) {
-            openBrace: BraceOpenToken (1,23) -> (1,23),
+          beatEffects: Props (1,23) -> (1,35) {
+            openBrace: LBrace (1,23) -> (1,23),
             properties: Array [
-              Property (1,24) -> (1,28) {
-                property: Identifier "cre" (1,24) -> (1,27),
+              Prop (1,24) -> (1,28) {
+                property: Ident "cre" (1,24) -> (1,27),
               },
-              Property (1,28) -> (1,34) {
-                property: Identifier "tu" (1,28) -> (1,30),
-                properties: ValueList (1,31) -> (1,34) {
+              Prop (1,28) -> (1,34) {
+                property: Ident "tu" (1,28) -> (1,30),
+                properties: Values (1,31) -> (1,34) {
                   values: Array [
-                    NumberLiteral "3" (1,31) -> (1,32),
-                    NumberLiteral "2" (1,33) -> (1,34),
+                    Number "3" (1,31) -> (1,32),
+                    Number "2" (1,33) -> (1,34),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,34) -> (1,34),
+            closeBrace: RBrace (1,34) -> (1,34),
           },
         },
       ],
@@ -4159,35 +4159,35 @@ Score (1,1) -> (1,20) {
       beats: Array [
         Beat (1,1) -> (1,11) {
           notes: NoteList (1,1) -> (1,8) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,5) {
-                noteValue: Identifier "C4" (1,2) -> (1,4),
+                noteValue: Ident "C4" (1,2) -> (1,4),
               },
               Note (1,5) -> (1,7) {
-                noteValue: Identifier "C5" (1,5) -> (1,7),
+                noteValue: Ident "C5" (1,5) -> (1,7),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,7) -> (1,7),
+            closeParenthesis: RParen (1,7) -> (1,7),
           },
-          beatMultiplier: AsteriskToken (1,8) -> (1,8),
-          beatMultiplierValue: NumberLiteral "4" (1,9) -> (1,10),
+          beatMultiplier: Asterisk (1,8) -> (1,8),
+          beatMultiplierValue: Number "4" (1,9) -> (1,10),
         },
         Beat (1,11) -> (1,20) {
           notes: NoteList (1,11) -> (1,18) {
-            openParenthesis: ParenthesisOpenToken (1,11) -> (1,11),
+            openParenthesis: LParen (1,11) -> (1,11),
             notes: Array [
               Note (1,12) -> (1,15) {
-                noteValue: Identifier "D4" (1,12) -> (1,14),
+                noteValue: Ident "D4" (1,12) -> (1,14),
               },
               Note (1,15) -> (1,17) {
-                noteValue: Identifier "D5" (1,15) -> (1,17),
+                noteValue: Ident "D5" (1,15) -> (1,17),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,17) -> (1,17),
+            closeParenthesis: RParen (1,17) -> (1,17),
           },
-          beatMultiplier: AsteriskToken (1,18) -> (1,18),
-          beatMultiplierValue: NumberLiteral "2" (1,19) -> (1,20),
+          beatMultiplier: Asterisk (1,18) -> (1,18),
+          beatMultiplierValue: Number "2" (1,19) -> (1,20),
         },
       ],
     },
@@ -4205,32 +4205,32 @@ Score (1,1) -> (1,24) {
     Bar (1,1) -> (1,24) {
       beats: Array [
         Beat (1,1) -> (1,24) {
-          durationChange: BeatDurationChange (1,1) -> (1,4) {
-            colon: ColonToken (1,1) -> (1,1),
-            value: NumberLiteral "2" (1,2) -> (1,3),
+          durationChange: Duration (1,1) -> (1,4) {
+            colon: Colon (1,1) -> (1,1),
+            value: Number "2" (1,2) -> (1,3),
           },
-          rest: Identifier "r" (1,4) -> (1,5),
-          durationDot: DotToken (1,5) -> (1,5),
-          durationValue: NumberLiteral "8" (1,6) -> (1,7),
-          beatMultiplier: AsteriskToken (1,8) -> (1,8),
-          beatMultiplierValue: NumberLiteral "2" (1,10) -> (1,11),
-          beatEffects: Properties (1,12) -> (1,24) {
-            openBrace: BraceOpenToken (1,12) -> (1,12),
+          rest: Ident "r" (1,4) -> (1,5),
+          durationDot: Dot (1,5) -> (1,5),
+          durationValue: Number "8" (1,6) -> (1,7),
+          beatMultiplier: Asterisk (1,8) -> (1,8),
+          beatMultiplierValue: Number "2" (1,10) -> (1,11),
+          beatEffects: Props (1,12) -> (1,24) {
+            openBrace: LBrace (1,12) -> (1,12),
             properties: Array [
-              Property (1,13) -> (1,17) {
-                property: Identifier "cre" (1,13) -> (1,16),
+              Prop (1,13) -> (1,17) {
+                property: Ident "cre" (1,13) -> (1,16),
               },
-              Property (1,17) -> (1,23) {
-                property: Identifier "tu" (1,17) -> (1,19),
-                properties: ValueList (1,20) -> (1,23) {
+              Prop (1,17) -> (1,23) {
+                property: Ident "tu" (1,17) -> (1,19),
+                properties: Values (1,20) -> (1,23) {
                   values: Array [
-                    NumberLiteral "3" (1,20) -> (1,21),
-                    NumberLiteral "2" (1,22) -> (1,23),
+                    Number "3" (1,20) -> (1,21),
+                    Number "2" (1,22) -> (1,23),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,23) -> (1,23),
+            closeBrace: RBrace (1,23) -> (1,23),
           },
         },
       ],
@@ -4249,14 +4249,14 @@ Score (1,1) -> (1,8) {
     Bar (1,1) -> (1,8) {
       beats: Array [
         Beat (1,1) -> (1,5) {
-          rest: Identifier "r" (1,1) -> (1,2),
-          durationDot: DotToken (1,2) -> (1,2),
-          durationValue: NumberLiteral "4" (1,3) -> (1,4),
+          rest: Ident "r" (1,1) -> (1,2),
+          durationDot: Dot (1,2) -> (1,2),
+          durationValue: Number "4" (1,3) -> (1,4),
         },
         Beat (1,5) -> (1,8) {
-          rest: Identifier "r" (1,5) -> (1,6),
-          durationDot: DotToken (1,6) -> (1,6),
-          durationValue: NumberLiteral "8" (1,7) -> (1,8),
+          rest: Ident "r" (1,5) -> (1,6),
+          durationDot: Dot (1,6) -> (1,6),
+          durationValue: Number "8" (1,7) -> (1,8),
         },
       ],
     },
@@ -4270,18 +4270,18 @@ Score (1,1) -> (1,10) {
     Bar (1,1) -> (1,10) {
       beats: Array [
         Beat (1,1) -> (1,6) {
-          durationChange: BeatDurationChange (1,1) -> (1,4) {
-            colon: ColonToken (1,1) -> (1,1),
-            value: NumberLiteral "2" (1,2) -> (1,3),
+          durationChange: Duration (1,1) -> (1,4) {
+            colon: Colon (1,1) -> (1,1),
+            value: Number "2" (1,2) -> (1,3),
           },
-          rest: Identifier "r" (1,4) -> (1,5),
+          rest: Ident "r" (1,4) -> (1,5),
         },
         Beat (1,6) -> (1,10) {
-          durationChange: BeatDurationChange (1,6) -> (1,9) {
-            colon: ColonToken (1,6) -> (1,6),
-            value: NumberLiteral "4" (1,7) -> (1,8),
+          durationChange: Duration (1,6) -> (1,9) {
+            colon: Colon (1,6) -> (1,6),
+            value: Number "4" (1,7) -> (1,8),
           },
-          rest: Identifier "r" (1,9) -> (1,10),
+          rest: Ident "r" (1,9) -> (1,10),
         },
       ],
     },
@@ -4303,23 +4303,23 @@ Score (1,1) -> (1,14) {
     Bar (1,1) -> (1,14) {
       beats: Array [
         Beat (1,1) -> (1,7) {
-          rest: Identifier "r" (1,1) -> (1,2),
-          durationDot: DotToken (1,2) -> (1,2),
-          durationValue: NumberLiteral "4" (1,3) -> (1,4),
-          beatEffects: Properties (1,5) -> (1,7) {
-            openBrace: BraceOpenToken (1,5) -> (1,5),
+          rest: Ident "r" (1,1) -> (1,2),
+          durationDot: Dot (1,2) -> (1,2),
+          durationValue: Number "4" (1,3) -> (1,4),
+          beatEffects: Props (1,5) -> (1,7) {
+            openBrace: LBrace (1,5) -> (1,5),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,6) -> (1,6),
+            closeBrace: RBrace (1,6) -> (1,6),
           },
         },
         Beat (1,8) -> (1,14) {
-          rest: Identifier "r" (1,8) -> (1,9),
-          durationDot: DotToken (1,9) -> (1,9),
-          durationValue: NumberLiteral "4" (1,10) -> (1,11),
-          beatEffects: Properties (1,12) -> (1,14) {
-            openBrace: BraceOpenToken (1,12) -> (1,12),
+          rest: Ident "r" (1,8) -> (1,9),
+          durationDot: Dot (1,9) -> (1,9),
+          durationValue: Number "4" (1,10) -> (1,11),
+          beatEffects: Props (1,12) -> (1,14) {
+            openBrace: LBrace (1,12) -> (1,12),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,13) -> (1,13),
+            closeBrace: RBrace (1,13) -> (1,13),
           },
         },
       ],
@@ -4338,43 +4338,43 @@ Score (1,1) -> (1,27) {
     Bar (1,1) -> (1,27) {
       beats: Array [
         Beat (1,1) -> (1,10) {
-          rest: Identifier "r" (1,1) -> (1,2),
-          durationDot: DotToken (1,2) -> (1,2),
-          durationValue: NumberLiteral "4" (1,3) -> (1,4),
-          beatEffects: Properties (1,5) -> (1,10) {
-            openBrace: BraceOpenToken (1,5) -> (1,5),
+          rest: Ident "r" (1,1) -> (1,2),
+          durationDot: Dot (1,2) -> (1,2),
+          durationValue: Number "4" (1,3) -> (1,4),
+          beatEffects: Props (1,5) -> (1,10) {
+            openBrace: LBrace (1,5) -> (1,5),
             properties: Array [
-              Property (1,6) -> (1,8) {
-                property: Identifier "v" (1,6) -> (1,7),
+              Prop (1,6) -> (1,8) {
+                property: Ident "v" (1,6) -> (1,7),
               },
-              Property (1,8) -> (1,9) {
-                property: Identifier "f" (1,8) -> (1,9),
+              Prop (1,8) -> (1,9) {
+                property: Ident "f" (1,8) -> (1,9),
               },
             ],
-            closeBrace: BraceCloseToken (1,9) -> (1,9),
+            closeBrace: RBrace (1,9) -> (1,9),
           },
         },
         Beat (1,11) -> (1,27) {
-          rest: Identifier "r" (1,11) -> (1,12),
-          durationDot: DotToken (1,12) -> (1,12),
-          durationValue: NumberLiteral "4" (1,13) -> (1,14),
-          beatEffects: Properties (1,15) -> (1,27) {
-            openBrace: BraceOpenToken (1,15) -> (1,15),
+          rest: Ident "r" (1,11) -> (1,12),
+          durationDot: Dot (1,12) -> (1,12),
+          durationValue: Number "4" (1,13) -> (1,14),
+          beatEffects: Props (1,15) -> (1,27) {
+            openBrace: LBrace (1,15) -> (1,15),
             properties: Array [
-              Property (1,16) -> (1,20) {
-                property: Identifier "cre" (1,16) -> (1,19),
+              Prop (1,16) -> (1,20) {
+                property: Ident "cre" (1,16) -> (1,19),
               },
-              Property (1,20) -> (1,26) {
-                property: Identifier "tu" (1,20) -> (1,22),
-                properties: ValueList (1,23) -> (1,26) {
+              Prop (1,20) -> (1,26) {
+                property: Ident "tu" (1,20) -> (1,22),
+                properties: Values (1,23) -> (1,26) {
                   values: Array [
-                    NumberLiteral "3" (1,23) -> (1,24),
-                    NumberLiteral "2" (1,25) -> (1,26),
+                    Number "3" (1,23) -> (1,24),
+                    Number "2" (1,25) -> (1,26),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,26) -> (1,26),
+            closeBrace: RBrace (1,26) -> (1,26),
           },
         },
       ],
@@ -4393,14 +4393,14 @@ Score (1,1) -> (1,8) {
     Bar (1,1) -> (1,8) {
       beats: Array [
         Beat (1,1) -> (1,5) {
-          rest: Identifier "r" (1,1) -> (1,2),
-          beatMultiplier: AsteriskToken (1,2) -> (1,2),
-          beatMultiplierValue: NumberLiteral "4" (1,3) -> (1,4),
+          rest: Ident "r" (1,1) -> (1,2),
+          beatMultiplier: Asterisk (1,2) -> (1,2),
+          beatMultiplierValue: Number "4" (1,3) -> (1,4),
         },
         Beat (1,5) -> (1,8) {
-          rest: Identifier "r" (1,5) -> (1,6),
-          beatMultiplier: AsteriskToken (1,6) -> (1,6),
-          beatMultiplierValue: NumberLiteral "2" (1,7) -> (1,8),
+          rest: Ident "r" (1,5) -> (1,6),
+          beatMultiplier: Asterisk (1,6) -> (1,6),
+          beatMultiplierValue: Number "2" (1,7) -> (1,8),
         },
       ],
     },
@@ -4418,7 +4418,7 @@ Score (1,1) -> (1,2) {
     Bar (1,1) -> (1,2) {
       beats: Array [
         Beat (1,1) -> (1,2) {
-          rest: Identifier "r" (1,1) -> (1,2),
+          rest: Ident "r" (1,1) -> (1,2),
         },
       ],
     },
@@ -4445,21 +4445,21 @@ Score (1,1) -> (1,14) {
           notes: NoteList (1,1) -> (1,14) {
             notes: Array [
               Note (1,1) -> (1,14) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
-                noteEffects: Properties (1,4) -> (1,14) {
-                  openBrace: BraceOpenToken (1,4) -> (1,4),
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,14) {
+                  openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
-                    Property (1,6) -> (1,13) {
-                      property: Identifier "tu" (1,6) -> (1,8),
-                      properties: ValueList (1,9) -> (1,13) {
+                    Prop (1,6) -> (1,13) {
+                      property: Ident "tu" (1,6) -> (1,8),
+                      properties: Values (1,9) -> (1,13) {
                         values: Array [
-                          NumberLiteral "3" (1,9) -> (1,10),
-                          NumberLiteral "2" (1,11) -> (1,12),
+                          Number "3" (1,9) -> (1,10),
+                          Number "2" (1,11) -> (1,12),
                         ],
                       },
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,13) -> (1,13),
+                  closeBrace: RBrace (1,13) -> (1,13),
                 },
               },
             ],
@@ -4484,11 +4484,11 @@ Score (1,1) -> (1,6) {
           notes: NoteList (1,1) -> (1,6) {
             notes: Array [
               Note (1,1) -> (1,6) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
-                noteEffects: Properties (1,4) -> (1,6) {
-                  openBrace: BraceOpenToken (1,4) -> (1,4),
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,6) {
+                  openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [],
-                  closeBrace: BraceCloseToken (1,5) -> (1,5),
+                  closeBrace: RBrace (1,5) -> (1,5),
                 },
               },
             ],
@@ -4513,21 +4513,21 @@ Score (1,1) -> (1,12) {
           notes: NoteList (1,1) -> (1,12) {
             notes: Array [
               Note (1,1) -> (1,12) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
-                noteEffects: Properties (1,4) -> (1,12) {
-                  openBrace: BraceOpenToken (1,4) -> (1,4),
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,12) {
+                  openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
-                    Property (1,5) -> (1,11) {
-                      property: Identifier "tr" (1,5) -> (1,7),
-                      properties: ValueList (1,8) -> (1,11) {
+                    Prop (1,5) -> (1,11) {
+                      property: Ident "tr" (1,5) -> (1,7),
+                      properties: Values (1,8) -> (1,11) {
                         values: Array [
-                          NumberLiteral "4" (1,8) -> (1,9),
-                          NumberLiteral "4" (1,10) -> (1,11),
+                          Number "4" (1,8) -> (1,9),
+                          Number "4" (1,10) -> (1,11),
                         ],
                       },
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,11) -> (1,11),
+                  closeBrace: RBrace (1,11) -> (1,11),
                 },
               },
             ],
@@ -4548,24 +4548,24 @@ Score (1,1) -> (1,15) {
           notes: NoteList (1,1) -> (1,15) {
             notes: Array [
               Note (1,1) -> (1,15) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
-                noteEffects: Properties (1,4) -> (1,15) {
-                  openBrace: BraceOpenToken (1,4) -> (1,4),
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,15) {
+                  openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
-                    Property (1,5) -> (1,14) {
-                      property: Identifier "b" (1,5) -> (1,6),
-                      properties: ValueList (1,7) -> (1,14) {
-                        openParenthesis: ParenthesisOpenToken (1,7) -> (1,7),
+                    Prop (1,5) -> (1,14) {
+                      property: Ident "b" (1,5) -> (1,6),
+                      properties: Values (1,7) -> (1,14) {
+                        openParenthesis: LParen (1,7) -> (1,7),
                         values: Array [
-                          NumberLiteral "0" (1,8) -> (1,9),
-                          NumberLiteral "4" (1,10) -> (1,11),
-                          NumberLiteral "0" (1,12) -> (1,13),
+                          Number "0" (1,8) -> (1,9),
+                          Number "4" (1,10) -> (1,11),
+                          Number "0" (1,12) -> (1,13),
                         ],
-                        closeParenthesis: ParenthesisCloseToken (1,13) -> (1,13),
+                        closeParenthesis: RParen (1,13) -> (1,13),
                       },
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,14) -> (1,14),
+                  closeBrace: RBrace (1,14) -> (1,14),
                 },
               },
             ],
@@ -4594,30 +4594,30 @@ Score (1,1) -> (1,20) {
           notes: NoteList (1,1) -> (1,20) {
             notes: Array [
               Note (1,1) -> (1,20) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
-                noteEffects: Properties (1,4) -> (1,20) {
-                  openBrace: BraceOpenToken (1,4) -> (1,4),
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,20) {
+                  openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
-                    Property (1,5) -> (1,8) {
-                      property: Identifier "nh" (1,5) -> (1,7),
+                    Prop (1,5) -> (1,8) {
+                      property: Ident "nh" (1,5) -> (1,7),
                     },
-                    Property (1,8) -> (1,17) {
-                      property: Identifier "b" (1,8) -> (1,9),
-                      properties: ValueList (1,10) -> (1,17) {
-                        openParenthesis: ParenthesisOpenToken (1,10) -> (1,10),
+                    Prop (1,8) -> (1,17) {
+                      property: Ident "b" (1,8) -> (1,9),
+                      properties: Values (1,10) -> (1,17) {
+                        openParenthesis: LParen (1,10) -> (1,10),
                         values: Array [
-                          NumberLiteral "0" (1,11) -> (1,12),
-                          NumberLiteral "4" (1,13) -> (1,14),
-                          NumberLiteral "0" (1,15) -> (1,16),
+                          Number "0" (1,11) -> (1,12),
+                          Number "4" (1,13) -> (1,14),
+                          Number "0" (1,15) -> (1,16),
                         ],
-                        closeParenthesis: ParenthesisCloseToken (1,16) -> (1,16),
+                        closeParenthesis: RParen (1,16) -> (1,16),
                       },
                     },
-                    Property (1,18) -> (1,19) {
-                      property: Identifier "v" (1,18) -> (1,19),
+                    Prop (1,18) -> (1,19) {
+                      property: Ident "v" (1,18) -> (1,19),
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,19) -> (1,19),
+                  closeBrace: RBrace (1,19) -> (1,19),
                 },
               },
             ],
@@ -4636,64 +4636,64 @@ Score (1,1) -> (1,48) {
       beats: Array [
         Beat (1,1) -> (1,48) {
           notes: NoteList (1,1) -> (1,48) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,21) {
-                noteValue: Identifier "C4" (1,2) -> (1,4),
-                noteEffects: Properties (1,5) -> (1,21) {
-                  openBrace: BraceOpenToken (1,5) -> (1,5),
+                noteValue: Ident "C4" (1,2) -> (1,4),
+                noteEffects: Props (1,5) -> (1,21) {
+                  openBrace: LBrace (1,5) -> (1,5),
                   properties: Array [
-                    Property (1,6) -> (1,9) {
-                      property: Identifier "nh" (1,6) -> (1,8),
+                    Prop (1,6) -> (1,9) {
+                      property: Ident "nh" (1,6) -> (1,8),
                     },
-                    Property (1,9) -> (1,18) {
-                      property: Identifier "b" (1,9) -> (1,10),
-                      properties: ValueList (1,11) -> (1,18) {
-                        openParenthesis: ParenthesisOpenToken (1,11) -> (1,11),
+                    Prop (1,9) -> (1,18) {
+                      property: Ident "b" (1,9) -> (1,10),
+                      properties: Values (1,11) -> (1,18) {
+                        openParenthesis: LParen (1,11) -> (1,11),
                         values: Array [
-                          NumberLiteral "0" (1,12) -> (1,13),
-                          NumberLiteral "4" (1,14) -> (1,15),
-                          NumberLiteral "0" (1,16) -> (1,17),
+                          Number "0" (1,12) -> (1,13),
+                          Number "4" (1,14) -> (1,15),
+                          Number "0" (1,16) -> (1,17),
                         ],
-                        closeParenthesis: ParenthesisCloseToken (1,17) -> (1,17),
+                        closeParenthesis: RParen (1,17) -> (1,17),
                       },
                     },
-                    Property (1,19) -> (1,20) {
-                      property: Identifier "v" (1,19) -> (1,20),
+                    Prop (1,19) -> (1,20) {
+                      property: Ident "v" (1,19) -> (1,20),
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,20) -> (1,20),
+                  closeBrace: RBrace (1,20) -> (1,20),
                 },
               },
               Note (1,22) -> (1,47) {
-                noteValue: Identifier "C5" (1,22) -> (1,24),
-                noteEffects: Properties (1,25) -> (1,47) {
-                  openBrace: BraceOpenToken (1,25) -> (1,25),
+                noteValue: Ident "C5" (1,22) -> (1,24),
+                noteEffects: Props (1,25) -> (1,47) {
+                  openBrace: LBrace (1,25) -> (1,25),
                   properties: Array [
-                    Property (1,27) -> (1,29) {
-                      property: Identifier "v" (1,27) -> (1,28),
+                    Prop (1,27) -> (1,29) {
+                      property: Ident "v" (1,27) -> (1,28),
                     },
-                    Property (1,29) -> (1,31) {
-                      property: Identifier "h" (1,29) -> (1,30),
+                    Prop (1,29) -> (1,31) {
+                      property: Ident "h" (1,29) -> (1,30),
                     },
-                    Property (1,31) -> (1,46) {
-                      property: Identifier "unknown" (1,31) -> (1,38),
-                      properties: ValueList (1,39) -> (1,46) {
-                        openParenthesis: ParenthesisOpenToken (1,39) -> (1,39),
+                    Prop (1,31) -> (1,46) {
+                      property: Ident "unknown" (1,31) -> (1,38),
+                      properties: Values (1,39) -> (1,46) {
+                        openParenthesis: LParen (1,39) -> (1,39),
                         values: Array [
-                          NumberLiteral "1" (1,40) -> (1,41),
-                          NumberLiteral "2" (1,42) -> (1,43),
-                          NumberLiteral "3" (1,44) -> (1,45),
+                          Number "1" (1,40) -> (1,41),
+                          Number "2" (1,42) -> (1,43),
+                          Number "3" (1,44) -> (1,45),
                         ],
-                        closeParenthesis: ParenthesisCloseToken (1,45) -> (1,45),
+                        closeParenthesis: RParen (1,45) -> (1,45),
                       },
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,46) -> (1,46),
+                  closeBrace: RBrace (1,46) -> (1,46),
                 },
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,47) -> (1,47),
+            closeParenthesis: RParen (1,47) -> (1,47),
           },
         },
       ],
@@ -4709,79 +4709,79 @@ Score (1,1) -> (1,59) {
       beats: Array [
         Beat (1,1) -> (1,59) {
           notes: NoteList (1,1) -> (1,48) {
-            openParenthesis: ParenthesisOpenToken (1,1) -> (1,1),
+            openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,21) {
-                noteValue: Identifier "C4" (1,2) -> (1,4),
-                noteEffects: Properties (1,5) -> (1,21) {
-                  openBrace: BraceOpenToken (1,5) -> (1,5),
+                noteValue: Ident "C4" (1,2) -> (1,4),
+                noteEffects: Props (1,5) -> (1,21) {
+                  openBrace: LBrace (1,5) -> (1,5),
                   properties: Array [
-                    Property (1,6) -> (1,9) {
-                      property: Identifier "nh" (1,6) -> (1,8),
+                    Prop (1,6) -> (1,9) {
+                      property: Ident "nh" (1,6) -> (1,8),
                     },
-                    Property (1,9) -> (1,18) {
-                      property: Identifier "b" (1,9) -> (1,10),
-                      properties: ValueList (1,11) -> (1,18) {
-                        openParenthesis: ParenthesisOpenToken (1,11) -> (1,11),
+                    Prop (1,9) -> (1,18) {
+                      property: Ident "b" (1,9) -> (1,10),
+                      properties: Values (1,11) -> (1,18) {
+                        openParenthesis: LParen (1,11) -> (1,11),
                         values: Array [
-                          NumberLiteral "0" (1,12) -> (1,13),
-                          NumberLiteral "4" (1,14) -> (1,15),
-                          NumberLiteral "0" (1,16) -> (1,17),
+                          Number "0" (1,12) -> (1,13),
+                          Number "4" (1,14) -> (1,15),
+                          Number "0" (1,16) -> (1,17),
                         ],
-                        closeParenthesis: ParenthesisCloseToken (1,17) -> (1,17),
+                        closeParenthesis: RParen (1,17) -> (1,17),
                       },
                     },
-                    Property (1,19) -> (1,20) {
-                      property: Identifier "v" (1,19) -> (1,20),
+                    Prop (1,19) -> (1,20) {
+                      property: Ident "v" (1,19) -> (1,20),
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,20) -> (1,20),
+                  closeBrace: RBrace (1,20) -> (1,20),
                 },
               },
               Note (1,22) -> (1,47) {
-                noteValue: Identifier "C5" (1,22) -> (1,24),
-                noteEffects: Properties (1,25) -> (1,47) {
-                  openBrace: BraceOpenToken (1,25) -> (1,25),
+                noteValue: Ident "C5" (1,22) -> (1,24),
+                noteEffects: Props (1,25) -> (1,47) {
+                  openBrace: LBrace (1,25) -> (1,25),
                   properties: Array [
-                    Property (1,27) -> (1,29) {
-                      property: Identifier "v" (1,27) -> (1,28),
+                    Prop (1,27) -> (1,29) {
+                      property: Ident "v" (1,27) -> (1,28),
                     },
-                    Property (1,29) -> (1,31) {
-                      property: Identifier "h" (1,29) -> (1,30),
+                    Prop (1,29) -> (1,31) {
+                      property: Ident "h" (1,29) -> (1,30),
                     },
-                    Property (1,31) -> (1,46) {
-                      property: Identifier "unknown" (1,31) -> (1,38),
-                      properties: ValueList (1,39) -> (1,46) {
-                        openParenthesis: ParenthesisOpenToken (1,39) -> (1,39),
+                    Prop (1,31) -> (1,46) {
+                      property: Ident "unknown" (1,31) -> (1,38),
+                      properties: Values (1,39) -> (1,46) {
+                        openParenthesis: LParen (1,39) -> (1,39),
                         values: Array [
-                          NumberLiteral "1" (1,40) -> (1,41),
-                          NumberLiteral "2" (1,42) -> (1,43),
-                          NumberLiteral "3" (1,44) -> (1,45),
+                          Number "1" (1,40) -> (1,41),
+                          Number "2" (1,42) -> (1,43),
+                          Number "3" (1,44) -> (1,45),
                         ],
-                        closeParenthesis: ParenthesisCloseToken (1,45) -> (1,45),
+                        closeParenthesis: RParen (1,45) -> (1,45),
                       },
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,46) -> (1,46),
+                  closeBrace: RBrace (1,46) -> (1,46),
                 },
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (1,47) -> (1,47),
+            closeParenthesis: RParen (1,47) -> (1,47),
           },
-          beatEffects: Properties (1,49) -> (1,59) {
-            openBrace: BraceOpenToken (1,49) -> (1,49),
+          beatEffects: Props (1,49) -> (1,59) {
+            openBrace: LBrace (1,49) -> (1,49),
             properties: Array [
-              Property (1,51) -> (1,58) {
-                property: Identifier "tu" (1,51) -> (1,53),
-                properties: ValueList (1,54) -> (1,58) {
+              Prop (1,51) -> (1,58) {
+                property: Ident "tu" (1,51) -> (1,53),
+                properties: Values (1,54) -> (1,58) {
                   values: Array [
-                    NumberLiteral "3" (1,54) -> (1,55),
-                    NumberLiteral "2" (1,56) -> (1,57),
+                    Number "3" (1,54) -> (1,55),
+                    Number "2" (1,56) -> (1,57),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,58) -> (1,58),
+            closeBrace: RBrace (1,58) -> (1,58),
           },
         },
       ],
@@ -4811,24 +4811,24 @@ Score (1,1) -> (1,21) {
           notes: NoteList (1,1) -> (1,21) {
             notes: Array [
               Note (1,1) -> (1,21) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
-                noteEffects: Properties (1,4) -> (1,21) {
-                  openBrace: BraceOpenToken (1,4) -> (1,4),
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,21) {
+                  openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
-                    Property (1,5) -> (1,20) {
-                      property: Identifier "unknown" (1,5) -> (1,12),
-                      properties: ValueList (1,13) -> (1,20) {
-                        openParenthesis: ParenthesisOpenToken (1,13) -> (1,13),
+                    Prop (1,5) -> (1,20) {
+                      property: Ident "unknown" (1,5) -> (1,12),
+                      properties: Values (1,13) -> (1,20) {
+                        openParenthesis: LParen (1,13) -> (1,13),
                         values: Array [
-                          NumberLiteral "1" (1,14) -> (1,15),
-                          NumberLiteral "2" (1,16) -> (1,17),
-                          NumberLiteral "3" (1,18) -> (1,19),
+                          Number "1" (1,14) -> (1,15),
+                          Number "2" (1,16) -> (1,17),
+                          Number "3" (1,18) -> (1,19),
                         ],
-                        closeParenthesis: ParenthesisCloseToken (1,19) -> (1,19),
+                        closeParenthesis: RParen (1,19) -> (1,19),
                       },
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,20) -> (1,20),
+                  closeBrace: RBrace (1,20) -> (1,20),
                 },
               },
             ],
@@ -4853,48 +4853,48 @@ Score (1,1) -> (1,31) {
           notes: NoteList (1,1) -> (1,20) {
             notes: Array [
               Note (1,1) -> (1,20) {
-                noteValue: Identifier "C4" (1,1) -> (1,3),
-                noteEffects: Properties (1,4) -> (1,20) {
-                  openBrace: BraceOpenToken (1,4) -> (1,4),
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,20) {
+                  openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
-                    Property (1,5) -> (1,8) {
-                      property: Identifier "nh" (1,5) -> (1,7),
+                    Prop (1,5) -> (1,8) {
+                      property: Ident "nh" (1,5) -> (1,7),
                     },
-                    Property (1,8) -> (1,17) {
-                      property: Identifier "b" (1,8) -> (1,9),
-                      properties: ValueList (1,10) -> (1,17) {
-                        openParenthesis: ParenthesisOpenToken (1,10) -> (1,10),
+                    Prop (1,8) -> (1,17) {
+                      property: Ident "b" (1,8) -> (1,9),
+                      properties: Values (1,10) -> (1,17) {
+                        openParenthesis: LParen (1,10) -> (1,10),
                         values: Array [
-                          NumberLiteral "0" (1,11) -> (1,12),
-                          NumberLiteral "4" (1,13) -> (1,14),
-                          NumberLiteral "0" (1,15) -> (1,16),
+                          Number "0" (1,11) -> (1,12),
+                          Number "4" (1,13) -> (1,14),
+                          Number "0" (1,15) -> (1,16),
                         ],
-                        closeParenthesis: ParenthesisCloseToken (1,16) -> (1,16),
+                        closeParenthesis: RParen (1,16) -> (1,16),
                       },
                     },
-                    Property (1,18) -> (1,19) {
-                      property: Identifier "v" (1,18) -> (1,19),
+                    Prop (1,18) -> (1,19) {
+                      property: Ident "v" (1,18) -> (1,19),
                     },
                   ],
-                  closeBrace: BraceCloseToken (1,19) -> (1,19),
+                  closeBrace: RBrace (1,19) -> (1,19),
                 },
               },
             ],
           },
-          beatEffects: Properties (1,21) -> (1,31) {
-            openBrace: BraceOpenToken (1,21) -> (1,21),
+          beatEffects: Props (1,21) -> (1,31) {
+            openBrace: LBrace (1,21) -> (1,21),
             properties: Array [
-              Property (1,23) -> (1,30) {
-                property: Identifier "tu" (1,23) -> (1,25),
-                properties: ValueList (1,26) -> (1,30) {
+              Prop (1,23) -> (1,30) {
+                property: Ident "tu" (1,23) -> (1,25),
+                properties: Values (1,26) -> (1,30) {
                   values: Array [
-                    NumberLiteral "3" (1,26) -> (1,27),
-                    NumberLiteral "2" (1,28) -> (1,29),
+                    Number "3" (1,26) -> (1,27),
+                    Number "2" (1,28) -> (1,29),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,30) -> (1,30),
+            closeBrace: RBrace (1,30) -> (1,30),
           },
         },
       ],
@@ -4918,25 +4918,25 @@ Score (1,1) -> (1,34) {
   bars: Array [
     Bar (1,1) -> (1,34) {
       metaData: Array [
-        MetaData (1,1) -> (1,16) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+        Meta (1,1) -> (1,16) {
+          tag: Tag "title" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,16) {
             values: Array [
-              StringLiteral "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14),
             ],
           },
         },
-        MetaData (1,16) -> (1,32) {
-          tag: MetaDataTag "subtitle" (1,16) -> (1,25) {
-            prefix: BackSlashToken (1,16) -> (1,17),
-            tag: Identifier "subtitle" (1,17) -> (1,25),
+        Meta (1,16) -> (1,32) {
+          tag: Tag "subtitle" (1,16) -> (1,25) {
+            prefix: Backslash (1,16) -> (1,17),
+            tag: Ident "subtitle" (1,17) -> (1,25),
           },
-          values: ValueList (1,26) -> (1,32) {
+          values: Values (1,26) -> (1,32) {
             values: Array [
-              StringLiteral "Sub" (1,26) -> (1,30),
+              String "Sub" (1,26) -> (1,30),
             ],
           },
         },
@@ -4955,29 +4955,29 @@ Score (1,1) -> (1,31) {
   bars: Array [
     Bar (1,1) -> (1,31) {
       metaData: Array [
-        MetaData (1,1) -> (1,28) {
-          tag: MetaDataTag "track" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "track" (1,2) -> (1,7),
+        Meta (1,1) -> (1,28) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,15) {
+          values: Values (1,8) -> (1,15) {
             values: Array [
-              StringLiteral "Name" (1,8) -> (1,13),
+              String "Name" (1,8) -> (1,13),
             ],
           },
-          properties: Properties (1,15) -> (1,28) {
-            openBrace: BraceOpenToken (1,15) -> (1,15),
+          properties: Props (1,15) -> (1,28) {
+            openBrace: LBrace (1,15) -> (1,15),
             properties: Array [
-              Property (1,16) -> (1,27) {
-                property: Identifier "color" (1,16) -> (1,21),
-                properties: ValueList (1,22) -> (1,27) {
+              Prop (1,16) -> (1,27) {
+                property: Ident "color" (1,16) -> (1,21),
+                properties: Values (1,22) -> (1,27) {
                   values: Array [
-                    StringLiteral "red" (1,22) -> (1,26),
+                    String "red" (1,22) -> (1,26),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,27) -> (1,27),
+            closeBrace: RBrace (1,27) -> (1,27),
           },
         },
       ],
@@ -4991,29 +4991,29 @@ Score (1,1) -> (1,31) {
   bars: Array [
     Bar (1,1) -> (1,31) {
       metaData: Array [
-        MetaData (1,1) -> (1,29) {
-          tag: MetaDataTag "track" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "track" (1,2) -> (1,7),
+        Meta (1,1) -> (1,29) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
           },
-          values: ValueList (1,22) -> (1,29) {
+          values: Values (1,22) -> (1,29) {
             values: Array [
-              StringLiteral "Name" (1,22) -> (1,27),
+              String "Name" (1,22) -> (1,27),
             ],
           },
-          properties: Properties (1,8) -> (1,21) {
-            openBrace: BraceOpenToken (1,8) -> (1,8),
+          properties: Props (1,8) -> (1,21) {
+            openBrace: LBrace (1,8) -> (1,8),
             properties: Array [
-              Property (1,9) -> (1,20) {
-                property: Identifier "color" (1,9) -> (1,14),
-                properties: ValueList (1,15) -> (1,20) {
+              Prop (1,9) -> (1,20) {
+                property: Ident "color" (1,9) -> (1,14),
+                properties: Values (1,15) -> (1,20) {
                   values: Array [
-                    StringLiteral "red" (1,15) -> (1,19),
+                    String "red" (1,15) -> (1,19),
                   ],
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,20) -> (1,20),
+            closeBrace: RBrace (1,20) -> (1,20),
           },
         },
       ],
@@ -5035,16 +5035,16 @@ Score (1,1) -> (1,34) {
   bars: Array [
     Bar (1,1) -> (1,34) {
       metaData: Array [
-        MetaData (1,1) -> (1,32) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+        Meta (1,1) -> (1,32) {
+          tag: Tag "title" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,31) {
+          values: Values (1,8) -> (1,31) {
             values: Array [
-              StringLiteral "Title" (1,8) -> (1,14),
-              StringLiteral "Template" (1,16) -> (1,25),
-              Identifier "left" (1,27) -> (1,31),
+              String "Title" (1,8) -> (1,14),
+              String "Template" (1,16) -> (1,25),
+              Ident "left" (1,27) -> (1,31),
             ],
           },
         },
@@ -5063,17 +5063,17 @@ Score (1,1) -> (1,20) {
   bars: Array [
     Bar (1,1) -> (1,20) {
       metaData: Array [
-        MetaData (1,1) -> (1,18) {
-          tag: MetaDataTag "title" (1,1) -> (1,7) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "title" (1,2) -> (1,7),
+        Meta (1,1) -> (1,18) {
+          tag: Tag "title" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "title" (1,2) -> (1,7),
           },
-          values: ValueList (1,8) -> (1,17) {
-            openParenthesis: ParenthesisOpenToken (1,8) -> (1,8),
+          values: Values (1,8) -> (1,17) {
+            openParenthesis: LParen (1,8) -> (1,8),
             values: Array [
-              StringLiteral "Title" (1,9) -> (1,15),
+              String "Title" (1,9) -> (1,15),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,16) -> (1,16),
+            closeParenthesis: RParen (1,16) -> (1,16),
           },
         },
       ],
@@ -5091,30 +5091,30 @@ Score (1,1) -> (1,44) {
   bars: Array [
     Bar (1,1) -> (1,44) {
       metaData: Array [
-        MetaData (1,1) -> (1,24) {
-          tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "notExisting" (1,2) -> (1,13),
+        Meta (1,1) -> (1,24) {
+          tag: Tag "notExisting" (1,1) -> (1,13) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: ValueList (1,14) -> (1,23) {
-            openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+          values: Values (1,14) -> (1,23) {
+            openParenthesis: LParen (1,14) -> (1,14),
             values: Array [
-              StringLiteral "Value" (1,15) -> (1,21),
+              String "Value" (1,15) -> (1,21),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
+            closeParenthesis: RParen (1,22) -> (1,22),
           },
         },
-        MetaData (1,24) -> (1,42) {
-          tag: MetaDataTag "notExisting" (1,24) -> (1,36) {
-            prefix: BackSlashToken (1,24) -> (1,25),
-            tag: Identifier "notExisting" (1,25) -> (1,36),
+        Meta (1,24) -> (1,42) {
+          tag: Tag "notExisting" (1,24) -> (1,36) {
+            prefix: Backslash (1,24) -> (1,25),
+            tag: Ident "notExisting" (1,25) -> (1,36),
           },
-          values: ValueList (1,37) -> (1,41) {
-            openParenthesis: ParenthesisOpenToken (1,37) -> (1,37),
+          values: Values (1,37) -> (1,41) {
+            openParenthesis: LParen (1,37) -> (1,37),
             values: Array [
-              StringLiteral "" (1,38) -> (1,39),
+              String "" (1,38) -> (1,39),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,40) -> (1,40),
+            closeParenthesis: RParen (1,40) -> (1,40),
           },
         },
       ],
@@ -5132,17 +5132,17 @@ Score (1,1) -> (1,26) {
   bars: Array [
     Bar (1,1) -> (1,26) {
       metaData: Array [
-        MetaData (1,1) -> (1,24) {
-          tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "notExisting" (1,2) -> (1,13),
+        Meta (1,1) -> (1,24) {
+          tag: Tag "notExisting" (1,1) -> (1,13) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: ValueList (1,14) -> (1,23) {
-            openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+          values: Values (1,14) -> (1,23) {
+            openParenthesis: LParen (1,14) -> (1,14),
             values: Array [
-              StringLiteral "Value" (1,15) -> (1,21),
+              String "Value" (1,15) -> (1,21),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
+            closeParenthesis: RParen (1,22) -> (1,22),
           },
         },
       ],
@@ -5160,22 +5160,22 @@ Score (1,1) -> (1,29) {
   bars: Array [
     Bar (1,1) -> (1,29) {
       metaData: Array [
-        MetaData (1,1) -> (1,26) {
-          tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "notExisting" (1,2) -> (1,13),
+        Meta (1,1) -> (1,26) {
+          tag: Tag "notExisting" (1,1) -> (1,13) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: ValueList (1,14) -> (1,23) {
-            openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+          values: Values (1,14) -> (1,23) {
+            openParenthesis: LParen (1,14) -> (1,14),
             values: Array [
-              StringLiteral "Value" (1,15) -> (1,21),
+              String "Value" (1,15) -> (1,21),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
+            closeParenthesis: RParen (1,22) -> (1,22),
           },
-          properties: Properties (1,24) -> (1,26) {
-            openBrace: BraceOpenToken (1,24) -> (1,24),
+          properties: Props (1,24) -> (1,26) {
+            openBrace: LBrace (1,24) -> (1,24),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,25) -> (1,25),
+            closeBrace: RBrace (1,25) -> (1,25),
           },
         },
       ],
@@ -5193,35 +5193,35 @@ Score (1,1) -> (1,44) {
   bars: Array [
     Bar (1,1) -> (1,44) {
       metaData: Array [
-        MetaData (1,1) -> (1,41) {
-          tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
-            prefix: BackSlashToken (1,1) -> (1,2),
-            tag: Identifier "notExisting" (1,2) -> (1,13),
+        Meta (1,1) -> (1,41) {
+          tag: Tag "notExisting" (1,1) -> (1,13) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: ValueList (1,14) -> (1,23) {
-            openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+          values: Values (1,14) -> (1,23) {
+            openParenthesis: LParen (1,14) -> (1,14),
             values: Array [
-              StringLiteral "Value" (1,15) -> (1,21),
+              String "Value" (1,15) -> (1,21),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
+            closeParenthesis: RParen (1,22) -> (1,22),
           },
-          properties: Properties (1,24) -> (1,41) {
-            openBrace: BraceOpenToken (1,24) -> (1,24),
+          properties: Props (1,24) -> (1,41) {
+            openBrace: LBrace (1,24) -> (1,24),
             properties: Array [
-              Property (1,25) -> (1,40) {
-                property: Identifier "unknown" (1,25) -> (1,32),
-                properties: ValueList (1,33) -> (1,40) {
-                  openParenthesis: ParenthesisOpenToken (1,33) -> (1,33),
+              Prop (1,25) -> (1,40) {
+                property: Ident "unknown" (1,25) -> (1,32),
+                properties: Values (1,33) -> (1,40) {
+                  openParenthesis: LParen (1,33) -> (1,33),
                   values: Array [
-                    NumberLiteral "1" (1,34) -> (1,35),
-                    NumberLiteral "2" (1,36) -> (1,37),
-                    NumberLiteral "3" (1,38) -> (1,39),
+                    Number "1" (1,34) -> (1,35),
+                    Number "2" (1,36) -> (1,37),
+                    Number "3" (1,38) -> (1,39),
                   ],
-                  closeParenthesis: ParenthesisCloseToken (1,39) -> (1,39),
+                  closeParenthesis: RParen (1,39) -> (1,39),
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,40) -> (1,40),
+            closeBrace: RBrace (1,40) -> (1,40),
           },
         },
       ],
@@ -5243,9 +5243,9 @@ Score (1,1) -> (1,21) {
           notes: NoteList (1,4) -> (1,8) {
             notes: Array [
               Note (1,4) -> (1,8) {
-                noteValue: NumberLiteral "3" (1,4) -> (1,5),
-                noteStringDot: DotToken (1,5) -> (1,5),
-                noteString: NumberLiteral "3" (1,6) -> (1,7),
+                noteValue: Number "3" (1,4) -> (1,5),
+                noteStringDot: Dot (1,5) -> (1,5),
+                noteString: Number "3" (1,6) -> (1,7),
               },
             ],
           },
@@ -5254,16 +5254,16 @@ Score (1,1) -> (1,21) {
     },
     Bar (1,8) -> (1,21) {
       metaData: Array [
-        MetaData (1,10) -> (1,21) {
-          tag: MetaDataTag "sync" (1,10) -> (1,15) {
-            prefix: BackSlashToken (1,10) -> (1,11),
-            tag: Identifier "sync" (1,11) -> (1,15),
+        Meta (1,10) -> (1,21) {
+          tag: Tag "sync" (1,10) -> (1,15) {
+            prefix: Backslash (1,10) -> (1,11),
+            tag: Ident "sync" (1,11) -> (1,15),
           },
-          values: ValueList (1,16) -> (1,21) {
+          values: Values (1,16) -> (1,21) {
             values: Array [
-              NumberLiteral "1" (1,16) -> (1,17),
-              NumberLiteral "1" (1,18) -> (1,19),
-              NumberLiteral "1" (1,20) -> (1,21),
+              Number "1" (1,16) -> (1,17),
+              Number "1" (1,18) -> (1,19),
+              Number "1" (1,20) -> (1,21),
             ],
           },
         },
@@ -5286,7 +5286,7 @@ Score (1,1) -> (1,20) {
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
-                noteValue: NumberLiteral "32" (1,4) -> (1,6),
+                noteValue: Number "32" (1,4) -> (1,6),
               },
             ],
           },
@@ -5295,16 +5295,16 @@ Score (1,1) -> (1,20) {
     },
     Bar (1,7) -> (1,20) {
       metaData: Array [
-        MetaData (1,9) -> (1,20) {
-          tag: MetaDataTag "sync" (1,9) -> (1,14) {
-            prefix: BackSlashToken (1,9) -> (1,10),
-            tag: Identifier "sync" (1,10) -> (1,14),
+        Meta (1,9) -> (1,20) {
+          tag: Tag "sync" (1,9) -> (1,14) {
+            prefix: Backslash (1,9) -> (1,10),
+            tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: ValueList (1,15) -> (1,20) {
+          values: Values (1,15) -> (1,20) {
             values: Array [
-              NumberLiteral "1" (1,15) -> (1,16),
-              NumberLiteral "1" (1,17) -> (1,18),
-              NumberLiteral "1" (1,19) -> (1,20),
+              Number "1" (1,15) -> (1,16),
+              Number "1" (1,17) -> (1,18),
+              Number "1" (1,19) -> (1,20),
             ],
           },
         },
@@ -5327,7 +5327,7 @@ Score (1,1) -> (1,20) {
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+                noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
           },
@@ -5336,16 +5336,16 @@ Score (1,1) -> (1,20) {
     },
     Bar (1,7) -> (1,20) {
       metaData: Array [
-        MetaData (1,9) -> (1,20) {
-          tag: MetaDataTag "sync" (1,9) -> (1,14) {
-            prefix: BackSlashToken (1,9) -> (1,10),
-            tag: Identifier "sync" (1,10) -> (1,14),
+        Meta (1,9) -> (1,20) {
+          tag: Tag "sync" (1,9) -> (1,14) {
+            prefix: Backslash (1,9) -> (1,10),
+            tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: ValueList (1,15) -> (1,20) {
+          values: Values (1,15) -> (1,20) {
             values: Array [
-              NumberLiteral "1" (1,15) -> (1,16),
-              NumberLiteral "1" (1,17) -> (1,18),
-              NumberLiteral "1" (1,19) -> (1,20),
+              Number "1" (1,15) -> (1,16),
+              Number "1" (1,17) -> (1,18),
+              Number "1" (1,19) -> (1,20),
             ],
           },
         },
@@ -5370,13 +5370,13 @@ Score (1,1) -> (1,14) {
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+                noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,7) -> (1,7),
+      pipe: Pipe (1,7) -> (1,7),
     },
     Bar (1,9) -> (1,14) {
       beats: Array [
@@ -5384,11 +5384,11 @@ Score (1,1) -> (1,14) {
           notes: NoteList (1,9) -> (1,12) {
             notes: Array [
               Note (1,9) -> (1,12) {
-                noteValue: Identifier "C5" (1,9) -> (1,11),
+                noteValue: Ident "C5" (1,9) -> (1,11),
               },
             ],
           },
-          durationDot: DotToken (1,12) -> (1,12),
+          durationDot: Dot (1,12) -> (1,12),
         },
       ],
     },
@@ -5405,13 +5405,13 @@ Score (1,1) -> (1,16) {
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+                noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,7) -> (1,7),
+      pipe: Pipe (1,7) -> (1,7),
     },
     Bar (1,9) -> (1,13) {
       beats: Array [
@@ -5419,13 +5419,13 @@ Score (1,1) -> (1,16) {
           notes: NoteList (1,9) -> (1,12) {
             notes: Array [
               Note (1,9) -> (1,12) {
-                noteValue: Identifier "C5" (1,9) -> (1,11),
+                noteValue: Ident "C5" (1,9) -> (1,11),
               },
             ],
           },
         },
       ],
-      pipe: PipeToken (1,12) -> (1,12),
+      pipe: Pipe (1,12) -> (1,12),
     },
   ],
 }
@@ -5448,14 +5448,14 @@ Score (1,1) -> (1,36) {
   bars: Array [
     Bar (1,2) -> (1,23) {
       metaData: Array [
-        MetaData (1,2) -> (1,16) {
-          tag: MetaDataTag "title" (1,2) -> (1,8) {
-            prefix: BackSlashToken (1,2) -> (1,3),
-            tag: Identifier "title" (1,3) -> (1,8),
+        Meta (1,2) -> (1,16) {
+          tag: Tag "title" (1,2) -> (1,8) {
+            prefix: Backslash (1,2) -> (1,3),
+            tag: Ident "title" (1,3) -> (1,8),
           },
-          values: ValueList (1,9) -> (1,16) {
+          values: Values (1,9) -> (1,16) {
             values: Array [
-              StringLiteral "Test" (1,9) -> (1,14),
+              String "Test" (1,9) -> (1,14),
             ],
           },
         },
@@ -5465,27 +5465,27 @@ Score (1,1) -> (1,36) {
           notes: NoteList (1,18) -> (1,20) {
             notes: Array [
               Note (1,18) -> (1,20) {
-                noteValue: Identifier "C4" (1,18) -> (1,20),
+                noteValue: Ident "C4" (1,18) -> (1,20),
               },
             ],
           },
-          durationDot: DotToken (1,20) -> (1,20),
-          durationValue: NumberLiteral "4" (1,21) -> (1,22),
+          durationDot: Dot (1,20) -> (1,20),
+          durationValue: Number "4" (1,21) -> (1,22),
         },
       ],
     },
     Bar (1,23) -> (1,36) {
       metaData: Array [
-        MetaData (1,25) -> (1,36) {
-          tag: MetaDataTag "sync" (1,25) -> (1,30) {
-            prefix: BackSlashToken (1,25) -> (1,26),
-            tag: Identifier "sync" (1,26) -> (1,30),
+        Meta (1,25) -> (1,36) {
+          tag: Tag "sync" (1,25) -> (1,30) {
+            prefix: Backslash (1,25) -> (1,26),
+            tag: Ident "sync" (1,26) -> (1,30),
           },
-          values: ValueList (1,31) -> (1,36) {
+          values: Values (1,31) -> (1,36) {
             values: Array [
-              NumberLiteral "1" (1,31) -> (1,32),
-              NumberLiteral "1" (1,33) -> (1,34),
-              NumberLiteral "1" (1,35) -> (1,36),
+              Number "1" (1,31) -> (1,32),
+              Number "1" (1,33) -> (1,34),
+              Number "1" (1,35) -> (1,36),
             ],
           },
         },
@@ -5508,7 +5508,7 @@ Score (1,1) -> (1,26) {
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+                noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
           },
@@ -5517,24 +5517,24 @@ Score (1,1) -> (1,26) {
     },
     Bar (1,7) -> (1,26) {
       metaData: Array [
-        MetaData (1,9) -> (1,25) {
-          tag: MetaDataTag "sync" (1,9) -> (1,14) {
-            prefix: BackSlashToken (1,9) -> (1,10),
-            tag: Identifier "sync" (1,10) -> (1,14),
+        Meta (1,9) -> (1,25) {
+          tag: Tag "sync" (1,9) -> (1,14) {
+            prefix: Backslash (1,9) -> (1,10),
+            tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: ValueList (1,15) -> (1,22) {
-            openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
+          values: Values (1,15) -> (1,22) {
+            openParenthesis: LParen (1,15) -> (1,15),
             values: Array [
-              NumberLiteral "1" (1,16) -> (1,17),
-              NumberLiteral "1" (1,18) -> (1,19),
-              NumberLiteral "1" (1,20) -> (1,21),
+              Number "1" (1,16) -> (1,17),
+              Number "1" (1,18) -> (1,19),
+              Number "1" (1,20) -> (1,21),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+            closeParenthesis: RParen (1,21) -> (1,21),
           },
-          properties: Properties (1,23) -> (1,25) {
-            openBrace: BraceOpenToken (1,23) -> (1,23),
+          properties: Props (1,23) -> (1,25) {
+            openBrace: LBrace (1,23) -> (1,23),
             properties: Array [],
-            closeBrace: BraceCloseToken (1,24) -> (1,24),
+            closeBrace: RBrace (1,24) -> (1,24),
           },
         },
       ],
@@ -5556,7 +5556,7 @@ Score (1,1) -> (1,43) {
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+                noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
           },
@@ -5565,37 +5565,37 @@ Score (1,1) -> (1,43) {
     },
     Bar (1,7) -> (1,43) {
       metaData: Array [
-        MetaData (1,9) -> (1,42) {
-          tag: MetaDataTag "sync" (1,9) -> (1,14) {
-            prefix: BackSlashToken (1,9) -> (1,10),
-            tag: Identifier "sync" (1,10) -> (1,14),
+        Meta (1,9) -> (1,42) {
+          tag: Tag "sync" (1,9) -> (1,14) {
+            prefix: Backslash (1,9) -> (1,10),
+            tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: ValueList (1,15) -> (1,22) {
-            openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
+          values: Values (1,15) -> (1,22) {
+            openParenthesis: LParen (1,15) -> (1,15),
             values: Array [
-              NumberLiteral "1" (1,16) -> (1,17),
-              NumberLiteral "1" (1,18) -> (1,19),
-              NumberLiteral "1" (1,20) -> (1,21),
+              Number "1" (1,16) -> (1,17),
+              Number "1" (1,18) -> (1,19),
+              Number "1" (1,20) -> (1,21),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+            closeParenthesis: RParen (1,21) -> (1,21),
           },
-          properties: Properties (1,23) -> (1,42) {
-            openBrace: BraceOpenToken (1,23) -> (1,23),
+          properties: Props (1,23) -> (1,42) {
+            openBrace: LBrace (1,23) -> (1,23),
             properties: Array [
-              Property (1,25) -> (1,40) {
-                property: Identifier "unknown" (1,25) -> (1,32),
-                properties: ValueList (1,33) -> (1,40) {
-                  openParenthesis: ParenthesisOpenToken (1,33) -> (1,33),
+              Prop (1,25) -> (1,40) {
+                property: Ident "unknown" (1,25) -> (1,32),
+                properties: Values (1,33) -> (1,40) {
+                  openParenthesis: LParen (1,33) -> (1,33),
                   values: Array [
-                    NumberLiteral "1" (1,34) -> (1,35),
-                    NumberLiteral "2" (1,36) -> (1,37),
-                    NumberLiteral "3" (1,38) -> (1,39),
+                    Number "1" (1,34) -> (1,35),
+                    Number "2" (1,36) -> (1,37),
+                    Number "3" (1,38) -> (1,39),
                   ],
-                  closeParenthesis: ParenthesisCloseToken (1,39) -> (1,39),
+                  closeParenthesis: RParen (1,39) -> (1,39),
                 },
               },
             ],
-            closeBrace: BraceCloseToken (1,41) -> (1,41),
+            closeBrace: RBrace (1,41) -> (1,41),
           },
         },
       ],
@@ -5617,7 +5617,7 @@ Score (1,1) -> (1,22) {
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+                noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
           },
@@ -5626,19 +5626,19 @@ Score (1,1) -> (1,22) {
     },
     Bar (1,7) -> (1,22) {
       metaData: Array [
-        MetaData (1,9) -> (1,22) {
-          tag: MetaDataTag "sync" (1,9) -> (1,14) {
-            prefix: BackSlashToken (1,9) -> (1,10),
-            tag: Identifier "sync" (1,10) -> (1,14),
+        Meta (1,9) -> (1,22) {
+          tag: Tag "sync" (1,9) -> (1,14) {
+            prefix: Backslash (1,9) -> (1,10),
+            tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: ValueList (1,15) -> (1,22) {
-            openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
+          values: Values (1,15) -> (1,22) {
+            openParenthesis: LParen (1,15) -> (1,15),
             values: Array [
-              NumberLiteral "1" (1,16) -> (1,17),
-              NumberLiteral "1" (1,18) -> (1,19),
-              NumberLiteral "1" (1,20) -> (1,21),
+              Number "1" (1,16) -> (1,17),
+              Number "1" (1,18) -> (1,19),
+              Number "1" (1,20) -> (1,21),
             ],
-            closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+            closeParenthesis: RParen (1,21) -> (1,21),
           },
         },
       ],
