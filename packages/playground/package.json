@@ -9,7 +9,7 @@
         "@fontsource/noto-serif": "^5.2.8",
         "@fortawesome/fontawesome-free": "^7.1.0",
         "@popperjs/core": "^2.11.8",
-        "@types/serve-static": "^1.15.8",
+        "@types/serve-static": "^1.15.9",
         "bootstrap": "^5.3.8",
         "handlebars": "^4.7.8",
         "serve-static": "^2.2.0"
