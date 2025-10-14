@@ -73,7 +73,7 @@ export class AlphaTexLexer {
         return peeked;
     }
 
-    public extendToFloat(peekedNode: AlphaTexNumberLiteral): AlphaTexAstNode {
+    public extendToFloat(peekedNode: AlphaTexNumberLiteral): AlphaTexNumberLiteral {
         // float number tokenizing is a bit tricky in alphaTex
         // we chose <fret>.<string>.<duration> (or <fret>.<string>) as
         // syntax for fretted notes, this conflicts now with a context
@@ -589,8 +589,8 @@ export class AlphaTexLexer {
     private static _buildNonIdentifierChars() {
         const c = new Set<number>();
 
-        for (const terminal of AlphaTexLexer._terminalTokens) {
-            c.add(terminal[0]);
+        for (const terminal of AlphaTexLexer._terminalTokens.keys()) {
+            c.add(terminal);
         }
 
         // dashes allowed in names
