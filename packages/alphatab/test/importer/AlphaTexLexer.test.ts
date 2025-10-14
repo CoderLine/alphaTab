@@ -1,4 +1,4 @@
-import type { AlphaTexAstNode } from '@src/importer/alphaTex/AlphaTexAst';
+import { type AlphaTexAstNode, AlphaTexNodeType, type AlphaTexNumberLiteral } from '@src/importer/alphaTex/AlphaTexAst';
 import { AlphaTexLexer } from '@src/importer/alphaTex/AlphaTexLexer';
 import { expect } from 'chai';
 
@@ -8,11 +8,12 @@ describe('AlphaTexLexerTest', () => {
         const actual: AlphaTexAstNode[] = [];
 
         while (true) {
-            const token = lexer.nextToken();
+            const token = lexer.peekToken();
             if (!token) {
                 break;
             }
             actual.push(token);
+            lexer.advance();
         }
 
         expect(actual).toMatchSnapshot();
@@ -27,11 +28,17 @@ describe('AlphaTexLexerTest', () => {
         const actual: AlphaTexAstNode[] = [];
 
         while (true) {
-            const token = lexer.nextTokenWithFloats();
+            const token = lexer.peekToken();
             if (!token) {
                 break;
             }
-            actual.push(token);
+
+            if (token.nodeType === AlphaTexNodeType.Number) {
+                actual.push(lexer.extendToFloat(token as AlphaTexNumberLiteral));
+            } else {
+                actual.push(token);
+            }
+            lexer.advance();
         }
 
         expect(actual).toMatchSnapshot();
@@ -90,6 +97,7 @@ describe('AlphaTexLexerTest', () => {
         lexerTest('electricpiano1');
         lexerTest('Unicodeöäü Unicode😸 Utf16🤘🏻');
         lexerTest('dashed-identifier');
+        lexerTest('HelloWorld Multiple Identifiers');
     });
 
     it('floats', () => {

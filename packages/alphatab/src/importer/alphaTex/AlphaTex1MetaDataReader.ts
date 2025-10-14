@@ -122,10 +122,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         property: AlphaTexPropertyNode
     ): AlphaTexValueList | undefined {
         const tag = property.property.text.toLowerCase();
-        const endOfProperty = new Set<AlphaTexNodeType>([
-            AlphaTexNodeType.Ident,
-            AlphaTexNodeType.RBrace
-        ]);
+        const endOfProperty = new Set<AlphaTexNodeType>([AlphaTexNodeType.Ident, AlphaTexNodeType.RBrace]);
         for (const lookup of lookups) {
             if (lookup.has(tag)) {
                 const types = lookup.get(tag);
@@ -241,6 +238,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         const valueList = Atnf.values(values, false)!;
         valueList.start = valueListStart;
         valueList.end = parser.lexer.currentTokenLocation();
+        valueList.validated = true;
 
         return valueList;
     }
@@ -253,40 +251,48 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
     ): boolean {
         switch (value.nodeType) {
             case AlphaTexNodeType.Ident:
+                const identifier = value as AlphaTexIdentifier;
                 if (expected?.allowedValues) {
-                    const identifierText = (parser.lexer.peekToken() as AlphaTexIdentifier).text;
-                    if (expected.allowedValues.has(identifierText.toLowerCase())) {
-                        valueList.push(parser.lexer.nextToken() as AlphaTexIdentifier);
+                    if (expected.allowedValues.has(identifier.text.toLowerCase())) {
+                        valueList.push(identifier);
+                        parser.lexer.advance();
                     }
                 } else if (expected?.reservedIdentifiers) {
-                    const identifierText = (parser.lexer.peekToken() as AlphaTexIdentifier).text;
-                    if (!expected.reservedIdentifiers.has(identifierText.toLowerCase())) {
-                        valueList.push(parser.lexer.nextToken() as AlphaTexIdentifier);
+                    if (!expected.reservedIdentifiers.has(identifier.text.toLowerCase())) {
+                        valueList.push(identifier);
+                        parser.lexer.advance();
                     }
                 } else {
-                    valueList.push(parser.lexer.nextToken() as AlphaTexIdentifier);
+                    valueList.push(identifier);
+                    parser.lexer.advance();
                 }
 
                 return true;
             case AlphaTexNodeType.String:
+                const str = value as AlphaTexStringLiteral;
+
                 if (expected?.allowedValues) {
-                    const identifierText = (parser.lexer.peekToken() as AlphaTexStringLiteral).text;
-                    if (expected.allowedValues.has(identifierText.toLowerCase())) {
-                        valueList.push(parser.lexer.nextToken() as AlphaTexStringLiteral);
+                    if (expected.allowedValues.has(str.text.toLowerCase())) {
+                        valueList.push(str);
+                        parser.lexer.advance();
                     }
                 } else {
-                    valueList.push(parser.lexer.nextToken() as AlphaTexStringLiteral);
+                    valueList.push(str);
+                    parser.lexer.advance();
                 }
+
                 return true;
             case AlphaTexNodeType.Number:
                 const parseMode = expected?.parseMode ?? ValueListParseTypesMode.Optional;
                 switch (parseMode) {
                     case ValueListParseTypesMode.RequiredAsFloat:
                     case ValueListParseTypesMode.OptionalAsFloat:
-                        valueList.push(parser.lexer.nextTokenWithFloats() as AlphaTexNumberLiteral);
+                        valueList.push(parser.lexer.extendToFloat(value as AlphaTexNumberLiteral));
+                        parser.lexer.advance();
                         break;
                     default:
-                        valueList.push(parser.lexer.nextToken() as AlphaTexNumberLiteral);
+                        valueList.push(value as AlphaTexNumberLiteral);
+                        parser.lexer.advance();
                         break;
                 }
                 return true;

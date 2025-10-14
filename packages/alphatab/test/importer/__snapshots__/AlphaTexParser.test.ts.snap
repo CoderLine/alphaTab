@@ -5237,9 +5237,9 @@ exports[`AlphaTexParserTest valid-score-metadata valuelist propertylist unknown 
 exports[`AlphaTexParserTest valid-sync-points basic fretted 1`] = `
 Score (1,1) -> (1,21) {
   bars: Array [
-    Bar (1,2) -> (1,8) {
+    Bar (1,2) -> (1,10) {
       beats: Array [
-        Beat (1,4) -> (1,8) {
+        Beat (1,4) -> (1,10) {
           notes: NoteList (1,4) -> (1,8) {
             notes: Array [
               Note (1,4) -> (1,8) {
@@ -5252,7 +5252,7 @@ Score (1,1) -> (1,21) {
         },
       ],
     },
-    Bar (1,8) -> (1,21) {
+    Bar (1,10) -> (1,21) {
       metaData: Array [
         Meta (1,10) -> (1,21) {
           tag: Tag "sync" (1,10) -> (1,15) {
@@ -5280,12 +5280,12 @@ exports[`AlphaTexParserTest valid-sync-points basic fretted: parser-diagnostics 
 exports[`AlphaTexParserTest valid-sync-points basic simple numbered 1`] = `
 Score (1,1) -> (1,20) {
   bars: Array [
-    Bar (1,2) -> (1,7) {
+    Bar (1,2) -> (1,9) {
       beats: Array [
-        Beat (1,4) -> (1,7) {
-          notes: NoteList (1,4) -> (1,7) {
+        Beat (1,4) -> (1,9) {
+          notes: NoteList (1,4) -> (1,9) {
             notes: Array [
-              Note (1,4) -> (1,7) {
+              Note (1,4) -> (1,9) {
                 noteValue: Number "32" (1,4) -> (1,6),
               },
             ],
@@ -5293,7 +5293,7 @@ Score (1,1) -> (1,20) {
         },
       ],
     },
-    Bar (1,7) -> (1,20) {
+    Bar (1,9) -> (1,20) {
       metaData: Array [
         Meta (1,9) -> (1,20) {
           tag: Tag "sync" (1,9) -> (1,14) {
@@ -5321,9 +5321,9 @@ exports[`AlphaTexParserTest valid-sync-points basic simple numbered: parser-diag
 exports[`AlphaTexParserTest valid-sync-points basic simple pitched 1`] = `
 Score (1,1) -> (1,20) {
   bars: Array [
-    Bar (1,2) -> (1,7) {
+    Bar (1,2) -> (1,9) {
       beats: Array [
-        Beat (1,4) -> (1,7) {
+        Beat (1,4) -> (1,9) {
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
@@ -5334,7 +5334,7 @@ Score (1,1) -> (1,20) {
         },
       ],
     },
-    Bar (1,7) -> (1,20) {
+    Bar (1,9) -> (1,20) {
       metaData: Array [
         Meta (1,9) -> (1,20) {
           tag: Tag "sync" (1,9) -> (1,14) {
@@ -5502,9 +5502,9 @@ exports[`AlphaTexParserTest valid-sync-points full: parser-diagnostics 1`] = `Ar
 exports[`AlphaTexParserTest valid-sync-points properties empty 1`] = `
 Score (1,1) -> (1,26) {
   bars: Array [
-    Bar (1,2) -> (1,7) {
+    Bar (1,2) -> (1,9) {
       beats: Array [
-        Beat (1,4) -> (1,7) {
+        Beat (1,4) -> (1,9) {
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
@@ -5515,7 +5515,7 @@ Score (1,1) -> (1,26) {
         },
       ],
     },
-    Bar (1,7) -> (1,26) {
+    Bar (1,9) -> (1,26) {
       metaData: Array [
         Meta (1,9) -> (1,25) {
           tag: Tag "sync" (1,9) -> (1,14) {
@@ -5550,9 +5550,9 @@ exports[`AlphaTexParserTest valid-sync-points properties empty: parser-diagnosti
 exports[`AlphaTexParserTest valid-sync-points properties unknown 1`] = `
 Score (1,1) -> (1,43) {
   bars: Array [
-    Bar (1,2) -> (1,7) {
+    Bar (1,2) -> (1,9) {
       beats: Array [
-        Beat (1,4) -> (1,7) {
+        Beat (1,4) -> (1,9) {
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
@@ -5563,7 +5563,7 @@ Score (1,1) -> (1,43) {
         },
       ],
     },
-    Bar (1,7) -> (1,43) {
+    Bar (1,9) -> (1,43) {
       metaData: Array [
         Meta (1,9) -> (1,42) {
           tag: Tag "sync" (1,9) -> (1,14) {
@@ -5611,9 +5611,9 @@ exports[`AlphaTexParserTest valid-sync-points properties unknown: parser-diagnos
 exports[`AlphaTexParserTest valid-sync-points valuelist 1`] = `
 Score (1,1) -> (1,22) {
   bars: Array [
-    Bar (1,2) -> (1,7) {
+    Bar (1,2) -> (1,9) {
       beats: Array [
-        Beat (1,4) -> (1,7) {
+        Beat (1,4) -> (1,9) {
           notes: NoteList (1,4) -> (1,7) {
             notes: Array [
               Note (1,4) -> (1,7) {
@@ -5624,7 +5624,7 @@ Score (1,1) -> (1,22) {
         },
       ],
     },
-    Bar (1,7) -> (1,22) {
+    Bar (1,9) -> (1,22) {
       metaData: Array [
         Meta (1,9) -> (1,22) {
           tag: Tag "sync" (1,9) -> (1,14) {

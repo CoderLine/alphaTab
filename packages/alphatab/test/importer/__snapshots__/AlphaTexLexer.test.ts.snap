@@ -337,6 +337,14 @@ Array [
 ]
 `;
 
+exports[`AlphaTexLexerTest identifiers 10`] = `
+Array [
+  Ident "HelloWorld" (1,1) -> (1,11),
+  Ident "Multiple" (1,12) -> (1,20),
+  Ident "Identifiers" (1,21) -> (1,32),
+]
+`;
+
 exports[`AlphaTexLexerTest leading-comments 1`] = `
 Array [
   Ident "true" (2,10) -> (3,1) {

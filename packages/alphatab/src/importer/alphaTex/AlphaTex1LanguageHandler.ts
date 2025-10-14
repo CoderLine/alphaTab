@@ -886,6 +886,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             }
         }
 
+        if (values.validated) {
+            return true;
+        }
+
         while (expectedIndex < expectedValues.length) {
             const expected = expectedValues[expectedIndex];
 

@@ -254,6 +254,13 @@ export interface AlphaTexValueList extends AlphaTexAstNode {
      * The close parenthesis token grouping the values.
      */
     closeParenthesis?: AlphaTexParenthesisCloseTokenNode;
+
+    /**
+     * Whether the types of this list have been validated already to match
+     * the types expected of the property or metadata.
+     * @internal
+     */
+    validated?: boolean;
 }
 
 /**

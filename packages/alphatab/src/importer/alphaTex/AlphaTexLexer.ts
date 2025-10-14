@@ -26,7 +26,6 @@ import {
     AlphaTexDiagnosticsSeverity
 } from '@src/importer/alphaTex/AlphaTexShared';
 import { IOHelper } from '@src/io/IOHelper';
-import { Queue } from '@src/synth/ds/Queue';
 
 /**
  * @public
@@ -46,7 +45,8 @@ export class AlphaTexLexer {
     private _tokenStart: AlphaTexAstNodeLocation = { line: 0, col: 0, offset: 0 };
     private _leadingComments: AlphaTexComment[] | undefined;
     private _trailingCommentNode: AlphaTexAstNode | undefined;
-    private _tokenQueue: Queue<AlphaTexAstNode> = new Queue<AlphaTexAstNode>();
+
+    private _peekedToken: AlphaTexAstNode | undefined;
 
     public readonly lexerDiagnostics = new AlphaTexDiagnosticBag();
 
@@ -58,32 +58,22 @@ export class AlphaTexLexer {
         this._codepoint = this._codepoints.length > 0 ? this._codepoints[0] : AlphaTexLexer._eof;
     }
 
-    public get canRead() {
-        return !this._fatalError && (!this._tokenQueue.isEmpty || this._offset < this._codepoints.length);
-    }
-
     public peekToken(): AlphaTexAstNode | undefined {
         if (this._fatalError) {
             return undefined;
         }
 
-        if (this._tokenQueue.isEmpty) {
-            const token = this._readToken();
-            if (!token) {
-                return token;
-            }
-            this._tokenQueue.enqueue(token);
-            return token;
+        let peeked = this._peekedToken;
+        if (peeked) {
+            return peeked;
         }
 
-        return this._tokenQueue.peek();
+        peeked = this._readToken();
+        this._peekedToken = peeked;
+        return peeked;
     }
 
-    public revert(node: AlphaTexAstNode) {
-        this._tokenQueue.enqueueFront(node);
-    }
-
-    public nextTokenWithFloats(): AlphaTexAstNode | undefined {
+    public extendToFloat(peekedNode: AlphaTexNumberLiteral): AlphaTexAstNode {
         // float number tokenizing is a bit tricky in alphaTex
         // we chose <fret>.<string>.<duration> (or <fret>.<string>) as
         // syntax for fretted notes, this conflicts now with a context
@@ -91,85 +81,93 @@ export class AlphaTexLexer {
 
         // It would be a good idea to check for 3.3.3 patterns here
         // and then handle the numbers as individual ones? as for now we
-        // use "nextTokenAsFloat" at dedicated areas when parsing.
+        // use "extendToFloat" at dedicated areas when parsing.
 
-        const start = this.nextToken();
-        if (!start) {
-            return undefined;
-        }
-        if (start.nodeType !== AlphaTexNodeType.Number) {
-            return start;
-        }
-
-        const floatSeparator = this.peekToken();
-        // integer number
+        // a float needs a decimal separator and a digit after the peeked node
         if (
-            !floatSeparator ||
-            floatSeparator.nodeType !== AlphaTexNodeType.Dot ||
-            floatSeparator.start!.offset !== start.end!.offset
+            this._codepoint !== 0x2e /* . */ ||
+            this._offset + 1 >= this._codepoints.length ||
+            !AlphaTexLexer._isDigit(this._codepoints[this._offset + 1])
         ) {
-            return start;
+            return peekedNode;
         }
-        this.nextToken(); // consume dot
 
-        const fractional = this.peekToken();
-        if (
-            // 1 at end
-            !fractional ||
-            // 1 . 1
-            fractional.start!.offset !== floatSeparator.end!.offset + 1 ||
-            // 1.1a
-            fractional.nodeType !== AlphaTexNodeType.Number ||
-            // -1.-1
-            (fractional as AlphaTexNumberLiteral).value < 0
-        ) {
-            this._tokenQueue.enqueueFront(floatSeparator);
-            return start;
+        let offset = this._offset + 2;
+        // advance to end of fractional digits
+        while (offset < this._codepoints.length && AlphaTexLexer._isDigit(this._codepoints[offset])) {
+            offset++;
         }
-        this.nextToken(); // consume fraction
 
-        return {
-            nodeType: AlphaTexNodeType.Number,
-            start: start.start,
-            end: fractional.end,
-            leadingComments: start.leadingComments,
-            value: Number.parseFloat(
-                String.fromCodePoint(...this._codepoints.slice(start.start!.offset, fractional.end!.offset))
-            )
-        } as AlphaTexNumberLiteral;
+        // 1.1a -> handle as Number(1) Dot(.) Ident(1a)
+        if (offset < this._codepoints.length && AlphaTexLexer._isIdentifierCharacter(this._codepoints[offset])) {
+            return peekedNode;
+        }
+
+        // jump to last digit
+        const characters = offset - this._offset - 1;
+        this._offset += characters;
+        this._col += characters;
+        this._nextCodepoint(); // consume last digit like usual
+
+        // update end and value
+        peekedNode.end = this._currentLexerLocation();
+        peekedNode.value = Number.parseFloat(
+            String.fromCodePoint(...this._codepoints.slice(peekedNode.start!.offset, peekedNode.end!.offset))
+        );
+
+        return peekedNode;
     }
 
-    public nextToken(): AlphaTexAstNode | undefined {
-        if (this._fatalError) {
-            return undefined;
-        }
-
-        if (this._tokenQueue.isEmpty) {
-            return this._readToken();
-        }
-        return this._tokenQueue.dequeue();
+    public advance() {
+        this._peekedToken = undefined;
     }
+
+    // public nextToken(): AlphaTexAstNode | undefined {
+    //     if (this._fatalError) {
+    //         return undefined;
+    //     }
+
+    //     const reverted = this._revertedToken;
+    //     if (reverted) {
+    //         this._revertedToken = undefined;
+    //         return reverted;
+    //     }
+
+    //     const peeked = this._peekedToken;
+    //     if (peeked) {
+    //         this._peekedToken = undefined;
+    //         return peeked;
+    //     }
+
+    //     return this._readToken();
+    // }
 
     private _nextCodepoint(): number {
-        if (this._offset < this._codepoints.length - 1) {
-            ++this._offset;
-            this._codepoint = this._codepoints[this._offset];
-            if (this._codepoint === 0x0a) {
-                this._line++;
+        const codePoints = this._codepoints;
+        let offset = this._offset;
+
+        if (offset < codePoints.length - 1) {
+            ++offset;
+            const codepoint = codePoints[offset];
+            this._codepoint = codepoint;
+            if (codepoint === 0x0a) {
+                ++this._line;
                 this._col = 1;
             } else {
-                this._col++;
+                ++this._col;
             }
+            this._offset = offset;
+            return codepoint;
         } else if (this._codepoint !== AlphaTexLexer._eof) {
             this._codepoint = AlphaTexLexer._eof;
-            this._col++;
-            this._offset = this._codepoints.length;
+            ++this._col;
+            this._offset = codePoints.length;
         }
-        return this._codepoint;
+        return AlphaTexLexer._eof;
     }
 
     public currentTokenLocation(): AlphaTexAstNodeLocation {
-        return this._tokenQueue.peek()?.start ?? this._currentLexerLocation();
+        return this._peekedToken?.start ?? this._currentLexerLocation();
     }
 
     private _currentLexerLocation(): AlphaTexAstNodeLocation {
@@ -588,28 +586,34 @@ export class AlphaTexLexer {
         return ch >= 0x30 && ch <= 0x39 /* 0-9 */;
     }
 
-    private static _isIdentifierCharacter(ch: number): boolean {
-        return AlphaTexLexer._isIdentifierStart(ch) || AlphaTexLexer._isDigit(ch) || ch === 0x2d /* dash */;
-    }
+    private static _buildNonIdentifierChars() {
+        const c = new Set<number>();
 
-    private static _isIdentifierStart(ch: number): boolean {
-        // allow almost all characters:
-        return !(
-            (
-                AlphaTexLexer._terminalTokens.has(ch) || // terminal tokens end identifiers
-                ch <= 0x21 || // control characters
-                AlphaTexLexer._isDigit(ch)
-            ) // digits
-        );
+        for (const terminal of AlphaTexLexer._terminalTokens) {
+            c.add(terminal[0]);
+        }
+
+        // dashes allowed in names
+        c.delete(0x2d /* - */);
+
+        // eof
+        c.add(AlphaTexLexer._eof);
+
+        return c;
+    }
+    private static readonly _nonIdentifierChars = AlphaTexLexer._buildNonIdentifierChars();
+
+    private static _isIdentifierCharacter(ch: number): boolean {
+        return !AlphaTexLexer._nonIdentifierChars.has(ch);
     }
 
     private static _isWhiteSpace(ch: number): boolean {
         return (
-            ch === 0x09 /* \t */ ||
+            ch === 0x20 /* space */ ||
             ch === 0x0a /* \n */ ||
-            ch === 0x0b /* \v */ ||
             ch === 0x0d /* \r */ ||
-            ch === 0x20 /* space */
+            ch === 0x09 /* \t */ ||
+            ch === 0x0b /* \v */
         );
     }
 }

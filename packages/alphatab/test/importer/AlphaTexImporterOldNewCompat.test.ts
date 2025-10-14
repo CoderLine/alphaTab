@@ -136,8 +136,9 @@ describe('AlphaTexImporterOldNewCompat', () => {
         const oldTex = new AlphaTexExporterOld().exportToString(ScoreLoader.loadAlphaTex(newTex, settings));
 
         let sumNew = 0;
+        let sumOld = 0;
 
-        function run(i: number, check: boolean) {
+        function run(i: number, check: boolean, log: boolean) {
             const oldImporter = new AlphaTexImporterOld();
             oldImporter.initFromString(oldTex, settings);
 
@@ -155,25 +156,32 @@ describe('AlphaTexImporterOldNewCompat', () => {
             if (check) {
                 const oldTime = oldEnd - oldStart;
                 const newTime = newEnd - newStart;
-                Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'Old', i, oldTime);
-                Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'New', i, newTime);
-                Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'Diff', i, newTime - oldTime);
+                if (log) {
+                    Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'Old', i, oldTime);
+                    Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'New', i, newTime);
+                    Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'Diff', i, newTime - oldTime);
+                }
                 sumNew += newTime;
+                sumOld += oldTime;
             }
         }
 
         // warmup
-        for (let i = 0; i < 3; i++) {
-            run(i, false);
+        for (let i = 0; i < 10; i++) {
+            run(i, false, false);
         }
 
-        const testCount = 10;
+        const testCount = 100;
         for (let i = 0; i < testCount; i++) {
-            run(i, true);
+            run(i, true, false);
         }
 
         const avgNew = sumNew / testCount;
         expect(avgNew).to.be.lessThan(25);
+        const avgOld = sumOld / testCount;
+        Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'Overall', avgNew / avgOld);
+
+        expect(avgNew / avgOld).to.be.lessThan(2);
     });
 
     // it('profile', async () => {

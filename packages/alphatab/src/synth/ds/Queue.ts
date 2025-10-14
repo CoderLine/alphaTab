@@ -16,11 +16,6 @@ class QueueItem<T> {
 export class Queue<T extends object> {
     private _head?: QueueItem<T>;
     private _tail?: QueueItem<T>;
-    private _length: number = 0;
-
-    public get length(): number {
-        return this._length;
-    }
 
     public get isEmpty() {
         return this._head === undefined;
@@ -29,7 +24,6 @@ export class Queue<T extends object> {
     public clear() {
         this._head = undefined;
         this._tail = undefined;
-        this._length = 0;
     }
 
     public enqueue(item: T) {
@@ -43,7 +37,6 @@ export class Queue<T extends object> {
             this._head = queueItem;
             this._tail = queueItem;
         }
-        this._length++;
     }
 
     public enqueueFront(item: T) {
@@ -77,7 +70,6 @@ export class Queue<T extends object> {
         if (!newHead) {
             this._tail = undefined;
         }
-        this._length--;
         return head.value;
     }
 }

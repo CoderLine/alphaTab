@@ -262,9 +262,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                     this.semanticDiagnostics
                 );
                 if (this.logErrors) {
-                    if (this.logErrors) {
-                        Logger.error('AlphaTex', `Error while parsing alphaTex: ${error.toString()}`);
-                    }
+                    Logger.error('AlphaTex', `Error while parsing alphaTex: ${error.toString()}`);
                 }
 
                 throw error;
