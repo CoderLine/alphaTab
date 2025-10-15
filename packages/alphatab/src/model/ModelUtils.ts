@@ -1,21 +1,18 @@
-import { AccidentalType } from '@src/model/AccidentalType';
-import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import type { Duration } from '@src/model/Duration';
-import type { KeySignature } from '@src/model/KeySignature';
-import { MasterBar } from '@src/model/MasterBar';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@src/model/Score';
-import type { Track } from '@src/model/Track';
-import { Voice } from '@src/model/Voice';
 import type { Settings } from '@src/Settings';
+import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { MasterBar } from '@src/model/MasterBar';
+import type { Track } from '@src/model/Track';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { Bar } from '@src/model/Bar';
+import { Voice } from '@src/model/Voice';
+import { Automation, AutomationType } from '@src/model/Automation';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { KeySignature } from '@src/model/KeySignature';
+import { AccidentalType } from '@src/model/AccidentalType';
 
-/**
- * @internal
- */
 export class TuningParseResult {
     public note: string | null = null;
     public tone: TuningParseResultTone = new TuningParseResultTone();
@@ -26,9 +23,6 @@ export class TuningParseResult {
     }
 }
 
-/**
- * @internal
- */
 export class TuningParseResultTone {
     public noteValue: number;
     public accidentalMode: NoteAccidentalMode;
@@ -41,7 +35,6 @@ export class TuningParseResultTone {
 /**
  * This public class contains some utilities for working with model public classes
  * @partial
- * @internal
  */
 export class ModelUtils {
     public static getIndex(duration: Duration): number {
@@ -88,15 +81,6 @@ export class ModelUtils {
         return !!ModelUtils.parseTuning(name);
     }
 
-
-    /**
-     * @internal
-     */
-    public static readonly tuningLetters = new Set<number>([
-        0x43 /* C */, 0x44 /* D */, 0x45 /* E */, 0x46 /* F */, 0x47 /* G */, 0x41 /* A */, 0x42 /* B */, 0x63 /* c */,
-        0x64 /* d */, 0x65 /* e */, 0x66 /* f */, 0x67 /* g */, 0x61 /* a */, 0x62 /* b */, 0x23 /* # */
-    ]);
-    
     public static parseTuning(name: string): TuningParseResult | null {
         let note: string = '';
         let octave: string = '';
@@ -108,10 +92,8 @@ export class ModelUtils {
                     return null;
                 }
                 octave += String.fromCharCode(c);
-            } else if (ModelUtils.tuningLetters.has(c)) {
-                note += String.fromCharCode(c);
             } else {
-                return null;
+                note += String.fromCharCode(c);
             }
         }
         if (!octave || !note) {
@@ -200,6 +182,25 @@ export class ModelUtils {
         return new TuningParseResultTone(noteValue, noteAccidenalMode);
     }
 
+     /**
+     * @internal
+     */
+    public static readonly reverseAccidentalModeMapping = new Map<NoteAccidentalMode, string>([
+        [NoteAccidentalMode.Default, 'd'],
+
+        [NoteAccidentalMode.ForceNone, 'forcenone'],
+
+        [NoteAccidentalMode.ForceNatural, 'forcenatural'],
+
+        [NoteAccidentalMode.ForceSharp, '#'],
+
+        [NoteAccidentalMode.ForceDoubleSharp, 'x'],
+
+        [NoteAccidentalMode.ForceFlat, 'b'],
+
+        [NoteAccidentalMode.ForceDoubleFlat, 'bb']
+    ]);
+
     /**
      * @internal
      */
@@ -225,25 +226,6 @@ export class ModelUtils {
 
         ['forcedoubleflat', NoteAccidentalMode.ForceDoubleFlat],
         ['bb', NoteAccidentalMode.ForceDoubleFlat]
-    ]);
-
-    /**
-     * @internal
-     */
-    public static readonly reverseAccidentalModeMapping = new Map<NoteAccidentalMode, string>([
-        [NoteAccidentalMode.Default, 'd'],
-
-        [NoteAccidentalMode.ForceNone, 'forcenone'],
-
-        [NoteAccidentalMode.ForceNatural, 'forcenatural'],
-
-        [NoteAccidentalMode.ForceSharp, '#'],
-
-        [NoteAccidentalMode.ForceDoubleSharp, 'x'],
-
-        [NoteAccidentalMode.ForceFlat, 'b'],
-
-        [NoteAccidentalMode.ForceDoubleFlat, 'bb']
     ]);
 
     public static parseAccidentalMode(data: string): NoteAccidentalMode {
@@ -660,19 +642,19 @@ export class ModelUtils {
         }
     }
 
-    private static _allMusicFontSymbols: MusicFontSymbol[] = [];
+    private static allMusicFontSymbols: MusicFontSymbol[] = [];
 
     /**
      * Gets a list of all music font symbols used in alphaTab.
      */
     public static getAllMusicFontSymbols(): MusicFontSymbol[] {
-        if (ModelUtils._allMusicFontSymbols.length === 0) {
-            ModelUtils._allMusicFontSymbols = Object.values(MusicFontSymbol)
+        if (ModelUtils.allMusicFontSymbols.length === 0) {
+            ModelUtils.allMusicFontSymbols = Object.values(MusicFontSymbol)
                 .filter<any>((k: any) => typeof k === 'number')
                 .map(v => v as number as MusicFontSymbol) as MusicFontSymbol[];
         }
 
-        return ModelUtils._allMusicFontSymbols;
+        return ModelUtils.allMusicFontSymbols;
     }
 
     /**
@@ -723,7 +705,7 @@ export class ModelUtils {
      *
      * e.g. 3# is 3-sharps -> KeySignature.A
      */
-    private static _translateKeyTransposeTable(texts: string[][]): KeySignature[][] {
+    private static translateKeyTransposeTable(texts: string[][]): KeySignature[][] {
         const keySignatures: KeySignature[][] = [];
         for (const transpose of texts) {
             const transposeValues: KeySignature[] = [];
@@ -740,7 +722,10 @@ export class ModelUtils {
         return keySignatures;
     }
 
-    private static readonly _keyTransposeTable: KeySignature[][] = ModelUtils._translateKeyTransposeTable([
+    /**
+     * @internal
+     */
+    private static readonly keyTransposeTable: KeySignature[][] = ModelUtils.translateKeyTransposeTable([
         /*              Cb    Gb    Db    Ab    Eb    Bb    F     C     G     D     A     E     B     F     C# */
         /* C	 0 */ ['7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#'],
         /* Db	 1 */ ['2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b', '3b', '2b', '1b', '0#'],
@@ -769,7 +754,7 @@ export class ModelUtils {
         }
 
         if (transpose < 0) {
-            const lookup = ModelUtils._keyTransposeTable[-transpose];
+            const lookup = ModelUtils.keyTransposeTable[-transpose];
             const keySignatureIndex = lookup.indexOf(keySignature);
             if (keySignatureIndex === -1) {
                 return keySignature;
@@ -777,7 +762,7 @@ export class ModelUtils {
 
             return (keySignatureIndex - 7) as KeySignature;
         } else {
-            return ModelUtils._keyTransposeTable[transpose][keySignature + 7];
+            return ModelUtils.keyTransposeTable[transpose][keySignature + 7];
         }
     }
 
@@ -785,7 +770,7 @@ export class ModelUtils {
      * a lookup list containing an info whether the notes within an octave
      * need an accidental rendered. the accidental symbol is determined based on the type of key signature.
      */
-    private static _keySignatureLookup: Array<boolean[]> = [
+    private static KeySignatureLookup: Array<boolean[]> = [
         // Flats (where the value is true, a flat accidental is required for the notes)
         [true, true, true, true, true, true, true, true, true, true, true, true],
         [true, true, true, true, true, false, true, true, true, true, true, true],
@@ -810,7 +795,7 @@ export class ModelUtils {
      * Contains the list of notes within an octave have accidentals set.
      * @internal
      */
-    public static readonly accidentalNotes: boolean[] = [
+    public static accidentalNotes: boolean[] = [
         false,
         true,
         false,
@@ -840,7 +825,7 @@ export class ModelUtils {
         const index: number = noteValue % 12;
 
         const accidentalForKeySignature: AccidentalType = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
-        const hasKeySignatureAccidentalSetForNote: boolean = ModelUtils._keySignatureLookup[ksi][index];
+        const hasKeySignatureAccidentalSetForNote: boolean = ModelUtils.KeySignatureLookup[ksi][index];
         const hasNoteAccidentalWithinOctave: boolean = ModelUtils.accidentalNotes[index];
 
         // the general logic is like this:

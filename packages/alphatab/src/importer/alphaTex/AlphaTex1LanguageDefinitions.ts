@@ -448,7 +448,7 @@ export class AlphaTex1LanguageDefinitions {
         string,
         ValueListParseTypesExtended[] | undefined
     >([
-        // tu 3, tu 3,2
+        // tu 3, tu 3 2
         [
             'tu',
             AlphaTex1LanguageDefinitions._basicList([

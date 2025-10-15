@@ -83,6 +83,11 @@ import { SynthConstants } from '@src/synth/SynthConstants';
 export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler {
     public static readonly instance = new AlphaTex1LanguageHandler();
 
+    private static readonly _tuningLetters = new Set<number>([
+        0x43 /* C */, 0x44 /* D */, 0x45 /* E */, 0x46 /* F */, 0x47 /* G */, 0x41 /* A */, 0x42 /* B */, 0x63 /* c */,
+        0x64 /* d */, 0x65 /* e */, 0x66 /* f */, 0x67 /* g */, 0x61 /* a */, 0x62 /* b */, 0x23 /* # */
+    ]);
+
     public applyScoreMetaData(
         importer: IAlphaTexImporter,
         score: Score,
@@ -330,7 +335,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             } else if (i === metaData.values!.values.length - 1 && tuning.length > 0) {
                                 tuningName = text;
                             } else {
-                                const tuningLetters = Array.from(ModelUtils.tuningLetters).join(',');
+                                const tuningLetters = Array.from(AlphaTex1LanguageHandler._tuningLetters).join(',');
                                 const accidentalModes = Array.from(ModelUtils.accidentalModeMapping.keys()).join(',');
                                 importer.addSemanticDiagnostic({
                                     code: AlphaTexDiagnosticCode.AT209,
