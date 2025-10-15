@@ -208,11 +208,28 @@ export class AlphaTexParser {
             }
 
             this._beatDuration(beat);
+
+            // pre 1.7 the multiplier was between the duration and effects
+            // for backwards compat we still allow it
             this._beatMultiplier(beat);
+           
 
             beat.beatEffects = this._properties(property =>
                 this._metaDataReader.readBeatPropertyValues(this, property)
             );
+
+            if(beat.beatMultiplierValue !== undefined && beat.beatEffects?.openBrace) {
+                this.addParserDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT304,
+                    message: 'The beat multiplier should be specified after the beat effects.',
+                    severity: AlphaTexDiagnosticsSeverity.Warning,
+                    start: beat.beatMultiplier!.start,
+                    end: beat.beatMultiplierValue.end
+                });
+            }
+
+            this._beatMultiplier(beat);
+
         } finally {
             beat.end = this.lexer.currentTokenLocation();
         }

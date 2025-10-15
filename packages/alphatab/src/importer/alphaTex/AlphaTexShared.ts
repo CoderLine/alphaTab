@@ -202,7 +202,12 @@ export enum AlphaTexDiagnosticCode {
     AT303 = 303,
 
     /**
-     * he dots separating score metadata, score contents and the sync points can be removed.
+     * The beat multiplier should be specified after the beat effects.
+     */
+    AT304 = 304,
+
+    /**
+     * The dots separating score metadata, score contents and the sync points can be removed.
      */
     AT400 = 400
 }
