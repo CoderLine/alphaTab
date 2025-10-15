@@ -9,8 +9,8 @@
     ],
     "scripts": {
         "clean": "npm run clean --workspaces --if-present",
-        "lint": "npm run lint-ci --workspaces --if-present",
-        "lint-ci": "npm run lint-ci --workspaces --if-present -- --reporter=github",
+        "lint": "npm run lint --workspaces --if-present",
+        "lint-ci": "npm run lint --workspaces --if-present -- --reporter=github",
         "typecheck": "npm run typecheck --workspaces --if-present",
         "dev": "npm run dev --workspace=packages/playground",
 
