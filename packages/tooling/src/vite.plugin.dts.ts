@@ -26,7 +26,8 @@ export default function generateDts(root: string, entryFile: string, outputFilen
             },
             dtsRollup: {
                 enabled: true,
-                publicTrimmedFilePath: outputFile
+                publicTrimmedFilePath: outputFile,
+                omitTrimmingComments: true
             }
         }
     });
