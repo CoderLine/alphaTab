@@ -32,6 +32,9 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { TypeConversions } from '@src/io/TypeConversions';
 import { IntBitReader } from '@src/synth/vorbis/IntBitReader';
 
+/**
+ * @internal
+ */
 export class VorbisSetupHeader {
     public codebooks: VorbisCodebook[] = [];
     public timeDomainTransforms: VorbisTimeDomainTransform[] = [];
@@ -41,6 +44,9 @@ export class VorbisSetupHeader {
     public modes: VorbisMode[] = [];
 }
 
+/**
+ * @internal
+ */
 class VorbisUtils {
     static ilog(x: number): number {
         let cnt = 0;
@@ -76,10 +82,16 @@ class VorbisUtils {
     }
 }
 
+/**
+ * @internal
+ */
 interface IFastList {
     get(index: number): number;
 }
 
+/**
+ * @internal
+ */
 class FastListArray implements IFastList {
     private _data: Int32Array;
     public constructor(data: Int32Array) {
@@ -89,6 +101,10 @@ class FastListArray implements IFastList {
         return this._data[index];
     }
 }
+
+/**
+ * @internal
+ */
 class FastRange implements IFastList {
     public static readonly instance = new FastRange();
     public get(index: number) {
@@ -96,6 +112,9 @@ class FastRange implements IFastList {
     }
 }
 
+/**
+ * @internal
+ */
 export class VorbisCodebook {
     private _lengths: Int32Array;
     private _maxBits: number = 0;
@@ -123,8 +142,8 @@ export class VorbisCodebook {
         // init the storage
         this._lengths = new Int32Array(this.entries);
 
-        this.initTree(packet, huffman);
-        this.initLookupTable(packet);
+        this._initTree(packet, huffman);
+        this._initLookupTable(packet);
     }
 
     public get(entry: number, dim: number): number {
@@ -161,7 +180,7 @@ export class VorbisCodebook {
         return -1;
     }
 
-    private initTree(packet: IntBitReader, huffman: Huffman) {
+    private _initTree(packet: IntBitReader, huffman: Huffman) {
         let sparse: boolean;
         let total = 0;
 
@@ -227,7 +246,7 @@ export class VorbisCodebook {
                 values = new Int32Array(sortedCount);
             }
 
-            if (!this.computeCodewords(sparse, codewords, codewordLengths, this._lengths, this.entries, values)) {
+            if (!this._computeCodewords(sparse, codewords, codewordLengths, this._lengths, this.entries, values)) {
                 throw new AlphaTabError(AlphaTabErrorType.Format, 'Vorbis: Failed to compute codewords');
             }
 
@@ -240,7 +259,7 @@ export class VorbisCodebook {
         }
     }
 
-    private computeCodewords(
+    private _computeCodewords(
         sparse: boolean,
         codewords: Int32Array | null,
         codewordLengths: Int32Array | null,
@@ -262,7 +281,7 @@ export class VorbisCodebook {
             return true;
         }
 
-        this.addEntry(sparse, codewords, codewordLengths, 0, k, m++, len[k], values);
+        this._addEntry(sparse, codewords, codewordLengths, 0, k, m++, len[k], values);
 
         for (let i = 1; i <= len[k]; ++i) {
             available[i] = 1 << (32 - i);
@@ -283,7 +302,7 @@ export class VorbisCodebook {
 
             const res = available[z];
             available[z] = 0;
-            this.addEntry(sparse, codewords, codewordLengths, VorbisUtils.bitReverse(res), i, m++, len[i], values);
+            this._addEntry(sparse, codewords, codewordLengths, VorbisUtils.bitReverse(res), i, m++, len[i], values);
 
             if (z !== len[i]) {
                 for (let y = len[i]; y > z; --y) {
@@ -295,7 +314,7 @@ export class VorbisCodebook {
         return true;
     }
 
-    private addEntry(
+    private _addEntry(
         sparse: boolean,
         codewords: Int32Array | null,
         codewordLengths: Int32Array | null,
@@ -314,7 +333,7 @@ export class VorbisCodebook {
         }
     }
 
-    private initLookupTable(packet: IntBitReader) {
+    private _initLookupTable(packet: IntBitReader) {
         this.mapType = packet.readBits(4);
         if (this.mapType === 0) {
             return;
@@ -323,12 +342,12 @@ export class VorbisCodebook {
         const minValue = VorbisUtils.convertFromVorbisFloat32(packet.readBits(32));
         const deltaValue = VorbisUtils.convertFromVorbisFloat32(packet.readBits(32));
         const valueBits = packet.readBits(4) + 1;
-        const sequence_p = packet.readBit();
+        const sequenceP = packet.readBit();
 
         let lookupValueCount = this.entries * this.dimensions;
         const lookupTable = new Float32Array(lookupValueCount);
         if (this.mapType === 1) {
-            lookupValueCount = this.lookup1Values();
+            lookupValueCount = this._lookup1Values();
         }
 
         const multiplicands = new Uint32Array(lookupValueCount);
@@ -346,7 +365,7 @@ export class VorbisCodebook {
                     const value = multiplicands[moff] * deltaValue + minValue + last;
                     lookupTable[idx * this.dimensions + i] = value;
 
-                    if (sequence_p) {
+                    if (sequenceP) {
                         last = value;
                     }
 
@@ -361,7 +380,7 @@ export class VorbisCodebook {
                     const value = multiplicands[moff] * deltaValue + minValue + last;
                     lookupTable[idx * this.dimensions + i] = value;
 
-                    if (sequence_p) {
+                    if (sequenceP) {
                         last = value;
                     }
 
@@ -373,7 +392,7 @@ export class VorbisCodebook {
         this._lookupTable = lookupTable;
     }
 
-    private lookup1Values(): number {
+    private _lookup1Values(): number {
         let r = Math.floor(Math.exp(Math.log(this.entries) / this.dimensions));
 
         if (Math.floor(Math.pow(r + 1, this.dimensions)) <= this.entries) {
@@ -384,6 +403,9 @@ export class VorbisCodebook {
     }
 }
 
+/**
+ * @internal
+ */
 class HuffmanListNode {
     public value: number = 0;
 
@@ -392,8 +414,11 @@ class HuffmanListNode {
     public mask: number = 0;
 }
 
+/**
+ * @internal
+ */
 export class Huffman {
-    public static readonly MAX_TABLE_BITS = 10;
+    public static readonly maxTableBits = 10;
 
     public tableBits: number = 0;
     public prefixTree: (HuffmanListNode | null)[] = [];
@@ -423,7 +448,7 @@ export class Huffman {
             return len;
         });
 
-        const tableBits = maxLen > Huffman.MAX_TABLE_BITS ? Huffman.MAX_TABLE_BITS : maxLen;
+        const tableBits = maxLen > Huffman.maxTableBits ? Huffman.maxTableBits : maxLen;
 
         const prefixList: (HuffmanListNode | null)[] = [];
         let overflowList: (HuffmanListNode | null)[] | null = null;
@@ -457,23 +482,35 @@ export class Huffman {
     }
 }
 
+/**
+ * @internal
+ */
 export class VorbisTimeDomainTransform {
     public constructor(packet: IntBitReader) {
         packet.readBits(16);
     }
 }
 
+/**
+ * @internal
+ */
 export interface IVorbisFloorData {
     readonly executeChannel: boolean;
     forceEnergy: boolean;
     forceNoEnergy: boolean;
 }
 
+/**
+ * @internal
+ */
 export interface IVorbisFloor {
     unpack(packet: IntBitReader, blockSize: number, channel: number): IVorbisFloorData;
     apply(floorData: IVorbisFloorData, blockSize: number, residue: Float32Array): void;
 }
 
+/**
+ * @internal
+ */
 class VorbisFloorData0 implements IVorbisFloorData {
     public coeff: Float32Array;
     public amp: number = 0;
@@ -490,10 +527,13 @@ class VorbisFloorData0 implements IVorbisFloorData {
     }
 }
 
+/**
+ * @internal
+ */
 export class VorbisFloor0 implements IVorbisFloor {
     private _order: number;
     private _rate: number;
-    private _bark_map_size: number;
+    private _barkMapSize: number;
     private _ampBits: number;
     private _ampOfs: number;
     private _ampDiv: number;
@@ -506,12 +546,12 @@ export class VorbisFloor0 implements IVorbisFloor {
     public constructor(packet: IntBitReader, block0Size: number, block1Size: number, codebooks: VorbisCodebook[]) {
         this._order = packet.readBits(8);
         this._rate = packet.readBits(16);
-        this._bark_map_size = packet.readBits(16);
+        this._barkMapSize = packet.readBits(16);
         this._ampBits = packet.readBits(6);
         this._ampOfs = packet.readBits(8);
         this._books = new Array<VorbisCodebook>(packet.readBits(4) + 1);
 
-        if (this._order < 1 || this._rate < 1 || this._bark_map_size < 1 || this._books.length === 0) {
+        if (this._order < 1 || this._rate < 1 || this._barkMapSize < 1 || this._books.length === 0) {
             throw new AlphaTabError(AlphaTabErrorType.Format, 'Vorbis: Invalid Floor0 Data');
         }
 
@@ -534,36 +574,36 @@ export class VorbisFloor0 implements IVorbisFloor {
         this._bookBits = VorbisUtils.ilog(this._books.length);
 
         this._barkMaps = new Map<number, Int32Array>([
-            [block0Size, this.synthesizeBarkCurve(block0Size / 2)],
-            [block1Size, this.synthesizeBarkCurve(block1Size / 2)]
+            [block0Size, this._synthesizeBarkCurve(block0Size / 2)],
+            [block1Size, this._synthesizeBarkCurve(block1Size / 2)]
         ]);
         this._wMap = new Map<number, Float32Array>([
-            [block0Size, this.synthesizeWDelMap(block0Size / 2)],
-            [block1Size, this.synthesizeWDelMap(block1Size / 2)]
+            [block0Size, this._synthesizeWDelMap(block0Size / 2)],
+            [block1Size, this._synthesizeWDelMap(block1Size / 2)]
         ]);
     }
 
-    private synthesizeBarkCurve(n: number): Int32Array {
-        const scale = this._bark_map_size / VorbisFloor0.toBARK(this._rate / 2);
+    private _synthesizeBarkCurve(n: number): Int32Array {
+        const scale = this._barkMapSize / VorbisFloor0._toBARK(this._rate / 2);
 
         const map = new Int32Array(n + 1);
 
         for (let i = 0; i < n - 1; i++) {
             map[i] = Math.min(
-                this._bark_map_size - 1,
-                Math.floor(VorbisFloor0.toBARK((this._rate / 2 / n) * i) * scale)
+                this._barkMapSize - 1,
+                Math.floor(VorbisFloor0._toBARK((this._rate / 2 / n) * i) * scale)
             );
         }
         map[n] = -1;
         return map;
     }
 
-    private static toBARK(lsp: number): number {
+    private static _toBARK(lsp: number): number {
         return 13.1 * Math.atan(0.00074 * lsp) + 2.24 * Math.atan(0.0000000185 * lsp * lsp) + 0.0001 * lsp;
     }
 
-    private synthesizeWDelMap(n: number) {
-        const wdel = Math.PI / this._bark_map_size;
+    private _synthesizeWDelMap(n: number) {
+        const wdel = Math.PI / this._barkMapSize;
 
         const map = new Float32Array(n);
         for (let i = 0; i < n; i++) {
@@ -673,6 +713,9 @@ export class VorbisFloor0 implements IVorbisFloor {
     }
 }
 
+/**
+ * @internal
+ */
 class VorbisFloor1Data implements IVorbisFloorData {
     public posts = new Int32Array(64);
     public postCount: number = 0;
@@ -685,6 +728,9 @@ class VorbisFloor1Data implements IVorbisFloorData {
     public forceNoEnergy: boolean = false;
 }
 
+/**
+ * @internal
+ */
 export class VorbisFloor1 implements IVorbisFloor {
     private static readonly _rangeLookup = [256, 128, 86, 64];
     private static readonly _yBitsLookup = [8, 7, 7, 6];
@@ -707,24 +753,24 @@ export class VorbisFloor1 implements IVorbisFloor {
     private _subclassBookIndex: Int32Array[];
 
     public constructor(packet: IntBitReader, codebooks: VorbisCodebook[]) {
-        let maximum_class = -1;
+        let maximumClass = -1;
         this._partitionClass = new Int32Array(packet.readBits(5));
         for (let i = 0; i < this._partitionClass.length; i++) {
             this._partitionClass[i] = packet.readBits(4);
-            if (this._partitionClass[i] > maximum_class) {
-                maximum_class = this._partitionClass[i];
+            if (this._partitionClass[i] > maximumClass) {
+                maximumClass = this._partitionClass[i];
             }
         }
 
-        ++maximum_class;
+        ++maximumClass;
 
-        this._classDimensions = new Int32Array(maximum_class);
-        this._classSubclasses = new Int32Array(maximum_class);
-        this._classMasterbooks = new Array<VorbisCodebook>(maximum_class);
-        this._classMasterBookIndex = new Int32Array(maximum_class);
-        this._subclassBooks = new Array<(VorbisCodebook | null)[]>(maximum_class);
-        this._subclassBookIndex = new Array<Int32Array>(maximum_class);
-        for (let i = 0; i < maximum_class; i++) {
+        this._classDimensions = new Int32Array(maximumClass);
+        this._classSubclasses = new Int32Array(maximumClass);
+        this._classMasterbooks = new Array<VorbisCodebook>(maximumClass);
+        this._classMasterBookIndex = new Int32Array(maximumClass);
+        this._subclassBooks = new Array<(VorbisCodebook | null)[]>(maximumClass);
+        this._subclassBookIndex = new Array<Int32Array>(maximumClass);
+        for (let i = 0; i < maximumClass; i++) {
             this._classDimensions[i] = packet.readBits(3) + 1;
             this._classSubclasses[i] = packet.readBits(2);
             if (this._classSubclasses[i] > 0) {
@@ -856,7 +902,7 @@ export class VorbisFloor1 implements IVorbisFloor {
         const n = blockSize / 2;
 
         if (data.postCount > 0) {
-            const stepFlags = this.unwrapPosts(data);
+            const stepFlags = this._unwrapPosts(data);
 
             let lx = 0;
 
@@ -868,7 +914,7 @@ export class VorbisFloor1 implements IVorbisFloor {
                     const hx = this._xList[idx];
                     const hy = data.posts[idx] * this._multiplier;
                     if (lx < n) {
-                        this.renderLineMulti(lx, ly, Math.min(hx, n), hy, residue);
+                        this._renderLineMulti(lx, ly, Math.min(hx, n), hy, residue);
                     }
                     lx = hx;
                     ly = hy;
@@ -879,14 +925,14 @@ export class VorbisFloor1 implements IVorbisFloor {
             }
 
             if (lx < n) {
-                this.renderLineMulti(lx, ly, n, ly, residue);
+                this._renderLineMulti(lx, ly, n, ly, residue);
             }
         } else {
             residue.fill(0, 0, n);
         }
     }
 
-    private unwrapPosts(data: VorbisFloor1Data): boolean[] {
+    private _unwrapPosts(data: VorbisFloor1Data): boolean[] {
         const stepFlags = new Array<boolean>(64);
         stepFlags.fill(false);
         stepFlags[0] = true;
@@ -900,7 +946,7 @@ export class VorbisFloor1 implements IVorbisFloor {
             const lowOfs = this._lNeigh[i];
             const highOfs = this._hNeigh[i];
 
-            const predicted = this.renderPoint(
+            const predicted = this._renderPoint(
                 this._xList[lowOfs],
                 finalY[lowOfs],
                 this._xList[highOfs],
@@ -950,7 +996,7 @@ export class VorbisFloor1 implements IVorbisFloor {
         return stepFlags;
     }
 
-    private renderPoint(x0: number, y0: number, x1: number, y1: number, X: number) {
+    private _renderPoint(x0: number, y0: number, x1: number, y1: number, X: number) {
         const dy = y1 - y0;
         const adx = x1 - x0;
         const ady = Math.abs(dy);
@@ -962,7 +1008,7 @@ export class VorbisFloor1 implements IVorbisFloor {
         return y0 + off;
     }
 
-    private renderLineMulti(x0: number, y0: number, x1: number, y1: number, v: Float32Array) {
+    private _renderLineMulti(x0: number, y0: number, x1: number, y1: number, v: Float32Array) {
         const dy = y1 - y0;
         const adx = x1 - x0;
         let ady = Math.abs(dy);
@@ -972,7 +1018,7 @@ export class VorbisFloor1 implements IVorbisFloor {
         let y = y0;
         let err = -adx;
 
-        v[x0] *= VorbisFloor1.inverse_dB_table[y0];
+        v[x0] *= VorbisFloor1._inverseDbTable[y0];
         ady -= Math.abs(b) * adx;
 
         while (++x < x1) {
@@ -982,12 +1028,11 @@ export class VorbisFloor1 implements IVorbisFloor {
                 err -= adx;
                 y += sy;
             }
-            v[x] *= VorbisFloor1.inverse_dB_table[y];
+            v[x] *= VorbisFloor1._inverseDbTable[y];
         }
     }
 
-    // prettier-ignore
-    private static readonly inverse_dB_table = new Float32Array([
+    private static readonly _inverseDbTable = new Float32Array([
         1.0649863e-7, 1.1341951e-7, 1.2079015e-7, 1.2863978e-7, 1.3699951e-7, 1.4590251e-7, 1.5538408e-7, 1.6548181e-7,
         1.7623575e-7, 1.8768855e-7, 1.9988561e-7, 2.128753e-7, 2.2670913e-7, 2.4144197e-7, 2.5713223e-7, 2.7384213e-7,
         2.9163793e-7, 3.1059021e-7, 3.3077411e-7, 3.5226968e-7, 3.7516214e-7, 3.9954229e-7, 4.255068e-7, 4.5315863e-7,
@@ -1024,6 +1069,9 @@ export class VorbisFloor1 implements IVorbisFloor {
     ]);
 }
 
+/**
+ * @internal
+ */
 export class VorbisFloor implements IVorbisFloor {
     public floor: IVorbisFloor;
 
@@ -1050,10 +1098,16 @@ export class VorbisFloor implements IVorbisFloor {
     }
 }
 
+/**
+ * @internal
+ */
 export interface IVorbisResidue {
     decode(packet: IntBitReader, doNotDecodeChannel: boolean[], blockSize: number, buffer: Float32Array[]): void;
 }
 
+/**
+ * @internal
+ */
 export class VorbisResidue0 implements IVorbisResidue {
     private _channels: number;
     private _begin: number;
@@ -1078,13 +1132,13 @@ export class VorbisResidue0 implements IVorbisResidue {
         this._cascade = new Int32Array(this._classifications);
         let acc = 0;
         for (let i = 0; i < this._classifications; i++) {
-            const low_bits = packet.readBits(3);
+            const lowBits = packet.readBits(3);
             if (packet.readBit()) {
-                this._cascade[i] = (packet.readBits(5) << 3) | low_bits;
+                this._cascade[i] = (packet.readBits(5) << 3) | lowBits;
             } else {
-                this._cascade[i] = low_bits;
+                this._cascade[i] = lowBits;
             }
-            acc += VorbisResidue0.icount(this._cascade[i]);
+            acc += VorbisResidue0._icount(this._cascade[i]);
         }
 
         const bookNums = new Int32Array(acc);
@@ -1142,7 +1196,7 @@ export class VorbisResidue0 implements IVorbisResidue {
         this._channels = channels;
     }
 
-    private static icount(v: number): number {
+    private static _icount(v: number): number {
         let ret = 0;
         while (v !== 0) {
             ret += v & 1;
@@ -1236,6 +1290,9 @@ export class VorbisResidue0 implements IVorbisResidue {
     }
 }
 
+/**
+ * @internal
+ */
 export class VorbisResidue1 extends VorbisResidue0 {
     protected override writeVectors(
         codebook: VorbisCodebook,
@@ -1261,6 +1318,9 @@ export class VorbisResidue1 extends VorbisResidue0 {
     }
 }
 
+/**
+ * @internal
+ */
 export class VorbisResidue2 extends VorbisResidue0 {
     private _realChannels: number;
     public constructor(packet: IntBitReader, channels: number, codebooks: VorbisCodebook[]) {
@@ -1308,6 +1368,9 @@ export class VorbisResidue2 extends VorbisResidue0 {
     }
 }
 
+/**
+ * @internal
+ */
 export class VorbisResidue implements IVorbisResidue {
     public residue: IVorbisResidue;
 
@@ -1339,6 +1402,9 @@ export class VorbisResidue implements IVorbisResidue {
     }
 }
 
+/**
+ * @internal
+ */
 export class VorbisMapping {
     private _mdct: Mdct;
     private _couplingAngle: Int32Array;
@@ -1525,17 +1591,26 @@ export class VorbisMapping {
     }
 }
 
+/**
+ * @internal
+ */
 class VorbisModeOverlapInfo {
     public packetStartIndex: number = 0;
     public packetTotalLength: number = 0;
     public packetValidLength: number = 0;
 }
 
+/**
+ * @internal
+ */
 class VorbisModePacketInfo {
     public overlapInfo: VorbisModeOverlapInfo = new VorbisModeOverlapInfo();
     public windowIndex: number = 0;
 }
 
+/**
+ * @internal
+ */
 class VorbisReadNextPacketResult {
     public samplePosition: number | null = null;
     public constructor(samplePosition: number | null = null) {
@@ -1543,8 +1618,11 @@ class VorbisReadNextPacketResult {
     }
 }
 
+/**
+ * @internal
+ */
 export class VorbisMode {
-    private static readonly M_PI2 = 3.1415926539 / 2;
+    private static readonly _piHalf = 3.1415926539 / 2;
 
     private _channels: number;
     private _blockFlag: boolean;
@@ -1579,25 +1657,25 @@ export class VorbisMode {
         if (this._blockFlag) {
             this._blockSize = block1Size;
             this._windows = [
-                VorbisMode.calcWindow(block0Size, block1Size, block0Size),
-                VorbisMode.calcWindow(block1Size, block1Size, block0Size),
-                VorbisMode.calcWindow(block0Size, block1Size, block1Size),
-                VorbisMode.calcWindow(block1Size, block1Size, block1Size)
+                VorbisMode._calcWindow(block0Size, block1Size, block0Size),
+                VorbisMode._calcWindow(block1Size, block1Size, block0Size),
+                VorbisMode._calcWindow(block0Size, block1Size, block1Size),
+                VorbisMode._calcWindow(block1Size, block1Size, block1Size)
             ];
             this._overlapInfo = [
-                VorbisMode.calcOverlap(block0Size, block1Size, block0Size),
-                VorbisMode.calcOverlap(block1Size, block1Size, block0Size),
-                VorbisMode.calcOverlap(block0Size, block1Size, block1Size),
-                VorbisMode.calcOverlap(block1Size, block1Size, block1Size)
+                VorbisMode._calcOverlap(block0Size, block1Size, block0Size),
+                VorbisMode._calcOverlap(block1Size, block1Size, block0Size),
+                VorbisMode._calcOverlap(block0Size, block1Size, block1Size),
+                VorbisMode._calcOverlap(block1Size, block1Size, block1Size)
             ];
         } else {
             this._blockSize = block0Size;
-            this._windows = [VorbisMode.calcWindow(block0Size, block0Size, block0Size)];
+            this._windows = [VorbisMode._calcWindow(block0Size, block0Size, block0Size)];
         }
     }
 
     public decode(reader: IntBitReader, buffer: Float32Array[]): VorbisModeOverlapInfo {
-        const info = this.getPacketInfo(reader);
+        const info = this._getPacketInfo(reader);
 
         this._mapping.decodePacket(reader, this._blockSize, buffer);
 
@@ -1611,7 +1689,7 @@ export class VorbisMode {
         return info.overlapInfo;
     }
 
-    private getPacketInfo(reader: IntBitReader): VorbisModePacketInfo {
+    private _getPacketInfo(reader: IntBitReader): VorbisModePacketInfo {
         const info = new VorbisModePacketInfo();
         if (this._blockFlag) {
             const prevFlag = reader.readBit();
@@ -1633,7 +1711,7 @@ export class VorbisMode {
         return info;
     }
 
-    private static calcWindow(prevBlockSize: number, blockSize: number, nextBlockSize: number): Float32Array {
+    private static _calcWindow(prevBlockSize: number, blockSize: number, nextBlockSize: number): Float32Array {
         const array = new Float32Array(blockSize);
 
         const left = prevBlockSize / 2;
@@ -1644,9 +1722,9 @@ export class VorbisMode {
         const rightbegin = wnd - wnd / 4 - right / 2;
 
         for (let i = 0; i < left; i++) {
-            let x = Math.sin(((i + 0.5) / left) * VorbisMode.M_PI2);
+            let x = Math.sin(((i + 0.5) / left) * VorbisMode._piHalf);
             x *= x;
-            array[leftbegin + i] = Math.sin(x * VorbisMode.M_PI2);
+            array[leftbegin + i] = Math.sin(x * VorbisMode._piHalf);
         }
 
         for (let i = leftbegin + left; i < rightbegin; i++) {
@@ -1654,15 +1732,15 @@ export class VorbisMode {
         }
 
         for (let i = 0; i < right; i++) {
-            let x = Math.sin(((right - i - 0.5) / right) * VorbisMode.M_PI2);
+            let x = Math.sin(((right - i - 0.5) / right) * VorbisMode._piHalf);
             x *= x;
-            array[rightbegin + i] = Math.sin(x * VorbisMode.M_PI2);
+            array[rightbegin + i] = Math.sin(x * VorbisMode._piHalf);
         }
 
         return array;
     }
 
-    private static calcOverlap(prevBlockSize: number, blockSize: number, nextBlockSize: number): VorbisModeOverlapInfo {
+    private static _calcOverlap(prevBlockSize: number, blockSize: number, nextBlockSize: number): VorbisModeOverlapInfo {
         const leftOverlapHalfSize = prevBlockSize / 4;
         const rightOverlapHalfSize = nextBlockSize / 4;
 
@@ -1678,10 +1756,13 @@ export class VorbisMode {
     }
 }
 
+/**
+ * @internal
+ */
 class MdctImpl {
     // biome-ignore lint/correctness/noPrecisionLoss: High precision PI
     // biome-ignore lint/suspicious/noApproximativeNumericConstant: High precision PI
-    private static readonly M_PI = 3.14159265358979323846264;
+    private static readonly _pi = 3.14159265358979323846264;
 
     private readonly _n: number;
     private readonly _n2: number;
@@ -1711,17 +1792,17 @@ class MdctImpl {
         let k: number = 0;
         let k2: number = 0;
         for (; k < this._n4; ++k, k2 += 2) {
-            this._a[k2] = Math.cos((4 * k * MdctImpl.M_PI) / n);
-            this._a[k2 + 1] = -Math.sin((4 * k * MdctImpl.M_PI) / n);
-            this._b[k2] = Math.cos(((k2 + 1) * MdctImpl.M_PI) / n / 2) * 0.5;
-            this._b[k2 + 1] = Math.sin(((k2 + 1) * MdctImpl.M_PI) / n / 2) * 0.5;
+            this._a[k2] = Math.cos((4 * k * MdctImpl._pi) / n);
+            this._a[k2 + 1] = -Math.sin((4 * k * MdctImpl._pi) / n);
+            this._b[k2] = Math.cos(((k2 + 1) * MdctImpl._pi) / n / 2) * 0.5;
+            this._b[k2 + 1] = Math.sin(((k2 + 1) * MdctImpl._pi) / n / 2) * 0.5;
         }
 
         k = 0;
         k2 = 0;
         for (; k < this._n8; ++k, k2 += 2) {
-            this._c[k2] = Math.cos((2 * (k2 + 1) * MdctImpl.M_PI) / n);
-            this._c[k2 + 1] = -Math.sin((2 * (k2 + 1) * MdctImpl.M_PI) / n);
+            this._c[k2] = Math.cos((2 * (k2 + 1) * MdctImpl._pi) / n);
+            this._c[k2 + 1] = -Math.sin((2 * (k2 + 1) * MdctImpl._pi) / n);
         }
 
         // now, calc the bit reverse table
@@ -1742,23 +1823,23 @@ class MdctImpl {
 
         {
             let d = this._n2 - 2; // buf2
-            let AA = 0; // A
+            let aa = 0; // A
             let e = 0; // buffer
-            const e_stop = this._n2; // buffer
-            while (e !== e_stop) {
-                buf2[d + 1] = buffer[e] * this._a[AA] - buffer[e + 2] * this._a[AA + 1];
-                buf2[d] = buffer[e] * this._a[AA + 1] + buffer[e + 2] * this._a[AA];
+            const eStop = this._n2; // buffer
+            while (e !== eStop) {
+                buf2[d + 1] = buffer[e] * this._a[aa] - buffer[e + 2] * this._a[aa + 1];
+                buf2[d] = buffer[e] * this._a[aa + 1] + buffer[e + 2] * this._a[aa];
                 d -= 2;
-                AA += 2;
+                aa += 2;
                 e += 4;
             }
 
             e = this._n2 - 3;
             while (d >= 0) {
-                buf2[d + 1] = -buffer[e + 2] * this._a[AA] - -buffer[e] * this._a[AA + 1];
-                buf2[d] = -buffer[e + 2] * this._a[AA + 1] + -buffer[e] * this._a[AA];
+                buf2[d + 1] = -buffer[e + 2] * this._a[aa] - -buffer[e] * this._a[aa + 1];
+                buf2[d] = -buffer[e + 2] * this._a[aa + 1] + -buffer[e] * this._a[aa];
                 d -= 2;
-                AA += 2;
+                aa += 2;
                 e -= 4;
             }
         }
@@ -1770,7 +1851,7 @@ class MdctImpl {
         // step 2
 
         {
-            let AA = this._n2 - 8; // A
+            let aa = this._n2 - 8; // A
 
             let e0 = this._n4; // v
             let e1 = 0; // v
@@ -1778,26 +1859,26 @@ class MdctImpl {
             let d0 = this._n4; // u
             let d1 = 0; // u
 
-            while (AA >= 0) {
-                let v40_20: number;
+            while (aa >= 0) {
+                let v4020: number;
 
-                let v41_21: number;
+                let v4121: number;
 
-                v41_21 = v[e0 + 1] - v[e1 + 1];
-                v40_20 = v[e0] - v[e1];
+                v4121 = v[e0 + 1] - v[e1 + 1];
+                v4020 = v[e0] - v[e1];
                 u[d0 + 1] = v[e0 + 1] + v[e1 + 1];
                 u[d0] = v[e0] + v[e1];
-                u[d1 + 1] = v41_21 * this._a[AA + 4] - v40_20 * this._a[AA + 5];
-                u[d1] = v40_20 * this._a[AA + 4] + v41_21 * this._a[AA + 5];
+                u[d1 + 1] = v4121 * this._a[aa + 4] - v4020 * this._a[aa + 5];
+                u[d1] = v4020 * this._a[aa + 4] + v4121 * this._a[aa + 5];
 
-                v41_21 = v[e0 + 3] - v[e1 + 3];
-                v40_20 = v[e0 + 2] - v[e1 + 2];
+                v4121 = v[e0 + 3] - v[e1 + 3];
+                v4020 = v[e0 + 2] - v[e1 + 2];
                 u[d0 + 3] = v[e0 + 3] + v[e1 + 3];
                 u[d0 + 2] = v[e0 + 2] + v[e1 + 2];
-                u[d1 + 3] = v41_21 * this._a[AA] - v40_20 * this._a[AA + 1];
-                u[d1 + 2] = v40_20 * this._a[AA] + v41_21 * this._a[AA + 1];
+                u[d1 + 3] = v4121 * this._a[aa] - v4020 * this._a[aa + 1];
+                u[d1 + 2] = v4020 * this._a[aa] + v4121 * this._a[aa + 1];
 
-                AA -= 8;
+                aa -= 8;
 
                 d0 += 4;
                 d1 += 4;
@@ -1809,23 +1890,23 @@ class MdctImpl {
         // step 3
 
         // iteration 0
-        this.step3_iter0_loop(this._n >> 4, u, this._n2 - 1 - this._n4 * 0, -this._n8);
-        this.step3_iter0_loop(this._n >> 4, u, this._n2 - 1 - this._n4 * 1, -this._n8);
+        this._step3Iter0Loop(this._n >> 4, u, this._n2 - 1 - this._n4 * 0, -this._n8);
+        this._step3Iter0Loop(this._n >> 4, u, this._n2 - 1 - this._n4 * 1, -this._n8);
 
         // iteration 1
-        this.step3_inner_r_loop(this._n >> 5, u, this._n2 - 1 - this._n8 * 0, -(this._n >> 4), 16);
-        this.step3_inner_r_loop(this._n >> 5, u, this._n2 - 1 - this._n8 * 1, -(this._n >> 4), 16);
-        this.step3_inner_r_loop(this._n >> 5, u, this._n2 - 1 - this._n8 * 2, -(this._n >> 4), 16);
-        this.step3_inner_r_loop(this._n >> 5, u, this._n2 - 1 - this._n8 * 3, -(this._n >> 4), 16);
+        this._step3InnerRLoop(this._n >> 5, u, this._n2 - 1 - this._n8 * 0, -(this._n >> 4), 16);
+        this._step3InnerRLoop(this._n >> 5, u, this._n2 - 1 - this._n8 * 1, -(this._n >> 4), 16);
+        this._step3InnerRLoop(this._n >> 5, u, this._n2 - 1 - this._n8 * 2, -(this._n >> 4), 16);
+        this._step3InnerRLoop(this._n >> 5, u, this._n2 - 1 - this._n8 * 3, -(this._n >> 4), 16);
 
         // iterations 2 ... x
         let l = 2;
         for (; l < (this._ld - 3) >> 1; ++l) {
             const k0 = this._n >> (l + 2);
-            const k0_2 = k0 >> 1;
+            const k02 = k0 >> 1;
             const lim = 1 << (l + 1);
             for (let i = 0; i < lim; ++i) {
-                this.step3_inner_r_loop(this._n >> (l + 4), u, this._n2 - 1 - k0 * i, -k0_2, 1 << (l + 3));
+                this._step3InnerRLoop(this._n >> (l + 4), u, this._n2 - 1 - k0 * i, -k02, 1 << (l + 3));
             }
         }
 
@@ -1833,21 +1914,21 @@ class MdctImpl {
         for (; l < this._ld - 6; ++l) {
             const k0 = this._n >> (l + 2);
             const k1 = 1 << (l + 3);
-            const k0_2 = k0 >> 1;
+            const k02 = k0 >> 1;
             const rlim = this._n >> (l + 6);
             const lim = 1 << (l + 1);
-            let i_off = this._n2 - 1;
+            let iOff = this._n2 - 1;
             let A0 = 0;
 
             for (let r = rlim; r > 0; --r) {
-                this.step3_inner_s_loop(lim, u, i_off, -k0_2, A0, k1, k0);
+                this._step3InnerSLoop(lim, u, iOff, -k02, A0, k1, k0);
                 A0 += k1 * 4;
-                i_off -= 8;
+                iOff -= 8;
             }
         }
 
         // combine some iteration steps...
-        this.step3_inner_s_loop_ld654(this._n >> 5, u, this._n2 - 1, this._n);
+        this._step3InnerSLoopLd654(this._n >> 5, u, this._n2 - 1, this._n);
 
         // steps 4, 5, and 6
         {
@@ -1980,48 +2061,48 @@ class MdctImpl {
         }
     }
 
-    private step3_inner_r_loop(lim: number, e: Float32Array, d0: number, k_off: number, k1: number) {
-        let k00_20: number;
-        let k01_21: number;
+    private _step3InnerRLoop(lim: number, e: Float32Array, d0: number, kOff: number, k1: number) {
+        let k0020: number;
+        let k0121: number;
 
         let e0 = d0; // e
-        let e2 = e0 + k_off; // e
+        let e2 = e0 + kOff; // e
         let a = 0;
 
         for (let i = lim >> 2; i > 0; --i) {
-            k00_20 = e[e0] - e[e2];
-            k01_21 = e[e0 - 1] - e[e2 - 1];
+            k0020 = e[e0] - e[e2];
+            k0121 = e[e0 - 1] - e[e2 - 1];
             e[e0] += e[e2];
             e[e0 - 1] += e[e2 - 1];
-            e[e2] = k00_20 * this._a[a] - k01_21 * this._a[a + 1];
-            e[e2 - 1] = k01_21 * this._a[a] + k00_20 * this._a[a + 1];
+            e[e2] = k0020 * this._a[a] - k0121 * this._a[a + 1];
+            e[e2 - 1] = k0121 * this._a[a] + k0020 * this._a[a + 1];
 
             a += k1;
 
-            k00_20 = e[e0 - 2] - e[e2 - 2];
-            k01_21 = e[e0 - 3] - e[e2 - 3];
+            k0020 = e[e0 - 2] - e[e2 - 2];
+            k0121 = e[e0 - 3] - e[e2 - 3];
             e[e0 - 2] += e[e2 - 2];
             e[e0 - 3] += e[e2 - 3];
-            e[e2 - 2] = k00_20 * this._a[a] - k01_21 * this._a[a + 1];
-            e[e2 - 3] = k01_21 * this._a[a] + k00_20 * this._a[a + 1];
+            e[e2 - 2] = k0020 * this._a[a] - k0121 * this._a[a + 1];
+            e[e2 - 3] = k0121 * this._a[a] + k0020 * this._a[a + 1];
 
             a += k1;
 
-            k00_20 = e[e0 - 4] - e[e2 - 4];
-            k01_21 = e[e0 - 5] - e[e2 - 5];
+            k0020 = e[e0 - 4] - e[e2 - 4];
+            k0121 = e[e0 - 5] - e[e2 - 5];
             e[e0 - 4] += e[e2 - 4];
             e[e0 - 5] += e[e2 - 5];
-            e[e2 - 4] = k00_20 * this._a[a] - k01_21 * this._a[a + 1];
-            e[e2 - 5] = k01_21 * this._a[a] + k00_20 * this._a[a + 1];
+            e[e2 - 4] = k0020 * this._a[a] - k0121 * this._a[a + 1];
+            e[e2 - 5] = k0121 * this._a[a] + k0020 * this._a[a + 1];
 
             a += k1;
 
-            k00_20 = e[e0 - 6] - e[e2 - 6];
-            k01_21 = e[e0 - 7] - e[e2 - 7];
+            k0020 = e[e0 - 6] - e[e2 - 6];
+            k0121 = e[e0 - 7] - e[e2 - 7];
             e[e0 - 6] += e[e2 - 6];
             e[e0 - 7] += e[e2 - 7];
-            e[e2 - 6] = k00_20 * this._a[a] - k01_21 * this._a[a + 1];
-            e[e2 - 7] = k01_21 * this._a[a] + k00_20 * this._a[a + 1];
+            e[e2 - 6] = k0020 * this._a[a] - k0121 * this._a[a + 1];
+            e[e2 - 7] = k0121 * this._a[a] + k0020 * this._a[a + 1];
 
             a += k1;
 
@@ -2030,44 +2111,44 @@ class MdctImpl {
         }
     }
 
-    private step3_iter0_loop(n: number, e: Float32Array, i_off: number, k_off: number) {
-        let ee0 = i_off; // e
-        let ee2 = ee0 + k_off; // e
+    private _step3Iter0Loop(n: number, e: Float32Array, iOff: number, kOff: number) {
+        let ee0 = iOff; // e
+        let ee2 = ee0 + kOff; // e
         let a = 0;
         for (let i = n >> 2; i > 0; --i) {
-            let k00_20: number;
-            let k01_21: number;
+            let k0020: number;
+            let k0121: number;
 
-            k00_20 = e[ee0] - e[ee2];
-            k01_21 = e[ee0 - 1] - e[ee2 - 1];
+            k0020 = e[ee0] - e[ee2];
+            k0121 = e[ee0 - 1] - e[ee2 - 1];
             e[ee0] += e[ee2];
             e[ee0 - 1] += e[ee2 - 1];
-            e[ee2] = k00_20 * this._a[a] - k01_21 * this._a[a + 1];
-            e[ee2 - 1] = k01_21 * this._a[a] + k00_20 * this._a[a + 1];
+            e[ee2] = k0020 * this._a[a] - k0121 * this._a[a + 1];
+            e[ee2 - 1] = k0121 * this._a[a] + k0020 * this._a[a + 1];
             a += 8;
 
-            k00_20 = e[ee0 - 2] - e[ee2 - 2];
-            k01_21 = e[ee0 - 3] - e[ee2 - 3];
+            k0020 = e[ee0 - 2] - e[ee2 - 2];
+            k0121 = e[ee0 - 3] - e[ee2 - 3];
             e[ee0 - 2] += e[ee2 - 2];
             e[ee0 - 3] += e[ee2 - 3];
-            e[ee2 - 2] = k00_20 * this._a[a] - k01_21 * this._a[a + 1];
-            e[ee2 - 3] = k01_21 * this._a[a] + k00_20 * this._a[a + 1];
+            e[ee2 - 2] = k0020 * this._a[a] - k0121 * this._a[a + 1];
+            e[ee2 - 3] = k0121 * this._a[a] + k0020 * this._a[a + 1];
             a += 8;
 
-            k00_20 = e[ee0 - 4] - e[ee2 - 4];
-            k01_21 = e[ee0 - 5] - e[ee2 - 5];
+            k0020 = e[ee0 - 4] - e[ee2 - 4];
+            k0121 = e[ee0 - 5] - e[ee2 - 5];
             e[ee0 - 4] += e[ee2 - 4];
             e[ee0 - 5] += e[ee2 - 5];
-            e[ee2 - 4] = k00_20 * this._a[a] - k01_21 * this._a[a + 1];
-            e[ee2 - 5] = k01_21 * this._a[a] + k00_20 * this._a[a + 1];
+            e[ee2 - 4] = k0020 * this._a[a] - k0121 * this._a[a + 1];
+            e[ee2 - 5] = k0121 * this._a[a] + k0020 * this._a[a + 1];
             a += 8;
 
-            k00_20 = e[ee0 - 6] - e[ee2 - 6];
-            k01_21 = e[ee0 - 7] - e[ee2 - 7];
+            k0020 = e[ee0 - 6] - e[ee2 - 6];
+            k0121 = e[ee0 - 7] - e[ee2 - 7];
             e[ee0 - 6] += e[ee2 - 6];
             e[ee0 - 7] += e[ee2 - 7];
-            e[ee2 - 6] = k00_20 * this._a[a] - k01_21 * this._a[a + 1];
-            e[ee2 - 7] = k01_21 * this._a[a] + k00_20 * this._a[a + 1];
+            e[ee2 - 6] = k0020 * this._a[a] - k0121 * this._a[a + 1];
+            e[ee2 - 7] = k0121 * this._a[a] + k0020 * this._a[a + 1];
             a += 8;
 
             ee0 -= 8;
@@ -2075,29 +2156,29 @@ class MdctImpl {
         }
     }
 
-    private step3_inner_s_loop(
+    private _step3InnerSLoop(
         n: number,
         e: Float32Array,
-        i_off: number,
-        k_off: number,
+        iOff: number,
+        kOff: number,
         a: number,
-        a_off: number,
+        aOff: number,
         k0: number
     ) {
         const A0 = this._a[a];
         const A1 = this._a[a + 1];
-        const A2 = this._a[a + a_off];
-        const A3 = this._a[a + a_off + 1];
-        const A4 = this._a[a + a_off * 2];
-        const A5 = this._a[a + a_off * 2 + 1];
-        const A6 = this._a[a + a_off * 3];
-        const A7 = this._a[a + a_off * 3 + 1];
+        const A2 = this._a[a + aOff];
+        const A3 = this._a[a + aOff + 1];
+        const A4 = this._a[a + aOff * 2];
+        const A5 = this._a[a + aOff * 2 + 1];
+        const A6 = this._a[a + aOff * 3];
+        const A7 = this._a[a + aOff * 3 + 1];
 
         let k00: number;
         let k11: number;
 
-        let ee0 = i_off; // e
-        let ee2 = ee0 + k_off; // e
+        let ee0 = iOff; // e
+        let ee2 = ee0 + kOff; // e
 
         for (let i = n; i > 0; --i) {
             k00 = e[ee0] - e[ee2];
@@ -2133,10 +2214,10 @@ class MdctImpl {
         }
     }
 
-    private step3_inner_s_loop_ld654(n: number, e: Float32Array, i_off: number, base_n: number) {
-        const a_off = base_n >> 3;
-        const A2 = this._a[a_off];
-        let z = i_off; // e
+    private _step3InnerSLoopLd654(n: number, e: Float32Array, iOff: number, baseN: number) {
+        const aOff = baseN >> 3;
+        const A2 = this._a[aOff];
+        let z = iOff; // e
         const b = z - 16 * n; // e
 
         while (z > b) {
@@ -2171,14 +2252,14 @@ class MdctImpl {
             e[z - 14] = (k00 + k11) * A2;
             e[z - 15] = (k00 - k11) * A2;
 
-            this.iter_54(e, z);
-            this.iter_54(e, z - 8);
+            this._iter54(e, z);
+            this._iter54(e, z - 8);
 
             z -= 16;
         }
     }
 
-    private iter_54(e: Float32Array, z: number) {
+    private _iter54(e: Float32Array, z: number) {
         const k00 = e[z] - e[z - 4];
         const y0 = e[z] + e[z - 4];
         const y2 = e[z - 2] + e[z - 6];
@@ -2203,6 +2284,9 @@ class MdctImpl {
     }
 }
 
+/**
+ * @internal
+ */
 export class Mdct {
     private _setupCache: Map<number, MdctImpl> = new Map<number, MdctImpl>();
 
@@ -2219,6 +2303,9 @@ export class Mdct {
     }
 }
 
+/**
+ * @internal
+ */
 export class VorbisStreamDecoder {
     private _stream: VorbisStream;
     private _setup: VorbisSetupHeader;
@@ -2306,7 +2393,7 @@ export class VorbisStreamDecoder {
                     break;
                 }
 
-                const readResult = this.readNextPacket((idx - offset) / this._stream.audioChannels);
+                const readResult = this._readNextPacket((idx - offset) / this._stream.audioChannels);
 
                 if (readResult === null) {
                     // drain the current packet (the windowing will fade it out)
@@ -2329,7 +2416,7 @@ export class VorbisStreamDecoder {
                 this._prevPacketEnd - this._prevPacketStart
             );
             if (copyLen > 0) {
-                idx += this.copyBuffer(buffer, idx, copyLen);
+                idx += this._copyBuffer(buffer, idx, copyLen);
             }
         }
 
@@ -2343,7 +2430,7 @@ export class VorbisStreamDecoder {
         return count;
     }
 
-    private copyBuffer(target: Float32Array, targetIndex: number, count: number) {
+    private _copyBuffer(target: Float32Array, targetIndex: number, count: number) {
         let idx = targetIndex;
         for (; count > 0; this._prevPacketStart++, count--) {
             for (let ch = 0; ch < this._stream.audioChannels; ch++) {
@@ -2353,9 +2440,9 @@ export class VorbisStreamDecoder {
         return idx - targetIndex;
     }
 
-    private readNextPacket(bufferedSamples: number): VorbisReadNextPacketResult | null {
+    private _readNextPacket(bufferedSamples: number): VorbisReadNextPacketResult | null {
         // decode the next packet now so we can start overlapping with it
-        const res = this.decodeNextPacket();
+        const res = this._decodeNextPacket();
         this._eosFound = this._eosFound || res.isEndOfStream;
         if (res.curPacket == null) {
             return null;
@@ -2377,7 +2464,7 @@ export class VorbisStreamDecoder {
         // start overlapping (if we don't have an previous packet data, just loop and the previous packet logic will handle things appropriately)
         if (this._prevPacketEnd > 0) {
             // overlap the first samples in the packet with the previous packet, then loop
-            VorbisStreamDecoder.overlapBuffers(
+            VorbisStreamDecoder._overlapBuffers(
                 this._prevPacketBuf!,
                 res.curPacket,
                 this._prevPacketStart,
@@ -2402,7 +2489,7 @@ export class VorbisStreamDecoder {
         return new VorbisReadNextPacketResult(res.samplePosition);
     }
 
-    private static overlapBuffers(
+    private static _overlapBuffers(
         previous: Float32Array[],
         next: Float32Array[],
         prevStart: number,
@@ -2417,7 +2504,7 @@ export class VorbisStreamDecoder {
         }
     }
 
-    private decodeNextPacket(): DecodeNextPacketInfo {
+    private _decodeNextPacket(): DecodeNextPacketInfo {
         const res = new DecodeNextPacketInfo();
         let packet: OggPacket | null = null;
         if (this._packetIndex >= this._packets.length) {
@@ -2456,6 +2543,9 @@ export class VorbisStreamDecoder {
     }
 }
 
+/**
+ * @internal
+ */
 class DecodeNextPacketInfo {
     public curPacket: Float32Array[] | null = null;
     public startIndex: number = 0;

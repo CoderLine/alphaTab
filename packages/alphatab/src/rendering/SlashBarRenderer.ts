@@ -19,6 +19,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using Slash Rhythm notation
+ * @internal
  */
 export class SlashBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'slash';
@@ -147,11 +148,11 @@ export class SlashBarRenderer extends LineBarRenderer {
                     this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime))
         ) {
             this.createStartSpacing();
-            this.createTimeSignatureGlyphs();
+            this._createTimeSignatureGlyphs();
         }
     }
 
-    private createTimeSignatureGlyphs(): void {
+    private _createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
 
         const masterBar = this.bar.masterBar;

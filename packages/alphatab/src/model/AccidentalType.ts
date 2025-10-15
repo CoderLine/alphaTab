@@ -1,5 +1,6 @@
 /**
  * Defines all possible accidentals for notes.
+ * @public
  */
 export enum AccidentalType {
     /**

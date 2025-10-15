@@ -7,6 +7,9 @@ import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 import { BarTempoGlyph } from '@src/rendering/glyphs/BarTempoGlyph';
 
+/**
+ * @internal
+ */
 export class TempoEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectTempo;

@@ -16,6 +16,9 @@ import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { TextAlign } from '@src/platform/ICanvas';
 
+/**
+ * @internal
+ */
 enum DataType {
     Boolean = 0,
     Integer = 1,
@@ -66,18 +69,19 @@ enum DataType {
  *       1 byte | Green
  *       1 byte | Blue
  *       1 byte | Alpha
+ * @internal
  */
 export class BinaryStylesheet {
-    public readonly _types: Map<string, DataType> = new Map();
+    private readonly _types: Map<string, DataType> = new Map();
     public readonly raw: Map<string, unknown> = new Map();
 
     public constructor(data?: Uint8Array) {
         if (data) {
-            this.read(data);
+            this._read(data);
         }
     }
 
-    private read(data: Uint8Array) {
+    private _read(data: Uint8Array) {
         // BinaryStylesheet apears to be big-endien
         const readable: ByteBuffer = ByteBuffer.fromBuffer(data);
         const entryCount: number = IOHelper.readInt32BE(readable);
@@ -218,7 +222,7 @@ export class BinaryStylesheet {
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).template = value as string;
                     break;
                 case 'Header/TitleAlignment':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).textAlign = this._toTextAlign(
                         value as number
                     );
                     break;
@@ -231,7 +235,7 @@ export class BinaryStylesheet {
                     break;
                 case 'Header/SubtitleAlignment':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).textAlign =
-                        this.toTextAlign(value as number);
+                        this._toTextAlign(value as number);
                     break;
                 case 'Header/drawSubtitle':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).isVisible =
@@ -242,9 +246,8 @@ export class BinaryStylesheet {
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).template = value as string;
                     break;
                 case 'Header/ArtistAlignment':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).textAlign = this.toTextAlign(
-                        value as number
-                    );
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).textAlign =
+                        this._toTextAlign(value as number);
                     break;
                 case 'Header/drawArtist':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).isVisible = value as boolean;
@@ -254,7 +257,7 @@ export class BinaryStylesheet {
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).template = value as string;
                     break;
                 case 'Header/AlbumAlignment':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).textAlign = this._toTextAlign(
                         value as number
                     );
                     break;
@@ -266,7 +269,7 @@ export class BinaryStylesheet {
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).template = value as string;
                     break;
                 case 'Header/WordsAlignment':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).textAlign = this._toTextAlign(
                         value as number
                     );
                     break;
@@ -278,7 +281,7 @@ export class BinaryStylesheet {
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).template = value as string;
                     break;
                 case 'Header/MusicAlignment':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).textAlign = this._toTextAlign(
                         value as number
                     );
                     break;
@@ -292,7 +295,7 @@ export class BinaryStylesheet {
                     break;
                 case 'Header/WordsAndMusicAlignment':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).textAlign =
-                        this.toTextAlign(value as number);
+                        this._toTextAlign(value as number);
                     break;
                 case 'Header/drawWordsAndMusic':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).isVisible =
@@ -305,7 +308,7 @@ export class BinaryStylesheet {
                     break;
                 case 'Header/TabberAlignment':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).textAlign =
-                        this.toTextAlign(value as number);
+                        this._toTextAlign(value as number);
                     break;
                 case 'Header/drawTabber':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).isVisible =
@@ -318,7 +321,7 @@ export class BinaryStylesheet {
                     break;
                 case 'Footer/CopyrightAlignment':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).textAlign =
-                        this.toTextAlign(value as number);
+                        this._toTextAlign(value as number);
                     break;
                 case 'Footer/drawCopyright':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).isVisible =
@@ -331,7 +334,7 @@ export class BinaryStylesheet {
                     break;
                 case 'Footer/Copyright2Alignment':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).textAlign =
-                        this.toTextAlign(value as number);
+                        this._toTextAlign(value as number);
                     break;
                 case 'Footer/drawCopyright2':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).isVisible =
@@ -340,7 +343,7 @@ export class BinaryStylesheet {
             }
         }
     }
-    private toTextAlign(value: number): TextAlign {
+    private _toTextAlign(value: number): TextAlign {
         switch (value) {
             case 0:
                 return TextAlign.Left;
@@ -363,7 +366,7 @@ export class BinaryStylesheet {
         IOHelper.writeInt32BE(writer, this.raw.size); // entry count
 
         for (const [k, v] of this.raw) {
-            const dataType = this.getDataType(k, v);
+            const dataType = this._getDataType(k, v);
 
             GpBinaryHelpers.gpWriteString(writer, k);
             writer.writeByte(dataType as number);
@@ -406,7 +409,7 @@ export class BinaryStylesheet {
             }
         }
     }
-    private getDataType(key: string, value: unknown): DataType {
+    private _getDataType(key: string, value: unknown): DataType {
         if (this._types.has(key)) {
             return this._types.get(key)!;
         }
@@ -519,34 +522,34 @@ export class BinaryStylesheet {
             for (const [k, v] of scoreStyle.headerAndFooter) {
                 switch (k) {
                     case ScoreSubElement.Title:
-                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Title');
+                        BinaryStylesheet._addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Title');
                         break;
                     case ScoreSubElement.SubTitle:
-                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Subtitle');
+                        BinaryStylesheet._addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Subtitle');
                         break;
                     case ScoreSubElement.Artist:
-                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Artist');
+                        BinaryStylesheet._addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Artist');
                         break;
                     case ScoreSubElement.Album:
-                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Album');
+                        BinaryStylesheet._addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Album');
                         break;
                     case ScoreSubElement.Words:
-                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Words');
+                        BinaryStylesheet._addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Words');
                         break;
                     case ScoreSubElement.Music:
-                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Music');
+                        BinaryStylesheet._addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Music');
                         break;
                     case ScoreSubElement.WordsAndMusic:
-                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'WordsAndMusic');
+                        BinaryStylesheet._addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'WordsAndMusic');
                         break;
                     case ScoreSubElement.Transcriber:
-                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Tabber');
+                        BinaryStylesheet._addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Tabber');
                         break;
                     case ScoreSubElement.Copyright:
-                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright');
+                        BinaryStylesheet._addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright');
                         break;
                     case ScoreSubElement.CopyrightSecondLine:
-                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright2');
+                        BinaryStylesheet._addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright2');
                         break;
                 }
             }
@@ -557,7 +560,7 @@ export class BinaryStylesheet {
         return writer.toArray();
     }
 
-    private static addHeaderAndFooter(
+    private static _addHeaderAndFooter(
         binaryStylesheet: BinaryStylesheet,
         style: HeaderFooterStyle,
         prefix: string,

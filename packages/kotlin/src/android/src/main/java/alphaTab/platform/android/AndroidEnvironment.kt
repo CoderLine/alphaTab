@@ -22,7 +22,7 @@ internal class AndroidEnvironment {
             }
             _isInitialized = true
 
-            Environment.HighDpiFactor = context.resources.displayMetrics.density.toDouble()
+            Environment.highDpiFactor = context.resources.displayMetrics.density.toDouble()
 
             screenWidth = context.resources.displayMetrics.widthPixels
             screenHeight = context.resources.displayMetrics.heightPixels

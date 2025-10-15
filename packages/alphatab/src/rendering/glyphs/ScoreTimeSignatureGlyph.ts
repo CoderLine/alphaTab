@@ -1,5 +1,8 @@
 import { TimeSignatureGlyph } from '@src/rendering/glyphs/TimeSignatureGlyph';
 
+/**
+ * @internal
+ */
 export class ScoreTimeSignatureGlyph extends TimeSignatureGlyph {
     protected get commonScale(): number {
         return 1;

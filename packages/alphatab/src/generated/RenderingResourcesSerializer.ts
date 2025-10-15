@@ -8,6 +8,9 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { EngravingSettingsSerializer } from "@src/generated/EngravingSettingsSerializer";
 import { Font } from "@src/model/Font";
 import { Color } from "@src/model/Color";
+/**
+ * @internal
+ */
 export class RenderingResourcesSerializer {
     public static fromJson(obj: RenderingResources, m: unknown): void {
         if (!m) {

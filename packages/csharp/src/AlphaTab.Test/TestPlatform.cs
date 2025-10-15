@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +19,7 @@ static partial class TestPlatform
         {
             if (currentDir.GetDirectories(".git").Length == 1)
             {
-                return System.IO.Path.Join(currentDir.FullName, "packages", "alphatab");
+                return Path.Join(currentDir.FullName, "packages", "alphatab");
             }
 
             currentDir = currentDir.Parent;
@@ -162,6 +162,15 @@ static partial class TestPlatform
         await fs.WriteAsync(data.Buffer.Raw, (int)data.ByteOffset, (int)data.Length);
     }
 
+
+    public static async Task SaveFileAsString(string name, string data)
+    {
+        var path = Path.Combine(AlphaTabProjectRoot.Value, name);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        await using var fs = new StreamWriter(new FileStream(path, FileMode.Create, FileAccess.ReadWrite));
+        await fs.WriteAsync(data);
+    }
+
     public static Task<IList<string>> ListDirectory(string path)
     {
         return Task.FromResult((IList<string>)Directory
@@ -188,6 +197,21 @@ static partial class TestPlatform
     public static T[] EnumValues<T>(Type type) where T : struct, Enum
     {
         return Enum.GetValues<T>();
+    }
+
+    public static IEnumerable<object?> SetAsUnknownIterable(object set)
+    {
+        if (set is ICollection s)
+        {
+            foreach (var v in s)
+            {
+                yield return v;
+            }
+        }
+        else
+        {
+            throw new ArgumentException("Provided value was no set", nameof(set));
+        }
     }
 
     public static IEnumerable<ArrayTuple<object?, object?>> MapAsUnknownIterable(object map)
@@ -227,6 +251,15 @@ static partial class TestPlatform
             IList l => l,
             _ => throw new InvalidCastException(
                 $"Unknown array type[{array?.GetType().FullName}]")
+        };
+    }
+
+    public static string GetConstructorName(object val)
+    {
+        return val switch
+        {
+            IRecord => "Object",
+            _ => val.GetType().Name
         };
     }
 }

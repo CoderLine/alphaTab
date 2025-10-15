@@ -11,6 +11,7 @@ import { ScoreSubElement } from '@src/model/Score';
 
 /**
  * This layout arranges the bars into a fixed width and dynamic height region.
+ * @internal
  */
 export class PageViewLayout extends ScoreLayout {
     private _systems: StaffSystem[] = [];
@@ -36,16 +37,16 @@ export class PageViewLayout extends ScoreLayout {
         this._allMasterBarRenderers = [];
         //
         // 1. Score Info
-        y = this.layoutAndRenderScoreInfo(y, -1);
+        y = this._layoutAndRenderScoreInfo(y, -1);
         //
         // 2. Tunings
-        y = this.layoutAndRenderTunings(y, -1);
+        y = this._layoutAndRenderTunings(y, -1);
         //
         // 3. Chord Diagrms
-        y = this.layoutAndRenderChordDiagrams(y, -1);
+        y = this._layoutAndRenderChordDiagrams(y, -1);
         //
         // 4. One result per StaffSystem
-        y = this.layoutAndRenderScore(y);
+        y = this._layoutAndRenderScore(y);
 
         y = this.layoutAndRenderBottomScoreInfo(y);
 
@@ -72,16 +73,16 @@ export class PageViewLayout extends ScoreLayout {
         const oldHeight: number = this.height;
         //
         // 1. Score Info
-        y = this.layoutAndRenderScoreInfo(y, oldHeight);
+        y = this._layoutAndRenderScoreInfo(y, oldHeight);
         //
         // 2. Tunings
-        y = this.layoutAndRenderTunings(y, oldHeight);
+        y = this._layoutAndRenderTunings(y, oldHeight);
         //
         // 3. Chord Digrams
-        y = this.layoutAndRenderChordDiagrams(y, oldHeight);
+        y = this._layoutAndRenderChordDiagrams(y, oldHeight);
         //
         // 4. One result per StaffSystem
-        y = this.resizeAndRenderScore(y, oldHeight);
+        y = this._resizeAndRenderScore(y, oldHeight);
 
         y = this.layoutAndRenderBottomScoreInfo(y);
 
@@ -90,7 +91,7 @@ export class PageViewLayout extends ScoreLayout {
         this.height = (y + this.pagePadding![3]) * this.renderer.settings.display.scale;
     }
 
-    private layoutAndRenderTunings(y: number, totalHeight: number = -1): number {
+    private _layoutAndRenderTunings(y: number, totalHeight: number = -1): number {
         if (!this.tuningGlyph) {
             return y;
         }
@@ -119,7 +120,7 @@ export class PageViewLayout extends ScoreLayout {
         return y + tuningHeight;
     }
 
-    private layoutAndRenderChordDiagrams(y: number, totalHeight: number = -1): number {
+    private _layoutAndRenderChordDiagrams(y: number, totalHeight: number = -1): number {
         if (!this.chordDiagrams) {
             return y;
         }
@@ -147,7 +148,7 @@ export class PageViewLayout extends ScoreLayout {
         return y + diagramHeight;
     }
 
-    private layoutAndRenderScoreInfo(y: number, totalHeight: number = -1): number {
+    private _layoutAndRenderScoreInfo(y: number, totalHeight: number = -1): number {
         Logger.debug(this.name, 'Layouting score info');
 
         const e = new RenderFinishedEventArgs();
@@ -160,7 +161,7 @@ export class PageViewLayout extends ScoreLayout {
 
         const scoreInfoGlyphs: TextGlyph[] = [];
 
-        for (const [scoreElement, _notationElement] of ScoreLayout.HeaderElements.value) {
+        for (const [scoreElement, _notationElement] of ScoreLayout.headerElements.value) {
             if (this.headerGlyphs.has(scoreElement)) {
                 const glyph: TextGlyph = this.headerGlyphs.get(scoreElement)!;
                 glyph.y = infoHeight;
@@ -202,7 +203,7 @@ export class PageViewLayout extends ScoreLayout {
         return y + infoHeight;
     }
 
-    private resizeAndRenderScore(y: number, oldHeight: number): number {
+    private _resizeAndRenderScore(y: number, oldHeight: number): number {
         // if we have a fixed number of bars per row, we only need to refit them.
         const barsPerRowActive =
             this.renderer.settings.display.barsPerRow > 0 ||
@@ -211,13 +212,13 @@ export class PageViewLayout extends ScoreLayout {
         if (barsPerRowActive) {
             for (let i: number = 0; i < this._systems.length; i++) {
                 const system: StaffSystem = this._systems[i];
-                this.fitSystem(system);
-                y += this.paintSystem(system, oldHeight);
+                this._fitSystem(system);
+                y += this._paintSystem(system, oldHeight);
             }
         } else {
             this._systems = [];
             let currentIndex: number = 0;
-            const maxWidth: number = this.maxWidth;
+            const maxWidth: number = this._maxWidth;
             let system: StaffSystem = this.createEmptyStaffSystem();
             system.index = this._systems.length;
             system.x = this.pagePadding![0];
@@ -241,8 +242,8 @@ export class PageViewLayout extends ScoreLayout {
                     system.isFull = true;
                     system.isLast = this.lastBarIndex === system.lastBarIndex;
                     this._systems.push(system);
-                    this.fitSystem(system);
-                    y += this.paintSystem(system, oldHeight);
+                    this._fitSystem(system);
+                    y += this._paintSystem(system, oldHeight);
                     // note: we do not increase currentIndex here to have it added to the next system
                     system = this.createEmptyStaffSystem();
                     system.index = this._systems.length;
@@ -252,13 +253,13 @@ export class PageViewLayout extends ScoreLayout {
             }
             system.isLast = this.lastBarIndex === system.lastBarIndex;
             // don't forget to finish the last system
-            this.fitSystem(system);
-            y += this.paintSystem(system, oldHeight);
+            this._fitSystem(system);
+            y += this._paintSystem(system, oldHeight);
         }
         return y;
     }
 
-    private layoutAndRenderScore(y: number): number {
+    private _layoutAndRenderScore(y: number): number {
         const startIndex: number = this.firstBarIndex;
         let currentBarIndex: number = startIndex;
         const endBarIndex: number = this.lastBarIndex;
@@ -266,24 +267,24 @@ export class PageViewLayout extends ScoreLayout {
         this._systems = [];
         while (currentBarIndex <= endBarIndex) {
             // create system and align set proper coordinates
-            const system: StaffSystem = this.createStaffSystem(currentBarIndex, endBarIndex);
+            const system: StaffSystem = this._createStaffSystem(currentBarIndex, endBarIndex);
             this._systems.push(system);
             system.x = this.pagePadding![0];
             system.y = y;
             currentBarIndex = system.lastBarIndex + 1;
             // finalize system (sizing etc).
-            this.fitSystem(system);
+            this._fitSystem(system);
             Logger.debug(
                 this.name,
                 `Rendering partial from bar ${system.firstBarIndex} to ${system.lastBarIndex}`,
                 null
             );
-            y += this.paintSystem(system, y);
+            y += this._paintSystem(system, y);
         }
         return y;
     }
 
-    private paintSystem(system: StaffSystem, totalHeight: number): number {
+    private _paintSystem(system: StaffSystem, totalHeight: number): number {
         // paint into canvas
         const height: number = Math.floor(system.height);
 
@@ -313,16 +314,16 @@ export class PageViewLayout extends ScoreLayout {
     /**
      * Realignes the bars in this line according to the available space
      */
-    private fitSystem(system: StaffSystem): void {
-        if (system.isFull || system.width > this.maxWidth || this.renderer.settings.display.justifyLastSystem) {
-            system.scaleToWidth(this.maxWidth);
+    private _fitSystem(system: StaffSystem): void {
+        if (system.isFull || system.width > this._maxWidth || this.renderer.settings.display.justifyLastSystem) {
+            system.scaleToWidth(this._maxWidth);
         } else {
             system.scaleToWidth(system.width);
         }
         system.finalizeSystem();
     }
 
-    private getBarsPerSystem(rowIndex: number) {
+    private _getBarsPerSystem(rowIndex: number) {
         let barsPerRow: number = this.renderer.settings.display.barsPerRow;
 
         if (this.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithScale) {
@@ -343,11 +344,11 @@ export class PageViewLayout extends ScoreLayout {
         return barsPerRow;
     }
 
-    private createStaffSystem(currentBarIndex: number, endIndex: number): StaffSystem {
+    private _createStaffSystem(currentBarIndex: number, endIndex: number): StaffSystem {
         const system: StaffSystem = this.createEmptyStaffSystem();
         system.index = this._systems.length;
-        const barsPerRow: number = this.getBarsPerSystem(system.index);
-        const maxWidth: number = this.maxWidth;
+        const barsPerRow: number = this._getBarsPerSystem(system.index);
+        const maxWidth: number = this._maxWidth;
         const end: number = endIndex + 1;
 
         let barIndex = currentBarIndex;
@@ -415,7 +416,7 @@ export class PageViewLayout extends ScoreLayout {
         return system;
     }
 
-    private get maxWidth(): number {
+    private get _maxWidth(): number {
         return this.scaledWidth - this.pagePadding![0] - this.pagePadding![2];
     }
 }

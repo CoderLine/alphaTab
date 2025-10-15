@@ -1,5 +1,6 @@
 /**
  * Lists all layout modes that are supported.
+ * @public
  */
 export enum LayoutMode {
     /**

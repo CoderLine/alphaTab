@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using AlphaTab.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test;
@@ -34,11 +36,17 @@ internal static class TestGlobals
         Assert.Fail(Convert.ToString(message));
     }
 
-    internal static AsyncLocal<int> SnapshotAssertionCounter { get; }
-    static TestGlobals()
+    private static readonly Dictionary<string, int> SnapshotAssertionCounters = new();
+    public static string UseSnapshotValue(string baseName, string hint)
     {
-        SnapshotAssertionCounter = new AsyncLocal<int>();
-        TestMethodAttribute.GlobalBeforeTest += () => { SnapshotAssertionCounter.Value = 0; };
+        if (!string.IsNullOrEmpty(hint))
+        {
+            baseName += $": {hint}";
+        }
+
+        var value = SnapshotAssertionCounters.GetValueOrDefault(baseName) + 1;
+        SnapshotAssertionCounters[baseName] = value;
+        return $"{baseName} {value}";
     }
 }
 
@@ -245,19 +253,32 @@ internal class Expector<T>
             Assert.Fail("Could not find snapshot file at " + absoluteSnapFilePath);
         }
 
-        var snapshotFile = SnapshotFileRepository.LoadSnapshortFile(absoluteSnapFilePath);
+        var snapshotFile = SnapshotFileRepository.LoadSnapshotFile(absoluteSnapFilePath);
 
-        var testSuiteName = testMethodInfo.MethodInfo.DeclaringType!.Name;
-        var testName = testMethodInfo.MethodInfo.GetCustomAttribute<TestMethodAttribute>()!.DisplayName;
+        var parts = new Collections.List<string>();
+        CollectTestSuiteNames(parts, testMethodInfo.MethodInfo.DeclaringType!);
+        var testName = testMethodInfo.MethodInfo.GetCustomAttribute<TestMethodAttribute>()!
+            .DisplayName;
+        parts.Add(testName ?? "");
 
-        var snapshortName = $"{testSuiteName} {testName} {++TestGlobals.SnapshotAssertionCounter.Value}";
+        var snapshotName = TestGlobals.UseSnapshotValue(string.Join(" ", parts), hint);
 
-        var error = snapshotFile.Match(snapshortName, _actual);
+        var error = snapshotFile.Match(snapshotName, _actual);
         if (!string.IsNullOrEmpty(error))
         {
             Assert.Fail(error);
         }
     }
+
+    private static void CollectTestSuiteNames(Collections.List<string> parts, Type testClass)
+    {
+        if (testClass.DeclaringType is not null)
+        {
+            CollectTestSuiteNames(parts, testClass.DeclaringType!);
+        }
+
+        var testSuiteName = testClass.GetCustomAttribute<TestClassAttribute>()?.DisplayName ??
+                            testClass.Name;
+        parts.Add(testSuiteName);
+    }
 }
-
-

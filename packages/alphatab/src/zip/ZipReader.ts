@@ -4,6 +4,9 @@ import type { IReadable } from '@src/io/IReadable';
 import { Inflate } from '@src/zip/Inflate';
 import { ZipEntry } from '@src/zip/ZipEntry';
 
+/**
+ * @internal
+ */
 export class ZipReader {
     private _readable: IReadable;
 
@@ -14,7 +17,7 @@ export class ZipReader {
     public read(): ZipEntry[] {
         const entries: ZipEntry[] = [];
         while (true) {
-            const e: ZipEntry | null = this.readEntry();
+            const e: ZipEntry | null = this._readEntry();
             if (!e) {
                 break;
             }
@@ -23,7 +26,7 @@ export class ZipReader {
         return entries;
     }
 
-    private readEntry(): ZipEntry | null {
+    private _readEntry(): ZipEntry | null {
         const readable: IReadable = this._readable;
         const h: number = IOHelper.readInt32LE(readable);
         if (h !== ZipEntry.LocalFileHeaderSignature) {

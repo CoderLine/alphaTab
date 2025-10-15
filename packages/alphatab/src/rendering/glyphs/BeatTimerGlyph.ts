@@ -1,6 +1,9 @@
 import { type ICanvas, TextBaseline, TextAlign } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
+/**
+ * @internal
+ */
 export class BeatTimerGlyph extends EffectGlyph {
     private _timer: number;
     private _text: string = '';

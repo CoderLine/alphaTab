@@ -7,6 +7,9 @@ import { KeySignature } from '@src/model/KeySignature';
 import { CanvasHelper, type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { BarSubElement } from '@src/model/Bar';
 
+/**
+ * @internal
+ */
 export class NumberedKeySignatureGlyph extends Glyph {
     private _keySignature: KeySignature;
     private _keySignatureType: KeySignatureType;

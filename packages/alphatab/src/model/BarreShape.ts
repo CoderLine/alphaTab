@@ -1,5 +1,6 @@
 /**
  * Lists all beat barré types.
+ * @public
  */
 export enum BarreShape {
     /**

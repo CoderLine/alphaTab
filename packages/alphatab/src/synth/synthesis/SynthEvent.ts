@@ -4,6 +4,9 @@
 // Licensed under: MPL-2.0
 import { AlphaTabMetronomeEvent, type MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 
+/**
+ * @internal
+ */
 export class SynthEvent {
     public eventIndex: number;
     public event: MidiEvent;

@@ -2,6 +2,9 @@ import { Color } from '@src/model/Color';
 import type { ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
+/**
+ * @internal
+ */
 export class DummyEffectGlyph extends EffectGlyph {
     private _w: number;
     private _h: number;

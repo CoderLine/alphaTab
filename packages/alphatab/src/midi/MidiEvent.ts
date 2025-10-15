@@ -7,6 +7,7 @@ import { IOHelper } from '@src/io/IOHelper';
 
 /**
  * Lists all midi event types. Based on the type the instance is a specific subclass.
+ * @public
  */
 export enum MidiEventType {
     // NOTE: the values try to be backwards compatible with alphaTab 1.2.
@@ -43,6 +44,7 @@ export enum MidiEventType {
 
 /**
  * Represents a midi event.
+ * @public
  */
 export abstract class MidiEvent {
     /**
@@ -112,6 +114,7 @@ export abstract class MidiEvent {
 
 /**
  * Represents a time signature change event.
+ * @public
  */
 export class TimeSignatureEvent extends MidiEvent {
     /**
@@ -169,6 +172,7 @@ export class TimeSignatureEvent extends MidiEvent {
 
 /**
  * The base class for alphaTab specific midi events (like metronomes and rests).
+ * @public
  */
 export abstract class AlphaTabSysExEvent extends MidiEvent {
     public static readonly AlphaTabManufacturerId = 0x7d;
@@ -196,6 +200,7 @@ export abstract class AlphaTabSysExEvent extends MidiEvent {
 /**
  * Represents a metronome event. This event is emitted by the synthesizer only during playback and
  * is typically not part of the midi file itself.
+ * @public
  */
 export class AlphaTabMetronomeEvent extends AlphaTabSysExEvent {
     /**
@@ -243,6 +248,7 @@ export class AlphaTabMetronomeEvent extends AlphaTabSysExEvent {
 
 /**
  * Represents a REST beat being 'played'. This event supports alphaTab in placing the cursor.
+ * @public
  */
 export class AlphaTabRestEvent extends AlphaTabSysExEvent {
     public channel: number;
@@ -260,6 +266,7 @@ export class AlphaTabRestEvent extends AlphaTabSysExEvent {
 
 /**
  * The base class for note related events.
+ * @public
  */
 export abstract class NoteEvent extends MidiEvent {
     /**
@@ -303,6 +310,7 @@ export abstract class NoteEvent extends MidiEvent {
 
 /**
  * Represents a note being played
+ * @public
  */
 export class NoteOnEvent extends NoteEvent {
     public constructor(track: number, tick: number, channel: number, noteKey: number, noteVelocity: number) {
@@ -319,6 +327,7 @@ export class NoteOnEvent extends NoteEvent {
 
 /**
  * Represents a note stop being played.
+ * @public
  */
 export class NoteOffEvent extends NoteEvent {
     public constructor(track: number, tick: number, channel: number, noteKey: number, noteVelocity: number) {
@@ -335,6 +344,7 @@ export class NoteOffEvent extends NoteEvent {
 
 /**
  * Represents the change of a value on a midi controller.
+ * @public
  */
 export class ControlChangeEvent extends MidiEvent {
     /**
@@ -376,6 +386,7 @@ export class ControlChangeEvent extends MidiEvent {
 
 /**
  * Represents the change of the midi program on a channel.
+ * @public
  */
 export class ProgramChangeEvent extends MidiEvent {
     /**
@@ -406,6 +417,7 @@ export class ProgramChangeEvent extends MidiEvent {
 
 /**
  * Represents a change of the tempo in the song.
+ * @public
  */
 export class TempoChangeEvent extends MidiEvent {
     /**
@@ -447,6 +459,7 @@ export class TempoChangeEvent extends MidiEvent {
 
 /**
  * Represents a change of the pitch bend (aka. pitch wheel) on a specific channel.
+ * @public
  */
 export class PitchBendEvent extends MidiEvent {
     /**
@@ -482,6 +495,7 @@ export class PitchBendEvent extends MidiEvent {
 
 /**
  * Represents a single note pitch bend change.
+ * @public
  */
 export class NoteBendEvent extends MidiEvent {
     /**
@@ -513,6 +527,7 @@ export class NoteBendEvent extends MidiEvent {
 
 /**
  * Represents the end of the track indicating that no more events for this track follow.
+ * @public
  */
 export class EndOfTrackEvent extends MidiEvent {
     public constructor(track: number, tick: number) {

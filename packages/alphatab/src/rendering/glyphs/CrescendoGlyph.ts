@@ -4,6 +4,9 @@ import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 export class CrescendoGlyph extends GroupedEffectGlyph {
     private _crescendo: CrescendoType;
 

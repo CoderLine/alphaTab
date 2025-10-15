@@ -2,6 +2,7 @@ import type { ControllerType } from '@src/midi/ControllerType';
 
 /**
  * A handler is responsible for writing midi events to a custom structure
+ * @public
  */
 export interface IMidiFileHandler {
     /**

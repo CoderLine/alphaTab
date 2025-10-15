@@ -1,5 +1,8 @@
 import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
+/**
+ * @internal
+ */
 export class ScoreNoteGlyphInfo {
     public glyph: MusicFontGlyph;
     public steps: number = 0;

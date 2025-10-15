@@ -11,10 +11,13 @@ import { TabBendGlyph } from '@src/rendering/glyphs/TabBendGlyph';
 import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
+/**
+ * @internal
+ */
 // TODO: make part of effect bar renderers
 export class TabWhammyBarGlyph extends Glyph {
-    private static readonly TopOffsetSharedDataKey: string = 'tab.whammy.topoffset';
-    private static readonly BottomOffsetSharedDataKey: string = 'tab.whammy.bottomffset';
+    private static readonly _topOffsetSharedDataKey: string = 'tab.whammy.topoffset';
+    private static readonly _bottomOffsetSharedDataKey: string = 'tab.whammy.bottomffset';
     private _beat: Beat;
     private _renderPoints: BendPoint[];
     private _isSimpleDip: boolean = false;
@@ -22,10 +25,10 @@ export class TabWhammyBarGlyph extends Glyph {
     public constructor(beat: Beat) {
         super(0, 0);
         this._beat = beat;
-        this._renderPoints = this.createRenderingPoints(beat);
+        this._renderPoints = this._createRenderingPoints(beat);
     }
 
-    private createRenderingPoints(beat: Beat): BendPoint[] {
+    private _createRenderingPoints(beat: Beat): BendPoint[] {
         // advanced rendering
         if (beat.whammyBarType === WhammyType.Custom) {
             return beat.whammyBarPoints!;
@@ -72,7 +75,7 @@ export class TabWhammyBarGlyph extends Glyph {
             }
             beat = beat.nextBeat;
         }
-        let topOffset: number = maxValue!.value > 0 ? Math.abs(this.getOffset(maxValue!.value)) : 0;
+        let topOffset: number = maxValue!.value > 0 ? Math.abs(this._getOffset(maxValue!.value)) : 0;
         if (
             topOffset > 0 ||
             this._beat.whammyBarPoints![0].value !== 0 ||
@@ -80,27 +83,27 @@ export class TabWhammyBarGlyph extends Glyph {
         ) {
             topOffset += this.renderer.resources.tablatureFont.size + this.renderer.smuflMetrics.tabWhammyTextPadding;
         }
-        const bottomOffset: number = minValue!.value < 0 ? Math.abs(this.getOffset(minValue!.value)) : 0;
+        const bottomOffset: number = minValue!.value < 0 ? Math.abs(this._getOffset(minValue!.value)) : 0;
 
         const currentTopOffset: number = this.renderer.staff.getSharedLayoutData<number>(
-            TabWhammyBarGlyph.TopOffsetSharedDataKey,
+            TabWhammyBarGlyph._topOffsetSharedDataKey,
             -1
         );
         let maxTopOffset = currentTopOffset;
 
         if (topOffset > currentTopOffset) {
-            this.renderer.staff.setSharedLayoutData(TabWhammyBarGlyph.TopOffsetSharedDataKey, topOffset);
+            this.renderer.staff.setSharedLayoutData(TabWhammyBarGlyph._topOffsetSharedDataKey, topOffset);
             maxTopOffset = topOffset;
         }
 
         const currentBottomOffset: number = this.renderer.staff.getSharedLayoutData<number>(
-            TabWhammyBarGlyph.BottomOffsetSharedDataKey,
+            TabWhammyBarGlyph._bottomOffsetSharedDataKey,
             -1
         );
         let maxBottomOffset = currentBottomOffset;
 
         if (bottomOffset > currentBottomOffset) {
-            this.renderer.staff.setSharedLayoutData(TabWhammyBarGlyph.BottomOffsetSharedDataKey, bottomOffset);
+            this.renderer.staff.setSharedLayoutData(TabWhammyBarGlyph._bottomOffsetSharedDataKey, bottomOffset);
             maxBottomOffset = currentBottomOffset;
         }
 
@@ -109,7 +112,7 @@ export class TabWhammyBarGlyph extends Glyph {
         this.renderer.registerOverflowTop(maxTopOffset + maxBottomOffset);
     }
 
-    private getOffset(value: number): number {
+    private _getOffset(value: number): number {
         if (value === 0) {
             return 0;
         }
@@ -171,7 +174,7 @@ export class TabWhammyBarGlyph extends Glyph {
             canvas.beginPath();
 
             const sharedTopOffset = this.renderer.staff.getSharedLayoutData<number>(
-                TabWhammyBarGlyph.TopOffsetSharedDataKey,
+                TabWhammyBarGlyph._topOffsetSharedDataKey,
                 0
             );
             const zeroY: number = cy + sharedTopOffset;
@@ -182,10 +185,10 @@ export class TabWhammyBarGlyph extends Glyph {
                 let isFirst: boolean = i === 0;
                 // draw pre-bend if previous
                 if (i === 0 && firstPt.value !== 0 && !this._beat.isContinuedWhammy) {
-                    this.paintWhammy(false, new BendPoint(0, 0), firstPt, startX, zeroY, dx, canvas);
+                    this._paintWhammy(false, new BendPoint(0, 0), firstPt, startX, zeroY, dx, canvas);
                     isFirst = false;
                 }
-                this.paintWhammy(isFirst, firstPt, secondPt, startX, zeroY, dx, canvas, slurText);
+                this._paintWhammy(isFirst, firstPt, secondPt, startX, zeroY, dx, canvas, slurText);
                 slurText = '';
             }
             canvas.stroke();
@@ -194,7 +197,7 @@ export class TabWhammyBarGlyph extends Glyph {
         canvas.textBaseline = oldBaseLine;
     }
 
-    private paintWhammy(
+    private _paintWhammy(
         isFirst: boolean,
         firstPt: BendPoint,
         secondPt: BendPoint,
@@ -206,8 +209,8 @@ export class TabWhammyBarGlyph extends Glyph {
     ): void {
         const x1: number = cx + dx * firstPt.offset;
         const x2: number = cx + dx * secondPt.offset;
-        const y1: number = cy - this.getOffset(firstPt.value);
-        const y2: number = cy - this.getOffset(secondPt.value);
+        const y1: number = cy - this._getOffset(firstPt.value);
+        const y2: number = cy - this._getOffset(secondPt.value);
         if (firstPt.offset === secondPt.offset) {
             const dashSize: number = this.renderer.smuflMetrics.tabWhammyDashSize;
             const dashes: number = Math.abs(y2 - y1) / (dashSize * 2);

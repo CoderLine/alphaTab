@@ -7,6 +7,7 @@ import type { Settings } from '@src/Settings';
 
 /**
  * A canvas implementation storing SVG data
+ * @internal
  */
 export abstract class SvgCanvas implements ICanvas {
     protected buffer: string = '';
@@ -160,11 +161,11 @@ export abstract class SvgCanvas implements ICanvas {
         if (this.textAlign !== TextAlign.Left) {
             s += ` text-anchor="${this.getSvgTextAlignment(this.textAlign)}"`;
         }
-        s += `>${SvgCanvas.escapeText(text)}</text>`;
+        s += `>${SvgCanvas._escapeText(text)}</text>`;
         this.buffer += s;
     }
 
-    private static escapeText(text: string) {
+    private static _escapeText(text: string) {
         return text
             .replace(/&/g, '&amp;')
             .replace(/"/g, '&quot;')

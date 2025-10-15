@@ -8,6 +8,9 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
+/**
+ * @internal
+ */
 export abstract class ScoreNoteChordGlyphBase extends Glyph {
     private _infos: ScoreNoteGlyphInfo[] = [];
 
@@ -147,7 +150,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         cx += this.x;
         cy += this.y;
-        this.paintLedgerLines(cx, cy, canvas);
+        this._paintLedgerLines(cx, cy, canvas);
         const infos: ScoreNoteGlyphInfo[] = this._infos;
         for (const g of infos) {
             g.glyph.renderer = this.renderer;
@@ -155,7 +158,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         }
     }
 
-    private paintLedgerLines(cx: number, cy: number, canvas: ICanvas) {
+    private _paintLedgerLines(cx: number, cy: number, canvas: ICanvas) {
         if (!this.minNote) {
             return;
         }

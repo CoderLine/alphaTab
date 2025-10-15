@@ -20,14 +20,20 @@ import {
 } from '@src/synth/vorbis/VorbisStreamDecoder';
 import { IntBitReader } from '@src/synth/vorbis/IntBitReader';
 
+/**
+ * @internal
+ */
 enum VorbisPacketTypes {
     IdentificationHeader = 1,
     Comment = 3,
     SetupHeader = 5
 }
 
+/**
+ * @internal
+ */
 export class VorbisStreamReader {
-    private static readonly VorbisHeaderMarker = new Uint8Array([
+    static readonly vorbisHeaderMarker = new Uint8Array([
         'v'.charCodeAt(0),
         'o'.charCodeAt(0),
         'r'.charCodeAt(0),
@@ -47,13 +53,13 @@ export class VorbisStreamReader {
     public read(): VorbisStream | null {
         let packet: OggPacket | null;
         while (true) {
-            packet = this.nextPacket();
+            packet = this._nextPacket();
             if (packet == null) {
                 return null;
             }
 
             if (packet.isBeginningOfStream) {
-                const stream = this.readStream(packet);
+                const stream = this._readStream(packet);
                 if (stream != null) {
                     return stream;
                 }
@@ -61,25 +67,25 @@ export class VorbisStreamReader {
         }
     }
 
-    private nextPacket(): OggPacket | null {
+    private _nextPacket(): OggPacket | null {
         this._packetIndex++;
         return this._packetIndex < this._packets.length ? this._packets[this._packetIndex] : null;
     }
 
-    private readStream(startPacket: OggPacket): VorbisStream | null {
+    private _readStream(startPacket: OggPacket): VorbisStream | null {
         // Read vorbis stream info
         const stream = new VorbisStream();
 
-        if (!this.readIdentificationHeader(stream, startPacket)) {
+        if (!this._readIdentificationHeader(stream, startPacket)) {
             return null;
         }
 
-        if (!this.readComments(this.nextPacket())) {
+        if (!this._readComments(this._nextPacket())) {
             return null;
         }
 
         const vorbisSetup = new VorbisSetupHeader();
-        if (!this.readSetupHeader(stream, vorbisSetup, this.nextPacket())) {
+        if (!this._readSetupHeader(stream, vorbisSetup, this._nextPacket())) {
             return null;
         }
 
@@ -87,7 +93,7 @@ export class VorbisStreamReader {
         const streamDataPackets: OggPacket[] = [];
         let packet: OggPacket | null;
         while (true) {
-            packet = this.nextPacket();
+            packet = this._nextPacket();
             if (packet == null) {
                 break;
             }
@@ -110,7 +116,7 @@ export class VorbisStreamReader {
      * @param reader
      * @returns
      */
-    private comonHeaderDecode(packetType: VorbisPacketTypes, reader: ByteBuffer) {
+    private _commonHeaderDecode(packetType: VorbisPacketTypes, reader: ByteBuffer) {
         const data = new Uint8Array(7);
         reader.read(data, 0, data.length);
 
@@ -118,8 +124,8 @@ export class VorbisStreamReader {
             return false;
         }
 
-        for (let i = 0; i < VorbisStreamReader.VorbisHeaderMarker.length; i++) {
-            if (data[1 + i] !== VorbisStreamReader.VorbisHeaderMarker[i]) {
+        for (let i = 0; i < VorbisStreamReader.vorbisHeaderMarker.length; i++) {
+            if (data[1 + i] !== VorbisStreamReader.vorbisHeaderMarker[i]) {
                 return false;
             }
         }
@@ -133,15 +139,15 @@ export class VorbisStreamReader {
      * @param reader
      * @returns
      */
-    private comonHeaderDecodeBit(packetType: VorbisPacketTypes, reader: IntBitReader) {
+    private _commonHeaderDecodeBit(packetType: VorbisPacketTypes, reader: IntBitReader) {
         const data = reader.readBytes(7);
 
         if (data[0] !== packetType) {
             return false;
         }
 
-        for (let i = 0; i < VorbisStreamReader.VorbisHeaderMarker.length; i++) {
-            if (data[1 + i] !== VorbisStreamReader.VorbisHeaderMarker[i]) {
+        for (let i = 0; i < VorbisStreamReader.vorbisHeaderMarker.length; i++) {
+            if (data[1 + i] !== VorbisStreamReader.vorbisHeaderMarker[i]) {
                 return false;
             }
         }
@@ -155,10 +161,10 @@ export class VorbisStreamReader {
      * @param packet
      * @returns
      */
-    private readIdentificationHeader(stream: VorbisStream, packet: OggPacket) {
+    private _readIdentificationHeader(stream: VorbisStream, packet: OggPacket) {
         const reader = ByteBuffer.fromBuffer(packet.packetData);
 
-        if (!this.comonHeaderDecode(VorbisPacketTypes.IdentificationHeader, reader)) {
+        if (!this._commonHeaderDecode(VorbisPacketTypes.IdentificationHeader, reader)) {
             return false;
         }
 
@@ -186,8 +192,8 @@ export class VorbisStreamReader {
         if (
             //  [blocksize_0] must be less than or equal to [blocksize_1].
             stream.blocksize0 > stream.blocksize1 ||
-            !VorbisStreamReader.isAllowedBlockSize(stream.blocksize0) ||
-            !VorbisStreamReader.isAllowedBlockSize(stream.blocksize0)
+            !VorbisStreamReader._isAllowedBlockSize(stream.blocksize0) ||
+            !VorbisStreamReader._isAllowedBlockSize(stream.blocksize0)
         ) {
             return false;
         }
@@ -201,7 +207,7 @@ export class VorbisStreamReader {
         return true;
     }
 
-    private static isAllowedBlockSize(blocksize: number) {
+    private static _isAllowedBlockSize(blocksize: number) {
         // Allowed final blocksize values are 64, 128, 256, 512, 1024, 2048, 4096 and 8192 in Vorbis I.
         switch (blocksize) {
             case 64:
@@ -224,13 +230,13 @@ export class VorbisStreamReader {
      * @param packet
      * @returns
      */
-    private readComments(packet: OggPacket | null) {
+    private _readComments(packet: OggPacket | null) {
         if (packet == null) {
             return false;
         }
 
         const reader = ByteBuffer.fromBuffer(packet.packetData);
-        if (!this.comonHeaderDecode(VorbisPacketTypes.Comment, reader)) {
+        if (!this._commonHeaderDecode(VorbisPacketTypes.Comment, reader)) {
             return false;
         }
 
@@ -257,7 +263,7 @@ export class VorbisStreamReader {
      * @param packet
      * @returns
      */
-    private readSetupHeader(stream: VorbisStream, setup: VorbisSetupHeader, packet: OggPacket | null) {
+    private _readSetupHeader(stream: VorbisStream, setup: VorbisSetupHeader, packet: OggPacket | null) {
         if (packet == null) {
             return false;
         }
@@ -267,7 +273,7 @@ export class VorbisStreamReader {
         const mdct = new Mdct();
         const huffman = new Huffman();
 
-        if (!this.comonHeaderDecodeBit(VorbisPacketTypes.SetupHeader, bitReader)) {
+        if (!this._commonHeaderDecodeBit(VorbisPacketTypes.SetupHeader, bitReader)) {
             return false;
         }
 

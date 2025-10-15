@@ -32,6 +32,8 @@ import { PendingBuffer } from '@src/zip/PendingBuffer';
  * to the split of deflate and setInput.
  *
  * author of the original java version : Jochen Hoenicke
+ * 
+ * @internal
  */
 export class Deflater {
     /*
@@ -69,13 +71,13 @@ export class Deflater {
      *
      */
 
-    private static readonly IsFlushing: number = 0x04;
-    private static readonly IsFinishing: number = 0x08;
+    private static readonly _isFlushing: number = 0x04;
+    static readonly isFinishing: number = 0x08;
 
-    private static readonly BusyState: number = 0x10;
-    private static readonly FlushingState: number = 0x14;
-    private static readonly FinishingState: number = 0x1c;
-    private static readonly FinishedState: number = 0x1e;
+    private static readonly _busyState: number = 0x10;
+    private static readonly _flushingState: number = 0x14;
+    private static readonly _finishingState: number = 0x1c;
+    private static readonly _finishedState: number = 0x1e;
 
     private _state: number = 0;
     private _pending: PendingBuffer;
@@ -92,7 +94,7 @@ export class Deflater {
      * useful for the GZIP/PKZIP formats.
      */
     public constructor() {
-        this._pending = new PendingBuffer(DeflaterConstants.PENDING_BUF_SIZE);
+        this._pending = new PendingBuffer(DeflaterConstants.pendingBufSize);
         this._engine = new DeflaterEngine(this._pending);
         this.reset();
     }
@@ -112,7 +114,7 @@ export class Deflater {
      * are available.
      */
     public get isFinished() {
-        return this._state === Deflater.FinishedState && this._pending.isFlushed;
+        return this._state === Deflater._finishedState && this._pending.isFlushed;
     }
 
     /**
@@ -121,7 +123,7 @@ export class Deflater {
      * had before.
      */
     public reset() {
-        this._state = Deflater.BusyState;
+        this._state = Deflater._busyState;
         this._pending.reset();
         this._engine.reset();
     }
@@ -155,22 +157,22 @@ export class Deflater {
             offset += count;
             length -= count;
 
-            if (length === 0 || this._state === Deflater.FinishedState) {
+            if (length === 0 || this._state === Deflater._finishedState) {
                 break;
             }
 
             if (
                 !this._engine.deflate(
-                    (this._state & Deflater.IsFlushing) !== 0,
-                    (this._state & Deflater.IsFinishing) !== 0
+                    (this._state & Deflater._isFlushing) !== 0,
+                    (this._state & Deflater.isFinishing) !== 0
                 )
             ) {
                 switch (this._state) {
-                    case Deflater.BusyState:
+                    case Deflater._busyState:
                         // We need more input now
                         return origLength - length;
 
-                    case Deflater.FlushingState:
+                    case Deflater._flushingState:
                         /* We have to supply some lookahead.  8 bit lookahead
                          * is needed by the zlib inflater, and we must fill
                          * the next byte, so that all bits are flushed.
@@ -183,12 +185,12 @@ export class Deflater {
                             this._pending.writeBits(2, 10);
                             neededbits -= 10;
                         }
-                        this._state = Deflater.BusyState;
+                        this._state = Deflater._busyState;
                         break;
 
-                    case Deflater.FinishingState:
+                    case Deflater._finishingState:
                         this._pending.alignToByte();
-                        this._state = Deflater.FinishedState;
+                        this._state = Deflater._finishedState;
                         break;
                 }
             }
@@ -202,6 +204,6 @@ export class Deflater {
      * be called to force all bytes to be flushed.
      */
     public finish() {
-        this._state |= Deflater.IsFlushing | Deflater.IsFinishing;
+        this._state |= Deflater._isFlushing | Deflater.isFinishing;
     }
 }

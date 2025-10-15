@@ -29,6 +29,9 @@
 
 // https://github.com/jestjs/jest/blob/main/packages/pretty-format
 
+/**
+ * @internal
+ */
 export class PrettyFormatConfig {
     public escapeString: boolean = true;
     public indent: string = '  ';
@@ -42,6 +45,9 @@ export class PrettyFormatConfig {
     public spacingOuter: string = '\n';
 }
 
+/**
+ * @internal
+ */
 export type PrettyFormatPrinter = (
     val: unknown,
     config: PrettyFormatConfig,
@@ -50,6 +56,9 @@ export type PrettyFormatPrinter = (
     refs: unknown[]
 ) => string;
 
+/**
+ * @internal
+ */
 interface PrettyFormatNewPlugin {
     serialize(
         val: unknown,
@@ -64,6 +73,7 @@ interface PrettyFormatNewPlugin {
 
 /**
  * @partial
+ * @internal
  */
 export class PrettyFormat {
     static findPlugin(plugins: PrettyFormatNewPlugin[], val: unknown) {
@@ -200,7 +210,48 @@ export class PrettyFormat {
                 : `Map {${PrettyFormat.printIteratorEntries(TestPlatform.mapAsUnknownIterable(val), config, indentation, depth, refs, PrettyFormat.printer, ' => ')}}`;
         }
 
-        return '';
+        // Avoid failure to serialize global window object in jsdom test environment.
+        // For example, not even relevant if window is prop of React element.
+        const constructorName = TestPlatform.getConstructorName(val);
+        return hitMaxDepth
+            ? `[${constructorName}]`
+            : `${
+                  min ? '' : !config.printBasicPrototype && constructorName === 'Object' ? '' : `${constructorName} `
+              }{${PrettyFormat._printObjectProperties(val as object, config, indentation, depth, refs)}}`;
+    }
+
+    private static _printObjectProperties(
+        val: object,
+        config: PrettyFormatConfig,
+        indentation: string,
+        depth: number,
+        refs: unknown[]
+    ) {
+        let result = '';
+        const entries = Object.entries(val);
+
+        if (entries.length > 0) {
+            result += config.spacingOuter;
+
+            const indentationNext = indentation + config.indent;
+
+            for (let i = 0; i < entries.length; i++) {
+                const name = PrettyFormat.printer(entries[i][0], config, indentationNext, depth, refs);
+                const value = PrettyFormat.printer(entries[i][1], config, indentationNext, depth, refs);
+
+                result += `${indentationNext + name}: ${value}`;
+
+                if (i < entries.length - 1) {
+                    result += `,${config.spacingInner}`;
+                } else if (!config.min) {
+                    result += ',';
+                }
+            }
+
+            result += config.spacingOuter + indentation;
+        }
+
+        return result;
     }
 
     /**
@@ -326,6 +377,7 @@ import { MidiEvent } from '@src/midi/MidiEvent';
 
 /**
  * A serializer plugin for pretty-format for creating simple MidiEbent snapshots
+ * @internal
  */
 export class MidiEventSerializerPlugin implements PrettyFormatNewPlugin {
     public static readonly instance = new MidiEventSerializerPlugin();
@@ -349,18 +401,19 @@ export class MidiEventSerializerPlugin implements PrettyFormatNewPlugin {
 /**
  * A serializer plugin for pretty-format for creating simple Score model snapshots
  * @partial
+ * @internal
  */
 export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
     public static readonly instance = new ScoreSerializerPlugin();
 
-    private defaultScoreJson: Map<string, unknown>;
-    private defaultMasterBarJson: Map<string, unknown>;
-    private defaultTrackJson: Map<string, unknown>;
-    private defaultStaffJson: Map<string, unknown>;
-    private defaultBarJson: Map<string, unknown>;
-    private defaultVoiceJson: Map<string, unknown>;
-    private defaultBeatJson: Map<string, unknown>;
-    private defaultNoteJson: Map<string, unknown>;
+    private _defaultScoreJson: Map<string, unknown>;
+    private _defaultMasterBarJson: Map<string, unknown>;
+    private _defaultTrackJson: Map<string, unknown>;
+    private _defaultStaffJson: Map<string, unknown>;
+    private _defaultBarJson: Map<string, unknown>;
+    private _defaultVoiceJson: Map<string, unknown>;
+    private _defaultBeatJson: Map<string, unknown>;
+    private _defaultNoteJson: Map<string, unknown>;
 
     private constructor() {
         // we create empty basic objects and reset some props we always want in the snapshot
@@ -390,14 +443,14 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
         defaultNote.id = -1;
         defaultNote.index = -1;
 
-        this.defaultScoreJson = ScoreSerializer.toJson(defaultScore)!;
-        this.defaultMasterBarJson = MasterBarSerializer.toJson(defaultMasterBar)!;
-        this.defaultTrackJson = TrackSerializer.toJson(defaultTrack)!;
-        this.defaultStaffJson = StaffSerializer.toJson(defaultStaff)!;
-        this.defaultBarJson = BarSerializer.toJson(defaultBar)!;
-        this.defaultVoiceJson = VoiceSerializer.toJson(defaultVoice)!;
-        this.defaultBeatJson = BeatSerializer.toJson(defaultBeat)!;
-        this.defaultNoteJson = NoteSerializer.toJson(defaultNote)!;
+        this._defaultScoreJson = ScoreSerializer.toJson(defaultScore)!;
+        this._defaultMasterBarJson = MasterBarSerializer.toJson(defaultMasterBar)!;
+        this._defaultTrackJson = TrackSerializer.toJson(defaultTrack)!;
+        this._defaultStaffJson = StaffSerializer.toJson(defaultStaff)!;
+        this._defaultBarJson = BarSerializer.toJson(defaultBar)!;
+        this._defaultVoiceJson = VoiceSerializer.toJson(defaultVoice)!;
+        this._defaultBeatJson = BeatSerializer.toJson(defaultBeat)!;
+        this._defaultNoteJson = NoteSerializer.toJson(defaultNote)!;
     }
 
     public serialize(
@@ -409,7 +462,7 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
         printer: PrettyFormatPrinter
     ): string {
         const json = JsonConverter.scoreToJsObject(val as Score);
-        this.filterOutDefaultValues(json as Map<string, unknown>);
+        this._filterOutDefaultValues(json as Map<string, unknown>);
         return printer(json, config, indentation, depth, refs);
     }
 
@@ -417,10 +470,10 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
         return arg0 instanceof Score;
     }
 
-    private filterOutDefaultValues(scoreJson: Map<string, unknown>) {
+    private _filterOutDefaultValues(scoreJson: Map<string, unknown>) {
         const masterBars = scoreJson.get('masterbars') as Map<string, unknown>[];
         for (const masterBar of masterBars) {
-            ScoreSerializerPlugin.sanitizeJson(masterBar, this.defaultMasterBarJson, 'MasterBar');
+            ScoreSerializerPlugin._sanitizeJson(masterBar, this._defaultMasterBarJson, 'MasterBar');
         }
 
         const tracks = scoreJson.get('tracks') as Map<string, unknown>[];
@@ -435,24 +488,24 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
                         for (const beat of beats) {
                             const notes = beat.get('notes') as Map<string, unknown>[];
                             for (const note of notes) {
-                                ScoreSerializerPlugin.sanitizeJson(note, this.defaultNoteJson, 'Note');
+                                ScoreSerializerPlugin._sanitizeJson(note, this._defaultNoteJson, 'Note');
                             }
-                            ScoreSerializerPlugin.sanitizeJson(beat, this.defaultBeatJson, 'Beat');
+                            ScoreSerializerPlugin._sanitizeJson(beat, this._defaultBeatJson, 'Beat');
                         }
-                        ScoreSerializerPlugin.sanitizeJson(voice, this.defaultVoiceJson, 'Voice');
+                        ScoreSerializerPlugin._sanitizeJson(voice, this._defaultVoiceJson, 'Voice');
                     }
-                    ScoreSerializerPlugin.sanitizeJson(bar, this.defaultBarJson, 'Bar');
+                    ScoreSerializerPlugin._sanitizeJson(bar, this._defaultBarJson, 'Bar');
                 }
-                ScoreSerializerPlugin.sanitizeJson(staff, this.defaultStaffJson, 'Staff');
+                ScoreSerializerPlugin._sanitizeJson(staff, this._defaultStaffJson, 'Staff');
             }
-            ScoreSerializerPlugin.sanitizeJson(track, this.defaultTrackJson, 'Track');
+            ScoreSerializerPlugin._sanitizeJson(track, this._defaultTrackJson, 'Track');
         }
 
         // walk hierarchy and filter out stuff
-        ScoreSerializerPlugin.sanitizeJson(scoreJson, this.defaultScoreJson, 'Score');
+        ScoreSerializerPlugin._sanitizeJson(scoreJson, this._defaultScoreJson, 'Score');
     }
 
-    private static sanitizeJson(
+    private static _sanitizeJson(
         modelJson: Map<string, unknown>,
         defaultValueJson: Map<string, unknown>,
         kind?: string
@@ -507,7 +560,7 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
                                     TestPlatform.typedArrayAsUnknownArray(dv).length === 0 &&
                                     TestPlatform.typedArrayAsUnknownArray(v).length === 0;
                             } else if (dv instanceof Map && v instanceof Map) {
-                                ScoreSerializerPlugin.sanitizeJson(
+                                ScoreSerializerPlugin._sanitizeJson(
                                     v as Map<string, unknown>,
                                     dv as Map<string, unknown>
                                 );
@@ -516,7 +569,7 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
                                     isEqual = true;
                                 }
                             } else {
-                                isEqual = ScoreSerializerPlugin.isPlatformTypeEqual(v, dv);
+                                isEqual = ScoreSerializerPlugin._isPlatformTypeEqual(v, dv);
                             }
                             break;
                     }
@@ -535,17 +588,21 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
      * @target web
      * @partial
      */
-    private static isPlatformTypeEqual(v: unknown, _dv: unknown): boolean {
+    private static _isPlatformTypeEqual(v: unknown, _dv: unknown): boolean {
         // we should not have any other types in our JSONs, if we extend it, this will catch it
         throw new Error(`Unexpected value in serialized json${String(v)}`);
     }
 }
 
 // Some helpers for snapshots on C# and Kotlin compilation
+
+/**
+ * @internal
+ */
 export class SnapshotFileRepository {
     private static _cache: Map<string, SnapshotFile> = new Map<string, SnapshotFile>();
 
-    public static loadSnapshortFile(path: string): SnapshotFile {
+    public static loadSnapshotFile(path: string): SnapshotFile {
         let file = SnapshotFileRepository._cache.get(path);
         if (!file) {
             file = new SnapshotFile();
@@ -557,14 +614,17 @@ export class SnapshotFileRepository {
     }
 }
 
+/**
+ * @internal
+ */
 export class SnapshotFile {
-    private static createConfig() {
+    private static _createConfig() {
         const c = new PrettyFormatConfig();
         c.plugins.push(ScoreSerializerPlugin.instance);
         c.plugins.push(MidiEventSerializerPlugin.instance);
         return c;
     }
-    private static readonly matchOptions: PrettyFormatConfig = SnapshotFile.createConfig();
+    private static readonly _matchOptions: PrettyFormatConfig = SnapshotFile._createConfig();
 
     public snapshots: Map<string, string> = new Map<string, string>();
 
@@ -580,7 +640,10 @@ export class SnapshotFile {
             return `No snapshot '${name}' found`;
         }
 
-        const actual = PrettyFormat.format(value, SnapshotFile.matchOptions).split('\n');
+        // https://github.com/jestjs/jest/blob/8e683abe2a1d3f6f6513dd9467f0f49d3d2ffc0d/packages/jest-snapshot-utils/src/utils.ts#L190C51-L190C70
+        const actual = SnapshotFile._printBacktickString(PrettyFormat.format(value, SnapshotFile._matchOptions)).split(
+            '\n'
+        );
 
         const lines = Math.min(expected.length, actual.length);
         const errors: string[] = [];
@@ -603,6 +666,15 @@ export class SnapshotFile {
         return null;
     }
 
+    // https://github.com/jestjs/jest/blob/8e683abe2a1d3f6f6513dd9467f0f49d3d2ffc0d/packages/jest-snapshot-utils/src/utils.ts#L167-L171
+    private static _printBacktickString(str: string) {
+        return SnapshotFile._escapeBacktickString(str);
+    }
+
+    private static _escapeBacktickString(str: string) {
+        return str.replaceAll(/[`\\]/g, (substring: string) => `\\${substring}`);
+    }
+
     loadFrom(path: string) {
         const content = TestPlatform.loadFileAsStringSync(path);
 
@@ -619,6 +691,13 @@ export class SnapshotFile {
                 }
 
                 const name = lines[i].substring(9, endOfName);
+
+                if (lines[i].endsWith('`;')) {
+                    const startOfValue = lines[i].indexOf('`', endOfName + 2) + 1;
+                    this.snapshots.set(name, lines[i].substring(startOfValue, lines[i].length - 2));
+                    i++;
+                    continue;
+                }
                 i++;
 
                 let value = '';

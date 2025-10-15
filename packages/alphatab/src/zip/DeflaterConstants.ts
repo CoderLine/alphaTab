@@ -21,24 +21,26 @@
 
 /**
  * This class contains constants used for deflation.
+ * 
+ * @internal
  */
 export class DeflaterConstants {
-    public static readonly MAX_WBITS: number = 15;
-    public static readonly WSIZE: number = 1 << DeflaterConstants.MAX_WBITS;
-    public static readonly WMASK: number = DeflaterConstants.WSIZE - 1;
+    public static readonly maxWbits: number = 15;
+    public static readonly wsize: number = 1 << DeflaterConstants.maxWbits;
+    public static readonly wmask: number = DeflaterConstants.wsize - 1;
 
-    public static readonly MIN_MATCH: number = 3;
-    public static readonly MAX_MATCH: number = 258;
+    public static readonly minMatch: number = 3;
+    public static readonly maxMatch: number = 258;
 
-    public static readonly DEFAULT_MEM_LEVEL: number = 8;
-    public static readonly PENDING_BUF_SIZE: number = 1 << (DeflaterConstants.DEFAULT_MEM_LEVEL + 8);
+    public static readonly defaultMemLevel: number = 8;
+    public static readonly pendingBufSize: number = 1 << (DeflaterConstants.defaultMemLevel + 8);
 
-    public static readonly HASH_BITS: number = DeflaterConstants.DEFAULT_MEM_LEVEL + 7;
-    public static readonly HASH_SIZE: number = 1 << DeflaterConstants.HASH_BITS;
-    public static readonly HASH_SHIFT: number =
-        (DeflaterConstants.HASH_BITS + DeflaterConstants.MIN_MATCH - 1) / DeflaterConstants.MIN_MATCH;
-    public static readonly HASH_MASK: number = DeflaterConstants.HASH_SIZE - 1;
+    public static readonly hashBits: number = DeflaterConstants.defaultMemLevel + 7;
+    public static readonly hashSize: number = 1 << DeflaterConstants.hashBits;
+    public static readonly hashShift: number =
+        (DeflaterConstants.hashBits + DeflaterConstants.minMatch - 1) / DeflaterConstants.minMatch;
+    public static readonly hashMask: number = DeflaterConstants.hashSize - 1;
 
-    public static readonly MIN_LOOKAHEAD: number = DeflaterConstants.MAX_MATCH + DeflaterConstants.MIN_MATCH + 1;
-    public static readonly MAX_DIST: number = DeflaterConstants.WSIZE - DeflaterConstants.MIN_LOOKAHEAD;
+    public static readonly minLookahead: number = DeflaterConstants.maxMatch + DeflaterConstants.minMatch + 1;
+    public static readonly maxDist: number = DeflaterConstants.wsize - DeflaterConstants.minLookahead;
 }

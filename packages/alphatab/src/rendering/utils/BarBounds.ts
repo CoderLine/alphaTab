@@ -5,6 +5,7 @@ import type { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 
 /**
  * Represents the boundaries of a single bar.
+ * @public
  */
 export class BarBounds {
     /**

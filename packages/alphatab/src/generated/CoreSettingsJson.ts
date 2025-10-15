@@ -9,6 +9,7 @@ import { LogLevel } from "@src/LogLevel";
  * All main settings of alphaTab controlling rather general aspects of its behavior.
  * @json
  * @json_declaration
+ * @public
  * @target web
  */
 export interface CoreSettingsJson {

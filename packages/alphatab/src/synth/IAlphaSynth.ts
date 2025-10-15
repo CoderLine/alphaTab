@@ -13,6 +13,7 @@ import type { Score } from '@src/model/Score';
 
 /**
  * Rerpresents a point to sync the alphaTab time axis with an external backing track.
+ * @public
  */
 export class BackingTrackSyncPoint {
     /**
@@ -72,6 +73,7 @@ export class BackingTrackSyncPoint {
 
 /**
  * The public API interface for interacting with the synthesizer.
+ * @public
  */
 export interface IAlphaSynth {
     /**

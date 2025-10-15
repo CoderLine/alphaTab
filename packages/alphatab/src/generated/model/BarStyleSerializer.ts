@@ -7,6 +7,9 @@ import { BarStyle } from "@src/model/Bar";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BarSubElement } from "@src/model/Bar";
 import { Color } from "@src/model/Color";
+/**
+ * @internal
+ */
 export class BarStyleSerializer {
     public static fromJson(obj: BarStyle, m: unknown): void {
         if (!m) {

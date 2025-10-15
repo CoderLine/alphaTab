@@ -47,6 +47,7 @@ import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer
  *   - Support for ChorusEffectsSend and ReverbEffectsSend generators
  *   - Better low-pass filter without lowering performance too much
  *   - Support for modulators
+ * @internal
  */
 export class TinySoundFont implements IAudioSampleSynthesizer {
     private _midiEventQueue: Queue<SynthEvent> = new Queue<SynthEvent>();
@@ -68,11 +69,11 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
     }
 
     public synthesize(buffer: Float32Array, bufferPos: number, sampleCount: number): SynthEvent[] {
-        return this.fillWorkingBuffer(buffer, bufferPos, sampleCount);
+        return this._fillWorkingBuffer(buffer, bufferPos, sampleCount);
     }
 
     public synthesizeSilent(sampleCount: number): void {
-        this.fillWorkingBuffer(null, 0, sampleCount);
+        this._fillWorkingBuffer(null, 0, sampleCount);
     }
 
     public channelGetMixVolume(channel: number): number {
@@ -82,7 +83,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
     }
 
     public channelSetMixVolume(channel: number, volume: number): void {
-        const c: Channel = this.channelInit(channel);
+        const c: Channel = this._channelInit(channel);
         for (const v of this._voices) {
             if (v.playingChannel === channel && v.playingPreset !== -1) {
                 v.mixVolume = volume;
@@ -175,7 +176,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
         this._midiEventQueue.enqueue(synthEvent);
     }
 
-    private fillWorkingBuffer(buffer: Float32Array | null, bufferPos: number, sampleCount: number): SynthEvent[] {
+    private _fillWorkingBuffer(buffer: Float32Array | null, bufferPos: number, sampleCount: number): SynthEvent[] {
         // Break the process loop into sections representing the smallest timeframe before the midi controls need to be updated
         // the bigger the timeframe the more efficent the process is, but playback quality will be reduced.
         const anySolo: boolean = this._isAnySolo;
@@ -489,7 +490,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @returns returns false if preset does not exist, otherwise true
      */
     public bankNoteOn(bank: number, presetNumber: number, key: number, vel: number): boolean {
-        const presetIndex: number = this.getPresetIndex(bank, presetNumber);
+        const presetIndex: number = this._getPresetIndex(bank, presetNumber);
         if (presetIndex === -1) {
             return false;
         }
@@ -546,7 +547,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @returns returns false if preset does not exist, otherwise true
      */
     public bankNoteOff(bank: number, presetNumber: number, key: number): boolean {
-        const presetIndex: number = this.getPresetIndex(bank, presetNumber);
+        const presetIndex: number = this._getPresetIndex(bank, presetNumber);
         if (presetIndex === -1) {
             return false;
         }
@@ -580,7 +581,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
         return count;
     }
 
-    private channelInit(channel: number): Channel {
+    private _channelInit(channel: number): Channel {
         if (this._channels && channel < this._channels.channelList.length) {
             return this._channels.channelList[channel];
         }
@@ -613,7 +614,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
     /**
      * Returns the preset index from a bank and preset number, or -1 if it does not exist in the loaded SoundFont
      */
-    private getPresetIndex(bank: number, presetNumber: number): number {
+    private _getPresetIndex(bank: number, presetNumber: number): number {
         if (!this.presets) {
             return -1;
         }
@@ -643,7 +644,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * Returns the name of a preset by bank and preset number
      */
     public bankGetPresetName(bank: number, presetNumber: number): string | null {
-        return this.getPresetName(this.getPresetIndex(bank, presetNumber));
+        return this.getPresetName(this._getPresetIndex(bank, presetNumber));
     }
 
     /**
@@ -706,7 +707,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
             }
         }
 
-        const c: Channel = this.channelInit(channel);
+        const c: Channel = this._channelInit(channel);
         c.perNotePitchWheel.delete(key);
 
         if (!matchFirst) {
@@ -736,7 +737,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @param channel channel number
      */
     public channelNoteOffAll(channel: number): void {
-        const c: Channel = this.channelInit(channel);
+        const c: Channel = this._channelInit(channel);
         c.perNotePitchWheel.clear();
 
         for (const v of this._voices) {
@@ -755,7 +756,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @param channel channel number
      */
     public channelSoundsOffAll(channel: number): void {
-        const c: Channel = this.channelInit(channel);
+        const c: Channel = this._channelInit(channel);
         c.perNotePitchWheel.clear();
 
         for (const v of this._voices) {
@@ -775,7 +776,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @param presetIndex preset index <= 0 and > {@link presetCount}
      */
     public channelSetPresetIndex(channel: number, presetIndex: number): void {
-        this.channelInit(channel).presetIndex = TypeConversions.int32ToUint16(presetIndex);
+        this._channelInit(channel).presetIndex = TypeConversions.int32ToUint16(presetIndex);
     }
 
     /**
@@ -785,21 +786,21 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @returns return false if preset does not exist, otherwise true
      */
     public channelSetPresetNumber(channel: number, presetNumber: number, midiDrums: boolean = false): boolean {
-        const c: Channel = this.channelInit(channel);
+        const c: Channel = this._channelInit(channel);
         let presetIndex: number = 0;
         if (midiDrums) {
-            presetIndex = this.getPresetIndex(128 | (c.bank & 0x7fff), presetNumber);
+            presetIndex = this._getPresetIndex(128 | (c.bank & 0x7fff), presetNumber);
             if (presetIndex === -1) {
-                presetIndex = this.getPresetIndex(128, presetNumber);
+                presetIndex = this._getPresetIndex(128, presetNumber);
             }
             if (presetIndex === -1) {
-                presetIndex = this.getPresetIndex(128, 0);
+                presetIndex = this._getPresetIndex(128, 0);
             }
             if (presetIndex === -1) {
-                presetIndex = this.getPresetIndex(c.bank & 0x7ff, presetNumber);
+                presetIndex = this._getPresetIndex(c.bank & 0x7ff, presetNumber);
             }
         } else {
-            presetIndex = this.getPresetIndex(c.bank & 0x7ff, presetNumber);
+            presetIndex = this._getPresetIndex(c.bank & 0x7ff, presetNumber);
         }
         c.presetIndex = presetIndex;
         return presetIndex !== -1;
@@ -810,7 +811,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @param bank instrument bank number (alternative to preset_index)
      */
     public channelSetBank(channel: number, bank: number): void {
-        this.channelInit(channel).bank = TypeConversions.int32ToUint16(bank);
+        this._channelInit(channel).bank = TypeConversions.int32ToUint16(bank);
     }
 
     /**
@@ -820,8 +821,8 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @returns return false if preset does not exist, otherwise true
      */
     public channelSetBankPreset(channel: number, bank: number, presetNumber: number): boolean {
-        const c: Channel = this.channelInit(channel);
-        const presetIndex: number = this.getPresetIndex(bank, presetNumber);
+        const c: Channel = this._channelInit(channel);
+        const presetIndex: number = this._getPresetIndex(bank, presetNumber);
         if (presetIndex === -1) {
             return false;
         }
@@ -851,7 +852,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
                 }
             }
         }
-        this.channelInit(channel).panOffset = pan - 0.5;
+        this._channelInit(channel).panOffset = pan - 0.5;
     }
 
     /**
@@ -859,7 +860,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @param volume linear volume scale factor (default 1.0 full)
      */
     public channelSetVolume(channel: number, volume: number): void {
-        const c: Channel = this.channelInit(channel);
+        const c: Channel = this._channelInit(channel);
         const gainDb: number = SynthHelper.gainToDecibels(volume);
         const gainDBChange: number = gainDb - c.gainDb;
         if (gainDBChange === 0) {
@@ -880,13 +881,13 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @param pitchWheel pitch wheel position 0 to 16383 (default 8192 unpitched)
      */
     public channelSetPitchWheel(channel: number, pitchWheel: number): void {
-        const c: Channel = this.channelInit(channel);
+        const c: Channel = this._channelInit(channel);
         if (c.pitchWheel === pitchWheel) {
             return;
         }
 
         c.pitchWheel = TypeConversions.int32ToUint16(pitchWheel);
-        this.channelApplyPitch(channel, c);
+        this._channelApplyPitch(channel, c);
     }
 
     /**
@@ -902,16 +903,16 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
             key += this._liveTranspositionPitches.get(channel)!;
         }
 
-        const c: Channel = this.channelInit(channel);
+        const c: Channel = this._channelInit(channel);
         if (c.perNotePitchWheel.has(key) && c.perNotePitchWheel.get(key) === pitchWheel) {
             return;
         }
 
         c.perNotePitchWheel.set(key, pitchWheel);
-        this.channelApplyPitch(channel, c, key);
+        this._channelApplyPitch(channel, c, key);
     }
 
-    private channelApplyPitch(channel: number, c: Channel, key: number = -1): void {
+    private _channelApplyPitch(channel: number, c: Channel, key: number = -1): void {
         for (const v of this._voices) {
             if (v.playingChannel === channel && v.playingPreset !== -1 && (key === -1 || v.playingKey === key)) {
                 v.updatePitchRatio(c, this.outSampleRate);
@@ -924,14 +925,14 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @param pitchRange range of the pitch wheel in semitones (default 2.0, total +/- 2 semitones)
      */
     public channelSetPitchRange(channel: number, pitchRange: number): void {
-        const c: Channel = this.channelInit(channel);
+        const c: Channel = this._channelInit(channel);
         if (c.pitchRange === pitchRange) {
             return;
         }
 
         c.pitchRange = pitchRange;
         if (c.pitchWheel !== 8192) {
-            this.channelApplyPitch(channel, c);
+            this._channelApplyPitch(channel, c);
         }
     }
 
@@ -940,20 +941,20 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
      * @param tuning tuning of all playing voices in semitones (default 0.0, standard (A440) tuning)
      */
     public channelSetTuning(channel: number, tuning: number): void {
-        const c: Channel = this.channelInit(channel);
+        const c: Channel = this._channelInit(channel);
         if (c.tuning === tuning) {
             return;
         }
 
         c.tuning = tuning;
-        this.channelApplyPitch(channel, c);
+        this._channelApplyPitch(channel, c);
     }
 
     /**
      * Apply a MIDI control change to the channel (not all controllers are supported!)
      */
     public channelMidiControl(channel: number, controller: ControllerType, controlValue: number): void {
-        const c: Channel = this.channelInit(channel);
+        const c: Channel = this._channelInit(channel);
         switch (controller) {
             case ControllerType.DataEntryFine:
                 c.midiData = TypeConversions.int32ToUint16((c.midiData & 0x3f80) | controlValue);
@@ -1391,7 +1392,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
 
                                     const shouldLoadSamples =
                                         (isPercussion &&
-                                            TinySoundFont.setContainsRange(
+                                            TinySoundFont._setContainsRange(
                                                 percussionKeys,
                                                 zoneRegion.loKey,
                                                 zoneRegion.hiKey
@@ -1506,7 +1507,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
         }
     }
 
-    private static setContainsRange(x: Set<number>, lo: number, hi: number) {
+    private static _setContainsRange(x: Set<number>, lo: number, hi: number) {
         for (let i = lo; i <= hi; i++) {
             if (x.has(i)) {
                 return true;

@@ -102,9 +102,10 @@ export interface SourceFile extends Node {
     namespace: NamespaceDeclaration;
 }
 
-export interface UsingDeclaration extends Node {
+export interface UsingDeclaration extends Node, NamedElement {
     nodeType: SyntaxKind.UsingDeclaration;
-    namespaceOrTypeName: string;
+    name: string;
+    alias?: TypeNode;
 }
 
 export interface NamespaceDeclaration extends Node {
@@ -160,6 +161,7 @@ export interface ClassDeclaration extends NamedTypeDeclaration {
     interfaces?: TypeNode[];
     isAbstract: boolean;
     members: ClassMember[];
+    isRecord?:boolean;
 }
 
 export type ClassMember =
@@ -266,6 +268,7 @@ export interface UnresolvedTypeNode extends TypeNode {
     tsType?: ts.Type;
     tsSymbol?: ts.Symbol;
     typeArguments?: UnresolvedTypeNode[];
+    skipAliasSymbolOnResolve?: boolean;
 }
 
 export type TypeReferenceType = NamedTypeDeclaration | TypeParameterDeclaration | TypeNode | string;

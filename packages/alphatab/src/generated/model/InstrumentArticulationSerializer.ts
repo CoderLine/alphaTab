@@ -7,6 +7,9 @@ import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { TechniqueSymbolPlacement } from "@src/model/InstrumentArticulation";
+/**
+ * @internal
+ */
 export class InstrumentArticulationSerializer {
     public static fromJson(obj: InstrumentArticulation, m: unknown): void {
         if (!m) {

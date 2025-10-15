@@ -25,6 +25,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using (Jianpu) Numbered Music Notation
+ * @internal
  */
 export class NumberedBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'numbered';
@@ -277,7 +278,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
         // Key signature
         if (!this.bar.previousBar || this.bar.keySignature !== this.bar.previousBar.keySignature) {
             this.createStartSpacing();
-            this.createKeySignatureGlyphs();
+            this._createKeySignatureGlyphs();
         }
 
         if (
@@ -294,16 +295,16 @@ export class NumberedBarRenderer extends LineBarRenderer {
                     this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime))
         ) {
             this.createStartSpacing();
-            this.createTimeSignatureGlyphs();
+            this._createTimeSignatureGlyphs();
         }
     }
-    private createKeySignatureGlyphs() {
+    private _createKeySignatureGlyphs() {
         this.addPreBeatGlyph(
             new NumberedKeySignatureGlyph(0, this.getLineY(0), this.bar.keySignature, this.bar.keySignatureType)
         );
     }
 
-    private createTimeSignatureGlyphs(): void {
+    private _createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
 
         const masterBar = this.bar.masterBar;

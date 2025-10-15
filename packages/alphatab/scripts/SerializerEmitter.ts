@@ -43,8 +43,7 @@ export default createEmitter('json', (program, input) => {
         );
     }
 
-    statements.push(
-        ts.factory.createClassDeclaration(
+    const clz = ts.addSyntheticLeadingComment(ts.factory.createClassDeclaration(
             [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
             `${input.name!.text}Serializer`,
             undefined,
@@ -54,8 +53,13 @@ export default createEmitter('json', (program, input) => {
                 createToJsonMethod(input, serializable, importer),
                 createSetPropertyMethod(input, serializable, importer)
             ]
-        )
+        ),
+        ts.SyntaxKind.MultiLineCommentTrivia,
+        '*\n * @internal\n ',
+        true
     );
+
+    statements.push(clz);
 
     const sourceFile = ts.factory.createSourceFile(
         [

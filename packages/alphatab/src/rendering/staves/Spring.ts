@@ -1,3 +1,6 @@
+/**
+ * @internal
+ */
 export class Spring {
     public timePosition: number = 0;
     public longestDuration: number = 0;

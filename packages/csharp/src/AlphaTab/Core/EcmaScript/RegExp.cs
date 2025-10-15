@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
@@ -66,6 +66,13 @@ internal class RegExp
         return _global
             ? _regex.Replace(input, match => replacer(match.Value, match.Groups[1].Value))
             : _regex.Replace(input, match => replacer(match.Value, match.Groups[1].Value), 1);
+    }
+
+    public string Replace(string input, Func<string, string> replacer)
+    {
+        return _global
+            ? _regex.Replace(input, match => replacer(match.Value))
+            : _regex.Replace(input, match => replacer(match.Value), 1);
     }
 
     public string[] Split(string value)

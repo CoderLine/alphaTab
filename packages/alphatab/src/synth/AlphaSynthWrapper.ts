@@ -23,6 +23,8 @@ import { SynthConstants } from '@src/synth/SynthConstants';
  * This wrapper is used when re-exposing the underlying player via {@link AlphaTabApiBase} to integrators.
  * Even with dynamic switching between synthesizer, backing tracks etc. aspects like volume, playbackspeed,
  * event listeners etc. should not be lost.
+ * 
+ * @internal
  */
 export class AlphaSynthWrapper implements IAlphaSynth {
     // relevant state information we want to remember when switching between player instances

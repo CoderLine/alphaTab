@@ -24,6 +24,9 @@ import { NoteOrnament } from '@src/model/NoteOrnament';
 import { ElementStyle } from '@src/model/ElementStyle';
 import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 class NoteIdBag {
     public tieDestinationNoteId: number = -1;
     public tieOriginNoteId: number = -1;
@@ -37,6 +40,7 @@ class NoteIdBag {
 
 /**
  * Lists all graphical sub elements within a {@link Note} which can be styled via {@link Note.style}
+ * @public
  */
 export enum NoteSubElement {
     /**
@@ -104,6 +108,7 @@ export enum NoteSubElement {
  * Defines the custom styles for notes.
  * @json
  * @json_strict
+ * @public
  */
 export class NoteStyle extends ElementStyle<NoteSubElement> {
     /**
@@ -124,25 +129,26 @@ export class NoteStyle extends ElementStyle<NoteSubElement> {
  * @cloneable
  * @json
  * @json_strict
+ * @public
  */
 export class Note {
     /**
      * @internal
      */
-    public static GlobalNoteId: number = 0;
+    public static globalNoteId: number = 0;
 
     /**
      * @internal
      */
     public static resetIds() {
-        Note.GlobalNoteId = 0;
+        Note.globalNoteId = 0;
     }
 
     /**
      * Gets or sets the unique id of this note.
      * @clone_ignore
      */
-    public id: number = Note.GlobalNoteId++;
+    public id: number = Note.globalNoteId++;
 
     /**
      * Gets or sets the zero-based index of this note within the beat.
@@ -1011,12 +1017,12 @@ export class Note {
         }
     }
 
-    private static readonly MaxOffsetForSameLineSearch: number = 3;
+    private static readonly _maxOffsetForSameLineSearch: number = 3;
 
     public static nextNoteOnSameLine(note: Note): Note | null {
         let nextBeat: Beat | null = note.beat.nextBeat;
         // keep searching in same bar
-        while (nextBeat && nextBeat.voice.bar.index <= note.beat.voice.bar.index + Note.MaxOffsetForSameLineSearch) {
+        while (nextBeat && nextBeat.voice.bar.index <= note.beat.voice.bar.index + Note._maxOffsetForSameLineSearch) {
             const noteOnString: Note | null = nextBeat.getNoteOnString(note.string);
             if (noteOnString) {
                 return noteOnString;
@@ -1038,7 +1044,7 @@ export class Note {
 
         let nextBeat: Beat | null = note.beat.nextBeat;
         // keep searching in same bar
-        while (nextBeat && nextBeat.voice.bar.index <= note.beat.voice.bar.index + Note.MaxOffsetForSameLineSearch) {
+        while (nextBeat && nextBeat.voice.bar.index <= note.beat.voice.bar.index + Note._maxOffsetForSameLineSearch) {
             // 1. same string first
             let noteOnString: Note | null = nextBeat.getNoteOnString(note.string);
             if (noteOnString) {
@@ -1078,7 +1084,7 @@ export class Note {
         // keep searching in same bar
         while (
             previousBeat &&
-            previousBeat.voice.bar.index >= note.beat.voice.bar.index - Note.MaxOffsetForSameLineSearch
+            previousBeat.voice.bar.index >= note.beat.voice.bar.index - Note._maxOffsetForSameLineSearch
         ) {
             if (note.isStringed) {
                 const noteOnString: Note | null = previousBeat.getNoteOnString(note.string);
@@ -1104,7 +1110,7 @@ export class Note {
         return null;
     }
 
-    private static NoteIdLookupKey = 'NoteIdLookup';
+    private static _noteIdLookupKey = 'NoteIdLookup';
 
     private _noteIdBag: NoteIdBag | null = null;
     public chain(sharedDataBag: Map<string, unknown> | null = null) {
@@ -1118,11 +1124,11 @@ export class Note {
         if (this._noteIdBag !== null) {
             // get or create lookup
             let noteIdLookup: Map<number, Note>;
-            if (sharedDataBag.has(Note.NoteIdLookupKey)) {
-                noteIdLookup = sharedDataBag.get(Note.NoteIdLookupKey) as Map<number, Note>;
+            if (sharedDataBag.has(Note._noteIdLookupKey)) {
+                noteIdLookup = sharedDataBag.get(Note._noteIdLookupKey) as Map<number, Note>;
             } else {
                 noteIdLookup = new Map<number, Note>();
-                sharedDataBag.set(Note.NoteIdLookupKey, noteIdLookup);
+                sharedDataBag.set(Note._noteIdLookupKey, noteIdLookup);
             }
 
             // if this note is a source note for any effect, remember it for later

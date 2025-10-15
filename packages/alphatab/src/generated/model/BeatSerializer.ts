@@ -30,6 +30,9 @@ import { WahPedal } from "@src/model/WahPedal";
 import { BarreShape } from "@src/model/BarreShape";
 import { Rasgueado } from "@src/model/Rasgueado";
 import { BeatStyle } from "@src/model/Beat";
+/**
+ * @internal
+ */
 export class BeatSerializer {
     public static fromJson(obj: Beat, m: unknown): void {
         if (!m) {

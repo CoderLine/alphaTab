@@ -6,6 +6,7 @@ import { Environment } from '@src/Environment';
 
 /**
  * @target web
+ * @internal
  */
 export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     public static readonly CmdOutputPrefix: string = 'alphaSynth.output.';
@@ -32,7 +33,7 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     public open(): void {
         Logger.debug('AlphaSynth', 'Initializing synth worker');
         this._worker = Environment.globalThis as IWorkerScope;
-        this._worker.addEventListener('message', this.handleMessage.bind(this));
+        this._worker.addEventListener('message', this._handleMessage.bind(this));
         (this.ready as EventEmitter).trigger();
     }
 
@@ -42,7 +43,7 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
         });
     }
 
-    private handleMessage(e: MessageEvent): void {
+    private _handleMessage(e: MessageEvent): void {
         const data: any = e.data;
         const cmd: any = data.cmd;
         switch (cmd) {

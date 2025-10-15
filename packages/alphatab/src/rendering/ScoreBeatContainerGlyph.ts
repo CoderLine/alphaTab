@@ -11,6 +11,9 @@ import { ScoreSlurGlyph } from '@src/rendering/glyphs/ScoreSlurGlyph';
 import { ScoreTieGlyph } from '@src/rendering/glyphs/ScoreTieGlyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
+/**
+ * @internal
+ */
 export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: ScoreBendGlyph | null = null;
     private _effectSlur: ScoreSlurGlyph | null = null;

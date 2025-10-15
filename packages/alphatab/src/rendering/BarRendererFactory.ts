@@ -7,6 +7,7 @@ import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
 
 /**
  * This is the base public class for creating factories providing BarRenderers
+ * @internal
  */
 export abstract class BarRendererFactory {
     public isInsideBracket: boolean = true;

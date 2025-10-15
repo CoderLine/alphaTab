@@ -4,6 +4,9 @@ import type { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBas
 import type { Note } from '@src/model/Note';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 
+/**
+ * @internal
+ */
 export class BeatOnNoteGlyphBase extends BeatGlyphBase {
     public beamingHelper!: BeamingHelper;
     public centerX: number = 0;

@@ -3,6 +3,9 @@ import { OggReader } from '@src/synth/vorbis/OggReader';
 import type { VorbisStream } from '@src/synth/vorbis/VorbisStream';
 import { VorbisStreamReader } from '@src/synth/vorbis/VorbisStreamReader';
 
+/**
+ * @internal
+ */
 export class VorbisFile {
     public streams: VorbisStream[] = [];
 

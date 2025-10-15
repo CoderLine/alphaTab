@@ -4,6 +4,7 @@
  * @cloneable
  * @json
  * @json_strict
+ * @public
  */
 export class BendPoint {
     public static readonly MaxPosition: number = 60;

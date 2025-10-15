@@ -1,5 +1,6 @@
 /**
  * This public class provides names for all general midi instruments.
+ * @internal
  */
 export class GeneralMidi {
     private static _values: Map<string, number> = new Map([

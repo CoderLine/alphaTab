@@ -3,6 +3,9 @@ import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { NumberedTieGlyph } from '@src/rendering//glyphs/NumberedTieGlyph';
 import { NumberedSlurGlyph } from '@src/rendering/glyphs/NumberedSlurGlyph';
 
+/**
+ * @internal
+ */
 export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
     private _effectSlurs: NumberedSlurGlyph[] = [];
 

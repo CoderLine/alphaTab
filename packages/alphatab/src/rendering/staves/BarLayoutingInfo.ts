@@ -10,10 +10,11 @@ import { GraceType } from '@src/model/GraceType';
  * This public class stores size information about a stave.
  * It is used by the layout engine to collect the sizes of score parts
  * to align the parts across multiple staves.
+ * @internal
  */
 export class BarLayoutingInfo {
-    private static readonly MinDuration: number = 30;
-    private static readonly MinDurationWidth: number = 7;
+    private static readonly _defaultMinDuration: number = 30;
+    private static readonly _defaultMinDurationWidth: number = 7;
 
     private _timeSortedSprings: Spring[] = [];
     private _minTime: number = -1;
@@ -22,7 +23,7 @@ export class BarLayoutingInfo {
     private _incompleteGraceRodsWidth: number = 0;
 
     // the smallest duration we have between two springs to ensure we have positive spring constants
-    private _minDuration: number = BarLayoutingInfo.MinDuration;
+    private _minDuration: number = BarLayoutingInfo._defaultMinDuration;
 
     /**
      * an internal version number that increments whenever a change was made.
@@ -34,7 +35,7 @@ export class BarLayoutingInfo {
     public minStretchForce: number = 0;
     public totalSpringConstant: number = 0;
 
-    private updateMinStretchForce(force: number): void {
+    private _updateMinStretchForce(force: number): void {
         if (this.minStretchForce < force) {
             this.minStretchForce = force;
         }
@@ -202,11 +203,11 @@ export class BarLayoutingInfo {
             }
         }
 
-        this.calculateSpringConstants();
+        this._calculateSpringConstants();
         this.version++;
     }
 
-    private calculateSpringConstants(): void {
+    private _calculateSpringConstants(): void {
         let totalSpringConstant: number = 0;
         const sortedSprings: Spring[] = this._timeSortedSprings;
         if (sortedSprings.length === 0) {
@@ -223,7 +224,7 @@ export class BarLayoutingInfo {
                 const nextSpring: Spring = sortedSprings[i + 1];
                 duration = Math.abs(nextSpring.timePosition - currentSpring.timePosition);
             }
-            currentSpring.springConstant = this.calculateSpringConstant(currentSpring, duration);
+            currentSpring.springConstant = this._calculateSpringConstant(currentSpring, duration);
             totalSpringConstant += 1 / currentSpring.springConstant;
         }
         this.totalSpringConstant = 1 / totalSpringConstant;
@@ -252,7 +253,7 @@ export class BarLayoutingInfo {
             }
 
             const requiredSpaceForce = requiredSpace * currentSpring.springConstant;
-            this.updateMinStretchForce(requiredSpaceForce);
+            this._updateMinStretchForce(requiredSpaceForce);
         }
     }
 
@@ -298,7 +299,7 @@ export class BarLayoutingInfo {
     //     }
     // }
 
-    private calculateSpringConstant(spring: Spring, duration: number): number {
+    private _calculateSpringConstant(spring: Spring, duration: number): number {
         if (duration <= 0) {
             duration = MidiUtils.toTicks(Duration.TwoHundredFiftySixth);
         }
@@ -308,7 +309,7 @@ export class BarLayoutingInfo {
         const smallestDuration: number = spring.smallestDuration;
 
         const minDuration = this._minDuration;
-        const minDurationWidth = BarLayoutingInfo.MinDurationWidth;
+        const minDurationWidth = BarLayoutingInfo._defaultMinDurationWidth;
 
         const phi: number = 1 + 0.85 * Math.log2(duration / minDuration);
         return (smallestDuration / duration) * (1 / (phi * minDurationWidth));
@@ -328,7 +329,7 @@ export class BarLayoutingInfo {
     public calculateVoiceWidth(force: number): number {
         let width = 0;
         if (this.totalSpringConstant !== -1) {
-            width = this.calculateWidth(force, this.totalSpringConstant);
+            width = this._calculateWidth(force, this.totalSpringConstant);
         }
 
         if (this._timeSortedSprings.length > 0) {
@@ -338,7 +339,7 @@ export class BarLayoutingInfo {
         return width;
     }
 
-    private calculateWidth(force: number, springConstant: number): number {
+    private _calculateWidth(force: number, springConstant: number): number {
         return force / springConstant;
     }
 
@@ -359,7 +360,7 @@ export class BarLayoutingInfo {
         let springX: number = sortedSprings[0].preSpringWidth;
         for (let i: number = 0; i < sortedSprings.length; i++) {
             positions.set(sortedSprings[i].timePosition, springX);
-            springX += this.calculateWidth(force, sortedSprings[i].springConstant);
+            springX += this._calculateWidth(force, sortedSprings[i].springConstant);
         }
         return positions;
     }

@@ -10,6 +10,7 @@ import { ElementStyle } from '@src/model/ElementStyle';
 
 /**
  * Lists all graphical sub elements within a {@link Track} which can be styled via {@link Track.style}
+ * @public
  */
 export enum TrackSubElement {
     /**
@@ -38,6 +39,7 @@ export enum TrackSubElement {
  * Defines the custom styles for tracks.
  * @json
  * @json_strict
+ * @public
  */
 export class TrackStyle extends ElementStyle<TrackSubElement> {}
 
@@ -46,9 +48,10 @@ export class TrackStyle extends ElementStyle<TrackSubElement> {}
  * It is primarily a list of staves containing individual music notation kinds.
  * @json
  * @json_strict
+ * @public
  */
 export class Track {
-    private static readonly ShortNameMaxLength: number = 10;
+    private static readonly _shortNameMaxLength: number = 10;
     /**
      * Gets or sets the zero-based index of this track.
      * @json_ignore
@@ -158,8 +161,8 @@ export class Track {
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         if (!this.shortName) {
             this.shortName = this.name;
-            if (this.shortName.length > Track.ShortNameMaxLength) {
-                this.shortName = this.shortName.substr(0, Track.ShortNameMaxLength);
+            if (this.shortName.length > Track._shortNameMaxLength) {
+                this.shortName = this.shortName.substr(0, Track._shortNameMaxLength);
             }
         }
         for(const s of this.staves){

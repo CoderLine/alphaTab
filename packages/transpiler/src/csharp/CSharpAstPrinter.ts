@@ -3,7 +3,7 @@ import * as ts from 'typescript';
 import AstPrinterBase from '../AstPrinterBase';
 
 export default class CSharpAstPrinter extends AstPrinterBase {
-    private keywords: Set<string> = new Set<string>([
+    private _keywords: Set<string> = new Set<string>([
         'abstract',
         'as',
         'base',
@@ -84,7 +84,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
     ]);
 
     protected override escapeIdentifier(identifier: string): string {
-        if (this.keywords.has(identifier)) {
+        if (this._keywords.has(identifier)) {
             return `@${identifier}`;
         }
         return identifier;
@@ -380,7 +380,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeBody(d.body);
         this.writeLine();
 
-        if (this.isGetEnumerator(d)) {
+        if (this._isGetEnumerator(d)) {
             this.write('System.Collections.Generic.IEnumerator<');
             this.writeType((d.returnType as cs.TypeReference).typeArguments![0]);
             this.write('> System.Collections.Generic.IEnumerable<');
@@ -396,7 +396,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         }
     }
 
-    private isGetEnumerator(d: cs.MethodDeclaration) {
+    private _isGetEnumerator(d: cs.MethodDeclaration) {
         return (
             d.name === 'GetEnumerator' &&
             cs.isTypeReference(d.returnType) &&
@@ -426,6 +426,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
             } else {
                 this.write(' => ');
                 this.writeExpression(body as cs.Expression);
+                this.writeLine(';');
             }
         } else {
             this.writeLine(';');
@@ -711,6 +712,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
             case cs.SyntaxKind.EnumDeclaration:
             case cs.SyntaxKind.DelegateDeclaration:
                 this.write(this._context.getFullName(type as cs.NamedTypeDeclaration));
+                break;
+            case cs.SyntaxKind.UsingDeclaration:
+                this.write((type as cs.UsingDeclaration).name);
                 break;
             case cs.SyntaxKind.TypeParameterDeclaration:
                 this.write((type as cs.TypeParameterDeclaration).name);
@@ -1064,7 +1068,16 @@ export default class CSharpAstPrinter extends AstPrinterBase {
     }
 
     protected writeUsing(using: cs.UsingDeclaration) {
-        this.writeLine(`using ${using.namespaceOrTypeName};`);
+         if (using.skipEmit) {
+            return;
+        }
+
+        this.write(`using ${using.name}`);
+        if (using.alias) {
+            this.write(` = `);
+            this.writeType(using.alias, true);
+        }
+        this.writeLine(';');
     }
 
     protected writeLocalFunction(expr: cs.LocalFunctionDeclaration) {

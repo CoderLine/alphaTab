@@ -1,5 +1,5 @@
-import * as cs from '../csharp/CSharpAst';
 import * as ts from 'typescript';
+import * as cs from '../csharp/CSharpAst';
 import CSharpEmitterContext from '../csharp/CSharpEmitterContext';
 
 export default class KotlinEmitterContext extends CSharpEmitterContext {
@@ -23,7 +23,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
             expr?.parent &&
             cs.isMemberAccessExpression(expr.parent) &&
             expr.parent.tsSymbol &&
-            this.isSymbolPartial(expr.parent.tsSymbol)
+            this._isSymbolPartial(expr.parent.tsSymbol)
         ) {
             className += 'Partials';
         }
@@ -48,7 +48,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return this.makeTypeName('kotlin.Throwable');
     }
 
-    private isSymbolPartial(tsSymbol: ts.Symbol): boolean {
+    private _isSymbolPartial(tsSymbol: ts.Symbol): boolean {
         if (!tsSymbol.valueDeclaration) {
             return false;
         }
@@ -56,7 +56,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return !!ts.getJSDocTags(tsSymbol.valueDeclaration).find(t => t.tagName.text === 'partial');
     }
 
-    protected getOverriddenMembers(
+    public getOverriddenMembers(
         classType: ts.ClassDeclaration | ts.InterfaceDeclaration,
         classElement: ts.ClassElement
     ): (ts.ClassElement | ts.TypeElement)[] {
@@ -76,7 +76,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return super.isCsValueType(mapValueType);
     }
 
-    public override getMethodNameFromSymbol(symbol: ts.Symbol): string {
+    public override getNameFromSymbol(symbol: ts.Symbol): string {
         const parent = 'parent' in symbol ? (symbol.parent as ts.Symbol) : undefined;
 
         if (symbol.name === 'dispose' && (!parent || parent.name === 'SymbolConstructor')) {

@@ -27,30 +27,32 @@ import type { PendingBuffer } from '@src/zip/PendingBuffer';
 /**
  * Low level compression engine for deflate algorithm which uses a 32K sliding window
  * with secondary compression from Huffman/Shannon-Fano codes.
+ * 
+ * @internal
  */
 export class DeflaterEngine {
-    private static readonly TooFar: number = 4096;
+    private static readonly _tooFar: number = 4096;
 
-    private blockStart: number;
-    private maxChain: number = 128;
-    private niceLength: number = 128;
-    private goodLength: number = 8;
+    private _blockStart: number;
+    private _maxChain: number = 128;
+    private _niceLength: number = 128;
+    private _goodLength: number = 8;
 
     /**
      * Hash index of string to be inserted
      */
-    private insertHashIndex: number = 0;
+    private _insertHashIndex: number = 0;
 
     /**
      * Points to the current character in the window.
      */
-    private strstart: number;
+    private _strstart: number;
 
     /**
      * This array contains the part of the uncompressed stream that
      * is of relevance.  The current character is indexed by strstart.
      */
-    private window: Uint8Array;
+    private _window: Uint8Array;
 
     /**
      * Hashtable, hashing three characters to an index for window, so
@@ -58,7 +60,7 @@ export class DeflaterEngine {
      * Note that the array should really be unsigned short, so you need
      * to and the values with 0xffff.
      */
-    private head: Int16Array;
+    private _head: Int16Array;
 
     /**
      * <code>prev[index &amp; WMASK]</code> points to the previous index that has the
@@ -67,7 +69,7 @@ export class DeflaterEngine {
      * Note that the array should really be unsigned short, so you need
      * to and the values with 0xffff.
      */
-    private prev: Int16Array;
+    private _prev: Int16Array;
 
     /**
      * lookahead is the number of characters starting at strstart in
@@ -75,37 +77,37 @@ export class DeflaterEngine {
      * So window[strstart] until window[strstart+lookahead-1] are valid
      * characters.
      */
-    private lookahead: number = 0;
+    private _lookahead: number = 0;
 
     /**
      * The input data for compression.
      */
-    private inputBuf: Uint8Array | null = null;
+    private _inputBuf: Uint8Array | null = null;
 
     /**
      * The offset into inputBuf, where input data starts.
      */
-    private inputOff: number = 0;
+    private _inputOff: number = 0;
 
     /**
      * The end offset of the input data.
      */
-    private inputEnd: number = 0;
+    private _inputEnd: number = 0;
 
     /**
      * Set if previous match exists
      */
-    private prevAvailable: boolean = false;
+    private _prevAvailable: boolean = false;
 
-    private matchStart: number = 0;
+    private _matchStart: number = 0;
 
     /**
      * Length of best match
      */
-    private matchLen: number = 0;
+    private _matchLen: number = 0;
 
-    private pending: PendingBuffer;
-    private huffman: DeflaterHuffman;
+    private _pending: PendingBuffer;
+    private _huffman: DeflaterHuffman;
 
     public inputCrc: Crc32;
 
@@ -115,44 +117,44 @@ export class DeflaterEngine {
      * @param noAdlerCalculation Pending buffer to use
      */
     public constructor(pending: PendingBuffer) {
-        this.pending = pending;
-        this.huffman = new DeflaterHuffman(pending);
+        this._pending = pending;
+        this._huffman = new DeflaterHuffman(pending);
         this.inputCrc = new Crc32();
 
-        this.window = new Uint8Array(2 * DeflaterConstants.WSIZE);
-        this.head = new Int16Array(DeflaterConstants.HASH_SIZE);
-        this.prev = new Int16Array(DeflaterConstants.WSIZE);
+        this._window = new Uint8Array(2 * DeflaterConstants.wsize);
+        this._head = new Int16Array(DeflaterConstants.hashSize);
+        this._prev = new Int16Array(DeflaterConstants.wsize);
 
         // We start at index 1, to avoid an implementation deficiency, that
         // we cannot build a repeat pattern at index 0.
-        this.blockStart = 1;
-        this.strstart = 1;
+        this._blockStart = 1;
+        this._strstart = 1;
     }
 
     /**
      * Reset internal state
      */
     public reset() {
-        this.huffman.reset();
+        this._huffman.reset();
         this.inputCrc.reset();
-        this.blockStart = 1;
-        this.strstart = 1;
-        this.lookahead = 0;
-        this.prevAvailable = false;
-        this.matchLen = DeflaterConstants.MIN_MATCH - 1;
+        this._blockStart = 1;
+        this._strstart = 1;
+        this._lookahead = 0;
+        this._prevAvailable = false;
+        this._matchLen = DeflaterConstants.minMatch - 1;
 
-        for (let i = 0; i < DeflaterConstants.HASH_SIZE; i++) {
-            this.head[i] = 0;
+        for (let i = 0; i < DeflaterConstants.hashSize; i++) {
+            this._head[i] = 0;
         }
 
-        for (let i = 0; i < DeflaterConstants.WSIZE; i++) {
-            this.prev[i] = 0;
+        for (let i = 0; i < DeflaterConstants.wsize; i++) {
+            this._prev[i] = 0;
         }
     }
 
-    private updateHash() {
-        this.insertHashIndex =
-            (this.window[this.strstart] << DeflaterConstants.HASH_SHIFT) ^ this.window[this.strstart + 1];
+    private _updateHash() {
+        this._insertHashIndex =
+            (this._window[this._strstart] << DeflaterConstants.hashShift) ^ this._window[this._strstart + 1];
     }
 
     /**
@@ -160,7 +162,7 @@ export class DeflaterEngine {
      * @returns Return true if input is needed via setInput
      */
     public needsInput(): boolean {
-        return this.inputEnd === this.inputOff;
+        return this._inputEnd === this._inputOff;
     }
 
     /**
@@ -172,9 +174,9 @@ export class DeflaterEngine {
      */
     public setInput(buffer: Uint8Array, offset: number, count: number) {
         const end = offset + count;
-        this.inputBuf = buffer;
-        this.inputOff = offset;
-        this.inputEnd = end;
+        this._inputBuf = buffer;
+        this._inputOff = offset;
+        this._inputEnd = end;
     }
 
     /**
@@ -187,93 +189,93 @@ export class DeflaterEngine {
         let progress: boolean;
         do {
             this.fillWindow();
-            const canFlush = flush && this.inputOff === this.inputEnd;
-            progress = this.deflateSlow(canFlush, finish);
-        } while (this.pending.isFlushed && progress); // repeat while we have no pending output and progress was made
+            const canFlush = flush && this._inputOff === this._inputEnd;
+            progress = this._deflateSlow(canFlush, finish);
+        } while (this._pending.isFlushed && progress); // repeat while we have no pending output and progress was made
         return progress;
     }
 
-    private deflateSlow(flush: boolean, finish: boolean): boolean {
-        if (this.lookahead < DeflaterConstants.MIN_LOOKAHEAD && !flush) {
+    private _deflateSlow(flush: boolean, finish: boolean): boolean {
+        if (this._lookahead < DeflaterConstants.minLookahead && !flush) {
             return false;
         }
 
-        while (this.lookahead >= DeflaterConstants.MIN_LOOKAHEAD || flush) {
-            if (this.lookahead === 0) {
-                if (this.prevAvailable) {
-                    this.huffman.tallyLit(this.window[this.strstart - 1] & 0xff);
+        while (this._lookahead >= DeflaterConstants.minLookahead || flush) {
+            if (this._lookahead === 0) {
+                if (this._prevAvailable) {
+                    this._huffman.tallyLit(this._window[this._strstart - 1] & 0xff);
                 }
-                this.prevAvailable = false;
+                this._prevAvailable = false;
 
                 // We are flushing everything
-                this.huffman.flushBlock(this.window, this.blockStart, this.strstart - this.blockStart, finish);
-                this.blockStart = this.strstart;
+                this._huffman.flushBlock(this._window, this._blockStart, this._strstart - this._blockStart, finish);
+                this._blockStart = this._strstart;
                 return false;
             }
 
-            if (this.strstart >= 2 * DeflaterConstants.WSIZE - DeflaterConstants.MIN_LOOKAHEAD) {
+            if (this._strstart >= 2 * DeflaterConstants.wsize - DeflaterConstants.minLookahead) {
                 /* slide window, as FindLongestMatch needs this.
                  * This should only happen when flushing and the window
                  * is almost full.
                  */
-                this.slideWindow();
+                this._slideWindow();
             }
 
-            const prevMatch = this.matchStart;
-            let prevLen = this.matchLen;
-            if (this.lookahead >= DeflaterConstants.MIN_MATCH) {
-                const hashHead = this.insertString();
+            const prevMatch = this._matchStart;
+            let prevLen = this._matchLen;
+            if (this._lookahead >= DeflaterConstants.minMatch) {
+                const hashHead = this._insertString();
 
                 if (
                     hashHead !== 0 &&
-                    this.strstart - hashHead <= DeflaterConstants.MAX_DIST &&
-                    this.findLongestMatch(hashHead)
+                    this._strstart - hashHead <= DeflaterConstants.maxDist &&
+                    this._findLongestMatch(hashHead)
                 ) {
                     // longestMatch sets matchStart and matchLen
 
                     // Discard match if too small and too far away
                     if (
-                        this.matchLen === DeflaterConstants.MIN_MATCH &&
-                        this.strstart - this.matchStart > DeflaterEngine.TooFar
+                        this._matchLen === DeflaterConstants.minMatch &&
+                        this._strstart - this._matchStart > DeflaterEngine._tooFar
                     ) {
-                        this.matchLen = DeflaterConstants.MIN_MATCH - 1;
+                        this._matchLen = DeflaterConstants.minMatch - 1;
                     }
                 }
             }
 
             // previous match was better
-            if (prevLen >= DeflaterConstants.MIN_MATCH && this.matchLen <= prevLen) {
-                this.huffman.tallyDist(this.strstart - 1 - prevMatch, prevLen);
+            if (prevLen >= DeflaterConstants.minMatch && this._matchLen <= prevLen) {
+                this._huffman.tallyDist(this._strstart - 1 - prevMatch, prevLen);
                 prevLen -= 2;
                 do {
-                    this.strstart++;
-                    this.lookahead--;
-                    if (this.lookahead >= DeflaterConstants.MIN_MATCH) {
-                        this.insertString();
+                    this._strstart++;
+                    this._lookahead--;
+                    if (this._lookahead >= DeflaterConstants.minMatch) {
+                        this._insertString();
                     }
                 } while (--prevLen > 0);
 
-                this.strstart++;
-                this.lookahead--;
-                this.prevAvailable = false;
-                this.matchLen = DeflaterConstants.MIN_MATCH - 1;
+                this._strstart++;
+                this._lookahead--;
+                this._prevAvailable = false;
+                this._matchLen = DeflaterConstants.minMatch - 1;
             } else {
-                if (this.prevAvailable) {
-                    this.huffman.tallyLit(this.window[this.strstart - 1] & 0xff);
+                if (this._prevAvailable) {
+                    this._huffman.tallyLit(this._window[this._strstart - 1] & 0xff);
                 }
-                this.prevAvailable = true;
-                this.strstart++;
-                this.lookahead--;
+                this._prevAvailable = true;
+                this._strstart++;
+                this._lookahead--;
             }
 
-            if (this.huffman.isFull()) {
-                let len = this.strstart - this.blockStart;
-                if (this.prevAvailable) {
+            if (this._huffman.isFull()) {
+                let len = this._strstart - this._blockStart;
+                if (this._prevAvailable) {
                     len--;
                 }
-                const lastBlock = finish && this.lookahead === 0 && !this.prevAvailable;
-                this.huffman.flushBlock(this.window, this.blockStart, len, lastBlock);
-                this.blockStart += len;
+                const lastBlock = finish && this._lookahead === 0 && !this._prevAvailable;
+                this._huffman.flushBlock(this._window, this._blockStart, len, lastBlock);
+                this._blockStart += len;
                 return !lastBlock;
             }
         }
@@ -286,39 +288,39 @@ export class DeflaterEngine {
      * @param curMatch
      * @returns True if a match greater than the minimum length is found
      */
-    private findLongestMatch(curMatch: number): boolean {
+    private _findLongestMatch(curMatch: number): boolean {
         let match: number;
-        let scan = this.strstart;
+        let scan = this._strstart;
         // scanMax is the highest position that we can look at
-        const scanMax = scan + Math.min(DeflaterConstants.MAX_MATCH, this.lookahead) - 1;
-        const limit = Math.max(scan - DeflaterConstants.MAX_DIST, 0);
+        const scanMax = scan + Math.min(DeflaterConstants.maxMatch, this._lookahead) - 1;
+        const limit = Math.max(scan - DeflaterConstants.maxDist, 0);
 
-        const window = this.window;
-        const prev = this.prev;
-        let chainLength = this.maxChain;
-        const niceLength = Math.min(this.niceLength, this.lookahead);
+        const window = this._window;
+        const prev = this._prev;
+        let chainLength = this._maxChain;
+        const niceLength = Math.min(this._niceLength, this._lookahead);
 
-        this.matchLen = Math.max(this.matchLen, DeflaterConstants.MIN_MATCH - 1);
+        this._matchLen = Math.max(this._matchLen, DeflaterConstants.minMatch - 1);
 
-        if (scan + this.matchLen > scanMax) {
+        if (scan + this._matchLen > scanMax) {
             return false;
         }
 
-        let scan_end1 = window[scan + this.matchLen - 1];
-        let scan_end = window[scan + this.matchLen];
+        let scanEnd1 = window[scan + this._matchLen - 1];
+        let scanEnd = window[scan + this._matchLen];
 
         // Do not waste too much time if we already have a good match:
-        if (this.matchLen >= this.goodLength) {
+        if (this._matchLen >= this._goodLength) {
             chainLength >>= 2;
         }
 
         do {
             match = curMatch;
-            scan = this.strstart;
+            scan = this._strstart;
 
             if (
-                window[match + this.matchLen] !== scan_end ||
-                window[match + this.matchLen - 1] !== scan_end1 ||
+                window[match + this._matchLen] !== scanEnd ||
+                window[match + this._matchLen - 1] !== scanEnd1 ||
                 window[match] !== window[scan] ||
                 window[++match] !== window[++scan]
             ) {
@@ -428,21 +430,21 @@ export class DeflaterEngine {
                 );
             }
 
-            if (scan - this.strstart > this.matchLen) {
-                this.matchStart = curMatch;
-                this.matchLen = scan - this.strstart;
+            if (scan - this._strstart > this._matchLen) {
+                this._matchStart = curMatch;
+                this._matchLen = scan - this._strstart;
 
-                if (this.matchLen >= niceLength) {
+                if (this._matchLen >= niceLength) {
                     break;
                 }
 
-                scan_end1 = window[scan - 1];
-                scan_end = window[scan];
+                scanEnd1 = window[scan - 1];
+                scanEnd = window[scan];
             }
-            curMatch = prev[curMatch & DeflaterConstants.WMASK] & 0xffff;
+            curMatch = prev[curMatch & DeflaterConstants.wmask] & 0xffff;
         } while (curMatch > limit && 0 !== --chainLength);
 
-        return this.matchLen >= DeflaterConstants.MIN_MATCH;
+        return this._matchLen >= DeflaterConstants.minMatch;
     }
 
     /**
@@ -450,16 +452,16 @@ export class DeflaterEngine {
      * value for this hash.
      * @returns The previous hash value
      */
-    private insertString(): number {
+    private _insertString(): number {
         const hash =
-            ((this.insertHashIndex << DeflaterConstants.HASH_SHIFT) ^
-                this.window[this.strstart + (DeflaterConstants.MIN_MATCH - 1)]) &
-            DeflaterConstants.HASH_MASK;
+            ((this._insertHashIndex << DeflaterConstants.hashShift) ^
+                this._window[this._strstart + (DeflaterConstants.minMatch - 1)]) &
+            DeflaterConstants.hashMask;
 
-        const match = this.head[hash];
-        this.prev[this.strstart & DeflaterConstants.WMASK] = match;
-        this.head[hash] = this.strstart;
-        this.insertHashIndex = hash;
+        const match = this._head[hash];
+        this._prev[this._strstart & DeflaterConstants.wmask] = match;
+        this._head[hash] = this._strstart;
+        this._insertHashIndex = hash;
         return match & 0xffff;
     }
 
@@ -470,56 +472,56 @@ export class DeflaterEngine {
         /* If the window is almost full and there is insufficient lookahead,
          * move the upper half to the lower one to make room in the upper half.
          */
-        if (this.strstart >= DeflaterConstants.WSIZE + DeflaterConstants.MAX_DIST) {
-            this.slideWindow();
+        if (this._strstart >= DeflaterConstants.wsize + DeflaterConstants.maxDist) {
+            this._slideWindow();
         }
 
         /* If there is not enough lookahead, but still some input left,
          * read in the input
          */
-        if (this.lookahead < DeflaterConstants.MIN_LOOKAHEAD && this.inputOff < this.inputEnd) {
-            let more = 2 * DeflaterConstants.WSIZE - this.lookahead - this.strstart;
+        if (this._lookahead < DeflaterConstants.minLookahead && this._inputOff < this._inputEnd) {
+            let more = 2 * DeflaterConstants.wsize - this._lookahead - this._strstart;
 
-            if (more > this.inputEnd - this.inputOff) {
-                more = this.inputEnd - this.inputOff;
+            if (more > this._inputEnd - this._inputOff) {
+                more = this._inputEnd - this._inputOff;
             }
 
-            this.window.set(
-                this.inputBuf!.subarray(this.inputOff, this.inputOff + more),
-                this.strstart + this.lookahead
+            this._window.set(
+                this._inputBuf!.subarray(this._inputOff, this._inputOff + more),
+                this._strstart + this._lookahead
             );
-            this.inputCrc.update(this.inputBuf!, this.inputOff, more);
+            this.inputCrc.update(this._inputBuf!, this._inputOff, more);
 
-            this.inputOff += more;
+            this._inputOff += more;
             // this.totalIn += more;
-            this.lookahead += more;
+            this._lookahead += more;
         }
 
-        if (this.lookahead >= DeflaterConstants.MIN_MATCH) {
-            this.updateHash();
+        if (this._lookahead >= DeflaterConstants.minMatch) {
+            this._updateHash();
         }
     }
 
-    private slideWindow() {
-        this.window.set(
-            this.window.subarray(DeflaterConstants.WSIZE, DeflaterConstants.WSIZE + DeflaterConstants.WSIZE),
+    private _slideWindow() {
+        this._window.set(
+            this._window.subarray(DeflaterConstants.wsize, DeflaterConstants.wsize + DeflaterConstants.wsize),
             0
         );
-        this.matchStart -= DeflaterConstants.WSIZE;
-        this.strstart -= DeflaterConstants.WSIZE;
-        this.blockStart -= DeflaterConstants.WSIZE;
+        this._matchStart -= DeflaterConstants.wsize;
+        this._strstart -= DeflaterConstants.wsize;
+        this._blockStart -= DeflaterConstants.wsize;
 
         // Slide the hash table (could be avoided with 32 bit values
         // at the expense of memory usage).
-        for (let i = 0; i < DeflaterConstants.HASH_SIZE; ++i) {
-            const m = this.head[i] & 0xffff;
-            this.head[i] = m >= DeflaterConstants.WSIZE ? m - DeflaterConstants.WSIZE : 0;
+        for (let i = 0; i < DeflaterConstants.hashSize; ++i) {
+            const m = this._head[i] & 0xffff;
+            this._head[i] = m >= DeflaterConstants.wsize ? m - DeflaterConstants.wsize : 0;
         }
 
         // Slide the prev table.
-        for (let i = 0; i < DeflaterConstants.WSIZE; i++) {
-            const m = this.prev[i] & 0xffff;
-            this.prev[i] = m >= DeflaterConstants.WSIZE ? m - DeflaterConstants.WSIZE : 0;
+        for (let i = 0; i < DeflaterConstants.wsize; i++) {
+            const m = this._prev[i] & 0xffff;
+            this._prev[i] = m >= DeflaterConstants.wsize ? m - DeflaterConstants.wsize : 0;
         }
     }
 }

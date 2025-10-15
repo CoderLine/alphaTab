@@ -8,6 +8,9 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { NoteSubElement } from "@src/model/Note";
 import { Color } from "@src/model/Color";
+/**
+ * @internal
+ */
 export class NoteStyleSerializer {
     public static fromJson(obj: NoteStyle, m: unknown): void {
         if (!m) {

@@ -11,6 +11,9 @@ import { NotationSettingsSerializer } from "@src/generated/NotationSettingsSeria
 import { ImporterSettingsSerializer } from "@src/generated/ImporterSettingsSerializer";
 import { PlayerSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
 import { ExporterSettingsSerializer } from "@src/generated/ExporterSettingsSerializer";
+/**
+ * @internal
+ */
 export class SettingsSerializer {
     public static fromJson(obj: Settings, m: unknown): void {
         if (!m) {

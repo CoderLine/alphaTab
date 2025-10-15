@@ -16,6 +16,9 @@
  * THIS SOFTWARE.
  */
 
+/**
+ * @internal
+ */
 export class PixelMatchOptions {
     /**
      * Matching threshold, ranges from 0 to 1. Smaller values make the comparison more sensitive.
@@ -57,6 +60,9 @@ export class PixelMatchOptions {
     public diffMask: boolean | null = null;
 }
 
+/**
+ * @internal
+ */
 export class PixelMatchResult {
     public readonly totalPixels: number;
     public readonly differentPixels: number;
@@ -69,10 +75,13 @@ export class PixelMatchResult {
     }
 }
 
+/**
+ * @internal
+ */
 export class PixelMatch {
-    static defaultOptions: PixelMatchOptions = PixelMatch.createDefaultOptions();
+    static defaultOptions: PixelMatchOptions = PixelMatch._createDefaultOptions();
 
-    private static createDefaultOptions(): PixelMatchOptions {
+    private static _createDefaultOptions(): PixelMatchOptions {
         const o = new PixelMatchOptions();
         o.threshold = 0.1; // matching threshold (0 to 1); smaller is more sensitive
         o.includeAA = false; // whether to skip anti-aliasing detection

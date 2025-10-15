@@ -15,7 +15,7 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalUnsignedTypes
 internal class EnvironmentPartials {
     companion object {
-        internal fun createPlatformSpecificRenderEngines(engines: alphaTab.collections.Map<String, RenderEngineFactory>) {
+        internal fun _createPlatformSpecificRenderEngines(engines: alphaTab.collections.Map<String, RenderEngineFactory>) {
             engines.set(
                 "android",
                 RenderEngineFactory(true) { AndroidCanvas() }
@@ -29,7 +29,7 @@ internal class EnvironmentPartials {
         internal fun platformInit() {
         }
 
-        internal fun printPlatformInfo(print: (message: String) -> Unit) {
+        internal fun _printPlatformInfo(print: (message: String) -> Unit) {
             print("OS Name: ${System.getProperty("os.name")}");
             print("OS Version: ${System.getProperty("os.version")}");
             print("Device Brand: ${Build.MANUFACTURER}");

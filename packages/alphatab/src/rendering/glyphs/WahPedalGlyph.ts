@@ -3,12 +3,15 @@ import { WahPedal } from '@src/model/WahPedal';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import type { ICanvas } from '@src/platform/ICanvas';
 
+/**
+ * @internal
+ */
 export class WahPedalGlyph extends MusicFontGlyph {
     public constructor(wahPedal: WahPedal) {
-        super(0, 0, 1, WahPedalGlyph.getSymbol(wahPedal));
+        super(0, 0, 1, WahPedalGlyph._getSymbol(wahPedal));
         this.center = true;
     }
-    private static getSymbol(wahPedal: WahPedal): MusicFontSymbol {
+    private static _getSymbol(wahPedal: WahPedal): MusicFontSymbol {
         switch (wahPedal) {
             case WahPedal.Open:
                 return MusicFontSymbol.GuitarOpenPedal;

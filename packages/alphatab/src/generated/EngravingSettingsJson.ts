@@ -27,6 +27,7 @@ import { Duration } from "@src/model/Duration";
  * @json
  * @json_declaration
  * @cloneable
+ * @public
  * @target web
  */
 export interface EngravingSettingsJson {

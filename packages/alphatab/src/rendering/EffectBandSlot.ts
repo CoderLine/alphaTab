@@ -1,6 +1,9 @@
 import type { Beat } from '@src/model/Beat';
 import type { EffectBand } from '@src/rendering/EffectBand';
 
+/**
+ * @internal
+ */
 export class EffectBandSlotShared {
     public uniqueEffectId: string | null = null;
     public y: number = 0;
@@ -9,6 +12,9 @@ export class EffectBandSlotShared {
     public lastBeat: Beat | null = null;
 }
 
+/**
+ * @internal
+ */
 export class EffectBandSlot {
     public bands: EffectBand[];
 

@@ -1,5 +1,6 @@
 /**
  * Lists all durations of a beat.
+ * @public
  */
 export enum Duration {
     /**

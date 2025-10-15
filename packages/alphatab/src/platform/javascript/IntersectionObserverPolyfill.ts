@@ -1,27 +1,27 @@
 /**
  * A polyfill of the InsersectionObserver
  * @target web
+ * @internal
  */
 export class IntersectionObserverPolyfill {
     private _callback: IntersectionObserverCallback;
     private _elements: HTMLElement[] = [];
+    private _timer: any = null;
 
     public constructor(callback: IntersectionObserverCallback) {
-        let timer: any = null;
-        const oldCheck = this.check.bind(this);
-        this.check = () => {
-            if (!timer) {
-                timer = setTimeout(() => {
-                    oldCheck();
-                    timer = null;
-                }, 100);
-            }
-        };
-
         this._callback = callback;
 
-        window.addEventListener('resize', this.check, true);
-        document.addEventListener('scroll', this.check, true);
+        window.addEventListener('resize', () => this._check, true);
+        document.addEventListener('scroll', () => this._check, true);
+    }
+
+    private _check() {
+        if (!this._timer) {
+            this._timer = setTimeout(() => {
+                this._doCheck();
+                this._timer = null;
+            }, 100);
+        }
     }
 
     public observe(target: HTMLElement) {
@@ -29,7 +29,7 @@ export class IntersectionObserverPolyfill {
             return;
         }
         this._elements.push(target);
-        this.check();
+        this._check();
     }
 
     public unobserve(target: HTMLElement) {
@@ -38,7 +38,7 @@ export class IntersectionObserverPolyfill {
         });
     }
 
-    private check() {
+    private _doCheck() {
         const entries: IntersectionObserverEntry[] = [];
         for (const element of this._elements) {
             const rect = element.getBoundingClientRect();

@@ -8,6 +8,9 @@ import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
 import type { Staff } from '@src/model/Staff';
 import type { Track } from '@src/model/Track';
 
+/**
+ * @internal
+ */
 export class EffectBarRendererFactory extends BarRendererFactory {
     public infos: EffectBarRendererInfo[];
     private _staffId: string;

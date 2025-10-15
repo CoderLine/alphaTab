@@ -6,6 +6,7 @@ import { IOHelper } from '@src/io/IOHelper';
 
 /**
  * Lists the different midi file formats which are supported for export.
+ * @public
  */
 export enum MidiFileFormat {
     /**
@@ -18,6 +19,9 @@ export enum MidiFileFormat {
     MultiTrack = 1
 }
 
+/**
+ * @public
+ */
 export class MidiTrack {
     /**
      * Gets a list of midi events sorted by time.
@@ -71,6 +75,7 @@ export class MidiTrack {
 
 /**
  * Represents a midi file with a single track that can be played via {@link AlphaSynth}
+ * @public
  */
 export class MidiFile {
     /**
@@ -104,7 +109,7 @@ export class MidiFile {
      */
     public readonly tracks: MidiTrack[] = [];
 
-    private ensureTracks(trackCount: number) {
+    private _ensureTracks(trackCount: number) {
         while (this.tracks.length < trackCount) {
             this.tracks.push(new MidiTrack());
         }
@@ -115,10 +120,10 @@ export class MidiFile {
      */
     public addEvent(e: MidiEvent): void {
         if (this.format === MidiFileFormat.SingleTrackMultiChannel) {
-            this.ensureTracks(1);
+            this._ensureTracks(1);
             this.tracks[0].addEvent(e);
         } else {
-            this.ensureTracks(e.track + 1);
+            this._ensureTracks(e.track + 1);
             this.tracks[e.track].addEvent(e);
         }
     }

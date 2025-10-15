@@ -8,6 +8,9 @@ import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 
+/**
+ * @internal
+ */
 export class LyricsEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectLyrics;

@@ -4,6 +4,7 @@ import type { HtmlElementContainer } from '@src/platform/javascript/HtmlElementC
 
 /**
  * @target web
+ * @internal
  */
 export class BrowserMouseEventArgs implements IMouseEventArgs {
     public readonly mouseEvent: MouseEvent;

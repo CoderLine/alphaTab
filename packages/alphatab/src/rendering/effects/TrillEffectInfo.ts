@@ -7,6 +7,9 @@ import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { TrillGlyph } from '@src/rendering/glyphs/TrillGlyph';
 import { NotationElement } from '@src/NotationSettings';
 
+/**
+ * @internal
+ */
 export class TrillEffectInfo extends NoteEffectInfoBase {
     public get notationElement(): NotationElement {
         return NotationElement.EffectTrill;

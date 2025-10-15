@@ -8,6 +8,9 @@ import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { WahPedalGlyph } from '@src/rendering/glyphs/WahPedalGlyph';
 import type { Settings } from '@src/Settings';
 
+/**
+ * @internal
+ */
 export class WahPedalEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectWahPedal;

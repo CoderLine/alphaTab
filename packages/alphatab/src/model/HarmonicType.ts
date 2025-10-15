@@ -1,5 +1,6 @@
 /**
  * Lists all harmonic types.
+ * @public
  */
 export enum HarmonicType {
     /**

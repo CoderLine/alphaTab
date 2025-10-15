@@ -1,5 +1,6 @@
 /**
  * Represents a writer where binary data can be written to.
+ * @public
  */
 export interface IWriteable {
     /**

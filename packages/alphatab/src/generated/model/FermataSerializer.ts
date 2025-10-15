@@ -6,6 +6,9 @@
 import { Fermata } from "@src/model/Fermata";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { FermataType } from "@src/model/Fermata";
+/**
+ * @internal
+ */
 export class FermataSerializer {
     public static fromJson(obj: Fermata, m: unknown): void {
         if (!m) {

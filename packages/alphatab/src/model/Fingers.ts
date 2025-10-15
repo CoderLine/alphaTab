@@ -1,5 +1,6 @@
 /**
  * Lists all fingers.
+ * @public
  */
 export enum Fingers {
     /**

@@ -4,6 +4,9 @@ import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import type { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
+/**
+ * @internal
+ */
 export abstract class GroupedEffectGlyph extends EffectGlyph {
     protected endPosition: BeatXPosition;
     protected forceGroupedRendering: boolean = false;

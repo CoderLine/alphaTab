@@ -74,6 +74,12 @@ internal fun String.replace(
 ): String {
     return pattern.replace(this, replacement)
 }
+internal fun String.replace(
+    pattern: RegExp,
+    replacement: (match: String) -> String
+): String {
+    return pattern.replace(this, replacement)
+}
 
 internal inline fun String.indexOfInDouble(item: String): Double {
     return this.indexOf(item).toDouble()
@@ -158,6 +164,13 @@ internal inline fun String.replaceAll(search: RegExp, after: String): String {
     return this.replace(search, after)
 }
 
+internal inline fun String.replaceAll(
+    search: RegExp,
+    noinline replacement: (match: String) -> String
+): String {
+    return this.replace(search, replacement)
+}
+
 internal inline fun IAlphaTabEnum.toDouble(): Double {
     return this.value.toDouble()
 }
@@ -182,7 +195,7 @@ internal inline fun Double?.toTemplate(): String {
     return this?.toInvariantString() ?: ""
 }
 
-internal fun Any?.toTemplate(): String = when(this) {
+internal fun Any?.toTemplate(): String = when (this) {
     null -> ""
     is IAlphaTabEnum -> this.toInvariantString()
     is Double -> this.toTemplate()
@@ -317,6 +330,10 @@ internal inline fun <reified T> List<T>.spread(): Array<T> {
     return _data.toTypedArray();
 }
 
+internal inline fun <reified T> List<T?>.filterNotNull(): List<T> {
+    return List(_data.filterNotNullTo(ArrayListWithRemoveRange()))
+}
+
 internal inline fun <reified TKey, reified TValue, reified TResult> List<MapEntry<TKey, TValue>>.map(
     func: (v: ArrayTuple<TKey, TValue>) -> TResult
 ): List<TResult> {
@@ -356,4 +373,10 @@ internal inline fun Iterator<Double>.spread(): DoubleArray {
 
 internal inline fun <reified T> Iterator<T>.spread(): kotlin.Array<T> {
     return IteratorIterable(this).toList().toTypedArray()
+}
+
+internal inline fun <reified T> List<T>.concat(other: Iterable<T>): List<T> {
+    val copy = this.slice()
+    copy.push(other)
+    return copy
 }

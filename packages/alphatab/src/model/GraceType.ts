@@ -1,5 +1,6 @@
 /**
  * Lists all types of grace notes
+ * @public
  */
 export enum GraceType {
     /**

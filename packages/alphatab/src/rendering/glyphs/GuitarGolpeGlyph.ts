@@ -2,6 +2,9 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
+/**
+ * @internal
+ */
 export class GuitarGolpeGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, center: boolean = false) {
         super(x, y, NoteHeadGlyph.GraceScale, MusicFontSymbol.GuitarGolpe);

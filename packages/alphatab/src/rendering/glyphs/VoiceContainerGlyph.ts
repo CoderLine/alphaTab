@@ -11,6 +11,7 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 /**
  * This glyph acts as container for handling
  * multiple voice rendering
+ * @internal
  */
 export class VoiceContainerGlyph extends GlyphGroup {
     public static readonly KeySizeBeat: string = 'Beat';
@@ -28,10 +29,10 @@ export class VoiceContainerGlyph extends GlyphGroup {
 
     public scaleToWidth(width: number): void {
         const force: number = this.renderer.layoutingInfo.spaceToForce(width);
-        this.scaleToForce(force);
+        this._scaleToForce(force);
     }
 
-    private scaleToForce(force: number): void {
+    private _scaleToForce(force: number): void {
         this.width = this.renderer.layoutingInfo.calculateVoiceWidth(force);
         const positions: Map<number, number> = this.renderer.layoutingInfo.buildOnTimePositions(force);
         const beatGlyphs: BeatContainerGlyph[] = this.beatGlyphs;
@@ -127,7 +128,7 @@ export class VoiceContainerGlyph extends GlyphGroup {
         for (const b of beatGlyphs) {
             b.applyLayoutingInfo(info);
         }
-        this.scaleToForce(Math.max(this.renderer.settings.display.stretchForce, info.minStretchForce));
+        this._scaleToForce(Math.max(this.renderer.settings.display.stretchForce, info.minStretchForce));
     }
 
     public override addGlyph(g: Glyph): void {

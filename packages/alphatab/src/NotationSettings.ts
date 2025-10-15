@@ -1,5 +1,6 @@
 /**
  * Lists the different modes on how rhythm notation is shown on the tab staff.
+ * @public
  */
 export enum TabRhythmMode {
     /**
@@ -23,6 +24,7 @@ export enum TabRhythmMode {
 
 /**
  * Lists all modes on how fingerings should be displayed.
+ * @public
  */
 export enum FingeringMode {
     /**
@@ -49,6 +51,7 @@ export enum FingeringMode {
 
 /**
  * Lists all modes on how alphaTab can handle the display and playback of music notation.
+ * @public
  */
 export enum NotationMode {
     /**
@@ -80,6 +83,7 @@ export enum NotationMode {
  * Lists all major music notation elements that are part
  * of the music sheet and can be dynamically controlled to be shown
  * or hidden.
+ * @public
  */
 export enum NotationElement {
     /**
@@ -344,6 +348,7 @@ export enum NotationElement {
  * The notation settings control how various music notation elements are shown and behaving
  * @json
  * @json_declaration
+ * @public
  */
 export class NotationSettings {
     /**

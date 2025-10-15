@@ -7,11 +7,13 @@ import { ModelUtils } from '@src/model/ModelUtils';
  * If provided as number a raw RGBA value needs to be used.
  *
  * @target web
+ * @public
  */
 export type ColorJson = Color | string | number;
 
 /**
  * @json_immutable
+ * @public
  */
 export class Color {
     public static readonly BlackRgb: string = '#000000';

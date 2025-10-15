@@ -8,6 +8,9 @@ import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@src/rendering/glyphs/LineRangedGlyph';
 import { NotationElement } from '@src/NotationSettings';
 
+/**
+ * @internal
+ */
 export class HarmonicsEffectInfo extends NoteEffectInfoBase {
     private _harmonicType: HarmonicType;
     private _beat: Beat | null = null;

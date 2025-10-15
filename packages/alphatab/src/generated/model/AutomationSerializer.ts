@@ -8,6 +8,9 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { SyncPointDataSerializer } from "@src/generated/model/SyncPointDataSerializer";
 import { AutomationType } from "@src/model/Automation";
 import { SyncPointData } from "@src/model/Automation";
+/**
+ * @internal
+ */
 export class AutomationSerializer {
     public static fromJson(obj: Automation, m: unknown): void {
         if (!m) {

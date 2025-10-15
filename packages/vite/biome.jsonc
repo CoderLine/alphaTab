@@ -4,17 +4,23 @@
     "extends": "//",
     "files": {
         "includes": [
-            "**/*.*"
+            "*.ts",
+            "src/**",
+            "test/**"
         ]
     },
     "formatter": {
         "includes": [
-            "**"
+            "*.ts",
+            "src/**",
+            "test/**"
         ]
     },
     "linter": {
         "includes": [
-            "**"
+            "*.ts",
+            "src/**",
+            "test/**"
         ]
     }
 }

@@ -9,6 +9,9 @@ import { NoteSubElement } from '@src/model/Note';
 import { type Beat, BeatSubElement } from '@src/model/Beat';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
+/**
+ * @internal
+ */
 export class SlashNoteHeadGlyph extends MusicFontGlyph {
 
     public beatEffects: Map<string, Glyph> = new Map();
@@ -29,9 +32,9 @@ export class SlashNoteHeadGlyph extends MusicFontGlyph {
                 ? undefined
                 : ElementStyleHelper.note(canvas, this.noteHeadElement, this.beat!.notes[0]);
         super.paint(cx, cy, canvas);
-        this.paintEffects(cx, cy, canvas);
+        this._paintEffects(cx, cy, canvas);
     }
-    private paintEffects(cx: number, cy: number, canvas: ICanvas) {
+    private _paintEffects(cx: number, cy: number, canvas: ICanvas) {
         using _ = ElementStyleHelper.beat(canvas, this.effectElement, this.beat!);
         for (const g of this.beatEffects.values()) {
             g.paint(cx + this.x, cy + this.y, canvas);

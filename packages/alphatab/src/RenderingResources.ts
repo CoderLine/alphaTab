@@ -7,23 +7,24 @@ import { EngravingSettings } from '@src/EngravingSettings';
  * This public class contains central definitions for controlling the visual appearance.
  * @json
  * @json_declaration
+ * @public
  */
 export class RenderingResources {
-    private static sansFont: string = 'Arial, sans-serif';
-    private static serifFont: string = 'Georgia, serif';
+    private static _sansFont: string = 'Arial, sans-serif';
+    private static _serifFont: string = 'Georgia, serif';
 
     /**
      * The name of the SMuFL Font to use for rendering music symbols.
-     * 
+     *
      * @remarks
      * If this family name is provided, alphaTab will not load any custom font, but expects
      * this font to be available in your environment (loadad as webfont or registered in alphaSkia).
-     * 
+     *
      * When using alphaTab in a browser environment it is rather recommended to specify the web font
-     * via the `smuflFontSources` on the `CoreSettings`and skipping this setting. 
-     * 
+     * via the `smuflFontSources` on the `CoreSettings`and skipping this setting.
+     *
      * You will also need to fill {@link engravingSettings} to match this font.
-     * 
+     *
      * @since 1.7.0
      * @internal
      */
@@ -41,84 +42,84 @@ export class RenderingResources {
      * @defaultValue `bold 12px Arial, sans-serif`
      * @since 0.9.6
      */
-    public copyrightFont: Font = new Font(RenderingResources.sansFont, 12, FontStyle.Plain, FontWeight.Bold);
+    public copyrightFont: Font = new Font(RenderingResources._sansFont, 12, FontStyle.Plain, FontWeight.Bold);
 
     /**
      * The font to use for displaying the songs title in the header of the music sheet.
      * @defaultValue `32px Georgia, serif`
      * @since 0.9.6
      */
-    public titleFont: Font = new Font(RenderingResources.serifFont, 32, FontStyle.Plain);
+    public titleFont: Font = new Font(RenderingResources._serifFont, 32, FontStyle.Plain);
 
     /**
      * The font to use for displaying the songs subtitle in the header of the music sheet.
      * @defaultValue `20px Georgia, serif`
      * @since 0.9.6
      */
-    public subTitleFont: Font = new Font(RenderingResources.serifFont, 20, FontStyle.Plain);
+    public subTitleFont: Font = new Font(RenderingResources._serifFont, 20, FontStyle.Plain);
 
     /**
      * The font to use for displaying the lyrics information in the header of the music sheet.
      * @defaultValue `15px Arial, sans-serif`
      * @since 0.9.6
      */
-    public wordsFont: Font = new Font(RenderingResources.serifFont, 15, FontStyle.Plain);
+    public wordsFont: Font = new Font(RenderingResources._serifFont, 15, FontStyle.Plain);
 
     /**
      * The font to use for displaying certain effect related elements in the music sheet.
      * @defaultValue `italic 12px Georgia, serif`
      * @since 0.9.6
      */
-    public effectFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Italic);
+    public effectFont: Font = new Font(RenderingResources._serifFont, 12, FontStyle.Italic);
 
     /**
      * The font to use for displaying beat time information in the music sheet.
      * @defaultValue `12px Georgia, serif`
      * @since 1.4.0
      */
-    public timerFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Plain);
+    public timerFont: Font = new Font(RenderingResources._serifFont, 12, FontStyle.Plain);
 
     /**
      * The font to use for displaying the directions texts.
      * @defaultValue `14px Georgia, serif`
      * @since 1.4.0
      */
-    public directionsFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Plain);
+    public directionsFont: Font = new Font(RenderingResources._serifFont, 14, FontStyle.Plain);
 
     /**
      * The font to use for displaying the fretboard numbers in chord diagrams.
      * @defaultValue `11px Arial, sans-serif`
      * @since 0.9.6
      */
-    public fretboardNumberFont: Font = new Font(RenderingResources.sansFont, 11, FontStyle.Plain);
+    public fretboardNumberFont: Font = new Font(RenderingResources._sansFont, 11, FontStyle.Plain);
 
     /**
      * The font to use for displaying the numbered music notation in the music sheet.
      * @defaultValue `14px Arial, sans-serif`
      * @since 1.4.0
      */
-    public numberedNotationFont: Font = new Font(RenderingResources.sansFont, 16, FontStyle.Plain);
+    public numberedNotationFont: Font = new Font(RenderingResources._sansFont, 16, FontStyle.Plain);
 
     /**
      * The font to use for displaying the grace notes in numbered music notation in the music sheet.
      * @defaultValue `16px Arial, sans-serif`
      * @since 1.4.0
      */
-    public numberedNotationGraceFont: Font = new Font(RenderingResources.sansFont, 14, FontStyle.Plain);
+    public numberedNotationGraceFont: Font = new Font(RenderingResources._sansFont, 14, FontStyle.Plain);
 
     /**
      * The font to use for displaying the guitar tablature numbers in the music sheet.
      * @defaultValue `13px Arial, sans-serif`
      * @since 0.9.6
      */
-    public tablatureFont: Font = new Font(RenderingResources.sansFont, 14, FontStyle.Plain);
+    public tablatureFont: Font = new Font(RenderingResources._sansFont, 14, FontStyle.Plain);
 
     /**
      * The font to use for grace notation related texts in the music sheet.
      * @defaultValue `11px Arial, sans-serif`
      * @since 0.9.6
      */
-    public graceFont: Font = new Font(RenderingResources.sansFont, 12, FontStyle.Plain);
+    public graceFont: Font = new Font(RenderingResources._sansFont, 12, FontStyle.Plain);
 
     /**
      * The color to use for rendering the lines of staves.
@@ -139,7 +140,7 @@ export class RenderingResources {
      * @defaultValue `11px Arial, sans-serif`
      * @since 0.9.6
      */
-    public barNumberFont: Font = new Font(RenderingResources.sansFont, 11, FontStyle.Plain);
+    public barNumberFont: Font = new Font(RenderingResources._sansFont, 11, FontStyle.Plain);
 
     /**
      * The color to use for displaying the bar numbers above the music sheet.
@@ -154,7 +155,7 @@ export class RenderingResources {
      * @since 0.9.6
      * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
      */
-    public fingeringFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Plain);
+    public fingeringFont: Font = new Font(RenderingResources._serifFont, 14, FontStyle.Plain);
 
     /**
      * The font to use for displaying finger information when inline into the music sheet.
@@ -162,14 +163,14 @@ export class RenderingResources {
      * @since 1.4.0
      * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
      */
-    public inlineFingeringFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Plain);
+    public inlineFingeringFont: Font = new Font(RenderingResources._serifFont, 12, FontStyle.Plain);
 
     /**
      * The font to use for section marker labels shown above the music sheet.
      * @defaultValue `bold 14px Georgia, serif`
      * @since 0.9.6
      */
-    public markerFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Plain, FontWeight.Bold);
+    public markerFont: Font = new Font(RenderingResources._serifFont, 14, FontStyle.Plain, FontWeight.Bold);
 
     /**
      * The color to use for music notation elements of the primary voice.

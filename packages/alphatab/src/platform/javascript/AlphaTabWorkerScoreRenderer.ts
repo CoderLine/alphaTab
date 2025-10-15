@@ -12,6 +12,7 @@ import { Environment } from '@src/Environment';
 
 /**
  * @target web
+ * @public
  */
 export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     private _api: AlphaTabApiBase<T>;
@@ -31,9 +32,9 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         }
         this._worker.postMessage({
             cmd: 'alphaTab.initialize',
-            settings: this.serializeSettingsForWorker(settings)
+            settings: this._serializeSettingsForWorker(settings)
         });
-        this._worker.addEventListener('message', this.handleWorkerMessage.bind(this));
+        this._worker.addEventListener('message', this._handleWorkerMessage.bind(this));
     }
 
     public destroy(): void {
@@ -43,11 +44,11 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     public updateSettings(settings: Settings): void {
         this._worker.postMessage({
             cmd: 'alphaTab.updateSettings',
-            settings: this.serializeSettingsForWorker(settings)
+            settings: this._serializeSettingsForWorker(settings)
         });
     }
 
-    private serializeSettingsForWorker(settings: Settings): unknown {
+    private _serializeSettingsForWorker(settings: Settings): unknown {
         const jsObject = JsonConverter.settingsToJsObject(Environment.prepareForPostMessage(settings))!;
         // cut out player settings, they are only needed on UI thread side
         jsObject.delete('player');
@@ -85,7 +86,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         });
     }
 
-    private handleWorkerMessage(e: MessageEvent): void {
+    private _handleWorkerMessage(e: MessageEvent): void {
         const data: any = e.data;
         const cmd: string = data.cmd;
         switch (cmd) {
@@ -118,7 +119,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
             cmd: 'alphaTab.renderScore',
             score: jsObject,
             trackIndexes: Environment.prepareForPostMessage(trackIndexes),
-            fontSizes: FontSizes.FontSizeLookupTables
+            fontSizes: FontSizes.fontSizeLookupTables
         });
     }
 

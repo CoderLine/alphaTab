@@ -5,6 +5,9 @@ import { RowContainerGlyph } from '@src/rendering/glyphs/RowContainerGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { ScoreSubElement } from '@src/model/Score';
 
+/**
+ * @internal
+ */
 export class ChordDiagramContainerGlyph extends RowContainerGlyph {
     public addChord(chord: Chord): void {
         if (chord.strings.length > 0) {

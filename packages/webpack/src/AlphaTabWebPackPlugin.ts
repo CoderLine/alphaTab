@@ -137,7 +137,7 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
 const contextify = makeCacheableWithContext(_contextify);
 
 export class AlphaTabWebPackPlugin {
-    _webPackWithAlphaTab!: webPackWithAlphaTab;
+    private _webPackWithAlphaTab!: webPackWithAlphaTab;
     options: AlphaTabWebPackPluginOptions;
 
     constructor(options?: AlphaTabWebPackPluginOptions) {

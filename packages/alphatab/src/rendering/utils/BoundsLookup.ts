@@ -9,6 +9,9 @@ import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 
+/**
+ * @public
+ */
 export class BoundsLookup {
     /**
      * @target web
@@ -19,25 +22,25 @@ export class BoundsLookup {
         json.staffSystems = systems;
         for (const system of this.staffSystems) {
             const g: StaffSystemBounds = {} as any;
-            g.visualBounds = this.boundsToJson(system.visualBounds);
-            g.realBounds = this.boundsToJson(system.realBounds);
+            g.visualBounds = this._boundsToJson(system.visualBounds);
+            g.realBounds = this._boundsToJson(system.realBounds);
             g.bars = [];
             for (const masterBar of system.bars) {
                 const mb: MasterBarBounds = {} as any;
-                mb.lineAlignedBounds = this.boundsToJson(masterBar.lineAlignedBounds);
-                mb.visualBounds = this.boundsToJson(masterBar.visualBounds);
-                mb.realBounds = this.boundsToJson(masterBar.realBounds);
+                mb.lineAlignedBounds = this._boundsToJson(masterBar.lineAlignedBounds);
+                mb.visualBounds = this._boundsToJson(masterBar.visualBounds);
+                mb.realBounds = this._boundsToJson(masterBar.realBounds);
                 mb.index = masterBar.index;
                 mb.bars = [];
                 for (const bar of masterBar.bars) {
                     const b: BarBounds = {} as any;
-                    b.visualBounds = this.boundsToJson(bar.visualBounds);
-                    b.realBounds = this.boundsToJson(bar.realBounds);
+                    b.visualBounds = this._boundsToJson(bar.visualBounds);
+                    b.realBounds = this._boundsToJson(bar.realBounds);
                     b.beats = [];
                     for (const beat of bar.beats) {
                         const bb: BeatBounds = {} as any;
-                        bb.visualBounds = this.boundsToJson(beat.visualBounds);
-                        bb.realBounds = this.boundsToJson(beat.realBounds);
+                        bb.visualBounds = this._boundsToJson(beat.visualBounds);
+                        bb.realBounds = this._boundsToJson(beat.realBounds);
                         bb.onNotesX = beat.onNotesX;
                         const bbd: any = bb;
                         bbd.beatIndex = beat.beat.index;
@@ -52,7 +55,7 @@ export class BoundsLookup {
                                 const n: NoteBounds = {} as any;
                                 const nd: any = n;
                                 nd.index = note.note.index;
-                                n.noteHeadBounds = this.boundsToJson(note.noteHeadBounds);
+                                n.noteHeadBounds = this._boundsToJson(note.noteHeadBounds);
                                 notes.push(n);
                             }
                         }
@@ -75,26 +78,26 @@ export class BoundsLookup {
         const staffSystems: StaffSystemBounds[] = (json as any).staffSystems;
         for (const staffSystem of staffSystems) {
             const sg: StaffSystemBounds = new StaffSystemBounds();
-            sg.visualBounds = BoundsLookup.boundsFromJson(staffSystem.visualBounds);
-            sg.realBounds = BoundsLookup.boundsFromJson(staffSystem.realBounds);
+            sg.visualBounds = BoundsLookup._boundsFromJson(staffSystem.visualBounds);
+            sg.realBounds = BoundsLookup._boundsFromJson(staffSystem.realBounds);
             lookup.addStaffSystem(sg);
             for (const masterBar of staffSystem.bars) {
                 const mb: MasterBarBounds = new MasterBarBounds();
                 mb.index = masterBar.index;
                 mb.isFirstOfLine = masterBar.isFirstOfLine;
-                mb.lineAlignedBounds = BoundsLookup.boundsFromJson(masterBar.lineAlignedBounds);
-                mb.visualBounds = BoundsLookup.boundsFromJson(masterBar.visualBounds);
-                mb.realBounds = BoundsLookup.boundsFromJson(masterBar.realBounds);
+                mb.lineAlignedBounds = BoundsLookup._boundsFromJson(masterBar.lineAlignedBounds);
+                mb.visualBounds = BoundsLookup._boundsFromJson(masterBar.visualBounds);
+                mb.realBounds = BoundsLookup._boundsFromJson(masterBar.realBounds);
                 sg.addBar(mb);
                 for (const bar of masterBar.bars) {
                     const b: BarBounds = new BarBounds();
-                    b.visualBounds = BoundsLookup.boundsFromJson(bar.visualBounds);
-                    b.realBounds = BoundsLookup.boundsFromJson(bar.realBounds);
+                    b.visualBounds = BoundsLookup._boundsFromJson(bar.visualBounds);
+                    b.realBounds = BoundsLookup._boundsFromJson(bar.realBounds);
                     mb.addBar(b);
                     for (const beat of bar.beats) {
                         const bb: BeatBounds = new BeatBounds();
-                        bb.visualBounds = BoundsLookup.boundsFromJson(beat.visualBounds);
-                        bb.realBounds = BoundsLookup.boundsFromJson(beat.realBounds);
+                        bb.visualBounds = BoundsLookup._boundsFromJson(beat.visualBounds);
+                        bb.realBounds = BoundsLookup._boundsFromJson(beat.realBounds);
                         bb.onNotesX = beat.onNotesX;
                         const bd: any = beat;
                         bb.beat =
@@ -107,7 +110,7 @@ export class BoundsLookup {
                                 const n: NoteBounds = new NoteBounds();
                                 const nd: any = note;
                                 n.note = bb.beat.notes[nd.index];
-                                n.noteHeadBounds = BoundsLookup.boundsFromJson(note.noteHeadBounds);
+                                n.noteHeadBounds = BoundsLookup._boundsFromJson(note.noteHeadBounds);
                                 bb.addNote(n);
                             }
                         }
@@ -122,9 +125,7 @@ export class BoundsLookup {
     /**
      * @target web
      */
-    private static boundsFromJson(boundsRaw: Bounds): Bounds {
-        // TODO: can we just set the right prototype here?
-        // Object.setPrototypeOf(...)
+    private static _boundsFromJson(boundsRaw: Bounds): Bounds {
         const b = new Bounds();
         b.x = boundsRaw.x;
         b.y = boundsRaw.y;
@@ -136,7 +137,7 @@ export class BoundsLookup {
     /**
      * @target web
      */
-    private boundsToJson(bounds: Bounds): Bounds {
+    private _boundsToJson(bounds: Bounds): Bounds {
         const json: Bounds = {} as any;
         json.x = bounds.x;
         json.y = bounds.y;

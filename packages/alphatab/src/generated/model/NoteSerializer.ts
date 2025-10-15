@@ -21,6 +21,9 @@ import { NoteAccidentalMode } from "@src/model/NoteAccidentalMode";
 import { DynamicValue } from "@src/model/DynamicValue";
 import { NoteOrnament } from "@src/model/NoteOrnament";
 import { NoteStyle } from "@src/model/Note";
+/**
+ * @internal
+ */
 export class NoteSerializer {
     public static fromJson(obj: Note, m: unknown): void {
         if (!m) {

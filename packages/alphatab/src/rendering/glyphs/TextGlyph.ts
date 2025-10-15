@@ -3,6 +3,9 @@ import type { Font } from '@src/model/Font';
 import { type ICanvas, TextAlign, type TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
+/**
+ * @internal
+ */
 export class TextGlyph extends EffectGlyph {
     private _lines: string[];
     private _lineHeights: number[] | null = null;

@@ -1,5 +1,6 @@
 /**
  * Lists all simile mark types as they are assigned to bars.
+ * @public
  */
 export enum SimileMark {
     /**

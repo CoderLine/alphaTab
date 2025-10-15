@@ -9,6 +9,7 @@ import type { Staff } from '@src/model/Staff';
 
 /**
  * This Factory produces ScoreBarRenderer instances
+ * @internal
  */
 export class ScoreBarRendererFactory extends BarRendererFactory {
     public get staffId(): string {

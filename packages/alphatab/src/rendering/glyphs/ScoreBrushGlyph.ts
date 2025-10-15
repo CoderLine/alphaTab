@@ -8,6 +8,9 @@ import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NoteYPosition } from '@src/rendering/BarRendererBase';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 export class ScoreBrushGlyph extends Glyph {
     private _beat: Beat;
     private _noteVibratoGlyph?: NoteVibratoGlyph;

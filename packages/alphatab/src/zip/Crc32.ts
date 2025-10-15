@@ -1,9 +1,10 @@
 /**
  * CRC-32 with reversed data and unreversed output
+ * @internal
  */
 export class Crc32 {
-    private static readonly Crc32Lookup: Uint32Array = Crc32.buildCrc32Lookup();
-    private static buildCrc32Lookup(): Uint32Array {
+    private static readonly _crc32Lookup: Uint32Array = Crc32._buildCrc32Lookup();
+    private static _buildCrc32Lookup(): Uint32Array {
         const poly = 0xedb88320;
         const lookup = new Uint32Array(256);
         for (let i = 0; i < lookup.length; i++) {
@@ -17,12 +18,12 @@ export class Crc32 {
         return lookup;
     }
 
-    private static readonly CrcInit: number = 0xffffffff;
+    private static readonly _crcInit: number = 0xffffffff;
 
     /**
      * The CRC data checksum so far.
      */
-    private _checkValue: number = Crc32.CrcInit;
+    private _checkValue: number = Crc32._crcInit;
 
     /**
      * Returns the CRC data checksum computed so far.
@@ -47,7 +48,7 @@ export class Crc32 {
     public update(data: Uint8Array, offset: number, count: number) {
         for (let i = 0; i < count; i++) {
             this._checkValue =
-                Crc32.Crc32Lookup[(this._checkValue ^ data[offset + i]) & 0xff] ^ (this._checkValue >>> 8);
+                Crc32._crc32Lookup[(this._checkValue ^ data[offset + i]) & 0xff] ^ (this._checkValue >>> 8);
         }
     }
 
@@ -55,6 +56,6 @@ export class Crc32 {
      * Resets the CRC data checksum as if no update was ever called.
      */
     public reset() {
-        this._checkValue = Crc32.CrcInit;
+        this._checkValue = Crc32._crcInit;
     }
 }

@@ -39,6 +39,7 @@ import { AlphaSynthAudioExporterWorkerApi } from '@src/platform/javascript/Alpha
 
 /**
  * @target web
+ * @internal
  */
 enum ResultState {
     LayoutDone = 0,
@@ -49,6 +50,7 @@ enum ResultState {
 
 /**
  * @target web
+ * @internal
  */
 interface ResultPlaceholder extends HTMLElement {
     layoutResultId?: string;
@@ -59,6 +61,7 @@ interface ResultPlaceholder extends HTMLElement {
 
 /**
  * @target web
+ * @internal
  */
 interface RegisteredWebFont {
     hash: number;
@@ -70,6 +73,7 @@ interface RegisteredWebFont {
 
 /**
  * @target web
+ * @internal
  */
 export class BrowserUiFacade implements IUiFacade<unknown> {
     private _fontCheckers: Map<string, FontLoadingChecker> = new Map();
@@ -94,10 +98,10 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     public areWorkersSupported: boolean;
 
     public get canRender(): boolean {
-        return this.areAllFontsLoaded();
+        return this._areAllFontsLoaded();
     }
 
-    private areAllFontsLoaded(): boolean {
+    private _areAllFontsLoaded(): boolean {
         let isAnyNotLoaded = false;
         for (const checker of this._fontCheckers.values()) {
             if (!checker.isFontLoaded) {
@@ -113,9 +117,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         return true;
     }
 
-    private onFontLoaded(family: string): void {
+    private _onFontLoaded(family: string): void {
         FontSizes.generateFontLookup(family);
-        if (this.areAllFontsLoaded()) {
+        if (this._areAllFontsLoaded()) {
             (this.canRenderChanged as EventEmitter).trigger();
         }
     }
@@ -131,13 +135,13 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         this.rootContainer = new HtmlElementContainer(rootElement);
         this.areWorkersSupported = 'Worker' in window;
 
-        this._intersectionObserver = new IntersectionObserver(this.onElementVisibilityChanged.bind(this), {
+        this._intersectionObserver = new IntersectionObserver(this._onElementVisibilityChanged.bind(this), {
             threshold: [0, 0.01, 1]
         });
         this._intersectionObserver.observe(rootElement);
     }
 
-    private onElementVisibilityChanged(entries: IntersectionObserverEntry[]) {
+    private _onElementVisibilityChanged(entries: IntersectionObserverEntry[]) {
         for (const e of entries) {
             const htmlElement = e.target as HTMLElement;
             if (htmlElement === (this.rootContainer as HtmlElementContainer).element) {
@@ -187,13 +191,13 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             settings = JsonConverter.jsObjectToSettings(raw);
         }
 
-        const dataAttributes: Map<string, unknown> = this.getDataAttributes();
+        const dataAttributes: Map<string, unknown> = this._getDataAttributes();
         SettingsSerializer.fromJson(settings, dataAttributes);
         if (settings.notation.notationMode === NotationMode.SongBook) {
             settings.setSongBookModeSettings();
         }
         api.settings = settings;
-        this.setupFontCheckers(settings);
+        this._setupFontCheckers(settings);
 
         this._initialTrackIndexes = this.parseTracks(settings.core.tracks);
         this._contents = '';
@@ -202,28 +206,28 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             this._contents = element.element.innerHTML;
             element.element.innerHTML = '';
         }
-        this.createStyleElements(settings);
+        this._createStyleElements(settings);
         this._file = settings.core.file;
     }
 
-    private setupFontCheckers(settings: Settings): void {
-        this.registerFontChecker(settings.display.resources.copyrightFont);
-        this.registerFontChecker(settings.display.resources.effectFont);
-        this.registerFontChecker(settings.display.resources.graceFont);
-        this.registerFontChecker(settings.display.resources.markerFont);
-        this.registerFontChecker(settings.display.resources.tablatureFont);
-        this.registerFontChecker(settings.display.resources.titleFont);
-        this.registerFontChecker(settings.display.resources.wordsFont);
-        this.registerFontChecker(settings.display.resources.barNumberFont);
-        this.registerFontChecker(settings.display.resources.fretboardNumberFont);
-        this.registerFontChecker(settings.display.resources.subTitleFont);
+    private _setupFontCheckers(settings: Settings): void {
+        this._registerFontChecker(settings.display.resources.copyrightFont);
+        this._registerFontChecker(settings.display.resources.effectFont);
+        this._registerFontChecker(settings.display.resources.graceFont);
+        this._registerFontChecker(settings.display.resources.markerFont);
+        this._registerFontChecker(settings.display.resources.tablatureFont);
+        this._registerFontChecker(settings.display.resources.titleFont);
+        this._registerFontChecker(settings.display.resources.wordsFont);
+        this._registerFontChecker(settings.display.resources.barNumberFont);
+        this._registerFontChecker(settings.display.resources.fretboardNumberFont);
+        this._registerFontChecker(settings.display.resources.subTitleFont);
     }
 
-    private registerFontChecker(font: Font): void {
+    private _registerFontChecker(font: Font): void {
         if (!this._fontCheckers.has(font.families.join(', '))) {
             const checker: FontLoadingChecker = new FontLoadingChecker(font.families);
             this._fontCheckers.set(font.families.join(', '), checker);
-            checker.fontLoaded.on(this.onFontLoaded.bind(this));
+            checker.fontLoaded.on(this._onFontLoaded.bind(this));
             checker.checkForFontAvailability();
         }
     }
@@ -354,7 +358,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
     }
 
-    private createStyleElements(settings: Settings): void {
+    private _createStyleElements(settings: Settings): void {
         const root = (this._api.container as HtmlElementContainer).element.ownerDocument!;
         BrowserUiFacade.createSharedStyleElement(root);
 
@@ -365,14 +369,14 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
         // create a simple unique hash for the font source definition
         // as data urls might be used we don't want to just use the plain strings.
-        const hash = BrowserUiFacade.cyrb53(smuflFontSources.values());
+        const hash = BrowserUiFacade._cyrb53(smuflFontSources.values());
 
         // reuse existing style if available
         const registeredWebFonts = BrowserUiFacade._registeredWebFonts;
         if (registeredWebFonts.has(hash)) {
             const webFont = registeredWebFonts.get(hash)!;
             webFont.usages++;
-            webFont.checker.fontLoaded.on(this.onFontLoaded.bind(this));
+            webFont.checker.fontLoaded.on(this._onFontLoaded.bind(this));
             this._webFont = webFont;
             return;
         }
@@ -381,7 +385,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         const familyName = `alphaTab${fontSuffix}`;
 
         const src = Array.from(smuflFontSources.entries())
-            .map(e => `url(${JSON.stringify(e[1])}) format('${BrowserUiFacade.cssFormat(e[0])}')`)
+            .map(e => `url(${JSON.stringify(e[1])}) format('${BrowserUiFacade._cssFormat(e[0])}')`)
             .join(',');
 
         const css: string = `
@@ -412,7 +416,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         styleElement.innerHTML = css;
         root.getElementsByTagName('head').item(0)!.appendChild(styleElement);
         const checker = new FontLoadingChecker([familyName]);
-        checker.fontLoaded.on(this.onFontLoaded.bind(this));
+        checker.fontLoaded.on(this._onFontLoaded.bind(this));
         this._fontCheckers.set(familyName, checker);
         checker.checkForFontAvailability();
 
@@ -430,7 +434,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         this._webFont = webFont;
     }
 
-    private static cssFormat(format: FontFileFormat) {
+    private static _cssFormat(format: FontFileFormat) {
         switch (format) {
             case FontFileFormat.EmbeddedOpenType:
                 return 'embedded-opentype';
@@ -458,7 +462,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
      * @param seed
      * @returns
      */
-    private static cyrb53(strings: Iterable<string>, seed: number = 0) {
+    private static _cyrb53(strings: Iterable<string>, seed: number = 0) {
         let h1 = 0xdeadbeef ^ seed;
         let h2 = 0x41c6ce57 ^ seed;
         for (const str of strings) {
@@ -543,7 +547,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         return tracks;
     }
 
-    private getDataAttributes(): Map<string, unknown> {
+    private _getDataAttributes(): Map<string, unknown> {
         const dataAttributes: Map<string, unknown> = new Map<string, unknown>();
         const element: HTMLElement = (this._api.container as HtmlElementContainer).element;
         if (element.dataset) {
@@ -866,14 +870,14 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public scrollToY(element: IContainer, scrollTargetY: number, speed: number): void {
-        this.internalScrollToY((element as HtmlElementContainer).element, scrollTargetY, speed);
+        this._internalScrollToY((element as HtmlElementContainer).element, scrollTargetY, speed);
     }
 
     public scrollToX(element: IContainer, scrollTargetY: number, speed: number): void {
-        this.internalScrollToX((element as HtmlElementContainer).element, scrollTargetY, speed);
+        this._internalScrollToX((element as HtmlElementContainer).element, scrollTargetY, speed);
     }
 
-    private internalScrollToY(element: HTMLElement, scrollTargetY: number, speed: number): void {
+    private _internalScrollToY(element: HTMLElement, scrollTargetY: number, speed: number): void {
         if (this._api.settings.player.nativeBrowserSmoothScroll) {
             element.scrollTo({
                 top: scrollTargetY,
@@ -899,7 +903,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
     }
 
-    private internalScrollToX(element: HTMLElement, scrollTargetX: number, speed: number): void {
+    private _internalScrollToX(element: HTMLElement, scrollTargetX: number, speed: number): void {
         if (this._api.settings.player.nativeBrowserSmoothScroll) {
             element.scrollTo({
                 left: scrollTargetX,

@@ -6,6 +6,9 @@ import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import type { Color } from '@src/model/Color';
 
+/**
+ * @internal
+ */
 export class TuningGlyph extends GlyphGroup {
     private _tuning: Tuning;
     private _trackLabel: string;
@@ -23,7 +26,7 @@ export class TuningGlyph extends GlyphGroup {
         if (this.glyphs!.length > 0) {
             return;
         }
-        this.createGlyphs(this._tuning);
+        this._createGlyphs(this._tuning);
         for (const g of this.glyphs!) {
             g.renderer = this.renderer;
             g.doLayout();
@@ -39,7 +42,7 @@ export class TuningGlyph extends GlyphGroup {
         canvas.color = c;
     }
 
-    private createGlyphs(tuning: Tuning): void {
+    private _createGlyphs(tuning: Tuning): void {
         const res = this.renderer.resources;
         this.height = 0;
 

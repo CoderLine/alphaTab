@@ -1,9 +1,12 @@
 import { DynamicValue } from '@src/model/DynamicValue';
 import type { Duration } from '@src/model/Duration';
 
+/**
+ * @internal
+ */
 export class MidiUtils {
     public static readonly QuarterTime: number = 960;
-    private static readonly MinVelocity: number = 15;
+    private static readonly _minVelocity: number = 15;
     public static readonly VelocityIncrement: number = 16;
 
     /**
@@ -64,28 +67,28 @@ export class MidiUtils {
         let velocity: number = 1;
         switch (dynamicValue) {
             case DynamicValue.PPP:
-                velocity = MidiUtils.MinVelocity + 0 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 0 * MidiUtils.VelocityIncrement;
                 break;
             case DynamicValue.PP:
-                velocity = MidiUtils.MinVelocity + 1 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 1 * MidiUtils.VelocityIncrement;
                 break;
             case DynamicValue.P:
-                velocity = MidiUtils.MinVelocity + 2 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 2 * MidiUtils.VelocityIncrement;
                 break;
             case DynamicValue.MP:
-                velocity = MidiUtils.MinVelocity + 3 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 3 * MidiUtils.VelocityIncrement;
                 break;
             case DynamicValue.MF:
-                velocity = MidiUtils.MinVelocity + 4 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 4 * MidiUtils.VelocityIncrement;
                 break;
             case DynamicValue.F:
-                velocity = MidiUtils.MinVelocity + 5 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 5 * MidiUtils.VelocityIncrement;
                 break;
             case DynamicValue.FF:
-                velocity = MidiUtils.MinVelocity + 6 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 6 * MidiUtils.VelocityIncrement;
                 break;
             case DynamicValue.FFF:
-                velocity = MidiUtils.MinVelocity + 7 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 7 * MidiUtils.VelocityIncrement;
                 break;
 
             // special
@@ -102,15 +105,15 @@ export class MidiUtils {
                 break;
 
             case DynamicValue.FFFF:
-                velocity = MidiUtils.MinVelocity + 8 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 8 * MidiUtils.VelocityIncrement;
                 break;
 
             case DynamicValue.FFFFF:
-                velocity = MidiUtils.MinVelocity + 9 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 9 * MidiUtils.VelocityIncrement;
                 break;
 
             case DynamicValue.FFFFFF:
-                velocity = MidiUtils.MinVelocity + 10 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 10 * MidiUtils.VelocityIncrement;
                 break;
 
             // "forced" variants -> a bit louder than normal, same as FF for us
@@ -120,12 +123,12 @@ export class MidiUtils {
             case DynamicValue.SFPP:
             case DynamicValue.SFZ:
             case DynamicValue.FZ:
-                velocity = MidiUtils.MinVelocity + 6 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 6 * MidiUtils.VelocityIncrement;
                 break;
 
             // force -> piano, same as F for us
             case DynamicValue.FP:
-                velocity = MidiUtils.MinVelocity + 5 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 5 * MidiUtils.VelocityIncrement;
                 break;
 
             // "rinforced" varaints -> like "forced" but typically for a whole passage
@@ -133,7 +136,7 @@ export class MidiUtils {
             case DynamicValue.RF:
             case DynamicValue.RFZ:
             case DynamicValue.SFFZ:
-                velocity = MidiUtils.MinVelocity + 5 * MidiUtils.VelocityIncrement;
+                velocity = MidiUtils._minVelocity + 5 * MidiUtils.VelocityIncrement;
                 break;
 
             // almost not hearable but still a value
@@ -142,7 +145,7 @@ export class MidiUtils {
                 break;
             // A bit weaker than standard F but stronger than MF
             case DynamicValue.PF:
-                velocity = MidiUtils.MinVelocity + ((4.5 * MidiUtils.VelocityIncrement) | 0);
+                velocity = MidiUtils._minVelocity + ((4.5 * MidiUtils.VelocityIncrement) | 0);
                 break;
         }
 

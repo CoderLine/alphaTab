@@ -11,6 +11,9 @@ import type { Beat } from '@src/model/Beat';
 import { Fingers } from '@src/model/Fingers';
 import { GeneralMidi } from '@src/midi/GeneralMidi';
 
+/**
+ * @internal
+ */
 export class FingeringInfo {
     public line: number = 0;
     public symbols: MusicFontSymbol[];
@@ -22,6 +25,9 @@ export class FingeringInfo {
     }
 }
 
+/**
+ * @internal
+ */
 export class FingeringGroupGlyph extends GlyphGroup {
     private _infos: Map<number, FingeringInfo> = new Map<number, FingeringInfo>();
 
@@ -49,7 +55,7 @@ export class FingeringGroupGlyph extends GlyphGroup {
             true
         );
         if (symbolLeft !== MusicFontSymbol.None) {
-            this.addFinger(note, symbolLeft);
+            this._addFinger(note, symbolLeft);
         }
         const symbolRight = FingeringGroupGlyph.fingerToMusicFontSymbol(
             this.renderer.settings,
@@ -58,7 +64,7 @@ export class FingeringGroupGlyph extends GlyphGroup {
             false
         );
         if (symbolRight !== MusicFontSymbol.None) {
-            this.addFinger(note, symbolRight);
+            this._addFinger(note, symbolRight);
         }
     }
 
@@ -130,7 +136,7 @@ export class FingeringGroupGlyph extends GlyphGroup {
         }
     }
 
-    private addFinger(note: Note, symbol: MusicFontSymbol) {
+    private _addFinger(note: Note, symbol: MusicFontSymbol) {
         const sr = this.renderer as ScoreBarRenderer;
         const line: number = sr.getNoteLine(note);
 

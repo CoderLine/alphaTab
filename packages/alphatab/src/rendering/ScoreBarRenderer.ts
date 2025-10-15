@@ -31,11 +31,12 @@ import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
 
 /**
  * This BarRenderer renders a bar using standard music notation.
+ * @internal
  */
 export class ScoreBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'score';
-    private static SharpKsSteps: number[] = [-1, 2, -2, 1, 4, 0, 3];
-    private static FlatKsSteps: number[] = [3, 0, 4, 1, 5, 2, 6];
+    private static _sharpKsSteps: number[] = [-1, 2, -2, 1, 4, 0, 3];
+    private static _flatKsSteps: number[] = [3, 0, 4, 1, 5, 2, 6];
 
     public simpleWhammyOverflow: number = 0;
 
@@ -218,7 +219,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                     }
                     // beamed notes
                     else {
-                        this.ensureDrawingInfo(h, h.direction);
+                        this._ensureDrawingInfo(h, h.direction);
                         const drawingInfo = h.drawingInfos.get(h.direction)!;
 
                         if (h.direction === BeamDirection.Up) {
@@ -231,7 +232,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
                                 maxNoteY = topY;
                             }
 
-                            const bottomY: number = this.getBarLineStart(h.beatOfLowestNote, h.direction) + noteOverflowPadding;
+                            const bottomY: number =
+                                this.getBarLineStart(h.beatOfLowestNote, h.direction) + noteOverflowPadding;
                             if (bottomY > minNoteY) {
                                 minNoteY = bottomY;
                             }
@@ -246,7 +248,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
                                 minNoteY = bottomY;
                             }
 
-                            const topY: number = this.getBarLineStart(h.beatOfHighestNote, h.direction) - noteOverflowPadding;
+                            const topY: number =
+                                this.getBarLineStart(h.beatOfHighestNote, h.direction) - noteOverflowPadding;
                             if (topY < maxNoteY) {
                                 maxNoteY = topY;
                             }
@@ -270,7 +273,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         this.paintTuplets(cx, cy, canvas, BeatSubElement.StandardNotationTuplet);
     }
 
-    private getSlashFlagY() {
+    private _getSlashFlagY() {
         const line = (this.heightLineCount - 1) / 2;
         const slashY = this.getLineY(line);
         return slashY;
@@ -278,7 +281,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
         if (beat.slashed) {
-            let slashY = this.getSlashFlagY();
+            let slashY = this._getSlashFlagY();
             const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
             const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
 
@@ -316,7 +319,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
         if (beat.slashed) {
-            let slashY = this.getSlashFlagY();
+            let slashY = this._getSlashFlagY();
             const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
             const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
 
@@ -441,11 +444,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 : this.getFlagBottomY(h.beats[0], direction);
         }
 
-        this.ensureDrawingInfo(h, direction);
+        this._ensureDrawingInfo(h, direction);
         return h.drawingInfos.get(direction)!.calcY(x);
     }
 
-    private ensureDrawingInfo(h: BeamingHelper, direction: BeamDirection) {
+    private _ensureDrawingInfo(h: BeamingHelper, direction: BeamDirection) {
         if (!h.drawingInfos.has(direction)) {
             const scale = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
             const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
@@ -706,7 +709,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             (this.bar.previousBar && this.bar.keySignature !== this.bar.previousBar.keySignature)
         ) {
             this.createStartSpacing();
-            this.createKeySignatureGlyphs();
+            this._createKeySignatureGlyphs();
         }
         // Time Signature
         if (
@@ -721,14 +724,14 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime)
         ) {
             this.createStartSpacing();
-            this.createTimeSignatureGlyphs();
+            this._createTimeSignatureGlyphs();
         }
     }
 
-    private createKeySignatureGlyphs(): void {
+    private _createKeySignatureGlyphs(): void {
         let offsetClef: number = 0;
-        const currentKey: number = this.bar.keySignature;
-        const previousKey: number = !this.bar.previousBar ? 0 : this.bar.previousBar.keySignature;
+        const currentKey = this.bar.keySignature as number;
+        const previousKey = !this.bar.previousBar ? 0 : (this.bar.previousBar.keySignature as number);
         switch (this.bar.clef) {
             case Clef.Neutral:
                 offsetClef = 0;
@@ -759,13 +762,13 @@ export class ScoreBarRenderer extends LineBarRenderer {
         // a sharp keysignature
         if (ModelUtils.keySignatureIsSharp(currentKey)) {
             for (let i: number = 0; i < Math.abs(currentKey); i++) {
-                const step: number = ScoreBarRenderer.SharpKsSteps[i] + offsetClef;
+                const step: number = ScoreBarRenderer._sharpKsSteps[i] + offsetClef;
                 newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Sharp, 1));
                 newLines.set(step, true);
             }
         } else {
             for (let i: number = 0; i < Math.abs(currentKey); i++) {
-                const step: number = ScoreBarRenderer.FlatKsSteps[i] + offsetClef;
+                const step: number = ScoreBarRenderer._flatKsSteps[i] + offsetClef;
                 newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Flat, 1));
                 newLines.set(step, true);
             }
@@ -774,8 +777,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (this.bar.keySignature === KeySignature.C) {
             const naturalizeSymbols: number = Math.abs(previousKey);
             const previousKeyPositions = ModelUtils.keySignatureIsSharp(previousKey)
-                ? ScoreBarRenderer.SharpKsSteps
-                : ScoreBarRenderer.FlatKsSteps;
+                ? ScoreBarRenderer._sharpKsSteps
+                : ScoreBarRenderer._flatKsSteps;
             for (let i: number = 0; i < naturalizeSymbols; i++) {
                 const step: number = previousKeyPositions[i] + offsetClef;
                 if (!newLines.has(step)) {
@@ -802,7 +805,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
     }
 
-    private createTimeSignatureGlyphs(): void {
+    private _createTimeSignatureGlyphs(): void {
         const lines = this.bar.staff.standardNotationLineCount - 1;
         this.addPreBeatGlyph(
             new ScoreTimeSignatureGlyph(

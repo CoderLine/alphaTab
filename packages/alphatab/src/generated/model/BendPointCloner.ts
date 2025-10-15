@@ -4,6 +4,9 @@
 // the code is regenerated.
 // </auto-generated>
 import { BendPoint } from "@src/model/BendPoint";
+/**
+ * @internal
+ */
 export class BendPointCloner {
     public static clone(original: BendPoint): BendPoint {
         const clone = new BendPoint();

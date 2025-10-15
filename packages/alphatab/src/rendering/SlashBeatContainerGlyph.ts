@@ -2,6 +2,9 @@ import type { Note } from '@src/model/Note';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { SlashTieGlyph } from '@src/rendering/glyphs/SlashTieGlyph';
 
+/**
+ * @internal
+ */
 export class SlashBeatContainerGlyph extends BeatContainerGlyph {
     private _tiedNoteTie: SlashTieGlyph | null = null;
 

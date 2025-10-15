@@ -7,6 +7,9 @@ import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { SustainPedalGlyph } from '@src/rendering/glyphs/SustainPedalGlyph';
 
+/**
+ * @internal
+ */
 export class SustainPedalEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectSustainPedal;

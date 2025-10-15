@@ -2,6 +2,7 @@ import type { Track } from '@src/model/Track';
 
 /**
  * Lists the different modes on how the brackets/braces are drawn and extended.
+ * @public
  */
 export enum BracketExtendMode {
     /**
@@ -24,6 +25,7 @@ export enum BracketExtendMode {
 
 /**
  * Lists the different policies on how to display the track names.
+ * @public
  */
 export enum TrackNamePolicy {
     /**
@@ -42,6 +44,7 @@ export enum TrackNamePolicy {
 
 /**
  * Lists the different modes what text to display for track names.
+ * @public
  */
 export enum TrackNameMode {
     /**
@@ -56,6 +59,7 @@ export enum TrackNameMode {
 
 /**
  * Lists the different orientations modes how to render the track names.
+ * @public
  */
 export enum TrackNameOrientation {
     /**
@@ -73,6 +77,7 @@ export enum TrackNameOrientation {
  * It contains settings which control the display of the score when rendered.
  * @json
  * @json_strict
+ * @public
  */
 export class RenderStylesheet {
     /**

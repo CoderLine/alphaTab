@@ -2,6 +2,7 @@ import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 
 /**
  * Represents a output device on which the synth can send the audio to.
+ * @public
  */
 export interface ISynthOutputDevice {
     /**
@@ -23,7 +24,7 @@ export interface ISynthOutputDevice {
 /**
  * This is the base interface for output devices which can
  * request and playback audio samples.
- * @csharp_public
+ * @public
  */
 export interface ISynthOutput {
     /**

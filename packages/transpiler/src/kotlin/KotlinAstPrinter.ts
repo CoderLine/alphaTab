@@ -1,6 +1,6 @@
-import * as cs from '../csharp/CSharpAst';
 import * as ts from 'typescript';
 import AstPrinterBase from '../AstPrinterBase';
+import * as cs from '../csharp/CSharpAst';
 import type KotlinEmitterContext from './KotlinEmitterContext';
 
 export default class KotlinAstPrinter extends AstPrinterBase {
@@ -16,7 +16,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this._context = context;
     }
 
-    private keywords: Set<string> = new Set<string>([
+    private _keywords: Set<string> = new Set<string>([
         'as',
         'as?',
         'break',
@@ -81,7 +81,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     ]);
 
     protected override escapeIdentifier(identifier: string): string {
-        if (this.keywords.has(identifier)) {
+        if (this._keywords.has(identifier)) {
             return `\`${identifier}\``;
         }
         return identifier;
@@ -175,7 +175,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 this.writeLine();
             }
             for (const line of lines) {
-                this.writeLine(` * ${line}`);
+                this.writeLine(` * ${line.replaceAll('/*', '/\\*')}`);
             }
         } else if (lines.length === 1) {
             if (this._isStartOfLine) {
@@ -303,12 +303,17 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             currentEnumValue++;
         }
 
-        this.write('companion object');
+        this.write('companion object : alphaTab.core.IAlphaTabEnumCompanion<');
+        this.write(d.name);
+        this.write('>');
+
         this.beginBlock();
 
-        this.write('public fun fromValue(v:Double): ');
+        this.writeLine(`public override val values = arrayOf(${d.members.map(m => m.name).join(', ')}) `);
+        this.write('public override fun fromValue(v:Double): ');
         this.writeIdentifier(d.name);
         this.beginBlock();
+
         this.write('return when(v.toInt())');
         this.beginBlock();
 
@@ -482,7 +487,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             this.writeLine('@kotlin.jvm.JvmStatic');
         }
         if (d.isTestMethod) {
-            this.writeLine('@Test');
+            this.writeLine('@org.junit.Test');
         }
         this.writeVisibility(d.visibility);
 
@@ -769,7 +774,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                     this.writeType(arrayType.elementType);
                     this.write('>');
                 } else {
-                    const elementTypeName = this.getContainerTypeName(arrayType.elementType);
+                    const elementTypeName = this._getContainerTypeName(arrayType.elementType);
                     if (elementTypeName) {
                         this.write('alphaTab.collections.');
                         this.write(elementTypeName);
@@ -787,8 +792,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 if (!mapType.keyType && !mapType.valueType) {
                     this.write('alphaTab.collections.MapBase<*,*>');
                 } else {
-                    const keyTypeName = this.getContainerTypeName(mapType.keyType!);
-                    const valueTypeName = this.getContainerTypeName(mapType.valueType!);
+                    const keyTypeName = this._getContainerTypeName(mapType.keyType!);
+                    const valueTypeName = this._getContainerTypeName(mapType.valueType!);
 
                     this.write('alphaTab.collections.');
                     if (keyTypeName && valueTypeName) {
@@ -919,7 +924,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                             if (ts.isInterfaceDeclaration(d) || ts.isClassDeclaration(d)) {
                                 return d.typeParameters;
                             }
-                            return undefined
+                            return undefined;
                         })
                         .find(x => !!x);
 
@@ -956,7 +961,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
     }
 
-    private getContainerTypeName(type: cs.TypeNode): string | null {
+    private _getContainerTypeName(type: cs.TypeNode): string | null {
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
                 if (type.isNullable) {
@@ -1027,6 +1032,11 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 }
                 this.write('?:');
                 break;
+            case '??=':
+                this.write('= ');
+                this.writeExpression(expr.left);
+                this.write('?:');
+                break;
             case '&':
                 this.write('and');
                 break;
@@ -1090,7 +1100,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this._returnRunTest.pop();
     }
 
-    protected shouldWriteDoubleSuffix(expr: cs.Expression) {
+    protected shouldWriteDoubleSuffix(expr: cs.Expression): boolean {
         let shouldWriteSuffix = false;
         if (!this._forceInteger && expr.parent) {
             shouldWriteSuffix = cs.isNumericLiteral(expr) ? expr.value.indexOf('.') === -1 : false;
@@ -1200,7 +1210,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                     elementType = expr.type.reference.elementType;
                 }
 
-                const type = elementType ? this.getContainerTypeName(elementType) : null;
+                const type = elementType ? this._getContainerTypeName(elementType) : null;
                 this.write('alphaTab.collections.');
                 if (type) {
                     this.write(type);
@@ -1257,7 +1267,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 this.write('.');
             } else if (cs.isTypeReference(expr.expression)) {
                 this.write('.');
-            } else if (this.isNullable(expr.expression)) {
+            } else if (this._isNullable(expr.expression)) {
                 this.write('!!.');
             } else {
                 this.write('.');
@@ -1267,10 +1277,10 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeIdentifier(name);
     }
 
-    private isNullable(expr: cs.Expression): boolean {
+    private _isNullable(expr: cs.Expression): boolean {
         const parent = expr.parent;
         if (cs.isParenthesizedExpression(expr)) {
-            return this.isNullable(expr.expression);
+            return this._isNullable(expr.expression);
         }
 
         if (
@@ -1334,7 +1344,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             return;
         }
 
-        if (this.isNullable(expr.expression)) {
+        if (this._isNullable(expr.expression)) {
             this.write('!!');
         }
         this.write('[');
@@ -1358,21 +1368,21 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                     return;
                 case cs.PrimitiveType.Double:
                     this.writeExpression(expr.expression);
-                    if (this.isNullable(expr.expression)) {
+                    if (this._isNullable(expr.expression)) {
                         this.write('!!');
                     }
                     this.write('.toDouble()');
                     return;
                 case cs.PrimitiveType.Int:
                     this.writeExpression(expr.expression);
-                    if (this.isNullable(expr.expression)) {
+                    if (this._isNullable(expr.expression)) {
                         this.write('!!');
                     }
                     this.write('.toInt()');
                     return;
                 case cs.PrimitiveType.Long:
                     this.writeExpression(expr.expression);
-                    if (this.isNullable(expr.expression)) {
+                    if (this._isNullable(expr.expression)) {
                         this.write('!!');
                     }
                     this.write('.toLong()');
@@ -1394,7 +1404,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
     }
 
-    private _catchVar:number = 0;
+    private _catchVar: number = 0;
     protected writeCatchClause(c: cs.CatchClause): void {
         if (c.variableDeclaration) {
             this.write('catch (');
@@ -1566,37 +1576,37 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             this.writeStatement(s.statement);
             this._indent--;
         }
-        this.writeForIncrementors(this._forLoopIncrementors.at(-1));
+        this._writeForIncrementors(this._forLoopIncrementors.at(-1));
         this.endBlock();
         this.endBlock();
         // }
 
         this._forLoopIncrementors.pop();
     }
-    private writeForIncrementors(i: cs.Expression | undefined) {
+    private _writeForIncrementors(i: cs.Expression | undefined) {
         if (!i) {
             return;
         }
 
         if (cs.isBinaryExpression(i)) {
-            this.writeBinaryExpressionsAsStatements(i);
+            this._writeBinaryExpressionsAsStatements(i);
         } else {
             this.writeExpression(i);
             this.writeLine();
         }
     }
 
-    private writeBinaryExpressionsAsStatements(e: cs.BinaryExpression) {
+    private _writeBinaryExpressionsAsStatements(e: cs.BinaryExpression) {
         if (e.operator === ',') {
             if (cs.isBinaryExpression(e.left)) {
-                this.writeBinaryExpressionsAsStatements(e.left);
+                this._writeBinaryExpressionsAsStatements(e.left);
             } else {
                 this.writeExpression(e.left);
                 this.writeLine();
             }
 
             if (cs.isBinaryExpression(e.right)) {
-                this.writeBinaryExpressionsAsStatements(e.right);
+                this._writeBinaryExpressionsAsStatements(e.right);
             } else {
                 this.writeExpression(e.right);
                 this.writeLine();
@@ -1608,7 +1618,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     }
 
     protected writeContinueStatement(c: cs.ContinueStatement): void {
-        this.writeForIncrementors(this._forLoopIncrementors.at(-1));
+        this._writeForIncrementors(this._forLoopIncrementors.at(-1));
         super.writeContinueStatement(c);
     }
 
@@ -1886,7 +1896,16 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     }
 
     protected writeImport(using: cs.UsingDeclaration) {
-        this.writeLine(`import ${using.namespaceOrTypeName}.*`);
+        if (using.skipEmit) {
+            return;
+        }
+
+        if (using.alias) {
+            this.writeLine(`typalias ${using.name} = `);
+            this.writeType(using.alias, true);
+        } else {
+            this.writeLine(`import ${using.name}.*`);
+        }
     }
 
     protected override writeSemicolon() {
@@ -2012,5 +2031,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         } else {
             super.writeInvocationExpression(expr);
         }
+    }
+    protected override writeStringLiteral(expr: cs.StringLiteral): void {
+        this.write(JSON.stringify(expr.text).replace('${', '\\$\\{'));
     }
 }

@@ -13,6 +13,7 @@ import type { IAudioExporterWorker } from '@src/synth/IAudioExporter';
 /**
  * This interface represents the UI abstraction between alphaTab and the corresponding UI framework being used.
  * @param <TSettings> The type of that holds the settings passed from the UI layer.
+ * @public
  */
 export interface IUiFacade<TSettings> {
     /**

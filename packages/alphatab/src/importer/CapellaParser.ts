@@ -27,12 +27,18 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Ottavia } from '@src/model/Ottavia';
 import type { KeySignature } from '@src/model/KeySignature';
 
+/**
+ * @internal
+ */
 class DrawObject {
     public noteRange: number = 1;
     public x: number = 0;
     public y: number = 0;
 }
 
+/**
+ * @internal
+ */
 enum FrameType {
     None = 0,
     Rectangle = 1,
@@ -40,6 +46,9 @@ enum FrameType {
     Circle = 3
 }
 
+/**
+ * @internal
+ */
 class TextDrawObject extends DrawObject {
     public align: TextAlign = TextAlign.Left;
     public frame: FrameType = FrameType.None;
@@ -49,34 +58,61 @@ class TextDrawObject extends DrawObject {
     public height: number = 0;
 }
 
+/**
+ * @internal
+ */
 class GuitarDrawObject extends DrawObject {
     public chord: Chord = new Chord();
 }
 
+/**
+ * @internal
+ */
 class SlurDrawObject extends DrawObject {}
 
+/**
+ * @internal
+ */
 class WavyLineDrawObject extends DrawObject {}
 
+/**
+ * @internal
+ */
 class TupletBracketDrawObject extends DrawObject {
     public number: number = 0;
 }
 
+/**
+ * @internal
+ */
 class WedgeDrawObject extends DrawObject {
     public decrescendo: boolean = false;
 }
 
+/**
+ * @internal
+ */
 class VoltaDrawObject extends DrawObject {
     public allNumbers: boolean = false;
     public firstNumber: number = 0;
     public lastNumber: number = 0;
 }
 
+/**
+ * @internal
+ */
 class OctaveClefDrawObject extends DrawObject {
     public octave: number = 1;
 }
 
+/**
+ * @internal
+ */
 class TrillDrawObject extends DrawObject {}
 
+/**
+ * @internal
+ */
 class StaffLayout {
     public defaultClef: Clef = Clef.G2;
     public description: string = '';
@@ -88,12 +124,18 @@ class StaffLayout {
     public index: number = 0;
 }
 
+/**
+ * @internal
+ */
 class Bracket {
     public from: number = 0;
     public to: number = 0;
     public curly: boolean = false;
 }
 
+/**
+ * @internal
+ */
 class CapellaVoiceState {
     public currentBarIndex: number = -1;
     public currentBarComplete: boolean = true;
@@ -104,6 +146,9 @@ class CapellaVoiceState {
     public repeatEnd: MasterBar | null = null;
 }
 
+/**
+ * @internal
+ */
 export class CapellaParser {
     public score!: Score;
     private _trackChannel: number = 0;
@@ -130,26 +175,26 @@ export class CapellaParser {
             throw new UnsupportedFormatError('Could not parse XML', e as Error);
         }
 
-        this.parseDom(dom);
+        this._parseDom(dom);
 
-        this.consolidate();
+        this._consolidate();
 
         this.score.finish(settings);
     }
 
-    private consolidate() {
+    private _consolidate() {
         ModelUtils.consolidate(this.score);
 
-        CapellaParser.applyEffectRange(this._slurs, (_, beat) => {
+        CapellaParser._applyEffectRange(this._slurs, (_, beat) => {
             beat.isLegatoOrigin = true;
         });
 
-        CapellaParser.applyEffectRange(this._crescendo, (cre, beat) => {
+        CapellaParser._applyEffectRange(this._crescendo, (cre, beat) => {
             beat.crescendo = cre.decrescendo ? CrescendoType.Decrescendo : CrescendoType.Crescendo;
         });
     }
 
-    private static applyEffectRange<T extends DrawObject>(
+    private static _applyEffectRange<T extends DrawObject>(
         effects: Map<Beat, T>,
         applyEffect: (effect: T, beat: Beat) => void
     ) {
@@ -171,7 +216,7 @@ export class CapellaParser {
         }
     }
 
-    private parseDom(dom: XmlDocument): void {
+    private _parseDom(dom: XmlDocument): void {
         const root: XmlNode | null = dom.firstElement;
         if (!root) {
             throw new UnsupportedFormatError('No valid XML');
@@ -182,20 +227,20 @@ export class CapellaParser {
             for (const n of root.childElements()) {
                 switch (n.localName) {
                     case 'info':
-                        this.parseInfo(n);
+                        this._parseInfo(n);
                         break;
                     case 'layout':
-                        this.parseLayout(n);
+                        this._parseLayout(n);
                         break;
                     case 'gallery':
-                        this.parseGallery(n);
+                        this._parseGallery(n);
                         break;
                     case 'pageObjects':
-                        this.parsePageObjects(n);
+                        this._parsePageObjects(n);
                         break;
                     // barCount ignored
                     case 'systems':
-                        this.parseSystems(n);
+                        this._parseSystems(n);
                         break;
                 }
             }
@@ -205,14 +250,14 @@ export class CapellaParser {
     }
 
     private _staffLookup: Map<number, Staff> = new Map();
-    private parseLayout(element: XmlNode) {
+    private _parseLayout(element: XmlNode) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staves':
-                    this.parseLayoutStaves(c);
+                    this._parseLayoutStaves(c);
                     break;
                 case 'brackets':
-                    this.parseBrackets(c);
+                    this._parseBrackets(c);
                     break;
             }
         }
@@ -269,17 +314,17 @@ export class CapellaParser {
     }
 
     private _brackets: Bracket[] = [];
-    private parseBrackets(element: XmlNode) {
+    private _parseBrackets(element: XmlNode) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'bracket':
-                    this.parseBracket(c);
+                    this._parseBracket(c);
                     break;
             }
         }
     }
 
-    private parseBracket(element: XmlNode) {
+    private _parseBracket(element: XmlNode) {
         const bracket = new Bracket();
         bracket.from = Number.parseInt(element.getAttribute('from'), 10);
         bracket.to = Number.parseInt(element.getAttribute('to'), 10);
@@ -289,11 +334,11 @@ export class CapellaParser {
         this._brackets.push(bracket);
     }
 
-    private parseLayoutStaves(element: XmlNode) {
+    private _parseLayoutStaves(element: XmlNode) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staffLayout':
-                    this.parseStaffLayout(c);
+                    this._parseStaffLayout(c);
                     break;
             }
         }
@@ -302,7 +347,7 @@ export class CapellaParser {
     private _staffLayoutLookup: Map<string, StaffLayout> = new Map();
     private _staffLayouts: StaffLayout[] = [];
 
-    private parseStaffLayout(element: XmlNode) {
+    private _parseStaffLayout(element: XmlNode) {
         const layout = new StaffLayout();
         layout.description = element.getAttribute('description');
 
@@ -310,7 +355,7 @@ export class CapellaParser {
             switch (c.localName) {
                 case 'notation':
                     if (c.attributes.has('defaultClef')) {
-                        layout.defaultClef = this.parseClef(c.attributes.get('defaultClef')!);
+                        layout.defaultClef = this._parseClef(c.attributes.get('defaultClef')!);
                     }
                     break;
 
@@ -336,7 +381,7 @@ export class CapellaParser {
         this._staffLayouts.push(layout);
     }
 
-    private parseClef(v: string): Clef {
+    private _parseClef(v: string): Clef {
         switch (v) {
             case 'treble':
                 return Clef.G2;
@@ -350,7 +395,7 @@ export class CapellaParser {
         return Clef.G2;
     }
 
-    private parseClefOttava(v: string): Ottavia {
+    private _parseClefOttava(v: string): Ottavia {
         if (v.endsWith('-')) {
             return Ottavia._8vb;
         }
@@ -361,17 +406,17 @@ export class CapellaParser {
         return Ottavia.Regular;
     }
 
-    private parseSystems(element: XmlNode) {
+    private _parseSystems(element: XmlNode) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'system':
-                    this.parseSystem(c);
+                    this._parseSystem(c);
                     break;
             }
         }
     }
 
-    private parseSystem(element: XmlNode) {
+    private _parseSystem(element: XmlNode) {
         if (element.attributes.has('tempo')) {
             if (this.score.masterBars.length === 0) {
                 this._initialTempo = Number.parseInt(element.attributes.get('tempo')!, 10);
@@ -385,7 +430,7 @@ export class CapellaParser {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staves':
-                    this.parseStaves(element, c);
+                    this._parseStaves(element, c);
                     break;
             }
         }
@@ -393,12 +438,12 @@ export class CapellaParser {
         this._isFirstSystem = false;
     }
 
-    private parseStaves(systemElement: XmlNode, element: XmlNode) {
+    private _parseStaves(systemElement: XmlNode, element: XmlNode) {
         const firstBarIndex = this.score.masterBars.length;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staff':
-                    this.parseStaff(systemElement, firstBarIndex, c);
+                    this._parseStaff(systemElement, firstBarIndex, c);
                     break;
             }
         }
@@ -407,32 +452,32 @@ export class CapellaParser {
     private _timeSignature: MasterBar = new MasterBar();
     private _currentStaffLayout!: StaffLayout;
 
-    private parseStaff(systemElement: XmlNode, firstBarIndex: number, element: XmlNode) {
+    private _parseStaff(systemElement: XmlNode, firstBarIndex: number, element: XmlNode) {
         const staffId = element.getAttribute('layout');
         this._currentStaffLayout = this._staffLayoutLookup.get(staffId)!;
         this._timeSignature.timeSignatureNumerator = 4;
         this._timeSignature.timeSignatureDenominator = 4;
         this._timeSignature.timeSignatureCommon = false;
 
-        this.parseTime(element.getAttribute('defaultTime'));
+        this._parseTime(element.getAttribute('defaultTime'));
         const staff = this._staffLookup.get(this._currentStaffLayout.index)!;
 
         // there might be systems where this staff is not contained
         // so we create bars until the current staff to ensure the right
         // alignment
         while (staff.bars.length < firstBarIndex) {
-            this.addNewBar(staff);
+            this._addNewBar(staff);
         }
 
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'voices':
-                    this.parseVoices(staffId, staff, systemElement, firstBarIndex, c);
+                    this._parseVoices(staffId, staff, systemElement, firstBarIndex, c);
                     break;
             }
         }
     }
-    private parseTime(value: string) {
+    private _parseTime(value: string) {
         switch (value) {
             case 'allaBreve':
             case 'C':
@@ -455,32 +500,26 @@ export class CapellaParser {
                 break;
         }
     }
-    private parseVoices(
-        staffId: string,
-        staff: Staff,
-        systemElement: XmlNode,
-        firstBarIndex: number,
-        element: XmlNode
-    ) {
+    private _parseVoices(staffId: string, staff: Staff, systemElement: XmlNode, firstBarIndex: number, element: XmlNode) {
         let voiceIndex = 0;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'voice':
-                    this.parseVoice(staffId, staff, systemElement, voiceIndex, firstBarIndex, c);
+                    this._parseVoice(staffId, staff, systemElement, voiceIndex, firstBarIndex, c);
                     voiceIndex++;
                     break;
             }
         }
     }
 
-    private getOrCreateBar(staff: Staff, barIndex: number): Bar {
+    private _getOrCreateBar(staff: Staff, barIndex: number): Bar {
         if (barIndex < staff.bars.length) {
             return staff.bars[barIndex];
         }
-        return this.addNewBar(staff);
+        return this._addNewBar(staff);
     }
 
-    private addNewBar(staff: Staff) {
+    private _addNewBar(staff: Staff) {
         // voice tags always start a new bar
         const currentBar: Bar = new Bar();
         if (staff.bars.length > 0) {
@@ -515,16 +554,16 @@ export class CapellaParser {
     private _currentBar!: Bar;
     private _currentVoice!: Voice;
 
-    private newBar(staff: Staff, voiceIndex: number) {
+    private _newBar(staff: Staff, voiceIndex: number) {
         this._currentVoiceState.currentBarIndex++;
-        this._currentBar = this.getOrCreateBar(staff, this._currentVoiceState.currentBarIndex);
+        this._currentBar = this._getOrCreateBar(staff, this._currentVoiceState.currentBarIndex);
         this._currentVoiceState.currentBarDuration = this._currentBar.masterBar.calculateDuration(false);
         this._currentVoiceState.currentBarComplete = false;
         this._currentVoiceState.currentPosition = 0;
-        this.ensureVoice(staff, voiceIndex);
+        this._ensureVoice(staff, voiceIndex);
     }
 
-    private parseVoice(
+    private _parseVoice(
         staffId: string,
         staff: Staff,
         systemElement: XmlNode,
@@ -541,11 +580,11 @@ export class CapellaParser {
             this._currentVoiceState = new CapellaVoiceState();
             this._currentVoiceState.currentBarIndex = firstBarIndex - 1;
             this._voiceStates.set(voiceStateKey, this._currentVoiceState);
-            this.newBar(staff, voiceIndex);
+            this._newBar(staff, voiceIndex);
         } else {
             this._currentVoiceState = this._voiceStates.get(voiceStateKey)!;
-            this._currentBar = this.getOrCreateBar(staff, this._currentVoiceState.currentBarIndex);
-            this.ensureVoice(staff, voiceIndex);
+            this._currentBar = this._getOrCreateBar(staff, this._currentVoiceState.currentBarIndex);
+            this._ensureVoice(staff, voiceIndex);
         }
 
         // voice tags always start a new bar
@@ -580,19 +619,19 @@ export class CapellaParser {
         if (noteObjects) {
             for (const c of noteObjects.childElements()) {
                 if (this._currentVoiceState.currentBarComplete && c.localName !== 'barline') {
-                    this.newBar(staff, voiceIndex);
+                    this._newBar(staff, voiceIndex);
                 }
 
                 switch (c.localName) {
                     case 'clefSign':
-                        this._currentBar.clef = this.parseClef(c.getAttribute('clef'));
-                        this._currentBar.clefOttava = this.parseClefOttava(c.getAttribute('clef'));
+                        this._currentBar.clef = this._parseClef(c.getAttribute('clef'));
+                        this._currentBar.clefOttava = this._parseClefOttava(c.getAttribute('clef'));
                         break;
                     case 'keySign':
                         this._currentBar.keySignature = Number.parseInt(c.getAttribute('fifths'), 10) as KeySignature;
                         break;
                     case 'timeSign':
-                        this.parseTime(c.getAttribute('time'));
+                        this._parseTime(c.getAttribute('time'));
                         this._currentBar.masterBar.timeSignatureDenominator =
                             this._timeSignature.timeSignatureDenominator;
                         this._currentBar.masterBar.timeSignatureNumerator = this._timeSignature.timeSignatureNumerator;
@@ -621,14 +660,14 @@ export class CapellaParser {
                                 if (this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
                                     this._currentBar.masterBar.repeatCount = this._currentVoiceState.repeatCount;
                                 }
-                                this.parseBarDrawObject(c);
+                                this._parseBarDrawObject(c);
                                 if (!this._currentVoiceState.currentBarComplete) {
                                     this._currentBar.masterBar.isAnacrusis = true;
                                 }
                                 this._currentVoiceState.currentBarComplete = true;
                                 break;
                             case 'repBegin':
-                                this.newBar(staff, voiceIndex); // repeat-start requires instant new bar
+                                this._newBar(staff, voiceIndex); // repeat-start requires instant new bar
                                 this._currentBar.masterBar.isRepeatStart = true;
                                 this._currentVoiceState.repeatEnd = null;
                                 this._currentVoiceState.repeatCount = 0;
@@ -638,8 +677,8 @@ export class CapellaParser {
                                 if (this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
                                     this._currentBar.masterBar.repeatCount = this._currentVoiceState.repeatCount;
                                 }
-                                this.parseBarDrawObject(c);
-                                this.newBar(staff, voiceIndex); // end-begin requires instant new bar
+                                this._parseBarDrawObject(c);
+                                this._newBar(staff, voiceIndex); // end-begin requires instant new bar
                                 this._currentBar.masterBar.isRepeatStart = true;
                                 break;
                             case 'dashed':
@@ -659,26 +698,26 @@ export class CapellaParser {
                         break;
                     case 'chord':
                         const chordBeat = new Beat();
-                        this.initFromPreviousBeat(chordBeat, this._currentVoice);
+                        this._initFromPreviousBeat(chordBeat, this._currentVoice);
                         chordBeat.beamingMode = this._beamingMode;
                         if (this._currentVoiceState.voiceStemDir) {
                             chordBeat.preferredBeamDirection = this._currentVoiceState.voiceStemDir;
                         }
-                        this.parseDuration(chordBeat, c.findChildElement('duration')!);
+                        this._parseDuration(chordBeat, c.findChildElement('duration')!);
                         chordBeat.updateDurations();
                         this._currentVoiceState.currentPosition += chordBeat.playbackDuration;
                         this._currentVoice.addBeat(chordBeat);
 
-                        this.parseChord(chordBeat, c);
+                        this._parseChord(chordBeat, c);
 
                         if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
                             this._currentVoiceState.currentBarComplete = true;
                         }
                         break;
                     case 'rest':
-                        const restBeat = this.parseRestDurations(c.findChildElement('duration')!);
+                        const restBeat = this._parseRestDurations(c.findChildElement('duration')!);
                         if (restBeat) {
-                            this.initFromPreviousBeat(restBeat, this._currentVoice);
+                            this._initFromPreviousBeat(restBeat, this._currentVoice);
                             restBeat.updateDurations();
                             this._currentVoiceState.currentPosition += restBeat.playbackDuration;
                             this._currentVoice.addBeat(restBeat);
@@ -693,14 +732,14 @@ export class CapellaParser {
         }
     }
 
-    private initFromPreviousBeat(chordBeat: Beat, currentVoice: Voice) {
-        const previousBeat = this.getLastBeat(currentVoice);
+    private _initFromPreviousBeat(chordBeat: Beat, currentVoice: Voice) {
+        const previousBeat = this._getLastBeat(currentVoice);
         if (previousBeat) {
             chordBeat.dynamics = previousBeat.dynamics;
         }
     }
 
-    private getLastBeat(voice: Voice): Beat | null {
+    private _getLastBeat(voice: Voice): Beat | null {
         if (voice.beats.length > 0) {
             return voice.beats[voice.beats.length - 1];
         }
@@ -708,13 +747,13 @@ export class CapellaParser {
             const previousBar = voice.bar.staff.bars[voice.bar.index - 1];
             if (voice.index < previousBar.voices.length) {
                 const previousVoice = previousBar.voices[voice.index];
-                return this.getLastBeat(previousVoice);
+                return this._getLastBeat(previousVoice);
             }
         }
         return null;
     }
 
-    private ensureVoice(staff: Staff, voiceIndex: number) {
+    private _ensureVoice(staff: Staff, voiceIndex: number) {
         while (this._currentBar.voices.length < voiceIndex + 1) {
             this._currentBar.addVoice(new Voice());
         }
@@ -729,7 +768,7 @@ export class CapellaParser {
         this._currentVoice = this._currentBar.voices[voiceIndex];
     }
 
-    private parseChord(beat: Beat, element: XmlNode) {
+    private _parseChord(beat: Beat, element: XmlNode) {
         const articulation: Note = new Note();
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -758,13 +797,13 @@ export class CapellaParser {
 
                     break;
                 case 'lyric':
-                    this.parseLyric(beat, c);
+                    this._parseLyric(beat, c);
                     break;
                 case 'drawObjects':
-                    this.parseBeatDrawObject(beat, c);
+                    this._parseBeatDrawObject(beat, c);
                     break;
                 case 'heads':
-                    this.parseHeads(beat, articulation, c);
+                    this._parseHeads(beat, articulation, c);
                     break;
                 case 'beam':
                     switch (c.getAttribute('group')) {
@@ -780,11 +819,11 @@ export class CapellaParser {
         }
     }
 
-    private parseHeads(beat: Beat, articulation: Note, element: XmlNode) {
+    private _parseHeads(beat: Beat, articulation: Note, element: XmlNode) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'head':
-                    this.parseHead(beat, articulation, c);
+                    this._parseHead(beat, articulation, c);
                     break;
             }
         }
@@ -795,7 +834,7 @@ export class CapellaParser {
     private _slurs!: Map<Beat, SlurDrawObject>;
     private _crescendo!: Map<Beat, WedgeDrawObject>;
 
-    private parseHead(beat: Beat, articulation: Note, element: XmlNode) {
+    private _parseHead(beat: Beat, articulation: Note, element: XmlNode) {
         const note = new Note();
         const pitch = ModelUtils.parseTuning(element.getAttribute('pitch'));
         note.octave = pitch!.octave - 1;
@@ -831,11 +870,11 @@ export class CapellaParser {
         }
     }
 
-    private parseBeatDrawObject(beat: Beat, element: XmlNode) {
+    private _parseBeatDrawObject(beat: Beat, element: XmlNode) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
-                    const obj = this.parseDrawObj(c);
+                    const obj = this._parseDrawObj(c);
                     if (obj) {
                         if (obj instanceof TextDrawObject) {
                             if (obj.fontFace.startsWith('capella')) {
@@ -886,7 +925,7 @@ export class CapellaParser {
                             const slur = obj as any as SlurDrawObject;
                             this._slurs.set(beat, slur);
                         } else if (obj instanceof VoltaDrawObject) {
-                            this.applyVolta(obj);
+                            this._applyVolta(obj);
                         }
                     }
                     break;
@@ -894,14 +933,14 @@ export class CapellaParser {
         }
     }
 
-    private parseBarDrawObject(element: XmlNode) {
+    private _parseBarDrawObject(element: XmlNode) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
-                    const obj = this.parseDrawObj(c);
+                    const obj = this._parseDrawObj(c);
                     if (obj) {
                         if (obj instanceof VoltaDrawObject) {
-                            this.applyVolta(obj);
+                            this._applyVolta(obj);
                         }
                     }
                     break;
@@ -909,7 +948,7 @@ export class CapellaParser {
         }
     }
 
-    private applyVolta(obj: VoltaDrawObject) {
+    private _applyVolta(obj: VoltaDrawObject) {
         if (obj.lastNumber > 0) {
             this._currentVoiceState.repeatCount = obj.lastNumber;
             if (
@@ -941,7 +980,7 @@ export class CapellaParser {
         }
     }
 
-    private parseLyric(beat: Beat, element: XmlNode) {
+    private _parseLyric(beat: Beat, element: XmlNode) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'verse':
@@ -958,12 +997,12 @@ export class CapellaParser {
         }
     }
 
-    private parseRestDurations(element: XmlNode): Beat | null {
+    private _parseRestDurations(element: XmlNode): Beat | null {
         const durationBase = element.getAttribute('base');
         if (durationBase.indexOf('/') !== -1) {
             const restBeat = new Beat();
             restBeat.beamingMode = this._beamingMode;
-            this.parseDuration(restBeat, element);
+            this._parseDuration(restBeat, element);
             return restBeat;
         }
 
@@ -980,7 +1019,7 @@ export class CapellaParser {
         return null;
     }
 
-    private parseDurationValue(s: string): Duration {
+    private _parseDurationValue(s: string): Duration {
         switch (s) {
             case '2/1':
                 return Duration.DoubleWhole;
@@ -1006,9 +1045,9 @@ export class CapellaParser {
         }
     }
 
-    private parseDuration(beat: Beat, element: XmlNode) {
+    private _parseDuration(beat: Beat, element: XmlNode) {
         const durationBase = element.getAttribute('base');
-        beat.duration = this.parseDurationValue(durationBase);
+        beat.duration = this._parseDurationValue(durationBase);
 
         if (element.attributes.has('dots')) {
             beat.dots = Number.parseInt(element.attributes.get('dots')!, 10);
@@ -1028,11 +1067,11 @@ export class CapellaParser {
         }
     }
 
-    private parsePageObjects(element: XmlNode) {
+    private _parsePageObjects(element: XmlNode) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
-                    const obj = this.parseDrawObj(c);
+                    const obj = this._parseDrawObj(c);
                     if (obj) {
                         if (obj instanceof TextDrawObject) {
                             switch (obj.align) {
@@ -1057,11 +1096,11 @@ export class CapellaParser {
         }
     }
 
-    private parseGallery(element: XmlNode) {
+    private _parseGallery(element: XmlNode) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
-                    const obj = this.parseDrawObj(c);
+                    const obj = this._parseDrawObj(c);
                     if (obj) {
                         this._galleryObjects.set(c.getAttribute('name'), obj);
                     }
@@ -1070,7 +1109,7 @@ export class CapellaParser {
         }
     }
 
-    private parseDrawObj(element: XmlNode): DrawObject | null {
+    private _parseDrawObj(element: XmlNode): DrawObject | null {
         let obj: DrawObject | null = null;
 
         let noteRange = 1;
@@ -1078,31 +1117,31 @@ export class CapellaParser {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'text':
-                    obj = this.parseText(c);
+                    obj = this._parseText(c);
                     break;
                 case 'guitar':
-                    obj = this.parseGuitar(c);
+                    obj = this._parseGuitar(c);
                     break;
                 case 'slur':
-                    obj = this.parseSlur(c);
+                    obj = this._parseSlur(c);
                     break;
                 case 'wavyLine':
-                    obj = this.parseWavyLine(c);
+                    obj = this._parseWavyLine(c);
                     break;
                 case 'bracket':
-                    obj = this.parseTupletBracket(c);
+                    obj = this._parseTupletBracket(c);
                     break;
                 case 'wedge':
-                    obj = this.parseWedge(c);
+                    obj = this._parseWedge(c);
                     break;
                 case 'volta':
-                    obj = this.parseVolta(c);
+                    obj = this._parseVolta(c);
                     break;
                 case 'octaveClef':
-                    obj = this.parseOctaveClef(c);
+                    obj = this._parseOctaveClef(c);
                     break;
                 case 'trill':
-                    obj = this.parseTrill(c);
+                    obj = this._parseTrill(c);
                     break;
                 case 'basic':
                     if (c.attributes.has('noteRange')) {
@@ -1119,12 +1158,12 @@ export class CapellaParser {
         return obj;
     }
 
-    private parseTrill(_unused: XmlNode): DrawObject | null {
+    private _parseTrill(_unused: XmlNode): DrawObject | null {
         const obj = new TrillDrawObject();
         return obj;
     }
 
-    private parseOctaveClef(element: XmlNode): OctaveClefDrawObject {
+    private _parseOctaveClef(element: XmlNode): OctaveClefDrawObject {
         const obj = new OctaveClefDrawObject();
 
         if (element.attributes.has('octave')) {
@@ -1134,7 +1173,7 @@ export class CapellaParser {
         return obj;
     }
 
-    private parseVolta(element: XmlNode): VoltaDrawObject {
+    private _parseVolta(element: XmlNode): VoltaDrawObject {
         const obj = new VoltaDrawObject();
 
         obj.allNumbers = element.attributes.get('allNumbers') === 'true';
@@ -1148,7 +1187,7 @@ export class CapellaParser {
         return obj;
     }
 
-    private parseWedge(element: XmlNode): WedgeDrawObject {
+    private _parseWedge(element: XmlNode): WedgeDrawObject {
         const obj = new WedgeDrawObject();
 
         obj.decrescendo = element.attributes.get('decrescendo') === 'true';
@@ -1156,7 +1195,7 @@ export class CapellaParser {
         return obj;
     }
 
-    private parseTupletBracket(element: XmlNode): TupletBracketDrawObject {
+    private _parseTupletBracket(element: XmlNode): TupletBracketDrawObject {
         const obj = new TupletBracketDrawObject();
 
         if (element.attributes.has('number')) {
@@ -1166,17 +1205,17 @@ export class CapellaParser {
         return obj;
     }
 
-    private parseWavyLine(_unused: XmlNode): WavyLineDrawObject {
+    private _parseWavyLine(_unused: XmlNode): WavyLineDrawObject {
         const obj = new WavyLineDrawObject();
         return obj;
     }
 
-    private parseSlur(_unused: XmlNode): SlurDrawObject {
+    private _parseSlur(_unused: XmlNode): SlurDrawObject {
         const obj = new SlurDrawObject();
         return obj;
     }
 
-    private parseGuitar(element: XmlNode): GuitarDrawObject {
+    private _parseGuitar(element: XmlNode): GuitarDrawObject {
         const obj = new GuitarDrawObject();
 
         const strings = element.innerText.trim();
@@ -1192,7 +1231,7 @@ export class CapellaParser {
         return obj;
     }
 
-    private parseText(element: XmlNode): TextDrawObject {
+    private _parseText(element: XmlNode): TextDrawObject {
         const obj = new TextDrawObject();
 
         if (element.attributes.has('x')) {
@@ -1256,7 +1295,7 @@ export class CapellaParser {
         return obj;
     }
 
-    private parseInfo(element: XmlNode): void {
+    private _parseInfo(element: XmlNode): void {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 // encodingSoftware ignored

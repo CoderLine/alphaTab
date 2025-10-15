@@ -4,6 +4,7 @@ import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 
 /**
  * Represents the bounds of a single note
+ * @public
  */
 export class NoteBounds {
     /**

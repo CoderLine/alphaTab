@@ -12,6 +12,9 @@ import { ScoreNoteChordGlyphBase } from '@src/rendering/glyphs/ScoreNoteChordGly
 import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
+/**
+ * @internal
+ */
 export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
 
     private _beat: Beat;

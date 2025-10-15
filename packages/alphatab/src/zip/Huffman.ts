@@ -21,8 +21,14 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+/**
+ * @internal
+ */
 export class Huffman {}
 
+/**
+ * @internal
+ */
 export class Found extends Huffman {
     public readonly n: number;
 
@@ -32,6 +38,9 @@ export class Found extends Huffman {
     }
 }
 
+/**
+ * @internal
+ */
 export class NeedBit extends Huffman {
     public readonly left: Huffman;
     public readonly right: Huffman;
@@ -43,6 +52,9 @@ export class NeedBit extends Huffman {
     }
 }
 
+/**
+ * @internal
+ */
 export class NeedBits extends Huffman {
     public readonly n: number;
     public readonly table: Huffman[];

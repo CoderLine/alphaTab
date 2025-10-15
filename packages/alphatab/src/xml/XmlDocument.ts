@@ -25,6 +25,9 @@ import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { XmlParser } from '@src/xml/XmlParser';
 import { XmlWriter } from '@src/xml/XmlWriter';
 
+/**
+ * @internal
+ */
 export class XmlDocument extends XmlNode {
     public constructor() {
         super();

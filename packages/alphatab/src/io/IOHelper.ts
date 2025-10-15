@@ -2,6 +2,9 @@ import type { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
 import type { IWriteable } from '@src/io/IWriteable';
 
+/**
+ * @public
+ */
 export class IOHelper {
     public static readInt32BE(input: IReadable): number {
         const ch1: number = input.readByte();
@@ -144,7 +147,7 @@ export class IOHelper {
     }
 
     public static toString(data: Uint8Array, encoding: string): string {
-        const detectedEncoding: string | null = IOHelper.detectEncoding(data);
+        const detectedEncoding: string | null = IOHelper._detectEncoding(data);
         if (detectedEncoding) {
             encoding = detectedEncoding;
         }
@@ -155,7 +158,7 @@ export class IOHelper {
         return decoder.decode(data.buffer as ArrayBuffer);
     }
 
-    private static detectEncoding(data: Uint8Array): string | null {
+    private static _detectEncoding(data: Uint8Array): string | null {
         if (data.length > 2 && data[0] === 0xfe && data[1] === 0xff) {
             return 'utf-16be';
         }

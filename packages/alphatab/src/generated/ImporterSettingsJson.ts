@@ -7,6 +7,7 @@
  * All settings related to importers that decode file formats.
  * @json
  * @json_declaration
+ * @public
  * @target web
  */
 export interface ImporterSettingsJson {

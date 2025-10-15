@@ -7,6 +7,7 @@
  * This object defines the details on how to generate the slide effects.
  * @json
  * @json_declaration
+ * @public
  * @target web
  */
 export interface SlidePlaybackSettingsJson {

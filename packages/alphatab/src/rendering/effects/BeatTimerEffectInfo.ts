@@ -7,6 +7,9 @@ import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { BeatTimerGlyph } from '@src/rendering/glyphs/BeatTimerGlyph';
 
+/**
+ * @internal
+ */
 export class BeatTimerEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectBeatTimer;

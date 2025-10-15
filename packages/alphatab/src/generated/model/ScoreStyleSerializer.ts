@@ -9,6 +9,9 @@ import { HeaderFooterStyleSerializer } from "@src/generated/model/HeaderFooterSt
 import { ScoreSubElement } from "@src/model/Score";
 import { HeaderFooterStyle } from "@src/model/Score";
 import { Color } from "@src/model/Color";
+/**
+ * @internal
+ */
 export class ScoreStyleSerializer {
     public static fromJson(obj: ScoreStyle, m: unknown): void {
         if (!m) {

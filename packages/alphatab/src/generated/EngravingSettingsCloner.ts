@@ -4,6 +4,9 @@
 // the code is regenerated.
 // </auto-generated>
 import { EngravingSettings } from "@src/EngravingSettings";
+/**
+ * @internal
+ */
 export class EngravingSettingsCloner {
     public static clone(original: EngravingSettings): EngravingSettings {
         const clone = new EngravingSettings();

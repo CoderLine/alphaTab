@@ -18,6 +18,7 @@ import type { ControllerType } from '@src/midi/ControllerType';
 /**
  * This implementation of the {@link IMidiFileHandler}
  * generates a {@link MidiFile} object which can be used in AlphaSynth for playback.
+ * @public
  */
 export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     private _midiFile: MidiFile;
@@ -60,8 +61,8 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
                 track,
                 start,
                 channel,
-                AlphaSynthMidiFileHandler.fixValue(key),
-                AlphaSynthMidiFileHandler.fixValue(velocity)
+                AlphaSynthMidiFileHandler._fixValue(key),
+                AlphaSynthMidiFileHandler._fixValue(velocity)
             )
         );
 
@@ -70,13 +71,13 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
                 track,
                 start + length,
                 channel,
-                AlphaSynthMidiFileHandler.fixValue(key),
-                AlphaSynthMidiFileHandler.fixValue(velocity)
+                AlphaSynthMidiFileHandler._fixValue(key),
+                AlphaSynthMidiFileHandler._fixValue(velocity)
             )
         );
     }
 
-    private static fixValue(value: number): number {
+    private static _fixValue(value: number): number {
         if (value > 127) {
             return 127;
         }
@@ -94,7 +95,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         value: number
     ): void {
         this._midiFile.addEvent(
-            new ControlChangeEvent(track, tick, channel, controller, AlphaSynthMidiFileHandler.fixValue(value))
+            new ControlChangeEvent(track, tick, channel, controller, AlphaSynthMidiFileHandler._fixValue(value))
         );
     }
 

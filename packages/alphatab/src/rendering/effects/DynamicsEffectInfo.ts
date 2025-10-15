@@ -7,6 +7,9 @@ import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 
+/**
+ * @internal
+ */
 export class DynamicsEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectDynamics;
@@ -25,10 +28,10 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
     }
 
     public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
-        return this.internalShouldCreateGlyph(beat);
+        return this._internalShouldCreateGlyph(beat);
     }
 
-    private internalShouldCreateGlyph(beat: Beat): boolean {
+    private _internalShouldCreateGlyph(beat: Beat): boolean {
         if (
             beat.voice.bar.staff.track.score.stylesheet.hideDynamics ||
             beat.isEmpty ||
@@ -38,7 +41,7 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
             return false;
         }
 
-        const previousBeat = this.getPreviousDynamicsBeat(beat);
+        const previousBeat = this._getPreviousDynamicsBeat(beat);
 
         let show: boolean = (beat.voice.index === 0 && !previousBeat) || beat.dynamics !== previousBeat?.dynamics;
         // ensure we do not show duplicate dynamics
@@ -49,7 +52,7 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
                     if (
                         beatAtSamePos &&
                         beat.dynamics === beatAtSamePos.dynamics &&
-                        this.internalShouldCreateGlyph(beatAtSamePos)
+                        this._internalShouldCreateGlyph(beatAtSamePos)
                     ) {
                         show = false;
                     }
@@ -58,7 +61,7 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
         }
         return show;
     }
-    private getPreviousDynamicsBeat(beat: Beat) {
+    private _getPreviousDynamicsBeat(beat: Beat) {
         let previousBeat = beat.previousBeat;
         while (previousBeat != null) {
             if (!previousBeat.isRest) {

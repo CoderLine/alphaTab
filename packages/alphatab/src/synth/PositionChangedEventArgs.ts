@@ -1,5 +1,6 @@
 /**
  * Represents the info when the time in the synthesizer changes.
+ * @public
  */
 export class PositionChangedEventArgs {
     /**

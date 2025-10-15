@@ -3,6 +3,9 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 
+/**
+ * @internal
+ */
 export class TrillGlyph extends GroupedEffectGlyph {
     public constructor(x: number, y: number) {
         super(BeatXPosition.EndBeat);

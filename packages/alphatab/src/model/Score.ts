@@ -15,6 +15,7 @@ import { Automation, AutomationType, type FlatSyncPoint, SyncPointData } from '@
 
 /**
  * Lists all graphical sub elements within a {@link Score} which can be styled via {@link Score.style}
+ * @public
  */
 export enum ScoreSubElement {
     /**
@@ -70,6 +71,7 @@ export enum ScoreSubElement {
  * The additional style and display information for header and footer elements.
  * @json
  * @json_strict
+ * @public
  */
 export class HeaderFooterStyle {
     /**
@@ -110,7 +112,7 @@ export class HeaderFooterStyle {
         let anyPlaceholderFilled = false;
         let anyPlaceholder = false;
         const replaced = this.template.replace(
-            HeaderFooterStyle.PlaceholderPattern,
+            HeaderFooterStyle._placeholderPattern,
             (_match: string, variable: string) => {
                 anyPlaceholder = true;
                 let value = '';
@@ -158,13 +160,14 @@ export class HeaderFooterStyle {
         return replaced;
     }
 
-    private static readonly PlaceholderPattern = /%([^%]+)%/g;
+    private static readonly _placeholderPattern = /%([^%]+)%/g;
 }
 
 /**
  * Defines the custom styles for Scores.
  * @json
  * @json_strict
+ * @public
  */
 export class ScoreStyle extends ElementStyle<ScoreSubElement> {
     /**
@@ -201,6 +204,7 @@ export class ScoreStyle extends ElementStyle<ScoreSubElement> {
  * a song and stores the sub components.
  * @json
  * @json_strict
+ * @public
  */
 export class Score {
     private _currentRepeatGroup: RepeatGroup | null = null;
@@ -329,7 +333,7 @@ export class Score {
         this._openedRepeatGroups = [];
         this._properlyOpenedRepeatGroups = 0;
         for (const bar of this.masterBars) {
-            this.addMasterBarToRepeatGroups(bar);
+            this._addMasterBarToRepeatGroups(bar);
         }
     }
 
@@ -347,7 +351,7 @@ export class Score {
                 (bar.previousMasterBar.isAnacrusis ? 0 : bar.previousMasterBar.calculateDuration());
         }
 
-        this.addMasterBarToRepeatGroups(bar);
+        this._addMasterBarToRepeatGroups(bar);
 
         this.masterBars.push(bar);
     }
@@ -356,7 +360,7 @@ export class Score {
      * Adds the given bar correctly into the current repeat group setup.
      * @param bar
      */
-    private addMasterBarToRepeatGroups(bar: MasterBar) {
+    private _addMasterBarToRepeatGroups(bar: MasterBar) {
         // handling the repeats is quite tricky due to many invalid combinations a user might define
         // there are also some complexities due to nested repeats and repeats with multiple endings but only one opening.
         // all scenarios are handled below.

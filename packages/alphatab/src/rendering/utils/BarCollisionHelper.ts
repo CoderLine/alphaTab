@@ -1,6 +1,9 @@
 import type { Beat } from '@src/model/Beat';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 
+/**
+ * @internal
+ */
 export class ReservedLayoutAreaSlot {
     public topY: number = 0;
     public bottomY: number = 0;
@@ -10,6 +13,9 @@ export class ReservedLayoutAreaSlot {
     }
 }
 
+/**
+ * @internal
+ */
 export class ReservedLayoutArea {
     public beat: Beat;
     public topY: number = -1000;
@@ -38,6 +44,9 @@ export class ReservedLayoutArea {
     }
 }
 
+/**
+ * @internal
+ */
 export class BarCollisionHelper {
     public reservedLayoutAreasByDisplayTime: Map<number, ReservedLayoutArea> = new Map();
     public restDurationsByDisplayTime: Map<number /*start*/, Map<number /*duration*/, number /*beat id*/>> = new Map();

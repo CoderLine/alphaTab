@@ -23,6 +23,9 @@
 
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
+/**
+ * @internal
+ */
 export class XmlError extends AlphaTabError {
     public xml: string;
     public pos: number = 0;

@@ -4,6 +4,7 @@ import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 /**
  * @deprecated Move to the new concrete Midi Event Types.
+ * @public
  */
 export class DeprecatedMidiEvent extends MidiEvent {
     public constructor() {
@@ -17,6 +18,7 @@ export class DeprecatedMidiEvent extends MidiEvent {
 
 /**
  * @deprecated Move to the new concrete Midi Event Types.
+ * @public
  */
 export enum MetaEventType {
     SequenceNumber = 0x00,
@@ -41,6 +43,7 @@ export enum MetaEventType {
 
 /**
  * @deprecated Move to the new concrete Midi Event Types.
+ * @public
  */
 export class MetaEvent extends DeprecatedMidiEvent {
     public get metaStatus(): MetaEventType {
@@ -50,6 +53,7 @@ export class MetaEvent extends DeprecatedMidiEvent {
 
 /**
  * @deprecated Move to the new concrete Midi Event Types.
+ * @public
  */
 export class MetaDataEvent extends MetaEvent {
     public data: Uint8Array = new Uint8Array();
@@ -57,6 +61,7 @@ export class MetaDataEvent extends MetaEvent {
 
 /**
  * @deprecated Move to the new concrete Midi Event Types.
+ * @public
  */
 export class MetaNumberEvent extends MetaEvent {
     public value: number = 0;
@@ -64,6 +69,7 @@ export class MetaNumberEvent extends MetaEvent {
 
 /**
  * @deprecated Move to the new concrete Midi Event Types.
+ * @public
  */
 export class Midi20PerNotePitchBendEvent extends DeprecatedMidiEvent {
     public noteKey: number = 0;
@@ -72,6 +78,7 @@ export class Midi20PerNotePitchBendEvent extends DeprecatedMidiEvent {
 
 /**
  * @deprecated Move to the new concrete Midi Event Types.
+ * @public
  */
 export enum SystemCommonType {
     SystemExclusive = 0xf0,
@@ -84,11 +91,13 @@ export enum SystemCommonType {
 
 /**
  * @deprecated Move to the new concrete Midi Event Types.
+ * @public
  */
 export class SystemCommonEvent extends DeprecatedMidiEvent {}
 
 /**
  * @deprecated Move to the new concrete Midi Event Types.
+ * @public
  */
 export enum AlphaTabSystemExclusiveEvents {
     MetronomeTick = 0,
@@ -97,6 +106,7 @@ export enum AlphaTabSystemExclusiveEvents {
 
 /**
  * @deprecated Move to the new concrete Midi Event Types.
+ * @public
  */
 export class SystemExclusiveEvent extends SystemCommonEvent {
     public static readonly AlphaTabManufacturerId = 0x7d;

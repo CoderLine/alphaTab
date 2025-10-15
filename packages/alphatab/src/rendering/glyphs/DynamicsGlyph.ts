@@ -2,9 +2,12 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 export class DynamicsGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, dynamics: DynamicValue) {
-        super(x, y, 1, DynamicsGlyph.getSymbol(dynamics));
+        super(x, y, 1, DynamicsGlyph._getSymbol(dynamics));
     }
 
     public override doLayout(): void {
@@ -16,7 +19,7 @@ export class DynamicsGlyph extends MusicFontGlyph {
         this.offsetY = forteBaseLine;
     }
 
-    private static getSymbol(dynamics: DynamicValue): MusicFontSymbol {
+    private static _getSymbol(dynamics: DynamicValue): MusicFontSymbol {
         switch (dynamics) {
             case DynamicValue.PPP:
                 return MusicFontSymbol.DynamicPPP;

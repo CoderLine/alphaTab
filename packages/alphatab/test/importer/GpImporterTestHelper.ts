@@ -21,6 +21,9 @@ import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
 
+/**
+ * @internal
+ */
 export class GpImporterTestHelper {
     public static async prepareImporterWithFile(
         name: string,
@@ -467,7 +470,7 @@ export class GpImporterTestHelper {
         expect(score.tracks[3].color.rgba).to.equal('#0000FF');
     }
 
-    private static createChord(name: string, firstFret: number, strings: number[], barreFrets?: number[]) {
+    private static _createChord(name: string, firstFret: number, strings: number[], barreFrets?: number[]) {
         const chord = new Chord();
         chord.name = name;
         chord.firstFret = firstFret;
@@ -484,36 +487,36 @@ export class GpImporterTestHelper {
         expect(staff.chords!.size).to.equal(8);
 
         GpImporterTestHelper.checkChord(
-            GpImporterTestHelper.createChord('C', 1, [0, 1, 0, 2, 3, -1]),
+            GpImporterTestHelper._createChord('C', 1, [0, 1, 0, 2, 3, -1]),
             track.staves[0].bars[0].voices[0].beats[0].chord
         );
         GpImporterTestHelper.checkChord(
-            GpImporterTestHelper.createChord('Cm', 1, [-1, -1, 0, 1, 3, -1]),
+            GpImporterTestHelper._createChord('Cm', 1, [-1, -1, 0, 1, 3, -1]),
             track.staves[0].bars[0].voices[0].beats[1].chord
         );
         GpImporterTestHelper.checkChord(
-            GpImporterTestHelper.createChord('C', 1, [3, 5, 5, 5, 3, -1], [3]),
+            GpImporterTestHelper._createChord('C', 1, [3, 5, 5, 5, 3, -1], [3]),
             track.staves[0].bars[0].voices[0].beats[2].chord
         );
         GpImporterTestHelper.checkChord(
-            GpImporterTestHelper.createChord('Cm', 1, [3, 4, 5, 5, 3, -1], [3]),
+            GpImporterTestHelper._createChord('Cm', 1, [3, 4, 5, 5, 3, -1], [3]),
             track.staves[0].bars[0].voices[0].beats[3].chord
         );
 
         GpImporterTestHelper.checkChord(
-            GpImporterTestHelper.createChord('D', 1, [2, 3, 2, 0, -1, -1], [2]),
+            GpImporterTestHelper._createChord('D', 1, [2, 3, 2, 0, -1, -1], [2]),
             track.staves[0].bars[1].voices[0].beats[0].chord
         );
         GpImporterTestHelper.checkChord(
-            GpImporterTestHelper.createChord('Dm', 1, [1, 3, 2, 0, -1, -1]),
+            GpImporterTestHelper._createChord('Dm', 1, [1, 3, 2, 0, -1, -1]),
             track.staves[0].bars[1].voices[0].beats[1].chord
         );
         GpImporterTestHelper.checkChord(
-            GpImporterTestHelper.createChord('D', 5, [5, 7, 7, 7, 5, -1], [5]),
+            GpImporterTestHelper._createChord('D', 5, [5, 7, 7, 7, 5, -1], [5]),
             track.staves[0].bars[1].voices[0].beats[2].chord
         );
         GpImporterTestHelper.checkChord(
-            GpImporterTestHelper.createChord('Dm', 5, [5, 6, 7, 7, 5, -1], [5]),
+            GpImporterTestHelper._createChord('Dm', 5, [5, 6, 7, 7, 5, -1], [5]),
             track.staves[0].bars[1].voices[0].beats[3].chord
         );
     }

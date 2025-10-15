@@ -1,13 +1,21 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
-import terser from '@rollup/plugin-terser';
+import terser, {type Options as TerserOptions } from '@rollup/plugin-terser';
 import typescript, { type RollupTypescriptOptions } from '@rollup/plugin-typescript';
 import type { OutputChunk, OutputOptions } from 'rollup';
 import license from 'rollup-plugin-license';
 import ts from 'typescript';
 import type { LibraryOptions, UserConfig } from 'vite';
 import generateDts from './vite.plugin.dts.ts';
+
+const terserOptions: TerserOptions = {
+    mangle: {
+        properties: {
+            regex: /^_/
+        }
+    }  
+};
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -128,7 +136,7 @@ export function umd(
             dir: 'dist/',
             format: 'umd',
             name: name,
-            plugins: [terser()],
+            plugins: [terser(terserOptions)],
             entryFileNames: '[name].min.js',
             chunkFileNames: '[name].min.js'
         });
@@ -213,7 +221,7 @@ export function esm(
             },
             dir: 'dist/',
             format: 'es',
-            plugins: [terser()],
+            plugins: [terser(terserOptions)],
             entryFileNames: '[name].min.mjs',
             chunkFileNames: '[name].min.mjs'
         });
@@ -221,7 +229,7 @@ export function esm(
 }
 
 export function dtsPathsTransformer(mapping: Record<string, string>) {
-    const mapPath = (filePath, input: string): string | undefined => {
+    const mapPath = (filePath:string, input: string): string | undefined => {
         for (const [k, v] of Object.entries(mapping)) {
             if (input.startsWith(k)) {
                 const absoluteFile = path.resolve(v, input.substring(k.length));
@@ -233,7 +241,7 @@ export function dtsPathsTransformer(mapping: Record<string, string>) {
 
     return (context: ts.TransformationContext) => {
         return (source: ts.SourceFile | ts.Bundle) => {
-            const sourceFilePath = ts.isSourceFile(source) ? source.fileName : source.sourceFiles[0];
+            const sourceFilePath = ts.isSourceFile(source) ? source.fileName : source.sourceFiles[0].fileName;
 
             const visitor = (node: ts.Node) => {
                 if (ts.isExportDeclaration(node) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) {

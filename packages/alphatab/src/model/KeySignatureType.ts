@@ -1,5 +1,6 @@
 /**
  * This public enumeration lists all available types of KeySignatures
+ * @public
  */
 export enum KeySignatureType {
     /**

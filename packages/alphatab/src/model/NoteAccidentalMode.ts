@@ -1,5 +1,6 @@
 /**
  * Lists the modes how accidentals are handled for notes
+ * @public
  */
 export enum NoteAccidentalMode {
     /**

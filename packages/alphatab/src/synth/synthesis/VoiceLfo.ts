@@ -4,6 +4,9 @@
 // Licensed under: MPL-2.0
 import { SynthHelper } from '@src/synth/SynthHelper';
 
+/**
+ * @internal
+ */
 export class VoiceLfo {
     public samplesUntil: number = 0;
     public level: number = 0;

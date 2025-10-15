@@ -9,6 +9,9 @@ import { NotationMode } from "@src/NotationSettings";
 import { FingeringMode } from "@src/NotationSettings";
 import { NotationElement } from "@src/NotationSettings";
 import { TabRhythmMode } from "@src/NotationSettings";
+/**
+ * @internal
+ */
 export class NotationSettingsSerializer {
     public static fromJson(obj: NotationSettings, m: unknown): void {
         if (!m) {

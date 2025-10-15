@@ -5,6 +5,9 @@
 import { Envelope } from '@src/synth/synthesis/Envelope';
 import { SynthHelper } from '@src/synth/SynthHelper';
 
+/**
+ * @internal
+ */
 export enum VoiceEnvelopeSegment {
     None = 0,
     Delay = 1,
@@ -16,8 +19,11 @@ export enum VoiceEnvelopeSegment {
     Done = 7
 }
 
+/**
+ * @internal
+ */
 export class VoiceEnvelope {
-    private static readonly FastReleaseTime: number = 0.01;
+    private static readonly _fastReleaseTime: number = 0.01;
 
     public level: number = 0;
     public slope: number = 0;
@@ -128,7 +134,7 @@ export class VoiceEnvelope {
                 case VoiceEnvelopeSegment.Sustain:
                     this.segment = VoiceEnvelopeSegment.Release;
                     this.samplesUntilNextSegment =
-                        ((this.parameters.release <= 0 ? VoiceEnvelope.FastReleaseTime : this.parameters.release) *
+                        ((this.parameters.release <= 0 ? VoiceEnvelope._fastReleaseTime : this.parameters.release) *
                             outSampleRate) |
                         0;
 

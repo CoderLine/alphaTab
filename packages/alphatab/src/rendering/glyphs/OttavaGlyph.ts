@@ -4,6 +4,9 @@ import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 export class OttavaGlyph extends GroupedEffectGlyph {
     private _ottava: Ottavia;
     private _aboveStaff: boolean;
@@ -20,10 +23,10 @@ export class OttavaGlyph extends GroupedEffectGlyph {
     }
 
     protected override paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {
-        this.paintOttava(cx, cy, canvas);
+        this._paintOttava(cx, cy, canvas);
     }
 
-    private paintOttava(cx: number, cy: number, canvas: ICanvas): number {
+    private _paintOttava(cx: number, cy: number, canvas: ICanvas): number {
         let size: number = 0;
         switch (this._ottava) {
             case Ottavia._15ma:
@@ -77,7 +80,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
-        const size: number = this.paintOttava(cx, cy, canvas);
+        const size: number = this._paintOttava(cx, cy, canvas);
         const lineSpacing: number = this.renderer.smuflMetrics.lineRangedGlyphDashGap;
         const startX: number = cx + this.x + size + lineSpacing;
         let lineY: number = cy + this.y;

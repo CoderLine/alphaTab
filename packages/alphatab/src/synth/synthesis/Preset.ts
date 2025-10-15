@@ -4,6 +4,9 @@
 // Licensed under: MPL-2.0
 import type { Region } from '@src/synth/synthesis/Region';
 
+/**
+ * @internal
+ */
 export class Preset {
     public name: string = '';
     public presetNumber: number = 0;

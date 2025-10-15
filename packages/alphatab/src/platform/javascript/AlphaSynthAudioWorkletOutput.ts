@@ -8,6 +8,7 @@ import type { Settings } from '@src/Settings';
 
 /**
  * @target web
+ * @internal
  */
 interface AudioWorkletProcessor {
     readonly port: MessagePort;
@@ -16,6 +17,7 @@ interface AudioWorkletProcessor {
 
 /**
  * @target web
+ * @internal
  */
 declare let AudioWorkletProcessor: {
     prototype: AudioWorkletProcessor;
@@ -27,10 +29,12 @@ declare let AudioWorkletProcessor: {
 // we need to really use them as globals
 /**
  * @target web
+ * @internal
  */
 declare let registerProcessor: any;
 /**
  * @target web
+ * @internal
  */
 declare let sampleRate: number;
 
@@ -38,6 +42,7 @@ declare let sampleRate: number;
  * This class implements a HTML5 Web Audio API based audio output device
  * for alphaSynth using the modern Audio Worklets.
  * @target web
+ * @internal
  */
 export class AlphaSynthWebWorklet {
     private static _isRegistered = false;
@@ -71,10 +76,10 @@ export class AlphaSynthWebWorklet {
                         AlphaSynthWebWorkletProcessor.BufferSize * this._bufferCount
                     );
 
-                    this.port.onmessage = this.handleMessage.bind(this);
+                    this.port.onmessage = this._handleMessage.bind(this);
                 }
 
-                private handleMessage(e: MessageEvent) {
+                private _handleMessage(e: MessageEvent) {
                     const data: any = e.data;
                     const cmd: any = data.cmd;
                     switch (cmd) {
@@ -137,12 +142,12 @@ export class AlphaSynthWebWorklet {
                         cmd: AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed,
                         samples: samplesFromBuffer / SynthConstants.AudioChannels
                     });
-                    this.requestBuffers();
+                    this._requestBuffers();
 
                     return this._circularBuffer.count > 0 || !this._isStopped;
                 }
 
-                private requestBuffers(): void {
+                private _requestBuffers(): void {
                     // if we fall under the half of buffers
                     // we request one half
                     const halfBufferCount = (this._bufferCount / 2) | 0;
@@ -171,6 +176,7 @@ export class AlphaSynthWebWorklet {
  * This class implements a HTML5 Web Audio API based audio output device
  * for alphaSynth. It can be controlled via a JS API.
  * @target web
+ * @internal
  */
 export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     private _worklet: AudioWorkletNode | null = null;
@@ -190,7 +196,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
 
     public override play(): void {
         super.play();
-        const ctx = this._context!;
+        const ctx = this.context!;
         // create a script processor node which will replace the silence with the generated audio
         Environment.createAudioWorklet(ctx, this._settings).then(
             () => {
@@ -201,9 +207,9 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
                         bufferTimeInMilliseconds: this._bufferTimeInMilliseconds
                     }
                 });
-                this._worklet.port.onmessage = this.handleMessage.bind(this);
-                this._source!.connect(this._worklet);
-                this._source!.start(0);
+                this._worklet.port.onmessage = this._handleMessage.bind(this);
+                this.source!.connect(this._worklet);
+                this.source!.start(0);
                 this._worklet.connect(ctx!.destination);
             },
             reason => {
@@ -212,7 +218,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
         );
     }
 
-    private handleMessage(e: MessageEvent) {
+    private _handleMessage(e: MessageEvent) {
         const data: any = e.data;
         const cmd: any = data.cmd;
         switch (cmd) {

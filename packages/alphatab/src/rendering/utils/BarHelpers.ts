@@ -6,6 +6,9 @@ import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarCollisionHelper } from '@src/rendering/utils/BarCollisionHelper';
 import type { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
+/**
+ * @internal
+ */
 export class BarHelpers {
     private _renderer: BarRendererBase;
     public beamHelpers: BeamingHelper[][] = [];

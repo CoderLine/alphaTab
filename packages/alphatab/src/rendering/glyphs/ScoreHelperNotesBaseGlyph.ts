@@ -6,8 +6,11 @@ import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 
+/**
+ * @internal
+ */
 export class ScoreHelperNotesBaseGlyph extends Glyph {
-    protected BendNoteHeads: BendNoteHeadGroupGlyph[] = [];
+    protected bendNoteHeads: BendNoteHeadGroupGlyph[] = [];
 
     protected drawBendSlur(
         canvas: ICanvas,
@@ -25,7 +28,7 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
     public override doLayout(): void {
         super.doLayout();
         this.width = 0;
-        for (const noteHeads of this.BendNoteHeads) {
+        for (const noteHeads of this.bendNoteHeads) {
             noteHeads.doLayout();
             this.width += noteHeads.width;
         }

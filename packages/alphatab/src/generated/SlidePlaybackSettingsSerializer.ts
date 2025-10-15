@@ -5,6 +5,9 @@
 // </auto-generated>
 import { SlidePlaybackSettings } from "@src/PlayerSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
+/**
+ * @internal
+ */
 export class SlidePlaybackSettingsSerializer {
     public static fromJson(obj: SlidePlaybackSettings, m: unknown): void {
         if (!m) {

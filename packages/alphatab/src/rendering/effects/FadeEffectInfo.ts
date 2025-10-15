@@ -8,6 +8,9 @@ import { NotationElement } from '@src/NotationSettings';
 import { FadeType } from '@src/model/FadeType';
 import { FadeGlyph } from '@src/rendering/glyphs/FadeGlyph';
 
+/**
+ * @internal
+ */
 export class FadeEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectFadeIn;

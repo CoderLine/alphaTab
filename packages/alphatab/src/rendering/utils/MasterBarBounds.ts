@@ -6,6 +6,7 @@ import type { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 
 /**
  * Represents the boundaries of a list of bars related to a single master bar.
+ * @public
  */
 export class MasterBarBounds {
     /**

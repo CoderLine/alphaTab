@@ -14,6 +14,9 @@ import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { BeatSubElement } from '@src/model/Beat';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: SlashNoteHeadGlyph | null = null;
     public deadSlapped: DeadSlappedBeatGlyph | null = null;

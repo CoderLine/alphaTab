@@ -7,7 +7,8 @@ import type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
 declare const webkitAudioContext: any;
 
 /**
- * @target web
+ * @target 
+ * @internal
  */
 export class AlphaSynthWebAudioSynthOutputDevice implements ISynthOutputDevice {
     public device: MediaDeviceInfo;
@@ -27,6 +28,7 @@ export class AlphaSynthWebAudioSynthOutputDevice implements ISynthOutputDevice {
 /**
  * Some shared web audio stuff.
  * @target web
+ * @internal
  */
 export class WebAudioHelper {
     private static _knownDevices: ISynthOutputDevice[] = [];
@@ -118,33 +120,34 @@ export class WebAudioHelper {
 
 /**
  * @target web
+ * @internal
  */
 export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     protected static readonly BufferSize: number = 4096;
     protected static readonly PreferredSampleRate: number = 44100;
 
-    protected _context: AudioContext | null = null;
-    protected _buffer: AudioBuffer | null = null;
-    protected _source: AudioBufferSourceNode | null = null;
+    protected context: AudioContext | null = null;
+    protected buffer: AudioBuffer | null = null;
+    protected source: AudioBufferSourceNode | null = null;
 
     private _resumeHandler?: () => void;
 
     public get sampleRate(): number {
-        return this._context ? this._context.sampleRate : AlphaSynthWebAudioOutputBase.PreferredSampleRate;
+        return this.context ? this.context.sampleRate : AlphaSynthWebAudioOutputBase.PreferredSampleRate;
     }
 
     public activate(resumedCallback?: () => void): void {
-        if (!this._context) {
-            this._context = WebAudioHelper.createAudioContext();
+        if (!this.context) {
+            this.context = WebAudioHelper.createAudioContext();
         }
 
-        if (this._context.state === 'suspended' || (this._context.state as string) === 'interrupted') {
+        if (this.context.state === 'suspended' || (this.context.state as string) === 'interrupted') {
             Logger.debug('WebAudio', 'Audio Context is suspended, trying resume');
-            this._context.resume().then(
+            this.context.resume().then(
                 () => {
                     Logger.debug(
                         'WebAudio',
-                        `Audio Context resume success: state=${this._context?.state}, sampleRate:${this._context?.sampleRate}`
+                        `Audio Context resume success: state=${this.context?.state}, sampleRate:${this.context?.sampleRate}`
                     );
                     if (resumedCallback) {
                         resumedCallback();
@@ -153,14 +156,14 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
                 reason => {
                     Logger.warning(
                         'WebAudio',
-                        `Audio Context resume failed: state=${this._context?.state}, sampleRate:${this._context?.sampleRate}, reason=${reason}`
+                        `Audio Context resume failed: state=${this.context?.state}, sampleRate:${this.context?.sampleRate}, reason=${reason}`
                     );
                 }
             );
         }
     }
 
-    private patchIosSampleRate(): void {
+    private _patchIosSampleRate(): void {
         const ua: string = navigator.userAgent;
         if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1) {
             const context: AudioContext = WebAudioHelper.createAudioContext();
@@ -176,25 +179,25 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     }
 
     public open(_bufferTimeInMilliseconds: number): void {
-        this.patchIosSampleRate();
-        this._context = WebAudioHelper.createAudioContext();
-        const ctx: any = this._context;
+        this._patchIosSampleRate();
+        this.context = WebAudioHelper.createAudioContext();
+        const ctx: any = this.context;
         if (ctx.state === 'suspended') {
-            this.registerResumeHandler();
+            this._registerResumeHandler();
         }
     }
 
-    private registerResumeHandler() {
+    private _registerResumeHandler() {
         this._resumeHandler = (() => {
             this.activate(() => {
-                this.unregisterResumeHandler();
+                this._unregisterResumeHandler();
             });
         }).bind(this);
         document.body.addEventListener('touchend', this._resumeHandler, false);
         document.body.addEventListener('click', this._resumeHandler, false);
     }
 
-    private unregisterResumeHandler() {
+    private _unregisterResumeHandler() {
         const resumeHandler = this._resumeHandler;
         if (resumeHandler) {
             document.body.removeEventListener('touchend', resumeHandler, false);
@@ -203,28 +206,28 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     }
 
     public play(): void {
-        const ctx = this._context!;
+        const ctx = this.context!;
         this.activate();
         // create an empty buffer source (silence)
-        this._buffer = ctx.createBuffer(2, AlphaSynthWebAudioOutputBase.BufferSize, ctx.sampleRate);
-        this._source = ctx.createBufferSource();
-        this._source.buffer = this._buffer;
-        this._source.loop = true;
+        this.buffer = ctx.createBuffer(2, AlphaSynthWebAudioOutputBase.BufferSize, ctx.sampleRate);
+        this.source = ctx.createBufferSource();
+        this.source.buffer = this.buffer;
+        this.source.loop = true;
     }
 
     public pause(): void {
-        if (this._source) {
-            this._source.stop(0);
-            this._source.disconnect();
+        if (this.source) {
+            this.source.stop(0);
+            this.source.disconnect();
         }
-        this._source = null;
+        this.source = null;
     }
 
     public destroy(): void {
         this.pause();
-        this._context?.close();
-        this._context = null;
-        this.unregisterResumeHandler();
+        this.context?.close();
+        this.context = null;
+        this._unregisterResumeHandler();
     }
 
     public abstract addSamples(f: Float32Array): void;
@@ -257,9 +260,9 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
 
         // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/setSinkId
         if (!device) {
-            await (this._context as any).setSinkId('');
+            await (this.context as any).setSinkId('');
         } else {
-            await (this._context as any).setSinkId(device.deviceId);
+            await (this.context as any).setSinkId(device.deviceId);
         }
     }
 
@@ -269,7 +272,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
         }
 
         // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/sinkId
-        const sinkId = (this._context as any).sinkId;
+        const sinkId = (this.context as any).sinkId;
 
         if (typeof sinkId !== 'string' || sinkId === '' || sinkId === 'default') {
             return null;

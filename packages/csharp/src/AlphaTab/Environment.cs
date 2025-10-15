@@ -17,7 +17,7 @@ partial class Environment
     {
     }
 
-    private static void PrintPlatformInfo(System.Action<string> print)
+    private static void _printPlatformInfo(System.Action<string> print)
     {
         print($".net Runtime: {RuntimeInformation.FrameworkDescription}");
         print($"Process: {RuntimeInformation.ProcessArchitecture}");
@@ -42,7 +42,7 @@ partial class Environment
         };
     }
 
-    private static void CreatePlatformSpecificRenderEngines(
+    private static void _createPlatformSpecificRenderEngines(
         IMap<string, RenderEngineFactory> renderEngines)
     {
         renderEngines.Set(

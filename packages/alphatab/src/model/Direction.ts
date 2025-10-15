@@ -1,5 +1,6 @@
 /**
  * Lists all directions which can be applied to a masterbar.
+ * @public
  */
 export enum Direction {
     TargetFine = 0,

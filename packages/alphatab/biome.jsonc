@@ -18,8 +18,7 @@
             "src/**",
             "test/**",
             "src.compiler/**",
-            "playground/**",
-            "playground-template/**"
+            "playground/**"
         ]
     },
     "linter": {
@@ -27,8 +26,72 @@
             "*.ts",
             "src/**",
             "test/**",
-            "src.compiler/**",
-            "playground-template/**"
-        ]
+            "src.compiler/**"
+        ],
+        "rules": {
+            "style": {
+                "useNamingConvention": {
+                    "level": "error",
+                    "options": {
+                        "strictCase": false,
+                        "conventions": [
+                            {
+                                "selector": {
+                                    "kind": "classMember",
+                                    "modifiers": [
+                                        "private"
+                                    ]
+                                },
+                                "match": "_(.+)",
+                                "formats": [
+                                    "camelCase"
+                                ]
+                            },
+                            {
+                                "selector": {
+                                    "kind": "objectLiteralProperty"
+                                },
+                                "formats": [
+                                    "camelCase",
+                                    "PascalCase"
+                                ]
+                            },
+                            {
+                                "selector": {
+                                    "kind": "typeProperty"
+                                },
+                                "formats": [
+                                    "camelCase",
+                                    "PascalCase"
+                                ]
+                            },
+                            {
+                                "selector": {
+                                    "kind": "classProperty",
+                                    "modifiers": [
+                                        "static",
+                                        "readonly"
+                                    ]
+                                },
+                                "formats": [
+                                    "camelCase",
+                                    "PascalCase"
+                                ]
+                            },
+                            {
+                                "selector": {
+                                    "kind": "enumMember"
+                                },
+                                "match": ".+",
+                                "formats": [
+                                    "PascalCase",
+                                    "CONSTANT_CASE"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@ import type { Score } from '@src/model/Score';
 
 /**
  * Helper container to handle repeats correctly
+ * @internal
  */
 class Repeat {
     public group: RepeatGroup;
@@ -21,6 +22,9 @@ class Repeat {
     }
 }
 
+/**
+ * @internal
+ */
 enum MidiPlaybackControllerState {
     /**
      * Normally playing with repeats.
@@ -48,6 +52,9 @@ enum MidiPlaybackControllerState {
     DirectionJumpedAlFine = 4
 }
 
+/**
+ * @internal
+ */
 export class MidiPlaybackController {
     private _score: Score;
 
@@ -117,41 +124,37 @@ export class MidiPlaybackController {
     }
 
     public moveNext(): void {
-        if (this.moveNextWithDirections()) {
+        if (this._moveNextWithDirections()) {
             return;
         }
 
-        this.moveNextWithNormalRepeats();
+        this._moveNextWithNormalRepeats();
     }
 
-    private resetRepeats() {
+    private _resetRepeats() {
         this._groupsOnStack.clear();
         this._previousAlternateEndings = 0;
         this._repeatStack = [];
     }
 
-    private handleDaCapo(
-        directions: Set<Direction>,
-        daCapo: Direction,
-        newState: MidiPlaybackControllerState
-    ): boolean {
+    private _handleDaCapo(directions: Set<Direction>, daCapo: Direction, newState: MidiPlaybackControllerState): boolean {
         if (directions.has(daCapo)) {
             this.index = 0; // jump to start
             this._state = newState;
-            this.resetRepeats();
+            this._resetRepeats();
             return true;
         }
         return false;
     }
 
-    private handleDalSegno(
+    private _handleDalSegno(
         directions: Set<Direction>,
         dalSegno: Direction,
         newState: MidiPlaybackControllerState,
         jumpTarget: Direction
     ): boolean {
         if (directions!.has(dalSegno)) {
-            const segno = this.findJumpTarget(jumpTarget, this.index, true /* typically jumps are backwards */);
+            const segno = this._findJumpTarget(jumpTarget, this.index, true /* typically jumps are backwards */);
             if (segno === -1) {
                 // no jump target found, keep playing normally
                 return false;
@@ -159,16 +162,16 @@ export class MidiPlaybackController {
 
             this.index = segno;
             this._state = newState;
-            this.resetRepeats();
+            this._resetRepeats();
             return true;
         }
         return false;
     }
 
-    private handleDaCoda(directions: Set<Direction>, daCoda: Direction, jumpTarget: Direction): boolean {
+    private _handleDaCoda(directions: Set<Direction>, daCoda: Direction, jumpTarget: Direction): boolean {
         // Found the "Da Coda" after the jump -> Jump further
         if (directions.has(daCoda)) {
-            const coda = this.findJumpTarget(jumpTarget, this.index, false /* typically da coda jumps are forwards */);
+            const coda = this._findJumpTarget(jumpTarget, this.index, false /* typically da coda jumps are forwards */);
             if (coda === -1) {
                 // no coda found, continue playing normally to end.
                 this.index++;
@@ -183,7 +186,7 @@ export class MidiPlaybackController {
         return false;
     }
 
-    private moveNextWithDirections() {
+    private _moveNextWithDirections() {
         const masterBar: MasterBar = this._score.masterBars[this.index];
         const hasDirections = masterBar.directions !== null && masterBar.directions.size > 0;
 
@@ -214,22 +217,22 @@ export class MidiPlaybackController {
                 // Da capo Jumps (to start)
                 // prettier-ignore
                 if (
-                    this.handleDaCapo(
+                    this._handleDaCapo(
                         masterBar.directions!,
                         Direction.JumpDaCapo,
                         MidiPlaybackControllerState.DirectionJumped
                     ) ||
-                    this.handleDaCapo(
+                    this._handleDaCapo(
                         masterBar.directions!,
                         Direction.JumpDaCapoAlCoda,
                         MidiPlaybackControllerState.DirectionJumpedAlCoda
                     ) ||
-                    this.handleDaCapo(
+                    this._handleDaCapo(
                         masterBar.directions!,
                         Direction.JumpDaCapoAlDoubleCoda,
                         MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda
                     ) ||
-                    this.handleDaCapo(
+                    this._handleDaCapo(
                         masterBar.directions!,
                         Direction.JumpDaCapoAlFine,
                         MidiPlaybackControllerState.DirectionJumpedAlFine
@@ -241,25 +244,25 @@ export class MidiPlaybackController {
                 // Dal Segno Jumps
                 // prettier-ignore
                 if (
-                    this.handleDalSegno(
+                    this._handleDalSegno(
                         masterBar.directions!,
                         Direction.JumpDalSegno,
                         MidiPlaybackControllerState.DirectionJumped,
                         Direction.TargetSegno
                     ) ||
-                    this.handleDalSegno(
+                    this._handleDalSegno(
                         masterBar.directions!,
                         Direction.JumpDalSegnoAlCoda,
                         MidiPlaybackControllerState.DirectionJumpedAlCoda,
                         Direction.TargetSegno
                     ) ||
-                    this.handleDalSegno(
+                    this._handleDalSegno(
                         masterBar.directions!,
                         Direction.JumpDalSegnoAlDoubleCoda,
                         MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda,
                         Direction.TargetSegno
                     ) ||
-                    this.handleDalSegno(
+                    this._handleDalSegno(
                         masterBar.directions!,
                         Direction.JumpDalSegnoAlFine,
                         MidiPlaybackControllerState.DirectionJumpedAlFine,
@@ -272,25 +275,25 @@ export class MidiPlaybackController {
                 // Dal SegnoSegno Jumps
                 // prettier-ignore
                 if (
-                    this.handleDalSegno(
+                    this._handleDalSegno(
                         masterBar.directions!,
                         Direction.JumpDalSegnoSegno,
                         MidiPlaybackControllerState.DirectionJumped,
                         Direction.TargetSegnoSegno
                     ) ||
-                    this.handleDalSegno(
+                    this._handleDalSegno(
                         masterBar.directions!,
                         Direction.JumpDalSegnoSegnoAlCoda,
                         MidiPlaybackControllerState.DirectionJumpedAlCoda,
                         Direction.TargetSegnoSegno
                     ) ||
-                    this.handleDalSegno(
+                    this._handleDalSegno(
                         masterBar.directions!,
                         Direction.JumpDalSegnoSegnoAlDoubleCoda,
                         MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda,
                         Direction.TargetSegnoSegno
                     ) ||
-                    this.handleDalSegno(
+                    this._handleDalSegno(
                         masterBar.directions!,
                         Direction.JumpDalSegnoSegnoAlFine,
                         MidiPlaybackControllerState.DirectionJumpedAlFine,
@@ -310,7 +313,7 @@ export class MidiPlaybackController {
 
             case MidiPlaybackControllerState.DirectionJumpedAlCoda:
                 // Found the "Da Coda" after the jump -> Jump further
-                if (this.handleDaCoda(masterBar.directions!, Direction.JumpDaCoda, Direction.TargetCoda)) {
+                if (this._handleDaCoda(masterBar.directions!, Direction.JumpDaCoda, Direction.TargetCoda)) {
                     return true;
                 }
 
@@ -319,7 +322,7 @@ export class MidiPlaybackController {
                 return true;
 
             case MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda:
-                if (this.handleDaCoda(masterBar.directions!, Direction.JumpDaDoubleCoda, Direction.TargetDoubleCoda)) {
+                if (this._handleDaCoda(masterBar.directions!, Direction.JumpDaDoubleCoda, Direction.TargetDoubleCoda)) {
                     return true;
                 }
 
@@ -350,24 +353,24 @@ export class MidiPlaybackController {
      * @param backwardsFirst whether to first search backwards before looking forwards.
      * @returns the index of the masterbar found with the given direction or -1 if no masterbar with the given direction was found.
      */
-    private findJumpTarget(toFind: Direction, searchIndex: number, backwardsFirst: boolean): number {
+    private _findJumpTarget(toFind: Direction, searchIndex: number, backwardsFirst: boolean): number {
         let index: number;
         if (backwardsFirst) {
-            index = this.findJumpTargetBackwards(toFind, searchIndex);
+            index = this._findJumpTargetBackwards(toFind, searchIndex);
             if (index === -1) {
-                index = this.findJumpTargetForwards(toFind, searchIndex);
+                index = this._findJumpTargetForwards(toFind, searchIndex);
             }
             return index;
         }
 
-        index = this.findJumpTargetForwards(toFind, searchIndex);
+        index = this._findJumpTargetForwards(toFind, searchIndex);
         if (index === -1) {
-            index = this.findJumpTargetBackwards(toFind, searchIndex);
+            index = this._findJumpTargetBackwards(toFind, searchIndex);
         }
         return index;
     }
 
-    private findJumpTargetForwards(toFind: Direction, searchIndex: number): number {
+    private _findJumpTargetForwards(toFind: Direction, searchIndex: number): number {
         let index = searchIndex;
         while (index < this._score.masterBars.length) {
             const d = this._score.masterBars[index].directions;
@@ -379,7 +382,7 @@ export class MidiPlaybackController {
         return -1;
     }
 
-    private findJumpTargetBackwards(toFind: Direction, searchIndex: number): number {
+    private _findJumpTargetBackwards(toFind: Direction, searchIndex: number): number {
         let index = searchIndex;
         while (index >= 0) {
             const d = this._score.masterBars[index].directions;
@@ -391,7 +394,7 @@ export class MidiPlaybackController {
         return -1;
     }
 
-    private moveNextWithNormalRepeats() {
+    private _moveNextWithNormalRepeats() {
         const masterBar: MasterBar = this._score.masterBars[this.index];
         const masterBarRepeatCount: number = masterBar.repeatCount - 1;
         // if we encounter a repeat end...

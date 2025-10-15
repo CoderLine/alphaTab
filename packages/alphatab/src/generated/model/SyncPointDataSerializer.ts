@@ -5,6 +5,9 @@
 // </auto-generated>
 import { SyncPointData } from "@src/model/Automation";
 import { JsonHelper } from "@src/io/JsonHelper";
+/**
+ * @internal
+ */
 export class SyncPointDataSerializer {
     public static fromJson(obj: SyncPointData, m: unknown): void {
         if (!m) {

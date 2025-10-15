@@ -85,7 +85,7 @@ export default defineConfig(({ mode }) => {
             lib.entry['alphaTab.core'] = path.resolve(__dirname, 'src/alphaTab.core.ts');
             lib.entry['alphaTab.worker'] = path.resolve(__dirname, 'src/alphaTab.worker.ts');
             lib.entry['alphaTab.worklet'] = path.resolve(__dirname, 'src/alphaTab.worklet.ts');
-
+            
             for (const output of config.build!.rollupOptions!.output as OutputOptions[]) {
                 const isMin = (output.entryFileNames as string).includes('.min');
                 (output.plugins as Plugin[]).push(adjustScriptPathsPlugin(isMin));

@@ -13,6 +13,7 @@ import { HtmlElementContainer } from '@src/platform/javascript/HtmlElementContai
  * This is solved in this container by scaling the element first up to a higher degree (as specified)
  * so that the browser can do a scaling according to typical zoom levels and then the scaling will work.
  * @target web
+ * @internal
  */
 export class ScalableHtmlElementContainer extends HtmlElementContainer {
     private _xscale: number;

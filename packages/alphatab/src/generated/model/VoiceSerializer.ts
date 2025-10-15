@@ -9,6 +9,9 @@ import { BeatSerializer } from "@src/generated/model/BeatSerializer";
 import { VoiceStyleSerializer } from "@src/generated/model/VoiceStyleSerializer";
 import { Beat } from "@src/model/Beat";
 import { VoiceStyle } from "@src/model/Voice";
+/**
+ * @internal
+ */
 export class VoiceSerializer {
     public static fromJson(obj: Voice, m: unknown): void {
         if (!m) {

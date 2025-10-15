@@ -15,6 +15,7 @@ import { LayoutConfiguration } from '@src/importer/LayoutConfiguration';
 
 /**
  * This ScoreImporter can read Guitar Pro 7 and 8 (gp) files.
+ * @internal
  */
 export class Gp7To8Importer extends ScoreImporter {
     public get name(): string {

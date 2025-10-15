@@ -3,6 +3,9 @@ import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { ICanvas } from '@src/platform/ICanvas';
 
+/**
+ * @internal
+ */
 export class NoteHeadGlyph extends MusicFontGlyph {
     // TODO: SmuFL
     public static readonly GraceScale: number = 0.75;

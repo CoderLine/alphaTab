@@ -14,4 +14,8 @@ internal class Lazy<T : Any?>(factory: () -> T) {
             @Suppress("UNCHECKED_CAST")
             return _value as T
         }
+
+    public fun reset() {
+        _value = UninitializedValue
+    }
 }

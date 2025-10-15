@@ -14,6 +14,7 @@ import { Logger } from '@src/Logger';
 /**
  * This is the main wrapper of the rendering engine which
  * can render a single track of a score object into a notation sheet.
+ * @public
  */
 export class ScoreRenderer implements IScoreRenderer {
     private _currentLayoutMode: LayoutMode = LayoutMode.Page;
@@ -37,8 +38,8 @@ export class ScoreRenderer implements IScoreRenderer {
      */
     public constructor(settings: Settings) {
         this.settings = settings;
-        this.recreateCanvas();
-        this.recreateLayout();
+        this._recreateCanvas();
+        this._recreateLayout();
     }
 
     public destroy(): void {
@@ -50,7 +51,7 @@ export class ScoreRenderer implements IScoreRenderer {
         this.tracks = null;
     }
 
-    private recreateCanvas(): boolean {
+    private _recreateCanvas(): boolean {
         if (this._currentRenderEngine !== this.settings.core.engine) {
             this.canvas?.destroy();
             this.canvas = Environment.getRenderEngineFactory(this.settings.core.engine).createCanvas();
@@ -60,7 +61,7 @@ export class ScoreRenderer implements IScoreRenderer {
         return false;
     }
 
-    private recreateLayout(): boolean {
+    private _recreateLayout(): boolean {
         if (!this.layout || this._currentLayoutMode !== this.settings.display.layoutMode) {
             this.layout = Environment.getLayoutEngineFactory(this.settings.display.layoutMode).createLayout(this);
             this._currentLayoutMode = this.settings.display.layoutMode;
@@ -135,7 +136,7 @@ export class ScoreRenderer implements IScoreRenderer {
             return;
         }
         this.boundsLookup = new BoundsLookup();
-        this.recreateCanvas();
+        this._recreateCanvas();
         this.canvas!.lineWidth = 1;
         this.canvas!.settings = this.settings;
 
@@ -143,7 +144,7 @@ export class ScoreRenderer implements IScoreRenderer {
             Logger.debug('Rendering', 'Clearing rendered tracks because no score or tracks are set');
             (this.preRender as EventEmitterOfT<boolean>).trigger(false);
             this._renderedTracks = null;
-            this.onRenderFinished();
+            this._onRenderFinished();
             (this.postRenderFinished as EventEmitter).trigger();
             Logger.debug('Rendering', 'Clearing finished');
         } else {
@@ -153,14 +154,14 @@ export class ScoreRenderer implements IScoreRenderer {
                 Logger.debug('Rendering', `Track ${i}: ${track.name}`);
             }
             (this.preRender as EventEmitterOfT<boolean>).trigger(false);
-            this.recreateLayout();
-            this.layoutAndRender();
+            this._recreateLayout();
+            this._layoutAndRender();
             Logger.debug('Rendering', 'Rendering finished');
         }
     }
 
     public resizeRender(): void {
-        if (this.recreateLayout() || this.recreateCanvas() || this._renderedTracks !== this.tracks || !this.tracks) {
+        if (this._recreateLayout() || this._recreateCanvas() || this._renderedTracks !== this.tracks || !this.tracks) {
             Logger.debug('Rendering', 'Starting full rerendering due to layout or canvas change', null);
             this.render();
         } else if (this.layout!.supportsResize) {
@@ -169,7 +170,7 @@ export class ScoreRenderer implements IScoreRenderer {
             (this.preRender as EventEmitterOfT<boolean>).trigger(true);
             this.canvas!.settings = this.settings;
             this.layout!.resize();
-            this.onRenderFinished();
+            this._onRenderFinished();
             (this.postRenderFinished as EventEmitter).trigger();
         } else {
             Logger.debug('Rendering', 'Current layout does not support dynamic resizing, nothing was done', null);
@@ -177,7 +178,7 @@ export class ScoreRenderer implements IScoreRenderer {
         Logger.debug('Rendering', 'Resize finished');
     }
 
-    private layoutAndRender(): void {
+    private _layoutAndRender(): void {
         Logger.debug(
             'Rendering',
             `Rendering at scale ${this.settings.display.scale} with layout ${this.layout!.name}`,
@@ -185,7 +186,7 @@ export class ScoreRenderer implements IScoreRenderer {
         );
         this.layout!.layoutAndRender();
         this._renderedTracks = this.tracks;
-        this.onRenderFinished();
+        this._onRenderFinished();
         (this.postRenderFinished as EventEmitter).trigger();
     }
 
@@ -199,7 +200,7 @@ export class ScoreRenderer implements IScoreRenderer {
     public readonly postRenderFinished: IEventEmitter = new EventEmitter();
     public readonly error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
 
-    private onRenderFinished() {
+    private _onRenderFinished() {
         this.boundsLookup?.finish(this.settings.display.scale);
         const e = new RenderFinishedEventArgs();
         e.totalHeight = this.layout!.height;

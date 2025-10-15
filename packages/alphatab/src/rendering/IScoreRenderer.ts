@@ -7,6 +7,7 @@ import type { Settings } from '@src/Settings';
 
 /**
  * Represents the public interface of the component that can render scores.
+ * @public
  */
 export interface IScoreRenderer {
     /**

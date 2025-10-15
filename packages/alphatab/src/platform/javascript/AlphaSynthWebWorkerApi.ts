@@ -21,6 +21,7 @@ import type { Score } from '@src/model/Score';
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
  * @target web
+ * @internal
  */
 export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     private _synth!: Worker;
@@ -231,7 +232,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._isLooping = false;
         this._playbackRange = null;
         this._output = player;
-        this._output.ready.on(this.onOutputReady.bind(this));
+        this._output.ready.on(this._onOutputReady.bind(this));
         this._output.samplesPlayed.on(this.onOutputSamplesPlayed.bind(this));
         this._output.sampleRequest.on(this.onOutputSampleRequest.bind(this));
         this._output.open(settings.player.bufferTimeInMilliseconds);
@@ -369,14 +370,14 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         switch (cmd) {
             case 'alphaSynth.ready':
                 this._workerIsReady = true;
-                this.checkReady();
+                this._checkReady();
                 break;
             case 'alphaSynth.destroyed':
                 this._synth.terminate();
                 break;
             case 'alphaSynth.readyForPlayback':
                 this._workerIsReadyForPlayback = true;
-                this.checkReadyForPlayback();
+                this._checkReadyForPlayback();
                 break;
             case 'alphaSynth.positionChanged':
                 this._currentPosition = new PositionChangedEventArgs(
@@ -417,7 +418,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 (this.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(data.error);
                 break;
             case 'alphaSynth.midiLoaded':
-                this.checkReadyForPlayback();
+                this._checkReadyForPlayback();
                 this._loadedMidiInfo = new PositionChangedEventArgs(
                     data.currentTime,
                     data.endTime,
@@ -430,7 +431,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(this._loadedMidiInfo);
                 break;
             case 'alphaSynth.midiLoadFailed':
-                this.checkReadyForPlayback();
+                this._checkReadyForPlayback();
                 (this.midiLoadFailed as EventEmitterOfT<Error>).trigger(data.error);
                 break;
             case 'alphaSynth.output.addSamples':
@@ -451,13 +452,13 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         }
     }
 
-    private checkReady(): void {
+    private _checkReady(): void {
         if (this.isReady) {
             (this.ready as EventEmitter).trigger();
         }
     }
 
-    private checkReadyForPlayback(): void {
+    private _checkReadyForPlayback(): void {
         if (this.isReadyForPlayback) {
             (this.readyForPlayback as EventEmitter).trigger();
         }
@@ -493,9 +494,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    private onOutputReady(): void {
+    private _onOutputReady(): void {
         this._outputIsReady = true;
-        this.checkReady();
+        this._checkReady();
     }
 
     public loadBackingTrack(_score: Score): void {

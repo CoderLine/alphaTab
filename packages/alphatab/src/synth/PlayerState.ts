@@ -1,5 +1,6 @@
 /**
  * Lists the different states of the player
+ * @public
  */
 export enum PlayerState {
     /**

@@ -4,6 +4,7 @@ import type { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 /**
  * Classes implementing this interface can act as main audio synthesis engine
  * within alphaSynth.
+ * @internal
  */
 export interface IAudioSampleSynthesizer {
     /**

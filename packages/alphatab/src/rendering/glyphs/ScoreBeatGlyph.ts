@@ -37,6 +37,9 @@ import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { BeamDirection } from '@src/rendering/_barrel';
 import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
 
+/**
+ * @internal
+ */
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;
     private _skipPaint: boolean = false;
@@ -118,7 +121,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
                 for (const note of this.container.beat.notes) {
                     if (note.isVisible && (!note.beat.slashed || note.index === 0)) {
-                        this.createNoteGlyph(note);
+                        this._createNoteGlyph(note);
                         ghost.addParenthesis(note);
                     }
                 }
@@ -144,7 +147,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         const group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
                         for (const note of this.container.beat.notes) {
-                            const g = this.createBeatDot(sr.getNoteLine(note), group);
+                            const g = this._createBeatDot(sr.getNoteLine(note), group);
                             g.colorOverride = ElementStyleHelper.noteColor(
                                 sr.resources,
                                 NoteSubElement.StandardNotationEffects,
@@ -196,7 +199,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         const group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
-                        this.createBeatDot(line, group);
+                        this._createBeatDot(line, group);
                         this.addEffect(group);
                     }
                 }
@@ -212,14 +215,14 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    private createBeatDot(line: number, group: GlyphGroup) {
+    private _createBeatDot(line: number, group: GlyphGroup) {
         const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         const g = new AugmentationDotGlyph(0, sr.getScoreY(line));
         group.addGlyph(g);
         return g;
     }
 
-    private createNoteHeadGlyph(n: Note): MusicFontGlyph {
+    private _createNoteHeadGlyph(n: Note): MusicFontGlyph {
         const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
 
         const style = n.style;
@@ -261,12 +264,12 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         return new NoteHeadGlyph(0, 0, n.beat.duration, isGrace);
     }
 
-    private createNoteGlyph(n: Note): void {
+    private _createNoteGlyph(n: Note): void {
         if (n.beat.graceType === GraceType.BendGrace && !n.hasBend) {
             return;
         }
         const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        const noteHeadGlyph = this.createNoteHeadGlyph(n);
+        const noteHeadGlyph = this._createNoteHeadGlyph(n);
         noteHeadGlyph.colorOverride = ElementStyleHelper.noteColor(
             sr.resources,
             NoteSubElement.StandardNotationNoteHead,

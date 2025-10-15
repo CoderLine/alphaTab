@@ -4,6 +4,9 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { type ICanvas, TextBaseline, TextAlign } from '@src/platform/ICanvas';
 
+/**
+ * @internal
+ */
 class TargetDirectionGlyph extends Glyph {
     private _symbols: MusicFontSymbol[];
     private _scale = 1;
@@ -31,6 +34,9 @@ class TargetDirectionGlyph extends Glyph {
     }
 }
 
+/**
+ * @internal
+ */
 class JumpDirectionGlyph extends Glyph {
     private _text: string;
 
@@ -62,6 +68,9 @@ class JumpDirectionGlyph extends Glyph {
     }
 }
 
+/**
+ * @internal
+ */
 export class DirectionsContainerGlyph extends EffectGlyph {
     private _directions: Set<Direction>;
 
@@ -137,13 +146,13 @@ export class DirectionsContainerGlyph extends EffectGlyph {
             this._barEndGlyphs.push(new JumpDirectionGlyph('D.C. al Fine'));
         }
 
-        const beginHeight = this.doSideLayout(this._barBeginGlyphs);
-        const endHeight = this.doSideLayout(this._barEndGlyphs);
+        const beginHeight = this._doSideLayout(this._barBeginGlyphs);
+        const endHeight = this._doSideLayout(this._barEndGlyphs);
 
         this.height = Math.max(beginHeight, endHeight);
     }
 
-    private doSideLayout(glyphs: Glyph[]): number {
+    private _doSideLayout(glyphs: Glyph[]): number {
         let y = 0;
 
         const padding = this.renderer.settings.display.effectBandPaddingBottom;

@@ -10,8 +10,10 @@ import type { MidiEventType } from '@src/midi/MidiEvent';
 
 /**
  * @target web
+ * @internal
  */
-export declare class jQuery extends Array<HTMLElement> {
+// biome-ignore lint/style/useNamingConvention: Use original jQuery name
+declare class jQuery extends Array<HTMLElement> {
     public constructor(v?: any);
 
     public readonly context: HTMLElement;
@@ -31,6 +33,7 @@ export declare class jQuery extends Array<HTMLElement> {
 /**
  * @target web
  * @deprecated Migrate to {@link AlphaTabApi}.
+ * @internal
  */
 export class JQueryAlphaTab {
     public exec(element: HTMLElement, method: string, args: any[]): unknown {

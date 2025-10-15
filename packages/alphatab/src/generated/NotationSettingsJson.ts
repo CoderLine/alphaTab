@@ -11,6 +11,7 @@ import { TabRhythmMode } from "@src/NotationSettings";
  * The notation settings control how various music notation elements are shown and behaving
  * @json
  * @json_declaration
+ * @public
  * @target web
  */
 export interface NotationSettingsJson {

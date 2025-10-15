@@ -1,5 +1,6 @@
 /**
  * Lists all types of fermatas
+ * @public
  */
 export enum FermataType {
     /**
@@ -20,6 +21,7 @@ export enum FermataType {
  * Represents a fermata.
  * @json
  * @json_strict
+ * @public
  */
 export class Fermata {
     /**

@@ -5,6 +5,9 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Bounds } from '@src/rendering/utils/Bounds';
 
+/**
+ * @internal
+ */
 export class TieGlyph extends Glyph {
     protected startBeat: Beat | null;
     protected endBeat: Beat | null;
@@ -187,7 +190,7 @@ export class TieGlyph extends Glyph {
         offset: number,
         size: number
     ): Bounds {
-        const cp = TieGlyph.computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
+        const cp = TieGlyph._computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
 
         x1 = cp[0];
         y1 = cp[1];
@@ -197,12 +200,12 @@ export class TieGlyph extends Glyph {
         y2 = cp[7];
 
         const tx = (x1 - cpx) / (x1 - 2 * cpx + x2);
-        const ex = TieGlyph.calculateExtrema(x1, y1, cpx, cpy, x2, y2, tx);
+        const ex = TieGlyph._calculateExtrema(x1, y1, cpx, cpy, x2, y2, tx);
         const xMin = ex.length > 0 ? Math.min(x1, x2, ex[0]) : Math.min(x1, x2);
         const xMax = ex.length > 0 ? Math.max(x1, x2, ex[0]) : Math.max(x1, x2);
 
         const ty = (y1 - cpy) / (y1 - 2 * cpy + y2);
-        const ey = TieGlyph.calculateExtrema(x1, y1, cpx, cpy, x2, y2, ty);
+        const ey = TieGlyph._calculateExtrema(x1, y1, cpx, cpy, x2, y2, ty);
         const yMin = ey.length > 0 ? Math.min(y1, y2, ey[1]) : Math.min(y1, y2);
         const yMax = ey.length > 0 ? Math.max(y1, y2, ey[1]) : Math.max(y1, y2);
 
@@ -214,7 +217,7 @@ export class TieGlyph extends Glyph {
         return b;
     }
 
-    private static calculateExtrema(
+    private static _calculateExtrema(
         x1: number,
         y1: number,
         cpx: number,
@@ -236,7 +239,7 @@ export class TieGlyph extends Glyph {
         return [c1x + (c2x - c1x) * t, c1y + (c2y - c1y) * t];
     }
 
-    private static computeBezierControlPoints(
+    private static _computeBezierControlPoints(
         scale: number,
         x1: number,
         y1: number,
@@ -304,15 +307,15 @@ export class TieGlyph extends Glyph {
 
         const angle = Math.atan2(dY, dX);
 
-        [cp1x, cp1y] = TieGlyph.rotate(cp1x, cp1y, x1, y1, angle);
-        [cp2x, cp2y] = TieGlyph.rotate(cp2x, cp2y, x1, y1, angle);
-        [cp3x, cp3y] = TieGlyph.rotate(cp3x, cp3y, x1, y1, angle);
-        [cp4x, cp4y] = TieGlyph.rotate(cp4x, cp4y, x1, y1, angle);
+        [cp1x, cp1y] = TieGlyph._rotate(cp1x, cp1y, x1, y1, angle);
+        [cp2x, cp2y] = TieGlyph._rotate(cp2x, cp2y, x1, y1, angle);
+        [cp3x, cp3y] = TieGlyph._rotate(cp3x, cp3y, x1, y1, angle);
+        [cp4x, cp4y] = TieGlyph._rotate(cp4x, cp4y, x1, y1, angle);
 
         return [x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2, cp3x, cp3y, cp4x, cp4y, x1, y1];
     }
 
-    private static rotate(x: number, y: number, rotateX: number, rotateY: number, angle: number): [number, number] {
+    private static _rotate(x: number, y: number, rotateX: number, rotateY: number, angle: number): [number, number] {
         const dx = x - rotateX;
         const dy = y - rotateY;
         const rx = dx * Math.cos(angle) - dy * Math.sin(angle);
@@ -331,7 +334,7 @@ export class TieGlyph extends Glyph {
         offset: number /*= 22*/,
         size: number /*= 4*/
     ): void {
-        const cps = TieGlyph.computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
+        const cps = TieGlyph._computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
 
         canvas.beginPath();
         canvas.moveTo(cps[0], cps[1]);

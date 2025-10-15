@@ -2,6 +2,7 @@
  * All settings related to importers that decode file formats.
  * @json
  * @json_declaration
+ * @public
  */
 export class ImporterSettings {
     /**

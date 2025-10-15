@@ -17,6 +17,10 @@ function toImportPath(fileName: string) {
 }
 
 function isCloneMember(propertyDeclaration: ts.PropertyDeclaration) {
+    if (ts.isPrivateIdentifier(propertyDeclaration.name)){
+        return false;
+    }
+
     if (propertyDeclaration.modifiers) {
         if (
             propertyDeclaration.modifiers.find(
@@ -347,15 +351,19 @@ export default createEmitter('cloneable', (program, input) => {
         );
     }
 
-    statements.push(
-        ts.factory.createClassDeclaration(
+    const clz = ts.addSyntheticLeadingComment(ts.factory.createClassDeclaration(
             [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
             `${input.name!.text}Cloner`,
             undefined,
             undefined,
             [createCloneMethod(program, input, importer)]
-        )
+        ),
+        ts.SyntaxKind.MultiLineCommentTrivia,
+        '*\n * @internal\n ',
+        true
     );
+
+    statements.push(clz);
 
     const sourceFile = ts.factory.createSourceFile(
         [

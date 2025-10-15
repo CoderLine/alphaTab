@@ -2,6 +2,9 @@ import { BeatSubElement } from '@src/model/Beat';
 import type { ICanvas } from '@src/platform/ICanvas';
 import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
 
+/**
+ * @internal
+ */
 export class SlashRestGlyph extends ScoreRestGlyph {
     public override updateBeamingHelper(cx: number): void {
         if (this.beamingHelper) {

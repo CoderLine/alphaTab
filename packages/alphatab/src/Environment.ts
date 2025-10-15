@@ -74,6 +74,7 @@ import { StaveProfile } from '@src/StaveProfile';
 
 /**
  * A factory for custom layout engines.
+ * @internal
  */
 export class LayoutEngineFactory {
     /**
@@ -95,6 +96,7 @@ export class LayoutEngineFactory {
  * A factory for custom render engines.
  * Note for Web: To use a custom engine in workers you have to ensure the engine and registration to the environment are
  * also done in the background worker files (e.g. when bundling)
+ * @public
  */
 export class RenderEngineFactory {
     /**
@@ -117,21 +119,22 @@ export class RenderEngineFactory {
  * alphaTab looks for information like available layout engines
  * staves etc.
  * @partial
+ * @public
  */
 export class Environment {
-    private static readonly StaffIdBeforeSlashAlways = 'before-slash-always';
-    private static readonly StaffIdBeforeScoreAlways = 'before-score-always';
-    private static readonly StaffIdBeforeScoreHideable = 'before-score-hideable';
-    private static readonly StaffIdBeforeNumberedAlways = 'before-numbered-always';
-    private static readonly StaffIdBeforeTabAlways = 'before-tab-always';
-    private static readonly StaffIdBeforeTabHideable = 'before-tab-hideable';
-    private static readonly StaffIdBeforeEndAlways = 'before-end-always';
+    private static readonly _staffIdBeforeSlashAlways = 'before-slash-always';
+    private static readonly _staffIdBeforeScoreAlways = 'before-score-always';
+    private static readonly _staffIdBeforeScoreHideable = 'before-score-hideable';
+    private static readonly _staffIdBeforeNumberedAlways = 'before-numbered-always';
+    private static readonly _staffIdBeforeTabAlways = 'before-tab-always';
+    private static readonly _staffIdBeforeTabHideable = 'before-tab-hideable';
+    private static readonly _staffIdBeforeEndAlways = 'before-end-always';
 
     /**
      * The scaling factor to use when rending raster graphics for sharper rendering on high-dpi displays.
      * @internal
      */
-    public static HighDpiFactor = 1;
+    public static highDpiFactor = 1;
 
     /**
      * @target web
@@ -170,27 +173,27 @@ export class Environment {
     /**
      * @target web
      */
-    public static readonly webPlatform: WebPlatform = Environment.detectWebPlatform();
+    public static readonly webPlatform: WebPlatform = Environment._detectWebPlatform();
 
     /**
      * @target web
      */
-    public static readonly isWebPackBundled: boolean = Environment.detectWebPack();
+    public static readonly isWebPackBundled: boolean = Environment._detectWebPack();
 
     /**
      * @target web
      */
-    public static readonly isViteBundled: boolean = Environment.detectVite();
+    public static readonly isViteBundled: boolean = Environment._detectVite();
 
     /**
      * @target web
      */
-    public static readonly scriptFile: string | null = Environment.detectScriptFile();
+    public static readonly scriptFile: string | null = Environment._detectScriptFile();
 
     /**
      * @target web
      */
-    public static readonly fontDirectory: string | null = Environment.detectFontDirectory();
+    public static readonly fontDirectory: string | null = Environment._detectFontDirectory();
 
     /**
      * @target web
@@ -233,12 +236,12 @@ export class Environment {
     /**
      * @target web
      */
-    private static detectScriptFile(): string | null {
+    private static _detectScriptFile(): string | null {
         // custom global constant
         if (!Environment.isRunningInWorker && Environment.globalThis.ALPHATAB_ROOT) {
             let scriptFile = Environment.globalThis.ALPHATAB_ROOT;
             scriptFile = Environment.ensureFullUrl(scriptFile);
-            scriptFile = Environment.appendScriptName(scriptFile);
+            scriptFile = Environment._appendScriptName(scriptFile);
             return scriptFile;
         }
 
@@ -309,7 +312,7 @@ export class Environment {
         return relativeUrl;
     }
 
-    private static appendScriptName(url: string): string {
+    private static _appendScriptName(url: string): string {
         // append script name
         if (url && !url.endsWith('.js')) {
             if (!url.endsWith('/')) {
@@ -323,7 +326,7 @@ export class Environment {
     /**
      * @target web
      */
-    private static detectFontDirectory(): string | null {
+    private static _detectFontDirectory(): string | null {
         if (!Environment.isRunningInWorker && Environment.globalThis.ALPHATAB_FONT) {
             return Environment.ensureFullUrl(Environment.globalThis.ALPHATAB_FONT);
         }
@@ -342,7 +345,7 @@ export class Environment {
     /**
      * @target web
      */
-    private static registerJQueryPlugin(): void {
+    private static _registerJQueryPlugin(): void {
         if (!Environment.isRunningInWorker && Environment.globalThis && 'jQuery' in Environment.globalThis) {
             const jquery: any = Environment.globalThis.jQuery;
             const api: JQueryAlphaTab = new JQueryAlphaTab();
@@ -365,19 +368,19 @@ export class Environment {
         }
     }
 
-    public static readonly renderEngines: Map<string, RenderEngineFactory> = Environment.createDefaultRenderEngines();
+    public static readonly renderEngines: Map<string, RenderEngineFactory> = Environment._createDefaultRenderEngines();
 
     /**
      * @internal
      */
     public static readonly layoutEngines: Map<LayoutMode, LayoutEngineFactory> =
-        Environment.createDefaultLayoutEngines();
+        Environment._createDefaultLayoutEngines();
 
     /**
      * @internal
      */
     public static readonly staveProfiles: Map<StaveProfile, BarRendererFactory[]> =
-        Environment.createDefaultStaveProfiles();
+        Environment._createDefaultStaveProfiles();
 
     public static getRenderEngineFactory(engine: string): RenderEngineFactory {
         if (!engine || !Environment.renderEngines.has(engine)) {
@@ -411,7 +414,7 @@ export class Environment {
         ];
     }
 
-    private static createDefaultRenderEngines(): Map<string, RenderEngineFactory> {
+    private static _createDefaultRenderEngines(): Map<string, RenderEngineFactory> {
         const renderEngines = new Map<string, RenderEngineFactory>();
         renderEngines.set(
             'svg',
@@ -428,7 +431,7 @@ export class Environment {
             })
         );
 
-        Environment.createPlatformSpecificRenderEngines(renderEngines);
+        Environment._createPlatformSpecificRenderEngines(renderEngines);
         return renderEngines;
     }
 
@@ -454,7 +457,7 @@ export class Environment {
      * @target web
      * @partial
      */
-    private static createPlatformSpecificRenderEngines(renderEngines: Map<string, RenderEngineFactory>) {
+    private static _createPlatformSpecificRenderEngines(renderEngines: Map<string, RenderEngineFactory>) {
         renderEngines.set(
             'html5',
             new RenderEngineFactory(false, () => {
@@ -463,11 +466,11 @@ export class Environment {
         );
     }
 
-    private static createDefaultRenderers(): BarRendererFactory[] {
+    private static _createDefaultRenderers(): BarRendererFactory[] {
         return [
             //
             // Slash
-            new EffectBarRendererFactory(Environment.StaffIdBeforeSlashAlways, [
+            new EffectBarRendererFactory(Environment._staffIdBeforeSlashAlways, [
                 new TempoEffectInfo(),
                 new TripletFeelEffectInfo(),
                 new MarkerEffectInfo(),
@@ -483,7 +486,7 @@ export class Environment {
 
             //
             // Score (standard notation)
-            new EffectBarRendererFactory(Environment.StaffIdBeforeScoreAlways, [
+            new EffectBarRendererFactory(Environment._staffIdBeforeScoreAlways, [
                 new FermataEffectInfo(),
                 new BeatBarreEffectInfo(),
                 new NoteOrnamentEffectInfo(),
@@ -491,7 +494,7 @@ export class Environment {
                 new WahPedalEffectInfo()
             ]),
             new EffectBarRendererFactory(
-                Environment.StaffIdBeforeScoreHideable,
+                Environment._staffIdBeforeScoreHideable,
                 [
                     new WhammyBarEffectInfo(),
                     new TrillEffectInfo(),
@@ -509,7 +512,7 @@ export class Environment {
 
             //
             // Numbered
-            new EffectBarRendererFactory(Environment.StaffIdBeforeNumberedAlways, [
+            new EffectBarRendererFactory(Environment._staffIdBeforeNumberedAlways, [
                 new CrescendoEffectInfo(),
                 new OttaviaEffectInfo(false),
                 new DynamicsEffectInfo(),
@@ -521,9 +524,9 @@ export class Environment {
 
             //
             // Tabs
-            new EffectBarRendererFactory(Environment.StaffIdBeforeTabAlways, [new LyricsEffectInfo()]),
+            new EffectBarRendererFactory(Environment._staffIdBeforeTabAlways, [new LyricsEffectInfo()]),
             new EffectBarRendererFactory(
-                Environment.StaffIdBeforeTabHideable,
+                Environment._staffIdBeforeTabHideable,
                 [
                     // TODO: whammy line effect
                     new TrillEffectInfo(),
@@ -551,13 +554,13 @@ export class Environment {
                 (_, staff) => staff.showTablature
             ),
             new TabBarRendererFactory(),
-            new EffectBarRendererFactory(Environment.StaffIdBeforeEndAlways, [
+            new EffectBarRendererFactory(Environment._staffIdBeforeEndAlways, [
                 new GolpeEffectInfo(GolpeType.Thumb, (_s, b) => !b.voice.bar.staff.showStandardNotation)
             ])
         ];
     }
 
-    private static createDefaultStaveProfiles(): Map<StaveProfile, BarRendererFactory[]> {
+    private static _createDefaultStaveProfiles(): Map<StaveProfile, BarRendererFactory[]> {
         const staveProfiles = new Map<StaveProfile, BarRendererFactory[]>();
 
         // the general layout is repeating the same pattern across the different notation staffs:
@@ -565,17 +568,17 @@ export class Environment {
         // * effects specific to the notation renderer, hidden if the nottation renderer is hidden (`before-xxxx-hideable`)
         // * the notation renderer itself, hidden based on settings (`xxxx`)
 
-        const defaultRenderers = Environment.createDefaultRenderers();
+        const defaultRenderers = Environment._createDefaultRenderers();
         staveProfiles.set(StaveProfile.Default, defaultRenderers);
         staveProfiles.set(StaveProfile.ScoreTab, defaultRenderers);
 
         const scoreRenderers = new Set<string>([
-            Environment.StaffIdBeforeSlashAlways,
-            Environment.StaffIdBeforeScoreAlways,
-            Environment.StaffIdBeforeNumberedAlways,
-            Environment.StaffIdBeforeTabAlways,
+            Environment._staffIdBeforeSlashAlways,
+            Environment._staffIdBeforeScoreAlways,
+            Environment._staffIdBeforeNumberedAlways,
+            Environment._staffIdBeforeTabAlways,
             ScoreBarRenderer.StaffId,
-            Environment.StaffIdBeforeEndAlways
+            Environment._staffIdBeforeEndAlways
         ]);
         staveProfiles.set(
             StaveProfile.Score,
@@ -583,16 +586,16 @@ export class Environment {
         );
 
         const tabRenderers = new Set<string>([
-            Environment.StaffIdBeforeSlashAlways,
-            Environment.StaffIdBeforeScoreAlways,
-            Environment.StaffIdBeforeNumberedAlways,
-            Environment.StaffIdBeforeTabAlways,
+            Environment._staffIdBeforeSlashAlways,
+            Environment._staffIdBeforeScoreAlways,
+            Environment._staffIdBeforeNumberedAlways,
+            Environment._staffIdBeforeTabAlways,
             TabBarRenderer.StaffId,
-            Environment.StaffIdBeforeEndAlways
+            Environment._staffIdBeforeEndAlways
         ]);
         staveProfiles.set(
             StaveProfile.Tab,
-            Environment.createDefaultRenderers().filter(r => {
+            Environment._createDefaultRenderers().filter(r => {
                 if (r instanceof TabBarRendererFactory) {
                     const tab = r as TabBarRendererFactory;
                     tab.showTimeSignature = true;
@@ -605,7 +608,7 @@ export class Environment {
 
         staveProfiles.set(
             StaveProfile.TabMixed,
-            Environment.createDefaultRenderers().filter(r => {
+            Environment._createDefaultRenderers().filter(r => {
                 if (r instanceof TabBarRendererFactory) {
                     const tab = r as TabBarRendererFactory;
                     tab.showTimeSignature = false;
@@ -619,7 +622,7 @@ export class Environment {
         return staveProfiles;
     }
 
-    private static createDefaultLayoutEngines(): Map<LayoutMode, LayoutEngineFactory> {
+    private static _createDefaultLayoutEngines(): Map<LayoutMode, LayoutEngineFactory> {
         const engines = new Map<LayoutMode, LayoutEngineFactory>();
         // default layout engines
         engines.set(
@@ -650,8 +653,8 @@ export class Environment {
 
         // browser polyfills
         if (Environment.webPlatform === WebPlatform.Browser || Environment.webPlatform === WebPlatform.BrowserModule) {
-            Environment.registerJQueryPlugin();
-            Environment.HighDpiFactor = window.devicePixelRatio;
+            Environment._registerJQueryPlugin();
+            Environment.highDpiFactor = window.devicePixelRatio;
         }
 
         Environment.createWebWorker = createWebWorker;
@@ -707,7 +710,7 @@ export class Environment {
     /**
      * @target web
      */
-    private static detectWebPack(): boolean {
+    private static _detectWebPack(): boolean {
         try {
             // @ts-expect-error
             if (typeof __webpack_require__ === 'function') {
@@ -722,7 +725,7 @@ export class Environment {
     /**
      * @target web
      */
-    private static detectVite(): boolean {
+    private static _detectVite(): boolean {
         try {
             // @ts-expect-error
             if (typeof __BASE__ === 'string') {
@@ -737,7 +740,7 @@ export class Environment {
     /**
      * @target web
      */
-    private static detectWebPlatform(): WebPlatform {
+    private static _detectWebPlatform(): WebPlatform {
         // There might be polyfills or platforms like Electron which have a global process object defined even in the browser.
         // We need to differenciate between those platforms and a real nodejs
 
@@ -790,15 +793,15 @@ export class Environment {
                   Logger.debug('VersionInfo', message);
               };
         VersionInfo.print(printer);
-        printer(`High DPI: ${Environment.HighDpiFactor}`);
-        Environment.printPlatformInfo(printer);
+        printer(`High DPI: ${Environment.highDpiFactor}`);
+        Environment._printPlatformInfo(printer);
     }
 
     /**
      * @target web
      * @partial
      */
-    private static printPlatformInfo(print: (message: string) => void) {
+    private static _printPlatformInfo(print: (message: string) => void) {
         print(`Platform: ${WebPlatform[Environment.webPlatform]}`);
         print(`WebPack: ${Environment.isWebPackBundled}`);
         print(`Vite: ${Environment.isViteBundled}`);

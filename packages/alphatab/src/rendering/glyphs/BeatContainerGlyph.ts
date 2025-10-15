@@ -16,6 +16,9 @@ import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 
+/**
+ * @internal
+ */
 export class BeatContainerGlyph extends Glyph {
     public voiceContainer: VoiceContainerGlyph;
     public beat: Beat;

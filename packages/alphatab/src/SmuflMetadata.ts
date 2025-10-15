@@ -1,6 +1,7 @@
 /**
  * https://w3c.github.io/smufl/latest/specification/engravingdefaults.html
  * @record
+ * @public
  */
 export interface SmuflEngravingDefaults {
     arrowShaftThickness: number;
@@ -36,6 +37,7 @@ export interface SmuflEngravingDefaults {
 /**
  * https://w3c.github.io/smufl/latest/specification/glyphbboxes.html
  * @record
+ * @public
  */
 export interface SmuflGlyphBoundingBox {
     bBoxNE: [number, number];
@@ -45,6 +47,7 @@ export interface SmuflGlyphBoundingBox {
 /**
  * https://w3c.github.io/smufl/latest/specification/glyphswithanchors.html#glyphswithanchors
  * @record
+ * @public
  */
 export interface SmuflGlyphWithAnchor {
     splitStemUpSE?: [number, number];
@@ -75,6 +78,7 @@ export interface SmuflGlyphWithAnchor {
  * The SmuFL Metadata object describing the structure needed by alphaTab.
  * https://w3c.github.io/smufl/latest/specification/font-specific-metadata.html
  * @record
+ * @public
  */
 export interface SmuflMetadata {
     engravingDefaults: SmuflEngravingDefaults;

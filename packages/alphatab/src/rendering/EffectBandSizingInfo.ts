@@ -1,6 +1,9 @@
 import type { EffectBand } from '@src/rendering/EffectBand';
 import { EffectBandSlot } from '@src/rendering/EffectBandSlot';
 
+/**
+ * @internal
+ */
 export class EffectBandSizingInfo {
     private _effectSlot: Map<string, EffectBandSlot>;
     public slots: EffectBandSlot[];

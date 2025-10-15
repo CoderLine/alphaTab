@@ -1,5 +1,6 @@
 /**
  * Lists all midi controllers.
+ * @public
  */
 export enum ControllerType {
     /**

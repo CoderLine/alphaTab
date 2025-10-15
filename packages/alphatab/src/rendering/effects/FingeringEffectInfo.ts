@@ -10,6 +10,9 @@ import type { Settings } from '@src/Settings';
 import { FingeringGroupGlyph } from '@src/rendering/glyphs/FingeringGroupGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
+/**
+ * @internal
+ */
 export class FingeringEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectFingering;

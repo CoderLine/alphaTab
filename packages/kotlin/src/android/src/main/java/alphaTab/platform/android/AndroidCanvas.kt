@@ -84,15 +84,15 @@ internal class AndroidCanvas : ICanvas {
 
     override fun beginRender(width: Double, height: Double) {
         val newImage = Bitmap.createBitmap(
-            (width * Environment.HighDpiFactor).toInt(),
-            (height * Environment.HighDpiFactor).toInt(),
+            (width * Environment.highDpiFactor).toInt(),
+            (height * Environment.highDpiFactor).toInt(),
             Bitmap.Config.ARGB_8888
         )
         newImage.isPremultiplied = true
 
         _surface = newImage
         _canvas = Canvas(_surface!!)
-        _canvas!!.scale(Environment.HighDpiFactor.toFloat(), Environment.HighDpiFactor.toFloat())
+        _canvas!!.scale(Environment.highDpiFactor.toFloat(), Environment.highDpiFactor.toFloat())
         _path?.close()
 
         textBaseline = TextBaseline.Top

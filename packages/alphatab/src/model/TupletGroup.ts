@@ -4,26 +4,27 @@ import type { Voice } from '@src/model/Voice';
 
 /**
  * Represents a list of beats that are grouped within the same tuplet.
+ * @public
  */
 export class TupletGroup {
-    private static readonly HalfTicks: number = 1920;
-    private static readonly QuarterTicks: number = 960;
-    private static readonly EighthTicks: number = 480;
-    private static readonly SixteenthTicks: number = 240;
-    private static readonly ThirtySecondTicks: number = 120;
-    private static readonly SixtyFourthTicks: number = 60;
-    private static readonly OneHundredTwentyEighthTicks: number = 30;
-    private static readonly TwoHundredFiftySixthTicks: number = 15;
+    private static readonly _halfTicks: number = 1920;
+    private static readonly _quarterTicks: number = 960;
+    private static readonly _eighthTicks: number = 480;
+    private static readonly _sixteenthTicks: number = 240;
+    private static readonly _thirtySecondTicks: number = 120;
+    private static readonly _sixtyFourthTicks: number = 60;
+    private static readonly _oneHundredTwentyEighthTicks: number = 30;
+    private static readonly _twoHundredFiftySixthTicks: number = 15;
 
-    private static AllTicks: number[] = [
-        TupletGroup.HalfTicks,
-        TupletGroup.QuarterTicks,
-        TupletGroup.EighthTicks,
-        TupletGroup.SixteenthTicks,
-        TupletGroup.ThirtySecondTicks,
-        TupletGroup.SixtyFourthTicks,
-        TupletGroup.OneHundredTwentyEighthTicks,
-        TupletGroup.TwoHundredFiftySixthTicks
+    private static _allTicks: number[] = [
+        TupletGroup._halfTicks,
+        TupletGroup._quarterTicks,
+        TupletGroup._eighthTicks,
+        TupletGroup._sixteenthTicks,
+        TupletGroup._thirtySecondTicks,
+        TupletGroup._sixtyFourthTicks,
+        TupletGroup._oneHundredTwentyEighthTicks,
+        TupletGroup._twoHundredFiftySixthTicks
     ];
 
     private _isEqualLengthTuplet: boolean = true;
@@ -92,7 +93,7 @@ export class TupletGroup {
             }
         } else {
             const factor: number = (this.beats[0].tupletNumerator / this.beats[0].tupletDenominator) | 0;
-            for (const potentialMatch of TupletGroup.AllTicks) {
+            for (const potentialMatch of TupletGroup._allTicks) {
                 if (this.totalDuration === potentialMatch * factor) {
                     this.isFull = true;
                     break;

@@ -5,6 +5,9 @@
 // </auto-generated>
 import { Automation } from "@src/model/Automation";
 import { SyncPointDataCloner } from "@src/generated/model/SyncPointDataCloner";
+/**
+ * @internal
+ */
 export class AutomationCloner {
     public static clone(original: Automation): Automation {
         const clone = new Automation();

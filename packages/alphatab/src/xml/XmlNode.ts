@@ -21,6 +21,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+/**
+ * @internal
+ */
 export enum XmlNodeType {
     None = 0,
     Element = 1,
@@ -31,6 +34,9 @@ export enum XmlNodeType {
     Comment = 6
 }
 
+/**
+ * @internal
+ */
 export class XmlNode {
     public nodeType: XmlNodeType = XmlNodeType.None;
     public localName: string | null = null;
@@ -65,17 +71,17 @@ export class XmlNode {
 
     public getElementsByTagName(name: string, recursive: boolean = false): XmlNode[] {
         const tags: XmlNode[] = [];
-        this.searchElementsByTagName(this.childNodes, tags, name, recursive);
+        this._searchElementsByTagName(this.childNodes, tags, name, recursive);
         return tags;
     }
 
-    private searchElementsByTagName(all: XmlNode[], result: XmlNode[], name: string, recursive: boolean = false): void {
+    private _searchElementsByTagName(all: XmlNode[], result: XmlNode[], name: string, recursive: boolean = false): void {
         for (const c of all) {
             if (c && c.nodeType === XmlNodeType.Element && c.localName === name) {
                 result.push(c);
             }
             if (recursive) {
-                this.searchElementsByTagName(c.childNodes, result, name, true);
+                this._searchElementsByTagName(c.childNodes, result, name, true);
             }
         }
     }

@@ -71,7 +71,10 @@ export default abstract class AstPrinterBase {
         }
     }
 
-    protected writeCommaSeparated<T>(values: T[], write: (p: T) => void, newLine: boolean = false) {
+    protected writeCommaSeparated<T>(values: T[], write: (p: T) => void, newLine?: boolean) {
+        if(newLine === undefined) {
+            newLine = values.length > 5;
+        }
         values.forEach((v, i) => {
             if (i > 0) {
                 this.write(', ');

@@ -2,12 +2,18 @@ import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import type { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 
+/**
+ * @internal
+ */
 class AccidentalColumnInfo {
     public x: number = 0;
     public y: number = -3000;
     public width: number = 0;
 }
 
+/**
+ * @internal
+ */
 export class AccidentalGroupGlyph extends GlyphGroup {
     public constructor() {
         super(0, 0);

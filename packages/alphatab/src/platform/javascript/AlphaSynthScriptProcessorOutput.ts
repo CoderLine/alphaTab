@@ -2,12 +2,11 @@ import { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
 import { AlphaSynthWebAudioOutputBase } from '@src/platform/javascript/AlphaSynthWebAudioOutputBase';
 import { SynthConstants } from '@src/synth/SynthConstants';
 
-// tslint:disable: deprecation
-
 /**
  * This class implements a HTML5 Web Audio API based audio output device
  * for alphaSynth using the legacy ScriptProcessor node.
  * @target web
+ * @internal
  */
 export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBase {
     private _audioNode: ScriptProcessorNode | null = null;
@@ -26,17 +25,17 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
 
     public override play(): void {
         super.play();
-        const ctx = this._context!;
+        const ctx = this.context!;
         // create a script processor node which will replace the silence with the generated audio
         this._audioNode = ctx.createScriptProcessor(4096, 0, 2);
-        this._audioNode.onaudioprocess = this.generateSound.bind(this);
+        this._audioNode.onaudioprocess = this._generateSound.bind(this);
         this._circularBuffer.clear();
-        this.requestBuffers();
-        this._source = ctx.createBufferSource();
-        this._source.buffer = this._buffer;
-        this._source.loop = true;
-        this._source.connect(this._audioNode, 0, 0);
-        this._source.start(0);
+        this._requestBuffers();
+        this.source = ctx.createBufferSource();
+        this.source.buffer = this.buffer;
+        this.source.loop = true;
+        this.source.connect(this._audioNode, 0, 0);
+        this.source.start(0);
         this._audioNode.connect(ctx.destination, 0, 0);
     }
 
@@ -57,7 +56,7 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
         this._circularBuffer.clear();
     }
 
-    private requestBuffers(): void {
+    private _requestBuffers(): void {
         // if we fall under the half of buffers
         // we request one half
         const halfBufferCount = (this._bufferCount / 2) | 0;
@@ -76,7 +75,7 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
     }
 
     private _outputBuffer: Float32Array = new Float32Array(0);
-    private generateSound(e: AudioProcessingEvent): void {
+    private _generateSound(e: AudioProcessingEvent): void {
         const left: Float32Array = e.outputBuffer.getChannelData(0);
         const right: Float32Array = e.outputBuffer.getChannelData(1);
         const samples: number = left.length + right.length;
@@ -104,6 +103,6 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
         }
 
         this.onSamplesPlayed(samplesFromBuffer / SynthConstants.AudioChannels);
-        this.requestBuffers();
+        this._requestBuffers();
     }
 }

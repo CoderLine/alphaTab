@@ -2,6 +2,7 @@ import type { Beat } from '@src/model/Beat';
 
 /**
  * Represents a beat and when it is actually played according to the generated audio.
+ * @public
  */
 export class BeatTickLookupItem {
     /**
@@ -22,6 +23,7 @@ export class BeatTickLookupItem {
 
 /**
  * Represents the time period, for which one or multiple {@link Beat}s are played
+ * @public
  */
 export class BeatTickLookup {
     private _highlightedBeats: Map<number, boolean> = new Map();

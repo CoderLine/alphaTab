@@ -1,5 +1,6 @@
 /**
  * Lists all stave profiles controlling which staves are shown.
+ * @public
  */
 export enum StaveProfile {
     /**

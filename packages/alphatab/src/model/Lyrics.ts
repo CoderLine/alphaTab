@@ -1,3 +1,6 @@
+/**
+ * @internal
+ */
 enum LyricsState {
     IgnoreSpaces = 0,
     Begin = 1,
@@ -8,15 +11,16 @@ enum LyricsState {
 
 /**
  * Represents the lyrics of a song.
+ * @public
  */
 export class Lyrics {
-    private static readonly CharCodeLF: number = 10;
-    private static readonly CharCodeTab: number = 9;
-    private static readonly CharCodeCR: number = 13;
-    private static readonly CharCodeSpace: number = 32;
-    private static readonly CharCodeBrackedClose: number = 93;
-    private static readonly CharCodeBrackedOpen: number = 91;
-    private static readonly CharCodeDash: number = 45;
+    private static readonly _charCodeLF: number = 10;
+    private static readonly _charCodeTab: number = 9;
+    private static readonly _charCodeCR: number = 13;
+    private static readonly _charCodeSpace: number = 32;
+    private static readonly _charCodeBrackedClose: number = 93;
+    private static readonly _charCodeBrackedOpen: number = 91;
+    private static readonly _charCodeDash: number = 45;
 
     /**
      * Gets or sets he start bar on which the lyrics should begin.
@@ -36,10 +40,10 @@ export class Lyrics {
 
     public finish(skipEmptyEntries: boolean = false): void {
         this.chunks = [];
-        this.parse(this.text, 0, this.chunks, skipEmptyEntries);
+        this._parse(this.text, 0, this.chunks, skipEmptyEntries);
     }
 
-    private parse(str: string, p: number, _chunks: string[], skipEmptyEntries: boolean): void {
+    private _parse(str: string, p: number, _chunks: string[], skipEmptyEntries: boolean): void {
         if (!str) {
             return;
         }
@@ -54,11 +58,11 @@ export class Lyrics {
             switch (state) {
                 case LyricsState.IgnoreSpaces:
                     switch (c) {
-                        case Lyrics.CharCodeLF:
-                        case Lyrics.CharCodeCR:
-                        case Lyrics.CharCodeTab:
+                        case Lyrics._charCodeLF:
+                        case Lyrics._charCodeCR:
+                        case Lyrics._charCodeTab:
                             break;
-                        case Lyrics.CharCodeSpace:
+                        case Lyrics._charCodeSpace:
                             if (!skipSpace) {
                                 state = next;
                                 continue;
@@ -72,7 +76,7 @@ export class Lyrics {
                     break;
                 case LyricsState.Begin:
                     switch (c) {
-                        case Lyrics.CharCodeBrackedOpen:
+                        case Lyrics._charCodeBrackedOpen:
                             state = LyricsState.Comment;
                             break;
                         default:
@@ -83,21 +87,21 @@ export class Lyrics {
                     break;
                 case LyricsState.Comment:
                     switch (c) {
-                        case Lyrics.CharCodeBrackedClose:
+                        case Lyrics._charCodeBrackedClose:
                             state = LyricsState.Begin;
                             break;
                     }
                     break;
                 case LyricsState.Text:
                     switch (c) {
-                        case Lyrics.CharCodeDash:
+                        case Lyrics._charCodeDash:
                             state = LyricsState.Dash;
                             break;
-                        case Lyrics.CharCodeCR:
-                        case Lyrics.CharCodeLF:
-                        case Lyrics.CharCodeSpace:
+                        case Lyrics._charCodeCR:
+                        case Lyrics._charCodeLF:
+                        case Lyrics._charCodeSpace:
                             const txt: string = str.substr(start, p - start);
-                            this.addChunk(txt, skipEmptyEntries);
+                            this._addChunk(txt, skipEmptyEntries);
                             state = LyricsState.IgnoreSpaces;
                             next = LyricsState.Begin;
                             break;
@@ -105,11 +109,11 @@ export class Lyrics {
                     break;
                 case LyricsState.Dash:
                     switch (c) {
-                        case Lyrics.CharCodeDash:
+                        case Lyrics._charCodeDash:
                             break;
                         default:
                             const txt: string = str.substr(start, p - start);
-                            this.addChunk(txt, skipEmptyEntries);
+                            this._addChunk(txt, skipEmptyEntries);
                             skipSpace = true;
                             state = LyricsState.IgnoreSpaces;
                             next = LyricsState.Begin;
@@ -122,18 +126,18 @@ export class Lyrics {
 
         if (state === LyricsState.Text) {
             if (p !== start) {
-                this.addChunk(str.substr(start, p - start), skipEmptyEntries);
+                this._addChunk(str.substr(start, p - start), skipEmptyEntries);
             }
         }
     }
-    private addChunk(txt: string, skipEmptyEntries: boolean) {
-        txt = this.prepareChunk(txt);
+    private _addChunk(txt: string, skipEmptyEntries: boolean) {
+        txt = this._prepareChunk(txt);
         if (!skipEmptyEntries || (txt.length > 0 && txt !== '-')) {
             this.chunks.push(txt);
         }
     }
 
-    private prepareChunk(txt: string): string {
+    private _prepareChunk(txt: string): string {
         const chunk = txt.split('+').join(' ');
 
         // trim off trailing _ like "You____" becomes "You"

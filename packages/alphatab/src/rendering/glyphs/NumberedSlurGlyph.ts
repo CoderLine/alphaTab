@@ -4,6 +4,9 @@ import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
+/**
+ * @internal
+ */
 export class NumberedSlurGlyph extends TabTieGlyph {
     private _direction: BeamDirection;
     private _forSlide: boolean;

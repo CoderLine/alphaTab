@@ -2,6 +2,7 @@
  * All settings related to exporters that encode file formats.
  * @json
  * @json_declaration
+ * @public
  */
 export class ExporterSettings {
     /**

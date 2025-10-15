@@ -2,6 +2,9 @@ import type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
 import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { SynthConstants } from '@src/synth/SynthConstants';
 
+/**
+ * @internal
+ */
 export class TestOutput implements ISynthOutput {
     public samples: Float32Array[] = [];
     public sampleCount: number = 0;

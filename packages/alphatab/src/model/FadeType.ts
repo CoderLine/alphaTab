@@ -1,5 +1,6 @@
 /**
  * Lists the different fade types.
+ * @public
  */
 export enum FadeType {
     /**

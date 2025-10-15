@@ -34,11 +34,17 @@ import type { Track } from '@src/model/Track';
 //                       | if no bits set -> activate standard notation
 //
 
+/**
+ * @internal
+ */
 class PartConfigurationScoreView {
     public isMultiRest: boolean = false;
     public trackViewGroups: PartConfigurationTrackViewGroup[] = [];
 }
 
+/**
+ * @internal
+ */
 class PartConfigurationTrackViewGroup {
     public showNumbered: boolean = false;
     public showSlash: boolean = false;
@@ -46,6 +52,9 @@ class PartConfigurationTrackViewGroup {
     public showTablature: boolean = false;
 }
 
+/**
+ * @internal
+ */
 export class PartConfiguration {
     public scoreViews: PartConfigurationScoreView[] = [];
 

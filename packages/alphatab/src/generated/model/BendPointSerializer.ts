@@ -5,6 +5,9 @@
 // </auto-generated>
 import { BendPoint } from "@src/model/BendPoint";
 import { JsonHelper } from "@src/io/JsonHelper";
+/**
+ * @internal
+ */
 export class BendPointSerializer {
     public static fromJson(obj: BendPoint, m: unknown): void {
         if (!m) {

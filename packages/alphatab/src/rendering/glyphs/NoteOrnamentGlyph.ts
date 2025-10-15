@@ -2,13 +2,16 @@ import { NoteOrnament } from '@src/model/NoteOrnament';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 export class NoteOrnamentGlyph extends MusicFontGlyph {
     constructor(ornament: NoteOrnament) {
-        super(0, 0, 1, NoteOrnamentGlyph.getSymbol(ornament));
+        super(0, 0, 1, NoteOrnamentGlyph._getSymbol(ornament));
         this.center = true;
     }
 
-    private static getSymbol(ornament: NoteOrnament): MusicFontSymbol {
+    private static _getSymbol(ornament: NoteOrnament): MusicFontSymbol {
         switch (ornament) {
             case NoteOrnament.InvertedTurn:
                 return MusicFontSymbol.OrnamentTurnInverted;

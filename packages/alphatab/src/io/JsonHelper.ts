@@ -2,6 +2,7 @@ import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 /**
  * @partial
+ * @internal
  */
 export class JsonHelper {
     /**

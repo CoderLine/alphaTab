@@ -6,6 +6,9 @@
 import { SustainPedalMarker } from "@src/model/Bar";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { SustainPedalMarkerType } from "@src/model/Bar";
+/**
+ * @internal
+ */
 export class SustainPedalMarkerSerializer {
     public static fromJson(obj: SustainPedalMarker, m: unknown): void {
         if (!m) {

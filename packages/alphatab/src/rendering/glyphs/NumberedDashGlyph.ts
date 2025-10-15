@@ -3,6 +3,9 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { type Beat, BeatSubElement } from '@src/model/Beat';
 import type { ICanvas } from '@src/platform/ICanvas';
 
+/**
+ * @internal
+ */
 export class NumberedDashGlyph extends Glyph {
     private _beat: Beat;
 

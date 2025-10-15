@@ -14,6 +14,9 @@ import { MasterBar } from "@src/model/MasterBar";
 import { Track } from "@src/model/Track";
 import { BackingTrack } from "@src/model/BackingTrack";
 import { ScoreStyle } from "@src/model/Score";
+/**
+ * @internal
+ */
 export class ScoreSerializer {
     public static fromJson(obj: Score, m: unknown): void {
         if (!m) {

@@ -4,6 +4,7 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 /**
  * Effect-Glyphs implementing this public interface get notified
  * as they are expanded over multiple beats.
+ * @internal
  */
 export class EffectGlyph extends Glyph {
     /**

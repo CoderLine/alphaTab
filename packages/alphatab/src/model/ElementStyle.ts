@@ -3,6 +3,7 @@ import type { Color } from '@src/model/Color';
 
 /**
  * Defines the custom styles for an element in the music sheet (like bars, voices, notes etc).
+ * @public
  */
 export class ElementStyle<TSubElements extends number> {
     /**

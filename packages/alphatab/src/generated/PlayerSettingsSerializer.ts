@@ -10,6 +10,9 @@ import { SlidePlaybackSettingsSerializer } from "@src/generated/SlidePlaybackSet
 import { PlayerOutputMode } from "@src/PlayerSettings";
 import { PlayerMode } from "@src/PlayerSettings";
 import { ScrollMode } from "@src/PlayerSettings";
+/**
+ * @internal
+ */
 export class PlayerSettingsSerializer {
     public static fromJson(obj: PlayerSettings, m: unknown): void {
         if (!m) {

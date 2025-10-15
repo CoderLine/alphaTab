@@ -15,7 +15,7 @@ internal class FontSizesPartials {
         @ExperimentalUnsignedTypes
         @ExperimentalContracts
         public fun generateFontLookup(family: String) {
-            if (FontSizes.FontSizeLookupTables.has(family)) {
+            if (FontSizes.fontSizeLookupTables.has(family)) {
                 return
             }
 
@@ -50,17 +50,17 @@ internal class FontSizesPartials {
                         canvas.endRender().close()
                     }
 
-                    FontSizes.FontSizeLookupTables.set(
+                    FontSizes.fontSizeLookupTables.set(
                         family,
                         FontSizeDefinition(Uint8Array(widths), Uint8Array(heights))
                     )
                 } else {
                     Logger.warning("Rendering", "Generating font lookup before alphaSkia init, SVG sizes will be wrong")
-                    FontSizes.FontSizeLookupTables.set(family, FontSizeDefinition(Uint8Array(ubyteArrayOf((8).toUByte())), Uint8Array(ubyteArrayOf((10).toUByte()))))
+                    FontSizes.fontSizeLookupTables.set(family, FontSizeDefinition(Uint8Array(ubyteArrayOf((8).toUByte())), Uint8Array(ubyteArrayOf((10).toUByte()))))
                 }
             } catch (e: Throwable) {
                 Logger.error("Rendering", "Error while generating font lookup $e ${e.stackTraceToString()}")
-                FontSizes.FontSizeLookupTables.set(family, FontSizeDefinition(Uint8Array(ubyteArrayOf((8).toUByte())), Uint8Array(ubyteArrayOf((10).toUByte()))))
+                FontSizes.fontSizeLookupTables.set(family, FontSizeDefinition(Uint8Array(ubyteArrayOf((8).toUByte())), Uint8Array(ubyteArrayOf((10).toUByte()))))
             }
         }
     }

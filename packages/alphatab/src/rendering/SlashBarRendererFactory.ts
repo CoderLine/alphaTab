@@ -9,6 +9,7 @@ import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
 
 /**
  * This Factory produces SlashBarRenderer instances
+ * @internal
  */
 export class SlashBarRendererFactory extends BarRendererFactory {
     public get staffId(): string {

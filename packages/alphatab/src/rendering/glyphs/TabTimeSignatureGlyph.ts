@@ -3,6 +3,9 @@ import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { BarSubElement } from '@src/model/Bar';
 
+/**
+ * @internal
+ */
 export class TabTimeSignatureGlyph extends TimeSignatureGlyph {
     public override doLayout(): void {
         this.barSubElement = BarSubElement.GuitarTabsTimeSignature;

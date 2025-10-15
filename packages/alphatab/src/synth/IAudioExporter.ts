@@ -4,6 +4,7 @@ import type { PlaybackRange } from '@src/synth/PlaybackRange';
 
 /**
  * The options controlling how to export the audio.
+ * @public
  */
 export class AudioExportOptions {
     /**
@@ -73,6 +74,7 @@ export class AudioExportOptions {
 
 /**
  * Represents a single chunk of audio produced.
+ * @public
  */
 export class AudioExportChunk {
     /**
@@ -103,6 +105,7 @@ export class AudioExportChunk {
 
 /**
  * A exporter which can be used to obtain the synthesized audio for custom processing.
+ * @public
  */
 export interface IAudioExporter extends Disposable {
     /**
@@ -129,6 +132,7 @@ export interface IAudioExporter extends Disposable {
  * This is the internal worker interface implemented by IAudioExporters and consists
  * of the internal APIs needed to spawn new exporters. Its mainly used to simplify
  * the public API visible when using exporters.
+ * @public
  */
 export interface IAudioExporterWorker extends IAudioExporter {
     /**

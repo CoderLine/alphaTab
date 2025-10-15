@@ -7,6 +7,9 @@ import { VoiceStyle } from "@src/model/Voice";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { VoiceSubElement } from "@src/model/Voice";
 import { Color } from "@src/model/Color";
+/**
+ * @internal
+ */
 export class VoiceStyleSerializer {
     public static fromJson(obj: VoiceStyle, m: unknown): void {
         if (!m) {

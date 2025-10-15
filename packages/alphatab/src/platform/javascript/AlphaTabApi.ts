@@ -17,6 +17,7 @@ import { FileLoadError } from '@src/FileLoadError';
 
 /**
  * @target web
+ * @public
  */
 export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
     /**
@@ -201,7 +202,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * @inheritdoc
      */
     public override changeTrackMute(tracks: Track[], mute: boolean): void {
-        const trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
+        const trackList: Track[] = this._trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
         super.changeTrackMute(trackList, mute);
     }
 
@@ -209,7 +210,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * @inheritdoc
      */
     public override changeTrackSolo(tracks: Track[], solo: boolean): void {
-        const trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
+        const trackList: Track[] = this._trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
         super.changeTrackSolo(trackList, solo);
     }
 
@@ -217,11 +218,11 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * @inheritdoc
      */
     public override changeTrackVolume(tracks: Track[], volume: number): void {
-        const trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
+        const trackList: Track[] = this._trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
         super.changeTrackVolume(trackList, volume);
     }
 
-    private trackIndexesToTracks(trackIndexes: number[]): Track[] {
+    private _trackIndexesToTracks(trackIndexes: number[]): Track[] {
         if (!this.score) {
             return [];
         }
