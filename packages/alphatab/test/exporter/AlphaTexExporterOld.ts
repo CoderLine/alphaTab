@@ -260,7 +260,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         return writer.tex;
     }
 
-    private _writeScoreTo(writer: AlphaTexWriter, score: Score) {
+    private _writeScoreTo(writer: AlphaTexWriterOld, score: Score) {
         writer.writeSingleLineComment('Score Metadata');
         writer.writeStringMeta('album', score.album);
         writer.writeStringMeta('artist', score.artist);
@@ -278,7 +278,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         }
         writer.writeLine();
 
-        if (score.defaultSystemsLayout !== AlphaTexExporter._defaultScore.defaultSystemsLayout) {
+        if (score.defaultSystemsLayout !== AlphaTexExporterOld._defaultScore.defaultSystemsLayout) {
             writer.writeMeta('defaultSystemsLayout', `${score.defaultSystemsLayout}`);
         }
         if (score.systemsLayout.length > 0) {
@@ -309,12 +309,12 @@ export class AlphaTexExporterOld extends ScoreExporter {
         }
     }
 
-    private _writeStyleSheetTo(writer: AlphaTexWriter, stylesheet: RenderStylesheet) {
+    private _writeStyleSheetTo(writer: AlphaTexWriterOld, stylesheet: RenderStylesheet) {
         writer.writeSingleLineComment('Score Stylesheet');
         if (stylesheet.hideDynamics) {
             writer.writeMeta('hideDynamics');
         }
-        if (stylesheet.bracketExtendMode !== AlphaTexExporter._defaultScore.stylesheet.bracketExtendMode) {
+        if (stylesheet.bracketExtendMode !== AlphaTexExporterOld._defaultScore.stylesheet.bracketExtendMode) {
             writer.writeMeta('bracketExtendMode', BracketExtendMode[stylesheet.bracketExtendMode]);
         }
         if (stylesheet.useSystemSignSeparator) {
@@ -325,26 +325,26 @@ export class AlphaTexExporterOld extends ScoreExporter {
         }
         if (
             stylesheet.singleTrackTrackNamePolicy !==
-            AlphaTexExporter._defaultScore.stylesheet.singleTrackTrackNamePolicy
+            AlphaTexExporterOld._defaultScore.stylesheet.singleTrackTrackNamePolicy
         ) {
             writer.writeMeta('singleTrackTrackNamePolicy', TrackNamePolicy[stylesheet.singleTrackTrackNamePolicy]);
         }
         if (
-            stylesheet.multiTrackTrackNamePolicy !== AlphaTexExporter._defaultScore.stylesheet.multiTrackTrackNamePolicy
+            stylesheet.multiTrackTrackNamePolicy !== AlphaTexExporterOld._defaultScore.stylesheet.multiTrackTrackNamePolicy
         ) {
             writer.writeMeta('multiTrackTrackNamePolicy', TrackNamePolicy[stylesheet.multiTrackTrackNamePolicy]);
         }
-        if (stylesheet.firstSystemTrackNameMode !== AlphaTexExporter._defaultScore.stylesheet.firstSystemTrackNameMode) {
+        if (stylesheet.firstSystemTrackNameMode !== AlphaTexExporterOld._defaultScore.stylesheet.firstSystemTrackNameMode) {
             writer.writeMeta('firstSystemTrackNameMode', TrackNameMode[stylesheet.firstSystemTrackNameMode]);
         }
         if (
-            stylesheet.otherSystemsTrackNameMode !== AlphaTexExporter._defaultScore.stylesheet.otherSystemsTrackNameMode
+            stylesheet.otherSystemsTrackNameMode !== AlphaTexExporterOld._defaultScore.stylesheet.otherSystemsTrackNameMode
         ) {
             writer.writeMeta('otherSystemsTrackNameMode', TrackNameMode[stylesheet.otherSystemsTrackNameMode]);
         }
         if (
             stylesheet.firstSystemTrackNameOrientation !==
-            AlphaTexExporter._defaultScore.stylesheet.firstSystemTrackNameOrientation
+            AlphaTexExporterOld._defaultScore.stylesheet.firstSystemTrackNameOrientation
         ) {
             writer.writeMeta(
                 'firstSystemTrackNameOrientation',
@@ -353,7 +353,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         }
         if (
             stylesheet.otherSystemsTrackNameOrientation !==
-            AlphaTexExporter._defaultScore.stylesheet.otherSystemsTrackNameOrientation
+            AlphaTexExporterOld._defaultScore.stylesheet.otherSystemsTrackNameOrientation
         ) {
             writer.writeMeta(
                 'otherSystemsTrackNameOrientation',
@@ -371,7 +371,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         // 'pertrackmultibarrest',
     }
 
-    private _writeTrackTo(writer: AlphaTexWriter, track: Track) {
+    private _writeTrackTo(writer: AlphaTexWriterOld, track: Track) {
         writer.write('\\track ');
         writer.writeString(track.name);
         if (track.shortName.length > 0) {
@@ -383,12 +383,12 @@ export class AlphaTexExporterOld extends ScoreExporter {
 
         writer.writeSingleLineComment('Track Properties');
 
-        if (track.color.rgba !== AlphaTexExporter._defaultTrack.color.rgba) {
+        if (track.color.rgba !== AlphaTexExporterOld._defaultTrack.color.rgba) {
             writer.write(` color `);
             writer.writeString(track.color.rgba);
             writer.writeLine();
         }
-        if (track.defaultSystemsLayout !== AlphaTexExporter._defaultTrack.defaultSystemsLayout) {
+        if (track.defaultSystemsLayout !== AlphaTexExporterOld._defaultTrack.defaultSystemsLayout) {
             writer.write(` defaultSystemsLayout ${track.defaultSystemsLayout}`);
             writer.writeLine();
         }
@@ -437,7 +437,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         writer.outdent();
     }
 
-    private _writeStaffTo(writer: AlphaTexWriter, staff: Staff) {
+    private _writeStaffTo(writer: AlphaTexWriterOld, staff: Staff) {
         writer.write('\\staff ');
 
         writer.beginGroup('{', '}', 'Staff Properties');
@@ -487,7 +487,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         writer.outdent();
     }
 
-    private _writeBarTo(writer: AlphaTexWriter, bar: Bar, voiceIndex: number) {
+    private _writeBarTo(writer: AlphaTexWriterOld, bar: Bar, voiceIndex: number) {
         if (bar.index > 0) {
             writer.writeLine('|');
         }
@@ -530,7 +530,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         writer.outdent();
     }
 
-    private _writeStaffMetaTo(writer: AlphaTexWriter, staff: Staff) {
+    private _writeStaffMetaTo(writer: AlphaTexWriterOld, staff: Staff) {
         writer.writeSingleLineComment(`Staff ${staff.index + 1} Metadata`);
 
         if (staff.capo !== 0) {
@@ -579,7 +579,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         }
     }
 
-    private _writeChordTo(writer: AlphaTexWriter, c: Chord) {
+    private _writeChordTo(writer: AlphaTexWriterOld, c: Chord) {
         writer.write('\\chord {');
         if (c.firstFret > 0) {
             writer.write(`firstfret ${c.firstFret} `);
@@ -602,7 +602,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         writer.writeLine();
     }
 
-    private _writeMasterBarMetaTo(writer: AlphaTexWriter, masterBar: MasterBar) {
+    private _writeMasterBarMetaTo(writer: AlphaTexWriterOld, masterBar: MasterBar) {
         writer.writeSingleLineComment(`Masterbar ${masterBar.index + 1} Metadata`, true);
 
         if (masterBar.alternateEndings !== 0) {
@@ -693,7 +693,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         writer.dropSingleLineComment();
     }
 
-    private _writeBarMetaTo(writer: AlphaTexWriter, bar: Bar) {
+    private _writeBarMetaTo(writer: AlphaTexWriterOld, bar: Bar) {
         writer.writeSingleLineComment(`Bar ${bar.index + 1} Metadata`, true);
         const l = writer.tex.length;
 
@@ -825,7 +825,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         writer.dropSingleLineComment();
     }
 
-    private _writeVoiceTo(writer: AlphaTexWriter, voice: Voice) {
+    private _writeVoiceTo(writer: AlphaTexWriterOld, voice: Voice) {
         if (voice.isEmpty) {
             writer.writeSingleLineComment(`empty voice`);
             return;
@@ -841,7 +841,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         }
     }
 
-    private _writeBeatTo(writer: AlphaTexWriter, beat: Beat) {
+    private _writeBeatTo(writer: AlphaTexWriterOld, beat: Beat) {
         // Notes
         if (beat.isRest) {
             writer.write('r');
@@ -874,7 +874,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         writer.writeLine();
     }
 
-    private _writeBeatEffectsTo(writer: AlphaTexWriter, beat: Beat) {
+    private _writeBeatEffectsTo(writer: AlphaTexWriterOld, beat: Beat) {
         writer.beginGroup('{', '}');
 
         switch (beat.fade) {
@@ -1134,7 +1134,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         writer.endGroup();
     }
 
-    private _writeNoteTo(writer: AlphaTexWriter, note: Note) {
+    private _writeNoteTo(writer: AlphaTexWriterOld, note: Note) {
         if (note.index > 0) {
             writer.write(' ');
         }
@@ -1157,7 +1157,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
         this._writeNoteEffectsTo(writer, note);
     }
 
-    private _writeNoteEffectsTo(writer: AlphaTexWriter, note: Note) {
+    private _writeNoteEffectsTo(writer: AlphaTexWriterOld, note: Note) {
         writer.beginGroup('{', '}');
 
         if (note.hasBend) {

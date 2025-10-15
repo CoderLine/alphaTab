@@ -189,7 +189,6 @@ export class AlphaTexLexerOld {
 
     private _codepoints: number[];
     private _codepoint: number = AlphaTexLexerOld._eof;
-    private _codepoint: number = AlphaTexLexerOld.eof;
 
     public sy: AlphaTexSymbols = AlphaTexSymbols.No;
     public syData: unknown = '';
