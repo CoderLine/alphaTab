@@ -7,6 +7,9 @@ import { NoteEffectInfoBase } from '@src/rendering/effects/NoteEffectInfoBase';
 import type { Note } from '@src/model/Note';
 import { LeftHandTapGlyph } from '@src/rendering/glyphs/LeftHandTapGlyph';
 
+/**
+ * @internal
+ */
 export class LeftHandTapEffectInfo extends NoteEffectInfoBase {
     public get notationElement(): NotationElement {
         return NotationElement.EffectTap;

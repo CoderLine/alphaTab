@@ -6,6 +6,7 @@ import type { MasterBar } from '@src/model/MasterBar';
 /**
  * Represents a single point in time defining the tempo of a {@link MasterBarTickLookup}.
  * This is typically the initial tempo of a master bar or a tempo change.
+ * @public
  */
 export class MasterBarTickLookupTempoChange {
     /**
@@ -26,6 +27,7 @@ export class MasterBarTickLookupTempoChange {
 
 /**
  * Represents the time period, for which all bars of a {@link MasterBar} are played.
+ * @public
  */
 export class MasterBarTickLookup {
     /**
@@ -72,7 +74,7 @@ export class MasterBarTickLookup {
      * @param currentBeat The item in which to insert the new item afterwards
      * @param newBeat The new item to insert
      */
-    private insertAfter(currentBeat: BeatTickLookup | null, newBeat: BeatTickLookup) {
+    private _insertAfter(currentBeat: BeatTickLookup | null, newBeat: BeatTickLookup) {
         if (this.firstBeat == null || currentBeat == null || this.lastBeat == null) {
             this.firstBeat = newBeat;
             this.lastBeat = newBeat;
@@ -99,7 +101,7 @@ export class MasterBarTickLookup {
      * @param currentBeat The item in which to insert the new item afterwards
      * @param newBeat The new item to insert
      */
-    private insertBefore(currentBeat: BeatTickLookup | null, newBeat: BeatTickLookup) {
+    private _insertBefore(currentBeat: BeatTickLookup | null, newBeat: BeatTickLookup) {
         if (this.firstBeat == null || currentBeat == null || this.lastBeat == null) {
             this.firstBeat = newBeat;
             this.lastBeat = newBeat;
@@ -247,7 +249,7 @@ export class MasterBarTickLookup {
             const n1 = new BeatTickLookup(sliceStart, end);
             n1.highlightBeat(beat, beatPlaybackStart);
 
-            this.insertAfter(this.firstBeat, n1);
+            this._insertAfter(this.firstBeat, n1);
         }
         // Variant B
         // Variant C
@@ -256,7 +258,7 @@ export class MasterBarTickLookup {
             const n1 = new BeatTickLookup(this.lastBeat!.end, end);
             n1.highlightBeat(beat, beatPlaybackStart);
 
-            this.insertAfter(this.lastBeat, n1);
+            this._insertAfter(this.lastBeat, n1);
         } else {
             let l1: BeatTickLookup | null = null;
             if (sliceStart < this.firstBeat.start) {
@@ -288,20 +290,20 @@ export class MasterBarTickLookup {
                     const n1 = new BeatTickLookup(sliceStart, l1.start);
                     n1.highlightBeat(beat, beatPlaybackStart);
 
-                    this.insertBefore(this.firstBeat, n1);
+                    this._insertBefore(this.firstBeat, n1);
                 }
                 // Variant F
                 else if (end < l1.end) {
                     const n1 = new BeatTickLookup(sliceStart, l1.start);
                     n1.highlightBeat(beat, beatPlaybackStart);
-                    this.insertBefore(l1, n1);
+                    this._insertBefore(l1, n1);
 
                     const n2 = new BeatTickLookup(l1.start, end);
                     for (const b of l1.highlightedBeats) {
                         n2.highlightBeat(b.beat, b.playbackStart);
                     }
                     n2.highlightBeat(beat, beatPlaybackStart);
-                    this.insertBefore(l1, n2);
+                    this._insertBefore(l1, n2);
 
                     l1.start = end;
                 }
@@ -312,7 +314,7 @@ export class MasterBarTickLookup {
 
                     l1.highlightBeat(beat, beatPlaybackStart);
 
-                    this.insertBefore(l1, n1);
+                    this._insertBefore(l1, n1);
                 } /* end > this.firstBeat.end */
                 // Variant H
                 else {
@@ -321,7 +323,7 @@ export class MasterBarTickLookup {
 
                     l1.highlightBeat(beat, beatPlaybackStart);
 
-                    this.insertBefore(l1, n1);
+                    this._insertBefore(l1, n1);
 
                     this.addBeat(beat, beatPlaybackStart, l1.end, end - l1.end);
                 }
@@ -336,15 +338,15 @@ export class MasterBarTickLookup {
                     l1.start = sliceStart;
                     l1.highlightBeat(beat, beatPlaybackStart);
 
-                    this.insertBefore(l1, n1);
+                    this._insertBefore(l1, n1);
                 }
                 // Variant J
                 else if (end < l1.end) {
                     const n1 = new BeatTickLookup(l1.start, sliceStart);
-                    this.insertBefore(l1, n1);
+                    this._insertBefore(l1, n1);
 
                     const n2 = new BeatTickLookup(sliceStart, end);
-                    this.insertBefore(l1, n2);
+                    this._insertBefore(l1, n2);
 
                     for (const b of l1.highlightedBeats) {
                         n1.highlightBeat(b.beat, b.playbackStart);
@@ -364,7 +366,7 @@ export class MasterBarTickLookup {
                     l1.start = sliceStart;
                     l1.highlightBeat(beat, beatPlaybackStart);
 
-                    this.insertBefore(l1, n1);
+                    this._insertBefore(l1, n1);
 
                     this.addBeat(beat, beatPlaybackStart, l1.end, end - l1.end);
                 }
@@ -383,7 +385,7 @@ export class MasterBarTickLookup {
 
                     l1.start = end;
 
-                    this.insertBefore(l1, n1);
+                    this._insertBefore(l1, n1);
                 } /* end > l1.end */
                 // variant N
                 else {

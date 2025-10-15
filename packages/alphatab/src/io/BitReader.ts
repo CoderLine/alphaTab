@@ -3,12 +3,13 @@ import { EndOfReaderError, type IReadable } from '@src/io/IReadable';
 
 /**
  * This utility public class allows bitwise reading of a stream
+ * @internal
  */
 export class BitReader {
-    private static readonly ByteSize: number = 8;
+    private static readonly _byteSize: number = 8;
 
     private _currentByte: number = 0;
-    private _position: number = BitReader.ByteSize;
+    private _position: number = BitReader._byteSize;
     private _source: IReadable;
 
     public constructor(source: IReadable) {
@@ -56,7 +57,7 @@ export class BitReader {
         }
         // shift the desired byte to the least significant bit and
         // get the value using masking
-        const value: number = (this._currentByte >> (BitReader.ByteSize - this._position - 1)) & 0x01;
+        const value: number = (this._currentByte >> (BitReader._byteSize - this._position - 1)) & 0x01;
         this._position++;
         return value;
     }

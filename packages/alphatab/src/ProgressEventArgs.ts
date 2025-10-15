@@ -1,5 +1,6 @@
 /**
  * Represents the progress of any data being loaded.
+ * @public
  */
 export class ProgressEventArgs {
     /**

@@ -103,13 +103,13 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
             val params = view.layoutParams
             if (params is RelativeLayout.LayoutParams) {
                 params.setMargins(
-                    (x * Environment.HighDpiFactor).toInt(),
-                    (y * Environment.HighDpiFactor).toInt(),
+                    (x * Environment.highDpiFactor).toInt(),
+                    (y * Environment.highDpiFactor).toInt(),
                     0,
                     0
                 )
-                params.width = (w * Environment.HighDpiFactor).toInt()
-                params.height = (h * Environment.HighDpiFactor).toInt()
+                params.width = (w * Environment.highDpiFactor).toInt()
+                params.height = (h * Environment.highDpiFactor).toInt()
             }
 
             view.requestLayout()
@@ -117,10 +117,10 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
     }
 
     override var width: Double
-        get() = (view.measuredWidth / Environment.HighDpiFactor)
+        get() = (view.measuredWidth / Environment.highDpiFactor)
         set(value) {
             _uiInvoke {
-                val scaled = (value * Environment.HighDpiFactor).toInt()
+                val scaled = (value * Environment.highDpiFactor).toInt()
                 val params = view.layoutParams
                 if (params != null) {
                     params.width = scaled
@@ -132,7 +132,7 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
         get() = view.measuredHeight.toDouble()
         set(value) {
             _uiInvoke {
-                val scaled = (value * Environment.HighDpiFactor).toInt()
+                val scaled = (value * Environment.highDpiFactor).toInt()
                 val params = view.layoutParams
                 if (params != null) {
                     params.height = scaled
@@ -171,7 +171,7 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
         _uiInvoke {
             val params = view.layoutParams as RelativeLayout.LayoutParams
             val startX = params.leftMargin
-            val endX = x * Environment.HighDpiFactor
+            val endX = x * Environment.highDpiFactor
             val a: Animation = object : Animation() {
                 override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
                     params.leftMargin = (startX + ((endX - startX) * interpolatedTime)).toInt()

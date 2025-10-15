@@ -13,6 +13,7 @@ import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 /**
  * This renderer is responsible for displaying effects above or below the other staves
  * like the vibrato.
+ * @internal
  */
 export class EffectBarRenderer extends BarRendererBase {
     private _infos: EffectBarRendererInfo[];
@@ -30,19 +31,19 @@ export class EffectBarRenderer extends BarRendererBase {
         this.bottomOverflow = 0;
         this.topPadding = 0;
         this.bottomPadding = 0;
-        this.updateHeight();
+        this._updateHeight();
         super.updateSizes();
     }
 
     public override finalizeRenderer(): boolean {
         let didChange = super.finalizeRenderer();
-        if (this.updateHeight()) {
+        if (this._updateHeight()) {
             didChange = true;
         }
         return didChange;
     }
 
-    private updateHeight(): boolean {
+    private _updateHeight(): boolean {
         if (!this.sizingInfo) {
             return false;
         }
@@ -80,7 +81,7 @@ export class EffectBarRenderer extends BarRendererBase {
                 this.sizingInfo!.register(effectBand);
             }
         }
-        this.updateHeight();
+        this._updateHeight();
         return result;
     }
 

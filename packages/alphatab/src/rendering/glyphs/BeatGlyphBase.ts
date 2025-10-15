@@ -6,6 +6,9 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import type { ICanvas } from '@src/platform/ICanvas';
 
+/**
+ * @internal
+ */
 export class BeatGlyphBase extends GlyphGroup {
     private _effectGlyphs: Glyph[] = [];
     private _normalGlyphs: Glyph[] = [];
@@ -54,17 +57,17 @@ export class BeatGlyphBase extends GlyphGroup {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        this.paintEffects(cx, cy, canvas);
-        this.paintNormal(cx, cy, canvas);
+        this._paintEffects(cx, cy, canvas);
+        this._paintNormal(cx, cy, canvas);
     }
 
-    private paintNormal(cx: number, cy: number, canvas: ICanvas) {
+    private _paintNormal(cx: number, cy: number, canvas: ICanvas) {
         for (const g of this._normalGlyphs) {
             g.paint(cx + this.x, cy + this.y, canvas);
         }
     }
 
-    private paintEffects(cx: number, cy: number, canvas: ICanvas) {
+    private _paintEffects(cx: number, cy: number, canvas: ICanvas) {
         using _ = this.effectElement
             ? ElementStyleHelper.beat(canvas, this.effectElement!, this.container.beat)
             : undefined;

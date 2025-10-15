@@ -24,6 +24,9 @@
 import { XmlError } from '@src/xml/XmlError';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 
+/**
+ * @internal
+ */
 enum XmlState {
     IgnoreSpaces = 0,
     Begin = 1,
@@ -46,6 +49,9 @@ enum XmlState {
     Escape = 18
 }
 
+/**
+ * @internal
+ */
 export class XmlParser {
     public static readonly CharCodeLF: number = 10;
     public static readonly CharCodeTab: number = 9;
@@ -78,7 +84,7 @@ export class XmlParser {
     public static readonly CharCodeUnderscore: number = 95;
     public static readonly CharCodeSemi: number = 59;
 
-    private static Escapes: Map<string, string> = new Map<string, string>([
+    private static _escapes: Map<string, string> = new Map<string, string>([
         ['lt', '<'],
         ['gt', '>'],
         ['amp', '&'],
@@ -215,7 +221,7 @@ export class XmlParser {
                     break;
 
                 case XmlState.TagName:
-                    if (!XmlParser.isValidChar(c)) {
+                    if (!XmlParser._isValidChar(c)) {
                         if (p === start) {
                             throw new XmlError('Expected node name', str, p);
                         }
@@ -245,7 +251,7 @@ export class XmlParser {
                     break;
 
                 case XmlState.AttribName:
-                    if (!XmlParser.isValidChar(c)) {
+                    if (!XmlParser._isValidChar(c)) {
                         if (start === p) {
                             throw new XmlError('Expected attribute name', str, p);
                         }
@@ -329,7 +335,7 @@ export class XmlParser {
                     }
 
                 case XmlState.Close:
-                    if (!XmlParser.isValidChar(c)) {
+                    if (!XmlParser._isValidChar(c)) {
                         if (start === p) {
                             throw new XmlError('Expected node name', str, p);
                         }
@@ -385,14 +391,14 @@ export class XmlParser {
                                     ? Number.parseInt(`0${s.substr(1, s.length - 1)}`, 10)
                                     : Number.parseInt(s.substr(1, s.length - 1), 10);
                             buf += String.fromCharCode(code);
-                        } else if (XmlParser.Escapes.has(s)) {
-                            buf += XmlParser.Escapes.get(s);
+                        } else if (XmlParser._escapes.has(s)) {
+                            buf += XmlParser._escapes.get(s);
                         } else {
                             buf += `&${s};`?.toString();
                         }
                         start = p + 1;
                         state = escapeNext;
-                    } else if (!XmlParser.isValidChar(c) && c !== XmlParser.CharCodeSharp) {
+                    } else if (!XmlParser._isValidChar(c) && c !== XmlParser.CharCodeSharp) {
                         buf += '&';
                         buf += str.substr(start, p - start);
                         p--;
@@ -432,7 +438,7 @@ export class XmlParser {
         throw new XmlError('Unexpected end', str, p);
     }
 
-    private static isValidChar(c: number): boolean {
+    private static _isValidChar(c: number): boolean {
         return (
             (c >= XmlParser.CharCodeLowerA && c <= XmlParser.CharCodeLowerZ) ||
             (c >= XmlParser.CharCodeUpperA && c <= XmlParser.CharCodeUpperZ) ||

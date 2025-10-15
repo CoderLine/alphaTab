@@ -8,6 +8,9 @@ import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import { NotationElement } from '@src/NotationSettings';
 
+/**
+ * @internal
+ */
 export class WideNoteVibratoEffectInfo extends NoteEffectInfoBase {
     public get notationElement(): NotationElement {
         return NotationElement.EffectWideNoteVibrato;

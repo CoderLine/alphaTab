@@ -4,6 +4,9 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { type Beat, BeatSubElement } from '@src/model/Beat';
 import { NoteSubElement } from '@src/model/Note';
 
+/**
+ * @internal
+ */
 export class NumberedNoteHeadGlyph extends Glyph {
     private _isGrace: boolean;
     private _beat: Beat;

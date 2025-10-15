@@ -5,6 +5,9 @@ import type { Note } from '@src/model/Note';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
+/**
+ * @internal
+ */
 export class AccentuationGlyph extends EffectGlyph {
     private _note: Note;
     public constructor(x: number, y: number, note: Note) {
@@ -12,7 +15,7 @@ export class AccentuationGlyph extends EffectGlyph {
         this._note = note;
     }
 
-    private static getSymbol(accentuation: AccentuationType, above: boolean): MusicFontSymbol {
+    private static _getSymbol(accentuation: AccentuationType, above: boolean): MusicFontSymbol {
         switch (accentuation) {
             case AccentuationType.None:
                 return MusicFontSymbol.None;
@@ -34,7 +37,7 @@ export class AccentuationGlyph extends EffectGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const dir = this.renderer.getBeatDirection(this._note.beat);
-        const symbol = AccentuationGlyph.getSymbol(this._note.accentuated, dir === BeamDirection.Down);
+        const symbol = AccentuationGlyph._getSymbol(this._note.accentuated, dir === BeamDirection.Down);
 
         const y = dir === BeamDirection.Up ? cy + this.y : cy + this.y + this.height;
         CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x, y, 1, symbol, true);

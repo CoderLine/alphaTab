@@ -15,6 +15,9 @@ import { VibratoType } from '@src/model/VibratoType';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 export class TabBendGlyph extends Glyph {
     private _notes: Note[] = [];
     private _renderPoints: Map<number, TabBendRenderPoint[]> = new Map();
@@ -32,7 +35,7 @@ export class TabBendGlyph extends Glyph {
 
     public addBends(note: Note): void {
         this._notes.push(note);
-        const renderPoints: TabBendRenderPoint[] = this.createRenderingPoints(note);
+        const renderPoints: TabBendRenderPoint[] = this._createRenderingPoints(note);
         this._renderPoints.set(note.id, renderPoints);
         if (this._maxBendValue === -1 || this._maxBendValue < note.maxBendPoint!.value) {
             this._maxBendValue = note.maxBendPoint!.value;
@@ -174,7 +177,7 @@ export class TabBendGlyph extends Glyph {
         });
     }
 
-    private createRenderingPoints(note: Note): TabBendRenderPoint[] {
+    private _createRenderingPoints(note: Note): TabBendRenderPoint[] {
         const renderingPoints: TabBendRenderPoint[] = [];
         // Guitar Pro Rendering Note:
         // Last point of bend is always at end of the note even
@@ -285,18 +288,18 @@ export class TabBendGlyph extends Glyph {
                 let secondPt: TabBendRenderPoint = renderPoints[i + 1];
                 // draw pre-bend if previous
                 if (i === 0 && firstPt.value !== 0 && !note.isTieDestination) {
-                    this.paintBend(note, new TabBendRenderPoint(0, 0), firstPt, startX, topY, dX, slurText, canvas);
+                    this._paintBend(note, new TabBendRenderPoint(0, 0), firstPt, startX, topY, dX, slurText, canvas);
                 }
                 if (note.bendType !== BendType.Prebend) {
                     if (i === 0) {
                         startX += this.renderer.smuflMetrics.postNoteEffectPadding;
                     }
-                    this.paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
+                    this._paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
                 } else if (note.isTieOrigin && note.tieDestination!.hasBend) {
                     secondPt = new TabBendRenderPoint(BendPoint.MaxPosition, firstPt.value);
                     secondPt.lineValue = firstPt.lineValue;
 
-                    this.paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
+                    this._paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
                 }
             }
 
@@ -318,7 +321,7 @@ export class TabBendGlyph extends Glyph {
         }
     }
 
-    private paintBend(
+    private _paintBend(
         note: Note,
         firstPt: TabBendRenderPoint,
         secondPt: TabBendRenderPoint,

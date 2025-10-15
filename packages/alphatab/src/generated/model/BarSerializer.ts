@@ -17,6 +17,9 @@ import { BarLineStyle } from "@src/model/Bar";
 import { KeySignature } from "@src/model/KeySignature";
 import { KeySignatureType } from "@src/model/KeySignatureType";
 import { BarStyle } from "@src/model/Bar";
+/**
+ * @internal
+ */
 export class BarSerializer {
     public static fromJson(obj: Bar, m: unknown): void {
         if (!m) {

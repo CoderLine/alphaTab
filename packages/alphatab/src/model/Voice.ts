@@ -7,6 +7,7 @@ import { ElementStyle } from '@src/model/ElementStyle';
 
 /**
  * Lists all graphical sub elements within a {@link Voice} which can be styled via {@link Voice.style}
+ * @public
  */
 export enum VoiceSubElement {
     /**
@@ -19,6 +20,7 @@ export enum VoiceSubElement {
  * Defines the custom styles for voices.
  * @json
  * @json_strict
+ * @public
  */
 export class VoiceStyle extends ElementStyle<VoiceSubElement> {}
 
@@ -27,6 +29,7 @@ export class VoiceStyle extends ElementStyle<VoiceSubElement> {}
  * that can be played during a bar.
  * @json
  * @json_strict
+ * @public
  */
 export class Voice {
     private _beatLookup!: Map<number, Beat>;
@@ -114,7 +117,7 @@ export class Voice {
         }
     }
 
-    private chain(beat: Beat, sharedDataBag: Map<string, unknown> | null = null): void {
+    private _chain(beat: Beat, sharedDataBag: Map<string, unknown> | null = null): void {
         if (!this.bar) {
             return;
         }
@@ -165,7 +168,7 @@ export class Voice {
         for (let index: number = 0; index < this.beats.length; index++) {
             const beat: Beat = this.beats[index];
             beat.index = index;
-            this.chain(beat, sharedDataBag);
+            this._chain(beat, sharedDataBag);
             if (beat.graceType === GraceType.None) {
                 beat.graceGroup = currentGraceGroup;
                 if (currentGraceGroup) {

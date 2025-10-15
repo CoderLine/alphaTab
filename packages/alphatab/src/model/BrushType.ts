@@ -1,5 +1,6 @@
 /**
  * Lists all types of how to brush multiple notes on a beat.
+ * @public
  */
 export enum BrushType {
     /**

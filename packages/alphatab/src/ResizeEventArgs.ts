@@ -1,8 +1,8 @@
 import type { Settings } from '@src/Settings';
-import { CoreSettings } from '@src/CoreSettings';
 
 /**
  * Represents the information related to a resize event.
+ * @public
  */
 export class ResizeEventArgs {
     /**
@@ -19,16 +19,4 @@ export class ResizeEventArgs {
      * Gets the settings currently used for rendering.
      */
     public settings: Settings | null = null;
-
-    public core(): CoreSettings {
-        if (this.settings && this.causeIssue()) {
-            return this.settings.core;
-        }
-        return new CoreSettings();
-    }
-
-    private causeIssue() {
-        this.settings = null;
-        return true;
-    }
 }

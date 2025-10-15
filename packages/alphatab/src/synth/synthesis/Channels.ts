@@ -7,6 +7,9 @@ import type { Channel } from '@src/synth/synthesis/Channel';
 import type { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
 import type { Voice } from '@src/synth/synthesis/Voice';
 
+/**
+ * @internal
+ */
 export class Channels {
     public activeChannel: number = 0;
     public channelList: Channel[] = [];

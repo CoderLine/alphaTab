@@ -4,8 +4,11 @@ import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { RenderingResources } from '@src/RenderingResources';
 
+/**
+ * @internal
+ */
 export class ChordDiagramGlyph extends EffectGlyph {
-    private static readonly Frets: number = 5;
+    private static readonly _frets: number = 5;
 
     private _chord: Chord;
     private _textRow: number = 0;
@@ -30,7 +33,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
         this.height =
             this._textRow +
             this._fretRow +
-            ChordDiagramGlyph.Frets * this.renderer.smuflMetrics.chordDiagramFretSpacing +
+            ChordDiagramGlyph._frets * this.renderer.smuflMetrics.chordDiagramFretSpacing +
             2 * this.renderer.smuflMetrics.chordDiagramPaddingY;
         this.width =
             this._firstFretSpacing +
@@ -81,7 +84,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
         cy += this._fretRow;
         for (let i: number = 0; i < this._chord.strings.length; i++) {
             const x: number = cx + i * stringSpacing;
-            canvas.fillRect(x, cy, lineWidth, fretSpacing * ChordDiagramGlyph.Frets + 1);
+            canvas.fillRect(x, cy, lineWidth, fretSpacing * ChordDiagramGlyph._frets + 1);
         }
 
         if (this._chord.firstFret > 1) {
@@ -97,7 +100,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
             );
         }
 
-        for (let i: number = 0; i <= ChordDiagramGlyph.Frets; i++) {
+        for (let i: number = 0; i <= ChordDiagramGlyph._frets; i++) {
             const y: number = cy + i * fretSpacing;
             canvas.fillRect(cx, y, w, this.renderer.smuflMetrics.chordDiagramFretHeight);
         }

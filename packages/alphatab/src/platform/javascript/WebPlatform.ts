@@ -1,6 +1,7 @@
 /**
  * Lists all web specific platforms alphaTab might run in
  * like browser, nodejs.
+ * @public
  */
 export enum WebPlatform {
     Browser = 0,

@@ -9,6 +9,7 @@ import type { SmuflMetadata } from '@src/SmuflMetadata';
 /**
  * @json
  * @json_declaration
+ * @public
  */
 export class EngravingStemInfo {
     /**
@@ -47,6 +48,7 @@ export class EngravingStemInfo {
  * @json
  * @json_declaration
  * @cloneable
+ * @public
  */
 export class EngravingSettings {
     private static _bravuraDefaults?: EngravingSettings;
@@ -351,7 +353,7 @@ export class EngravingSettings {
         this.stemFlagOffsets.set(Duration.TwoHundredFiftySixth, 0);
 
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
-            const symbol = EngravingSettings.smuflNameToMusicFontSymbol(g);
+            const symbol = EngravingSettings._smuflNameToMusicFontSymbol(g);
             if (symbol) {
                 if (v.stemDownNW) {
                     const b = new EngravingStemInfo();
@@ -411,7 +413,7 @@ export class EngravingSettings {
         const bBoxes = smufl.glyphBBoxes;
         if (bBoxes) {
             for (const [g, v] of Object.entries(bBoxes)) {
-                const symbol = EngravingSettings.smuflNameToMusicFontSymbol(g);
+                const symbol = EngravingSettings._smuflNameToMusicFontSymbol(g);
                 if (symbol) {
                     handledSymbols.add(symbol);
                     this.glyphTop.set(symbol, v.bBoxNE[1] * this.oneStaffSpace);
@@ -509,7 +511,7 @@ export class EngravingSettings {
         ['6stringTabClef', 'SixStringTabClef']
     ]);
 
-    private static smuflNameToMusicFontSymbol(g: string): MusicFontSymbol | undefined {
+    private static _smuflNameToMusicFontSymbol(g: string): MusicFontSymbol | undefined {
         const name = EngravingSettings.smuflNameToGlyphNameMapping.has(g)
             ? EngravingSettings.smuflNameToGlyphNameMapping.get(g)!
             : g.substring(0, 1).toUpperCase() + g.substring(1);

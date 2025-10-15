@@ -6,9 +6,10 @@ import { assert } from 'chai';
 
 /**
  * @partial
+ * @internal
  */
 export class ComparisonHelpers {
-    private static removeInitialAutomations(score: Score) {
+    private static _removeInitialAutomations(score: Score) {
         for (const t of score.tracks) {
             if (
                 t.staves.length > 0 &&
@@ -22,7 +23,7 @@ export class ComparisonHelpers {
         }
     }
 
-    private static removeEmptyVoices(score: Score) {
+    private static _removeEmptyVoices(score: Score) {
         for (const track of score.tracks) {
             for (const staff of track.staves) {
                 let biggestNonEmptyVoice = 0;
@@ -74,10 +75,10 @@ export class ComparisonHelpers {
 
         const ignorePaths: RegExp[] = [/^.*stringtuning\.isstandard$/i, /^.*masterbars.*\.fermata$/i];
 
-        ComparisonHelpers.removeEmptyVoices(expected);
+        ComparisonHelpers._removeEmptyVoices(expected);
         // ignore instrument automation on first beat
-        ComparisonHelpers.removeInitialAutomations(expected);
-        ComparisonHelpers.removeInitialAutomations(actual);
+        ComparisonHelpers._removeInitialAutomations(expected);
+        ComparisonHelpers._removeInitialAutomations(actual);
 
         ignoreKeys = ignoreKeys ?? [];
         ignoreKeys.push(
@@ -114,7 +115,6 @@ export class ComparisonHelpers {
             'pertrackdisplaytuning',
             'pertrackchorddiagramsontop',
             'pertrackmultibarrest',
-
 
             // masterbar
             'isdoublebar', // deprecated

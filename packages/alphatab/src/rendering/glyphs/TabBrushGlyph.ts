@@ -8,6 +8,9 @@ import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { NoteYPosition } from '@src/rendering/BarRendererBase';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 export class TabBrushGlyph extends Glyph {
     private _beat: Beat;
     private _noteVibratoGlyph?: NoteVibratoGlyph;

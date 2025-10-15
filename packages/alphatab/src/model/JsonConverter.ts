@@ -26,12 +26,13 @@ import { JsonHelper } from '@src/io/JsonHelper';
 /**
  * This class can convert a full {@link Score} instance to a simple JavaScript object and back for further
  * JSON serialization.
+ * @public
  */
 export class JsonConverter {
     /**
      * @target web
      */
-    private static jsonReplacer(_: any, v: any) {
+    private static _jsonReplacer(_: any, v: any) {
         if (v instanceof Map) {
             if ('fromEntries' in Object) {
                 return Object.fromEntries(v);
@@ -56,7 +57,7 @@ export class JsonConverter {
      */
     public static scoreToJson(score: Score): string {
         const obj: unknown = JsonConverter.scoreToJsObject(score);
-        return JSON.stringify(obj, JsonConverter.jsonReplacer);
+        return JSON.stringify(obj, JsonConverter._jsonReplacer);
     }
 
     /**
@@ -100,7 +101,7 @@ export class JsonConverter {
      */
     public static settingsToJson(settings: Settings): string {
         const obj: unknown = JsonConverter.settingsToJsObject(settings);
-        return JSON.stringify(obj, JsonConverter.jsonReplacer);
+        return JSON.stringify(obj, JsonConverter._jsonReplacer);
     }
 
     /**
@@ -148,7 +149,7 @@ export class JsonConverter {
                     break;
                 case 'tracks':
                     for (const midiTrack of v as unknown[]) {
-                        const midiTrack2: MidiTrack = JsonConverter.jsObjectToMidiTrack(midiTrack);
+                        const midiTrack2: MidiTrack = JsonConverter._jsObjectToMidiTrack(midiTrack);
                         midi2.tracks.push(midiTrack2);
                     }
                     break;
@@ -158,7 +159,7 @@ export class JsonConverter {
         return midi2;
     }
 
-    private static jsObjectToMidiTrack(jsObject: unknown): MidiTrack {
+    private static _jsObjectToMidiTrack(jsObject: unknown): MidiTrack {
         const midi2: MidiTrack = new MidiTrack();
 
         JsonHelper.forEach(jsObject, (v, k) => {
@@ -273,14 +274,14 @@ export class JsonConverter {
 
         const tracks: Map<string, unknown>[] = [];
         for (const track of midi.tracks) {
-            tracks.push(JsonConverter.midiTrackToJsObject(track));
+            tracks.push(JsonConverter._midiTrackToJsObject(track));
         }
         o.set('tracks', tracks);
 
         return o;
     }
 
-    private static midiTrackToJsObject(midi: MidiTrack): Map<string, unknown> {
+    private static _midiTrackToJsObject(midi: MidiTrack): Map<string, unknown> {
         const o = new Map<string, unknown>();
 
         const events: Map<string, unknown>[] = [];

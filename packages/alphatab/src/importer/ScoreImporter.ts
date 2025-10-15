@@ -5,6 +5,7 @@ import type { Settings } from '@src/Settings';
 /**
  * This is the base public class for creating new song importers which
  * enable reading scores from any binary datasource
+ * @public
  */
 export abstract class ScoreImporter {
     protected data!: IReadable;

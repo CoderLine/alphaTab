@@ -7,6 +7,9 @@ import { Envelope } from '@src/synth/synthesis/Envelope';
 import { LoopMode } from '@src/synth/synthesis/LoopMode';
 import { TypeConversions } from '@src/io/TypeConversions';
 
+/**
+ * @internal
+ */
 export enum GenOperators {
     StartAddrsOffset = 0,
     EndAddrsOffset = 1,
@@ -71,11 +74,14 @@ export enum GenOperators {
     EndOper = 60
 }
 
+/**
+ * @internal
+ */
 export class Region {
-    private static readonly NoSamples = new Float32Array(0);
+    private static readonly _noSamples = new Float32Array(0);
 
     public loopMode: LoopMode = LoopMode.None;
-    public samples: Float32Array = Region.NoSamples;
+    public samples: Float32Array = Region._noSamples;
     public sampleRate: number = 0;
     public loKey: number = 0;
     public hiKey: number = 0;
@@ -146,7 +152,7 @@ export class Region {
 
     public clear(forRelative: boolean): void {
         this.loopMode = LoopMode.None;
-        this.samples = Region.NoSamples;
+        this.samples = Region._noSamples;
         this.sampleRate = 0;
         this.loKey = 0;
         this.hiKey = 0;

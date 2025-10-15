@@ -1,5 +1,6 @@
 /**
  * Lists all types of pick strokes.
+ * @public
  */
 export enum PickStroke {
     /**

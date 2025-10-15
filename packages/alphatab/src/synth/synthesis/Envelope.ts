@@ -4,6 +4,9 @@
 // Licensed under: MPL-2.0
 import { SynthHelper } from '@src/synth/SynthHelper';
 
+/**
+ * @internal
+ */
 export class Envelope {
     public delay: number = 0;
     public attack: number = 0;

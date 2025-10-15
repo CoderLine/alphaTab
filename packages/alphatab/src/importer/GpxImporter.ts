@@ -11,6 +11,7 @@ import { LayoutConfiguration } from '@src/importer/LayoutConfiguration';
 
 /**
  * This ScoreImporter can read Guitar Pro 6 (gpx) files.
+ * @internal
  */
 export class GpxImporter extends ScoreImporter {
     public get name(): string {

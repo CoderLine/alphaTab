@@ -23,6 +23,7 @@
  * This class is general purpose class for writing data to a buffer.
  * It allows you to write bits as well as bytes
  * Based on DeflaterPending.java
+ * @internal
  */
 export class PendingBuffer {
     private _buffer: Uint8Array;

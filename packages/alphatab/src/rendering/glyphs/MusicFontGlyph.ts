@@ -3,6 +3,9 @@ import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { Color } from '@src/model/Color';
 
+/**
+ * @internal
+ */
 export class MusicFontGlyph extends EffectGlyph {
     protected glyphScale: number = 0;
     public symbol: MusicFontSymbol;
@@ -47,6 +50,9 @@ export class MusicFontGlyph extends EffectGlyph {
     }
 }
 
+/**
+ * @internal
+ */
 export class MusicFontTextGlyph extends EffectGlyph {
     protected glyphScale: number = 0;
     public symbols: MusicFontSymbol[];

@@ -3,6 +3,9 @@ import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import type { RenderingResources } from '@src/RenderingResources';
 
+/**
+ * @internal
+ */
 export class LineRangedGlyph extends GroupedEffectGlyph {
     private _label: string;
     private _dashed: boolean;

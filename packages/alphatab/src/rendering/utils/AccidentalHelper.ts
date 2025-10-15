@@ -10,6 +10,9 @@ import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
 import type { Clef } from '@src/model/Clef';
 import type { KeySignature } from '@src/model/KeySignature';
 
+/**
+ * @internal
+ */
 class BeatLines {
     public maxLine: number = -1000;
     public maxLineNote: Note|null=null;
@@ -20,6 +23,7 @@ class BeatLines {
 /**
  * This small utilty public class allows the assignment of accidentals within a
  * desired scope.
+ * @internal
  */
 export class AccidentalHelper {
     private _bar: Bar;
@@ -32,23 +36,23 @@ export class AccidentalHelper {
      *      0 steps is on the first line (counting from top)
      *      1 steps is on the space inbetween the first and the second line
      */
-    private static readonly StepsPerOctave: number = 7;
+    private static readonly _stepsPerOctave: number = 7;
 
     /**
      * Those are the amount of steps for the different clefs in case of a note value 0
      * [Neutral, C3, C4, F4, G2]
      */
-    private static OctaveSteps: number[] = [38, 32, 30, 26, 38];
+    private static _octaveSteps: number[] = [38, 32, 30, 26, 38];
 
     /**
      * The step offsets of the notes within an octave in case of for sharp keysignatures
      */
-    public static SharpNoteSteps: number[] = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
+    public static readonly sharpNoteSteps: number[] = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
 
     /**
      * The step offsets of the notes within an octave in case of for flat keysignatures
      */
-    public static FlatNoteSteps: number[] = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6];
+    public static readonly flatNoteSteps: number[] = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6];
 
     private _registeredAccidentals: Map<number, AccidentalType> = new Map();
     private _appliedScoreLines: Map<number, number> = new Map();
@@ -122,7 +126,7 @@ export class AccidentalHelper {
     public applyAccidental(note: Note): AccidentalType {
         const noteValue = AccidentalHelper.getNoteValue(note);
         const quarterBend: boolean = note.hasQuarterToneOffset;
-        return this.getAccidental(noteValue, quarterBend, note.beat, false, note);
+        return this._getAccidental(noteValue, quarterBend, note.beat, false, note);
     }
 
     /**
@@ -140,7 +144,7 @@ export class AccidentalHelper {
         quarterBend: boolean,
         isHelperNote: boolean
     ): AccidentalType {
-        return this.getAccidental(noteValue, quarterBend, relatedBeat, isHelperNote, null);
+        return this._getAccidental(noteValue, quarterBend, relatedBeat, isHelperNote, null);
     }
 
     public static computeLineWithoutAccidentals(bar: Bar, note: Note) {
@@ -156,7 +160,7 @@ export class AccidentalHelper {
     }
 
 
-    private getAccidental(
+    private _getAccidental(
         noteValue: number,
         quarterBend: boolean,
         relatedBeat: Beat,
@@ -240,13 +244,13 @@ export class AccidentalHelper {
         }
 
         if (!isHelperNote) {
-            this.registerLine(relatedBeat, steps, note);
+            this._registerLine(relatedBeat, steps, note);
         }
 
         return accidentalToSet;
     }
 
-    private registerLine(relatedBeat: Beat, line: number, note:Note|null) {
+    private _registerLine(relatedBeat: Beat, line: number, note:Note|null) {
         let lines: BeatLines;
         if (this._beatLines.has(relatedBeat.id)) {
             lines = this._beatLines.get(relatedBeat.id)!;
@@ -288,14 +292,14 @@ export class AccidentalHelper {
         const octave: number = ((value / 12) | 0) - 1;
 
         // Initial Position
-        let steps: number = AccidentalHelper.OctaveSteps[clefValue];
+        let steps: number = AccidentalHelper._octaveSteps[clefValue];
         // Move to Octave
-        steps -= octave * AccidentalHelper.StepsPerOctave;
+        steps -= octave * AccidentalHelper._stepsPerOctave;
         // get the step list for the current keySignature
         const stepList =
             ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
-                ? AccidentalHelper.SharpNoteSteps
-                : AccidentalHelper.FlatNoteSteps;
+                ? AccidentalHelper.sharpNoteSteps
+                : AccidentalHelper.flatNoteSteps;
 
         steps -= stepList[index];
 

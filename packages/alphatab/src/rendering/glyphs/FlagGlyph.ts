@@ -4,6 +4,9 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
+/**
+ * @internal
+ */
 export class FlagGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, duration: Duration, direction: BeamDirection, isGrace: boolean) {
         super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, FlagGlyph.getSymbol(duration, direction, isGrace));

@@ -3,6 +3,9 @@ import { CanvasHelper, TextAlign, TextBaseline, type ICanvas } from '@src/platfo
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 enum TripletFeelNoteGroup {
     EighthEighth = 0,
     SixteenthSixteenth = 1,
@@ -14,6 +17,9 @@ enum TripletFeelNoteGroup {
     ThirtySecondSixteenthDotted = 7
 }
 
+/**
+ * @internal
+ */
 export class TripletFeelGlyph extends EffectGlyph {
     private _tripletFeel: TripletFeel;
     private _tupletHeight: number = 0;
@@ -85,19 +91,19 @@ export class TripletFeelGlyph extends EffectGlyph {
         canvas.fillText('(', cx, textY);
         cx += canvas.measureText('( ').width;
 
-        cx = this.drawGroup(cx, noteY + this._tupletHeight, canvas, leftNotes);
+        cx = this._drawGroup(cx, noteY + this._tupletHeight, canvas, leftNotes);
 
         canvas.fillText(' = ', cx, textY);
         cx += canvas.measureText(' = ').width;
 
-        cx = this.drawGroup(cx, noteY + this._tupletHeight, canvas, rightNotes);
+        cx = this._drawGroup(cx, noteY + this._tupletHeight, canvas, rightNotes);
 
         canvas.fillText(' )', cx, textY);
 
         canvas.textBaseline = b;
     }
 
-    private drawGroup(cx: number, cy: number, canvas: ICanvas, group: TripletFeelNoteGroup) {
+    private _drawGroup(cx: number, cy: number, canvas: ICanvas, group: TripletFeelNoteGroup) {
         const noteScale = this.renderer.smuflMetrics.tempoNoteScale;
 
         let leftNote: MusicFontSymbol[] = [];

@@ -25,6 +25,9 @@ import { Duration } from '@src/model/Duration';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 
+/**
+ * @internal
+ */
 export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
     public isNaturalizeAccidental = false;
     public accidental: AccidentalType = AccidentalType.None;
@@ -97,6 +100,9 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
     }
 }
 
+/**
+ * @internal
+ */
 export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: NumberedNoteHeadGlyph | null = null;
     public deadSlapped: DeadSlappedBeatGlyph | null = null;
@@ -146,18 +152,18 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     public override getLowestNoteY(): number {
-        return this.internalGetNoteY(NoteYPosition.Center);
+        return this._internalGetNoteY(NoteYPosition.Center);
     }
 
     public override getHighestNoteY(): number {
-        return this.internalGetNoteY(NoteYPosition.Center);
+        return this._internalGetNoteY(NoteYPosition.Center);
     }
 
     public override getNoteY(_note: Note, requestedPosition: NoteYPosition): number {
-        return this.internalGetNoteY(requestedPosition);
+        return this._internalGetNoteY(requestedPosition);
     }
 
-    private internalGetNoteY(requestedPosition: NoteYPosition): number {
+    private _internalGetNoteY(requestedPosition: NoteYPosition): number {
         let g: Glyph | null = null;
         if (this.noteHeads) {
             g = this.noteHeads;
@@ -210,7 +216,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    public static MajorKeySignatureOneValues: Array<number> = [
+    public static readonly majorKeySignatureOneValues: Array<number> = [
         // Flats
         59, 66, 61, 68, 63, 58, 65,
         // natural
@@ -219,7 +225,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         67, 62, 69, 64, 71, 66, 61
     ];
 
-    public static MinorKeySignatureOneValues: Array<number> = [
+    public static readonly minorKeySignatureOneValues: Array<number> = [
         // Flats
         71, 66, 73, 68, 63, 70, 65,
         // natural
@@ -247,8 +253,8 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
 
                 const oneNoteValues =
                     kst === KeySignatureType.Minor
-                        ? NumberedBeatGlyph.MinorKeySignatureOneValues
-                        : NumberedBeatGlyph.MajorKeySignatureOneValues;
+                        ? NumberedBeatGlyph.minorKeySignatureOneValues
+                        : NumberedBeatGlyph.majorKeySignatureOneValues;
                 const oneNoteValue = oneNoteValues[ksi];
 
                 const note = this.container.beat.notes[0];
@@ -269,12 +275,12 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
 
                     const stepList =
                         ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
-                            ? AccidentalHelper.FlatNoteSteps
-                            : AccidentalHelper.SharpNoteSteps;
+                            ? AccidentalHelper.flatNoteSteps
+                            : AccidentalHelper.sharpNoteSteps;
 
                     let steps = stepList[index] + 1;
 
-                    const hasAccidental = ModelUtils.AccidentalNotes[index];
+                    const hasAccidental = ModelUtils.accidentalNotes[index];
                     if (
                         hasAccidental &&
                         !(this.container.preNotes as NumberedBeatPreNotesGlyph).isNaturalizeAccidental

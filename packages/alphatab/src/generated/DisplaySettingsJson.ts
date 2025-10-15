@@ -11,6 +11,7 @@ import { SystemsLayoutMode } from "@src/DisplaySettings";
  * The display settings control how the general layout and display of alphaTab is done.
  * @json
  * @json_declaration
+ * @public
  * @target web
  */
 export interface DisplaySettingsJson {

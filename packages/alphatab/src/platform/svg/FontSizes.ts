@@ -5,6 +5,7 @@ import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 
 /**
  * Describes the sizes of a font for measuring purposes.
+ * @internal
  */
 export class FontSizeDefinition {
     /**
@@ -26,9 +27,10 @@ export class FontSizeDefinition {
 /**
  * This public class stores text widths for several fonts and allows width calculation
  * @partial
+ * @internal
  */
 export class FontSizes {
-    public static FontSizeLookupTables: Map<string, FontSizeDefinition> = new Map<string, FontSizeDefinition>();
+    public static readonly fontSizeLookupTables: Map<string, FontSizeDefinition> = new Map<string, FontSizeDefinition>();
 
     public static readonly ControlChars: number = 0x20;
 
@@ -37,7 +39,7 @@ export class FontSizes {
      * @partial
      */
     public static generateFontLookup(family: string): void {
-        if (FontSizes.FontSizeLookupTables.has(family)) {
+        if (FontSizes.fontSizeLookupTables.has(family)) {
             return;
         }
 
@@ -58,10 +60,10 @@ export class FontSizes {
             }
 
             const data: FontSizeDefinition = new FontSizeDefinition(new Uint8Array(widths), new Uint8Array(heights));
-            FontSizes.FontSizeLookupTables.set(family, data);
+            FontSizes.fontSizeLookupTables.set(family, data);
         } else {
             const data: FontSizeDefinition = new FontSizeDefinition(new Uint8Array([8]), new Uint8Array([10]));
-            FontSizes.FontSizeLookupTables.set(family, data);
+            FontSizes.fontSizeLookupTables.set(family, data);
         }
     }
 
@@ -78,16 +80,16 @@ export class FontSizes {
 
         // find a font which is maybe registered already
         for (let i = 0; i < families.length; i++) {
-            if (FontSizes.FontSizeLookupTables.has(families[i])) {
+            if (FontSizes.fontSizeLookupTables.has(families[i])) {
                 family = families[i];
                 break;
             }
         }
 
-        if (!FontSizes.FontSizeLookupTables.has(family)) {
+        if (!FontSizes.fontSizeLookupTables.has(family)) {
             FontSizes.generateFontLookup(family);
         }
-        data = FontSizes.FontSizeLookupTables.get(family)!;
+        data = FontSizes.fontSizeLookupTables.get(family)!;
         let factor: number = 1;
         if (style === FontStyle.Italic) {
             factor *= 1.1;

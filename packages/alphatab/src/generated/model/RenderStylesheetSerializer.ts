@@ -9,6 +9,9 @@ import { BracketExtendMode } from "@src/model/RenderStylesheet";
 import { TrackNamePolicy } from "@src/model/RenderStylesheet";
 import { TrackNameMode } from "@src/model/RenderStylesheet";
 import { TrackNameOrientation } from "@src/model/RenderStylesheet";
+/**
+ * @internal
+ */
 export class RenderStylesheetSerializer {
     public static fromJson(obj: RenderStylesheet, m: unknown): void {
         if (!m) {

@@ -6,6 +6,9 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { GraceType } from '@src/model/GraceType';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 
+/**
+ * @internal
+ */
 export class ScoreSlurGlyph extends ScoreLegatoGlyph {
     private _startNote: Note;
     private _endNote: Note;
@@ -21,7 +24,7 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
     }
 
     protected override getStartY(): number {
-        if (this.isStartCentered()) {
+        if (this._isStartCentered()) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
                     // below lowest note
@@ -35,8 +38,8 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
     }
 
     protected override getEndY(): number {
-        if (this.isEndCentered()) {
-            if (this.isEndOnStem()) {
+        if (this._isEndCentered()) {
+            if (this._isEndOnStem()) {
                 switch (this.tieDirection) {
                     case BeamDirection.Up:
                         return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.TopWithStem);
@@ -54,13 +57,13 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
         return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.Center);
     }
 
-    private isStartCentered() {
+    private _isStartCentered() {
         return (
             (this._startNote === this._startNote.beat.maxNote && this.tieDirection === BeamDirection.Up) ||
             (this._startNote === this._startNote.beat.minNote && this.tieDirection === BeamDirection.Down)
         );
     }
-    private isEndCentered() {
+    private _isEndCentered() {
         return (
             this._startNote.beat.graceType === GraceType.None &&
             ((this._endNote === this._endNote.beat.maxNote && this.tieDirection === BeamDirection.Up) ||
@@ -68,7 +71,7 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
         );
     }
 
-    private isEndOnStem() {
+    private _isEndOnStem() {
         const endNoteScoreRenderer = this.endNoteRenderer as ScoreBarRenderer;
 
         const startBeamDirection = (this.startNoteRenderer as ScoreBarRenderer).getBeatDirection(this.startBeat!);
@@ -78,14 +81,14 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
     }
 
     protected override getStartX(): number {
-        return this.isStartCentered()
+        return this._isStartCentered()
             ? this.startNoteRenderer!.getBeatX(this._startNote.beat, BeatXPosition.MiddleNotes)
             : this.startNoteRenderer!.getNoteX(this._startNote, NoteXPosition.Right);
     }
 
     protected override getEndX(): number {
-        if (this.isEndCentered()) {
-            if (this.isEndOnStem()) {
+        if (this._isEndCentered()) {
+            if (this._isEndOnStem()) {
                 return this.endNoteRenderer!.getBeatX(this._endNote.beat, BeatXPosition.Stem);
             }
             return this.endNoteRenderer!.getNoteX(this._endNote, NoteXPosition.Center);

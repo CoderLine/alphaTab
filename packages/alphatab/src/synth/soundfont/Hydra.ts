@@ -13,6 +13,9 @@ import { FormatError } from '@src/FormatError';
 import { VorbisFile } from '@src/synth/vorbis/VorbisFile';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 
+/**
+ * @internal
+ */
 export class Hydra {
     public phdrs: HydraPhdr[] = [];
     public pbags: HydraPbag[] = [];
@@ -181,6 +184,9 @@ export class Hydra {
     }
 }
 
+/**
+ * @internal
+ */
 export class HydraIbag {
     public static readonly SizeInFile: number = 4;
 
@@ -193,6 +199,9 @@ export class HydraIbag {
     }
 }
 
+/**
+ * @internal
+ */
 export class HydraImod {
     public static readonly SizeInFile: number = 10;
 
@@ -211,6 +220,9 @@ export class HydraImod {
     }
 }
 
+/**
+ * @internal
+ */
 export class HydraIgen {
     public static readonly SizeInFile: number = 4;
 
@@ -223,6 +235,9 @@ export class HydraIgen {
     }
 }
 
+/**
+ * @internal
+ */
 export class HydraInst {
     public static readonly SizeInFile: number = 22;
 
@@ -235,6 +250,9 @@ export class HydraInst {
     }
 }
 
+/**
+ * @internal
+ */
 export class HydraPbag {
     public static readonly SizeInFile: number = 4;
 
@@ -247,6 +265,9 @@ export class HydraPbag {
     }
 }
 
+/**
+ * @internal
+ */
 export class HydraPgen {
     public static readonly SizeInFile: number = 4;
     public static readonly GenInstrument: number = 41;
@@ -263,6 +284,9 @@ export class HydraPgen {
     }
 }
 
+/**
+ * @internal
+ */
 export class HydraPhdr {
     public static readonly SizeInFile: number = 38;
 
@@ -285,6 +309,9 @@ export class HydraPhdr {
     }
 }
 
+/**
+ * @internal
+ */
 export class HydraPmod {
     public static readonly SizeInFile: number = 10;
 
@@ -303,6 +330,9 @@ export class HydraPmod {
     }
 }
 
+/**
+ * @internal
+ */
 export class HydraShdr {
     public static readonly SizeInFile: number = 46;
 
@@ -332,6 +362,9 @@ export class HydraShdr {
     }
 }
 
+/**
+ * @internal
+ */
 export class HydraGenAmount {
     public wordAmount: number;
 

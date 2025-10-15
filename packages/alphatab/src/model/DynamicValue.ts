@@ -1,5 +1,6 @@
 /**
  * Lists all dynamics.
+ * @public
  */
 export enum DynamicValue {
     // common dynamics

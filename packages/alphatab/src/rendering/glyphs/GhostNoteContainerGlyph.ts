@@ -7,6 +7,9 @@ import { NotationElement } from '@src/NotationSettings';
 import type { Color } from '@src/model/Color';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
+/**
+ * @internal
+ */
 export class GhostNoteInfo {
     public line: number = 0;
     public isGhost: boolean;
@@ -19,6 +22,9 @@ export class GhostNoteInfo {
     }
 }
 
+/**
+ * @internal
+ */
 export class GhostNoteContainerGlyph extends Glyph {
     private _isOpen: boolean;
     private _infos: GhostNoteInfo[] = [];
@@ -35,32 +41,32 @@ export class GhostNoteContainerGlyph extends Glyph {
         const line: number = sr.getNoteLine(n);
         const hasParenthesis: boolean =
             n.isGhost ||
-            (this.isTiedBend(n) &&
+            (this._isTiedBend(n) &&
                 sr.settings.notation.isNotationElementVisible(NotationElement.ParenthesisOnTiedBends));
 
         const color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.Effects, n);
 
-        this.add(new GhostNoteInfo(line, hasParenthesis, color));
+        this._add(new GhostNoteInfo(line, hasParenthesis, color));
     }
 
     public addParenthesisOnLine(line: number, hasParenthesis: boolean): void {
         const info: GhostNoteInfo = new GhostNoteInfo(line, hasParenthesis, undefined);
-        this.add(info);
+        this._add(info);
     }
 
-    private add(info: GhostNoteInfo): void {
+    private _add(info: GhostNoteInfo): void {
         this._infos.push(info);
         if (info.isGhost) {
             this.isEmpty = false;
         }
     }
 
-    private isTiedBend(note: Note): boolean {
+    private _isTiedBend(note: Note): boolean {
         if (note.isTieDestination) {
             if (note.tieOrigin!.hasBend) {
                 return true;
             }
-            return this.isTiedBend(note.tieOrigin!);
+            return this._isTiedBend(note.tieOrigin!);
         }
         return false;
     }

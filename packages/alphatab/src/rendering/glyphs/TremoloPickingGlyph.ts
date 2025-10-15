@@ -2,12 +2,15 @@ import { Duration } from '@src/model/Duration';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 export class TremoloPickingGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, duration: Duration) {
-        super(x, y, 1, TremoloPickingGlyph.getSymbol(duration));
+        super(x, y, 1, TremoloPickingGlyph._getSymbol(duration));
     }
 
-    private static getSymbol(duration: Duration): MusicFontSymbol {
+    private static _getSymbol(duration: Duration): MusicFontSymbol {
         switch (duration) {
             case Duration.ThirtySecond:
                 return MusicFontSymbol.Tremolo3;

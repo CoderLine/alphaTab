@@ -2,6 +2,10 @@
 // developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
+
+/**
+ * @internal
+ */
 export class SynthConstants {
     public static readonly DefaultChannelCount: number = 16 + 1;
     public static readonly MetronomeChannel: number = SynthConstants.DefaultChannelCount - 1;

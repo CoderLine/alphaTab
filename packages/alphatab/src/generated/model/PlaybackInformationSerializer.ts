@@ -5,6 +5,9 @@
 // </auto-generated>
 import { PlaybackInformation } from "@src/model/PlaybackInformation";
 import { JsonHelper } from "@src/io/JsonHelper";
+/**
+ * @internal
+ */
 export class PlaybackInformationSerializer {
     public static fromJson(obj: PlaybackInformation, m: unknown): void {
         if (!m) {

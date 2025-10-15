@@ -36,7 +36,9 @@ fs.writeSync(
     `\
 ${GENERATED_FILE_HEADER}
 
-
+/**
+ * @internal
+ */ 
 export class VersionInfo {
     public static readonly version: string = '${version}';
     public static readonly date: string = '${new Date().toISOString()}';

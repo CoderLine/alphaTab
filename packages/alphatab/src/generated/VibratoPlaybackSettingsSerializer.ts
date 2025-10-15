@@ -5,6 +5,9 @@
 // </auto-generated>
 import { VibratoPlaybackSettings } from "@src/PlayerSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
+/**
+ * @internal
+ */
 export class VibratoPlaybackSettingsSerializer {
     public static fromJson(obj: VibratoPlaybackSettings, m: unknown): void {
         if (!m) {

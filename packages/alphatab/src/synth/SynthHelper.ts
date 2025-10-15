@@ -3,6 +3,9 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 
+/**
+ * @internal
+ */
 export class SynthHelper {
     public static timecents2Secs(timecents: number): number {
         return Math.pow(2, timecents / 1200.0);

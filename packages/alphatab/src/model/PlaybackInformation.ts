@@ -3,6 +3,7 @@
  * for playback.
  * @json
  * @json_strict
+ * @public
  */
 export class PlaybackInformation {
     /**

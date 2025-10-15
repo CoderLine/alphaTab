@@ -24,6 +24,9 @@ import { TuningGlyph } from '@src/rendering/glyphs/TuningGlyph';
 import type { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 
+/**
+ * @internal
+ */
 class LazyPartial {
     public args: RenderFinishedEventArgs;
     public renderCallback: (canvas: ICanvas) => void;
@@ -35,6 +38,7 @@ class LazyPartial {
 
 /**
  * Lists the different modes in which the staves and systems are arranged.
+ * @internal
  */
 export enum InternalSystemsLayoutMode {
     /**
@@ -55,6 +59,7 @@ export enum InternalSystemsLayoutMode {
 
 /**
  * This is the base class for creating new layouting engines for the score renderer.
+ * @internal
  */
 export abstract class ScoreLayout {
     private _barRendererLookup: Map<string, Map<number, BarRendererBase>> = new Map();
@@ -116,7 +121,7 @@ export abstract class ScoreLayout {
             this.pagePadding = [this.pagePadding[0], this.pagePadding[1], this.pagePadding[0], this.pagePadding[1]];
         }
 
-        this.createScoreInfoGlyphs();
+        this._createScoreInfoGlyphs();
         this.doLayoutAndRender();
     }
 
@@ -138,7 +143,7 @@ export abstract class ScoreLayout {
         if (!this.renderer.settings.core.enableLazyLoading) {
             // in case of no lazy loading -> first notify about layout, then directly render
             (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
-            this.internalRenderLazyPartial(args, callback);
+            this._internalRenderLazyPartial(args, callback);
         } else {
             // in case of lazy loading -> first register lazy, then notify
             this._lazyPartials.set(args.id, new LazyPartial(args, callback));
@@ -146,7 +151,7 @@ export abstract class ScoreLayout {
         }
     }
 
-    private internalRenderLazyPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
+    private _internalRenderLazyPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
         const canvas = this.renderer.canvas!;
         canvas.beginRender(args.width, args.height);
         callback(canvas);
@@ -157,13 +162,13 @@ export abstract class ScoreLayout {
     public renderLazyPartial(resultId: string) {
         if (this._lazyPartials.has(resultId)) {
             const lazyPartial = this._lazyPartials.get(resultId)!;
-            this.internalRenderLazyPartial(lazyPartial.args, lazyPartial.renderCallback);
+            this._internalRenderLazyPartial(lazyPartial.args, lazyPartial.renderCallback);
         }
     }
 
     protected abstract doLayoutAndRender(): void;
 
-    protected static HeaderElements: Lazy<Map<ScoreSubElement, NotationElement | undefined>> = new Lazy(
+    protected static readonly headerElements: Lazy<Map<ScoreSubElement, NotationElement | undefined>> = new Lazy(
         () =>
             new Map<ScoreSubElement, NotationElement | undefined>([
                 [ScoreSubElement.Title, NotationElement.ScoreTitle],
@@ -176,7 +181,7 @@ export abstract class ScoreLayout {
                 [ScoreSubElement.Transcriber, undefined]
             ])
     );
-    protected static FooterElements: Lazy<Map<ScoreSubElement, NotationElement | undefined>> = new Lazy(
+    protected static readonly footerElements: Lazy<Map<ScoreSubElement, NotationElement | undefined>> = new Lazy(
         () =>
             new Map<ScoreSubElement, NotationElement | undefined>([
                 [ScoreSubElement.Copyright, NotationElement.ScoreCopyright],
@@ -184,7 +189,7 @@ export abstract class ScoreLayout {
             ])
     );
 
-    private createHeaderFooterGlyph(
+    private _createHeaderFooterGlyph(
         settings: Settings,
         score: Score,
         element: ScoreSubElement,
@@ -244,7 +249,7 @@ export abstract class ScoreLayout {
         );
     }
 
-    private createScoreInfoGlyphs(): void {
+    private _createScoreInfoGlyphs(): void {
         Logger.debug('ScoreLayout', 'Creating score info glyphs');
         const settings = this.renderer.settings;
         const score: Score = this.renderer.score!;
@@ -252,8 +257,8 @@ export abstract class ScoreLayout {
         this.footerGlyphs = new Map<ScoreSubElement, TextGlyph>();
         const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);
 
-        for (const [scoreElement, notationElement] of ScoreLayout.HeaderElements.value) {
-            const glyph = this.createHeaderFooterGlyph(settings, score, scoreElement, notationElement);
+        for (const [scoreElement, notationElement] of ScoreLayout.headerElements.value) {
+            const glyph = this._createHeaderFooterGlyph(settings, score, scoreElement, notationElement);
             if (glyph) {
                 glyph.renderer = fakeBarRenderer;
                 glyph.doLayout();
@@ -261,8 +266,8 @@ export abstract class ScoreLayout {
             }
         }
 
-        for (const [scoreElement, notationElement] of ScoreLayout.FooterElements.value) {
-            const glyph = this.createHeaderFooterGlyph(settings, score, scoreElement, notationElement);
+        for (const [scoreElement, notationElement] of ScoreLayout.footerElements.value) {
+            const glyph = this._createHeaderFooterGlyph(settings, score, scoreElement, notationElement);
             if (glyph) {
                 glyph.renderer = fakeBarRenderer;
                 glyph.doLayout();
@@ -424,7 +429,7 @@ export abstract class ScoreLayout {
 
         let width = 0;
 
-        for (const [scoreElement, _notationElement] of ScoreLayout.FooterElements.value) {
+        for (const [scoreElement, _notationElement] of ScoreLayout.footerElements.value) {
             if (this.footerGlyphs.has(scoreElement)) {
                 const glyph: TextGlyph = this.footerGlyphs.get(scoreElement)!;
                 glyph.y = infoHeight;

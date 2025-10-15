@@ -12,12 +12,18 @@ import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
 import { NoteYPosition, type BarRendererBase } from '@src/rendering/BarRendererBase';
 
+/**
+ * @internal
+ */
 class BeatLinePositions {
     public staffId: string = '';
     public up: number = 0;
     public down: number = 0;
 }
 
+/**
+ * @internal
+ */
 export class BeamingHelperDrawInfo {
     public startBeat: Beat | null = null;
     public startX: number = 0;
@@ -45,6 +51,7 @@ export class BeamingHelperDrawInfo {
 
 /**
  * This public class helps drawing beams and bars for notes.
+ * @internal
  */
 export class BeamingHelper {
     private _staff: Staff;
@@ -87,23 +94,23 @@ export class BeamingHelper {
 
     public hasLine(forceFlagOnSingleBeat: boolean, beat?: Beat): boolean {
         return (
-            (forceFlagOnSingleBeat && this.beatHasLine(beat!)) ||
-            (!forceFlagOnSingleBeat && this.beats.length === 1 && this.beatHasLine(beat!))
+            (forceFlagOnSingleBeat && this._beatHasLine(beat!)) ||
+            (!forceFlagOnSingleBeat && this.beats.length === 1 && this._beatHasLine(beat!))
         );
     }
 
-    private beatHasLine(beat: Beat): boolean {
+    private _beatHasLine(beat: Beat): boolean {
         return beat!.duration > Duration.Whole;
     }
 
     public hasFlag(forceFlagOnSingleBeat: boolean, beat?: Beat): boolean {
         return (
-            (forceFlagOnSingleBeat && this.beatHasFlag(beat!)) ||
-            (!forceFlagOnSingleBeat && this.beats.length === 1 && this.beatHasFlag(this.beats[0]))
+            (forceFlagOnSingleBeat && this._beatHasFlag(beat!)) ||
+            (!forceFlagOnSingleBeat && this.beats.length === 1 && this._beatHasFlag(this.beats[0]))
         );
     }
 
-    private beatHasFlag(beat: Beat) {
+    private _beatHasFlag(beat: Beat) {
         return (
             !beat.deadSlapped && !beat.isRest && (beat.duration > Duration.Quarter || beat.graceType !== GraceType.None)
         );
@@ -132,7 +139,7 @@ export class BeamingHelper {
     }
 
     public registerBeatLineX(staffId: string, beat: Beat, up: number, down: number): void {
-        const positions: BeatLinePositions = this.getOrCreateBeatPositions(beat);
+        const positions: BeatLinePositions = this._getOrCreateBeatPositions(beat);
         positions.staffId = staffId;
         positions.up = up;
         positions.down = down;
@@ -145,7 +152,7 @@ export class BeamingHelper {
         }
     }
 
-    private getOrCreateBeatPositions(beat: Beat): BeatLinePositions {
+    private _getOrCreateBeatPositions(beat: Beat): BeatLinePositions {
         if (!this._beatLineXPositions.has(beat.index)) {
             this._beatLineXPositions.set(beat.index, new BeatLinePositions());
         }
@@ -154,11 +161,11 @@ export class BeamingHelper {
 
     public direction: BeamDirection = BeamDirection.Up;
     public finish(): void {
-        this.direction = this.calculateDirection();
+        this.direction = this._calculateDirection();
         this._renderer.completeBeamingHelper(this);
     }
 
-    private calculateDirection(): BeamDirection {
+    private _calculateDirection(): BeamDirection {
         // no proper voice (should not happen usually)
         if (!this.voice) {
             return BeamDirection.Up;
@@ -169,15 +176,15 @@ export class BeamingHelper {
         }
         // on multi-voice setups secondary voices are always down
         if (this.voice.index > 0) {
-            return this.invert(BeamDirection.Down);
+            return this._invert(BeamDirection.Down);
         }
         // on multi-voice setups primary voices are always up
         if (this.voice.bar.isMultiVoice) {
-            return this.invert(BeamDirection.Up);
+            return this._invert(BeamDirection.Up);
         }
         // grace notes are always up
         if (this.beats[0].graceType !== GraceType.None) {
-            return this.invert(BeamDirection.Up);
+            return this._invert(BeamDirection.Up);
         }
 
         // the average line is used for determination
@@ -188,10 +195,10 @@ export class BeamingHelper {
             const lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper, NoteYPosition.Center);
 
             const avg = (highestNotePosition + lowestNotePosition) / 2;
-            return this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
+            return this._invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
         }
 
-        return this.invert(BeamDirection.Up);
+        return this._invert(BeamDirection.Up);
     }
 
     public static computeLineHeightsForRest(duration: Duration): number[] {
@@ -256,7 +263,7 @@ export class BeamingHelper {
         }
     }
 
-    private invert(direction: BeamDirection): BeamDirection {
+    private _invert(direction: BeamDirection): BeamDirection {
         if (!this.invertBeamDirection) {
             return direction;
         }
@@ -285,7 +292,7 @@ export class BeamingHelper {
             switch (this.beats[this.beats.length - 1].beamingMode) {
                 case BeatBeamingMode.Auto:
                 case BeatBeamingMode.ForceSplitOnSecondaryToNext:
-                    add = BeamingHelper.canJoin(this.beats[this.beats.length - 1], beat);
+                    add = BeamingHelper._canJoin(this.beats[this.beats.length - 1], beat);
                     break;
                 case BeatBeamingMode.ForceSplitToNext:
                     add = false;
@@ -320,8 +327,8 @@ export class BeamingHelper {
                     this.beats = [];
                 }
                 this.beats.push(beat);
-                this.checkNote(beat.minNote);
-                this.checkNote(beat.maxNote);
+                this._checkNote(beat.minNote);
+                this._checkNote(beat.maxNote);
                 if (this.shortestDuration < beat.duration) {
                     this.shortestDuration = beat.duration;
                 }
@@ -339,7 +346,7 @@ export class BeamingHelper {
         return add;
     }
 
-    private checkNote(note: Note | null): void {
+    private _checkNote(note: Note | null): void {
         if (!note) {
             return;
         }
@@ -375,7 +382,7 @@ export class BeamingHelper {
     }
 
     // TODO: Check if this beaming is really correct, I'm not sure if we are connecting beats correctly
-    private static canJoin(b1: Beat, b2: Beat): boolean {
+    private static _canJoin(b1: Beat, b2: Beat): boolean {
         // is this a voice we can join with?
         if (
             !b1 ||
@@ -402,7 +409,7 @@ export class BeamingHelper {
         const start1: number = b1.playbackStart;
         const start2: number = b2.playbackStart;
         // we can only join 8th, 16th, 32th and 64th voices
-        if (!BeamingHelper.canJoinDuration(b1.duration) || !BeamingHelper.canJoinDuration(b2.duration)) {
+        if (!BeamingHelper._canJoinDuration(b1.duration) || !BeamingHelper._canJoinDuration(b2.duration)) {
             return start1 === start2;
         }
         // break between different tuplet groups
@@ -430,7 +437,7 @@ export class BeamingHelper {
         return division1 === division2;
     }
 
-    private static canJoinDuration(d: Duration): boolean {
+    private static _canJoinDuration(d: Duration): boolean {
         switch (d) {
             case Duration.Whole:
             case Duration.Half:

@@ -6,6 +6,9 @@ import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 
+/**
+ * @internal
+ */
 export class ScoreTieGlyph extends TieGlyph {
     protected startNote: Note;
     protected endNote: Note;

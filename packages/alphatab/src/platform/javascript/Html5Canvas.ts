@@ -8,6 +8,7 @@ import type { Settings } from '@src/Settings';
 /**
  * A canvas implementation for HTML5 canvas
  * @target web
+ * @internal
  */
 export class Html5Canvas implements ICanvas {
     private _measureCanvas: HTMLCanvasElement;
@@ -49,13 +50,13 @@ export class Html5Canvas implements ICanvas {
         const scale = this.settings.display.scale;
 
         this._canvas = document.createElement('canvas');
-        this._canvas.width = (width * Environment.HighDpiFactor) | 0;
-        this._canvas.height = (height * Environment.HighDpiFactor) | 0;
+        this._canvas.width = (width * Environment.highDpiFactor) | 0;
+        this._canvas.height = (height * Environment.highDpiFactor) | 0;
         this._canvas.style.width = `${width}px`;
         this._canvas.style.height = `${height}px`;
         this._context = this._canvas.getContext('2d')!;
         this._context.textBaseline = 'hanging';
-        this._context.scale(Environment.HighDpiFactor * scale, Environment.HighDpiFactor * scale);
+        this._context.scale(Environment.highDpiFactor * scale, Environment.highDpiFactor * scale);
         this._context.lineWidth = this._lineWidth;
     }
 
@@ -244,7 +245,7 @@ export class Html5Canvas implements ICanvas {
         if (symbol === MusicFontSymbol.None) {
             return;
         }
-        this.fillMusicFontSymbolText(x, y, relativeScale, String.fromCharCode(symbol), centerAtPosition);
+        this._fillMusicFontSymbolText(x, y, relativeScale, String.fromCharCode(symbol), centerAtPosition);
     }
 
     public fillMusicFontSymbols(
@@ -260,10 +261,10 @@ export class Html5Canvas implements ICanvas {
                 s += String.fromCharCode(symbol);
             }
         }
-        this.fillMusicFontSymbolText(x, y, relativeScale, s, centerAtPosition);
+        this._fillMusicFontSymbolText(x, y, relativeScale, s, centerAtPosition);
     }
 
-    private fillMusicFontSymbolText(
+    private _fillMusicFontSymbolText(
         x: number,
         y: number,
         relativeScale: number,

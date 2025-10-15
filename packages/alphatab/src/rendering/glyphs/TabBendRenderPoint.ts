@@ -1,5 +1,8 @@
 import { BendPoint } from '@src/model/BendPoint';
 
+/**
+ * @internal
+ */
 export class TabBendRenderPoint extends BendPoint {
     public lineValue: number = 0;
 

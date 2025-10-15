@@ -3,6 +3,9 @@ import type { Note } from '@src/model/Note';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import type { Settings } from '@src/Settings';
 
+/**
+ * @internal
+ */
 export abstract class NoteEffectInfoBase extends EffectBarRendererInfo {
     protected lastCreateInfo: Note[] | null = null;
 

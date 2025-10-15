@@ -28,13 +28,19 @@
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import type { IReadable } from '@src/io/IReadable';
 
+/**
+ * @internal
+ */
 class IntBitReaderReadResult {
     public value: number = 0;
     public bitsRead: number = 0;
 }
 
+/**
+ * @internal
+ */
 export class IntBitReader {
-    private static readonly ByteSize = 8; // size of byte in bits
+    private static readonly _byteSize = 8; // size of byte in bits
 
     private readonly _source: IReadable;
     private _bitBucket: bigint = 0n; // 8
@@ -46,7 +52,7 @@ export class IntBitReader {
     }
 
     public readByte(): number {
-        return this.readBits(IntBitReader.ByteSize);
+        return this.readBits(IntBitReader._byteSize);
     }
 
     public readBit(): boolean {

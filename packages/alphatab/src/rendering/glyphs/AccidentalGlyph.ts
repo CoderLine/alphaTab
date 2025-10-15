@@ -2,6 +2,9 @@ import { AccidentalType } from '@src/model/AccidentalType';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 export class AccidentalGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, accidentalType: AccidentalType, scale: number) {
         super(x, y, scale, AccidentalGlyph.getMusicSymbol(accidentalType));

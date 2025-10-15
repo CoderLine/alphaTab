@@ -2,6 +2,10 @@
 // developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
+
+/**
+ * @internal
+ */
 export class VoiceLowPass {
     public qInv: number = 0;
     public a0: number = 0;
@@ -28,12 +32,12 @@ export class VoiceLowPass {
     public setup(fc: number): void {
         // Lowpass filter from http://www.earlevel.com/main/2012/11/26/biquad-c-source-code/
         const k: number = Math.tan(Math.PI * fc);
-        const KK: number = k * k;
-        const norm: number = 1 / (1 + k * this.qInv + KK);
-        this.a0 = KK * norm;
+        const kk: number = k * k;
+        const norm: number = 1 / (1 + k * this.qInv + kk);
+        this.a0 = kk * norm;
         this.a1 = 2 * this.a0;
-        this.b1 = 2 * (KK - 1) * norm;
-        this.b2 = (1 - k * this.qInv + KK) * norm;
+        this.b1 = 2 * (kk - 1) * norm;
+        this.b2 = (1 - k * this.qInv + kk) * norm;
     }
 
     public process(input: number): number {

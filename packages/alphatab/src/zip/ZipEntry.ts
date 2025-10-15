@@ -1,3 +1,6 @@
+/**
+ * @internal
+ */
 export class ZipEntry {
     public static readonly OptionalDataDescriptorSignature: number = 0x08074b50;
     public static readonly CompressionMethodDeflate: number = 8;

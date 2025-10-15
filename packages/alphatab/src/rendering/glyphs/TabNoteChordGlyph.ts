@@ -10,6 +10,9 @@ import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
+/**
+ * @internal
+ */
 export class TabNoteChordGlyph extends Glyph {
     private _notes: NoteNumberGlyph[] = [];
     private _deadSlapped: DeadSlappedBeatGlyph | null = null;

@@ -4,6 +4,9 @@ import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 export abstract class VibratoGlyphBase extends GroupedEffectGlyph {
     private _type: VibratoType;
     private _symbol: MusicFontSymbol = MusicFontSymbol.None;
@@ -60,6 +63,9 @@ export abstract class VibratoGlyphBase extends GroupedEffectGlyph {
     }
 }
 
+/**
+ * @internal
+ */
 export class NoteVibratoGlyph extends VibratoGlyphBase {
     protected override get slightVibratoGlyph(): MusicFontSymbol {
         return MusicFontSymbol.GuitarVibratoStroke;

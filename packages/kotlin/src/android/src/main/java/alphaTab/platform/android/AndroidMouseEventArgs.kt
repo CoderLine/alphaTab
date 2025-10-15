@@ -26,7 +26,7 @@ internal class AndroidMouseEventArgs(
             relativeTo.view.getLocationOnScreen(location)
         }
 
-        return (_event.rawX - location[0]) / Environment.HighDpiFactor
+        return (_event.rawX - location[0]) / Environment.highDpiFactor
     }
 
     override fun getY(relativeTo: IContainer): Double {val location = IntArray(2)
@@ -36,7 +36,7 @@ internal class AndroidMouseEventArgs(
             relativeTo.view.getLocationOnScreen(location)
         }
 
-        return (_event.rawY - location[1]) / Environment.HighDpiFactor
+        return (_event.rawY - location[1]) / Environment.highDpiFactor
     }
 
     override fun preventDefault() {

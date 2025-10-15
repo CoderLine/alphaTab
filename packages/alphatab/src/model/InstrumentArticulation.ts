@@ -1,9 +1,11 @@
+
 import { Duration } from '@src/model/Duration';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 
 /**
  * This public enum lists all base line modes
+ * @public
  */
 export enum TechniqueSymbolPlacement {
     /**
@@ -28,6 +30,7 @@ export enum TechniqueSymbolPlacement {
  * Describes an instrument articulation which is used for percussions.
  * @json
  * @json_strict
+ * @public
  */
 export class InstrumentArticulation {
     /**

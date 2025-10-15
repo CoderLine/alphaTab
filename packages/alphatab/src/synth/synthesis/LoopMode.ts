@@ -3,6 +3,9 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 
+/**
+ * @internal
+ */
 export enum LoopMode {
     None = 0,
     Continuous = 1,

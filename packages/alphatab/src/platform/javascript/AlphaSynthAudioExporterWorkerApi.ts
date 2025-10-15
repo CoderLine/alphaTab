@@ -7,6 +7,7 @@ import type { AudioExportChunk, AudioExportOptions, IAudioExporterWorker } from 
 
 /**
  * @target web
+ * @internal
  */
 export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
     private static _nextExporterId = 1;

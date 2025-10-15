@@ -31,6 +31,7 @@ import { ElementStyle } from '@src/model/ElementStyle';
 
 /**
  * Lists the different modes on how beaming for a beat should be done.
+ * @public
  */
 export enum BeatBeamingMode {
     /**
@@ -53,6 +54,7 @@ export enum BeatBeamingMode {
 
 /**
  * Lists all graphical sub elements within a {@link Beat} which can be styled via {@link Beat.style}
+ * @public
  */
 export enum BeatSubElement {
     /**
@@ -180,6 +182,7 @@ export enum BeatSubElement {
  * Defines the custom styles for beats.
  * @json
  * @json_strict
+ * @public
  */
 export class BeatStyle extends ElementStyle<BeatSubElement> {}
 
@@ -189,6 +192,7 @@ export class BeatStyle extends ElementStyle<BeatSubElement> {}
  * @json
  * @json_strict
  * @cloneable
+ * @public
  */
 export class Beat {
     private static _globalBeatId: number = 0;
@@ -767,7 +771,7 @@ export class Beat {
         return null;
     }
 
-    private calculateDuration(): number {
+    private _calculateDuration(): number {
         if (this.overrideDisplayDuration !== undefined) {
             return this.overrideDisplayDuration!;
         }
@@ -787,7 +791,7 @@ export class Beat {
     }
 
     public updateDurations(): void {
-        const ticks: number = this.calculateDuration();
+        const ticks: number = this._calculateDuration();
         this.playbackDuration = ticks;
 
         switch (this.graceType) {
@@ -1069,7 +1073,7 @@ export class Beat {
                 cloneNote.maxBendPoint = null;
                 cloneNote.bendPoints = null;
                 cloneNote.bendStyle = BendStyle.Default;
-                cloneNote.id = Note.GlobalNoteId++;
+                cloneNote.id = Note.globalNoteId++;
 
                 // fix ties
                 if (note.isTieOrigin) {

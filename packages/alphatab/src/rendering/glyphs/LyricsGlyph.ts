@@ -2,6 +2,9 @@ import type { Font } from '@src/model/Font';
 import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
+/**
+ * @internal
+ */
 export class LyricsGlyph extends EffectGlyph {
     private _lines: string[];
 

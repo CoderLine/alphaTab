@@ -5,6 +5,9 @@
 import { IOHelper } from '@src/io/IOHelper';
 import type { IReadable } from '@src/io/IReadable';
 
+/**
+ * @internal
+ */
 export class RiffChunk {
     public static readonly HeaderSize = 4 /*FourCC*/ + 4 /*Size*/;
 

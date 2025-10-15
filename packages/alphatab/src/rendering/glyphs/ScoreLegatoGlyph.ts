@@ -7,6 +7,9 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
 
+/**
+ * @internal
+ */
 export class ScoreLegatoGlyph extends TieGlyph {
     public constructor(startBeat: Beat, endBeat: Beat, forEnd: boolean = false) {
         super(startBeat, endBeat, forEnd);

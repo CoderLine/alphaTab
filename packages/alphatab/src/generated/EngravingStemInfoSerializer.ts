@@ -5,6 +5,9 @@
 // </auto-generated>
 import { EngravingStemInfo } from "@src/EngravingSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
+/**
+ * @internal
+ */
 export class EngravingStemInfoSerializer {
     public static fromJson(obj: EngravingStemInfo, m: unknown): void {
         if (!m) {

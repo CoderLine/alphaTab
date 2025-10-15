@@ -2,6 +2,9 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 
+/**
+ * @internal
+ */
 export class NumberGlyph extends Glyph {
     private _scale: number = 0;
     private _baseline: TextBaseline;

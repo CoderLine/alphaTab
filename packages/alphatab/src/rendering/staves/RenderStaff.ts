@@ -11,6 +11,7 @@ import { InternalSystemsLayoutMode } from '@src/rendering/layout/ScoreLayout';
 /**
  * A Staff represents a single line within a StaffSystem.
  * It stores BarRenderer instances created from a given factory.
+ * @internal
  */
 export class RenderStaff {
     private _factory: BarRendererFactory;

@@ -5,6 +5,9 @@
 // </auto-generated>
 import { Section } from "@src/model/Section";
 import { JsonHelper } from "@src/io/JsonHelper";
+/**
+ * @internal
+ */
 export class SectionSerializer {
     public static fromJson(obj: Section, m: unknown): void {
         if (!m) {

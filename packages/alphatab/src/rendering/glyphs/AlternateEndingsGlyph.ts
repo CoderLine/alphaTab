@@ -4,6 +4,9 @@ import type { RenderingResources } from '@src/RenderingResources';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { BarLineStyle } from '@src/model/Bar';
 
+/**
+ * @internal
+ */
 export class AlternateEndingsGlyph extends EffectGlyph {
     private _endings: number[];
     private _endingsString: string = '';

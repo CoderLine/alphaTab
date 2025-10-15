@@ -13,6 +13,7 @@ import type { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 
 /**
  * A synth output for playing backing tracks.
+ * @public
  */
 export interface IBackingTrackSynthOutput extends ISynthOutput {
     /**
@@ -44,6 +45,9 @@ export interface IBackingTrackSynthOutput extends ISynthOutput {
     loadBackingTrack(backingTrack: BackingTrack): void;
 }
 
+/**
+ * @internal
+ */
 class BackingTrackAudioSynthesizer implements IAudioSampleSynthesizer {
     private _midiEventQueue: Queue<SynthEvent> = new Queue<SynthEvent>();
 
@@ -85,7 +89,7 @@ class BackingTrackAudioSynthesizer implements IAudioSampleSynthesizer {
         this.fakeSynthesize();
     }
 
-    private processMidiMessage(_e: MidiEvent): void {}
+    private _processMidiMessage(_e: MidiEvent): void {}
 
     public dispatchEvent(synthEvent: SynthEvent): void {
         this._midiEventQueue.enqueue(synthEvent);
@@ -102,7 +106,7 @@ class BackingTrackAudioSynthesizer implements IAudioSampleSynthesizer {
             if (m.isMetronome && this.metronomeVolume > 0) {
                 // ignore metronome
             } else if (m.event) {
-                this.processMidiMessage(m.event);
+                this._processMidiMessage(m.event);
             }
             processedEvents.push(m);
         }
@@ -135,6 +139,9 @@ class BackingTrackAudioSynthesizer implements IAudioSampleSynthesizer {
     }
 }
 
+/**
+ * @internal
+ */
 export class BackingTrackPlayer extends AlphaSynthBase {
     private _backingTrackOutput: IBackingTrackSynthOutput;
     constructor(backingTrackOutput: IBackingTrackSynthOutput, bufferTimeInMilliseconds: number) {

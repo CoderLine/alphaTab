@@ -1,5 +1,6 @@
 /**
  * An emitter for an event without any value passed to the listeners.
+ * @public
  */
 export interface IEventEmitter {
     /**
@@ -20,6 +21,7 @@ export interface IEventEmitter {
 /**
  * An emitter for an event with a single parameter passed to the listeners.
  * @partial
+ * @public
  */
 export interface IEventEmitterOfT<T> {
     /**
@@ -37,6 +39,9 @@ export interface IEventEmitterOfT<T> {
     off(value: (arg: T) => void): void;
 }
 
+/**
+ * @internal
+ */
 export class EventEmitter implements IEventEmitter {
     private _listeners: (() => void)[] = [];
     private readonly _fireOnRegister: (() => boolean) | undefined;
@@ -68,6 +73,7 @@ export class EventEmitter implements IEventEmitter {
 
 /**
  * @partial
+ * @internal
  */
 export class EventEmitterOfT<T> implements IEventEmitterOfT<T> {
     private _listeners: ((arg: T) => void)[] = [];

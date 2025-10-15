@@ -12,6 +12,7 @@ import { SlidePlaybackSettingsJson } from "@src/generated/SlidePlaybackSettingsJ
  * The player settings control how the audio playback and UI is behaving.
  * @json
  * @json_declaration
+ * @public
  * @target web
  */
 export interface PlayerSettingsJson {

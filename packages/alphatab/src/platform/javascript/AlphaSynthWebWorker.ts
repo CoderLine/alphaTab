@@ -13,6 +13,7 @@ import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChan
  * This class implements a HTML5 WebWorker based version of alphaSynth
  * which can be controlled via WebWorker messages.
  * @target web
+ * @internal
  */
 export class AlphaSynthWebWorker {
     private _player: AlphaSynth;
@@ -143,10 +144,10 @@ export class AlphaSynthWebWorker {
         }
 
         if (cmd.startsWith('alphaSynth.exporter')) {
-            this.handleExporterMessage(e);
+            this._handleExporterMessage(e);
         }
     }
-    private handleExporterMessage(e: MessageEvent) {
+    private _handleExporterMessage(e: MessageEvent) {
         const data: any = e.data;
         const cmd: string = data.cmd;
         try {
@@ -233,11 +234,11 @@ export class AlphaSynthWebWorker {
     public onSoundFontLoadFailed(e: any): void {
         this._main.postMessage({
             cmd: 'alphaSynth.soundFontLoadFailed',
-            error: this.serializeException(Environment.prepareForPostMessage(e))
+            error: this._serializeException(Environment.prepareForPostMessage(e))
         });
     }
 
-    private serializeException(e: any): unknown {
+    private _serializeException(e: any): unknown {
         const error: any = JSON.parse(JSON.stringify(e));
         if (e.message) {
             error.message = e.message;
@@ -267,7 +268,7 @@ export class AlphaSynthWebWorker {
     public onMidiLoadFailed(e: any): void {
         this._main.postMessage({
             cmd: 'alphaSynth.midiLoaded',
-            error: this.serializeException(Environment.prepareForPostMessage(e))
+            error: this._serializeException(Environment.prepareForPostMessage(e))
         });
     }
 

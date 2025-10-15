@@ -6,6 +6,7 @@ import { Settings } from '@src/Settings';
 /**
  * This is the base class for creating new song exporters which
  * enable writing scores to a binary datasink.
+ * @public
  */
 export abstract class ScoreExporter {
     protected data!: IWriteable;

@@ -7,6 +7,9 @@ import { TrackStyle } from "@src/model/Track";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { TrackSubElement } from "@src/model/Track";
 import { Color } from "@src/model/Color";
+/**
+ * @internal
+ */
 export class TrackStyleSerializer {
     public static fromJson(obj: TrackStyle, m: unknown): void {
         if (!m) {

@@ -1,5 +1,6 @@
 /**
  * Lists all types of whammy bars
+ * @public
  */
 export enum WhammyType {
     /**

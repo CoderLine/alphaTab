@@ -1,6 +1,7 @@
 /**
  * Lists all music font symbols used within alphaTab. The names
  * and values are aligned with the SMuFL standard.
+ * @public
  */
 export enum MusicFontSymbol {
     None = -1,

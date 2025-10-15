@@ -6,6 +6,7 @@ import type { StaffSystem, SystemBracket } from '@src/rendering/staves/StaffSyst
  * Represents the group of rendered staves belonging to an individual track.
  * This includes staves like effects, notation representations (numbered, tabs,..) and multiple
  * staffs (grand staff).
+ * @internal
  */
 export class StaffTrackGroup {
     public track: Track;

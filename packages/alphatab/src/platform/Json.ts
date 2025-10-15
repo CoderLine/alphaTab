@@ -3,6 +3,7 @@ import { IOHelper } from '@src/io/IOHelper';
 /**
  * A cross platform implementation of the EcmaScript JSON standard implementation.
  * @partial
+ * @internal
  */
 export class Json {
     // https://tc39.es/ecma262/multipage/structured-data.html#sec-quotejsonstring
@@ -14,16 +15,16 @@ export class Json {
         // 2.
         for (const c of IOHelper.iterateCodepoints(text)) {
             // 2a.
-            if (Json.jsonSingleCharacterEscapeSequences.has(c)) {
+            if (Json._jsonSingleCharacterEscapeSequences.has(c)) {
                 // 2ai.
-                product += Json.jsonSingleCharacterEscapeSequences.get(c)!;
+                product += Json._jsonSingleCharacterEscapeSequences.get(c)!;
             }
             // 2b.
             else if (c < 0x0020 || IOHelper.isLeadingSurrogate(c) || IOHelper.isTrailingSurrogate(c)) {
                 //  2bi.
                 const unit = c;
                 // 2bii.
-                product += Json.unicodeEscape(unit);
+                product += Json._unicodeEscape(unit);
             }
             // 2c
             else {
@@ -39,7 +40,7 @@ export class Json {
     }
 
     // https://tc39.es/ecma262/multipage/structured-data.html#sec-unicodeescape
-    private static unicodeEscape(c: number): string {
+    private static _unicodeEscape(c: number): string {
         // 1.
         const n = c;
         // 2. skipped
@@ -50,7 +51,7 @@ export class Json {
     }
 
     // https://tc39.es/ecma262/multipage/structured-data.html#table-json-single-character-escapes
-    private static jsonSingleCharacterEscapeSequences = new Map<number, string>([
+    private static _jsonSingleCharacterEscapeSequences = new Map<number, string>([
         [0x0008, '\\b'],
         [0x0009, '\\t'],
         [0x000a, '\\n'],

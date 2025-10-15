@@ -1,5 +1,6 @@
 /**
  * Lists all types how two voices can be joined with bars.
+ * @internal
  */
 export enum BeamBarType {
     /**

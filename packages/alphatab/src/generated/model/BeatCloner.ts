@@ -7,6 +7,9 @@ import { Beat } from "@src/model/Beat";
 import { NoteCloner } from "@src/generated/model/NoteCloner";
 import { AutomationCloner } from "@src/generated/model/AutomationCloner";
 import { BendPointCloner } from "@src/generated/model/BendPointCloner";
+/**
+ * @internal
+ */
 export class BeatCloner {
     public static clone(original: Beat): Beat {
         const clone = new Beat();

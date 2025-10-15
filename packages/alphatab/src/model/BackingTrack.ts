@@ -2,6 +2,7 @@
  * Holds information about the backing track which can be played instead of synthesized audio.
  * @json
  * @json_strict
+ * @public
  */
 export class BackingTrack {
 

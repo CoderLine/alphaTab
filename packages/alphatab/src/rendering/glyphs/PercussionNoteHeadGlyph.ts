@@ -5,6 +5,9 @@ import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import type { Duration } from '@src/model/Duration';
 import { TechniqueSymbolPlacement, type InstrumentArticulation } from '@src/model/InstrumentArticulation';
 
+/**
+ * @internal
+ */
 export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     private _isGrace: boolean;
     private _articulation: InstrumentArticulation;

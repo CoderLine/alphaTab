@@ -13,7 +13,7 @@ import { ExporterSettingsJson } from "@src/generated/ExporterSettingsJson";
  * This public class contains instance specific settings for alphaTab
  * @json
  * @json_declaration
- * @public_api
+ * @public
  * @target web
  */
 export interface SettingsJson {

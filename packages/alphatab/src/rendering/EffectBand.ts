@@ -10,6 +10,9 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import type { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
+/**
+ * @internal
+ */
 export class EffectBand extends Glyph {
     private _uniqueEffectGlyphs: EffectGlyph[][] = [];
     private _effectGlyphs: Map<number, EffectGlyph>[] = [];
@@ -65,7 +68,7 @@ export class EffectBand extends Glyph {
                         break;
                 }
             }
-            const glyph: EffectGlyph = this.createOrResizeGlyph(this.info.sizingMode, beat);
+            const glyph: EffectGlyph = this._createOrResizeGlyph(this.info.sizingMode, beat);
             if (glyph.height > this.height) {
                 this.height = glyph.height;
                 this.originalHeight = glyph.height;
@@ -77,7 +80,7 @@ export class EffectBand extends Glyph {
         this.height = this.originalHeight;
     }
 
-    private createOrResizeGlyph(sizing: EffectBarGlyphSizing, b: Beat): EffectGlyph {
+    private _createOrResizeGlyph(sizing: EffectBarGlyphSizing, b: Beat): EffectGlyph {
         let g: EffectGlyph;
         switch (sizing) {
             case EffectBarGlyphSizing.FullBar:
@@ -130,7 +133,7 @@ export class EffectBand extends Glyph {
                         // if the effect cannot be expanded, create a new glyph
                         // in case of expansion also create a new glyph, but also link the glyphs together
                         // so for rendering it might be expanded.
-                        const newGlyph: EffectGlyph = this.createOrResizeGlyph(singleSizing, b);
+                        const newGlyph: EffectGlyph = this._createOrResizeGlyph(singleSizing, b);
                         if (prevEffect && this.info.canExpand(prevBeat, b)) {
                             // link glyphs
                             prevEffect.nextGlyph = newGlyph;
@@ -141,12 +144,12 @@ export class EffectBand extends Glyph {
                         return newGlyph;
                     }
                     // in case the previous beat did not have the same effect, we simply create a new glyph
-                    return this.createOrResizeGlyph(singleSizing, b);
+                    return this._createOrResizeGlyph(singleSizing, b);
                 }
                 // in case of the very first beat, we simply create the glyph.
-                return this.createOrResizeGlyph(singleSizing, b);
+                return this._createOrResizeGlyph(singleSizing, b);
             default:
-                return this.createOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
+                return this._createOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
         }
     }
 
@@ -171,12 +174,12 @@ export class EffectBand extends Glyph {
     public alignGlyphs(): void {
         for (let v: number = 0; v < this._effectGlyphs.length; v++) {
             for (const beatIndex of this._effectGlyphs[v].keys()) {
-                this.alignGlyph(this.info.sizingMode, this.renderer.bar.voices[v].beats[beatIndex]);
+                this._alignGlyph(this.info.sizingMode, this.renderer.bar.voices[v].beats[beatIndex]);
             }
         }
     }
 
-    private alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {
+    private _alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {
         const g: EffectGlyph = this._effectGlyphs[beat.voice.index].get(beat.index)!;
         const container: BeatContainerGlyph = this.renderer.getBeatContainer(beat)!;
 

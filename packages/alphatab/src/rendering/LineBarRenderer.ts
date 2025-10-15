@@ -25,6 +25,7 @@ import { BeatXPosition } from '@src/rendering/BeatXPosition';
  *
  * This base class takes care of the typical bits like drawing lines,
  * allowing note positioning and creating glyphs like repeats, bar numbers etc..
+ * @internal
  */
 export abstract class LineBarRenderer extends BarRendererBase {
     protected firstLineY: number = 0;
@@ -92,7 +93,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return this.lineOffset * line;
     }
 
-    // private static readonly Random Random = new Random();
     protected override paintBackground(cx: number, cy: number, canvas: ICanvas): void {
         super.paintBackground(cx, cy, canvas);
         // canvas.color = Color.random(100);
@@ -184,7 +184,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             if (this.hasVoiceContainer(voice)) {
                 const container = this.getVoiceContainer(voice)!;
                 for (const tupletGroup of container.tupletGroups) {
-                    this.paintTupletHelper(
+                    this._paintTupletHelper(
                         cx + this.beatGlyphsStart,
                         cy,
                         canvas,
@@ -204,7 +204,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     protected abstract calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number;
 
-    private paintTupletHelper(
+    private _paintTupletHelper(
         cx: number,
         cy: number,
         canvas: ICanvas,
@@ -425,7 +425,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     ): void {
         for (const v of this.helpers.beamHelpers) {
             for (const h of v) {
-                this.paintBeamHelper(cx + this.beatGlyphsStart, cy, canvas, h, flagsElement, beamsElement);
+                this._paintBeamHelper(cx + this.beatGlyphsStart, cy, canvas, h, flagsElement, beamsElement);
             }
         }
     }
@@ -434,7 +434,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return h.beats.length === 1;
     }
 
-    private paintBeamHelper(
+    private _paintBeamHelper(
         cx: number,
         cy: number,
         canvas: ICanvas,
@@ -536,7 +536,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             if (beat.graceType === GraceType.BeforeBeat) {
                 if (direction === BeamDirection.Down) {
-                    CanvasHelper.fillMusicFontSymbolSafe(canvas,
+                    CanvasHelper.fillMusicFontSymbolSafe(
+                        canvas,
                         cx + this.x + beatLineX + flagWidth / 2,
                         (topY + bottomY - this.smuflMetrics.glyphHeights.get(MusicFontSymbol.GraceNoteSlashStemDown)!) /
                             2,
@@ -545,7 +546,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
                         true
                     );
                 } else {
-                    CanvasHelper.fillMusicFontSymbolSafe(canvas,
+                    CanvasHelper.fillMusicFontSymbolSafe(
+                        canvas,
                         cx + this.x + beatLineX + flagWidth / 2,
                         (topY + bottomY + this.smuflMetrics.glyphHeights.get(MusicFontSymbol.GraceNoteSlashStemUp)!) /
                             2,
@@ -762,7 +764,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
             slashY += barSize + barSpacing;
 
             if (direction === BeamDirection.Down) {
-                CanvasHelper.fillMusicFontSymbolSafe(canvas,
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
                     cx + this.x + beatLineX + flagWidth / 2,
                     slashY,
                     NoteHeadGlyph.GraceScale,
@@ -770,7 +773,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     true
                 );
             } else {
-                CanvasHelper.fillMusicFontSymbolSafe(canvas,
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
                     cx + this.x + beatLineX + flagWidth / 2,
                     slashY,
                     NoteHeadGlyph.GraceScale,

@@ -1,5 +1,6 @@
 /**
  * Lists all modes how alphaTab can scroll the container during playback.
+ * @public
  */
 export enum ScrollMode {
     /**
@@ -20,6 +21,7 @@ export enum ScrollMode {
  * This object defines the details on how to generate the vibrato effects.
  * @json
  * @json_declaration
+ * @public
  */
 export class VibratoPlaybackSettings {
     /**
@@ -75,6 +77,7 @@ export class VibratoPlaybackSettings {
  * This object defines the details on how to generate the slide effects.
  * @json
  * @json_declaration
+ * @public
  */
 export class SlidePlaybackSettings {
     /**
@@ -106,6 +109,7 @@ export class SlidePlaybackSettings {
 /**
  * Lists the different modes how alphaTab will play the generated audio.
  * @target web
+ * @public
  */
 export enum PlayerOutputMode {
     /**
@@ -121,6 +125,7 @@ export enum PlayerOutputMode {
 
 /**
  * Lists the different modes how the internal alphaTab player (and related cursor behavior) is working.
+ * @public
  */
 export enum PlayerMode {
     /**
@@ -152,6 +157,7 @@ export enum PlayerMode {
  * The player settings control how the audio playback and UI is behaving.
  * @json
  * @json_declaration
+ * @public
  */
 export class PlayerSettings {
     /**

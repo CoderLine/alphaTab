@@ -15,6 +15,9 @@ import { BeatSubElement } from '@src/model/Beat';
 import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
 import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
 
+/**
+ * @internal
+ */
 export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public slash: SlashNoteHeadGlyph | null = null;
     public noteNumbers: TabNoteChordGlyph | null = null;
@@ -82,7 +85,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 tabNoteNumbers.beamingHelper = this.beamingHelper;
                 for (const note of this.container.beat.notes) {
                     if (note.isVisible) {
-                        this.createNoteGlyph(note);
+                        this._createNoteGlyph(note);
                     }
                 }
                 this.addNormal(tabNoteNumbers);
@@ -178,7 +181,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    private createNoteGlyph(n: Note): void {
+    private _createNoteGlyph(n: Note): void {
         const tr: TabBarRenderer = this.renderer as TabBarRenderer;
         const noteNumberGlyph: NoteNumberGlyph = new NoteNumberGlyph(0, 0, n);
         const l: number = n.beat.voice.bar.staff.tuning.length - n.string;

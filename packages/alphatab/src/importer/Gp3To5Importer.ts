@@ -48,8 +48,11 @@ import { Ottavia } from '@src/model/Ottavia';
 import { WahPedal } from '@src/model/WahPedal';
 import { AccidentalType } from '@src/model/AccidentalType';
 
+/**
+ * @internal
+ */
 export class Gp3To5Importer extends ScoreImporter {
-    private static readonly VersionString: string = 'FICHIER GUITAR PRO ';
+    private static readonly _versionString: string = 'FICHIER GUITAR PRO ';
     private _versionNumber: number = 0;
     private _score!: Score;
     private _globalTripletFeel: TripletFeel = TripletFeel.NoTripletFeel;
@@ -60,10 +63,7 @@ export class Gp3To5Importer extends ScoreImporter {
     private _playbackInfos: PlaybackInformation[] = [];
     private _doubleBars: Set<number> = new Set<number>();
     private _clefsPerTrack: Map<number, Clef> = new Map<number, Clef>();
-    private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<
-        number,
-        [KeySignature, KeySignatureType]
-    >();
+    private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<number, [KeySignature, KeySignatureType]>();
     private _beatTextChunksByTrack: Map<number, string[]> = new Map<number, string[]>();
 
     private _directionLookup: Map<number, Direction[]> = new Map<number, Direction[]>();
@@ -117,29 +117,29 @@ export class Gp3To5Importer extends ScoreImporter {
         this.readPlaybackInfos();
         // repetition stuff
         if (this._versionNumber >= 500) {
-            this.readDirection(Direction.TargetCoda);
-            this.readDirection(Direction.TargetDoubleCoda);
-            this.readDirection(Direction.TargetSegno);
-            this.readDirection(Direction.TargetSegnoSegno);
-            this.readDirection(Direction.TargetFine);
+            this._readDirection(Direction.TargetCoda);
+            this._readDirection(Direction.TargetDoubleCoda);
+            this._readDirection(Direction.TargetSegno);
+            this._readDirection(Direction.TargetSegnoSegno);
+            this._readDirection(Direction.TargetFine);
 
-            this.readDirection(Direction.JumpDaCapo);
-            this.readDirection(Direction.JumpDaCapoAlCoda);
-            this.readDirection(Direction.JumpDaCapoAlDoubleCoda);
-            this.readDirection(Direction.JumpDaCapoAlFine);
+            this._readDirection(Direction.JumpDaCapo);
+            this._readDirection(Direction.JumpDaCapoAlCoda);
+            this._readDirection(Direction.JumpDaCapoAlDoubleCoda);
+            this._readDirection(Direction.JumpDaCapoAlFine);
 
-            this.readDirection(Direction.JumpDalSegno);
-            this.readDirection(Direction.JumpDalSegnoAlCoda);
-            this.readDirection(Direction.JumpDalSegnoAlDoubleCoda);
-            this.readDirection(Direction.JumpDalSegnoAlFine);
+            this._readDirection(Direction.JumpDalSegno);
+            this._readDirection(Direction.JumpDalSegnoAlCoda);
+            this._readDirection(Direction.JumpDalSegnoAlDoubleCoda);
+            this._readDirection(Direction.JumpDalSegnoAlFine);
 
-            this.readDirection(Direction.JumpDalSegnoSegno);
-            this.readDirection(Direction.JumpDalSegnoSegnoAlCoda);
-            this.readDirection(Direction.JumpDalSegnoSegnoAlDoubleCoda);
-            this.readDirection(Direction.JumpDalSegnoSegnoAlFine);
+            this._readDirection(Direction.JumpDalSegnoSegno);
+            this._readDirection(Direction.JumpDalSegnoSegnoAlCoda);
+            this._readDirection(Direction.JumpDalSegnoSegnoAlDoubleCoda);
+            this._readDirection(Direction.JumpDalSegnoSegnoAlFine);
 
-            this.readDirection(Direction.JumpDaCoda);
-            this.readDirection(Direction.JumpDaDoubleCoda);
+            this._readDirection(Direction.JumpDaCoda);
+            this._readDirection(Direction.JumpDaDoubleCoda);
 
             // unknown (4)
             this.data.skip(4);
@@ -167,7 +167,7 @@ export class Gp3To5Importer extends ScoreImporter {
         return this._score;
     }
 
-    private readDirection(direction: Direction) {
+    private _readDirection(direction: Direction) {
         let directionIndex = IOHelper.readInt16LE(this.data);
         // direction not set
         if (directionIndex === -1) {
@@ -189,10 +189,10 @@ export class Gp3To5Importer extends ScoreImporter {
 
     public readVersion(): void {
         let version: string = GpBinaryHelpers.gpReadStringByteLength(this.data, 30, this.settings.importer.encoding);
-        if (!version.startsWith(Gp3To5Importer.VersionString)) {
+        if (!version.startsWith(Gp3To5Importer._versionString)) {
             throw new UnsupportedFormatError('Unsupported format');
         }
-        version = version.substr(Gp3To5Importer.VersionString.length + 1);
+        version = version.substr(Gp3To5Importer._versionString.length + 1);
         const dot: number = version.indexOf(String.fromCharCode(46));
         this._versionNumber =
             100 * Number.parseInt(version.substr(0, dot), 10) + Number.parseInt(version.substr(dot + 1), 10);
@@ -548,7 +548,7 @@ export class Gp3To5Importer extends ScoreImporter {
             // typically: 3
             this.data.readByte();
 
-            this.readRseBank();
+            this._readRseBank();
 
             // this.data.skip(42);
             if (this._versionNumber >= 510) {
@@ -972,10 +972,10 @@ export class Gp3To5Importer extends ScoreImporter {
             }
             if (strokeUp > 0) {
                 beat.brushType = BrushType.BrushUp;
-                beat.brushDuration = Gp3To5Importer.toStrokeValue(strokeUp);
+                beat.brushDuration = Gp3To5Importer._toStrokeValue(strokeUp);
             } else if (strokeDown > 0) {
                 beat.brushType = BrushType.BrushDown;
-                beat.brushDuration = Gp3To5Importer.toStrokeValue(strokeDown);
+                beat.brushDuration = Gp3To5Importer._toStrokeValue(strokeDown);
             }
         }
         if ((flags2 & 0x02) !== 0) {
@@ -1015,7 +1015,7 @@ export class Gp3To5Importer extends ScoreImporter {
                 const point: BendPoint = new BendPoint(0, 0);
                 point.offset = IOHelper.readInt32LE(this.data); // 0...60
 
-                point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer.BendStep) | 0; // 0..12 (amount of quarters)
+                point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer._bendStep) | 0; // 0..12 (amount of quarters)
 
                 GpBinaryHelpers.gpReadBool(this.data); // vibrato
 
@@ -1024,7 +1024,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
     }
 
-    private static toStrokeValue(value: number): number {
+    private static _toStrokeValue(value: number): number {
         switch (value) {
             case 1:
                 return 30;
@@ -1043,7 +1043,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
     }
 
-    private readRseBank() {
+    private _readRseBank() {
         // RSE Banks on disk are having filenames like this: 033_2_002.ini
         // 033 is the RSE instrument (selected in the instrument list)
         // 2 seem to be some sort of style variation. e.g. bass has multiple variations (1,2), guitars have only 1, percussion has only 0
@@ -1071,7 +1071,7 @@ export class Gp3To5Importer extends ScoreImporter {
         // when reopening the file the bank is always 0
 
         if (this._versionNumber >= 500) {
-            this.readRseBank();
+            this._readRseBank();
         }
         tableChange.volume = IOHelper.readSInt8(this.data);
         tableChange.balance = IOHelper.readSInt8(this.data);
@@ -1298,7 +1298,7 @@ export class Gp3To5Importer extends ScoreImporter {
         note.isStaccato = (flags2 & 0x01) !== 0;
     }
 
-    private static readonly BendStep: number = 25;
+    private static readonly _bendStep: number = 25;
 
     public readBend(note: Note): void {
         this.data.readByte(); // type
@@ -1311,7 +1311,7 @@ export class Gp3To5Importer extends ScoreImporter {
                 const point: BendPoint = new BendPoint(0, 0);
                 point.offset = IOHelper.readInt32LE(this.data); // 0...60
 
-                point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer.BendStep) | 0; // 0..12 (amount of quarters)
+                point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer._bendStep) | 0; // 0..12 (amount of quarters)
 
                 GpBinaryHelpers.gpReadBool(this.data); // vibrato
 
@@ -1482,6 +1482,9 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 }
 
+/**
+ * @internal
+ */
 export class GpBinaryHelpers {
     public static gpReadColor(data: IReadable, readAlpha: boolean = false): Color {
         const r: number = data.readByte();
@@ -1557,6 +1560,7 @@ export class GpBinaryHelpers {
 
 /**
  * A mixtablechange describes several track changes.
+ * @internal
  */
 class MixTableChange {
     public volume: number = -1;

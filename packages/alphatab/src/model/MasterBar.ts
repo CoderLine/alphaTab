@@ -16,6 +16,7 @@ import type { Direction } from '@src/model/Direction';
  * all tracks.
  * @json
  * @json_strict
+ * @public
  */
 export class MasterBar {
     public static readonly MaxAlternateEndings: number = 8;

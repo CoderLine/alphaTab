@@ -8,6 +8,9 @@ import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { NoteOrnamentGlyph } from '@src/rendering/glyphs/NoteOrnamentGlyph';
 import type { Settings } from '@src/Settings';
 
+/**
+ * @internal
+ */
 export class NoteOrnamentEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectNoteOrnament;

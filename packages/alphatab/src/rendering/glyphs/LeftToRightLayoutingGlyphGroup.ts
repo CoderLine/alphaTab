@@ -1,6 +1,9 @@
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 
+/**
+ * @internal
+ */
 export class LeftToRightLayoutingGlyphGroup extends GlyphGroup {
     public gap: number = 0;
 

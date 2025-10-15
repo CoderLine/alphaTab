@@ -13,6 +13,9 @@ import { Section } from "@src/model/Section";
 import { Automation } from "@src/model/Automation";
 import { Fermata } from "@src/model/Fermata";
 import { Direction } from "@src/model/Direction";
+/**
+ * @internal
+ */
 export class MasterBarSerializer {
     public static fromJson(obj: MasterBar, m: unknown): void {
         if (!m) {

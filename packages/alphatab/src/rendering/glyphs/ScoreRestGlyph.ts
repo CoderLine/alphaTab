@@ -6,6 +6,9 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatSubElement } from '@src/model/Beat';
 
+/**
+ * @internal
+ */
 export class ScoreRestGlyph extends MusicFontGlyph {
     public beamingHelper!: BeamingHelper;
 

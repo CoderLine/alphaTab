@@ -4,6 +4,7 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 /**
  * This glyph allows to group several other glyphs to be
  * drawn at the same x position
+ * @internal
  */
 export class GlyphGroup extends Glyph {
     public glyphs: Glyph[] | null = null;

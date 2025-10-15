@@ -6,6 +6,9 @@ import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
+/**
+ * @internal
+ */
 export class TabRestGlyph extends MusicFontGlyph {
     private _isVisibleRest: boolean;
     public beamingHelper!: BeamingHelper;

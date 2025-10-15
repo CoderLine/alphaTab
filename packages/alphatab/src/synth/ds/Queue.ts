@@ -1,3 +1,6 @@
+/**
+ * @internal
+ */
 class QueueItem<T> {
     public value: T;
     public next?: QueueItem<T>;
@@ -7,7 +10,10 @@ class QueueItem<T> {
     }
 }
 
-export class Queue<T> {
+/**
+ * @internal
+ */
+export class Queue<T extends object> {
     private _head?: QueueItem<T>;
     private _tail?: QueueItem<T>;
 

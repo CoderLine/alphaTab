@@ -7,6 +7,9 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { BarSubElement } from '@src/model/Bar';
 import { TextBaseline, type ICanvas } from '@src/platform/ICanvas';
 
+/**
+ * @internal
+ */
 export abstract class TimeSignatureGlyph extends GlyphGroup {
     private _numerator: number = 0;
     private _denominator: number = 0;

@@ -13,6 +13,9 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { KeySignature } from '@src/model/KeySignature';
 import { AccidentalType } from '@src/model/AccidentalType';
 
+/**
+ * @internal
+ */
 export class TuningParseResult {
     public note: string | null = null;
     public tone: TuningParseResultTone = new TuningParseResultTone();
@@ -23,6 +26,9 @@ export class TuningParseResult {
     }
 }
 
+/**
+ * @internal
+ */
 export class TuningParseResultTone {
     public noteValue: number;
     public accidentalMode: NoteAccidentalMode;
@@ -35,6 +41,7 @@ export class TuningParseResultTone {
 /**
  * This public class contains some utilities for working with model public classes
  * @partial
+ * @internal
  */
 export class ModelUtils {
     public static getIndex(duration: Duration): number {
@@ -81,10 +88,11 @@ export class ModelUtils {
         return !!ModelUtils.parseTuning(name);
     }
 
-    private static readonly TuningLetters = new Set<number>([
+    private static readonly _tuningLetters = new Set<number>([
         0x43 /* C */, 0x44 /* D */, 0x45 /* E */, 0x46 /* F */, 0x47 /* G */, 0x41 /* A */, 0x42 /* B */, 0x63 /* c */,
         0x64 /* d */, 0x65 /* e */, 0x66 /* f */, 0x67 /* g */, 0x61 /* a */, 0x62 /* b */, 0x23 /* # */
     ]);
+    
     public static parseTuning(name: string): TuningParseResult | null {
         let note: string = '';
         let octave: string = '';
@@ -96,7 +104,7 @@ export class ModelUtils {
                     return null;
                 }
                 octave += String.fromCharCode(c);
-            } else if (ModelUtils.TuningLetters.has(c)) {
+            } else if (ModelUtils._tuningLetters.has(c)) {
                 note += String.fromCharCode(c);
             } else {
                 return null;
@@ -629,19 +637,19 @@ export class ModelUtils {
         }
     }
 
-    private static allMusicFontSymbols: MusicFontSymbol[] = [];
+    private static _allMusicFontSymbols: MusicFontSymbol[] = [];
 
     /**
      * Gets a list of all music font symbols used in alphaTab.
      */
     public static getAllMusicFontSymbols(): MusicFontSymbol[] {
-        if (ModelUtils.allMusicFontSymbols.length === 0) {
-            ModelUtils.allMusicFontSymbols = Object.values(MusicFontSymbol)
+        if (ModelUtils._allMusicFontSymbols.length === 0) {
+            ModelUtils._allMusicFontSymbols = Object.values(MusicFontSymbol)
                 .filter<any>((k: any) => typeof k === 'number')
                 .map(v => v as number as MusicFontSymbol) as MusicFontSymbol[];
         }
 
-        return ModelUtils.allMusicFontSymbols;
+        return ModelUtils._allMusicFontSymbols;
     }
 
     /**
@@ -692,7 +700,7 @@ export class ModelUtils {
      *
      * e.g. 3# is 3-sharps -> KeySignature.A
      */
-    private static translateKeyTransposeTable(texts: string[][]): KeySignature[][] {
+    private static _translateKeyTransposeTable(texts: string[][]): KeySignature[][] {
         const keySignatures: KeySignature[][] = [];
         for (const transpose of texts) {
             const transposeValues: KeySignature[] = [];
@@ -709,10 +717,7 @@ export class ModelUtils {
         return keySignatures;
     }
 
-    /**
-     * @internal
-     */
-    private static readonly keyTransposeTable: KeySignature[][] = ModelUtils.translateKeyTransposeTable([
+    private static readonly _keyTransposeTable: KeySignature[][] = ModelUtils._translateKeyTransposeTable([
         /*              Cb    Gb    Db    Ab    Eb    Bb    F     C     G     D     A     E     B     F     C# */
         /* C	 0 */ ['7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#'],
         /* Db	 1 */ ['2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b', '3b', '2b', '1b', '0#'],
@@ -741,7 +746,7 @@ export class ModelUtils {
         }
 
         if (transpose < 0) {
-            const lookup = ModelUtils.keyTransposeTable[-transpose];
+            const lookup = ModelUtils._keyTransposeTable[-transpose];
             const keySignatureIndex = lookup.indexOf(keySignature);
             if (keySignatureIndex === -1) {
                 return keySignature;
@@ -749,7 +754,7 @@ export class ModelUtils {
 
             return (keySignatureIndex - 7) as KeySignature;
         } else {
-            return ModelUtils.keyTransposeTable[transpose][keySignature + 7];
+            return ModelUtils._keyTransposeTable[transpose][keySignature + 7];
         }
     }
 
@@ -757,7 +762,7 @@ export class ModelUtils {
      * a lookup list containing an info whether the notes within an octave
      * need an accidental rendered. the accidental symbol is determined based on the type of key signature.
      */
-    private static KeySignatureLookup: Array<boolean[]> = [
+    private static _keySignatureLookup: Array<boolean[]> = [
         // Flats (where the value is true, a flat accidental is required for the notes)
         [true, true, true, true, true, true, true, true, true, true, true, true],
         [true, true, true, true, true, false, true, true, true, true, true, true],
@@ -782,7 +787,7 @@ export class ModelUtils {
      * Contains the list of notes within an octave have accidentals set.
      * @internal
      */
-    public static AccidentalNotes: boolean[] = [
+    public static readonly accidentalNotes: boolean[] = [
         false,
         true,
         false,
@@ -812,8 +817,8 @@ export class ModelUtils {
         const index: number = noteValue % 12;
 
         const accidentalForKeySignature: AccidentalType = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
-        const hasKeySignatureAccidentalSetForNote: boolean = ModelUtils.KeySignatureLookup[ksi][index];
-        const hasNoteAccidentalWithinOctave: boolean = ModelUtils.AccidentalNotes[index];
+        const hasKeySignatureAccidentalSetForNote: boolean = ModelUtils._keySignatureLookup[ksi][index];
+        const hasNoteAccidentalWithinOctave: boolean = ModelUtils.accidentalNotes[index];
 
         // the general logic is like this:
         // - we check if the key signature has an accidental defined

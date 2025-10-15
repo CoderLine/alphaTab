@@ -3,6 +3,7 @@ import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 
 /**
  * This interface represents a container control in the UI layer.
+ * @public
  */
 export interface IContainer {
     /**

@@ -18,6 +18,9 @@ import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
 import { Duration } from '@src/model/Duration';
 
+/**
+ * @internal
+ */
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, MusicFontGlyph> = new Map();
     private _notes: Note[] = [];
@@ -60,12 +63,12 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         if (this._noteGlyphLookup.has(note.id)) {
             const n = this._noteGlyphLookup.get(note.id)!;
-            return this.internalGetNoteY(n, requestedPosition);
+            return this._internalGetNoteY(n, requestedPosition);
         }
         return 0;
     }
 
-    private internalGetNoteY(n: MusicFontGlyph, requestedPosition: NoteYPosition): number {
+    private _internalGetNoteY(n: MusicFontGlyph, requestedPosition: NoteYPosition): number {
         let pos = this.y + n.y;
 
         const scale = this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
@@ -161,13 +164,13 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             aboveBeatEffectsY = scoreRenderer.getScoreY(scoreRenderer.heightLineCount);
         } else {
             if (this.direction === BeamDirection.Up) {
-                belowBeatEffectsY = this.internalGetNoteY(this.maxNote!.glyph, NoteYPosition.Bottom) + effectSpacing;
+                belowBeatEffectsY = this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.Bottom) + effectSpacing;
                 aboveBeatEffectsY =
-                    this.internalGetNoteY(this.minNote!.glyph, NoteYPosition.TopWithStem) - effectSpacing;
+                    this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.TopWithStem) - effectSpacing;
             } else {
                 belowBeatEffectsY =
-                    this.internalGetNoteY(this.maxNote!.glyph, NoteYPosition.BottomWithStem) + effectSpacing;
-                aboveBeatEffectsY = this.internalGetNoteY(this.minNote!.glyph, NoteYPosition.Top) - effectSpacing;
+                    this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.BottomWithStem) + effectSpacing;
+                aboveBeatEffectsY = this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.Top) - effectSpacing;
             }
         }
 
@@ -216,13 +219,13 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
             let tremoloY = 0;
             if (direction === BeamDirection.Up) {
-                const topY = this.internalGetNoteY(this.minNote!.glyph, NoteYPosition.TopWithStem);
-                const bottomY = this.internalGetNoteY(this.minNote!.glyph, NoteYPosition.StemUp);
+                const topY = this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.TopWithStem);
+                const bottomY = this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.StemUp);
 
                 tremoloY = (topY + bottomY) / 2;
             } else {
-                const topY = this.internalGetNoteY(this.maxNote!.glyph, NoteYPosition.StemDown);
-                const bottomY = this.internalGetNoteY(this.maxNote!.glyph, NoteYPosition.BottomWithStem);
+                const topY = this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.StemDown);
+                const bottomY = this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.BottomWithStem);
 
                 tremoloY = (topY + bottomY) / 2;
             }
@@ -257,12 +260,12 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        this.paintEffects(cx, cy, canvas);
+        this._paintEffects(cx, cy, canvas);
 
         super.paint(cx, cy, canvas);
     }
 
-    private paintEffects(cx: number, cy: number, canvas: ICanvas) {
+    private _paintEffects(cx: number, cy: number, canvas: ICanvas) {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationEffects, this.beat);
         for (const g of this.aboveBeatEffects.values()) {
             g.paint(cx + this.x + this.width / 2, cy + this.y, canvas);

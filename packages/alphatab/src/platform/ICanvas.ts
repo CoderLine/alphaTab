@@ -5,6 +5,7 @@ import type { Settings } from '@src/Settings';
 
 /**
  * This public enum lists all different text alignments
+ * @public
  */
 export enum TextAlign {
     /**
@@ -13,14 +14,17 @@ export enum TextAlign {
     Left = 0,
     /**
      * Text is centered.
-     */ Center = 1,
+     */
+    Center = 1,
     /**
      * Text is right aligned.
-     */ Right = 2
+     */
+    Right = 2
 }
 
 /**
  * This public enum lists all base line modes
+ * @public
  */
 export enum TextBaseline {
     /**
@@ -43,6 +47,7 @@ export enum TextBaseline {
 
 /**
  * The MeasuredText class represents the dimensions of a piece of text in the canvas;
+ * @public
  */
 export class MeasuredText {
     /**
@@ -63,6 +68,7 @@ export class MeasuredText {
 
 /**
  * This is the base public interface for canvas implementations on different plattforms.
+ * @public
  */
 export interface ICanvas {
     settings: Settings;
@@ -137,6 +143,9 @@ export interface ICanvas {
     destroy(): void;
 }
 
+/**
+ * @internal
+ */
 export class CanvasHelper {
     public static fillMusicFontSymbolSafe(
         canvas: ICanvas,

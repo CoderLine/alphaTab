@@ -1,5 +1,6 @@
 /**
  * Lists all golpe types.
+ * @public
  */
 export enum GolpeType {
     /**

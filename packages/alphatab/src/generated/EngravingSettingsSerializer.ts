@@ -9,6 +9,9 @@ import { EngravingStemInfoSerializer } from "@src/generated/EngravingStemInfoSer
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { EngravingStemInfo } from "@src/EngravingSettings";
 import { Duration } from "@src/model/Duration";
+/**
+ * @internal
+ */
 export class EngravingSettingsSerializer {
     public static fromJson(obj: EngravingSettings, m: unknown): void {
         if (!m) {

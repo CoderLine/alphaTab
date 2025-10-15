@@ -7,6 +7,9 @@ import type { StaffSystem } from '@src/rendering/staves/StaffSystem';
 import { Logger } from '@src/Logger';
 import { SystemsLayoutMode } from '@src/DisplaySettings';
 
+/**
+ * @internal
+ */
 export class HorizontalScreenLayoutPartialInfo {
     public x: number = 0;
     public width: number = 0;
@@ -15,6 +18,7 @@ export class HorizontalScreenLayoutPartialInfo {
 
 /**
  * This layout arranges the bars all horizontally
+ * @internal
  */
 export class HorizontalScreenLayout extends ScoreLayout {
     private _system: StaffSystem | null = null;
@@ -127,7 +131,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
                 null
             );
         }
-        this.finalizeStaffSystem();
+        this._finalizeStaffSystem();
 
         const scale = this.renderer.settings.display.scale;
 
@@ -186,7 +190,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         this.height += this.pagePadding![3];
     }
 
-    private finalizeStaffSystem() {
+    private _finalizeStaffSystem() {
         this._system!.scaleToWidth(this._system!.width);
         this._system!.finalizeSystem();
     }

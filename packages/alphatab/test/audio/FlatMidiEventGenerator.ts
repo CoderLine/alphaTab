@@ -1,6 +1,9 @@
 import type { ControllerType } from '@src/midi/ControllerType';
 import type { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 
+/**
+ * @internal
+ */
 export class FlatMidiEventGenerator implements IMidiFileHandler {
     public midiEvents: FlatMidiEvent[];
 
@@ -60,6 +63,9 @@ export class FlatMidiEventGenerator implements IMidiFileHandler {
     }
 }
 
+/**
+ * @internal
+ */
 export class FlatMidiEvent {
     public tick: number = 0;
 
@@ -69,10 +75,6 @@ export class FlatMidiEvent {
 
     public toString(): string {
         return `Tick[${this.tick}]`;
-    }
-
-    protected equals_FlatMidiEventGenerator_MidiEvent(other: FlatMidiEvent): boolean {
-        return this.tick === other.tick;
     }
 
     public equals(obj: unknown): boolean {
@@ -91,6 +93,9 @@ export class FlatMidiEvent {
     }
 }
 
+/**
+ * @internal
+ */
 export class FlatTempoEvent extends FlatMidiEvent {
     public tempo: number = 0;
 
@@ -116,6 +121,9 @@ export class FlatTempoEvent extends FlatMidiEvent {
     }
 }
 
+/**
+ * @internal
+ */
 export class FlatTimeSignatureEvent extends FlatMidiEvent {
     public numerator: number = 0;
     public denominator: number = 0;
@@ -143,6 +151,9 @@ export class FlatTimeSignatureEvent extends FlatMidiEvent {
     }
 }
 
+/**
+ * @internal
+ */
 export class FlatTrackMidiEvent extends FlatMidiEvent {
     public track: number = 0;
 
@@ -168,12 +179,18 @@ export class FlatTrackMidiEvent extends FlatMidiEvent {
     }
 }
 
+/**
+ * @internal
+ */
 export class FlatTrackEndEvent extends FlatTrackMidiEvent {
     public override toString(): string {
         return `End of Track ${super.toString()}`;
     }
 }
 
+/**
+ * @internal
+ */
 export class FlatChannelMidiEvent extends FlatTrackMidiEvent {
     public channel: number = 0;
 
@@ -199,6 +216,9 @@ export class FlatChannelMidiEvent extends FlatTrackMidiEvent {
     }
 }
 
+/**
+ * @internal
+ */
 export class FlatControlChangeEvent extends FlatChannelMidiEvent {
     public controller: ControllerType;
     public value: number = 0;
@@ -226,6 +246,9 @@ export class FlatControlChangeEvent extends FlatChannelMidiEvent {
     }
 }
 
+/**
+ * @internal
+ */
 export class FlatRestEvent extends FlatChannelMidiEvent {
     public override toString(): string {
         return `Rest: ${super.toString()}`;
@@ -243,6 +266,9 @@ export class FlatRestEvent extends FlatChannelMidiEvent {
     }
 }
 
+/**
+ * @internal
+ */
 export class FlatProgramChangeEvent extends FlatChannelMidiEvent {
     public program: number = 0;
 
@@ -268,6 +294,9 @@ export class FlatProgramChangeEvent extends FlatChannelMidiEvent {
     }
 }
 
+/**
+ * @internal
+ */
 export class FlatNoteEvent extends FlatChannelMidiEvent {
     public length: number = 0;
     public key: number = 0;
@@ -297,6 +326,9 @@ export class FlatNoteEvent extends FlatChannelMidiEvent {
     }
 }
 
+/**
+ * @internal
+ */
 export class FlatBendEvent extends FlatChannelMidiEvent {
     public value: number = 0;
 
@@ -321,6 +353,10 @@ export class FlatBendEvent extends FlatChannelMidiEvent {
         return false;
     }
 }
+
+/**
+ * @internal
+ */
 export class FlatNoteBendEvent extends FlatChannelMidiEvent {
     public key: number;
     public value: number;

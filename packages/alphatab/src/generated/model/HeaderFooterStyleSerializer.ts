@@ -6,6 +6,9 @@
 import { HeaderFooterStyle } from "@src/model/Score";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { TextAlign } from "@src/platform/ICanvas";
+/**
+ * @internal
+ */
 export class HeaderFooterStyleSerializer {
     public static fromJson(obj: HeaderFooterStyle, m: unknown): void {
         if (!m) {

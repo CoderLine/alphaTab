@@ -6,11 +6,18 @@ import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
+/**
+ * @internal
+ */
 abstract class BarLineGlyphBase extends Glyph {
     public override doLayout(): void {
         this.width = this.renderer.smuflMetrics.thinBarlineThickness;
     }
 }
+
+/**
+ * @internal
+ */
 class BarLineLightGlyph extends BarLineGlyphBase {
     private _isRepeat: boolean;
     constructor(x: number, y: number, isRepeat: boolean) {
@@ -29,6 +36,9 @@ class BarLineLightGlyph extends BarLineGlyphBase {
     }
 }
 
+/**
+ * @internal
+ */
 class BarLineDottedGlyph extends BarLineGlyphBase {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const circleRadius: number = this.renderer.smuflMetrics.thinBarlineThickness / 2;
@@ -45,6 +55,9 @@ class BarLineDottedGlyph extends BarLineGlyphBase {
     }
 }
 
+/**
+ * @internal
+ */
 class BarLineDashedGlyph extends BarLineGlyphBase {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const dashSize: number = this.renderer.smuflMetrics.dashedBarlineDashLength;
@@ -73,6 +86,9 @@ class BarLineDashedGlyph extends BarLineGlyphBase {
     }
 }
 
+/**
+ * @internal
+ */
 class BarLineHeavyGlyph extends BarLineGlyphBase {
     public override doLayout(): void {
         this.width = this.renderer.smuflMetrics.thickBarlineThickness;
@@ -83,6 +99,9 @@ class BarLineHeavyGlyph extends BarLineGlyphBase {
     }
 }
 
+/**
+ * @internal
+ */
 class BarLineRepeatDotsGlyph extends BarLineGlyphBase {
     public override doLayout(): void {
         this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.RepeatDot)!;
@@ -107,6 +126,10 @@ class BarLineRepeatDotsGlyph extends BarLineGlyphBase {
         CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x, exactCenter + dotOffset + lineHeight, 1, MusicFontSymbol.RepeatDot);
     }
 }
+
+/**
+ * @internal
+ */
 class BarLineShortGlyph extends BarLineGlyphBase {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const renderer = this.renderer as LineBarRenderer;
@@ -125,6 +148,9 @@ class BarLineShortGlyph extends BarLineGlyphBase {
     }
 }
 
+/**
+ * @internal
+ */
 class BarLineTickGlyph extends BarLineGlyphBase {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const renderer = this.renderer as LineBarRenderer;
@@ -136,6 +162,9 @@ class BarLineTickGlyph extends BarLineGlyphBase {
     }
 }
 
+/**
+ * @internal
+ */
 export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
     private _isRight: boolean;
 

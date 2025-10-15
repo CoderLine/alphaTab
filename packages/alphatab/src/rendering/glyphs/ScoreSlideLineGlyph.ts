@@ -12,6 +12,9 @@ import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import type { ScoreBeatPreNotesGlyph } from '@src/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 
+/**
+ * @internal
+ */
 export class ScoreSlideLineGlyph extends Glyph {
     private _outType: SlideOutType;
     private _inType: SlideInType;
@@ -31,11 +34,11 @@ export class ScoreSlideLineGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        this.paintSlideIn(cx, cy, canvas);
-        this.drawSlideOut(cx, cy, canvas);
+        this._paintSlideIn(cx, cy, canvas);
+        this._drawSlideOut(cx, cy, canvas);
     }
 
-    private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
+    private _paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         const sizeX: number = startNoteRenderer.smuflMetrics.simpleSlideWidth;
         let endX =
@@ -58,13 +61,13 @@ export class ScoreSlideLineGlyph extends Glyph {
                 return;
         }
 
-        const accidentalsWidth: number = this.getAccidentalsWidth(startNoteRenderer, this._startNote.beat);
+        const accidentalsWidth: number = this._getAccidentalsWidth(startNoteRenderer, this._startNote.beat);
         startX -= accidentalsWidth;
         endX -= accidentalsWidth;
-        this.paintSlideLine(canvas, false, startX, endX, startY, endY);
+        this._paintSlideLine(canvas, false, startX, endX, startY, endY);
     }
 
-    private getAccidentalsWidth(renderer: ScoreBarRenderer, beat: Beat): number {
+    private _getAccidentalsWidth(renderer: ScoreBarRenderer, beat: Beat): number {
         const preNotes: ScoreBeatPreNotesGlyph = renderer.getPreNotesGlyphForBeat(beat) as ScoreBeatPreNotesGlyph;
         if (preNotes && preNotes.accidentals) {
             return preNotes.accidentals.width;
@@ -72,7 +75,7 @@ export class ScoreSlideLineGlyph extends Glyph {
         return 0;
     }
 
-    private drawSlideOut(cx: number, cy: number, canvas: ICanvas): void {
+    private _drawSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         const sizeX: number = startNoteRenderer.smuflMetrics.simpleSlideWidth;
         const offsetX: number = startNoteRenderer.smuflMetrics.postNoteEffectPadding;
@@ -188,10 +191,10 @@ export class ScoreSlideLineGlyph extends Glyph {
             default:
                 return;
         }
-        this.paintSlideLine(canvas, waves, startX, endX, startY, endY);
+        this._paintSlideLine(canvas, waves, startX, endX, startY, endY);
     }
 
-    private paintSlideLine(
+    private _paintSlideLine(
         canvas: ICanvas,
         waves: boolean,
         startX: number,

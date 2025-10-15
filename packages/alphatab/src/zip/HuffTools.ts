@@ -24,6 +24,10 @@ import { FormatError } from '@src/FormatError';
 import { Found, type Huffman, NeedBit, NeedBits } from '@src/zip/Huffman';
 
 // This Inflater is based on the Zip Reader of the Haxe Standard Library (MIT)
+
+/**
+ * @internal
+ */
 export class HuffTools {
     public static make(lengths: number[], pos: number, nlengths: number, maxbits: number): Huffman {
         const counts: number[] = [];
@@ -56,12 +60,12 @@ export class HuffTools {
                 bits.set((n << 5) | l, i);
             }
         }
-        return HuffTools.treeCompress(
-            new NeedBit(HuffTools.treeMake(bits, maxbits, 0, 1), HuffTools.treeMake(bits, maxbits, 1, 1))
+        return HuffTools._treeCompress(
+            new NeedBit(HuffTools._treeMake(bits, maxbits, 0, 1), HuffTools._treeMake(bits, maxbits, 1, 1))
         );
     }
 
-    private static treeMake(bits: Map<number, number>, maxbits: number, v: number, len: number): Huffman {
+    private static _treeMake(bits: Map<number, number>, maxbits: number, v: number, len: number): Huffman {
         if (len > maxbits) {
             throw new FormatError('Invalid huffman');
         }
@@ -71,17 +75,17 @@ export class HuffTools {
         }
         v = v << 1;
         len += 1;
-        return new NeedBit(HuffTools.treeMake(bits, maxbits, v, len), HuffTools.treeMake(bits, maxbits, v | 1, len));
+        return new NeedBit(HuffTools._treeMake(bits, maxbits, v, len), HuffTools._treeMake(bits, maxbits, v | 1, len));
     }
 
-    private static treeCompress(t: Huffman): Huffman {
-        const d: number = HuffTools.treeDepth(t);
+    private static _treeCompress(t: Huffman): Huffman {
+        const d: number = HuffTools._treeDepth(t);
         if (d === 0) {
             return t;
         }
         if (d === 1) {
             if (t instanceof NeedBit) {
-                return new NeedBit(HuffTools.treeCompress(t.left), HuffTools.treeCompress(t.right));
+                return new NeedBit(HuffTools._treeCompress(t.left), HuffTools._treeCompress(t.right));
             }
             throw new FormatError('assert');
         }
@@ -90,24 +94,24 @@ export class HuffTools {
         for (let i: number = 0; i < size; i++) {
             table.push(new Found(-1));
         }
-        HuffTools.treeWalk(table, 0, 0, d, t);
+        HuffTools._treeWalk(table, 0, 0, d, t);
         return new NeedBits(d, table);
     }
 
-    private static treeWalk(table: Huffman[], p: number, cd: number, d: number, t: Huffman): void {
+    private static _treeWalk(table: Huffman[], p: number, cd: number, d: number, t: Huffman): void {
         if (t instanceof NeedBit) {
             if (d > 0) {
-                HuffTools.treeWalk(table, p, cd + 1, d - 1, t.left);
-                HuffTools.treeWalk(table, p | (1 << cd), cd + 1, d - 1, t.right);
+                HuffTools._treeWalk(table, p, cd + 1, d - 1, t.left);
+                HuffTools._treeWalk(table, p | (1 << cd), cd + 1, d - 1, t.right);
             } else {
-                table[p] = HuffTools.treeCompress(t);
+                table[p] = HuffTools._treeCompress(t);
             }
         } else {
-            table[p] = HuffTools.treeCompress(t);
+            table[p] = HuffTools._treeCompress(t);
         }
     }
 
-    private static treeDepth(t: Huffman): number {
+    private static _treeDepth(t: Huffman): number {
         if (t instanceof Found) {
             return 0;
         }
@@ -115,8 +119,8 @@ export class HuffTools {
             throw new FormatError('assert');
         }
         if (t instanceof NeedBit) {
-            const da: number = HuffTools.treeDepth(t.left);
-            const db: number = HuffTools.treeDepth(t.right);
+            const da: number = HuffTools._treeDepth(t.left);
+            const db: number = HuffTools._treeDepth(t.right);
             return 1 + (da < db ? da : db);
         }
         return 0;

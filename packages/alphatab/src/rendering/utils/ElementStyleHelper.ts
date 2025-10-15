@@ -11,6 +11,7 @@ import type { RenderingResources } from '@src/RenderingResources';
 
 /**
  * A helper to apply element styles in a specific rendering scope via the `using` keyword
+ * @internal
  */
 export class ElementStyleHelper {
     public static score(
@@ -23,13 +24,13 @@ export class ElementStyleHelper {
             return undefined;
         }
 
-        const defaultColor: Color = ElementStyleHelper.scoreDefaultColor(canvas.settings.display.resources, element);
+        const defaultColor: Color = ElementStyleHelper._scoreDefaultColor(canvas.settings.display.resources, element);
 
         return new ElementStyleScope<ScoreSubElement>(canvas, element, score.style, defaultColor);
     }
 
     public static scoreColor(res: RenderingResources, element: ScoreSubElement, score: Score): Color | undefined {
-        const defaultColor: Color = ElementStyleHelper.scoreDefaultColor(res, element);
+        const defaultColor: Color = ElementStyleHelper._scoreDefaultColor(res, element);
 
         if (score.style && score.style!.colors.has(element)) {
             return score.style!.colors.get(element) ?? defaultColor;
@@ -38,7 +39,7 @@ export class ElementStyleHelper {
         return undefined;
     }
 
-    private static scoreDefaultColor(res: RenderingResources, _element: ScoreSubElement) {
+    private static _scoreDefaultColor(res: RenderingResources, _element: ScoreSubElement) {
         const defaultColor: Color = res.mainGlyphColor;
 
         return defaultColor;
@@ -114,7 +115,7 @@ export class ElementStyleHelper {
     }
 
     public static trackColor(res: RenderingResources, element: TrackSubElement, track: Track): Color | undefined {
-        const defaultColor = ElementStyleHelper.trackDefaultColor(res, element);
+        const defaultColor = ElementStyleHelper._trackDefaultColor(res, element);
 
         if (track.style && track.style!.colors.has(element)) {
             return track.style!.colors.get(element) ?? defaultColor;
@@ -123,7 +124,7 @@ export class ElementStyleHelper {
         return undefined;
     }
 
-    private static trackDefaultColor(res: RenderingResources, element: TrackSubElement) {
+    private static _trackDefaultColor(res: RenderingResources, element: TrackSubElement) {
         let defaultColor: Color = res.mainGlyphColor;
         switch (element) {
             case TrackSubElement.TrackName:
@@ -148,13 +149,13 @@ export class ElementStyleHelper {
             return undefined;
         }
 
-        const defaultColor = ElementStyleHelper.trackDefaultColor(canvas.settings.display.resources, element);
+        const defaultColor = ElementStyleHelper._trackDefaultColor(canvas.settings.display.resources, element);
 
         return new ElementStyleScope<TrackSubElement>(canvas, element, track.style, defaultColor);
     }
 
     public static beatColor(res: RenderingResources, element: BeatSubElement, beat: Beat): Color | undefined {
-        const defaultColor = ElementStyleHelper.beatDefaultColor(res, element, beat);
+        const defaultColor = ElementStyleHelper._beatDefaultColor(res, element, beat);
 
         if (beat.style && beat.style!.colors.has(element)) {
             return beat.style!.colors.get(element) ?? defaultColor;
@@ -163,7 +164,7 @@ export class ElementStyleHelper {
         return undefined;
     }
 
-    private static beatDefaultColor(res: RenderingResources, _element: BeatSubElement, beat: Beat) {
+    private static _beatDefaultColor(res: RenderingResources, _element: BeatSubElement, beat: Beat) {
         const defaultColor: Color = beat.voice.index === 0 ? res.mainGlyphColor : res.secondaryGlyphColor;
 
         return defaultColor;
@@ -178,13 +179,13 @@ export class ElementStyleHelper {
             return undefined;
         }
 
-        const defaultColor = ElementStyleHelper.beatDefaultColor(canvas.settings.display.resources, element, beat);
+        const defaultColor = ElementStyleHelper._beatDefaultColor(canvas.settings.display.resources, element, beat);
 
         return new ElementStyleScope<BeatSubElement>(canvas, element, beat.style, defaultColor);
     }
 
     public static noteColor(res: RenderingResources, element: NoteSubElement, note: Note): Color | undefined {
-        const defaultColor = ElementStyleHelper.noteDefaultColor(res, element, note);
+        const defaultColor = ElementStyleHelper._noteDefaultColor(res, element, note);
 
         if (note.style && note.style!.colors.has(element)) {
             return note.style!.colors.get(element) ?? defaultColor;
@@ -193,7 +194,7 @@ export class ElementStyleHelper {
         return undefined;
     }
 
-    private static noteDefaultColor(res: RenderingResources, _element: NoteSubElement, note: Note) {
+    private static _noteDefaultColor(res: RenderingResources, _element: NoteSubElement, note: Note) {
         const defaultColor: Color = note.beat.voice.index === 0 ? res.mainGlyphColor : res.secondaryGlyphColor;
 
         return defaultColor;
@@ -220,6 +221,7 @@ export class ElementStyleHelper {
 
 /**
  * A helper class for applying elements styles to the canvas and restoring the previous state afterwards.
+ * @internal
  */
 class ElementStyleScope<TSubElement extends number> implements Disposable {
     private _canvas: ICanvas;

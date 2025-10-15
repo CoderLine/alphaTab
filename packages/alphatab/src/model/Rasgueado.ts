@@ -1,5 +1,6 @@
 /**
  * Lists all Rasgueado types.
+ * @public
  */
 export enum Rasgueado {
     None = 0,

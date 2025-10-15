@@ -9,6 +9,7 @@ import type { Settings } from '@src/Settings';
  * A {@link IScoreRenderer} implementation wrapping and underling other {@link IScoreRenderer}
  * allowing dynamic changing of the underlying instance without loosing aspects like the
  * event listeners.
+ * @internal
  */
 export class ScoreRendererWrapper implements IScoreRenderer {
     private _instance?: IScoreRenderer;

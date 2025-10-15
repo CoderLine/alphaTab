@@ -1,5 +1,6 @@
 /**
  * Lists all Crescendo and Decrescendo types.
+ * @public
  */
 export enum CrescendoType {
     /**

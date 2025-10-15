@@ -19,6 +19,9 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
 import type { EngravingSettings } from '@src/EngravingSettings';
 
+/**
+ * @internal
+ */
 export abstract class SystemBracket {
     public firstStaffInBracket: RenderStaff | null = null;
     public lastStaffInBracket: RenderStaff | null = null;
@@ -29,7 +32,7 @@ export abstract class SystemBracket {
 
     public abstract includesStaff(s: RenderStaff): boolean;
 
-    public finalizeBracket(smuflMetrics:EngravingSettings) {
+    public finalizeBracket(smuflMetrics: EngravingSettings) {
         // systems with just a single staff do not have a bracket
         if (this.firstStaffInBracket === this.lastStaffInBracket) {
             this.width = 0;
@@ -41,7 +44,7 @@ export abstract class SystemBracket {
         const bravuraBraceWidthAtMusicFontSize = smuflMetrics.glyphWidths.get(MusicFontSymbol.Brace)!;
 
         // normal bracket width
-        if(this.drawAsBrace) {
+        if (this.drawAsBrace) {
             this.width = bravuraBraceWidthAtMusicFontSize;
         } else {
             this.width = smuflMetrics.bracketThickness;
@@ -60,6 +63,9 @@ export abstract class SystemBracket {
     }
 }
 
+/**
+ * @internal
+ */
 class SingleTrackSystemBracket extends SystemBracket {
     protected track: Track;
 
@@ -78,6 +84,9 @@ class SingleTrackSystemBracket extends SystemBracket {
     }
 }
 
+/**
+ * @internal
+ */
 class SimilarInstrumentSystemBracket extends SingleTrackSystemBracket {
     public override includesStaff(r: RenderStaff): boolean {
         // allow merging on same track (for braces, percussion and items belonging together)
@@ -98,6 +107,7 @@ class SimilarInstrumentSystemBracket extends SingleTrackSystemBracket {
 /**
  * A StaffSystem consists of a list of different staves and groups
  * them using an accolade.
+ * @internal
  */
 export class StaffSystem {
     private _allStaves: RenderStaff[] = [];
@@ -169,9 +179,9 @@ export class StaffSystem {
                 s.addBarRenderer(renderer);
             }
         }
-        this.calculateAccoladeSpacing(tracks);
+        this._calculateAccoladeSpacing(tracks);
 
-        this.updateWidthFromLastBar();
+        this._updateWidthFromLastBar();
         return renderers;
     }
 
@@ -208,11 +218,11 @@ export class StaffSystem {
                 }
             }
         }
-        this.calculateAccoladeSpacing(tracks);
+        this._calculateAccoladeSpacing(tracks);
 
         barLayoutingInfo.finish();
         // ensure same widths of new renderer
-        result.width = this.updateWidthFromLastBar();
+        result.width = this._updateWidthFromLastBar();
 
         return result;
     }
@@ -243,7 +253,7 @@ export class StaffSystem {
         return null;
     }
 
-    private updateWidthFromLastBar(): number {
+    private _updateWidthFromLastBar(): number {
         let realWidth: number = 0;
         let barDisplayScale: number = 0;
         for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
@@ -267,7 +277,7 @@ export class StaffSystem {
         return realWidth;
     }
 
-    private calculateAccoladeSpacing(tracks: Track[]): void {
+    private _calculateAccoladeSpacing(tracks: Track[]): void {
         const settings = this.layout.renderer.settings;
         if (!this._accoladeSpacingCalculated) {
             this._accoladeSpacingCalculated = true;
@@ -376,7 +386,7 @@ export class StaffSystem {
         }
     }
 
-    private getStaffTrackGroup(track: Track): StaffTrackGroup | null {
+    private _getStaffTrackGroup(track: Track): StaffTrackGroup | null {
         for (let i: number = 0, j: number = this.staves.length; i < j; i++) {
             const g: StaffTrackGroup = this.staves[i];
             if (g.track === track) {
@@ -387,7 +397,7 @@ export class StaffSystem {
     }
 
     public addStaff(track: Track, staff: RenderStaff): void {
-        let group: StaffTrackGroup | null = this.getStaffTrackGroup(track);
+        let group: StaffTrackGroup | null = this._getStaffTrackGroup(track);
         if (!group) {
             group = new StaffTrackGroup(this, track);
             this.staves.push(group);
@@ -441,10 +451,12 @@ export class StaffSystem {
     public get height(): number {
         return this._allStaves.length === 0
             ? 0
-            : Math.ceil(this._allStaves[this._allStaves.length - 1].y +
-                  this._allStaves[this._allStaves.length - 1].height +
-                  this.topPadding +
-                  this.bottomPadding);
+            : Math.ceil(
+                  this._allStaves[this._allStaves.length - 1].y +
+                      this._allStaves[this._allStaves.length - 1].height +
+                      this.topPadding +
+                      this.bottomPadding
+              );
     }
 
     public scaleToWidth(width: number): void {
@@ -470,18 +482,20 @@ export class StaffSystem {
             );
 
             // NOTE: the divider is currently not "nicely" centered between the systems as this would lead to cropping
-            
+
             // NOTE: Prevent cropping of separator if it overlaps
-            const smuflMetrics = this.layout.renderer.settings.display.resources.engravingSettings
+            const smuflMetrics = this.layout.renderer.settings.display.resources.engravingSettings;
             const overlap = Math.min(0, smuflMetrics.glyphBottom.get(MusicFontSymbol.SystemDivider) ?? 0);
-            CanvasHelper.fillMusicFontSymbolSafe(canvas,
+            CanvasHelper.fillMusicFontSymbolSafe(
+                canvas,
                 cx + this.x,
                 cy + this.y + this.height + overlap,
                 1,
                 MusicFontSymbol.SystemDivider,
                 false
             );
-            CanvasHelper.fillMusicFontSymbolSafe(canvas,
+            CanvasHelper.fillMusicFontSymbolSafe(
+                canvas,
                 cx + this.x + this.width - smuflMetrics.glyphWidths.get(MusicFontSymbol.SystemDivider)!,
                 cy + this.y + this.height + overlap,
                 1,
@@ -623,8 +637,12 @@ export class StaffSystem {
                                 firstLineBarRenderer.bar
                             );
                             const h = Math.ceil(thisTop - previousBottom);
-                            canvas.fillRect(accoladeX, cy + previousBottom, 
-                                res.engravingSettings.thinBarlineThickness, h);
+                            canvas.fillRect(
+                                accoladeX,
+                                cy + previousBottom,
+                                res.engravingSettings.thinBarlineThickness,
+                                h
+                            );
                         }
 
                         previousStaffInBracket = s;
@@ -645,7 +663,8 @@ export class StaffSystem {
                     let accoladeEnd: number = lastEnd;
 
                     if (bracket.drawAsBrace) {
-                        CanvasHelper.fillMusicFontSymbolSafe(canvas,
+                        CanvasHelper.fillMusicFontSymbolSafe(
+                            canvas,
                             barStartX - barOffset - barSize,
                             accoladeEnd,
                             bracket.braceScale,
@@ -663,8 +682,20 @@ export class StaffSystem {
                         );
 
                         const spikeX: number = barStartX - barOffset - barSize;
-                        CanvasHelper.fillMusicFontSymbolSafe(canvas,spikeX, accoladeStart, 1, MusicFontSymbol.BracketTop);
-                        CanvasHelper.fillMusicFontSymbolSafe(canvas,spikeX, Math.floor(accoladeEnd), 1, MusicFontSymbol.BracketBottom);
+                        CanvasHelper.fillMusicFontSymbolSafe(
+                            canvas,
+                            spikeX,
+                            accoladeStart,
+                            1,
+                            MusicFontSymbol.BracketTop
+                        );
+                        CanvasHelper.fillMusicFontSymbolSafe(
+                            canvas,
+                            spikeX,
+                            Math.floor(accoladeEnd),
+                            1,
+                            MusicFontSymbol.BracketBottom
+                        );
                     }
                 }
             }
@@ -684,10 +715,10 @@ export class StaffSystem {
             this.layout.renderer.tracks!.length > 1
         ) {
             // NOTE: Reuse padding to place separato
-            const neededHeight = settings.display.resources.engravingSettings.glyphHeights.get(MusicFontSymbol.SystemDivider)!;
-            this.bottomPadding = Math.max(this.bottomPadding, 
-                neededHeight
-            );
+            const neededHeight = settings.display.resources.engravingSettings.glyphHeights.get(
+                MusicFontSymbol.SystemDivider
+            )!;
+            this.bottomPadding = Math.max(this.bottomPadding, neededHeight);
             this._hasSystemSeparator = true;
         }
 

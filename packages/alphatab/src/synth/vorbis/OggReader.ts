@@ -2,6 +2,9 @@ import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { IOHelper } from '@src/io/IOHelper';
 import type { IReadable } from '@src/io/IReadable';
 
+/**
+ * @internal
+ */
 export class OggPacket {
     public packetData: Uint8Array;
     public isBeginningOfStream: boolean;
@@ -28,12 +31,18 @@ export class OggPacket {
     }
 }
 
+/**
+ * @internal
+ */
 enum PageFlags {
     ContinuesPacket = 1,
     BeginningOfStream = 2,
     EndOfStream = 4
 }
 
+/**
+ * @internal
+ */
 export class OggReader {
     private _readable: IReadable;
 
@@ -43,19 +52,19 @@ export class OggReader {
 
     public read(): OggPacket[] {
         const packets: OggPacket[] = [];
-        while (this.findAndReadPage(packets)) {}
+        while (this._findAndReadPage(packets)) {}
         return packets;
     }
 
-    private findAndReadPage(packets: OggPacket[]): boolean {
-        if (!this.seekPageHeader()) {
+    private _findAndReadPage(packets: OggPacket[]): boolean {
+        if (!this._seekPageHeader()) {
             return false;
         }
 
-        return this.readPage(packets);
+        return this._readPage(packets);
     }
 
-    private seekPageHeader(): boolean {
+    private _seekPageHeader(): boolean {
         // search for sync byte (max 64KB)
         for (let i = 0; i < 65536; i++) {
             const magic = IOHelper.readInt32LE(this._readable);
@@ -68,7 +77,7 @@ export class OggReader {
         return false;
     }
 
-    private readPage(packets: OggPacket[]): boolean {
+    private _readPage(packets: OggPacket[]): boolean {
         const version = this._readable.readByte();
         if (version === -1 || version !== 0) {
             return false;

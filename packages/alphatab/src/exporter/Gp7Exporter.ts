@@ -10,6 +10,7 @@ import { ZipWriter } from '@src/zip/ZipWriter';
 import { LayoutConfiguration } from '@src/importer/LayoutConfiguration';
 /**
  * This ScoreExporter can write Guitar Pro 7+ (gp) files.
+ * @public
  */
 export class Gp7Exporter extends ScoreExporter {
     public get name(): string {

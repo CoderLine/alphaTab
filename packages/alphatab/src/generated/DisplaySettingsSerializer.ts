@@ -9,6 +9,9 @@ import { RenderingResourcesSerializer } from "@src/generated/RenderingResourcesS
 import { LayoutMode } from "@src/LayoutMode";
 import { StaveProfile } from "@src/StaveProfile";
 import { SystemsLayoutMode } from "@src/DisplaySettings";
+/**
+ * @internal
+ */
 export class DisplaySettingsSerializer {
     public static fromJson(obj: DisplaySettings, m: unknown): void {
         if (!m) {

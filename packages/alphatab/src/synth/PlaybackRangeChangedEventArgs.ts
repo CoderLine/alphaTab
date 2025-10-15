@@ -2,6 +2,7 @@ import type { PlaybackRange } from '@src/synth/PlaybackRange';
 
 /**
  * Represents the info when the playback range changed.
+ * @public
  */
 export class PlaybackRangeChangedEventArgs {
     /**

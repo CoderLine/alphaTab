@@ -1,6 +1,9 @@
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
+/**
+ * @internal
+ */
 export class TabClefGlyph extends MusicFontGlyph {
     constructor(x: number, y: number) {
         super(x, y, 1, MusicFontSymbol.SixStringTabClef);

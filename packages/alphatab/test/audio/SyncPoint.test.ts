@@ -358,6 +358,9 @@ describe('SyncPointTests', () => {
     });
 });
 
+/**
+ * @internal
+ */
 class TestBackingTrackOutput implements IBackingTrackSynthOutput {
     public seekTimes: number[] = [];
 
@@ -407,6 +410,9 @@ class TestBackingTrackOutput implements IBackingTrackSynthOutput {
     }
 }
 
+/**
+ * @internal
+ */
 class TestExternalMediaHandler implements IExternalMediaHandler {
     private _output: IExternalMediaSynthOutput;
 
@@ -438,6 +444,9 @@ class TestExternalMediaHandler implements IExternalMediaHandler {
     pause(): void {}
 }
 
+/**
+ * @internal
+ */
 class EmptyAudioSynthesizer implements IAudioSampleSynthesizer {
     public masterVolume: number = 0;
     public metronomeVolume: number = 0;

@@ -1,5 +1,6 @@
 /**
  * Lists all sizing types of the effect bar glyphs
+ * @internal
  */
 export enum EffectBarGlyphSizing {
     /**

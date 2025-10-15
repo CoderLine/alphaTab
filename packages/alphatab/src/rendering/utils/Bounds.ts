@@ -1,5 +1,6 @@
 /**
  * Represents a rectangular area within the renderer music notation.
+ * @public
  */
 export class Bounds {
     /**

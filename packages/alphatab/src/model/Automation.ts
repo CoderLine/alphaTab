@@ -1,5 +1,6 @@
 /**
  * This public enumeration lists all types of automations.
+ * @public
  */
 export enum AutomationType {
     /**
@@ -31,6 +32,7 @@ export enum AutomationType {
 /**
  * A simple flat sync point for easy persistence separate to the main data model.
  * @record
+ * @public
  */
 export interface FlatSyncPoint {
     /**
@@ -58,6 +60,7 @@ export interface FlatSyncPoint {
  * @cloneable
  * @json
  * @json_strict
+ * @public
  */
 export class SyncPointData {
     /**
@@ -76,6 +79,7 @@ export class SyncPointData {
  * @cloneable
  * @json
  * @json_strict
+ * @public
  */
 export class Automation {
     /**

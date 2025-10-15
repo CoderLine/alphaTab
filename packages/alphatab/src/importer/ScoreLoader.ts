@@ -14,6 +14,7 @@ import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 /**
  * The ScoreLoader enables you easy loading of Scores using all
  * available importers
+ * @public
  */
 export class ScoreLoader {
     /**

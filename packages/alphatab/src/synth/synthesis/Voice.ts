@@ -13,13 +13,16 @@ import { SynthHelper } from '@src/synth/SynthHelper';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import type { Channel } from '@src/synth/synthesis/Channel';
 
+/**
+ * @internal
+ */
 export class Voice {
     /**
      * The lower this block size is the more accurate the effects are.
      * Increasing the value significantly lowers the CPU usage of the voice rendering.
      * If LFO affects the low-pass filter it can be hearable even as low as 8.
      */
-    private static readonly RenderEffectSampleBlock: number = SynthConstants.MicroBufferSize;
+    static readonly renderEffectSampleBlock: number = SynthConstants.MicroBufferSize;
 
     public playingPreset: number = 0;
     public playingKey: number = 0;
@@ -182,7 +185,7 @@ export class Voice {
             let gainLeft: number;
             let gainRight: number = 0;
             let blockSamples: number =
-                numSamples > Voice.RenderEffectSampleBlock ? Voice.RenderEffectSampleBlock : numSamples;
+                numSamples > Voice.renderEffectSampleBlock ? Voice.renderEffectSampleBlock : numSamples;
             numSamples -= blockSamples;
 
             if (dynamicLowpass) {

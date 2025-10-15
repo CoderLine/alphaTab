@@ -2,6 +2,7 @@ import type { IContainer } from '@src/platform/IContainer';
 
 /**
  * This wrapper holds all cursor related elements.
+ * @public
  */
 export class Cursors {
     /**

@@ -5,6 +5,9 @@
 // </auto-generated>
 import { Note } from "@src/model/Note";
 import { BendPointCloner } from "@src/generated/model/BendPointCloner";
+/**
+ * @internal
+ */
 export class NoteCloner {
     public static clone(original: Note): Note {
         const clone = new Note();

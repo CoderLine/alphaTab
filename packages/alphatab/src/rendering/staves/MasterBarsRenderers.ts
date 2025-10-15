@@ -5,6 +5,7 @@ import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
 /**
  * This container represents a single column of bar renderers independent from any staves.
  * This container can be used to reorganize renderers into a new staves.
+ * @internal
  */
 export class MasterBarsRenderers {
     public width: number = 0;

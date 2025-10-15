@@ -1,5 +1,6 @@
 /**
  * Lists all ottavia.
+ * @public
  */
 export enum Ottavia {
     /**

@@ -14,6 +14,9 @@ import * as alphaSkiaModule from '@coderline/alphaskia';
 import { AlphaSkiaCanvas, AlphaSkiaImage } from '@coderline/alphaskia';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
+/**
+ * @internal
+ */
 export class VisualTestRun {
     public width: number;
     public referenceFileName: string;
@@ -23,6 +26,9 @@ export class VisualTestRun {
     }
 }
 
+/**
+ * @internal
+ */
 export class VisualTestOptions {
     public score: Score;
     public runs: VisualTestRun[];
@@ -64,6 +70,7 @@ export class VisualTestOptions {
 
 /**
  * @partial
+ * @internal
  */
 export class VisualTestHelper {
     public static async runVisualTest(
@@ -133,7 +140,6 @@ export class VisualTestHelper {
             api.renderer.postRenderFinished.on(() => {
                 if (runIndex < runs.length) {
                     uiFacade.rootContainer.width = runs[runIndex++].width;
-                    // @ts-expect-error
                     api.triggerResize();
                 } else {
                     resolve();
@@ -216,7 +222,7 @@ export class VisualTestHelper {
             'font/noto-serif/NotoSerif-BoldItalic.otf',
             'font/noto-music/NotoMusic-Regular.otf',
             'font/noto-color-emoji/NotoColorEmoji_WindowsCompatible.ttf',
-            'font/petaluma/Petaluma.otf',
+            'font/petaluma/Petaluma.otf'
         ];
 
         for (const font of fonts) {
@@ -237,7 +243,7 @@ export class VisualTestHelper {
 
     static prepareSettingsForTest(settings: Settings) {
         settings.core.engine = 'skia';
-        Environment.HighDpiFactor = 1; // test data is in scale 1
+        Environment.highDpiFactor = 1; // test data is in scale 1
         settings.core.enableLazyLoading = false;
 
         settings.display.resources.copyrightFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
@@ -288,14 +294,14 @@ export class VisualTestHelper {
         // convert reference image to canvas
         if (referenceFileData.length > 0) {
             using expected = AlphaSkiaImage.decode(referenceFileData.buffer as ArrayBuffer);
-            await VisualTestHelper.expectToEqualVisuallyAsync(
+            await VisualTestHelper._expectToEqualVisuallyAsync(
                 actual.endRender()!,
                 run.referenceFileName,
                 expected,
                 options
             );
         } else {
-            await VisualTestHelper.expectToEqualVisuallyAsync(
+            await VisualTestHelper._expectToEqualVisuallyAsync(
                 actual.endRender()!,
                 run.referenceFileName,
                 undefined,
@@ -304,7 +310,7 @@ export class VisualTestHelper {
         }
     }
 
-    private static async expectToEqualVisuallyAsync(
+    private static async _expectToEqualVisuallyAsync(
         actual: AlphaSkiaImage,
         expectedFileName: string,
         expected: AlphaSkiaImage | undefined,

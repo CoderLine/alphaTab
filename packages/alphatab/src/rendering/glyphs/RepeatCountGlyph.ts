@@ -4,6 +4,9 @@ import type { RenderingResources } from '@src/RenderingResources';
 import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
+/**
+ * @internal
+ */
 export class RepeatCountGlyph extends Glyph {
     private _count: number = 0;
 

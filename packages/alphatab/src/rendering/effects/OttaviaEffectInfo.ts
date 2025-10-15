@@ -8,6 +8,9 @@ import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 
+/**
+ * @internal
+ */
 export class OttaviaEffectInfo extends EffectBarRendererInfo {
     private _aboveStaff: boolean;
 

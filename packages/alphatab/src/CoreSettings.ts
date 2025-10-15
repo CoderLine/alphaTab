@@ -6,6 +6,7 @@ import type { EngravingSettings } from '@src/EngravingSettings';
 /**
  * Lists the known file formats for font files.
  * @target web
+ * @public
  */
 export enum FontFileFormat {
     /**
@@ -43,6 +44,7 @@ export enum FontFileFormat {
  * All main settings of alphaTab controlling rather general aspects of its behavior.
  * @json
  * @json_declaration
+ * @public
  */
 export class CoreSettings {
     /**

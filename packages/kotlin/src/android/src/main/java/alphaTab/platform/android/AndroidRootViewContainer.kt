@@ -39,11 +39,11 @@ internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListene
     }
 
     override var width: Double
-        get() = (_outerScroll.measuredWidth / Environment.HighDpiFactor)
+        get() = (_outerScroll.measuredWidth / Environment.highDpiFactor)
         set(@Suppress("UNUSED_PARAMETER") value) {
         }
     override var height: Double
-        get() = (_outerScroll.measuredHeight / Environment.HighDpiFactor)
+        get() = (_outerScroll.measuredHeight / Environment.highDpiFactor)
         set(@Suppress("UNUSED_PARAMETER") value) {
         }
     override val isVisible: Boolean
@@ -104,7 +104,7 @@ internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListene
     fun scrollToX(offset: Double) {
         _uiInvoke {
             _outerScroll.smoothScrollTo(
-                (offset * Environment.HighDpiFactor).toInt(),
+                (offset * Environment.highDpiFactor).toInt(),
                 _outerScroll.scrollY
             )
         }
@@ -114,7 +114,7 @@ internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListene
         _uiInvoke {
             _innerScroll.smoothScrollTo(
                 _innerScroll.scrollX,
-                (offset * Environment.HighDpiFactor).toInt()
+                (offset * Environment.highDpiFactor).toInt()
             )
         }
     }

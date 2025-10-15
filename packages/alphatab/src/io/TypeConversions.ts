@@ -1,10 +1,11 @@
 /**
  * @target web
+ * @internal
  */
 export class TypeConversions {
-    private static _conversionBuffer: ArrayBuffer = new ArrayBuffer(8);
-    private static _conversionByteArray: Uint8Array = new Uint8Array(TypeConversions._conversionBuffer);
-    private static _dataView = new DataView(TypeConversions._conversionBuffer);
+    private static readonly _conversionBuffer: ArrayBuffer = new ArrayBuffer(8);
+    private static readonly _conversionByteArray: Uint8Array = new Uint8Array(TypeConversions._conversionBuffer);
+    private static readonly _dataView = new DataView(TypeConversions._conversionBuffer);
 
     public static float64ToBytes(v: number): Uint8Array {
         TypeConversions._dataView.setFloat64(0, v, true);

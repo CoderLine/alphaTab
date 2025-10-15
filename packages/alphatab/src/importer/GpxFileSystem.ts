@@ -5,6 +5,7 @@ import { EndOfReaderError, type IReadable } from '@src/io/IReadable';
 
 /**
  * this public class represents a file within the GpxFileSystem
+ * @internal
  */
 export class GpxFile {
     public fileName: string = '';
@@ -15,6 +16,7 @@ export class GpxFile {
 /**
  * This public class represents the file system structure
  * stored within a GPX container file.
+ * @internal
  */
 export class GpxFileSystem {
     public static readonly HeaderBcFs: string = 'BCFS';
@@ -50,7 +52,7 @@ export class GpxFileSystem {
      */
     public load(s: IReadable): void {
         const src: BitReader = new BitReader(s);
-        this.readBlock(src);
+        this._readBlock(src);
     }
 
     /**
@@ -59,7 +61,7 @@ export class GpxFileSystem {
      * @returns a string with 4 characters representing the header.
      */
     public readHeader(src: BitReader): string {
-        return this.getString(src.readBytes(4), 0, 4);
+        return this._getString(src.readBytes(4), 0, 4);
     }
 
     /**
@@ -73,7 +75,7 @@ export class GpxFileSystem {
     public decompress(src: BitReader, skipHeader: boolean = false): Uint8Array {
         const uncompressed: ByteBuffer = ByteBuffer.empty();
         let buffer: Uint8Array;
-        const expectedLength: number = this.getInteger(src.readBytes(4), 0);
+        const expectedLength: number = this._getInteger(src.readBytes(4), 0);
         try {
             // as long we reach our expected length we try to decompress, a EOF might occure.
             while (uncompressed.length < expectedLength) {
@@ -119,14 +121,14 @@ export class GpxFileSystem {
      * @param data the data source
      * @returns
      */
-    private readBlock(data: BitReader): void {
+    private _readBlock(data: BitReader): void {
         const header: string = this.readHeader(data);
         if (header === 'BCFZ') {
             // decompress the data and use this
             // we will skip the header
-            this.readUncompressedBlock(this.decompress(data, true));
+            this._readUncompressedBlock(this.decompress(data, true));
         } else if (header === 'BCFS') {
-            this.readUncompressedBlock(data.readAll());
+            this._readUncompressedBlock(data.readAll());
         } else {
             throw new UnsupportedFormatError('Unsupported format');
         }
@@ -136,7 +138,7 @@ export class GpxFileSystem {
      * Reads an uncompressed data block into the model.
      * @param data the data store to read from.
      */
-    private readUncompressedBlock(data: Uint8Array): void {
+    private _readUncompressedBlock(data: Uint8Array): void {
         // the uncompressed block contains a list of filesystem entires
         // as long we have data we will try to read more entries
         // the first sector (0x1000 bytes) is empty (filled with 0xFF)
@@ -146,7 +148,7 @@ export class GpxFileSystem {
         let offset: number = sectorSize;
         // we always need 4 bytes (+3 including offset) to read the type
         while (offset + 3 < data.length) {
-            const entryType: number = this.getInteger(data, offset);
+            const entryType: number = this._getInteger(data, offset);
             if (entryType === 2) {
                 // file structure:
                 //   offset |   type   |   size   | what
@@ -158,8 +160,8 @@ export class GpxFileSystem {
                 //    0x94  |   int[]  |  n*4byte | Indices of the sector containing the data (end is marked with 0)
                 // The sectors marked at 0x94 are absolutely positioned ( 1*0x1000 is sector 1, 2*0x1000 is sector 2,...)
                 const file: GpxFile = new GpxFile();
-                file.fileName = this.getString(data, offset + 0x04, 127);
-                file.fileSize = this.getInteger(data, offset + 0x8c);
+                file.fileName = this._getString(data, offset + 0x04, 127);
+                file.fileSize = this._getInteger(data, offset + 0x8c);
                 // store file if needed
                 const storeFile: boolean = !this.fileFilter || this.fileFilter(file.fileName);
                 if (storeFile) {
@@ -174,7 +176,7 @@ export class GpxFileSystem {
                 // as long we have data blocks we need to iterate them,
                 const fileData: ByteBuffer | null = storeFile ? ByteBuffer.withCapacity(file.fileSize) : null;
                 while (true) {
-                    sector = this.getInteger(data, dataPointerOffset + 4 * sectorCount++);
+                    sector = this._getInteger(data, dataPointerOffset + 4 * sectorCount++);
                     if (sector !== 0) {
                         // the next file entry starts after the last data sector so we
                         // move the offset along
@@ -208,7 +210,7 @@ export class GpxFileSystem {
      * @param length the max length to read
      * @returns the ascii string read from the datasource.
      */
-    private getString(data: Uint8Array, offset: number, length: number): string {
+    private _getString(data: Uint8Array, offset: number, length: number): string {
         let buf: string = '';
         for (let i: number = 0; i < length; i++) {
             const code: number = data[offset + i] & 0xff;
@@ -227,7 +229,7 @@ export class GpxFileSystem {
      * @param offset offset the offset to start reading from
      * @returns
      */
-    private getInteger(data: Uint8Array, offset: number): number {
+    private _getInteger(data: Uint8Array, offset: number): number {
         return (data[offset + 3] << 24) | (data[offset + 2] << 16) | (data[offset + 1] << 8) | data[offset];
     }
 }

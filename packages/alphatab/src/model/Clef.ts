@@ -1,5 +1,6 @@
 /**
  * This public enumeration lists all supported Clefs.
+ * @public
  */
 export enum Clef {
     /**

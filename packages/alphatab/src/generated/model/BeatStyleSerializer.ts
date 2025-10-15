@@ -7,6 +7,9 @@ import { BeatStyle } from "@src/model/Beat";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BeatSubElement } from "@src/model/Beat";
 import { Color } from "@src/model/Color";
+/**
+ * @internal
+ */
 export class BeatStyleSerializer {
     public static fromJson(obj: BeatStyle, m: unknown): void {
         if (!m) {

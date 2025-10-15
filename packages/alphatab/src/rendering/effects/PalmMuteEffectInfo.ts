@@ -7,6 +7,9 @@ import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@src/rendering/glyphs/LineRangedGlyph';
 import { NotationElement } from '@src/NotationSettings';
 
+/**
+ * @internal
+ */
 export class PalmMuteEffectInfo extends NoteEffectInfoBase {
     public get notationElement(): NotationElement {
         return NotationElement.EffectPalmMute;

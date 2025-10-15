@@ -4,6 +4,7 @@ import path from 'node:path';
 
 /**
  * @partial
+ * @internal
  */
 export class TestPlatform {
     /**
@@ -113,5 +114,22 @@ export class TestPlatform {
      */
     public static mapAsUnknownIterable(map: unknown): Iterable<[unknown, unknown]> {
         return (map as Map<unknown, unknown>).entries();
+    }
+    
+    /**
+     * @target web
+     * @partial
+     */
+    public static setAsUnknownIterable(set: unknown): Iterable<unknown> {
+        return set as Set<unknown>;
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static getConstructorName(val: unknown) {
+        const withConstructor = val as object;
+        return (typeof withConstructor.constructor === 'function' && withConstructor.constructor.name) || 'Object';
     }
 }

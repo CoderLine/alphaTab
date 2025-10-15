@@ -10,6 +10,9 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 
+/**
+ * @internal
+ */
 export class TabSlideLineGlyph extends Glyph {
     private _inType: SlideInType;
     private _outType: SlideOutType;
@@ -29,11 +32,11 @@ export class TabSlideLineGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        this.paintSlideIn(cx, cy, canvas);
-        this.paintSlideOut(cx, cy, canvas);
+        this._paintSlideIn(cx, cy, canvas);
+        this._paintSlideOut(cx, cy, canvas);
     }
 
-    private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
+    private _paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
         const sizeX: number = this.renderer.smuflMetrics.simpleSlideWidth;
         const sizeY: number =  this.renderer.smuflMetrics.simpleSlideHeight;
@@ -74,10 +77,10 @@ export class TabSlideLineGlyph extends Glyph {
             default:
                 return;
         }
-        this.paintSlideLine(canvas, false, startX, endX, startY, endY);
+        this._paintSlideLine(canvas, false, startX, endX, startY, endY);
     }
 
-    private paintSlideOut(cx: number, cy: number, canvas: ICanvas): void {
+    private _paintSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
         const sizeX: number = this.renderer.smuflMetrics.simpleSlideWidth;
         const sizeY: number =  this.renderer.smuflMetrics.simpleSlideHeight;
@@ -202,10 +205,10 @@ export class TabSlideLineGlyph extends Glyph {
             default:
                 return;
         }
-        this.paintSlideLine(canvas, waves, startX, endX, startY, endY);
+        this._paintSlideLine(canvas, waves, startX, endX, startY, endY);
     }
 
-    private paintSlideLine(
+    private _paintSlideLine(
         canvas: ICanvas,
         waves: boolean,
         startX: number,

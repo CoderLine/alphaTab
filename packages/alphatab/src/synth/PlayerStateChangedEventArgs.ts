@@ -2,6 +2,7 @@ import type { PlayerState } from '@src/synth/PlayerState';
 
 /**
  * Represents the info when the player state changes.
+ * @public
  */
 export class PlayerStateChangedEventArgs {
     /**

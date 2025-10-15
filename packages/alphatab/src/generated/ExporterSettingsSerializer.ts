@@ -5,6 +5,9 @@
 // </auto-generated>
 import { ExporterSettings } from "@src/ExporterSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
+/**
+ * @internal
+ */
 export class ExporterSettingsSerializer {
     public static fromJson(obj: ExporterSettings, m: unknown): void {
         if (!m) {

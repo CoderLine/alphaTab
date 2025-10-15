@@ -6,12 +6,15 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { BarSubElement } from '@src/model/Bar';
 
+/**
+ * @internal
+ */
 export class ClefGlyph extends MusicFontGlyph {
     private _clef: Clef;
     private _clefOttava: Ottavia;
 
     public constructor(x: number, y: number, clef: Clef, clefOttava: Ottavia) {
-        super(x, y, 1, ClefGlyph.getSymbol(clef, clefOttava));
+        super(x, y, 1, ClefGlyph._getSymbol(clef, clefOttava));
         this._clef = clef;
         this._clefOttava = clefOttava;
     }
@@ -23,7 +26,7 @@ export class ClefGlyph extends MusicFontGlyph {
         this.offsetX = this.width / 2;
     }
 
-    private static getSymbol(clef: Clef, clefOttava: Ottavia): MusicFontSymbol {
+    private static _getSymbol(clef: Clef, clefOttava: Ottavia): MusicFontSymbol {
         switch (clef) {
             case Clef.Neutral:
                 return MusicFontSymbol.UnpitchedPercussionClef1;

@@ -3,6 +3,9 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 
+/**
+ * @internal
+ */
 export class Channel {
     public presetIndex: number = 0;
     public bank: number = 0;

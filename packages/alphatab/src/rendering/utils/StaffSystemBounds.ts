@@ -4,6 +4,7 @@ import type { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 
 /**
  * Represents the bounds of a staff system.
+ * @public
  */
 export class StaffSystemBounds {
     /**

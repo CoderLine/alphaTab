@@ -13,6 +13,9 @@ import { TrackStyleSerializer } from "@src/generated/model/TrackStyleSerializer"
 import { Staff } from "@src/model/Staff";
 import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
 import { TrackStyle } from "@src/model/Track";
+/**
+ * @internal
+ */
 export class TrackSerializer {
     public static fromJson(obj: Track, m: unknown): void {
         if (!m) {

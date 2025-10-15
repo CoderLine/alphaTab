@@ -7,6 +7,9 @@ import { CoreSettings } from "@src/CoreSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { FontFileFormat } from "@src/CoreSettings";
 import { LogLevel } from "@src/LogLevel";
+/**
+ * @internal
+ */
 export class CoreSettingsSerializer {
     public static fromJson(obj: CoreSettings, m: unknown): void {
         if (!m) {

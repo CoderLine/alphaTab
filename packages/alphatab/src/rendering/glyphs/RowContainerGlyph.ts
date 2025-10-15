@@ -2,6 +2,9 @@ import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { RowGlyphContainer } from '@src/rendering/glyphs/RowGlyphContainer';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 
+/**
+ * @internal
+ */
 export class RowContainerGlyph extends GlyphGroup {
     private _rows: RowGlyphContainer[] = [];
     private _align: TextAlign;

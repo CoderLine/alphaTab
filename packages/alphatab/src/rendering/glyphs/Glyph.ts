@@ -4,6 +4,7 @@ import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 /**
  * A glyph is a single symbol which can be added to a GlyphBarRenderer for automated
  * layouting and drawing of stacked symbols.
+ * @internal
  */
 export class Glyph {
     public x: number;

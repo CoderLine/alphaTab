@@ -1,5 +1,6 @@
 /**
  * Lists all note ornaments.
+ * @public
  */
 export enum NoteOrnament {
     None = 0,

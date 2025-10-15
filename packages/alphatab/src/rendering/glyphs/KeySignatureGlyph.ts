@@ -3,6 +3,9 @@ import { LeftToRightLayoutingGlyphGroup } from '@src/rendering/glyphs/LeftToRigh
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { BarSubElement } from '@src/model/Bar';
 
+/**
+ * @internal
+ */
 export class KeySignatureGlyph extends LeftToRightLayoutingGlyphGroup {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationKeySignature, this.renderer.bar);

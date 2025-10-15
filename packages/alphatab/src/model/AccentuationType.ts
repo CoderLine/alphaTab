@@ -1,5 +1,6 @@
 /**
  * Lists all types of note acceuntations
+ * @public
  */
 export enum AccentuationType {
     /**

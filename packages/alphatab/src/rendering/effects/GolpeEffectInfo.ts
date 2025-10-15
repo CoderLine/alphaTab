@@ -8,6 +8,9 @@ import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { GuitarGolpeGlyph } from '@src/rendering/glyphs/GuitarGolpeGlyph';
 
+/**
+ * @internal
+ */
 export class GolpeEffectInfo extends EffectBarRendererInfo {
     private _type: GolpeType;
     private _shouldCreate?: (settings: Settings, beat: Beat) => boolean;

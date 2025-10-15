@@ -320,7 +320,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
             }
         }
         beatCursor.layoutParams = RelativeLayout.LayoutParams(
-            (3 * Environment.HighDpiFactor).toInt(),
+            (3 * Environment.highDpiFactor).toInt(),
             0
         )
         beatCursor.setBackgroundColor(settingsContainer.beatCursorFillColor)

@@ -55,6 +55,9 @@ import { BeamDirection } from '@src/rendering/_barrel';
 import { Settings } from '@src/Settings';
 import { ScoreExporter } from './ScoreExporter';
 
+/**
+ * @internal
+ */
 class WriterGroup {
     start: string = '';
     end: string = '';
@@ -64,6 +67,7 @@ class WriterGroup {
 
 /**
  * A small helper to write formatted alphaTex code to a string buffer.
+ * @internal
  */
 class AlphaTexWriter {
     public tex: string = '';
@@ -123,7 +127,7 @@ class AlphaTexWriter {
         }
     }
 
-    private preWrite() {
+    private _preWrite() {
         if (this._singleLineComment) {
             const comment = this._singleLineComment;
             this._singleLineComment = '';
@@ -156,7 +160,7 @@ class AlphaTexWriter {
     }
 
     public write(text: string) {
-        this.preWrite();
+        this._preWrite();
         this.tex += text;
         this.isStartOfLine = false;
     }
@@ -170,7 +174,7 @@ class AlphaTexWriter {
         }
 
         const hasContent = this._groups[this._groups.length - 1].hasContent;
-        this.preWrite();
+        this._preWrite();
 
         if (hasContent) {
             this.tex += ' ';
@@ -180,7 +184,7 @@ class AlphaTexWriter {
     }
 
     public writeString(text: string) {
-        this.preWrite();
+        this._preWrite();
         this.tex += Environment.quoteJsonString(text);
         this.tex += ' ';
     }
@@ -190,14 +194,14 @@ class AlphaTexWriter {
             return;
         }
 
-        this.preWrite();
+        this._preWrite();
         this.tex += `\\${tag} `;
         this.tex += Environment.quoteJsonString(value);
         this.writeLine();
     }
 
     public writeMeta(tag: string, value?: string) {
-        this.preWrite();
+        this._preWrite();
         this.tex += `\\${tag} `;
         if (value) {
             this.tex += value;
@@ -206,7 +210,7 @@ class AlphaTexWriter {
     }
 
     public writeLine(text?: string) {
-        this.preWrite();
+        this._preWrite();
         if (text !== undefined) {
             this.tex += text;
         }
@@ -223,11 +227,12 @@ class AlphaTexWriter {
 
 /**
  * This ScoreExporter can write alphaTex strings.
+ * @public
  */
 export class AlphaTexExporter extends ScoreExporter {
     // used to lookup some default values.
-    private static readonly DefaultScore = new Score();
-    private static readonly DefaultTrack = new Track();
+    private static readonly _defaultScore = new Score();
+    private static readonly _defaultTrack = new Track();
 
     public get name(): string {
         return 'alphaTex';
@@ -247,11 +252,11 @@ export class AlphaTexExporter extends ScoreExporter {
         const writer = new AlphaTexWriter();
         writer.comments = this.settings.exporter.comments;
         writer.indentString = this.settings.exporter.indent > 0 ? ' '.repeat(this.settings.exporter.indent) : '';
-        this.writeScoreTo(writer, score);
+        this._writeScoreTo(writer, score);
         return writer.tex;
     }
 
-    private writeScoreTo(writer: AlphaTexWriter, score: Score) {
+    private _writeScoreTo(writer: AlphaTexWriter, score: Score) {
         writer.writeSingleLineComment('Score Metadata');
         writer.writeStringMeta('album', score.album);
         writer.writeStringMeta('artist', score.artist);
@@ -269,14 +274,14 @@ export class AlphaTexExporter extends ScoreExporter {
         }
         writer.writeLine();
 
-        if (score.defaultSystemsLayout !== AlphaTexExporter.DefaultScore.defaultSystemsLayout) {
+        if (score.defaultSystemsLayout !== AlphaTexExporter._defaultScore.defaultSystemsLayout) {
             writer.writeMeta('defaultSystemsLayout', `${score.defaultSystemsLayout}`);
         }
         if (score.systemsLayout.length > 0) {
             writer.writeMeta('systemsLayout', score.systemsLayout.join(' '));
         }
 
-        this.writeStyleSheetTo(writer, score.stylesheet);
+        this._writeStyleSheetTo(writer, score.stylesheet);
         writer.writeLine('.');
 
         // Unsupported:
@@ -284,7 +289,7 @@ export class AlphaTexExporter extends ScoreExporter {
 
         for (const track of score.tracks) {
             writer.writeLine();
-            this.writeTrackTo(writer, track);
+            this._writeTrackTo(writer, track);
         }
 
         const flatSyncPoints = score.exportFlatSyncPoints();
@@ -300,12 +305,12 @@ export class AlphaTexExporter extends ScoreExporter {
         }
     }
 
-    private writeStyleSheetTo(writer: AlphaTexWriter, stylesheet: RenderStylesheet) {
+    private _writeStyleSheetTo(writer: AlphaTexWriter, stylesheet: RenderStylesheet) {
         writer.writeSingleLineComment('Score Stylesheet');
         if (stylesheet.hideDynamics) {
             writer.writeMeta('hideDynamics');
         }
-        if (stylesheet.bracketExtendMode !== AlphaTexExporter.DefaultScore.stylesheet.bracketExtendMode) {
+        if (stylesheet.bracketExtendMode !== AlphaTexExporter._defaultScore.stylesheet.bracketExtendMode) {
             writer.writeMeta('bracketExtendMode', BracketExtendMode[stylesheet.bracketExtendMode]);
         }
         if (stylesheet.useSystemSignSeparator) {
@@ -316,26 +321,26 @@ export class AlphaTexExporter extends ScoreExporter {
         }
         if (
             stylesheet.singleTrackTrackNamePolicy !==
-            AlphaTexExporter.DefaultScore.stylesheet.singleTrackTrackNamePolicy
+            AlphaTexExporter._defaultScore.stylesheet.singleTrackTrackNamePolicy
         ) {
             writer.writeMeta('singleTrackTrackNamePolicy', TrackNamePolicy[stylesheet.singleTrackTrackNamePolicy]);
         }
         if (
-            stylesheet.multiTrackTrackNamePolicy !== AlphaTexExporter.DefaultScore.stylesheet.multiTrackTrackNamePolicy
+            stylesheet.multiTrackTrackNamePolicy !== AlphaTexExporter._defaultScore.stylesheet.multiTrackTrackNamePolicy
         ) {
             writer.writeMeta('multiTrackTrackNamePolicy', TrackNamePolicy[stylesheet.multiTrackTrackNamePolicy]);
         }
-        if (stylesheet.firstSystemTrackNameMode !== AlphaTexExporter.DefaultScore.stylesheet.firstSystemTrackNameMode) {
+        if (stylesheet.firstSystemTrackNameMode !== AlphaTexExporter._defaultScore.stylesheet.firstSystemTrackNameMode) {
             writer.writeMeta('firstSystemTrackNameMode', TrackNameMode[stylesheet.firstSystemTrackNameMode]);
         }
         if (
-            stylesheet.otherSystemsTrackNameMode !== AlphaTexExporter.DefaultScore.stylesheet.otherSystemsTrackNameMode
+            stylesheet.otherSystemsTrackNameMode !== AlphaTexExporter._defaultScore.stylesheet.otherSystemsTrackNameMode
         ) {
             writer.writeMeta('otherSystemsTrackNameMode', TrackNameMode[stylesheet.otherSystemsTrackNameMode]);
         }
         if (
             stylesheet.firstSystemTrackNameOrientation !==
-            AlphaTexExporter.DefaultScore.stylesheet.firstSystemTrackNameOrientation
+            AlphaTexExporter._defaultScore.stylesheet.firstSystemTrackNameOrientation
         ) {
             writer.writeMeta(
                 'firstSystemTrackNameOrientation',
@@ -344,7 +349,7 @@ export class AlphaTexExporter extends ScoreExporter {
         }
         if (
             stylesheet.otherSystemsTrackNameOrientation !==
-            AlphaTexExporter.DefaultScore.stylesheet.otherSystemsTrackNameOrientation
+            AlphaTexExporter._defaultScore.stylesheet.otherSystemsTrackNameOrientation
         ) {
             writer.writeMeta(
                 'otherSystemsTrackNameOrientation',
@@ -362,7 +367,7 @@ export class AlphaTexExporter extends ScoreExporter {
         // 'pertrackmultibarrest',
     }
 
-    private writeTrackTo(writer: AlphaTexWriter, track: Track) {
+    private _writeTrackTo(writer: AlphaTexWriter, track: Track) {
         writer.write('\\track ');
         writer.writeString(track.name);
         if (track.shortName.length > 0) {
@@ -374,12 +379,12 @@ export class AlphaTexExporter extends ScoreExporter {
 
         writer.writeSingleLineComment('Track Properties');
 
-        if (track.color.rgba !== AlphaTexExporter.DefaultTrack.color.rgba) {
+        if (track.color.rgba !== AlphaTexExporter._defaultTrack.color.rgba) {
             writer.write(` color `);
             writer.writeString(track.color.rgba);
             writer.writeLine();
         }
-        if (track.defaultSystemsLayout !== AlphaTexExporter.DefaultTrack.defaultSystemsLayout) {
+        if (track.defaultSystemsLayout !== AlphaTexExporter._defaultTrack.defaultSystemsLayout) {
             writer.write(` defaultSystemsLayout ${track.defaultSystemsLayout}`);
             writer.writeLine();
         }
@@ -418,7 +423,7 @@ export class AlphaTexExporter extends ScoreExporter {
         writer.indent();
 
         for (const staff of track.staves) {
-            this.writeStaffTo(writer, staff);
+            this._writeStaffTo(writer, staff);
         }
 
         // Unsupported:
@@ -428,7 +433,7 @@ export class AlphaTexExporter extends ScoreExporter {
         writer.outdent();
     }
 
-    private writeStaffTo(writer: AlphaTexWriter, staff: Staff) {
+    private _writeStaffTo(writer: AlphaTexWriter, staff: Staff) {
         writer.write('\\staff ');
 
         writer.beginGroup('{', '}', 'Staff Properties');
@@ -464,7 +469,7 @@ export class AlphaTexExporter extends ScoreExporter {
             }
 
             for (const bar of staff.bars) {
-                this.writeBarTo(writer, bar, v);
+                this._writeBarTo(writer, bar, v);
             }
 
             if (voiceCount > 1) {
@@ -478,7 +483,7 @@ export class AlphaTexExporter extends ScoreExporter {
         writer.outdent();
     }
 
-    private writeBarTo(writer: AlphaTexWriter, bar: Bar, voiceIndex: number) {
+    private _writeBarTo(writer: AlphaTexWriter, bar: Bar, voiceIndex: number) {
         if (bar.index > 0) {
             writer.writeLine('|');
         }
@@ -489,14 +494,14 @@ export class AlphaTexExporter extends ScoreExporter {
             // Staff meta on first bar
             if (bar.index === 0) {
                 const l = writer.tex.length;
-                this.writeStaffMetaTo(writer, bar.staff);
+                this._writeStaffMetaTo(writer, bar.staff);
                 anyWritten = writer.tex.length > l;
             }
 
             // Master Bar meta on first track
             if (bar.staff.index === 0 && bar.staff.track.index === 0) {
                 const l = writer.tex.length;
-                this.writeMasterBarMetaTo(writer, bar.masterBar);
+                this._writeMasterBarMetaTo(writer, bar.masterBar);
                 anyWritten = writer.tex.length > l;
             }
 
@@ -507,13 +512,13 @@ export class AlphaTexExporter extends ScoreExporter {
 
         writer.writeSingleLineComment(`Bar ${bar.index + 1}`);
         writer.indent();
-        this.writeBarMetaTo(writer, bar);
+        this._writeBarMetaTo(writer, bar);
 
         // Unsupported:
         // - style
 
         if (!bar.isEmpty) {
-            this.writeVoiceTo(writer, bar.voices[voiceIndex]);
+            this._writeVoiceTo(writer, bar.voices[voiceIndex]);
         } else {
             writer.writeSingleLineComment(`empty bar`);
         }
@@ -521,7 +526,7 @@ export class AlphaTexExporter extends ScoreExporter {
         writer.outdent();
     }
 
-    private writeStaffMetaTo(writer: AlphaTexWriter, staff: Staff) {
+    private _writeStaffMetaTo(writer: AlphaTexWriter, staff: Staff) {
         writer.writeSingleLineComment(`Staff ${staff.index + 1} Metadata`);
 
         if (staff.capo !== 0) {
@@ -565,12 +570,12 @@ export class AlphaTexExporter extends ScoreExporter {
 
         if (staff.chords != null) {
             for (const [_, chord] of staff.chords!) {
-                this.writeChordTo(writer, chord);
+                this._writeChordTo(writer, chord);
             }
         }
     }
 
-    private writeChordTo(writer: AlphaTexWriter, c: Chord) {
+    private _writeChordTo(writer: AlphaTexWriter, c: Chord) {
         writer.write('\\chord {');
         if (c.firstFret > 0) {
             writer.write(`firstfret ${c.firstFret} `);
@@ -593,7 +598,7 @@ export class AlphaTexExporter extends ScoreExporter {
         writer.writeLine();
     }
 
-    private writeMasterBarMetaTo(writer: AlphaTexWriter, masterBar: MasterBar) {
+    private _writeMasterBarMetaTo(writer: AlphaTexWriter, masterBar: MasterBar) {
         writer.writeSingleLineComment(`Masterbar ${masterBar.index + 1} Metadata`, true);
 
         if (masterBar.alternateEndings !== 0) {
@@ -684,7 +689,7 @@ export class AlphaTexExporter extends ScoreExporter {
         writer.dropSingleLineComment();
     }
 
-    private writeBarMetaTo(writer: AlphaTexWriter, bar: Bar) {
+    private _writeBarMetaTo(writer: AlphaTexWriter, bar: Bar) {
         writer.writeSingleLineComment(`Bar ${bar.index + 1} Metadata`, true);
         const l = writer.tex.length;
 
@@ -816,7 +821,7 @@ export class AlphaTexExporter extends ScoreExporter {
         writer.dropSingleLineComment();
     }
 
-    private writeVoiceTo(writer: AlphaTexWriter, voice: Voice) {
+    private _writeVoiceTo(writer: AlphaTexWriter, voice: Voice) {
         if (voice.isEmpty) {
             writer.writeSingleLineComment(`empty voice`);
             return;
@@ -828,11 +833,11 @@ export class AlphaTexExporter extends ScoreExporter {
         // - style
 
         for (const beat of voice.beats) {
-            this.writeBeatTo(writer, beat);
+            this._writeBeatTo(writer, beat);
         }
     }
 
-    private writeBeatTo(writer: AlphaTexWriter, beat: Beat) {
+    private _writeBeatTo(writer: AlphaTexWriter, beat: Beat) {
         // Notes
         if (beat.isRest) {
             writer.write('r');
@@ -847,7 +852,7 @@ export class AlphaTexExporter extends ScoreExporter {
                 if (note.index > 0) {
                     writer.write(' ');
                 }
-                this.writeNoteTo(writer, note);
+                this._writeNoteTo(writer, note);
             }
 
             if (beat.notes.length > 1) {
@@ -860,12 +865,12 @@ export class AlphaTexExporter extends ScoreExporter {
         // Unsupported:
         // - style
 
-        this.writeBeatEffectsTo(writer, beat);
+        this._writeBeatEffectsTo(writer, beat);
 
         writer.writeLine();
     }
 
-    private writeBeatEffectsTo(writer: AlphaTexWriter, beat: Beat) {
+    private _writeBeatEffectsTo(writer: AlphaTexWriter, beat: Beat) {
         writer.beginGroup('{', '}');
 
         switch (beat.fade) {
@@ -1125,7 +1130,7 @@ export class AlphaTexExporter extends ScoreExporter {
         writer.endGroup();
     }
 
-    private writeNoteTo(writer: AlphaTexWriter, note: Note) {
+    private _writeNoteTo(writer: AlphaTexWriter, note: Note) {
         if (note.index > 0) {
             writer.write(' ');
         }
@@ -1145,10 +1150,10 @@ export class AlphaTexExporter extends ScoreExporter {
         // Unsupported:
         // - style
 
-        this.writeNoteEffectsTo(writer, note);
+        this._writeNoteEffectsTo(writer, note);
     }
 
-    private writeNoteEffectsTo(writer: AlphaTexWriter, note: Note) {
+    private _writeNoteEffectsTo(writer: AlphaTexWriter, note: Note) {
         writer.beginGroup('{', '}');
 
         if (note.hasBend) {

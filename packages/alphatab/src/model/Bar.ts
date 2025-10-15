@@ -11,6 +11,7 @@ import { KeySignatureType } from '@src/model/KeySignatureType';
 
 /**
  * The different pedal marker types.
+ * @public
  */
 export enum SustainPedalMarkerType {
     /**
@@ -31,6 +32,7 @@ export enum SustainPedalMarkerType {
  * A marker on whether a sustain pedal starts or ends.
  * @json
  * @json_strict
+ * @public
  */
 export class SustainPedalMarker {
     /**
@@ -65,6 +67,7 @@ export class SustainPedalMarker {
 
 /**
  * Lists all graphical sub elements within a {@link Bar} which can be styled via {@link Bar.style}
+ * @public
  */
 export enum BarSubElement {
     /**
@@ -192,11 +195,13 @@ export enum BarSubElement {
  * Defines the custom styles for bars.
  * @json
  * @json_strict
+ * @public
  */
 export class BarStyle extends ElementStyle<BarSubElement> {}
 
 /**
  * Lists all bar line styles.
+ * @public
  */
 export enum BarLineStyle {
     /**
@@ -220,6 +225,7 @@ export enum BarLineStyle {
  * A bar is a single block within a track, also known as Measure.
  * @json
  * @json_strict
+ * @public
  */
 export class Bar {
     private static _globalBarId: number = 0;
@@ -281,7 +287,7 @@ export class Bar {
      */
     public simileMark: SimileMark = SimileMark.None;
 
-    private _filledVoices:Set<number> = new Set<number>([0]);
+    private _filledVoices: Set<number> = new Set<number>([0]);
 
     /**
      * Gets a value indicating whether this bar contains multiple voices with notes.
@@ -295,7 +301,7 @@ export class Bar {
      * Gets the number of voices which have content within this stuff.
      * @json_ignore
      */
-    public get filledVoices():Set<number> {
+    public get filledVoices(): Set<number> {
         return this._filledVoices;
     }
 
@@ -395,17 +401,17 @@ export class Bar {
      * @param isFirstOfSystem  Whether the bar is the first one in the system.
      */
     public getActualBarLineLeft(isFirstOfSystem: boolean): BarLineStyle {
-        return Bar.actualBarLine(this, false, isFirstOfSystem);
+        return Bar._actualBarLine(this, false, isFirstOfSystem);
     }
 
     /**
      * The bar line to draw on the right side of the bar with an "automatic" type resolved to the actual one.
      */
     public getActualBarLineRight(): BarLineStyle {
-        return Bar.actualBarLine(this, true, false /* not relevant */);
+        return Bar._actualBarLine(this, true, false /* not relevant */);
     }
 
-    private static automaticToActualType(masterBar: MasterBar, isRight: boolean, firstOfSystem: boolean) {
+    private static _automaticToActualType(masterBar: MasterBar, isRight: boolean, firstOfSystem: boolean) {
         let actualLineType: BarLineStyle;
 
         if (isRight) {
@@ -433,13 +439,13 @@ export class Bar {
         return actualLineType;
     }
 
-    private static actualBarLine(bar: Bar, isRight: boolean, firstOfSystem: boolean) {
+    private static _actualBarLine(bar: Bar, isRight: boolean, firstOfSystem: boolean) {
         const masterBar = bar.masterBar;
         const requestedLineType = isRight ? bar.barLineRight : bar.barLineLeft;
 
         let actualLineType: BarLineStyle;
         if (requestedLineType === BarLineStyle.Automatic) {
-            actualLineType = Bar.automaticToActualType(masterBar, isRight, firstOfSystem);
+            actualLineType = Bar._automaticToActualType(masterBar, isRight, firstOfSystem);
         } else {
             actualLineType = requestedLineType;
         }
@@ -475,7 +481,7 @@ export class Bar {
                 this._isRestOnly = false;
             }
         }
-        
+
         // chain sustain pedal markers (and merge overlaps)
         const sustainPedals = this.sustainPedals;
         if (sustainPedals.length > 0) {

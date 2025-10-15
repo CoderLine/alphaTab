@@ -10,6 +10,7 @@ import { ColorJson } from "@src/model/Color";
  * This public class contains central definitions for controlling the visual appearance.
  * @json
  * @json_declaration
+ * @public
  * @target web
  */
 export interface RenderingResourcesJson {

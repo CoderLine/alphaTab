@@ -3,6 +3,9 @@ import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 
+/**
+ * @internal
+ */
 export class GhostParenthesisGlyph extends Glyph {
     private _isOpen: boolean;
 

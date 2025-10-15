@@ -1,5 +1,6 @@
 /**
  * Represents a range of the song that should be played.
+ * @public
  */
 export class PlaybackRange {
     /**

@@ -14,6 +14,9 @@ import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
 import type { IAudioExporterWorker } from '@src/synth/IAudioExporter';
 import { TestPlatform } from '@test/TestPlatform';
 
+/**
+ * @internal
+ */
 class TestUiContainer implements IContainer {
     private _width: number = 0;
     private _height: number = 0;
@@ -105,6 +108,9 @@ class TestUiContainer implements IContainer {
     public mouseUp: IEventEmitterOfT<IMouseEventArgs> = new EventEmitterOfT<IMouseEventArgs>();
 }
 
+/**
+ * @internal
+ */
 export class TestUiFacade implements IUiFacade<unknown> {
     public readonly rootContainer: IContainer;
     public readonly areWorkersSupported: boolean;

@@ -5,6 +5,7 @@
 
 /**
  * Supported output modes by the render methods
+ * @internal
  */
 export enum OutputMode {
     /**

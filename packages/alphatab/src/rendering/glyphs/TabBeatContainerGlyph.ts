@@ -9,6 +9,9 @@ import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
 import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 
+/**
+ * @internal
+ */
 export class TabBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: TabBendGlyph | null = null;
     private _effectSlurs: TabSlurGlyph[] = [];

@@ -10,6 +10,9 @@ import { ChordSerializer } from "@src/generated/model/ChordSerializer";
 import { TuningSerializer } from "@src/generated/model/TuningSerializer";
 import { Bar } from "@src/model/Bar";
 import { Chord } from "@src/model/Chord";
+/**
+ * @internal
+ */
 export class StaffSerializer {
     public static fromJson(obj: Staff, m: unknown): void {
         if (!m) {

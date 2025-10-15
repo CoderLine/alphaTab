@@ -5,6 +5,9 @@ import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
 import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
+/**
+ * @internal
+ */
 export class TabSlurGlyph extends TabTieGlyph {
     private _direction: BeamDirection;
     private _forSlide: boolean;

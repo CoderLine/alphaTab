@@ -2,6 +2,7 @@ import type { MidiEvent } from '@src/midi/MidiEvent';
 
 /**
  * Represents the info when the synthesizer played certain midi events.
+ * @public
  */
 export class MidiEventsPlayedEventArgs {
     /**

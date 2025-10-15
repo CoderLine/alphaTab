@@ -3,9 +3,12 @@ import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
+/**
+ * @internal
+ */
 export class PickStrokeGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, pickStroke: PickStroke) {
-        super(x, y, NoteHeadGlyph.GraceScale, PickStrokeGlyph.getSymbol(pickStroke));
+        super(x, y, NoteHeadGlyph.GraceScale, PickStrokeGlyph._getSymbol(pickStroke));
         this.center = true;
     }
 
@@ -14,7 +17,7 @@ export class PickStrokeGlyph extends MusicFontGlyph {
         this.offsetY = this.height;
     }
 
-    private static getSymbol(pickStroke: PickStroke): MusicFontSymbol {
+    private static _getSymbol(pickStroke: PickStroke): MusicFontSymbol {
         switch (pickStroke) {
             case PickStroke.Up:
                 return MusicFontSymbol.StringsUpBow;

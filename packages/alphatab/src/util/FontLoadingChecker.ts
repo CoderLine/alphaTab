@@ -5,6 +5,7 @@ import { Environment } from '@src/Environment';
 /**
  * This small utility helps to detect whether a particular font is already loaded.
  * @target web
+ * @internal
  */
 export class FontLoadingChecker {
     private _originalFamilies: string[];
@@ -75,7 +76,7 @@ export class FontLoadingChecker {
         const checkFont = async () => {
             // Fast Path: check if one of the specified fonts is already available.
             for (const font of this._families) {
-                if (await this.isFontAvailable(font, false)) {
+                if (await this._isFontAvailable(font, false)) {
                     successHandler(font);
                     return;
                 }
@@ -89,7 +90,7 @@ export class FontLoadingChecker {
             }
 
             Logger.debug('Font', `[${this._families[0]}] Font API signaled loaded`);
-            if (await this.isFontAvailable(this._families[0], true)) {
+            if (await this._isFontAvailable(this._families[0], true)) {
                 successHandler(this._families[0]);
             } else {
                 errorHandler('Font not available');
@@ -103,7 +104,7 @@ export class FontLoadingChecker {
         });
     }
 
-    private isFontAvailable(family: string, advancedCheck: boolean): Promise<boolean> {
+    private _isFontAvailable(family: string, advancedCheck: boolean): Promise<boolean> {
         return new Promise<boolean>(resolve => {
             // In some very rare occasions Chrome reports false for the font.
             // in this case we try to force some refresh and reload by creating an element with this font.

@@ -8,6 +8,9 @@ import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 import { BarreShape } from '@src/model/BarreShape';
 
+/**
+ * @internal
+ */
 export class BeatBarreEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectLetRing;
@@ -45,7 +48,7 @@ export class BeatBarreEffectInfo extends EffectBarRendererInfo {
         return new LineRangedGlyph(barre, false);
     }
 
-    private static readonly RomanLetters = new Map<string, number>([
+    private static readonly _romanLetters = new Map<string, number>([
         // ['M', 1000],
         // ['CM', 900],
         // ['D', 500],
@@ -65,7 +68,7 @@ export class BeatBarreEffectInfo extends EffectBarRendererInfo {
         let str = '';
 
         if (num > 0) {
-            for (const [romanLetter, romanNumber] of BeatBarreEffectInfo.RomanLetters) {
+            for (const [romanLetter, romanNumber] of BeatBarreEffectInfo._romanLetters) {
                 const q = Math.floor(num / romanNumber);
                 num -= q * romanNumber;
                 str += romanLetter.repeat(q);

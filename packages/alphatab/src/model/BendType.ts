@@ -1,5 +1,6 @@
 /**
  * Lists all types of bends
+ * @public
  */
 export enum BendType {
     /**

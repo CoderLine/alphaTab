@@ -1,6 +1,7 @@
 /**
  * Defines all loglevels.
  * @json
+ * @public
  */
 export enum LogLevel {
     /**

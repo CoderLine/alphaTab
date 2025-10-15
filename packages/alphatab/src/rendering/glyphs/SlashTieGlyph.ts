@@ -4,6 +4,9 @@ import { type BarRendererBase, NoteYPosition, NoteXPosition } from '@src/renderi
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
+/**
+ * @internal
+ */
 export class SlashTieGlyph extends TieGlyph {
     protected startNote: Note;
     protected endNote: Note;
@@ -14,12 +17,12 @@ export class SlashTieGlyph extends TieGlyph {
         this.endNote = endNote;
     }
 
-    private get isLeftHandTap() {
+    private get _isLeftHandTap() {
         return this.startNote === this.endNote;
     }
 
     protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
-        if (this.isLeftHandTap) {
+        if (this._isLeftHandTap) {
             return this.startNoteRenderer!.smuflMetrics.tieHeight;
         }
         return super.getTieHeight(startX, startY, endX, endY);
@@ -42,7 +45,7 @@ export class SlashTieGlyph extends TieGlyph {
     }
 
     protected override getStartX(): number {
-        if (this.isLeftHandTap) {
+        if (this._isLeftHandTap) {
             return this.getEndX() - this.renderer.smuflMetrics.leftHandTabTieWidth;
         }
         return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Right);

@@ -19,6 +19,9 @@ import { BeatSubElement } from '@src/model/Beat';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { SlideInType } from '@src/model/SlideInType';
 
+/**
+ * @internal
+ */
 export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     private _prebends: BendNoteHeadGroupGlyph | null = null;
     public get prebendNoteHeadOffset(): number {
@@ -79,7 +82,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                                 break;
                         }
                     }
-                    this.createAccidentalGlyph(note, accidentals);
+                    this._createAccidentalGlyph(note, accidentals);
                     ghost.addParenthesis(note);
                     fingering.addFingers(note);
 
@@ -178,7 +181,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         super.doLayout();
     }
 
-    private createAccidentalGlyph(n: Note, accidentals: AccidentalGroupGlyph): void {
+    private _createAccidentalGlyph(n: Note, accidentals: AccidentalGroupGlyph): void {
         const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         let accidental: AccidentalType = sr.accidentalHelper.applyAccidental(n);
         let noteLine: number = sr.getNoteLine(n);

@@ -4,6 +4,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements.
+ * @internal
  */
 export class CssFontSvgCanvas extends SvgCanvas {
     public fillMusicFontSymbol(
@@ -16,7 +17,7 @@ export class CssFontSvgCanvas extends SvgCanvas {
         if (symbol === MusicFontSymbol.None) {
             return;
         }
-        this.fillMusicFontSymbolText(x, y, relativeScale, `&#${symbol};`, centerAtPosition);
+        this._fillMusicFontSymbolText(x, y, relativeScale, `&#${symbol};`, centerAtPosition);
     }
 
     public fillMusicFontSymbols(
@@ -32,10 +33,10 @@ export class CssFontSvgCanvas extends SvgCanvas {
                 s += `&#${symbol};`;
             }
         }
-        this.fillMusicFontSymbolText(x, y, relativeScale, s, centerAtPosition);
+        this._fillMusicFontSymbolText(x, y, relativeScale, s, centerAtPosition);
     }
 
-    private fillMusicFontSymbolText(
+    private _fillMusicFontSymbolText(
         x: number,
         y: number,
         relativeScale: number,

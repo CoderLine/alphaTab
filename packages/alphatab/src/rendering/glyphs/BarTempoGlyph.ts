@@ -6,13 +6,14 @@ import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 /**
  * This glyph renders tempo annotations for tempo automations
  * where the drawing position is determined more dynamically while rendering.
+ * @internal
  */
 export class BarTempoGlyph extends EffectGlyph {
-    private tempoAutomations: Automation[];
+    private _tempoAutomations: Automation[];
 
     public constructor(tempoAutomations: Automation[]) {
         super(0, 0);
-        this.tempoAutomations = tempoAutomations;
+        this._tempoAutomations = tempoAutomations;
     }
 
     public override doLayout(): void {
@@ -24,7 +25,7 @@ export class BarTempoGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        for (const automation of this.tempoAutomations) {
+        for (const automation of this._tempoAutomations) {
             let x = cx + this.renderer.getRatioPositionX(automation.ratioPosition);
 
             const res = this.renderer.resources;

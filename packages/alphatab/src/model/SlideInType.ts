@@ -1,5 +1,6 @@
 /**
  * This public enum lists all different types of finger slide-ins on a string.
+ * @public
  */
 export enum SlideInType {
     /**

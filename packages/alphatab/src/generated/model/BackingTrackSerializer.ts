@@ -5,6 +5,9 @@
 // </auto-generated>
 import { BackingTrack } from "@src/model/BackingTrack";
 import { JsonHelper } from "@src/io/JsonHelper";
+/**
+ * @internal
+ */
 export class BackingTrackSerializer {
     public static fromJson(obj: BackingTrack, m: unknown): void {
         if (!m) {

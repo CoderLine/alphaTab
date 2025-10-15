@@ -3,6 +3,7 @@
  * section within a song. It acts like a marker.
  * @json
  * @json_strict
+ * @public
  */
 export class Section {
     /**

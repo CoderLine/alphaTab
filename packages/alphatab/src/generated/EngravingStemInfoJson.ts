@@ -6,6 +6,7 @@
 /**
  * @json
  * @json_declaration
+ * @public
  * @target web
  */
 export interface EngravingStemInfoJson {

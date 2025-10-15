@@ -9,6 +9,7 @@ import { NumberedBarRenderer } from '@src/rendering/NumberedBarRenderer';
 
 /**
  * This Factory produces NumberedBarRenderer instances
+ * @internal
  */
 export class NumberedBarRendererFactory extends BarRendererFactory {
     public get staffId(): string {

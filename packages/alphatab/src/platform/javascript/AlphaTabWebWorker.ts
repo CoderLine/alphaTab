@@ -10,6 +10,7 @@ import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 
 /**
  * @target web
+ * @public
  */
 export class AlphaTabWebWorker {
     private _renderer!: ScoreRenderer;
@@ -17,7 +18,7 @@ export class AlphaTabWebWorker {
 
     public constructor(main: IWorkerScope) {
         this._main = main;
-        this._main.addEventListener('message', this.handleMessage.bind(this), false);
+        this._main.addEventListener('message', this._handleMessage.bind(this), false);
     }
 
     public static init(): void {
@@ -26,7 +27,7 @@ export class AlphaTabWebWorker {
         );
     }
 
-    private handleMessage(e: MessageEvent): void {
+    private _handleMessage(e: MessageEvent): void {
         const data: any = e.data;
         const cmd: any = data ? data.cmd : '';
         switch (cmd) {
@@ -64,7 +65,7 @@ export class AlphaTabWebWorker {
                         resize: resize
                     });
                 });
-                this._renderer.error.on(this.error.bind(this));
+                this._renderer.error.on(this._error.bind(this));
                 break;
             case 'alphaTab.invalidate':
                 this._renderer.render();
@@ -79,18 +80,18 @@ export class AlphaTabWebWorker {
                 this._renderer.width = data.width;
                 break;
             case 'alphaTab.renderScore':
-                this.updateFontSizes(data.fontSizes);
+                this._updateFontSizes(data.fontSizes);
                 const score: any =
                     data.score == null ? null : JsonConverter.jsObjectToScore(data.score, this._renderer.settings);
-                this.renderMultiple(score, data.trackIndexes);
+                this._renderMultiple(score, data.trackIndexes);
                 break;
             case 'alphaTab.updateSettings':
-                this.updateSettings(data.settings);
+                this._updateSettings(data.settings);
                 break;
         }
     }
 
-    private updateFontSizes(fontSizes: { [key: string]: FontSizeDefinition } | Map<string, FontSizeDefinition>): void {
+    private _updateFontSizes(fontSizes: { [key: string]: FontSizeDefinition } | Map<string, FontSizeDefinition>): void {
         if (!(fontSizes instanceof Map)) {
             const obj = fontSizes;
             fontSizes = new Map<string, FontSizeDefinition>();
@@ -100,28 +101,25 @@ export class AlphaTabWebWorker {
         }
 
         if (fontSizes) {
-            if (!FontSizes.FontSizeLookupTables) {
-                FontSizes.FontSizeLookupTables = new Map<string, FontSizeDefinition>();
-            }
             for (const [k, v] of fontSizes) {
-                FontSizes.FontSizeLookupTables.set(k, v);
+                FontSizes.fontSizeLookupTables.set(k, v);
             }
         }
     }
 
-    private updateSettings(json: unknown): void {
+    private _updateSettings(json: unknown): void {
         SettingsSerializer.fromJson(this._renderer.settings, json);
     }
 
-    private renderMultiple(score: Score | null, trackIndexes: number[] | null): void {
+    private _renderMultiple(score: Score | null, trackIndexes: number[] | null): void {
         try {
             this._renderer.renderScore(score, trackIndexes);
         } catch (e) {
-            this.error(e as Error);
+            this._error(e as Error);
         }
     }
 
-    private error(error: Error): void {
+    private _error(error: Error): void {
         Logger.error('Worker', 'An unexpected error occurred in worker', error);
         this._main.postMessage({
             cmd: 'alphaTab.error',

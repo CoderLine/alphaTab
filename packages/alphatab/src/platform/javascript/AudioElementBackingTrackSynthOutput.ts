@@ -9,6 +9,7 @@ import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
  * A {@link IBackingTrackSynthOutput} which uses a HTMLAudioElement as playback mechanism.
  * Allows the access to the element for further custom usage.
  * @target web
+ * @public
  */
 export interface IAudioElementBackingTrackSynthOutput extends IBackingTrackSynthOutput {
     /**
@@ -21,6 +22,7 @@ export interface IAudioElementBackingTrackSynthOutput extends IBackingTrackSynth
 
 /**
  * @target web
+ * @internal
  */
 export class AudioElementBackingTrackSynthOutput implements IAudioElementBackingTrackSynthOutput {
     // fake rate
@@ -72,16 +74,16 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
         audioElement.style.display = 'none';
         document.body.appendChild(audioElement);
         audioElement.addEventListener('seeked', () => {
-            this.updatePosition();
+            this._updatePosition();
         });
         audioElement.addEventListener('timeupdate', () => {
-            this.updatePosition();
+            this._updatePosition();
         });
         this.audioElement = audioElement;
         (this.ready as EventEmitter).trigger();
     }
 
-    private updatePosition() {
+    private _updatePosition() {
         const timePos = this.audioElement.currentTime * 1000;
         (this.timeUpdate as EventEmitterOfT<number>).trigger(timePos);
     }
@@ -89,7 +91,7 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
     public play(): void {
         this.audioElement.play();
         this._updateInterval = window.setInterval(() => {
-            this.updatePosition();
+            this._updatePosition();
         }, 50);
     }
     public destroy(): void {

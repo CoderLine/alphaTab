@@ -25,6 +25,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
+ * @internal
  */
 export class TabBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'tab';
@@ -196,11 +197,11 @@ export class TabBarRenderer extends LineBarRenderer {
                     this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime))
         ) {
             this.createStartSpacing();
-            this.createTimeSignatureGlyphs();
+            this._createTimeSignatureGlyphs();
         }
     }
 
-    private createTimeSignatureGlyphs(): void {
+    private _createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
 
         const lines = (this.bar.staff.tuning.length + 1) / 2 - 1;

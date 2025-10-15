@@ -1,3 +1,6 @@
+/**
+ * @internal
+ */
 export class VorbisStream {
     public audioChannels: number = 0;
     public audioSampleRate: number = 0;

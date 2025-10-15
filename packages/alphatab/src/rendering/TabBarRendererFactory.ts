@@ -9,6 +9,7 @@ import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
 
 /**
  * This Factory produces TabBarRenderer instances
+ * @internal
  */
 export class TabBarRendererFactory extends BarRendererFactory {
     public showTimeSignature: boolean | null = null;

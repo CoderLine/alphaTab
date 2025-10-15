@@ -2,6 +2,7 @@
  * A very basic polyfill of the ResizeObserver which triggers
  * a the callback on window resize for all registered targets.
  * @target web
+ * @internal
  */
 export class ResizeObserverPolyfill {
     private _callback: ResizeObserverCallback;
@@ -9,7 +10,7 @@ export class ResizeObserverPolyfill {
 
     public constructor(callback: ResizeObserverCallback) {
         this._callback = callback;
-        window.addEventListener('resize', this.onWindowResize.bind(this), false);
+        window.addEventListener('resize', this._onWindowResize.bind(this), false);
     }
 
     public observe(target: Element) {
@@ -24,7 +25,7 @@ export class ResizeObserverPolyfill {
         this._targets.clear();
     }
 
-    private onWindowResize() {
+    private _onWindowResize() {
         const entries: ResizeObserverEntry[] = [];
         for (const t of this._targets) {
             entries.push({

@@ -9,6 +9,7 @@ import { Tuning } from '@src/model/Tuning';
  * where a single track can contain multiple staves.
  * @json
  * @json_strict
+ * @public
  */
 export class Staff {
     public static readonly DefaultStandardNotationLineCount = 5;

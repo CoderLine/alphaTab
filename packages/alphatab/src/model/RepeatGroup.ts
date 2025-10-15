@@ -2,6 +2,7 @@ import type { MasterBar } from '@src/model/MasterBar';
 
 /**
  * This public class can store the information about a group of measures which are repeated
+ * @public
  */
 export class RepeatGroup {
     /**

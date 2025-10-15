@@ -3,6 +3,7 @@ import { JsonHelper } from '@src/io/JsonHelper';
 /**
  * A very basic font parser which parses the fields according to
  * https://www.w3.org/TR/CSS21/fonts.html#propdef-font
+ * @internal
  */
 class FontParserToken {
     public startPos: number;
@@ -15,6 +16,9 @@ class FontParserToken {
     }
 }
 
+/**
+ * @internal
+ */
 class FontParser {
     public style: string = 'normal';
     public variant: string = 'normal';
@@ -32,10 +36,10 @@ class FontParser {
 
     public constructor(input: string) {
         this._input = input;
-        this._tokens = this.splitToTokens(input);
+        this._tokens = this._splitToTokens(input);
     }
 
-    private splitToTokens(input: string): FontParserToken[] {
+    private _splitToTokens(input: string): FontParserToken[] {
         const tokens: FontParserToken[] = [];
 
         let startPos = 0;
@@ -56,7 +60,7 @@ class FontParser {
     }
 
     public parse() {
-        this.reset();
+        this._reset();
         // default font flags
         if (this._tokens.length === 1) {
             switch (this._currentToken?.text) {
@@ -72,10 +76,10 @@ class FontParser {
         }
 
         if (!this.parseOnlyFamilies) {
-            this.fontStyleVariantWeight();
-            this.fontSizeLineHeight();
+            this._fontStyleVariantWeight();
+            this._fontSizeLineHeight();
         }
-        this.fontFamily();
+        this._fontFamily();
     }
 
     public static parseFamilies(value: string): string[] {
@@ -85,7 +89,7 @@ class FontParser {
         return parser.families;
     }
 
-    private fontFamily() {
+    private _fontFamily() {
         if (!this._currentToken) {
             if (this.parseOnlyFamilies) {
                 return;
@@ -102,7 +106,7 @@ class FontParser {
                 pos++;
             } else if (c === '"' || c === "'") {
                 // quoted
-                const endOfString = this.findEndOfQuote(familyListInput, pos + 1, c);
+                const endOfString = this._findEndOfQuote(familyListInput, pos + 1, c);
                 this.families.push(
                     familyListInput
                         .substring(pos + 1, endOfString)
@@ -112,14 +116,14 @@ class FontParser {
                 pos = endOfString + 1;
             } else {
                 // until comma
-                const endOfString = this.findEndOfQuote(familyListInput, pos + 1, ',');
+                const endOfString = this._findEndOfQuote(familyListInput, pos + 1, ',');
                 this.families.push(familyListInput.substring(pos, endOfString).trim());
                 pos = endOfString + 1;
             }
         }
     }
 
-    private findEndOfQuote(s: string, pos: number, quoteChar: string): number {
+    private _findEndOfQuote(s: string, pos: number, quoteChar: string): number {
         let escaped = false;
         while (pos < s.length) {
             const c = s.charAt(pos);
@@ -139,7 +143,7 @@ class FontParser {
         return s.length;
     }
 
-    private fontSizeLineHeight() {
+    private _fontSizeLineHeight() {
         if (!this._currentToken) {
             throw new Error('Missing font size');
         }
@@ -149,7 +153,7 @@ class FontParser {
             throw new Error(`Invalid font size '${this._currentToken}' specified`);
         }
 
-        this.nextToken();
+        this._nextToken();
 
         if (parts.length >= 2) {
             if (parts[1] === '/') {
@@ -158,7 +162,7 @@ class FontParser {
                     throw new Error('Missing line-height after font size');
                 }
                 this.lineHeight = this._currentToken.text;
-                this.nextToken();
+                this._nextToken();
             } else {
                 // size/line-height (no spaces)
                 this.size = parts[0];
@@ -170,15 +174,15 @@ class FontParser {
             if (this._currentToken && this._currentToken.text.indexOf('/') === 0) {
                 // size / line-height (with spaces befor and after slash)
                 if (this._currentToken.text === '/') {
-                    this.nextToken();
+                    this._nextToken();
                     if (!this._currentToken) {
                         throw new Error('Missing line-height after font size');
                     }
                     this.lineHeight = this._currentToken.text;
-                    this.nextToken();
+                    this._nextToken();
                 } else {
                     this.lineHeight = this._currentToken.text.substr(1);
-                    this.nextToken();
+                    this._nextToken();
                 }
             }
         } else {
@@ -186,7 +190,7 @@ class FontParser {
         }
     }
 
-    private nextToken() {
+    private _nextToken() {
         this._currentTokenIndex++;
         if (this._currentTokenIndex < this._tokens.length) {
             this._currentToken = this._tokens[this._currentTokenIndex];
@@ -195,7 +199,7 @@ class FontParser {
         }
     }
 
-    private fontStyleVariantWeight() {
+    private _fontStyleVariantWeight() {
         let hasStyle = false;
         let hasVariant = false;
         let hasWeight = false;
@@ -213,7 +217,7 @@ class FontParser {
                 case 'inherit':
                     ambiguous.push(text);
                     valuesNeeded--;
-                    this.nextToken();
+                    this._nextToken();
                     break;
 
                 // style
@@ -222,14 +226,14 @@ class FontParser {
                     this.style = text;
                     hasStyle = true;
                     valuesNeeded--;
-                    this.nextToken();
+                    this._nextToken();
                     break;
                 // variant
                 case 'small-caps':
                     this.variant = text;
                     hasVariant = true;
                     valuesNeeded--;
-                    this.nextToken();
+                    this._nextToken();
                     break;
 
                 // weight
@@ -248,7 +252,7 @@ class FontParser {
                     this.weight = text;
                     hasWeight = true;
                     valuesNeeded--;
-                    this.nextToken();
+                    this._nextToken();
                     break;
                 default:
                     // unknown token -> done with this part
@@ -272,9 +276,9 @@ class FontParser {
         }
     }
 
-    private reset() {
+    private _reset() {
         this._currentTokenIndex = -1;
-        this.nextToken();
+        this._nextToken();
     }
 
     public static quoteFont(f: string): string {
@@ -289,6 +293,7 @@ class FontParser {
 
 /**
  * Lists all flags for font styles.
+ * @public
  */
 export enum FontStyle {
     /**
@@ -303,6 +308,7 @@ export enum FontStyle {
 
 /**
  * Lists all font weight values.
+ * @public
  */
 export enum FontWeight {
     /**
@@ -319,6 +325,7 @@ export enum FontWeight {
  * Describes a font to be used.
  * If specified as string, a CSS `font` shorthand property compliant value needs to be used.
  * @target web
+ * @public
  */
 export type FontJson =
     | Font
@@ -332,6 +339,7 @@ export type FontJson =
 
 /**
  * @json_immutable
+ * @public
  */
 export class Font {
     private _css: string;
@@ -341,7 +349,7 @@ export class Font {
     private _weight: FontWeight;
     private _size: number;
 
-    private reset() {
+    private _reset() {
         this._cssScale = 0;
         this._css = this.toCssString();
     }
@@ -374,7 +382,7 @@ export class Font {
      */
     public set families(value: string[]) {
         this._families = value;
-        this.reset();
+        this._reset();
     }
 
     /**
@@ -389,7 +397,7 @@ export class Font {
      */
     public set size(value: number) {
         this._size = value;
-        this.reset();
+        this._reset();
     }
 
     /**
@@ -403,7 +411,7 @@ export class Font {
      */
     public set style(value: FontStyle) {
         this._style = value;
-        this.reset();
+        this._reset();
     }
 
     /**
@@ -418,7 +426,7 @@ export class Font {
      */
     public set weight(value: FontWeight) {
         this._weight = value;
-        this.reset();
+        this._reset();
     }
 
     public get isBold(): boolean {

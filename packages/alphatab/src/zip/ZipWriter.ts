@@ -5,6 +5,9 @@ import { Crc32 } from '@src/zip/Crc32';
 import { Deflater } from '@src/zip/Deflater';
 import { ZipEntry } from '@src/zip/ZipEntry';
 
+/**
+ * @internal
+ */
 class ZipCentralDirectoryHeader {
     public entry: ZipEntry;
     public localHeaderOffset: number;
@@ -27,6 +30,9 @@ class ZipCentralDirectoryHeader {
     }
 }
 
+/**
+ * @internal
+ */
 export class ZipWriter {
     private _data: IWriteable;
     private _centralDirectoryHeaders: ZipCentralDirectoryHeader[] = [];
@@ -41,7 +47,7 @@ export class ZipWriter {
         const compressionMode = ZipEntry.CompressionMethodDeflate;
 
         const compressedData = ByteBuffer.empty();
-        const crc32 = this.compress(compressedData, entry.data, compressionMode);
+        const crc32 = this._compress(compressedData, entry.data, compressionMode);
         const compressedDataArray = compressedData.toArray();
         const directoryHeader = new ZipCentralDirectoryHeader(
             entry,
@@ -84,7 +90,7 @@ export class ZipWriter {
         this._data.write(compressedDataArray, 0, compressedDataArray.length);
     }
 
-    private compress(output: IWriteable, data: Uint8Array, compressionMode: number): number {
+    private _compress(output: IWriteable, data: Uint8Array, compressionMode: number): number {
         if (compressionMode !== ZipEntry.CompressionMethodDeflate) {
             const crc = new Crc32();
             crc.update(data, 0, data.length);
@@ -124,14 +130,14 @@ export class ZipWriter {
     public end() {
         const startOfCentralDirectory = this._data.bytesWritten;
         for (const header of this._centralDirectoryHeaders) {
-            this.writeCentralDirectoryHeader(header);
+            this._writeCentralDirectoryHeader(header);
         }
         const endOfCentralDirectory = this._data.bytesWritten;
 
-        this.writeEndOfCentralDirectoryRecord(startOfCentralDirectory, endOfCentralDirectory);
+        this._writeEndOfCentralDirectoryRecord(startOfCentralDirectory, endOfCentralDirectory);
     }
 
-    private writeEndOfCentralDirectoryRecord(startOfCentralDirectory: number, endOfCentralDirectory: number) {
+    private _writeEndOfCentralDirectoryRecord(startOfCentralDirectory: number, endOfCentralDirectory: number) {
         // Signature
         IOHelper.writeInt32LE(this._data, ZipEntry.EndOfCentralDirSignature);
         // number of this disk             2 bytes
@@ -164,7 +170,7 @@ export class ZipWriter {
         // <empty>
     }
 
-    private writeCentralDirectoryHeader(header: ZipCentralDirectoryHeader) {
+    private _writeCentralDirectoryHeader(header: ZipCentralDirectoryHeader) {
         // Signature
         IOHelper.writeInt32LE(this._data, ZipEntry.CentralFileHeaderSignature);
         // version made by

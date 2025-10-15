@@ -12,6 +12,7 @@ import { CapellaParser } from '@src/importer/CapellaParser';
 
 /**
  * This ScoreImporter can read Capella (cap/capx) files.
+ * @internal
  */
 export class CapellaImporter extends ScoreImporter {
     public get name(): string {

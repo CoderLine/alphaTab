@@ -5,9 +5,12 @@ import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { MultiBarRestGlyph } from '@src/rendering/glyphs/MultiBarRestGlyph';
 
+/**
+ * @internal
+ */
 export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyph {
     public constructor(voiceContainer: VoiceContainerGlyph) {
-        super(MultiBarRestBeatContainerGlyph.getOrCreatePlaceholderBeat(voiceContainer), voiceContainer);
+        super(MultiBarRestBeatContainerGlyph._getOrCreatePlaceholderBeat(voiceContainer), voiceContainer);
         this.preNotes = new BeatGlyphBase();
         this.onNotes = new BeatOnNoteGlyphBase();
     }
@@ -20,7 +23,7 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyph {
         super.doLayout();
     }
 
-    private static getOrCreatePlaceholderBeat(voiceContainer: VoiceContainerGlyph): Beat {
+    private static _getOrCreatePlaceholderBeat(voiceContainer: VoiceContainerGlyph): Beat {
         if (voiceContainer.voice.beats.length > 1) {
             return voiceContainer.voice.beats[0];
         }

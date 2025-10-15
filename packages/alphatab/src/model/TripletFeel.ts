@@ -1,5 +1,6 @@
 /**
  * This public enumeration lists all feels of triplets.
+ * @public
  */
 export enum TripletFeel {
     /**

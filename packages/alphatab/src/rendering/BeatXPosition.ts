@@ -1,5 +1,6 @@
 /**
  * Lists the different position modes for {@link BarRendererBase.getBeatX}
+ * @internal
  */
 export enum BeatXPosition {
     /**

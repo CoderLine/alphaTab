@@ -29,6 +29,7 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
+ * @internal
  */
 export enum NoteYPosition {
     /**
@@ -63,6 +64,7 @@ export enum NoteYPosition {
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteX}
+ * @internal
  */
 export enum NoteXPosition {
     /**
@@ -81,6 +83,7 @@ export enum NoteXPosition {
 
 /**
  * This is the base public class for creating blocks which can render bars.
+ * @internal
  */
 export class BarRendererBase {
     private _preBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();

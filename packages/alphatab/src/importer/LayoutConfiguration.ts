@@ -42,14 +42,23 @@ import type { PartConfiguration } from '@src/importer/PartConfiguration';
 // TrackViewGroup:
 //    1 byte (bool)      | isVisible (true -> 0xFF, false -> 0x00)
 
+/**
+ * @internal
+ */
 class LayoutConfigurationScoreView {
     public trackViewGroups: LayoutConfigurationTrackViewGroup[] = [];
 }
 
+/**
+ * @internal
+ */
 class LayoutConfigurationTrackViewGroup {
     public isVisible: boolean = false;
 }
 
+/**
+ * @internal
+ */
 enum GuitarProView {
     PageVertical = 0x00,
     PageGrid = 0x01,
@@ -59,6 +68,9 @@ enum GuitarProView {
     PageHorizontal = 0x05
 }
 
+/**
+ * @internal
+ */
 export class LayoutConfiguration {
     public zoomLevel: number = 4;
     public view: GuitarProView = GuitarProView.PageVertical;

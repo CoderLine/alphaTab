@@ -9,6 +9,9 @@ import type { RenderingResources } from '@src/RenderingResources';
 import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 
+/**
+ * @internal
+ */
 export class TapEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectTap;

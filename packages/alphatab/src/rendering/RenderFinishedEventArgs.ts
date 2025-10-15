@@ -3,6 +3,7 @@ import { ModelUtils } from '@src/model/ModelUtils';
 /**
  * This eventargs define the details about the rendering and layouting process and are
  * provided whenever a part of of the music sheet is rendered.
+ * @public
  */
 export class RenderFinishedEventArgs {
     /**

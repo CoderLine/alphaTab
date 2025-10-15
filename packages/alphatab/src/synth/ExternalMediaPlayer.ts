@@ -5,6 +5,7 @@ import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
 /**
  * A custom handler for integrating alphaTab with an external media source.
+ * @public
  */
 export interface IExternalMediaHandler {
     /**
@@ -37,6 +38,7 @@ export interface IExternalMediaHandler {
 
 /**
  * A output handling the playback via an external media.
+ * @public
  */
 export interface IExternalMediaSynthOutput extends IBackingTrackSynthOutput {
     /**
@@ -50,6 +52,9 @@ export interface IExternalMediaSynthOutput extends IBackingTrackSynthOutput {
     updatePosition(currentTime: number): void;
 }
 
+/**
+ * @internal
+ */
 class ExternalMediaSynthOutput implements IExternalMediaSynthOutput {
     // fake rate
     public readonly sampleRate: number = 44100;
@@ -147,6 +152,9 @@ class ExternalMediaSynthOutput implements IExternalMediaSynthOutput {
     }
 }
 
+/**
+ * @internal
+ */
 export class ExternalMediaPlayer extends BackingTrackPlayer {
     public get handler(): IExternalMediaHandler | undefined {
         return (this.output as ExternalMediaSynthOutput).handler;

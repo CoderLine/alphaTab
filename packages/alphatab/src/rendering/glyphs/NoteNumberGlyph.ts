@@ -11,6 +11,9 @@ import { NotationElement, NotationMode } from '@src/NotationSettings';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
+/**
+ * @internal
+ */
 export class NoteNumberGlyph extends Glyph {
     private _note: Note;
     private _noteString: string | null = null;

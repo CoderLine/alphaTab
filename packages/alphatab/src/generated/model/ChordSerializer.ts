@@ -5,6 +5,9 @@
 // </auto-generated>
 import { Chord } from "@src/model/Chord";
 import { JsonHelper } from "@src/io/JsonHelper";
+/**
+ * @internal
+ */
 export class ChordSerializer {
     public static fromJson(obj: Chord, m: unknown): void {
         if (!m) {

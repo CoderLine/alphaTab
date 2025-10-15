@@ -7,6 +7,9 @@ import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 import { DirectionsContainerGlyph } from '@src/rendering/glyphs/DirectionsContainerGlyph';
 
+/**
+ * @internal
+ */
 export class DirectionsEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectDirections;

@@ -7,9 +7,10 @@ import { Lazy } from '@src/util/Lazy';
 
 /**
  * @target web
+ * @internal
  */
 export class HtmlElementContainer implements IContainer {
-    private static resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(
+    private static _resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(
         () =>
             new ResizeObserver((entries: ResizeObserverEntry[]) => {
                 for (const e of entries) {
@@ -120,7 +121,7 @@ export class HtmlElementContainer implements IContainer {
         this.resize = {
             on: function (value: any) {
                 if (container._resizeListeners === 0) {
-                    HtmlElementContainer.resizeObserver.value.observe(container.element);
+                    HtmlElementContainer._resizeObserver.value.observe(container.element);
                 }
                 container.element.addEventListener('resize', value, true);
                 container._resizeListeners++;
@@ -132,7 +133,7 @@ export class HtmlElementContainer implements IContainer {
                 this._resizeListeners--;
                 if (this._resizeListeners <= 0) {
                     this._resizeListeners = 0;
-                    HtmlElementContainer.resizeObserver.value.unobserve(this.element);
+                    HtmlElementContainer._resizeObserver.value.unobserve(this.element);
                 }
             }
         };

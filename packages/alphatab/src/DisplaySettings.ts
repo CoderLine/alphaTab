@@ -5,6 +5,7 @@ import type { Staff } from '@src/model/Staff';
 
 /**
  * Lists the different modes in which the staves and systems are arranged.
+ * @public
  */
 export enum SystemsLayoutMode {
     /**
@@ -22,6 +23,7 @@ export enum SystemsLayoutMode {
  * The display settings control how the general layout and display of alphaTab is done.
  * @json
  * @json_declaration
+ * @public
  */
 export class DisplaySettings {
     /**

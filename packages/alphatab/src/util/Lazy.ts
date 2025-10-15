@@ -1,5 +1,6 @@
 /**
  * @target web
+ * @internal
  */
 export class Lazy<T> {
     private _factory: () => T;

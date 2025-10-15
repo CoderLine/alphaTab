@@ -3,6 +3,9 @@ import { type SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar'
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 
+/**
+ * @internal
+ */
 export class SustainPedalGlyph extends EffectGlyph {
 
     public constructor() {

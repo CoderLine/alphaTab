@@ -5,6 +5,9 @@
 // </auto-generated>
 import { Tuning } from "@src/model/Tuning";
 import { JsonHelper } from "@src/io/JsonHelper";
+/**
+ * @internal
+ */
 export class TuningSerializer {
     public static fromJson(obj: Tuning, m: unknown): void {
         if (!m) {

@@ -17,6 +17,9 @@ import { assert } from 'chai';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
 import { SystemsLayoutMode } from '@src/DisplaySettings';
 
+/**
+ * @internal
+ */
 export class MusicXmlImporterTestHelper {
     public static async loadFile(file: string): Promise<Score> {
         const fileData = await TestPlatform.loadFile(file);

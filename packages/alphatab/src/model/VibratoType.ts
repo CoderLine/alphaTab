@@ -1,5 +1,6 @@
 /**
  * This public enum lists all vibrato types that can be performed.
+ * @public
  */
 export enum VibratoType {
     /**
