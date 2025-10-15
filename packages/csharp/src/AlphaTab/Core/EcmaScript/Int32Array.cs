@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +17,12 @@ internal class Int32Array : IEnumerable<int>
         _data = new ArraySegment<int>(new int[(int)size]);
     }
 
-    public Int32Array(IList<double> list)
+    public Int32Array(IEnumerable<double> list)
     {
         _data = new ArraySegment<int>(list.Select(i => (int)i).ToArray());
     }
 
-    public Int32Array(IList<int> list)
+    public Int32Array(IEnumerable<int> list)
     {
         _data = new ArraySegment<int>(list.ToArray());
     }

@@ -25,10 +25,10 @@ internal class RenderPlaceholder(public var result: RenderFinishedEventArgs) : C
     public var state: Int = STATE_LAYOUT_DONE
     public var isVisible: Boolean = false
     public var drawingRect: RectF = RectF(
-        (result.x * Environment.HighDpiFactor).toFloat(),
-        (result.y * Environment.HighDpiFactor).toFloat(),
-        ((result.x + result.width) * Environment.HighDpiFactor).toFloat(),
-        ((result.y + result.height) * Environment.HighDpiFactor).toFloat()
+        (result.x * Environment.highDpiFactor).toFloat(),
+        (result.y * Environment.highDpiFactor).toFloat(),
+        ((result.x + result.width) * Environment.highDpiFactor).toFloat(),
+        ((result.y + result.height) * Environment.highDpiFactor).toFloat()
     )
 
     override fun close() {
@@ -108,11 +108,11 @@ internal class AlphaTabRenderSurface(context: Context, attributeSet: AttributeSe
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         setMeasuredDimension(
             MeasureSpec.makeMeasureSpec(
-                (_totalWidth * Environment.HighDpiFactor).toInt(),
+                (_totalWidth * Environment.highDpiFactor).toInt(),
                 MeasureSpec.EXACTLY
             ),
             MeasureSpec.makeMeasureSpec(
-                (_totalHeight * Environment.HighDpiFactor).toInt(),
+                (_totalHeight * Environment.highDpiFactor).toInt(),
                 MeasureSpec.EXACTLY
             )
         )

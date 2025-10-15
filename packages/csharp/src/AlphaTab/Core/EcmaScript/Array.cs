@@ -8,7 +8,7 @@ internal static class Array
 {
     public static bool IsArray(object? o)
     {
-        return o is IList;
+        return o is not string and IList;
     }
 
     public static IList<T> From<T>(IEnumerable<T> x)

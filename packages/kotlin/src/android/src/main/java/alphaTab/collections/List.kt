@@ -64,6 +64,10 @@ public class List<T> : Iterable<T> {
         _data.addAll(items)
     }
 
+    internal fun push(items: Iterable<T>) {
+        _data.addAll(items)
+    }
+
     public operator fun get(index: Int): T {
         return _data[index]
     }
@@ -110,7 +114,10 @@ public class List<T> : Iterable<T> {
     public fun <TOut> map(transform: (v: T) -> TOut): List<TOut> {
         return List(_data.map(transform))
     }
-
+    public fun <TOut> flatMap(transform: (v: T) -> Iterable<TOut>): List<TOut> {
+        return List(_data.flatMap(transform))
+    }
+    
     public fun map(transform: (v: T) -> Double): DoubleList {
         val mapped = DoubleList(_data.size)
         _data.forEachIndexed { index, item ->

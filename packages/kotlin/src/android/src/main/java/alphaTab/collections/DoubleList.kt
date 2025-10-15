@@ -33,7 +33,7 @@ public class DoubleList : IDoubleIterable {
     internal constructor(elements: IDoubleIterable) {
         _items = DoubleArray(0)
         _size = 0
-        for(d in elements) {
+        for (d in elements) {
             push(d)
         }
     }
@@ -120,6 +120,11 @@ public class DoubleList : IDoubleIterable {
         return DoubleList(copy, _size)
     }
 
+    public fun slice(start: Double, end: Double): DoubleList {
+        val copy = _items.copyOfRange(start.toInt(), end.toInt())
+        return DoubleList(copy, copy.size)
+    }
+
     public fun sort() {
         _items.sort(0, _size)
     }
@@ -160,7 +165,7 @@ public class DoubleList : IDoubleIterable {
     }
 
 
-    internal fun reduce(operation: (acc: Double, v: Double) -> Double, initial:Double): Double {
+    internal fun reduce(operation: (acc: Double, v: Double) -> Double, initial: Double): Double {
         var accumulator = initial
         for (element in _items) accumulator = operation(accumulator, element)
         return accumulator

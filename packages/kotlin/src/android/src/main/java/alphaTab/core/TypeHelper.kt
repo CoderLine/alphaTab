@@ -21,7 +21,10 @@ internal class TypeHelper {
 
         @ExperimentalContracts
         @ExperimentalUnsignedTypes
-        public inline fun <reified T : Enum<T>> parseEnum(value: String, @Suppress("UNUSED_PARAMETER") type: KClass<T>): T {
+        public inline fun <reified T : Enum<T>> parseEnum(
+            value: String,
+            @Suppress("UNUSED_PARAMETER") type: KClass<T>
+        ): T {
             return parseEnum(value, enumValues<T>())
         }
 
@@ -140,6 +143,32 @@ internal class TypeHelper {
                 )
             }
             return d
+        }
+
+        fun unknownToNumber(v: Any?): Double {
+            when (v) {
+                null -> {
+                    throw ClassCastException("Cannot cast null to number")
+                }
+
+                is Int -> {
+                    return v.toDouble()
+                }
+
+                is Double -> {
+                    return v
+                }
+
+                is IAlphaTabEnum -> {
+                    return v.toDouble()
+                }
+
+                else -> {
+                    throw _root_ide_package_.kotlin.ClassCastException(
+                        "Cannot cast ${v.javaClass.name} to number"
+                    )
+                }
+            }
         }
     }
 }

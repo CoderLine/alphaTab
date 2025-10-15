@@ -1,5 +1,10 @@
 package alphaTab.core
 
-public interface IAlphaTabEnum {
-    public val value: Int
+interface IAlphaTabEnum {
+    val value: Int
+}
+
+interface IAlphaTabEnumCompanion<T> {
+    val values:Array<T>
+    fun fromValue(value:Double): T
 }

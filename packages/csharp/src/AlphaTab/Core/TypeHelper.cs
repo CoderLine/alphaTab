@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -20,7 +20,14 @@ namespace AlphaTab.Core
             return Enum.TryParse(s, true, out T value) ? value : default;
         }
 
-        public static void Add<T>(this IList<T> list, IList<T> newItems)
+        public static IList<T> Concat<T>(this IList<T> list, IList<T> newItems)
+        {
+            var copy = new List<T>(list);
+            copy.AddRange(newItems);
+            return copy;
+        }
+
+        public static void Add<T>(this IList<T> list, IEnumerable<T> newItems)
         {
             if (list is List<T> l)
             {
@@ -49,6 +56,7 @@ namespace AlphaTab.Core
                 }
             }
         }
+
         public static void Add<T>(this IList<T> list, IEnumerator<T> newItems)
         {
             foreach (var i in newItems)
@@ -119,6 +127,15 @@ namespace AlphaTab.Core
         public static IList<T> Slice<T>(this IList<T> data, double start)
         {
             return new List<T>(data.GetRange((int)start, data.Count - (int)start));
+        }
+
+        public static IList<T> Slice<T>(this IList<T> data, double start, double end)
+        {
+            return new List<T>(data.GetRange((int)start, (int)end - (int)start));
+        }
+        public static IEnumerable<T> Concat<T>(this IEnumerable<T> a, IEnumerable<T> b)
+        {
+            return Enumerable.Concat(a, b);
         }
 
         public static IList<T> GetRange<T>(this IList<T> data, int index, int count)
@@ -386,6 +403,13 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Replace(this string input, RegExp pattern,
+            Func<string, string> replacer)
+        {
+            return pattern.Replace(input, replacer);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsTruthy(string? s)
         {
             return !string.IsNullOrEmpty(s);
@@ -424,6 +448,13 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IList<TResult> FlatMap<TSource, TResult>(this IList<TSource> source,
+            Func<TSource, IEnumerable<TResult>> func)
+        {
+            return source.SelectMany(func).ToList();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string SubstringIndex(this string s, double startIndex)
         {
             return s.Substring((int)startIndex);
@@ -459,6 +490,12 @@ namespace AlphaTab.Core
         public static string ReplaceAll(this string s, RegExp before, string after)
         {
             return s.Replace(before, after);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ReplaceAll(this string s, RegExp before, Func<string, string> replacer)
+        {
+            return s.Replace(before, replacer);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -520,6 +557,18 @@ namespace AlphaTab.Core
         public static object ToTemplate(this double value)
         {
             return value.ToInvariantString();
+        }
+
+        public static double UnknownToNumber(object? value)
+        {
+            return value switch
+            {
+                null => throw new InvalidCastException("Cannot cast null to number"),
+                double d => d,
+                IConvertible c => c.ToDouble(CultureInfo.InvariantCulture),
+                _ => throw new InvalidCastException(
+                    $"Cannot cast {value.GetType().FullName} to number")
+            };
         }
 
         public static string TypeOf(object? actual)
@@ -646,7 +695,7 @@ namespace AlphaTab.Core
             char lowSurrogateCodePoint)
         {
             return (((uint)highSurrogateCodePoint << 10) + lowSurrogateCodePoint -
-                          ((0xD800U << 10) + 0xDC00U - (1 << 16)));
+                    ((0xD800U << 10) + 0xDC00U - (1 << 16)));
         }
 
         public static double? CodePointAt(this string s, double position)
@@ -666,6 +715,11 @@ namespace AlphaTab.Core
             }
 
             return s[i];
+        }
+
+        public static int IndexOf(this string haystack, string needle, double startPosition)
+        {
+            return haystack.IndexOf(needle, (int)startPosition, StringComparison.Ordinal);
         }
     }
 }

@@ -11,6 +11,7 @@ import alphaTab.core.ArrayTuple
 import alphaTab.core.DoubleDoubleArrayTuple
 import alphaTab.core.IArrayTuple
 import alphaTab.core.IDoubleDoubleArrayTuple
+import alphaTab.core.IRecord
 import alphaTab.core.ecmaScript.Record
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.core.toInvariantString
@@ -24,6 +25,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.io.OutputStreamWriter
 import java.nio.file.Paths
 import kotlin.contracts.ExperimentalContracts
 import kotlin.reflect.KClass
@@ -226,6 +228,14 @@ class TestPlatformPartials {
             }
         }
 
+        fun saveFileAsString(name: String, data: String) {
+            val fs = openFileWrite(name)
+            fs.use {
+                val writer = OutputStreamWriter(fs)
+                writer.write(data)
+            }
+        }
+
 
         fun joinPath(vararg path: String): String {
             return path.joinToString(File.separator)
@@ -246,6 +256,12 @@ class TestPlatformPartials {
             return alphaTab.collections.List(enumValues<T>().toMutableList())
         }
 
+        internal fun setAsUnknownIterable(set: Any?): Iterable<Any?> =
+                when(set) {
+                    is alphaTab.core.ecmaScript.Set<*> -> set
+                    is Iterable<*> -> set
+                    else -> throw ClassCastException("Invalid set type: " + set?.javaClass?.name)
+                }
         internal fun mapAsUnknownIterable(map: Any?): Iterable<IArrayTuple<Any?, Any?>> =
             when (map) {
                 is alphaTab.collections.Map<*, *> -> map.map { ArrayTuple(it.key, it.value) }
@@ -273,6 +289,13 @@ class TestPlatformPartials {
                 is BooleanList -> alphaTab.collections.List(array.map<Any?> { it })
                 null -> throw Error("Unknown Array Type: null")
                 else -> throw Error("Unknown Array Type: ${array::class.qualifiedName}")
+            }
+
+        internal fun getConstructorName(o:Any?) =
+            when(o) {
+                is IRecord -> "Object"
+                null -> ""
+                else -> o.javaClass.name
             }
     }
 }

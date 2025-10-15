@@ -7,7 +7,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     protected override context: KotlinEmitterContext;
     public constructor(typeScript: ts.SourceFile, context: KotlinEmitterContext) {
         super(typeScript, context);
-        this.testClassAttribute = '';
+        this.testClassAttribute = 'TestClass';
         this.testMethodAttribute = 'TestName';
         this.snapshotFileAttribute = 'SnapshotFile';
         this.deprecatedAttributeName = 'kotlin.Deprecated';
@@ -22,7 +22,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     private _paramReferences: Map<string, cs.Identifier[]>[] = [];
     private _paramsWithAssignment: Set<string>[] = [];
 
-    private getMethodLocalParameterName(name: string) {
+    private _getMethodLocalParameterName(name: string) {
         return `param${name}`;
     }
 
@@ -45,7 +45,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             identifier.tsSymbol &&
             identifier.tsSymbol.valueDeclaration &&
             ts.isParameter(identifier.tsSymbol.valueDeclaration) &&
-            !this.isSuperCall(expression.parent)
+            !this._isSuperCall(expression.parent)
         ) {
             // TODO: proper scope handling here, first register all parameters when
             // a new scope is started,
@@ -137,17 +137,17 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return bin;
     }
 
-    private isSuperCall(parent: ts.Node): boolean {
+    private _isSuperCall(parent: ts.Node): boolean {
         return ts.isCallExpression(parent) && parent.expression.kind === ts.SyntaxKind.SuperKeyword;
     }
 
-    private injectParametersAsLocal(block: cs.Block) {
+    private _injectParametersAsLocal(block: cs.Block) {
         const localParams: cs.VariableStatement[] = [];
 
         const currentAssignments = this._paramsWithAssignment[this._paramsWithAssignment.length - 1];
         const currentScope = this._paramReferences[this._paramReferences.length - 1];
         for (const p of currentAssignments) {
-            const renamedP = this.getMethodLocalParameterName(p);
+            const renamedP = this._getMethodLocalParameterName(p);
 
             for (const ident of currentScope.get(p)!) {
                 ident.text = renamedP;
@@ -211,7 +211,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
         const el = super.visitSetAccessor(parent, classElement);
         if (el.body && cs.isBlock(el.body)) {
-            this.injectParametersAsLocal(el.body);
+            this._injectParametersAsLocal(el.body);
         }
 
         this._paramReferences.pop();
@@ -222,6 +222,9 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
     override visitCallExpression(parent: cs.Node, expression: ts.CallExpression) {
         const invocation = super.visitCallExpression(parent, expression);
+        if (!invocation) {
+            return invocation;
+        }
 
         // For Kotlin we generate async functions as "suspend" functions
         // and await expressions are normal method calls.
@@ -230,9 +233,31 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
         // similarly in reverse cases, when we have suspend function calling a method which returns a Deferred directly (e.g. on async interface methods)
         // then we call .await()
-        if (invocation && cs.isInvocationExpression(invocation)) {
-            const returnType = this.context.typeChecker.getTypeAtLocation(expression);
+        if (cs.isInvocationExpression(invocation)) {
+            // translate filter(x => x !== null) to filterNotNull()
             const method = this.context.typeChecker.getSymbolAtLocation(expression.expression);
+            if (
+                method?.name === 'filter' &&
+                expression.arguments.length === 1 &&
+                ts.isArrowFunction(expression.arguments[0])
+            ) {
+                const body = expression.arguments[0].body;
+                if (
+                    ts.isBinaryExpression(body) &&
+                    body.operatorToken.kind === ts.SyntaxKind.ExclamationEqualsEqualsToken &&
+                    ts.isIdentifier(body.left) &&
+                    (body.right.kind === ts.SyntaxKind.NullKeyword ||
+                        body.right.kind === ts.SyntaxKind.UndefinedKeyword ||
+                        (ts.isIdentifier(body.right) &&
+                            (body.right.text === 'undefined' || body.right.text === 'null')))
+                ) {
+                    (invocation.expression as cs.MemberAccessExpression).member =
+                        this.context.toMethodName('filterNotNull');
+                    invocation.arguments = [];
+                }
+            }
+
+            const returnType = this.context.typeChecker.getTypeAtLocation(expression);
 
             if (returnType?.symbol?.name === 'Promise' && (method as any)?.parent?.name !== 'Promise') {
                 const isSuspend =
@@ -301,7 +326,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         const constr = super.visitConstructorDeclaration(parent, classElement);
 
         if (constr.body && cs.isBlock(constr.body)) {
-            this.injectParametersAsLocal(constr.body);
+            this._injectParametersAsLocal(constr.body);
         }
 
         this._paramReferences.pop();
@@ -341,7 +366,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         const method = super.visitTestClassMethod(parent, d);
 
         if (method.body && cs.isBlock(method.body)) {
-            this.injectParametersAsLocal(method.body);
+            this._injectParametersAsLocal(method.body);
         }
 
         this._paramReferences.pop();
@@ -360,11 +385,52 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         const method = super.visitMethodDeclaration(parent, classElement);
 
         if (method.body && cs.isBlock(method.body)) {
-            this.injectParametersAsLocal(method.body);
+            this._injectParametersAsLocal(method.body);
         }
 
         this._paramReferences.pop();
         this._paramsWithAssignment.pop();
+
+        // @partial @target web methods which implement interfaces
+        // need a forwarding call
+        if (method.skipEmit && method.isOverride && method.partial && !method.isStatic) {
+            this.context.processingSkippedElement = false;
+            method.skipEmit = undefined;
+            this.context.registerUnresolvedTypeNode(method.returnType as cs.UnresolvedTypeNode);
+            parent.members.push(method);
+            const invoke = {
+                nodeType: cs.SyntaxKind.InvocationExpression,
+                arguments: [],
+                parent: method,
+                expression: null!
+            } as cs.InvocationExpression;
+
+            const access = {
+                nodeType: cs.SyntaxKind.MemberAccessExpression,
+                member: method.name,
+                parent: invoke,
+                expression: null!
+            } as cs.MemberAccessExpression;
+            invoke.expression = access;
+
+            const clz = {
+                nodeType: cs.SyntaxKind.Identifier,
+                parent: access,
+                text: `${(parent.parent as cs.NamespaceDeclaration).namespace}.${parent.name}Partials`
+            } as cs.Identifier;
+            access.expression = clz;
+
+            for (const p of method.parameters) {
+                this.context.registerUnresolvedTypeNode(p.type as cs.UnresolvedTypeNode);
+                invoke.arguments.push({
+                    nodeType: cs.SyntaxKind.Identifier,
+                    parent: invoke,
+                    text: p.name
+                } as cs.Identifier);
+            }
+
+            method.body = invoke;
+        }
 
         return method;
     }
@@ -379,7 +445,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         const fun = super.visitFunctionDeclaration(parent, expression);
 
         if (fun.body) {
-            this.injectParametersAsLocal(fun.body);
+            this._injectParametersAsLocal(fun.body);
         }
 
         this._paramReferences.pop();
@@ -437,7 +503,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     }
 
     protected override visitAsExpression(parent: cs.Node, expression: ts.AsExpression): cs.Expression | null {
-        if (this.isCastToEnum(expression)) {
+        if (this._isCastToEnum(expression)) {
             const methodAccess = {
                 nodeType: cs.SyntaxKind.MemberAccessExpression,
                 parent: parent,
@@ -463,7 +529,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             return call;
         }
 
-        if (this.isCastFromEnumToNumber(expression)) {
+        if (this._isCastFromEnumToNumber(expression)) {
             const methodAccess = {
                 nodeType: cs.SyntaxKind.MemberAccessExpression,
                 parent: parent,
@@ -490,7 +556,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return super.visitAsExpression(parent, expression);
     }
 
-    private isCastFromEnumToNumber(expression: ts.AsExpression) {
+    private _isCastFromEnumToNumber(expression: ts.AsExpression) {
         const targetType = this.context.typeChecker.getTypeFromTypeNode(expression.type);
         const nonNullable = this.context.typeChecker.getNonNullableType(targetType);
         if (nonNullable.flags === ts.TypeFlags.Number) {
@@ -499,18 +565,18 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         }
         return false;
     }
-    private isCastToEnum(expression: ts.AsExpression) {
+    private _isCastToEnum(expression: ts.AsExpression) {
         const targetType = this.context.typeChecker.getTypeFromTypeNode(expression.type);
         return targetType.flags & ts.TypeFlags.Enum || targetType.flags & ts.TypeFlags.EnumLiteral;
     }
 
-    override visitTestClass(d: ts.CallExpression): void {
+    override visitTestClass(d: ts.CallExpression, registerInNamespace: boolean = true) {
         this.csharpFile.usings.push({
             nodeType: cs.SyntaxKind.UsingDeclaration,
-            namespaceOrTypeName: 'kotlinx.coroutines.test',
+            name: 'kotlinx.coroutines.test',
             parent: this.csharpFile
         } as cs.UsingDeclaration);
-        super.visitTestClass(d);
+        return super.visitTestClass(d, registerInNamespace);
     }
 
     protected override convertPropertyToInvocation(parentSymbol: ts.Symbol, _symbol: ts.Symbol): boolean {
@@ -520,6 +586,31 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 return true;
         }
         return false;
+    }
+
+    protected applyPropertyOverride(
+        csProperty: cs.PropertyDeclaration,
+        classElement:
+            | ts.PropertyDeclaration
+            | ts.GetAccessorDeclaration
+            | ts.SetAccessorDeclaration
+            | ts.PropertySignature
+    ): void {
+        if ((csProperty.parent as cs.ClassDeclaration).isRecord && classElement.parent !== csProperty.parent!.tsNode) {
+            csProperty.isOverride = true;
+            if (!classElement.questionToken && !csProperty.initializer) {
+                csProperty.initializer = {
+                    nodeType: cs.SyntaxKind.NonNullExpression,
+                    parent: csProperty,
+                    expression: {
+                        nodeType: cs.SyntaxKind.NullLiteral
+                    } as cs.NullLiteral
+                } as cs.NonNullExpression;
+            }
+            return;
+        }
+
+        super.applyPropertyOverride(csProperty, classElement);
     }
 
     protected applyMethodOverride(csMethod: cs.MethodDeclaration, classElement: ts.MethodDeclaration) {
@@ -621,5 +712,22 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             } as cs.NonNullExpression;
         }
         return prop;
+    }
+
+    protected visitTypeParameterDeclaration(
+        parent: cs.Node,
+        p: ts.TypeParameterDeclaration
+    ): cs.TypeParameterDeclaration {
+        const d = super.visitTypeParameterDeclaration(parent, p);
+
+        // no object/class constraing for generics in kotlin, they are always objects
+        if (p.constraint) {
+            const type = this.context.typeChecker.getTypeFromTypeNode(p.constraint);
+            if ('intrinsicName' in type && type.intrinsicName === 'object') {
+                d.constraint = undefined;
+            }
+        }
+
+        return d;
     }
 }

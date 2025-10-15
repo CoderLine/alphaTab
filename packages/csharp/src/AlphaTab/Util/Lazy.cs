@@ -1,4 +1,4 @@
-﻿namespace AlphaTab.Util;
+﻿﻿namespace AlphaTab.Util;
 
 internal class Lazy<T> where T:class?
 {
@@ -20,8 +20,15 @@ internal class Lazy<T> where T:class?
             if (!_created)
             {
                 _value = _factory();
+                _created = true;
             }
             return _value;
         }
+    }
+
+    public void Reset()
+    {
+        _created = false;
+        _value = null!;
     }
 }
