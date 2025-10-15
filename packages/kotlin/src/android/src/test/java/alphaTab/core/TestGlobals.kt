@@ -2,6 +2,7 @@ package alphaTab.core
 
 import alphaTab.SnapshotFileRepository
 import alphaTab.TestPlatformPartials
+import alphaTab.collections.List
 import alphaTab.collections.ObjectDoubleMap
 import org.junit.Assert
 import java.lang.reflect.Method
@@ -9,10 +10,11 @@ import java.nio.file.Paths
 import kotlin.contracts.ExperimentalContracts
 import kotlin.reflect.KClass
 
+annotation class TestClass(val name: String)
 annotation class TestName(val name: String)
 annotation class SnapshotFile(val path: String)
 
-typealias Test = org.junit.Test
+
 
 class assert {
     companion object {
@@ -50,6 +52,7 @@ class NotExpector<T>(private val actual: T) {
 class Expector<T>(private val actual: T) {
     val to
         get() = this
+
     fun not() = NotExpector(actual)
 
     val be
@@ -69,8 +72,9 @@ class Expector<T>(private val actual: T) {
             expectedTyped = expected.toInt();
         }
 
-        if(expected is Double && expected == 0.0 &&
-            actualToCheck is Double) {
+        if (expected is Double && expected == 0.0 &&
+            actualToCheck is Double
+        ) {
             val d = actualToCheck as Double;
             if (d == -0.0) {
                 @Suppress("UNCHECKED_CAST")
@@ -84,7 +88,10 @@ class Expector<T>(private val actual: T) {
 
     fun lessThan(expected: Double) {
         if (actual is Number) {
-            Assert.assertTrue("Expected $actual to be less than $expected", actual.toDouble() < expected)
+            Assert.assertTrue(
+                "Expected $actual to be less than $expected",
+                actual.toDouble() < expected
+            )
         } else {
             Assert.fail("lessThan can only be used with numeric operands");
         }
@@ -93,11 +100,15 @@ class Expector<T>(private val actual: T) {
 
     fun greaterThan(expected: Double) {
         if (actual is Number) {
-            Assert.assertTrue("Expected $actual to be greater than $expected", actual.toDouble() > expected)
+            Assert.assertTrue(
+                "Expected $actual to be greater than $expected",
+                actual.toDouble() > expected
+            )
         } else {
             Assert.fail("greaterThan can only be used with numeric operands");
         }
     }
+
     fun closeTo(expected: Double, delta: Double, message: String? = null) {
         if (actual is Number) {
             Assert.assertEquals(message, expected, actual.toDouble(), delta)
@@ -106,12 +117,12 @@ class Expector<T>(private val actual: T) {
         }
     }
 
-    fun length(expected:Double) {
-        if(actual is alphaTab.collections.List<*>) {
+    fun length(expected: Double) {
+        if (actual is alphaTab.collections.List<*>) {
             Assert.assertEquals(expected.toInt(), actual.length.toInt())
-        } else if(actual is alphaTab.collections.DoubleList) {
+        } else if (actual is alphaTab.collections.DoubleList) {
             Assert.assertEquals(expected.toInt(), actual.length.toInt())
-        } else if(actual is alphaTab.collections.BooleanList) {
+        } else if (actual is alphaTab.collections.BooleanList) {
             Assert.assertEquals(expected.toInt(), actual.length.toInt())
         } else {
             Assert.fail("length can only be used with collection operands");
@@ -119,8 +130,11 @@ class Expector<T>(private val actual: T) {
     }
 
     fun contain(value: Any) {
-        if(actual is Iterable<*>) {
-            Assert.assertTrue("Expected collection ${actual.joinToString(",")} to contain $value", actual.contains(value))
+        if (actual is Iterable<*>) {
+            Assert.assertTrue(
+                "Expected collection ${actual.joinToString(",")} to contain $value",
+                actual.contains(value)
+            )
         } else {
             Assert.fail("contain can only be used with Iterable operands");
         }
@@ -180,15 +194,15 @@ class Expector<T>(private val actual: T) {
 
     private fun findTestMethod(): Method {
         val walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
-        var testMethod:Method? = null
+        var testMethod: Method? = null
         walker.forEach { frame ->
-            if(testMethod == null) {
+            if (testMethod == null) {
                 val method = frame.declaringClass.getDeclaredMethod(
                     frame.methodName,
                     *frame.methodType.parameterArray()
                 )
 
-                if(method.getAnnotation(Test::class.java) != null) {
+                if (method.getAnnotation(org.junit.Test::class.java) != null) {
                     testMethod = method
                 }
             }
@@ -203,7 +217,7 @@ class Expector<T>(private val actual: T) {
 
     @ExperimentalUnsignedTypes
     @ExperimentalContracts
-    fun toMatchSnapshot() {
+    fun toMatchSnapshot(hint: String = "") {
         val testMethodInfo = findTestMethod()
         val file = testMethodInfo.getAnnotation(SnapshotFile::class.java)?.path
         if (file.isNullOrEmpty()) {
@@ -218,22 +232,34 @@ class Expector<T>(private val actual: T) {
             Assert.fail("Could not find snapshot file at $absoluteSnapFilePath")
         }
 
-        val snapshotFile = SnapshotFileRepository.loadSnapshortFile(absoluteSnapFilePath.toString())
+        val snapshotFile = SnapshotFileRepository.loadSnapshotFile(absoluteSnapFilePath.toString())
 
-        val testSuiteName = testMethodInfo.declaringClass.simpleName
+        val parts = List<String>();
+        collectTestSuiteNames(parts, testMethodInfo.declaringClass)
         val testName = testMethodInfo.getAnnotation(TestName::class.java)!!.name
+        parts.push(testName)
 
-        val fullTestName = "$testSuiteName $testName "
+        val snapshotName = TestGlobals.useSnapshotValue(parts.joinToString(" "), hint);
 
-        val counter = (TestGlobals.snapshotAssertionCounters.get(fullTestName) ?: 0.0) + 1
-        TestGlobals.snapshotAssertionCounters.set(fullTestName, counter)
 
-        val snapshotName = "$fullTestName${counter.toInt()}"
+
+
+
 
         val error = snapshotFile.match(snapshotName, actual)
         if (!error.isNullOrEmpty()) {
             Assert.fail(error)
         }
+    }
+
+    private fun collectTestSuiteNames(parts: List<String>, testClass: Class<*>) {
+        if (testClass.declaringClass != null) {
+            collectTestSuiteNames(parts, testClass.declaringClass!!);
+        }
+
+        val testSuiteName =
+            testClass.getAnnotation(TestClass::class.java)?.name ?: testClass.simpleName
+        parts.push(testSuiteName);
     }
 }
 
@@ -242,6 +268,18 @@ class TestGlobals {
     @ExperimentalContracts
     companion object {
         val snapshotAssertionCounters: ObjectDoubleMap<String> = ObjectDoubleMap()
+
+        fun useSnapshotValue(baseName: String, hint: String): String {
+            var fullName = baseName
+            if (hint.isNotEmpty()) {
+                fullName += ": $hint";
+            }
+
+            val value =
+                if (snapshotAssertionCounters.has(fullName)) snapshotAssertionCounters.get(fullName)!! + 1 else 1.0
+            snapshotAssertionCounters.set(fullName, value)
+            return "$fullName ${value.toInt()}";
+        }
 
         fun <T> expect(actual: T): Expector<T> {
             return Expector(actual);

@@ -210,7 +210,48 @@ export class PrettyFormat {
                 : `Map {${PrettyFormat.printIteratorEntries(TestPlatform.mapAsUnknownIterable(val), config, indentation, depth, refs, PrettyFormat.printer, ' => ')}}`;
         }
 
-        return '';
+        // Avoid failure to serialize global window object in jsdom test environment.
+        // For example, not even relevant if window is prop of React element.
+        const constructorName = TestPlatform.getConstructorName(val);
+        return hitMaxDepth
+            ? `[${constructorName}]`
+            : `${
+                  min ? '' : !config.printBasicPrototype && constructorName === 'Object' ? '' : `${constructorName} `
+              }{${PrettyFormat._printObjectProperties(val as object, config, indentation, depth, refs)}}`;
+    }
+
+    private static _printObjectProperties(
+        val: object,
+        config: PrettyFormatConfig,
+        indentation: string,
+        depth: number,
+        refs: unknown[]
+    ) {
+        let result = '';
+        const entries = Object.entries(val);
+
+        if (entries.length > 0) {
+            result += config.spacingOuter;
+
+            const indentationNext = indentation + config.indent;
+
+            for (let i = 0; i < entries.length; i++) {
+                const name = PrettyFormat.printer(entries[i][0], config, indentationNext, depth, refs);
+                const value = PrettyFormat.printer(entries[i][1], config, indentationNext, depth, refs);
+
+                result += `${indentationNext + name}: ${value}`;
+
+                if (i < entries.length - 1) {
+                    result += `,${config.spacingInner}`;
+                } else if (!config.min) {
+                    result += ',';
+                }
+            }
+
+            result += config.spacingOuter + indentation;
+        }
+
+        return result;
     }
 
     /**
@@ -599,7 +640,10 @@ export class SnapshotFile {
             return `No snapshot '${name}' found`;
         }
 
-        const actual = PrettyFormat.format(value, SnapshotFile.matchOptions).split('\n');
+        // https://github.com/jestjs/jest/blob/8e683abe2a1d3f6f6513dd9467f0f49d3d2ffc0d/packages/jest-snapshot-utils/src/utils.ts#L190C51-L190C70
+        const actual = SnapshotFile._printBacktickString(PrettyFormat.format(value, SnapshotFile._matchOptions)).split(
+            '\n'
+        );
 
         const lines = Math.min(expected.length, actual.length);
         const errors: string[] = [];
@@ -622,6 +666,15 @@ export class SnapshotFile {
         return null;
     }
 
+    // https://github.com/jestjs/jest/blob/8e683abe2a1d3f6f6513dd9467f0f49d3d2ffc0d/packages/jest-snapshot-utils/src/utils.ts#L167-L171
+    private static _printBacktickString(str: string) {
+        return SnapshotFile._escapeBacktickString(str);
+    }
+
+    private static _escapeBacktickString(str: string) {
+        return str.replaceAll(/[`\\]/g, (substring: string) => `\\${substring}`);
+    }
+
     loadFrom(path: string) {
         const content = TestPlatform.loadFileAsStringSync(path);
 
@@ -638,6 +691,13 @@ export class SnapshotFile {
                 }
 
                 const name = lines[i].substring(9, endOfName);
+
+                if (lines[i].endsWith('`;')) {
+                    const startOfValue = lines[i].indexOf('`', endOfName + 2) + 1;
+                    this.snapshots.set(name, lines[i].substring(startOfValue, lines[i].length - 2));
+                    i++;
+                    continue;
+                }
                 i++;
 
                 let value = '';
