@@ -99,15 +99,27 @@ export class AlphaTex1LanguageDefinitions {
         return basic.map(b => AlphaTex1LanguageDefinitions._valueType(b[0], b[1]));
     }
 
-    private static readonly _scoreInfoValueListTypes = AlphaTex1LanguageDefinitions._basicList([
-        [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Required],
-        [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Optional],
-        [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Optional]
-    ]);
-    private static readonly _scoreInfoTemplateValueListTypes = AlphaTex1LanguageDefinitions._basicList([
-        [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Required],
-        [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Optional]
-    ]);
+    private static readonly _scoreInfoValueListTypes = [
+        AlphaTex1LanguageDefinitions._valueType(
+            [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
+            ValueListParseTypesMode.Required
+        ),
+        AlphaTex1LanguageDefinitions._valueType([AlphaTexNodeType.String], ValueListParseTypesMode.Optional),
+        AlphaTex1LanguageDefinitions._valueType(
+            [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
+            ValueListParseTypesMode.Optional,
+            ['left', 'center', 'right']
+        )
+    ];
+
+    private static readonly _scoreInfoTemplateValueListTypes = [
+        AlphaTex1LanguageDefinitions._valueType([AlphaTexNodeType.String], ValueListParseTypesMode.Required),
+        AlphaTex1LanguageDefinitions._valueType(
+            [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
+            ValueListParseTypesMode.Optional,
+            ['left', 'center', 'right']
+        )
+    ];
     private static readonly _numberOnlyValueListTypes = AlphaTex1LanguageDefinitions._basicList([
         [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required]
     ]);
@@ -162,6 +174,21 @@ export class AlphaTex1LanguageDefinitions {
             AlphaTex1LanguageDefinitions._basicList([
                 [[AlphaTexNodeType.Number], ValueListParseTypesMode.ValueListWithoutParenthesis]
             ])
+        ]
+    ]);
+
+    /**
+     * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
+     * in `\tuning {}` properties.
+     */
+    public static readonly tuningPropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
+        // hide
+        ['hide', undefined],
+
+        // label "Label"
+        [
+            'label',
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.String], ValueListParseTypesMode.Required]])
         ]
     ]);
 
@@ -605,9 +632,13 @@ export class AlphaTex1LanguageDefinitions {
         // tuning E4 B3 G3 D3 A2 E2, \tuning "E4" "B3" "G3" "D3"
         [
             'tuning',
-            AlphaTex1LanguageDefinitions._basicList([
-                [[AlphaTexNodeType.Ident, AlphaTexNodeType.String], ValueListParseTypesMode.ValueListWithoutParenthesis]
-            ])
+            [
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.Ident, AlphaTexNodeType.String],
+                    ValueListParseTypesMode.ValueListWithoutParenthesis,
+                    ['piano', 'none', 'voice']
+                )
+            ]
         ],
 
         // chord "C" 0 1 0 2 3 x
