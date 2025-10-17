@@ -210,7 +210,7 @@ export abstract class ScoreLayout {
                 }
                 break;
             case ScoreSubElement.CopyrightSecondLine:
-                if (!this.headerGlyphs.has(ScoreSubElement.Copyright)) {
+                if (!this.footerGlyphs.has(ScoreSubElement.Copyright)) {
                     return undefined;
                 }
                 break;
