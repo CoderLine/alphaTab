@@ -73,6 +73,12 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                     [AlphaTex1LanguageDefinitions.chordPropertyValueListTypes],
                     property
                 );
+            case 'tuning':
+                return this._readPropertyValues(
+                    parser,
+                    [AlphaTex1LanguageDefinitions.tuningPropertyValueListTypes],
+                    property
+                );
             case 'staff':
                 return this._readPropertyValues(
                     parser,
@@ -172,9 +178,9 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 value &&
                 (expected.expectedTypes.has(value.nodeType) ||
                     // value lists start with a parenthesis open token
-                    AlphaTex1MetaDataReader._isValueListMatch(value, expected))
+                    AlphaTex1MetaDataReader._isValueListMatch(value, expected)) &&
+                    this._handleTypeValueListItem(parser, values, value, expected)
             ) {
-                this._handleTypeValueListItem(parser, values, value, expected);
                 switch (expected.parseMode) {
                     case ValueListParseTypesMode.OptionalAndStop:
                         // stop reading values
@@ -256,11 +262,15 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                     if (expected.allowedValues.has(identifier.text.toLowerCase())) {
                         valueList.push(identifier);
                         parser.lexer.advance();
+                    } else {
+                        return false;
                     }
                 } else if (expected?.reservedIdentifiers) {
                     if (!expected.reservedIdentifiers.has(identifier.text.toLowerCase())) {
                         valueList.push(identifier);
                         parser.lexer.advance();
+                    } else {
+                        return false;
                     }
                 } else {
                     valueList.push(identifier);

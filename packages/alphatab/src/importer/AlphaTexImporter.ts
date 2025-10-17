@@ -901,8 +901,16 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 this._state.hasAnyProperData = true;
                 this._handler.applyScoreMetaData(this, this._state.score, m);
             } else if (this._handler.knownStaffMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
+                // backwards compatiblity (staff metadata tags)
                 this._state.hasAnyProperData = true;
                 this._handler.applyStaffMetaData(this, this._state.currentStaff!, m);
+                this.addSemanticDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT306,
+                    message: 'This staff metadata tag should be specified as staff property.',
+                    severity: AlphaTexDiagnosticsSeverity.Warning,
+                    start: m.start,
+                    end: m.end
+                });
             } else if (this._handler.knownBarMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
                 this._state.hasAnyProperData = true;
                 if (initialBarMeta) {

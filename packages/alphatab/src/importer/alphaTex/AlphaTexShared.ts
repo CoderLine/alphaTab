@@ -207,9 +207,19 @@ export enum AlphaTexDiagnosticCode {
     AT304 = 304,
 
     /**
+     * This value should be rather specified via the properties.
+     */
+    AT305 = 305,
+
+    /**
+     * This staff metadata tag should be specified as staff property.
+     */
+    AT306 = 306,
+
+    /**
      * The dots separating score metadata, score contents and the sync points can be removed.
      */
-    AT400 = 400
+    AT400 = 400,
 }
 
 /**

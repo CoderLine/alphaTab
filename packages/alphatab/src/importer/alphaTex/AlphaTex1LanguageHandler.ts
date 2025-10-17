@@ -17,6 +17,7 @@ import {
     AlphaTexNodeType,
     type AlphaTexNumberLiteral,
     type AlphaTexPropertyNode,
+    type AlphaTexStringLiteral,
     type AlphaTexTextNode,
     type AlphaTexValueList,
     type IAlphaTexValueListItem
@@ -325,8 +326,16 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             importer.makeStaffPitched(staff);
                             i = metaData.values!.values.length;
                             break;
+                        // backwards compatibility only
                         case 'hide':
                             hideTuning = true;
+                            importer.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT305,
+                                message: `This value should be rather specified via the properties.`,
+                                start: v.start,
+                                end: v.end,
+                                severity: AlphaTexDiagnosticsSeverity.Warning
+                            });
                             break;
                         default:
                             const t = ModelUtils.parseTuning(text);
@@ -334,6 +343,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                                 tuning.push(t.realValue);
                             } else if (i === metaData.values!.values.length - 1 && tuning.length > 0) {
                                 tuningName = text;
+                                importer.addSemanticDiagnostic({
+                                    code: AlphaTexDiagnosticCode.AT305,
+                                    message: `This value should be rather specified via the properties.`,
+                                    start: v.start,
+                                    end: v.end,
+                                    severity: AlphaTexDiagnosticsSeverity.Warning
+                                });
                             } else {
                                 const tuningLetters = Array.from(AlphaTex1LanguageHandler._tuningLetters).join(',');
                                 const accidentalModes = Array.from(ModelUtils.accidentalModeMapping.keys()).join(',');
@@ -354,6 +370,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 staff.stringTuning = new Tuning();
                 staff.stringTuning.tunings = tuning;
                 staff.stringTuning.name = tuningName;
+
+                this._tuningProperties(importer, staff, staff.stringTuning, metaData);
+
                 if (hideTuning) {
                     if (!staff.track.score.stylesheet.perTrackDisplayTuning) {
                         staff.track.score.stylesheet.perTrackDisplayTuning = new Map<number, boolean>();
@@ -1156,6 +1175,35 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
+    private _tuningProperties(
+        importer: IAlphaTexImporter,
+        staff: Staff,
+        tuning: Tuning,
+        metaData: AlphaTexMetaDataNode
+    ) {
+        if (!metaData.properties) {
+            return;
+        }
+
+        for (const p of metaData.properties.properties) {
+            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.tuningPropertyValueListTypes], p)) {
+                continue;
+            }
+
+            switch (p.property.text.toLowerCase()) {
+                case 'hide':
+                    if (!staff.track.score.stylesheet.perTrackDisplayTuning) {
+                        staff.track.score.stylesheet.perTrackDisplayTuning = new Map<number, boolean>();
+                    }
+                    staff.track.score.stylesheet.perTrackDisplayTuning!.set(staff.track.index, false);
+                    break;
+                case 'label':
+                    tuning.name = (p.values!.values[0] as AlphaTexStringLiteral).text;
+                    break;
+            }
+        }
+    }
+
     private static _booleanLikeValue(values: IAlphaTexValueListItem[], i: number): boolean {
         if (i >= values.length) {
             return true;
@@ -1218,7 +1266,6 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
                 case ApplyNodeResult.NotAppliedUnrecognizedMarker:
                     const knownProps = lookupList.flatMap(l => Array.from(l.keys()));
-                    Array.from(AlphaTex1LanguageDefinitions.chordPropertyValueListTypes.keys()).join(',');
                     importer.addSemanticDiagnostic({
                         code: AlphaTexDiagnosticCode.AT212,
                         message: `Unrecogized property '${p.property.text}', expected one of ${knownProps}`,
@@ -1709,6 +1756,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         tempoLabel = '';
                     }
                 }
+
                 const tempoAutomation = new Automation();
                 tempoAutomation.isLinear = false;
                 tempoAutomation.type = AutomationType.Tempo;
@@ -2689,11 +2737,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 staff.track.score.stylesheet.perTrackDisplayTuning &&
                 staff.track.score.stylesheet.perTrackDisplayTuning!.has(staff.track.index)
             ) {
-                tuning.values!.values.push(Atnf.ident('hide'));
+                tuning.properties = Atnf.props([['hide', undefined]]);
             }
 
             if (staff.stringTuning.name.length > 0) {
-                tuning.values!.values.push(Atnf.string(staff.stringTuning.name));
+                tuning.properties ??= Atnf.props([]);
+                Atnf.prop(tuning.properties!.properties, 'label', Atnf.stringValue(staff.stringTuning.name));
             }
         }
 
