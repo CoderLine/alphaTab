@@ -243,7 +243,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
 
         const valueList = Atnf.values(values, false)!;
         valueList.start = valueListStart;
-        valueList.end = parser.lexer.currentTokenLocation();
+        valueList.end = parser.lexer.previousTokenEndLocation();
         valueList.validated = true;
 
         return valueList;

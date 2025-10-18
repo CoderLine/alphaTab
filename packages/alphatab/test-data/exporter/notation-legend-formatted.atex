@@ -21,7 +21,9 @@
     tabs
   }
     // Staff 1 Metadata
-    \tuning (E4 B3 G3 D3 A2 E2 "Guitar Standard Tuning")
+    \tuning (E4 B3 G3 D3 A2 E2) {
+      label "Guitar Standard Tuning"
+    }
     \chord {firstfret 1 showdiagram true showfingering false showname true} "C9" 3 3 3 2 3 x
     \chord {firstfret 1 showdiagram true showfingering false showname true} "C" 0 1 0 2 3 x
     \chord {firstfret 1 showdiagram true showfingering false showname true} "G" 3 0 0 0 2 3

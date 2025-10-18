@@ -5037,6 +5037,16 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
+    "message" => "Unexpected additional value 'Ident', expected: required(Number),optional(String|Ident)",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
+    },
+  },
+  Map {
+    "code" => 209,
+    "severity" => 2,
     "message" => "Unexpected barre shape value 'invalid', expected: none,full,half",
     "start" => Map {
       "col" => 21,
@@ -5189,6 +5199,16 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
+    "message" => "Unexpected additional value 'Ident', expected: optional(String|Ident),optional(Number)",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
+    },
+  },
+  Map {
+    "code" => 209,
+    "severity" => 2,
     "message" => "Unexpected fermata value 'invalid', expected: short,medium,long",
     "start" => Map {
       "col" => 21,
@@ -5243,6 +5263,16 @@ exports[`AlphaTexImporterTest errors at209 gracetype: parser-diagnostics 1`] = `
 
 exports[`AlphaTexImporterTest errors at209 gracetype: semantic-diagnostics 1`] = `
 Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected additional value 'Ident', expected: optional(String|Ident)",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
+    },
+  },
   Map {
     "code" => 209,
     "severity" => 2,
@@ -5360,7 +5390,7 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected additional value 'Number', expected: required(String|Ident),optional(String|Ident),optional(String|Ident)",
+    "message" => "Unexpected additional value 'Number', expected: required(String|Ident),optional(String),optional(String|Ident)",
     "start" => Map {
       "col" => 18,
       "line" => 1,
@@ -5415,9 +5445,9 @@ exports[`AlphaTexImporterTest errors at209 textalign: parser-diagnostics 1`] = `
 exports[`AlphaTexImporterTest errors at209 textalign: semantic-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 209,
+    "code" => 217,
     "severity" => 2,
-    "message" => "Unexpected textAlign value 'invalid', expected: left,center,right",
+    "message" => "Unrecognized note value 'invalid'.",
     "start" => Map {
       "col" => 25,
       "line" => 1,
@@ -5474,7 +5504,7 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected tuning value 'Invalid', expected: <note><accidental><octave> where <note>=oneOf(67,68,69,70,71,65,66,99,100,101,102,103,97,98,35) <accidental>=oneOf(default,d,forcenone,-,forcenatural,n,forcesharp,#,forcedoublesharp,##,x,forceflat,b,forcedoubleflat,bb), <octave>=number",
+    "message" => "Unexpected tuning value 'Invalid', expected: <note><accidental><octave> where <note>=oneOf(67,68,69,70,71,65,66,99,100,101,102,103,97,98,35) <accidental>=oneOf(default,d,,forcenone,-,forcenatural,n,forcesharp,#,forcedoublesharp,##,x,forceflat,b,forcedoubleflat,bb), <octave>=number",
     "start" => Map {
       "col" => 16,
       "line" => 1,
@@ -5533,9 +5563,9 @@ Array [
     "severity" => 2,
     "message" => "Missing values. Expected following values: required(Number)",
     "start" => Map {
-      "col" => 9,
+      "col" => 8,
       "line" => 1,
-      "offset" => 8,
+      "offset" => 7,
     },
   },
 ]
@@ -5552,9 +5582,9 @@ Array [
     "severity" => 2,
     "message" => "Missing values. Expected following values: required(Number)",
     "start" => Map {
-      "col" => 10,
+      "col" => 9,
       "line" => 1,
-      "offset" => 9,
+      "offset" => 8,
     },
   },
 ]
@@ -5571,9 +5601,9 @@ Array [
     "severity" => 2,
     "message" => "Missing values. Expected following values: required(String|Ident)",
     "start" => Map {
-      "col" => 10,
+      "col" => 9,
       "line" => 1,
-      "offset" => 9,
+      "offset" => 8,
     },
   },
 ]

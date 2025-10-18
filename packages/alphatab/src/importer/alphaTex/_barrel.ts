@@ -38,9 +38,10 @@ export { AlphaTexLexer } from '@src/importer/alphaTex/AlphaTexLexer';
 export { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
 export {
     AlphaTexAccidentalMode,
-    type AlphaTexDiagnostic, 
+    type AlphaTexDiagnostic,
     AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
-    AlphaTexDiagnosticsSeverity
+    AlphaTexDiagnosticsSeverity,
+    type IAlphaTexImporter,
+    type IAlphaTexImporterState
 } from '@src/importer/alphaTex/AlphaTexShared';
-

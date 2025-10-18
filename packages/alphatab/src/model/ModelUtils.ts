@@ -81,6 +81,14 @@ export class ModelUtils {
         return !!ModelUtils.parseTuning(name);
     }
 
+    /**
+     * @internal
+     */
+    public static readonly tuningLetters = new Set<number>([
+        0x43 /* C */, 0x44 /* D */, 0x45 /* E */, 0x46 /* F */, 0x47 /* G */, 0x41 /* A */, 0x42 /* B */, 0x63 /* c */,
+        0x64 /* d */, 0x65 /* e */, 0x66 /* f */, 0x67 /* g */, 0x61 /* a */, 0x62 /* b */, 0x23 /* # */
+    ]);
+
     public static parseTuning(name: string): TuningParseResult | null {
         let note: string = '';
         let octave: string = '';
@@ -92,6 +100,12 @@ export class ModelUtils {
                     return null;
                 }
                 octave += String.fromCharCode(c);
+            } else if (note.length === 0) {
+                if (ModelUtils.tuningLetters.has(c)) {
+                    note += String.fromCharCode(c);
+                } else {
+                    return null;
+                }
             } else {
                 note += String.fromCharCode(c);
             }
@@ -99,11 +113,16 @@ export class ModelUtils {
         if (!octave || !note) {
             return null;
         }
+
         const result: TuningParseResult = new TuningParseResult();
 
         result.octave = Number.parseInt(octave, 10) + 1;
         result.note = note.toLowerCase();
-        result.tone = ModelUtils.getToneForText(result.note);
+        const tone = ModelUtils.getToneForText(result.note);
+        if (tone === null) {
+            return null;
+        }
+        result.tone = tone;
 
         // if tone.noteValue is negative (eg. on Cb note)
         // we adjust roll-over to a lower octave
@@ -123,7 +142,7 @@ export class ModelUtils {
         return result.realValue;
     }
 
-    public static getToneForText(note: string): TuningParseResultTone {
+    public static getToneForText(note: string): TuningParseResultTone | null {
         const noteName = note.substring(0, 1);
         const accidental = note.substring(1);
 
@@ -153,8 +172,11 @@ export class ModelUtils {
                 noteValue = 11;
                 break;
             default:
-                noteValue = 0;
-                break;
+                return null;
+        }
+
+        if (!ModelUtils.accidentalModeMapping.has(accidental)) {
+            return null;
         }
 
         noteAccidenalMode = ModelUtils.parseAccidentalMode(accidental);
@@ -182,7 +204,7 @@ export class ModelUtils {
         return new TuningParseResultTone(noteValue, noteAccidenalMode);
     }
 
-     /**
+    /**
      * @internal
      */
     public static readonly reverseAccidentalModeMapping = new Map<NoteAccidentalMode, string>([
@@ -207,6 +229,7 @@ export class ModelUtils {
     public static readonly accidentalModeMapping = new Map<string, NoteAccidentalMode>([
         ['default', NoteAccidentalMode.Default],
         ['d', NoteAccidentalMode.Default],
+        ['', NoteAccidentalMode.Default],
 
         ['forcenone', NoteAccidentalMode.ForceNone],
         ['-', NoteAccidentalMode.ForceNone],
@@ -642,19 +665,19 @@ export class ModelUtils {
         }
     }
 
-    private static allMusicFontSymbols: MusicFontSymbol[] = [];
+    private static _allMusicFontSymbols: MusicFontSymbol[] = [];
 
     /**
      * Gets a list of all music font symbols used in alphaTab.
      */
     public static getAllMusicFontSymbols(): MusicFontSymbol[] {
-        if (ModelUtils.allMusicFontSymbols.length === 0) {
-            ModelUtils.allMusicFontSymbols = Object.values(MusicFontSymbol)
+        if (ModelUtils._allMusicFontSymbols.length === 0) {
+            ModelUtils._allMusicFontSymbols = Object.values(MusicFontSymbol)
                 .filter<any>((k: any) => typeof k === 'number')
                 .map(v => v as number as MusicFontSymbol) as MusicFontSymbol[];
         }
 
-        return ModelUtils.allMusicFontSymbols;
+        return ModelUtils._allMusicFontSymbols;
     }
 
     /**
@@ -705,7 +728,7 @@ export class ModelUtils {
      *
      * e.g. 3# is 3-sharps -> KeySignature.A
      */
-    private static translateKeyTransposeTable(texts: string[][]): KeySignature[][] {
+    private static _translateKeyTransposeTable(texts: string[][]): KeySignature[][] {
         const keySignatures: KeySignature[][] = [];
         for (const transpose of texts) {
             const transposeValues: KeySignature[] = [];
@@ -725,7 +748,7 @@ export class ModelUtils {
     /**
      * @internal
      */
-    private static readonly keyTransposeTable: KeySignature[][] = ModelUtils.translateKeyTransposeTable([
+    private static readonly _keyTransposeTable: KeySignature[][] = ModelUtils._translateKeyTransposeTable([
         /*              Cb    Gb    Db    Ab    Eb    Bb    F     C     G     D     A     E     B     F     C# */
         /* C	 0 */ ['7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#'],
         /* Db	 1 */ ['2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b', '3b', '2b', '1b', '0#'],
@@ -754,7 +777,7 @@ export class ModelUtils {
         }
 
         if (transpose < 0) {
-            const lookup = ModelUtils.keyTransposeTable[-transpose];
+            const lookup = ModelUtils._keyTransposeTable[-transpose];
             const keySignatureIndex = lookup.indexOf(keySignature);
             if (keySignatureIndex === -1) {
                 return keySignature;
@@ -762,7 +785,7 @@ export class ModelUtils {
 
             return (keySignatureIndex - 7) as KeySignature;
         } else {
-            return ModelUtils.keyTransposeTable[transpose][keySignature + 7];
+            return ModelUtils._keyTransposeTable[transpose][keySignature + 7];
         }
     }
 
@@ -770,7 +793,7 @@ export class ModelUtils {
      * a lookup list containing an info whether the notes within an octave
      * need an accidental rendered. the accidental symbol is determined based on the type of key signature.
      */
-    private static KeySignatureLookup: Array<boolean[]> = [
+    private static _keySignatureLookup: Array<boolean[]> = [
         // Flats (where the value is true, a flat accidental is required for the notes)
         [true, true, true, true, true, true, true, true, true, true, true, true],
         [true, true, true, true, true, false, true, true, true, true, true, true],
@@ -825,7 +848,7 @@ export class ModelUtils {
         const index: number = noteValue % 12;
 
         const accidentalForKeySignature: AccidentalType = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
-        const hasKeySignatureAccidentalSetForNote: boolean = ModelUtils.KeySignatureLookup[ksi][index];
+        const hasKeySignatureAccidentalSetForNote: boolean = ModelUtils._keySignatureLookup[ksi][index];
         const hasNoteAccidentalWithinOctave: boolean = ModelUtils.accidentalNotes[index];
 
         // the general logic is like this:

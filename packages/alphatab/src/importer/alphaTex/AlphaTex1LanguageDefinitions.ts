@@ -629,14 +629,18 @@ export class AlphaTex1LanguageDefinitions {
     ]);
 
     public static readonly staffMetaDataValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        // tuning E4 B3 G3 D3 A2 E2, \tuning "E4" "B3" "G3" "D3"
+        // tuning E4 B3 G3 D3 A2 E2, \tuning "E4" "B3" "G3" "D3", \tuning piano
         [
             'tuning',
             [
                 AlphaTex1LanguageDefinitions._valueType(
                     [AlphaTexNodeType.Ident, AlphaTexNodeType.String],
-                    ValueListParseTypesMode.ValueListWithoutParenthesis,
+                    ValueListParseTypesMode.OptionalAndStop,
                     ['piano', 'none', 'voice']
+                ),
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.Ident, AlphaTexNodeType.String],
+                    ValueListParseTypesMode.ValueListWithoutParenthesis
                 )
             ]
         ],

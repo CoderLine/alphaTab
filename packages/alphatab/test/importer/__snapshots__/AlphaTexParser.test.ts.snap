@@ -5,12 +5,12 @@ Score (1,1) -> (1,19) {
   bars: Array [
     Bar (1,1) -> (1,19) {
       metaData: Array [
-        Meta (1,1) -> (1,12) {
+        Meta (1,1) -> (1,11) {
           tag: Tag "tempo" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "tempo" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,12) {
+          values: Values (1,8) -> (1,11) {
             values: Array [
               Number "120" (1,8) -> (1,11),
             ],
@@ -18,10 +18,10 @@ Score (1,1) -> (1,19) {
         },
       ],
       beats: Array [
-        Beat (1,12) -> (1,16) {
-          notes: NoteList (1,12) -> (1,16) {
+        Beat (1,12) -> (1,15) {
+          notes: NoteList (1,12) -> (1,15) {
             notes: Array [
-              Note (1,12) -> (1,16) {
+              Note (1,12) -> (1,15) {
                 noteValue: Number "3" (1,12) -> (1,13),
                 noteStringDot: Dot (1,13) -> (1,13),
                 noteString: Number "3" (1,14) -> (1,15),
@@ -55,12 +55,12 @@ Score (1,1) -> (1,26) {
   bars: Array [
     Bar (1,1) -> (1,26) {
       metaData: Array [
-        Meta (1,1) -> (1,23) {
+        Meta (1,1) -> (1,21) {
           tag: Tag "tempo" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "tempo" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,23) {
+          values: Values (1,8) -> (1,21) {
             values: Array [
               Number "120" (1,8) -> (1,11),
               String "Moderate" (1,12) -> (1,21),
@@ -184,15 +184,15 @@ exports[`AlphaTexParserTest comments bar multiline: lexer-diagnostics 1`] = `Arr
 exports[`AlphaTexParserTest comments bar multiline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments beat chord multiline 1`] = `
-Score (1,1) -> (3,12) {
+Score (1,1) -> (3,11) {
   bars: Array [
-    Bar (1,1) -> (3,12) {
+    Bar (1,1) -> (3,11) {
       beats: Array [
-        Beat (1,3) -> (3,12) {
-          notes: NoteList (1,3) -> (3,12) {
+        Beat (1,3) -> (3,11) {
+          notes: NoteList (1,3) -> (3,11) {
             openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
-              Note (1,4) -> (3,9) {
+              Note (1,4) -> (2,1) {
                 noteValue: Ident "C4" (1,4) -> (2,1),
               },
               Note (3,9) -> (3,11) {
@@ -218,15 +218,15 @@ exports[`AlphaTexParserTest comments beat chord multiline: lexer-diagnostics 1`]
 exports[`AlphaTexParserTest comments beat chord multiline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments beat chord singleline 1`] = `
-Score (1,1) -> (3,6) {
+Score (1,1) -> (3,5) {
   bars: Array [
-    Bar (1,1) -> (3,6) {
+    Bar (1,1) -> (3,5) {
       beats: Array [
-        Beat (1,3) -> (3,6) {
-          notes: NoteList (1,3) -> (3,6) {
+        Beat (1,3) -> (3,5) {
+          notes: NoteList (1,3) -> (3,5) {
             openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
-              Note (1,4) -> (3,3) {
+              Note (1,4) -> (2,1) {
                 noteValue: Ident "C4" (1,4) -> (2,1),
               },
               Note (3,3) -> (3,5) {
@@ -255,10 +255,10 @@ Score (1,1) -> (3,11) {
   bars: Array [
     Bar (1,1) -> (3,11) {
       beats: Array [
-        Beat (1,3) -> (3,9) {
-          notes: NoteList (1,3) -> (3,9) {
+        Beat (1,3) -> (2,1) {
+          notes: NoteList (1,3) -> (2,1) {
             notes: Array [
-              Note (1,3) -> (3,9) {
+              Note (1,3) -> (2,1) {
                 noteValue: Ident "C4" (1,3) -> (2,1),
               },
             ],
@@ -293,10 +293,10 @@ Score (1,1) -> (3,5) {
   bars: Array [
     Bar (1,1) -> (3,5) {
       beats: Array [
-        Beat (1,3) -> (3,3) {
-          notes: NoteList (1,3) -> (3,3) {
+        Beat (1,3) -> (2,1) {
+          notes: NoteList (1,3) -> (2,1) {
             notes: Array [
-              Note (1,3) -> (3,3) {
+              Note (1,3) -> (2,1) {
                 noteValue: Ident "C4" (1,3) -> (2,1),
               },
             ],
@@ -326,15 +326,15 @@ exports[`AlphaTexParserTest comments beat singleline: lexer-diagnostics 1`] = `A
 exports[`AlphaTexParserTest comments beat singleline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments beateffects multiline 1`] = `
-Score (1,1) -> (3,10) {
+Score (1,1) -> (3,9) {
   bars: Array [
-    Bar (1,1) -> (3,10) {
+    Bar (1,1) -> (3,9) {
       beats: Array [
-        Beat (1,3) -> (3,10) {
-          notes: NoteList (1,3) -> (1,10) {
+        Beat (1,3) -> (3,9) {
+          notes: NoteList (1,3) -> (1,9) {
             openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
-              Note (1,4) -> (1,7) {
+              Note (1,4) -> (1,6) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
               },
               Note (1,7) -> (1,9) {
@@ -343,7 +343,7 @@ Score (1,1) -> (3,10) {
             ],
             closeParenthesis: RParen (1,9) -> (1,9),
           },
-          beatEffects: Props (1,11) -> (3,10) {
+          beatEffects: Props (1,11) -> (3,9) {
             openBrace: LBrace (1,11) -> (1,11),
             properties: Array [],
             closeBrace: RBrace (3,9) -> (3,9) {
@@ -365,15 +365,15 @@ exports[`AlphaTexParserTest comments beateffects multiline: lexer-diagnostics 1`
 exports[`AlphaTexParserTest comments beateffects multiline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments beateffects singleline 1`] = `
-Score (1,1) -> (3,5) {
+Score (1,1) -> (3,3) {
   bars: Array [
-    Bar (1,1) -> (3,5) {
+    Bar (1,1) -> (3,3) {
       beats: Array [
-        Beat (1,3) -> (3,4) {
-          notes: NoteList (1,3) -> (1,10) {
+        Beat (1,3) -> (3,3) {
+          notes: NoteList (1,3) -> (1,9) {
             openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
-              Note (1,4) -> (1,7) {
+              Note (1,4) -> (1,6) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
               },
               Note (1,7) -> (1,9) {
@@ -382,7 +382,7 @@ Score (1,1) -> (3,5) {
             ],
             closeParenthesis: RParen (1,9) -> (1,9),
           },
-          beatEffects: Props (1,11) -> (3,4) {
+          beatEffects: Props (1,11) -> (3,3) {
             openBrace: LBrace (1,11) -> (1,11),
             properties: Array [],
             closeBrace: RBrace (3,3) -> (3,3) {
@@ -403,17 +403,17 @@ exports[`AlphaTexParserTest comments beateffects singleline: lexer-diagnostics 1
 exports[`AlphaTexParserTest comments beateffects singleline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments noteeffects multiline 1`] = `
-Score (1,1) -> (3,14) {
+Score (1,1) -> (3,13) {
   bars: Array [
-    Bar (1,1) -> (3,14) {
+    Bar (1,1) -> (3,13) {
       beats: Array [
-        Beat (1,3) -> (3,14) {
-          notes: NoteList (1,3) -> (3,14) {
+        Beat (1,3) -> (3,13) {
+          notes: NoteList (1,3) -> (3,13) {
             openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
-              Note (1,4) -> (3,10) {
+              Note (1,4) -> (3,9) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
-                noteEffects: Props (1,9) -> (3,10) {
+                noteEffects: Props (1,9) -> (3,9) {
                   openBrace: LBrace (1,9) -> (1,9),
                   properties: Array [],
                   closeBrace: RBrace (3,9) -> (3,9) {
@@ -442,17 +442,17 @@ exports[`AlphaTexParserTest comments noteeffects multiline: lexer-diagnostics 1`
 exports[`AlphaTexParserTest comments noteeffects multiline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments noteeffects singleline 1`] = `
-Score (1,1) -> (3,8) {
+Score (1,1) -> (3,7) {
   bars: Array [
-    Bar (1,1) -> (3,8) {
+    Bar (1,1) -> (3,7) {
       beats: Array [
-        Beat (1,3) -> (3,8) {
-          notes: NoteList (1,3) -> (3,8) {
+        Beat (1,3) -> (3,7) {
+          notes: NoteList (1,3) -> (3,7) {
             openParenthesis: LParen (1,3) -> (1,3),
             notes: Array [
-              Note (1,4) -> (3,4) {
+              Note (1,4) -> (3,3) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
-                noteEffects: Props (1,7) -> (3,4) {
+                noteEffects: Props (1,7) -> (3,3) {
                   openBrace: LBrace (1,7) -> (1,7),
                   properties: Array [],
                   closeBrace: RBrace (3,3) -> (3,3) {
@@ -480,11 +480,11 @@ exports[`AlphaTexParserTest comments noteeffects singleline: lexer-diagnostics 1
 exports[`AlphaTexParserTest comments noteeffects singleline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments score meta multiline 1`] = `
-Score (1,1) -> (2,22) {
+Score (1,1) -> (2,21) {
   bars: Array [
-    Bar (2,9) -> (2,22) {
+    Bar (2,9) -> (2,21) {
       metaData: Array [
-        Meta (2,9) -> (2,22) {
+        Meta (2,9) -> (2,21) {
           tag: Tag "title" (2,9) -> (2,15) {
             leadingComments: Array [
               "/** multi
@@ -493,7 +493,7 @@ line**/",
             prefix: Backslash (2,9) -> (2,10),
             tag: Ident "title" (2,10) -> (2,15),
           },
-          values: Values (2,16) -> (2,22) {
+          values: Values (2,16) -> (2,21) {
             values: Array [
               String "Test" (2,16) -> (2,21),
             ],
@@ -506,11 +506,11 @@ line**/",
 `;
 
 exports[`AlphaTexParserTest comments score meta multiline middle 1`] = `
-Score (1,1) -> (2,15) {
+Score (1,1) -> (2,14) {
   bars: Array [
-    Bar (1,1) -> (2,15) {
+    Bar (1,1) -> (2,14) {
       metaData: Array [
-        Meta (1,1) -> (2,15) {
+        Meta (1,1) -> (2,14) {
           tag: Tag "title" (1,1) -> (1,7) {
             trailingComments: Array [
               "/** multi
@@ -519,7 +519,7 @@ line**/",
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (2,9) -> (2,15) {
+          values: Values (2,9) -> (2,14) {
             values: Array [
               String "Test" (2,9) -> (2,14),
             ],
@@ -540,11 +540,11 @@ exports[`AlphaTexParserTest comments score meta multiline: lexer-diagnostics 1`]
 exports[`AlphaTexParserTest comments score meta multiline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments score meta singleline 1`] = `
-Score (1,1) -> (2,16) {
+Score (1,1) -> (2,15) {
   bars: Array [
-    Bar (2,3) -> (2,16) {
+    Bar (2,3) -> (2,15) {
       metaData: Array [
-        Meta (2,3) -> (2,16) {
+        Meta (2,3) -> (2,15) {
           tag: Tag "title" (2,3) -> (2,9) {
             leadingComments: Array [
               "// Single ",
@@ -552,7 +552,7 @@ Score (1,1) -> (2,16) {
             prefix: Backslash (2,3) -> (2,4),
             tag: Ident "title" (2,4) -> (2,9),
           },
-          values: Values (2,10) -> (2,16) {
+          values: Values (2,10) -> (2,15) {
             values: Array [
               String "Test" (2,10) -> (2,15),
             ],
@@ -569,12 +569,12 @@ exports[`AlphaTexParserTest comments score meta singleline: lexer-diagnostics 1`
 exports[`AlphaTexParserTest comments score meta singleline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest errors at200 missing 1`] = `
-Score (1,1) -> (1,9) {
+Score (1,1) -> (1,7) {
   bars: Array [
-    Bar (1,1) -> (1,9) {
+    Bar (1,1) -> (1,7) {
       beats: Array [
-        Beat (1,1) -> (1,9) {
-          notes: NoteList (1,1) -> (1,6) {
+        Beat (1,1) -> (1,7) {
+          notes: NoteList (1,1) -> (1,5) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,5) {
@@ -615,8 +615,8 @@ Score (1,1) -> (1,10) {
   bars: Array [
     Bar (1,1) -> (1,10) {
       beats: Array [
-        Beat (1,1) -> (1,9) {
-          notes: NoteList (1,1) -> (1,6) {
+        Beat (1,1) -> (1,7) {
+          notes: NoteList (1,1) -> (1,5) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
               Note (1,2) -> (1,5) {
@@ -662,11 +662,11 @@ Array [
 `;
 
 exports[`AlphaTexParserTest errors at201 missing 1`] = `
-Score (1,1) -> (1,2) {
+Score (1,1) -> (1,1) {
   bars: Array [
-    Bar (1,1) -> (1,2) {
+    Bar (1,1) -> (1,1) {
       beats: Array [
-        Beat (1,1) -> (1,2),
+        Beat (1,1) -> (1,1),
       ],
     },
   ],
@@ -727,7 +727,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at202 beat duration 1`] = `Score (1,1) -> (1,6)`;
+exports[`AlphaTexParserTest errors at202 beat duration 1`] = `Score (1,1) -> (1,5)`;
 
 exports[`AlphaTexParserTest errors at202 beat duration: lexer-diagnostics 1`] = `Array []`;
 
@@ -746,7 +746,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at202 meta value 1`] = `Score (1,1) -> (1,8)`;
+exports[`AlphaTexParserTest errors at202 meta value 1`] = `Score (1,1) -> (1,7)`;
 
 exports[`AlphaTexParserTest errors at202 meta value: lexer-diagnostics 1`] = `Array []`;
 
@@ -765,7 +765,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at202 note string 1`] = `Score (1,1) -> (1,3)`;
+exports[`AlphaTexParserTest errors at202 note string 1`] = `Score (1,1) -> (1,2)`;
 
 exports[`AlphaTexParserTest errors at202 note string: lexer-diagnostics 1`] = `Array []`;
 
@@ -784,7 +784,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at202 note value 1`] = `Score (1,1) -> (1,6)`;
+exports[`AlphaTexParserTest errors at202 note value 1`] = `Score (1,1) -> (1,4)`;
 
 exports[`AlphaTexParserTest errors at202 note value: lexer-diagnostics 1`] = `Array []`;
 
@@ -804,16 +804,16 @@ Array [
 `;
 
 exports[`AlphaTexParserTest errors at202 value list 1`] = `
-Score (1,1) -> (1,19) {
+Score (1,1) -> (1,18) {
   bars: Array [
-    Bar (1,1) -> (1,19) {
+    Bar (1,1) -> (1,18) {
       metaData: Array [
-        Meta (1,1) -> (1,19) {
+        Meta (1,1) -> (1,18) {
           tag: Tag "meta" (1,1) -> (1,6) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "meta" (1,2) -> (1,6),
           },
-          values: Values (1,7) -> (1,19) {
+          values: Values (1,7) -> (1,18) {
             openParenthesis: LParen (1,7) -> (1,7),
             values: Array [],
             closeParenthesis: RParen (1,18) -> (1,18),
@@ -861,7 +861,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at203 note string 1`] = `Score (1,1) -> (1,6)`;
+exports[`AlphaTexParserTest errors at203 note string 1`] = `Score (1,1) -> (1,5)`;
 
 exports[`AlphaTexParserTest errors at203 note string: lexer-diagnostics 1`] = `Array []`;
 
@@ -1080,7 +1080,7 @@ Score (1,1) -> (1,26) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,15) {
+          values: Values (1,8) -> (1,13) {
             values: Array [
               String "Test" (1,8) -> (1,13),
             ],
@@ -1123,16 +1123,16 @@ Array [
 `;
 
 exports[`AlphaTexParserTest errors at206 values 1`] = `
-Score (1,1) -> (1,15) {
+Score (1,1) -> (1,14) {
   bars: Array [
-    Bar (1,1) -> (1,15) {
+    Bar (1,1) -> (1,14) {
       metaData: Array [
-        Meta (1,1) -> (1,15) {
+        Meta (1,1) -> (1,14) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,15) {
+          values: Values (1,8) -> (1,14) {
             openParenthesis: LParen (1,8) -> (1,8),
             values: Array [
               String "Test" (1,9) -> (1,14),
@@ -1167,12 +1167,12 @@ Score (1,1) -> (1,28) {
   bars: Array [
     Bar (1,1) -> (1,28) {
       metaData: Array [
-        Meta (1,3) -> (1,25) {
+        Meta (1,3) -> (1,23) {
           tag: Tag "tempo" (1,3) -> (1,9) {
             prefix: Backslash (1,3) -> (1,4),
             tag: Ident "tempo" (1,4) -> (1,9),
           },
-          values: Values (1,10) -> (1,25) {
+          values: Values (1,10) -> (1,23) {
             values: Array [
               Number "120" (1,10) -> (1,13),
               String "Moderate" (1,14) -> (1,23),
@@ -1199,16 +1199,16 @@ Score (1,1) -> (1,28) {
 `;
 
 exports[`AlphaTexParserTest floats tempo parenthesis 1`] = `
-Score (1,1) -> (1,30) {
+Score (1,1) -> (1,29) {
   bars: Array [
-    Bar (1,1) -> (1,30) {
+    Bar (1,1) -> (1,29) {
       metaData: Array [
-        Meta (1,3) -> (1,30) {
+        Meta (1,3) -> (1,29) {
           tag: Tag "tempo" (1,3) -> (1,9) {
             prefix: Backslash (1,3) -> (1,4),
             tag: Ident "tempo" (1,4) -> (1,9),
           },
-          values: Values (1,10) -> (1,30) {
+          values: Values (1,10) -> (1,29) {
             openParenthesis: LParen (1,10) -> (1,10),
             values: Array [
               Number "120" (1,11) -> (1,14),
@@ -1255,16 +1255,16 @@ Score (1,1) -> (1,13) {
 `;
 
 exports[`AlphaTexParserTest floats valuelist parenthesis 1`] = `
-Score (1,1) -> (1,19) {
+Score (1,1) -> (1,18) {
   bars: Array [
-    Bar (1,1) -> (1,19) {
+    Bar (1,1) -> (1,18) {
       metaData: Array [
-        Meta (1,1) -> (1,19) {
+        Meta (1,1) -> (1,18) {
           tag: Tag "unknown" (1,1) -> (1,9) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "unknown" (1,2) -> (1,9),
           },
-          values: Values (1,10) -> (1,19) {
+          values: Values (1,10) -> (1,18) {
             openParenthesis: LParen (1,10) -> (1,10),
             values: Array [
               Number "1.2" (1,11) -> (1,14),
@@ -1288,16 +1288,16 @@ exports[`AlphaTexParserTest floats valuelist: lexer-diagnostics 1`] = `Array []`
 exports[`AlphaTexParserTest floats valuelist: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest intermediate finished beat effect value, not closed 1`] = `
-Score (1,1) -> (1,50) {
+Score (1,1) -> (1,48) {
   bars: Array [
-    Bar (1,1) -> (1,50) {
+    Bar (1,1) -> (1,48) {
       metaData: Array [
-        Meta (1,1) -> (1,16) {
+        Meta (1,1) -> (1,14) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,14) {
             values: Array [
               String "Title" (1,8) -> (1,14),
             ],
@@ -1305,17 +1305,17 @@ Score (1,1) -> (1,50) {
         },
       ],
       beats: Array [
-        Beat (1,18) -> (1,50) {
-          notes: NoteList (1,18) -> (1,34) {
+        Beat (1,18) -> (1,48) {
+          notes: NoteList (1,18) -> (1,33) {
             notes: Array [
-              Note (1,18) -> (1,34) {
+              Note (1,18) -> (1,33) {
                 noteValue: Ident "C4" (1,18) -> (1,20),
-                noteEffects: Props (1,21) -> (1,34) {
+                noteEffects: Props (1,21) -> (1,33) {
                   openBrace: LBrace (1,21) -> (1,21),
                   properties: Array [
-                    Prop (1,23) -> (1,33) {
+                    Prop (1,23) -> (1,31) {
                       property: Ident "slur" (1,23) -> (1,27),
-                      properties: Values (1,28) -> (1,33) {
+                      properties: Values (1,28) -> (1,31) {
                         values: Array [
                           String "S1" (1,28) -> (1,31),
                         ],
@@ -1329,12 +1329,12 @@ Score (1,1) -> (1,50) {
           },
           durationDot: Dot (1,35) -> (1,35),
           durationValue: Number "4" (1,37) -> (1,38),
-          beatEffects: Props (1,39) -> (1,50) {
+          beatEffects: Props (1,39) -> (1,48) {
             openBrace: LBrace (1,39) -> (1,39),
             properties: Array [
-              Prop (1,41) -> (1,50) {
+              Prop (1,41) -> (1,48) {
                 property: Ident "rasg" (1,41) -> (1,45),
-                properties: Values (1,46) -> (1,50) {
+                properties: Values (1,46) -> (1,48) {
                   values: Array [
                     String "i" (1,46) -> (1,48),
                   ],
@@ -1367,26 +1367,26 @@ Array [
 `;
 
 exports[`AlphaTexParserTest intermediate finished meta property value, not closed  1`] = `
-Score (1,1) -> (1,25) {
+Score (1,1) -> (1,24) {
   bars: Array [
-    Bar (1,1) -> (1,25) {
+    Bar (1,1) -> (1,24) {
       metaData: Array [
-        Meta (1,1) -> (1,25) {
+        Meta (1,1) -> (1,24) {
           tag: Tag "track" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,12) {
+          values: Values (1,8) -> (1,10) {
             values: Array [
               String "X" (1,8) -> (1,10),
             ],
           },
-          properties: Props (1,12) -> (1,25) {
+          properties: Props (1,12) -> (1,24) {
             openBrace: LBrace (1,12) -> (1,12),
             properties: Array [
-              Prop (1,14) -> (1,25) {
+              Prop (1,14) -> (1,24) {
                 property: Ident "color" (1,14) -> (1,19),
-                properties: Values (1,20) -> (1,25) {
+                properties: Values (1,20) -> (1,24) {
                   values: Array [
                     String "red" (1,20) -> (1,24),
                   ],
@@ -1419,16 +1419,16 @@ Array [
 `;
 
 exports[`AlphaTexParserTest intermediate finished note effect value, not closed 1`] = `
-Score (1,1) -> (1,32) {
+Score (1,1) -> (1,31) {
   bars: Array [
-    Bar (1,1) -> (1,32) {
+    Bar (1,1) -> (1,31) {
       metaData: Array [
-        Meta (1,1) -> (1,16) {
+        Meta (1,1) -> (1,14) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,14) {
             values: Array [
               String "Title" (1,8) -> (1,14),
             ],
@@ -1436,17 +1436,17 @@ Score (1,1) -> (1,32) {
         },
       ],
       beats: Array [
-        Beat (1,18) -> (1,32) {
-          notes: NoteList (1,18) -> (1,32) {
+        Beat (1,18) -> (1,31) {
+          notes: NoteList (1,18) -> (1,31) {
             notes: Array [
-              Note (1,18) -> (1,32) {
+              Note (1,18) -> (1,31) {
                 noteValue: Ident "C4" (1,18) -> (1,20),
-                noteEffects: Props (1,21) -> (1,32) {
+                noteEffects: Props (1,21) -> (1,31) {
                   openBrace: LBrace (1,21) -> (1,21),
                   properties: Array [
-                    Prop (1,23) -> (1,32) {
+                    Prop (1,23) -> (1,31) {
                       property: Ident "slur" (1,23) -> (1,27),
-                      properties: Values (1,28) -> (1,32) {
+                      properties: Values (1,28) -> (1,31) {
                         values: Array [
                           String "S1" (1,28) -> (1,31),
                         ],
@@ -1482,16 +1482,16 @@ Array [
 `;
 
 exports[`AlphaTexParserTest intermediate started beat duration 1`] = `
-Score (1,1) -> (1,36) {
+Score (1,1) -> (1,35) {
   bars: Array [
-    Bar (1,1) -> (1,36) {
+    Bar (1,1) -> (1,35) {
       metaData: Array [
-        Meta (1,1) -> (1,16) {
+        Meta (1,1) -> (1,14) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,14) {
             values: Array [
               String "Title" (1,8) -> (1,14),
             ],
@@ -1499,17 +1499,17 @@ Score (1,1) -> (1,36) {
         },
       ],
       beats: Array [
-        Beat (1,18) -> (1,36) {
-          notes: NoteList (1,18) -> (1,34) {
+        Beat (1,18) -> (1,35) {
+          notes: NoteList (1,18) -> (1,33) {
             notes: Array [
-              Note (1,18) -> (1,34) {
+              Note (1,18) -> (1,33) {
                 noteValue: Ident "C4" (1,18) -> (1,20),
-                noteEffects: Props (1,21) -> (1,34) {
+                noteEffects: Props (1,21) -> (1,33) {
                   openBrace: LBrace (1,21) -> (1,21),
                   properties: Array [
-                    Prop (1,23) -> (1,33) {
+                    Prop (1,23) -> (1,31) {
                       property: Ident "slur" (1,23) -> (1,27),
-                      properties: Values (1,28) -> (1,33) {
+                      properties: Values (1,28) -> (1,31) {
                         values: Array [
                           String "S1" (1,28) -> (1,31),
                         ],
@@ -1552,7 +1552,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest intermediate started beat effect value 1`] = `Score (1,1) -> (1,48)`;
+exports[`AlphaTexParserTest intermediate started beat effect value 1`] = `Score (1,1) -> (1,45)`;
 
 exports[`AlphaTexParserTest intermediate started beat effect value: lexer-diagnostics 1`] = `
 Array [
@@ -1585,16 +1585,16 @@ Array [
 `;
 
 exports[`AlphaTexParserTest intermediate started beat effects 1`] = `
-Score (1,1) -> (1,41) {
+Score (1,1) -> (1,39) {
   bars: Array [
-    Bar (1,1) -> (1,41) {
+    Bar (1,1) -> (1,39) {
       metaData: Array [
-        Meta (1,1) -> (1,16) {
+        Meta (1,1) -> (1,14) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,14) {
             values: Array [
               String "Title" (1,8) -> (1,14),
             ],
@@ -1602,17 +1602,17 @@ Score (1,1) -> (1,41) {
         },
       ],
       beats: Array [
-        Beat (1,18) -> (1,41) {
-          notes: NoteList (1,18) -> (1,34) {
+        Beat (1,18) -> (1,39) {
+          notes: NoteList (1,18) -> (1,33) {
             notes: Array [
-              Note (1,18) -> (1,34) {
+              Note (1,18) -> (1,33) {
                 noteValue: Ident "C4" (1,18) -> (1,20),
-                noteEffects: Props (1,21) -> (1,34) {
+                noteEffects: Props (1,21) -> (1,33) {
                   openBrace: LBrace (1,21) -> (1,21),
                   properties: Array [
-                    Prop (1,23) -> (1,33) {
+                    Prop (1,23) -> (1,31) {
                       property: Ident "slur" (1,23) -> (1,27),
-                      properties: Values (1,28) -> (1,33) {
+                      properties: Values (1,28) -> (1,31) {
                         values: Array [
                           String "S1" (1,28) -> (1,31),
                         ],
@@ -1626,7 +1626,7 @@ Score (1,1) -> (1,41) {
           },
           durationDot: Dot (1,35) -> (1,35),
           durationValue: Number "4" (1,37) -> (1,38),
-          beatEffects: Props (1,39) -> (1,41) {
+          beatEffects: Props (1,39) -> (1,39) {
             openBrace: LBrace (1,39) -> (1,39),
             properties: Array [],
           },
@@ -1676,21 +1676,21 @@ exports[`AlphaTexParserTest intermediate started initial meta: parser-diagnostic
 exports[`AlphaTexParserTest intermediate started meta 1`] = `Score (1,1) -> (1,4)`;
 
 exports[`AlphaTexParserTest intermediate started meta properties 1`] = `
-Score (1,1) -> (1,13) {
+Score (1,1) -> (1,12) {
   bars: Array [
-    Bar (1,1) -> (1,13) {
+    Bar (1,1) -> (1,12) {
       metaData: Array [
-        Meta (1,1) -> (1,13) {
+        Meta (1,1) -> (1,12) {
           tag: Tag "track" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,12) {
+          values: Values (1,8) -> (1,10) {
             values: Array [
               String "X" (1,8) -> (1,10),
             ],
           },
-          properties: Props (1,12) -> (1,13) {
+          properties: Props (1,12) -> (1,12) {
             openBrace: LBrace (1,12) -> (1,12),
             properties: Array [],
           },
@@ -1737,7 +1737,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest intermediate started meta property value 1`] = `Score (1,1) -> (1,21)`;
+exports[`AlphaTexParserTest intermediate started meta property value 1`] = `Score (1,1) -> (1,19)`;
 
 exports[`AlphaTexParserTest intermediate started meta property value: lexer-diagnostics 1`] = `
 Array [
@@ -1769,7 +1769,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest intermediate started meta string 1`] = `Score (1,1) -> (1,11)`;
+exports[`AlphaTexParserTest intermediate started meta string 1`] = `Score (1,1) -> (1,7)`;
 
 exports[`AlphaTexParserTest intermediate started meta string: lexer-diagnostics 1`] = `
 Array [
@@ -1837,7 +1837,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest intermediate started note effect value 1`] = `Score (1,1) -> (1,31)`;
+exports[`AlphaTexParserTest intermediate started note effect value 1`] = `Score (1,1) -> (1,27)`;
 
 exports[`AlphaTexParserTest intermediate started note effect value: lexer-diagnostics 1`] = `
 Array [
@@ -1870,16 +1870,16 @@ Array [
 `;
 
 exports[`AlphaTexParserTest intermediate started note effects 1`] = `
-Score (1,1) -> (1,23) {
+Score (1,1) -> (1,21) {
   bars: Array [
-    Bar (1,1) -> (1,23) {
+    Bar (1,1) -> (1,21) {
       metaData: Array [
-        Meta (1,1) -> (1,16) {
+        Meta (1,1) -> (1,14) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,14) {
             values: Array [
               String "Title" (1,8) -> (1,14),
             ],
@@ -1887,12 +1887,12 @@ Score (1,1) -> (1,23) {
         },
       ],
       beats: Array [
-        Beat (1,18) -> (1,23) {
-          notes: NoteList (1,18) -> (1,23) {
+        Beat (1,18) -> (1,21) {
+          notes: NoteList (1,18) -> (1,21) {
             notes: Array [
-              Note (1,18) -> (1,23) {
+              Note (1,18) -> (1,21) {
                 noteValue: Ident "C4" (1,18) -> (1,20),
-                noteEffects: Props (1,21) -> (1,23) {
+                noteEffects: Props (1,21) -> (1,21) {
                   openBrace: LBrace (1,21) -> (1,21),
                   properties: Array [],
                 },
@@ -1928,12 +1928,12 @@ Score (1,1) -> (1,19) {
   bars: Array [
     Bar (1,1) -> (1,19) {
       metaData: Array [
-        Meta (1,1) -> (1,16) {
+        Meta (1,1) -> (1,14) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,14) {
             values: Array [
               String "Title" (1,8) -> (1,14),
             ],
@@ -1961,11 +1961,11 @@ exports[`AlphaTexParserTest intermediate started pitched note: lexer-diagnostics
 exports[`AlphaTexParserTest intermediate started pitched note: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-bar-meta known no score meta 1`] = `
-Score (1,1) -> (1,17) {
+Score (1,1) -> (1,16) {
   bars: Array [
-    Bar (1,1) -> (1,13) {
+    Bar (1,1) -> (1,12) {
       metaData: Array [
-        Meta (1,1) -> (1,9) {
+        Meta (1,1) -> (1,8) {
           tag: Tag "ts" (1,1) -> (1,4) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "ts" (1,2) -> (1,4),
@@ -1979,10 +1979,10 @@ Score (1,1) -> (1,17) {
         },
       ],
       beats: Array [
-        Beat (1,9) -> (1,12) {
-          notes: NoteList (1,9) -> (1,12) {
+        Beat (1,9) -> (1,11) {
+          notes: NoteList (1,9) -> (1,11) {
             notes: Array [
-              Note (1,9) -> (1,12) {
+              Note (1,9) -> (1,11) {
                 noteValue: Ident "C4" (1,9) -> (1,11),
               },
             ],
@@ -1991,12 +1991,12 @@ Score (1,1) -> (1,17) {
       ],
       pipe: Pipe (1,12) -> (1,12),
     },
-    Bar (1,14) -> (1,17) {
+    Bar (1,14) -> (1,16) {
       beats: Array [
-        Beat (1,14) -> (1,17) {
-          notes: NoteList (1,14) -> (1,17) {
+        Beat (1,14) -> (1,16) {
+          notes: NoteList (1,14) -> (1,16) {
             notes: Array [
-              Note (1,14) -> (1,17) {
+              Note (1,14) -> (1,16) {
                 noteValue: Ident "C4" (1,14) -> (1,16),
               },
             ],
@@ -2013,11 +2013,11 @@ exports[`AlphaTexParserTest valid-bar-meta known no score meta: lexer-diagnostic
 exports[`AlphaTexParserTest valid-bar-meta known no score meta: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-bar-meta known score meta 1`] = `
-Score (1,1) -> (1,30) {
+Score (1,1) -> (1,29) {
   bars: Array [
-    Bar (1,1) -> (1,26) {
+    Bar (1,1) -> (1,25) {
       metaData: Array [
-        Meta (1,3) -> (1,12) {
+        Meta (1,3) -> (1,10) {
           tag: Tag "ts" (1,3) -> (1,6) {
             prefix: Backslash (1,3) -> (1,4),
             tag: Ident "ts" (1,4) -> (1,6),
@@ -2031,21 +2031,21 @@ Score (1,1) -> (1,30) {
         },
       ],
       beats: Array [
-        Beat (1,12) -> (1,22) {
-          notes: NoteList (1,12) -> (1,21) {
+        Beat (1,12) -> (1,20) {
+          notes: NoteList (1,12) -> (1,20) {
             openParenthesis: LParen (1,12) -> (1,12),
             notes: Array [
-              Note (1,13) -> (1,20) {
+              Note (1,13) -> (1,19) {
                 noteValue: String "Value" (1,13) -> (1,19),
               },
             ],
             closeParenthesis: RParen (1,20) -> (1,20),
           },
         },
-        Beat (1,22) -> (1,25) {
-          notes: NoteList (1,22) -> (1,25) {
+        Beat (1,22) -> (1,24) {
+          notes: NoteList (1,22) -> (1,24) {
             notes: Array [
-              Note (1,22) -> (1,25) {
+              Note (1,22) -> (1,24) {
                 noteValue: Ident "C4" (1,22) -> (1,24),
               },
             ],
@@ -2054,12 +2054,12 @@ Score (1,1) -> (1,30) {
       ],
       pipe: Pipe (1,25) -> (1,25),
     },
-    Bar (1,27) -> (1,30) {
+    Bar (1,27) -> (1,29) {
       beats: Array [
-        Beat (1,27) -> (1,30) {
-          notes: NoteList (1,27) -> (1,30) {
+        Beat (1,27) -> (1,29) {
+          notes: NoteList (1,27) -> (1,29) {
             notes: Array [
-              Note (1,27) -> (1,30) {
+              Note (1,27) -> (1,29) {
                 noteValue: Ident "C4" (1,27) -> (1,29),
               },
             ],
@@ -2076,16 +2076,16 @@ exports[`AlphaTexParserTest valid-bar-meta known score meta: lexer-diagnostics 1
 exports[`AlphaTexParserTest valid-bar-meta known score meta: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-bar-meta unknown no score meta 1`] = `
-Score (1,1) -> (1,32) {
+Score (1,1) -> (1,31) {
   bars: Array [
-    Bar (1,1) -> (1,28) {
+    Bar (1,1) -> (1,27) {
       metaData: Array [
-        Meta (1,1) -> (1,24) {
+        Meta (1,1) -> (1,22) {
           tag: Tag "notExisting" (1,1) -> (1,13) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: Values (1,14) -> (1,23) {
+          values: Values (1,14) -> (1,22) {
             openParenthesis: LParen (1,14) -> (1,14),
             values: Array [
               String "Value" (1,15) -> (1,21),
@@ -2095,10 +2095,10 @@ Score (1,1) -> (1,32) {
         },
       ],
       beats: Array [
-        Beat (1,24) -> (1,27) {
-          notes: NoteList (1,24) -> (1,27) {
+        Beat (1,24) -> (1,26) {
+          notes: NoteList (1,24) -> (1,26) {
             notes: Array [
-              Note (1,24) -> (1,27) {
+              Note (1,24) -> (1,26) {
                 noteValue: Ident "C4" (1,24) -> (1,26),
               },
             ],
@@ -2107,12 +2107,12 @@ Score (1,1) -> (1,32) {
       ],
       pipe: Pipe (1,27) -> (1,27),
     },
-    Bar (1,29) -> (1,32) {
+    Bar (1,29) -> (1,31) {
       beats: Array [
-        Beat (1,29) -> (1,32) {
-          notes: NoteList (1,29) -> (1,32) {
+        Beat (1,29) -> (1,31) {
+          notes: NoteList (1,29) -> (1,31) {
             notes: Array [
-              Note (1,29) -> (1,32) {
+              Note (1,29) -> (1,31) {
                 noteValue: Ident "C4" (1,29) -> (1,31),
               },
             ],
@@ -2129,16 +2129,16 @@ exports[`AlphaTexParserTest valid-bar-meta unknown no score meta: lexer-diagnost
 exports[`AlphaTexParserTest valid-bar-meta unknown no score meta: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-bar-meta unkonwn score meta 1`] = `
-Score (1,1) -> (1,34) {
+Score (1,1) -> (1,33) {
   bars: Array [
-    Bar (1,1) -> (1,30) {
+    Bar (1,1) -> (1,29) {
       metaData: Array [
-        Meta (1,3) -> (1,26) {
+        Meta (1,3) -> (1,24) {
           tag: Tag "notExisting" (1,3) -> (1,15) {
             prefix: Backslash (1,3) -> (1,4),
             tag: Ident "notExisting" (1,4) -> (1,15),
           },
-          values: Values (1,16) -> (1,25) {
+          values: Values (1,16) -> (1,24) {
             openParenthesis: LParen (1,16) -> (1,16),
             values: Array [
               String "Value" (1,17) -> (1,23),
@@ -2148,10 +2148,10 @@ Score (1,1) -> (1,34) {
         },
       ],
       beats: Array [
-        Beat (1,26) -> (1,29) {
-          notes: NoteList (1,26) -> (1,29) {
+        Beat (1,26) -> (1,28) {
+          notes: NoteList (1,26) -> (1,28) {
             notes: Array [
-              Note (1,26) -> (1,29) {
+              Note (1,26) -> (1,28) {
                 noteValue: Ident "C4" (1,26) -> (1,28),
               },
             ],
@@ -2160,12 +2160,12 @@ Score (1,1) -> (1,34) {
       ],
       pipe: Pipe (1,29) -> (1,29),
     },
-    Bar (1,31) -> (1,34) {
+    Bar (1,31) -> (1,33) {
       beats: Array [
-        Beat (1,31) -> (1,34) {
-          notes: NoteList (1,31) -> (1,34) {
+        Beat (1,31) -> (1,33) {
+          notes: NoteList (1,31) -> (1,33) {
             notes: Array [
-              Note (1,31) -> (1,34) {
+              Note (1,31) -> (1,33) {
                 noteValue: Ident "C4" (1,31) -> (1,33),
               },
             ],
@@ -2182,14 +2182,14 @@ exports[`AlphaTexParserTest valid-bar-meta unkonwn score meta: lexer-diagnostics
 exports[`AlphaTexParserTest valid-bar-meta unkonwn score meta: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-bars empty at end 1`] = `
-Score (1,1) -> (1,12) {
+Score (1,1) -> (1,9) {
   bars: Array [
-    Bar (1,1) -> (1,5) {
+    Bar (1,1) -> (1,4) {
       beats: Array [
-        Beat (1,1) -> (1,4) {
-          notes: NoteList (1,1) -> (1,4) {
+        Beat (1,1) -> (1,3) {
+          notes: NoteList (1,1) -> (1,3) {
             notes: Array [
-              Note (1,1) -> (1,4) {
+              Note (1,1) -> (1,3) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
@@ -2198,12 +2198,12 @@ Score (1,1) -> (1,12) {
       ],
       pipe: Pipe (1,4) -> (1,4),
     },
-    Bar (1,6) -> (1,10) {
+    Bar (1,6) -> (1,9) {
       beats: Array [
-        Beat (1,6) -> (1,9) {
-          notes: NoteList (1,6) -> (1,9) {
+        Beat (1,6) -> (1,8) {
+          notes: NoteList (1,6) -> (1,8) {
             notes: Array [
-              Note (1,6) -> (1,9) {
+              Note (1,6) -> (1,8) {
                 noteValue: Ident "C4" (1,6) -> (1,8),
               },
             ],
@@ -2221,14 +2221,14 @@ exports[`AlphaTexParserTest valid-bars empty at end: lexer-diagnostics 1`] = `Ar
 exports[`AlphaTexParserTest valid-bars empty at end: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-bars multiple empty 1`] = `
-Score (1,1) -> (1,17) {
+Score (1,1) -> (1,15) {
   bars: Array [
-    Bar (1,1) -> (1,5) {
+    Bar (1,1) -> (1,4) {
       beats: Array [
-        Beat (1,1) -> (1,4) {
-          notes: NoteList (1,1) -> (1,4) {
+        Beat (1,1) -> (1,3) {
+          notes: NoteList (1,1) -> (1,3) {
             notes: Array [
-              Note (1,1) -> (1,4) {
+              Note (1,1) -> (1,3) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
@@ -2237,12 +2237,12 @@ Score (1,1) -> (1,17) {
       ],
       pipe: Pipe (1,4) -> (1,4),
     },
-    Bar (1,6) -> (1,10) {
+    Bar (1,6) -> (1,9) {
       beats: Array [
-        Beat (1,6) -> (1,9) {
-          notes: NoteList (1,6) -> (1,9) {
+        Beat (1,6) -> (1,8) {
+          notes: NoteList (1,6) -> (1,8) {
             notes: Array [
-              Note (1,6) -> (1,9) {
+              Note (1,6) -> (1,8) {
                 noteValue: Ident "C4" (1,6) -> (1,8),
               },
             ],
@@ -2251,13 +2251,13 @@ Score (1,1) -> (1,17) {
       ],
       pipe: Pipe (1,9) -> (1,9),
     },
-    Bar (1,11) -> (1,12) {
+    Bar (1,11) -> (1,11) {
       pipe: Pipe (1,11) -> (1,11),
     },
-    Bar (1,13) -> (1,14) {
+    Bar (1,13) -> (1,13) {
       pipe: Pipe (1,13) -> (1,13),
     },
-    Bar (1,15) -> (1,16) {
+    Bar (1,15) -> (1,15) {
       pipe: Pipe (1,15) -> (1,15),
     },
   ],
@@ -2265,14 +2265,14 @@ Score (1,1) -> (1,17) {
 `;
 
 exports[`AlphaTexParserTest valid-bars multiple empty then filled 1`] = `
-Score (1,1) -> (1,20) {
+Score (1,1) -> (1,19) {
   bars: Array [
-    Bar (1,1) -> (1,5) {
+    Bar (1,1) -> (1,4) {
       beats: Array [
-        Beat (1,1) -> (1,4) {
-          notes: NoteList (1,1) -> (1,4) {
+        Beat (1,1) -> (1,3) {
+          notes: NoteList (1,1) -> (1,3) {
             notes: Array [
-              Note (1,1) -> (1,4) {
+              Note (1,1) -> (1,3) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
@@ -2281,12 +2281,12 @@ Score (1,1) -> (1,20) {
       ],
       pipe: Pipe (1,4) -> (1,4),
     },
-    Bar (1,6) -> (1,10) {
+    Bar (1,6) -> (1,9) {
       beats: Array [
-        Beat (1,6) -> (1,9) {
-          notes: NoteList (1,6) -> (1,9) {
+        Beat (1,6) -> (1,8) {
+          notes: NoteList (1,6) -> (1,8) {
             notes: Array [
-              Note (1,6) -> (1,9) {
+              Note (1,6) -> (1,8) {
                 noteValue: Ident "C4" (1,6) -> (1,8),
               },
             ],
@@ -2295,21 +2295,21 @@ Score (1,1) -> (1,20) {
       ],
       pipe: Pipe (1,9) -> (1,9),
     },
-    Bar (1,11) -> (1,12) {
+    Bar (1,11) -> (1,11) {
       pipe: Pipe (1,11) -> (1,11),
     },
-    Bar (1,13) -> (1,14) {
+    Bar (1,13) -> (1,13) {
       pipe: Pipe (1,13) -> (1,13),
     },
-    Bar (1,15) -> (1,16) {
+    Bar (1,15) -> (1,15) {
       pipe: Pipe (1,15) -> (1,15),
     },
-    Bar (1,17) -> (1,20) {
+    Bar (1,17) -> (1,19) {
       beats: Array [
-        Beat (1,17) -> (1,20) {
-          notes: NoteList (1,17) -> (1,20) {
+        Beat (1,17) -> (1,19) {
+          notes: NoteList (1,17) -> (1,19) {
             notes: Array [
-              Note (1,17) -> (1,20) {
+              Note (1,17) -> (1,19) {
                 noteValue: Ident "C4" (1,17) -> (1,19),
               },
             ],
@@ -2330,14 +2330,14 @@ exports[`AlphaTexParserTest valid-bars multiple empty: lexer-diagnostics 1`] = `
 exports[`AlphaTexParserTest valid-bars multiple empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-bars no score meta 1`] = `
-Score (1,1) -> (1,10) {
+Score (1,1) -> (1,9) {
   bars: Array [
-    Bar (1,2) -> (1,6) {
+    Bar (1,2) -> (1,5) {
       beats: Array [
-        Beat (1,2) -> (1,5) {
-          notes: NoteList (1,2) -> (1,5) {
+        Beat (1,2) -> (1,4) {
+          notes: NoteList (1,2) -> (1,4) {
             notes: Array [
-              Note (1,2) -> (1,5) {
+              Note (1,2) -> (1,4) {
                 noteValue: Ident "C4" (1,2) -> (1,4),
               },
             ],
@@ -2346,12 +2346,12 @@ Score (1,1) -> (1,10) {
       ],
       pipe: Pipe (1,5) -> (1,5),
     },
-    Bar (1,7) -> (1,10) {
+    Bar (1,7) -> (1,9) {
       beats: Array [
-        Beat (1,7) -> (1,10) {
-          notes: NoteList (1,7) -> (1,10) {
+        Beat (1,7) -> (1,9) {
+          notes: NoteList (1,7) -> (1,9) {
             notes: Array [
-              Note (1,7) -> (1,10) {
+              Note (1,7) -> (1,9) {
                 noteValue: Ident "C4" (1,7) -> (1,9),
               },
             ],
@@ -2368,16 +2368,16 @@ exports[`AlphaTexParserTest valid-bars no score meta: lexer-diagnostics 1`] = `A
 exports[`AlphaTexParserTest valid-bars no score meta: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-bars with score meta 1`] = `
-Score (1,1) -> (1,25) {
+Score (1,1) -> (1,24) {
   bars: Array [
-    Bar (1,1) -> (1,21) {
+    Bar (1,1) -> (1,20) {
       metaData: Array [
-        Meta (1,1) -> (1,15) {
+        Meta (1,1) -> (1,13) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,15) {
+          values: Values (1,8) -> (1,13) {
             values: Array [
               String "Test" (1,8) -> (1,13),
             ],
@@ -2385,10 +2385,10 @@ Score (1,1) -> (1,25) {
         },
       ],
       beats: Array [
-        Beat (1,17) -> (1,20) {
-          notes: NoteList (1,17) -> (1,20) {
+        Beat (1,17) -> (1,19) {
+          notes: NoteList (1,17) -> (1,19) {
             notes: Array [
-              Note (1,17) -> (1,20) {
+              Note (1,17) -> (1,19) {
                 noteValue: Ident "C4" (1,17) -> (1,19),
               },
             ],
@@ -2397,12 +2397,12 @@ Score (1,1) -> (1,25) {
       ],
       pipe: Pipe (1,20) -> (1,20),
     },
-    Bar (1,22) -> (1,25) {
+    Bar (1,22) -> (1,24) {
       beats: Array [
-        Beat (1,22) -> (1,25) {
-          notes: NoteList (1,22) -> (1,25) {
+        Beat (1,22) -> (1,24) {
+          notes: NoteList (1,22) -> (1,24) {
             notes: Array [
-              Note (1,22) -> (1,25) {
+              Note (1,22) -> (1,24) {
                 noteValue: Ident "C4" (1,22) -> (1,24),
               },
             ],
@@ -2419,11 +2419,11 @@ exports[`AlphaTexParserTest valid-bars with score meta: lexer-diagnostics 1`] = 
 exports[`AlphaTexParserTest valid-bars with score meta: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beat-effects empty 1`] = `
-Score (1,1) -> (1,8) {
+Score (1,1) -> (1,7) {
   bars: Array [
-    Bar (1,1) -> (1,8) {
+    Bar (1,1) -> (1,7) {
       beats: Array [
-        Beat (1,1) -> (1,8) {
+        Beat (1,1) -> (1,7) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
@@ -2433,7 +2433,7 @@ Score (1,1) -> (1,8) {
           },
           durationDot: Dot (1,3) -> (1,3),
           durationValue: Number "8" (1,4) -> (1,5),
-          beatEffects: Props (1,6) -> (1,8) {
+          beatEffects: Props (1,6) -> (1,7) {
             openBrace: LBrace (1,6) -> (1,6),
             properties: Array [],
             closeBrace: RBrace (1,7) -> (1,7),
@@ -2450,11 +2450,11 @@ exports[`AlphaTexParserTest valid-beat-effects empty: lexer-diagnostics 1`] = `A
 exports[`AlphaTexParserTest valid-beat-effects empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beat-effects known 1`] = `
-Score (1,1) -> (1,14) {
+Score (1,1) -> (1,13) {
   bars: Array [
-    Bar (1,1) -> (1,14) {
+    Bar (1,1) -> (1,13) {
       beats: Array [
-        Beat (1,1) -> (1,14) {
+        Beat (1,1) -> (1,13) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
@@ -2464,7 +2464,7 @@ Score (1,1) -> (1,14) {
           },
           durationDot: Dot (1,3) -> (1,3),
           durationValue: Number "8" (1,4) -> (1,5),
-          beatEffects: Props (1,6) -> (1,14) {
+          beatEffects: Props (1,6) -> (1,13) {
             openBrace: LBrace (1,6) -> (1,6),
             properties: Array [
               Prop (1,7) -> (1,13) {
@@ -2487,11 +2487,11 @@ Score (1,1) -> (1,14) {
 `;
 
 exports[`AlphaTexParserTest valid-beat-effects known with list 1`] = `
-Score (1,1) -> (1,19) {
+Score (1,1) -> (1,18) {
   bars: Array [
-    Bar (1,1) -> (1,19) {
+    Bar (1,1) -> (1,18) {
       beats: Array [
-        Beat (1,1) -> (1,19) {
+        Beat (1,1) -> (1,18) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
@@ -2501,12 +2501,12 @@ Score (1,1) -> (1,19) {
           },
           durationDot: Dot (1,3) -> (1,3),
           durationValue: Number "8" (1,4) -> (1,5),
-          beatEffects: Props (1,6) -> (1,19) {
+          beatEffects: Props (1,6) -> (1,18) {
             openBrace: LBrace (1,6) -> (1,6),
             properties: Array [
-              Prop (1,7) -> (1,18) {
+              Prop (1,7) -> (1,17) {
                 property: Ident "tb" (1,7) -> (1,9),
-                properties: Values (1,10) -> (1,18) {
+                properties: Values (1,10) -> (1,17) {
                   openParenthesis: LParen (1,10) -> (1,10),
                   values: Array [
                     Number "0" (1,11) -> (1,12),
@@ -2535,11 +2535,11 @@ exports[`AlphaTexParserTest valid-beat-effects known: lexer-diagnostics 1`] = `A
 exports[`AlphaTexParserTest valid-beat-effects known: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beat-effects multiple 1`] = `
-Score (1,1) -> (1,30) {
+Score (1,1) -> (1,29) {
   bars: Array [
-    Bar (1,1) -> (1,30) {
+    Bar (1,1) -> (1,29) {
       beats: Array [
-        Beat (1,1) -> (1,30) {
+        Beat (1,1) -> (1,29) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
@@ -2549,15 +2549,15 @@ Score (1,1) -> (1,30) {
           },
           durationDot: Dot (1,3) -> (1,3),
           durationValue: Number "8" (1,4) -> (1,5),
-          beatEffects: Props (1,6) -> (1,30) {
+          beatEffects: Props (1,6) -> (1,29) {
             openBrace: LBrace (1,6) -> (1,6),
             properties: Array [
-              Prop (1,7) -> (1,11) {
+              Prop (1,7) -> (1,10) {
                 property: Ident "cre" (1,7) -> (1,10),
               },
-              Prop (1,11) -> (1,22) {
+              Prop (1,11) -> (1,21) {
                 property: Ident "tb" (1,11) -> (1,13),
-                properties: Values (1,14) -> (1,22) {
+                properties: Values (1,14) -> (1,21) {
                   openParenthesis: LParen (1,14) -> (1,14),
                   values: Array [
                     Number "0" (1,15) -> (1,16),
@@ -2591,11 +2591,11 @@ exports[`AlphaTexParserTest valid-beat-effects multiple: lexer-diagnostics 1`] =
 exports[`AlphaTexParserTest valid-beat-effects multiple: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beat-effects unknown 1`] = `
-Score (1,1) -> (1,23) {
+Score (1,1) -> (1,22) {
   bars: Array [
-    Bar (1,1) -> (1,23) {
+    Bar (1,1) -> (1,22) {
       beats: Array [
-        Beat (1,1) -> (1,23) {
+        Beat (1,1) -> (1,22) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
@@ -2605,12 +2605,12 @@ Score (1,1) -> (1,23) {
           },
           durationDot: Dot (1,3) -> (1,3),
           durationValue: Number "8" (1,4) -> (1,5),
-          beatEffects: Props (1,6) -> (1,23) {
+          beatEffects: Props (1,6) -> (1,22) {
             openBrace: LBrace (1,6) -> (1,6),
             properties: Array [
-              Prop (1,7) -> (1,22) {
+              Prop (1,7) -> (1,21) {
                 property: Ident "unknown" (1,7) -> (1,14),
-                properties: Values (1,15) -> (1,22) {
+                properties: Values (1,15) -> (1,21) {
                   openParenthesis: LParen (1,15) -> (1,15),
                   values: Array [
                     Number "1" (1,16) -> (1,17),
@@ -2639,10 +2639,10 @@ Score (1,1) -> (1,8) {
   bars: Array [
     Bar (1,1) -> (1,8) {
       beats: Array [
-        Beat (1,1) -> (1,5) {
-          notes: NoteList (1,1) -> (1,5) {
+        Beat (1,1) -> (1,4) {
+          notes: NoteList (1,1) -> (1,4) {
             notes: Array [
-              Note (1,1) -> (1,5) {
+              Note (1,1) -> (1,4) {
                 noteValue: Number "3" (1,1) -> (1,2),
                 noteStringDot: Dot (1,2) -> (1,2),
                 noteString: Number "3" (1,3) -> (1,4),
@@ -2672,12 +2672,12 @@ exports[`AlphaTexParserTest valid-beats-basic-fretted basic: lexer-diagnostics 1
 exports[`AlphaTexParserTest valid-beats-basic-fretted basic: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-basic-fretted complex 1`] = `
-Score (1,1) -> (1,26) {
+Score (1,1) -> (1,25) {
   bars: Array [
-    Bar (1,1) -> (1,26) {
+    Bar (1,1) -> (1,25) {
       beats: Array [
-        Beat (1,1) -> (1,26) {
-          durationChange: Duration (1,1) -> (1,4) {
+        Beat (1,1) -> (1,25) {
+          durationChange: Duration (1,1) -> (1,3) {
             colon: Colon (1,1) -> (1,1),
             value: Number "2" (1,2) -> (1,3),
           },
@@ -2694,10 +2694,10 @@ Score (1,1) -> (1,26) {
           durationValue: Number "8" (1,8) -> (1,9),
           beatMultiplier: Asterisk (1,10) -> (1,10),
           beatMultiplierValue: Number "2" (1,12) -> (1,13),
-          beatEffects: Props (1,14) -> (1,26) {
+          beatEffects: Props (1,14) -> (1,25) {
             openBrace: LBrace (1,14) -> (1,14),
             properties: Array [
-              Prop (1,15) -> (1,19) {
+              Prop (1,15) -> (1,18) {
                 property: Ident "cre" (1,15) -> (1,18),
               },
               Prop (1,19) -> (1,25) {
@@ -2728,7 +2728,7 @@ Score (1,1) -> (1,12) {
   bars: Array [
     Bar (1,1) -> (1,12) {
       beats: Array [
-        Beat (1,1) -> (1,7) {
+        Beat (1,1) -> (1,6) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
@@ -2765,14 +2765,14 @@ Score (1,1) -> (1,14) {
   bars: Array [
     Bar (1,1) -> (1,14) {
       beats: Array [
-        Beat (1,1) -> (1,8) {
-          durationChange: Duration (1,1) -> (1,4) {
+        Beat (1,1) -> (1,7) {
+          durationChange: Duration (1,1) -> (1,3) {
             colon: Colon (1,1) -> (1,1),
             value: Number "2" (1,2) -> (1,3),
           },
-          notes: NoteList (1,4) -> (1,8) {
+          notes: NoteList (1,4) -> (1,7) {
             notes: Array [
-              Note (1,4) -> (1,8) {
+              Note (1,4) -> (1,7) {
                 noteValue: Number "3" (1,4) -> (1,5),
                 noteStringDot: Dot (1,5) -> (1,5),
                 noteString: Number "3" (1,6) -> (1,7),
@@ -2781,7 +2781,7 @@ Score (1,1) -> (1,14) {
           },
         },
         Beat (1,8) -> (1,14) {
-          durationChange: Duration (1,8) -> (1,11) {
+          durationChange: Duration (1,8) -> (1,10) {
             colon: Colon (1,8) -> (1,8),
             value: Number "4" (1,9) -> (1,10),
           },
@@ -2810,11 +2810,11 @@ exports[`AlphaTexParserTest valid-beats-basic-fretted duration: lexer-diagnostic
 exports[`AlphaTexParserTest valid-beats-basic-fretted duration: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-basic-fretted effects empty 1`] = `
-Score (1,1) -> (1,18) {
+Score (1,1) -> (1,17) {
   bars: Array [
-    Bar (1,1) -> (1,18) {
+    Bar (1,1) -> (1,17) {
       beats: Array [
-        Beat (1,1) -> (1,9) {
+        Beat (1,1) -> (1,8) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
@@ -2826,13 +2826,13 @@ Score (1,1) -> (1,18) {
           },
           durationDot: Dot (1,4) -> (1,4),
           durationValue: Number "4" (1,5) -> (1,6),
-          beatEffects: Props (1,7) -> (1,9) {
+          beatEffects: Props (1,7) -> (1,8) {
             openBrace: LBrace (1,7) -> (1,7),
             properties: Array [],
             closeBrace: RBrace (1,8) -> (1,8),
           },
         },
-        Beat (1,10) -> (1,18) {
+        Beat (1,10) -> (1,17) {
           notes: NoteList (1,10) -> (1,13) {
             notes: Array [
               Note (1,10) -> (1,13) {
@@ -2844,7 +2844,7 @@ Score (1,1) -> (1,18) {
           },
           durationDot: Dot (1,13) -> (1,13),
           durationValue: Number "4" (1,14) -> (1,15),
-          beatEffects: Props (1,16) -> (1,18) {
+          beatEffects: Props (1,16) -> (1,17) {
             openBrace: LBrace (1,16) -> (1,16),
             properties: Array [],
             closeBrace: RBrace (1,17) -> (1,17),
@@ -2861,11 +2861,11 @@ exports[`AlphaTexParserTest valid-beats-basic-fretted effects empty: lexer-diagn
 exports[`AlphaTexParserTest valid-beats-basic-fretted effects empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-basic-fretted effects known 1`] = `
-Score (1,1) -> (1,31) {
+Score (1,1) -> (1,30) {
   bars: Array [
-    Bar (1,1) -> (1,31) {
+    Bar (1,1) -> (1,30) {
       beats: Array [
-        Beat (1,1) -> (1,12) {
+        Beat (1,1) -> (1,11) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
@@ -2877,10 +2877,10 @@ Score (1,1) -> (1,31) {
           },
           durationDot: Dot (1,4) -> (1,4),
           durationValue: Number "4" (1,5) -> (1,6),
-          beatEffects: Props (1,7) -> (1,12) {
+          beatEffects: Props (1,7) -> (1,11) {
             openBrace: LBrace (1,7) -> (1,7),
             properties: Array [
-              Prop (1,8) -> (1,10) {
+              Prop (1,8) -> (1,9) {
                 property: Ident "v" (1,8) -> (1,9),
               },
               Prop (1,10) -> (1,11) {
@@ -2890,7 +2890,7 @@ Score (1,1) -> (1,31) {
             closeBrace: RBrace (1,11) -> (1,11),
           },
         },
-        Beat (1,13) -> (1,31) {
+        Beat (1,13) -> (1,30) {
           notes: NoteList (1,13) -> (1,16) {
             notes: Array [
               Note (1,13) -> (1,16) {
@@ -2902,10 +2902,10 @@ Score (1,1) -> (1,31) {
           },
           durationDot: Dot (1,16) -> (1,16),
           durationValue: Number "4" (1,17) -> (1,18),
-          beatEffects: Props (1,19) -> (1,31) {
+          beatEffects: Props (1,19) -> (1,30) {
             openBrace: LBrace (1,19) -> (1,19),
             properties: Array [
-              Prop (1,20) -> (1,24) {
+              Prop (1,20) -> (1,23) {
                 property: Ident "cre" (1,20) -> (1,23),
               },
               Prop (1,24) -> (1,30) {
@@ -2936,7 +2936,7 @@ Score (1,1) -> (1,12) {
   bars: Array [
     Bar (1,1) -> (1,12) {
       beats: Array [
-        Beat (1,1) -> (1,7) {
+        Beat (1,1) -> (1,6) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
@@ -2975,9 +2975,9 @@ exports[`AlphaTexParserTest valid-beats-basic-fretted multiplier: parser-diagnos
 exports[`AlphaTexParserTest valid-beats-basic-fretted spacing 1`] = `
 Score (1,1) -> (1,37) {
   bars: Array [
-    Bar (1,1) -> (1,8) {
+    Bar (1,1) -> (1,7) {
       beats: Array [
-        Beat (1,1) -> (1,7) {
+        Beat (1,1) -> (1,6) {
           notes: NoteList (1,1) -> (1,4) {
             notes: Array [
               Note (1,1) -> (1,4) {
@@ -2993,12 +2993,12 @@ Score (1,1) -> (1,37) {
       ],
       pipe: Pipe (1,7) -> (1,7),
     },
-    Bar (1,9) -> (1,20) {
+    Bar (1,9) -> (1,19) {
       beats: Array [
-        Beat (1,9) -> (1,19) {
-          notes: NoteList (1,9) -> (1,15) {
+        Beat (1,9) -> (1,18) {
+          notes: NoteList (1,9) -> (1,14) {
             notes: Array [
-              Note (1,9) -> (1,15) {
+              Note (1,9) -> (1,14) {
                 noteValue: Number "3" (1,9) -> (1,10),
                 noteStringDot: Dot (1,11) -> (1,11),
                 noteString: Number "3" (1,13) -> (1,14),
@@ -3011,12 +3011,12 @@ Score (1,1) -> (1,37) {
       ],
       pipe: Pipe (1,19) -> (1,19),
     },
-    Bar (1,21) -> (1,29) {
+    Bar (1,21) -> (1,28) {
       beats: Array [
-        Beat (1,21) -> (1,28) {
-          notes: NoteList (1,21) -> (1,25) {
+        Beat (1,21) -> (1,27) {
+          notes: NoteList (1,21) -> (1,24) {
             notes: Array [
-              Note (1,21) -> (1,25) {
+              Note (1,21) -> (1,24) {
                 noteValue: Number "3" (1,21) -> (1,22),
                 noteStringDot: Dot (1,22) -> (1,22),
                 noteString: Number "3" (1,23) -> (1,24),
@@ -3059,10 +3059,10 @@ Score (1,1) -> (1,6) {
   bars: Array [
     Bar (1,1) -> (1,6) {
       beats: Array [
-        Beat (1,1) -> (1,4) {
-          notes: NoteList (1,1) -> (1,4) {
+        Beat (1,1) -> (1,3) {
+          notes: NoteList (1,1) -> (1,3) {
             notes: Array [
-              Note (1,1) -> (1,4) {
+              Note (1,1) -> (1,3) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
               },
             ],
@@ -3088,12 +3088,12 @@ exports[`AlphaTexParserTest valid-beats-basic-pitched basic: lexer-diagnostics 1
 exports[`AlphaTexParserTest valid-beats-basic-pitched basic: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-basic-pitched complex 1`] = `
-Score (1,1) -> (1,25) {
+Score (1,1) -> (1,24) {
   bars: Array [
-    Bar (1,1) -> (1,25) {
+    Bar (1,1) -> (1,24) {
       beats: Array [
-        Beat (1,1) -> (1,25) {
-          durationChange: Duration (1,1) -> (1,4) {
+        Beat (1,1) -> (1,24) {
+          durationChange: Duration (1,1) -> (1,3) {
             colon: Colon (1,1) -> (1,1),
             value: Number "2" (1,2) -> (1,3),
           },
@@ -3108,10 +3108,10 @@ Score (1,1) -> (1,25) {
           durationValue: Number "8" (1,7) -> (1,8),
           beatMultiplier: Asterisk (1,9) -> (1,9),
           beatMultiplierValue: Number "2" (1,11) -> (1,12),
-          beatEffects: Props (1,13) -> (1,25) {
+          beatEffects: Props (1,13) -> (1,24) {
             openBrace: LBrace (1,13) -> (1,13),
             properties: Array [
-              Prop (1,14) -> (1,18) {
+              Prop (1,14) -> (1,17) {
                 property: Ident "cre" (1,14) -> (1,17),
               },
               Prop (1,18) -> (1,24) {
@@ -3142,7 +3142,7 @@ Score (1,1) -> (1,10) {
   bars: Array [
     Bar (1,1) -> (1,10) {
       beats: Array [
-        Beat (1,1) -> (1,6) {
+        Beat (1,1) -> (1,5) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
@@ -3175,21 +3175,21 @@ Score (1,1) -> (1,12) {
   bars: Array [
     Bar (1,1) -> (1,12) {
       beats: Array [
-        Beat (1,1) -> (1,7) {
-          durationChange: Duration (1,1) -> (1,4) {
+        Beat (1,1) -> (1,6) {
+          durationChange: Duration (1,1) -> (1,3) {
             colon: Colon (1,1) -> (1,1),
             value: Number "2" (1,2) -> (1,3),
           },
-          notes: NoteList (1,4) -> (1,7) {
+          notes: NoteList (1,4) -> (1,6) {
             notes: Array [
-              Note (1,4) -> (1,7) {
+              Note (1,4) -> (1,6) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
           },
         },
         Beat (1,7) -> (1,12) {
-          durationChange: Duration (1,7) -> (1,10) {
+          durationChange: Duration (1,7) -> (1,9) {
             colon: Colon (1,7) -> (1,7),
             value: Number "4" (1,8) -> (1,9),
           },
@@ -3216,11 +3216,11 @@ exports[`AlphaTexParserTest valid-beats-basic-pitched duration: lexer-diagnostic
 exports[`AlphaTexParserTest valid-beats-basic-pitched duration: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-basic-pitched effects empty 1`] = `
-Score (1,1) -> (1,16) {
+Score (1,1) -> (1,15) {
   bars: Array [
-    Bar (1,1) -> (1,16) {
+    Bar (1,1) -> (1,15) {
       beats: Array [
-        Beat (1,1) -> (1,8) {
+        Beat (1,1) -> (1,7) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
@@ -3230,13 +3230,13 @@ Score (1,1) -> (1,16) {
           },
           durationDot: Dot (1,3) -> (1,3),
           durationValue: Number "4" (1,4) -> (1,5),
-          beatEffects: Props (1,6) -> (1,8) {
+          beatEffects: Props (1,6) -> (1,7) {
             openBrace: LBrace (1,6) -> (1,6),
             properties: Array [],
             closeBrace: RBrace (1,7) -> (1,7),
           },
         },
-        Beat (1,9) -> (1,16) {
+        Beat (1,9) -> (1,15) {
           notes: NoteList (1,9) -> (1,11) {
             notes: Array [
               Note (1,9) -> (1,11) {
@@ -3246,7 +3246,7 @@ Score (1,1) -> (1,16) {
           },
           durationDot: Dot (1,11) -> (1,11),
           durationValue: Number "4" (1,12) -> (1,13),
-          beatEffects: Props (1,14) -> (1,16) {
+          beatEffects: Props (1,14) -> (1,15) {
             openBrace: LBrace (1,14) -> (1,14),
             properties: Array [],
             closeBrace: RBrace (1,15) -> (1,15),
@@ -3263,11 +3263,11 @@ exports[`AlphaTexParserTest valid-beats-basic-pitched effects empty: lexer-diagn
 exports[`AlphaTexParserTest valid-beats-basic-pitched effects empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-basic-pitched effects known 1`] = `
-Score (1,1) -> (1,29) {
+Score (1,1) -> (1,28) {
   bars: Array [
-    Bar (1,1) -> (1,29) {
+    Bar (1,1) -> (1,28) {
       beats: Array [
-        Beat (1,1) -> (1,11) {
+        Beat (1,1) -> (1,10) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
@@ -3277,10 +3277,10 @@ Score (1,1) -> (1,29) {
           },
           durationDot: Dot (1,3) -> (1,3),
           durationValue: Number "4" (1,4) -> (1,5),
-          beatEffects: Props (1,6) -> (1,11) {
+          beatEffects: Props (1,6) -> (1,10) {
             openBrace: LBrace (1,6) -> (1,6),
             properties: Array [
-              Prop (1,7) -> (1,9) {
+              Prop (1,7) -> (1,8) {
                 property: Ident "v" (1,7) -> (1,8),
               },
               Prop (1,9) -> (1,10) {
@@ -3290,7 +3290,7 @@ Score (1,1) -> (1,29) {
             closeBrace: RBrace (1,10) -> (1,10),
           },
         },
-        Beat (1,12) -> (1,29) {
+        Beat (1,12) -> (1,28) {
           notes: NoteList (1,12) -> (1,14) {
             notes: Array [
               Note (1,12) -> (1,14) {
@@ -3300,10 +3300,10 @@ Score (1,1) -> (1,29) {
           },
           durationDot: Dot (1,14) -> (1,14),
           durationValue: Number "4" (1,15) -> (1,16),
-          beatEffects: Props (1,17) -> (1,29) {
+          beatEffects: Props (1,17) -> (1,28) {
             openBrace: LBrace (1,17) -> (1,17),
             properties: Array [
-              Prop (1,18) -> (1,22) {
+              Prop (1,18) -> (1,21) {
                 property: Ident "cre" (1,18) -> (1,21),
               },
               Prop (1,22) -> (1,28) {
@@ -3334,7 +3334,7 @@ Score (1,1) -> (1,10) {
   bars: Array [
     Bar (1,1) -> (1,10) {
       beats: Array [
-        Beat (1,1) -> (1,6) {
+        Beat (1,1) -> (1,5) {
           notes: NoteList (1,1) -> (1,3) {
             notes: Array [
               Note (1,1) -> (1,3) {
@@ -3367,15 +3367,15 @@ exports[`AlphaTexParserTest valid-beats-basic-pitched multiplier: lexer-diagnost
 exports[`AlphaTexParserTest valid-beats-basic-pitched multiplier: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-chord-fretted chord 1`] = `
-Score (1,1) -> (1,20) {
+Score (1,1) -> (1,19) {
   bars: Array [
-    Bar (1,1) -> (1,20) {
+    Bar (1,1) -> (1,19) {
       beats: Array [
-        Beat (1,1) -> (1,11) {
-          notes: NoteList (1,1) -> (1,10) {
+        Beat (1,1) -> (1,9) {
+          notes: NoteList (1,1) -> (1,9) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,6) {
+              Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
                 noteStringDot: Dot (1,3) -> (1,3),
                 noteString: Number "3" (1,4) -> (1,5),
@@ -3389,11 +3389,11 @@ Score (1,1) -> (1,20) {
             closeParenthesis: RParen (1,9) -> (1,9),
           },
         },
-        Beat (1,11) -> (1,20) {
-          notes: NoteList (1,11) -> (1,20) {
+        Beat (1,11) -> (1,19) {
+          notes: NoteList (1,11) -> (1,19) {
             openParenthesis: LParen (1,11) -> (1,11),
             notes: Array [
-              Note (1,12) -> (1,16) {
+              Note (1,12) -> (1,15) {
                 noteValue: Number "1" (1,12) -> (1,13),
                 noteStringDot: Dot (1,13) -> (1,13),
                 noteString: Number "2" (1,14) -> (1,15),
@@ -3418,19 +3418,19 @@ exports[`AlphaTexParserTest valid-beats-chord-fretted chord: lexer-diagnostics 1
 exports[`AlphaTexParserTest valid-beats-chord-fretted chord: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-chord-fretted complex 1`] = `
-Score (1,1) -> (1,32) {
+Score (1,1) -> (1,31) {
   bars: Array [
-    Bar (1,1) -> (1,32) {
+    Bar (1,1) -> (1,31) {
       beats: Array [
-        Beat (1,1) -> (1,32) {
-          durationChange: Duration (1,1) -> (1,4) {
+        Beat (1,1) -> (1,31) {
+          durationChange: Duration (1,1) -> (1,3) {
             colon: Colon (1,1) -> (1,1),
             value: Number "2" (1,2) -> (1,3),
           },
-          notes: NoteList (1,4) -> (1,13) {
+          notes: NoteList (1,4) -> (1,12) {
             openParenthesis: LParen (1,4) -> (1,4),
             notes: Array [
-              Note (1,5) -> (1,9) {
+              Note (1,5) -> (1,8) {
                 noteValue: Number "3" (1,5) -> (1,6),
                 noteStringDot: Dot (1,6) -> (1,6),
                 noteString: Number "3" (1,7) -> (1,8),
@@ -3447,10 +3447,10 @@ Score (1,1) -> (1,32) {
           durationValue: Number "8" (1,14) -> (1,15),
           beatMultiplier: Asterisk (1,16) -> (1,16),
           beatMultiplierValue: Number "2" (1,18) -> (1,19),
-          beatEffects: Props (1,20) -> (1,32) {
+          beatEffects: Props (1,20) -> (1,31) {
             openBrace: LBrace (1,20) -> (1,20),
             properties: Array [
-              Prop (1,21) -> (1,25) {
+              Prop (1,21) -> (1,24) {
                 property: Ident "cre" (1,21) -> (1,24),
               },
               Prop (1,25) -> (1,31) {
@@ -3481,11 +3481,11 @@ Score (1,1) -> (1,24) {
   bars: Array [
     Bar (1,1) -> (1,24) {
       beats: Array [
-        Beat (1,1) -> (1,13) {
-          notes: NoteList (1,1) -> (1,10) {
+        Beat (1,1) -> (1,12) {
+          notes: NoteList (1,1) -> (1,9) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,6) {
+              Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
                 noteStringDot: Dot (1,3) -> (1,3),
                 noteString: Number "3" (1,4) -> (1,5),
@@ -3502,10 +3502,10 @@ Score (1,1) -> (1,24) {
           durationValue: Number "4" (1,11) -> (1,12),
         },
         Beat (1,13) -> (1,24) {
-          notes: NoteList (1,13) -> (1,22) {
+          notes: NoteList (1,13) -> (1,21) {
             openParenthesis: LParen (1,13) -> (1,13),
             notes: Array [
-              Note (1,14) -> (1,18) {
+              Note (1,14) -> (1,17) {
                 noteValue: Number "1" (1,14) -> (1,15),
                 noteStringDot: Dot (1,15) -> (1,15),
                 noteString: Number "2" (1,16) -> (1,17),
@@ -3528,19 +3528,19 @@ Score (1,1) -> (1,24) {
 `;
 
 exports[`AlphaTexParserTest valid-beats-chord-fretted duration change 1`] = `
-Score (1,1) -> (1,26) {
+Score (1,1) -> (1,25) {
   bars: Array [
-    Bar (1,1) -> (1,26) {
+    Bar (1,1) -> (1,25) {
       beats: Array [
-        Beat (1,1) -> (1,14) {
-          durationChange: Duration (1,1) -> (1,4) {
+        Beat (1,1) -> (1,12) {
+          durationChange: Duration (1,1) -> (1,3) {
             colon: Colon (1,1) -> (1,1),
             value: Number "2" (1,2) -> (1,3),
           },
-          notes: NoteList (1,4) -> (1,13) {
+          notes: NoteList (1,4) -> (1,12) {
             openParenthesis: LParen (1,4) -> (1,4),
             notes: Array [
-              Note (1,5) -> (1,9) {
+              Note (1,5) -> (1,8) {
                 noteValue: Number "3" (1,5) -> (1,6),
                 noteStringDot: Dot (1,6) -> (1,6),
                 noteString: Number "3" (1,7) -> (1,8),
@@ -3554,15 +3554,15 @@ Score (1,1) -> (1,26) {
             closeParenthesis: RParen (1,12) -> (1,12),
           },
         },
-        Beat (1,14) -> (1,26) {
-          durationChange: Duration (1,14) -> (1,17) {
+        Beat (1,14) -> (1,25) {
+          durationChange: Duration (1,14) -> (1,16) {
             colon: Colon (1,14) -> (1,14),
             value: Number "4" (1,15) -> (1,16),
           },
-          notes: NoteList (1,17) -> (1,26) {
+          notes: NoteList (1,17) -> (1,25) {
             openParenthesis: LParen (1,17) -> (1,17),
             notes: Array [
-              Note (1,18) -> (1,22) {
+              Note (1,18) -> (1,21) {
                 noteValue: Number "1" (1,18) -> (1,19),
                 noteStringDot: Dot (1,19) -> (1,19),
                 noteString: Number "2" (1,20) -> (1,21),
@@ -3591,15 +3591,15 @@ exports[`AlphaTexParserTest valid-beats-chord-fretted duration: lexer-diagnostic
 exports[`AlphaTexParserTest valid-beats-chord-fretted duration: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-chord-fretted effects empty 1`] = `
-Score (1,1) -> (1,30) {
+Score (1,1) -> (1,29) {
   bars: Array [
-    Bar (1,1) -> (1,30) {
+    Bar (1,1) -> (1,29) {
       beats: Array [
-        Beat (1,1) -> (1,15) {
-          notes: NoteList (1,1) -> (1,10) {
+        Beat (1,1) -> (1,14) {
+          notes: NoteList (1,1) -> (1,9) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,6) {
+              Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
                 noteStringDot: Dot (1,3) -> (1,3),
                 noteString: Number "3" (1,4) -> (1,5),
@@ -3614,17 +3614,17 @@ Score (1,1) -> (1,30) {
           },
           durationDot: Dot (1,10) -> (1,10),
           durationValue: Number "4" (1,11) -> (1,12),
-          beatEffects: Props (1,13) -> (1,15) {
+          beatEffects: Props (1,13) -> (1,14) {
             openBrace: LBrace (1,13) -> (1,13),
             properties: Array [],
             closeBrace: RBrace (1,14) -> (1,14),
           },
         },
-        Beat (1,16) -> (1,30) {
-          notes: NoteList (1,16) -> (1,25) {
+        Beat (1,16) -> (1,29) {
+          notes: NoteList (1,16) -> (1,24) {
             openParenthesis: LParen (1,16) -> (1,16),
             notes: Array [
-              Note (1,17) -> (1,21) {
+              Note (1,17) -> (1,20) {
                 noteValue: Number "1" (1,17) -> (1,18),
                 noteStringDot: Dot (1,18) -> (1,18),
                 noteString: Number "2" (1,19) -> (1,20),
@@ -3639,7 +3639,7 @@ Score (1,1) -> (1,30) {
           },
           durationDot: Dot (1,25) -> (1,25),
           durationValue: Number "4" (1,26) -> (1,27),
-          beatEffects: Props (1,28) -> (1,30) {
+          beatEffects: Props (1,28) -> (1,29) {
             openBrace: LBrace (1,28) -> (1,28),
             properties: Array [],
             closeBrace: RBrace (1,29) -> (1,29),
@@ -3656,15 +3656,15 @@ exports[`AlphaTexParserTest valid-beats-chord-fretted effects empty: lexer-diagn
 exports[`AlphaTexParserTest valid-beats-chord-fretted effects empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-chord-fretted effects known 1`] = `
-Score (1,1) -> (1,43) {
+Score (1,1) -> (1,42) {
   bars: Array [
-    Bar (1,1) -> (1,43) {
+    Bar (1,1) -> (1,42) {
       beats: Array [
-        Beat (1,1) -> (1,18) {
-          notes: NoteList (1,1) -> (1,10) {
+        Beat (1,1) -> (1,17) {
+          notes: NoteList (1,1) -> (1,9) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,6) {
+              Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
                 noteStringDot: Dot (1,3) -> (1,3),
                 noteString: Number "3" (1,4) -> (1,5),
@@ -3679,10 +3679,10 @@ Score (1,1) -> (1,43) {
           },
           durationDot: Dot (1,10) -> (1,10),
           durationValue: Number "4" (1,11) -> (1,12),
-          beatEffects: Props (1,13) -> (1,18) {
+          beatEffects: Props (1,13) -> (1,17) {
             openBrace: LBrace (1,13) -> (1,13),
             properties: Array [
-              Prop (1,14) -> (1,16) {
+              Prop (1,14) -> (1,15) {
                 property: Ident "v" (1,14) -> (1,15),
               },
               Prop (1,16) -> (1,17) {
@@ -3692,11 +3692,11 @@ Score (1,1) -> (1,43) {
             closeBrace: RBrace (1,17) -> (1,17),
           },
         },
-        Beat (1,19) -> (1,43) {
-          notes: NoteList (1,19) -> (1,28) {
+        Beat (1,19) -> (1,42) {
+          notes: NoteList (1,19) -> (1,27) {
             openParenthesis: LParen (1,19) -> (1,19),
             notes: Array [
-              Note (1,20) -> (1,24) {
+              Note (1,20) -> (1,23) {
                 noteValue: Number "1" (1,20) -> (1,21),
                 noteStringDot: Dot (1,21) -> (1,21),
                 noteString: Number "2" (1,22) -> (1,23),
@@ -3711,10 +3711,10 @@ Score (1,1) -> (1,43) {
           },
           durationDot: Dot (1,28) -> (1,28),
           durationValue: Number "4" (1,29) -> (1,30),
-          beatEffects: Props (1,31) -> (1,43) {
+          beatEffects: Props (1,31) -> (1,42) {
             openBrace: LBrace (1,31) -> (1,31),
             properties: Array [
-              Prop (1,32) -> (1,36) {
+              Prop (1,32) -> (1,35) {
                 property: Ident "cre" (1,32) -> (1,35),
               },
               Prop (1,36) -> (1,42) {
@@ -3745,11 +3745,11 @@ Score (1,1) -> (1,24) {
   bars: Array [
     Bar (1,1) -> (1,24) {
       beats: Array [
-        Beat (1,1) -> (1,13) {
-          notes: NoteList (1,1) -> (1,10) {
+        Beat (1,1) -> (1,12) {
+          notes: NoteList (1,1) -> (1,9) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,6) {
+              Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
                 noteStringDot: Dot (1,3) -> (1,3),
                 noteString: Number "3" (1,4) -> (1,5),
@@ -3766,10 +3766,10 @@ Score (1,1) -> (1,24) {
           beatMultiplierValue: Number "4" (1,11) -> (1,12),
         },
         Beat (1,13) -> (1,24) {
-          notes: NoteList (1,13) -> (1,22) {
+          notes: NoteList (1,13) -> (1,21) {
             openParenthesis: LParen (1,13) -> (1,13),
             notes: Array [
-              Note (1,14) -> (1,18) {
+              Note (1,14) -> (1,17) {
                 noteValue: Number "1" (1,14) -> (1,15),
                 noteStringDot: Dot (1,15) -> (1,15),
                 noteString: Number "2" (1,16) -> (1,17),
@@ -3801,15 +3801,15 @@ Score (1,1) -> (4,19) {
     Bar (1,14) -> (4,19) {
       beats: Array [
         Beat (1,14) -> (4,19) {
-          notes: NoteList (1,14) -> (4,15) {
+          notes: NoteList (1,14) -> (4,14) {
             openParenthesis: LParen (1,14) -> (1,14),
             notes: Array [
-              Note (2,18) -> (3,18) {
+              Note (2,18) -> (2,21) {
                 noteValue: Number "3" (2,18) -> (2,19),
                 noteStringDot: Dot (2,19) -> (2,19),
                 noteString: Number "3" (2,20) -> (2,21),
               },
-              Note (3,18) -> (4,14) {
+              Note (3,18) -> (4,1) {
                 noteValue: Number "3" (3,18) -> (3,19),
                 noteStringDot: Dot (3,20) -> (3,20),
                 noteString: Number "3" (3,22) -> (4,1),
@@ -3831,15 +3831,15 @@ exports[`AlphaTexParserTest valid-beats-chord-fretted spacing: lexer-diagnostics
 exports[`AlphaTexParserTest valid-beats-chord-fretted spacing: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-chord-pitched chord 1`] = `
-Score (1,1) -> (1,16) {
+Score (1,1) -> (1,15) {
   bars: Array [
-    Bar (1,1) -> (1,16) {
+    Bar (1,1) -> (1,15) {
       beats: Array [
-        Beat (1,1) -> (1,9) {
-          notes: NoteList (1,1) -> (1,8) {
+        Beat (1,1) -> (1,7) {
+          notes: NoteList (1,1) -> (1,7) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,5) {
+              Note (1,2) -> (1,4) {
                 noteValue: Ident "C4" (1,2) -> (1,4),
               },
               Note (1,5) -> (1,7) {
@@ -3849,11 +3849,11 @@ Score (1,1) -> (1,16) {
             closeParenthesis: RParen (1,7) -> (1,7),
           },
         },
-        Beat (1,9) -> (1,16) {
-          notes: NoteList (1,9) -> (1,16) {
+        Beat (1,9) -> (1,15) {
+          notes: NoteList (1,9) -> (1,15) {
             openParenthesis: LParen (1,9) -> (1,9),
             notes: Array [
-              Note (1,10) -> (1,13) {
+              Note (1,10) -> (1,12) {
                 noteValue: Ident "D4" (1,10) -> (1,12),
               },
               Note (1,13) -> (1,15) {
@@ -3874,19 +3874,19 @@ exports[`AlphaTexParserTest valid-beats-chord-pitched chord: lexer-diagnostics 1
 exports[`AlphaTexParserTest valid-beats-chord-pitched chord: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-chord-pitched complex 1`] = `
-Score (1,1) -> (1,30) {
+Score (1,1) -> (1,29) {
   bars: Array [
-    Bar (1,1) -> (1,30) {
+    Bar (1,1) -> (1,29) {
       beats: Array [
-        Beat (1,1) -> (1,30) {
-          durationChange: Duration (1,1) -> (1,4) {
+        Beat (1,1) -> (1,29) {
+          durationChange: Duration (1,1) -> (1,3) {
             colon: Colon (1,1) -> (1,1),
             value: Number "2" (1,2) -> (1,3),
           },
-          notes: NoteList (1,4) -> (1,11) {
+          notes: NoteList (1,4) -> (1,10) {
             openParenthesis: LParen (1,4) -> (1,4),
             notes: Array [
-              Note (1,5) -> (1,8) {
+              Note (1,5) -> (1,7) {
                 noteValue: Ident "C4" (1,5) -> (1,7),
               },
               Note (1,8) -> (1,10) {
@@ -3899,10 +3899,10 @@ Score (1,1) -> (1,30) {
           durationValue: Number "8" (1,12) -> (1,13),
           beatMultiplier: Asterisk (1,14) -> (1,14),
           beatMultiplierValue: Number "2" (1,16) -> (1,17),
-          beatEffects: Props (1,18) -> (1,30) {
+          beatEffects: Props (1,18) -> (1,29) {
             openBrace: LBrace (1,18) -> (1,18),
             properties: Array [
-              Prop (1,19) -> (1,23) {
+              Prop (1,19) -> (1,22) {
                 property: Ident "cre" (1,19) -> (1,22),
               },
               Prop (1,23) -> (1,29) {
@@ -3933,11 +3933,11 @@ Score (1,1) -> (1,20) {
   bars: Array [
     Bar (1,1) -> (1,20) {
       beats: Array [
-        Beat (1,1) -> (1,11) {
-          notes: NoteList (1,1) -> (1,8) {
+        Beat (1,1) -> (1,10) {
+          notes: NoteList (1,1) -> (1,7) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,5) {
+              Note (1,2) -> (1,4) {
                 noteValue: Ident "C4" (1,2) -> (1,4),
               },
               Note (1,5) -> (1,7) {
@@ -3950,10 +3950,10 @@ Score (1,1) -> (1,20) {
           durationValue: Number "4" (1,9) -> (1,10),
         },
         Beat (1,11) -> (1,20) {
-          notes: NoteList (1,11) -> (1,18) {
+          notes: NoteList (1,11) -> (1,17) {
             openParenthesis: LParen (1,11) -> (1,11),
             notes: Array [
-              Note (1,12) -> (1,15) {
+              Note (1,12) -> (1,14) {
                 noteValue: Ident "D4" (1,12) -> (1,14),
               },
               Note (1,15) -> (1,17) {
@@ -3972,19 +3972,19 @@ Score (1,1) -> (1,20) {
 `;
 
 exports[`AlphaTexParserTest valid-beats-chord-pitched duration change 1`] = `
-Score (1,1) -> (1,22) {
+Score (1,1) -> (1,21) {
   bars: Array [
-    Bar (1,1) -> (1,22) {
+    Bar (1,1) -> (1,21) {
       beats: Array [
-        Beat (1,1) -> (1,12) {
-          durationChange: Duration (1,1) -> (1,4) {
+        Beat (1,1) -> (1,10) {
+          durationChange: Duration (1,1) -> (1,3) {
             colon: Colon (1,1) -> (1,1),
             value: Number "2" (1,2) -> (1,3),
           },
-          notes: NoteList (1,4) -> (1,11) {
+          notes: NoteList (1,4) -> (1,10) {
             openParenthesis: LParen (1,4) -> (1,4),
             notes: Array [
-              Note (1,5) -> (1,8) {
+              Note (1,5) -> (1,7) {
                 noteValue: Ident "C4" (1,5) -> (1,7),
               },
               Note (1,8) -> (1,10) {
@@ -3994,15 +3994,15 @@ Score (1,1) -> (1,22) {
             closeParenthesis: RParen (1,10) -> (1,10),
           },
         },
-        Beat (1,12) -> (1,22) {
-          durationChange: Duration (1,12) -> (1,15) {
+        Beat (1,12) -> (1,21) {
+          durationChange: Duration (1,12) -> (1,14) {
             colon: Colon (1,12) -> (1,12),
             value: Number "4" (1,13) -> (1,14),
           },
-          notes: NoteList (1,15) -> (1,22) {
+          notes: NoteList (1,15) -> (1,21) {
             openParenthesis: LParen (1,15) -> (1,15),
             notes: Array [
-              Note (1,16) -> (1,19) {
+              Note (1,16) -> (1,18) {
                 noteValue: Ident "D4" (1,16) -> (1,18),
               },
               Note (1,19) -> (1,21) {
@@ -4027,15 +4027,15 @@ exports[`AlphaTexParserTest valid-beats-chord-pitched duration: lexer-diagnostic
 exports[`AlphaTexParserTest valid-beats-chord-pitched duration: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-chord-pitched effects empty 1`] = `
-Score (1,1) -> (1,22) {
+Score (1,1) -> (1,21) {
   bars: Array [
-    Bar (1,1) -> (1,22) {
+    Bar (1,1) -> (1,21) {
       beats: Array [
-        Beat (1,1) -> (1,11) {
-          notes: NoteList (1,1) -> (1,8) {
+        Beat (1,1) -> (1,10) {
+          notes: NoteList (1,1) -> (1,7) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,5) {
+              Note (1,2) -> (1,4) {
                 noteValue: Ident "C4" (1,2) -> (1,4),
               },
               Note (1,5) -> (1,7) {
@@ -4044,17 +4044,17 @@ Score (1,1) -> (1,22) {
             ],
             closeParenthesis: RParen (1,7) -> (1,7),
           },
-          beatEffects: Props (1,9) -> (1,11) {
+          beatEffects: Props (1,9) -> (1,10) {
             openBrace: LBrace (1,9) -> (1,9),
             properties: Array [],
             closeBrace: RBrace (1,10) -> (1,10),
           },
         },
-        Beat (1,12) -> (1,22) {
-          notes: NoteList (1,12) -> (1,19) {
+        Beat (1,12) -> (1,21) {
+          notes: NoteList (1,12) -> (1,18) {
             openParenthesis: LParen (1,12) -> (1,12),
             notes: Array [
-              Note (1,13) -> (1,16) {
+              Note (1,13) -> (1,15) {
                 noteValue: Ident "D4" (1,13) -> (1,15),
               },
               Note (1,16) -> (1,18) {
@@ -4063,7 +4063,7 @@ Score (1,1) -> (1,22) {
             ],
             closeParenthesis: RParen (1,18) -> (1,18),
           },
-          beatEffects: Props (1,20) -> (1,22) {
+          beatEffects: Props (1,20) -> (1,21) {
             openBrace: LBrace (1,20) -> (1,20),
             properties: Array [],
             closeBrace: RBrace (1,21) -> (1,21),
@@ -4080,15 +4080,15 @@ exports[`AlphaTexParserTest valid-beats-chord-pitched effects empty: lexer-diagn
 exports[`AlphaTexParserTest valid-beats-chord-pitched effects empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-chord-pitched effects known 1`] = `
-Score (1,1) -> (1,35) {
+Score (1,1) -> (1,34) {
   bars: Array [
-    Bar (1,1) -> (1,35) {
+    Bar (1,1) -> (1,34) {
       beats: Array [
-        Beat (1,1) -> (1,14) {
-          notes: NoteList (1,1) -> (1,8) {
+        Beat (1,1) -> (1,13) {
+          notes: NoteList (1,1) -> (1,7) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,5) {
+              Note (1,2) -> (1,4) {
                 noteValue: Ident "C4" (1,2) -> (1,4),
               },
               Note (1,5) -> (1,7) {
@@ -4097,10 +4097,10 @@ Score (1,1) -> (1,35) {
             ],
             closeParenthesis: RParen (1,7) -> (1,7),
           },
-          beatEffects: Props (1,9) -> (1,14) {
+          beatEffects: Props (1,9) -> (1,13) {
             openBrace: LBrace (1,9) -> (1,9),
             properties: Array [
-              Prop (1,10) -> (1,12) {
+              Prop (1,10) -> (1,11) {
                 property: Ident "v" (1,10) -> (1,11),
               },
               Prop (1,12) -> (1,13) {
@@ -4110,11 +4110,11 @@ Score (1,1) -> (1,35) {
             closeBrace: RBrace (1,13) -> (1,13),
           },
         },
-        Beat (1,15) -> (1,35) {
-          notes: NoteList (1,15) -> (1,22) {
+        Beat (1,15) -> (1,34) {
+          notes: NoteList (1,15) -> (1,21) {
             openParenthesis: LParen (1,15) -> (1,15),
             notes: Array [
-              Note (1,16) -> (1,19) {
+              Note (1,16) -> (1,18) {
                 noteValue: Ident "D4" (1,16) -> (1,18),
               },
               Note (1,19) -> (1,21) {
@@ -4123,10 +4123,10 @@ Score (1,1) -> (1,35) {
             ],
             closeParenthesis: RParen (1,21) -> (1,21),
           },
-          beatEffects: Props (1,23) -> (1,35) {
+          beatEffects: Props (1,23) -> (1,34) {
             openBrace: LBrace (1,23) -> (1,23),
             properties: Array [
-              Prop (1,24) -> (1,28) {
+              Prop (1,24) -> (1,27) {
                 property: Ident "cre" (1,24) -> (1,27),
               },
               Prop (1,28) -> (1,34) {
@@ -4157,11 +4157,11 @@ Score (1,1) -> (1,20) {
   bars: Array [
     Bar (1,1) -> (1,20) {
       beats: Array [
-        Beat (1,1) -> (1,11) {
-          notes: NoteList (1,1) -> (1,8) {
+        Beat (1,1) -> (1,10) {
+          notes: NoteList (1,1) -> (1,7) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,5) {
+              Note (1,2) -> (1,4) {
                 noteValue: Ident "C4" (1,2) -> (1,4),
               },
               Note (1,5) -> (1,7) {
@@ -4174,10 +4174,10 @@ Score (1,1) -> (1,20) {
           beatMultiplierValue: Number "4" (1,9) -> (1,10),
         },
         Beat (1,11) -> (1,20) {
-          notes: NoteList (1,11) -> (1,18) {
+          notes: NoteList (1,11) -> (1,17) {
             openParenthesis: LParen (1,11) -> (1,11),
             notes: Array [
-              Note (1,12) -> (1,15) {
+              Note (1,12) -> (1,14) {
                 noteValue: Ident "D4" (1,12) -> (1,14),
               },
               Note (1,15) -> (1,17) {
@@ -4200,12 +4200,12 @@ exports[`AlphaTexParserTest valid-beats-chord-pitched multiplier: lexer-diagnost
 exports[`AlphaTexParserTest valid-beats-chord-pitched multiplier: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-rest complex 1`] = `
-Score (1,1) -> (1,24) {
+Score (1,1) -> (1,23) {
   bars: Array [
-    Bar (1,1) -> (1,24) {
+    Bar (1,1) -> (1,23) {
       beats: Array [
-        Beat (1,1) -> (1,24) {
-          durationChange: Duration (1,1) -> (1,4) {
+        Beat (1,1) -> (1,23) {
+          durationChange: Duration (1,1) -> (1,3) {
             colon: Colon (1,1) -> (1,1),
             value: Number "2" (1,2) -> (1,3),
           },
@@ -4214,10 +4214,10 @@ Score (1,1) -> (1,24) {
           durationValue: Number "8" (1,6) -> (1,7),
           beatMultiplier: Asterisk (1,8) -> (1,8),
           beatMultiplierValue: Number "2" (1,10) -> (1,11),
-          beatEffects: Props (1,12) -> (1,24) {
+          beatEffects: Props (1,12) -> (1,23) {
             openBrace: LBrace (1,12) -> (1,12),
             properties: Array [
-              Prop (1,13) -> (1,17) {
+              Prop (1,13) -> (1,16) {
                 property: Ident "cre" (1,13) -> (1,16),
               },
               Prop (1,17) -> (1,23) {
@@ -4248,7 +4248,7 @@ Score (1,1) -> (1,8) {
   bars: Array [
     Bar (1,1) -> (1,8) {
       beats: Array [
-        Beat (1,1) -> (1,5) {
+        Beat (1,1) -> (1,4) {
           rest: Ident "r" (1,1) -> (1,2),
           durationDot: Dot (1,2) -> (1,2),
           durationValue: Number "4" (1,3) -> (1,4),
@@ -4269,15 +4269,15 @@ Score (1,1) -> (1,10) {
   bars: Array [
     Bar (1,1) -> (1,10) {
       beats: Array [
-        Beat (1,1) -> (1,6) {
-          durationChange: Duration (1,1) -> (1,4) {
+        Beat (1,1) -> (1,5) {
+          durationChange: Duration (1,1) -> (1,3) {
             colon: Colon (1,1) -> (1,1),
             value: Number "2" (1,2) -> (1,3),
           },
           rest: Ident "r" (1,4) -> (1,5),
         },
         Beat (1,6) -> (1,10) {
-          durationChange: Duration (1,6) -> (1,9) {
+          durationChange: Duration (1,6) -> (1,8) {
             colon: Colon (1,6) -> (1,6),
             value: Number "4" (1,7) -> (1,8),
           },
@@ -4298,25 +4298,25 @@ exports[`AlphaTexParserTest valid-beats-rest duration: lexer-diagnostics 1`] = `
 exports[`AlphaTexParserTest valid-beats-rest duration: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-rest effects empty 1`] = `
-Score (1,1) -> (1,14) {
+Score (1,1) -> (1,13) {
   bars: Array [
-    Bar (1,1) -> (1,14) {
+    Bar (1,1) -> (1,13) {
       beats: Array [
-        Beat (1,1) -> (1,7) {
+        Beat (1,1) -> (1,6) {
           rest: Ident "r" (1,1) -> (1,2),
           durationDot: Dot (1,2) -> (1,2),
           durationValue: Number "4" (1,3) -> (1,4),
-          beatEffects: Props (1,5) -> (1,7) {
+          beatEffects: Props (1,5) -> (1,6) {
             openBrace: LBrace (1,5) -> (1,5),
             properties: Array [],
             closeBrace: RBrace (1,6) -> (1,6),
           },
         },
-        Beat (1,8) -> (1,14) {
+        Beat (1,8) -> (1,13) {
           rest: Ident "r" (1,8) -> (1,9),
           durationDot: Dot (1,9) -> (1,9),
           durationValue: Number "4" (1,10) -> (1,11),
-          beatEffects: Props (1,12) -> (1,14) {
+          beatEffects: Props (1,12) -> (1,13) {
             openBrace: LBrace (1,12) -> (1,12),
             properties: Array [],
             closeBrace: RBrace (1,13) -> (1,13),
@@ -4333,18 +4333,18 @@ exports[`AlphaTexParserTest valid-beats-rest effects empty: lexer-diagnostics 1`
 exports[`AlphaTexParserTest valid-beats-rest effects empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-beats-rest effects known 1`] = `
-Score (1,1) -> (1,27) {
+Score (1,1) -> (1,26) {
   bars: Array [
-    Bar (1,1) -> (1,27) {
+    Bar (1,1) -> (1,26) {
       beats: Array [
-        Beat (1,1) -> (1,10) {
+        Beat (1,1) -> (1,9) {
           rest: Ident "r" (1,1) -> (1,2),
           durationDot: Dot (1,2) -> (1,2),
           durationValue: Number "4" (1,3) -> (1,4),
-          beatEffects: Props (1,5) -> (1,10) {
+          beatEffects: Props (1,5) -> (1,9) {
             openBrace: LBrace (1,5) -> (1,5),
             properties: Array [
-              Prop (1,6) -> (1,8) {
+              Prop (1,6) -> (1,7) {
                 property: Ident "v" (1,6) -> (1,7),
               },
               Prop (1,8) -> (1,9) {
@@ -4354,14 +4354,14 @@ Score (1,1) -> (1,27) {
             closeBrace: RBrace (1,9) -> (1,9),
           },
         },
-        Beat (1,11) -> (1,27) {
+        Beat (1,11) -> (1,26) {
           rest: Ident "r" (1,11) -> (1,12),
           durationDot: Dot (1,12) -> (1,12),
           durationValue: Number "4" (1,13) -> (1,14),
-          beatEffects: Props (1,15) -> (1,27) {
+          beatEffects: Props (1,15) -> (1,26) {
             openBrace: LBrace (1,15) -> (1,15),
             properties: Array [
-              Prop (1,16) -> (1,20) {
+              Prop (1,16) -> (1,19) {
                 property: Ident "cre" (1,16) -> (1,19),
               },
               Prop (1,20) -> (1,26) {
@@ -4392,7 +4392,7 @@ Score (1,1) -> (1,8) {
   bars: Array [
     Bar (1,1) -> (1,8) {
       beats: Array [
-        Beat (1,1) -> (1,5) {
+        Beat (1,1) -> (1,4) {
           rest: Ident "r" (1,1) -> (1,2),
           beatMultiplier: Asterisk (1,2) -> (1,2),
           beatMultiplierValue: Number "4" (1,3) -> (1,4),
@@ -4437,21 +4437,21 @@ exports[`AlphaTexParserTest valid-empty empty: lexer-diagnostics 1`] = `Array []
 exports[`AlphaTexParserTest valid-empty empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-note-effects beat effects in note effect 1`] = `
-Score (1,1) -> (1,14) {
+Score (1,1) -> (1,13) {
   bars: Array [
-    Bar (1,1) -> (1,14) {
+    Bar (1,1) -> (1,13) {
       beats: Array [
-        Beat (1,1) -> (1,14) {
-          notes: NoteList (1,1) -> (1,14) {
+        Beat (1,1) -> (1,13) {
+          notes: NoteList (1,1) -> (1,13) {
             notes: Array [
-              Note (1,1) -> (1,14) {
+              Note (1,1) -> (1,13) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
-                noteEffects: Props (1,4) -> (1,14) {
+                noteEffects: Props (1,4) -> (1,13) {
                   openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
-                    Prop (1,6) -> (1,13) {
+                    Prop (1,6) -> (1,12) {
                       property: Ident "tu" (1,6) -> (1,8),
-                      properties: Values (1,9) -> (1,13) {
+                      properties: Values (1,9) -> (1,12) {
                         values: Array [
                           Number "3" (1,9) -> (1,10),
                           Number "2" (1,11) -> (1,12),
@@ -4476,16 +4476,16 @@ exports[`AlphaTexParserTest valid-note-effects beat effects in note effect: lexe
 exports[`AlphaTexParserTest valid-note-effects beat effects in note effect: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-note-effects empty 1`] = `
-Score (1,1) -> (1,6) {
+Score (1,1) -> (1,5) {
   bars: Array [
-    Bar (1,1) -> (1,6) {
+    Bar (1,1) -> (1,5) {
       beats: Array [
-        Beat (1,1) -> (1,6) {
-          notes: NoteList (1,1) -> (1,6) {
+        Beat (1,1) -> (1,5) {
+          notes: NoteList (1,1) -> (1,5) {
             notes: Array [
-              Note (1,1) -> (1,6) {
+              Note (1,1) -> (1,5) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
-                noteEffects: Props (1,4) -> (1,6) {
+                noteEffects: Props (1,4) -> (1,5) {
                   openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [],
                   closeBrace: RBrace (1,5) -> (1,5),
@@ -4505,16 +4505,16 @@ exports[`AlphaTexParserTest valid-note-effects empty: lexer-diagnostics 1`] = `A
 exports[`AlphaTexParserTest valid-note-effects empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-note-effects known 1`] = `
-Score (1,1) -> (1,12) {
+Score (1,1) -> (1,11) {
   bars: Array [
-    Bar (1,1) -> (1,12) {
+    Bar (1,1) -> (1,11) {
       beats: Array [
-        Beat (1,1) -> (1,12) {
-          notes: NoteList (1,1) -> (1,12) {
+        Beat (1,1) -> (1,11) {
+          notes: NoteList (1,1) -> (1,11) {
             notes: Array [
-              Note (1,1) -> (1,12) {
+              Note (1,1) -> (1,11) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
-                noteEffects: Props (1,4) -> (1,12) {
+                noteEffects: Props (1,4) -> (1,11) {
                   openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
                     Prop (1,5) -> (1,11) {
@@ -4540,21 +4540,21 @@ Score (1,1) -> (1,12) {
 `;
 
 exports[`AlphaTexParserTest valid-note-effects known with list 1`] = `
-Score (1,1) -> (1,15) {
+Score (1,1) -> (1,14) {
   bars: Array [
-    Bar (1,1) -> (1,15) {
+    Bar (1,1) -> (1,14) {
       beats: Array [
-        Beat (1,1) -> (1,15) {
-          notes: NoteList (1,1) -> (1,15) {
+        Beat (1,1) -> (1,14) {
+          notes: NoteList (1,1) -> (1,14) {
             notes: Array [
-              Note (1,1) -> (1,15) {
+              Note (1,1) -> (1,14) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
-                noteEffects: Props (1,4) -> (1,15) {
+                noteEffects: Props (1,4) -> (1,14) {
                   openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
-                    Prop (1,5) -> (1,14) {
+                    Prop (1,5) -> (1,13) {
                       property: Ident "b" (1,5) -> (1,6),
-                      properties: Values (1,7) -> (1,14) {
+                      properties: Values (1,7) -> (1,13) {
                         openParenthesis: LParen (1,7) -> (1,7),
                         values: Array [
                           Number "0" (1,8) -> (1,9),
@@ -4586,24 +4586,24 @@ exports[`AlphaTexParserTest valid-note-effects known: lexer-diagnostics 1`] = `A
 exports[`AlphaTexParserTest valid-note-effects known: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-note-effects multiple 1`] = `
-Score (1,1) -> (1,20) {
+Score (1,1) -> (1,19) {
   bars: Array [
-    Bar (1,1) -> (1,20) {
+    Bar (1,1) -> (1,19) {
       beats: Array [
-        Beat (1,1) -> (1,20) {
-          notes: NoteList (1,1) -> (1,20) {
+        Beat (1,1) -> (1,19) {
+          notes: NoteList (1,1) -> (1,19) {
             notes: Array [
-              Note (1,1) -> (1,20) {
+              Note (1,1) -> (1,19) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
-                noteEffects: Props (1,4) -> (1,20) {
+                noteEffects: Props (1,4) -> (1,19) {
                   openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
-                    Prop (1,5) -> (1,8) {
+                    Prop (1,5) -> (1,7) {
                       property: Ident "nh" (1,5) -> (1,7),
                     },
-                    Prop (1,8) -> (1,17) {
+                    Prop (1,8) -> (1,16) {
                       property: Ident "b" (1,8) -> (1,9),
-                      properties: Values (1,10) -> (1,17) {
+                      properties: Values (1,10) -> (1,16) {
                         openParenthesis: LParen (1,10) -> (1,10),
                         values: Array [
                           Number "0" (1,11) -> (1,12),
@@ -4630,25 +4630,25 @@ Score (1,1) -> (1,20) {
 `;
 
 exports[`AlphaTexParserTest valid-note-effects multiple chord 1`] = `
-Score (1,1) -> (1,48) {
+Score (1,1) -> (1,47) {
   bars: Array [
-    Bar (1,1) -> (1,48) {
+    Bar (1,1) -> (1,47) {
       beats: Array [
-        Beat (1,1) -> (1,48) {
-          notes: NoteList (1,1) -> (1,48) {
+        Beat (1,1) -> (1,47) {
+          notes: NoteList (1,1) -> (1,47) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,21) {
+              Note (1,2) -> (1,20) {
                 noteValue: Ident "C4" (1,2) -> (1,4),
-                noteEffects: Props (1,5) -> (1,21) {
+                noteEffects: Props (1,5) -> (1,20) {
                   openBrace: LBrace (1,5) -> (1,5),
                   properties: Array [
-                    Prop (1,6) -> (1,9) {
+                    Prop (1,6) -> (1,8) {
                       property: Ident "nh" (1,6) -> (1,8),
                     },
-                    Prop (1,9) -> (1,18) {
+                    Prop (1,9) -> (1,17) {
                       property: Ident "b" (1,9) -> (1,10),
-                      properties: Values (1,11) -> (1,18) {
+                      properties: Values (1,11) -> (1,17) {
                         openParenthesis: LParen (1,11) -> (1,11),
                         values: Array [
                           Number "0" (1,12) -> (1,13),
@@ -4665,20 +4665,20 @@ Score (1,1) -> (1,48) {
                   closeBrace: RBrace (1,20) -> (1,20),
                 },
               },
-              Note (1,22) -> (1,47) {
+              Note (1,22) -> (1,46) {
                 noteValue: Ident "C5" (1,22) -> (1,24),
-                noteEffects: Props (1,25) -> (1,47) {
+                noteEffects: Props (1,25) -> (1,46) {
                   openBrace: LBrace (1,25) -> (1,25),
                   properties: Array [
-                    Prop (1,27) -> (1,29) {
+                    Prop (1,27) -> (1,28) {
                       property: Ident "v" (1,27) -> (1,28),
                     },
-                    Prop (1,29) -> (1,31) {
+                    Prop (1,29) -> (1,30) {
                       property: Ident "h" (1,29) -> (1,30),
                     },
-                    Prop (1,31) -> (1,46) {
+                    Prop (1,31) -> (1,45) {
                       property: Ident "unknown" (1,31) -> (1,38),
-                      properties: Values (1,39) -> (1,46) {
+                      properties: Values (1,39) -> (1,45) {
                         openParenthesis: LParen (1,39) -> (1,39),
                         values: Array [
                           Number "1" (1,40) -> (1,41),
@@ -4703,25 +4703,25 @@ Score (1,1) -> (1,48) {
 `;
 
 exports[`AlphaTexParserTest valid-note-effects multiple chord beat effects 1`] = `
-Score (1,1) -> (1,59) {
+Score (1,1) -> (1,58) {
   bars: Array [
-    Bar (1,1) -> (1,59) {
+    Bar (1,1) -> (1,58) {
       beats: Array [
-        Beat (1,1) -> (1,59) {
-          notes: NoteList (1,1) -> (1,48) {
+        Beat (1,1) -> (1,58) {
+          notes: NoteList (1,1) -> (1,47) {
             openParenthesis: LParen (1,1) -> (1,1),
             notes: Array [
-              Note (1,2) -> (1,21) {
+              Note (1,2) -> (1,20) {
                 noteValue: Ident "C4" (1,2) -> (1,4),
-                noteEffects: Props (1,5) -> (1,21) {
+                noteEffects: Props (1,5) -> (1,20) {
                   openBrace: LBrace (1,5) -> (1,5),
                   properties: Array [
-                    Prop (1,6) -> (1,9) {
+                    Prop (1,6) -> (1,8) {
                       property: Ident "nh" (1,6) -> (1,8),
                     },
-                    Prop (1,9) -> (1,18) {
+                    Prop (1,9) -> (1,17) {
                       property: Ident "b" (1,9) -> (1,10),
-                      properties: Values (1,11) -> (1,18) {
+                      properties: Values (1,11) -> (1,17) {
                         openParenthesis: LParen (1,11) -> (1,11),
                         values: Array [
                           Number "0" (1,12) -> (1,13),
@@ -4738,20 +4738,20 @@ Score (1,1) -> (1,59) {
                   closeBrace: RBrace (1,20) -> (1,20),
                 },
               },
-              Note (1,22) -> (1,47) {
+              Note (1,22) -> (1,46) {
                 noteValue: Ident "C5" (1,22) -> (1,24),
-                noteEffects: Props (1,25) -> (1,47) {
+                noteEffects: Props (1,25) -> (1,46) {
                   openBrace: LBrace (1,25) -> (1,25),
                   properties: Array [
-                    Prop (1,27) -> (1,29) {
+                    Prop (1,27) -> (1,28) {
                       property: Ident "v" (1,27) -> (1,28),
                     },
-                    Prop (1,29) -> (1,31) {
+                    Prop (1,29) -> (1,30) {
                       property: Ident "h" (1,29) -> (1,30),
                     },
-                    Prop (1,31) -> (1,46) {
+                    Prop (1,31) -> (1,45) {
                       property: Ident "unknown" (1,31) -> (1,38),
-                      properties: Values (1,39) -> (1,46) {
+                      properties: Values (1,39) -> (1,45) {
                         openParenthesis: LParen (1,39) -> (1,39),
                         values: Array [
                           Number "1" (1,40) -> (1,41),
@@ -4768,12 +4768,12 @@ Score (1,1) -> (1,59) {
             ],
             closeParenthesis: RParen (1,47) -> (1,47),
           },
-          beatEffects: Props (1,49) -> (1,59) {
+          beatEffects: Props (1,49) -> (1,58) {
             openBrace: LBrace (1,49) -> (1,49),
             properties: Array [
-              Prop (1,51) -> (1,58) {
+              Prop (1,51) -> (1,57) {
                 property: Ident "tu" (1,51) -> (1,53),
-                properties: Values (1,54) -> (1,58) {
+                properties: Values (1,54) -> (1,57) {
                   values: Array [
                     Number "3" (1,54) -> (1,55),
                     Number "2" (1,56) -> (1,57),
@@ -4803,21 +4803,21 @@ exports[`AlphaTexParserTest valid-note-effects multiple: lexer-diagnostics 1`] =
 exports[`AlphaTexParserTest valid-note-effects multiple: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-note-effects unknown 1`] = `
-Score (1,1) -> (1,21) {
+Score (1,1) -> (1,20) {
   bars: Array [
-    Bar (1,1) -> (1,21) {
+    Bar (1,1) -> (1,20) {
       beats: Array [
-        Beat (1,1) -> (1,21) {
-          notes: NoteList (1,1) -> (1,21) {
+        Beat (1,1) -> (1,20) {
+          notes: NoteList (1,1) -> (1,20) {
             notes: Array [
-              Note (1,1) -> (1,21) {
+              Note (1,1) -> (1,20) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
-                noteEffects: Props (1,4) -> (1,21) {
+                noteEffects: Props (1,4) -> (1,20) {
                   openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
-                    Prop (1,5) -> (1,20) {
+                    Prop (1,5) -> (1,19) {
                       property: Ident "unknown" (1,5) -> (1,12),
-                      properties: Values (1,13) -> (1,20) {
+                      properties: Values (1,13) -> (1,19) {
                         openParenthesis: LParen (1,13) -> (1,13),
                         values: Array [
                           Number "1" (1,14) -> (1,15),
@@ -4845,24 +4845,24 @@ exports[`AlphaTexParserTest valid-note-effects unknown: lexer-diagnostics 1`] = 
 exports[`AlphaTexParserTest valid-note-effects unknown: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-note-effects with beat effects 1`] = `
-Score (1,1) -> (1,31) {
+Score (1,1) -> (1,30) {
   bars: Array [
-    Bar (1,1) -> (1,31) {
+    Bar (1,1) -> (1,30) {
       beats: Array [
-        Beat (1,1) -> (1,31) {
-          notes: NoteList (1,1) -> (1,20) {
+        Beat (1,1) -> (1,30) {
+          notes: NoteList (1,1) -> (1,19) {
             notes: Array [
-              Note (1,1) -> (1,20) {
+              Note (1,1) -> (1,19) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
-                noteEffects: Props (1,4) -> (1,20) {
+                noteEffects: Props (1,4) -> (1,19) {
                   openBrace: LBrace (1,4) -> (1,4),
                   properties: Array [
-                    Prop (1,5) -> (1,8) {
+                    Prop (1,5) -> (1,7) {
                       property: Ident "nh" (1,5) -> (1,7),
                     },
-                    Prop (1,8) -> (1,17) {
+                    Prop (1,8) -> (1,16) {
                       property: Ident "b" (1,8) -> (1,9),
-                      properties: Values (1,10) -> (1,17) {
+                      properties: Values (1,10) -> (1,16) {
                         openParenthesis: LParen (1,10) -> (1,10),
                         values: Array [
                           Number "0" (1,11) -> (1,12),
@@ -4881,12 +4881,12 @@ Score (1,1) -> (1,31) {
               },
             ],
           },
-          beatEffects: Props (1,21) -> (1,31) {
+          beatEffects: Props (1,21) -> (1,30) {
             openBrace: LBrace (1,21) -> (1,21),
             properties: Array [
-              Prop (1,23) -> (1,30) {
+              Prop (1,23) -> (1,29) {
                 property: Ident "tu" (1,23) -> (1,25),
-                properties: Values (1,26) -> (1,30) {
+                properties: Values (1,26) -> (1,29) {
                   values: Array [
                     Number "3" (1,26) -> (1,27),
                     Number "2" (1,28) -> (1,29),
@@ -4907,34 +4907,34 @@ exports[`AlphaTexParserTest valid-note-effects with beat effects: lexer-diagnost
 
 exports[`AlphaTexParserTest valid-note-effects with beat effects: parser-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest valid-score-metadata empty 1`] = `Score (1,1) -> (1,4)`;
+exports[`AlphaTexParserTest valid-score-metadata empty 1`] = `Score (1,1) -> (1,2)`;
 
 exports[`AlphaTexParserTest valid-score-metadata empty: lexer-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata known multiple 1`] = `
-Score (1,1) -> (1,34) {
+Score (1,1) -> (1,32) {
   bars: Array [
-    Bar (1,1) -> (1,34) {
+    Bar (1,1) -> (1,32) {
       metaData: Array [
-        Meta (1,1) -> (1,16) {
+        Meta (1,1) -> (1,14) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,16) {
+          values: Values (1,8) -> (1,14) {
             values: Array [
               String "Title" (1,8) -> (1,14),
             ],
           },
         },
-        Meta (1,16) -> (1,32) {
+        Meta (1,16) -> (1,30) {
           tag: Tag "subtitle" (1,16) -> (1,25) {
             prefix: Backslash (1,16) -> (1,17),
             tag: Ident "subtitle" (1,17) -> (1,25),
           },
-          values: Values (1,26) -> (1,32) {
+          values: Values (1,26) -> (1,30) {
             values: Array [
               String "Sub" (1,26) -> (1,30),
             ],
@@ -4951,26 +4951,26 @@ exports[`AlphaTexParserTest valid-score-metadata known multiple: lexer-diagnosti
 exports[`AlphaTexParserTest valid-score-metadata known multiple: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata known property 1`] = `
-Score (1,1) -> (1,31) {
+Score (1,1) -> (1,29) {
   bars: Array [
-    Bar (1,1) -> (1,31) {
+    Bar (1,1) -> (1,29) {
       metaData: Array [
-        Meta (1,1) -> (1,28) {
+        Meta (1,1) -> (1,27) {
           tag: Tag "track" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,15) {
+          values: Values (1,8) -> (1,13) {
             values: Array [
               String "Name" (1,8) -> (1,13),
             ],
           },
-          properties: Props (1,15) -> (1,28) {
+          properties: Props (1,15) -> (1,27) {
             openBrace: LBrace (1,15) -> (1,15),
             properties: Array [
-              Prop (1,16) -> (1,27) {
+              Prop (1,16) -> (1,26) {
                 property: Ident "color" (1,16) -> (1,21),
-                properties: Values (1,22) -> (1,27) {
+                properties: Values (1,22) -> (1,26) {
                   values: Array [
                     String "red" (1,22) -> (1,26),
                   ],
@@ -4987,26 +4987,26 @@ Score (1,1) -> (1,31) {
 `;
 
 exports[`AlphaTexParserTest valid-score-metadata known property before value 1`] = `
-Score (1,1) -> (1,31) {
+Score (1,1) -> (1,29) {
   bars: Array [
-    Bar (1,1) -> (1,31) {
+    Bar (1,1) -> (1,29) {
       metaData: Array [
-        Meta (1,1) -> (1,29) {
+        Meta (1,1) -> (1,27) {
           tag: Tag "track" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,22) -> (1,29) {
+          values: Values (1,22) -> (1,27) {
             values: Array [
               String "Name" (1,22) -> (1,27),
             ],
           },
-          properties: Props (1,8) -> (1,21) {
+          properties: Props (1,8) -> (1,20) {
             openBrace: LBrace (1,8) -> (1,8),
             properties: Array [
-              Prop (1,9) -> (1,20) {
+              Prop (1,9) -> (1,19) {
                 property: Ident "color" (1,9) -> (1,14),
-                properties: Values (1,15) -> (1,20) {
+                properties: Values (1,15) -> (1,19) {
                   values: Array [
                     String "red" (1,15) -> (1,19),
                   ],
@@ -5031,11 +5031,11 @@ exports[`AlphaTexParserTest valid-score-metadata known property: lexer-diagnosti
 exports[`AlphaTexParserTest valid-score-metadata known property: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata known semantic 1`] = `
-Score (1,1) -> (1,34) {
+Score (1,1) -> (1,32) {
   bars: Array [
-    Bar (1,1) -> (1,34) {
+    Bar (1,1) -> (1,32) {
       metaData: Array [
-        Meta (1,1) -> (1,32) {
+        Meta (1,1) -> (1,31) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
@@ -5059,16 +5059,16 @@ exports[`AlphaTexParserTest valid-score-metadata known semantic: lexer-diagnosti
 exports[`AlphaTexParserTest valid-score-metadata known semantic: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata known valuelist 1`] = `
-Score (1,1) -> (1,20) {
+Score (1,1) -> (1,18) {
   bars: Array [
-    Bar (1,1) -> (1,20) {
+    Bar (1,1) -> (1,18) {
       metaData: Array [
-        Meta (1,1) -> (1,18) {
+        Meta (1,1) -> (1,16) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,17) {
+          values: Values (1,8) -> (1,16) {
             openParenthesis: LParen (1,8) -> (1,8),
             values: Array [
               String "Title" (1,9) -> (1,15),
@@ -5087,16 +5087,16 @@ exports[`AlphaTexParserTest valid-score-metadata known valuelist: lexer-diagnost
 exports[`AlphaTexParserTest valid-score-metadata known valuelist: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata unknown multiple 1`] = `
-Score (1,1) -> (1,44) {
+Score (1,1) -> (1,42) {
   bars: Array [
-    Bar (1,1) -> (1,44) {
+    Bar (1,1) -> (1,42) {
       metaData: Array [
-        Meta (1,1) -> (1,24) {
+        Meta (1,1) -> (1,22) {
           tag: Tag "notExisting" (1,1) -> (1,13) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: Values (1,14) -> (1,23) {
+          values: Values (1,14) -> (1,22) {
             openParenthesis: LParen (1,14) -> (1,14),
             values: Array [
               String "Value" (1,15) -> (1,21),
@@ -5104,12 +5104,12 @@ Score (1,1) -> (1,44) {
             closeParenthesis: RParen (1,22) -> (1,22),
           },
         },
-        Meta (1,24) -> (1,42) {
+        Meta (1,24) -> (1,40) {
           tag: Tag "notExisting" (1,24) -> (1,36) {
             prefix: Backslash (1,24) -> (1,25),
             tag: Ident "notExisting" (1,25) -> (1,36),
           },
-          values: Values (1,37) -> (1,41) {
+          values: Values (1,37) -> (1,40) {
             openParenthesis: LParen (1,37) -> (1,37),
             values: Array [
               String "" (1,38) -> (1,39),
@@ -5128,16 +5128,16 @@ exports[`AlphaTexParserTest valid-score-metadata unknown multiple: lexer-diagnos
 exports[`AlphaTexParserTest valid-score-metadata unknown multiple: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata unknown valuelist 1`] = `
-Score (1,1) -> (1,26) {
+Score (1,1) -> (1,24) {
   bars: Array [
-    Bar (1,1) -> (1,26) {
+    Bar (1,1) -> (1,24) {
       metaData: Array [
-        Meta (1,1) -> (1,24) {
+        Meta (1,1) -> (1,22) {
           tag: Tag "notExisting" (1,1) -> (1,13) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: Values (1,14) -> (1,23) {
+          values: Values (1,14) -> (1,22) {
             openParenthesis: LParen (1,14) -> (1,14),
             values: Array [
               String "Value" (1,15) -> (1,21),
@@ -5156,23 +5156,23 @@ exports[`AlphaTexParserTest valid-score-metadata unknown valuelist: lexer-diagno
 exports[`AlphaTexParserTest valid-score-metadata unknown valuelist: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata valuelist propertylist empty 1`] = `
-Score (1,1) -> (1,29) {
+Score (1,1) -> (1,27) {
   bars: Array [
-    Bar (1,1) -> (1,29) {
+    Bar (1,1) -> (1,27) {
       metaData: Array [
-        Meta (1,1) -> (1,26) {
+        Meta (1,1) -> (1,25) {
           tag: Tag "notExisting" (1,1) -> (1,13) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: Values (1,14) -> (1,23) {
+          values: Values (1,14) -> (1,22) {
             openParenthesis: LParen (1,14) -> (1,14),
             values: Array [
               String "Value" (1,15) -> (1,21),
             ],
             closeParenthesis: RParen (1,22) -> (1,22),
           },
-          properties: Props (1,24) -> (1,26) {
+          properties: Props (1,24) -> (1,25) {
             openBrace: LBrace (1,24) -> (1,24),
             properties: Array [],
             closeBrace: RBrace (1,25) -> (1,25),
@@ -5189,28 +5189,28 @@ exports[`AlphaTexParserTest valid-score-metadata valuelist propertylist empty: l
 exports[`AlphaTexParserTest valid-score-metadata valuelist propertylist empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata valuelist propertylist unknown prop 1`] = `
-Score (1,1) -> (1,44) {
+Score (1,1) -> (1,42) {
   bars: Array [
-    Bar (1,1) -> (1,44) {
+    Bar (1,1) -> (1,42) {
       metaData: Array [
-        Meta (1,1) -> (1,41) {
+        Meta (1,1) -> (1,40) {
           tag: Tag "notExisting" (1,1) -> (1,13) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: Values (1,14) -> (1,23) {
+          values: Values (1,14) -> (1,22) {
             openParenthesis: LParen (1,14) -> (1,14),
             values: Array [
               String "Value" (1,15) -> (1,21),
             ],
             closeParenthesis: RParen (1,22) -> (1,22),
           },
-          properties: Props (1,24) -> (1,41) {
+          properties: Props (1,24) -> (1,40) {
             openBrace: LBrace (1,24) -> (1,24),
             properties: Array [
-              Prop (1,25) -> (1,40) {
+              Prop (1,25) -> (1,39) {
                 property: Ident "unknown" (1,25) -> (1,32),
-                properties: Values (1,33) -> (1,40) {
+                properties: Values (1,33) -> (1,39) {
                   openParenthesis: LParen (1,33) -> (1,33),
                   values: Array [
                     Number "1" (1,34) -> (1,35),
@@ -5237,12 +5237,12 @@ exports[`AlphaTexParserTest valid-score-metadata valuelist propertylist unknown 
 exports[`AlphaTexParserTest valid-sync-points basic fretted 1`] = `
 Score (1,1) -> (1,21) {
   bars: Array [
-    Bar (1,2) -> (1,10) {
+    Bar (1,2) -> (1,8) {
       beats: Array [
-        Beat (1,4) -> (1,10) {
-          notes: NoteList (1,4) -> (1,8) {
+        Beat (1,4) -> (1,8) {
+          notes: NoteList (1,4) -> (1,7) {
             notes: Array [
-              Note (1,4) -> (1,8) {
+              Note (1,4) -> (1,7) {
                 noteValue: Number "3" (1,4) -> (1,5),
                 noteStringDot: Dot (1,5) -> (1,5),
                 noteString: Number "3" (1,6) -> (1,7),
@@ -5280,12 +5280,12 @@ exports[`AlphaTexParserTest valid-sync-points basic fretted: parser-diagnostics 
 exports[`AlphaTexParserTest valid-sync-points basic simple numbered 1`] = `
 Score (1,1) -> (1,20) {
   bars: Array [
-    Bar (1,2) -> (1,9) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
-        Beat (1,4) -> (1,9) {
-          notes: NoteList (1,4) -> (1,9) {
+        Beat (1,4) -> (1,7) {
+          notes: NoteList (1,4) -> (1,7) {
             notes: Array [
-              Note (1,4) -> (1,9) {
+              Note (1,4) -> (1,7) {
                 noteValue: Number "32" (1,4) -> (1,6),
               },
             ],
@@ -5321,12 +5321,12 @@ exports[`AlphaTexParserTest valid-sync-points basic simple numbered: parser-diag
 exports[`AlphaTexParserTest valid-sync-points basic simple pitched 1`] = `
 Score (1,1) -> (1,20) {
   bars: Array [
-    Bar (1,2) -> (1,9) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
-        Beat (1,4) -> (1,9) {
-          notes: NoteList (1,4) -> (1,7) {
+        Beat (1,4) -> (1,7) {
+          notes: NoteList (1,4) -> (1,6) {
             notes: Array [
-              Note (1,4) -> (1,7) {
+              Note (1,4) -> (1,6) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
@@ -5359,17 +5359,17 @@ exports[`AlphaTexParserTest valid-sync-points basic simple pitched: lexer-diagno
 
 exports[`AlphaTexParserTest valid-sync-points basic simple pitched: parser-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest valid-sync-points empty 1`] = `Score (1,1) -> (1,6)`;
+exports[`AlphaTexParserTest valid-sync-points empty 1`] = `Score (1,1) -> (1,4)`;
 
 exports[`AlphaTexParserTest valid-sync-points empty with bars 1`] = `
-Score (1,1) -> (1,14) {
+Score (1,1) -> (1,12) {
   bars: Array [
-    Bar (1,2) -> (1,8) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
-        Beat (1,4) -> (1,7) {
-          notes: NoteList (1,4) -> (1,7) {
+        Beat (1,4) -> (1,6) {
+          notes: NoteList (1,4) -> (1,6) {
             notes: Array [
-              Note (1,4) -> (1,7) {
+              Note (1,4) -> (1,6) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
@@ -5378,12 +5378,12 @@ Score (1,1) -> (1,14) {
       ],
       pipe: Pipe (1,7) -> (1,7),
     },
-    Bar (1,9) -> (1,14) {
+    Bar (1,9) -> (1,12) {
       beats: Array [
-        Beat (1,9) -> (1,14) {
-          notes: NoteList (1,9) -> (1,12) {
+        Beat (1,9) -> (1,12) {
+          notes: NoteList (1,9) -> (1,11) {
             notes: Array [
-              Note (1,9) -> (1,12) {
+              Note (1,9) -> (1,11) {
                 noteValue: Ident "C5" (1,9) -> (1,11),
               },
             ],
@@ -5397,14 +5397,14 @@ Score (1,1) -> (1,14) {
 `;
 
 exports[`AlphaTexParserTest valid-sync-points empty with bars empty at end 1`] = `
-Score (1,1) -> (1,16) {
+Score (1,1) -> (1,14) {
   bars: Array [
-    Bar (1,2) -> (1,8) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
-        Beat (1,4) -> (1,7) {
-          notes: NoteList (1,4) -> (1,7) {
+        Beat (1,4) -> (1,6) {
+          notes: NoteList (1,4) -> (1,6) {
             notes: Array [
-              Note (1,4) -> (1,7) {
+              Note (1,4) -> (1,6) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
@@ -5413,12 +5413,12 @@ Score (1,1) -> (1,16) {
       ],
       pipe: Pipe (1,7) -> (1,7),
     },
-    Bar (1,9) -> (1,13) {
+    Bar (1,9) -> (1,12) {
       beats: Array [
-        Beat (1,9) -> (1,12) {
-          notes: NoteList (1,9) -> (1,12) {
+        Beat (1,9) -> (1,11) {
+          notes: NoteList (1,9) -> (1,11) {
             notes: Array [
-              Note (1,9) -> (1,12) {
+              Note (1,9) -> (1,11) {
                 noteValue: Ident "C5" (1,9) -> (1,11),
               },
             ],
@@ -5446,14 +5446,14 @@ exports[`AlphaTexParserTest valid-sync-points empty: parser-diagnostics 1`] = `A
 exports[`AlphaTexParserTest valid-sync-points full 1`] = `
 Score (1,1) -> (1,36) {
   bars: Array [
-    Bar (1,2) -> (1,23) {
+    Bar (1,2) -> (1,22) {
       metaData: Array [
-        Meta (1,2) -> (1,16) {
+        Meta (1,2) -> (1,14) {
           tag: Tag "title" (1,2) -> (1,8) {
             prefix: Backslash (1,2) -> (1,3),
             tag: Ident "title" (1,3) -> (1,8),
           },
-          values: Values (1,9) -> (1,16) {
+          values: Values (1,9) -> (1,14) {
             values: Array [
               String "Test" (1,9) -> (1,14),
             ],
@@ -5461,7 +5461,7 @@ Score (1,1) -> (1,36) {
         },
       ],
       beats: Array [
-        Beat (1,18) -> (1,23) {
+        Beat (1,18) -> (1,22) {
           notes: NoteList (1,18) -> (1,20) {
             notes: Array [
               Note (1,18) -> (1,20) {
@@ -5500,14 +5500,14 @@ exports[`AlphaTexParserTest valid-sync-points full: lexer-diagnostics 1`] = `Arr
 exports[`AlphaTexParserTest valid-sync-points full: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-sync-points properties empty 1`] = `
-Score (1,1) -> (1,26) {
+Score (1,1) -> (1,24) {
   bars: Array [
-    Bar (1,2) -> (1,9) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
-        Beat (1,4) -> (1,9) {
-          notes: NoteList (1,4) -> (1,7) {
+        Beat (1,4) -> (1,7) {
+          notes: NoteList (1,4) -> (1,6) {
             notes: Array [
-              Note (1,4) -> (1,7) {
+              Note (1,4) -> (1,6) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
@@ -5515,14 +5515,14 @@ Score (1,1) -> (1,26) {
         },
       ],
     },
-    Bar (1,9) -> (1,26) {
+    Bar (1,9) -> (1,24) {
       metaData: Array [
-        Meta (1,9) -> (1,25) {
+        Meta (1,9) -> (1,24) {
           tag: Tag "sync" (1,9) -> (1,14) {
             prefix: Backslash (1,9) -> (1,10),
             tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: Values (1,15) -> (1,22) {
+          values: Values (1,15) -> (1,21) {
             openParenthesis: LParen (1,15) -> (1,15),
             values: Array [
               Number "1" (1,16) -> (1,17),
@@ -5531,7 +5531,7 @@ Score (1,1) -> (1,26) {
             ],
             closeParenthesis: RParen (1,21) -> (1,21),
           },
-          properties: Props (1,23) -> (1,25) {
+          properties: Props (1,23) -> (1,24) {
             openBrace: LBrace (1,23) -> (1,23),
             properties: Array [],
             closeBrace: RBrace (1,24) -> (1,24),
@@ -5548,14 +5548,14 @@ exports[`AlphaTexParserTest valid-sync-points properties empty: lexer-diagnostic
 exports[`AlphaTexParserTest valid-sync-points properties empty: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-sync-points properties unknown 1`] = `
-Score (1,1) -> (1,43) {
+Score (1,1) -> (1,41) {
   bars: Array [
-    Bar (1,2) -> (1,9) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
-        Beat (1,4) -> (1,9) {
-          notes: NoteList (1,4) -> (1,7) {
+        Beat (1,4) -> (1,7) {
+          notes: NoteList (1,4) -> (1,6) {
             notes: Array [
-              Note (1,4) -> (1,7) {
+              Note (1,4) -> (1,6) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
@@ -5563,14 +5563,14 @@ Score (1,1) -> (1,43) {
         },
       ],
     },
-    Bar (1,9) -> (1,43) {
+    Bar (1,9) -> (1,41) {
       metaData: Array [
-        Meta (1,9) -> (1,42) {
+        Meta (1,9) -> (1,41) {
           tag: Tag "sync" (1,9) -> (1,14) {
             prefix: Backslash (1,9) -> (1,10),
             tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: Values (1,15) -> (1,22) {
+          values: Values (1,15) -> (1,21) {
             openParenthesis: LParen (1,15) -> (1,15),
             values: Array [
               Number "1" (1,16) -> (1,17),
@@ -5579,12 +5579,12 @@ Score (1,1) -> (1,43) {
             ],
             closeParenthesis: RParen (1,21) -> (1,21),
           },
-          properties: Props (1,23) -> (1,42) {
+          properties: Props (1,23) -> (1,41) {
             openBrace: LBrace (1,23) -> (1,23),
             properties: Array [
-              Prop (1,25) -> (1,40) {
+              Prop (1,25) -> (1,39) {
                 property: Ident "unknown" (1,25) -> (1,32),
-                properties: Values (1,33) -> (1,40) {
+                properties: Values (1,33) -> (1,39) {
                   openParenthesis: LParen (1,33) -> (1,33),
                   values: Array [
                     Number "1" (1,34) -> (1,35),
@@ -5609,14 +5609,14 @@ exports[`AlphaTexParserTest valid-sync-points properties unknown: lexer-diagnost
 exports[`AlphaTexParserTest valid-sync-points properties unknown: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-sync-points valuelist 1`] = `
-Score (1,1) -> (1,22) {
+Score (1,1) -> (1,21) {
   bars: Array [
-    Bar (1,2) -> (1,9) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
-        Beat (1,4) -> (1,9) {
-          notes: NoteList (1,4) -> (1,7) {
+        Beat (1,4) -> (1,7) {
+          notes: NoteList (1,4) -> (1,6) {
             notes: Array [
-              Note (1,4) -> (1,7) {
+              Note (1,4) -> (1,6) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
               },
             ],
@@ -5624,14 +5624,14 @@ Score (1,1) -> (1,22) {
         },
       ],
     },
-    Bar (1,9) -> (1,22) {
+    Bar (1,9) -> (1,21) {
       metaData: Array [
-        Meta (1,9) -> (1,22) {
+        Meta (1,9) -> (1,21) {
           tag: Tag "sync" (1,9) -> (1,14) {
             prefix: Backslash (1,9) -> (1,10),
             tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: Values (1,15) -> (1,22) {
+          values: Values (1,15) -> (1,21) {
             openParenthesis: LParen (1,15) -> (1,15),
             values: Array [
               Number "1" (1,16) -> (1,17),

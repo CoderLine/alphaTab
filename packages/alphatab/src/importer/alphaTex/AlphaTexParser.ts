@@ -110,7 +110,7 @@ export class AlphaTexParser {
                 throw e;
             }
         } finally {
-            this._scoreNode.end = this.lexer.currentTokenLocation();
+            this._scoreNode.end = this.lexer.previousTokenEndLocation();
         }
     }
 
@@ -143,11 +143,11 @@ export class AlphaTexParser {
             }
 
             if (bar.metaData.length > 0 || bar.beats.length > 0 || bar.pipe) {
-                bar.end = this.lexer.currentTokenLocation();
+                bar.end = this.lexer.previousTokenEndLocation();
                 this._scoreNode.bars.push(bar);
             }
         } finally {
-            bar.end = this.lexer.currentTokenLocation();
+            bar.end = this.lexer.previousTokenEndLocation();
         }
     }
 
@@ -231,7 +231,7 @@ export class AlphaTexParser {
             this._beatMultiplier(beat);
 
         } finally {
-            beat.end = this.lexer.currentTokenLocation();
+            beat.end = this.lexer.previousTokenEndLocation();
         }
 
         return beat;
@@ -301,7 +301,7 @@ export class AlphaTexParser {
                 this._metaDataReader.readDurationChangePropertyValues(this, property)
             );
         } finally {
-            durationChange.end = this.lexer.currentTokenLocation();
+            durationChange.end = this.lexer.previousTokenEndLocation();
         }
 
         return durationChange;
@@ -393,7 +393,7 @@ export class AlphaTexParser {
                 });
             }
         } finally {
-            noteList.end = this.lexer.currentTokenLocation();
+            noteList.end = this.lexer.previousTokenEndLocation();
         }
 
         return noteList;
@@ -484,7 +484,7 @@ export class AlphaTexParser {
                 this._metaDataReader.readNotePropertyValues(this, property)
             );
         } finally {
-            note.end = this.lexer.currentTokenLocation();
+            note.end = this.lexer.previousTokenEndLocation();
         }
 
         return note;
@@ -555,7 +555,7 @@ export class AlphaTexParser {
                 );
             }
         } finally {
-            metaData.end = this.lexer.currentTokenLocation();
+            metaData.end = this.lexer.previousTokenEndLocation();
         }
         return metaData;
     }
@@ -598,7 +598,7 @@ export class AlphaTexParser {
                 });
             }
         } finally {
-            properties.end = this.lexer.currentTokenLocation();
+            properties.end = this.lexer.previousTokenEndLocation();
         }
 
         return properties;
@@ -631,7 +631,7 @@ export class AlphaTexParser {
                 }
             }
         } finally {
-            property.end = this.lexer.currentTokenLocation();
+            property.end = this.lexer.previousTokenEndLocation();
         }
 
         return property;
@@ -698,7 +698,7 @@ export class AlphaTexParser {
                 });
             }
         } finally {
-            valueList.end = this.lexer.currentTokenLocation();
+            valueList.end = this.lexer.previousTokenEndLocation();
         }
 
         return valueList;

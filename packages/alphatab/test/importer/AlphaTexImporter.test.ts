@@ -1417,8 +1417,10 @@ describe('AlphaTexImporterTest', () => {
         let tex = '. \n';
         const expectedAccidentalModes: NoteAccidentalMode[] = [];
         for (const [k, v] of ModelUtils.accidentalModeMapping) {
-            tex += `3.3 { acc ${k} } \n`;
-            expectedAccidentalModes.push(v);
+            if (k) {
+                tex += `3.3 { acc ${k} } \n`;
+                expectedAccidentalModes.push(v);
+            }
         }
 
         const score = parseTex(tex);
@@ -2391,7 +2393,6 @@ describe('AlphaTexImporterTest', () => {
             it('meta-track-track-meta', () => test(`\\clef C3 \\track "T1" \\track "T2" \\clef C4`));
         });
 
-        
         describe('with-previous-bars', () => {
             it('meta-track', () => test(`C4 | C5 | \\clef C3 \\track "T1"`));
             it('meta-track-staff', () => test(`C4 | C5 | \\clef C3 \\track "T1" \\staff`));

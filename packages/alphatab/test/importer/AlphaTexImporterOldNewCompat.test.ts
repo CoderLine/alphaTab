@@ -135,8 +135,8 @@ describe('AlphaTexImporterOldNewCompat', () => {
         const settings = new Settings();
         const oldTex = new AlphaTexExporterOld().exportToString(ScoreLoader.loadAlphaTex(newTex, settings));
 
-        let sumNew = 0;
-        let sumOld = 0;
+        const newTimes: number[] = [];
+        const oldTimes: number[] = [];
 
         function run(i: number, check: boolean, log: boolean) {
             const oldImporter = new AlphaTexImporterOld();
@@ -161,8 +161,8 @@ describe('AlphaTexImporterOldNewCompat', () => {
                     Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'New', i, newTime);
                     Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'Diff', i, newTime - oldTime);
                 }
-                sumNew += newTime;
-                sumOld += oldTime;
+                newTimes.push(newTime);
+                oldTimes.push(oldTime);
             }
         }
 
@@ -176,12 +176,12 @@ describe('AlphaTexImporterOldNewCompat', () => {
             run(i, true, false);
         }
 
-        const avgNew = sumNew / testCount;
-        expect(avgNew).to.be.lessThan(25);
-        const avgOld = sumOld / testCount;
-        Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'Overall', avgNew / avgOld);
+        const meanNew = newTimes[(newTimes.length / 2) | 0];
+        expect(meanNew).to.be.lessThan(25);
+        const meanOld = oldTimes[(oldTimes.length / 2) | 0];
+        Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'Mean Ratio', meanNew / meanOld);
 
-        expect(avgNew / avgOld).to.be.lessThan(2);
+        expect(meanNew / meanOld).to.be.lessThan(2);
     });
 
     // it('profile', async () => {

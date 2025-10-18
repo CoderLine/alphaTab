@@ -84,11 +84,6 @@ import { SynthConstants } from '@src/synth/SynthConstants';
 export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler {
     public static readonly instance = new AlphaTex1LanguageHandler();
 
-    private static readonly _tuningLetters = new Set<number>([
-        0x43 /* C */, 0x44 /* D */, 0x45 /* E */, 0x46 /* F */, 0x47 /* G */, 0x41 /* A */, 0x42 /* B */, 0x63 /* c */,
-        0x64 /* d */, 0x65 /* e */, 0x66 /* f */, 0x67 /* g */, 0x61 /* a */, 0x62 /* b */, 0x23 /* # */
-    ]);
-
     public applyScoreMetaData(
         importer: IAlphaTexImporter,
         score: Score,
@@ -351,7 +346,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                                     severity: AlphaTexDiagnosticsSeverity.Warning
                                 });
                             } else {
-                                const tuningLetters = Array.from(AlphaTex1LanguageHandler._tuningLetters).join(',');
+                                const tuningLetters = Array.from(ModelUtils.tuningLetters).join(',');
                                 const accidentalModes = Array.from(ModelUtils.accidentalModeMapping.keys()).join(',');
                                 importer.addSemanticDiagnostic({
                                     code: AlphaTexDiagnosticCode.AT209,
@@ -920,65 +915,41 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             const value: IAlphaTexValueListItem | undefined =
                 actualIndex < values.values.length ? values.values[actualIndex] : undefined;
 
-            // basic match
-            if (value && expected.expectedTypes.has(value.nodeType)) {
-                actualIndex++;
+            if (value && expected.expectedTypes.has(value.nodeType) && this._checkRestrictions(expected, value)) {
                 switch (expected.parseMode) {
                     case ValueListParseTypesMode.OptionalAndStop:
                         // stop reading values
                         expectedIndex = expectedValues.length;
+                        actualIndex++;
                         break;
-                    case ValueListParseTypesMode.RequiredAsValueList:
                     case ValueListParseTypesMode.ValueListWithoutParenthesis:
+                    case ValueListParseTypesMode.RequiredAsValueList:
                         // stay on current element
+                        actualIndex++;
                         break;
                     default:
                         // advance to next item
                         expectedIndex++;
+                        actualIndex++;
                         break;
                 }
-                continue;
             }
-
-            const expectedTypes = AlphaTex1LanguageHandler._buildExpectedTypesMessage([expected]);
-
-            // value list
-            if (
-                value &&
-                value.nodeType === AlphaTexNodeType.Values &&
-                (expected.parseMode === ValueListParseTypesMode.ValueListWithoutParenthesis ||
-                    expected.parseMode === ValueListParseTypesMode.RequiredAsValueList)
-            ) {
-                actualIndex++;
-                expectedIndex++;
-                for (const item of (value as AlphaTexValueList).values) {
-                    if (!expected.expectedTypes.has(item.nodeType)) {
-                        importer.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT209,
-                            message: `Unexpected list item value '${AlphaTexNodeType[value.nodeType]}', expected: ${expectedTypes}`,
-                            severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: item.start,
-                            end: item.end
-                        });
-                    }
-                }
-                continue;
-            }
-
-            // error handling
-            if (value) {
+            // not matched value?
+            else if (value) {
                 switch (expected.parseMode) {
                     case ValueListParseTypesMode.ValueListWithoutParenthesis:
+                    case ValueListParseTypesMode.RequiredAsValueList:
                         // end of value list as soon we have a different type
                         expectedIndex++;
                         break;
                     case ValueListParseTypesMode.Required:
                     case ValueListParseTypesMode.RequiredAsFloat:
-                    case ValueListParseTypesMode.RequiredAsValueList:
                         error = true;
                         importer.addSemanticDiagnostic({
                             code: AlphaTexDiagnosticCode.AT209,
-                            message: `Unexpected required value '${AlphaTexNodeType[value.nodeType]}', expected: ${expectedTypes}`,
+                            message: `Unexpected required value '${AlphaTexNodeType[value.nodeType]}', expected: ${AlphaTex1LanguageHandler._buildExpectedTypesMessage(
+                                [expected]
+                            )}`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
                             start: value.start,
                             end: value.end
@@ -994,26 +965,31 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         expectedIndex++;
                         break;
                 }
-            } else {
-                // no value anymore
+            }
+            // no value anymore
+            else {
                 switch (expected.parseMode) {
+                    case ValueListParseTypesMode.ValueListWithoutParenthesis:
+                    case ValueListParseTypesMode.RequiredAsValueList:
+                        // end of list
+                        expectedIndex++;
+                        break;
+
                     case ValueListParseTypesMode.Required:
                     case ValueListParseTypesMode.RequiredAsFloat:
                         error = true;
                         importer.addSemanticDiagnostic({
                             code: AlphaTexDiagnosticCode.AT210,
-                            message: `Missing values. Expected following values: ${expectedTypes}`,
+                            message: `Missing values. Expected following values: ${AlphaTex1LanguageHandler._buildExpectedTypesMessage(
+                                [expected]
+                            )}`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
                             start: values.end,
                             end: values.end
                         });
                         expectedIndex = expectedValues.length;
                         break;
-                    case ValueListParseTypesMode.ValueListWithoutParenthesis:
-                    case ValueListParseTypesMode.RequiredAsValueList:
-                        // end of list
-                        expectedIndex++;
-                        break;
+
                     case ValueListParseTypesMode.Optional:
                     case ValueListParseTypesMode.OptionalAsFloat:
                     case ValueListParseTypesMode.OptionalAsFloatInValueList:
@@ -1042,6 +1018,27 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         return !error;
+    }
+
+    private _checkRestrictions(expected: ValueListParseTypesExtended, value: IAlphaTexValueListItem) {
+        switch (value.nodeType) {
+            case AlphaTexNodeType.Ident:
+                const identifier = value as AlphaTexIdentifier;
+                if (expected?.allowedValues) {
+                    return expected.allowedValues.has(identifier.text.toLowerCase());
+                } else if (expected?.reservedIdentifiers) {
+                    return !expected.reservedIdentifiers.has(identifier.text.toLowerCase());
+                }
+                return true;
+            case AlphaTexNodeType.String:
+                const str = value as AlphaTexStringLiteral;
+                if (expected?.allowedValues) {
+                    return expected.allowedValues.has(str.text.toLowerCase());
+                }
+                return true;
+            default:
+                return true;
+        }
     }
 
     private _headerFooterStyle(

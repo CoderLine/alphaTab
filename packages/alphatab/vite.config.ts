@@ -43,10 +43,12 @@ export default defineConfig(({ mode }) => {
     );
 
     const lib = config.build!.lib! as LibraryOptions;
-    lib.entry['alphatab.core'] = path.resolve(__dirname, 'src/alphaTab.core.ts');
-    lib.entry['alphatab'] = path.resolve(__dirname, 'src/alphaTab.main.ts');
-    lib.entry['alphatab.worker'] = path.resolve(__dirname, 'src/alphaTab.worker.ts');
-    lib.entry['alphatab.worklet'] = path.resolve(__dirname, 'src/AlphaTab.worklet.ts');
+    const entry = lib.entry! as Record<string,string>;
+    entry['alphatab.core'] = path.resolve(__dirname, 'src/alphaTab.core.ts');
+    // biome-ignore lint/complexity/useLiteralKeys: consistency
+    entry['alphatab'] = path.resolve(__dirname, 'src/alphaTab.main.ts');
+    entry['alphatab.worker'] = path.resolve(__dirname, 'src/alphaTab.worker.ts');
+    entry['alphatab.worklet'] = path.resolve(__dirname, 'src/AlphaTab.worklet.ts');
     lib.name = 'alphaTab';
 
     const typeScriptOptions = (): Partial<RollupTypescriptOptions> => {
@@ -82,9 +84,9 @@ export default defineConfig(({ mode }) => {
         //case 'esm':
         default:
             esm('alphaTab', 'src/alphaTab.main.ts');
-            lib.entry['alphaTab.core'] = path.resolve(__dirname, 'src/alphaTab.core.ts');
-            lib.entry['alphaTab.worker'] = path.resolve(__dirname, 'src/alphaTab.worker.ts');
-            lib.entry['alphaTab.worklet'] = path.resolve(__dirname, 'src/alphaTab.worklet.ts');
+            entry['alphaTab.core'] = path.resolve(__dirname, 'src/alphaTab.core.ts');
+            entry['alphaTab.worker'] = path.resolve(__dirname, 'src/alphaTab.worker.ts');
+            entry['alphaTab.worklet'] = path.resolve(__dirname, 'src/alphaTab.worklet.ts');
             
             for (const output of config.build!.rollupOptions!.output as OutputOptions[]) {
                 const isMin = (output.entryFileNames as string).includes('.min');

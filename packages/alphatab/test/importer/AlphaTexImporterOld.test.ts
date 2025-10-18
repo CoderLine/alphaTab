@@ -41,7 +41,12 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Settings } from '@src/Settings';
 import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexExporterOld } from '@test/exporter/AlphaTexExporterOld';
-import { AlphaTexError, AlphaTexImporterOld, AlphaTexLexerOld, AlphaTexSymbols } from '@test/importer/AlphaTexImporterOld';
+import {
+    AlphaTexError,
+    AlphaTexImporterOld,
+    AlphaTexLexerOld,
+    AlphaTexSymbols
+} from '@test/importer/AlphaTexImporterOld';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 import { assert, expect } from 'chai';
@@ -859,8 +864,8 @@ describe('AlphaTexImporterOldTest', () => {
         ];
 
         for (let i = 0; i < expected.length; i++) {
-            expect(bars[i].keySignature).to.equal(expected[i][0]);
-            expect(bars[i].keySignatureType).to.equal(expected[i][1]);
+            expect(bars[i].keySignature).to.equal(expected[i][0], `Wrong keySignature at index ${i}`);
+            expect(bars[i].keySignatureType).to.equal(expected[i][1], `Wrong keySignature type at index ${i}`);
         }
 
         bars = score.tracks[0].staves[1].bars;
@@ -1416,8 +1421,10 @@ describe('AlphaTexImporterOldTest', () => {
         let tex = '. \n';
         const expectedAccidentalModes: NoteAccidentalMode[] = [];
         for (const [k, v] of ModelUtils.accidentalModeMapping) {
-            tex += `3.3 { acc ${k} } \n`;
-            expectedAccidentalModes.push(v);
+            if (k) {
+                tex += `3.3 { acc ${k} } \n`;
+                expectedAccidentalModes.push(v);
+            }
         }
 
         const score = parseTex(tex);
@@ -1979,11 +1986,26 @@ describe('AlphaTexImporterOldTest', () => {
         expect(score.tracks[0].staves[0].bars[barIndex++].clefOttava).to.equal(Ottavia._15ma);
 
         for (let i = 0; i < 5; i++) {
-            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(Clef.Neutral, `Invalid clef at index ${barIndex - 1}`);
-            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(Clef.C3, `Invalid clef at index ${barIndex - 1}`);
-            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(Clef.C4, `Invalid clef at index ${barIndex - 1}`);
-            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(Clef.F4, `Invalid clef at index ${barIndex - 1}`);
-            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(Clef.G2, `Invalid clef at index ${barIndex - 1}`);
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(
+                Clef.Neutral,
+                `Invalid clef at index ${barIndex - 1}`
+            );
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(
+                Clef.C3,
+                `Invalid clef at index ${barIndex - 1}`
+            );
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(
+                Clef.C4,
+                `Invalid clef at index ${barIndex - 1}`
+            );
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(
+                Clef.F4,
+                `Invalid clef at index ${barIndex - 1}`
+            );
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(
+                Clef.G2,
+                `Invalid clef at index ${barIndex - 1}`
+            );
         }
 
         testExportRoundtrip(score);
@@ -2362,7 +2384,6 @@ describe('AlphaTexImporterOldTest', () => {
         testExportRoundtrip(score);
     });
 
-    
     it('hide-tempo', () => {
         const score = parseTex(`
             .

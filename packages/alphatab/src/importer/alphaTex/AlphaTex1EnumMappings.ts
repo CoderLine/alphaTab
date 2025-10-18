@@ -27,7 +27,7 @@ export class AlphaTex1EnumMappings {
      * @target web
      * @partial
      */
-    private static _toEnum<T>(type: object, value:number,) {
+    private static _toEnum<T>(_type: object, value:number,) {
         return value as T;
     }
 

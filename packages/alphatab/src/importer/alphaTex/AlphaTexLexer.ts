@@ -46,6 +46,7 @@ export class AlphaTexLexer {
     private _leadingComments: AlphaTexComment[] | undefined;
     private _trailingCommentNode: AlphaTexAstNode | undefined;
 
+    private _previousToken: AlphaTexAstNode | undefined;
     private _peekedToken: AlphaTexAstNode | undefined;
 
     public readonly lexerDiagnostics = new AlphaTexDiagnosticBag();
@@ -119,6 +120,7 @@ export class AlphaTexLexer {
     }
 
     public advance() {
+        this._previousToken = this._peekedToken;
         this._peekedToken = undefined;
     }
 
@@ -166,7 +168,11 @@ export class AlphaTexLexer {
         return AlphaTexLexer._eof;
     }
 
-    public currentTokenLocation(): AlphaTexAstNodeLocation {
+    public previousTokenEndLocation(): AlphaTexAstNodeLocation {
+        return this._previousToken?.end ?? this._currentLexerLocation();
+    }
+
+        public currentTokenLocation(): AlphaTexAstNodeLocation {
         return this._peekedToken?.start ?? this._currentLexerLocation();
     }
 
