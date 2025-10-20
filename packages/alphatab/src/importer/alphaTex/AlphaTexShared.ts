@@ -182,6 +182,11 @@ export enum AlphaTexDiagnosticCode {
     AT217 = 217,
 
     /**
+     * Wrong note kind '%s' for staff with note kind '%s'. Do not mix incompatible staves and notes.
+     */
+    AT218 = 218,
+
+    /**
      * Expected no values, but found some. Values are ignored.
      */
     AT300 = 300,
@@ -283,16 +288,27 @@ export interface IAlphaTexImporterState {
     readonly sustainPedalToBeat: Map<SustainPedalMarker, Beat>;
 }
 
+
+/**
+ * Lists the note kinds we can detect
+ * @public
+ */
+export enum StaffNoteKind {
+    Pitched,
+    Fretted,
+    Articulation
+}
+
+
 /**
  * @public
  */
 export interface IAlphaTexImporter {
     readonly state: IAlphaTexImporterState;
 
-    makeStaffPitched(staff: Staff): void;
+    applyStaffNoteKind(staff: Staff, staffNoteKind: StaffNoteKind): void;
     startNewVoice(): void;
     startNewTrack(): Track;
-    applyPercussionStaff(staff: Staff): void;
     startNewStaff(): Staff;
     addSemanticDiagnostic(diagnostic: AlphaTexDiagnostic): void;
 }

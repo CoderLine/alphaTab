@@ -22,7 +22,8 @@ import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
     type IAlphaTexImporter,
-    type IAlphaTexImporterState
+    type IAlphaTexImporterState,
+    StaffNoteKind
 } from '@src/importer/alphaTex/AlphaTexShared';
 import {
     ApplyNodeResult,
@@ -155,6 +156,7 @@ class AlphaTexImportState implements IAlphaTexImporterState {
     public readonly lyrics = new Map<number, Lyrics[]>();
     public readonly sustainPedalToBeat = new Map<SustainPedalMarker, Beat>();
     public readonly staffTuningApplied = new Set<Staff>();
+    public readonly staffNoteKind = new Map<Staff, StaffNoteKind>();
     public readonly staffHasExplicitTuning = new Set<Staff>();
     public readonly staffHasExplicitDisplayTransposition = new Set<Staff>();
     public readonly staffDisplayTranspositionApplied = new Set<Staff>();
@@ -314,8 +316,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
     private _beginStaff(staff: Staff) {
         // ensure previous staff is properly initialized
         if (this._state.currentStaff) {
-            this._detectTuningForStaff();
-            this._handleTransposition();
+            this._detectTuningForStaff(this._state.currentStaff!);
+            this._handleTransposition(this._state.currentStaff!);
         }
 
         this._state.currentStaff = staff;
@@ -331,16 +333,16 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             }
         } else {
             this._newBar(this._state.currentStaff!);
-            this._detectTuningForStaff();
-            this._handleTransposition();
+            this._detectTuningForStaff(this._state.currentStaff!);
+            this._handleTransposition(this._state.currentStaff!);
         }
     }
 
     private _bar(node: AlphaTexBarNode) {
         const bar = this._barMeta(node);
 
-        this._detectTuningForStaff();
-        this._handleTransposition();
+        this._detectTuningForStaff(this._state.currentStaff!);
+        this._handleTransposition(this._state.currentStaff!);
 
         const voice: Voice = bar.voices[this._state.voiceIndex];
 
@@ -497,91 +499,67 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         // Note value
         let isDead: boolean = false;
         let isTie: boolean = false;
-        let fret: number = -1;
+        let numericValue: number = -1;
         let octave: number = -1;
         let tone: number = -1;
         let accidentalMode = NoteAccidentalMode.Default;
         const noteValue = node.noteValue as AlphaTexAstNode;
+        let detectedNoteKind: StaffNoteKind | undefined;
+        let staffNoteKind = this._state.staffNoteKind.has(this._state.currentStaff!)
+            ? this._state.staffNoteKind.get(this._state.currentStaff!)!
+            : undefined;
+
         switch (noteValue.nodeType) {
             case AlphaTexNodeType.Number:
-                fret = (noteValue as AlphaTexNumberLiteral).value;
-                if (this._state.currentStaff!.isPercussion && !PercussionMapper.instrumentArticulations.has(fret)) {
-                    this.addSemanticDiagnostic({
-                        code: AlphaTexDiagnosticCode.AT209,
-                        message: `Unexpected percussion articulation value '${fret}', expected: oneOf(${Array.from(PercussionMapper.instrumentArticulations.keys()).join(',')}).`,
-                        severity: AlphaTexDiagnosticsSeverity.Error,
-                        start: noteValue.start,
-                        end: noteValue.end
-                    });
-                    return;
+                numericValue = (noteValue as AlphaTexNumberLiteral).value;
+                if (node.noteString !== undefined) {
+                    detectedNoteKind = StaffNoteKind.Fretted;
+                } else {
+                    detectedNoteKind = StaffNoteKind.Articulation;
                 }
                 break;
             case AlphaTexNodeType.String:
             case AlphaTexNodeType.Ident:
                 const str = (noteValue as AlphaTexTextNode).text;
-                if (this._state.currentStaff!.isPercussion) {
-                    const articulationName = str.toLowerCase();
-                    if (this._state.percussionArticulationNames.has(articulationName)) {
-                        fret = this._state.percussionArticulationNames.get(articulationName)!;
-                    } else {
-                        this.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT209,
-                            message: `Unexpected percussion articulation value '${articulationName}', expected: oneOf(${Array.from(this._state.percussionArticulationNames.keys()).join(',')}).`,
-                            severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: noteValue.start,
-                            end: noteValue.end
-                        });
-                        return;
-                    }
+
+                isDead = str === 'x';
+                isTie = str === '-';
+                if (isTie || isDead) {
+                    numericValue = 0;
+                    detectedNoteKind = undefined; // don't know on those notes
                 } else {
-                    isDead = str === 'x';
-                    isTie = str === '-';
-
-                    if (isTie || isDead) {
-                        fret = 0;
+                    const tuning = ModelUtils.parseTuning(str);
+                    if (tuning) {
+                        detectedNoteKind = StaffNoteKind.Pitched;
+                        octave = tuning.octave;
+                        tone = tuning.tone.noteValue;
+                        if (this._state.accidentalMode === AlphaTexAccidentalMode.Explicit) {
+                            accidentalMode = tuning.tone.accidentalMode;
+                        }
                     } else {
-                        const tuning = ModelUtils.parseTuning(str);
-                        if (tuning) {
-                            // auto convert staff
-                            if (beat.index === 0 && beat.voice.index === 0 && beat.voice.bar.index === 0) {
-                                this.makeStaffPitched(this._state.currentStaff!);
+                        detectedNoteKind = StaffNoteKind.Articulation;
+                        const articulationName = str.toLowerCase();
+                        // apply defaults
+                        const percussionArticulationNames = this._state.percussionArticulationNames;
+                        if (staffNoteKind === undefined && percussionArticulationNames.size === 0) {
+                            for (const [defaultName, defaultValue] of PercussionMapper.instrumentArticulationNames) {
+                                percussionArticulationNames.set(defaultName.toLowerCase(), defaultValue);
+                                percussionArticulationNames.set(ModelUtils.toArticulationId(defaultName), defaultValue);
                             }
+                        }
 
-                            if (this._state.currentStaff!.isStringed) {
-                                this.addSemanticDiagnostic({
-                                    code: AlphaTexDiagnosticCode.AT215,
-                                    message: `Cannot use pitched note value '${str}' on string staff, please specify notes using the 'fret.string' syntax.`,
-                                    severity: AlphaTexDiagnosticsSeverity.Error,
-                                    start: noteValue.start,
-                                    end: noteValue.end
-                                });
-                                return;
-                            }
-
-                            if (this._state.currentStaff!.isPercussion) {
-                                this.addSemanticDiagnostic({
-                                    code: AlphaTexDiagnosticCode.AT216,
-                                    message: `Cannot use pitched note value '${str}' on percussion staff, please specify percussion articulations with numbers or names.`,
-                                    severity: AlphaTexDiagnosticsSeverity.Error,
-                                    start: noteValue.start,
-                                    end: noteValue.end
-                                });
-                                return;
-                            }
-
-                            octave = tuning.octave;
-                            tone = tuning.tone.noteValue;
-                            if (this._state.accidentalMode === AlphaTexAccidentalMode.Explicit) {
-                                accidentalMode = tuning.tone.accidentalMode;
-                            }
+                        if (percussionArticulationNames.has(articulationName)) {
+                            numericValue = percussionArticulationNames.get(articulationName)!;
                         } else {
                             this.addSemanticDiagnostic({
-                                code: AlphaTexDiagnosticCode.AT217,
-                                message: `Unrecognized note value '${str}'.`,
+                                code: AlphaTexDiagnosticCode.AT209,
+                                message: `Unexpected percussion articulation value '${articulationName}', expected: oneOf(${Array.from(this._state.percussionArticulationNames.keys()).join(',')}).`,
                                 severity: AlphaTexDiagnosticsSeverity.Error,
                                 start: noteValue.start,
                                 end: noteValue.end
                             });
+                            // avoid double error
+                            numericValue = Array.from(PercussionMapper.instrumentArticulationNames.values())[0];
                             return;
                         }
                     }
@@ -589,77 +567,92 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 break;
         }
 
-        //
-        // Note String
-        const isFretted: boolean =
-            octave === -1 && this._state.currentStaff!.tuning.length > 0 && !this._state.currentStaff!.isPercussion;
-        let noteString: number = -1;
-        if (isFretted) {
-            // Fret [Dot] String
-            if (!node.noteString) {
+        if (detectedNoteKind !== undefined) {
+            if (staffNoteKind === undefined) {
+                staffNoteKind = detectedNoteKind;
+                this.applyStaffNoteKind(this._state.currentStaff!, staffNoteKind);
+            } else if (staffNoteKind !== detectedNoteKind) {
                 this.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT207,
-                    message: `Missing string for fretted note.`,
-                    severity: AlphaTexDiagnosticsSeverity.Error,
-                    start: noteValue.end,
-                    end: noteValue.end
+                    code: AlphaTexDiagnosticCode.AT218,
+                    message: `Wrong note kind '${StaffNoteKind[detectedNoteKind]}' for staff with note kind ''${StaffNoteKind[staffNoteKind]}'. Do not mix incompatible staves and notes.`,
+                    severity: AlphaTexDiagnosticsSeverity.Error
                 });
-                return;
             }
-
-            noteString = node.noteString!.value;
-            if (noteString < 1 || noteString > this._state.currentStaff!.tuning.length) {
-                this.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT208,
-                    message: `Note string is out of range. Available range: 1-${this._state.currentStaff!.tuning.length}`,
-                    severity: AlphaTexDiagnosticsSeverity.Error,
-                    start: noteValue.end,
-                    end: noteValue.end
-                });
-                return;
-            }
+        } else if (staffNoteKind !== undefined) {
+            detectedNoteKind = staffNoteKind;
         }
 
         //
         // Construct Note
         const note = new Note();
-        if (isFretted) {
-            note.string = this._state.currentStaff!.tuning.length - (noteString - 1);
-            note.isDead = isDead;
-            note.isTieDestination = isTie;
-            if (!isTie) {
-                note.fret = fret;
-            }
-        } else if (this._state.currentStaff!.isPercussion) {
-            const articulationValue = fret;
-            let articulationIndex: number = 0;
-            if (this._state.articulationValueToIndex.has(articulationValue)) {
-                articulationIndex = this._state.articulationValueToIndex.get(articulationValue)!;
-            } else {
-                articulationIndex = this._state.currentTrack!.percussionArticulations.length;
-                const articulation = PercussionMapper.getArticulationByInputMidiNumber(articulationValue);
-                if (articulation === null) {
-                    this.addSemanticDiagnostic({
-                        code: AlphaTexDiagnosticCode.AT209,
-                        message: `Unexpected articulation value '${articulationValue}', expected: oneOf(${Array.from(PercussionMapper.instrumentArticulations.keys()).join(',')}).`,
-                        severity: AlphaTexDiagnosticsSeverity.Error,
-                        start: noteValue.end,
-                        end: noteValue.end
-                    });
-                    return;
-                }
+        note.isDead = isDead;
+        note.isTieDestination = isTie;
 
-                this._state.currentTrack!.percussionArticulations.push(articulation!);
-                this._state.articulationValueToIndex.set(articulationValue, articulationIndex);
-            }
+        // valid note kind detected, apply values, tied/dead notes at start might be rare, but can happen.
+        if (detectedNoteKind !== undefined && detectedNoteKind === staffNoteKind) {
+            switch (detectedNoteKind) {
+                case StaffNoteKind.Pitched:
+                    note.octave = octave;
+                    note.tone = tone;
+                    note.accidentalMode = accidentalMode;
+                    break;
+                case StaffNoteKind.Fretted:
+                    // Fret [Dot] String
+                    if (!node.noteString) {
+                        this.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT207,
+                            message: `Missing string for fretted note.`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: noteValue.end,
+                            end: noteValue.end
+                        });
+                        return;
+                    }
 
-            note.percussionArticulation = articulationIndex;
-        } else {
-            note.octave = octave;
-            note.tone = tone;
-            note.accidentalMode = accidentalMode;
-            note.isTieDestination = isTie;
+                    const noteString: number = node.noteString!.value;
+                    if (noteString < 1 || noteString > this._state.currentStaff!.tuning.length) {
+                        this.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT208,
+                            message: `Note string is out of range. Available range: 1-${this._state.currentStaff!.tuning.length}`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: noteValue.end,
+                            end: noteValue.end
+                        });
+                        return;
+                    }
+
+                    note.string = this._state.currentStaff!.tuning.length - (noteString - 1);
+                    if (!isTie) {
+                        note.fret = numericValue;
+                    }
+
+                    break;
+                case StaffNoteKind.Articulation:
+                    let articulationIndex: number = 0;
+                    if (this._state.articulationValueToIndex.has(numericValue)) {
+                        articulationIndex = this._state.articulationValueToIndex.get(numericValue)!;
+                    } else {
+                        articulationIndex = this._state.currentTrack!.percussionArticulations.length;
+                        const articulation = PercussionMapper.getArticulationByInputMidiNumber(numericValue);
+                        if (articulation === null) {
+                            this.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT209,
+                                message: `Unexpected articulation value '${numericValue}', expected: oneOf(${Array.from(PercussionMapper.instrumentArticulations.keys()).join(',')}).`,
+                                severity: AlphaTexDiagnosticsSeverity.Error,
+                                start: noteValue.end,
+                                end: noteValue.end
+                            });
+                            return;
+                        }
+
+                        this._state.currentTrack!.percussionArticulations.push(articulation!);
+                        this._state.articulationValueToIndex.set(numericValue, articulationIndex);
+                    }
+                    note.percussionArticulation = articulationIndex;
+                    break;
+            }
         }
+
         beat.addNote(note);
         this._state.hasAnyProperData = true;
 
@@ -667,6 +660,38 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         // Note Effects
         if (node.noteEffects) {
             this._noteEffects(note, node.noteEffects!);
+        }
+    }
+
+    /**
+     * @internal
+     */
+    public getStaffNoteKind(staff: Staff): StaffNoteKind | undefined {
+        return this._state.staffNoteKind.has(staff) ? this._state.staffNoteKind.get(staff) : undefined;
+    }
+
+    public applyStaffNoteKind(staff: Staff, staffNoteKind: StaffNoteKind) {
+        this._state.staffNoteKind.set(staff, staffNoteKind);
+        switch (staffNoteKind) {
+            case StaffNoteKind.Pitched:
+                staff.isPercussion = false;
+                staff.stringTuning.tunings = [];
+                if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
+                    staff.displayTranspositionPitch = 0;
+                }
+                break;
+            case StaffNoteKind.Fretted:
+                staff.isPercussion = false;
+                this._detectTuningForStaff(staff);
+                this._handleTransposition(staff);
+                break;
+            case StaffNoteKind.Articulation:
+                staff.isPercussion = true;
+                staff.stringTuning.tunings = [];
+                if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
+                    staff.displayTranspositionPitch = 0;
+                }
+                break;
         }
     }
 
@@ -698,50 +723,38 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
     }
 
-    public makeStaffPitched(staff: Staff) {
-        // clear tuning
-        staff.stringTuning.tunings = [];
-        if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
-            staff.displayTranspositionPitch = 0;
-        }
-    }
-
-    private _handleTransposition() {
+    private _handleTransposition(staff: Staff) {
         if (
-            !this._state.staffDisplayTranspositionApplied.has(this._state.currentStaff!) &&
-            !this._state.staffHasExplicitDisplayTransposition.has(this._state.currentStaff!)
+            !this._state.staffDisplayTranspositionApplied.has(staff) &&
+            !this._state.staffHasExplicitDisplayTransposition.has(staff)
         ) {
-            const program = this._state.currentStaff!.track.playbackInfo.program;
+            const program = staff.track.playbackInfo.program;
             if (ModelUtils.displayTranspositionPitches.has(program)) {
                 // guitar E4 B3 G3 D3 A2 E2
-                this._state.currentStaff!.displayTranspositionPitch =
-                    ModelUtils.displayTranspositionPitches.get(program)!;
+                staff.displayTranspositionPitch = ModelUtils.displayTranspositionPitches.get(program)!;
             } else {
                 this._state.currentStaff!.displayTranspositionPitch = 0;
             }
-            this._state.staffDisplayTranspositionApplied.add(this._state.currentStaff!);
+            this._state.staffDisplayTranspositionApplied.add(staff);
         }
     }
 
-    private _detectTuningForStaff() {
+    private _detectTuningForStaff(staff: Staff) {
         // detect tuning for staff
-        const program = this._state.currentStaff!.track.playbackInfo.program;
-        if (
-            !this._state.staffTuningApplied.has(this._state.currentStaff!) &&
-            !this._state.staffHasExplicitTuning.has(this._state.currentStaff!)
-        ) {
+        const program = staff.track.playbackInfo.program;
+        if (!this._state.staffTuningApplied.has(staff) && !this._state.staffHasExplicitTuning.has(staff)) {
             // reset to defaults
-            this._state.currentStaff!.stringTuning.tunings = [];
+            staff.stringTuning.tunings = [];
 
             if (program === 15) {
                 // dulcimer E4 B3 G3 D3 A2 E2
-                this._state.currentStaff!.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
+                staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
             } else if (program >= 24 && program <= 31) {
                 // guitar E4 B3 G3 D3 A2 E2
-                this._state.currentStaff!.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
+                staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
             } else if (program >= 32 && program <= 39) {
                 // bass G2 D2 A1 E1
-                this._state.currentStaff!.stringTuning.tunings = [43, 38, 33, 28];
+                staff.stringTuning.tunings = [43, 38, 33, 28];
             } else if (
                 program === 40 ||
                 program === 44 ||
@@ -752,36 +765,39 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 program === 51
             ) {
                 // violin E3 A3 D3 G2
-                this._state.currentStaff!.stringTuning.tunings = [52, 57, 50, 43];
+                staff.stringTuning.tunings = [52, 57, 50, 43];
             } else if (program === 41) {
                 // viola A3 D3 G2 C2
-                this._state.currentStaff!.stringTuning.tunings = [57, 50, 43, 36];
+                staff.stringTuning.tunings = [57, 50, 43, 36];
             } else if (program === 42) {
                 // cello A2 D2 G1 C1
-                this._state.currentStaff!.stringTuning.tunings = [45, 38, 31, 24];
+                staff.stringTuning.tunings = [45, 38, 31, 24];
             } else if (program === 43) {
                 // contrabass
                 // G2 D2 A1 E1
-                this._state.currentStaff!.stringTuning.tunings = [43, 38, 33, 28];
+                staff.stringTuning.tunings = [43, 38, 33, 28];
             } else if (program === 105) {
                 // banjo
                 // D3 B2 G2 D2 G3
-                this._state.currentStaff!.stringTuning.tunings = [50, 47, 43, 38, 55];
+                staff.stringTuning.tunings = [50, 47, 43, 38, 55];
             } else if (program === 106) {
                 // shamisen
                 // A3 E3 A2
-                this._state.currentStaff!.stringTuning.tunings = [57, 52, 45];
+                staff.stringTuning.tunings = [57, 52, 45];
             } else if (program === 107) {
                 // koto
                 // E3 A2 D2 G1
-                this._state.currentStaff!.stringTuning.tunings = [52, 45, 38, 31];
+                staff.stringTuning.tunings = [52, 45, 38, 31];
             } else if (program === 110) {
                 // Fiddle
                 // E4 A3 D3 G2
-                this._state.currentStaff!.stringTuning.tunings = [64, 57, 50, 43];
+                staff.stringTuning.tunings = [64, 57, 50, 43];
+            } else {
+                // any non-guitar instrument -> use guitar 6 string tuning
+                staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
             }
 
-            this._state.staffTuningApplied.add(this._state.currentStaff!);
+            this._state.staffTuningApplied.add(staff);
         }
     }
 

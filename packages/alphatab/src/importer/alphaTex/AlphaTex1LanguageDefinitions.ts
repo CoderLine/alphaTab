@@ -304,15 +304,6 @@ export class AlphaTex1LanguageDefinitions {
             ])
         ],
 
-        // tu 3, tu 3 2
-        [
-            'tu',
-            AlphaTex1LanguageDefinitions._basicList([
-                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]
-            ])
-        ],
-
         // tb dip fast (0 -1 0), tb dip (0 -1 0), tb (0 -1 0)
         [
             'tb',

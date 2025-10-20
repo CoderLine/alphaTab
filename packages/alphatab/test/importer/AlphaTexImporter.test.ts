@@ -1,4 +1,5 @@
 import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
+import { StaffNoteKind } from '@src/importer/alphaTex/AlphaTexShared';
 import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AutomationType } from '@src/model/Automation';
@@ -2412,5 +2413,31 @@ describe('AlphaTexImporterTest', () => {
             it('meta-voice-voice', () => test(`C4 | C5 | \\clef C3 \\voice \\voice`));
             it('meta-track-track-meta', () => test(`C4 | C5 | \\clef C3 \\track "T1" \\track "T2" \\clef C4`));
         });
+    });
+
+    describe('staff-autodetect', () => {
+        // tests for autodetecting staff note kinds
+        function test(tex: string, type: StaffNoteKind) {
+            const importer = new AlphaTexImporter();
+            importer.initFromString(tex, new Settings());
+            const s = importer.readScore();
+            expect(importer.getStaffNoteKind(s.tracks[0].staves[0])).to.equal(type);
+        }
+
+        // - direct values
+        describe('direct', () => {
+            it('pitch-value', () => test(`C4`, StaffNoteKind.Pitched));
+            it('fretted', () => test(`3.3`, StaffNoteKind.Fretted));
+            it('articulation', () => test(`"Ride (choke)"`, StaffNoteKind.Articulation));
+        });
+
+        // - with tuning already specified
+        describe('tuning', () => {
+            it('pitch-value', () => test(`\\tuning (C4 C4 C4) C4`, StaffNoteKind.Fretted));
+            it('fretted', () => test(`\\tuning (C4 C4 C4) 3.3`, StaffNoteKind.Fretted));
+            it('articulation', () => test(`\\tuning (C4 C4 C4) "Ride (choke)"`, StaffNoteKind.Fretted));
+        });
+
+        // - with instrument already specified
     });
 });

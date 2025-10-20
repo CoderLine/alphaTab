@@ -929,4 +929,14 @@ export class ModelUtils {
 
         return accidentalToSet;
     }
+
+    
+    /**
+     * @internal
+     */
+    public static toArticulationId(plain: string): string {
+        return plain.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    }
+
 }
+

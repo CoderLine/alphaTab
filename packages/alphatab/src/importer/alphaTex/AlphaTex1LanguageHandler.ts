@@ -25,6 +25,7 @@ import {
 import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
+    StaffNoteKind,
     type IAlphaTexImporter
 } from '@src/importer/alphaTex/AlphaTexShared';
 import { Atnf } from '@src/importer/alphaTex/ATNF';
@@ -318,7 +319,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         case 'piano':
                         case 'none':
                         case 'voice':
-                            importer.makeStaffPitched(staff);
+                            importer.applyStaffNoteKind(staff, StaffNoteKind.Pitched);
                             i = metaData.values!.values.length;
                             break;
                         // backwards compatibility only
@@ -429,7 +430,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     for (const [defaultName, defaultValue] of PercussionMapper.instrumentArticulationNames) {
                         percussionArticulationNames.set(defaultName.toLowerCase(), defaultValue);
                         percussionArticulationNames.set(
-                            AlphaTex1LanguageHandler._toArticulationId(defaultName),
+                            ModelUtils.toArticulationId(defaultName),
                             defaultValue
                         );
                     }
@@ -847,10 +848,6 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         return ApplyNodeResult.Applied;
     }
 
-    private static _toArticulationId(plain: string): string {
-        return plain.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-    }
-
     private static _getChordId(currentStaff: Staff, chordName: string): string {
         return chordName.toLowerCase() + currentStaff.index + currentStaff.track.index;
     }
@@ -1131,7 +1128,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 const instrumentName = (values!.values[0] as AlphaTexTextNode).text.toLowerCase();
                 if (instrumentName === 'percussion') {
                     for (const staff of track.staves) {
-                        importer.applyPercussionStaff(staff);
+                        importer.applyStaffNoteKind(staff, StaffNoteKind.Articulation);
                     }
                     track.playbackInfo.primaryChannel = SynthConstants.PercussionChannel;
                     track.playbackInfo.secondaryChannel = SynthConstants.PercussionChannel;
