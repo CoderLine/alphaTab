@@ -7,10 +7,6 @@
 
     <link rel="stylesheet" href="control.css" />
     <link rel="stylesheet" href="alphatex-editor.css" />
-
-    <script src="/node_modules/ace-builds/src-min/ace.js"></script>
-    <script src="/node_modules/ace-builds/src-min/ext-language_tools.js"></script>
-    <script src="/node_modules/ace-builds/src-min/mode-tex.js"></script>
 </head>
 
 <body>
@@ -35,7 +31,10 @@
     </div>
     <script type="module">
         import { setupControl } from './control.ts';
-
+        import ace from 'ace-builds';
+        import 'ace-builds/src-noconflict/ext-language_tools.js';
+        import 'ace-builds/src-noconflict/mode-tex.js';
+        
         function trimCode(code) {
             return code
                 .trim()

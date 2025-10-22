@@ -1,69 +1,35 @@
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { Environment } from '@src/Environment';
-import { IOHelper } from '@src/io/IOHelper';
-import { GeneralMidi } from '@src/midi/GeneralMidi';
-import { AccentuationType } from '@src/model/AccentuationType';
-import { AutomationType } from '@src/model/Automation';
-import { type Bar, BarLineStyle, SustainPedalMarkerType } from '@src/model/Bar';
-import { BarreShape } from '@src/model/BarreShape';
-import { type Beat, BeatBeamingMode } from '@src/model/Beat';
-import { BendStyle } from '@src/model/BendStyle';
-import { BendType } from '@src/model/BendType';
-import { BrushType } from '@src/model/BrushType';
-import type { Chord } from '@src/model/Chord';
-import { Clef } from '@src/model/Clef';
-import { CrescendoType } from '@src/model/CrescendoType';
-import { Direction } from '@src/model/Direction';
-import { DynamicValue } from '@src/model/DynamicValue';
-import { FadeType } from '@src/model/FadeType';
-import { FermataType } from '@src/model/Fermata';
-import { Fingers } from '@src/model/Fingers';
-import { GolpeType } from '@src/model/GolpeType';
-import { GraceType } from '@src/model/GraceType';
-import { HarmonicType } from '@src/model/HarmonicType';
-import { KeySignature } from '@src/model/KeySignature';
-import { KeySignatureType } from '@src/model/KeySignatureType';
-import type { MasterBar } from '@src/model/MasterBar';
-import { ModelUtils } from '@src/model/ModelUtils';
-import type { Note } from '@src/model/Note';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { NoteOrnament } from '@src/model/NoteOrnament';
-import { Ottavia } from '@src/model/Ottavia';
-import { PercussionMapper } from '@src/model/PercussionMapper';
-import { PickStroke } from '@src/model/PickStroke';
-import { Rasgueado } from '@src/model/Rasgueado';
+import { ScoreExporter } from '@src/exporter/ScoreExporter';
+import { AlphaTex1LanguageHandler } from '@src/importer/alphaTex/AlphaTex1LanguageHandler';
 import {
-    BracketExtendMode,
-    type RenderStylesheet,
-    TrackNameMode,
-    TrackNameOrientation,
-    TrackNamePolicy
-} from '@src/model/RenderStylesheet';
-import { Score } from '@src/model/Score';
-import { SimileMark } from '@src/model/SimileMark';
-import { SlideInType } from '@src/model/SlideInType';
-import { SlideOutType } from '@src/model/SlideOutType';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { TripletFeel } from '@src/model/TripletFeel';
+    type AlphaTexBarNode,
+    type AlphaTexBeatDurationChangeNode,
+    type AlphaTexBeatNode,
+    type AlphaTexComment,
+    type AlphaTexIdentifier,
+    type AlphaTexMetaDataNode,
+    AlphaTexNodeType,
+    type AlphaTexNoteListNode,
+    type AlphaTexNoteNode,
+    type AlphaTexNumberLiteral,
+    type AlphaTexPropertiesNode,
+    type AlphaTexPropertyNode,
+    type AlphaTexScoreNode,
+    type AlphaTexStringLiteral,
+    type AlphaTexValueList,
+    type IAlphaTexAstNode
+} from '@src/importer/alphaTex/AlphaTexAst';
+import type { IAlphaTexLanguageImportHandler } from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
+import { IOHelper } from '@src/io/IOHelper';
+import type { Bar } from '@src/model/Bar';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
+import { PercussionMapper } from '@src/model/PercussionMapper';
+import type { Score } from '@src/model/Score';
+import type { Staff } from '@src/model/Staff';
+import type { Track } from '@src/model/Track';
 import { Tuning } from '@src/model/Tuning';
-import { VibratoType } from '@src/model/VibratoType';
-import type { Voice } from '@src/model/Voice';
-import { WahPedal } from '@src/model/WahPedal';
-import { WhammyType } from '@src/model/WhammyType';
-import { BeamDirection } from '@src/rendering/_barrel';
 import { Settings } from '@src/Settings';
-import { ScoreExporter } from './ScoreExporter';
-
-/**
- * @internal
- */
-class WriterGroup {
-    start: string = '';
-    end: string = '';
-    comment: string = '';
-    hasContent: boolean = false;
-}
 
 /**
  * A small helper to write formatted alphaTex code to a string buffer.
@@ -74,46 +40,6 @@ class AlphaTexWriter {
     public isStartOfLine: boolean = true;
     public indentString: string = '';
     public currentIndent: number = 0;
-
-    public comments: boolean = false;
-
-    private _groups: WriterGroup[] = [];
-    private _singleLineComment: string = '';
-
-    public beginGroup(groupStart: string, groupEnd: string, comment: string = '') {
-        const group = new WriterGroup();
-        group.start = groupStart;
-        group.end = groupEnd;
-        group.comment = comment;
-        this._groups.push(group);
-    }
-
-    public writeSingleLineComment(text: string, onlyIfContent: boolean = false) {
-        if (this.comments && text) {
-            if (onlyIfContent) {
-                this._singleLineComment = `// ${text}`;
-            } else {
-                this.writeLine(`// ${text}`);
-            }
-        }
-    }
-
-    public dropSingleLineComment() {
-        this._singleLineComment = '';
-    }
-
-    public writeInlineComment(text: string) {
-        if (this.comments && text) {
-            this.write(`/* ${text} */`);
-        }
-    }
-
-    public endGroup() {
-        const topGroup = this._groups.pop()!;
-        if (topGroup.hasContent) {
-            this.write(topGroup.end);
-        }
-    }
 
     public indent() {
         if (this.indentString.length > 0) {
@@ -128,12 +54,6 @@ class AlphaTexWriter {
     }
 
     private _preWrite() {
-        if (this._singleLineComment) {
-            const comment = this._singleLineComment;
-            this._singleLineComment = '';
-            this.writeLine(comment);
-        }
-
         // indent if needed
         if (this.isStartOfLine && this.indentString.length > 0) {
             for (let i = 0; i < this.currentIndent; i++) {
@@ -141,22 +61,6 @@ class AlphaTexWriter {
             }
         }
         this.isStartOfLine = false;
-
-        if (this._singleLineComment) {
-            this.tex += this._singleLineComment;
-        }
-
-        // start group
-        if (this._groups.length > 0) {
-            const groups = this._groups[this._groups.length - 1];
-            if (!groups.hasContent) {
-                groups.hasContent = true;
-                this.tex += groups.start;
-                if (this.comments) {
-                    this.writeInlineComment(groups.comment);
-                }
-            }
-        }
     }
 
     public write(text: string) {
@@ -165,48 +69,9 @@ class AlphaTexWriter {
         this.isStartOfLine = false;
     }
 
-    public writeGroupItem(text: any) {
-        if (this._groups.length === 0) {
-            throw new AlphaTabError(
-                AlphaTabErrorType.General,
-                'Wrong usage of writeGroupItem, this is an internal error.'
-            );
-        }
-
-        const hasContent = this._groups[this._groups.length - 1].hasContent;
-        this._preWrite();
-
-        if (hasContent) {
-            this.tex += ' ';
-        }
-        this.tex += text;
-        this.isStartOfLine = false;
-    }
-
     public writeString(text: string) {
         this._preWrite();
         this.tex += Environment.quoteJsonString(text);
-        this.tex += ' ';
-    }
-
-    public writeStringMeta(tag: string, value: string, writeIfEmpty: boolean = false) {
-        if (value.length === 0 && !writeIfEmpty) {
-            return;
-        }
-
-        this._preWrite();
-        this.tex += `\\${tag} `;
-        this.tex += Environment.quoteJsonString(value);
-        this.writeLine();
-    }
-
-    public writeMeta(tag: string, value?: string) {
-        this._preWrite();
-        this.tex += `\\${tag} `;
-        if (value) {
-            this.tex += value;
-        }
-        this.writeLine();
     }
 
     public writeLine(text?: string) {
@@ -226,13 +91,355 @@ class AlphaTexWriter {
 }
 
 /**
+ * @internal
+ */
+class AlphaTexPrinter {
+    private _writer: AlphaTexWriter;
+    private _comments = false;
+
+    public get tex() {
+        return this._writer.tex;
+    }
+
+    constructor(settings: Settings) {
+        const writer = new AlphaTexWriter();
+        this._comments = settings.exporter.comments;
+        writer.indentString = settings.exporter.indent > 0 ? ' '.repeat(settings.exporter.indent) : '';
+        this._writer = writer;
+    }
+
+    public writeScoreNode(node: AlphaTexScoreNode) {
+        this._writeComments(node.leadingComments);
+
+        for (const b of node.bars) {
+            this._writeBar(b);
+        }
+
+        this._writeComments(node.trailingComments);
+    }
+
+    private _writeBar(bar: AlphaTexBarNode) {
+        this._writeComments(bar.leadingComments);
+        this._writeMetaDataList(bar.metaData);
+
+        this._writer.indent();
+
+        for (const beat of bar.beats) {
+            this._writeBeat(beat);
+        }
+
+        this._writer.outdent();
+
+        this._writeComments(bar.trailingComments);
+        this._writeToken(bar.pipe, true);
+    }
+
+    private _writeBeat(beat: AlphaTexBeatNode) {
+        this._writeComments(beat.leadingComments);
+        if (beat.durationChange) {
+            this._writeDurationChange(beat.durationChange);
+        }
+
+        if (beat.rest) {
+            this._writeValue(beat.rest);
+        } else if (beat.notes) {
+            this._writeNotes(beat.notes);
+        }
+
+        this._writeToken(beat.durationDot, false);
+        this._writeValue(beat.durationValue);
+
+        this._writeToken(beat.beatMultiplier, false);
+        this._writeValue(beat.beatMultiplierValue);
+
+        if (beat.beatEffects) {
+            this._writeProperties(beat.beatEffects, false);
+        }
+
+        this._writeComments(beat.trailingComments);
+        this._writer.writeLine();
+    }
+
+    private _writeNotes(notes: AlphaTexNoteListNode) {
+        this._writeComments(notes.leadingComments);
+        this._writeToken(notes.openParenthesis, false);
+
+        let first = true;
+        for (const n of notes.notes) {
+            if (!first) {
+                this._writer.write(' ');
+            }
+            this._writeNote(n);
+            first = false;
+        }
+
+        this._writeToken(notes.closeParenthesis, false);
+        this._writeComments(notes.trailingComments);
+    }
+
+    private _writeNote(n: AlphaTexNoteNode) {
+        this._writeComments(n.leadingComments);
+
+        this._writeValue(n.noteValue);
+        this._writeToken(n.noteStringDot, false);
+        this._writeValue(n.noteString);
+
+        if (n.noteEffects) {
+            this._writeProperties(n.noteEffects, false);
+        }
+
+        this._writeComments(n.trailingComments);
+    }
+
+    private _writeDurationChange(durationChange: AlphaTexBeatDurationChangeNode) {
+        this._writeComments(durationChange.leadingComments);
+        this._writeToken(durationChange.colon, false);
+        this._writeValue(durationChange.value);
+
+        if (durationChange.properties) {
+            this._writer.write(' ');
+            this._writeProperties(durationChange.properties, false);
+        }
+
+        this._writeComments(durationChange.trailingComments);
+
+        this._writer.write(' ');
+    }
+
+    private _writeMetaDataList(metaData: AlphaTexMetaDataNode[]) {
+        for (const m of metaData) {
+            this._writeMetaData(m);
+        }
+    }
+
+    private _trackIndex = 0;
+    private _staffIndex = 0;
+    private _voiceIndex = 0;
+
+    private _writeMetaData(m: AlphaTexMetaDataNode) {
+        // outdent from previous items if we had indents
+        switch (m.tag.tag.text) {
+            case 'track':
+                if (this._trackIndex > 0) {
+                    this._writer.outdent();
+                }
+                break;
+            case 'staff':
+                if (this._staffIndex > 0) {
+                    this._writer.outdent();
+                }
+                break;
+            case 'voice':
+                if (this._voiceIndex > 0) {
+                    this._writer.outdent();
+                }
+                break;
+        }
+
+        this._writeComments(m.leadingComments);
+        this._writeToken(m.tag.prefix, false);
+        this._writeValue(m.tag.tag);
+
+        let newLineAfterMeta = true;
+        if (m.propertiesBeforeValues) {
+            if (m.properties) {
+                this._writer.write(' ');
+                this._writeProperties(m.properties, false);
+            }
+            if (m.values) {
+                this._writer.write(' ');
+                this._writeValues(m.values);
+            }
+        } else {
+            if (m.values) {
+                this._writer.write(' ');
+                this._writeValues(m.values);
+            }
+
+            if (m.properties) {
+                this._writer.write(' ');
+                this._writeProperties(m.properties, true);
+                newLineAfterMeta = false;
+            }
+        }
+
+        if (m.trailingComments) {
+            this._writer.write(' ');
+            this._writeComments(m.trailingComments);
+        }
+
+        // outdent from previous items if we had indents
+        switch (m.tag.tag.text) {
+            case 'track':
+                this._trackIndex++;
+                this._staffIndex = 0;
+                this._voiceIndex = 0;
+                this._writer.indent();
+                break;
+            case 'staff':
+                this._staffIndex++;
+                this._voiceIndex = 0;
+                this._writer.indent();
+                break;
+            case 'voice':
+                this._voiceIndex++;
+                this._writer.indent();
+                break;
+        }
+
+        if (newLineAfterMeta) {
+            this._writer.writeLine();
+        }
+    }
+
+    private _writeProperties(properties: AlphaTexPropertiesNode, indent: boolean) {
+        this._writeComments(properties.leadingComments);
+        this._writeToken(properties.openBrace, indent);
+        if (indent) {
+            this._writer.indent();
+        }
+
+        let first = true;
+        for (const p of properties.properties) {
+            if (!first && !indent) {
+                this._writer.write(' ');
+            }
+            this._writeProperty(p);
+            first = false;
+            if (indent) {
+                this._writer.writeLine();
+            }
+        }
+
+        if (indent) {
+            this._writer.outdent();
+        }
+        this._writeToken(properties.closeBrace, indent);
+        this._writeComments(properties.trailingComments);
+    }
+
+    private _writeProperty(p: AlphaTexPropertyNode) {
+        this._writeComments(p.leadingComments);
+
+        this._writeValue(p.property);
+        if (p.values) {
+            this._writer.write(' ');
+            this._writeValues(p.values);
+        }
+
+        this._writeComments(p.trailingComments);
+    }
+
+    private _writeValues(values: AlphaTexValueList) {
+        this._writeComments(values.leadingComments);
+        this._writeToken(values.openParenthesis, false);
+        let first = true;
+        for (const v of values.values) {
+            if (!first) {
+                this._writer.write(' ');
+            }
+            this._writeValue(v);
+            first = false;
+        }
+        this._writeToken(values.closeParenthesis, false);
+        this._writeComments(values.trailingComments);
+    }
+
+    private _writeValue(v: IAlphaTexAstNode | undefined) {
+        if (!v) {
+            return;
+        }
+        this._writeComments(v.leadingComments);
+        switch (v.nodeType) {
+            case AlphaTexNodeType.Ident:
+                this._writer.write((v as AlphaTexIdentifier).text);
+                break;
+
+            case AlphaTexNodeType.Values:
+                this._writeValues(v as AlphaTexValueList);
+                break;
+            case AlphaTexNodeType.Number:
+                this._writer.write((v as AlphaTexNumberLiteral).value.toString());
+                break;
+            case AlphaTexNodeType.String:
+                this._writer.writeString((v as AlphaTexStringLiteral).text);
+                break;
+        }
+        this._writeComments(v.trailingComments);
+    }
+
+    private _writeToken(tokenNode: IAlphaTexAstNode | undefined, newLine: boolean) {
+        if (tokenNode) {
+            this._writeComments(tokenNode.leadingComments);
+            switch (tokenNode.nodeType) {
+                case AlphaTexNodeType.Dot:
+                    this._writer.write('.');
+                    break;
+                case AlphaTexNodeType.Backslash:
+                    this._writer.write('\\');
+                    break;
+                case AlphaTexNodeType.DoubleBackslash:
+                    this._writer.write('\\\\');
+                    break;
+                case AlphaTexNodeType.Pipe:
+                    this._writer.write('|');
+                    break;
+                case AlphaTexNodeType.LBrace:
+                    this._writer.write('{');
+                    break;
+                case AlphaTexNodeType.RBrace:
+                    this._writer.write('}');
+                    break;
+                case AlphaTexNodeType.LParen:
+                    this._writer.write('(');
+                    break;
+                case AlphaTexNodeType.RParen:
+                    this._writer.write(')');
+                    break;
+                case AlphaTexNodeType.Colon:
+                    this._writer.write(':');
+                    break;
+                case AlphaTexNodeType.Asterisk:
+                    this._writer.write('*');
+                    break;
+            }
+            this._writeComments(tokenNode.trailingComments);
+            if (newLine) {
+                this._writer.writeLine();
+            }
+        }
+    }
+
+    private _writeComments(comments: AlphaTexComment[] | undefined) {
+        if (!this._comments || !comments) {
+            return;
+        }
+
+        for (const c of comments) {
+            let txt = c.text;
+            if (!txt.startsWith(' ')) {
+                txt = ` ${txt}`;
+            }
+
+            if (c.multiLine) {
+                if (!txt.endsWith(' ')) {
+                    txt += ' ';
+                }
+
+                this._writer.write(`/*${txt}*/`);
+            } else {
+                this._writer.writeLine(`//${txt}`);
+            }
+        }
+    }
+}
+
+/**
  * This ScoreExporter can write alphaTex strings.
  * @public
  */
 export class AlphaTexExporter extends ScoreExporter {
-    // used to lookup some default values.
-    private static readonly _defaultScore = new Score();
-    private static readonly _defaultTrack = new Track();
+    private _handler: IAlphaTexLanguageImportHandler = AlphaTex1LanguageHandler.instance;
 
     public get name(): string {
         return 'alphaTex';
@@ -249,1114 +456,245 @@ export class AlphaTexExporter extends ScoreExporter {
     }
 
     public scoreToAlphaTexString(score: Score): string {
-        const writer = new AlphaTexWriter();
-        writer.comments = this.settings.exporter.comments;
-        writer.indentString = this.settings.exporter.indent > 0 ? ' '.repeat(this.settings.exporter.indent) : '';
-        this._writeScoreTo(writer, score);
-        return writer.tex;
+        const printer = new AlphaTexPrinter(this.settings);
+        printer.writeScoreNode(this._score(score));
+        return printer.tex;
     }
 
-    private _writeScoreTo(writer: AlphaTexWriter, score: Score) {
-        writer.writeSingleLineComment('Score Metadata');
-        writer.writeStringMeta('album', score.album);
-        writer.writeStringMeta('artist', score.artist);
-        writer.writeStringMeta('copyright', score.copyright);
-        writer.writeStringMeta('instructions', score.instructions);
-        writer.writeStringMeta('music', score.music);
-        writer.writeStringMeta('notices', score.notices);
-        writer.writeStringMeta('subtitle', score.subTitle);
-        writer.writeStringMeta('title', score.title);
-        writer.writeStringMeta('words', score.words);
-        writer.writeStringMeta('tab', score.tab);
-        writer.write(`\\tempo ${score.tempo} `);
-        if (score.tempoLabel) {
-            writer.writeString(score.tempoLabel);
-        }
-        writer.writeLine();
+    private _score(data: Score): AlphaTexScoreNode {
+        const score: AlphaTexScoreNode = {
+            nodeType: AlphaTexNodeType.Score,
+            bars: []
+        };
 
-        if (score.defaultSystemsLayout !== AlphaTexExporter._defaultScore.defaultSystemsLayout) {
-            writer.writeMeta('defaultSystemsLayout', `${score.defaultSystemsLayout}`);
-        }
-        if (score.systemsLayout.length > 0) {
-            writer.writeMeta('systemsLayout', score.systemsLayout.join(' '));
+        for (const t of data.tracks) {
+            this._track(score, t);
         }
 
-        this._writeStyleSheetTo(writer, score.stylesheet);
-        writer.writeLine('.');
-
-        // Unsupported:
-        // - style
-
-        for (const track of score.tracks) {
-            writer.writeLine();
-            this._writeTrackTo(writer, track);
-        }
-
-        const flatSyncPoints = score.exportFlatSyncPoints();
-        if (flatSyncPoints.length > 0) {
-            writer.writeLine('.');
-            for (const p of flatSyncPoints) {
-                if (p.barPosition > 0) {
-                    writer.writeMeta('sync', `${p.barIndex} ${p.barOccurence} ${p.millisecondOffset}`);
-                } else {
-                    writer.writeMeta('sync', `${p.barIndex} ${p.barOccurence} ${p.millisecondOffset} ${p.barPosition}`);
-                }
-            }
-        }
-    }
-
-    private _writeStyleSheetTo(writer: AlphaTexWriter, stylesheet: RenderStylesheet) {
-        writer.writeSingleLineComment('Score Stylesheet');
-        if (stylesheet.hideDynamics) {
-            writer.writeMeta('hideDynamics');
-        }
-        if (stylesheet.bracketExtendMode !== AlphaTexExporter._defaultScore.stylesheet.bracketExtendMode) {
-            writer.writeMeta('bracketExtendMode', BracketExtendMode[stylesheet.bracketExtendMode]);
-        }
-        if (stylesheet.useSystemSignSeparator) {
-            writer.writeMeta('useSystemSignSeparator');
-        }
-        if (stylesheet.multiTrackMultiBarRest) {
-            writer.writeMeta('multiBarRest');
-        }
-        if (
-            stylesheet.singleTrackTrackNamePolicy !==
-            AlphaTexExporter._defaultScore.stylesheet.singleTrackTrackNamePolicy
-        ) {
-            writer.writeMeta('singleTrackTrackNamePolicy', TrackNamePolicy[stylesheet.singleTrackTrackNamePolicy]);
-        }
-        if (
-            stylesheet.multiTrackTrackNamePolicy !== AlphaTexExporter._defaultScore.stylesheet.multiTrackTrackNamePolicy
-        ) {
-            writer.writeMeta('multiTrackTrackNamePolicy', TrackNamePolicy[stylesheet.multiTrackTrackNamePolicy]);
-        }
-        if (stylesheet.firstSystemTrackNameMode !== AlphaTexExporter._defaultScore.stylesheet.firstSystemTrackNameMode) {
-            writer.writeMeta('firstSystemTrackNameMode', TrackNameMode[stylesheet.firstSystemTrackNameMode]);
-        }
-        if (
-            stylesheet.otherSystemsTrackNameMode !== AlphaTexExporter._defaultScore.stylesheet.otherSystemsTrackNameMode
-        ) {
-            writer.writeMeta('otherSystemsTrackNameMode', TrackNameMode[stylesheet.otherSystemsTrackNameMode]);
-        }
-        if (
-            stylesheet.firstSystemTrackNameOrientation !==
-            AlphaTexExporter._defaultScore.stylesheet.firstSystemTrackNameOrientation
-        ) {
-            writer.writeMeta(
-                'firstSystemTrackNameOrientation',
-                TrackNameOrientation[stylesheet.firstSystemTrackNameOrientation]
-            );
-        }
-        if (
-            stylesheet.otherSystemsTrackNameOrientation !==
-            AlphaTexExporter._defaultScore.stylesheet.otherSystemsTrackNameOrientation
-        ) {
-            writer.writeMeta(
-                'otherSystemsTrackNameOrientation',
-                TrackNameOrientation[stylesheet.otherSystemsTrackNameOrientation]
-            );
-        }
-
-        // Unsupported:
-        // 'globaldisplaychorddiagramsontop',
-        // 'pertrackchorddiagramsontop',
-        // 'globaldisplaytuning',
-        // 'globaldisplaytuning',
-        // 'pertrackdisplaytuning',
-        // 'pertrackchorddiagramsontop',
-        // 'pertrackmultibarrest',
-    }
-
-    private _writeTrackTo(writer: AlphaTexWriter, track: Track) {
-        writer.write('\\track ');
-        writer.writeString(track.name);
-        if (track.shortName.length > 0) {
-            writer.writeString(track.shortName);
-        }
-
-        writer.writeLine(' {');
-        writer.indent();
-
-        writer.writeSingleLineComment('Track Properties');
-
-        if (track.color.rgba !== AlphaTexExporter._defaultTrack.color.rgba) {
-            writer.write(` color `);
-            writer.writeString(track.color.rgba);
-            writer.writeLine();
-        }
-        if (track.defaultSystemsLayout !== AlphaTexExporter._defaultTrack.defaultSystemsLayout) {
-            writer.write(` defaultSystemsLayout ${track.defaultSystemsLayout}`);
-            writer.writeLine();
-        }
-        if (track.systemsLayout.length > 0) {
-            writer.write(` systemsLayout ${track.systemsLayout.join(' ')}`);
-            writer.writeLine();
-        }
-
-        writer.writeLine(` volume ${track.playbackInfo.volume}`);
-        writer.writeLine(` balance ${track.playbackInfo.balance}`);
-
-        if (track.playbackInfo.isMute) {
-            writer.writeLine(` mute`);
-        }
-        if (track.playbackInfo.isSolo) {
-            writer.writeLine(` solo`);
-        }
-
-        if (
-            track.score.stylesheet.perTrackMultiBarRest &&
-            track.score.stylesheet.perTrackMultiBarRest!.has(track.index)
-        ) {
-            writer.writeLine(` multibarrest`);
-        }
-
-        writer.writeLine(
-            ` instrument ${track.isPercussion ? 'percussion' : GeneralMidi.getName(track.playbackInfo.program)}`
-        );
-        if (track.playbackInfo.bank > 0) {
-            writer.writeLine(` bank ${track.playbackInfo.bank}`);
-        }
-
-        writer.outdent();
-        writer.writeLine('}');
-
-        writer.indent();
-
-        for (const staff of track.staves) {
-            this._writeStaffTo(writer, staff);
-        }
-
-        // Unsupported:
-        // - custom percussionArticulations
-        // - style
-
-        writer.outdent();
-    }
-
-    private _writeStaffTo(writer: AlphaTexWriter, staff: Staff) {
-        writer.write('\\staff ');
-
-        writer.beginGroup('{', '}', 'Staff Properties');
-        if (staff.showStandardNotation) {
-            if (staff.standardNotationLineCount !== Staff.DefaultStandardNotationLineCount) {
-                writer.writeGroupItem(`score ${staff.standardNotationLineCount}`);
-            } else {
-                writer.writeGroupItem('score');
-            }
-        }
-        if (staff.showTablature) {
-            writer.writeGroupItem('tabs');
-        }
-        if (staff.showSlash) {
-            writer.writeGroupItem('slash');
-        }
-        if (staff.showNumbered) {
-            writer.writeGroupItem('numbered');
-        }
-        writer.endGroup();
-        writer.writeLine();
-
-        writer.indent();
-
-        const voiceCount = Math.max(...staff.filledVoices) + 1;
-        for (let v = 0; v < voiceCount; v++) {
-            if (voiceCount > 1) {
-                writer.write('\\voice ');
-                writer.writeInlineComment(`Voice ${v + 1}`);
-                writer.writeLine();
-
-                writer.indent();
-            }
-
-            for (const bar of staff.bars) {
-                this._writeBarTo(writer, bar, v);
-            }
-
-            if (voiceCount > 1) {
-                writer.outdent();
-            }
-        }
-
-        // Unsupported:
-        // - style
-
-        writer.outdent();
-    }
-
-    private _writeBarTo(writer: AlphaTexWriter, bar: Bar, voiceIndex: number) {
-        if (bar.index > 0) {
-            writer.writeLine('|');
-        }
-
-        if (voiceIndex === 0) {
-            let anyWritten = false;
-
-            // Staff meta on first bar
-            if (bar.index === 0) {
-                const l = writer.tex.length;
-                this._writeStaffMetaTo(writer, bar.staff);
-                anyWritten = writer.tex.length > l;
-            }
-
-            // Master Bar meta on first track
-            if (bar.staff.index === 0 && bar.staff.track.index === 0) {
-                const l = writer.tex.length;
-                this._writeMasterBarMetaTo(writer, bar.masterBar);
-                anyWritten = writer.tex.length > l;
-            }
-
-            if (anyWritten) {
-                writer.writeLine();
-            }
-        }
-
-        writer.writeSingleLineComment(`Bar ${bar.index + 1}`);
-        writer.indent();
-        this._writeBarMetaTo(writer, bar);
-
-        // Unsupported:
-        // - style
-
-        if (!bar.isEmpty) {
-            this._writeVoiceTo(writer, bar.voices[voiceIndex]);
+        if (score.bars.length === 0) {
+            score.bars.push({
+                nodeType: AlphaTexNodeType.Bar,
+                metaData: this._handler.buildScoreMetaDataNodes(data),
+                beats: []
+            });
         } else {
-            writer.writeSingleLineComment(`empty bar`);
+            score.bars[0].metaData = this._handler
+                .buildScoreMetaDataNodes(data)
+                .concat(score.bars[0].metaData as AlphaTexMetaDataNode[]);
         }
 
-        writer.outdent();
+        score.bars.push({
+            nodeType: AlphaTexNodeType.Bar,
+            metaData: this._handler.buildSyncPointNodes(data),
+            beats: []
+        });
+
+        return score;
     }
 
-    private _writeStaffMetaTo(writer: AlphaTexWriter, staff: Staff) {
-        writer.writeSingleLineComment(`Staff ${staff.index + 1} Metadata`);
-
-        if (staff.capo !== 0) {
-            writer.writeMeta('capo', `${staff.capo}`);
-        }
-        if (staff.isPercussion) {
-            writer.writeMeta('articulation', 'defaults');
-        } else if (staff.isStringed) {
-            writer.write('\\tuning');
-            for (const t of staff.stringTuning.tunings) {
-                writer.write(` ${Tuning.getTextForTuning(t, true)}`);
-            }
-
-            if (
-                staff.track.score.stylesheet.perTrackDisplayTuning &&
-                staff.track.score.stylesheet.perTrackDisplayTuning!.has(staff.track.index)
-            ) {
-                writer.write(' hide');
-            }
-
-            if (staff.stringTuning.name.length > 0) {
-                writer.write(' ');
-                writer.writeString(staff.stringTuning.name);
-            }
-
-            writer.writeLine();
-        }
-
-        if (staff.transpositionPitch !== 0) {
-            writer.writeMeta('transpose', `${-staff.transpositionPitch}`);
-        }
-
-        const defaultTransposition = ModelUtils.displayTranspositionPitches.has(staff.track.playbackInfo.program)
-            ? ModelUtils.displayTranspositionPitches.get(staff.track.playbackInfo.program)!
-            : 0;
-        if (staff.displayTranspositionPitch !== defaultTransposition) {
-            writer.writeMeta('displaytranspose', `${-staff.displayTranspositionPitch}`);
-        }
-
-        writer.writeMeta('accidentals', 'auto');
-
-        if (staff.chords != null) {
-            for (const [_, chord] of staff.chords!) {
-                this._writeChordTo(writer, chord);
-            }
+    private _track(score: AlphaTexScoreNode, data: Track) {
+        for (const s of data.staves) {
+            this._staff(score, s);
         }
     }
 
-    private _writeChordTo(writer: AlphaTexWriter, c: Chord) {
-        writer.write('\\chord {');
-        if (c.firstFret > 0) {
-            writer.write(`firstfret ${c.firstFret} `);
-        }
-        writer.write(`showdiagram ${c.showDiagram ? 'true' : 'false'} `);
-        writer.write(`showfingering ${c.showFingering ? 'true' : 'false'} `);
-        writer.write(`showname ${c.showName ? 'true' : 'false'} `);
-        if (c.barreFrets.length > 0) {
-            const barre = c.barreFrets.map(f => `${f}`).join(' ');
-            writer.write(`barre ${barre} `);
-        }
-        writer.write('} ');
+    private _staff(score: AlphaTexScoreNode, data: Staff) {
+        const voiceCount = Math.max(...data.filledVoices) + 1;
 
-        writer.writeString(c.name);
-
-        for (let i = 0; i < c.staff.tuning.length; i++) {
-            const fret = i < c.strings.length ? `${c.strings[i]} ` : `x `;
-            writer.write(fret);
-        }
-        writer.writeLine();
-    }
-
-    private _writeMasterBarMetaTo(writer: AlphaTexWriter, masterBar: MasterBar) {
-        writer.writeSingleLineComment(`Masterbar ${masterBar.index + 1} Metadata`, true);
-
-        if (masterBar.alternateEndings !== 0) {
-            writer.write('\\ae (');
-            writer.write(
-                ModelUtils.getAlternateEndingsList(masterBar.alternateEndings)
-                    .map(i => i + 1)
-                    .join(' ')
-            );
-            writer.writeLine(')');
-        }
-
-        if (masterBar.isRepeatStart) {
-            writer.writeMeta('ro');
-        }
-
-        if (masterBar.isRepeatEnd) {
-            writer.writeMeta('rc', `${masterBar.repeatCount}`);
-        }
-
-        if (
-            masterBar.index === 0 ||
-            masterBar.timeSignatureCommon !== masterBar.previousMasterBar?.timeSignatureCommon ||
-            masterBar.timeSignatureNumerator !== masterBar.previousMasterBar.timeSignatureNumerator ||
-            masterBar.timeSignatureDenominator !== masterBar.previousMasterBar.timeSignatureDenominator
-        ) {
-            if (masterBar.timeSignatureCommon) {
-                writer.writeStringMeta('ts ', 'common');
-            } else {
-                writer.writeLine(`\\ts ${masterBar.timeSignatureNumerator} ${masterBar.timeSignatureDenominator}`);
-            }
-        }
-
-        if (
-            (masterBar.index > 0 && masterBar.tripletFeel !== masterBar.previousMasterBar?.tripletFeel) ||
-            (masterBar.index === 0 && masterBar.tripletFeel !== TripletFeel.NoTripletFeel)
-        ) {
-            writer.writeMeta('tf', TripletFeel[masterBar.tripletFeel]);
-        }
-
-        if (masterBar.isFreeTime) {
-            writer.writeMeta('ft');
-        }
-
-        if (masterBar.section != null) {
-            writer.write('\\section ');
-            writer.writeString(masterBar.section.marker);
-            writer.writeString(masterBar.section.text);
-            writer.writeLine();
-        }
-
-        if (masterBar.isAnacrusis) {
-            writer.writeMeta('ac');
-        }
-
-        if (masterBar.displayScale !== 1) {
-            writer.writeMeta('scale', masterBar.displayScale.toFixed(3));
-        }
-
-        if (masterBar.displayWidth > 0) {
-            writer.writeMeta('width', `${masterBar.displayWidth}`);
-        }
-
-        if (masterBar.directions) {
-            for (const d of masterBar.directions!) {
-                let jumpValue: string = Direction[d];
-                if (jumpValue.startsWith('Target')) {
-                    jumpValue = jumpValue.substring('Target'.length);
-                } else if (jumpValue.startsWith('Jump')) {
-                    jumpValue = jumpValue.substring('Jump'.length);
-                }
-                writer.writeMeta('jump', jumpValue);
-            }
-        }
-
-        for (const a of masterBar.tempoAutomations) {
-            writer.write(`\\tempo ( ${a.value} `);
-            if (a.text) {
-                writer.writeString(a.text);
-            }
-            writer.write(`${a.ratioPosition} `);
-            if (!a.isVisible) {
-                writer.writeLine('hide ');
-            }
-            writer.writeLine(`)`);
-        }
-
-        writer.dropSingleLineComment();
-    }
-
-    private _writeBarMetaTo(writer: AlphaTexWriter, bar: Bar) {
-        writer.writeSingleLineComment(`Bar ${bar.index + 1} Metadata`, true);
-        const l = writer.tex.length;
-
-        if (bar.index === 0 || bar.clef !== bar.previousBar?.clef) {
-            writer.writeMeta('clef', Clef[bar.clef]);
-        }
-
-        if ((bar.index === 0 && bar.clefOttava !== Ottavia.Regular) || bar.clefOttava !== bar.previousBar?.clefOttava) {
-            let ottava = Ottavia[bar.clefOttava];
-            if (ottava.startsWith('_')) {
-                ottava = ottava.substring(1);
-            }
-            writer.writeMeta('ottava', ottava);
-        }
-
-        if ((bar.index === 0 && bar.simileMark !== SimileMark.None) || bar.simileMark !== bar.previousBar?.simileMark) {
-            writer.writeMeta('simile', SimileMark[bar.simileMark]);
-        }
-
-        if (bar.displayScale !== 1) {
-            writer.writeMeta('scale', bar.displayScale.toFixed(3));
-        }
-
-        if (bar.displayWidth > 0) {
-            writer.writeMeta('width', `${bar.displayWidth}`);
-        }
-
-        // sustainPedals are on beat level
-        for (const sp of bar.sustainPedals) {
-            switch (sp.pedalType) {
-                case SustainPedalMarkerType.Down:
-                    writer.writeMeta('spd', `${sp.ratioPosition}`);
-                    break;
-                case SustainPedalMarkerType.Hold:
-                    writer.writeMeta('sph', `${sp.ratioPosition}`);
-                    break;
-                case SustainPedalMarkerType.Up:
-                    writer.writeMeta('spu', `${sp.ratioPosition}`);
-                    break;
-            }
-        }
-
-        if (bar.barLineLeft !== BarLineStyle.Automatic) {
-            writer.writeMeta('barlineleft', BarLineStyle[bar.barLineLeft]);
-        }
-
-        if (bar.barLineRight !== BarLineStyle.Automatic) {
-            writer.writeMeta('barlineright', BarLineStyle[bar.barLineRight]);
-        }
-
-        if (
-            bar.index === 0 ||
-            bar.keySignature !== bar.previousBar!.keySignature ||
-            bar.keySignatureType !== bar.previousBar!.keySignatureType
-        ) {
-            let ks = '';
-            if (bar.keySignatureType === KeySignatureType.Minor) {
-                switch (bar.keySignature) {
-                    case KeySignature.Cb:
-                        ks = 'abminor';
-                        break;
-                    case KeySignature.Gb:
-                        ks = 'ebminor';
-                        break;
-                    case KeySignature.Db:
-                        ks = 'bbminor';
-                        break;
-                    case KeySignature.Ab:
-                        ks = 'fminor';
-                        break;
-                    case KeySignature.Eb:
-                        ks = 'cminor';
-                        break;
-                    case KeySignature.Bb:
-                        ks = 'gminor';
-                        break;
-                    case KeySignature.F:
-                        ks = 'dminor';
-                        break;
-                    case KeySignature.C:
-                        ks = 'aminor';
-                        break;
-                    case KeySignature.G:
-                        ks = 'eminor';
-                        break;
-                    case KeySignature.D:
-                        ks = 'bminor';
-                        break;
-                    case KeySignature.A:
-                        ks = 'f#minor';
-                        break;
-                    case KeySignature.E:
-                        ks = 'c#minor';
-                        break;
-                    case KeySignature.B:
-                        ks = 'g#minor';
-                        break;
-                    case KeySignature.FSharp:
-                        ks = 'd#minor';
-                        break;
-                    case KeySignature.CSharp:
-                        ks = 'a#minor';
-                        break;
-                    default:
-                        // fallback to major
-                        ks = KeySignature[bar.keySignature];
-                        break;
-                }
-            } else {
-                switch (bar.keySignature) {
-                    case KeySignature.FSharp:
-                        ks = 'f#';
-                        break;
-                    case KeySignature.CSharp:
-                        ks = 'c#';
-                        break;
-                    default:
-                        ks = KeySignature[bar.keySignature];
-                        break;
-                }
-            }
-            writer.writeStringMeta('ks', ks);
-        }
-
-        if (writer.tex.length > l) {
-            writer.writeLine();
-        }
-
-        writer.dropSingleLineComment();
-    }
-
-    private _writeVoiceTo(writer: AlphaTexWriter, voice: Voice) {
-        if (voice.isEmpty) {
-            writer.writeSingleLineComment(`empty voice`);
-            return;
-        }
-
-        writer.writeSingleLineComment(`Bar ${voice.bar.index + 1} / Voice ${voice.index + 1} contents`);
-
-        // Unsupported:
-        // - style
-
-        for (const beat of voice.beats) {
-            this._writeBeatTo(writer, beat);
-        }
-    }
-
-    private _writeBeatTo(writer: AlphaTexWriter, beat: Beat) {
-        // Notes
-        if (beat.isRest) {
-            writer.write('r');
-        } else if (beat.notes.length === 0) {
-            writer.write('()');
+        if (data.bars.length === 0) {
+            const bar: AlphaTexBarNode = {
+                nodeType: AlphaTexNodeType.Bar,
+                metaData: this._handler.buildBarMetaDataNodes(data, undefined, 0, false),
+                beats: [],
+                pipe: undefined
+            };
+            score.bars.push(bar);
         } else {
-            if (beat.notes.length > 1) {
-                writer.write('(');
-            }
-
-            for (const note of beat.notes) {
-                if (note.index > 0) {
-                    writer.write(' ');
-                }
-                this._writeNoteTo(writer, note);
-            }
-
-            if (beat.notes.length > 1) {
-                writer.write(')');
+            for (let v = 0; v < voiceCount; v++) {
+                this._voice(score, v, data, voiceCount > 1);
             }
         }
-
-        writer.write(`.${beat.duration as number}`);
-
-        // Unsupported:
-        // - style
-
-        this._writeBeatEffectsTo(writer, beat);
-
-        writer.writeLine();
     }
 
-    private _writeBeatEffectsTo(writer: AlphaTexWriter, beat: Beat) {
-        writer.beginGroup('{', '}');
-
-        switch (beat.fade) {
-            case FadeType.FadeIn:
-                writer.writeGroupItem('f');
-                break;
-            case FadeType.FadeOut:
-                writer.writeGroupItem('fo');
-                break;
-            case FadeType.VolumeSwell:
-                writer.writeGroupItem('vs');
-                break;
+    private _voice(score: AlphaTexScoreNode, v: number, data: Staff, isMultiVoice: boolean) {
+        for (const bar of data.bars) {
+            this._bar(score, bar, v, isMultiVoice);
         }
+    }
 
-        if (beat.vibrato === VibratoType.Slight) {
-            writer.writeGroupItem('v');
-        } else if (beat.vibrato === VibratoType.Wide) {
-            writer.writeGroupItem('vw');
-        }
+    private _bar(score: AlphaTexScoreNode, data: Bar, voiceIndex: number, isMultiVoice: boolean) {
+        const bar: AlphaTexBarNode = {
+            nodeType: AlphaTexNodeType.Bar,
+            metaData: this._handler.buildBarMetaDataNodes(data.staff, data, voiceIndex, isMultiVoice),
+            beats: [],
+            pipe: undefined
+        };
 
-        if (beat.slap) {
-            writer.writeGroupItem('s');
-        }
-
-        if (beat.pop) {
-            writer.writeGroupItem('p');
-        }
-
-        if (beat.tap) {
-            writer.writeGroupItem('tt');
-        }
-
-        if (beat.dots >= 2) {
-            writer.writeGroupItem('dd');
-        } else if (beat.dots > 0) {
-            writer.writeGroupItem('d');
-        }
-
-        if (beat.pickStroke === PickStroke.Up) {
-            writer.writeGroupItem('su');
-        } else if (beat.pickStroke === PickStroke.Down) {
-            writer.writeGroupItem('sd');
-        }
-
-        if (beat.hasTuplet) {
-            writer.writeGroupItem(`tu ${beat.tupletNumerator} ${beat.tupletDenominator}`);
-        }
-
-        if (beat.hasWhammyBar) {
-            writer.writeGroupItem('tbe');
-            switch (beat.whammyBarType) {
-                case WhammyType.Custom:
-                    writer.writeGroupItem('custom');
-                    break;
-                case WhammyType.Dive:
-                    writer.writeGroupItem('dive');
-                    break;
-                case WhammyType.Dip:
-                    writer.writeGroupItem('dip');
-                    break;
-                case WhammyType.Hold:
-                    writer.writeGroupItem('hold');
-                    break;
-                case WhammyType.Predive:
-                    writer.writeGroupItem('predive');
-                    break;
-                case WhammyType.PrediveDive:
-                    writer.writeGroupItem('predivedive');
-                    break;
-            }
-
-            switch (beat.whammyStyle) {
-                case BendStyle.Default:
-                    break;
-                case BendStyle.Gradual:
-                    writer.writeGroupItem('gradual');
-                    break;
-                case BendStyle.Fast:
-                    writer.writeGroupItem('fast');
-                    break;
-            }
-
-            writer.beginGroup('(', ')');
-
-            for (const p of beat.whammyBarPoints!) {
-                writer.writeGroupItem(` ${p.offset} ${p.value}`);
-            }
-
-            writer.endGroup();
-        }
-
-        switch (beat.brushType) {
-            case BrushType.BrushUp:
-                writer.writeGroupItem(`bu ${beat.brushDuration}`);
-                break;
-            case BrushType.BrushDown:
-                writer.writeGroupItem(`bd ${beat.brushDuration}`);
-                break;
-            case BrushType.ArpeggioUp:
-                writer.writeGroupItem(`au ${beat.brushDuration}`);
-                break;
-            case BrushType.ArpeggioDown:
-                writer.writeGroupItem(`ad ${beat.brushDuration}`);
-                break;
-        }
-
-        if (beat.chord != null) {
-            writer.writeGroupItem('ch ');
-            writer.writeString(beat.chord.name);
-        }
-
-        if (beat.ottava !== Ottavia.Regular) {
-            let ottava = Ottavia[beat.ottava];
-            if (ottava.startsWith('_')) {
-                ottava = ottava.substring(1);
-            }
-
-            writer.writeGroupItem(`ot ${ottava}`);
-        }
-
-        if (beat.hasRasgueado) {
-            writer.writeGroupItem(`rasg ${Rasgueado[beat.rasgueado]}`);
-        }
-
-        if (beat.text != null) {
-            writer.writeGroupItem('txt ');
-            writer.writeString(beat.text);
-        }
-
-        if (beat.lyrics != null && beat.lyrics!.length > 0) {
-            if (beat.lyrics.length > 1) {
-                for (let i = 0; i < beat.lyrics.length; i++) {
-                    writer.writeGroupItem(`lyrics ${i} `);
-                    writer.writeString(beat.lyrics[i]);
-                }
+        if (!data.isEmpty) {
+            const voice = data.voices[voiceIndex];
+            if (voice.isEmpty) {
+                bar.trailingComments = [
+                    {
+                        multiLine: false,
+                        text: `Bar ${data.index + 1} / Voice ${voiceIndex + 1} no contents`
+                    }
+                ];
             } else {
-                writer.writeGroupItem('lyrics ');
-                writer.writeString(beat.lyrics[0]);
+                for (const b of voice.beats) {
+                    bar.beats.push(this._beat(b));
+                }
+                if (bar.beats.length > 0) {
+                    bar.beats[0].leadingComments ??= [];
+                    bar.beats[0].leadingComments.unshift({
+                        multiLine: false,
+                        text: `Bar ${data.index + 1} / Voice ${voiceIndex + 1} contents`
+                    });
+                }
             }
+        } else {
+            bar.trailingComments = [
+                {
+                    multiLine: false,
+                    text: `Bar ${data.index + 1} / Voice ${voiceIndex + 1} no contents`
+                }
+            ];
         }
 
-        switch (beat.graceType) {
-            case GraceType.OnBeat:
-                writer.writeGroupItem('gr ob');
-                break;
-            case GraceType.BeforeBeat:
-                writer.writeGroupItem('gr');
-                break;
-            case GraceType.BendGrace:
-                writer.writeGroupItem('gr b');
-                break;
+        if (data.index < data.staff.bars.length - 1) {
+            bar.pipe = {
+                nodeType: AlphaTexNodeType.Pipe
+            };
         }
 
-        if (beat.isTremolo) {
-            writer.writeGroupItem(`tp ${beat.tremoloSpeed as number}`);
-        }
-
-        switch (beat.crescendo) {
-            case CrescendoType.Crescendo:
-                writer.writeGroupItem('cre');
-                break;
-            case CrescendoType.Decrescendo:
-                writer.writeGroupItem('dec');
-                break;
-        }
-
-        if ((beat.voice.bar.index === 0 && beat.index === 0) || beat.dynamics !== beat.previousBeat?.dynamics) {
-            writer.writeGroupItem(`dy ${DynamicValue[beat.dynamics].toLowerCase()}`);
-        }
-
-        const fermata = beat.fermata;
-        if (fermata != null) {
-            writer.writeGroupItem(`fermata ${FermataType[fermata.type]} ${fermata.length}`);
-        }
-
-        if (beat.isLegatoOrigin) {
-            writer.writeGroupItem('legatoorigin');
-        }
-
-        for (const automation of beat.automations) {
-            switch (automation.type) {
-                case AutomationType.Tempo:
-                    writer.writeGroupItem(`tempo ${automation.value}`);
-                    if (automation.text.length > 0) {
-                        writer.write(' ');
-                        writer.writeString(automation.text);
-                    }
-                    break;
-                case AutomationType.Volume:
-                    writer.writeGroupItem(`volume ${automation.value}`);
-                    break;
-                case AutomationType.Instrument:
-                    if (!beat.voice.bar.staff.isPercussion) {
-                        writer.writeGroupItem(`instrument ${GeneralMidi.getName(automation.value)}`);
-                    }
-                    break;
-                case AutomationType.Balance:
-                    writer.writeGroupItem(`balance ${automation.value}`);
-                    break;
-            }
-        }
-
-        switch (beat.wahPedal) {
-            case WahPedal.Open:
-                writer.writeGroupItem(`waho`);
-                break;
-            case WahPedal.Closed:
-                writer.writeGroupItem(`wahc`);
-                break;
-        }
-
-        if (beat.isBarre) {
-            writer.writeGroupItem(`barre ${beat.barreFret} ${BarreShape[beat.barreShape]}`);
-        }
-
-        if (beat.slashed) {
-            writer.writeGroupItem(`slashed`);
-        }
-
-        if (beat.deadSlapped) {
-            writer.writeGroupItem(`ds`);
-        }
-
-        switch (beat.golpe) {
-            case GolpeType.Thumb:
-                writer.writeGroupItem(`glpt`);
-                break;
-            case GolpeType.Finger:
-                writer.writeGroupItem(`glpf`);
-                break;
-        }
-
-        if (beat.invertBeamDirection) {
-            writer.writeGroupItem('beam invert');
-        } else if (beat.preferredBeamDirection !== null) {
-            writer.writeGroupItem(`beam ${BeamDirection[beat.preferredBeamDirection!]}`);
-        }
-
-        if (beat.beamingMode !== BeatBeamingMode.Auto) {
-            switch (beat.beamingMode) {
-                case BeatBeamingMode.ForceSplitToNext:
-                    writer.writeGroupItem(`beam split`);
-                    break;
-                case BeatBeamingMode.ForceMergeWithNext:
-                    writer.writeGroupItem(`beam merge`);
-                    break;
-                case BeatBeamingMode.ForceSplitOnSecondaryToNext:
-                    writer.writeGroupItem(`beam splitsecondary`);
-                    break;
-            }
-        }
-
-        if (beat.showTimer) {
-            writer.writeGroupItem(`timer`);
-        }
-
-        writer.endGroup();
+        score.bars.push(bar);
     }
 
-    private _writeNoteTo(writer: AlphaTexWriter, note: Note) {
-        if (note.index > 0) {
-            writer.write(' ');
+    private _beat(data: Beat): AlphaTexBeatNode {
+        const beat: AlphaTexBeatNode = {
+            nodeType: AlphaTexNodeType.Beat,
+            durationChange: undefined,
+            notes: undefined,
+            rest: undefined,
+            beatEffects: undefined
+        };
+
+        if (data.isRest) {
+            beat.rest = {
+                nodeType: AlphaTexNodeType.Ident,
+                text: 'r'
+            };
+        } else {
+            beat.notes = this._notes(data.notes);
         }
 
-        if (note.isPercussion) {
-            writer.writeString(PercussionMapper.getArticulationName(note));
-        } else if (note.isPiano) {
-            writer.write(Tuning.getTextForTuning(note.realValueWithoutHarmonic, true));
-        } else if (note.isStringed) {
-            writer.write(`${note.fret}`);
-            const stringNumber = note.beat.voice.bar.staff.tuning.length - note.string + 1;
-            writer.write(`.${stringNumber}`);
+        beat.durationDot = {
+            nodeType: AlphaTexNodeType.Dot
+        };
+        beat.durationValue = {
+            nodeType: AlphaTexNodeType.Number,
+            value: data.duration as number
+        };
+
+        beat.beatEffects = this._beatEffects(data);
+
+        return beat;
+    }
+
+    private _beatEffects(data: Beat): AlphaTexPropertiesNode | undefined {
+        const properties = this._handler.buildBeatEffects(data);
+        return properties.length > 0
+            ? {
+                  nodeType: AlphaTexNodeType.Props,
+                  openBrace: {
+                      nodeType: AlphaTexNodeType.LBrace
+                  },
+                  properties,
+                  closeBrace: {
+                      nodeType: AlphaTexNodeType.RBrace
+                  }
+              }
+            : undefined;
+    }
+
+    private _notes(data: Note[]): AlphaTexNoteListNode {
+        const notes: AlphaTexNoteListNode = {
+            nodeType: AlphaTexNodeType.NoteList,
+            openParenthesis: undefined,
+            notes: [],
+            closeParenthesis: undefined
+        };
+
+        if (data.length === 0 || data.length > 1) {
+            notes.openParenthesis = {
+                nodeType: AlphaTexNodeType.LParen
+            };
+            notes.closeParenthesis = {
+                nodeType: AlphaTexNodeType.RParen
+            };
+        }
+
+        for (const n of data) {
+            notes.notes.push(this._note(n));
+        }
+
+        return notes;
+    }
+
+    private _note(data: Note): AlphaTexNoteNode {
+        const note: AlphaTexNoteNode = {
+            nodeType: AlphaTexNodeType.Note,
+            noteValue: {
+                // placeholder value
+                nodeType: AlphaTexNodeType.Ident,
+                text: ''
+            } as AlphaTexIdentifier
+        };
+
+        if (data.isPercussion) {
+            note.noteValue = {
+                nodeType: AlphaTexNodeType.String,
+                text: PercussionMapper.getArticulationName(data)
+            } as AlphaTexStringLiteral;
+        } else if (data.isPiano) {
+            note.noteValue = {
+                nodeType: AlphaTexNodeType.Ident,
+                text: Tuning.getTextForTuning(data.realValueWithoutHarmonic, true)
+            } as AlphaTexIdentifier;
+        } else if (data.isStringed) {
+            note.noteValue = {
+                nodeType: AlphaTexNodeType.Number,
+                value: data.fret
+            } as AlphaTexNumberLiteral;
+            note.noteStringDot = {
+                nodeType: AlphaTexNodeType.Dot
+            };
+            const stringNumber = data.beat.voice.bar.staff.tuning.length - data.string + 1;
+            note.noteString = {
+                nodeType: AlphaTexNodeType.Number,
+                value: stringNumber
+            };
         } else {
             throw new Error('What kind of note');
         }
 
-        // Unsupported:
-        // - style
+        note.noteEffects = this._noteEffects(data);
 
-        this._writeNoteEffectsTo(writer, note);
+        return note;
     }
 
-    private _writeNoteEffectsTo(writer: AlphaTexWriter, note: Note) {
-        writer.beginGroup('{', '}');
-
-        if (note.hasBend) {
-            writer.writeGroupItem(`be ${BendType[note.bendType]}`);
-
-            if (note.bendStyle !== BendStyle.Default) {
-                writer.writeGroupItem(`${BendStyle[note.bendStyle]} `);
-            }
-
-            writer.beginGroup('(', ')');
-
-            for (const p of note.bendPoints!) {
-                writer.writeGroupItem(`${p.offset} ${p.value}`);
-            }
-
-            writer.endGroup();
-        }
-
-        switch (note.harmonicType) {
-            case HarmonicType.Natural:
-                writer.writeGroupItem('nh');
-                break;
-            case HarmonicType.Artificial:
-                writer.writeGroupItem(`ah ${note.harmonicValue}`);
-                break;
-            case HarmonicType.Pinch:
-                writer.writeGroupItem(`ph ${note.harmonicValue}`);
-                break;
-            case HarmonicType.Tap:
-                writer.writeGroupItem(`th ${note.harmonicValue}`);
-                break;
-            case HarmonicType.Semi:
-                writer.writeGroupItem(`sh ${note.harmonicValue}`);
-                break;
-            case HarmonicType.Feedback:
-                writer.writeGroupItem(`fh ${note.harmonicValue}`);
-                break;
-        }
-
-        if (note.showStringNumber) {
-            writer.writeGroupItem(`string`);
-        }
-
-        if (note.isTrill) {
-            writer.writeGroupItem(`tr ${note.trillFret} ${note.trillSpeed as number}`);
-        }
-
-        switch (note.vibrato) {
-            case VibratoType.Slight:
-                writer.writeGroupItem('v');
-                break;
-            case VibratoType.Wide:
-                writer.writeGroupItem('vw');
-                break;
-        }
-
-        switch (note.slideInType) {
-            case SlideInType.IntoFromBelow:
-                writer.writeGroupItem('sib');
-                break;
-            case SlideInType.IntoFromAbove:
-                writer.writeGroupItem('sia');
-                break;
-        }
-
-        switch (note.slideOutType) {
-            case SlideOutType.Shift:
-                writer.writeGroupItem('ss');
-                break;
-            case SlideOutType.Legato:
-                writer.writeGroupItem('sl');
-                break;
-            case SlideOutType.OutUp:
-                writer.writeGroupItem('sou');
-                break;
-            case SlideOutType.OutDown:
-                writer.writeGroupItem('sod');
-                break;
-            case SlideOutType.PickSlideDown:
-                writer.writeGroupItem('psd');
-                break;
-            case SlideOutType.PickSlideUp:
-                writer.writeGroupItem('psu');
-                break;
-        }
-
-        if (note.isHammerPullOrigin) {
-            writer.writeGroupItem('h');
-        }
-
-        if (note.isLeftHandTapped) {
-            writer.writeGroupItem('lht');
-        }
-
-        if (note.isGhost) {
-            writer.writeGroupItem('g');
-        }
-
-        switch (note.accentuated) {
-            case AccentuationType.Normal:
-                writer.writeGroupItem('ac');
-                break;
-            case AccentuationType.Heavy:
-                writer.writeGroupItem('hac');
-                break;
-            case AccentuationType.Tenuto:
-                writer.writeGroupItem('ten');
-                break;
-        }
-
-        if (note.isPalmMute) {
-            writer.writeGroupItem('pm');
-        }
-
-        if (note.isStaccato) {
-            writer.writeGroupItem('st');
-        }
-
-        if (note.isLetRing) {
-            writer.writeGroupItem('lr');
-        }
-
-        if (note.isDead) {
-            writer.writeGroupItem('x');
-        }
-
-        if (note.isTieDestination) {
-            writer.writeGroupItem('t');
-        }
-
-        switch (note.leftHandFinger) {
-            case Fingers.Thumb:
-                writer.writeGroupItem('lf 1');
-                break;
-            case Fingers.IndexFinger:
-                writer.writeGroupItem('lf 2');
-                break;
-            case Fingers.MiddleFinger:
-                writer.writeGroupItem('lf 3');
-                break;
-            case Fingers.AnnularFinger:
-                writer.writeGroupItem('lf 4');
-                break;
-            case Fingers.LittleFinger:
-                writer.writeGroupItem('lf 5');
-                break;
-        }
-
-        switch (note.rightHandFinger) {
-            case Fingers.Thumb:
-                writer.writeGroupItem('rf 1');
-                break;
-            case Fingers.IndexFinger:
-                writer.writeGroupItem('rf 2');
-                break;
-            case Fingers.MiddleFinger:
-                writer.writeGroupItem('rf 3');
-                break;
-            case Fingers.AnnularFinger:
-                writer.writeGroupItem('rf 4');
-                break;
-            case Fingers.LittleFinger:
-                writer.writeGroupItem('rf 5');
-                break;
-        }
-
-        if (!note.isVisible) {
-            writer.writeGroupItem('hide');
-        }
-
-        if (note.isSlurOrigin) {
-            const slurId = `s${note.id}`;
-            writer.writeGroupItem(`slur ${slurId}`);
-        }
-
-        if (note.isSlurDestination) {
-            const slurId = `s${note.slurOrigin!.id}`;
-            writer.writeGroupItem(`slur ${slurId}`);
-        }
-
-        if (note.isTrill) {
-            writer.writeGroupItem(`tr ${note.trillFret} ${note.trillSpeed as number}`);
-        }
-
-        if (note.accidentalMode !== NoteAccidentalMode.Default) {
-            writer.writeGroupItem(`acc ${NoteAccidentalMode[note.accidentalMode]}`);
-        }
-
-        switch (note.ornament) {
-            case NoteOrnament.InvertedTurn:
-                writer.writeGroupItem(`iturn`);
-                break;
-            case NoteOrnament.Turn:
-                writer.writeGroupItem(`turn`);
-                break;
-            case NoteOrnament.UpperMordent:
-                writer.writeGroupItem(`umordent`);
-                break;
-            case NoteOrnament.LowerMordent:
-                writer.writeGroupItem(`lmordent`);
-                break;
-        }
-
-        writer.endGroup();
+    private _noteEffects(data: Note): AlphaTexPropertiesNode | undefined {
+        const properties = this._handler.buildNoteEffects(data);
+        return properties.length > 0
+            ? {
+                  nodeType: AlphaTexNodeType.Props,
+                  openBrace: {
+                      nodeType: AlphaTexNodeType.LBrace
+                  },
+                  properties,
+                  closeBrace: {
+                      nodeType: AlphaTexNodeType.RBrace
+                  }
+              }
+            : undefined;
     }
 }

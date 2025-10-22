@@ -16,6 +16,5 @@ export class AlphaTabError extends Error {
     public constructor(type: AlphaTabErrorType, message: string | null = '', inner?: Error) {
         super(message ?? '', { cause: inner });
         this.type = type;
-        Object.setPrototypeOf(this, AlphaTabError.prototype);
     }
 }

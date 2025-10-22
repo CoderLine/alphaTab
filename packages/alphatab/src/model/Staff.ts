@@ -125,6 +125,7 @@ export class Staff {
         if (this.isPercussion) {
             this.stringTuning.tunings = [];
             this.showTablature = false;
+            this.displayTranspositionPitch = 0;
         }
         this.stringTuning.finish();
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {

@@ -16,6 +16,8 @@ import type { SyncExpectationResult } from 'expect';
 import { equals, iterableEquality, subsetEquality } from '@jest/expect-utils';
 import * as matcherUtils from 'jest-matcher-utils';
 import {
+    AlphaTexAstNodePlugin,
+    AlphaTexDiagnosticPlugin,
     MidiEventSerializerPlugin,
     type PrettyFormatConfig,
     type PrettyFormatPrinter,
@@ -57,6 +59,38 @@ export async function initializeJestSnapshot() {
         serialize(val, config, indentation, depth, refs, printer) {
             //
             return MidiEventSerializerPlugin.instance.serialize(
+                val,
+                config as PrettyFormatConfig,
+                indentation,
+                depth,
+                refs,
+                printer as PrettyFormatPrinter
+            );
+        }
+    });
+    addSerializer({
+        test(val) {
+            return AlphaTexDiagnosticPlugin.instance.test(val);
+        },
+        serialize(val, config, indentation, depth, refs, printer) {
+            //
+            return AlphaTexDiagnosticPlugin.instance.serialize(
+                val,
+                config as PrettyFormatConfig,
+                indentation,
+                depth,
+                refs,
+                printer as PrettyFormatPrinter
+            );
+        }
+    });
+    addSerializer({
+        test(val) {
+            return AlphaTexAstNodePlugin.instance.test(val);
+        },
+        serialize(val, config, indentation, depth, refs, printer) {
+            //
+            return AlphaTexAstNodePlugin.instance.serialize(
                 val,
                 config as PrettyFormatConfig,
                 indentation,

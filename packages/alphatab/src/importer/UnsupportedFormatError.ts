@@ -8,6 +8,5 @@ import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 export class UnsupportedFormatError extends AlphaTabError {
     public constructor(message: string | null = null, inner?: Error) {
         super(AlphaTabErrorType.Format, message ?? 'Unsupported format', inner);
-        Object.setPrototypeOf(this, UnsupportedFormatError.prototype);
     }
 }

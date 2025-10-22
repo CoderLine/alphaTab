@@ -19,7 +19,7 @@
         "generate-typescript": "npm run generate-typescript --workspace=packages/alphatab",
         
         "build": "npm run build --workspace=packages/alphatab",
-        "test": "npm run build --workspace=packages/alphatab",
+        "test": "npm run test --workspace=packages/alphatab",
 
         "build-web": "npm run build && npm run build-webpack && npm run build-vite",
         "test-web": "npm run test && npm run test-webpack && npm run test-vite",

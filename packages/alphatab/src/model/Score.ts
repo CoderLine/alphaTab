@@ -108,6 +108,22 @@ export class HeaderFooterStyle {
         this.textAlign = textAlign;
     }
 
+    public static equals(a: HeaderFooterStyle, b: HeaderFooterStyle) {
+        const aIsVisible = a.isVisible !== undefined ? a.isVisible! : true;
+        const bIsVisible = b.isVisible !== undefined ? b.isVisible! : true;
+
+        if (aIsVisible !== bIsVisible) {
+            return false;
+        }
+        if (a.template !== b.template) {
+            return false;
+        }
+        if (a.textAlign !== b.textAlign) {
+            return false;
+        }
+        return true;
+    }
+
     public buildText(score: Score) {
         let anyPlaceholderFilled = false;
         let anyPlaceholder = false;

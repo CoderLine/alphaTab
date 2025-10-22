@@ -3760,7 +3760,7 @@ export class MusicXmlImporter extends ScoreImporter {
             note.octave = 0;
             note.tone = 0;
         } else {
-            const value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue;
+            const value: number = octave * 12 + (ModelUtils.getToneForText(step)?.noteValue ?? 0);
             note.octave = (value / 12) | 0;
             note.tone = value - note.octave * 12;
         }
@@ -3791,7 +3791,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         semitones = semitones | 0; // no microtones supported
-        const value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue + semitones;
+        const value: number = octave * 12 + (ModelUtils.getToneForText(step)?.noteValue ?? 0) + semitones;
         const note = new Note();
 
         note.octave = (value / 12) | 0;

@@ -1,8 +1,7 @@
-import { MidiPlaybackController } from '@src/midi/MidiPlaybackController';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import type { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { Logger } from '@src/Logger';
+import { MidiPlaybackController } from '@src/midi/MidiPlaybackController';
+import type { Score } from '@src/model/Score';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { assert, expect } from 'chai';
 
@@ -46,9 +45,7 @@ describe('MidiPlaybackControllerTest', () => {
     }
 
     function testAlphaTexRepeat(tex: string, expectedBars: number[], maxBars: number): void {
-        const importer: AlphaTexImporter = new AlphaTexImporter();
-        importer.initFromString(tex, new Settings());
-        const score: Score = importer.readScore();
+        const score: Score = ScoreLoader.loadAlphaTex(tex);
         testRepeat(score, expectedBars, maxBars);
     }
 
@@ -112,8 +109,8 @@ describe('MidiPlaybackControllerTest', () => {
     it('multiple-closes', () => {
         const tex: string = `
             .
-            4.3.4*4 | \\ro 4.3.4*4 | \\rc 2 4.3.4*4 | 4.3.4*4 | 4.3.4*4 | \\rc 2 4.3.4*4 | 4.3.4*4 | 
-            \\ro 4.3.4*4 | \\rc 2 4.3.4*4 | 4.3.4*4 | 4.3.4*4 
+            4.3.4*4 | \\ro 4.3.4*4 | \\rc 2 4.3.4*4 | 4.3.4*4 | 4.3.4*4 | \\rc 2 4.3.4*4 | 4.3.4*4 |
+            \\ro 4.3.4*4 | \\rc 2 4.3.4*4 | 4.3.4*4 | 4.3.4*4
         `;
         const expectedBars: number[] = [
             0, // no repeat
@@ -151,7 +148,7 @@ describe('MidiPlaybackControllerTest', () => {
             .
             \\ro 4.3.4*4 | \\ro 4.3.4*4 | \\rc 2 4.3.4*4  | 4.3.4*4 | \\rc 2 4.3.4*4 |
             3.3.4*4 |
-            \\ro 4.3.4*4 | \\ro 4.3.4*4 | \\rc 2 4.3.4*4  | 4.3.4*4 | \\rc 2 4.3.4*4 
+            \\ro 4.3.4*4 | \\ro 4.3.4*4 | \\rc 2 4.3.4*4  | 4.3.4*4 | \\rc 2 4.3.4*4
         `;
         const expectedBars: number[] = [
             0, 1, 2, 1, 2, 3, 4, 0, 1, 2, 1, 2, 3, 4, 5, 6, 7, 8, 7, 8, 9, 10, 6, 7, 8, 7, 8, 9, 10
@@ -174,7 +171,7 @@ describe('MidiPlaybackControllerTest', () => {
     it('da-capo', () => {
         const tex: string = `
         .
-        \\ro :1 r | \\rc 2 r | \\jump DaCapo r | r       
+        \\ro :1 r | \\rc 2 r | \\jump DaCapo r | r
         `;
         const expectedBars: number[] = [0, 1, 0, 1, 2, 0, 1, 2, 3];
         testAlphaTexRepeat(tex, expectedBars, 50);
@@ -222,7 +219,7 @@ describe('MidiPlaybackControllerTest', () => {
         const tex: string = `
         .
         \\ro :1 r | \\rc 2 r | r |
-        \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda r | 
+        \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda r |
         r | r | \\jump DalSegnoAlCoda r | r | \\jump Coda r | r | \\ro \\rc 2 r
         `;
         const expectedBars: number[] = [0, 1, 0, 1, 2, 3, 4, 4, 5, 6, 7, 8, 3, 4, 5, 10, 11, 12, 12];
@@ -233,7 +230,7 @@ describe('MidiPlaybackControllerTest', () => {
         const tex: string = `
         .
         \\ro :1 r | \\rc 2 r | r |
-        \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda r | 
+        \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda r |
         r | r | \\jump DalSegnoAlCoda r | r | r | r | \\ro \\rc 2 r
         `;
         const expectedBars: number[] = [0, 1, 0, 1, 2, 3, 4, 4, 5, 6, 7, 8, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -244,7 +241,7 @@ describe('MidiPlaybackControllerTest', () => {
         const tex: string = `
         .
         \\ro :1 r | \\rc 2 r | r |
-        \\jump Segno r | \\ro \\rc 2 r | \\jump DaDoubleCoda r | 
+        \\jump Segno r | \\ro \\rc 2 r | \\jump DaDoubleCoda r |
         r | r | \\jump DalSegnoAlDoubleCoda r | r | \\jump DoubleCoda r | r | \\ro \\rc 2 r
         `;
         const expectedBars: number[] = [0, 1, 0, 1, 2, 3, 4, 4, 5, 6, 7, 8, 3, 4, 5, 10, 11, 12, 12];
@@ -255,8 +252,8 @@ describe('MidiPlaybackControllerTest', () => {
         const tex: string = `
         .
         \\ro :1 r | \\rc 2 r | r |
-        \\jump Segno r | \\ro \\rc 2 r | \\jump Fine | 
-        r | r | \\jump DalSegnoAlFine r | r | 
+        \\jump Segno r | \\ro \\rc 2 r | \\jump Fine |
+        r | r | \\jump DalSegnoAlFine r | r |
         `;
         const expectedBars: number[] = [0, 1, 0, 1, 2, 3, 4, 4, 5, 6, 7, 8, 3, 4, 5];
         testAlphaTexRepeat(tex, expectedBars, 50);
@@ -286,7 +283,7 @@ describe('MidiPlaybackControllerTest', () => {
         const tex: string = `
         .
         \\ro :1 r | \\rc 2 r | r |
-        \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump DaCoda r | 
+        \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump DaCoda r |
         r | r | \\jump DalSegnoSegnoAlCoda r | r | \\jump Coda r | r | \\ro \\rc 2 r
         `;
         const expectedBars: number[] = [0, 1, 0, 1, 2, 3, 4, 4, 5, 6, 7, 8, 3, 4, 5, 10, 11, 12, 12];
@@ -297,7 +294,7 @@ describe('MidiPlaybackControllerTest', () => {
         const tex: string = `
         .
         \\ro :1 r | \\rc 2 r | r |
-        \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump DaDoubleCoda r | 
+        \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump DaDoubleCoda r |
         r | r | \\jump DalSegnoSegnoAlDoubleCoda r | r | \\jump DoubleCoda r | r | \\ro \\rc 2 r
         `;
         const expectedBars: number[] = [0, 1, 0, 1, 2, 3, 4, 4, 5, 6, 7, 8, 3, 4, 5, 10, 11, 12, 12];
@@ -308,8 +305,8 @@ describe('MidiPlaybackControllerTest', () => {
         const tex: string = `
         .
         \\ro :1 r | \\rc 2 r | r |
-        \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump Fine | 
-        r | r | \\jump DalSegnoSegnoAlFine r | r | 
+        \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump Fine |
+        r | r | \\jump DalSegnoSegnoAlFine r | r |
         `;
         const expectedBars: number[] = [0, 1, 0, 1, 2, 3, 4, 4, 5, 6, 7, 8, 3, 4, 5];
         testAlphaTexRepeat(tex, expectedBars, 50);
@@ -318,14 +315,14 @@ describe('MidiPlaybackControllerTest', () => {
     it('multiple-jumps-same-target', () => {
         const tex: string = `
         .
-        
+
         \\ro :1 r | \\rc 2 r | r |
-        \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda r | 
+        \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda r |
         r | r | \\jump DalSegnoAlCoda r | r | \\jump Coda r | r | \\ro \\rc 2 r |
 
 
         \\ro :1 r | \\rc 2 r | r |
-        \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda r | 
+        \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda r |
         r | r | \\jump DalSegnoAlCoda r | r | \\jump Coda r | r | \\ro \\rc 2 r
 
         `;
@@ -342,14 +339,14 @@ describe('MidiPlaybackControllerTest', () => {
     it('multiple-jumps-different-target', () => {
         const tex: string = `
         .
-        
+
         \\ro :1 r | \\rc 2 r | r |
-        \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda r | 
+        \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda r |
         r | r | \\jump DalSegnoAlCoda r | r | \\jump Coda r | r | \\ro \\rc 2 r |
 
 
         \\ro :1 r | \\rc 2 r | r |
-        \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump DaDoubleCoda r | 
+        \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump DaDoubleCoda r |
         r | r | \\jump DalSegnoSegnoAlDoubleCoda r | r | \\jump DoubleCoda r | r | \\ro \\rc 2 r
 
         `;

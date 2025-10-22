@@ -26,6 +26,7 @@ export class TuningParseResult {
     }
 }
 
+
 /**
  * @internal
  */
@@ -88,11 +89,14 @@ export class ModelUtils {
         return !!ModelUtils.parseTuning(name);
     }
 
-    private static readonly _tuningLetters = new Set<number>([
+    /**
+     * @internal
+     */
+    public static readonly tuningLetters = new Set<number>([
         0x43 /* C */, 0x44 /* D */, 0x45 /* E */, 0x46 /* F */, 0x47 /* G */, 0x41 /* A */, 0x42 /* B */, 0x63 /* c */,
         0x64 /* d */, 0x65 /* e */, 0x66 /* f */, 0x67 /* g */, 0x61 /* a */, 0x62 /* b */, 0x23 /* # */
     ]);
-    
+
     public static parseTuning(name: string): TuningParseResult | null {
         let note: string = '';
         let octave: string = '';
@@ -104,20 +108,29 @@ export class ModelUtils {
                     return null;
                 }
                 octave += String.fromCharCode(c);
-            } else if (ModelUtils._tuningLetters.has(c)) {
-                note += String.fromCharCode(c);
+            } else if (note.length === 0) {
+                if (ModelUtils.tuningLetters.has(c)) {
+                    note += String.fromCharCode(c);
+                } else {
+                    return null;
+                }
             } else {
-                return null;
+                note += String.fromCharCode(c);
             }
         }
         if (!octave || !note) {
             return null;
         }
+
         const result: TuningParseResult = new TuningParseResult();
 
         result.octave = Number.parseInt(octave, 10) + 1;
         result.note = note.toLowerCase();
-        result.tone = ModelUtils.getToneForText(result.note);
+        const tone = ModelUtils.getToneForText(result.note);
+        if (tone === null) {
+            return null;
+        }
+        result.tone = tone;
 
         // if tone.noteValue is negative (eg. on Cb note)
         // we adjust roll-over to a lower octave
@@ -137,7 +150,7 @@ export class ModelUtils {
         return result.realValue;
     }
 
-    public static getToneForText(note: string): TuningParseResultTone {
+    public static getToneForText(note: string): TuningParseResultTone | null {
         const noteName = note.substring(0, 1);
         const accidental = note.substring(1);
 
@@ -167,8 +180,11 @@ export class ModelUtils {
                 noteValue = 11;
                 break;
             default:
-                noteValue = 0;
-                break;
+                return null;
+        }
+
+        if (!ModelUtils.accidentalModeMapping.has(accidental)) {
+            return null;
         }
 
         noteAccidenalMode = ModelUtils.parseAccidentalMode(accidental);
@@ -199,9 +215,29 @@ export class ModelUtils {
     /**
      * @internal
      */
+    public static readonly reverseAccidentalModeMapping = new Map<NoteAccidentalMode, string>([
+        [NoteAccidentalMode.Default, 'd'],
+
+        [NoteAccidentalMode.ForceNone, 'forcenone'],
+
+        [NoteAccidentalMode.ForceNatural, 'forcenatural'],
+
+        [NoteAccidentalMode.ForceSharp, '#'],
+
+        [NoteAccidentalMode.ForceDoubleSharp, 'x'],
+
+        [NoteAccidentalMode.ForceFlat, 'b'],
+
+        [NoteAccidentalMode.ForceDoubleFlat, 'bb']
+    ]);
+
+    /**
+     * @internal
+     */
     public static readonly accidentalModeMapping = new Map<string, NoteAccidentalMode>([
         ['default', NoteAccidentalMode.Default],
         ['d', NoteAccidentalMode.Default],
+        ['', NoteAccidentalMode.Default],
 
         ['forcenone', NoteAccidentalMode.ForceNone],
         ['-', NoteAccidentalMode.ForceNone],
@@ -717,6 +753,9 @@ export class ModelUtils {
         return keySignatures;
     }
 
+    /**
+     * @internal
+     */
     private static readonly _keyTransposeTable: KeySignature[][] = ModelUtils._translateKeyTransposeTable([
         /*              Cb    Gb    Db    Ab    Eb    Bb    F     C     G     D     A     E     B     F     C# */
         /* C	 0 */ ['7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#'],
@@ -787,7 +826,7 @@ export class ModelUtils {
      * Contains the list of notes within an octave have accidentals set.
      * @internal
      */
-    public static readonly accidentalNotes: boolean[] = [
+    public static accidentalNotes: boolean[] = [
         false,
         true,
         false,
@@ -898,4 +937,14 @@ export class ModelUtils {
 
         return accidentalToSet;
     }
+
+    
+    /**
+     * @internal
+     */
+    public static toArticulationId(plain: string): string {
+        return plain.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    }
+
 }
+

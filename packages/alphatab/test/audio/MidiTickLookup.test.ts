@@ -1,4 +1,3 @@
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
@@ -626,9 +625,10 @@ describe('MidiTickLookupTest', () => {
 
     it('before-beat-grace-later-bars', () => {
         const settings = new Settings();
-        const importer = new AlphaTexImporter();
-        importer.initFromString('\\ts 2 4 1.1.2 | 2.1.4 3.1 | 4.1{gr} 5.1{gr} 6.1.2 | 7.1.4 8.1', settings);
-        const score = importer.readScore();
+        const score = ScoreLoader.loadAlphaTex(
+            '\\ts 2 4 1.1.2 | 2.1.4 3.1 | 4.1{gr} 5.1{gr} 6.1.2 | 7.1.4 8.1',
+            settings
+        );
         const lookup = buildLookup(score, settings);
 
         // bar 2 contains the grace notes which stole duration from fret 3 beat.
@@ -744,7 +744,7 @@ describe('MidiTickLookupTest', () => {
             \\tempo 67
             .
             \\track "T01"
-            \\ts 1 4 1.1.8 2.1.8 | 6.1.8 7.1.8 | 
+            \\ts 1 4 1.1.8 2.1.8 | 6.1.8 7.1.8 |
             \\track "T02"
             3.1.16 4.1.16 5.1.8 | 8.1.16 9.1.16 10.1.8
         `,
@@ -869,9 +869,9 @@ describe('MidiTickLookupTest', () => {
             `
             \\track { multiBarRest }
             \\ts 2 4
-            1.1.4 2.1.4 | 
-            r | r | r | r | 
-            3.1.4 | 
+            1.1.4 2.1.4 |
+            r | r | r | r |
+            3.1.4 |
             r | r | r |
             \\ro r | r | r | \\rc 2 r |
             r

@@ -1,11 +1,11 @@
 import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
-import { AlphaTexError, AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { AlphaTexErrorWithDiagnostics } from '@src/importer/AlphaTexImporter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { TestPlatform } from '@test/TestPlatform';
-import { assert, expect } from 'chai';
+import { assert } from 'chai';
 
 describe('AlphaTexExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
@@ -15,12 +15,6 @@ describe('AlphaTexExporterTest', () => {
         } catch {
             return null;
         }
-    }
-
-    function parseAlphaTex(tex: string): Score {
-        const readerBase: AlphaTexImporter = new AlphaTexImporter();
-        readerBase.initFromString(tex, new Settings());
-        return readerBase.readScore();
     }
 
     function exportAlphaTex(score: Score, settings: Settings | null = null): string {
@@ -40,21 +34,25 @@ describe('AlphaTexExporterTest', () => {
             ComparisonHelpers.alphaTexExportRoundtripPrepare(expected);
 
             exported = exportAlphaTex(expected);
-            const actual = parseAlphaTex(exported);
+            const actual = ScoreLoader.loadAlphaTex(exported);
 
             ComparisonHelpers.alphaTexExportRoundtripEqual(fileName, actual, expected, ignoreKeys);
         } catch (e) {
-            let errorLine = '';
+            const errorLines: string[] = [];
 
             const error = e as Error;
-            if (error.cause instanceof AlphaTexError) {
-                const alphaTexError = error.cause as AlphaTexError;
-
+            const unwrapped = error.cause instanceof AlphaTexErrorWithDiagnostics ? error.cause! : error;
+            if (unwrapped instanceof AlphaTexErrorWithDiagnostics) {
+                const withDiag = unwrapped as AlphaTexErrorWithDiagnostics;
                 const lines = exported.split('\n');
-                errorLine = `Error Line: ${lines[alphaTexError.line - 1]}\n`;
+                for (const d of withDiag.iterateDiagnostics()) {
+                    errorLines.push(`Error Line ${lines[d.start!.line - 1]}`);
+                }
             }
 
-            assert.fail(`<${fileName}>${e}\n${errorLine}${error.stack}\n Tex:\n${exported}`);
+            assert.fail(
+                `<${fileName}>${unwrapped.toString()}\n${errorLines.join('\n')}${error.stack}\n Tex:\n${exported}`
+            );
         }
     }
 
@@ -64,6 +62,69 @@ describe('AlphaTexExporterTest', () => {
             await testRoundTripEqual(`${name}/${file}`, null);
         }
     }
+
+    it('notation-legend-roundtrip', async () => {
+        const score = (await loadScore('visual-tests/notation-legend/notation-legend.gp'))!;
+        // fill some more details to cover all features
+        score.title = 'Notation Legend';
+        score.subTitle = 'for test suite';
+        score.artist = 'alphaTab';
+
+        const settings = new Settings();
+        settings.exporter.comments = true;
+        settings.exporter.indent = 2;
+
+        ComparisonHelpers.alphaTexExportRoundtripPrepare(score);
+        const exported = exportAlphaTex(score!, settings);
+
+        const reimportedScore = ScoreLoader.loadAlphaTex(exported);
+        ComparisonHelpers.alphaTexExportRoundtripPrepare(reimportedScore);
+
+        ComparisonHelpers.alphaTexExportRoundtripEqual('export-roundtrip', reimportedScore, score);
+    });
+
+    it('exact-contents-formatted', async () => {
+        const score = (await loadScore('visual-tests/notation-legend/notation-legend.gp'))!;
+
+        // fill some more details to cover all features
+        score.title = 'Notation Legend';
+        score.subTitle = 'for test suite';
+        score.artist = 'alphaTab';
+
+        const settings = new Settings();
+        settings.exporter.comments = true;
+        settings.exporter.indent = 2;
+
+        let data = exportAlphaTex(score!, settings);
+        let expected = await TestPlatform.loadFileAsString('test-data/exporter/notation-legend-formatted.atex');
+
+        data = data.replaceAll('\r', '').trim();
+        expected = expected.replaceAll('\r', '').trim();
+
+        const expectedLines = expected.split('\n');
+        const actualLines = data.split('\n');
+        const lines = Math.min(expectedLines.length, actualLines.length);
+        const errors: string[] = [];
+
+        if (expectedLines.length !== actualLines.length) {
+            errors.push(`Expected ${expectedLines.length} lines, but only got ${actualLines.length}`);
+        }
+
+        for (let i = 0; i < lines; i++) {
+            if (actualLines[i].trimEnd() !== expectedLines[i].trimEnd()) {
+                errors.push(`Error on line ${i + 1}: `);
+                errors.push(`+ ${actualLines[i]}`);
+                errors.push(`- ${expectedLines[i]}`);
+            }
+        }
+
+        if (errors.length > 0) {
+            await TestPlatform.saveFileAsString('test-data/exporter/notation-legend-formatted.atex.new', data);
+            assert.fail(errors.join('\n'));
+        } else {
+            await TestPlatform.deleteFile('test-data/exporter/notation-legend-formatted.atex.new');
+        }
+    });
 
     // Note: we just test all our importer and visual tests to cover all features
 
@@ -113,26 +174,5 @@ describe('AlphaTexExporterTest', () => {
 
     it('gp7-to-alphaTex', async () => {
         await testRoundTripEqual(`conversion/full-song.gp`);
-    });
-
-    it('exact-contents-formatted', async () => {
-        const score = (await loadScore('visual-tests/notation-legend/notation-legend.gp'))!;
-
-        // fill some more details to cover all features
-        score.title = 'Notation Legend';
-        score.subTitle = 'for test suite';
-        score.artist = 'alphaTab';
-
-        const settings = new Settings();
-        settings.exporter.comments = true;
-        settings.exporter.indent = 2;
-
-        let data = exportAlphaTex(score!, settings);
-        let expected = await TestPlatform.loadFileAsString('test-data/exporter/notation-legend-formatted.atex');
-
-        data = data.replaceAll('\r', '').trim();
-        expected = expected.replaceAll('\r', '').trim();
-
-        expect(data).to.equal(expected);
     });
 });

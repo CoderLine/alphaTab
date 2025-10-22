@@ -1,7 +1,5 @@
 import { SystemsLayoutMode } from '@src/DisplaySettings';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { ByteBuffer } from '@src/io/ByteBuffer';
 import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
@@ -98,9 +96,7 @@ describe('EffectsAndAnnotationsTests', () => {
         const settings = new Settings();
         settings.display.barsPerRow = 1;
 
-        const importer = new AlphaTexImporter();
-        importer.init(ByteBuffer.fromString(tex), settings);
-        const score = importer.readScore();
+        const score = ScoreLoader.loadAlphaTex(tex);
 
         await VisualTestHelper.runVisualTestFull(
             new VisualTestOptions(
@@ -168,11 +164,10 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('sustain-pedal-alphatex', async () => {
-        const importer = new AlphaTexImporter();
         const settings = new Settings();
-        importer.initFromString(
+        const score = ScoreLoader.loadAlphaTex(
             `
-        .
+        \\tempo 120
         \\track "pno."
         :8 G4 { spd } G4 G4 { spu } G4 G4 { spd } G4 {spu} G4 G4 {spd} |
         G4 { spu } G4 G4 G4 G4 G4 G4 G4 |
@@ -183,7 +178,6 @@ describe('EffectsAndAnnotationsTests', () => {
         `,
             settings
         );
-        const score = importer.readScore();
         score.stylesheet.hideDynamics = true;
 
         expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(0);

@@ -32,7 +32,8 @@ export class Tuning {
      */
     public static getDefaultTuningFor(stringCount: number): Tuning | null {
         if (Tuning._defaultTunings.has(stringCount)) {
-            return Tuning._defaultTunings.get(stringCount)!;
+            const d = Tuning._defaultTunings.get(stringCount)!;
+            return new Tuning(d.name, d.tunings, d.isStandard);
         }
         return null;
     }
@@ -133,7 +134,7 @@ export class Tuning {
                 }
             }
             if (equals) {
-                return tuning;
+                return new Tuning(tuning.name, tuning.tunings, tuning.isStandard);
             }
         }
         return null;
@@ -165,6 +166,13 @@ export class Tuning {
         this.name = name;
         this.tunings = tuning ?? [];
     }
+
+    public reset() {
+        this.isStandard = false;
+        this.name = '';
+        this.tunings = [];
+    }
+    
 
     /**
      * Tries to detect the name and standard flag of the tuning from a known tuning list based

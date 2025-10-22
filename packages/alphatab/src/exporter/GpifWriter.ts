@@ -1219,7 +1219,7 @@ export class GpifWriter {
                     syncPointAutomation.addElement('Linear').innerText = 'false';
                     syncPointAutomation.addElement('Bar').innerText = mb.index.toString();
                     syncPointAutomation.addElement('Position').innerText = syncPoint.ratioPosition.toString();
-                    syncPointAutomation.addElement('Visible').innerText = 'true';
+                    syncPointAutomation.addElement('Visible').innerText = syncPoint.isVisible ? 'true' : 'false';
                     const value = syncPointAutomation.addElement('Value');
 
                     value.addElement('BarIndex').innerText = mb.index.toString();

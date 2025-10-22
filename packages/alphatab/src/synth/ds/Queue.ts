@@ -39,6 +39,17 @@ export class Queue<T extends object> {
         }
     }
 
+    public enqueueFront(item: T) {
+        const queueItem = new QueueItem<T>(item);
+        queueItem.next = this._head;
+        if (this._head) {
+            this._head = queueItem;
+        } else {
+            this._head = queueItem;
+            this._tail = queueItem;
+        }
+    }
+
     public peek(): T | undefined {
         const head = this._head;
         if (!head) {
@@ -53,7 +64,7 @@ export class Queue<T extends object> {
             return undefined;
         }
 
-        const newHead:QueueItem<T>|undefined = head.next;
+        const newHead: QueueItem<T> | undefined = head.next;
         this._head = newHead;
         // last item removed?
         if (!newHead) {

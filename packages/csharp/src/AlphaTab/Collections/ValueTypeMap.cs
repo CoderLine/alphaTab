@@ -50,6 +50,14 @@ public class ValueTypeMap<TKey, TValue> : Dictionary<TKey, TValue>, IValueTypeMa
         }
     }
 
+    internal ValueTypeMap(IEnumerator<ArrayTuple<TKey, TValue>> entries)
+    {
+        foreach (var entry in entries)
+        {
+            this[entry.V0] = entry.V1;
+        }
+    }
+
     public ValueTypeMap(IEnumerable<KeyValuePair<TKey, TValue>> entries)
     {
         foreach (var entry in entries)
