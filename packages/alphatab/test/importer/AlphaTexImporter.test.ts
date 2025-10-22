@@ -434,10 +434,11 @@ describe('AlphaTexImporterTest', () => {
     });
 
     it('unstringed', () => {
-        const tex: string = '\\tuning piano . c4 c#4 d4 d#4 | c4 db4 d4 eb4';
+        const tex: string = '\\instrument piano . c4 c#4 d4 d#4 | c4 db4 d4 eb4';
         const score = parseTex(tex);
         expect(score.tracks.length).to.equal(1);
         expect(score.masterBars.length).to.equal(2);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(0);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(4);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPiano).to.equal(true);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].realValue).to.equal(60);
@@ -1207,7 +1208,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].tuning.length).to.equal(4);
         expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(0);
 
-        score = parseTex('\\instrument acousticpiano . 3.3');
+        score = parseTex('\\instrument acousticpiano . C4');
         expect(score.tracks[0].staves[0].tuning.length).to.equal(0);
         expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(0);
     });
@@ -2433,9 +2434,9 @@ describe('AlphaTexImporterTest', () => {
 
         // - with tuning already specified
         describe('tuning', () => {
-            it('pitch-value', () => test(`\\tuning (C4 C4 C4) C4`, StaffNoteKind.Fretted));
+            it('pitch-value', () => test(`\\tuning (C4 C4 C4) C4`, StaffNoteKind.Pitched));
             it('fretted', () => test(`\\tuning (C4 C4 C4) 3.3`, StaffNoteKind.Fretted));
-            it('articulation', () => test(`\\tuning (C4 C4 C4) "Ride (choke)"`, StaffNoteKind.Fretted));
+            it('articulation', () => test(`\\tuning (C4 C4 C4) "Ride (choke)"`, StaffNoteKind.Articulation));
         });
 
         // - with instrument already specified

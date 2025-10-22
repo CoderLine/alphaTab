@@ -47,7 +47,7 @@ export class SustainPedalGlyph extends EffectGlyph {
                 // line to next marker or end-of-bar
                 if (marker.nextPedalMarker) {
                     if (marker.nextPedalMarker.bar === marker.bar) {
-                        let nextX = cx + this.renderer.getRatioPositionX(marker.nextPedalMarker.ratioPosition) - this.renderer.smuflMetrics.sustainPedalLinePadding;
+                        let nextX = cx + this.renderer.getRatioPositionX(marker.nextPedalMarker.ratioPosition);
 
                         switch (marker.nextPedalMarker.pedalType) {
                             case SustainPedalMarkerType.Down:

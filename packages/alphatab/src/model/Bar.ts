@@ -490,6 +490,9 @@ export class Bar {
 
             if (this.previousBar && this.previousBar.sustainPedals.length > 0) {
                 previousMarker = this.previousBar.sustainPedals[this.previousBar.sustainPedals.length - 1];
+                if(previousMarker.pedalType === SustainPedalMarkerType.Up) {
+                    previousMarker = null;
+                }
             }
 
             const isDown = previousMarker !== null && previousMarker.pedalType !== SustainPedalMarkerType.Up;

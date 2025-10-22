@@ -143,9 +143,10 @@ describe('Gp7ExporterTest', () => {
         const tex = `\\track "Drums"
         \\instrument percussion
         \\clef neutral
+        \\articulation defaults
         \\articulation Kick 36
         \\articulation Unused 46
-        Kick.4 42.4 Kick.4 42.4
+        Kick.4 "Hi-Hat (closed)".4 Kick.4 "Hi-Hat (closed)".4
         `;
 
         const expected = ScoreLoader.loadAlphaTex(tex);

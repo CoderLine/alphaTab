@@ -787,7 +787,7 @@ export class AlphaTexImporterOld extends ScoreImporter {
         this._currentTrack.playbackInfo.secondaryChannel = this._trackChannel++;
         const staff = this._currentTrack.staves[0];
         staff.displayTranspositionPitch = 0;
-        staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
+        staff.stringTuning = Tuning.getDefaultTuningFor(6)!;
         this._articulationValueToIndex.clear();
 
         this._beginStaff(staff);
@@ -1153,7 +1153,9 @@ export class AlphaTexImporterOld extends ScoreImporter {
                     if (this._sy !== AlphaTexSymbols.String) {
                         this._error('multiTrackTrackNamePolicy', AlphaTexSymbols.String, true);
                     }
-                    this._score.stylesheet.multiTrackTrackNamePolicy = this._parseTrackNamePolicy(this._syData as string);
+                    this._score.stylesheet.multiTrackTrackNamePolicy = this._parseTrackNamePolicy(
+                        this._syData as string
+                    );
                     this._sy = this._newSy();
                     anyTopLevelMeta = true;
                     break;
@@ -1310,6 +1312,7 @@ export class AlphaTexImporterOld extends ScoreImporter {
                 const strings: number = this._currentStaff.tuning.length;
                 this._staffHasExplicitTuning = true;
                 this._staffTuningApplied = false;
+                this._currentStaff.stringTuning.reset();
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
                         const text: string = (this._syData as string).toLowerCase();
@@ -1497,6 +1500,7 @@ export class AlphaTexImporterOld extends ScoreImporter {
                 for (const staff of this._currentTrack.staves) {
                     this._applyPercussionStaff(staff);
                 }
+                this._currentTrack.playbackInfo.program = 0;
                 this._currentTrack.playbackInfo.primaryChannel = SynthConstants.PercussionChannel;
                 this._currentTrack.playbackInfo.secondaryChannel = SynthConstants.PercussionChannel;
             } else {
@@ -1528,7 +1532,7 @@ export class AlphaTexImporterOld extends ScoreImporter {
 
     private _makeCurrentStaffPitched() {
         // clear tuning
-        this._currentStaff.stringTuning.tunings = [];
+        this._currentStaff.stringTuning.reset();
         if (!this._staffHasExplicitDisplayTransposition) {
             this._currentStaff.displayTranspositionPitch = 0;
         }
@@ -1894,7 +1898,7 @@ export class AlphaTexImporterOld extends ScoreImporter {
         const program = this._currentTrack.playbackInfo.program;
         if (!this._staffTuningApplied && !this._staffHasExplicitTuning) {
             // reset to defaults
-            this._currentStaff.stringTuning.tunings = [];
+            this._currentStaff.stringTuning.reset()
 
             if (program === 15) {
                 // dulcimer E4 B3 G3 D3 A2 E2

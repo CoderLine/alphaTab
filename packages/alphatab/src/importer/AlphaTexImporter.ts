@@ -38,6 +38,7 @@ import { Logger } from '@src/Logger';
 import type { FlatSyncPoint } from '@src/model/Automation';
 import { Bar, type SustainPedalMarker } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
+import { Clef } from '@src/model/Clef';
 import { Duration } from '@src/model/Duration';
 import { DynamicValue } from '@src/model/DynamicValue';
 import type { Lyrics } from '@src/model/Lyrics';
@@ -160,6 +161,7 @@ class AlphaTexImportState implements IAlphaTexImporterState {
     public readonly staffHasExplicitTuning = new Set<Staff>();
     public readonly staffHasExplicitDisplayTransposition = new Set<Staff>();
     public readonly staffDisplayTranspositionApplied = new Set<Staff>();
+    public readonly staffInitialClef = new Map<Staff, Clef>();
     public readonly syncPoints: FlatSyncPoint[] = [];
 
     public currentDynamics = DynamicValue.F;
@@ -303,7 +305,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         this._state.currentTrack.playbackInfo.secondaryChannel = this._state.trackChannel++;
         const staff = this._state.currentTrack.staves[0];
         staff.displayTranspositionPitch = 0;
-        staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
+        staff.stringTuning = Tuning.getDefaultTuningFor(6)!;
         this._state.articulationValueToIndex.clear();
 
         this._beginStaff(staff);
@@ -345,6 +347,10 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
         this._detectTuningForStaff(this._state.currentStaff!);
         this._handleTransposition(this._state.currentStaff!);
+
+        if (bar.index === 0 && this._state.staffInitialClef.has(this._state.currentStaff!)!) {
+            bar.clef = this._state.staffInitialClef.get(this._state.currentStaff!)!;
+        }
 
         const voice: Voice = bar.voices[this._state.voiceIndex];
 
@@ -588,6 +594,9 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         // Construct Note
         const note = new Note();
         note.isDead = isDead;
+        if (isDead || isTie) {
+            note.fret = numericValue;
+        }
         note.isTieDestination = isTie;
 
         // valid note kind detected, apply values, tied/dead notes at start might be rare, but can happen.
@@ -677,7 +686,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         switch (staffNoteKind) {
             case StaffNoteKind.Pitched:
                 staff.isPercussion = false;
-                staff.stringTuning.tunings = [];
+                staff.stringTuning.reset();
                 if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
                     staff.displayTranspositionPitch = 0;
                 }
@@ -689,7 +698,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 break;
             case StaffNoteKind.Articulation:
                 staff.isPercussion = true;
-                staff.stringTuning.tunings = [];
+                staff.stringTuning.reset();
                 if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
                     staff.displayTranspositionPitch = 0;
                 }
@@ -746,7 +755,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         const program = staff.track.playbackInfo.program;
         if (!this._state.staffTuningApplied.has(staff) && !this._state.staffHasExplicitTuning.has(staff)) {
             // reset to defaults
-            staff.stringTuning.tunings = [];
+            staff.stringTuning.reset();
 
             if (program === 15) {
                 // dulcimer E4 B3 G3 D3 A2 E2
@@ -757,6 +766,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             } else if (program >= 32 && program <= 39) {
                 // bass G2 D2 A1 E1
                 staff.stringTuning.tunings = [43, 38, 33, 28];
+                this._state.staffInitialClef.set(staff, Clef.F4);
             } else if (
                 program === 40 ||
                 program === 44 ||
@@ -796,7 +806,12 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 staff.stringTuning.tunings = [64, 57, 50, 43];
             } else {
                 // any non-guitar instrument -> use guitar 6 string tuning
-                staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
+                if (
+                    this._state.staffNoteKind.has(staff) &&
+                    this._state.staffNoteKind.get(staff)! === StaffNoteKind.Fretted
+                ) {
+                    staff.stringTuning = Tuning.getDefaultTuningFor(6)!;
+                }
             }
 
             this._state.staffTuningApplied.add(staff);

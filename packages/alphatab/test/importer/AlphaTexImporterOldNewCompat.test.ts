@@ -65,7 +65,7 @@ describe('AlphaTexImporterOldNewCompat', () => {
             return;
         }
 
-        ComparisonHelpers.alphaTexExportRoundtripEqual(fileName, oldScore, newScore, ignoreKeys);
+        ComparisonHelpers.alphaTexExportRoundtripEqual(fileName, newScore, oldScore, ignoreKeys);
     }
 
     async function testRoundTripEqual(name: string, ignoreKeys: string[] | null = null): Promise<void> {
@@ -149,6 +149,10 @@ describe('AlphaTexImporterOldNewCompat', () => {
             const newImporter = new AlphaTexImporter();
             newImporter.initFromString(oldTex, settings);
 
+            /*@target web*/
+            if (gc) {
+                gc();
+            }
             const newStart = performance.now();
             newImporter.readScore();
             const newEnd = performance.now();
