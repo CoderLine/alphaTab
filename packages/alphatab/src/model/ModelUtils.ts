@@ -13,6 +13,9 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { KeySignature } from '@src/model/KeySignature';
 import { AccidentalType } from '@src/model/AccidentalType';
 
+/**
+ * @internal
+ */
 export class TuningParseResult {
     public note: string | null = null;
     public tone: TuningParseResultTone = new TuningParseResultTone();
@@ -23,6 +26,10 @@ export class TuningParseResult {
     }
 }
 
+
+/**
+ * @internal
+ */
 export class TuningParseResultTone {
     public noteValue: number;
     public accidentalMode: NoteAccidentalMode;
@@ -35,6 +42,7 @@ export class TuningParseResultTone {
 /**
  * This public class contains some utilities for working with model public classes
  * @partial
+ * @internal
  */
 export class ModelUtils {
     public static getIndex(duration: Duration): number {

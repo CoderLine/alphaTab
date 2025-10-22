@@ -152,7 +152,13 @@ export class AlphaTexLexer {
             ++offset;
             const codepoint = codePoints[offset];
             this._codepoint = codepoint;
-            ++this._col;
+            if (codepoint === 0x0a /* \n */) {
+                this._trailingCommentNode = undefined;
+                ++this._line;
+                this._col = 1;
+            } else {
+                ++this._col;
+            }
             this._offset = offset;
             return codepoint;
         } else if (this._codepoint !== AlphaTexLexer._eof) {
@@ -167,7 +173,7 @@ export class AlphaTexLexer {
         return this._previousToken?.end ?? this._currentLexerLocation();
     }
 
-        public currentTokenLocation(): AlphaTexAstNodeLocation {
+    public currentTokenLocation(): AlphaTexAstNodeLocation {
         return this._peekedToken?.start ?? this._currentLexerLocation();
     }
 
@@ -549,13 +555,10 @@ export class AlphaTexLexer {
             text: '',
             multiLine: false
         };
-        let codepoint= this._codepoint;
+        let codepoint = this._codepoint;
         while (codepoint !== AlphaTexLexer._eof) {
             codepoint = this._nextCodepoint();
-            if (
-                codepoint !== 0x0a /* \n */ &&
-                codepoint !== AlphaTexLexer._eof
-            ) {
+            if (codepoint !== 0x0a /* \n */ && codepoint !== AlphaTexLexer._eof) {
                 comment.text += String.fromCodePoint(codepoint);
                 comment.end!.line = this._line;
                 comment.end!.col = this._col;
@@ -579,8 +582,6 @@ export class AlphaTexLexer {
         while (AlphaTexLexer._isWhiteSpace(codepoint)) {
             if (codepoint === 0x0a /* \n */) {
                 this._trailingCommentNode = undefined;
-                ++this._line;
-                this._col = 1;
             }
             codepoint = this._nextCodepoint();
         }
