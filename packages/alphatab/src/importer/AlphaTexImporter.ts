@@ -282,8 +282,10 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             this._state.score.tracks[track].applyLyrics(lyrics);
         }
         for (const [sustainPedal, beat] of this._state.sustainPedalToBeat) {
-            const duration = beat.voice.bar.masterBar.calculateDuration();
-            sustainPedal.ratioPosition = beat.playbackStart / duration;
+            if (sustainPedal.ratioPosition < 1) {
+                const duration = beat.voice.bar.masterBar.calculateDuration();
+                sustainPedal.ratioPosition = beat.playbackStart / duration;
+            }
         }
         return this._state.score;
     }

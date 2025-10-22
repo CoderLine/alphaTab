@@ -152,12 +152,7 @@ export class AlphaTexLexer {
             ++offset;
             const codepoint = codePoints[offset];
             this._codepoint = codepoint;
-            if (codepoint === 0x0a) {
-                ++this._line;
-                this._col = 1;
-            } else {
-                ++this._col;
-            }
+            ++this._col;
             this._offset = offset;
             return codepoint;
         } else if (this._codepoint !== AlphaTexLexer._eof) {
@@ -481,12 +476,13 @@ export class AlphaTexLexer {
         let isNumber = true;
 
         // negative start or dash
-        if (this._codepoint === 0x2d) {
-            str += String.fromCodePoint(this._codepoint);
-            this._codepoint = this._nextCodepoint();
+        let codepoint = this._codepoint;
+        if (codepoint === 0x2d) {
+            str += String.fromCodePoint(codepoint);
+            codepoint = this._nextCodepoint();
 
             // need a number afterwards otherwise we have a string(-)
-            if (!AlphaTexLexer._isDigit(this._codepoint)) {
+            if (!AlphaTexLexer._isDigit(codepoint)) {
                 isNumber = false;
             }
         }
@@ -496,16 +492,16 @@ export class AlphaTexLexer {
         do {
             if (isNumber) {
                 // adding digits to the number
-                if (AlphaTexLexer._isDigit(this._codepoint)) {
-                    str += String.fromCodePoint(this._codepoint);
-                    this._codepoint = this._nextCodepoint();
+                if (AlphaTexLexer._isDigit(codepoint)) {
+                    str += String.fromCodePoint(codepoint);
+                    codepoint = this._nextCodepoint();
                     keepReading = true;
                 }
                 // letter in number -> fallback to name reading
-                else if (AlphaTexLexer._isIdentifierCharacter(this._codepoint)) {
+                else if (AlphaTexLexer._isIdentifierCharacter(codepoint)) {
                     isNumber = false;
-                    str += String.fromCodePoint(this._codepoint);
-                    this._codepoint = this._nextCodepoint();
+                    str += String.fromCodePoint(codepoint);
+                    codepoint = this._nextCodepoint();
                     keepReading = true;
                 }
                 // general unknown character -> end reading
@@ -513,9 +509,9 @@ export class AlphaTexLexer {
                     keepReading = false;
                 }
             } else {
-                if (AlphaTexLexer._isIdentifierCharacter(this._codepoint)) {
-                    str += String.fromCodePoint(this._codepoint);
-                    this._codepoint = this._nextCodepoint();
+                if (AlphaTexLexer._isIdentifierCharacter(codepoint)) {
+                    str += String.fromCodePoint(codepoint);
+                    codepoint = this._nextCodepoint();
                     keepReading = true;
                 } else {
                     keepReading = false;
@@ -553,14 +549,14 @@ export class AlphaTexLexer {
             text: '',
             multiLine: false
         };
-        while (this._codepoint !== AlphaTexLexer._eof) {
-            this._codepoint = this._nextCodepoint();
+        let codepoint= this._codepoint;
+        while (codepoint !== AlphaTexLexer._eof) {
+            codepoint = this._nextCodepoint();
             if (
-                this._codepoint !== 0x0d /* \r */ &&
-                this._codepoint !== 0x0a /* \n */ &&
-                this._codepoint !== AlphaTexLexer._eof
+                codepoint !== 0x0a /* \n */ &&
+                codepoint !== AlphaTexLexer._eof
             ) {
-                comment.text += String.fromCodePoint(this._codepoint);
+                comment.text += String.fromCodePoint(codepoint);
                 comment.end!.line = this._line;
                 comment.end!.col = this._col;
                 comment.end!.offset = this._offset;
@@ -579,11 +575,14 @@ export class AlphaTexLexer {
 
     private _whitespace(): AlphaTexAstNode | undefined {
         // skip whitespaces
-        while (AlphaTexLexer._isWhiteSpace(this._codepoint)) {
-            if (this._codepoint === 0x0a /* \n */) {
+        let codepoint = this._codepoint;
+        while (AlphaTexLexer._isWhiteSpace(codepoint)) {
+            if (codepoint === 0x0a /* \n */) {
                 this._trailingCommentNode = undefined;
+                ++this._line;
+                this._col = 1;
             }
-            this._nextCodepoint();
+            codepoint = this._nextCodepoint();
         }
         return undefined;
     }
