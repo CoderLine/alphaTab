@@ -1809,7 +1809,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 AlphaTex1LanguageHandler._applySustainPedal(importer, beat, SustainPedalMarkerType.Up);
                 return ApplyNodeResult.Applied;
             case 'spe':
-                AlphaTex1LanguageHandler._applySustainPedal(importer, beat, SustainPedalMarkerType.Up, 1);
+                AlphaTex1LanguageHandler._applySustainPedal(importer, beat, SustainPedalMarkerType.Up, true);
                 return ApplyNodeResult.Applied;
             case 'slashed':
                 beat.slashed = true;
@@ -1972,12 +1972,17 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         importer: IAlphaTexImporter,
         beat: Beat,
         pedalType: SustainPedalMarkerType,
-        ratioPosition: number = -1
+        end:boolean = false
     ) {
         const sustainPedal = new SustainPedalMarker();
         sustainPedal.pedalType = pedalType;
         // exact ratio position will be applied after .finish() when times are known
-        sustainPedal.ratioPosition = ratioPosition >= 0 ? ratioPosition : beat.voice.bar.sustainPedals.length;
+        // this means we have to at least aling them linearly to mitigate deduplication
+        if (end) {
+            sustainPedal.ratioPosition = 1;
+        } else {
+            sustainPedal.ratioPosition = 0.001 * beat.voice.bar.sustainPedals.length;
+        }
         importer.state.sustainPedalToBeat.set(sustainPedal, beat);
         beat.voice.bar.sustainPedals.push(sustainPedal);
     }
