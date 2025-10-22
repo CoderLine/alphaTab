@@ -1,20 +1,21 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
-import terser, {type Options as TerserOptions } from '@rollup/plugin-terser';
 import typescript, { type RollupTypescriptOptions } from '@rollup/plugin-typescript';
-import type { OutputChunk, OutputOptions } from 'rollup';
+import type { OutputChunk, OutputOptions, OutputPlugin } from 'rollup';
 import license from 'rollup-plugin-license';
+import type { MinifyOptions } from 'terser';
 import ts from 'typescript';
 import type { LibraryOptions, UserConfig } from 'vite';
 import generateDts from './vite.plugin.dts.ts';
+import min from './vite.plugin.min.ts';
 
-const terserOptions: TerserOptions = {
+const terserOptions: MinifyOptions = {
     mangle: {
         properties: {
             regex: /^_/
         }
-    }  
+    }
 };
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -129,17 +130,10 @@ export function umd(
     });
 
     if (withMin) {
-        (config.build!.rollupOptions!.output as OutputOptions[]).push({
-            globals: {
-                jQuery: 'jQuery'
-            },
-            dir: 'dist/',
-            format: 'umd',
-            name: name,
-            plugins: [terser(terserOptions)],
-            entryFileNames: '[name].min.js',
-            chunkFileNames: '[name].min.js'
-        });
+        for (const output of config.build!.rollupOptions!.output as OutputOptions[]) {
+            output.plugins ??= [];
+            (output.plugins as OutputPlugin[]).push(min(terserOptions));
+        }
     }
 }
 
@@ -178,10 +172,8 @@ export function esm(
 ) {
     enableTypeScript(config, tsOptions, true);
     const lib = config.build!.lib! as LibraryOptions;
-
-    lib.entry = {
-        [name]: path.resolve(projectDir, entry)
-    };
+    const libEntry = lib.entry! as Record<string, string>;
+    libEntry[name] = path.resolve(projectDir, entry);
 
     (config.build!.rollupOptions!.output as OutputOptions[]).push({
         globals: {
@@ -194,7 +186,7 @@ export function esm(
         plugins: [
             {
                 name: 'dts',
-                writeBundle(_, bundle) {
+                async writeBundle(_, bundle) {
                     const files = Object.keys(bundle);
 
                     for (const file of files) {
@@ -206,7 +198,7 @@ export function esm(
                             shouldCreateDts(chunk)
                         ) {
                             this.info(`Creating types for bundle ${file}`);
-                            generateDts(projectDir, chunk.facadeModuleId!, file.replace('.mjs', '.d.ts'));
+                            await generateDts(projectDir, chunk.facadeModuleId!, file.replace('.mjs', '.d.ts'));
                         }
                     }
                 }
@@ -215,21 +207,14 @@ export function esm(
     });
 
     if (withMin) {
-        (config.build!.rollupOptions!.output as OutputOptions[]).push({
-            globals: {
-                jQuery: 'jQuery'
-            },
-            dir: 'dist/',
-            format: 'es',
-            plugins: [terser(terserOptions)],
-            entryFileNames: '[name].min.mjs',
-            chunkFileNames: '[name].min.mjs'
-        });
+        for (const output of config.build!.rollupOptions!.output as OutputOptions[]) {
+            (output.plugins as OutputPlugin[]).push(min(terserOptions));
+        }
     }
 }
 
 export function dtsPathsTransformer(mapping: Record<string, string>) {
-    const mapPath = (filePath:string, input: string): string | undefined => {
+    const mapPath = (filePath: string, input: string): string | undefined => {
         for (const [k, v] of Object.entries(mapping)) {
             if (input.startsWith(k)) {
                 const absoluteFile = path.resolve(v, input.substring(k.length));
