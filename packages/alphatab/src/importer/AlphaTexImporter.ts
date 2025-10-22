@@ -348,7 +348,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         this._detectTuningForStaff(this._state.currentStaff!);
         this._handleTransposition(this._state.currentStaff!);
 
-        if (bar.index === 0 && this._state.staffInitialClef.has(this._state.currentStaff!)!) {
+        if (bar.index === 0 && this._state.staffInitialClef.has(this._state.currentStaff!)) {
             bar.clef = this._state.staffInitialClef.get(this._state.currentStaff!)!;
         }
 
@@ -512,7 +512,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         let tone: number = -1;
         let accidentalMode = NoteAccidentalMode.Default;
         const noteValue = node.noteValue as AlphaTexAstNode;
-        let detectedNoteKind: StaffNoteKind | undefined;
+        let detectedNoteKind: StaffNoteKind | undefined = undefined;
         let staffNoteKind = this._state.staffNoteKind.has(this._state.currentStaff!)
             ? this._state.staffNoteKind.get(this._state.currentStaff!)!
             : undefined;

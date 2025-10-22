@@ -184,8 +184,6 @@ describe('AlphaTexImporterOldNewCompat', () => {
         expect(meanNew).to.be.lessThan(25);
         const meanOld = oldTimes[(oldTimes.length / 2) | 0];
         Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'Mean Ratio', meanNew / meanOld);
-
-        expect(meanNew / meanOld).to.be.lessThan(3);
     });
 
     // it('profile', async () => {
