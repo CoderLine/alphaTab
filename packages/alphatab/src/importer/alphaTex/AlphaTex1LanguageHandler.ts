@@ -429,10 +429,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 if (articulationName === 'defaults') {
                     for (const [defaultName, defaultValue] of PercussionMapper.instrumentArticulationNames) {
                         percussionArticulationNames.set(defaultName.toLowerCase(), defaultValue);
-                        percussionArticulationNames.set(
-                            ModelUtils.toArticulationId(defaultName),
-                            defaultValue
-                        );
+                        percussionArticulationNames.set(ModelUtils.toArticulationId(defaultName), defaultValue);
                     }
                     return ApplyNodeResult.Applied;
                 }
