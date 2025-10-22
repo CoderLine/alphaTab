@@ -38,7 +38,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
     /**
      * @inheritdoc
      */
-    public override tex(tex: string, tracks?: number[]): void {
+    public override tex(tex: string, tracks?: number[] | 'all'): void {
         const browser: BrowserUiFacade = this.uiFacade as BrowserUiFacade;
         super.tex(tex, browser.parseTracks(tracks));
     }

@@ -4,9 +4,10 @@
     margin: 0;
 }
 .editor-wrap {
-    height: 20vh;
+    height: 30vh;
+    overflow:visible;
+    z-index: 10000;
 }
 .editor-wrap > * {
-    width: 90vw;
-    height: 20vh;
+    height: 100%;
 }

@@ -583,7 +583,9 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 this.addSemanticDiagnostic({
                     code: AlphaTexDiagnosticCode.AT218,
                     message: `Wrong note kind '${StaffNoteKind[detectedNoteKind]}' for staff with note kind ''${StaffNoteKind[staffNoteKind]}'. Do not mix incompatible staves and notes.`,
-                    severity: AlphaTexDiagnosticsSeverity.Error
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: noteValue.start,
+                    end: noteValue.end,
                 });
             }
         } else if (staffNoteKind !== undefined) {
