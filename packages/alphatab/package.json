@@ -62,7 +62,7 @@
         "@coderline/alphaskia": "^3.4.135",
         "@coderline/alphaskia-linux": "^3.4.135",
         "@coderline/alphaskia-windows": "^3.4.135",
-        "@types/chai": "^5.2.2",
+        "@types/chai": "^5.2.3",
         "@types/mocha": "^10.0.10",
         "@types/node": "^24.8.1",
         "assert": "^2.1.0",
