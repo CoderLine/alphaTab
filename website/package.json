@@ -17,10 +17,11 @@
     "generate-alphatabdoc-empty": "tsx scripts/generate-alphatabdoc.mts --empty"
   },
   "dependencies": {
-    "@coderline/alphatab": "^1.7.0-alpha.1515",
+    "@coderline/alphatab": "^1.7.0-alpha.1589",
     "@docusaurus/core": "^3.9.2",
     "@docusaurus/preset-classic": "^3.9.2",
     "@docusaurus/theme-mermaid": "^3.9.2",
+    "@docusaurus/theme-search-algolia": "^3.9.2",
     "@fontsource/noto-sans": "^5.1.1",
     "@fontsource/noto-serif": "^5.1.1",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
@@ -33,7 +34,6 @@
     "@uiw/react-color": "^2.5.5",
     "@uiw/react-color-chrome": "^2.5.5",
     "clsx": "^2.1.1",
-    "docusaurus-lunr-search": "^3.6.0",
     "prism-react-renderer": "^2.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -41,6 +41,7 @@
     "webpack": "^5.98.0"
   },
   "devDependencies": {
+    "@coderline/alphatab-webpack": "^1.7.0-alpha.1589",
     "@docusaurus/module-type-aliases": "^3.9.2",
     "@docusaurus/tsconfig": "^3.9.2",
     "@types/react": "^19.0.10",

@@ -9,8 +9,8 @@ import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-di
 
 import * as path from "path";
 import * as fs from "fs";
-import { AlphaTabWebPackPlugin } from "@coderline/alphatab/webpack";
-import { Configuration, RuleSetRule } from "webpack";
+import { AlphaTabWebPackPlugin } from "@coderline/alphatab-webpack";
+import { RuleSetRule } from "webpack";
 
 const alphaTabVersionFull = JSON.parse(
   fs.readFileSync(
@@ -20,13 +20,18 @@ const alphaTabVersionFull = JSON.parse(
 ).version;
 const isPreRelease = alphaTabVersionFull.indexOf("-") >= 0;
 let alphaTabVersion;
+let algoliaAppId = '26AE6KNYRK';
+let algoliaApiKey = '3db9646111702a74fe1f2249ddafa870';
+let algoliaIndexName;
 if (isPreRelease) {
   alphaTabVersion = alphaTabVersionFull.substring(
     0,
     alphaTabVersionFull.indexOf("-")
   );
+  algoliaIndexName = 'next_alphaTab';
 } else {
   alphaTabVersion = alphaTabVersionFull;
+  algoliaIndexName = 'alphaTab';
 }
 
 function getSortValue(
@@ -181,6 +186,20 @@ const config: Config = {
         theme: {
           customCss: "./src/css/custom.scss",
         },
+        sitemap: {
+          async createSitemapItems({defaultCreateSitemapItems, ...params}) {
+            const defaultItems = await defaultCreateSitemapItems(params);
+            
+            // rank reference type docs lower than manual docs
+            for(const item of defaultItems) {
+              if(item.url.includes('reference/types')) {
+                item.priority = 0.1;
+              }
+            }
+
+            return defaultItems;
+          },
+        }
       } satisfies Preset.Options,
     ],
   ],
@@ -296,11 +315,15 @@ const config: Config = {
     colorMode: {
       defaultMode: 'light'
     },
+    algolia: {
+      appId: algoliaAppId,
+      apiKey: algoliaApiKey,
+      indexName: algoliaIndexName
+    },
   } satisfies Preset.ThemeConfig,
 
   plugins: [
     "docusaurus-plugin-sass",
-    require.resolve("docusaurus-lunr-search"),
     () => ({
       name: "docusaurus-customization",
       injectHtmlTags() {
