@@ -55,25 +55,6 @@ You can specify a multiplier after a beat to add the same beat multiple times to
 
 ## Multiple voices
 
-alphaTab supports showing multiple independent voices within one bar, to write such notation in alphaTex the `\voice` syntax can be used to start a new voice. 
-Once a new voice starts, you again can define the notes starting from the first bar. alphaTab will try to consolidate inconsistencies in the number of bars across voices. 
-
-<AlphaTexSample tracks="all">{`
-\\track "Piano"
-    \\staff{score} \\tuning piano \\instrument acousticgrandpiano
-        \\voice 
-            c4 d4 e4 f4 | c4 d4 e4 f4
-        \\voice 
-            c3 d3 e3 f3 | c3 d3 e3 f3
-
-\\track "Piano2"
-    \\staff{score} \\tuning piano \\instrument acousticgrandpiano
-        \\voice 
-            c4 d4 e4 f4 | c4 d4 e4 f4
-        \\voice 
-            c3 d3 e3 f3
-
-`}</AlphaTexSample>
             
 ## Accidentals
 

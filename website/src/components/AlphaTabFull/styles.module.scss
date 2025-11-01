@@ -34,6 +34,16 @@
   margin-top: -2rem;
 }
 
+[data-theme="light"] .at-wrap {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+}
+
+[data-theme="dark"] .at-wrap {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #1b1b1d;
+}
+
 .at-content {
   flex: 1 1 auto;
   overflow: hidden;
@@ -49,14 +59,22 @@
   color: #fff;
 }
 .at-logo {
-  background: #f7f7f7;
   height: 40px;
   display: flex;
   align-items: center;
   padding: 8px 4px;
   margin-right: 0 !important;
-  color: #8a8b8c;
   font-size: 14px;
+}
+
+[data-theme="light"] .at-logo {
+  background: #f7f7f7;
+  color: #8a8b8c;
+}
+
+[data-theme="dark"] .at-logo {
+  background: rgb(8,8,8);
+  color: rgb(117, 116, 115);
 }
 
 .at-logo img {
@@ -75,8 +93,19 @@
   bottom: 0;
   overflow: hidden;
   border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+
+[data-theme="light"] .at-sidebar {
+  border-right-color:  rgba(0, 0, 0, 0.12);
   background: #f7f7f7;
   color: #000;
+}
+
+[data-theme="dark"] .at-sidebar {
+  border-right-color:  rgba(255, 255, 255, 0.12);
+  background: rgb(8,8,8);
+  color: #fff;
 }
 
 .at-sidebar:hover {
@@ -110,9 +139,14 @@
   cursor: pointer;
 }
 
-.at-track:hover {
-  background: rgba(0, 0, 0, 0.1);
+[data-theme="light"] .at-track:hover {
+    background: rgba(0, 0, 0, 0.1);
 }
+
+[data-theme="dark"] .at-track:hover {
+    background: rgba(255,255,255, 0.1);
+}
+
 
 .at-track > .at-track-icon {
   grid-area: icon;
@@ -130,8 +164,12 @@
   opacity: 0.8;
 }
 
-.at-track.active {
-  background: rgba(0, 0, 0, 0.03);
+[data-theme="light"] .at-track.active {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .at-track.active {
+    background: rgba(255,255,255, 0.03);
 }
 
 .at-track.active > .at-track-icon {
@@ -194,16 +232,30 @@ input[type="range"]::-moz-range-thumb {
   bottom: 0;
   z-index: 1010;
   backdrop-filter: blur(3px);
-  background: rgba(0, 0, 0, 0.5);
   justify-content: center;
   align-items: flex-start;
+}
+
+[data-theme="light"] .at-overlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .at-overlay {
+  background: rgba(255,255,255, 0.5);
 }
 
 .at-overlay-content {
   margin-top: 20px;
   background: #fff;
-  box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.3);
   padding: 10px;
+}
+
+[data-theme="light"] .at-overlay-content {
+  box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .at-overlay-content {
+  box-shadow: 0px 5px 10px 0px rgba(255, 255, 255, 0.3);
 }
 
 .at-overlay-content > .spinner-border {

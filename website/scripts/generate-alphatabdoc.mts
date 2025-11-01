@@ -32,6 +32,7 @@ const context: GenerateContext = {
   flatExports: new Map(),
   nameToExportName: new Map(),
   settings: null!,
+  emptyFiles: false
 };
 
 function walkModuleDeclaration(
@@ -150,8 +151,9 @@ for (const { d, identifier } of exports) {
 context.settings = context.flatExports.get(
   "alphaTab.Settings"
 ) as ts.ClassDeclaration;
+
+context.emptyFiles = process.argv.includes("--empty");
+
 await generateSettings(context);
 await generateTypeDocs(context);
 await generateApiDocs(context);
-
-// TODO: run prettier on MDX files

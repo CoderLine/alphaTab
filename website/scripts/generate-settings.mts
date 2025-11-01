@@ -90,6 +90,10 @@ export async function generateSettings(context: GenerateContext) {
 
             await fileStream.write("---\n");
 
+            if (context.emptyFiles) {
+              continue;
+            }
+
             await writeCommonImports(fileStream);
 
             await fileStream.write(

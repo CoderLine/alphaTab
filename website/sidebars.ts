@@ -143,16 +143,14 @@ const sidebars: SidebarsConfig = {
   alphaTex: {
     alphaTex: [
       "alphatex/introduction",
-      "alphatex/metadata",
-      "alphatex/stylesheet",
-      "alphatex/notes",
+      "alphatex/syntax",
+      "alphatex/document-structure",
+      "alphatex/structural-metadata",
+      "alphatex/score-metadata",
+      "alphatex/staff-metadata",
       "alphatex/bar-metadata",
-      "alphatex/tracks-staves",
-      "alphatex/beat-effects",
-      "alphatex/note-effects",
-      "alphatex/percussion",
-      "alphatex/lyrics",
-      "alphatex/sync-points",
+      "alphatex/beat-properties",
+      "alphatex/note-properties"
     ],
   },
   showcase: [

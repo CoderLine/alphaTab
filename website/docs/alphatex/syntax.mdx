@@ -1,0 +1,104 @@
+---
+title: Language Syntax
+---
+
+If you compare alphaTex to programming or scripting languages, you will find similar constructs in this language. alphaTex (as the name implies) has borrowed
+some aspects from LaTeX, a well known language for writing documents. As alphaTex evolved it came up with various own syntax constructs described here. 
+
+When storing alphaTex to files, we recommend using the file extension `.atex`.
+
+## Comments
+
+Comments are supported in C-style comments via `// Single Line` and `/* Multi Line */`. You can use them anywhere within an alphaTex file
+to further annotate your written document for structural or organizational purposes.
+
+## Strings
+
+Textual values are expressed as quoted strings similar to most programming languages. Both single and double quotes are supported. 
+
+* `"Double Quoted String"`
+* `'Single Quoted String'`
+
+Additionally following escape sequences are supported:
+
+* `\n` Newline
+* `\r` Carriage Return
+* `\t` Tab
+* `\uXXXX` Unicode Character where XXXX is a 4 hex-digit number.
+* `\\` A backslash 
+* `\'` or `\"` a quote character 
+
+## Numbers
+
+alphaTex supports integer and decimal numbers.  Decimal numbers are only allowed in some dedicated places to avoid overlaps with some other syntax constructs.
+
+Examples:
+
+* `10`
+* `-10`
+* `0.5`
+* `-4.5`
+
+## Value Lists
+
+At various places value lists are used to describe items like time signatures or bend points.
+Value lists should be wrapped with parenthesis `(values)` if there are multiple values. If there is only a single value, the parenthesis can be omitted. 
+
+The individual values can be: 
+
+* Integer numbers: `3`, `-10`
+* Decimal Numbers: `3.3`, `-10.5`
+* Strings: `"Hello"`, `'Hello'`
+* Special identifiers: `true`, `hide`, `x`
+
+
+Basic Examples 
+
+* `( 1 2 3 )`  A list of numbers
+* `("Test" 3 hide)` A list of mixed type values 
+
+Real examples
+
+* `\ts (3 4)` A 3/4 time signature (specified on bar level)
+* `12.2 { b (0 4 0) }` A note bend describing a full note bend and release
+* `\title ("Song Title" "Title: %TITLE%" left)` A song title shown as `Title: Song Title` left aligned.
+
+## Properties
+
+Properties are a list of key-valuelist pairs describing additional optional aspects of elements.
+They are used to add effects to notes and beats, what notations should be visible in a staff and more. 
+
+Properties are always wrapped into curly braces. A property starts with an identifier describing the property, optionally followed by its values as value list. 
+
+Examples: 
+* `\track "Track Name" { color "#FF0000"}`
+* `\staff {score}`
+* `C4 {b (0 4) v txt "Bend with Vibrato"}`
+
+Property identifiers are case-insensitive.
+
+## Metadata Tags
+
+Metadata tags are the most similar construct to LaTeX. Metadata are used to describe various elements within the data model.
+
+The main syntax of metadata tags is: `\tag values {properties}`.
+Both the `values` and `{properties}` are optional from a syntax perspective. Depending on the `tag` values might be expected to be specified.
+
+Examples:
+
+* `\title "Song Title"`
+* `\track "Track Name" {color '#FF0000'}`
+* `\ts (3 4)`
+
+Metadata tags identifiers are case-insensitive.
+
+### Metadata tag values
+
+Metadata tags might have one or multiple values. The exact values supported (required or optional) depend on the tag.
+See [Value Lists](#value-lists) above for more details.
+
+### Metadata tag properties
+
+Metadata tags might have one or multiple properties. The exact values supported depend on the tag.
+See [Properties](#properties) above for more details.
+

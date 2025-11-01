@@ -1,7 +1,27 @@
 import * as alphaTab from "@coderline/alphatab";
+import type { ColorMode } from '@docusaurus/theme-common';
 
-export default {
-  setAlphaTabDefaults(settings: alphaTab.Settings) {
+const defaultColors = (new alphaTab.Settings()).display.resources;
+
+function setAlphaTabColors(settings: alphaTab.Settings, colorMode: ColorMode) {
+    if (colorMode === 'dark') {
+      settings.display.resources.staffLineColor = alphaTab.model.Color.fromJson('rgb(90, 90, 90)')!;
+      settings.display.resources.barSeparatorColor = alphaTab.model.Color.fromJson('rgb(221, 221, 238)')!;
+      settings.display.resources.barNumberColor = alphaTab.model.Color.fromJson('rgb(225, 50, 56)')!;
+      settings.display.resources.mainGlyphColor = alphaTab.model.Color.fromJson('rgb(255,255,255)')!;
+      settings.display.resources.secondaryGlyphColor = alphaTab.model.Color.fromJson('rgba(255,255,255,0.4)')!;
+      settings.display.resources.scoreInfoColor = alphaTab.model.Color.fromJson('rgb(255,255,255)')!;
+    } else {
+      settings.display.resources.staffLineColor = defaultColors.staffLineColor;
+      settings.display.resources.barSeparatorColor =defaultColors.barSeparatorColor;
+      settings.display.resources.barNumberColor = defaultColors.barNumberColor;
+      settings.display.resources.mainGlyphColor = defaultColors.mainGlyphColor;
+      settings.display.resources.secondaryGlyphColor = defaultColors.secondaryGlyphColor;
+      settings.display.resources.scoreInfoColor = defaultColors.scoreInfoColor;
+    }
+}
+
+ function setAlphaTabDefaults(settings: alphaTab.Settings, colorMode: ColorMode) {
     settings.core.fontDirectory = "/font/";
     settings.player.soundFont = "/soundfont/sonivox.sf3";
     settings.player.scrollMode = alphaTab.ScrollMode.Off;
@@ -15,6 +35,8 @@ export default {
         }
       })
     }
+      
+    setAlphaTabColors(settings, colorMode);
 
     settings.display.resources.copyrightFont.families = ["Noto Sans"];
     settings.display.resources.titleFont.families = ["Noto Serif"];
@@ -32,5 +54,9 @@ export default {
     settings.display.resources.directionsFont.families = ["Noto Serif"];
     settings.display.resources.numberedNotationFont.families = ["Noto Sans"];
     settings.display.resources.numberedNotationGraceFont.families = ["Noto Sans"];
-  },
+}
+
+export default {
+  setAlphaTabColors,
+  setAlphaTabDefaults
 };

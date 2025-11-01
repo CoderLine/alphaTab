@@ -1019,6 +1019,10 @@ function shouldGenerateMember(
     // e.g. constructors
     return false;
   }
+  if (ts.isComputedPropertyName(m.name)) {
+    // e.g. [Symbol.iterator]
+    return false;
+  }
 
   // private
   if (

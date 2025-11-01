@@ -45,7 +45,7 @@ alphaTab renders brackets and braces across staves which belong together. alphaT
 * Group Staves - The staves of the same track will be grouped together. If there are multiple "standard notation" staves a brace will be drawn, otherwise a bracket.
 * Group Same Instruments - Multiple tracks of the same instrument will be grouped together. No grouping happens if the staves of an instrument require a brace. 
 
-The mode is loaded from Guitar Pro files, can be [configured via alphaTex](/docs/alphatex/stylesheet.mdx#brackets-and-braces) or configured via `score.stylesheet.bracketExtendMode` on the data model.
+The mode is loaded from Guitar Pro files, can be [configured via alphaTex](/docs/alphatex/score-metadata.mdx#bracketextendmode) or configured via `score.stylesheet.bracketExtendMode` on the data model.
 
 <AlphaTab tex="true" tracks="all">{`
 \\bracketextendmode GroupSimilarInstruments

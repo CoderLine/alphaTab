@@ -9,132 +9,306 @@ clefs, key signatures repeats etc. They follow the format
 `\tag value value` just like the score metadata. Be sure not to
 mix the score metadata and the bar metadata of the first bar.
 
-## Time Signatures
+## `\ts`
 
-Time signatures have the format `\ts Numerator Denominator` or `\ts common`
+```plain title="Syntax"
+\ts common
+\ts (numerator denominator)
+```
 
-<AlphaTexSample>{`
+**Description:** Defines the time signature for this and subsequent bars.
+
+AlphaTab does not yet support polytempo notation where instruments might use different time signatures.
+Therefore be sure to only specify the timesignatures once as part of the first track/staff or ensure
+they are consistent across the whole document.
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| common | Specifies a common (4/4) time signature using the special C symbol | `identifier` | yes |
+| numerator | The time signature numerator | `number` | yes |
+| numerator | The time signature denominator | `number` | yes |
+
+**Example:**
+
+<AlphaTexSample tracks="all">{`
 \\ts 3 4 | \\ts 4 4 | \\ts 6 8 | \\ts common
 `}</AlphaTexSample>
 
+There are no properties on this metadata. 
 
-## Repeats
+## `\ro`
 
-Repeats can be started with `\ro` and
-be closed with `\rc Count`. Count specifies how many times
-the bar range is repeated.
+```plain title="Syntax"
+\ro
+```
 
-<AlphaTexSample>{`
+**Description:** Marks the start of a repeat.
+
+**Values:** None
+
+**Example:**
+
+<AlphaTexSample tracks="all">{`
 \\ro 1.3 2.3 3.3 4.3 | 5.3 6.3 7.3 8.3 | \\rc 2 1.3 2.3 3.3 4.3 |
 \\ro \\rc 3 1.3 2.3 3.3 4.3
 `}</AlphaTexSample>
 
-### Alternate Endings
+There are no properties on this metadata. 
 
-Alternate endings in a repeat range are specified with a list of numbers:
-`\ae (Repetition Repetition...)` or just `\ae Repetition` if only one number.
-Each "Repetition" number specifies in which repetition that ending bar should be played.
+## `\rc`
+
+```plain title="Syntax"
+\rc repeats
+```
+
+**Description:** Marks the end of a repeat.
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| repeats | The number of repeats which should be played | `number` | yes |
+
+**Example:**
+
+<AlphaTexSample tracks="all">{`
+\\ro 1.3 2.3 3.3 4.3 | 5.3 6.3 7.3 8.3 | \\rc 2 1.3 2.3 3.3 4.3 |
+\\ro \\rc 3 1.3 2.3 3.3 4.3
+`}</AlphaTexSample>
+
+There are no properties on this metadata. 
+
+## `\ae`
+
+```plain title="Syntax"
+\ae ending
+\ae (ending ending...)
+```
+
+**Description:** Specifies on which repeats a bar should be played (to build alternate endings).
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| ending | The repeats on which the bar should be played | `number` list | yes |
+
+**Example:**
 
 <AlphaTexSample>{`
 \\ro 1.3 2.3 3.3 4.3 | \\ae (1 2 3) 5.3 6.3 7.3 8.3 | \\ae 4 \\rc 4 5.3 8.3 7.3 6.3
 `}</AlphaTexSample>
 
-## Key Signatures
+There are no properties on this metadata. 
 
-The key signature can be specified with `\ks Value`.
+## `\ks`
+
+```plain title="Syntax"
+\ks key
+```
+
+**Description:** Specifies the key signature for this and subsequent bars. 
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| key | The key signature | `identifier` | yes |
+
 For major keys, the value is one of `Cb, Gb, Db, Ab, Eb, Bb, F, C, G, D, A, E, B, F#, C#`.
 Their equivalent minor scale can also be used, so `Bminor` is the same as `D` etc.
 A major scale can also be explicitly written out, like `Dmajor`.
+
+**Example:**
 
 <AlphaTexSample>{`
 \\ks Cb | \\ks C | \\ks C# |
 \\ks Aminor | \\ks Dmajor | \\ks Bminor
 `}</AlphaTexSample>
 
-The type of key signatures (major or minor) is derived from the used name.
+There are no properties on this metadata. 
 
-## Clef
+## `\clef`
 
-To change the clef simply specify `\clef Clef` where Clef is one of the following
-values: `G2, Treble, F4, Bass, C3, Tenor, C4, Alto, N, Neutral`
+```plain title="Syntax"
+\clef clef
+```
 
-To add ottavia to the clef add `\ottava Ottava` where Ottava is one of the following
-values: `15ma`, `8va`, `regular`, `8vb`, `15mb`.
+**Description:** Changes the clef for this and subsequent bars. 
 
-Clefs are remembered across bars unless explicitly changed.
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| clef | The clef | `identifier` | yes |
+
+Following clefs are supported: `G2, Treble, F4, Bass, C3, Tenor, C4, Alto, N, Neutral`
+
+**Example:**
 
 <AlphaTexSample>{`
 \\clef G2 | \\clef F4 | \\clef C3 | \\clef C4 | \\clef N |
 \\clef Treble | \\clef Bass | \\clef Tenor | \\clef Alto | \\clef Neutral |
+`}</AlphaTexSample>
+
+## `\ottava`
+
+```plain title="Syntax"
+\ottava ottava
+```
+
+**Description:** Changes the clef ottave for this and subsequent bars. 
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| ottava | The clef ottava | `identifier` | yes |
+
+Following ottavia are supported: `15ma`, `8va`, `regular`, `8vb`, `15mb`
+
+**Example:**
+
+<AlphaTexSample>{`
 \\clef F4 \\ottava 15ma | | \\ottava regular | | \\clef C3 \\ottava 8vb | |
 `}</AlphaTexSample>
 
+There are no properties on this metadata. 
 
-## Tempo
+## `\tempo`
 
-To change the tempo of the score you can specify `\tempo BPM`.
+```plain title="Syntax"
+\tempo tempo
+\tempo (tempo label position hide)
+```
+
+**Description:** Adds a tempo change to the bar.
+
+A bar can have multiple tempo changes. They can either be relatively positioned using this metadata tag or 
+applied via the `tempo` property as beat effect.
+
+Tempo changes affect the whole song and not only an individual track. 
+To avoid unexpected side effects, we recomment to specify the tempo changes only once on the first track/staff. 
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| tempo | The new tempo in BPM | `number` | yes |
+| label | A textual label for the tempo | `number` | no |
+| position | A relative (ratio) position where within the bar the tempo change should happen | `number` (float, 0-1) | no |
+| hide | If specified the tempo change is not visually shown | `identifier` | no |
+
+**Example:**
 
 <AlphaTexSample>{`
-// score meta also supports \\tempo, therefore we skip the score meta with a dot
-.
-// change tempo in bars
-\\tempo 30 1.3 2.3 3.3 4.3 |
-\\tempo 80 1.3 2.3 3.3 4.3
+\\tempo 30
+    C4 D4 E4 F4 |
+\\tempo (120 "Moderate")
+\\tempo (60 "" 0.5 hide)
+    C4 D4 E4 F4 |
 `}</AlphaTexSample>
 
-## Triplet Feel
+There are no properties on this metadata. 
 
-To change the triplet feel of a bar, specify `\tf TripletFeel`, where `TripletFeel` is one of the following values:
+## `\tf`
+
+```plain title="Syntax"
+\tf tripletFeel
+```
+
+**Description:** Changes the triplet feel (aka. swing) play style.
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| tripletFeel | The triplet feel style | `identifier` | yes |
 
 | TripletFeel       | Possible values       |
 |-------------------|-----------------------|
-| No Triplet Feel   | none, no, 0           |
-| Triplet 16th      | triplet-16th, t16, 1  |
-| Triplet 8th       | triplet-8th, t8, 2    |
-| Dotted 16th       | dotted-16th, d16, 3   |
-| Dotted 8th        | dotted-8th, d8, 4     |
-| Scottish 16th     | scottish-16th, s16, 5 |
-| Scottish 8th      | scottish-8th, s8, 6   |
+| No Triplet Feel   | none           |
+| Triplet 16th      | triplet16th |
+| Triplet 8th       | triplet8th    |
+| Dotted 16th       | dotted16th   |
+| Dotted 8th        | dotted8th     |
+| Scottish 16th     | scottish16th |
+| Scottish 8th      | scottish8th   |
 
-<AlphaTexSample>{`
+**Example:**
+
+<AlphaTexSample player={true}>{`
 \\tf none 3.3*4 |
-\\tf triplet-16th 3.3*4 | \\tf triplet-8th 3.3*4 |
-\\tf dotted-16th 3.3*4 | \\tf dotted-8th 3.3*4 |
-\\tf scottish-16th 3.3*4 | \\tf scottish-8th 3.3*4 |
-\\tf no 1.1*4 |
-\\tf t16 1.1*4 | \\tf t8 1.1*4 |
-\\tf d16 1.1*4 | \\tf d8 1.1*4 |
-\\tf s16 1.1*4 | \\tf s8 1.1*4
+\\tf triplet16th 3.3*4 | \\tf triplet8th 3.3*4 |
+\\tf dotted16th 3.3*4 | \\tf dotted8th 3.3*4 |
+\\tf scottish16th 3.3*4 | \\tf scottish8th 3.3*4 |
 `}</AlphaTexSample>
 
-## Anacrusis
+There are no properties on this metadata. 
+
+## `\ac`
+
+```plain title="Syntax"
+\ac
+```
+
+**Description:** Marks the bar as an anacrusis (pick-up) bar.
 
 By default bars follow a strict timing defined by the time signature and tempo. Anacrusis (aka. pickup bars) do not follow this rule.
-The length of those bars is defined by the actual beats/notes in the bar. Bars can be flagged as anacrusis bars via the `\ac` bar meta.
+The length of those bars is defined by the actual beats/notes in the bar. 
+
+**Values:** None
+
+**Example:**
 
 <AlphaTexSample>{`
 \\ks D \\ts 24 16 \\ac r.16 6.3 7.3 9.3 7.3 6.3 | r.16 5.4 7.4 9.4 7.4 5.4 6.3.4{d} 9.6.16 10.6 12.6 10.6 9.6 14.6.4{d} r.16
 `}</AlphaTexSample>
 
-## Sections
+There are no properties on this metadata. 
 
-To split your song into individual sections (e.g. intro, chorus, solo etc.)
-you can mark a bar as a section start by using `\section` followed by the section name.
-If you want to also specify a marker beside the text, use the format `\section Marker Text`.
+## `\section`
+
+```plain title="Syntax"
+\section marker text
+\section text
+```
+
+**Description:** Starts a new section within the song (intro, outro,..)
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| marker | The marker for the section, typically a single letter | `string` | no |
+| text | The text/description of the new section | `string` | yes |
+
+**Example:**
 
 <AlphaTexSample>{`
-\\section Intro // simple section
+\\section "Intro" // simple section
 1.1 1.1 1.1 1.1 | 1.1 1.1 1.1 1.1 |
-\\section "Chorus 01" // with spaces in name
-1.1 1.1 1.1 1.1 |
 \\section S Solo // with marker and section name differently
 1.1 1.1 1.1 1.1
 `}</AlphaTexSample>
 
-## Directions
+There are no properties on this metadata. 
 
-To specify play directions (jumps and jump targets) use the `\jump` metadata followed by the respective instruction.
-The names should be self explaining if you're familiar with this notation: 
+## `\jump`
+
+```plain title="Syntax"
+\jump direction
+```
+
+**Description:** Adds a direction/jump instruction to the bar.
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| direction | The direction to add | `identifier` | yes |
 
 **Jump Targets**
 
@@ -164,6 +338,8 @@ The names should be self explaining if you're familiar with this notation:
 * `DaCoda`
 * `DaDoubleCoda`
 
+**Example:**
+
 <AlphaTexSample player="true">{`
 .
 \\ro \\rc 2 3.3*4 | 
@@ -179,9 +355,19 @@ The names should be self explaining if you're familiar with this notation:
 3.3*4
 `}</AlphaTexSample>
 
-## Free Time
+There are no properties on this metadata. 
 
-To mark bars as free time bars, add the `\ft` tag to it. 
+## `\ft`
+
+```plain title="Syntax"
+\ft
+```
+
+**Description:** Marks the bar as a free-time bar where players are free to vary the playback.
+
+**Values:** None
+
+**Example:**
 
 <AlphaTexSample player="true">{`
 .
@@ -192,53 +378,72 @@ C4*2 |
 C4*2 |
 `}</AlphaTexSample>
 
+There are no properties on this metadata. 
 
-## Transpose
+## `\simile`
 
-This metadata affects the whole staff, its recommended to specify this only on the first bar of a staff not later.
+```plain title="Syntax"
+\simile mark
+```
 
-* `displayTranspose semitones` - Defines the number of semitones to transpose the notes in this staff with. This only affects the display of the notes, not their audio.
-* `transpose semitones` - Defines the number of semitones to transpose the notes in this staff with. This affects the display and audio.
+**Description:** Adds a simile mark to the bar indicating that the content of the last, or previous two bars should be repeated.
 
-<AlphaTexSample player="true" tracks="all">{`
-\\track \\staff \\instrument piano
-    \\displayTranspose -12
-        C4.4 D4 E4 F4 | r.1
-\\track \\staff \\instrument piano
-    \\transpose -12
-        r.1 | C4.4 D4 E4 F4
-`}</AlphaTexSample>
+**Values:**
 
-## Double Bar
-
-To mark a bar as double bar add `\db`
-
-<AlphaTexSample>{`
-\\db 3.3 3.3 3.3 3.3 | 1.1 2.1 3.1 4.1
-`}</AlphaTexSample>
-
-## Simile Marks
-
-To apply simile marks use the `\simile type` where type is:
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| mark | The mark to add | `identifier` | yes |
 
 * `none` - No simile mark is applied
 * `simple` -  A simple simile mark. The previous bar is repeated.
 * `firstofdouble` - A double simile mark. This value is assigned to the first bar of the 2 repeat bars.
 * `secondofdouble` - A double simile mark. This value is assigned to the second bar of the 2 repeat bars.
 
+**Example:**
+
 <AlphaTexSample player="true">{`
 3.3*4 | \\simile simple | 3.3*4 | 4.3*4 | \\simile firstofdouble | \\simile secondofdouble
 `}</AlphaTexSample>
 
-## Bar Lines
+There are no properties on this metadata. 
+
+## `\barlineLeft` and `\barlineRight`
+
+```plain title="Syntax"
+\barlineLeft style
+\barlineRight style
+```
+
+**Description:** Adjusts the lines which will be shown left and right on the bar.
 
 For some special notation needs, the default bar line can be adjusted on every bar.
 The bar line styles are aligned with the ones from [MusicXML](https://www.w3.org/2021/06/musicxml40/musicxml-reference/data-types/bar-style/).
 
-* `\barlineLeft` adjusts the left bar line
-* `\barlineRight` adjusts the right bar line
-
 alphaTab attempts to reuse lines on overlapping styles across bars. 
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| style | The line style to use | `identifier` | yes |
+
+Available styles:
+
+* `automatic` - Bar lines are determined automatically based on details like repeats and free time (default).
+* `dashed` 
+* `dotted` 
+* `heavy` 
+* `heavyheavy` 
+* `heavylight` 
+* `lightheavy` 
+* `lightlight`  
+* `none`
+* `regular`
+* `short` 
+* `tick` 
+
+
+**Example:**
 
 <AlphaTexSample tracks="all">{`
 \\instrument piano
@@ -272,17 +477,148 @@ alphaTab attempts to reuse lines on overlapping styles across bars.
         \\barlineright tick |
 `}</AlphaTexSample>
 
-* `automatic` - Bar lines are determined automatically based on details like repeats and free time (default).
-* `dashed` 
-* `dotted` 
-* `heavy` 
-* `heavyheavy` 
-* `heavylight` 
-* `lightheavy` 
-* `lightlight`  
-* `none`
-* `regular`
-* `short` 
-* `tick` 
+There are no properties on this metadata. 
+
+## `\scale`
+
+```plain title="Syntax"
+\scale scale
+```
+
+**Description:** Adjusts the relative scale of the bar when using `systemsLayoutMode: 'UseModelLayout'` with the page layout.
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| scale | The scale of the bar within the system | `number` (float) | yes |
+
+**Example:**
+
+<AlphaTexSample settings={{ display: {systemsLayoutMode: 'UseModelLayout'}  }}>{`
+\\track { defaultSystemsLayout 3 }
+    \\scale 0.25 :1 c4 | \\scale 0.5 c4 | \\scale 0.25 c4 | 
+    \\scale 0.5 c4 | \\scale 2 c4 | \\scale 0.5 c4 |
+    c4 | c4 
+`}</AlphaTexSample>
+
+There are no properties on this metadata. 
+
+## `\width`
+
+```plain title="Syntax"
+\width width
+```
+
+**Description:** Adjusts the absolute of the bar when using `systemsLayoutMode: 'UseModelLayout'` with the horizontal layout.
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| width | The absolute width of the bar | `number` | yes |
+
+**Example:**
+
+<AlphaTexSample settings={{ display: {  layoutMode: 'Horizontal', systemsLayoutMode: 'UseModelLayout'}  }}>{`
+\\track
+    \\width 100 :1 c4 | \\width 300 c4 | \\width 350 c4 
+`}</AlphaTexSample>
 
 
+There are no properties on this metadata. 
+
+### `\sync`
+
+```plain title="Syntax"
+\sync (barIndex occurence millisecondOffset ratioPosition)
+```
+
+**Description:** Adds a new sync point for synchronizing the music sheet with an external media source like a backing track or video player.
+
+alphaTex support specifying sync points for the [synchronization with external media](/docs/guides/audio-video-sync).
+
+It is recommended to add the sync points at the very end of the song but it is also possible
+to define them inbetween.
+
+The `barIndex`, `occurence`, `ratioPosition` values define the absolute position within the music sheet. 
+The `millisecondOffset` defines the absolute position within the external media. 
+
+With this information known, alphaTab can synchronize the external media with the music sheet. 
+
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| barIndex | The index of the bar being synced | `number` | yes |
+| occurence | The occurence of the bar for which this sync point applies (on repeats) | `number` | yes |
+| millisecondOffset | The absolute millisecond offset within the external media | `number` | yes |
+| ratioPosition | The relative position within the bar where the synchronization happens | `number` | no |
+
+**Example:**
+
+The sample below uses an audio backing track with inconsistent tempos. The sync points correct the tempo differences and the cursor is placed correctly.
+
+import { AlphaTexSyncPointSample } from '@site/src/components/AlphaTexSyncPointSample';
+
+<AlphaTexSyncPointSample />
+
+## `\accidentals`
+
+```plain title="Syntax"
+\accidentals mode
+```
+
+**Description:** Changes the mode how alphaTab should treat accidentals when writing pitched notes.
+
+alphaTab can use the accidentals as specified in alphaTex, or apply accidentals automatically based on the note pitch.
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| mode | The mode which should be active | `auto` or `explicit` | yes |
+
+**Example:**
+
+<AlphaTexSample>{`
+\\accidentals explicit
+    C#4 C4 Eb4 Ax4 |
+\\accidentals auto
+    C#4 C4 Eb4 Ax4 |
+`}</AlphaTexSample>
+
+There are no properties on this metadata. 
+
+## `\spd`, `\spu` and `\sph`
+
+```plain title="Syntax"
+\spd position
+\sph position
+\spu position
+```
+
+**Description:** Specifies how the sustain petal should be pressed down (`spd`), held (`sph`) or lifted up (`spu`).
+
+This tag allows specifying the sustain pedal relative to the bar. 
+The sustain pedal can also be applied via [beat properties](./beat-properties.mdx#spd-sph-spu-and-spe).
+
+**Values:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| position | The relative position within the bar for the marker | `number` (float, 0-1) | yes |
+
+**Example:**
+
+<AlphaTexSample>{`
+\\spd 0
+\\spu 0.25
+\\spd 0.5
+\\sph 0.75
+\\spu 1
+:8 C4 * 8
+`}</AlphaTexSample>
+
+There are no properties on this metadata. 
