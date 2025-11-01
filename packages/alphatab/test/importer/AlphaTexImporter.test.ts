@@ -1,5 +1,5 @@
 import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
-import { StaffNoteKind } from '@src/importer/alphaTex/AlphaTexShared';
+import { AlphaTexStaffNoteKind } from '@src/importer/alphaTex/AlphaTexShared';
 import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AutomationType } from '@src/model/Automation';
@@ -2418,7 +2418,7 @@ describe('AlphaTexImporterTest', () => {
 
     describe('staff-autodetect', () => {
         // tests for autodetecting staff note kinds
-        function test(tex: string, type: StaffNoteKind) {
+        function test(tex: string, type: AlphaTexStaffNoteKind) {
             const importer = new AlphaTexImporter();
             importer.initFromString(tex, new Settings());
             const s = importer.readScore();
@@ -2427,16 +2427,16 @@ describe('AlphaTexImporterTest', () => {
 
         // - direct values
         describe('direct', () => {
-            it('pitch-value', () => test(`C4`, StaffNoteKind.Pitched));
-            it('fretted', () => test(`3.3`, StaffNoteKind.Fretted));
-            it('articulation', () => test(`"Ride (choke)"`, StaffNoteKind.Articulation));
+            it('pitch-value', () => test(`C4`, AlphaTexStaffNoteKind.Pitched));
+            it('fretted', () => test(`3.3`, AlphaTexStaffNoteKind.Fretted));
+            it('articulation', () => test(`"Ride (choke)"`, AlphaTexStaffNoteKind.Articulation));
         });
 
         // - with tuning already specified
         describe('tuning', () => {
-            it('pitch-value', () => test(`\\tuning (C4 C4 C4) C4`, StaffNoteKind.Pitched));
-            it('fretted', () => test(`\\tuning (C4 C4 C4) 3.3`, StaffNoteKind.Fretted));
-            it('articulation', () => test(`\\tuning (C4 C4 C4) "Ride (choke)"`, StaffNoteKind.Articulation));
+            it('pitch-value', () => test(`\\tuning (C4 C4 C4) C4`, AlphaTexStaffNoteKind.Pitched));
+            it('fretted', () => test(`\\tuning (C4 C4 C4) 3.3`, AlphaTexStaffNoteKind.Fretted));
+            it('articulation', () => test(`\\tuning (C4 C4 C4) "Ride (choke)"`, AlphaTexStaffNoteKind.Articulation));
         });
 
         // - with instrument already specified
