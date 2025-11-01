@@ -42,7 +42,7 @@ export {
     AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
+    AlphaTexStaffNoteKind, 
     type IAlphaTexImporter,
-    type IAlphaTexImporterState,
-    AlphaTexStaffNoteKind
+    type IAlphaTexImporterState
 } from '@src/importer/alphaTex/AlphaTexShared';
