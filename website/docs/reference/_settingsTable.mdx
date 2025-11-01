@@ -1,0 +1,753 @@
+import { CodeBadge } from "@site/src/components/CodeBadge";
+import { Signature } from "@site/src/components/Signature";
+
+<table className="table table-striped table-condensed reference-table">
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><th colSpan="4">Core</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/core/enablelazyloading">
+      <CodeBadge name="core.enableLazyLoading" type="all" />
+    </a>
+  </td>
+  <td>
+     Enables lazy loading of the rendered music sheet chunks.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/core/engine">
+      <CodeBadge name="core.engine" type="all" />
+    </a>
+  </td>
+  <td>
+     The engine which should be used to render the the tablature.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/core/includenotebounds">
+      <CodeBadge name="core.includeNoteBounds" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether in the <Signature style="inline" js={[["identifier","BoundsLookup"]]} /> also the position and area of each individual note is provided.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/core/loglevel">
+      <CodeBadge name="core.logLevel" type="all" />
+    </a>
+  </td>
+  <td>
+     The log level to use within alphaTab
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/core/useworkers">
+      <CodeBadge name="core.useWorkers" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether the rendering should be done in a worker if possible.
+  </td>
+</tr>
+    <tr><th colSpan="4">Core - JavaScript Specific</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/core/file">
+      <CodeBadge name="core.file" type="js" />
+    </a>
+  </td>
+  <td>
+     The full URL to the input file to be loaded.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/core/fontdirectory">
+      <CodeBadge name="core.fontDirectory" type="js" />
+    </a>
+  </td>
+  <td>
+     The full URL to the alphaTab font directory.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/core/scriptfile">
+      <CodeBadge name="core.scriptFile" type="js" />
+    </a>
+  </td>
+  <td>
+     The full URL to the alphaTab JavaScript file.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/core/smuflfontsources">
+      <CodeBadge name="core.smuflFontSources" type="js" />
+    </a>
+  </td>
+  <td>
+     Defines the URLs from which to load the SMuFL compliant font files.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/core/tex">
+      <CodeBadge name="core.tex" type="js" />
+    </a>
+  </td>
+  <td>
+     Whether the contents of the DOM element should be loaded as alphaTex.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/core/tracks">
+      <CodeBadge name="core.tracks" type="js" />
+    </a>
+  </td>
+  <td>
+     The tracks to display for the initally loaded file.
+  </td>
+</tr>
+    <tr><th colSpan="4">Display</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/accoladebarpaddingright">
+      <CodeBadge name="display.accoladeBarPaddingRight" type="all" />
+    </a>
+  </td>
+  <td>
+     The padding between the accolade bar and the start of the bar itself.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/barcount">
+      <CodeBadge name="display.barCount" type="all" />
+    </a>
+  </td>
+  <td>
+     The total number of bars that should be rendered from the song. (-1 for all bars)
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/barcountperpartial">
+      <CodeBadge name="display.barCountPerPartial" type="all" />
+    </a>
+  </td>
+  <td>
+     The number of bars that should be placed within one partial render.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/barsperrow">
+      <CodeBadge name="display.barsPerRow" type="all" />
+    </a>
+  </td>
+  <td>
+     Limit the displayed bars per system (row). (-1 for automatic mode)
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/effectbandpaddingbottom">
+      <CodeBadge name="display.effectBandPaddingBottom" type="all" />
+    </a>
+  </td>
+  <td>
+     The padding between individual effect bands.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/effectstaffpaddingbottom">
+      <CodeBadge name="display.effectStaffPaddingBottom" type="all" />
+    </a>
+  </td>
+  <td>
+     The bottom padding applied to effect annotation staffs.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/effectstaffpaddingtop">
+      <CodeBadge name="display.effectStaffPaddingTop" type="all" />
+    </a>
+  </td>
+  <td>
+     The top padding applied to effect annotation staffs.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/firststaffpaddingleft">
+      <CodeBadge name="display.firstStaffPaddingLeft" type="all" />
+    </a>
+  </td>
+  <td>
+     The left padding applied between the left line and the first glyph in the first staff in a system.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/firstsystempaddingtop">
+      <CodeBadge name="display.firstSystemPaddingTop" type="all" />
+    </a>
+  </td>
+  <td>
+     The top padding applied to first system.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/justifylastsystem">
+      <CodeBadge name="display.justifyLastSystem" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether to justify also the last system in page layouts.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/lastsystempaddingbottom">
+      <CodeBadge name="display.lastSystemPaddingBottom" type="all" />
+    </a>
+  </td>
+  <td>
+     The bottom padding applied to the last system.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/layoutmode">
+      <CodeBadge name="display.layoutMode" type="all" />
+    </a>
+  </td>
+  <td>
+     The layouting mode used to arrange the the notation.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/notationstaffpaddingbottom">
+      <CodeBadge name="display.notationStaffPaddingBottom" type="all" />
+    </a>
+  </td>
+  <td>
+     The bottom padding applied to main notation staves (standard, tabs, numbered, slash).
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/notationstaffpaddingtop">
+      <CodeBadge name="display.notationStaffPaddingTop" type="all" />
+    </a>
+  </td>
+  <td>
+     The bottom padding applied to main notation staves (standard, tabs, numbered, slash).
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/padding">
+      <CodeBadge name="display.padding" type="all" />
+    </a>
+  </td>
+  <td>
+     Adjusts the padding between the music notation and the border.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/resources">
+      <CodeBadge name="display.resources" type="all" />
+    </a>
+  </td>
+  <td>
+     Allows adjusting of the used fonts and colors for rendering.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/scale">
+      <CodeBadge name="display.scale" type="all" />
+    </a>
+  </td>
+  <td>
+     The zoom level of the rendered notation.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/staffpaddingleft">
+      <CodeBadge name="display.staffPaddingLeft" type="all" />
+    </a>
+  </td>
+  <td>
+     The left padding applied between the left line and the first glyph in the following staff in a system.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/startbar">
+      <CodeBadge name="display.startBar" type="all" />
+    </a>
+  </td>
+  <td>
+     The bar start index to start layouting with.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/staveprofile">
+      <CodeBadge name="display.staveProfile" type="all" />
+    </a>
+  </td>
+  <td>
+     The stave profile defining which staves are shown for the music sheet.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/stretchforce">
+      <CodeBadge name="display.stretchForce" type="all" />
+    </a>
+  </td>
+  <td>
+     The default stretch force to use for layouting.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/systemlabelpaddingleft">
+      <CodeBadge name="display.systemLabelPaddingLeft" type="all" />
+    </a>
+  </td>
+  <td>
+     The padding left to the track name label of the system.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/systemlabelpaddingright">
+      <CodeBadge name="display.systemLabelPaddingRight" type="all" />
+    </a>
+  </td>
+  <td>
+     The padding left to the track name label of the system.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/systempaddingbottom">
+      <CodeBadge name="display.systemPaddingBottom" type="all" />
+    </a>
+  </td>
+  <td>
+     The bottom padding applied to systems beside the last one.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/systempaddingtop">
+      <CodeBadge name="display.systemPaddingTop" type="all" />
+    </a>
+  </td>
+  <td>
+     The top padding applied systems beside the first one.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/systemslayoutmode">
+      <CodeBadge name="display.systemsLayoutMode" type="all" />
+    </a>
+  </td>
+  <td>
+     The mode used to arrange staves and systems.
+  </td>
+</tr>
+    <tr><th colSpan="4">Exporter</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/exporter/comments">
+      <CodeBadge name="exporter.comments" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether to write extended comments into the exported file (e.g. to in alphaTex to mark where certain metadata or bars starts)
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/exporter/indent">
+      <CodeBadge name="exporter.indent" type="all" />
+    </a>
+  </td>
+  <td>
+     How many characters should be indented on formatted outputs. If set to negative values
+  </td>
+</tr>
+    <tr><th colSpan="4">Importer</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/importer/beattextaslyrics">
+      <CodeBadge name="importer.beatTextAsLyrics" type="all" />
+    </a>
+  </td>
+  <td>
+     Enables detecting lyrics from beat texts
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/importer/encoding">
+      <CodeBadge name="importer.encoding" type="all" />
+    </a>
+  </td>
+  <td>
+     The text encoding to use when decoding strings.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/importer/mergepartgroupsinmusicxml">
+      <CodeBadge name="importer.mergePartGroupsInMusicXml" type="all" />
+    </a>
+  </td>
+  <td>
+     If part-groups should be merged into a single track (MusicXML).
+  </td>
+</tr>
+    <tr><th colSpan="4">Notation</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/notation/displaytranspositionpitches">
+      <CodeBadge name="notation.displayTranspositionPitches" type="all" />
+    </a>
+  </td>
+  <td>
+     The transposition pitch offsets for the individual tracks used for rendering only.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/notation/elements">
+      <CodeBadge name="notation.elements" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether music notation elements are visible or not.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/notation/extendbendarrowsontiednotes">
+      <CodeBadge name="notation.extendBendArrowsOnTiedNotes" type="all" />
+    </a>
+  </td>
+  <td>
+     If set to true bend arrows expand to the end of the last tied note of the string. Otherwise they end on the next beat.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/notation/extendlineeffectstobeatend">
+      <CodeBadge name="notation.extendLineEffectsToBeatEnd" type="all" />
+    </a>
+  </td>
+  <td>
+     If set to true, line effects like w/bar and let-ring are drawn until the end of the beat instead of the start
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/notation/fingeringmode">
+      <CodeBadge name="notation.fingeringMode" type="all" />
+    </a>
+  </td>
+  <td>
+     The fingering mode to use.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/notation/notationmode">
+      <CodeBadge name="notation.notationMode" type="all" />
+    </a>
+  </td>
+  <td>
+     The mode to use for display and play music notation elements.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/notation/rhythmheight">
+      <CodeBadge name="notation.rhythmHeight" type="all" />
+    </a>
+  </td>
+  <td>
+     Controls how high the ryhthm notation is rendered below the tab staff
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/notation/rhythmmode">
+      <CodeBadge name="notation.rhythmMode" type="all" />
+    </a>
+  </td>
+  <td>
+     Controls how the rhythm notation is rendered for tab staves.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/notation/slurheight">
+      <CodeBadge name="notation.slurHeight" type="all" />
+    </a>
+  </td>
+  <td>
+     The height scale factor for slurs
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/notation/smallgracetabnotes">
+      <CodeBadge name="notation.smallGraceTabNotes" type="all" />
+    </a>
+  </td>
+  <td>
+     If set to true the guitar tabs on grace beats are rendered smaller.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/notation/transpositionpitches">
+      <CodeBadge name="notation.transpositionPitches" type="all" />
+    </a>
+  </td>
+  <td>
+     The transposition pitch offsets for the individual tracks used for rendering and playback.
+  </td>
+</tr>
+    <tr><th colSpan="4">Player</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/buffertimeinmilliseconds">
+      <CodeBadge name="player.bufferTimeInMilliseconds" type="all" />
+    </a>
+  </td>
+  <td>
+     The number of milliseconds the player should buffer.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/enableanimatedbeatcursor">
+      <CodeBadge name="player.enableAnimatedBeatCursor" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether the beat cursor should be animated or just ticking.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/enablecursor">
+      <CodeBadge name="player.enableCursor" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether playback cursors should be displayed.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/enableelementhighlighting">
+      <CodeBadge name="player.enableElementHighlighting" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether the notation elements of the currently played beat should be highlighted.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/enableplayer">
+      <CodeBadge name="player.enablePlayer" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether the player should be enabled.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/enableuserinteraction">
+      <CodeBadge name="player.enableUserInteraction" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether the default user interaction behavior should be active or not.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/nativebrowsersmoothscroll">
+      <CodeBadge name="player.nativeBrowserSmoothScroll" type="js" />
+    </a>
+  </td>
+  <td>
+     Whether the native browser smooth scroll mechanism should be used over a custom animation.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/playtripletfeel">
+      <CodeBadge name="player.playTripletFeel" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether the triplet feel should be played or only displayed.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/playermode">
+      <CodeBadge name="player.playerMode" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether the player should be enabled and which mode it should use.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/scrollmode">
+      <CodeBadge name="player.scrollMode" type="all" />
+    </a>
+  </td>
+  <td>
+     The mode how to scroll.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/scrolloffsetx">
+      <CodeBadge name="player.scrollOffsetX" type="all" />
+    </a>
+  </td>
+  <td>
+     The X-offset to add when scrolling.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/scrolloffsety">
+      <CodeBadge name="player.scrollOffsetY" type="all" />
+    </a>
+  </td>
+  <td>
+     The Y-offset to add when scrolling.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/scrollspeed">
+      <CodeBadge name="player.scrollSpeed" type="all" />
+    </a>
+  </td>
+  <td>
+     How fast the scrolling to the new position should happen.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/slide">
+      <CodeBadge name="player.slide" type="all" />
+    </a>
+  </td>
+  <td>
+     The slide settings allow control how the different slide types are generated for audio.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/songbookbendduration">
+      <CodeBadge name="player.songBookBendDuration" type="all" />
+    </a>
+  </td>
+  <td>
+     The bend duration in milliseconds for songbook bends.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/songbookdipduration">
+      <CodeBadge name="player.songBookDipDuration" type="all" />
+    </a>
+  </td>
+  <td>
+     The duration of whammy dips in milliseconds for songbook whammys.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/vibrato">
+      <CodeBadge name="player.vibrato" type="all" />
+    </a>
+  </td>
+  <td>
+     The Vibrato settings allow control how the different vibrato types are generated for audio.
+  </td>
+</tr>
+    <tr><th colSpan="4">Player - JavaScript Specific</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/outputmode">
+      <CodeBadge name="player.outputMode" type="js" />
+    </a>
+  </td>
+  <td>
+     The mode used for playing audio samples
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/scrollelement">
+      <CodeBadge name="player.scrollElement" type="js" />
+    </a>
+  </td>
+  <td>
+     The element to apply the scrolling on.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/soundfont">
+      <CodeBadge name="player.soundFont" type="js" />
+    </a>
+  </td>
+  <td>
+     The sound font file to load for the player.
+  </td>
+</tr>
+  </tbody>
+
+</table>
+

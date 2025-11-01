@@ -405,7 +405,7 @@ export function RasgueadoPatterns() {
   return (
     <div className={styles.wrapper}>
       {patterns.map((p) => (
-        <RasgueadoPattern rasgueado={p} />
+        <RasgueadoPattern key={alphaTab.model.Rasgueado[p]} rasgueado={p} />
       ))}
     </div>
   );

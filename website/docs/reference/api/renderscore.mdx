@@ -1,49 +1,51 @@
 ---
 title: renderScore
-description: "Initiates a rendering of the given score."
 sidebar_custom_props:
   kind: method
   category: Methods - Core
   since: 0.9.4
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="0.9.4" />
 
 ### Description
 Initiates a rendering of the given score.
 
-<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
-<TabItem value="js">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"renderScore"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"score"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/score"}>{"Score"}</Link><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"trackIndexes"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"number"}</span><span style={{"color":"#393A34"}}>{"[]"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"void"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="cs">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"void"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"RenderScore"}</span><span style={{"color":"#393A34"}}>{"("}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/score"}>{"Score"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"score"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"https://learn.microsoft.com/en-us/dotnet/api/system.collections.ilist"}>{"IList"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><span style={{"color":"#36acaa"}}>{"double"}</span><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"trackIndexes"}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="kt">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"renderScore"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"score"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/score"}>{"Score"}</Link><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"trackIndexes"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"alphaTab.collections.DoubleList"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Unit"}</span></code></pre></div></div>
-</TabItem>
-</Tabs>
+<Signature style="block"
+           js={[["identifier","renderScore"],["token","("],["identifier","score"],["token",":"],["whitespace"," "],["identifier","Score","/docs/reference/types/model/score"],["token",","],["whitespace"," "],["identifier","trackIndexes"],["token","?"],["token",":"],["whitespace"," "],["identifier","number"],["token","[]"],["token",")"],["token",":"],["whitespace"," "],["identifier","void"]]}
+           csharp={[["keyword","void"],["whitespace"," "],["identifier","RenderScore"],["token","("],["identifier","Score","/docs/reference/types/model/score"],["whitespace"," "],["identifier","score"],["token",","],["whitespace"," "],["identifier","IList","https://learn.microsoft.com/en-us/dotnet/api/system.collections.ilist"],["token","<"],["identifier","double"],["token",">"],["token","?"],["whitespace"," "],["identifier","trackIndexes"],["token",")"]]}
+           kotlin={[["identifier","fun"],["whitespace"," "],["identifier","renderScore"],["token","("],["identifier","score"],["token",":"],["whitespace"," "],["identifier","Score","/docs/reference/types/model/score"],["token",","],["whitespace"," "],["identifier","trackIndexes"],["token",":"],["whitespace"," "],["identifier","alphaTab.collections.DoubleList"],["token","?"],["token",")"],["token",":"],["whitespace"," "],["identifier","Unit"]]}
+/>
 
-
-<ParameterTable>
-    <ParameterRow platform="all" name="score">
-        The score containing the tracks to be rendered.
-    </ParameterRow>
-    <ParameterRow platform="all" name="trackIndexes">
-        The indexes of the tracks from the song that should be rendered. If not provided, the first track of the
-        song will be shown.
-    </ParameterRow>
-</ParameterTable>
-
+<table className="table table-striped table-condensed type-table">
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr>
+  <td>
+    <CodeBadge type="all" name="score" />
+  </td>
+  <td>
+    The score containing the tracks to be rendered.
+  </td>
+</tr>
+<tr>
+  <td>
+    <CodeBadge type="all" name="trackIndexes" />
+  </td>
+  <td>
+    The indexes of the tracks from the song that should be rendered. If not provided, the first track of the
+    song will be shown.
+  </td>
+</tr>
+  </tbody>
+</table>
 
 ## Examples
 

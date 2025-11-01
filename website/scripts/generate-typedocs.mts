@@ -45,10 +45,7 @@ export async function generateTypeDocs(context: GenerateContext) {
     await fileStream.write(`title: ${exportedName}\n`);
     await fileStream.write("---\n");
 
-    if(context.emptyFiles){
-      fileStream.suspend = true;
-    }
-
+    fileStream.suspend = context.emptyFiles;
     await writeCommonImports(fileStream);
 
     await fileStream.write(
@@ -440,10 +437,7 @@ async function writeFrontMatter(
 
   await fileStream.write("---\n");
 
-  if(context.emptyFiles){
-    return;
-  }
-
+  fileStream.suspend = context.emptyFiles;
   await writeCommonImports(fileStream);
 
   if (since) {
@@ -470,10 +464,6 @@ async function writePropertyPage(
   await using fileStream = await openFileStream(filePath);
 
   await writeFrontMatter(context, fileStream, memberName, member, "property");
-  if(context.emptyFiles){
-      return;
-  }
-
   await writePropertyDetails(context, fileStream, member);
 }
 
@@ -491,10 +481,6 @@ async function writeEventPage(
   await using fileStream = await openFileStream(filePath);
 
   await writeFrontMatter(context, fileStream, memberName, member, "event");
-  if(context.emptyFiles){
-      return;
-  }
-
   await writeEventDetails(context, fileStream, member);
 }
 
@@ -509,10 +495,6 @@ async function writeMethodPage(
   await using fileStream = await openFileStream(filePath);
 
   await writeFrontMatter(context, fileStream, memberName, member, "method");
-  if(context.emptyFiles){
-      return;
-  }
-
   await writeMethodDetails(context, fileStream, member);
 }
 

@@ -1,6 +1,5 @@
 ---
 title: print
-description: "Opens a popup window with the rendered music notation for printing."
 sidebar_custom_props:
   kind: method
   javaScriptOnly: true
@@ -8,14 +7,7 @@ sidebar_custom_props:
   since: 0.9.4
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="0.9.4" />
 
@@ -29,18 +21,36 @@ This function opens a popup window which is filled with a by-default A4 optimize
 * The stretch force is reduced to 0.8
 * The width is optimized to A4. Portrait if the page-layout is used, landscape if the horizontal-layout is used.
 
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"print"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"width"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"string"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"additionalSettings"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"unknown"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"void"}</span></code></pre></div></div>
+<Signature style="block"
+           js={[["identifier","print"],["token","("],["identifier","width"],["token","?"],["token",":"],["whitespace"," "],["identifier","string"],["token",","],["whitespace"," "],["identifier","additionalSettings"],["token","?"],["token",":"],["whitespace"," "],["identifier","unknown"],["token",")"],["token",":"],["whitespace"," "],["identifier","void"]]}
+/>
 
-
-<ParameterTable>
-    <ParameterRow platform="all" name="width">
-        An optional custom width as CSS width that should be used. Best is to use a CSS width that is suitable for your preferred page size.
-    </ParameterRow>
-    <ParameterRow platform="all" name="additionalSettings">
-        An optional parameter to specify additional setting values which should be respected during printing (<SinceBadge inline={true} since={"1.2.0"} />)
-    </ParameterRow>
-</ParameterTable>
-
+<table className="table table-striped table-condensed type-table">
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr>
+  <td>
+    <CodeBadge type="all" name="width" />
+  </td>
+  <td>
+    An optional custom width as CSS width that should be used. Best is to use a CSS width that is suitable for your preferred page size.
+  </td>
+</tr>
+<tr>
+  <td>
+    <CodeBadge type="all" name="additionalSettings" />
+  </td>
+  <td>
+    An optional parameter to specify additional setting values which should be respected during printing (<SinceBadge inline={true} since={"1.2.0"} />)
+  </td>
+</tr>
+  </tbody>
+</table>
 
 ## Example - JavaScript
 

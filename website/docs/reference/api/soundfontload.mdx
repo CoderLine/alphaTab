@@ -1,6 +1,5 @@
 ---
 title: soundFontLoad
-description: "This event is fired when the SoundFont is being loaded."
 sidebar_custom_props:
   kind: event
   javaScriptOnly: true
@@ -8,21 +7,16 @@ sidebar_custom_props:
   since: 0.9.4
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="0.9.4" />
 
 ### Description
 This event is fired when the SoundFont is being loaded. This event is fired when the SoundFont is being loaded and reports the progress accordingly.
 
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"soundFontLoad"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/progresseventargs"}>{"ProgressEventArgs"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+<Signature style="block"
+           js={[["keyword","readonly"],["whitespace"," "],["identifier","soundFontLoad"],["token",":"],["whitespace"," "],["identifier","IEventEmitterOfT","/docs/reference/types/ieventemitteroft"],["token","<"],["identifier","ProgressEventArgs","/docs/reference/types/progresseventargs"],["token",">"],["token",";"]]}
+/>
 
 
 ## Example - JavaScript

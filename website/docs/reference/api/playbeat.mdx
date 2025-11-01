@@ -1,20 +1,12 @@
 ---
 title: playBeat
-description: "Triggers the play of the given beat."
 sidebar_custom_props:
   kind: method
   category: Methods - Player
   since: 1.1.0
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="1.1.0" />
 
@@ -24,25 +16,30 @@ This method can be used in applications when individual beats need to be played 
 The player will not report any change in state or playback position during the playback of the requested beat.
 It is a playback of audio separate to the main song playback.
 
-<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
-<TabItem value="js">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"playBeat"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"beat"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/beat"}>{"Beat"}</Link><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"void"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="cs">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"void"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"PlayBeat"}</span><span style={{"color":"#393A34"}}>{"("}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/beat"}>{"Beat"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"beat"}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="kt">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"playBeat"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"beat"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/beat"}>{"Beat"}</Link><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Unit"}</span></code></pre></div></div>
-</TabItem>
-</Tabs>
+<Signature style="block"
+           js={[["identifier","playBeat"],["token","("],["identifier","beat"],["token",":"],["whitespace"," "],["identifier","Beat","/docs/reference/types/model/beat"],["token",")"],["token",":"],["whitespace"," "],["identifier","void"]]}
+           csharp={[["keyword","void"],["whitespace"," "],["identifier","PlayBeat"],["token","("],["identifier","Beat","/docs/reference/types/model/beat"],["whitespace"," "],["identifier","beat"],["token",")"]]}
+           kotlin={[["identifier","fun"],["whitespace"," "],["identifier","playBeat"],["token","("],["identifier","beat"],["token",":"],["whitespace"," "],["identifier","Beat","/docs/reference/types/model/beat"],["token",")"],["token",":"],["whitespace"," "],["identifier","Unit"]]}
+/>
 
-
-<ParameterTable>
-    <ParameterRow platform="all" name="beat">
-        the single beat to play
-    </ParameterRow>
-</ParameterTable>
-
+<table className="table table-striped table-condensed type-table">
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr>
+  <td>
+    <CodeBadge type="all" name="beat" />
+  </td>
+  <td>
+    the single beat to play
+  </td>
+</tr>
+  </tbody>
+</table>
 ### Returns 
 true if the playback was started, otherwise false. Reasons for not starting can be that the player is not ready or already playing. 
 

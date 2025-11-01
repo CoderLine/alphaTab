@@ -1,20 +1,12 @@
 ---
 title: exportAudio
-description: "Starts the audio export for the currently loaded song."
 sidebar_custom_props:
   kind: method
   category: Methods - Player
   since: 1.6.0
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="1.6.0" />
 
@@ -24,25 +16,30 @@ This method works with any PlayerMode active but changing the mode during export
 
 See [Audio Export](/docs/guides/audio-export) for further guidance how to use this feature.
 
-<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
-<TabItem value="js">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"exportAudio"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"options"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/audioexportoptions"}>{"AudioExportOptions"}</Link><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/iaudioexporter"}>{"Promise"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/iaudioexporter"}>{"IAudioExporter"}</Link><span style={{"color":"#393A34"}}>{">"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="cs">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1"}>{"System.Threading.Task"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/iaudioexporter"}>{"IAudioExporter"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"ExportAudio"}</span><span style={{"color":"#393A34"}}>{"("}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/audioexportoptions"}>{"AudioExportOptions"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"options"}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="kt">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"suspend"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"exportAudio"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"options"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/audioexportoptions"}>{"AudioExportOptions"}</Link><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/iaudioexporter"}>{"IAudioExporter"}</Link></code></pre></div></div>
-</TabItem>
-</Tabs>
+<Signature style="block"
+           js={[["identifier","exportAudio"],["token","("],["identifier","options"],["token",":"],["whitespace"," "],["identifier","AudioExportOptions","/docs/reference/types/synth/audioexportoptions"],["token",")"],["token",":"],["whitespace"," "],["identifier","Promise","/docs/reference/types/synth/iaudioexporter"],["token","<"],["identifier","IAudioExporter","/docs/reference/types/synth/iaudioexporter"],["token",">"]]}
+           csharp={[["identifier","System.Threading.Task","https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1"],["token","<"],["identifier","IAudioExporter","/docs/reference/types/synth/iaudioexporter"],["token",">"],["whitespace"," "],["identifier","ExportAudio"],["token","("],["identifier","AudioExportOptions","/docs/reference/types/synth/audioexportoptions"],["whitespace"," "],["identifier","options"],["token",")"]]}
+           kotlin={[["identifier","suspend"],["whitespace"," "],["identifier","fun"],["whitespace"," "],["identifier","exportAudio"],["token","("],["identifier","options"],["token",":"],["whitespace"," "],["identifier","AudioExportOptions","/docs/reference/types/synth/audioexportoptions"],["token",")"],["token",":"],["whitespace"," "],["identifier","IAudioExporter","/docs/reference/types/synth/iaudioexporter"]]}
+/>
 
-
-<ParameterTable>
-    <ParameterRow platform="all" name="options">
-        The export options.
-    </ParameterRow>
-</ParameterTable>
-
+<table className="table table-striped table-condensed type-table">
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr>
+  <td>
+    <CodeBadge type="all" name="options" />
+  </td>
+  <td>
+    The export options.
+  </td>
+</tr>
+  </tbody>
+</table>
 ### Returns 
 An exporter instance to export the audio in a streaming fashion. 
 

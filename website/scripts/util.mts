@@ -12,9 +12,10 @@ export async function openFileStream(path: string): Promise<FileStream> {
   let _suspended = false;
 
   const write = async (s: string) => {
-    if(!_suspended) {
-      await fileStream.write(s);
+    if (_suspended) {
+      return;
     }
+    await fileStream.write(s);
   };
   const writeLine = (s?: string) => {
     if (s) {
@@ -33,9 +34,9 @@ export async function openFileStream(path: string): Promise<FileStream> {
     writeLine,
     [Symbol.asyncDispose]: asyncDispose,
     get suspend() {
-      return _suspended 
+      return _suspended
     },
-    set suspend(v:boolean){
+    set suspend(v: boolean) {
       _suspended = v;
     }
   };

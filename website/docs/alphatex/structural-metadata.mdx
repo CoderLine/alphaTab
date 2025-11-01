@@ -362,7 +362,7 @@ export function GeneralMidiList() {
     return (
         <tbody>
             {items.map((x, i) => {
-                return (<tr>
+                return (<tr key={x}>
                     <td>{i}</td>
                     <td>{x}</td>
                 </tr>);
@@ -374,7 +374,7 @@ export function GeneralMidiList() {
 Refer to the following list of names you can use. 
 
 <div style={{overflow: 'auto', height: "300px"}}>
-    <table class="table table-striped table-condensed type-table">
+    <table className="table table-striped table-condensed type-table">
         <thead>
             <tr>
                 <th>Number</th>

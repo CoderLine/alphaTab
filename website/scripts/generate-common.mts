@@ -1,4 +1,3 @@
-import { PrismThemeEntry, themes as prismThemes } from "prism-react-renderer";
 import path from "path";
 import fs from "fs";
 import ts from "typescript";
@@ -9,7 +8,7 @@ import {
   valueOrFirstDeclarationInDts,
 } from "./typeschema.mjs";
 import { styleText } from "util";
-import { FileStream, toPascalCase } from "./util.mjs";
+import { FileStream, openFileStream, toPascalCase } from "./util.mjs";
 
 function toExampleKey(title: string) {
   return title
@@ -78,13 +77,84 @@ export function isTargetWeb(context: GenerateContext, node: ts.Node): boolean {
   return isWebOnly;
 }
 
-export function isDomWildcard(
-  context: GenerateContext,
-  node: ts.Node
-): boolean {
-  return !!getJSDocTags(context, node).find(
-    (t) => t.tagName.text === "domWildcard"
-  );
+export type ReferencePage = {
+  title: string,
+  description: string,
+  javaScriptOnly: boolean,
+  url: string
+};
+
+export class ReferenceTableData {
+  public readonly categories = new Map<string, ReferencePage[]>();
+
+  public addPage(category: string, page: ReferencePage) {
+    let items = this.categories.get(category);
+    if (!items) {
+      items = [];
+      this.categories.set(category, items);
+    }
+    items.push(page);
+
+  }
+}
+
+export async function writeReferenceTable(
+  path: string,
+  type: string,
+  categories: ReferenceTableData) {
+
+  await using table = await openFileStream(path);
+
+
+  await table.writeLine(`import { CodeBadge } from "@site/src/components/CodeBadge";`);
+  await table.writeLine(`import { Signature } from "@site/src/components/Signature";`);
+  await table.writeLine();
+  await table.writeLine(`<table className="table table-striped table-condensed reference-table">`);
+  await table.writeLine(`  <thead>`);
+  await table.writeLine(`    <tr>`);
+  await table.writeLine(`      <th>${type}</th>`);
+  await table.writeLine(`      <th>Summary</th>`);
+  await table.writeLine(`    </tr>`);
+  await table.writeLine(`  </thead>`);
+  await table.writeLine(`  <tbody>`);
+
+  const categoriesSorted = Array.from(categories.categories.entries())
+    .sort((a, b) => {
+      return a[0].localeCompare(b[0]);
+    });
+
+
+  for (const [category, pages] of categoriesSorted) {
+    await table.writeLine(`    <tr><th colSpan="4">${category}</th></tr>`);
+
+    const sorted = pages
+      .sort((a, b) => {
+        const at = a.title;
+        const bt = b.title;
+
+        if (at < bt) return -1;
+        if (at > bt) return 1;
+
+        return 0;
+      });
+
+    for (const v of sorted) {
+      await table.writeLine(`<tr>`);
+      await table.writeLine(`  <td>`);
+      await table.writeLine(`    <a href=${JSON.stringify(v.url)}>`);
+      await table.writeLine(`      <CodeBadge name=${JSON.stringify(v.title)} type="${v.javaScriptOnly ? 'js' : 'all'}" />`);
+      await table.writeLine(`    </a>`);
+      await table.writeLine(`  </td>`);
+      await table.writeLine(`  <td>`);
+      await table.writeLine(`     ${v.description}`);
+      await table.writeLine(`  </td>`);
+      await table.writeLine(`</tr>`);
+    }
+  }
+
+  await table.writeLine(`  </tbody>\n`);
+  await table.writeLine(`</table>\n`);
+
 }
 
 export function getCategory(
@@ -515,7 +585,7 @@ function getDeclarationReferenceUrl(
     case ts.SyntaxKind.PropertyDeclaration:
     case ts.SyntaxKind.PropertySignature:
       let page = (element as ts.ClassElement).name!.getText().toLowerCase();
-      if(page === "index") {
+      if (page === "index") {
         page = "index_";
       }
       return (
@@ -728,30 +798,61 @@ export async function writeMethodReturn(
   }
 }
 
+export async function beginParameterTable(
+  fileStream: FileStream
+) {
+  await fileStream.write(`<table className="table table-striped table-condensed type-table">\n`);
+  await fileStream.write(`  <thead>\n`);
+  await fileStream.write(`    <tr>\n`);
+  await fileStream.write(`      <th>Parameter</th>\n`);
+  await fileStream.write(`      <th>Summary</th>\n`);
+  await fileStream.write(`    </tr>\n`);
+  await fileStream.write(`  </thead>\n`);
+  await fileStream.write(`  <tbody>\n`);
+}
+
+export async function writeParameterRow(
+  fileStream: FileStream,
+  name: string,
+  description: string,
+) {
+  await fileStream.write(`<tr>\n`);
+  await fileStream.write(`  <td>\n`);
+  await fileStream.write(`    <CodeBadge type="all" name=${JSON.stringify(name)} />\n`);
+  await fileStream.write(`  </td>\n`);
+  await fileStream.write(`  <td>\n`);
+  for (const l of description.split('\n')) {
+    await fileStream.write(`    ${l}\n`);
+  }
+  await fileStream.write(`  </td>\n`);
+  await fileStream.write(`</tr>\n`);
+}
+
+export async function endParameterTable(
+  fileStream: FileStream
+) {
+  await fileStream.write(`  </tbody>\n`);
+  await fileStream.write(`</table>\n`);
+}
+
 export async function writeMethodParameters(
   context: GenerateContext,
   fileStream: FileStream,
   m: ts.MethodDeclaration | ts.MethodSignature
 ) {
   if (m.parameters.length > 0) {
-    await fileStream.write(`\n<ParameterTable>\n`);
+    await beginParameterTable(fileStream);
 
     for (let i = 0; i < m.parameters.length; i++) {
-      await fileStream.write(
-        `    <ParameterRow platform="all" name="${m.parameters[
+      await writeParameterRow(fileStream,
+        m.parameters[
           i
-        ].name.getText()}">\n`
+        ].name.getText(),
+        getFullDescription(context, m.parameters[i])
       );
-
-      for (const line of getFullDescription(context, m.parameters[i]).split(
-        "\n"
-      )) {
-        await fileStream.write(`        ${line}\n`);
-      }
-
-      await fileStream.write(`    </ParameterRow>\n`);
     }
-    await fileStream.write(`</ParameterTable>\n\n`);
+
+    await endParameterTable(fileStream);
   }
 }
 
@@ -761,15 +862,13 @@ export async function writeMethodSignatures(
   m: ts.MethodDeclaration | ts.MethodSignature
 ) {
   const isWebOnly = isTargetWeb(context, m);
-
-  if (!isWebOnly) {
-    await fileStream.writeLine(
-      `<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>`
-    );
-    await fileStream.writeLine(`<TabItem value="js">`);
-  }
-
   const builder = new TypeReferencedCodeBuilder(context);
+
+  await fileStream.writeLine(
+    `<Signature style="block"`
+  );
+
+
   if (m.modifiers) {
     for (const mod of m.modifiers) {
       builder.keyword(mod.getText());
@@ -810,12 +909,11 @@ export async function writeMethodSignatures(
   builder.whitespace(" ");
   builder.type(getTypeWithNullableInfo(context, m.type, true, false));
 
-  await fileStream.writeLine(builder.toMdx("js", "block"));
+  await fileStream.writeLine(
+    `           js={${builder.toJSON("js")}}`
+  );
 
   if (!isWebOnly) {
-    await fileStream.writeLine(`</TabItem>`);
-    await fileStream.writeLine(`<TabItem value="cs">`);
-
     builder.reset();
     if (m.modifiers) {
       for (const mod of m.modifiers) {
@@ -861,10 +959,9 @@ export async function writeMethodSignatures(
     }
     builder.token(")");
 
-    await fileStream.writeLine(builder.toMdx("c#", "block"));
-
-    await fileStream.writeLine(`</TabItem>`);
-    await fileStream.writeLine(`<TabItem value="kt">`);
+    await fileStream.writeLine(
+      `           csharp={${builder.toJSON("c#")}}`
+    );
 
     builder.reset();
 
@@ -902,33 +999,33 @@ export async function writeMethodSignatures(
     builder.whitespace(" ");
     builder.type(getTypeWithNullableInfo(context, m.type, false, false));
 
-    await fileStream.writeLine(builder.toMdx("kotlin", "block"));
-
-    await fileStream.writeLine(`</TabItem>`);
-    await fileStream.writeLine(`</Tabs>`);
+    await fileStream.writeLine(
+      `           kotlin={${builder.toJSON("kotlin")}}`
+    );
   }
+
+  await fileStream.writeLine(
+    `/>`
+  );
 
   await fileStream.writeLine();
 }
 
-export async function writeCommonImports(fileStream: FileStream) {
+export async function writeCommonImports(fileStream: FileStream, additionals: string[] = []) {
   await fileStream.writeLine();
-  await fileStream.writeLine(
-    "import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';"
-  );
-  await fileStream.writeLine("import CodeBlock from '@theme/CodeBlock';");
-  await fileStream.writeLine('import Tabs from "@theme/Tabs";');
-  await fileStream.writeLine('import TabItem from "@theme/TabItem";');
-  await fileStream.writeLine(
-    "import { CodeBadge } from '@site/src/components/CodeBadge';"
-  );
-  await fileStream.writeLine(
-    "import { SinceBadge } from '@site/src/components/SinceBadge';"
-  );
-  await fileStream.writeLine(
-    "import DynHeading from '@site/src/components/DynHeading';"
-  );
-  await fileStream.writeLine("import Link from '@docusaurus/Link';");
+  const imports = [
+    'Tabs',
+    'TabItem',
+    'CodeBadge',
+    'SinceBadge',
+    'DynHeading',
+    'Link',
+    'Signature',
+    ...additionals
+  ];
+
+  await fileStream.writeLine(`import { ${imports.join(', ')} } from '@site/src/reference-commons'`);
+
 
   await fileStream.writeLine();
 }
@@ -1092,15 +1189,11 @@ async function writePropertySignatures(
   m: ts.PropertySignature | ts.PropertyDeclaration | ts.GetAccessorDeclaration
 ) {
   const isWebOnly = isTargetWeb(context, m);
-
-  if (!isWebOnly) {
-    await fileStream.writeLine(
-      `<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>`
-    );
-    await fileStream.writeLine(`<TabItem value="js">`);
-  }
-
   const builder = new TypeReferencedCodeBuilder(context);
+
+  await fileStream.writeLine(
+    `<Signature style="block"`
+  );
 
   if (m.modifiers) {
     for (const mod of m.modifiers) {
@@ -1153,12 +1246,11 @@ async function writePropertySignatures(
 
   builder.token(";");
 
-  await fileStream.writeLine(builder.toMdx("js", "block"));
+  await fileStream.writeLine(
+    `           js={${builder.toJSON("js")}}`
+  );
 
   if (!isWebOnly) {
-    await fileStream.writeLine(`</TabItem>`);
-    await fileStream.writeLine(`<TabItem value="cs">`);
-
     const isReadonly =
       m.modifiers?.some((mod) => mod.kind === ts.SyntaxKind.ReadonlyKeyword) ||
       (ts.isGetAccessor(m) &&
@@ -1210,10 +1302,10 @@ async function writePropertySignatures(
       builder.identifier(defaultValue);
     }
 
-    await fileStream.writeLine(builder.toMdx("c#", "block"));
+    await fileStream.writeLine(
+      `           csharp={${builder.toJSON("c#")}}`
+    );
 
-    await fileStream.writeLine(`</TabItem>`);
-    await fileStream.writeLine(`<TabItem value="kt">`);
 
     builder.reset();
     if (isStatic) {
@@ -1249,17 +1341,19 @@ async function writePropertySignatures(
       builder.token("}");
     }
 
-    await fileStream.writeLine(builder.toMdx("kotlin", "block"));
-
-    await fileStream.writeLine(`</TabItem>`);
-    await fileStream.writeLine(`</Tabs>`);
+    await fileStream.writeLine(
+      `           kotlin={${builder.toJSON("kotlin")}}`
+    );
   }
 
+  await fileStream.writeLine(
+    `/>`
+  );
   await fileStream.writeLine();
 }
 
 type TypeReferencedCodeLink = { link: string; linkText: string };
-type TypeReferencedCodeToken = {
+export type TypeReferencedCodeToken = {
   kind: "identifier" | "token" | "keyword" | "whitespace" | "type" | "link";
   content: string | TypeWithNullableInfo | TypeReferencedCodeLink;
 };
@@ -1269,7 +1363,7 @@ type TypeReferencedCodeLanguage = "js" | "c#" | "kotlin";
 export class TypeReferencedCodeBuilder {
   private chunks: TypeReferencedCodeToken[] = [];
 
-  public constructor(private context: GenerateContext) {}
+  public constructor(private context: GenerateContext) { }
 
   public identifier(s: string) {
     this.chunks.push({ kind: "identifier", content: s });
@@ -1346,75 +1440,49 @@ export class TypeReferencedCodeBuilder {
     this.chunks = [];
   }
 
-  public toMdx(
-    language: TypeReferencedCodeLanguage,
-    style: "block" | "inline"
-  ) {
-    // NOTE: no dark theme
-    const theme = prismThemes.github;
-    const lookup = new Map<TypeReferencedCodeToken["kind"], PrismThemeEntry>();
-
-    lookup.set("identifier", theme.plain);
-    lookup.set("token", theme.plain);
-    lookup.set("keyword", theme.plain);
-    lookup.set("whitespace", theme.plain);
-
-    for (const styles of theme.styles) {
-      if (styles.types.includes("variable")) {
-        lookup.set("identifier", styles.style);
-      }
-      if (styles.types.includes("punctuation")) {
-        lookup.set("token", styles.style);
-      }
-      if (styles.types.includes("keyword")) {
-        lookup.set("keyword", styles.style);
-      }
-    }
-
-    let code = "";
-
-    switch (style) {
-      case "inline":
-        code += `<code style={${JSON.stringify(theme.plain)}}>`;
-        break;
-      case "block":
-        code += `<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock">`;
-        code += `<code className="codeBlockLines" style={${JSON.stringify(theme.plain)}}>`;
-        break;
-    }
-
+  public toJSON(language: TypeReferencedCodeLanguage) {
     const translated = this.translateChunks(this.chunks, language);
 
+    const json: any[] = [];
     for (const chunk of translated) {
       switch (chunk.kind) {
         case "identifier":
         case "token":
         case "keyword":
         case "whitespace":
-          code +=
-            `<span style={${JSON.stringify(lookup.get(chunk.kind))}}>{` +
-            JSON.stringify(chunk.content as string) +
-            `}</span>`;
+          json.push([chunk.kind, chunk.content.toString()]);
           break;
 
         // case "type": // rewritten during translateChunks
         //   break;
         case "link":
           const link = chunk.content as TypeReferencedCodeLink;
-          code += `<Link style={${JSON.stringify(lookup.get("identifier"))}} to={${JSON.stringify(link.link)}}>{${JSON.stringify(link.linkText)}}</Link>`;
+          json.push(['identifier', link.linkText, link.link]);
           break;
       }
     }
 
-    switch (style) {
-      case "inline":
-        code += "</code>";
+    return JSON.stringify(json);
+  }
+
+
+  public toMdx(
+    language: TypeReferencedCodeLanguage,
+    style: "block" | "inline"
+  ) {
+    let code = `<Signature style=${JSON.stringify(style)} `;
+    switch(language){
+      case "js":
+        code += 'js';
         break;
-      case "block":
-        code += `</code></pre></div></div>`;
+      case "c#":
+        code += 'csharp';
+        break;
+      case "kotlin":
+        code += 'kotlin';
         break;
     }
-
+    code += '={' + this.toJSON(language) + '} />';
     return code;
   }
 
@@ -1893,4 +1961,24 @@ export class TypeReferencedCodeBuilder {
         break;
     }
   }
+}
+
+
+export function escapeHtmlEntities(input: string): string {
+  if (input === null || input === undefined) return "";
+  const map: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+    "/": "&#x2F;",
+    "`": "&#96;",
+    "{": "\\{",
+    "}": "\\}",
+  };
+
+  return input.replace(/[\u00A0-\u9999<>&"'\/`\{\}]/g, (ch) => {
+    return map[ch] ?? `&#${ch.charCodeAt(0)};`;
+  });
 }

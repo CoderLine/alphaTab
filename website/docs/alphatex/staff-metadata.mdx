@@ -427,7 +427,7 @@ export function ArticulationTable({list}) {
             </thead>
             <tbody>
                 {list.map(i => (
-                    <tr>
+                    <tr key={i[0]}>
                         <td>{i[1]}</td>
                         <td><code>{i[0]}</code></td>
                         <td><code>{i[0].replace(/[^a-zA-Z0-9]/g, '')}</code></td>

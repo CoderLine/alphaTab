@@ -1,6 +1,5 @@
 ---
 title: core.tex
-description: "Whether the contents of the DOM element should be loaded as alphaTex."
 sidebar_custom_props:
   javaScriptOnly: true
   jsOnParent: true
@@ -8,24 +7,18 @@ sidebar_custom_props:
   since: 0.9.6
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, PropertyDescription } from '@site/src/reference-commons'
 
-import { SettingsHeader } from '@site/src/components/SettingsHeader';
-
-<SettingsHeader />
+<SinceBadge since="0.9.6" />
+<PropertyDescription showJson={true} />
 
 ### Description
 Whether the contents of the DOM element should be loaded as alphaTex. This setting allows you to fill alphaTex code into the DOM element and make alphaTab automatically
 load it when initializing. Note that this setting is only interpreted once on initialization.
 
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"tex"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"boolean"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+<Signature style="block"
+           js={[["identifier","tex"],["token",":"],["whitespace"," "],["identifier","boolean"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","false"],["token",";"]]}
+/>
 
 
 ## Example - JavaScript
