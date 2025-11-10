@@ -168,6 +168,7 @@ class AlphaTexImportState implements IAlphaTexImporterState {
     public accidentalMode = AlphaTexAccidentalMode.Explicit;
     public currentTupletNumerator = -1;
     public currentTupletDenominator = -1;
+    public scoreNode: AlphaTexScoreNode | undefined;
 }
 
 /**
@@ -181,6 +182,10 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
     public get state(): IAlphaTexImporterState {
         return this._state;
+    }
+
+    public get scoreNode(): AlphaTexScoreNode | undefined {
+        return this._state.scoreNode;
     }
 
     public get name(): string {
@@ -222,6 +227,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         let scoreNode: AlphaTexScoreNode;
         try {
             scoreNode = this._parser.read();
+            this._state.scoreNode = scoreNode;
         } catch (e) {
             if (this.logErrors) {
                 Logger.error('AlphaTex', `Error while parsing alphaTex: ${(e as Error).toString()}`);
@@ -585,7 +591,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                     message: `Wrong note kind '${StaffNoteKind[detectedNoteKind]}' for staff with note kind ''${StaffNoteKind[staffNoteKind]}'. Do not mix incompatible staves and notes.`,
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: noteValue.start,
-                    end: noteValue.end,
+                    end: noteValue.end
                 });
             }
         } else if (staffNoteKind !== undefined) {

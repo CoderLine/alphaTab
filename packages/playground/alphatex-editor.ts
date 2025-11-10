@@ -14,36 +14,12 @@ function trimCode(code: string) {
         .join('\r\n');
 }
 
+// @ts-expect-error
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-// import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
-// import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
-// import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
-// import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
+import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 
-async function setupMonaco() {
-    self.MonacoEnvironment = {
-        getWorker: (_workerId, label) => {
-            switch (label) {
-                // case 'json':
-                //     return getWorkerModule('/monaco-editor/esm/vs/language/json/json.worker?worker', label);
-                // case 'css':
-                // case 'scss':
-                // case 'less':
-                //     return getWorkerModule('/monaco-editor/esm/vs/language/css/css.worker?worker', label);
-                // case 'html':
-                // case 'handlebars':
-                // case 'razor':
-                //     return getWorkerModule('/monaco-editor/esm/vs/language/html/html.worker?worker', label);
-                // case 'typescript':
-                // case 'javascript':
-                //     return getWorkerModule('/monaco-editor/esm/vs/language/typescript/ts.worker?worker', label);
-                default:
-                    return new editorWorker();
-            }
-        }
-    };
-
-    const wasmBin = await new Promise<ArrayBuffer>((res, rej) => {
+async function load<T>(url: URL, type: XMLHttpRequest['responseType']): Promise<T> {
+    return new Promise<T>((res, rej) => {
         const req = new XMLHttpRequest();
         req.onload = () => {
             res(req.response);
@@ -51,11 +27,23 @@ async function setupMonaco() {
         req.onerror = e => {
             rej(e);
         };
-        const onigWasm = new URL('vscode-oniguruma/release/onig.wasm', import.meta.url);
-        req.open('GET', onigWasm);
-        req.responseType = 'arraybuffer';
+        req.open('GET', url);
+        req.responseType = type;
         req.send();
     });
+}
+
+async function setupMonaco() {
+    self.MonacoEnvironment = {
+        getWorker: () => {
+            return new editorWorker();
+        }
+    };
+
+    const wasmBin = await load<ArrayBuffer>(
+        new URL('vscode-oniguruma/release/onig.wasm', import.meta.url),
+        'arraybuffer'
+    );
 
     const registry = new vsctm.Registry({
         onigLib: (async () => {
@@ -71,18 +59,7 @@ async function setupMonaco() {
         })(),
         loadGrammar: async scopeName => {
             if (scopeName === 'source.alphatex') {
-                const grammar = await new Promise<string>((res, rej) => {
-                    const req = new XMLHttpRequest();
-                    req.onload = () => {
-                        res(req.responseText);
-                    };
-                    req.onerror = e => {
-                        rej(e);
-                    };
-                    const onigWasm = new URL('./alphatex.tmlanguage.json', import.meta.url);
-                    req.open('GET', onigWasm);
-                    req.send();
-                });
+                const grammar = await load<string>(new URL('./alphatex.tmlanguage.json', import.meta.url), 'text');
                 return vsctm.parseRawGrammar(grammar, 'alphatex.tmlanguage.json');
             }
             console.log(`Unknown scope name: ${scopeName}`);
@@ -94,31 +71,11 @@ async function setupMonaco() {
     monaco.languages.register({
         id: 'alphatex'
     });
-    monaco.languages.setLanguageConfiguration('alphatex', {
-        comments: {
-            lineComment: { comment: '//', noIndent: false },
-            blockComment: ['/*', '*/']
-        },
-        brackets: [
-            ['{', '}'],
-            ['[', ']'],
-            ['(', ')']
-        ],
-        autoClosingPairs: [
-            { open: '{', close: '}' },
-            { open: '[', close: ']' },
-            { open: '(', close: ')' },
-            { open: '"', close: '"' },
-            { open: "'", close: "'" }
-        ],
-        surroundingPairs: [
-            { open: '{', close: '}' },
-            { open: '[', close: ']' },
-            { open: '(', close: ')' },
-            { open: '"', close: '"' },
-            { open: "'", close: "'" }
-        ]
-    });
+
+    const languageConfiguration = JSON.parse(
+        await load<string>(new URL('./alphatex.language-configuration.json', import.meta.url), 'text')
+    );
+    monaco.languages.setLanguageConfiguration('alphatex', languageConfiguration);
     monaco.languages.setTokensProvider('alphatex', {
         getInitialState() {
             return vsctm.INITIAL;
@@ -146,28 +103,62 @@ async function setupMonaco() {
             };
         }
     });
+
+    monaco.languages.registerDocumentSemanticTokensProvider('alphatex', {
+        getLegend() {
+            return {
+                tokenTypes: [
+                    'number',
+
+                    'identifier',
+
+                    'valuelist',
+
+                    'metadata'
+                ],
+                tokenModifiers: [
+                    // number.
+                    'fret',
+                    'string',
+                    'duration',
+
+                    // identifier.
+                    'property',
+                    'beat',
+                    'note',
+
+                    // metadata.
+                    'structural',
+                    'score',
+                    'staff',
+                    'bar'
+                ]
+            };
+        },
+        provideDocumentSemanticTokens(model) {
+            const data: number[] = [];
+
+            if(model.getVersionId() === astId) {
+                
+            }
+
+            return {
+                data: new Uint32Array(data)
+            };
+        },
+        releaseDocumentSemanticTokens(resultId) {}
+    });
 }
 
+let ast: alphaTab.importer.alphaTex.AlphaTexScoreNode | undefined;
+let astId: number = -1;
 async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
     const initialCode = sessionStorage.getItem('alphatex-editor.code') ?? trimCode(element.innerHTML);
     element.innerHTML = '';
 
     await setupMonaco();
 
-    const editor = monaco.editor.create(element!, {
-        value: initialCode,
-        language: 'alphatex',
-        automaticLayout: true
-    });
-    editor.onDidChangeModelContent(() => {
-        monaco.editor.removeAllMarkers('alphaTab');
-        const tex = editor.getModel()!.getValue();
-        api.tex(tex, 'all');
-        sessionStorage.setItem('alphatex-editor.code', tex);
-    });
-    api.tex(initialCode, 'all');
-
-    api.error.on(e => {
+    function handleError(e: Error) {
         let atError: alphaTab.importer.AlphaTexErrorWithDiagnostics | undefined;
         if (e instanceof alphaTab.importer.AlphaTexErrorWithDiagnostics) {
             atError = e;
@@ -206,6 +197,43 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
 
             monaco.editor.setModelMarkers(editor.getModel()!, 'alphaTab', markers);
         }
+    }
+
+    const editor = monaco.editor.create(element!, {
+        value: initialCode,
+        language: 'alphatex',
+        automaticLayout: true
+    });
+
+    function loadTex(tex: string) {
+        monaco.editor.removeAllMarkers('alphaTab');
+        const model = editor.getModel()!;
+        const importer = new AlphaTexImporter();
+        importer.initFromString(tex, api.settings);
+        let score: alphaTab.model.Score;
+        try {
+            score = importer.readScore();
+        } catch (e) {
+            handleError(e as Error);
+            return;
+        }
+
+        astId = model?.getVersionId();
+        ast = importer.scoreNode;
+        sessionStorage.setItem('alphatex-editor.code', tex);
+
+        api.renderTracks(score.tracks);
+    }
+
+    editor.onDidChangeModelContent(() => {
+        const model = editor.getModel()!;
+        const tex = model.getValue();
+        loadTex(tex);
+    });
+    loadTex(initialCode);
+
+    api.error.on(e => {
+        handleError(e);
     });
 }
 
