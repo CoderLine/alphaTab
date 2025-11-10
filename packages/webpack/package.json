@@ -33,7 +33,7 @@
         "test": "mocha"
     },
     "dependencies": {
-        "webpack": "^5.101.3"
+        "webpack": "^5.102.1"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.2.6",
