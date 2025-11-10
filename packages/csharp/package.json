@@ -11,6 +11,6 @@
     },
     "devDependencies": {
         "@coderline/alphatab-transpiler": "*",
-        "rimraf": "^6.0.1"
+        "rimraf": "^6.1.0"
     }
 }
