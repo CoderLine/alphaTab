@@ -143,7 +143,7 @@ function propertyDocsToMarkdown(propDocs: PropertyDoc): string {
         ...propDocs.syntax,
         '```',
         '',
-        `**Description:** ${propDocs.description}`,
+        `**Description:** ${propDocs.longDescription}`,
         ...(propDocs.values.length === 0
             ? []
             : [
@@ -153,7 +153,7 @@ function propertyDocsToMarkdown(propDocs: PropertyDoc): string {
                   '|------|-------------|------|----------|',
                   ...propDocs.values.map(
                       v =>
-                          `| \`${v.name}\` | ${v.description?.replaceAll('\n', '<br />') ?? ''} | ${v.type} | ${v.required ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`
+                          `| \`${v.name}\` | ${v.longDescription?.replaceAll('\n', '<br />') ?? ''} | ${v.type} | ${v.required ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`
                   )
               ])
     ].join('\n');
@@ -165,7 +165,7 @@ function metaDataDocsToMarkdown(metaDataDocs: MetadataDoc): string {
         ...metaDataDocs.syntax,
         '```',
         '',
-        `**Description:** ${metaDataDocs.description}`,
+        `**Description:** ${metaDataDocs.longDescription}`,
         ...(metaDataDocs.values.length === 0
             ? []
             : [
@@ -175,7 +175,7 @@ function metaDataDocsToMarkdown(metaDataDocs: MetadataDoc): string {
                   '|------|-------------|------|----------|',
                   ...metaDataDocs.values.map(
                       v =>
-                          `| \`${v.name}\` | ${v.description?.replaceAll('\n', '<br />') ?? ''} | ${v.type} | ${v.required ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`
+                          `| \`${v.name}\` | ${v.longDescription?.replaceAll('\n', '<br />') ?? ''} | ${v.type} | ${v.required ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`
                   )
               ])
     ].join('\n');

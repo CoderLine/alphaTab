@@ -150,10 +150,10 @@ function createValueCompletions(
                                       description: i.shortDescription
                                   }
                                 : undefined,
-                            documentation: i.description
+                            documentation: i.longDescription
                                 ? {
                                       kind: 'markdown',
-                                      value: i.description
+                                      value: i.longDescription
                                   }
                                 : undefined,
                             insertText: i.snippet,
@@ -174,10 +174,10 @@ function createValueCompletions(
                                           description: i.shortDescription
                                       }
                                     : undefined,
-                                documentation: i.description
+                                documentation: i.longDescription
                                     ? {
                                           kind: 'markdown',
-                                          value: i.description
+                                          value: i.longDescription
                                       }
                                     : undefined,
                                 insertText: i.snippet,
@@ -210,10 +210,10 @@ function createValueCompletions(
                                       description: i.shortDescription
                                   }
                                 : undefined,
-                            documentation: i.description
+                            documentation: i.longDescription
                                 ? {
                                       kind: 'markdown',
-                                      value: i.description
+                                      value: i.longDescription
                                   }
                                 : undefined,
                             insertText: i.snippet,
@@ -254,10 +254,10 @@ function createMetaDataDocCompletions(
                   description: d.shortDescription
               }
             : undefined,
-        documentation: d.description
+        documentation: d.longDescription
             ? {
                   kind: 'markdown',
-                  value: d.description
+                  value: d.longDescription
               }
             : undefined,
         insertText: d.snippet,
@@ -292,10 +292,10 @@ function createPropertiesCompletions(
                   description: p.shortDescription
               }
             : undefined,
-        documentation: p.description
+        documentation: p.longDescription
             ? {
                   kind: 'markdown',
-                  value: p.description
+                  value: p.longDescription
               }
             : undefined,
         insertText: p.snippet,

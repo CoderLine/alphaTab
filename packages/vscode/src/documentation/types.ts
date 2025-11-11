@@ -1,16 +1,19 @@
+import { SettingsJson } from '@src/generated/SettingsJson';
 import type { AlphaTexNodeType } from '@src/importer/alphaTex/AlphaTexAst';
 
 export interface WithDescription {
-    description?: string;
+    longDescription?: string;
+    shortDescription: string;
+}
+
+export interface ValueItemDoc {
+    name: string;
+    snippet: string;
+    longDescription?: string;
     shortDescription?: string;
 }
 
-export interface ValueItemDoc extends WithDescription {
-    name: string;
-    snippet: string;
-}
-
-export interface ValueDoc extends WithDescription{
+export interface ValueDoc extends WithDescription {
     name: string;
     type: string;
     required: true | false | string;
@@ -18,22 +21,28 @@ export interface ValueDoc extends WithDescription{
     values?: Map<AlphaTexNodeType, ValueItemDoc[]>;
 }
 
-export interface PropertyDoc extends WithDescription{
+export interface PropertyDoc extends WithDescription {
     property: string;
     syntax: string[];
     values: ValueDoc[];
-    examples: string | string[];
+    examples: Example | Example[];
     snippet: string;
 }
 
-export interface MetadataDoc extends WithDescription{
+export type Example = string | {
+    options?: SettingsJson,
+    tex: string;
+    websiteMdx?: string;
+}
+
+
+export interface MetadataDoc extends WithDescription {
     tag: string;
     syntax: string[];
     snippet: string;
-    description: string;
     values: ValueDoc[];
     valueRemarks?: string;
-    example: string;
+    examples: Example | Example[];
     properties?: Map<string, PropertyDoc>;
 }
 
