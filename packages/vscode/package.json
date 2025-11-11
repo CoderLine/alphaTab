@@ -1,0 +1,87 @@
+{
+    "name": "@coderline/alphatab-vscode",
+    "version": "1.7.0",
+    "description": "A Visual Studio Code extension for alphaTab providing coding assistance for alphaTex.",
+    "keywords": [
+        "guitar",
+        "music-notation",
+        "music-sheet",
+        "html5",
+        "svg",
+        "guitar-tablature",
+        "alphaTab",
+        "alphaTex"
+    ],
+    "homepage": "https://alphatab.net",
+    "bugs": {
+        "url": "https://github.com/coderline/alphaTab/issues"
+    },
+    "author": "Daniel Kuschny",
+    "license": "MPL-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/coderline/alphaTab.git"
+    },
+    "scripts": {
+        "clean": "rimraf dist",
+        "lint": "biome lint",
+        "typecheck": "tsc --noEmit",
+        "build": "vite build",
+        "dev": "vite build --watch",
+        "test": "vscode-test"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^2.2.6",
+        "@rollup/plugin-node-resolve": "^16.0.3",
+        "@types/chai": "^5.2.2",
+        "@types/mocha": "^10.0.10",
+        "@types/node": "^24.8.1",
+        "@types/vscode": "^1.105.0",
+        "@vscode/test-cli": "^0.0.11",
+        "@vscode/test-electron": "^2.5.2",
+        "assert": "^2.1.0",
+        "chai": "^6.2.0",
+        "mocha": "^11.7.4",
+        "rimraf": "^6.0.1",
+        "tslib": "^2.8.1",
+        "tsx": "^4.20.6",
+        "typescript": "^5.9.3",
+        "vscode-languageclient": "^9.0.1",
+        "vscode-languageserver": "^9.0.1",
+        "vscode-languageserver-textdocument": "^1.0.12"
+    },
+    "publisher": "coderline",
+    "engines": {
+        "vscode": "^1.105.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "activationEvents": [
+        "workspaceContains:**/*.atex"
+    ],
+    "main": "./dist/extension.js",
+    "type": "commonjs",
+    "contributes": {
+        "languages": [
+            {
+                "id": "alphatex",
+                "aliases": [
+                    "alphaTex",
+                    "alphatex"
+                ],
+                "extensions": [
+                    ".atex"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "alphatex",
+                "scopeName": "source.alphatex",
+                "path": "./syntaxes/alphatex.tmLanguage.json"
+            }
+        ]
+    }
+}

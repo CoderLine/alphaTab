@@ -30,8 +30,7 @@ import {
     type AlphaTexDiagnostic,
     AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
-    AlphaTexDiagnosticsSeverity,
-    AlphaTexParserAbort
+    AlphaTexDiagnosticsSeverity
 } from '@src/importer/alphaTex/AlphaTexShared';
 import type { IAlphaTexMetaDataReader } from '@src/importer/alphaTex/IAlphaTexMetaDataReader';
 
@@ -78,7 +77,7 @@ export class AlphaTexParser {
         }
 
         if (abort) {
-            throw new AlphaTexParserAbort();
+            this.lexer.fatalError = true;
         }
     }
 
@@ -103,12 +102,6 @@ export class AlphaTexParser {
 
         try {
             this._bars();
-        } catch (e) {
-            if (e instanceof AlphaTexParserAbort) {
-                // OK
-            } else {
-                throw e;
-            }
         } finally {
             this._scoreNode.end = this.lexer.previousTokenEndLocation();
         }
@@ -132,6 +125,8 @@ export class AlphaTexParser {
             pipe: undefined,
             start: this.lexer.currentTokenLocation()
         };
+        this._scoreNode.bars.push(bar);
+
         try {
             this._barMetaData(bar);
             this._barBeats(bar);
@@ -144,7 +139,6 @@ export class AlphaTexParser {
 
             if (bar.metaData.length > 0 || bar.beats.length > 0 || bar.pipe) {
                 bar.end = this.lexer.previousTokenEndLocation();
-                this._scoreNode.bars.push(bar);
             }
         } finally {
             bar.end = this.lexer.previousTokenEndLocation();
@@ -164,7 +158,7 @@ export class AlphaTexParser {
                     end: token.end
                 });
             } else {
-                bar.metaData.push(this._metaData()!);
+                this._metaData(bar.metaData);
             }
 
             token = this.lexer.peekToken();
@@ -212,13 +206,12 @@ export class AlphaTexParser {
             // pre 1.7 the multiplier was between the duration and effects
             // for backwards compat we still allow it
             this._beatMultiplier(beat);
-           
 
             beat.beatEffects = this._properties(property =>
                 this._metaDataReader.readBeatPropertyValues(this, property)
             );
 
-            if(beat.beatMultiplierValue !== undefined && beat.beatEffects?.openBrace) {
+            if (beat.beatMultiplierValue !== undefined && beat.beatEffects?.openBrace) {
                 this.addParserDiagnostic({
                     code: AlphaTexDiagnosticCode.AT304,
                     message: 'The beat multiplier should be specified after the beat effects.',
@@ -229,7 +222,6 @@ export class AlphaTexParser {
             }
 
             this._beatMultiplier(beat);
-
         } finally {
             beat.end = this.lexer.previousTokenEndLocation();
         }
@@ -490,7 +482,7 @@ export class AlphaTexParser {
         return note;
     }
 
-    private _metaData(): AlphaTexMetaDataNode | undefined {
+    private _metaData(metaDataList: AlphaTexMetaDataNode[]) {
         const tag = this.lexer.peekToken();
         if (!tag || tag.nodeType !== AlphaTexNodeType.Tag) {
             return undefined;
@@ -504,6 +496,7 @@ export class AlphaTexParser {
             propertiesBeforeValues: false
         };
         this.lexer.advance();
+        metaDataList.push(metaData);
 
         try {
             // properties can be before or after the values, this is a again a historical

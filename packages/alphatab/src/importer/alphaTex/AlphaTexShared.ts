@@ -255,12 +255,6 @@ export class AlphaTexDiagnosticBag implements Iterable<AlphaTexDiagnostic> {
 }
 
 /**
- * An error used to abort the parsing of the alphaTex source into an
- * @internal
- */
-export class AlphaTexParserAbort extends Error {}
-
-/**
  * @public
  */
 export enum AlphaTexAccidentalMode {

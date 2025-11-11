@@ -69,7 +69,7 @@ export function defaultBuildUserConfig(): UserConfig {
             },
             minify: false,
             rollupOptions: {
-                external: ['jQuery', 'vite', 'rollup', /node:.*/],
+                external: ['jQuery', 'vite', 'rollup', /node:\w+/, 'child_process', 'fs', 'path', 'url', 'os', 'crypto', 'net'],
                 output: [],
                 onLog(level, log, handler) {
                     if (log.code === 'CIRCULAR_DEPENDENCY') {

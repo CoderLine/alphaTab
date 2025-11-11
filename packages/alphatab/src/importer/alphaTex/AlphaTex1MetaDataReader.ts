@@ -17,8 +17,7 @@ import {
 import type { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
 import {
     AlphaTexDiagnosticCode,
-    AlphaTexDiagnosticsSeverity,
-    AlphaTexParserAbort
+    AlphaTexDiagnosticsSeverity
 } from '@src/importer/alphaTex/AlphaTexShared';
 import { Atnf } from '@src/importer/alphaTex/ATNF';
 import type { IAlphaTexMetaDataReader } from '@src/importer/alphaTex/IAlphaTexMetaDataReader';
@@ -52,7 +51,8 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             start: metaData.start,
             end: metaData.end
         });
-        throw new AlphaTexParserAbort();
+        parser.lexer.fatalError = true;
+        return undefined;
     }
 
     public readMetaDataPropertyValues(
@@ -146,7 +146,8 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             start: property.property.start,
             end: property.property.end
         });
-        throw new AlphaTexParserAbort();
+        parser.lexer.fatalError = true;
+        return undefined;
     }
 
     private _readTypedValueList(
@@ -159,10 +160,14 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         let error = false;
         let parseRemaining = endOfListTypes !== undefined;
         let i = 0;
-        while (i < expectedValues.length) {
+        while (!error && i < expectedValues.length) {
             const expected = expectedValues[i];
 
             const value = parser.lexer.peekToken();
+
+            if(value?.nodeType === AlphaTexNodeType.Tag) {
+                break;
+            }
 
             // prevent parsing of special float values which could overlap
             // with stringed notes
@@ -202,7 +207,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                         break;
                     case ValueListParseTypesMode.Required:
                     case ValueListParseTypesMode.RequiredAsFloat:
-                        parser.unexpectedToken(value, Array.from(expected.expectedTypes), true);
+                        parser.unexpectedToken(value, Array.from(expected.expectedTypes), false);
                         error = true;
                         break;
 
@@ -219,10 +224,6 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                         break;
                 }
             }
-        }
-
-        if (error) {
-            throw new AlphaTexParserAbort();
         }
 
         // read remaining values user might have supplied
@@ -244,7 +245,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         const valueList = Atnf.values(values, false)!;
         valueList.start = valueListStart;
         valueList.end = parser.lexer.previousTokenEndLocation();
-        valueList.validated = true;
+        valueList.validated = !error;
 
         return valueList;
     }
