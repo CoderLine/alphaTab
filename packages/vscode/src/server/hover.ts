@@ -39,7 +39,9 @@ function createNoteHover(note: alphaTab.importer.alphaTex.AlphaTexNoteNode, offs
     if (note?.noteEffects) {
         const prop = binaryNodeSearch(note.noteEffects.properties, offset);
         if (prop && prop.property.start!.offset <= offset && offset <= prop.property.end!.offset) {
-            const propDocs = noteProperties.get(prop.property.text.toLowerCase());
+            const propDocs =
+                noteProperties.get(prop.property.text.toLowerCase()) ??
+                beatProperties.get(prop.property.text.toLowerCase());
             if (propDocs) {
                 return {
                     contents: {
