@@ -1,5 +1,5 @@
 import { AlphaTexNodeType } from '@src/importer/alphaTex/AlphaTexAst';
-import type { MetadataDoc, ValueItemDoc } from 'src/documentation/types';
+import type { MetadataDoc, ValueItemDoc } from '../../types';
 
 export const bracketExtendMode: MetadataDoc = {
     tag: '\\bracketExtendMode',

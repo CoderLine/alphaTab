@@ -25,6 +25,7 @@ export interface PropertyDoc extends WithDescription {
     property: string;
     syntax: string[];
     values: ValueDoc[];
+    valueRemarks?: string;
     examples: Example | Example[];
     snippet: string;
 }
@@ -49,3 +50,9 @@ export interface MetadataDoc extends WithDescription {
 export function properties(...props: PropertyDoc[]): Map<string, PropertyDoc> {
     return new Map(props.map(p => [p.property.toLowerCase(), p]));
 }
+
+
+export function metadata(...metadata: MetadataDoc[]) {
+    return new Map<string, MetadataDoc>(metadata.map(t => [t.tag.toLowerCase(), t]));
+}
+

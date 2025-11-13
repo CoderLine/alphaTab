@@ -22,13 +22,13 @@ export const tuning: MetadataDoc = {
         },
         {
             name: 'none',
-            shortDescription: 'Indicates that this staff is NOT stringed and has no tuning and uses pitched notes.	',
+            shortDescription: 'Indicates that this staff is NOT stringed and has no tuning and uses pitched notes.',
             type: '`identifier` list',
             required: true
         },
         {
             name: 'voice',
-            shortDescription: 'Indicates that this staff is NOT stringed, but a vocal voice with pitched notes.	',
+            shortDescription: 'Indicates that this staff is NOT stringed, but a vocal voice with pitched notes.',
             type: '`identifier` list',
             required: true
         }
@@ -68,7 +68,7 @@ export const tuning: MetadataDoc = {
             values: [
                 {
                     name: 'text',
-                    shortDescription: 'The label to set	.',
+                    shortDescription: 'The label to set.',
                     type: '`string`',
                     required: true
                 }

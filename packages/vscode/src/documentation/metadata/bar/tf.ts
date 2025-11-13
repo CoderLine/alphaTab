@@ -10,7 +10,7 @@ export const tf: MetadataDoc = {
     values: [
         {
             name: 'tripletFeel',
-            shortDescription: 'The triplet feel style	',
+            shortDescription: 'The triplet feel style',
             type: '`identifier`',
             required: true,
             values: new Map<AlphaTexNodeType, ValueItemDoc[]>([

@@ -31,13 +31,13 @@ export const sync: MetadataDoc = {
         },
         {
             name: 'millisecondOffset',
-            shortDescription: 'The absolute millisecond offset within the external media	',
+            shortDescription: 'The absolute millisecond offset within the external media',
             type: '`number`',
             required: true
         },
         {
             name: 'ratioPosition',
-            shortDescription: 'The relative position within the bar where the synchronization happens	',
+            shortDescription: 'The relative position within the bar where the synchronization happens',
             type: '`number`',
             required: false
         }

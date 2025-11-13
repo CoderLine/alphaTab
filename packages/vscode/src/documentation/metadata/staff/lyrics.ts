@@ -19,7 +19,7 @@ export const lyrics: MetadataDoc = {
         },
         {
             name: 'lyrics',
-            shortDescription: 'The lyrics text to apply to the beats	',
+            shortDescription: 'The lyrics text to apply to the beats',
             type: '`string`',
             required: true
         }

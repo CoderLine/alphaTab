@@ -131,7 +131,7 @@ export const articulation: MetadataDoc = {
         },
         {
             name: 'value',
-            shortDescription: 'The numeric value of the built-in articulation	',
+            shortDescription: 'The numeric value of the built-in articulation',
             type: '`identifier`',
             required: true
         }

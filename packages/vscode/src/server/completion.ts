@@ -137,14 +137,17 @@ function createValueCompletions(
     const requiredValues = expectedValues.filter(v => v.required);
     if (!actualValues && requiredValues.length === 1) {
         if (requiredValues[0].values) {
-            const identifiers = requiredValues[0].values.get(alphaTab.importer.alphaTex.AlphaTexNodeType.Ident);
+            const identifiers =
+                requiredValues[0].values.get(alphaTab.importer.alphaTex.AlphaTexNodeType.Ident) ??
+                requiredValues[0].values.get(alphaTab.importer.alphaTex.AlphaTexNodeType.String) ??
+                requiredValues[0].values.get(alphaTab.importer.alphaTex.AlphaTexNodeType.Number);
             if (identifiers) {
                 return identifiers.map(
                     i =>
                         ({
                             label: i.name,
                             sortText: `1_${i.name}`,
-                            kind: CompletionItemKind.EnumMember,
+                            kind: CompletionItemKind.Value,
                             labelDetails: i.shortDescription
                                 ? {
                                       description: i.shortDescription
@@ -160,31 +163,6 @@ function createValueCompletions(
                             insertTextFormat: InsertTextFormat.Snippet
                         }) satisfies CompletionItem
                 );
-            } else {
-                const strings = requiredValues[0].values.get(alphaTab.importer.alphaTex.AlphaTexNodeType.String);
-                if (strings) {
-                    return strings.map(
-                        i =>
-                            ({
-                                label: i.name,
-                                sortText: `1_${i.name}`,
-                                kind: CompletionItemKind.Value,
-                                labelDetails: i.shortDescription
-                                    ? {
-                                          description: i.shortDescription
-                                      }
-                                    : undefined,
-                                documentation: i.longDescription
-                                    ? {
-                                          kind: 'markdown',
-                                          value: i.longDescription
-                                      }
-                                    : undefined,
-                                insertText: i.snippet,
-                                insertTextFormat: InsertTextFormat.Snippet
-                            }) satisfies CompletionItem
-                    );
-                }
             }
         }
     } else if (actualValues) {
@@ -194,17 +172,12 @@ function createValueCompletions(
             const values =
                 valueIndex < expectedValues.length ? expectedValues[valueIndex].values?.get(value.nodeType) : undefined;
             if (values) {
-                const kind =
-                    value.nodeType === alphaTab.importer.alphaTex.AlphaTexNodeType.Ident
-                        ? CompletionItemKind.EnumMember
-                        : CompletionItemKind.Value;
-
                 return values.map(
                     i =>
                         ({
                             label: i.name,
                             sortText: `1_${i.name}`,
-                            kind,
+                            kind: CompletionItemKind.Value,
                             labelDetails: i.shortDescription
                                 ? {
                                       description: i.shortDescription

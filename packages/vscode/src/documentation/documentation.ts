@@ -1,3 +1,4 @@
+import { tu } from './properties/beat/tu';
 import { ac } from './metadata/bar/ac';
 import { accidentals } from './metadata/bar/accidentals';
 import { ae } from './metadata/bar/ae';
@@ -60,11 +61,95 @@ import { staff } from './metadata/structural/staff';
 import { track } from './metadata/structural/track';
 import { voice } from './metadata/structural/voice';
 
-import type { MetadataDoc, PropertyDoc, WithDescription } from './types';
-
-function metadata(...metadata: MetadataDoc[]) {
-    return new Map<string, MetadataDoc>(metadata.map(t => [t.tag.toLowerCase(), t]));
-}
+import { metadata, properties, type MetadataDoc, type WithDescription } from './types';
+import { f } from './properties/beat/f';
+import { fo } from './properties/beat/fo';
+import { vs } from './properties/beat/vs';
+import { v } from './properties/beat/v';
+import { vw } from './properties/beat/vw';
+import { s } from './properties/beat/s';
+import { p } from './properties/beat/p';
+import { tt } from './properties/beat/tt';
+import { d } from './properties/beat/d';
+import { dd } from './properties/beat/dd';
+import { su } from './properties/beat/su';
+import { sd } from './properties/beat/sd';
+import { cre } from './properties/beat/cre';
+import { dec } from './properties/beat/dec';
+import { beatSpd } from './properties/beat/spd';
+import { beatSph } from './properties/beat/sph';
+import { beatSpu } from './properties/beat/spu';
+import { beatSpe } from './properties/beat/spe';
+import { slashed } from './properties/beat/slashed';
+import { ds } from './properties/beat/ds';
+import { glpf } from './properties/beat/glpf';
+import { glpt } from './properties/beat/glpt';
+import { waho } from './properties/beat/waho';
+import { wahc } from './properties/beat/wahc';
+import { legatoOrigin } from './properties/beat/legatoOrigin';
+import { timer } from './properties/beat/timer';
+import { txt } from './properties/beat/txt';
+import { tb } from './properties/beat/tb';
+import { tbe } from './properties/beat/tbe';
+import { beatLyrics } from './properties/beat/lyrics';
+import { bu } from './properties/beat/bu';
+import { bd } from './properties/beat/bd';
+import { au } from './properties/beat/au';
+import { ad } from './properties/beat/ad';
+import { ch } from './properties/beat/ch';
+import { gr } from './properties/beat/gr';
+import { dy } from './properties/beat/dy';
+import { beatTempo } from './properties/beat/tempo';
+import { volume } from './properties/beat/volume';
+import { balance } from './properties/beat/balance';
+import { tp } from './properties/beat/tp';
+import { barre } from './properties/beat/barre';
+import { rasg } from './properties/beat/rasg';
+import { ot } from './properties/beat/ot';
+import { instrument } from './properties/beat/instrument';
+import { bank } from './properties/beat/bank';
+import { fermata } from './properties/beat/fermata';
+import { beam } from './properties/beat/beam';
+import { nh } from './properties/note/nh';
+import { ah } from './properties/note/ah';
+import { th } from './properties/note/th';
+import { ph } from './properties/note/ph';
+import { sh } from './properties/note/sh';
+import { fh } from './properties/note/fh';
+import { noteVibrato } from './properties/note/v';
+import { noteVibratoWide } from './properties/note/vw';
+import { sl } from './properties/note/sl';
+import { ss } from './properties/note/ss';
+import { sib } from './properties/note/sib';
+import { sia } from './properties/note/sia';
+import { sou } from './properties/note/sou';
+import { sod } from './properties/note/sod';
+import { psu } from './properties/note/psu';
+import { psd } from './properties/note/psd';
+import { h } from './properties/note/h';
+import { lht } from './properties/note/lht';
+import { g } from './properties/note/g';
+import { hac } from './properties/note/hac';
+import { ten } from './properties/note/ten';
+import { noteAccentuation } from './properties/note/ac';
+import { tr } from './properties/note/tr';
+import { pm } from './properties/note/pm';
+import { st } from './properties/note/st';
+import { lr } from './properties/note/lr';
+import { x } from './properties/note/x';
+import { t } from './properties/note/t';
+import { turn } from './properties/note/turn';
+import { iturn } from './properties/note/iturn';
+import { umordent } from './properties/note/umordent';
+import { lmordent } from './properties/note/lmordent';
+import { string } from './properties/note/string';
+import { hide } from './properties/note/hide';
+import { b } from './properties/note/b';
+import { be } from './properties/note/be';
+import { lf } from './properties/note/lf';
+import { rf } from './properties/note/rf';
+import { acc } from './properties/note/acc';
+import { slur } from './properties/note/slur';
 
 export const structuralMetaData = metadata(track, staff, voice);
 export const scoreMetaData = metadata(
@@ -130,16 +215,101 @@ export const allMetadata = new Map<string, MetadataDoc>([
     ...barMetaData.entries()
 ]);
 
-export const durationChangeProperties = new Map<string, PropertyDoc>(
-    // TODO
+export const durationChangeProperties = properties(tu);
+
+export const beatProperties = properties(
+    f,
+    fo,
+    vs,
+    v,
+    vw,
+    s,
+    p,
+    tt,
+    d,
+    dd,
+    su,
+    sd,
+    cre,
+    dec,
+    beatSpd,
+    beatSph,
+    beatSpu,
+    beatSpe,
+    slashed,
+    ds,
+    glpf,
+    glpt,
+    waho,
+    wahc,
+    legatoOrigin,
+    timer,
+    tu,
+    txt,
+    beatLyrics,
+    tb,
+    tbe,
+    bu,
+    bd,
+    au,
+    ad,
+    ch,
+    gr,
+    dy,
+    beatTempo,
+    volume,
+    balance,
+    tp,
+    barre,
+    rasg,
+    ot,
+    instrument,
+    bank,
+    fermata,
+    beam
 );
 
-export const beatProperties = new Map<string, PropertyDoc>(
-    // TODO
-);
-
-export const noteProperties = new Map<string, PropertyDoc>(
-    // TODO
+export const noteProperties = properties(
+    nh,
+    ah,
+    th,
+    ph,
+    sh,
+    fh,
+    noteVibrato,
+    noteVibratoWide,
+    sl,
+    ss,
+    sib,
+    sia,
+    sou,
+    sod,
+    psu,
+    psd,
+    h,
+    lht,
+    g,
+    noteAccentuation,
+    hac,
+    ten,
+    tr,
+    pm,
+    st,
+    lr,
+    x,
+    t,
+    turn,
+    iturn,
+    umordent,
+    lmordent,
+    string,
+    hide,
+    b,
+    be,
+    lf,
+    rf,
+    acc,
+    slur
 );
 
 const spaces = /^([ ]+)/;
