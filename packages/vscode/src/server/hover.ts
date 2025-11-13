@@ -141,11 +141,14 @@ function createMetaDataHover(metaData: alphaTab.importer.alphaTex.AlphaTexMetaDa
 
 function propertyDocsToMarkdown(propDocs: PropertyDoc): string {
     return [
-        '```alphatex title=Syntax',
+        `## ${propDocs.shortDescription}`,
+        propDocs.longDescription ? `**Description:** ${propDocs.longDescription}` : '',
+        '',
+        '**Syntax:**',
+        '```alphatex',
         ...propDocs.syntax,
         '```',
         '',
-        `**Description:** ${propDocs.longDescription}`,
         ...(propDocs.values.length === 0
             ? []
             : [
@@ -163,11 +166,14 @@ function propertyDocsToMarkdown(propDocs: PropertyDoc): string {
 
 function metaDataDocsToMarkdown(metaDataDocs: MetadataDoc): string {
     return [
-        '```alphatex title=Tag Syntax',
+        `## ${metaDataDocs.shortDescription}`,
+        metaDataDocs.longDescription ? `**Description:** ${metaDataDocs.longDescription}` : '',
+        '',
+        '**Tag Syntax:**',
+        '```alphatex',
         ...metaDataDocs.syntax,
         '```',
         '',
-        `**Description:** ${metaDataDocs.longDescription}`,
         ...(metaDataDocs.values.length === 0
             ? []
             : [
