@@ -1,12 +1,22 @@
 import * as alphaTab from '@src/alphaTab.main';
-import { allMetadata, barMetaData, scoreMetaData, structuralMetaData } from 'src/documentation/documentation';
-import type { MetadataDoc, PropertyDoc, ValueDoc } from 'src/documentation/types';
+import { Duration } from '@src/model/Duration';
+import {
+    allMetadata,
+    barMetaData,
+    beatProperties,
+    durationChangeProperties,
+    noteProperties,
+    scoreMetaData,
+    structuralMetaData
+} from 'src/documentation/documentation';
+import { metadata, type MetadataDoc, type PropertyDoc, type ValueDoc, type ValueItemDoc } from 'src/documentation/types';
 import type { AlphaTexTextDocument, Connection } from 'src/server/types';
 import { binaryNodeSearch } from 'src/server/utils';
+import type { TextEdit } from 'vscode-languageserver-textdocument';
 import {
-    type CompletionItem,
     CompletionItemKind,
     InsertTextFormat,
+    type CompletionItem,
     type TextDocumentPositionParams,
     type TextDocuments
 } from 'vscode-languageserver/lib/node/main';
@@ -38,7 +48,7 @@ export function setupCompletion(connection: Connection, documents: TextDocuments
         const bar = binaryNodeSearch(document.ast.bars, offset, true);
         const barIndex = bar ? document.ast.bars.indexOf(bar) : 0;
 
-        const metaData = bar ? binaryNodeSearch(bar.metaData, offset, true) : undefined;
+        const metaData = bar ? binaryNodeSearch(bar.metaData, offset, false) : undefined;
         if (metaData) {
             return createMetaDataCompletions(barIndex, metaData, offset);
         } else if (!bar || (bar.beats.length > 0 && offset < bar.beats[0].start!.offset)) {
@@ -50,7 +60,7 @@ export function setupCompletion(connection: Connection, documents: TextDocuments
             return createBeatCompletions(beat, offset);
         }
 
-        return [];
+        return createMetaDataCompletions(barIndex, metaData, offset);
     });
 
     connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
@@ -58,9 +68,215 @@ export function setupCompletion(connection: Connection, documents: TextDocuments
     });
 }
 
+const durations: [string, Duration][] = [
+    ['Quadruple Whole Note', Duration.QuadrupleWhole],
+    ['Double Whole Note', Duration.DoubleWhole],
+    ['Whole Note', Duration.Whole],
+    ['Half Note', Duration.Half],
+    ['Quarter Note', Duration.Quarter],
+    ['8th Note', Duration.Eighth],
+    ['16th Note', Duration.Sixteenth],
+    ['32nd Note', Duration.ThirtySecond],
+    ['64th Note', Duration.SixtyFourth],
+    ['128th Note', Duration.OneHundredTwentyEighth],
+    ['256th Note', Duration.TwoHundredFiftySixth]
+];
+
+const durationCompletionItems = durations.map(
+    d =>
+        ({
+            label: `${d[1] as number}`,
+            sortText: `1_${d[1]}`,
+            labelDetails: {
+                description: d[0]
+            },
+            kind: CompletionItemKind.Value,
+            insertText: `${d[1] as number} `,
+            insertTextFormat: InsertTextFormat.Snippet
+        }) satisfies CompletionItem
+);
+
 function createBeatCompletions(beat: alphaTab.importer.alphaTex.AlphaTexBeatNode, offset: number): CompletionItem[] {
-    // TODO
+    const completions: CompletionItem[] = [];
+
+    if (
+        beat.durationChange &&
+        beat.durationChange.start!.offset < offset &&
+        offset <= beat.durationChange!.end!.offset
+    ) {
+        return createDurationChangeCompletions(beat.durationChange, offset);
+    }
+
+    if (beat.notes && beat.notes.start!.offset < offset && offset <= beat.notes.end!.offset) {
+        const note = binaryNodeSearch(beat.notes.notes, offset, false);
+        if (note) {
+            return createNoteCompletions(beat, note, offset);
+        }
+    }
+
+    const afterDuration = beat.beatMultiplier?.start?.offset ?? beat.beatEffects?.start?.offset ?? beat.end!.offset;
+
+    if (beat.durationDot && beat.durationDot.start!.offset < offset && offset <= afterDuration) {
+        const replacement: TextEdit[] | undefined = beat.durationValue
+            ? [
+                  {
+                      range: {
+                          start: {
+                              line: beat.durationDot.end!.line - 1,
+                              character: beat.durationDot.end!.col
+                          },
+                          end: {
+                              line: beat.durationValue!.end!.line - 1,
+                              character: beat.durationValue!.end!.col - 1
+                          }
+                      },
+                      newText: ' '
+                  }
+              ]
+            : undefined;
+
+        completions.push(
+            ...durationCompletionItems.map(
+                d =>
+                    ({
+                        ...d,
+                        additionalTextEdits: replacement
+                    }) satisfies CompletionItem
+            )
+        );
+    }
+
+    if (beat.beatEffects && beat.beatEffects.start!.offset < offset && beat.beatEffects.end!.offset) {
+        completions.splice(0, 0, ...createPropertiesCompletions(beat.beatEffects, offset, beatProperties));
+    }
+
     return [];
+}
+
+function createDurationChangeCompletions(
+    durationChange: alphaTab.importer.alphaTex.AlphaTexBeatDurationChangeNode,
+    offset: number
+): CompletionItem[] {
+    const completions: CompletionItem[] = [];
+
+    if (!durationChange.properties || offset < durationChange.properties.start!.offset) {
+        const endOfValue = durationChange.properties?.start ?? durationChange.end!;
+        const replacement: TextEdit[] | undefined = durationChange.properties
+            ? [
+                  {
+                      range: {
+                          start: {
+                              line: durationChange.colon.start!.line - 1,
+                              character: durationChange.colon.start!.col
+                          },
+                          end: {
+                              line: endOfValue.line - 1,
+                              character: endOfValue.col - 1
+                          }
+                      },
+                      newText: ''
+                  }
+              ]
+            : undefined;
+
+        completions.push(
+            ...durationCompletionItems.map(d => ({
+                ...d,
+                additionalTextEdits: replacement
+            }))
+        );
+    } else if (
+        durationChange.properties &&
+        durationChange.properties.start!.offset < offset &&
+        durationChange.properties.end!.offset
+    ) {
+        completions.push(...Array.from(durationChangeProperties.values()).map(propertyToCompletion));
+    }
+
+    return completions;
+}
+
+function createNoteCompletions(
+    beat: alphaTab.importer.alphaTex.AlphaTexBeatNode,
+    note: alphaTab.importer.alphaTex.AlphaTexNoteNode,
+    offset: number
+): CompletionItem[] {
+    const completions: CompletionItem[] = [];
+    if (note.noteEffects && note.noteEffects.start!.offset < offset && note.noteEffects.end!.offset) {
+        if (beat.notes!.notes.length === 1) {
+            completions.    splice(0, 0, ...createPropertiesCompletions(note.noteEffects, offset, beatProperties));
+        }
+
+        completions.splice(0, 0, ...createPropertiesCompletions(note.noteEffects, offset, noteProperties));
+    }
+    return completions;
+}
+
+function propertyToCompletion(p: PropertyDoc): CompletionItem {
+    return {
+        label: p.property,
+        sortText: `1_${p.property}`,
+        kind: CompletionItemKind.Property,
+        insertText: p.snippet,
+        labelDetails: p.shortDescription
+            ? {
+                  description: p.shortDescription
+              }
+            : undefined,
+        documentation: p.longDescription
+            ? {
+                  kind: 'markdown',
+                  value: p.longDescription
+              }
+            : undefined,
+        insertTextFormat: InsertTextFormat.Snippet
+    };
+}
+function valueItemToCompletion(i: ValueItemDoc, more?: Partial<CompletionItem>): CompletionItem {
+    return {
+        label: i.name,
+        sortText: `1_${i.name}`,
+        kind: CompletionItemKind.Value,
+        labelDetails: i.shortDescription
+            ? {
+                  description: i.shortDescription
+              }
+            : undefined,
+        documentation: i.longDescription
+            ? {
+                  kind: 'markdown',
+                  value: i.longDescription
+              }
+            : undefined,
+        insertText: i.snippet,
+        insertTextFormat: InsertTextFormat.Snippet,
+        ...more
+    };
+}
+
+function metaDataDocToCompletion(d: MetadataDoc): CompletionItemWithData<MetaDataCompletionData> {
+    return {
+        label: d.tag,
+        sortText: `3_${d.tag}`,
+        kind: CompletionItemKind.Function,
+        labelDetails: d.shortDescription
+            ? {
+                  description: d.shortDescription
+              }
+            : undefined,
+        documentation: d.longDescription
+            ? {
+                  kind: 'markdown',
+                  value: d.longDescription
+              }
+            : undefined,
+        insertText: d.snippet,
+        insertTextFormat: InsertTextFormat.Snippet,
+        data: {
+            tag: d.tag.substring(1), // cut off backslash
+            tagLowerCase: d.tag.substring(1).toLowerCase()
+        }
+    };
 }
 
 function createMetaDataCompletions(
@@ -81,8 +297,10 @@ function createMetaDataCompletions(
         }
 
         if (metaData) {
+            const keepValues = metaData.values || metaData.properties;
             completions = completions.map(c => ({
                 ...c,
+                insertText: keepValues ? c.label : c.insertText,
                 additionalTextEdits: [
                     {
                         range: {
@@ -118,10 +336,8 @@ function createMetaDataCompletions(
         return completions;
     }
 
-    // value completions
     completions.splice(0, 0, ...createValueCompletions(metaDataDocs.values, metaData.values, offset));
 
-    // property completions
     if (metaDataDocs?.properties) {
         completions.splice(0, 0, ...createPropertiesCompletions(metaData.properties, offset, metaDataDocs.properties));
     }
@@ -135,34 +351,14 @@ function createValueCompletions(
     offset: number
 ) {
     const requiredValues = expectedValues.filter(v => v.required);
-    if (!actualValues && requiredValues.length === 1) {
+    if (!actualValues && requiredValues.length > 0) {
         if (requiredValues[0].values) {
             const identifiers =
                 requiredValues[0].values.get(alphaTab.importer.alphaTex.AlphaTexNodeType.Ident) ??
                 requiredValues[0].values.get(alphaTab.importer.alphaTex.AlphaTexNodeType.String) ??
                 requiredValues[0].values.get(alphaTab.importer.alphaTex.AlphaTexNodeType.Number);
             if (identifiers) {
-                return identifiers.map(
-                    i =>
-                        ({
-                            label: i.name,
-                            sortText: `1_${i.name}`,
-                            kind: CompletionItemKind.Value,
-                            labelDetails: i.shortDescription
-                                ? {
-                                      description: i.shortDescription
-                                  }
-                                : undefined,
-                            documentation: i.longDescription
-                                ? {
-                                      kind: 'markdown',
-                                      value: i.longDescription
-                                  }
-                                : undefined,
-                            insertText: i.snippet,
-                            insertTextFormat: InsertTextFormat.Snippet
-                        }) satisfies CompletionItem
-                );
+                return identifiers.map(i => valueItemToCompletion(i));
             }
         }
     } else if (actualValues) {
@@ -172,41 +368,24 @@ function createValueCompletions(
             const values =
                 valueIndex < expectedValues.length ? expectedValues[valueIndex].values?.get(value.nodeType) : undefined;
             if (values) {
-                return values.map(
-                    i =>
-                        ({
-                            label: i.name,
-                            sortText: `1_${i.name}`,
-                            kind: CompletionItemKind.Value,
-                            labelDetails: i.shortDescription
-                                ? {
-                                      description: i.shortDescription
-                                  }
-                                : undefined,
-                            documentation: i.longDescription
-                                ? {
-                                      kind: 'markdown',
-                                      value: i.longDescription
-                                  }
-                                : undefined,
-                            insertText: i.snippet,
-                            insertTextFormat: InsertTextFormat.Snippet,
-                            additionalTextEdits: [
-                                {
-                                    range: {
-                                        start: {
-                                            line: value.start!.line - 1,
-                                            character: value.start!.col - 1
-                                        },
-                                        end: {
-                                            line: value.end!.line - 1,
-                                            character: value.end!.col - 1
-                                        }
+                return values.map(i =>
+                    valueItemToCompletion(i, {
+                        additionalTextEdits: [
+                            {
+                                range: {
+                                    start: {
+                                        line: value.start!.line - 1,
+                                        character: value.start!.col - 1
                                     },
-                                    newText: ''
-                                }
-                            ]
-                        }) satisfies CompletionItem
+                                    end: {
+                                        line: value.end!.line - 1,
+                                        character: value.end!.col - 1
+                                    }
+                                },
+                                newText: ''
+                            }
+                        ]
+                    })
                 );
             }
         }
@@ -218,28 +397,7 @@ function createValueCompletions(
 function createMetaDataDocCompletions(
     metaData: Map<string, MetadataDoc>
 ): CompletionItemWithData<MetaDataCompletionData>[] {
-    return Array.from(metaData.values()).map(d => ({
-        label: d.tag,
-        sortText: `3_${d.tag}`,
-        kind: CompletionItemKind.Function,
-        labelDetails: d.shortDescription
-            ? {
-                  description: d.shortDescription
-              }
-            : undefined,
-        documentation: d.longDescription
-            ? {
-                  kind: 'markdown',
-                  value: d.longDescription
-              }
-            : undefined,
-        insertText: d.snippet,
-        insertTextFormat: InsertTextFormat.Snippet,
-        data: {
-            tag: d.tag.substring(1), // cut off backslash
-            tagLowerCase: d.tag.substring(1).toLowerCase()
-        }
-    }));
+    return Array.from(metaData.values()).map(metaDataDocToCompletion);
 }
 
 function createPropertiesCompletions(
@@ -256,24 +414,7 @@ function createPropertiesCompletions(
         return [];
     }
 
-    const allPropCompletions: CompletionItem[] = Array.from(availableProperties.values()).map(p => ({
-        label: p.property,
-        sortText: `2_${p.property}`,
-        kind: CompletionItemKind.Property,
-        labelDetails: p.shortDescription
-            ? {
-                  description: p.shortDescription
-              }
-            : undefined,
-        documentation: p.longDescription
-            ? {
-                  kind: 'markdown',
-                  value: p.longDescription
-              }
-            : undefined,
-        insertText: p.snippet,
-        insertTextFormat: InsertTextFormat.Snippet
-    }));
+    const allPropCompletions: CompletionItem[] = Array.from(availableProperties.values()).map(propertyToCompletion);
 
     const prop = properties ? binaryNodeSearch(properties.properties, offset, true) : undefined;
     if (prop) {
