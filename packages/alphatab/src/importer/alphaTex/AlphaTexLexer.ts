@@ -292,9 +292,9 @@ export class AlphaTexLexer {
     private _token<T extends AlphaTexTokenNode>(t: T): T {
         t.leadingComments = this._leadingComments;
         t.start = this._tokenStart;
-        t.end = this._currentLexerLocation();
         // consume char
         this._codepoint = this._nextCodepoint();
+        t.end = this._currentLexerLocation();
         return t;
     }
 

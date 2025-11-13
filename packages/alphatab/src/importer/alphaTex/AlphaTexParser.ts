@@ -194,7 +194,7 @@ export class AlphaTexParser {
         };
 
         try {
-            beat.durationChange = this._beatDurationChange();
+            this._beatDurationChange(beat);
 
             this._beatContent(beat);
             if (!beat.notes && !beat.rest) {
@@ -260,7 +260,7 @@ export class AlphaTexParser {
         }
     }
 
-    private _beatDurationChange(): AlphaTexBeatDurationChangeNode | undefined {
+    private _beatDurationChange(beat:AlphaTexBeatNode) {
         const colon = this.lexer.peekToken();
         if (colon?.nodeType !== AlphaTexNodeType.Colon) {
             return undefined;
@@ -274,6 +274,8 @@ export class AlphaTexParser {
             properties: undefined,
             start: colon.start
         };
+        beat.durationChange = durationChange;
+
         try {
             const durationValue = this.lexer.peekToken();
             if (!durationValue || durationValue.nodeType !== AlphaTexNodeType.Number) {
@@ -295,8 +297,6 @@ export class AlphaTexParser {
         } finally {
             durationChange.end = this.lexer.previousTokenEndLocation();
         }
-
-        return durationChange;
     }
 
     private _beatContent(beat: AlphaTexBeatNode) {
