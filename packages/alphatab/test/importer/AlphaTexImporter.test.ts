@@ -189,6 +189,15 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isDead).to.equal(true);
     });
 
+    it('dead', () => {
+        const tex: string = 'x.1 3.1{x}';
+        const score = parseTex(tex);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].string).to.equal(6);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].fret).to.equal(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].string).to.equal(6);
+    });
+
     it('trill-issue79', () => {
         const tex: string = ':4 3.3{tr 5 16}';
         const score = parseTex(tex);

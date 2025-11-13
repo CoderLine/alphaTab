@@ -540,7 +540,11 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 isTie = str === '-';
                 if (isTie || isDead) {
                     numericValue = 0;
-                    detectedNoteKind = undefined; // don't know on those notes
+                    if (node.noteStringDot && node.noteString) {
+                        detectedNoteKind = StaffNoteKind.Fretted;
+                    } else {
+                        detectedNoteKind = undefined; // don't know on those notes
+                    }
                 } else {
                     const tuning = ModelUtils.parseTuning(str);
                     if (tuning) {
