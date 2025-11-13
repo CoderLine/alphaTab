@@ -9,7 +9,7 @@ export const tu: PropertyDoc = {
     longDescription: `
     Adds a tuplet to the beat duration.
 
-    There are some built-in simple tuplet variants (see below) or you can specify the exact division.
+    There are some built-in simple tuplet variants or you can specify the exact division.
     `,
     values: [
         {
@@ -21,13 +21,13 @@ export const tu: PropertyDoc = {
                 [
                     AlphaTexNodeType.Number,
                     [
-                        { name: '3', snippet: '3', shortDescription: '3:2' },
-                        { name: '5', snippet: '5', shortDescription: '5:4' },
-                        { name: '6', snippet: '6', shortDescription: '6:4' },
-                        { name: '7', snippet: '7', shortDescription: '7:4' },
-                        { name: '9', snippet: '9', shortDescription: '9:8' },
-                        { name: '10', snippet: '10', shortDescription: '10:8' },
-                        { name: '12', snippet: '12', shortDescription: '12:8' }
+                        { name: '3', snippet: '3', shortDescription: '3:2 Tuplet' },
+                        { name: '5', snippet: '5', shortDescription: '5:4 Tuplet' },
+                        { name: '6', snippet: '6', shortDescription: '6:4 Tuplet' },
+                        { name: '7', snippet: '7', shortDescription: '7:4 Tuplet' },
+                        { name: '9', snippet: '9', shortDescription: '9:8 Tuplet' },
+                        { name: '10', snippet: '10', shortDescription: '10:8 Tuplet' },
+                        { name: '12', snippet: '12', shortDescription: '12:8 Tuplet' }
                     ]
                 ]
             ])

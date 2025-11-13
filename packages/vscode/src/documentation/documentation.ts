@@ -351,3 +351,17 @@ for (const d of allMetadata.values()) {
         }
     }
 }
+
+for (const d of beatProperties.values()) {
+    prepareDescription(d);
+    for (const v of d.values) {
+        prepareDescription(v);
+    }
+}
+
+for (const d of noteProperties.values()) {
+    prepareDescription(d);
+    for (const v of d.values) {
+        prepareDescription(v);
+    }
+}
