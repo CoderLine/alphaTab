@@ -39,6 +39,8 @@ export function binaryNodeSearch<T extends AlphaTexAstNode>(
         return undefined;
     }
 
+    // TODO: respect white-space between tokens on search (trailing white space counts to previous node)
+
     // not in range
     const rangeStart = items[0].start!.offset;
     const rangeEnd = items[items.length - 1].end!.offset;

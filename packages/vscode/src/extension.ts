@@ -1,5 +1,6 @@
 import path from 'node:path';
-import type * as vscode from 'vscode';
+import { setupPreview } from 'src/preview';
+import * as vscode from 'vscode';
 
 import {
     LanguageClient,
@@ -8,9 +9,11 @@ import {
     TransportKind
 } from 'vscode-languageclient/node';
 
-let client: LanguageClient;
+let disposables: vscode.Disposable[] = [];
 
 export function activate(context: vscode.ExtensionContext) {
+    const logChannel = vscode.window.createOutputChannel('alphaTab', { log: true });
+
     const serverModule = context.asAbsolutePath(path.join('dist', 'server.js'));
 
     const serverOptions: ServerOptions = {
@@ -23,17 +26,21 @@ export function activate(context: vscode.ExtensionContext) {
 
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'alphatex' }],
-        synchronize: {
-        }
+        synchronize: {},
+        outputChannel: logChannel
     };
 
-    client = new LanguageClient('alphaTex', 'alphaTex Language Client', serverOptions, clientOptions);
+    const client = new LanguageClient('alphaTex', 'alphaTex Language Client', serverOptions, clientOptions);
     client.start();
+    disposables.push(client);
+
+    disposables.push(...setupPreview(context, logChannel));
 }
 
 export function deactivate() {
-    if (!client) {
-        return undefined;
+    for(const d of disposables) {
+        d.dispose();
     }
-    return client.stop();
+    
+    disposables = [];
 }
