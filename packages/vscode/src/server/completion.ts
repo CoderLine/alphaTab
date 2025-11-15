@@ -9,17 +9,17 @@ import {
     scoreMetaData,
     structuralMetaData
 } from 'src/documentation/documentation';
-import { metadata, type MetadataDoc, type PropertyDoc, type ValueDoc, type ValueItemDoc } from 'src/documentation/types';
+import type { MetadataDoc, PropertyDoc, ValueDoc, ValueItemDoc } from 'src/documentation/types';
 import type { AlphaTexTextDocument, Connection } from 'src/server/types';
 import { binaryNodeSearch } from 'src/server/utils';
-import type { TextEdit } from 'vscode-languageserver-textdocument';
 import {
+    type CompletionItem,
     CompletionItemKind,
     InsertTextFormat,
-    type CompletionItem,
     type TextDocumentPositionParams,
     type TextDocuments
 } from 'vscode-languageserver/lib/node/main';
+import type { TextEdit } from 'vscode-languageserver-textdocument';
 
 interface MetaDataCompletionData {
     tagLowerCase: string;
@@ -50,17 +50,17 @@ export function setupCompletion(connection: Connection, documents: TextDocuments
 
         const metaData = bar ? binaryNodeSearch(bar.metaData, offset, false) : undefined;
         if (metaData) {
-            return createMetaDataCompletions(barIndex, metaData, offset);
+            return sortCompletions(createMetaDataCompletions(barIndex, metaData, offset));
         } else if (!bar || (bar.beats.length > 0 && offset < bar.beats[0].start!.offset)) {
-            return createMetaDataCompletions(barIndex, metaData, offset);
+            return sortCompletions(createMetaDataCompletions(barIndex, metaData, offset));
         }
 
-        const beat = binaryNodeSearch(bar.beats, offset);
+        const beat = binaryNodeSearch(bar.beats, offset, true);
         if (beat) {
-            return createBeatCompletions(beat, offset);
+            return sortCompletions(createBeatCompletions(beat, offset));
         }
 
-        return createMetaDataCompletions(barIndex, metaData, offset);
+        return sortCompletions(createMetaDataCompletions(barIndex, metaData, offset));
     });
 
     connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
@@ -68,9 +68,15 @@ export function setupCompletion(connection: Connection, documents: TextDocuments
     });
 }
 
+function sortCompletions(completions: CompletionItem[]): CompletionItem[] {
+    let i = 'a'.charCodeAt(0);
+    for (const c of completions) {
+        c.sortText = `${String.fromCharCode(i++)}`;
+    }
+    return completions;
+}
+
 const durations: [string, Duration][] = [
-    ['Quadruple Whole Note', Duration.QuadrupleWhole],
-    ['Double Whole Note', Duration.DoubleWhole],
     ['Whole Note', Duration.Whole],
     ['Half Note', Duration.Half],
     ['Quarter Note', Duration.Quarter],
@@ -79,14 +85,15 @@ const durations: [string, Duration][] = [
     ['32nd Note', Duration.ThirtySecond],
     ['64th Note', Duration.SixtyFourth],
     ['128th Note', Duration.OneHundredTwentyEighth],
-    ['256th Note', Duration.TwoHundredFiftySixth]
+    ['256th Note', Duration.TwoHundredFiftySixth],
+    ['Quadruple Whole Note', Duration.QuadrupleWhole],
+    ['Double Whole Note', Duration.DoubleWhole]
 ];
 
 const durationCompletionItems = durations.map(
     d =>
         ({
             label: `${d[1] as number}`,
-            sortText: `1_${d[1]}`,
             labelDetails: {
                 description: d[0]
             },
@@ -116,7 +123,7 @@ function createBeatCompletions(beat: alphaTab.importer.alphaTex.AlphaTexBeatNode
 
     const afterDuration = beat.beatMultiplier?.start?.offset ?? beat.beatEffects?.start?.offset ?? beat.end!.offset;
 
-    if (beat.durationDot && beat.durationDot.start!.offset < offset && offset <= afterDuration) {
+    if (beat.durationDot && beat.durationDot.start!.offset < offset && (offset <= afterDuration || !beat.beatEffects)) {
         const replacement: TextEdit[] | undefined = beat.durationValue
             ? [
                   {
@@ -150,7 +157,7 @@ function createBeatCompletions(beat: alphaTab.importer.alphaTex.AlphaTexBeatNode
         completions.splice(0, 0, ...createPropertiesCompletions(beat.beatEffects, offset, beatProperties));
     }
 
-    return [];
+    return completions;
 }
 
 function createDurationChangeCompletions(
@@ -190,7 +197,7 @@ function createDurationChangeCompletions(
         durationChange.properties.start!.offset < offset &&
         durationChange.properties.end!.offset
     ) {
-        completions.push(...Array.from(durationChangeProperties.values()).map(propertyToCompletion));
+        completions.push(...createPropertiesCompletions(durationChange.properties, offset, durationChangeProperties));
     }
 
     return completions;
@@ -204,7 +211,7 @@ function createNoteCompletions(
     const completions: CompletionItem[] = [];
     if (note.noteEffects && note.noteEffects.start!.offset < offset && note.noteEffects.end!.offset) {
         if (beat.notes!.notes.length === 1) {
-            completions.    splice(0, 0, ...createPropertiesCompletions(note.noteEffects, offset, beatProperties));
+            completions.splice(0, 0, ...createPropertiesCompletions(note.noteEffects, offset, beatProperties));
         }
 
         completions.splice(0, 0, ...createPropertiesCompletions(note.noteEffects, offset, noteProperties));
@@ -215,7 +222,6 @@ function createNoteCompletions(
 function propertyToCompletion(p: PropertyDoc): CompletionItem {
     return {
         label: p.property,
-        sortText: `1_${p.property}`,
         kind: CompletionItemKind.Property,
         insertText: p.snippet,
         labelDetails: p.shortDescription
@@ -235,7 +241,6 @@ function propertyToCompletion(p: PropertyDoc): CompletionItem {
 function valueItemToCompletion(i: ValueItemDoc, more?: Partial<CompletionItem>): CompletionItem {
     return {
         label: i.name,
-        sortText: `1_${i.name}`,
         kind: CompletionItemKind.Value,
         labelDetails: i.shortDescription
             ? {
@@ -257,7 +262,6 @@ function valueItemToCompletion(i: ValueItemDoc, more?: Partial<CompletionItem>):
 function metaDataDocToCompletion(d: MetadataDoc): CompletionItemWithData<MetaDataCompletionData> {
     return {
         label: d.tag,
-        sortText: `3_${d.tag}`,
         kind: CompletionItemKind.Function,
         labelDetails: d.shortDescription
             ? {

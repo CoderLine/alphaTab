@@ -1,5 +1,5 @@
 {
-    "name": "@coderline/alphatab-vscode",
+    "name": "alphatab-vscode",
     "version": "1.7.0",
     "description": "A Visual Studio Code extension for alphaTab providing coding assistance for alphaTex.",
     "keywords": [
@@ -58,7 +58,8 @@
         "Programming Languages"
     ],
     "activationEvents": [
-        "workspaceContains:**/*.atex"
+        "workspaceContains:**/*.atex",
+        "onWebviewPanel:alphatex.preview"
     ],
     "main": "./dist/extension.js",
     "type": "commonjs",
@@ -81,6 +82,48 @@
                 "language": "alphatex",
                 "scopeName": "source.alphatex",
                 "path": "./syntaxes/alphatex.tmLanguage.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "alphatab-vscode.commands.openPreview",
+                "title": "Open alphaTex Preview",
+                "category": "alphaTex",
+                "icon": "$(open-preview)"
+            },
+            {
+                "command": "alphatab-vscode.commands.refreshPreview",
+                "title": "Refresh alphaTex Preview",
+                "category": "alphaTex",
+                "icon": "$(refresh)"
+            }
+        ],
+        "menus": {
+            "editor/title": [
+                {
+                    "command": "alphatab-vscode.commands.openPreview",
+                    "when": "editorLangId == alphatex",
+                    "group": "navigation"
+                },
+                {
+                    "command": "alphatab-vscode.commands.refreshPreview",
+                    "when": "alphaTexPreviewFocus",
+                    "group": "navigation"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "alphatab-vscode.commands.openPreview",
+                    "when": "editorLangId == alphatex",
+                    "group": "navigation"
+                }
+            ]
+        },
+        "keybindings": [
+            {
+                "command": "alphatab-vscode.commands.openPreview",
+                "key": "ctrl+k a",
+                "mac": "cmd+k a"
             }
         ]
     }
