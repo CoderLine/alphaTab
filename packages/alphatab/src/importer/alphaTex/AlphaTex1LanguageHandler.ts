@@ -2772,7 +2772,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     private static _buildChordNode(chord: Chord): AlphaTexMetaDataNode {
         const chordNode = Atnf.meta(
             'chord',
-            Atnf.stringValue(chord.name),
+            Atnf.values([Atnf.string(chord.name)], true),
             Atnf.props([
                 chord.firstFret >= 0 ? ['firstfret', Atnf.numberValue(chord.firstFret)] : undefined,
                 ['showdiagram', Atnf.identValue(chord.showDiagram ? 'true' : 'false')],
@@ -2783,7 +2783,6 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     : undefined
             ])
         );
-        chordNode.propertiesBeforeValues = true;
 
         for (let i = 0; i < chord.staff.tuning.length; i++) {
             if (i < chord.strings.length && chord.strings[i] >= 0) {

@@ -24,13 +24,50 @@
     \tuning (E4 B3 G3 D3 A2 E2) {
       label "Guitar Standard Tuning"
     }
-    \chord {firstfret 1 showdiagram true showfingering false showname true} "C9" 3 3 3 2 3 x
-    \chord {firstfret 1 showdiagram true showfingering false showname true} "C" 0 1 0 2 3 x
-    \chord {firstfret 1 showdiagram true showfingering false showname true} "G" 3 0 0 0 2 3
-    \chord {firstfret 1 showdiagram true showfingering false showname true barre (1 1)} "Fm6" 1 3 1 3 3 1
-    \chord {firstfret 3 showdiagram true showfingering false showname true barre (3 3)} "C7sus4" 3 6 3 5 3 x
-    \chord {firstfret 1 showdiagram true showfingering false showname true} "C5" x x x 5 3 x
-    \chord {firstfret 1 showdiagram true showfingering false showname true} "G(no5)/B" x x x 5 2 x
+    \chord ("C9" 3 3 3 2 3 x) {
+      firstfret 1
+      showdiagram true
+      showfingering false
+      showname true
+    }
+    \chord ("C" 0 1 0 2 3 x) {
+      firstfret 1
+      showdiagram true
+      showfingering false
+      showname true
+    }
+    \chord ("G" 3 0 0 0 2 3) {
+      firstfret 1
+      showdiagram true
+      showfingering false
+      showname true
+    }
+    \chord ("Fm6" 1 3 1 3 3 1) {
+      firstfret 1
+      showdiagram true
+      showfingering false
+      showname true
+      barre (1 1)
+    }
+    \chord ("C7sus4" 3 6 3 5 3 x) {
+      firstfret 3
+      showdiagram true
+      showfingering false
+      showname true
+      barre (3 3)
+    }
+    \chord ("C5" x x x 5 3 x) {
+      firstfret 1
+      showdiagram true
+      showfingering false
+      showname true
+    }
+    \chord ("G(no5)/B" x x x 5 2 x) {
+      firstfret 1
+      showdiagram true
+      showfingering false
+      showname true
+    }
     \voice /* Voice 1 */
       // Masterbar 1 Metadata
       \ts (4 4)
