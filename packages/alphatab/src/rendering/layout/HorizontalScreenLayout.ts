@@ -133,10 +133,8 @@ export class HorizontalScreenLayout extends ScoreLayout {
         }
         this._finalizeStaffSystem();
 
-        const scale = this.renderer.settings.display.scale;
-
-        this.height = Math.floor(this._system.y + this._system.height) * scale;
-        this.width = (this._system.x + this._system.width + this.pagePadding![2]) * scale;
+        this.height = Math.floor(this._system.y + this._system.height);
+        this.width = (this._system.x + this._system.width + this.pagePadding![2]);
         currentBarIndex = 0;
 
         let x = 0;
@@ -146,10 +144,10 @@ export class HorizontalScreenLayout extends ScoreLayout {
             const e = new RenderFinishedEventArgs();
             e.x = x;
             e.y = 0;
-            e.totalWidth = this.width / scale;
-            e.totalHeight = this.height / scale;
+            e.totalWidth = this.width;
+            e.totalHeight = this.height;
             e.width = partial.width;
-            e.height = this.height / scale;
+            e.height = this.height;
             e.firstMasterBarIndex = partial.masterBars[0].index;
             e.lastMasterBarIndex = partial.masterBars[partial.masterBars.length - 1].index;
 
@@ -188,6 +186,8 @@ export class HorizontalScreenLayout extends ScoreLayout {
         this.height = this.layoutAndRenderAnnotation(this.height);
 
         this.height += this.pagePadding![3];
+
+        this.height *= this.renderer.settings.display.scale;
     }
 
     private _finalizeStaffSystem() {

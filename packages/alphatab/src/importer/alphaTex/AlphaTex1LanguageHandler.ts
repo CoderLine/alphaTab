@@ -25,7 +25,7 @@ import {
 import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
-    StaffNoteKind,
+    AlphaTexStaffNoteKind,
     type IAlphaTexImporter
 } from '@src/importer/alphaTex/AlphaTexShared';
 import { Atnf } from '@src/importer/alphaTex/ATNF';
@@ -319,7 +319,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         case 'piano':
                         case 'none':
                         case 'voice':
-                            importer.applyStaffNoteKind(staff, StaffNoteKind.Pitched);
+                            importer.applyStaffNoteKind(staff, AlphaTexStaffNoteKind.Pitched);
                             i = metaData.values!.values.length;
                             break;
                         // backwards compatibility only
@@ -1125,7 +1125,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 const instrumentName = (values!.values[0] as AlphaTexTextNode).text.toLowerCase();
                 if (instrumentName === 'percussion') {
                     for (const staff of track.staves) {
-                        importer.applyStaffNoteKind(staff, StaffNoteKind.Articulation);
+                        importer.applyStaffNoteKind(staff, AlphaTexStaffNoteKind.Articulation);
                     }
                     track.playbackInfo.primaryChannel = SynthConstants.PercussionChannel;
                     track.playbackInfo.secondaryChannel = SynthConstants.PercussionChannel;

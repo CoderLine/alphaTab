@@ -287,7 +287,7 @@ export interface IAlphaTexImporterState {
  * Lists the note kinds we can detect
  * @public
  */
-export enum StaffNoteKind {
+export enum AlphaTexStaffNoteKind {
     Pitched,
     Fretted,
     Articulation
@@ -300,7 +300,7 @@ export enum StaffNoteKind {
 export interface IAlphaTexImporter {
     readonly state: IAlphaTexImporterState;
 
-    applyStaffNoteKind(staff: Staff, staffNoteKind: StaffNoteKind): void;
+    applyStaffNoteKind(staff: Staff, staffNoteKind: AlphaTexStaffNoteKind): void;
     startNewVoice(): void;
     startNewTrack(): Track;
     startNewStaff(): Staff;
