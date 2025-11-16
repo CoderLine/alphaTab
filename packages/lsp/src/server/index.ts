@@ -14,7 +14,11 @@ import {
 } from '@src/server/types';
 
 // the only place where we should import specif vscode-languageserver packages
-import { createConnection as createBrowserConnection } from 'vscode-languageserver/lib/browser/main.js';
+import {
+    BrowserMessageReader,
+    BrowserMessageWriter,
+    createConnection as createBrowserConnection
+} from 'vscode-languageserver/lib/browser/main.js';
 import {
     createConnection as createNodeConnection,
     ProposedFeatures as NodeProposedFeatures
@@ -66,15 +70,17 @@ function startLanguageServer(serverConnection: Connection) {
 
 /**
  * Starts a new language server communicating via WebWorker.
+ * @param readerPort The port used to reading incoming language server messages
+ * @param writerPort The port used to writer outgoing language server messages
  */
-export function startWebWorkerLanguageServer() {
+export function startWebWorkerLanguageServer(
+    readerPort: MessagePort | Worker | DedicatedWorkerGlobalScope,
+    writerPort: MessagePort | Worker | DedicatedWorkerGlobalScope
+) {
     startLanguageServer(
         createBrowserConnection(
-            {
-                // todo
-            } as any,
-            null! /*TODO */,
-            null! /* TODO */
+            new BrowserMessageReader(readerPort),
+            new BrowserMessageWriter(writerPort)
         )
     );
 }
