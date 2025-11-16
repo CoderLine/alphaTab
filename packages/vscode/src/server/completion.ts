@@ -16,10 +16,11 @@ import {
     type CompletionItem,
     CompletionItemKind,
     InsertTextFormat,
+    RemoteConsole,
     type TextDocumentPositionParams,
-    type TextDocuments
+    type TextDocuments,
+    TextEdit
 } from 'vscode-languageserver/lib/node/main';
-import type { TextEdit } from 'vscode-languageserver-textdocument';
 
 interface MetaDataCompletionData {
     tagLowerCase: string;
@@ -45,22 +46,46 @@ export function setupCompletion(connection: Connection, documents: TextDocuments
 
         const offset = document.offsetAt(params.position);
 
-        const bar = binaryNodeSearch(document.ast.bars, offset, true);
+        const bar = binaryNodeSearch(document.ast.bars, offset, document.ast.end!.offset);
         const barIndex = bar ? document.ast.bars.indexOf(bar) : 0;
 
-        const metaData = bar ? binaryNodeSearch(bar.metaData, offset, false) : undefined;
+        // no bar
+        if (!bar) {
+            return sortCompletions(
+                createMetaDataCompletions(barIndex, undefined, offset, document.ast.end!.offset),
+                connection.console
+            );
+        }
+
+        const endOfBar =
+            bar.pipe?.start!.offset ??
+            (barIndex === document.ast.bars.length - 1
+                ? document.ast.end!.offset
+                : document.ast.bars[barIndex + 1].start!.offset);
+
+        const endOfBarMetaData = bar.beats[0]?.start!.offset ?? endOfBar;
+        const metaData = bar ? binaryNodeSearch(bar.metaData, offset, endOfBarMetaData) : undefined;
         if (metaData) {
-            return sortCompletions(createMetaDataCompletions(barIndex, metaData, offset));
-        } else if (!bar || (bar.beats.length > 0 && offset < bar.beats[0].start!.offset)) {
-            return sortCompletions(createMetaDataCompletions(barIndex, metaData, offset));
+            const metaDataIndex = bar.metaData.indexOf(metaData);
+            const endOfMetaData =
+                metaDataIndex === bar.metaData.length - 1
+                    ? endOfBarMetaData
+                    : bar.metaData[metaDataIndex + 1].start!.offset;
+            return sortCompletions(
+                createMetaDataCompletions(barIndex, metaData, offset, endOfMetaData),
+                connection.console
+            );
         }
 
-        const beat = binaryNodeSearch(bar.beats, offset, true);
+        const beat = binaryNodeSearch(bar.beats, offset, endOfBar);
         if (beat) {
-            return sortCompletions(createBeatCompletions(beat, offset));
+            const beatIndex = bar.beats.indexOf(beat);
+            const endOfBeat = beatIndex === bar.beats.length - 1 ? endOfBar : bar.beats[beatIndex + 1].start!.offset;
+
+            return sortCompletions(createBeatCompletions(beat, offset, endOfBeat), connection.console);
         }
 
-        return sortCompletions(createMetaDataCompletions(barIndex, metaData, offset));
+        return sortCompletions(createMetaDataCompletions(barIndex, undefined, offset, document.ast.end!.offset), connection.console);
     });
 
     connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
@@ -68,11 +93,12 @@ export function setupCompletion(connection: Connection, documents: TextDocuments
     });
 }
 
-function sortCompletions(completions: CompletionItem[]): CompletionItem[] {
+function sortCompletions(completions: CompletionItem[], console: RemoteConsole): CompletionItem[] {
     let i = 'a'.charCodeAt(0);
     for (const c of completions) {
         c.sortText = `${String.fromCharCode(i++)}`;
     }
+    console.debug(`Provide completions: ${JSON.stringify(completions)}`);
     return completions;
 }
 
@@ -103,7 +129,11 @@ const durationCompletionItems = durations.map(
         }) satisfies CompletionItem
 );
 
-function createBeatCompletions(beat: alphaTab.importer.alphaTex.AlphaTexBeatNode, offset: number): CompletionItem[] {
+function createBeatCompletions(
+    beat: alphaTab.importer.alphaTex.AlphaTexBeatNode,
+    offset: number,
+    endOfBeat: number
+): CompletionItem[] {
     const completions: CompletionItem[] = [];
 
     if (
@@ -111,13 +141,23 @@ function createBeatCompletions(beat: alphaTab.importer.alphaTex.AlphaTexBeatNode
         beat.durationChange.start!.offset < offset &&
         offset <= beat.durationChange!.end!.offset
     ) {
-        return createDurationChangeCompletions(beat.durationChange, offset);
+        const endOfDurationChange = beat.notes?.start!.offset ?? endOfBeat;
+        return createDurationChangeCompletions(beat.durationChange, offset, endOfDurationChange);
     }
 
     if (beat.notes && beat.notes.start!.offset < offset && offset <= beat.notes.end!.offset) {
-        const note = binaryNodeSearch(beat.notes.notes, offset, false);
+        const endOfNotes =
+            beat.notes?.closeParenthesis?.start!.offset ??
+            beat.durationDot?.start!.offset ??
+            beat.beatEffects?.start!.offset ??
+            beat.beatMultiplier?.start!.offset ??
+            endOfBeat;
+        const note = binaryNodeSearch(beat.notes.notes, offset, endOfNotes);
         if (note) {
-            return createNoteCompletions(beat, note, offset);
+            const noteIndex = beat.notes.notes.indexOf(note);
+            const endOfNote =
+                noteIndex === beat.notes.notes.length - 1 ? endOfNotes : beat.notes.notes[noteIndex + 1].start!.offset;
+            return createNoteCompletions(beat, note, offset, endOfNote);
         }
     }
 
@@ -126,19 +166,16 @@ function createBeatCompletions(beat: alphaTab.importer.alphaTex.AlphaTexBeatNode
     if (beat.durationDot && beat.durationDot.start!.offset < offset && (offset <= afterDuration || !beat.beatEffects)) {
         const replacement: TextEdit[] | undefined = beat.durationValue
             ? [
-                  {
-                      range: {
-                          start: {
-                              line: beat.durationDot.end!.line - 1,
-                              character: beat.durationDot.end!.col
-                          },
-                          end: {
-                              line: beat.durationValue!.end!.line - 1,
-                              character: beat.durationValue!.end!.col - 1
-                          }
+                  TextEdit.del({
+                      start: {
+                          line: beat.durationDot.end!.line - 1,
+                          character: beat.durationDot.end!.col - 1
                       },
-                      newText: ' '
-                  }
+                      end: {
+                          line: beat.durationValue!.end!.line - 1,
+                          character: beat.durationValue!.end!.col - 1
+                      }
+                  })
               ]
             : undefined;
 
@@ -154,7 +191,13 @@ function createBeatCompletions(beat: alphaTab.importer.alphaTex.AlphaTexBeatNode
     }
 
     if (beat.beatEffects && beat.beatEffects.start!.offset < offset && beat.beatEffects.end!.offset) {
-        completions.splice(0, 0, ...createPropertiesCompletions(beat.beatEffects, offset, beatProperties));
+        const endOfProperties =
+            beat.beatEffects?.closeBrace?.start!.offset ?? beat.beatMultiplier?.start!.offset ?? endOfBeat;
+        completions.splice(
+            0,
+            0,
+            ...createPropertiesCompletions(beat.beatEffects, offset, beatProperties, endOfProperties)
+        );
     }
 
     return completions;
@@ -162,7 +205,8 @@ function createBeatCompletions(beat: alphaTab.importer.alphaTex.AlphaTexBeatNode
 
 function createDurationChangeCompletions(
     durationChange: alphaTab.importer.alphaTex.AlphaTexBeatDurationChangeNode,
-    offset: number
+    offset: number,
+    endOfDurationChange: number
 ): CompletionItem[] {
     const completions: CompletionItem[] = [];
 
@@ -170,19 +214,16 @@ function createDurationChangeCompletions(
         const endOfValue = durationChange.properties?.start ?? durationChange.end!;
         const replacement: TextEdit[] | undefined = durationChange.properties
             ? [
-                  {
-                      range: {
-                          start: {
-                              line: durationChange.colon.start!.line - 1,
-                              character: durationChange.colon.start!.col
-                          },
-                          end: {
-                              line: endOfValue.line - 1,
-                              character: endOfValue.col - 1
-                          }
+                  TextEdit.del({
+                      start: {
+                          line: durationChange.colon.start!.line - 1,
+                          character: durationChange.colon.start!.col - 1
                       },
-                      newText: ''
-                  }
+                      end: {
+                          line: endOfValue.line - 1,
+                          character: endOfValue.col - 1
+                      }
+                  })
               ]
             : undefined;
 
@@ -197,7 +238,10 @@ function createDurationChangeCompletions(
         durationChange.properties.start!.offset < offset &&
         durationChange.properties.end!.offset
     ) {
-        completions.push(...createPropertiesCompletions(durationChange.properties, offset, durationChangeProperties));
+        const endOfProperties = durationChange.properties?.closeBrace?.start!.offset ?? endOfDurationChange;
+        completions.push(
+            ...createPropertiesCompletions(durationChange.properties, offset, durationChangeProperties, endOfProperties)
+        );
     }
 
     return completions;
@@ -206,20 +250,31 @@ function createDurationChangeCompletions(
 function createNoteCompletions(
     beat: alphaTab.importer.alphaTex.AlphaTexBeatNode,
     note: alphaTab.importer.alphaTex.AlphaTexNoteNode,
-    offset: number
+    offset: number,
+    endOfNote: number
 ): CompletionItem[] {
     const completions: CompletionItem[] = [];
     if (note.noteEffects && note.noteEffects.start!.offset < offset && note.noteEffects.end!.offset) {
+        const endOfProperties = note.noteEffects.closeBrace?.start!.offset ?? endOfNote;
+
         if (beat.notes!.notes.length === 1) {
-            completions.splice(0, 0, ...createPropertiesCompletions(note.noteEffects, offset, beatProperties));
+            completions.splice(
+                0,
+                0,
+                ...createPropertiesCompletions(note.noteEffects, offset, beatProperties, endOfProperties)
+            );
         }
 
-        completions.splice(0, 0, ...createPropertiesCompletions(note.noteEffects, offset, noteProperties));
+        completions.splice(
+            0,
+            0,
+            ...createPropertiesCompletions(note.noteEffects, offset, noteProperties, endOfProperties)
+        );
     }
     return completions;
 }
 
-function propertyToCompletion(p: PropertyDoc): CompletionItem {
+function propertyToCompletion(p: PropertyDoc, more?: Partial<CompletionItem>): CompletionItem {
     return {
         label: p.property,
         kind: CompletionItemKind.Property,
@@ -235,7 +290,8 @@ function propertyToCompletion(p: PropertyDoc): CompletionItem {
                   value: p.longDescription
               }
             : undefined,
-        insertTextFormat: InsertTextFormat.Snippet
+        insertTextFormat: InsertTextFormat.Snippet,
+        ...more
     };
 }
 function valueItemToCompletion(i: ValueItemDoc, more?: Partial<CompletionItem>): CompletionItem {
@@ -286,7 +342,8 @@ function metaDataDocToCompletion(d: MetadataDoc): CompletionItemWithData<MetaDat
 function createMetaDataCompletions(
     barIndex: number,
     metaData: alphaTab.importer.alphaTex.AlphaTexMetaDataNode | undefined,
-    offset: number
+    offset: number,
+    endOfMetaData: number
 ) {
     let completions: CompletionItem[] = [];
     const tagCompletion = !metaData || (metaData.tag.start!.offset <= offset && offset <= metaData.tag.end!.offset);
@@ -306,19 +363,16 @@ function createMetaDataCompletions(
                 ...c,
                 insertText: keepValues ? c.label : c.insertText,
                 additionalTextEdits: [
-                    {
-                        range: {
-                            start: {
-                                line: metaData.tag.start!.line - 1,
-                                character: metaData.tag.start!.col - 1
-                            },
-                            end: {
-                                line: metaData.tag.end!.line - 1,
-                                character: metaData.tag.end!.col - 1
-                            }
+                    TextEdit.del({
+                        start: {
+                            line: metaData.tag.start!.line - 1,
+                            character: metaData.tag.start!.col - 1
                         },
-                        newText: ''
-                    }
+                        end: {
+                            line: metaData.tag.end!.line - 1,
+                            character: metaData.tag.end!.col - 1
+                        }
+                    })
                 ]
             }));
         }
@@ -340,10 +394,20 @@ function createMetaDataCompletions(
         return completions;
     }
 
-    completions.splice(0, 0, ...createValueCompletions(metaDataDocs.values, metaData.values, offset));
+    const endOfValues =
+        metaData.values?.closeParenthesis?.start!.offset ??
+        metaData.values?.end!.offset ??
+        metaData.properties?.start!.offset ??
+        endOfMetaData;
+    completions.splice(0, 0, ...createValueCompletions(metaDataDocs.values, metaData.values, offset, endOfValues));
 
     if (metaDataDocs?.properties) {
-        completions.splice(0, 0, ...createPropertiesCompletions(metaData.properties, offset, metaDataDocs.properties));
+        const endOfProperties = metaData.properties?.closeBrace?.start!.offset ?? endOfMetaData;
+        completions.splice(
+            0,
+            0,
+            ...createPropertiesCompletions(metaData.properties, offset, metaDataDocs.properties, endOfProperties)
+        );
     }
 
     return completions;
@@ -352,7 +416,8 @@ function createMetaDataCompletions(
 function createValueCompletions(
     expectedValues: ValueDoc[],
     actualValues: alphaTab.importer.alphaTex.AlphaTexValueList | undefined,
-    offset: number
+    offset: number,
+    trailingEnd: number
 ) {
     const requiredValues = expectedValues.filter(v => v.required);
     if (!actualValues && requiredValues.length > 0) {
@@ -366,7 +431,7 @@ function createValueCompletions(
             }
         }
     } else if (actualValues) {
-        const value = binaryNodeSearch(actualValues.values, offset);
+        const value = binaryNodeSearch(actualValues.values, offset, trailingEnd);
         if (value) {
             const valueIndex = actualValues.values.indexOf(value);
             const values =
@@ -375,19 +440,16 @@ function createValueCompletions(
                 return values.map(i =>
                     valueItemToCompletion(i, {
                         additionalTextEdits: [
-                            {
-                                range: {
-                                    start: {
-                                        line: value.start!.line - 1,
-                                        character: value.start!.col - 1
-                                    },
-                                    end: {
-                                        line: value.end!.line - 1,
-                                        character: value.end!.col - 1
-                                    }
+                            TextEdit.del({
+                                start: {
+                                    line: value.start!.line - 1,
+                                    character: value.start!.col - 1
                                 },
-                                newText: ''
-                            }
+                                end: {
+                                    line: value.end!.line - 1,
+                                    character: value.end!.col - 1
+                                }
+                            })
                         ]
                     })
                 );
@@ -407,7 +469,8 @@ function createMetaDataDocCompletions(
 function createPropertiesCompletions(
     properties: alphaTab.importer.alphaTex.AlphaTexPropertiesNode | undefined,
     offset: number,
-    availableProperties: Map<string, PropertyDoc>
+    availableProperties: Map<string, PropertyDoc>,
+    endOfProperties: number
 ): CompletionItem[] {
     if (!properties) {
         return [];
@@ -418,11 +481,18 @@ function createPropertiesCompletions(
         return [];
     }
 
-    const allPropCompletions: CompletionItem[] = Array.from(availableProperties.values()).map(propertyToCompletion);
+    const allPropCompletions: CompletionItem[] = Array.from(availableProperties.values()).map(p =>
+        propertyToCompletion(p)
+    );
 
-    const prop = properties ? binaryNodeSearch(properties.properties, offset, true) : undefined;
+    const prop = properties ? binaryNodeSearch(properties.properties, offset, endOfProperties) : undefined;
     if (prop) {
-        return createPropertyCompletions(prop, offset, availableProperties, allPropCompletions);
+        const propIndex = properties.properties.indexOf(prop);
+        const endOfProp =
+            propIndex === properties.properties.length - 1
+                ? endOfProperties
+                : properties.properties[propIndex + 1].start!.offset;
+        return createPropertyCompletions(prop, offset, availableProperties, allPropCompletions, endOfProp);
     }
 
     return allPropCompletions;
@@ -432,7 +502,8 @@ function createPropertyCompletions(
     property: alphaTab.importer.alphaTex.AlphaTexPropertyNode,
     offset: number,
     availableProperties: Map<string, PropertyDoc>,
-    allPropCompletions: CompletionItem[]
+    allPropCompletions: CompletionItem[],
+    endOfProperty: number
 ) {
     const completions: CompletionItem[] = [];
     const propCompletion =
@@ -442,19 +513,16 @@ function createPropertyCompletions(
             ...allPropCompletions.map(c => ({
                 ...c,
                 additionalTextEdits: [
-                    {
-                        range: {
-                            start: {
-                                line: property.property.start!.line - 1,
-                                character: property.property.start!.col - 1
-                            },
-                            end: {
-                                line: property.property.end!.line - 1,
-                                character: property.property.end!.col - 1
-                            }
+                    TextEdit.del({
+                        start: {
+                            line: property.property.start!.line - 1,
+                            character: property.property.start!.col - 1
                         },
-                        newText: ''
-                    }
+                        end: {
+                            line: property.property.end!.line - 1,
+                            character: property.property.end!.col - 1
+                        }
+                    })
                 ]
             }))
         );
@@ -468,7 +536,7 @@ function createPropertyCompletions(
         return completions;
     }
 
-    completions.splice(0, 0, ...createValueCompletions(propDocs.values, property.values, offset));
+    completions.splice(0, 0, ...createValueCompletions(propDocs.values, property.values, offset, endOfProperty));
 
     return completions;
 }

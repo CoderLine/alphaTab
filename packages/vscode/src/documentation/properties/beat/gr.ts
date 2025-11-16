@@ -21,19 +21,22 @@ export const gr: PropertyDoc = {
                     AlphaTexNodeType.Ident,
                     [
                         {
-                            name: 'On-Beat',
+                            name: 'ob',
                             snippet: 'ob',
+                            shortDescription: 'On-Beat',
                             longDescription:
                                 'An On-Beat grace note where this beat will start at the play time of the next beat and steal its play time from the next beat.'
                         },
                         {
-                            name: 'Before-Beat',
+                            name: 'bb',
+                            shortDescription: 'Before-Beat',
                             snippet: 'bb',
                             longDescription:
                                 'A Before-Beat grace note where this beat will start before the next beat and steal its play time from the previous beat.'
                         },
                         {
-                            name: 'Bend',
+                            name: 'b',
+                            shortDescription: 'Bend',
                             snippet: 'b',
                             longDescription:
                                 "A bend grace note, a mechanism used in alphaTab for the 'songbook style' bends notes. You will likely not apply this type manually."

@@ -17,13 +17,13 @@ export const tf: MetadataDoc = {
                 [
                     AlphaTexNodeType.Ident,
                     [
-                        { name: 'No Triplet Feel', snippet: 'none', shortDescription: '' },
-                        { name: 'Triplet 16th', snippet: 'triplet16th', shortDescription: '' },
-                        { name: 'Triplet 8th', snippet: 'triplet8th', shortDescription: '' },
-                        { name: 'Dotted 16th', snippet: 'dotted16th', shortDescription: '' },
-                        { name: 'Dotted 8th', snippet: 'dotted8th', shortDescription: '' },
-                        { name: 'Scottish 16th', snippet: 'scottish16th', shortDescription: '' },
-                        { name: 'Scottish 8th', snippet: 'scottish8th', shortDescription: '' }
+                        { name: 'none', snippet: 'none', shortDescription: 'No Triplet Feel' },
+                        { name: 'triplet16th', snippet: 'triplet16th', shortDescription: 'Triplet 16th' },
+                        { name: 'triplet8th', snippet: 'triplet8th', shortDescription: 'Triplet 8th' },
+                        { name: 'dotted16th', snippet: 'dotted16th', shortDescription: 'Dotted 16th' },
+                        { name: 'dotted8th', snippet: 'dotted8th', shortDescription: 'Dotted 8th' },
+                        { name: 'scottish16th', snippet: 'scottish16th', shortDescription: 'Scottish 16th' },
+                        { name: 'scottish8th', snippet: 'scottish8th', shortDescription: 'Scottish 8th' }
                     ]
                 ]
             ])

@@ -17,11 +17,11 @@ export const lf: PropertyDoc = {
                 [
                     AlphaTexNodeType.Number,
                     [
-                        { name: 'Thumb', snippet: '1', shortDescription: '' },
-                        { name: 'Index-Finger', snippet: '2', shortDescription: '' },
-                        { name: 'Middle-Finger', snippet: '3', shortDescription: '' },
-                        { name: 'Annual-Finger', snippet: '4', shortDescription: '' },
-                        { name: 'Little-Finger', snippet: '5', shortDescription: '' }
+                        { name: '1', snippet: '1', shortDescription: 'Thumb' },
+                        { name: '2', snippet: '2', shortDescription: 'Index-Finger' },
+                        { name: '3', snippet: '3', shortDescription: 'Middle-Finger' },
+                        { name: '4', snippet: '4', shortDescription: 'Annual-Finger' },
+                        { name: '5', snippet: '5', shortDescription: 'Little-Finger' }
                     ]
                 ]
             ])

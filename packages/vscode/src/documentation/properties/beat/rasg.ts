@@ -17,24 +17,24 @@ export const rasg: PropertyDoc = {
                 [
                     AlphaTexNodeType.Ident,
                     [
-                        { name: 'ii', snippet: 'ii' },
-                        { name: 'mi', snippet: 'mi' },
-                        { name: 'mii (triplet)', snippet: 'miiTriplet' },
-                        { name: 'mii (anapaest)', snippet: 'miiAnapaest' },
-                        { name: 'pmp (triplet)', snippet: 'pmpTriplet' },
-                        { name: 'pmp (anapaest)', snippet: 'pmpAnapaest' },
-                        { name: 'pei (triplet)', snippet: 'peiTriplet' },
-                        { name: 'pei (anapaest)', snippet: 'peiAnapaest' },
-                        { name: 'pai (triplet)', snippet: 'paiTriplet' },
-                        { name: 'pai (anapaest)', snippet: 'paiAnapaest' },
-                        { name: 'ami (triplet)', snippet: 'amiTriplet' },
-                        { name: 'ami (anapaest)', snippet: 'amiAnapaest' },
-                        { name: 'ppp', snippet: 'ppp' },
-                        { name: 'amii', snippet: 'amii' },
-                        { name: 'amip', snippet: 'amip' },
-                        { name: 'eami', snippet: 'eami' },
-                        { name: 'eamii', snippet: 'eamii' },
-                        { name: 'peami', snippet: 'peami' }
+                        { name: 'ii', snippet: 'ii', shortDescription: 'ii' },
+                        { name: 'mi', snippet: 'mi', shortDescription: 'mi' },
+                        { name: 'miiTriplet', snippet: 'miiTriplet', shortDescription: 'mii (triplet)' },
+                        { name: 'miiAnapaest', snippet: 'miiAnapaest', shortDescription: 'mii (anapaest)' },
+                        { name: 'pmpTriplet', snippet: 'pmpTriplet', shortDescription: 'pmp (triplet)' },
+                        { name: 'pmpAnapaest', snippet: 'pmpAnapaest', shortDescription: 'pmp (anapaest)' },
+                        { name: 'peiTriplet', snippet: 'peiTriplet', shortDescription: 'pei (triplet)' },
+                        { name: 'peiAnapaest', snippet: 'peiAnapaest', shortDescription: 'pei (anapaest)' },
+                        { name: 'paiTriplet', snippet: 'paiTriplet', shortDescription: 'pai (triplet)' },
+                        { name: 'paiAnapaest', snippet: 'paiAnapaest', shortDescription: 'pai (anapaest)' },
+                        { name: 'amiTriplet', snippet: 'amiTriplet', shortDescription: 'ami (triplet)' },
+                        { name: 'amiAnapaest', snippet: 'amiAnapaest', shortDescription: 'ami (anapaest)' },
+                        { name: 'ppp', snippet: 'ppp', shortDescription: 'ppp' },
+                        { name: 'amii', snippet: 'amii', shortDescription: 'amii' },
+                        { name: 'amip', snippet: 'amip', shortDescription: 'amip' },
+                        { name: 'eami', snippet: 'eami', shortDescription: 'eami' },
+                        { name: 'eamii', snippet: 'eamii', shortDescription: 'eamii' },
+                        { name: 'peami', snippet: 'peami', shortDescription: 'peami' }
                     ]
                 ]
             ])

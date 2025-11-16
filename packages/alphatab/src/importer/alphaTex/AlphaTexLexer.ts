@@ -135,7 +135,7 @@ export class AlphaTexLexer {
             if (codepoint === 0x0a /* \n */) {
                 this._trailingCommentNode = undefined;
                 ++this._line;
-                this._col = 1;
+                this._col = 0; // will become 1 with the first character consumed
             } else {
                 ++this._col;
             }

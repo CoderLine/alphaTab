@@ -21,44 +21,44 @@ export const b: PropertyDoc = {
             values: new Map<AlphaTexNodeType, ValueItemDoc[]>([
                 [
                     AlphaTexNodeType.Ident,
-                    [
+                     [
                         {
-                            name: 'Custom',
+                            name: 'custom',
                             snippet: 'custom',
                             shortDescription: 'A non-standard custom bends with multiple points'
                         },
                         {
-                            name: 'Bend',
+                            name: 'bend',
                             snippet: 'bend',
                             shortDescription: 'A simple bend up to a higher note.'
                         },
                         {
-                            name: 'Release',
+                            name: 'release',
                             snippet: 'release',
                             shortDescription: 'A release of bends down to a lower note.'
                         },
                         {
-                            name: 'Bend-Release',
+                            name: 'bendRelease',
                             snippet: 'bendRelease',
                             shortDescription: 'A bend directly followed by a release.'
                         },
                         {
-                            name: 'Hold',
+                            name: 'hold',
                             snippet: 'hold',
                             shortDescription: 'A bend which is held from the previous note.'
                         },
                         {
-                            name: 'Pre-Bend',
+                            name: 'preBend',
                             snippet: 'preBend',
                             shortDescription: 'A bend applied before the note is played.'
                         },
                         {
-                            name: 'Pre-Bend Bend',
+                            name: 'preBendBend',
                             snippet: 'preBendBend',
                             shortDescription: 'A pre-bend followed by a bend'
                         },
                         {
-                            name: 'Pre-Bend Release',
+                            name: 'preBendRelease',
                             snippet: 'preBendRelease',
                             shortDescription: 'A pre-bend followed by a release'
                         }

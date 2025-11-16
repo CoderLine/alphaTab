@@ -23,18 +23,18 @@ export const barlineLeft: MetadataDoc = {
                 [
                     AlphaTexNodeType.Ident,
                     [
-                        { name: 'Automatic', snippet: 'automatic', shortDescription: 'Auto detect line to show' },
-                        { name: 'Dashed', snippet: 'dashed', shortDescription: '' },
-                        { name: 'Dotted', snippet: 'dotted', shortDescription: '' },
-                        { name: 'Heavy', snippet: 'heavy', shortDescription: '' },
-                        { name: 'Heavy-Heavy', snippet: 'heavyheavy', shortDescription: '' },
-                        { name: 'Heavy-Light', snippet: 'heavylight', shortDescription: '' },
-                        { name: 'Light-Heavy', snippet: 'lightheavy', shortDescription: '' },
-                        { name: 'Light-Light', snippet: 'lightlight', shortDescription: '' },
-                        { name: 'None', snippet: 'none', shortDescription: '' },
-                        { name: 'Regular', snippet: 'regular', shortDescription: '' },
-                        { name: 'Short', snippet: 'short', shortDescription: '' },
-                        { name: 'Tick', snippet: 'tick', shortDescription: '' }
+                        { name: 'automatic', snippet: 'automatic', shortDescription: 'Auto detect line to show' },
+                        { name: 'dashed', snippet: 'dashed', shortDescription: 'Dashed' },
+                        { name: 'dotted', snippet: 'dotted', shortDescription: 'Dotted' },
+                        { name: 'heavy', snippet: 'heavy', shortDescription: 'Heavy' },
+                        { name: 'heavyheavy', snippet: 'heavyheavy', shortDescription: 'Heavy-Heavy' },
+                        { name: 'heavylight', snippet: 'heavylight', shortDescription: 'Heavy-Light' },
+                        { name: 'lightheavy', snippet: 'lightheavy', shortDescription: 'Light-Heavy' },
+                        { name: 'lightlight', snippet: 'lightlight', shortDescription: 'Light-Light' },
+                        { name: 'none', snippet: 'none', shortDescription: 'None' },
+                        { name: 'regular', snippet: 'regular', shortDescription: 'Regular' },
+                        { name: 'short', snippet: 'short', shortDescription: 'Short' },
+                        { name: 'tick', snippet: 'tick', shortDescription: 'Tick' }
                     ]
                 ]
             ])

@@ -1,4 +1,5 @@
-import { harmonicValueDocs } from './ah';import type { PropertyDoc, ValueItemDoc } from '../../types';
+import { harmonicValueDocs } from './ah';
+import type { PropertyDoc, ValueItemDoc } from '../../types';
 import { AlphaTexNodeType } from '@src/importer/alphaTex/AlphaTexAst';
 
 export const tr: PropertyDoc = {
@@ -22,9 +23,9 @@ export const tr: PropertyDoc = {
                 [
                     AlphaTexNodeType.Number,
                     [
-                        { name: '16th', snippet: '16', shortDescription: '' },
-                        { name: '32th', snippet: '32', shortDescription: '' },
-                        { name: '64th', snippet: '64', shortDescription: '' }
+                        { name: '16', snippet: '16', shortDescription: '16th Note' },
+                        { name: '32', snippet: '32', shortDescription: '32nd Note' },
+                        { name: '64', snippet: '64', shortDescription: '64th Note' }
                     ]
                 ]
             ]),
@@ -37,3 +38,4 @@ export const tr: PropertyDoc = {
         :4 3.3{tr 4} 3.3{tr 4 16} 3.3{tr 5 32} 3.3{tr 6 64}
         `
 };
+6

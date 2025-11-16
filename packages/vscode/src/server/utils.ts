@@ -6,7 +6,8 @@ function binaryNodeSearchInner<T extends AlphaTexAstNode>(
     items: T[],
     offset: number,
     left: number = 0,
-    right: number = items.length
+    right: number = items.length,
+    trailingEnd: number
 ) {
     if (left > right) {
         return undefined;
@@ -16,41 +17,36 @@ function binaryNodeSearchInner<T extends AlphaTexAstNode>(
     const centerItem = items[center];
 
     // match
-    if (centerItem.start!.offset <= offset && offset <= centerItem.end!.offset) {
+    const end = center === items.length - 1 ? trailingEnd : items[center + 1].start!.offset;
+    if (centerItem.start!.offset <= offset && offset <= end) {
         return centerItem;
     }
 
     // left half
     if (offset < centerItem.start!.offset) {
-        return binaryNodeSearchInner(items, offset, left, center);
+        return binaryNodeSearchInner(items, offset, left, center, trailingEnd);
     }
 
     // right half
-    return binaryNodeSearchInner(items, offset, center, right);
+    return binaryNodeSearchInner(items, offset, center, right, trailingEnd);
 }
 
 export function binaryNodeSearch<T extends AlphaTexAstNode>(
     items: T[],
     offset: number,
-    lastIfBeyondEnd: boolean = false
+    trailingEnd: number = items.length > 0 ? items[items.length - 1].end!.offset : 0
 ) {
     // no items
     if (items.length === 0) {
         return undefined;
     }
 
-    // TODO: respect white-space between tokens on search (trailing white space counts to previous node)
-
     // not in range
     const rangeStart = items[0].start!.offset;
-    const rangeEnd = items[items.length - 1].end!.offset;
+    const rangeEnd = trailingEnd;
     if (offset < rangeStart || offset > rangeEnd) {
-        if (lastIfBeyondEnd && items.length > 0 && offset > rangeEnd) {
-            return items[items.length - 1];
-        }
-
         return undefined;
     }
 
-    return binaryNodeSearchInner(items, offset, 0, items.length);
+    return binaryNodeSearchInner(items, offset, 0, items.length, trailingEnd);
 }

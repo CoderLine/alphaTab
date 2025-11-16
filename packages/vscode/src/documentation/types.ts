@@ -6,6 +6,11 @@ export interface WithDescription {
     shortDescription: string;
 }
 
+export interface CommonDoc extends WithDescription {
+    syntax: string[];
+    values: ValueDoc[];
+}
+
 export interface ValueItemDoc {
     name: string;
     snippet: string;
@@ -21,27 +26,24 @@ export interface ValueDoc extends WithDescription {
     values?: Map<AlphaTexNodeType, ValueItemDoc[]>;
 }
 
-export interface PropertyDoc extends WithDescription {
+export interface PropertyDoc extends CommonDoc {
     property: string;
-    syntax: string[];
-    values: ValueDoc[];
     valueRemarks?: string;
     examples: Example | Example[];
     snippet: string;
 }
 
-export type Example = string | {
-    options?: SettingsJson,
-    tex: string;
-    websiteMdx?: string;
-}
+export type Example =
+    | string
+    | {
+          options?: SettingsJson;
+          tex: string;
+          websiteMdx?: string;
+      };
 
-
-export interface MetadataDoc extends WithDescription {
+export interface MetadataDoc extends CommonDoc {
     tag: string;
-    syntax: string[];
     snippet: string;
-    values: ValueDoc[];
     valueRemarks?: string;
     examples: Example | Example[];
     properties?: Map<string, PropertyDoc>;
@@ -51,8 +53,6 @@ export function properties(...props: PropertyDoc[]): Map<string, PropertyDoc> {
     return new Map(props.map(p => [p.property.toLowerCase(), p]));
 }
 
-
 export function metadata(...metadata: MetadataDoc[]) {
     return new Map<string, MetadataDoc>(metadata.map(t => [t.tag.toLowerCase(), t]));
 }
-

@@ -23,20 +23,20 @@ export const tbe: PropertyDoc = {
                     AlphaTexNodeType.Ident,
                     [
                         {
-                            name: 'Custom',
+                            name: 'custom',
                             snippet: 'custom',
                             shortDescription: 'Non standard custom whammys with multiple points'
                         },
-                        { name: 'Dive', snippet: 'dive', shortDescription: 'A gradual change between two points' },
-                        { name: 'Dip', snippet: 'dip', shortDescription: 'A A->B->A whammy pattern.' },
-                        { name: 'Hold', snippet: 'hold', shortDescription: 'Holding whammys (on tied notes).' },
+                        { name: 'dive', snippet: 'dive', shortDescription: 'A gradual change between two points' },
+                        { name: 'dip', snippet: 'dip', shortDescription: 'A A->B->A whammy pattern.' },
+                        { name: 'hold', snippet: 'hold', shortDescription: 'Holding whammys (on tied notes).' },
                         {
-                            name: 'Pre-Dive',
+                            name: 'predive',
                             snippet: 'predive',
                             shortDescription: 'Press/pull before playing the note and then kept'
                         },
                         {
-                            name: 'Pre-Dive-Dive',
+                            name: 'predivedive',
                             snippet: 'predivedive',
                             shortDescription:
                                 'Whammy bar is pressed/pulled before playing the note and then further pressed/released'

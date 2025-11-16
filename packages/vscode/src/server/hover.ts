@@ -1,6 +1,7 @@
-import type * as alphaTab from '@src/alphaTab.main';
+import * as alphaTab from '@src/alphaTab.main';
+import type { IAlphaTexValueListItem } from '@src/importer/alphaTex/AlphaTexAst';
 import { allMetadata, beatProperties, durationChangeProperties, noteProperties } from 'src/documentation/documentation';
-import type { MetadataDoc, PropertyDoc } from 'src/documentation/types';
+import type { CommonDoc, PropertyDoc, ValueDoc, ValueItemDoc } from 'src/documentation/types';
 import type { AlphaTexTextDocument, Connection } from 'src/server/types';
 import { binaryNodeSearch } from 'src/server/utils';
 import type { TextDocuments } from 'vscode-languageserver';
@@ -35,23 +36,32 @@ export function setupHover(connection: Connection, documents: TextDocuments<Alph
     });
 }
 
-function createNoteHover(note: alphaTab.importer.alphaTex.AlphaTexNoteNode, offset: number): Hover | null {
-    if (note?.noteEffects) {
-        const prop = binaryNodeSearch(note.noteEffects.properties, offset);
-        if (prop && prop.property.start!.offset <= offset && offset <= prop.property.end!.offset) {
-            const propDocs =
-                noteProperties.get(prop.property.text.toLowerCase()) ??
-                beatProperties.get(prop.property.text.toLowerCase());
-            if (propDocs) {
-                return {
-                    contents: {
-                        kind: 'markdown',
-                        value: propertyDocsToMarkdown(propDocs)
-                    }
-                };
-            } else {
-                return null;
+function createMetaDataHover(metaData: alphaTab.importer.alphaTex.AlphaTexMetaDataNode, offset: number): Hover | null {
+    const metaDataDocs = allMetadata.get(`\\${metaData.tag.tag.text.toLowerCase()}`);
+    if (!metaDataDocs) {
+        return null;
+    }
+
+    if (metaData.tag.start!.offset <= offset && offset <= metaData.tag.end!.offset) {
+        return {
+            contents: {
+                kind: 'markdown',
+                value: commonDocsToMarkdown(metaDataDocs, 'Tag Syntax')
             }
+        };
+    }
+
+    if (metaData.values) {
+        const hover = createValuesHover(metaData.values, metaDataDocs.values, offset);
+        if (hover != null) {
+            return hover;
+        }
+    }
+
+    if (metaData.properties && metaDataDocs.properties) {
+        const hover = createPropertiesHover(metaData.properties, metaDataDocs.properties, offset);
+        if (hover != null) {
+            return hover;
         }
     }
 
@@ -60,19 +70,9 @@ function createNoteHover(note: alphaTab.importer.alphaTex.AlphaTexNoteNode, offs
 
 function createBeatHover(beat: alphaTab.importer.alphaTex.AlphaTexBeatNode, offset: number): Hover | null {
     if (beat.durationChange?.properties) {
-        const prop = binaryNodeSearch(beat.durationChange.properties.properties, offset);
-        if (prop && prop.property.start!.offset <= offset && offset <= prop.property.end!.offset) {
-            const propDocs = durationChangeProperties.get(prop.property.text.toLowerCase());
-            if (propDocs) {
-                return {
-                    contents: {
-                        kind: 'markdown',
-                        value: propertyDocsToMarkdown(propDocs)
-                    }
-                };
-            } else {
-                return null;
-            }
+        const hover = createPropertiesHover(beat.durationChange.properties, durationChangeProperties, offset);
+        if (hover != null) {
+            return hover;
         }
     }
 
@@ -84,107 +84,130 @@ function createBeatHover(beat: alphaTab.importer.alphaTex.AlphaTexBeatNode, offs
     }
 
     if (beat.beatEffects) {
-        const prop = binaryNodeSearch(beat.beatEffects.properties, offset);
-        if (prop && prop.property.start!.offset <= offset && offset <= prop.property.end!.offset) {
-            const propDocs = beatProperties.get(prop.property.text.toLowerCase());
-            if (propDocs) {
-                return {
-                    contents: {
-                        kind: 'markdown',
-                        value: propertyDocsToMarkdown(propDocs)
-                    }
-                };
-            } else {
-                return null;
-            }
+        const hover = createPropertiesHover(beat.beatEffects, beatProperties, offset);
+        if (hover != null) {
+            return hover;
         }
     }
 
     return null;
 }
 
-function createMetaDataHover(metaData: alphaTab.importer.alphaTex.AlphaTexMetaDataNode, offset: number): Hover | null {
-    if (metaData.tag.start!.offset <= offset && offset <= metaData.tag.end!.offset) {
-        const metaDataDocs = allMetadata.get(`\\${metaData.tag.tag.text.toLowerCase()}`);
-        if (metaDataDocs) {
-            return {
-                contents: {
-                    kind: 'markdown',
-                    value: metaDataDocsToMarkdown(metaDataDocs)
+function createNoteHover(note: alphaTab.importer.alphaTex.AlphaTexNoteNode, offset: number): Hover | null {
+    if (note?.noteEffects) {
+        const hover = createPropertiesHover(note.noteEffects, [noteProperties, beatProperties], offset);
+        if (hover != null) {
+            return hover;
+        }
+    }
+
+    return null;
+}
+
+function createPropertiesHover(
+    properties: alphaTab.importer.alphaTex.AlphaTexPropertiesNode,
+    propertiesDocs: Map<string, PropertyDoc> | Map<string, PropertyDoc>[],
+    offset: number
+): Hover | null {
+    const prop = binaryNodeSearch(properties.properties, offset);
+    if (prop) {
+        let propDocs: PropertyDoc | undefined;
+        if (Array.isArray(propertiesDocs)) {
+            for (const d of propertiesDocs) {
+                propDocs = d.get(prop.property.text.toLowerCase());
+                if (propDocs) {
+                    break;
                 }
-            };
-        }
-    }
-
-    if (metaData.properties) {
-        const prop = binaryNodeSearch(metaData.properties.properties, offset);
-        if (prop && prop.property.start!.offset <= offset && offset <= prop.property.end!.offset) {
-            const metaDataDocs = allMetadata.get(`\\${metaData.tag.tag.text.toLowerCase()}`);
-            if (!metaDataDocs) {
-                return null;
             }
+        } else {
+            propDocs = propertiesDocs.get(prop.property.text.toLowerCase());
+        }
 
-            const propDocs = metaDataDocs.properties?.get(prop.property.text.toLowerCase());
-            if (propDocs) {
+        if (propDocs) {
+            if (prop.property.start!.offset <= offset && offset <= prop.property.end!.offset) {
                 return {
                     contents: {
                         kind: 'markdown',
-                        value: propertyDocsToMarkdown(propDocs)
+                        value: commonDocsToMarkdown(propDocs)
+                    }
+                };
+            } else if (prop.values) {
+                const hover = createValuesHover(prop.values, propDocs.values, offset);
+                if (hover) {
+                    return hover;
+                }
+            }
+        }
+    }
+    return null;
+}
+
+function valueToText(value: IAlphaTexValueListItem): string {
+    switch (value.nodeType) {
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Ident:
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.String:
+            return (value as alphaTab.importer.alphaTex.AlphaTexTextNode).text;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Number:
+            return (value as alphaTab.importer.alphaTex.AlphaTexNumberLiteral).value.toString();
+    }
+
+    return '';
+}
+
+function createValuesHover(
+    values: alphaTab.importer.alphaTex.AlphaTexValueList,
+    valueDocs: ValueDoc[],
+    offset: number
+): Hover | null {
+    const value = binaryNodeSearch(values.values, offset);
+    if (value) {
+        const valueIndex = values.values.indexOf(value);
+        if (valueIndex < valueDocs.length) {
+            const valueDoc = valueDocs[valueIndex];
+            const valueText = valueToText(value).toLowerCase();
+            const valueItem = valueDoc.values?.get(value.nodeType)?.find(d => d.name.toLowerCase() === valueText);
+            if (valueItem) {
+                return {
+                    contents: {
+                        kind: 'markdown',
+                        value: valueItemDocsToMarkDown(valueItem)
                     }
                 };
             }
         }
     }
-
     return null;
 }
 
-function propertyDocsToMarkdown(propDocs: PropertyDoc): string {
+function commonDocsToMarkdown(docs: CommonDoc, syntaxName: string = 'Syntax'): string {
     return [
-        `## ${propDocs.shortDescription}`,
-        propDocs.longDescription ? `**Description:** ${propDocs.longDescription}` : '',
+        `## ${docs.shortDescription}`,
+        docs.longDescription ? `**Description:** ${docs.longDescription}` : '',
         '',
-        '**Syntax:**',
+        `**${syntaxName}:**`,
         '```alphatex',
-        ...propDocs.syntax,
+        ...docs.syntax,
         '```',
         '',
-        ...(propDocs.values.length === 0
-            ? []
-            : [
-                  '',
-                  '**Values:**',
-                  '| Name | Description | Type | Required |',
-                  '|------|-------------|------|----------|',
-                  ...propDocs.values.map(
-                      v =>
-                          `| \`${v.name}\` | ${v.longDescription?.replaceAll('\n', '<br />') ?? ''} | ${v.type} | ${v.required ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`
-                  )
-              ])
+        valueDocsToMarkdownTable(docs.values)
     ].join('\n');
 }
 
-function metaDataDocsToMarkdown(metaDataDocs: MetadataDoc): string {
-    return [
-        `## ${metaDataDocs.shortDescription}`,
-        metaDataDocs.longDescription ? `**Description:** ${metaDataDocs.longDescription}` : '',
-        '',
-        '**Tag Syntax:**',
-        '```alphatex',
-        ...metaDataDocs.syntax,
-        '```',
-        '',
-        ...(metaDataDocs.values.length === 0
-            ? []
-            : [
-                  '',
-                  '**Values:**',
-                  '| Name | Description | Type | Required |',
-                  '|------|-------------|------|----------|',
-                  ...metaDataDocs.values.map(
-                      v =>
-                          `| \`${v.name}\` | ${v.longDescription?.replaceAll('\n', '<br />') ?? ''} | ${v.type} | ${v.required ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`
-                  )
-              ])
-    ].join('\n');
+function valueDocsToMarkdownTable(values: ValueDoc[]): string {
+    return values.length === 0
+        ? ''
+        : [
+              '',
+              '**Values:**',
+              '| Name | Description | Type | Required |',
+              '|------|-------------|------|----------|',
+              ...values.map(
+                  v =>
+                      `| \`${v.name}\` | ${(v.longDescription ?? v.shortDescription)?.replaceAll('\n', '<br />') ?? ''} | ${v.type} | ${v.required ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`
+              )
+          ].join('\n');
+}
+
+function valueItemDocsToMarkDown(docs: ValueItemDoc): string {
+    return [`## ${docs.name}`, docs.longDescription ?? docs.shortDescription, ''].join('\n');
 }

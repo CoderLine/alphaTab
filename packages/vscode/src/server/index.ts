@@ -8,7 +8,8 @@ import {
     type InitializeResult,
     ProposedFeatures,
     TextDocumentSyncKind, 
-    TextDocuments
+    TextDocuments,
+    PositionEncodingKind
 } from 'vscode-languageserver/lib/node/main';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
@@ -24,6 +25,7 @@ connection.onInitialize((params: InitializeParams) => {
     const result: InitializeResult = {
         capabilities: {
             textDocumentSync: TextDocumentSyncKind.Incremental,
+            positionEncoding: PositionEncodingKind.UTF16,
             completionProvider: {
                 resolveProvider: true
             },

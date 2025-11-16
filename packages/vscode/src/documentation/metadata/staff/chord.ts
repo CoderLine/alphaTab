@@ -1,4 +1,5 @@
-import { type MetadataDoc, properties } from '../../types';
+import { AlphaTexNodeType } from '@src/importer/alphaTex/AlphaTexAst';
+import { type MetadataDoc, properties, type ValueItemDoc } from '../../types';
 
 export const chord: MetadataDoc = {
     tag: '\\chord',
@@ -82,11 +83,48 @@ export const chord: MetadataDoc = {
                     shortDescription: 'The visibility of the diagram',
                     type: '`boolean`',
                     required: false,
-                    defaultValue: '`true`'
+                    defaultValue: '`true`',
+                    values: new Map<AlphaTexNodeType, ValueItemDoc[]>([
+                        [
+                            AlphaTexNodeType.Ident,
+                            [
+                                { name: 'true', snippet: 'true', shortDescription: 'Show the diagram' },
+                                { name: 'false', snippet: 'false', shortDescription: 'Shide the diagram' }
+                            ]
+                        ]
+                    ])
                 }
             ],
             examples: `
                 \\chord ("E" 0 0 1 2 2 0) {showdiagram false}
+                (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
+                `
+        },
+        {
+            property: 'showFingering',
+            syntax: ['showFingering visibility'],
+            snippet: 'showFingering',
+            shortDescription: `Set the finger position visibility.`,
+            values: [
+                {
+                    name: 'visibility',
+                    shortDescription: 'The visibility of the finger position in the chord diagram',
+                    type: '`boolean`',
+                    required: false,
+                    defaultValue: '`true`',
+                    values: new Map<AlphaTexNodeType, ValueItemDoc[]>([
+                        [
+                            AlphaTexNodeType.Ident,
+                            [
+                                { name: 'true', snippet: 'true', shortDescription: 'Show the fingering' },
+                                { name: 'false', snippet: 'false', shortDescription: 'Shide the fingering' }
+                            ]
+                        ]
+                    ])
+                }
+            ],
+            examples: `
+                \\chord ("E" 0 0 1 2 2 0) {showfingers false}
                 (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
                 `
         },
@@ -101,7 +139,16 @@ export const chord: MetadataDoc = {
                     shortDescription: 'The visibility of the chord name in the diagram',
                     type: '`boolean`',
                     required: false,
-                    defaultValue: '`true`'
+                    defaultValue: '`true`',
+                    values: new Map<AlphaTexNodeType, ValueItemDoc[]>([
+                        [
+                            AlphaTexNodeType.Ident,
+                            [
+                                { name: 'true', snippet: 'true', shortDescription: 'Show the chord name' },
+                                { name: 'false', snippet: 'false', shortDescription: 'Shide the chord name' }
+                            ]
+                        ]
+                    ])
                 }
             ],
             examples: `

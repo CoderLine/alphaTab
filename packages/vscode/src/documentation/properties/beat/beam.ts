@@ -19,13 +19,13 @@ export const beam: PropertyDoc = {
             values: new Map<AlphaTexNodeType, ValueItemDoc[]>([
                 [AlphaTexNodeType.Ident,
                     [
-                        { name: "Invert Stem", snippet: "invert", shortDescription: "Inverts the default stem direction." },
-                        { name: "Stem Upwards", snippet: "up", shortDescription: "Forces the stem to point upwards." },
-                        { name: "Stem Downwards", snippet: "down", shortDescription: "Forces the stem to point downwards." },
-                        { name: "Stem Automatic", snippet: "auto", shortDescription: "Sets the beaming mode to automatic." },
-                        { name: "Beam Split", snippet: "split", shortDescription: "Forces a split of the beam to the next beat (if there would be any)." },
-                        { name: "Beam Merge", snippet: "merge", shortDescription: "Forces a merge of the beam to the next beat (even if there would be none)." },
-                        { name: "Beam Split Secondary", snippet: "splitsecondary ", shortDescription: "Forces a split of the last bar connecting two beats (if there is any)." },
+                        { name: "invert", snippet: "invert", shortDescription: "Inverts the default stem direction." },
+                        { name: "up", snippet: "up", shortDescription: "Forces the stem to point upwards." },
+                        { name: "down", snippet: "down", shortDescription: "Forces the stem to point downwards." },
+                        { name: "auto", snippet: "auto", shortDescription: "Sets the beaming mode to automatic." },
+                        { name: "split", snippet: "split", shortDescription: "Forces a split of the beam to the next beat (if there would be any)." },
+                        { name: "merge", snippet: "merge", shortDescription: "Forces a merge of the beam to the next beat (even if there would be none)." },
+                        { name: "splitsecondary", snippet: "splitsecondary", shortDescription: "Forces a split of the last bar connecting two beats (if there is any)." },
                     ]
                 ]
             ])
