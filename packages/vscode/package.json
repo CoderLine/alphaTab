@@ -28,7 +28,9 @@
         "lint": "biome lint",
         "typecheck": "tsc --noEmit",
         "build": "vite build",
-        "dev": "vite build --watch",
+        "dev": "concurrently \"npm run dev-extension\" \"npm run dev-preview-app\"",
+        "dev-extension": "vite build --watch",
+        "dev-preview-app": "vite build --watch --mode previewApp",
         "test": "vscode-test"
     },
     "devDependencies": {
@@ -42,6 +44,7 @@
         "@vscode/test-electron": "^2.5.2",
         "assert": "^2.1.0",
         "chai": "^6.2.0",
+        "concurrently": "^9.2.1",
         "mocha": "^11.7.4",
         "rimraf": "^6.0.1",
         "tslib": "^2.8.1",

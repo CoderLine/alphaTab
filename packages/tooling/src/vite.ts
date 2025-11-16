@@ -156,8 +156,7 @@ export function commonjs(
         dir: 'dist/',
         format: 'cjs',
         name: name,
-        entryFileNames: '[name].js',
-        chunkFileNames: '[name].js'
+        entryFileNames: '[name].js'
     });
 }
 
