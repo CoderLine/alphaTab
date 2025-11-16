@@ -23,7 +23,7 @@ import {
     AlphaTexDiagnosticsSeverity,
     type IAlphaTexImporter,
     type IAlphaTexImporterState,
-    StaffNoteKind
+    AlphaTexStaffNoteKind
 } from '@src/importer/alphaTex/AlphaTexShared';
 import {
     ApplyNodeResult,
@@ -157,7 +157,7 @@ class AlphaTexImportState implements IAlphaTexImporterState {
     public readonly lyrics = new Map<number, Lyrics[]>();
     public readonly sustainPedalToBeat = new Map<SustainPedalMarker, Beat>();
     public readonly staffTuningApplied = new Set<Staff>();
-    public readonly staffNoteKind = new Map<Staff, StaffNoteKind>();
+    public readonly staffNoteKind = new Map<Staff, AlphaTexStaffNoteKind>();
     public readonly staffHasExplicitTuning = new Set<Staff>();
     public readonly staffHasExplicitDisplayTransposition = new Set<Staff>();
     public readonly staffDisplayTranspositionApplied = new Set<Staff>();
@@ -518,7 +518,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         let tone: number = -1;
         let accidentalMode = NoteAccidentalMode.Default;
         const noteValue = node.noteValue as AlphaTexAstNode;
-        let detectedNoteKind: StaffNoteKind | undefined = undefined;
+        let detectedNoteKind: AlphaTexStaffNoteKind | undefined = undefined;
         let staffNoteKind = this._state.staffNoteKind.has(this._state.currentStaff!)
             ? this._state.staffNoteKind.get(this._state.currentStaff!)!
             : undefined;
@@ -527,9 +527,9 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             case AlphaTexNodeType.Number:
                 numericValue = (noteValue as AlphaTexNumberLiteral).value;
                 if (node.noteString !== undefined) {
-                    detectedNoteKind = StaffNoteKind.Fretted;
+                    detectedNoteKind = AlphaTexStaffNoteKind.Fretted;
                 } else {
-                    detectedNoteKind = StaffNoteKind.Articulation;
+                    detectedNoteKind = AlphaTexStaffNoteKind.Articulation;
                 }
                 break;
             case AlphaTexNodeType.String:
@@ -548,14 +548,14 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 } else {
                     const tuning = ModelUtils.parseTuning(str);
                     if (tuning) {
-                        detectedNoteKind = StaffNoteKind.Pitched;
+                        detectedNoteKind = AlphaTexStaffNoteKind.Pitched;
                         octave = tuning.octave;
                         tone = tuning.tone.noteValue;
                         if (this._state.accidentalMode === AlphaTexAccidentalMode.Explicit) {
                             accidentalMode = tuning.tone.accidentalMode;
                         }
                     } else {
-                        detectedNoteKind = StaffNoteKind.Articulation;
+                        detectedNoteKind = AlphaTexStaffNoteKind.Articulation;
                         const articulationName = str.toLowerCase();
                         // apply defaults
                         const percussionArticulationNames = this._state.percussionArticulationNames;
@@ -614,12 +614,12 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         // valid note kind detected, apply values, tied/dead notes at start might be rare, but can happen.
         if (detectedNoteKind !== undefined && detectedNoteKind === staffNoteKind) {
             switch (detectedNoteKind) {
-                case StaffNoteKind.Pitched:
+                case AlphaTexStaffNoteKind.Pitched:
                     note.octave = octave;
                     note.tone = tone;
                     note.accidentalMode = accidentalMode;
                     break;
-                case StaffNoteKind.Fretted:
+                case AlphaTexStaffNoteKind.Fretted:
                     // Fret [Dot] String
                     if (!node.noteString) {
                         this.addSemanticDiagnostic({
@@ -650,7 +650,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                     }
 
                     break;
-                case StaffNoteKind.Articulation:
+                case AlphaTexStaffNoteKind.Articulation:
                     let articulationIndex: number = 0;
                     if (this._state.articulationValueToIndex.has(numericValue)) {
                         articulationIndex = this._state.articulationValueToIndex.get(numericValue)!;
@@ -689,26 +689,26 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
     /**
      * @internal
      */
-    public getStaffNoteKind(staff: Staff): StaffNoteKind | undefined {
+    public getStaffNoteKind(staff: Staff): AlphaTexStaffNoteKind | undefined {
         return this._state.staffNoteKind.has(staff) ? this._state.staffNoteKind.get(staff) : undefined;
     }
 
-    public applyStaffNoteKind(staff: Staff, staffNoteKind: StaffNoteKind) {
+    public applyStaffNoteKind(staff: Staff, staffNoteKind: AlphaTexStaffNoteKind) {
         this._state.staffNoteKind.set(staff, staffNoteKind);
         switch (staffNoteKind) {
-            case StaffNoteKind.Pitched:
+            case AlphaTexStaffNoteKind.Pitched:
                 staff.isPercussion = false;
                 staff.stringTuning.reset();
                 if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
                     staff.displayTranspositionPitch = 0;
                 }
                 break;
-            case StaffNoteKind.Fretted:
+            case AlphaTexStaffNoteKind.Fretted:
                 staff.isPercussion = false;
                 this._detectTuningForStaff(staff);
                 this._handleTransposition(staff);
                 break;
-            case StaffNoteKind.Articulation:
+            case AlphaTexStaffNoteKind.Articulation:
                 staff.isPercussion = true;
                 staff.stringTuning.reset();
                 if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
@@ -820,7 +820,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 // any non-guitar instrument -> use guitar 6 string tuning
                 if (
                     this._state.staffNoteKind.has(staff) &&
-                    this._state.staffNoteKind.get(staff)! === StaffNoteKind.Fretted
+                    this._state.staffNoteKind.get(staff)! === AlphaTexStaffNoteKind.Fretted
                 ) {
                     staff.stringTuning = Tuning.getDefaultTuningFor(6)!;
                 }

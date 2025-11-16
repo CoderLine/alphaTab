@@ -33,19 +33,19 @@
         "test": "mocha"
     },
     "dependencies": {
-        "vite": "^7.1.11"
+        "vite": "^7.2.2"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.2.6",
-        "@microsoft/api-extractor": "^7.53.1",
-        "@types/chai": "^5.2.2",
+        "@microsoft/api-extractor": "^7.53.3",
+        "@types/chai": "^5.2.3",
         "@types/mocha": "^10.0.10",
-        "@types/node": "^24.8.1",
+        "@types/node": "^24.10.0",
         "assert": "^2.1.0",
         "chai": "^6.2.0",
         "mocha": "^11.7.4",
-        "rimraf": "^6.0.1",
-        "terser": "^5.43.1",
+        "rimraf": "^6.1.0",
+        "terser": "^5.44.1",
         "tslib": "^2.8.1",
         "tsx": "^4.20.6",
         "typescript": "^5.9.3"
