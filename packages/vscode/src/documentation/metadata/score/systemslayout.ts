@@ -15,7 +15,8 @@ export const systemsLayout: MetadataDoc = {
             name: 'numberOfBars',
             shortDescription: 'Defines for every system (line) the number of bars it should contain',
             type: '`number` (repeated)',
-            required: true
+            required: true,
+            isList: true
         }
     ],
     examples: {

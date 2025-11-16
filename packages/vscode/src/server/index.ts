@@ -12,6 +12,7 @@ import {
     PositionEncodingKind
 } from 'vscode-languageserver/lib/node/main';
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { setupSignatureHelp } from 'src/server/signatureHelp';
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -28,6 +29,9 @@ connection.onInitialize((params: InitializeParams) => {
             positionEncoding: PositionEncodingKind.UTF16,
             completionProvider: {
                 resolveProvider: true
+            },
+            signatureHelpProvider: {
+                triggerCharacters: ['(']
             },
             diagnosticProvider: {
                 interFileDependencies: false,
@@ -49,6 +53,7 @@ connection.onInitialize((params: InitializeParams) => {
 setupDiagnostics(connection, documents);
 setupCompletion(connection,documents);
 setupHover(connection, documents);
+setupSignatureHelp(connection, documents);
 
 documents.listen(connection);
 connection.listen();

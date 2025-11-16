@@ -22,6 +22,7 @@ export interface ValueDoc extends WithDescription {
     name: string;
     type: string;
     required: true | false | string;
+    isList?: boolean;
     defaultValue?: string;
     values?: Map<AlphaTexNodeType, ValueItemDoc[]>;
 }

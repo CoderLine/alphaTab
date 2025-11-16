@@ -10,14 +10,14 @@ export const track: MetadataDoc = {
     valueRemarks: `The displayed name depends on the configured [Track Name Policy](https://next.alphatab.net/docs/alphatex/score-metadata#singletracktracknamepolicy-and-multitracktracknamepolicy). If the short name is not specified, the first 10 characters of the long name are used as short name.`,
     values: [
         {
-            name: 'fullName',
-            shortDescription: 'The full name of the track',
+            name: 'shortName',
+            shortDescription: 'The short name of the track',
             type: 'string',
             required: false
         },
         {
-            name: 'shortName',
-            shortDescription: 'The short name of the track',
+            name: 'fullName',
+            shortDescription: 'The full name of the track',
             type: 'string',
             required: false
         }
@@ -68,7 +68,8 @@ export const track: MetadataDoc = {
                     shortDescription: 'The number of bars to display per system',
                     longDescription: 'Defines for every system (line) the number of bars it should contain',
                     type: '`number` (repeated)',
-                    required: true
+                    required: true,
+                    isList: true
                 }
             ],
             examples: `

@@ -103,7 +103,8 @@ export const b: PropertyDoc = {
             shortDescription:
                 'The value of the whammy in quarter-tones relative to the original note, decimals supported',
             type: '`number` (repeated)',
-            required: true
+            required: true,
+            isList: true
         }
     ],
     valueRemarks: `
