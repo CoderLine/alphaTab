@@ -1,9 +1,7 @@
-import type {
-    AlphaTabConfig,
-    AlphaTexPreviewState,
-    AlphaTexPreviewMessages as AlphaTexPreviewMessages
-} from 'src/preview/app';
+import { LogLevel } from '@coderline/alphatab';
+import type { AlphaTexPreviewState, AlphaTexPreviewMessages as AlphaTexPreviewMessages } from 'src/preview/app';
 import * as vscode from 'vscode';
+import fs from 'node:fs';
 
 export function setupPreview(
     context: vscode.ExtensionContext,
@@ -25,7 +23,7 @@ export function setupPreview(
 class AlphaTexPreviewSerializer implements vscode.WebviewPanelSerializer {
     public constructor(private _preview: AlphaTexPreview) {}
     async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
-        this._preview.initializeWebViewPanel(webviewPanel);
+        await this._preview.initializeWebViewPanel(webviewPanel);
 
         if (!state) {
             return;
@@ -148,22 +146,10 @@ class AlphaTexPreview implements vscode.Disposable {
         }
     }
 
-    public initializeWebViewPanel(panel: vscode.WebviewPanel) {
+    public async initializeWebViewPanel(panel: vscode.WebviewPanel) {
         this._webviewPanel = panel;
 
         const dist = vscode.Uri.joinPath(this._context.extensionUri, 'dist');
-        const previewAppScriptPath = vscode.Uri.joinPath(dist, 'preview.js');
-        const soundfontPath = vscode.Uri.joinPath(dist, 'assets', 'sonivox.sf3');
-        const bravuraPath = vscode.Uri.joinPath(dist, 'assets', 'Bravura.woff2');
-
-        const previewAppScriptUri = panel.webview.asWebviewUri(previewAppScriptPath);
-        const soundfontUri = panel.webview.asWebviewUri(soundfontPath);
-        const bravuraUri = panel.webview.asWebviewUri(bravuraPath);
-
-        const config: AlphaTabConfig = {
-            soundfont: soundfontUri.toString(),
-            bravura: bravuraUri.toString()
-        };
 
         const promiseWithResolvers = Promise.withResolvers<void>();
         this._readyPromise = promiseWithResolvers.promise;
@@ -174,27 +160,46 @@ class AlphaTexPreview implements vscode.Disposable {
                 case 'alphatab-vscode.commands.previewInitialized':
                     promiseWithResolvers.resolve();
                     break;
+                case 'alphatab-vscode.commands.log':
+                    let method: keyof vscode.LogOutputChannel;
+                    switch (message.level) {
+                        case LogLevel.Debug:
+                            method = 'debug';
+                            break;
+                        case LogLevel.Info:
+                            method = 'info';
+                            break;
+                        case LogLevel.Warning:
+                            method = 'warn';
+                            break;
+                        case LogLevel.Error:
+                            method = 'error';
+                            break;
+                        default:
+                            return;
+                    }
+
+                    if (message.details) {
+                        this._logChannel[method](
+                            `[WebView] [${message.category}] ${message.message}`,
+                            ...message.details
+                        );
+                    } else {
+                        this._logChannel[method](`[WebView] [${message.category}] ${message.message}`);
+                    }
+                    break;
             }
         });
 
-        panel.webview.html = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>alphaTex</title>
-            </head>
-            <body>
-                <div id="initializing">alphaTab is initializing...</div>
-                <script>
-                window.alphaTabConfig = ${JSON.stringify(config)};
-                </script>
-                <script src=${JSON.stringify(previewAppScriptUri.toString())}></script>
-            </body>
-            </html>
-            `;
+        const previewAppPath = vscode.Uri.joinPath(dist, 'preview.html');
 
+        const html = await fs.promises.readFile(previewAppPath.fsPath, 'utf-8');
+        const webUriPattern = /\${webview:([^}]+)}/g;
+        const replaced = html.replaceAll(webUriPattern, (_, ...args) =>
+            panel.webview.asWebviewUri(vscode.Uri.joinPath(dist, args[0])).toString()
+        );
+
+        panel.webview.html = replaced;
         panel.onDidDispose(() => {
             if (!this._disposing) {
                 const index = this._disposables.indexOf(panel!);
@@ -242,15 +247,12 @@ class AlphaTexPreview implements vscode.Disposable {
 
         let panel = this._webviewPanel;
         if (!panel) {
-            const dist = vscode.Uri.joinPath(this._context.extensionUri, 'dist');
-
             panel = vscode.window.createWebviewPanel('alphatex.preview', 'alphaTex Preview', vscode.ViewColumn.Beside, {
                 enableScripts: true,
-                retainContextWhenHidden: true,
-                localResourceRoots: [dist]
+                retainContextWhenHidden: true
             });
 
-            this.initializeWebViewPanel(panel);
+            await this.initializeWebViewPanel(panel);
         }
 
         panel.reveal(vscode.ViewColumn.Beside);

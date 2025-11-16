@@ -1,5 +1,4 @@
-import * as alphaTab from '@coderline/alphatab';
-import type { SettingsJson } from '@src/generated/SettingsJson';
+import * as alphaTab from '@src/alphaTab.main';
 
 export type AlphaTexPreviewMessages =
     | {
@@ -9,9 +8,16 @@ export type AlphaTexPreviewMessages =
       }
     | {
           command: 'alphatab-vscode.commands.previewInitialized';
+      }
+    | {
+          command: 'alphatab-vscode.commands.log';
+          level: alphaTab.LogLevel;
+          category: string;
+          message: string;
+          details?: unknown[];
       };
 
-export type AlphaTabConfig = {
+type AlphaTabConfig = {
     soundfont: string;
     bravura: string;
 };
@@ -21,9 +27,56 @@ export type AlphaTexPreviewState = {
     documentUri: string;
 };
 
-const vscode = (globalThis as any).acquireVsCodeApi?.();
+const vscode:
+    | {
+          getState: () => AlphaTexPreviewState;
+          setState: (data: AlphaTexPreviewState) => void;
+          postMessage: (msg: AlphaTexPreviewMessages) => void;
+      }
+    | undefined = (globalThis as any).acquireVsCodeApi?.();
 
 async function initMain() {
+    if (vscode) {
+        alphaTab.Logger.log = {
+            debug(category, message, ...details) {
+                vscode.postMessage({
+                    command: 'alphatab-vscode.commands.log',
+                    level: alphaTab.LogLevel.Debug,
+                    category,
+                    message,
+                    details
+                });
+            },
+            error(category, message, ...details) {
+                vscode.postMessage({
+                    command: 'alphatab-vscode.commands.log',
+                    level: alphaTab.LogLevel.Error,
+                    category,
+                    message,
+                    details
+                });
+            },
+            info(category, message, ...details) {
+                vscode.postMessage({
+                    command: 'alphatab-vscode.commands.log',
+                    level: alphaTab.LogLevel.Info,
+                    category,
+                    message,
+                    details
+                });
+            },
+            warning(category, message, ...details) {
+                vscode.postMessage({
+                    command: 'alphatab-vscode.commands.log',
+                    level: alphaTab.LogLevel.Warning,
+                    category,
+                    message,
+                    details
+                });
+            }
+        };
+    }
+
     const style = document.createElement('style');
     style.innerText = `
     .at-cursor-bar {
@@ -107,7 +160,7 @@ async function initMain() {
     const sansFont = alphaTab.model.Font.fromJson(`12px ${computedStyle.getPropertyValue('--vscode-font-family')}`)!;
     const serifFont = alphaTab.model.Font.fromJson(`12px ${computedStyle.getPropertyValue('--vscode-font-family')}`)!;
 
-    console.trace('Initializing alphaTab');
+    alphaTab.Logger.debug('Preview', 'Initializing alphaTab');
 
     const api = new alphaTab.AlphaTabApi(at, {
         player: {
@@ -121,7 +174,6 @@ async function initMain() {
             ])
         },
         display: {
-            scale: 1.2,
             resources: {
                 mainGlyphColor: mainGlyphColor,
                 secondaryGlyphColor: new alphaTab.model.Color(
@@ -137,7 +189,7 @@ async function initMain() {
                 scoreInfoColor: mainGlyphColor
             }
         }
-    } satisfies SettingsJson);
+    } satisfies alphaTab.json.SettingsJson);
 
     api.settings.display.resources.copyrightFont.families = sansFont.families;
     api.settings.display.resources.titleFont.families = serifFont.families;
@@ -173,7 +225,7 @@ async function initMain() {
     });
 
     window.addEventListener('message', e => {
-        console.trace('Received message', e.data);
+        alphaTab.Logger.debug('Preview', 'Received message', e.data);
         const message: AlphaTexPreviewMessages = e.data;
         switch (message.command) {
             case 'alphatab-vscode.commands.refreshPreview':
@@ -191,7 +243,6 @@ async function initMain() {
                 break;
         }
     });
-
 
     vscode?.postMessage({ command: 'alphatab-vscode.commands.previewInitialized' } satisfies AlphaTexPreviewMessages);
 }
