@@ -14,6 +14,9 @@
         "typecheck": "npm run typecheck --workspaces --if-present",
         "dev": "npm run dev --workspace=packages/playground",
 
+        "dev-lsp": "npm run build && npm run dev --workspace=packages/lsp",
+        "dev-vscode": "npm run build && npm run build --workspace=packages/lsp && concurrently \"npm run dev --workspace=packages/lsp\" \"npm run dev --workspace=packages/vscode\"",
+
         "update-version": "node scripts/update-version.mjs",
 
         "generate-typescript": "npm run generate-typescript --workspace=packages/alphatab",
@@ -35,5 +38,8 @@
         
         "build-webpack": "npm run build --workspace=packages/webpack",
         "test-webpack": "npm run test --workspace=packages/webpack"
+    },
+    "devDependencies": {
+        "concurrently": "^9.2.1"
     }
 }

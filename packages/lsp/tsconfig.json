@@ -1,0 +1,30 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "module": "preserve",
+        "paths": {
+            "@src/*": [
+                "src/*"
+            ],
+            "@test/*": [
+                "test/*"
+            ]
+        },
+        "typeRoots": [
+            "./types",
+            "./node_modules/@types",
+            "../../node_modules/@types"
+        ],
+        "skipLibCheck": true,
+        "resolveJsonModule": true
+    },
+    "include": [
+        "src",
+        "test"
+    ],
+    "exclude": [
+        "**/node_modules",
+        "../../node_modules",
+    ]
+}

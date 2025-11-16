@@ -1,4 +1,4 @@
-import * as alphaTab from '@src/alphaTab.main';
+import * as alphaTab from '@coderline/alphaTab';
 
 export type AlphaTexPreviewMessages =
     | {

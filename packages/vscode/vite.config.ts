@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { commonjs, defaultBuildUserConfig, umd } from '@coderline/alphatab-tooling/src/vite';
 import { defaultClientMainFields, defineConfig, type LibraryOptions } from 'vite';
+import { languageConfiguration, textMateGrammar } from '@coderline/alphatab-lsp';
 
 export default defineConfig(({ command, mode }) => {
     if (command === 'serve') {
@@ -12,7 +13,7 @@ export default defineConfig(({ command, mode }) => {
         config.resolve ??= {};
         config.resolve.mainFields = defaultClientMainFields.filter(f => f !== 'browser');
         config.resolve.mainFields.unshift('require');
-        (config.build!.rollupOptions!.external as (RegExp|string)[]).push(/^vscode/, "./preview.js");
+        (config.build!.rollupOptions!.external as (RegExp | string)[]).push(/^vscode/);
 
         if (mode === 'previewApp') {
             umd(
@@ -22,7 +23,7 @@ export default defineConfig(({ command, mode }) => {
                 'src/preview/app/index.ts',
                 {
                     module: 'preserve',
-                    include: ['src/**', 'test/**', '../alphatab/src/**/*.ts']
+                    include: ['src/**', 'test/**']
                 },
                 false
             );
@@ -57,20 +58,30 @@ export default defineConfig(({ command, mode }) => {
 
             return config;
         } else {
-            commonjs(
-                config,
-                import.meta.dirname,
-                'extension',
-                'src/extension.ts',
-                {
-                    module: 'preserve',
-                    include: ['src/**', 'test/**', '../alphatab/src/**/*.ts']
-                }
-            );
+            commonjs(config, import.meta.dirname, 'extension', 'src/extension.ts', {
+                module: 'preserve',
+                include: ['src/**', 'test/**']
+            });
 
             const lib = config.build!.lib! as LibraryOptions;
             const entry = lib.entry! as Record<string, string>;
-            entry.server = path.resolve(__dirname, 'src/server/index.ts');
+            entry.server = path.resolve(__dirname, 'src/server.ts');
+
+            config.plugins!.push({
+                name: 'language-files',
+                apply: 'build',
+                async buildStart() {
+                    await fs.promises.writeFile(
+                        path.join(import.meta.dirname, 'language-configuration.json'),
+                        JSON.stringify(languageConfiguration, undefined, 4)
+                    );
+                    await fs.promises.mkdir(path.join(import.meta.dirname, 'syntaxes'), { recursive: true });
+                    await fs.promises.writeFile(
+                        path.join(import.meta.dirname, 'syntaxes', 'alphatex.tmLanguage.json'),
+                        JSON.stringify(textMateGrammar, undefined, 4)
+                    );
+                }
+            });
 
             return config;
         }
