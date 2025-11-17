@@ -45,13 +45,13 @@ export function setupCompletion(connection: Connection, documents: TextDocuments
 
         const offset = document.offsetAt(params.position);
 
-        const bar = binaryNodeSearch(document.ast.bars, offset, document.ast.end!.offset);
+        const bar = binaryNodeSearch(document.ast.bars, offset, Number.MAX_SAFE_INTEGER);
         const barIndex = bar ? document.ast.bars.indexOf(bar) : 0;
 
         // no bar
         if (!bar) {
             return sortCompletions(
-                createMetaDataCompletions(barIndex, undefined, offset, document.ast.end!.offset),
+                createMetaDataCompletions(barIndex, undefined, offset, Number.MAX_SAFE_INTEGER),
                 connection.console
             );
         }
@@ -59,7 +59,7 @@ export function setupCompletion(connection: Connection, documents: TextDocuments
         const endOfBar =
             bar.pipe?.start!.offset ??
             (barIndex === document.ast.bars.length - 1
-                ? document.ast.end!.offset
+                ? Number.MAX_SAFE_INTEGER
                 : document.ast.bars[barIndex + 1].start!.offset);
 
         const endOfBarMetaData = bar.beats[0]?.start!.offset ?? endOfBar;
@@ -85,7 +85,7 @@ export function setupCompletion(connection: Connection, documents: TextDocuments
         }
 
         return sortCompletions(
-            createMetaDataCompletions(barIndex, undefined, offset, document.ast.end!.offset),
+            createMetaDataCompletions(barIndex, undefined, offset, Number.MAX_SAFE_INTEGER),
             connection.console
         );
     });

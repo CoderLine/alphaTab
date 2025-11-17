@@ -1,0 +1,1 @@
+import './alphatex-lsp-worker'

@@ -68,14 +68,17 @@ function startLanguageServer(serverConnection: Connection) {
     serverConnection.listen();
 }
 
+
+type Port = ConstructorParameters<typeof BrowserMessageReader>[0];
+
 /**
  * Starts a new language server communicating via WebWorker.
  * @param readerPort The port used to reading incoming language server messages
  * @param writerPort The port used to writer outgoing language server messages
  */
 export function startWebWorkerLanguageServer(
-    readerPort: MessagePort | Worker | DedicatedWorkerGlobalScope,
-    writerPort: MessagePort | Worker | DedicatedWorkerGlobalScope
+    readerPort: Port,
+    writerPort: Port
 ) {
     startLanguageServer(
         createBrowserConnection(

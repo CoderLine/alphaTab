@@ -30,6 +30,7 @@
         "noImplicitReturns": true,
         "noUnusedLocals": true,
         "noImplicitOverride": true,
+        "skipLibCheck": true,
         "paths": {
             "@src/*": [
                 "./packages/alphatab/src/*"
