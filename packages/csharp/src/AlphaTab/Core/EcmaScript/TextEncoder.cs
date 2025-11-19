@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace AlphaTab.Core.Dom;
+namespace AlphaTab.Core.EcmaScript;
 
 internal class TextEncoder
 {

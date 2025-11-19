@@ -56,7 +56,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return !!ts.getJSDocTags(tsSymbol.valueDeclaration).find(t => t.tagName.text === 'partial');
     }
 
-    public getOverriddenMembers(
+    public override getOverriddenMembers(
         classType: ts.ClassDeclaration | ts.InterfaceDeclaration,
         classElement: ts.ClassElement
     ): (ts.ClassElement | ts.TypeElement)[] {
@@ -69,7 +69,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return undefined;
     }
 
-    protected isCsValueType(mapValueType: cs.TypeNode | null): boolean {
+    protected override isCsValueType(mapValueType: cs.TypeNode | null): boolean {
         if (mapValueType?.nodeType === cs.SyntaxKind.ArrayTupleNode) {
             return false;
         }
@@ -98,7 +98,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return this.makeTypeName('kotlin.collections.Iterator');
     }
 
-    public makeIteratorType(): string {
+    public override makeIteratorType(): string {
         return this.makeTypeName('kotlin.collections.Iterator');
     }
 }

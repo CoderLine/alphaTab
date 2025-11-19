@@ -1292,6 +1292,9 @@ export default class CSharpEmitterContext {
                         fileName = fileName.substring(4, fileName.length - 5);
                         if (fileName.length) {
                             suffix = fileName.split('.').map(s => {
+                                if (s.match(/webworker/i)) {
+                                    return `.${this.toPascalCase('ecmaScript')}`;
+                                }
                                 if (s.match(/esnext/)) {
                                     return `.${this.toPascalCase('ecmaScript')}`;
                                 }

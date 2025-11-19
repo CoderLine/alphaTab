@@ -531,9 +531,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this._returnRunTest.pop();
     }
 
-    protected writeThisLiteral(expr: cs.ThisLiteral): void {
+    protected override writeThisLiteral(expr: cs.ThisLiteral): void {
         super.writeThisLiteral(expr);
-        const scope = this._thisScope.at(-1);
+        const scope = this._thisScope[this._thisScope.length - 1];
         if (scope) {
             this.write(`@${scope}`);
         }
@@ -674,8 +674,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         return true;
     }
 
-    protected writeReturnStatement(r: cs.ReturnStatement): void {
-        if (this._returnRunTest.at(-1)) {
+    protected override writeReturnStatement(r: cs.ReturnStatement): void {
+        if (this._returnRunTest[this._returnRunTest.length - 1]) {
             this.writeLine('return@runTest');
         } else {
             super.writeReturnStatement(r);
@@ -1576,7 +1576,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             this.writeStatement(s.statement);
             this._indent--;
         }
-        this._writeForIncrementors(this._forLoopIncrementors.at(-1));
+        this._writeForIncrementors(this._forLoopIncrementors[this._forLoopIncrementors.length - 1]);
         this.endBlock();
         this.endBlock();
         // }
@@ -1617,8 +1617,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
     }
 
-    protected writeContinueStatement(c: cs.ContinueStatement): void {
-        this._writeForIncrementors(this._forLoopIncrementors.at(-1));
+    protected override writeContinueStatement(c: cs.ContinueStatement): void {
+        this._writeForIncrementors(this._forLoopIncrementors[this._forLoopIncrementors.length - 1]);
         super.writeContinueStatement(c);
     }
 
@@ -1806,7 +1806,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         return true;
     }
 
-    protected beginBlock() {
+    protected override beginBlock() {
         super.beginBlock();
         this._useScopes.push(0);
     }
@@ -1951,7 +1951,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
     }
 
-    protected writeDefaultExpression(d: cs.DefaultExpression): void {
+    protected override writeDefaultExpression(d: cs.DefaultExpression): void {
         if (d.parent && cs.isParameterDeclaration(d.parent) && d.parent.type) {
             if (d.parent.type.isNullable) {
                 this.write('null');
@@ -2019,7 +2019,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.write(')');
     }
 
-    protected writeInvocationExpression(expr: cs.InvocationExpression): void {
+    protected override writeInvocationExpression(expr: cs.InvocationExpression): void {
         if (expr.arguments.length === 1 && expr.arguments[0].nodeType === cs.SyntaxKind.Block) {
             this.writeExpression(expr.expression);
             if (expr.typeArguments) {

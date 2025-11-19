@@ -1105,7 +1105,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected override writeThrowStatement(s: cs.ThrowStatement) {
         this.write('throw');
-        const currentException = this._currentCatchClauseIdentifier.at(-1);
+        const currentException = this._currentCatchClauseIdentifier[this._currentCatchClauseIdentifier.length -1];
         if (s.expression && (!cs.isIdentifier(s.expression) || s.expression.text !== currentException)) {
             this.write(' ');
             this.writeExpression(s.expression);

@@ -2,7 +2,7 @@ import path from 'node:path';
 import url from 'node:url';
 import ts from 'typescript';
 
-import {createDiagnosticReporter} from '@coderline/alphatab-tooling/typescript'
+import { createDiagnosticReporter } from '@coderline/alphatab-tooling/typescript';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -18,7 +18,7 @@ export default function (emitters: Emitter[], handleErrors: boolean) {
         commandLine.options.project = path.resolve(__dirname, '../../alphatab/tsconfig.json');
     }
 
-    let reportDiagnostic = createDiagnosticReporter();
+    let reportDiagnostic = createDiagnosticReporter(false, console);
 
     const parseConfigFileHost: ts.ParseConfigFileHost = <any>ts.sys;
     parseConfigFileHost.onUnRecoverableConfigFileDiagnostic = diagnostic => {
@@ -34,11 +34,13 @@ export default function (emitters: Emitter[], handleErrors: boolean) {
         commandLine.watchOptions
     )!;
 
-    parsedCommandLine.fileNames = parsedCommandLine.fileNames.filter(f => !f.includes('playground'));
+    parsedCommandLine.fileNames = parsedCommandLine.fileNames.filter(
+        f => (!f.includes('playground') && (f.includes('src/')) || f.includes('test/'))
+    );
 
     const pretty = !!ts.sys.writeOutputIsTTY?.();
     if (pretty) {
-        reportDiagnostic = createDiagnosticReporter(true);
+        reportDiagnostic = createDiagnosticReporter(true, console);
     }
 
     const program = ts.createProgram({

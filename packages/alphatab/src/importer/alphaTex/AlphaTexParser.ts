@@ -263,7 +263,7 @@ export class AlphaTexParser {
     private _beatDurationChange(beat:AlphaTexBeatNode) {
         const colon = this.lexer.peekToken();
         if (colon?.nodeType !== AlphaTexNodeType.Colon) {
-            return undefined;
+            return;
         }
         this.lexer.advance();
 
@@ -286,7 +286,7 @@ export class AlphaTexParser {
                     start: colon!.start,
                     end: colon!.end
                 });
-                return undefined;
+                return;
             }
             this.lexer.advance();
             durationChange.value = durationValue as AlphaTexNumberLiteral;

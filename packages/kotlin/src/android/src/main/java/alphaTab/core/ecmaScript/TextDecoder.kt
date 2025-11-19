@@ -1,4 +1,4 @@
-package alphaTab.core.dom
+package alphaTab.core.ecmaScript
 
 import alphaTab.core.decodeToString
 import alphaTab.core.ecmaScript.ArrayBuffer

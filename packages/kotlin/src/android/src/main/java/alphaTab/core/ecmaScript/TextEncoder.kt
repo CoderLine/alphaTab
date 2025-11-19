@@ -1,4 +1,4 @@
-package alphaTab.core.dom
+package alphaTab.core.ecmaScript
 
 internal class TextEncoder {
     @ExperimentalUnsignedTypes

@@ -28,7 +28,7 @@ export default abstract class AstPrinterBase {
         }
     }
 
-    protected abstract writeSourceFile(sourceFile: cs.SourceFile);
+    protected abstract writeSourceFile(sourceFile: cs.SourceFile): void;
 
     protected writeSemicolon() {
         this.writeLine(';');
@@ -72,7 +72,7 @@ export default abstract class AstPrinterBase {
     }
 
     protected writeCommaSeparated<T>(values: T[], write: (p: T) => void, newLine?: boolean) {
-        if(newLine === undefined) {
+        if (newLine === undefined) {
             newLine = values.length > 5;
         }
         values.forEach((v, i) => {
@@ -86,11 +86,11 @@ export default abstract class AstPrinterBase {
         });
     }
 
-    protected abstract writeClassDeclaration(d: cs.ClassDeclaration);
-    protected abstract writeEnumDeclaration(d: cs.EnumDeclaration);
-    protected abstract writeInterfaceDeclaration(d: cs.InterfaceDeclaration);
-    protected abstract writeDelegateDeclaration(d: cs.DelegateDeclaration);
-    protected abstract writeParameter(p: cs.ParameterDeclaration);
+    protected abstract writeClassDeclaration(d: cs.ClassDeclaration): void;
+    protected abstract writeEnumDeclaration(d: cs.EnumDeclaration): void;
+    protected abstract writeInterfaceDeclaration(d: cs.InterfaceDeclaration): void;
+    protected abstract writeDelegateDeclaration(d: cs.DelegateDeclaration): void;
+    protected abstract writeParameter(p: cs.ParameterDeclaration): void;
 
     protected writeParameters(parameters: cs.ParameterDeclaration[]) {
         this.write('(');
@@ -106,12 +106,12 @@ export default abstract class AstPrinterBase {
         }
     }
 
-    protected abstract writeAttribute(a: cs.Attribute);
+    protected abstract writeAttribute(a: cs.Attribute): void;
 
-    protected abstract writeMethodDeclaration(d: cs.MethodDeclaration);
-    protected abstract writeFieldDeclarat1on(d: cs.FieldDeclaration);
-    protected abstract writePropertyDeclaration(d: cs.PropertyDeclaration);
-    protected abstract writeConstructorDeclaration(d: cs.ConstructorDeclaration);
+    protected abstract writeMethodDeclaration(d: cs.MethodDeclaration): void;
+    protected abstract writeFieldDeclarat1on(d: cs.FieldDeclaration): void;
+    protected abstract writePropertyDeclaration(d: cs.PropertyDeclaration): void;
+    protected abstract writeConstructorDeclaration(d: cs.ConstructorDeclaration): void;
 
     protected writeMember(member: cs.Node) {
         if (member.skipEmit) {
@@ -173,27 +173,26 @@ export default abstract class AstPrinterBase {
         forNew?: boolean,
         asNativeArray?: boolean,
         forTypeConstraint?: boolean
-    );
+    ): void;
 
-    protected abstract writePrefixUnaryExpression(expr: cs.PrefixUnaryExpression);
-    protected abstract writeBaseLiteralExpression(expr: cs.BaseLiteralExpression);
-    protected abstract writeAwaitExpression(expr: cs.AwaitExpression);
-    protected abstract writeBinaryExpression(expr: cs.BinaryExpression);
-    protected abstract writeConditionalExpression(expr: cs.ConditionalExpression);
-    protected abstract writeLambdaExpression(expr: cs.LambdaExpression);
-    protected abstract writeNumericLiteral(expr: cs.NumericLiteral);
-    protected abstract writeStringTemplateExpression(expr: cs.StringTemplateExpression);
-    protected abstract writeArrayCreationExpression(expr: cs.ArrayCreationExpression);
-    protected abstract writeTypeOfExpression(expr: cs.TypeOfExpression);
-    protected abstract writeMemberAccessExpression(expr: cs.MemberAccessExpression);
-    protected abstract writeElementAccessExpression(expr: cs.ElementAccessExpression);
-    protected abstract writeNewExpression(expr: cs.NewExpression);
-    protected abstract writeCastExpression(expr: cs.CastExpression);
-    protected abstract writeNonNullExpression(expr: cs.NonNullExpression);
-    protected abstract writeYieldExpression(expr: cs.YieldExpression);
-    protected abstract writeLabeledExpression(expr: cs.LabeledExpression);
-    protected abstract writeDeconstructDeclaration(expr: cs.DeconstructDeclaration);
-
+    protected abstract writePrefixUnaryExpression(expr: cs.PrefixUnaryExpression): void;
+    protected abstract writeBaseLiteralExpression(expr: cs.BaseLiteralExpression): void;
+    protected abstract writeAwaitExpression(expr: cs.AwaitExpression): void;
+    protected abstract writeBinaryExpression(expr: cs.BinaryExpression): void;
+    protected abstract writeConditionalExpression(expr: cs.ConditionalExpression): void;
+    protected abstract writeLambdaExpression(expr: cs.LambdaExpression): void;
+    protected abstract writeNumericLiteral(expr: cs.NumericLiteral): void;
+    protected abstract writeStringTemplateExpression(expr: cs.StringTemplateExpression): void;
+    protected abstract writeArrayCreationExpression(expr: cs.ArrayCreationExpression): void;
+    protected abstract writeTypeOfExpression(expr: cs.TypeOfExpression): void;
+    protected abstract writeMemberAccessExpression(expr: cs.MemberAccessExpression): void;
+    protected abstract writeElementAccessExpression(expr: cs.ElementAccessExpression): void;
+    protected abstract writeNewExpression(expr: cs.NewExpression): void;
+    protected abstract writeCastExpression(expr: cs.CastExpression): void;
+    protected abstract writeNonNullExpression(expr: cs.NonNullExpression): void;
+    protected abstract writeYieldExpression(expr: cs.YieldExpression): void;
+    protected abstract writeLabeledExpression(expr: cs.LabeledExpression): void;
+    protected abstract writeDeconstructDeclaration(expr: cs.DeconstructDeclaration): void;
 
     protected writeToDoExpression(_expr: cs.ToDoExpression) {
         this.write('/* TODO */');
@@ -423,7 +422,7 @@ export default abstract class AstPrinterBase {
                 throw new Error(`Unhandled expression type: ${cs.SyntaxKind[expr.nodeType]}`);
         }
     }
-    
+
     protected writeStatement(s: cs.Statement) {
         switch (s.nodeType) {
             case cs.SyntaxKind.EmptyStatement:
@@ -520,9 +519,9 @@ export default abstract class AstPrinterBase {
     }
 
     protected abstract writeCatchClause(c: cs.CatchClause): void;
-    protected abstract writeSwitchStatement(s: cs.SwitchStatement);
-    protected abstract writeForEachStatement(s: cs.ForEachStatement);
-    protected abstract writeForStatement(s: cs.ForStatement);
+    protected abstract writeSwitchStatement(s: cs.SwitchStatement): void;
+    protected abstract writeForEachStatement(s: cs.ForEachStatement): void;
+    protected abstract writeForStatement(s: cs.ForStatement): void;
 
     protected writeWhileStatement(s: cs.WhileStatement) {
         this.write('while (');
@@ -579,14 +578,14 @@ export default abstract class AstPrinterBase {
         this.writeSemicolon();
     }
 
-    protected abstract writeVariableStatement(v: cs.VariableStatement);
+    protected abstract writeVariableStatement(v: cs.VariableStatement): void;
 
     protected writeEmptyStatement(_: cs.EmptyStatement) {
         this.writeSemicolon();
     }
 
-    protected abstract writeVariableDeclarationList(declarationList: cs.VariableDeclarationList);
-    protected abstract writeBlock(b: cs.Block);
+    protected abstract writeVariableDeclarationList(declarationList: cs.VariableDeclarationList): void;
+    protected abstract writeBlock(b: cs.Block): void;
 
     protected writeVisibility(visibility: cs.Visibility) {
         switch (visibility) {
@@ -637,5 +636,5 @@ export default abstract class AstPrinterBase {
         this.writeLine(',');
     }
 
-    protected abstract writeLocalFunction(expr: cs.LocalFunctionDeclaration);
+    protected abstract writeLocalFunction(expr: cs.LocalFunctionDeclaration): void;
 }
