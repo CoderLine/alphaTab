@@ -4,8 +4,14 @@ import * as path from 'node:path';
 import type { ResolvedConfig } from './config';
 import { joinUrlSegments, removeLeadingSlash, withTrailingSlash } from './utils';
 
+/**
+ * @internal
+ */
 export const FS_PREFIX = '/@fs/';
 
+/**
+ * @internal
+ */
 export async function fileToUrl(id: string, config: ResolvedConfig): Promise<string> {
     let rtn: string;
     if (id.startsWith(withTrailingSlash(config.root))) {

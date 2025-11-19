@@ -1,1 +1,1 @@
-export { AlphaTabWebPackPlugin } from './AlphaTabWebPackPlugin';
+export { AlphaTabWebPackPlugin } from '@coderline/alphatab-webpack/AlphaTabWebPackPlugin';

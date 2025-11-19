@@ -1,3 +1,6 @@
+/**
+ * @public
+ */
 export interface AlphaTabVitePluginOptions {
     /**
      * The location where alphaTab can be found.

@@ -1,6 +1,6 @@
 // index.ts for more details on contents and license of this file
 
-import * as fs from 'node:fs';
+import fs from 'node:fs';
 import * as path from 'node:path';
 import { type DepOptimizationMetadata, type DevEnvironment, normalizePath, type OptimizedDepInfo } from 'vite';
 import type { ResolvedConfig } from './config';
@@ -9,6 +9,9 @@ import { tryFsResolve } from './resolve';
 import { cleanUrl } from './utils';
 
 // https://github.com/Danielku15/vite/blob/88b7def341f12d07d7d4f83cbe3dc73cc8c6b7be/packages/vite/src/node/optimizer/index.ts#L1356
+/**
+ * @internal
+ */
 export function tryOptimizedDepResolve(
     config: ResolvedConfig,
     ssr: boolean,
@@ -131,6 +134,9 @@ function addOptimizedDepInfo(
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/optimizer/index.ts#L1248
+/**
+ * @internal
+ */
 export function optimizedDepInfoFromFile(
     metadata: DepOptimizationMetadata,
     file: string

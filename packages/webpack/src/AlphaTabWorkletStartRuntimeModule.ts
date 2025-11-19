@@ -1,5 +1,8 @@
 import { isWorkerRuntime, type webPackWithAlphaTab, type webpackTypes } from './Utils';
 
+/**
+ * @internal
+ */
 export function injectWorkletRuntimeModule(webPackWithAlphaTab: webPackWithAlphaTab) {
     class AlphaTabWorkletStartRuntimeModule extends webPackWithAlphaTab.webpack.RuntimeModule {
         static readonly RuntimeGlobalWorkletGetStartupChunks = '__webpack_require__.wsc';

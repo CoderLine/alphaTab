@@ -1,9 +1,12 @@
-import * as fs from 'node:fs';
+import fs from 'node:fs';
 import * as path from 'node:path';
 import * as url from 'node:url';
 import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
 import type { Plugin, ResolvedConfig } from './bridge';
 
+/**
+ * @public
+ */
 export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
     let resolvedConfig: ResolvedConfig;
     let output = false;

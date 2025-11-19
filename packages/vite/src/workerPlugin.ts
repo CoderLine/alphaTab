@@ -51,6 +51,9 @@ import {
 const workerFileRE = new RegExp(`(?:\\?|&)${WORKER_FILE_ID}&type=(\\w+)(?:&|$)`);
 const workerAssetUrlRE = new RegExp(`${WORKER_ASSET_ID}([a-z\\d]{8})__`, 'g');
 
+/**
+ * @public
+ */
 export function workerPlugin(options: AlphaTabVitePluginOptions): Plugin {
     let resolvedConfig: ResolvedConfig;
     let isBuild: boolean;
@@ -155,7 +158,7 @@ export function workerPlugin(options: AlphaTabVitePluginOptions): Plugin {
                 s = new MagicString(code);
                 workerAssetUrlRE.lastIndex = 0;
 
-                // Replace "__VITE_WORKER_ASSET__5aa0ddc0__" using relative paths
+                // Replace "VITE_WORKER_ASSET__5aa0ddc0" using relative paths
                 const workerMap = workerCache.get(resolvedConfig.mainConfig || resolvedConfig)!;
                 const { fileNameHash } = workerMap;
 

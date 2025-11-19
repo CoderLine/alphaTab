@@ -1,5 +1,8 @@
 import { isWorkerRuntime, type webPackWithAlphaTab, type webpackTypes } from './Utils';
 
+/**
+ * @internal
+ */
 export function injectWorkerRuntimeModule(webPackWithAlphaTab: webPackWithAlphaTab) {
     class AlphaTabWorkerRuntimeModule extends webPackWithAlphaTab.webpack.RuntimeModule {
         public static Key: string = 'AlphaTabWorkerRuntime';

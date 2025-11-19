@@ -1,8 +1,13 @@
-/**@target web */
 import type * as webpackTypes from 'webpack';
 
+/**
+ * @public
+ */
 export type { webpackTypes };
 
+/**
+ * @internal
+ */
 export type webPackWithAlphaTab = {
     webpack: webpackTypes.Compiler['webpack'];
     alphaTab: {
@@ -37,25 +42,43 @@ export type webPackWithAlphaTab = {
     };
 };
 
+/**
+ * @internal
+ */
 export type NormalModuleFactory = webpackTypes.Compilation['params']['normalModuleFactory'];
+/**
+ * @internal
+ */
 export type Parser = any;
 import type { Expression, NewExpression } from 'estree';
 
 const JAVASCRIPT_MODULE_TYPE_AUTO = 'javascript/auto';
 const JAVASCRIPT_MODULE_TYPE_ESM = 'javascript/esm';
 
+/**
+ * @internal
+ */
 export interface Hash {
     update(data: string | Buffer, inputEncoding?: string): Hash;
 }
 
+/**
+ * @internal
+ */
 export interface ObjectSerializerContext {
     write: (arg0?: any) => void;
 }
 
+/**
+ * @internal
+ */
 export interface ObjectDeserializerContext {
     read: () => any;
 }
 
+/**
+ * @internal
+ */
 export function makeDependencySerializable(webPackWithAlphaTab: webPackWithAlphaTab, dependency: any, key: string) {
     webPackWithAlphaTab.webpack.util.serialization.register(dependency, key, null, {
         serialize(obj, context) {
@@ -72,6 +95,9 @@ export function makeDependencySerializable(webPackWithAlphaTab: webPackWithAlpha
     });
 }
 
+/**
+ * @internal
+ */
 export function tapJavaScript(
     normalModuleFactory: NormalModuleFactory,
     pluginName: string,
@@ -81,6 +107,9 @@ export function tapJavaScript(
     normalModuleFactory.hooks.parser.for(JAVASCRIPT_MODULE_TYPE_ESM).tap(pluginName, parserPlugin);
 }
 
+/**
+ * @internal
+ */
 export function parseModuleUrl(parser: any, expr: Expression) {
     if (expr.type !== 'NewExpression' || (expr as NewExpression).arguments.length !== 2) {
         return;
@@ -100,6 +129,9 @@ export function parseModuleUrl(parser: any, expr: Expression) {
 
 const ALPHATAB_WORKER_RUNTIME_PREFIX = 'atworker_';
 
+/**
+ * @internal
+ */
 export function getWorkerRuntime(
     parser: any,
     compilation: webpackTypes.Compilation,
@@ -117,6 +149,9 @@ export function getWorkerRuntime(
     return ALPHATAB_WORKER_RUNTIME_PREFIX + runtime;
 }
 
+/**
+ * @internal
+ */
 export function isWorkerRuntime(runtime: webpackTypes.Chunk['runtime']) {
     if (typeof runtime !== 'string') {
         return false;
