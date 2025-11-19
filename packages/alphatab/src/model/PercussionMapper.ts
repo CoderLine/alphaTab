@@ -1,6 +1,6 @@
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { InstrumentArticulation, TechniqueSymbolPlacement } from '@src/model/InstrumentArticulation';
-import type { Note } from '@src/model/Note';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { InstrumentArticulation, TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
+import type { Note } from '@coderline/alphatab/model/Note';
 
 /**
  * @internal

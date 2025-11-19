@@ -1,6 +1,6 @@
-﻿import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { BeatCloner } from '@src/generated/model/BeatCloner';
-import { AlphaTex1LanguageHandler } from '@src/importer/alphaTex/AlphaTex1LanguageHandler';
+﻿import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { BeatCloner } from '@coderline/alphatab/generated/model/BeatCloner';
+import { AlphaTex1LanguageHandler } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageHandler';
 import {
     type AlphaTexAstNode,
     type AlphaTexBarNode,
@@ -13,8 +13,8 @@ import {
     type AlphaTexPropertiesNode,
     type AlphaTexScoreNode,
     type AlphaTexTextNode
-} from '@src/importer/alphaTex/AlphaTexAst';
-import { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import {
     AlphaTexAccidentalMode,
     type AlphaTexDiagnostic,
@@ -24,36 +24,36 @@ import {
     type IAlphaTexImporter,
     type IAlphaTexImporterState,
     AlphaTexStaffNoteKind
-} from '@src/importer/alphaTex/AlphaTexShared';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import {
     ApplyNodeResult,
     ApplyStructuralMetaDataResult,
     type IAlphaTexLanguageImportHandler
-} from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
-import { ScoreImporter } from '@src/importer/ScoreImporter';
-import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IOHelper } from '@src/io/IOHelper';
-import { Logger } from '@src/Logger';
-import type { FlatSyncPoint } from '@src/model/Automation';
-import { Bar, type SustainPedalMarker } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
-import { Clef } from '@src/model/Clef';
-import { Duration } from '@src/model/Duration';
-import { DynamicValue } from '@src/model/DynamicValue';
-import type { Lyrics } from '@src/model/Lyrics';
-import { MasterBar } from '@src/model/MasterBar';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { Note } from '@src/model/Note';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { PercussionMapper } from '@src/model/PercussionMapper';
-import { Score } from '@src/model/Score';
-import type { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { Tuning } from '@src/model/Tuning';
-import { Voice } from '@src/model/Voice';
-import type { Settings } from '@src/Settings';
-import { Lazy } from '@src/util/Lazy';
+} from '@coderline/alphatab/importer/alphaTex/IAlphaTexLanguageImportHandler';
+import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
+import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { FlatSyncPoint } from '@coderline/alphatab/model/Automation';
+import { Bar, type SustainPedalMarker } from '@coderline/alphatab/model/Bar';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import { Clef } from '@coderline/alphatab/model/Clef';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import type { Lyrics } from '@coderline/alphatab/model/Lyrics';
+import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { Note } from '@coderline/alphatab/model/Note';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { Score } from '@coderline/alphatab/model/Score';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import { Track } from '@coderline/alphatab/model/Track';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { Voice } from '@coderline/alphatab/model/Voice';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { Lazy } from '@coderline/alphatab/util/Lazy';
 
 /**
  * @public

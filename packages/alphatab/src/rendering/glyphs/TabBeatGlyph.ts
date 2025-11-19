@@ -1,19 +1,19 @@
-import { GraceType } from '@src/model/GraceType';
-import { type Note, NoteSubElement } from '@src/model/Note';
-import { TabRhythmMode } from '@src/NotationSettings';
-import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { AugmentationDotGlyph } from '@src/rendering/glyphs/AugmentationDotGlyph';
-import type { Glyph } from '@src/rendering/glyphs/Glyph';
-import { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
-import { TabNoteChordGlyph } from '@src/rendering/glyphs/TabNoteChordGlyph';
-import { TabRestGlyph } from '@src/rendering/glyphs/TabRestGlyph';
-import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
-import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import type { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { BeatSubElement } from '@src/model/Beat';
-import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
-import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
+import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
+import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { NoteNumberGlyph } from '@coderline/alphatab/rendering/glyphs/NoteNumberGlyph';
+import { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteChordGlyph';
+import { TabRestGlyph } from '@coderline/alphatab/rendering/glyphs/TabRestGlyph';
+import { TabWhammyBarGlyph } from '@coderline/alphatab/rendering/glyphs/TabWhammyBarGlyph';
+import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+import type { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
+import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 
 /**
  * @internal

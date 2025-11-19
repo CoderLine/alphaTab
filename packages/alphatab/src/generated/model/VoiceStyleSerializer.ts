@@ -3,10 +3,10 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { VoiceStyle } from "@src/model/Voice";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { VoiceSubElement } from "@src/model/Voice";
-import { Color } from "@src/model/Color";
+import { VoiceStyle } from "@coderline/alphatab/model/Voice";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { VoiceSubElement } from "@coderline/alphatab/model/Voice";
+import { Color } from "@coderline/alphatab/model/Color";
 /**
  * @internal
  */

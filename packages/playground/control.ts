@@ -1,4 +1,4 @@
-import * as alphaTab from '@src/alphaTab.main';
+import * as alphaTab from '@coderline/alphatab';
 import * as bootstrap from 'bootstrap';
 import Handlebars from 'handlebars';
 

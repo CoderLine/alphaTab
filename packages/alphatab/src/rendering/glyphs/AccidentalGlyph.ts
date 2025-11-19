@@ -1,6 +1,6 @@
-import { AccidentalType } from '@src/model/AccidentalType';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * @internal

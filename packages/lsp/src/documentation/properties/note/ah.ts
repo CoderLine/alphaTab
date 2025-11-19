@@ -1,4 +1,4 @@
-import type { PropertyDoc } from '@src/documentation/types';
+import type { PropertyDoc } from '@coderline/alphatab-lsp/documentation/types';
 
 export const harmonicValueDocs = [
     'The harmonic value determines a relative fret-offset changing the note pitch when played. For natural harmonics the played fret determines the harmonic value. The rules are a bit special but mostly are aligned with the frequency adjustments happening when harmonics are played at respective frets:',

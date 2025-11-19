@@ -3,10 +3,10 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { BeatStyle } from "@src/model/Beat";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { BeatSubElement } from "@src/model/Beat";
-import { Color } from "@src/model/Color";
+import { BeatStyle } from "@coderline/alphatab/model/Beat";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { BeatSubElement } from "@coderline/alphatab/model/Beat";
+import { Color } from "@coderline/alphatab/model/Color";
 /**
  * @internal
  */

@@ -3,12 +3,12 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { ScoreStyle } from "@src/model/Score";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { HeaderFooterStyleSerializer } from "@src/generated/model/HeaderFooterStyleSerializer";
-import { ScoreSubElement } from "@src/model/Score";
-import { HeaderFooterStyle } from "@src/model/Score";
-import { Color } from "@src/model/Color";
+import { ScoreStyle } from "@coderline/alphatab/model/Score";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { HeaderFooterStyleSerializer } from "@coderline/alphatab/generated/model/HeaderFooterStyleSerializer";
+import { ScoreSubElement } from "@coderline/alphatab/model/Score";
+import { HeaderFooterStyle } from "@coderline/alphatab/model/Score";
+import { Color } from "@coderline/alphatab/model/Color";
 /**
  * @internal
  */

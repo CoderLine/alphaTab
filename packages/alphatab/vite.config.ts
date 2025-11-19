@@ -18,7 +18,7 @@ const adjustScriptPathsPlugin = (min: boolean) => {
             const modifiedCode = new MagicString(code);
             const extension = min ? '.min.mjs' : '.mjs';
             modifiedCode.replaceAll(
-                /(@src|\.)\/alphaTab\.(core|worker|worklet)(\.ts)?(['"])/g,
+                /(@coderline\/alphatab|\.)\/alphaTab\.(core|worker|worklet)(\.ts)?(['"])/g,
                 `./alphaTab.$2${extension}$4`
             );
 

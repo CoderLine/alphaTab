@@ -6,8 +6,8 @@ import {
     scoreMetaData,
     staffMetaData,
     structuralMetaData
-} from '@src/documentation/documentation';
-import { startNodeLanguageServer, startWebWorkerLanguageServer } from '@src/server';
+} from '@coderline/alphatab-lsp/documentation/documentation';
+import { startNodeLanguageServer, startWebWorkerLanguageServer } from '@coderline/alphatab-lsp/server';
 
 const documentation = {
     structuralMetaData,
@@ -27,7 +27,7 @@ import type {
     ValueDoc,
     ValueItemDoc,
     WithDescription
-} from '@src/documentation/types';
+} from '@coderline/alphatab-lsp/documentation/types';
 
 import textMateGrammarJson from './alphatex.tmLanguage.json';
 import languageConfigurationJson from './language-configuration.json';

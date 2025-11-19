@@ -3,12 +3,12 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { DisplaySettings } from "@src/DisplaySettings";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { RenderingResourcesSerializer } from "@src/generated/RenderingResourcesSerializer";
-import { LayoutMode } from "@src/LayoutMode";
-import { StaveProfile } from "@src/StaveProfile";
-import { SystemsLayoutMode } from "@src/DisplaySettings";
+import { DisplaySettings } from "@coderline/alphatab/DisplaySettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { RenderingResourcesSerializer } from "@coderline/alphatab/generated/RenderingResourcesSerializer";
+import { LayoutMode } from "@coderline/alphatab/LayoutMode";
+import { StaveProfile } from "@coderline/alphatab/StaveProfile";
+import { SystemsLayoutMode } from "@coderline/alphatab/DisplaySettings";
 /**
  * @internal
  */

@@ -1,13 +1,13 @@
-import { Clef } from '@src/model/Clef';
-import type { MasterBar } from '@src/model/MasterBar';
-import { Ottavia } from '@src/model/Ottavia';
-import { SimileMark } from '@src/model/SimileMark';
-import type { Staff } from '@src/model/Staff';
-import type { Voice } from '@src/model/Voice';
-import type { Settings } from '@src/Settings';
-import { ElementStyle } from '@src/model/ElementStyle';
-import { KeySignature } from '@src/model/KeySignature';
-import { KeySignatureType } from '@src/model/KeySignatureType';
+import { Clef } from '@coderline/alphatab/model/Clef';
+import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { SimileMark } from '@coderline/alphatab/model/SimileMark';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { Voice } from '@coderline/alphatab/model/Voice';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
+import { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 
 /**
  * The different pedal marker types.

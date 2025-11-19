@@ -2,7 +2,7 @@
 // developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
-import { SynthHelper } from '@src/synth/SynthHelper';
+import { SynthHelper } from '@coderline/alphatab/synth/SynthHelper';
 
 /**
  * @internal

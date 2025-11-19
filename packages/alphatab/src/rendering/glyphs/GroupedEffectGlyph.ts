@@ -1,8 +1,8 @@
-import type { Beat } from '@src/model/Beat';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import type { BeatXPosition } from '@src/rendering/BeatXPosition';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 
 /**
  * @internal

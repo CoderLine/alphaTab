@@ -1,23 +1,23 @@
-import type { Bar } from '@src/model/Bar';
-import type { Font } from '@src/model/Font';
-import { type Track, TrackSubElement } from '@src/model/Track';
-import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import type { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
-import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
-import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
-import { StaffTrackGroup } from '@src/rendering/staves/StaffTrackGroup';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
-import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
-import type { RenderingResources } from '@src/RenderingResources';
-import { NotationElement } from '@src/NotationSettings';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
-import type { EngravingSettings } from '@src/EngravingSettings';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Font } from '@coderline/alphatab/model/Font';
+import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
+import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
+import { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
+import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
+import { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
+import { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@coderline/alphatab/model/RenderStylesheet';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import type { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 
 /**
  * @internal

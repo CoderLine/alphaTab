@@ -1,4 +1,4 @@
-import type { Staff } from '@src/model/Staff';
+import type { Staff } from '@coderline/alphatab/model/Staff';
 
 // TODO: rework model to specify for each finger
 // on which frets they are placed.

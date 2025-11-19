@@ -1,11 +1,11 @@
-import type { Bar } from '@src/model/Bar';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
-import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import type { Track } from '@src/model/Track';
-import type { Staff } from '@src/model/Staff';
-import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
-import { NumberedBarRenderer } from '@src/rendering/NumberedBarRenderer';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
+import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import type { Track } from '@coderline/alphatab/model/Track';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
+import { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
 
 /**
  * This Factory produces NumberedBarRenderer instances

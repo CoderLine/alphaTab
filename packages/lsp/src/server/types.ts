@@ -1,4 +1,3 @@
-
 import type * as alphaTab from '@coderline/alphatab';
 import type { createConnection as createBrowserConnection } from 'vscode-languageserver/lib/browser/main.js';
 import type { createConnection as createNodeConnection } from 'vscode-languageserver/lib/node/main.js';
@@ -14,8 +13,29 @@ export interface AlphaTexTextDocument extends TextDocument {
     ast?: alphaTab.importer.alphaTex.AlphaTexScoreNode;
 }
 
-
 export { type RemoteConsole, type TextDocumentPositionParams, TextDocuments } from 'vscode-languageserver';
 
-export * from 'vscode-languageserver-protocol';
+export {
+    type DocumentDiagnosticReport,
+    DocumentDiagnosticReportKind,
+    type InitializeParams,
+    type InitializeResult,
+    PositionEncodingKind,
+    TextDocumentSyncKind
+} from 'vscode-languageserver-protocol';
+
+export {
+    type CompletionItem,
+    type Diagnostic,
+    DiagnosticSeverity,
+    CompletionItemKind,
+    InsertTextFormat,
+    type Hover,
+    TextEdit,
+    uinteger,
+    ParameterInformation,
+    type SignatureHelp,
+    SignatureInformation,
+} from 'vscode-languageserver-types';
+
 export { TextDocument } from 'vscode-languageserver-textdocument';

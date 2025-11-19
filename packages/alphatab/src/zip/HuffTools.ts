@@ -1,5 +1,5 @@
 // This Inflate algorithm is based on the Inflate class of the Haxe Standard Library (MIT)
-import { FormatError } from '@src/FormatError';
+import { FormatError } from '@coderline/alphatab/FormatError';
 /*
  * Copyright (C)2005-2019 Haxe Foundation
  *
@@ -21,7 +21,7 @@ import { FormatError } from '@src/FormatError';
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-import { Found, type Huffman, NeedBit, NeedBits } from '@src/zip/Huffman';
+import { Found, type Huffman, NeedBit, NeedBits } from '@coderline/alphatab/zip/Huffman';
 
 // This Inflater is based on the Zip Reader of the Haxe Standard Library (MIT)
 

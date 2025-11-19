@@ -1,5 +1,5 @@
 import * as alphaTab from '@coderline/alphatab'
-import { type MetadataDoc, properties, type ValueItemDoc } from '@src/documentation/types';
+import { type MetadataDoc, properties, type ValueItemDoc } from '@coderline/alphatab-lsp/documentation/types';
 import { generalMidiInstruments } from '../../common';
 
 export const track: MetadataDoc = {

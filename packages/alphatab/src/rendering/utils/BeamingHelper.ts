@@ -1,16 +1,16 @@
-import type { Bar } from '@src/model/Bar';
-import { type Beat, BeatBeamingMode } from '@src/model/Beat';
-import { Duration } from '@src/model/Duration';
-import { GraceType } from '@src/model/GraceType';
-import { HarmonicType } from '@src/model/HarmonicType';
-import type { Note } from '@src/model/Note';
-import type { Staff } from '@src/model/Staff';
-import type { Voice } from '@src/model/Voice';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { MidiUtils } from '@src/midi/MidiUtils';
-import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
-import { NoteYPosition, type BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { Voice } from '@coderline/alphatab/model/Voice';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
+import { NoteYPosition, type BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 
 /**
  * @internal

@@ -1,9 +1,9 @@
-import { Environment } from '@src/Environment';
-import { Color } from '@src/model/Color';
-import { Font, FontStyle, FontWeight } from '@src/model/Font';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
-import type { Settings } from '@src/Settings';
+import { Environment } from '@coderline/alphatab/Environment';
+import { Color } from '@coderline/alphatab/model/Color';
+import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@coderline/alphatab/platform/ICanvas';
+import type { Settings } from '@coderline/alphatab/Settings';
 import type * as alphaSkia from '@coderline/alphaskia';
 
 /**

@@ -1,10 +1,10 @@
-import { AutomationType } from '@src/model/Automation';
-import { BrushType } from '@src/model/BrushType';
-import { DynamicValue } from '@src/model/DynamicValue';
-import type { Score } from '@src/model/Score';
-import { SlideOutType } from '@src/model/SlideOutType';
-import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
-import { HarmonicType } from '@src/model/HarmonicType';
+import { AutomationType } from '@coderline/alphatab/model/Automation';
+import { BrushType } from '@coderline/alphatab/model/BrushType';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { expect } from 'chai';
 
 describe('Gp3ImporterTest', () => {

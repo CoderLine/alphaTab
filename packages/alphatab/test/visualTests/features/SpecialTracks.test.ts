@@ -1,4 +1,4 @@
-import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
+import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 
 describe('SpecialTracksTests', () => {
     it('drum-tabs', async () => {

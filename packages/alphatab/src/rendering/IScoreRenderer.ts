@@ -1,9 +1,9 @@
-import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
-import type { Score } from '@src/model/Score';
-import type { IUiFacade } from '@src/platform/IUiFacade';
-import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import type { Settings } from '@src/Settings';
+import type { IEventEmitter, IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { IUiFacade } from '@coderline/alphatab/platform/IUiFacade';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * Represents the public interface of the component that can render scores.

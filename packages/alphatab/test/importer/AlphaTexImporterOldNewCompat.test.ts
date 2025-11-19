@@ -1,12 +1,12 @@
-import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { Logger } from '@src/Logger';
-import type { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
-import { AlphaTexExporterOld } from '@test/exporter/AlphaTexExporterOld';
-import { AlphaTexError, AlphaTexImporterOld } from '@test/importer/AlphaTexImporterOld';
-import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
-import { TestPlatform } from '@test/TestPlatform';
+import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Settings } from '@coderline/alphatab/Settings';
+import { AlphaTexExporterOld } from 'test/exporter/AlphaTexExporterOld';
+import { AlphaTexError, AlphaTexImporterOld } from 'test/importer/AlphaTexImporterOld';
+import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
+import { TestPlatform } from 'test/TestPlatform';
 import { assert, expect } from 'chai';
 
 describe('AlphaTexImporterOldNewCompat', () => {

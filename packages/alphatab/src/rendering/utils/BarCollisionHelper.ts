@@ -1,5 +1,5 @@
-import type { Beat } from '@src/model/Beat';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 
 /**
  * @internal

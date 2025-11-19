@@ -1,17 +1,17 @@
-import { BinaryStylesheet } from '@src/importer/BinaryStylesheet';
-import { GpifParser } from '@src/importer/GpifParser';
-import { PartConfiguration } from '@src/importer/PartConfiguration';
-import { ScoreImporter } from '@src/importer/ScoreImporter';
-import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
+import { BinaryStylesheet } from '@coderline/alphatab/importer/BinaryStylesheet';
+import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
+import { PartConfiguration } from '@coderline/alphatab/importer/PartConfiguration';
+import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
+import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 
-import type { Score } from '@src/model/Score';
+import type { Score } from '@coderline/alphatab/model/Score';
 
-import { Logger } from '@src/Logger';
+import { Logger } from '@coderline/alphatab/Logger';
 
-import { ZipReader } from '@src/zip/ZipReader';
-import type { ZipEntry } from '@src/zip/ZipEntry';
-import { IOHelper } from '@src/io/IOHelper';
-import { LayoutConfiguration } from '@src/importer/LayoutConfiguration';
+import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
+import type { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { LayoutConfiguration } from '@coderline/alphatab/importer/LayoutConfiguration';
 
 /**
  * This ScoreImporter can read Guitar Pro 7 and 8 (gp) files.

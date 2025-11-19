@@ -1,6 +1,6 @@
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 
 /**
  * @internal

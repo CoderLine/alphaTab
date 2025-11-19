@@ -13,7 +13,7 @@ import {
     type ProgramChangeEvent,
     type TempoChangeEvent,
     type TimeSignatureEvent
-} from '@src/midi/MidiEvent';
+} from '@coderline/alphatab/midi/MidiEvent';
 import {
     type Hydra,
     type HydraIbag,
@@ -23,23 +23,23 @@ import {
     HydraPgen,
     type HydraPhdr,
     type HydraShdr
-} from '@src/synth/soundfont/Hydra';
-import { Channel } from '@src/synth/synthesis/Channel';
-import { Channels } from '@src/synth/synthesis/Channels';
-import { LoopMode } from '@src/synth/synthesis/LoopMode';
-import { OutputMode } from '@src/synth/synthesis/OutputMode';
-import { Preset } from '@src/synth/synthesis/Preset';
-import { Region } from '@src/synth/synthesis/Region';
-import type { SynthEvent } from '@src/synth/synthesis/SynthEvent';
-import { Voice } from '@src/synth/synthesis/Voice';
-import { VoiceEnvelopeSegment } from '@src/synth/synthesis/VoiceEnvelope';
-import { SynthHelper } from '@src/synth/SynthHelper';
-import { TypeConversions } from '@src/io/TypeConversions';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import { Queue } from '@src/synth/ds/Queue';
-import { ControllerType } from '@src/midi/ControllerType';
-import { Logger } from '@src/Logger';
-import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
+} from '@coderline/alphatab/synth/soundfont/Hydra';
+import { Channel } from '@coderline/alphatab/synth/synthesis/Channel';
+import { Channels } from '@coderline/alphatab/synth/synthesis/Channels';
+import { LoopMode } from '@coderline/alphatab/synth/synthesis/LoopMode';
+import { OutputMode } from '@coderline/alphatab/synth/synthesis/OutputMode';
+import { Preset } from '@coderline/alphatab/synth/synthesis/Preset';
+import { Region } from '@coderline/alphatab/synth/synthesis/Region';
+import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
+import { Voice } from '@coderline/alphatab/synth/synthesis/Voice';
+import { VoiceEnvelopeSegment } from '@coderline/alphatab/synth/synthesis/VoiceEnvelope';
+import { SynthHelper } from '@coderline/alphatab/synth/SynthHelper';
+import { TypeConversions } from '@coderline/alphatab/io/TypeConversions';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import { Queue } from '@coderline/alphatab/synth/ds/Queue';
+import { ControllerType } from '@coderline/alphatab/midi/ControllerType';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { IAudioSampleSynthesizer } from '@coderline/alphatab/synth/IAudioSampleSynthesizer';
 
 /**
  * This is a tiny soundfont based synthesizer.

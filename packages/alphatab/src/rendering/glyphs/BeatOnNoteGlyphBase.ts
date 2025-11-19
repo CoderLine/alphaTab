@@ -1,8 +1,8 @@
-import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import type { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import type { Note } from '@src/model/Note';
-import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import type { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 
 /**
  * @internal

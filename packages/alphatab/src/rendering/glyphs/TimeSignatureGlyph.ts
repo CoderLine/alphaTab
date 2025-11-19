@@ -1,11 +1,11 @@
-import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { NumberGlyph } from '@src/rendering/glyphs/NumberGlyph';
-import { GhostParenthesisGlyph } from '@src/rendering/glyphs/GhostParenthesisGlyph';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { BarSubElement } from '@src/model/Bar';
-import { TextBaseline, type ICanvas } from '@src/platform/ICanvas';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { NumberGlyph } from '@coderline/alphatab/rendering/glyphs/NumberGlyph';
+import { GhostParenthesisGlyph } from '@coderline/alphatab/rendering/glyphs/GhostParenthesisGlyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { BarSubElement } from '@coderline/alphatab/model/Bar';
+import { TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 
 /**
  * @internal

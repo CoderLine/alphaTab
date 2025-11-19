@@ -1,6 +1,6 @@
 /**@target web */
-export * from '@src/alphaTab.core';
-import * as alphaTab from '@src/alphaTab.core';
+export * from '@coderline/alphatab/alphaTab.core';
+import * as alphaTab from '@coderline/alphatab/alphaTab.core';
 
 if (alphaTab.Environment.isRunningInWorker) {
     alphaTab.Environment.initializeWorker();

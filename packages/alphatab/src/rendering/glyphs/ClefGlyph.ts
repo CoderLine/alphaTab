@@ -1,10 +1,10 @@
-import { Clef } from '@src/model/Clef';
-import { Ottavia } from '@src/model/Ottavia';
-import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { BarSubElement } from '@src/model/Bar';
+import { Clef } from '@coderline/alphatab/model/Clef';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { BarSubElement } from '@coderline/alphatab/model/Bar';
 
 /**
  * @internal

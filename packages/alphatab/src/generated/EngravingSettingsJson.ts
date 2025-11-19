@@ -3,9 +3,9 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
-import { EngravingStemInfoJson } from "@src/generated/EngravingStemInfoJson";
-import { Duration } from "@src/model/Duration";
+import { MusicFontSymbol } from "@coderline/alphatab/model/MusicFontSymbol";
+import { EngravingStemInfoJson } from "@coderline/alphatab/generated/EngravingStemInfoJson";
+import { Duration } from "@coderline/alphatab/model/Duration";
 /**
  * This class holds all all spacing, thickness and scaling metrics
  * related to engraving the music notation.

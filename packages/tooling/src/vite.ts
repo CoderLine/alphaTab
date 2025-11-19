@@ -103,7 +103,8 @@ export function defaultBuildUserConfig(): UserConfig {
                     'url',
                     'os',
                     'crypto',
-                    'net'
+                    'net',
+                    /^vscode/, 
                 ],
                 output: [],
                 onLog(level, log, handler) {

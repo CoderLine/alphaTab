@@ -4,15 +4,15 @@ import {
     type ProgramChangeEvent,
     type TempoChangeEvent,
     type TimeSignatureEvent
-} from '@src/midi/MidiEvent';
-import type { MidiFile } from '@src/midi/MidiFile';
-import type { PlaybackRange } from '@src/synth/PlaybackRange';
-import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
-import { Logger } from '@src/Logger';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import { MidiUtils } from '@src/midi/MidiUtils';
-import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
-import { BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
+} from '@coderline/alphatab/midi/MidiEvent';
+import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import type { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
+import { Logger } from '@coderline/alphatab/Logger';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import type { IAudioSampleSynthesizer } from '@coderline/alphatab/synth/IAudioSampleSynthesizer';
+import { BackingTrackSyncPoint } from '@coderline/alphatab/synth/IAlphaSynth';
 
 /**
  * @internal

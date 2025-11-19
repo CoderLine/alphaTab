@@ -1,9 +1,9 @@
-import type { IWriteable } from '@src/io/IWriteable';
-import { MidiFile } from '@src/midi/MidiFile';
-import type { ControllerType } from '@src/midi/ControllerType';
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IOHelper } from '@src/io/IOHelper';
+import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
+import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import type { ControllerType } from '@coderline/alphatab/midi/ControllerType';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 
 /**
  * Lists all midi event types. Based on the type the instance is a specific subclass.

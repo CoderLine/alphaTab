@@ -1,14 +1,14 @@
-import { type Beat, BeatSubElement } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import type { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
-import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import type { RenderingResources } from '@src/RenderingResources';
-import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { NoteNumberGlyph } from '@coderline/alphatab/rendering/glyphs/NoteNumberGlyph';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
+import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal

@@ -1,8 +1,8 @@
-import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import type { RenderingResources } from '@src/RenderingResources';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { BarLineStyle } from '@src/model/Bar';
+import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { BarLineStyle } from '@coderline/alphatab/model/Bar';
 
 /**
  * @internal

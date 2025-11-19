@@ -1,6 +1,6 @@
-import { XmlDocument } from '@src/xml/XmlDocument';
-import { XmlNodeType } from '@src/xml/XmlNode';
-import { TestPlatform } from '@test/TestPlatform';
+import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
+import { XmlNodeType } from '@coderline/alphatab/xml/XmlNode';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
 
 describe('XmlParseTest', () => {

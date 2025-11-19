@@ -1,19 +1,19 @@
-import type { Beat } from '@src/model/Beat';
-import { BendStyle } from '@src/model/BendStyle';
-import { BendType } from '@src/model/BendType';
-import type { Color } from '@src/model/Color';
-import type { Note } from '@src/model/Note';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { type BarRendererBase, NoteYPosition, NoteXPosition } from '@src/rendering/BarRendererBase';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { TabBendRenderPoint } from '@src/rendering/glyphs/TabBendRenderPoint';
-import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import type { RenderingResources } from '@src/RenderingResources';
-import { BendPoint } from '@src/model/BendPoint';
-import { VibratoType } from '@src/model/VibratoType';
-import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { BendStyle } from '@coderline/alphatab/model/BendStyle';
+import { BendType } from '@coderline/alphatab/model/BendType';
+import type { Color } from '@coderline/alphatab/model/Color';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { type BarRendererBase, NoteYPosition, NoteXPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { TabBendRenderPoint } from '@coderline/alphatab/rendering/glyphs/TabBendRenderPoint';
+import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
+import { BendPoint } from '@coderline/alphatab/model/BendPoint';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * @internal

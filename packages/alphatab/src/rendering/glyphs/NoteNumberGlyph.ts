@@ -1,15 +1,15 @@
-import { BendType } from '@src/model/BendType';
-import type { Font } from '@src/model/Font';
-import { HarmonicType } from '@src/model/HarmonicType';
-import { type Note, NoteSubElement } from '@src/model/Note';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { NoteBounds } from '@src/rendering/utils/NoteBounds';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { NotationElement, NotationMode } from '@src/NotationSettings';
-import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { BendType } from '@coderline/alphatab/model/BendType';
+import type { Font } from '@coderline/alphatab/model/Font';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal

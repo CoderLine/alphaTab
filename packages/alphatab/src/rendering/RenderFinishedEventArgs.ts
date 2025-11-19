@@ -1,4 +1,4 @@
-import { ModelUtils } from '@src/model/ModelUtils';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 
 /**
  * This eventargs define the details about the rendering and layouting process and are

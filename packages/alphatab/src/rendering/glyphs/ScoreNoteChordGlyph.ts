@@ -1,22 +1,22 @@
-import { type Beat, BeatSubElement } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { ScoreNoteChordGlyphBase } from '@src/rendering/glyphs/ScoreNoteChordGlyphBase';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { NoteBounds } from '@src/rendering/utils/NoteBounds';
-import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { GraceType } from '@src/model/GraceType';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
-import { Duration } from '@src/model/Duration';
+import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { ScoreNoteChordGlyphBase } from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyphBase';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
+import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
+import { Duration } from '@coderline/alphatab/model/Duration';
 
 /**
  * @internal

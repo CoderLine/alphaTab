@@ -1,6 +1,6 @@
-import { Environment } from '@src/Environment';
-import { ScoreExporter } from '@src/exporter/ScoreExporter';
-import { AlphaTex1LanguageHandler } from '@src/importer/alphaTex/AlphaTex1LanguageHandler';
+import { Environment } from '@coderline/alphatab/Environment';
+import { ScoreExporter } from '@coderline/alphatab/exporter/ScoreExporter';
+import { AlphaTex1LanguageHandler } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageHandler';
 import {
     type AlphaTexBarNode,
     type AlphaTexBeatDurationChangeNode,
@@ -18,18 +18,18 @@ import {
     type AlphaTexStringLiteral,
     type AlphaTexValueList,
     type IAlphaTexAstNode
-} from '@src/importer/alphaTex/AlphaTexAst';
-import type { IAlphaTexLanguageImportHandler } from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
-import { IOHelper } from '@src/io/IOHelper';
-import type { Bar } from '@src/model/Bar';
-import type { Beat } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import { PercussionMapper } from '@src/model/PercussionMapper';
-import type { Score } from '@src/model/Score';
-import type { Staff } from '@src/model/Staff';
-import type { Track } from '@src/model/Track';
-import { Tuning } from '@src/model/Tuning';
-import { Settings } from '@src/Settings';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import type { IAlphaTexLanguageImportHandler } from '@coderline/alphatab/importer/alphaTex/IAlphaTexLanguageImportHandler';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { Track } from '@coderline/alphatab/model/Track';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * A small helper to write formatted alphaTex code to a string buffer.

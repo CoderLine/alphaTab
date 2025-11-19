@@ -20,16 +20,16 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-import { FormatError } from '@src/FormatError';
-import { IOHelper } from '@src/io/IOHelper';
-import type { IReadable } from '@src/io/IReadable';
+import { FormatError } from '@coderline/alphatab/FormatError';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import type { IReadable } from '@coderline/alphatab/io/IReadable';
 import {
     Found as HuffmanFound,
     type Huffman,
     NeedBit as HuffmanNeedBit,
     NeedBits as HuffmanNeedBits
-} from '@src/zip/Huffman';
-import { HuffTools } from '@src/zip/HuffTools';
+} from '@coderline/alphatab/zip/Huffman';
+import { HuffTools } from '@coderline/alphatab/zip/HuffTools';
 
 /**
  * @internal

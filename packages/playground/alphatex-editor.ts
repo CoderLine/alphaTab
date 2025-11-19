@@ -1,20 +1,10 @@
-import * as alphaTab from '@src/alphaTab.main';
+import * as alphaTab from '@coderline/alphatab';
+import { textMateGrammar, languageConfiguration } from '@coderline/alphatab-lsp/index';
 
 import * as monaco from 'monaco-editor';
-import Split from 'split.js';
-import * as oniguruma from 'vscode-oniguruma';
-import * as vsctm from 'vscode-textmate';
-import { setupControl } from './control';
-
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 // @ts-expect-error
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import {
-    BrowserMessageReader,
-    BrowserMessageWriter,
-    createProtocolConnection
-} from 'vscode-languageserver-protocol/browser';
-
+import Split from 'split.js';
 import {
     type CompletionItem,
     CompletionItemKind,
@@ -28,6 +18,7 @@ import {
     DidOpenTextDocumentNotification,
     type DocumentDiagnosticParams,
     DocumentDiagnosticRequest,
+    type Hover,
     type HoverParams,
     HoverRequest,
     type InitializeParams,
@@ -35,30 +26,24 @@ import {
     InsertTextFormat,
     MarkedString,
     MarkupContent,
+    type ParameterInformation,
     PositionEncodingKind,
+    type SignatureHelp,
     type SignatureHelpParams,
     SignatureHelpRequest,
     SignatureHelpTriggerKind,
+    type SignatureInformation,
     type TextDocumentContentChangeEvent,
-    type TextEdit,
-    type Hover,
-    type ParameterInformation,
-    type SignatureHelp,
-    type SignatureInformation
+    type TextEdit
 } from 'vscode-languageserver-protocol';
-
-async function loadLspModule() {
-    try {
-        return await import('@coderline/alphatab-lsp');
-    } catch (e) {
-        console.error(
-            'Error loading alphaTab Language Server, advanced editor features are unavailable, run npm run build-lsp',
-            e
-        );
-        return undefined;
-    }
-}
-type AlphaTexLspModule = NonNullable<Awaited<ReturnType<typeof loadLspModule>>>;
+import {
+    BrowserMessageReader,
+    BrowserMessageWriter,
+    createProtocolConnection
+} from 'vscode-languageserver-protocol/browser';
+import * as oniguruma from 'vscode-oniguruma';
+import * as vsctm from 'vscode-textmate';
+import { setupControl } from './control';
 
 async function setupLspAlphaTexLanguageSupport(editor: monaco.editor.IStandaloneCodeEditor) {
     const worker = new Worker(new URL('./alphatex-lsp-worker-wrap', import.meta.url), { type: 'module' });
@@ -316,7 +301,7 @@ async function setupLspAlphaTexLanguageSupport(editor: monaco.editor.IStandalone
     });
 }
 
-async function setupBasicAlphaTexLanguageSupport(lsp: AlphaTexLspModule) {
+async function setupBasicAlphaTexLanguageSupport() {
     // basic language init (syntax grammar, language config etc.)
     const wasmBin = await load<ArrayBuffer>(
         new URL('vscode-oniguruma/release/onig.wasm', import.meta.url),
@@ -337,7 +322,7 @@ async function setupBasicAlphaTexLanguageSupport(lsp: AlphaTexLspModule) {
         })(),
         loadGrammar: async scopeName => {
             if (scopeName === 'source.alphatex') {
-                const grammar = JSON.stringify(lsp.textMateGrammar);
+                const grammar = JSON.stringify(textMateGrammar);
                 return vsctm.parseRawGrammar(grammar, 'alphatex.tmLanguage.json');
             }
             console.log(`Unknown scope name: ${scopeName}`);
@@ -350,7 +335,6 @@ async function setupBasicAlphaTexLanguageSupport(lsp: AlphaTexLspModule) {
         id: 'alphatex'
     });
 
-    const languageConfiguration = lsp.languageConfiguration;
     monaco.languages.setLanguageConfiguration('alphatex', languageConfiguration);
     monaco.languages.setTokensProvider('alphatex', {
         getInitialState() {
@@ -387,13 +371,7 @@ async function setupMonaco() {
         }
     };
 
-    const lsp = await loadLspModule();
-    if (!lsp) {
-        return;
-    }
-
-    await setupBasicAlphaTexLanguageSupport(lsp);
-    return lsp;
+    await setupBasicAlphaTexLanguageSupport();
 }
 
 function trimCode(code: string) {
@@ -425,7 +403,7 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
     const initialCode = sessionStorage.getItem('alphatex-editor.code') ?? trimCode(element.innerHTML);
     element.innerHTML = '';
 
-    const lsp = await setupMonaco();
+    await setupMonaco();
 
     const editor = monaco.editor.create(element!, {
         value: initialCode,
@@ -434,7 +412,7 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
     });
 
     function loadTex(tex: string) {
-        const importer = new AlphaTexImporter();
+        const importer = new alphaTab.importer.AlphaTexImporter();
         importer.initFromString(tex, api.settings);
         let score: alphaTab.model.Score;
         try {
@@ -454,9 +432,7 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
     });
     loadTex(initialCode);
 
-    if (lsp) {
-        await setupLspAlphaTexLanguageSupport(editor);
-    }
+    await setupLspAlphaTexLanguageSupport(editor);
 }
 
 const req = new XMLHttpRequest();

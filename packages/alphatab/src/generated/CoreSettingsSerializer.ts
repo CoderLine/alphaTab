@@ -3,10 +3,10 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { CoreSettings } from "@src/CoreSettings";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { FontFileFormat } from "@src/CoreSettings";
-import { LogLevel } from "@src/LogLevel";
+import { CoreSettings } from "@coderline/alphatab/CoreSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { FontFileFormat } from "@coderline/alphatab/CoreSettings";
+import { LogLevel } from "@coderline/alphatab/LogLevel";
 /**
  * @internal
  */

@@ -1,13 +1,13 @@
-import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
-import type { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
-import { InternalSystemsLayoutMode, ScoreLayout } from '@src/rendering/layout/ScoreLayout';
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import type { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
-import type { StaffSystem } from '@src/rendering/staves/StaffSystem';
-import type { RenderingResources } from '@src/RenderingResources';
-import { Logger } from '@src/Logger';
-import { SystemsLayoutMode } from '@src/DisplaySettings';
-import { ScoreSubElement } from '@src/model/Score';
+import { type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import type { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
+import { InternalSystemsLayoutMode, ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
+import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import type { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
+import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
+import { Logger } from '@coderline/alphatab/Logger';
+import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
+import { ScoreSubElement } from '@coderline/alphatab/model/Score';
 
 /**
  * This layout arranges the bars into a fixed width and dynamic height region.

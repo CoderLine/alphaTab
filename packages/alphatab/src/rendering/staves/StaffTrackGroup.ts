@@ -1,6 +1,6 @@
-import type { Track } from '@src/model/Track';
-import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
-import type { StaffSystem, SystemBracket } from '@src/rendering/staves/StaffSystem';
+import type { Track } from '@coderline/alphatab/model/Track';
+import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
+import type { StaffSystem, SystemBracket } from '@coderline/alphatab/rendering/staves/StaffSystem';
 
 /**
  * Represents the group of rendered staves belonging to an individual track.

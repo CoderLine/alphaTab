@@ -3,8 +3,8 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { SyncPointData } from "@src/model/Automation";
-import { JsonHelper } from "@src/io/JsonHelper";
+import { SyncPointData } from "@coderline/alphatab/model/Automation";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 /**
  * @internal
  */

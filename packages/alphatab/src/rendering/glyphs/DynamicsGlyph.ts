@@ -1,6 +1,6 @@
-import { DynamicValue } from '@src/model/DynamicValue';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * @internal

@@ -33,9 +33,9 @@ export {
     type IAlphaTexMetaDataTagPrefixNode,
     type IAlphaTexNoteValueNode,
     type IAlphaTexValueListItem
-} from '@src/importer/alphaTex/AlphaTexAst';
-export { AlphaTexLexer } from '@src/importer/alphaTex/AlphaTexLexer';
-export { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+export { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
+export { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 export {
     AlphaTexAccidentalMode,
     type AlphaTexDiagnostic,
@@ -45,4 +45,4 @@ export {
     AlphaTexStaffNoteKind, 
     type IAlphaTexImporter,
     type IAlphaTexImporterState
-} from '@src/importer/alphaTex/AlphaTexShared';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';

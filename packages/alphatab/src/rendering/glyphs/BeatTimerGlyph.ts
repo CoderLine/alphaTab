@@ -1,5 +1,5 @@
-import { type ICanvas, TextBaseline, TextAlign } from '@src/platform/ICanvas';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { type ICanvas, TextBaseline, TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 
 /**
  * @internal

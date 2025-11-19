@@ -1,4 +1,4 @@
-import { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
+import { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import { expect } from 'chai';
 
 describe('AlphaTexParserTest', () => {

@@ -1,14 +1,14 @@
-import type { Bar } from '@src/model/Bar';
-import type { Voice } from '@src/model/Voice';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { EffectBand } from '@src/rendering/EffectBand';
-import { EffectBandSizingInfo } from '@src/rendering/EffectBandSizingInfo';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import type { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Voice } from '@coderline/alphatab/model/Voice';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
+import { EffectBandSizingInfo } from '@coderline/alphatab/rendering/EffectBandSizingInfo';
+import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
+import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
+import type { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 
 /**
  * This renderer is responsible for displaying effects above or below the other staves

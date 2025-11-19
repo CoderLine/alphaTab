@@ -1,4 +1,4 @@
-export type { IWriteable } from '@src/io/IWriteable';
-export type { IReadable } from '@src/io/IReadable';
-export { ByteBuffer } from '@src/io/ByteBuffer';
-export { IOHelper } from '@src/io/IOHelper';
+export type { IWriteable } from '@coderline/alphatab/io/IWriteable';
+export type { IReadable } from '@coderline/alphatab/io/IReadable';
+export { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+export { IOHelper } from '@coderline/alphatab/io/IOHelper';

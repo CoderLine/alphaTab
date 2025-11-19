@@ -1,6 +1,6 @@
-import type { IReadable } from '@src/io/IReadable';
-import { Score } from '@src/model/Score';
-import type { Settings } from '@src/Settings';
+import type { IReadable } from '@coderline/alphatab/io/IReadable';
+import { Score } from '@coderline/alphatab/model/Score';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * This is the base public class for creating new song importers which

@@ -4,9 +4,9 @@ import {
     beatProperties,
     durationChangeProperties,
     noteProperties
-} from '@src/documentation/documentation';
-import type { CommonDoc, PropertyDoc, ValueDoc } from '@src/documentation/types';
-import { binaryNodeSearch } from '@src/server/utils';
+} from '@coderline/alphatab-lsp/documentation/documentation';
+import type { CommonDoc, PropertyDoc, ValueDoc } from '@coderline/alphatab-lsp/documentation/types';
+import { binaryNodeSearch } from '@coderline/alphatab-lsp/server/utils';
 import {
     type AlphaTexTextDocument,
     type Connection,
@@ -14,7 +14,7 @@ import {
     type SignatureHelp,
     SignatureInformation,
     type TextDocuments
-} from '@src/server/types';
+} from '@coderline/alphatab-lsp/server/types';
 
 export function setupSignatureHelp(connection: Connection, documents: TextDocuments<AlphaTexTextDocument>) {
     connection.onSignatureHelp(params => {

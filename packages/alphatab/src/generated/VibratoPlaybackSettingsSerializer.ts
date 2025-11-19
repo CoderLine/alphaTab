@@ -3,8 +3,8 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { VibratoPlaybackSettings } from "@src/PlayerSettings";
-import { JsonHelper } from "@src/io/JsonHelper";
+import { VibratoPlaybackSettings } from "@coderline/alphatab/PlayerSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 /**
  * @internal
  */

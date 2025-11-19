@@ -1,6 +1,6 @@
-import type { IContainer } from '@src/platform/IContainer';
-import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import type { HtmlElementContainer } from '@src/platform/javascript/HtmlElementContainer';
+import type { IContainer } from '@coderline/alphatab/platform/IContainer';
+import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
+import type { HtmlElementContainer } from '@coderline/alphatab/platform/javascript/HtmlElementContainer';
 
 /**
  * @target web

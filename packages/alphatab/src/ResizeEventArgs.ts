@@ -1,4 +1,4 @@
-import type { Settings } from '@src/Settings';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * Represents the information related to a resize event.

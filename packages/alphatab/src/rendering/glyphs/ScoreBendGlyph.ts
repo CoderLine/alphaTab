@@ -1,21 +1,21 @@
-import type { Beat } from '@src/model/Beat';
-import type { BendPoint } from '@src/model/BendPoint';
-import { BendStyle } from '@src/model/BendStyle';
-import { BendType } from '@src/model/BendType';
-import { GraceType } from '@src/model/GraceType';
-import { type Note, NoteSubElement } from '@src/model/Note';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
-import { BendNoteHeadGroupGlyph } from '@src/rendering/glyphs/BendNoteHeadGroupGlyph';
-import type { ScoreBeatPreNotesGlyph } from '@src/rendering/glyphs/ScoreBeatPreNotesGlyph';
-import { ScoreHelperNotesBaseGlyph } from '@src/rendering/glyphs/ScoreHelperNotesBaseGlyph';
-import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { NoteYPosition } from '@src/rendering/BarRendererBase';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { BendPoint } from '@coderline/alphatab/model/BendPoint';
+import { BendStyle } from '@coderline/alphatab/model/BendStyle';
+import { BendType } from '@coderline/alphatab/model/BendType';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
+import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
+import { ScoreHelperNotesBaseGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreHelperNotesBaseGlyph';
+import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * @internal

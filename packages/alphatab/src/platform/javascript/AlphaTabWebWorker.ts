@@ -1,12 +1,12 @@
-import { JsonConverter } from '@src/model/JsonConverter';
-import type { Score } from '@src/model/Score';
-import type { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
-import { type FontSizeDefinition, FontSizes } from '@src/platform/svg/FontSizes';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import type { Settings } from '@src/Settings';
-import { Logger } from '@src/Logger';
-import { Environment } from '@src/Environment';
-import { SettingsSerializer } from '@src/generated/SettingsSerializer';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { IWorkerScope } from '@coderline/alphatab/platform/javascript/IWorkerScope';
+import { type FontSizeDefinition, FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
+import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { Logger } from '@coderline/alphatab/Logger';
+import { Environment } from '@coderline/alphatab/Environment';
+import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 
 /**
  * @target web

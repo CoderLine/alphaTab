@@ -1,6 +1,6 @@
-import type { Font } from '@src/model/Font';
-import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { Font } from '@coderline/alphatab/model/Font';
+import { type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 
 /**
  * @internal

@@ -1,5 +1,5 @@
-import { DynamicValue } from '@src/model/DynamicValue';
-import type { Duration } from '@src/model/Duration';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import type { Duration } from '@coderline/alphatab/model/Duration';
 
 /**
  * @internal

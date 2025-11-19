@@ -1,6 +1,6 @@
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 
 /**
  * @internal

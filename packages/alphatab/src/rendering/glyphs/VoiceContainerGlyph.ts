@@ -1,12 +1,12 @@
-import { GraceType } from '@src/model/GraceType';
-import type { TupletGroup } from '@src/model/TupletGroup';
-import { type Voice, VoiceSubElement } from '@src/model/Voice';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import type { Glyph } from '@src/rendering/glyphs/Glyph';
-import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
+import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
+import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * This glyph acts as container for handling

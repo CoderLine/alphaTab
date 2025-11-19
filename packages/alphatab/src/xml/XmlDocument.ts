@@ -21,9 +21,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
-import { XmlParser } from '@src/xml/XmlParser';
-import { XmlWriter } from '@src/xml/XmlWriter';
+import { XmlNode, XmlNodeType } from '@coderline/alphatab/xml/XmlNode';
+import { XmlParser } from '@coderline/alphatab/xml/XmlParser';
+import { XmlWriter } from '@coderline/alphatab/xml/XmlWriter';
 
 /**
  * @internal

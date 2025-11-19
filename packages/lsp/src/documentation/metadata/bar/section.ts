@@ -1,4 +1,4 @@
-import type { MetadataDoc } from '@src/documentation/types';
+import type { MetadataDoc } from '@coderline/alphatab-lsp/documentation/types';
 
 export const section: MetadataDoc = {
     tag: '\\section',

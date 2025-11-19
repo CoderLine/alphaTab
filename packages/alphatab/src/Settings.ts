@@ -1,11 +1,11 @@
-import { CoreSettings } from '@src/CoreSettings';
-import { DisplaySettings } from '@src/DisplaySettings';
-import { ImporterSettings } from '@src/ImporterSettings';
-import { FingeringMode, NotationMode, NotationSettings, NotationElement } from '@src/NotationSettings';
-import { PlayerMode, PlayerSettings } from '@src/PlayerSettings';
-import { SettingsSerializer } from '@src/generated/SettingsSerializer';
-import type { SettingsJson } from '@src/generated/SettingsJson';
-import { ExporterSettings } from '@src/ExporterSettings';
+import { CoreSettings } from '@coderline/alphatab/CoreSettings';
+import { DisplaySettings } from '@coderline/alphatab/DisplaySettings';
+import { ImporterSettings } from '@coderline/alphatab/ImporterSettings';
+import { FingeringMode, NotationMode, NotationSettings, NotationElement } from '@coderline/alphatab/NotationSettings';
+import { PlayerMode, PlayerSettings } from '@coderline/alphatab/PlayerSettings';
+import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
+import type { SettingsJson } from '@coderline/alphatab/generated/SettingsJson';
+import { ExporterSettings } from '@coderline/alphatab/ExporterSettings';
 
 /**
  * This public class contains instance specific settings for alphaTab

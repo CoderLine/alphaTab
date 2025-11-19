@@ -1,9 +1,9 @@
-import type { Bar } from '@src/model/Bar';
-import type { Beat } from '@src/model/Beat';
-import { GraceType } from '@src/model/GraceType';
-import type { Settings } from '@src/Settings';
-import { GraceGroup } from '@src/model/GraceGroup';
-import { ElementStyle } from '@src/model/ElementStyle';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { GraceGroup } from '@coderline/alphatab/model/GraceGroup';
+import { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
 
 /**
  * Lists all graphical sub elements within a {@link Voice} which can be styled via {@link Voice.style}

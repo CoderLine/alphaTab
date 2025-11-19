@@ -1,18 +1,18 @@
-import { GraceType } from '@src/model/GraceType';
-import type { Note } from '@src/model/Note';
-import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { AugmentationDotGlyph } from '@src/rendering/glyphs/AugmentationDotGlyph';
-import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
-import type { SlashBarRenderer } from '@src/rendering/SlashBarRenderer';
-import { NoteBounds } from '@src/rendering/utils/NoteBounds';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { SlashRestGlyph } from '@src/rendering/glyphs/SlashRestGlyph';
-import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
-import type { Glyph } from '@src/rendering/glyphs/Glyph';
-import { BeatSubElement } from '@src/model/Beat';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
+import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
+import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
+import type { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRenderer';
+import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { SlashRestGlyph } from '@coderline/alphatab/rendering/glyphs/SlashRestGlyph';
+import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * @internal

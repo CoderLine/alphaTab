@@ -1,4 +1,4 @@
-import { startWebWorkerLanguageServer } from '@coderline/alphatab-lsp';
+import { startWebWorkerLanguageServer } from '@coderline/alphatab-lsp/index';
 
 console.info('Starting AlphaTab Language Server');
 const workerGlobalThis = globalThis as unknown as DedicatedWorkerGlobalScope;

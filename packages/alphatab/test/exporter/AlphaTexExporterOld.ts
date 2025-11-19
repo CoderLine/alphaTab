@@ -2,62 +2,62 @@
  * This file contains a copy of the "old" alphaTex importer
  * it was never released but battle tested during implementation
  */
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { Environment } from '@src/Environment';
-import { ScoreExporter } from '@src/exporter/ScoreExporter';
-import { IOHelper } from '@src/io/IOHelper';
-import { GeneralMidi } from '@src/midi/GeneralMidi';
-import { AccentuationType } from '@src/model/AccentuationType';
-import { AutomationType } from '@src/model/Automation';
-import { type Bar, BarLineStyle, SustainPedalMarkerType } from '@src/model/Bar';
-import { BarreShape } from '@src/model/BarreShape';
-import { type Beat, BeatBeamingMode } from '@src/model/Beat';
-import { BendStyle } from '@src/model/BendStyle';
-import { BendType } from '@src/model/BendType';
-import { BrushType } from '@src/model/BrushType';
-import type { Chord } from '@src/model/Chord';
-import { Clef } from '@src/model/Clef';
-import { CrescendoType } from '@src/model/CrescendoType';
-import { Direction } from '@src/model/Direction';
-import { DynamicValue } from '@src/model/DynamicValue';
-import { FadeType } from '@src/model/FadeType';
-import { FermataType } from '@src/model/Fermata';
-import { Fingers } from '@src/model/Fingers';
-import { GolpeType } from '@src/model/GolpeType';
-import { GraceType } from '@src/model/GraceType';
-import { HarmonicType } from '@src/model/HarmonicType';
-import { KeySignature } from '@src/model/KeySignature';
-import { KeySignatureType } from '@src/model/KeySignatureType';
-import type { MasterBar } from '@src/model/MasterBar';
-import { ModelUtils } from '@src/model/ModelUtils';
-import type { Note } from '@src/model/Note';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { NoteOrnament } from '@src/model/NoteOrnament';
-import { Ottavia } from '@src/model/Ottavia';
-import { PercussionMapper } from '@src/model/PercussionMapper';
-import { PickStroke } from '@src/model/PickStroke';
-import { Rasgueado } from '@src/model/Rasgueado';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { Environment } from '@coderline/alphatab/Environment';
+import { ScoreExporter } from '@coderline/alphatab/exporter/ScoreExporter';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
+import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
+import { AutomationType } from '@coderline/alphatab/model/Automation';
+import { type Bar, BarLineStyle, SustainPedalMarkerType } from '@coderline/alphatab/model/Bar';
+import { BarreShape } from '@coderline/alphatab/model/BarreShape';
+import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { BendStyle } from '@coderline/alphatab/model/BendStyle';
+import { BendType } from '@coderline/alphatab/model/BendType';
+import { BrushType } from '@coderline/alphatab/model/BrushType';
+import type { Chord } from '@coderline/alphatab/model/Chord';
+import { Clef } from '@coderline/alphatab/model/Clef';
+import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
+import { Direction } from '@coderline/alphatab/model/Direction';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { FadeType } from '@coderline/alphatab/model/FadeType';
+import { FermataType } from '@coderline/alphatab/model/Fermata';
+import { Fingers } from '@coderline/alphatab/model/Fingers';
+import { GolpeType } from '@coderline/alphatab/model/GolpeType';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
+import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { PickStroke } from '@coderline/alphatab/model/PickStroke';
+import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import {
     BracketExtendMode,
     type RenderStylesheet,
     TrackNameMode,
     TrackNameOrientation,
     TrackNamePolicy
-} from '@src/model/RenderStylesheet';
-import { Score } from '@src/model/Score';
-import { SimileMark } from '@src/model/SimileMark';
-import { SlideInType } from '@src/model/SlideInType';
-import { SlideOutType } from '@src/model/SlideOutType';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { TripletFeel } from '@src/model/TripletFeel';
-import { Tuning } from '@src/model/Tuning';
-import { VibratoType } from '@src/model/VibratoType';
-import type { Voice } from '@src/model/Voice';
-import { WahPedal } from '@src/model/WahPedal';
-import { WhammyType } from '@src/model/WhammyType';
-import { BeamDirection } from '@src/rendering/_barrel';
-import { Settings } from '@src/Settings';
+} from '@coderline/alphatab/model/RenderStylesheet';
+import { Score } from '@coderline/alphatab/model/Score';
+import { SimileMark } from '@coderline/alphatab/model/SimileMark';
+import { SlideInType } from '@coderline/alphatab/model/SlideInType';
+import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { Staff } from '@coderline/alphatab/model/Staff';
+import { Track } from '@coderline/alphatab/model/Track';
+import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import type { Voice } from '@coderline/alphatab/model/Voice';
+import { WahPedal } from '@coderline/alphatab/model/WahPedal';
+import { WhammyType } from '@coderline/alphatab/model/WhammyType';
+import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
+import { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal

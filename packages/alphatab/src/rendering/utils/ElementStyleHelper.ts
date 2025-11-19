@@ -1,13 +1,13 @@
-import { BarSubElement, type Bar } from '@src/model/Bar';
-import type { BeatSubElement, Beat } from '@src/model/Beat';
-import type { Color } from '@src/model/Color';
-import type { ElementStyle } from '@src/model/ElementStyle';
-import type { NoteSubElement, Note } from '@src/model/Note';
-import type { Score, ScoreSubElement } from '@src/model/Score';
-import { type Track, TrackSubElement } from '@src/model/Track';
-import type { VoiceSubElement, Voice } from '@src/model/Voice';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { RenderingResources } from '@src/RenderingResources';
+import { BarSubElement, type Bar } from '@coderline/alphatab/model/Bar';
+import type { BeatSubElement, Beat } from '@coderline/alphatab/model/Beat';
+import type { Color } from '@coderline/alphatab/model/Color';
+import type { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
+import type { NoteSubElement, Note } from '@coderline/alphatab/model/Note';
+import type { Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
+import type { VoiceSubElement, Voice } from '@coderline/alphatab/model/Voice';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 
 /**
  * A helper to apply element styles in a specific rendering scope via the `using` keyword

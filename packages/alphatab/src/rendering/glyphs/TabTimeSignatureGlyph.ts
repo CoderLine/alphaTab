@@ -1,7 +1,7 @@
-import { TimeSignatureGlyph } from '@src/rendering/glyphs/TimeSignatureGlyph';
-import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { BarSubElement } from '@src/model/Bar';
+import { TimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TimeSignatureGlyph';
+import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { BarSubElement } from '@coderline/alphatab/model/Bar';
 
 /**
  * @internal

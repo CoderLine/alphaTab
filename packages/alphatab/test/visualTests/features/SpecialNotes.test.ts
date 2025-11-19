@@ -1,4 +1,4 @@
-import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
 
 describe('SpecialNotesTests', () => {
     it('tied-notes', async () => {

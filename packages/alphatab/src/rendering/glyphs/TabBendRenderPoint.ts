@@ -1,4 +1,4 @@
-import { BendPoint } from '@src/model/BendPoint';
+import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 
 /**
  * @internal

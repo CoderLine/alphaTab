@@ -3,10 +3,10 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
-import { TechniqueSymbolPlacement } from "@src/model/InstrumentArticulation";
+import { InstrumentArticulation } from "@coderline/alphatab/model/InstrumentArticulation";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { MusicFontSymbol } from "@coderline/alphatab/model/MusicFontSymbol";
+import { TechniqueSymbolPlacement } from "@coderline/alphatab/model/InstrumentArticulation";
 /**
  * @internal
  */

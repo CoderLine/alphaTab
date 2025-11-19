@@ -360,14 +360,14 @@ export class PrettyFormat {
     }
 }
 
-import { BarSerializer } from '@src/generated/model/BarSerializer';
-import { BeatSerializer } from '@src/generated/model/BeatSerializer';
-import { MasterBarSerializer } from '@src/generated/model/MasterBarSerializer';
-import { NoteSerializer } from '@src/generated/model/NoteSerializer';
-import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
-import { StaffSerializer } from '@src/generated/model/StaffSerializer';
-import { TrackSerializer } from '@src/generated/model/TrackSerializer';
-import { VoiceSerializer } from '@src/generated/model/VoiceSerializer';
+import { BarSerializer } from '@coderline/alphatab/generated/model/BarSerializer';
+import { BeatSerializer } from '@coderline/alphatab/generated/model/BeatSerializer';
+import { MasterBarSerializer } from '@coderline/alphatab/generated/model/MasterBarSerializer';
+import { NoteSerializer } from '@coderline/alphatab/generated/model/NoteSerializer';
+import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
+import { StaffSerializer } from '@coderline/alphatab/generated/model/StaffSerializer';
+import { TrackSerializer } from '@coderline/alphatab/generated/model/TrackSerializer';
+import { VoiceSerializer } from '@coderline/alphatab/generated/model/VoiceSerializer';
 import {
     type AlphaTexAstNode,
     type AlphaTexBarNode,
@@ -385,19 +385,19 @@ import {
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
     type AlphaTexValueList
-} from '@src/importer/alphaTex/AlphaTexAst';
-import { MidiEvent } from '@src/midi/MidiEvent';
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
-import { JsonConverter } from '@src/model/JsonConverter';
-import { MasterBar } from '@src/model/MasterBar';
-import { Note } from '@src/model/Note';
-import { Score } from '@src/model/Score';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { Voice } from '@src/model/Voice';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { MidiEvent } from '@coderline/alphatab/midi/MidiEvent';
+import { Bar } from '@coderline/alphatab/model/Bar';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { Note } from '@coderline/alphatab/model/Note';
+import { Score } from '@coderline/alphatab/model/Score';
+import { Staff } from '@coderline/alphatab/model/Staff';
+import { Track } from '@coderline/alphatab/model/Track';
+import { Voice } from '@coderline/alphatab/model/Voice';
 import { TestPlatform } from './TestPlatform';
-import type { AlphaTexDiagnostic } from '@src/importer/alphaTex/AlphaTexShared';
+import type { AlphaTexDiagnostic } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 /**
  * @partial

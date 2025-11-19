@@ -1,15 +1,15 @@
-import type { MidiFile } from '@src/midi/MidiFile';
-import type { PlaybackRange } from '@src/synth/PlaybackRange';
-import type { PlayerState } from '@src/synth/PlayerState';
-import type { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
-import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
-import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
-import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
-import type { LogLevel } from '@src/LogLevel';
-import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import type { MidiEventType } from '@src/midi/MidiEvent';
-import type { ISynthOutput } from '@src/synth/ISynthOutput';
-import type { Score } from '@src/model/Score';
+import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import type { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import type { PlayerState } from '@coderline/alphatab/synth/PlayerState';
+import type { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerStateChangedEventArgs';
+import type { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/PlaybackRangeChangedEventArgs';
+import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
+import type { IEventEmitter, IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import type { LogLevel } from '@coderline/alphatab/LogLevel';
+import type { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
+import type { MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
+import type { ISynthOutput } from '@coderline/alphatab/synth/ISynthOutput';
+import type { Score } from '@coderline/alphatab/model/Score';
 
 /**
  * Rerpresents a point to sync the alphaTab time axis with an external backing track.

@@ -1,22 +1,22 @@
-import { AlphaTexAccidentalMode } from '@src/importer/alphaTex/AlphaTexShared';
-import { BarLineStyle } from '@src/model/Bar';
-import { BarreShape } from '@src/model/BarreShape';
-import { BendStyle } from '@src/model/BendStyle';
-import { BendType } from '@src/model/BendType';
-import { Clef } from '@src/model/Clef';
-import { Direction } from '@src/model/Direction';
-import { DynamicValue } from '@src/model/DynamicValue';
-import { FermataType } from '@src/model/Fermata';
-import { GraceType } from '@src/model/GraceType';
-import { KeySignature } from '@src/model/KeySignature';
-import { KeySignatureType } from '@src/model/KeySignatureType';
-import { Ottavia } from '@src/model/Ottavia';
-import { Rasgueado } from '@src/model/Rasgueado';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { SimileMark } from '@src/model/SimileMark';
-import { TripletFeel } from '@src/model/TripletFeel';
-import { WhammyType } from '@src/model/WhammyType';
-import { TextAlign } from '@src/platform/ICanvas';
+import { AlphaTexAccidentalMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { BarLineStyle } from '@coderline/alphatab/model/Bar';
+import { BarreShape } from '@coderline/alphatab/model/BarreShape';
+import { BendStyle } from '@coderline/alphatab/model/BendStyle';
+import { BendType } from '@coderline/alphatab/model/BendType';
+import { Clef } from '@coderline/alphatab/model/Clef';
+import { Direction } from '@coderline/alphatab/model/Direction';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { FermataType } from '@coderline/alphatab/model/Fermata';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
+import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@coderline/alphatab/model/RenderStylesheet';
+import { SimileMark } from '@coderline/alphatab/model/SimileMark';
+import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
+import { WhammyType } from '@coderline/alphatab/model/WhammyType';
+import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 
 /**
  * @internal

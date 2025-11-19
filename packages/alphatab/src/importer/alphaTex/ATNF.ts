@@ -14,7 +14,7 @@ import {
     type AlphaTexStringLiteral,
     type AlphaTexValueList,
     type IAlphaTexValueListItem
-} from '@src/importer/alphaTex/AlphaTexAst';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 /**
  * AlphaTexNodeFactory (short name for less code)

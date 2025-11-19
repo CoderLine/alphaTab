@@ -3,17 +3,17 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-export type { CoreSettingsJson } from "@src/generated/CoreSettingsJson";
-export type { RenderingResourcesJson } from "@src/generated/RenderingResourcesJson";
-export type { DisplaySettingsJson } from "@src/generated/DisplaySettingsJson";
-export type { EngravingStemInfoJson } from "@src/generated/EngravingStemInfoJson";
-export type { EngravingSettingsJson } from "@src/generated/EngravingSettingsJson";
-export type { ExporterSettingsJson } from "@src/generated/ExporterSettingsJson";
-export type { ImporterSettingsJson } from "@src/generated/ImporterSettingsJson";
-export type { NotationSettingsJson } from "@src/generated/NotationSettingsJson";
-export type { VibratoPlaybackSettingsJson } from "@src/generated/VibratoPlaybackSettingsJson";
-export type { SlidePlaybackSettingsJson } from "@src/generated/SlidePlaybackSettingsJson";
-export type { PlayerSettingsJson } from "@src/generated/PlayerSettingsJson";
-export type { FontJson } from "@src/model/Font";
-export type { ColorJson } from "@src/model/Color";
-export type { SettingsJson } from "@src/generated/SettingsJson";
+export type { CoreSettingsJson } from "@coderline/alphatab/generated/CoreSettingsJson";
+export type { RenderingResourcesJson } from "@coderline/alphatab/generated/RenderingResourcesJson";
+export type { DisplaySettingsJson } from "@coderline/alphatab/generated/DisplaySettingsJson";
+export type { EngravingStemInfoJson } from "@coderline/alphatab/generated/EngravingStemInfoJson";
+export type { EngravingSettingsJson } from "@coderline/alphatab/generated/EngravingSettingsJson";
+export type { ExporterSettingsJson } from "@coderline/alphatab/generated/ExporterSettingsJson";
+export type { ImporterSettingsJson } from "@coderline/alphatab/generated/ImporterSettingsJson";
+export type { NotationSettingsJson } from "@coderline/alphatab/generated/NotationSettingsJson";
+export type { VibratoPlaybackSettingsJson } from "@coderline/alphatab/generated/VibratoPlaybackSettingsJson";
+export type { SlidePlaybackSettingsJson } from "@coderline/alphatab/generated/SlidePlaybackSettingsJson";
+export type { PlayerSettingsJson } from "@coderline/alphatab/generated/PlayerSettingsJson";
+export type { FontJson } from "@coderline/alphatab/model/Font";
+export type { ColorJson } from "@coderline/alphatab/model/Color";
+export type { SettingsJson } from "@coderline/alphatab/generated/SettingsJson";

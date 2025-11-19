@@ -4,12 +4,12 @@
 // the parser should not need to do that semantic checks, that's the importers job
 // but we emit "Hint" diagnostics for now.
 
-import { AlphaTex1EnumMappings } from '@src/importer/alphaTex/AlphaTex1EnumMappings';
+import { AlphaTex1EnumMappings } from '@coderline/alphatab/importer/alphaTex/AlphaTex1EnumMappings';
 import {
     AlphaTex1LanguageDefinitions,
     type ValueListParseTypesExtended,
     ValueListParseTypesMode
-} from '@src/importer/alphaTex/AlphaTex1LanguageDefinitions';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import {
     type AlphaTexAstNode,
     type AlphaTexIdentifier,
@@ -21,63 +21,63 @@ import {
     type AlphaTexTextNode,
     type AlphaTexValueList,
     type IAlphaTexValueListItem
-} from '@src/importer/alphaTex/AlphaTexAst';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
     AlphaTexStaffNoteKind,
     type IAlphaTexImporter
-} from '@src/importer/alphaTex/AlphaTexShared';
-import { Atnf } from '@src/importer/alphaTex/ATNF';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { Atnf } from '@coderline/alphatab/importer/alphaTex/ATNF';
 import {
     ApplyNodeResult,
     ApplyStructuralMetaDataResult,
     type IAlphaTexLanguageImportHandler
-} from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
-import { GeneralMidi } from '@src/midi/GeneralMidi';
-import { AccentuationType } from '@src/model/AccentuationType';
-import { Automation, AutomationType, type FlatSyncPoint } from '@src/model/Automation';
-import { type Bar, BarLineStyle, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
-import { BarreShape } from '@src/model/BarreShape';
-import { type Beat, BeatBeamingMode } from '@src/model/Beat';
-import { BendPoint } from '@src/model/BendPoint';
-import { BendStyle } from '@src/model/BendStyle';
-import { BrushType } from '@src/model/BrushType';
-import { Chord } from '@src/model/Chord';
-import { Clef } from '@src/model/Clef';
-import { Color } from '@src/model/Color';
-import { CrescendoType } from '@src/model/CrescendoType';
-import { Duration } from '@src/model/Duration';
-import { FadeType } from '@src/model/FadeType';
-import { Fermata } from '@src/model/Fermata';
-import { Fingers } from '@src/model/Fingers';
-import { GolpeType } from '@src/model/GolpeType';
-import { GraceType } from '@src/model/GraceType';
-import { HarmonicType } from '@src/model/HarmonicType';
-import { KeySignatureType } from '@src/model/KeySignatureType';
-import { Lyrics } from '@src/model/Lyrics';
-import type { MasterBar } from '@src/model/MasterBar';
-import { ModelUtils } from '@src/model/ModelUtils';
-import type { Note } from '@src/model/Note';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { NoteOrnament } from '@src/model/NoteOrnament';
-import { Ottavia } from '@src/model/Ottavia';
-import { PercussionMapper } from '@src/model/PercussionMapper';
-import { PickStroke } from '@src/model/PickStroke';
-import type { RenderStylesheet } from '@src/model/RenderStylesheet';
-import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
-import { Section } from '@src/model/Section';
-import { SimileMark } from '@src/model/SimileMark';
-import { SlideInType } from '@src/model/SlideInType';
-import { SlideOutType } from '@src/model/SlideOutType';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { TripletFeel } from '@src/model/TripletFeel';
-import { Tuning } from '@src/model/Tuning';
-import { VibratoType } from '@src/model/VibratoType';
-import { WahPedal } from '@src/model/WahPedal';
-import { BeamDirection } from '@src/rendering/_barrel';
-import { SynthConstants } from '@src/synth/SynthConstants';
+} from '@coderline/alphatab/importer/alphaTex/IAlphaTexLanguageImportHandler';
+import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
+import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
+import { Automation, AutomationType, type FlatSyncPoint } from '@coderline/alphatab/model/Automation';
+import { type Bar, BarLineStyle, SustainPedalMarker, SustainPedalMarkerType } from '@coderline/alphatab/model/Bar';
+import { BarreShape } from '@coderline/alphatab/model/BarreShape';
+import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { BendPoint } from '@coderline/alphatab/model/BendPoint';
+import { BendStyle } from '@coderline/alphatab/model/BendStyle';
+import { BrushType } from '@coderline/alphatab/model/BrushType';
+import { Chord } from '@coderline/alphatab/model/Chord';
+import { Clef } from '@coderline/alphatab/model/Clef';
+import { Color } from '@coderline/alphatab/model/Color';
+import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { FadeType } from '@coderline/alphatab/model/FadeType';
+import { Fermata } from '@coderline/alphatab/model/Fermata';
+import { Fingers } from '@coderline/alphatab/model/Fingers';
+import { GolpeType } from '@coderline/alphatab/model/GolpeType';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
+import { Lyrics } from '@coderline/alphatab/model/Lyrics';
+import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { PickStroke } from '@coderline/alphatab/model/PickStroke';
+import type { RenderStylesheet } from '@coderline/alphatab/model/RenderStylesheet';
+import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { Section } from '@coderline/alphatab/model/Section';
+import { SimileMark } from '@coderline/alphatab/model/SimileMark';
+import { SlideInType } from '@coderline/alphatab/model/SlideInType';
+import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { Staff } from '@coderline/alphatab/model/Staff';
+import { Track } from '@coderline/alphatab/model/Track';
+import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import { WahPedal } from '@coderline/alphatab/model/WahPedal';
+import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 
 /**
  * @internal

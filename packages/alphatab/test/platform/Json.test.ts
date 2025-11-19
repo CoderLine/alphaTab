@@ -1,4 +1,4 @@
-import { Json } from '@src/platform/Json';
+import { Json } from '@coderline/alphatab/platform/Json';
 import { expect } from 'chai';
 
 describe('JsonTests', () => {

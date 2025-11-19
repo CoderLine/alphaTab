@@ -1,8 +1,8 @@
-import type { Bar } from '@src/model/Bar';
-import type { Chord } from '@src/model/Chord';
-import type { Track } from '@src/model/Track';
-import type { Settings } from '@src/Settings';
-import { Tuning } from '@src/model/Tuning';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Chord } from '@coderline/alphatab/model/Chord';
+import type { Track } from '@coderline/alphatab/model/Track';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
 
 /**
  * This class describes a single staff within a track. There are instruments like pianos

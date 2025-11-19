@@ -3,11 +3,11 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { RenderingResources } from "@src/RenderingResources";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { EngravingSettingsSerializer } from "@src/generated/EngravingSettingsSerializer";
-import { Font } from "@src/model/Font";
-import { Color } from "@src/model/Color";
+import { RenderingResources } from "@coderline/alphatab/RenderingResources";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { EngravingSettingsSerializer } from "@coderline/alphatab/generated/EngravingSettingsSerializer";
+import { Font } from "@coderline/alphatab/model/Font";
+import { Color } from "@coderline/alphatab/model/Color";
 /**
  * @internal
  */

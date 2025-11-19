@@ -1,7 +1,7 @@
-import type { Automation } from '@src/model/Automation';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { CanvasHelper, TextBaseline, type ICanvas } from '@src/platform/ICanvas';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { Automation } from '@coderline/alphatab/model/Automation';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { CanvasHelper, TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 
 /**
  * This glyph renders tempo annotations for tempo automations

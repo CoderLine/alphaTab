@@ -1,6 +1,6 @@
-import type { MidiFile } from '@src/midi/MidiFile';
-import type { BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
-import type { PlaybackRange } from '@src/synth/PlaybackRange';
+import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import type { BackingTrackSyncPoint } from '@coderline/alphatab/synth/IAlphaSynth';
+import type { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
 
 /**
  * The options controlling how to export the audio.

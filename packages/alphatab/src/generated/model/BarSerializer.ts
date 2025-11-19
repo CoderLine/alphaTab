@@ -3,20 +3,20 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Bar } from "@src/model/Bar";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { VoiceSerializer } from "@src/generated/model/VoiceSerializer";
-import { SustainPedalMarkerSerializer } from "@src/generated/model/SustainPedalMarkerSerializer";
-import { BarStyleSerializer } from "@src/generated/model/BarStyleSerializer";
-import { Clef } from "@src/model/Clef";
-import { Ottavia } from "@src/model/Ottavia";
-import { Voice } from "@src/model/Voice";
-import { SimileMark } from "@src/model/SimileMark";
-import { SustainPedalMarker } from "@src/model/Bar";
-import { BarLineStyle } from "@src/model/Bar";
-import { KeySignature } from "@src/model/KeySignature";
-import { KeySignatureType } from "@src/model/KeySignatureType";
-import { BarStyle } from "@src/model/Bar";
+import { Bar } from "@coderline/alphatab/model/Bar";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { VoiceSerializer } from "@coderline/alphatab/generated/model/VoiceSerializer";
+import { SustainPedalMarkerSerializer } from "@coderline/alphatab/generated/model/SustainPedalMarkerSerializer";
+import { BarStyleSerializer } from "@coderline/alphatab/generated/model/BarStyleSerializer";
+import { Clef } from "@coderline/alphatab/model/Clef";
+import { Ottavia } from "@coderline/alphatab/model/Ottavia";
+import { Voice } from "@coderline/alphatab/model/Voice";
+import { SimileMark } from "@coderline/alphatab/model/SimileMark";
+import { SustainPedalMarker } from "@coderline/alphatab/model/Bar";
+import { BarLineStyle } from "@coderline/alphatab/model/Bar";
+import { KeySignature } from "@coderline/alphatab/model/KeySignature";
+import { KeySignatureType } from "@coderline/alphatab/model/KeySignatureType";
+import { BarStyle } from "@coderline/alphatab/model/Bar";
 /**
  * @internal
  */

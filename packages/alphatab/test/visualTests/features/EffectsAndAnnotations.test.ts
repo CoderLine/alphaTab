@@ -1,9 +1,9 @@
-import { SystemsLayoutMode } from '@src/DisplaySettings';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';
-import { Settings } from '@src/Settings';
-import { TestPlatform } from '@test/TestPlatform';
-import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
+import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { BeatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
+import { Settings } from '@coderline/alphatab/Settings';
+import { TestPlatform } from 'test/TestPlatform';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
 import { expect } from 'chai';
 
 describe('EffectsAndAnnotationsTests', () => {

@@ -1,7 +1,7 @@
-import { Duration } from '@src/model/Duration';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 
 /**
  * @internal

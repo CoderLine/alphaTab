@@ -1,4 +1,4 @@
-import { IOHelper } from '@src/io/IOHelper';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 
 /**
  * A cross platform implementation of the EcmaScript JSON standard implementation.

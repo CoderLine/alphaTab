@@ -1,12 +1,12 @@
-import { Settings } from '@src/Settings';
-import { type Beat, BeatBeamingMode } from '@src/model/Beat';
-import { Direction } from '@src/model/Direction';
-import { Ottavia } from '@src/model/Ottavia';
-import { type Score, ScoreSubElement } from '@src/model/Score';
-import { WahPedal } from '@src/model/WahPedal';
-import { TextAlign } from '@src/platform/ICanvas';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
+import { Settings } from '@coderline/alphatab/Settings';
+import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { Direction } from '@coderline/alphatab/model/Direction';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { type Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { WahPedal } from '@coderline/alphatab/model/WahPedal';
+import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { expect } from 'chai';
 
 describe('Gp5ImporterTest', () => {

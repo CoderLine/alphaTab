@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { BendPoint } from "@src/model/BendPoint";
+import { BendPoint } from "@coderline/alphatab/model/BendPoint";
 /**
  * @internal
  */

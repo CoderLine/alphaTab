@@ -1,9 +1,9 @@
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@src/EventEmitter';
-import type { Score } from '@src/model/Score';
-import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import type { Settings } from '@src/Settings';
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * A {@link IScoreRenderer} implementation wrapping and underling other {@link IScoreRenderer}

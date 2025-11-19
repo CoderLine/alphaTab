@@ -3,11 +3,11 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Automation } from "@src/model/Automation";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { SyncPointDataSerializer } from "@src/generated/model/SyncPointDataSerializer";
-import { AutomationType } from "@src/model/Automation";
-import { SyncPointData } from "@src/model/Automation";
+import { Automation } from "@coderline/alphatab/model/Automation";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { SyncPointDataSerializer } from "@coderline/alphatab/generated/model/SyncPointDataSerializer";
+import { AutomationType } from "@coderline/alphatab/model/Automation";
+import { SyncPointData } from "@coderline/alphatab/model/Automation";
 /**
  * @internal
  */

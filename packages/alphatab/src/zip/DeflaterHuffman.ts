@@ -19,8 +19,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-import { DeflaterConstants } from '@src/zip/DeflaterConstants';
-import type { PendingBuffer } from '@src/zip/PendingBuffer';
+import { DeflaterConstants } from '@coderline/alphatab/zip/DeflaterConstants';
+import type { PendingBuffer } from '@coderline/alphatab/zip/PendingBuffer';
 
 /**
  * @internal

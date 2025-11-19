@@ -3,12 +3,12 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Voice } from "@src/model/Voice";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { BeatSerializer } from "@src/generated/model/BeatSerializer";
-import { VoiceStyleSerializer } from "@src/generated/model/VoiceStyleSerializer";
-import { Beat } from "@src/model/Beat";
-import { VoiceStyle } from "@src/model/Voice";
+import { Voice } from "@coderline/alphatab/model/Voice";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { BeatSerializer } from "@coderline/alphatab/generated/model/BeatSerializer";
+import { VoiceStyleSerializer } from "@coderline/alphatab/generated/model/VoiceStyleSerializer";
+import { Beat } from "@coderline/alphatab/model/Beat";
+import { VoiceStyle } from "@coderline/alphatab/model/Voice";
 /**
  * @internal
  */

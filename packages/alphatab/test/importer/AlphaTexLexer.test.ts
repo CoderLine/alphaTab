@@ -1,5 +1,5 @@
-import { type AlphaTexAstNode, AlphaTexNodeType, type AlphaTexNumberLiteral } from '@src/importer/alphaTex/AlphaTexAst';
-import { AlphaTexLexer } from '@src/importer/alphaTex/AlphaTexLexer';
+import { type AlphaTexAstNode, AlphaTexNodeType, type AlphaTexNumberLiteral } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
 import { expect } from 'chai';
 
 describe('AlphaTexLexerTest', () => {

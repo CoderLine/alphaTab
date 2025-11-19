@@ -1,17 +1,17 @@
-import { Beat } from '@src/model/Beat';
-import type { Duration } from '@src/model/Duration';
-import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@src/model/Score';
-import type { Settings } from '@src/Settings';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { MasterBar } from '@src/model/MasterBar';
-import type { Track } from '@src/model/Track';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import { Bar } from '@src/model/Bar';
-import { Voice } from '@src/model/Voice';
-import { Automation, AutomationType } from '@src/model/Automation';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { KeySignature } from '@src/model/KeySignature';
-import { AccidentalType } from '@src/model/AccidentalType';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import type { Duration } from '@coderline/alphatab/model/Duration';
+import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@coderline/alphatab/model/Score';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import type { Track } from '@coderline/alphatab/model/Track';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import { Bar } from '@coderline/alphatab/model/Bar';
+import { Voice } from '@coderline/alphatab/model/Voice';
+import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 
 /**
  * @internal

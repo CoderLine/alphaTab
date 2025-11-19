@@ -3,16 +3,16 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Track } from "@src/model/Track";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { StaffSerializer } from "@src/generated/model/StaffSerializer";
-import { PlaybackInformationSerializer } from "@src/generated/model/PlaybackInformationSerializer";
-import { Color } from "@src/model/Color";
-import { InstrumentArticulationSerializer } from "@src/generated/model/InstrumentArticulationSerializer";
-import { TrackStyleSerializer } from "@src/generated/model/TrackStyleSerializer";
-import { Staff } from "@src/model/Staff";
-import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
-import { TrackStyle } from "@src/model/Track";
+import { Track } from "@coderline/alphatab/model/Track";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { StaffSerializer } from "@coderline/alphatab/generated/model/StaffSerializer";
+import { PlaybackInformationSerializer } from "@coderline/alphatab/generated/model/PlaybackInformationSerializer";
+import { Color } from "@coderline/alphatab/model/Color";
+import { InstrumentArticulationSerializer } from "@coderline/alphatab/generated/model/InstrumentArticulationSerializer";
+import { TrackStyleSerializer } from "@coderline/alphatab/generated/model/TrackStyleSerializer";
+import { Staff } from "@coderline/alphatab/model/Staff";
+import { InstrumentArticulation } from "@coderline/alphatab/model/InstrumentArticulation";
+import { TrackStyle } from "@coderline/alphatab/model/Track";
 /**
  * @internal
  */

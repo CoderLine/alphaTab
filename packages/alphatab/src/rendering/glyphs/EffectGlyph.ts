@@ -1,5 +1,5 @@
-import type { Beat } from '@src/model/Beat';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 
 /**
  * Effect-Glyphs implementing this public interface get notified

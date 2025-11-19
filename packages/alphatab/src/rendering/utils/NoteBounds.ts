@@ -1,6 +1,6 @@
-import type { Note } from '@src/model/Note';
-import type { Bounds } from '@src/rendering/utils/Bounds';
-import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 
 /**
  * Represents the bounds of a single note

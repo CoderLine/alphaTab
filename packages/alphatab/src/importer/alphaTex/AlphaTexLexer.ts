@@ -19,13 +19,13 @@
     type AlphaTexStringLiteral,
     type AlphaTexTokenNode,
     type IAlphaTexMetaDataTagPrefixNode
-} from '@src/importer/alphaTex/AlphaTexAst';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import {
     AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity
-} from '@src/importer/alphaTex/AlphaTexShared';
-import { IOHelper } from '@src/io/IOHelper';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 
 /**
  * @public

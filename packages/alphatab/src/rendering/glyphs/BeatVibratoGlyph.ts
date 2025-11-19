@@ -1,5 +1,5 @@
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { VibratoGlyphBase } from '@src/rendering/glyphs/NoteVibratoGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { VibratoGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
 
 /**
  * @internal

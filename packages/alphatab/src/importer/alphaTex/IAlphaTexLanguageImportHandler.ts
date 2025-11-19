@@ -1,10 +1,10 @@
-﻿import type { AlphaTexMetaDataNode, AlphaTexPropertyNode } from '@src/importer/alphaTex/AlphaTexAst';
-import type { IAlphaTexImporter } from '@src/importer/alphaTex/AlphaTexShared';
-import type { Bar } from '@src/model/Bar';
-import type { Beat } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import type { Score } from '@src/model/Score';
-import type { Staff } from '@src/model/Staff';
+﻿import type { AlphaTexMetaDataNode, AlphaTexPropertyNode } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import type { IAlphaTexImporter } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { Staff } from '@coderline/alphatab/model/Staff';
 
 /**
  * @internal

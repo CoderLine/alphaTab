@@ -1,5 +1,5 @@
-import { XmlDocument } from '@src/xml/XmlDocument';
-import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
+import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
+import { XmlNode, XmlNodeType } from '@coderline/alphatab/xml/XmlNode';
 import { expect } from 'chai';
 
 describe('XmlWriteTest', () => {

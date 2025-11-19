@@ -3,8 +3,8 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Section } from "@src/model/Section";
-import { JsonHelper } from "@src/io/JsonHelper";
+import { Section } from "@coderline/alphatab/model/Section";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 /**
  * @internal
  */

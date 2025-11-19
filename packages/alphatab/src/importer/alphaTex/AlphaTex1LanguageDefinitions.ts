@@ -1,5 +1,5 @@
-import { AlphaTex1EnumMappings } from '@src/importer/alphaTex/AlphaTex1EnumMappings';
-import { AlphaTexNodeType } from '@src/importer/alphaTex/AlphaTexAst';
+import { AlphaTex1EnumMappings } from '@coderline/alphatab/importer/alphaTex/AlphaTex1EnumMappings';
+import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 /**
  * Defines how the value of the meta data tag is parsed.

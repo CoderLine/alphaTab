@@ -1,10 +1,10 @@
-import type { Beat } from '@src/model/Beat';
-import { GraceType } from '@src/model/GraceType';
-import type { Voice } from '@src/model/Voice';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BarCollisionHelper } from '@src/rendering/utils/BarCollisionHelper';
-import type { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import type { Voice } from '@coderline/alphatab/model/Voice';
+import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BarCollisionHelper } from '@coderline/alphatab/rendering/utils/BarCollisionHelper';
+import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal

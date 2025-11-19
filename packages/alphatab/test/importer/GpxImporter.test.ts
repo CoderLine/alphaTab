@@ -1,11 +1,11 @@
-import { type GpxFile, GpxFileSystem } from '@src/importer/GpxFileSystem';
-import { GpxImporter } from '@src/importer/GpxImporter';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import type { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
-import { Logger } from '@src/Logger';
-import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
-import { TestPlatform } from '@test/TestPlatform';
+import { type GpxFile, GpxFileSystem } from '@coderline/alphatab/importer/GpxFileSystem';
+import { GpxImporter } from '@coderline/alphatab/importer/GpxImporter';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Settings } from '@coderline/alphatab/Settings';
+import { Logger } from '@coderline/alphatab/Logger';
+import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
 
 describe('GpxImporterTest', () => {

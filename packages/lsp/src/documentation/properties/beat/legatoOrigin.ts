@@ -1,4 +1,4 @@
-import type { PropertyDoc } from '@src/documentation/types';
+import type { PropertyDoc } from '@coderline/alphatab-lsp/documentation/types';
 
 export const legatoOrigin: PropertyDoc = {
     property: 'legatoOrigin',

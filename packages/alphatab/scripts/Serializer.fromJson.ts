@@ -7,7 +7,7 @@ function generateFromJsonBody(
     serializable: TypeSchema,
     importer: (name: string, module: string) => void
 ) {
-    importer('JsonHelper', '@src/io/JsonHelper');
+    importer('JsonHelper', '@coderline/alphatab/io/JsonHelper');
 
     const serializerName = `${input.name!.text}Serializer`;
     return ts.factory.createBlock(

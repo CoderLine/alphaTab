@@ -1,9 +1,9 @@
-import { SystemsLayoutMode } from '@src/DisplaySettings';
-import { LayoutMode } from '@src/LayoutMode';
-import { Settings } from '@src/Settings';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { TestPlatform } from '@test/TestPlatform';
-import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
+import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { Settings } from '@coderline/alphatab/Settings';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { TestPlatform } from 'test/TestPlatform';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
 
 describe('SystemsLayoutTests', () => {
     it('bars-adjusted-automatic', async () => {

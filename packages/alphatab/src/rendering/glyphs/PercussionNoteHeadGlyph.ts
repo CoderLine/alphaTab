@@ -1,9 +1,9 @@
-import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import type { Duration } from '@src/model/Duration';
-import { TechniqueSymbolPlacement, type InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import type { Duration } from '@coderline/alphatab/model/Duration';
+import { TechniqueSymbolPlacement, type InstrumentArticulation } from '@coderline/alphatab/model/InstrumentArticulation';
 
 /**
  * @internal

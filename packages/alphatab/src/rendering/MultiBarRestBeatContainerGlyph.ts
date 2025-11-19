@@ -1,9 +1,9 @@
-import { Beat } from '@src/model/Beat';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import type { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
-import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { MultiBarRestGlyph } from '@src/rendering/glyphs/MultiBarRestGlyph';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import type { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
+import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
+import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
+import { MultiBarRestGlyph } from '@coderline/alphatab/rendering/glyphs/MultiBarRestGlyph';
 
 /**
  * @internal

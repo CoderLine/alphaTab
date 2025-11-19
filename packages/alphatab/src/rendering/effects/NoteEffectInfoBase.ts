@@ -1,7 +1,7 @@
-import type { Beat } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import type { Settings } from '@src/Settings';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal

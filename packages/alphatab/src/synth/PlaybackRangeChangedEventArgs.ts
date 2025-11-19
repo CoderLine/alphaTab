@@ -1,4 +1,4 @@
-import type { PlaybackRange } from '@src/synth/PlaybackRange';
+import type { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
 
 /**
  * Represents the info when the playback range changed.

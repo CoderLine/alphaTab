@@ -1,10 +1,10 @@
-import type { Note } from '@src/model/Note';
-import { ScoreLegatoGlyph } from '@src/rendering/glyphs/ScoreLegatoGlyph';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { NoteYPosition, NoteXPosition } from '@src/rendering/BarRendererBase';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { GraceType } from '@src/model/GraceType';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { NoteYPosition, NoteXPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 
 /**
  * @internal

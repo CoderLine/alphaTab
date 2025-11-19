@@ -1,24 +1,24 @@
-import { type IEventEmitterOfT, type IEventEmitter, EventEmitterOfT, EventEmitter } from '@src/EventEmitter';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
-import { MidiFile } from '@src/midi/MidiFile';
-import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
-import type { BackingTrack } from '@src/model/BackingTrack';
-import { Settings } from '@src/Settings';
-import { BackingTrackPlayer, type IBackingTrackSynthOutput } from '@src/synth/BackingTrackPlayer';
+import { type IEventEmitterOfT, type IEventEmitter, EventEmitterOfT, EventEmitter } from '@coderline/alphatab/EventEmitter';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
+import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
+import { Settings } from '@coderline/alphatab/Settings';
+import { BackingTrackPlayer, type IBackingTrackSynthOutput } from '@coderline/alphatab/synth/BackingTrackPlayer';
 import {
     ExternalMediaPlayer,
     type IExternalMediaHandler,
     type IExternalMediaSynthOutput
-} from '@src/synth/ExternalMediaPlayer';
-import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
-import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
-import { MidiFileSequencer } from '@src/synth/MidiFileSequencer';
-import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
-import type { Hydra } from '@src/synth/soundfont/Hydra';
-import type { SynthEvent } from '@src/synth/synthesis/SynthEvent';
-import { FlatMidiEventGenerator } from '@test/audio/FlatMidiEventGenerator';
-import { TestPlatform } from '@test/TestPlatform';
+} from '@coderline/alphatab/synth/ExternalMediaPlayer';
+import type { IAudioSampleSynthesizer } from '@coderline/alphatab/synth/IAudioSampleSynthesizer';
+import type { ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
+import { MidiFileSequencer } from '@coderline/alphatab/synth/MidiFileSequencer';
+import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
+import type { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
+import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
+import { FlatMidiEventGenerator } from 'test/audio/FlatMidiEventGenerator';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
 
 describe('SyncPointTests', () => {

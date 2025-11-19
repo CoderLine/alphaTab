@@ -1,4 +1,4 @@
-import { properties, type MetadataDoc } from '@src/documentation/types';
+import { properties, type MetadataDoc } from '@coderline/alphatab-lsp/documentation/types';
 
 export const tuning: MetadataDoc = {
     tag: '\\tuning',

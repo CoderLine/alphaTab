@@ -1,5 +1,5 @@
-import type { Score } from '@src/model/Score';
-import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { expect } from 'chai';
 
 describe('Gp4ImporterTest', () => {

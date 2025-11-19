@@ -3,13 +3,13 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { PlayerSettings } from "@src/PlayerSettings";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { VibratoPlaybackSettingsSerializer } from "@src/generated/VibratoPlaybackSettingsSerializer";
-import { SlidePlaybackSettingsSerializer } from "@src/generated/SlidePlaybackSettingsSerializer";
-import { PlayerOutputMode } from "@src/PlayerSettings";
-import { PlayerMode } from "@src/PlayerSettings";
-import { ScrollMode } from "@src/PlayerSettings";
+import { PlayerSettings } from "@coderline/alphatab/PlayerSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { VibratoPlaybackSettingsSerializer } from "@coderline/alphatab/generated/VibratoPlaybackSettingsSerializer";
+import { SlidePlaybackSettingsSerializer } from "@coderline/alphatab/generated/SlidePlaybackSettingsSerializer";
+import { PlayerOutputMode } from "@coderline/alphatab/PlayerSettings";
+import { PlayerMode } from "@coderline/alphatab/PlayerSettings";
+import { ScrollMode } from "@coderline/alphatab/PlayerSettings";
 /**
  * @internal
  */

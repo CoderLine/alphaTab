@@ -1,7 +1,7 @@
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { type Beat, BeatSubElement } from '@src/model/Beat';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 
 /**
  * @internal

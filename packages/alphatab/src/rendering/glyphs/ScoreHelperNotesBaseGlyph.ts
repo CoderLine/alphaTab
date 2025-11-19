@@ -1,10 +1,10 @@
-import type { Beat } from '@src/model/Beat';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { BendNoteHeadGroupGlyph } from '@src/rendering/glyphs/BendNoteHeadGroupGlyph';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 
 /**
  * @internal

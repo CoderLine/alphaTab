@@ -1,7 +1,7 @@
-import { TripletFeel } from '@src/model/TripletFeel';
-import { CanvasHelper, TextAlign, TextBaseline, type ICanvas } from '@src/platform/ICanvas';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
+import { CanvasHelper, TextAlign, TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * @internal

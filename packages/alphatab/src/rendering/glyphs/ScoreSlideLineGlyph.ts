@@ -1,16 +1,16 @@
-import type { Beat } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import { SlideInType } from '@src/model/SlideInType';
-import { SlideOutType } from '@src/model/SlideOutType';
-import { VibratoType } from '@src/model/VibratoType';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
-import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
-import type { ScoreBeatPreNotesGlyph } from '@src/rendering/glyphs/ScoreBeatPreNotesGlyph';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { SlideInType } from '@coderline/alphatab/model/SlideInType';
+import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
+import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 
 /**
  * @internal

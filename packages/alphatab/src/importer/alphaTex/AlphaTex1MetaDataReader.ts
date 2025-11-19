@@ -2,7 +2,7 @@ import {
     AlphaTex1LanguageDefinitions,
     type ValueListParseTypesExtended,
     ValueListParseTypesMode
-} from '@src/importer/alphaTex/AlphaTex1LanguageDefinitions';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import {
     type AlphaTexAstNode,
     type AlphaTexIdentifier,
@@ -13,14 +13,14 @@ import {
     type AlphaTexStringLiteral,
     type AlphaTexValueList,
     type IAlphaTexValueListItem
-} from '@src/importer/alphaTex/AlphaTexAst';
-import type { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity
-} from '@src/importer/alphaTex/AlphaTexShared';
-import { Atnf } from '@src/importer/alphaTex/ATNF';
-import type { IAlphaTexMetaDataReader } from '@src/importer/alphaTex/IAlphaTexMetaDataReader';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { Atnf } from '@coderline/alphatab/importer/alphaTex/ATNF';
+import type { IAlphaTexMetaDataReader } from '@coderline/alphatab/importer/alphaTex/IAlphaTexMetaDataReader';
 
 /**
  * @internal

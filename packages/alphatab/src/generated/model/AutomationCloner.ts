@@ -3,8 +3,8 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Automation } from "@src/model/Automation";
-import { SyncPointDataCloner } from "@src/generated/model/SyncPointDataCloner";
+import { Automation } from "@coderline/alphatab/model/Automation";
+import { SyncPointDataCloner } from "@coderline/alphatab/generated/model/SyncPointDataCloner";
 /**
  * @internal
  */

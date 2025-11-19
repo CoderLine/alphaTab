@@ -1,5 +1,5 @@
-import type { ControllerType } from '@src/midi/ControllerType';
-import type { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
+import type { ControllerType } from '@coderline/alphatab/midi/ControllerType';
+import type { IMidiFileHandler } from '@coderline/alphatab/midi/IMidiFileHandler';
 
 /**
  * @internal

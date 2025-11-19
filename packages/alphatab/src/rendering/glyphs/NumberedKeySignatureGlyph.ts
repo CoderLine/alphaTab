@@ -1,11 +1,11 @@
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { AccidentalType } from '@src/model/AccidentalType';
-import { KeySignatureType } from '@src/model/KeySignatureType';
-import { KeySignature } from '@src/model/KeySignature';
-import { CanvasHelper, type ICanvas, TextBaseline } from '@src/platform/ICanvas';
-import { BarSubElement } from '@src/model/Bar';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
+import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
+import { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { CanvasHelper, type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { BarSubElement } from '@coderline/alphatab/model/Bar';
 
 /**
  * @internal

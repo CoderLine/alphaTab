@@ -1,16 +1,16 @@
-import { StaveProfile } from '@src/StaveProfile';
-import { Settings } from '@src/Settings';
-import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
-import { TestPlatform } from '@test/TestPlatform';
+import { StaveProfile } from '@coderline/alphatab/StaveProfile';
+import { Settings } from '@coderline/alphatab/Settings';
+import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
-import { Logger } from '@src/Logger';
-import { BarStyle, BarSubElement } from '@src/model/Bar';
-import { BeatStyle, BeatSubElement } from '@src/model/Beat';
-import { Color } from '@src/model/Color';
-import { NoteStyle, NoteSubElement } from '@src/model/Note';
-import { type Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
-import { TrackStyle, TrackSubElement } from '@src/model/Track';
-import { VoiceStyle, VoiceSubElement } from '@src/model/Voice';
+import { Logger } from '@coderline/alphatab/Logger';
+import { BarStyle, BarSubElement } from '@coderline/alphatab/model/Bar';
+import { BeatStyle, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { Color } from '@coderline/alphatab/model/Color';
+import { NoteStyle, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { TrackStyle, TrackSubElement } from '@coderline/alphatab/model/Track';
+import { VoiceStyle, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 
 describe('GeneralTests', () => {
     it('song-details', async () => {

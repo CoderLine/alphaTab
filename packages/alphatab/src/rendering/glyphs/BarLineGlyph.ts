@@ -1,10 +1,10 @@
-import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { BarLineStyle } from '@src/model/Bar';
-import { LeftToRightLayoutingGlyphGroup } from '@src/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
-import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { BarLineStyle } from '@coderline/alphatab/model/Bar';
+import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * @internal

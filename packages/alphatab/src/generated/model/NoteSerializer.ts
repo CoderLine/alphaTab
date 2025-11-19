@@ -3,24 +3,24 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Note } from "@src/model/Note";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
-import { NoteStyleSerializer } from "@src/generated/model/NoteStyleSerializer";
-import { AccentuationType } from "@src/model/AccentuationType";
-import { BendType } from "@src/model/BendType";
-import { BendStyle } from "@src/model/BendStyle";
-import { BendPoint } from "@src/model/BendPoint";
-import { HarmonicType } from "@src/model/HarmonicType";
-import { SlideInType } from "@src/model/SlideInType";
-import { SlideOutType } from "@src/model/SlideOutType";
-import { VibratoType } from "@src/model/VibratoType";
-import { Fingers } from "@src/model/Fingers";
-import { Duration } from "@src/model/Duration";
-import { NoteAccidentalMode } from "@src/model/NoteAccidentalMode";
-import { DynamicValue } from "@src/model/DynamicValue";
-import { NoteOrnament } from "@src/model/NoteOrnament";
-import { NoteStyle } from "@src/model/Note";
+import { Note } from "@coderline/alphatab/model/Note";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { BendPointSerializer } from "@coderline/alphatab/generated/model/BendPointSerializer";
+import { NoteStyleSerializer } from "@coderline/alphatab/generated/model/NoteStyleSerializer";
+import { AccentuationType } from "@coderline/alphatab/model/AccentuationType";
+import { BendType } from "@coderline/alphatab/model/BendType";
+import { BendStyle } from "@coderline/alphatab/model/BendStyle";
+import { BendPoint } from "@coderline/alphatab/model/BendPoint";
+import { HarmonicType } from "@coderline/alphatab/model/HarmonicType";
+import { SlideInType } from "@coderline/alphatab/model/SlideInType";
+import { SlideOutType } from "@coderline/alphatab/model/SlideOutType";
+import { VibratoType } from "@coderline/alphatab/model/VibratoType";
+import { Fingers } from "@coderline/alphatab/model/Fingers";
+import { Duration } from "@coderline/alphatab/model/Duration";
+import { NoteAccidentalMode } from "@coderline/alphatab/model/NoteAccidentalMode";
+import { DynamicValue } from "@coderline/alphatab/model/DynamicValue";
+import { NoteOrnament } from "@coderline/alphatab/model/NoteOrnament";
+import { NoteStyle } from "@coderline/alphatab/model/Note";
 /**
  * @internal
  */

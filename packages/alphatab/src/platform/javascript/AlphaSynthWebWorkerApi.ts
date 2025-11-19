@@ -1,22 +1,22 @@
-import type { MidiFile } from '@src/midi/MidiFile';
-import type { BackingTrackSyncPoint, IAlphaSynth } from '@src/synth/IAlphaSynth';
-import type { ISynthOutput } from '@src/synth/ISynthOutput';
-import type { PlaybackRange } from '@src/synth/PlaybackRange';
-import { PlayerState } from '@src/synth/PlayerState';
-import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
-import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
-import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { JsonConverter } from '@src/model/JsonConverter';
-import { Logger } from '@src/Logger';
-import type { LogLevel } from '@src/LogLevel';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import type { MidiEventType } from '@src/midi/MidiEvent';
-import { Environment } from '@src/Environment';
-import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
-import type { Settings } from '@src/Settings';
-import { ModelUtils } from '@src/model/ModelUtils';
-import type { Score } from '@src/model/Score';
+import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import type { BackingTrackSyncPoint, IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
+import type { ISynthOutput } from '@coderline/alphatab/synth/ISynthOutput';
+import type { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import { PlayerState } from '@coderline/alphatab/synth/PlayerState';
+import { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerStateChangedEventArgs';
+import { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { LogLevel } from '@coderline/alphatab/LogLevel';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
+import type { MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
+import { Environment } from '@coderline/alphatab/Environment';
+import { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/PlaybackRangeChangedEventArgs';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { Score } from '@coderline/alphatab/model/Score';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.

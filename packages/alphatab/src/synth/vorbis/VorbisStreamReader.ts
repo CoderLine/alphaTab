@@ -2,10 +2,10 @@
  * Vorbis Stream Reader according to https://xiph.org/vorbis/doc/Vorbis_I_spec.html
  */
 
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import type { OggPacket } from '@src/synth/vorbis/OggReader';
-import { VorbisStream } from '@src/synth/vorbis/VorbisStream';
-import { IOHelper } from '@src/io/IOHelper';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import type { OggPacket } from '@coderline/alphatab/synth/vorbis/OggReader';
+import { VorbisStream } from '@coderline/alphatab/synth/vorbis/VorbisStream';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import {
     Huffman,
     Mdct,
@@ -17,8 +17,8 @@ import {
     VorbisSetupHeader,
     VorbisStreamDecoder,
     VorbisTimeDomainTransform
-} from '@src/synth/vorbis/VorbisStreamDecoder';
-import { IntBitReader } from '@src/synth/vorbis/IntBitReader';
+} from '@coderline/alphatab/synth/vorbis/VorbisStreamDecoder';
+import { IntBitReader } from '@coderline/alphatab/synth/vorbis/IntBitReader';
 
 /**
  * @internal

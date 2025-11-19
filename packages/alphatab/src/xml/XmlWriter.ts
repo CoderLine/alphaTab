@@ -1,4 +1,4 @@
-import { type XmlNode, XmlNodeType } from '@src/xml/XmlNode';
+import { type XmlNode, XmlNodeType } from '@coderline/alphatab/xml/XmlNode';
 
 /**
  * @internal

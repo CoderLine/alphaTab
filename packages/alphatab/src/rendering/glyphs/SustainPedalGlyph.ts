@@ -1,7 +1,7 @@
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { type SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { type SustainPedalMarker, SustainPedalMarkerType } from '@coderline/alphatab/model/Bar';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 
 /**
  * @internal

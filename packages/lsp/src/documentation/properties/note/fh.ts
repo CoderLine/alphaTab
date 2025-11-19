@@ -1,5 +1,5 @@
-import type { PropertyDoc } from '@src/documentation/types';
-import { harmonicValueDocs } from '@src/documentation/properties/note/ah';
+import type { PropertyDoc } from '@coderline/alphatab-lsp/documentation/types';
+import { harmonicValueDocs } from '@coderline/alphatab-lsp/documentation/properties/note/ah';
 
 
 export const fh: PropertyDoc = {

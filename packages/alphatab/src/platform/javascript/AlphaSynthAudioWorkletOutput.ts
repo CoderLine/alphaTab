@@ -1,10 +1,10 @@
-import { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
-import { Environment } from '@src/Environment';
-import { Logger } from '@src/Logger';
-import { AlphaSynthWorkerSynthOutput } from '@src/platform/javascript/AlphaSynthWorkerSynthOutput';
-import { AlphaSynthWebAudioOutputBase } from '@src/platform/javascript/AlphaSynthWebAudioOutputBase';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import type { Settings } from '@src/Settings';
+import { CircularSampleBuffer } from '@coderline/alphatab/synth/ds/CircularSampleBuffer';
+import { Environment } from '@coderline/alphatab/Environment';
+import { Logger } from '@coderline/alphatab/Logger';
+import { AlphaSynthWorkerSynthOutput } from '@coderline/alphatab/platform/javascript/AlphaSynthWorkerSynthOutput';
+import { AlphaSynthWebAudioOutputBase } from '@coderline/alphatab/platform/javascript/AlphaSynthWebAudioOutputBase';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @target web

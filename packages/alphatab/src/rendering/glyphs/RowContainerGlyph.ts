@@ -1,6 +1,6 @@
-import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
-import { RowGlyphContainer } from '@src/rendering/glyphs/RowGlyphContainer';
-import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
+import { type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { RowGlyphContainer } from '@coderline/alphatab/rendering/glyphs/RowGlyphContainer';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
 
 /**
  * @internal

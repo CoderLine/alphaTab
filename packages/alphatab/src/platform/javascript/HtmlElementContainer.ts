@@ -1,9 +1,9 @@
-import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
-import type { IContainer } from '@src/platform/IContainer';
-import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { Lazy } from '@src/util/Lazy';
+import type { IEventEmitter, IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import type { IContainer } from '@coderline/alphatab/platform/IContainer';
+import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
+import { BrowserMouseEventArgs } from '@coderline/alphatab/platform/javascript/BrowserMouseEventArgs';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { Lazy } from '@coderline/alphatab/util/Lazy';
 
 /**
  * @target web

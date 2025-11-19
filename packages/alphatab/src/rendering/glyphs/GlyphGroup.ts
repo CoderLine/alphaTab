@@ -1,5 +1,5 @@
-import type { ICanvas } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 
 /**
  * This glyph allows to group several other glyphs to be

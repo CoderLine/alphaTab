@@ -1,7 +1,7 @@
-import type { Color } from '@src/model/Color';
-import type { Font } from '@src/model/Font';
-import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { Settings } from '@src/Settings';
+import type { Color } from '@coderline/alphatab/model/Color';
+import type { Font } from '@coderline/alphatab/model/Font';
+import type { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * This public enum lists all different text alignments

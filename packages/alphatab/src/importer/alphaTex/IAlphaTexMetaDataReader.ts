@@ -2,8 +2,8 @@ import type {
     AlphaTexMetaDataTagNode,
     AlphaTexPropertyNode,
     AlphaTexValueList
-} from '@src/importer/alphaTex/AlphaTexAst';
-import type { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 
 /**
  * @internal

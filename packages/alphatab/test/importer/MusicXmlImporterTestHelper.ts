@@ -1,21 +1,21 @@
-import { MusicXmlImporter } from '@src/importer/MusicXmlImporter';
-import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
-import { MasterBar } from '@src/model/MasterBar';
-import { Note } from '@src/model/Note';
-import type { Score } from '@src/model/Score';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { Voice } from '@src/model/Voice';
-import { Settings } from '@src/Settings';
-import { TestPlatform } from '@test/TestPlatform';
-import { JsonConverter } from '@src/model/JsonConverter';
-import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
+import { MusicXmlImporter } from '@coderline/alphatab/importer/MusicXmlImporter';
+import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { Bar } from '@coderline/alphatab/model/Bar';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { Note } from '@coderline/alphatab/model/Note';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Staff } from '@coderline/alphatab/model/Staff';
+import { Track } from '@coderline/alphatab/model/Track';
+import { Voice } from '@coderline/alphatab/model/Voice';
+import { Settings } from '@coderline/alphatab/Settings';
+import { TestPlatform } from 'test/TestPlatform';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { assert } from 'chai';
-import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
-import { SystemsLayoutMode } from '@src/DisplaySettings';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
+import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
 
 /**
  * @internal

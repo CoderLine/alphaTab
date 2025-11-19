@@ -2,8 +2,8 @@
 // developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
-import { IOHelper } from '@src/io/IOHelper';
-import type { IReadable } from '@src/io/IReadable';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import type { IReadable } from '@coderline/alphatab/io/IReadable';
 
 /**
  * @internal

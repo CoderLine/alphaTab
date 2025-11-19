@@ -1,6 +1,6 @@
-import { Color } from '@src/model/Color';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { Color } from '@coderline/alphatab/model/Color';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 
 /**
  * @internal

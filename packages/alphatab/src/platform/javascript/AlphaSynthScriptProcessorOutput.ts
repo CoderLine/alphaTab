@@ -1,6 +1,6 @@
-import { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
-import { AlphaSynthWebAudioOutputBase } from '@src/platform/javascript/AlphaSynthWebAudioOutputBase';
-import { SynthConstants } from '@src/synth/SynthConstants';
+import { CircularSampleBuffer } from '@coderline/alphatab/synth/ds/CircularSampleBuffer';
+import { AlphaSynthWebAudioOutputBase } from '@coderline/alphatab/platform/javascript/AlphaSynthWebAudioOutputBase';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 
 /**
  * This class implements a HTML5 Web Audio API based audio output device

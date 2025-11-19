@@ -1,5 +1,5 @@
-import type { Hydra } from '@src/synth/soundfont/Hydra';
-import type { SynthEvent } from '@src/synth/synthesis/SynthEvent';
+import type { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
+import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
 
 /**
  * Classes implementing this interface can act as main audio synthesis engine

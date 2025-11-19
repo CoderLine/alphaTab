@@ -1,6 +1,6 @@
-import type { IReadable } from '@src/io/IReadable';
-import type { IWriteable } from '@src/io/IWriteable';
-import { IOHelper } from '@src/io/IOHelper';
+import type { IReadable } from '@coderline/alphatab/io/IReadable';
+import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 
 /**
  * @public

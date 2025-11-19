@@ -1,24 +1,24 @@
-import { MidiUtils } from '@src/midi/MidiUtils';
-import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { type Beat, BeatBeamingMode } from '@src/model/Beat';
-import { BendType } from '@src/model/BendType';
-import { FermataType } from '@src/model/Fermata';
-import { GraceType } from '@src/model/GraceType';
-import type { MasterBar } from '@src/model/MasterBar';
-import type { Note } from '@src/model/Note';
-import { Ottavia } from '@src/model/Ottavia';
-import type { Score } from '@src/model/Score';
-import { SimileMark } from '@src/model/SimileMark';
-import { SlideOutType } from '@src/model/SlideOutType';
-import { VibratoType } from '@src/model/VibratoType';
-import { WhammyType } from '@src/model/WhammyType';
-import { Settings } from '@src/Settings';
-import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
-import { TestPlatform } from '@test/TestPlatform';
-import { AutomationType } from '@src/model/Automation';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import { Gp7To8Importer } from '@coderline/alphatab/importer/Gp7To8Importer';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { BendType } from '@coderline/alphatab/model/BendType';
+import { FermataType } from '@coderline/alphatab/model/Fermata';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { SimileMark } from '@coderline/alphatab/model/SimileMark';
+import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import { WhammyType } from '@coderline/alphatab/model/WhammyType';
+import { Settings } from '@coderline/alphatab/Settings';
+import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
+import { TestPlatform } from 'test/TestPlatform';
+import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { expect } from 'chai';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 describe('Gp7ImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {

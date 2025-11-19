@@ -1,13 +1,13 @@
-﻿import type { AlphaTexAstNodeLocation } from '@src/importer/alphaTex/AlphaTexAst';
-import type { FlatSyncPoint } from '@src/model/Automation';
-import type { SustainPedalMarker } from '@src/model/Bar';
-import type { Beat } from '@src/model/Beat';
-import type { DynamicValue } from '@src/model/DynamicValue';
-import type { Lyrics } from '@src/model/Lyrics';
-import type { Note } from '@src/model/Note';
-import type { Score } from '@src/model/Score';
-import type { Staff } from '@src/model/Staff';
-import type { Track } from '@src/model/Track';
+﻿import type { AlphaTexAstNodeLocation } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import type { FlatSyncPoint } from '@coderline/alphatab/model/Automation';
+import type { SustainPedalMarker } from '@coderline/alphatab/model/Bar';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import type { Lyrics } from '@coderline/alphatab/model/Lyrics';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { Track } from '@coderline/alphatab/model/Track';
 
 /**
  * The different severity levels for diagnostics parsing alphaTex.

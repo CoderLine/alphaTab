@@ -1,15 +1,15 @@
-import { LayoutMode } from '@src/LayoutMode';
-import { LogLevel } from '@src/LogLevel';
-import { StaveProfile } from '@src/StaveProfile';
-import { Settings } from '@src/Settings';
-import { SettingsSerializer } from '@src/generated/SettingsSerializer';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { Color } from '@src/model/Color';
-import { Font, FontStyle } from '@src/model/Font';
-import { JsonConverter } from '@src/model/JsonConverter';
-import type { Score } from '@src/model/Score';
-import { NotationElement, TabRhythmMode, NotationMode, FingeringMode } from '@src/NotationSettings';
-import { TestPlatform } from '@test/TestPlatform';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { LogLevel } from '@coderline/alphatab/LogLevel';
+import { StaveProfile } from '@coderline/alphatab/StaveProfile';
+import { Settings } from '@coderline/alphatab/Settings';
+import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { Color } from '@coderline/alphatab/model/Color';
+import { Font, FontStyle } from '@coderline/alphatab/model/Font';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { NotationElement, TabRhythmMode, NotationMode, FingeringMode } from '@coderline/alphatab/NotationSettings';
+import { TestPlatform } from 'test/TestPlatform';
 import { ComparisonHelpers } from './ComparisonHelpers';
 import { assert, expect } from 'chai';
 

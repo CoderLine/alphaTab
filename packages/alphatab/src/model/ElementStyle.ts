@@ -1,5 +1,5 @@
-import type { RenderingResources } from '@src/RenderingResources';
-import type { Color } from '@src/model/Color';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
+import type { Color } from '@coderline/alphatab/model/Color';
 
 /**
  * Defines the custom styles for an element in the music sheet (like bars, voices, notes etc).

@@ -25,8 +25,8 @@
  * SOFTWARE.
  */
 
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import type { IReadable } from '@src/io/IReadable';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import type { IReadable } from '@coderline/alphatab/io/IReadable';
 
 /**
  * @internal

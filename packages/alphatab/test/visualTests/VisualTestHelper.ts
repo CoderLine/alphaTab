@@ -1,18 +1,18 @@
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import type { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
-import { TestPlatform } from '@test/TestPlatform';
-import { Environment } from '@src/Environment';
-import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { PixelMatch, PixelMatchOptions } from '@test/visualTests/PixelMatch';
-import { JsonConverter } from '@src/model/JsonConverter';
-import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Settings } from '@coderline/alphatab/Settings';
+import { TestPlatform } from 'test/TestPlatform';
+import { Environment } from '@coderline/alphatab/Environment';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { PixelMatch, PixelMatchOptions } from 'test/visualTests/PixelMatch';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
 import { TestUiFacade } from './TestUiFacade';
 import * as alphaSkiaModule from '@coderline/alphaskia';
 import { AlphaSkiaCanvas, AlphaSkiaImage } from '@coderline/alphaskia';
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
 
 /**
  * @internal

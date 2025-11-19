@@ -1,10 +1,10 @@
-import { MidiUtils } from '@src/midi/MidiUtils';
-import type { Beat } from '@src/model/Beat';
-import { Duration } from '@src/model/Duration';
-import { Spring } from '@src/rendering/staves/Spring';
-import { ModelUtils } from '@src/model/ModelUtils';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { GraceType } from '@src/model/GraceType';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { Spring } from '@coderline/alphatab/rendering/staves/Spring';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
 
 /**
  * This public class stores size information about a stave.

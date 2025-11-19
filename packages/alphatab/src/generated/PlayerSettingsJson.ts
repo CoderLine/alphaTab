@@ -3,11 +3,11 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { PlayerOutputMode } from "@src/PlayerSettings";
-import { PlayerMode } from "@src/PlayerSettings";
-import { ScrollMode } from "@src/PlayerSettings";
-import { VibratoPlaybackSettingsJson } from "@src/generated/VibratoPlaybackSettingsJson";
-import { SlidePlaybackSettingsJson } from "@src/generated/SlidePlaybackSettingsJson";
+import { PlayerOutputMode } from "@coderline/alphatab/PlayerSettings";
+import { PlayerMode } from "@coderline/alphatab/PlayerSettings";
+import { ScrollMode } from "@coderline/alphatab/PlayerSettings";
+import { VibratoPlaybackSettingsJson } from "@coderline/alphatab/generated/VibratoPlaybackSettingsJson";
+import { SlidePlaybackSettingsJson } from "@coderline/alphatab/generated/SlidePlaybackSettingsJson";
 /**
  * The player settings control how the audio playback and UI is behaving.
  * @json

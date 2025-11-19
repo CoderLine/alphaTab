@@ -3,6 +3,7 @@
     "version": "1.7.0",
     "description": "A development playground for alphaTab to test features while developing",
     "private": true,
+    "type": "module",
     "dependencies": {
         "@coderline/alphatab": "*",
         "@fontsource/noto-sans": "^5.2.10",

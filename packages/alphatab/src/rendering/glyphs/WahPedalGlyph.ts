@@ -1,7 +1,7 @@
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { WahPedal } from '@src/model/WahPedal';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { WahPedal } from '@coderline/alphatab/model/WahPedal';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 
 /**
  * @internal

@@ -1,18 +1,18 @@
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@src/EventEmitter';
-import { Logger } from '@src/Logger';
-import type { LogLevel } from '@src/LogLevel';
-import type { MidiEventType } from '@src/midi/MidiEvent';
-import type { MidiFile } from '@src/midi/MidiFile';
-import type { Score } from '@src/model/Score';
-import type { BackingTrackSyncPoint, IAlphaSynth } from '@src/synth/IAlphaSynth';
-import type { ISynthOutput } from '@src/synth/ISynthOutput';
-import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import type { PlaybackRange } from '@src/synth/PlaybackRange';
-import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
-import { PlayerState } from '@src/synth/PlayerState';
-import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
-import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
-import { SynthConstants } from '@src/synth/SynthConstants';
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { LogLevel } from '@coderline/alphatab/LogLevel';
+import type { MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
+import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { BackingTrackSyncPoint, IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
+import type { ISynthOutput } from '@coderline/alphatab/synth/ISynthOutput';
+import type { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
+import type { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/PlaybackRangeChangedEventArgs';
+import { PlayerState } from '@coderline/alphatab/synth/PlayerState';
+import { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerStateChangedEventArgs';
+import { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 
 /**
  * A {@link IAlphaSynth} implementation wrapping and underling other {@link IAlphaSynth}

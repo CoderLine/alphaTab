@@ -1,5 +1,5 @@
-import type { EffectBand } from '@src/rendering/EffectBand';
-import { EffectBandSlot } from '@src/rendering/EffectBandSlot';
+import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
+import { EffectBandSlot } from '@coderline/alphatab/rendering/EffectBandSlot';
 
 /**
  * @internal

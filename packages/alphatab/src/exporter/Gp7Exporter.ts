@@ -1,13 +1,13 @@
-import { Logger } from '@src/Logger';
-import type { Score } from '@src/model/Score';
-import { ZipEntry } from '@src/zip/ZipEntry';
-import { ScoreExporter } from '@src/exporter/ScoreExporter';
-import { GpifWriter } from '@src/exporter//GpifWriter';
-import { IOHelper } from '@src/io/IOHelper';
-import { BinaryStylesheet } from '@src/importer/BinaryStylesheet';
-import { PartConfiguration } from '@src/importer/PartConfiguration';
-import { ZipWriter } from '@src/zip/ZipWriter';
-import { LayoutConfiguration } from '@src/importer/LayoutConfiguration';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
+import { ScoreExporter } from '@coderline/alphatab/exporter/ScoreExporter';
+import { GpifWriter } from '@coderline/alphatab/exporter//GpifWriter';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { BinaryStylesheet } from '@coderline/alphatab/importer/BinaryStylesheet';
+import { PartConfiguration } from '@coderline/alphatab/importer/PartConfiguration';
+import { ZipWriter } from '@coderline/alphatab/zip/ZipWriter';
+import { LayoutConfiguration } from '@coderline/alphatab/importer/LayoutConfiguration';
 /**
  * This ScoreExporter can write Guitar Pro 7+ (gp) files.
  * @public

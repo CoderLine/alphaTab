@@ -1,5 +1,5 @@
-import type { Beat } from '@src/model/Beat';
-import type { EffectBand } from '@src/rendering/EffectBand';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 
 /**
  * @internal

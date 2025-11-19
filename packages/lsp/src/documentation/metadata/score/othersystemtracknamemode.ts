@@ -1,5 +1,5 @@
 import * as alphaTab from '@coderline/alphatab';
-import type { MetadataDoc, ValueItemDoc } from '@src/documentation/types';
+import type { MetadataDoc, ValueItemDoc } from '@coderline/alphatab-lsp/documentation/types';
 
 export const otherSystemsTrackNameMode: MetadataDoc = {
     tag: '\\otherSystemsTrackNameMode',

@@ -1,8 +1,8 @@
-import type { Beat } from '@src/model/Beat';
-import type { BarBounds } from '@src/rendering/utils/BarBounds';
-import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import type { Bounds } from '@src/rendering/utils/Bounds';
-import type { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import type { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import type { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
 
 /**
  * Represents the boundaries of a list of bars related to a single master bar.

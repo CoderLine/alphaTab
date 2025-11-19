@@ -1,7 +1,7 @@
-import { StaveProfile } from '@src/StaveProfile';
-import { TabRhythmMode } from '@src/NotationSettings';
-import { Settings } from '@src/Settings';
-import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
+import { StaveProfile } from '@coderline/alphatab/StaveProfile';
+import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
+import { Settings } from '@coderline/alphatab/Settings';
+import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 
 describe('GuitarTabsTests', () => {
     it('rhythm', async () => {

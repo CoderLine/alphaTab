@@ -1,6 +1,6 @@
-import { BinaryStylesheet } from '@src/importer/BinaryStylesheet';
-import type { Color } from '@src/model/Color';
-import { TestPlatform } from '@test/TestPlatform';
+import { BinaryStylesheet } from '@coderline/alphatab/importer/BinaryStylesheet';
+import type { Color } from '@coderline/alphatab/model/Color';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
 
 describe('BinaryStylesheetParserTest', () => {

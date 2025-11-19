@@ -1,25 +1,25 @@
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Logger } from '@src/Logger';
-import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { Logger } from '@coderline/alphatab/Logger';
+import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
 
-import { MasterBarTickLookup, MasterBarTickLookupTempoChange } from '@src/midi/MasterBarTickLookup';
-import { MidiFile } from '@src/midi/MidiFile';
-import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
+import { MasterBarTickLookup, MasterBarTickLookupTempoChange } from '@coderline/alphatab/midi/MasterBarTickLookup';
+import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import {
     MidiTickLookup,
     type MidiTickLookupFindBeatResult,
     MidiTickLookupFindBeatResultCursorMode
-} from '@src/midi/MidiTickLookup';
-import { MidiUtils } from '@src/midi/MidiUtils';
-import { Beat } from '@src/model/Beat';
-import { Duration } from '@src/model/Duration';
-import { MasterBar } from '@src/model/MasterBar';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { Note } from '@src/model/Note';
-import type { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
-import { TestPlatform } from '@test/TestPlatform';
+} from '@coderline/alphatab/midi/MidiTickLookup';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { Note } from '@coderline/alphatab/model/Note';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Settings } from '@coderline/alphatab/Settings';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
 
 describe('MidiTickLookupTest', () => {

@@ -1,6 +1,6 @@
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 
 /**
  * @internal

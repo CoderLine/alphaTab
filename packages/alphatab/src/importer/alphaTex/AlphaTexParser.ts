@@ -1,4 +1,4 @@
-﻿import { AlphaTex1MetaDataReader } from '@src/importer/alphaTex/AlphaTex1MetaDataReader';
+﻿import { AlphaTex1MetaDataReader } from '@coderline/alphatab/importer/alphaTex/AlphaTex1MetaDataReader';
 import {
     type AlphaTexAsteriskTokenNode,
     type AlphaTexAstNode,
@@ -24,15 +24,15 @@ import {
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
     type AlphaTexValueList
-} from '@src/importer/alphaTex/AlphaTexAst';
-import { AlphaTexLexer } from '@src/importer/alphaTex/AlphaTexLexer';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
 import {
     type AlphaTexDiagnostic,
     AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity
-} from '@src/importer/alphaTex/AlphaTexShared';
-import type { IAlphaTexMetaDataReader } from '@src/importer/alphaTex/IAlphaTexMetaDataReader';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import type { IAlphaTexMetaDataReader } from '@coderline/alphatab/importer/alphaTex/IAlphaTexMetaDataReader';
 
 /**
  * A parser for translating a given alphaTex source into an AST for further use

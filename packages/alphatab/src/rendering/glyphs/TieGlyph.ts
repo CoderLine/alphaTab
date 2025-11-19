@@ -1,9 +1,9 @@
-import type { Beat } from '@src/model/Beat';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { Bounds } from '@src/rendering/utils/Bounds';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 
 /**
  * @internal

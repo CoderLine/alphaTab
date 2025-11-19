@@ -1,9 +1,9 @@
-import { Color } from '@src/model/Color';
-import { Font, FontStyle } from '@src/model/Font';
-import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
-import { FontSizes } from '@src/platform/svg/FontSizes';
-import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { Settings } from '@src/Settings';
+import { Color } from '@coderline/alphatab/model/Color';
+import { Font, FontStyle } from '@coderline/alphatab/model/Font';
+import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@coderline/alphatab/platform/ICanvas';
+import { FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
+import type { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * A canvas implementation storing SVG data
