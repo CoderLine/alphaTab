@@ -47,7 +47,7 @@
         "@types/node": "^24.10.0",
         "assert": "^2.1.0",
         "chai": "^6.2.1",
-        "mocha": "^11.7.4",
+        "mocha": "^11.7.5",
         "rimraf": "^6.1.0",
         "rollup-plugin-node-externals": "^8.1.2",
         "terser": "^5.44.1",
