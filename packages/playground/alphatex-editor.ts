@@ -76,8 +76,7 @@ async function setupLspAlphaTexLanguageSupport(editor: monaco.editor.IStandalone
     const initRequest: InitializeParams = {
         processId: null,
         clientInfo: {
-            name: 'alphaTab Playground',
-            version: '1.7.0'
+            name: 'alphaTab Playground'
         },
         rootUri: null,
         capabilities: {
@@ -408,7 +407,8 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
     const editor = monaco.editor.create(element!, {
         value: initialCode,
         language: 'alphatex',
-        automaticLayout: true
+        automaticLayout: true,
+        wordBasedSuggestions: 'off'
     });
 
     function loadTex(tex: string) {
@@ -759,7 +759,7 @@ function lspToMonacoMarkupContent(contents: MarkupContent): monaco.IMarkdownStri
     ];
 }
 function markdownToPlainText(value: string): string {
-    return value.replace(/[\\`\`\``*_{}[\]()#+\-.!]/g, '\\$&');
+    return value.replace(/[\\`*_{}[\]()#+\-.!]/g, '\\$&');
 }
 const codeBlock = '```';
 

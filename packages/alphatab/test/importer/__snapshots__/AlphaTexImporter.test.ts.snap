@@ -5563,9 +5563,9 @@ Array [
     "severity" => 2,
     "message" => "Missing values. Expected following values: required(Number)",
     "start" => Map {
-      "col" => 8,
+      "col" => 9,
       "line" => 1,
-      "offset" => 7,
+      "offset" => 8,
     },
   },
 ]
@@ -5582,9 +5582,9 @@ Array [
     "severity" => 2,
     "message" => "Missing values. Expected following values: required(Number)",
     "start" => Map {
-      "col" => 9,
+      "col" => 10,
       "line" => 1,
-      "offset" => 8,
+      "offset" => 9,
     },
   },
 ]
@@ -5601,9 +5601,9 @@ Array [
     "severity" => 2,
     "message" => "Missing values. Expected following values: required(String|Ident)",
     "start" => Map {
-      "col" => 9,
+      "col" => 10,
       "line" => 1,
-      "offset" => 8,
+      "offset" => 9,
     },
   },
 ]

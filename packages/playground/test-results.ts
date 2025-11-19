@@ -102,7 +102,7 @@ async function createComparer(card: HTMLElement, result: TestResult) {
             reject();
         };
 
-        img.src = '/' + result.originalFile;
+        img.src = `/${result.originalFile}`;
     });
 
     const actual = new Promise((resolve, reject) => {
@@ -117,7 +117,7 @@ async function createComparer(card: HTMLElement, result: TestResult) {
         if (result.newFile instanceof Uint8Array) {
             img.src = URL.createObjectURL(new Blob([result.newFile.buffer as ArrayBuffer], { type: 'image/png' }));
         } else {
-            img.src = '/' + result.newFile;
+            img.src = `/${result.newFile}`;
         }
     });
 
@@ -135,7 +135,7 @@ async function createComparer(card: HTMLElement, result: TestResult) {
                 new Blob([(result.diffFile as Uint8Array).buffer as ArrayBuffer], { type: 'image/png' })
             );
         } else {
-            img.src = '/' + result.diffFile;
+            img.src = `/${result.diffFile}`;
         }
     });
 

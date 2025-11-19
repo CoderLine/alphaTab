@@ -129,16 +129,19 @@ export class AlphaTexLexer {
         let offset = this._offset;
 
         if (offset < codePoints.length - 1) {
-            ++offset;
-            const codepoint = codePoints[offset];
-            this._codepoint = codepoint;
-            if (codepoint === 0x0a /* \n */) {
+            // at the point we move after the new line we trigger the execution logic
+            const previousCodepoint = codePoints[offset];
+            if (previousCodepoint === 0x0a /* \n */) {
                 this._trailingCommentNode = undefined;
                 ++this._line;
-                this._col = 0; // will become 1 with the first character consumed
+                this._col = 1;
             } else {
                 ++this._col;
             }
+
+            ++offset;
+            const codepoint = codePoints[offset];
+            this._codepoint = codepoint;
             this._offset = offset;
             return codepoint;
         } else if (this._codepoint !== AlphaTexLexer._eof) {

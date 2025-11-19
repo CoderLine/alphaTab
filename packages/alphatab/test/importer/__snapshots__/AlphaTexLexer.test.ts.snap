@@ -2,49 +2,49 @@
 
 exports[`AlphaTexLexerTest basic-tokens 1`] = `
 Array [
-  Dot (1,1) -> (1,1),
+  Dot (1,1) -> (1,2),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 2`] = `
 Array [
-  Colon (1,1) -> (1,1),
+  Colon (1,1) -> (1,2),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 3`] = `
 Array [
-  LParen (1,1) -> (1,1),
+  LParen (1,1) -> (1,2),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 4`] = `
 Array [
-  RParen (1,1) -> (1,1),
+  RParen (1,1) -> (1,2),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 5`] = `
 Array [
-  LBrace (1,1) -> (1,1),
+  LBrace (1,1) -> (1,2),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 6`] = `
 Array [
-  RBrace (1,1) -> (1,1),
+  RBrace (1,1) -> (1,2),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 7`] = `
 Array [
-  Pipe (1,1) -> (1,1),
+  Pipe (1,1) -> (1,2),
 ]
 `;
 
 exports[`AlphaTexLexerTest basic-tokens 8`] = `
 Array [
-  Asterisk (1,1) -> (1,1),
+  Asterisk (1,1) -> (1,2),
 ]
 `;
 
@@ -199,7 +199,7 @@ Array [
 exports[`AlphaTexLexerTest floats 3`] = `
 Array [
   Number "1.1" (1,1) -> (1,4),
-  Dot (1,4) -> (1,4),
+  Dot (1,4) -> (1,5),
   Number "4" (1,5) -> (1,6),
 ]
 `;
@@ -207,7 +207,7 @@ Array [
 exports[`AlphaTexLexerTest floats 4`] = `
 Array [
   Number "1.1" (1,1) -> (1,4),
-  Dot (1,5) -> (1,5),
+  Dot (1,5) -> (1,6),
   Number "4" (1,6) -> (1,7),
 ]
 `;
@@ -215,7 +215,7 @@ Array [
 exports[`AlphaTexLexerTest floats 5`] = `
 Array [
   Number "1" (1,1) -> (1,2),
-  Dot (1,3) -> (1,3),
+  Dot (1,3) -> (1,4),
   Number "1.4" (1,4) -> (1,7),
 ]
 `;
@@ -229,7 +229,7 @@ Array [
 exports[`AlphaTexLexerTest floats 7`] = `
 Array [
   Ident "-" (1,1) -> (1,2),
-  Dot (1,2) -> (1,2),
+  Dot (1,2) -> (1,3),
   Number "1" (1,3) -> (1,4),
 ]
 `;
@@ -237,28 +237,28 @@ Array [
 exports[`AlphaTexLexerTest floats 8`] = `
 Array [
   Number "1.1" (1,1) -> (1,4),
-  LParen (1,4) -> (1,4),
+  LParen (1,4) -> (1,5),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 9`] = `
 Array [
   Number "1.1" (1,1) -> (1,4),
-  LBrace (1,4) -> (1,4),
+  LBrace (1,4) -> (1,5),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 10`] = `
 Array [
   Number "1.1" (1,1) -> (1,4),
-  Pipe (1,4) -> (1,4),
+  Pipe (1,4) -> (1,5),
 ]
 `;
 
 exports[`AlphaTexLexerTest floats 11`] = `
 Array [
   Number "1" (1,1) -> (1,2),
-  Dot (1,2) -> (1,2),
+  Dot (1,2) -> (1,3),
   Ident "1a" (1,3) -> (1,5),
 ]
 `;
@@ -266,7 +266,7 @@ Array [
 exports[`AlphaTexLexerTest floats 12`] = `
 Array [
   Ident "1a" (1,1) -> (1,3),
-  Dot (1,3) -> (1,3),
+  Dot (1,3) -> (1,4),
   Number "1" (1,4) -> (1,5),
 ]
 `;
@@ -347,12 +347,12 @@ Array [
 
 exports[`AlphaTexLexerTest leading-comments 1`] = `
 Array [
-  Ident "true" (2,10) -> (3,1) {
+  Ident "true" (3,9) -> (3,13) {
     leadingComments: Array [
       "// Single",
     ],
   },
-  Ident "false" (6,10) -> (7,1) {
+  Ident "false" (7,9) -> (7,14) {
     leadingComments: Array [
       "/** Multi **/",
       "/** Multi2 **/",
@@ -404,7 +404,7 @@ Array [
     prefix: Backslash (1,1) -> (1,2),
     tag: Ident "withUnicode😼" (1,2) -> (1,14),
   },
-  Dot (1,15) -> (1,15),
+  Dot (1,15) -> (1,16),
   Tag "withNumber123" (1,17) -> (1,31) {
     prefix: Backslash (1,17) -> (1,18),
     tag: Ident "withNumber123" (1,18) -> (1,31),
@@ -500,17 +500,17 @@ Array [
 
 exports[`AlphaTexLexerTest trailing-comments 1`] = `
 Array [
-  Ident "true" (1,10) -> (1,14) {
+  Ident "true" (2,9) -> (2,13) {
     trailingComments: Array [
       "// Single After",
     ],
   },
-  Ident "false" (2,10) -> (2,15) {
+  Ident "false" (3,9) -> (3,14) {
     trailingComments: Array [
       "/** Multi After **/",
     ],
   },
-  Ident "true" (3,23) -> (3,27) {
+  Ident "true" (4,22) -> (4,26) {
     leadingComments: Array [
       "/** before **/",
     ],
@@ -518,7 +518,7 @@ Array [
       "/** middle **/",
     ],
   },
-  Ident "false" (3,41) -> (3,46) {
+  Ident "false" (4,40) -> (4,45) {
     trailingComments: Array [
       "// after",
     ],
@@ -528,7 +528,7 @@ Array [
 
 exports[`AlphaTexLexerTest whitespace 1`] = `
 Array [
-  Dot (1,3) -> (1,3),
-  Dot (2,8) -> (2,8),
+  Dot (1,3) -> (1,4),
+  Dot (2,7) -> (2,8),
 ]
 `;

@@ -250,6 +250,28 @@ export class AlphaTabWebPackPlugin {
                         }
 
                         alphaTabSourceDir = path.resolve(alphaTabSourceDir, '..');
+
+                        // walk up to package.json
+                        while (alphaTabSourceDir) {
+                            if (
+                                await fs.promises
+                                    .access(path.join(alphaTabSourceDir, 'package.json'), fs.constants.F_OK)
+                                    .then(() => true)
+                                    .catch(() => false)
+                            ) {
+                                // found package directory
+                                alphaTabSourceDir = path.resolve(alphaTabSourceDir, 'dist');
+                                break;
+                            } else {
+                                // reached root
+                                const parent = path.resolve(alphaTabSourceDir, '..');
+                                if (parent === alphaTabSourceDir) {
+                                    alphaTabSourceDir = undefined;
+                                } else {
+                                    alphaTabSourceDir = parent;
+                                }
+                            }
+                        }
                     } catch {
                         alphaTabSourceDir = compilation.getPath('node_modules/@coderline/alphatab/dist/');
                     }
