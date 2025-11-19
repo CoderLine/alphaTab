@@ -24,38 +24,40 @@
     "type": "module",
     "main": "dist/alphaTab.webpack.js",
     "module": "dist/alphaTab.webpack.mjs",
-    "typings": "dist/alphaTab.webpack.d.ts",
+    "types": "dist/alphaTab.webpack.d.ts",
+    "exports": {
+        "./*": "./dist/*"
+    },
     "scripts": {
         "clean": "rimraf dist",
         "lint": "biome lint",
         "typecheck": "tsc --noEmit",
-        "build": "vite build --mode esm && vite build --mode cjs",
+        "build": "vite build",
         "test": "mocha"
     },
     "dependencies": {
         "webpack": "^5.101.3"
     },
+    "engines": {
+        "node": ">=20.19.0"
+    },
     "devDependencies": {
         "@biomejs/biome": "^2.2.6",
-        "@microsoft/api-extractor": "^7.53.3",
         "@types/chai": "^5.2.3",
         "@types/mocha": "^10.0.10",
         "@types/node": "^24.10.0",
         "assert": "^2.1.0",
         "chai": "^6.2.0",
-        "html-webpack-plugin": "^5.6.4",
         "mocha": "^11.7.4",
         "rimraf": "^6.1.0",
-        "terser": "^5.44.1",
         "tslib": "^2.8.1",
         "tsx": "^4.20.6",
         "typescript": "^5.9.3",
         "webpack-cli": "^6.0.1"
     },
     "files": [
-        "/dist/alphaTab*.js",
-        "/dist/alphaTab*.mjs",
-        "/dist/alphaTab*.ts",
+        "/dist/**",
+        "!/dist/types",
         "LICENSE",
         "LICENSE.header",
         "README.md"

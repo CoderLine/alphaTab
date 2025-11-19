@@ -4,91 +4,47 @@
     "scopeName": "source.alphatex",
     "uuid": "1ebe68ca-6558-428e-a6af-90831f41e88e",
     "patterns": [
-        {
-            "include": "#statements"
-        }
+        { "include": "#statements" }
     ],
     "repository": {
         "statements": {
             "patterns": [
-                {
-                    "include": "#string"
-                },
-                {
-                    "include": "#comment"
-                },
-                {
-                    "include": "#metadata"
-                },
-                {
-                    "include": "#literal"
-                },
-                {
-                    "include": "#expression"
-                },
-                {
-                    "include": "#punctuation-pipe"
-                },
-                {
-                    "include": "#punctuation-dot"
-                }
+                { "include": "#string" },
+                { "include": "#comment" },
+                { "include": "#metadata" },
+                { "include": "#literal" },
+                { "include": "#expression" },
+                { "include": "#punctuation-pipe" },
+                { "include": "#punctuation-dot" }
             ]
         },
         "string": {
             "patterns": [
-                {
-                    "include": "#qstring-single"
-                },
-                {
-                    "include": "#qstring-double"
-                }
+                { "include": "#qstring-single" },
+                { "include": "#qstring-double" }
             ]
         },
         "qstring-single": {
             "name": "string.quoted.single.alphatex",
             "begin": "'",
-            "beginCaptures": {
-                "0": {
-                    "name": "punctuation.definition.string.begin.alphatex"
-                }
-            },
+            "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.alphatex" } },
             "end": "(\\')|((?:[^\\\\\\n])$)",
             "endCaptures": {
-                "1": {
-                    "name": "punctuation.definition.string.end.alphatex"
-                },
-                "2": {
-                    "name": "invalid.illegal.newline.alphatex"
-                }
+                "1": { "name": "punctuation.definition.string.end.alphatex" },
+                "2": { "name": "invalid.illegal.newline.alphatex" }
             },
-            "patterns": [
-                {
-                    "include": "#string-character-escape"
-                }
-            ]
+            "patterns": [ { "include": "#string-character-escape" } ]
         },
         "qstring-double": {
             "name": "string.quoted.double.alphatex",
             "begin": "\"",
-            "beginCaptures": {
-                "0": {
-                    "name": "punctuation.definition.string.begin.alphatex"
-                }
-            },
+            "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.alphatex" } },
             "end": "(\")|((?:[^\\\\\\n])$)",
             "endCaptures": {
-                "1": {
-                    "name": "punctuation.definition.string.end.alphatex"
-                },
-                "2": {
-                    "name": "invalid.illegal.newline.alphatex"
-                }
+                "1": { "name": "punctuation.definition.string.end.alphatex" },
+                "2": { "name": "invalid.illegal.newline.alphatex" }
             },
-            "patterns": [
-                {
-                    "include": "#string-character-escape"
-                }
-            ]
+            "patterns": [ { "include": "#string-character-escape" } ]
         },
         "string-character-escape": {
             "name": "constant.character.escape.alphatex",
@@ -99,35 +55,19 @@
                 {
                     "name": "comment.block.alphatex",
                     "begin": "/\\*",
-                    "beginCaptures": {
-                        "0": {
-                            "name": "punctuation.definition.comment.alphatex"
-                        }
-                    },
+                    "beginCaptures": { "0": { "name": "punctuation.definition.comment.alphatex" } },
                     "end": "\\*/",
-                    "endCaptures": {
-                        "0": {
-                            "name": "punctuation.definition.comment.alphatex"
-                        }
-                    }
+                    "endCaptures": { "0": { "name": "punctuation.definition.comment.alphatex" } }
                 },
                 {
                     "begin": "(^[ \\t]+)?(?=//)",
-                    "beginCaptures": {
-                        "1": {
-                            "name": "punctuation.whitespace.comment.leading.alphatex"
-                        }
-                    },
+                    "beginCaptures": { "1": { "name": "punctuation.whitespace.comment.leading.alphatex" } },
                     "end": "(?=$)",
                     "patterns": [
                         {
                             "name": "comment.line.double-slash.alphatex",
                             "begin": "//",
-                            "beginCaptures": {
-                                "0": {
-                                    "name": "punctuation.definition.comment.alphatex"
-                                }
-                            },
+                            "beginCaptures": { "0": { "name": "punctuation.definition.comment.alphatex" } },
                             "end": "(?=$)"
                         }
                     ]
@@ -135,134 +75,64 @@
             ]
         },
         "literal": {
-            "patterns": [
-                {
-                    "include": "#numeric-literal"
-                }
-            ]
+            "patterns": [ { "include": "#numeric-literal" } ]
         },
         "numeric-literal": {
             "name": "constant.numeric.decimal.alphatex",
             "match": "[0-9]+",
-            "captures": {
-                "0": {
-                    "name": "constant.numeric.decimal.alphatex"
-                }
-            }
+            "captures": { "0": { "name": "constant.numeric.decimal.alphatex" } }
         },
         "expression": {
             "patterns": [
-                {
-                    "include": "#string"
-                },
-                {
-                    "include": "#comment"
-                },
-                {
-                    "include": "#literal"
-                },
-                {
-                    "include": "#identifier"
-                },
-                {
-                    "include": "#valueList"
-                },
-                {
-                    "include": "#properties"
-                },
-                {
-                    "include": "#punctuation"
-                }
+                { "include": "#string" },
+                { "include": "#comment" },
+                { "include": "#literal" },
+                { "include": "#identifier" },
+                { "include": "#valueList" },
+                { "include": "#properties" },
+                { "include": "#punctuation" }
             ]
         },
         "valueList": {
             "begin": "\\(",
-            "beginCaptures": {
-                "0": {
-                    "name": "punctuation.definition.value-list.begin.js"
-                }
-            },
+            "beginCaptures": { "0": { "name": "punctuation.definition.value-list.begin.js" } },
             "end": "\\)",
-            "endCaptures": {
-                "0": {
-                    "name": "punctuation.definition.value-list.end.js"
-                }
-            },
+            "endCaptures": { "0": { "name": "punctuation.definition.value-list.end.js" } },
             "patterns": [
-                {
-                    "include": "#string"
-                },
-                {
-                    "include": "#comment"
-                },
-                {
-                    "include": "#literal"
-                },
-                {
-                    "include": "#identifier"
-                }
+                { "include": "#string" },
+                { "include": "#comment" },
+                { "include": "#literal" },
+                { "include": "#identifier" }
             ]
         },
         "properties": {
             "begin": "\\{",
-            "beginCaptures": {
-                "0": {
-                    "name": "punctuation.definition.properties.begin.js"
-                }
-            },
+            "beginCaptures": { "0": { "name": "punctuation.definition.properties.begin.js" } },
             "end": "\\}",
-            "endCaptures": {
-                "0": {
-                    "name": "punctuation.definition.properties.end.js"
-                }
-            },
+            "endCaptures": { "0": { "name": "punctuation.definition.properties.end.js" } },
             "patterns": [
-                {
-                    "include": "#string"
-                },
-                {
-                    "include": "#comment"
-                },
-                {
-                    "include": "#literal"
-                },
-                {
-                    "include": "#identifier"
-                },
-                {
-                    "include": "#valueList"
-                }
+                { "include": "#string" },
+                { "include": "#comment" },
+                { "include": "#literal" },
+                { "include": "#identifier" },
+                { "include": "#valueList" }
             ]
         },
         "metadata": {
             "name": "keyword.metadata.alphatex",
             "match": "\\\\{1,2}[^\\s]+",
-            "captures": {
-                "0": {
-                    "name": "keyword.metadata.alphatex"
-                }
-            }
+            "captures": { "0": { "name": "keyword.metadata.alphatex" } }
         },
         "identifier": {
             "name": "variable.identifier.alphatex",
             "match": "[^/\"'-\\.:\\(\\)\\{\\}\\|\\*\\\\\\s][^/\"'\\.:\\(\\)\\{\\}\\|\\*\\\\\\s]+",
-            "captures": {
-                "0": {
-                    "name": "variable.identifier.alphatex"
-                }
-            }
+            "captures": { "0": { "name": "variable.identifier.alphatex" } }
         },
         "punctuation": {
             "patterns": [
-                {
-                    "include": "#punctuation-dot"
-                },
-                {
-                    "include": "#punctuation-pipe"
-                },
-                {
-                    "include": "#punctuation-asterisk"
-                }
+                { "include": "#punctuation-dot" },
+                { "include": "#punctuation-pipe" },
+                { "include": "#punctuation-asterisk" }
             ]
         },
         "punctuation-pipe": {

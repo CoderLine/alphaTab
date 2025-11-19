@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { defaultBuildUserConfig, dtsPathsTransformer, esm } from '@coderline/alphatab-tooling/src/vite';
 import { defaultClientMainFields, defineConfig } from 'vite';
+import { defaultBuildUserConfig, dtsPathsTransformer, esm } from '../tooling/src/vite';
 
 export default defineConfig(({ command }) => {
     if (command === 'serve') {

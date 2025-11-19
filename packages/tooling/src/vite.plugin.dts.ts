@@ -2,13 +2,7 @@ import path from 'node:path';
 import url from 'node:url';
 import { Extractor, ExtractorConfig, type ExtractorResult } from '@microsoft/api-extractor';
 
-export default function generateDts(root: string, entryFile: string, outputFilename: string) {
-    const relativePath = path.relative(root, entryFile);
-    const dtsRoot = path.resolve(root, 'dist', 'types');
-    const dtsPath = path.resolve(dtsRoot, relativePath).replace('.ts', '.d.ts');
-
-    const outputFile: string = path.join(root, 'dist', outputFilename);
-
+export default function generateDts(root: string, dtsPath: string, outputFile: string) {
     const extractorConfig: ExtractorConfig = ExtractorConfig.prepare({
         packageJsonFullPath: path.resolve(root, 'package.json'),
         configObjectFullPath: undefined,
@@ -16,13 +10,7 @@ export default function generateDts(root: string, entryFile: string, outputFilen
             projectFolder: root,
             mainEntryPointFilePath: dtsPath,
             compiler: {
-                overrideTsconfig: {
-                    compilerOptions: {
-                        paths: {
-                            '@src/*': [dtsRoot]
-                        }
-                    }
-                }
+                tsconfigFilePath: path.join(root, 'tsconfig.json')
             },
             dtsRollup: {
                 enabled: true,
@@ -39,7 +27,7 @@ export default function generateDts(root: string, entryFile: string, outputFilen
     });
 
     if (extractorResult.succeeded) {
-        console.log(`DTS bundled`, entryFile, outputFile);
+        console.log(`DTS bundled`, outputFile);
     } else {
         throw new Error(
             `API Extractor completed with ${extractorResult.errorCount} errors` +

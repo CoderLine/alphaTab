@@ -1,4 +1,4 @@
-import * as fs from 'node:fs';
+import fs from 'node:fs';
 import url from 'node:url';
 import path from 'node:path';
 import { exec } from 'node:child_process';

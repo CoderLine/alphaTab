@@ -1,0 +1,97 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "Bundler",
+        "target": "ES2022",
+        "module": "preserve",
+        "lib": [
+            "ES2015",
+            "ES2016",
+            "ES2017",
+            "ES2021",
+            "es2022.regexp",
+            "es2022.error",
+            "ES2024.Promise",
+            "WebWorker",
+            "DOM",
+            "DOM.Iterable",
+            "ES2017.ArrayBuffer",
+            "ES2024.ArrayBuffer"
+        ],
+        "isolatedModules": true,
+        "moduleDetection": "force",
+        "noEmit": true,
+        "strict": true,
+        "allowSyntheticDefaultImports": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
+        "emitDecoratorMetadata": false,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noImplicitOverride": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "paths": {
+            // repeating of all individual packages for a unified
+            // import syntax format
+            "@coderline/alphatab/*": [
+                "${configDir}/../alphatab/src/*"
+            ],
+            "@coderline/alphatab": [
+                "${configDir}/../alphatab/src/alphaTab.main"
+            ],
+            "@coderline/alphatab-csharp/*": [
+                "${configDir}/../csharp/src/*"
+            ],
+            "@coderline/alphatab-kotlin/*": [
+                "${configDir}/../kotlin/src/*"
+            ],
+            "@coderline/alphatab-lsp/*": [
+                "${configDir}/../lsp/src/*"
+            ],
+            "@coderline/alphatab-lsp": [
+                "${configDir}/../lsp/src/index"
+            ],
+            "@coderline/alphatab-playground/*": [
+                "${configDir}/../playground/src/*"
+            ],
+            "@coderline/alphatab-tooling/*": [
+                "${configDir}/../tooling/src/*"
+            ],
+            "@coderline/alphatab-transpiler/*": [
+                "${configDir}/../transpiler/src/*"
+            ],
+            "@coderline/alphatab-vite/*": [
+                "${configDir}/../vite/src/*"
+            ],
+            "alphatab-vscode/*": [
+                "${configDir}/../vscode/src/*"
+            ],
+            "@coderline/alphatab-webpack/*": [
+                "${configDir}/../webpack/src/*"
+            ]
+        },
+        "baseUrl": "${configDir}",
+        "typeRoots": [
+            // monorepo root
+            "${configDir}/../../node_modules/@types",
+            // project dir
+            "${configDir}/node_modules/@types",
+            "${configDir}/types",
+        ],
+    },
+    "include": [
+        "${configDir}/*.ts",
+        "${configDir}/src",
+        "${configDir}/test"
+    ],
+    "exclude": [
+        // monorepo root
+        "${configDir}/../../node_modules",
+        // project dir
+        "${configDir}/node_modules",
+        // any potential left-overs
+        "**/node_modules"
+    ]
+}

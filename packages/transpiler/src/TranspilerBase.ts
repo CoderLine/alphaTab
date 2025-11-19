@@ -2,23 +2,9 @@ import path from 'node:path';
 import url from 'node:url';
 import ts from 'typescript';
 
+import {createDiagnosticReporter} from '@coderline/alphatab-tooling/typescript'
+
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-
-function createDiagnosticReporter(pretty?: boolean): ts.DiagnosticReporter {
-    const host: ts.FormatDiagnosticsHost = {
-        getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
-        getNewLine: () => ts.sys.newLine,
-        getCanonicalFileName: ts.sys.useCaseSensitiveFileNames ? x => x : x => x.toLowerCase()
-    };
-
-    if (!pretty) {
-        return diagnostic => ts.sys.write(ts.formatDiagnostic(diagnostic, host));
-    }
-
-    return diagnostic => {
-        ts.sys.write(ts.formatDiagnosticsWithColorAndContext([diagnostic], host) + host.getNewLine());
-    };
-}
 
 interface Emitter {
     name: string;

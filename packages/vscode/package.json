@@ -27,7 +27,7 @@
         "clean": "rimraf dist",
         "lint": "biome lint",
         "typecheck": "tsc --noEmit",
-        "build": "vite build",
+        "build": "vite build && vite build --mode previewApp",
         "dev": "concurrently \"npm run dev-extension\" \"npm run dev-preview-app\"",
         "dev-extension": "vite build --watch",
         "dev-preview-app": "vite build --watch --mode previewApp",
