@@ -1,7 +1,7 @@
-import { setupCompletion } from '@coderline/alphatab-lsp/server/completion';
-import { setupDiagnostics } from '@coderline/alphatab-lsp/server/diagnostics';
-import { setupHover } from '@coderline/alphatab-lsp/server/hover';
-import { setupSignatureHelp } from '@coderline/alphatab-lsp/server/signatureHelp';
+import { setupCompletion } from '@coderline/alphatab-language-server/server/completion';
+import { setupDiagnostics } from '@coderline/alphatab-language-server/server/diagnostics';
+import { setupHover } from '@coderline/alphatab-language-server/server/hover';
+import { setupSignatureHelp } from '@coderline/alphatab-language-server/server/signatureHelp';
 import {
     type AlphaTexTextDocument,
     type Connection,
@@ -11,7 +11,7 @@ import {
     TextDocument,
     TextDocumentSyncKind,
     TextDocuments
-} from '@coderline/alphatab-lsp/server/types';
+} from '@coderline/alphatab-language-server/server/types';
 
 // the only place where we should import specif vscode-languageserver packages
 import {

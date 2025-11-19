@@ -4,10 +4,10 @@ import {
     beatProperties,
     durationChangeProperties,
     noteProperties
-} from '@coderline/alphatab-lsp/documentation/documentation';
-import type { CommonDoc, PropertyDoc, ValueDoc, ValueItemDoc } from '@coderline/alphatab-lsp/documentation/types';
-import type { AlphaTexTextDocument, Connection, Hover, TextDocuments } from '@coderline/alphatab-lsp/server/types';
-import { binaryNodeSearch } from '@coderline/alphatab-lsp/server/utils';
+} from '@coderline/alphatab-language-server/documentation/documentation';
+import type { CommonDoc, PropertyDoc, ValueDoc, ValueItemDoc } from '@coderline/alphatab-language-server/documentation/types';
+import type { AlphaTexTextDocument, Connection, Hover, TextDocuments } from '@coderline/alphatab-language-server/server/types';
+import { binaryNodeSearch } from '@coderline/alphatab-language-server/server/utils';
 
 export function setupHover(connection: Connection, documents: TextDocuments<AlphaTexTextDocument>) {
     connection.onHover(params => {

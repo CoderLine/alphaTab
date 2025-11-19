@@ -1,4 +1,4 @@
-import type { PropertyDoc } from '@coderline/alphatab-lsp/documentation/types';
+import type { PropertyDoc } from '@coderline/alphatab-language-server/documentation/types';
 
 export const sou: PropertyDoc = {
     property: 'sou',

@@ -1,4 +1,4 @@
-import type { MetadataDoc } from '@coderline/alphatab-lsp/documentation/types';
+import type { MetadataDoc } from '@coderline/alphatab-language-server/documentation/types';
 
 export const list: [string, number][] = [
     ['Ride (choke)', 29],

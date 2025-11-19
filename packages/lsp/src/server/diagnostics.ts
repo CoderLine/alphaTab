@@ -8,7 +8,7 @@ import {
     DocumentDiagnosticReportKind,
     type TextDocuments,
     uinteger
-} from '@coderline/alphatab-lsp/server/types';
+} from '@coderline/alphatab-language-server/server/types';
 
 export function setupDiagnostics(connection: Connection, documents: TextDocuments<AlphaTexTextDocument>) {
     connection.languages.diagnostics.on(async params => {

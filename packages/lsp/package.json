@@ -1,5 +1,5 @@
 {
-    "name": "@coderline/alphatab-lsp",
+    "name": "@coderline/alphatab-language-server",
     "version": "1.7.0",
     "private": true,
     "description": "A language server for alphaTab providing coding assistance for alphaTex.",
@@ -11,7 +11,10 @@
         "svg",
         "guitar-tablature",
         "alphaTab",
-        "alphaTex"
+        "alphaTex",
+        "language",
+        "server",
+        "lsp"
     ],
     "homepage": "https://alphatab.net",
     "bugs": {

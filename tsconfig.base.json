@@ -47,10 +47,10 @@
             "@coderline/alphatab-kotlin/*": [
                 "${configDir}/../kotlin/src/*"
             ],
-            "@coderline/alphatab-lsp/*": [
+            "@coderline/alphatab-language-server/*": [
                 "${configDir}/../lsp/src/*"
             ],
-            "@coderline/alphatab-lsp": [
+            "@coderline/alphatab-language-server": [
                 "${configDir}/../lsp/src/index"
             ],
             "@coderline/alphatab-playground/*": [
@@ -70,7 +70,13 @@
             ],
             "@coderline/alphatab-webpack/*": [
                 "${configDir}/../webpack/src/*"
-            ]
+            ],
+            "@coderline/alphatab-monaco/*": [
+                "${configDir}/../monaco/src/*"
+            ],
+            "@coderline/alphatab-monaco": [
+                "${configDir}/../monaco/src/alphaTab.monaco"
+            ],
         },
         "baseUrl": "${configDir}",
         "typeRoots": [

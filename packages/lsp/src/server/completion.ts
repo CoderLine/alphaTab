@@ -7,9 +7,9 @@ import {
     noteProperties,
     scoreMetaData,
     structuralMetaData
-} from '@coderline/alphatab-lsp/documentation/documentation';
-import type { MetadataDoc, PropertyDoc, ValueDoc, ValueItemDoc } from '@coderline/alphatab-lsp/documentation/types';
-import type { AlphaTexTextDocument, Connection } from '@coderline/alphatab-lsp/server/types';
+} from '@coderline/alphatab-language-server/documentation/documentation';
+import type { MetadataDoc, PropertyDoc, ValueDoc, ValueItemDoc } from '@coderline/alphatab-language-server/documentation/types';
+import type { AlphaTexTextDocument, Connection } from '@coderline/alphatab-language-server/server/types';
 import {
     type CompletionItem,
     CompletionItemKind,
@@ -18,8 +18,8 @@ import {
     type TextDocumentPositionParams,
     type TextDocuments,
     TextEdit
-} from '@coderline/alphatab-lsp/server/types';
-import { binaryNodeSearch } from '@coderline/alphatab-lsp/server/utils';
+} from '@coderline/alphatab-language-server/server/types';
+import { binaryNodeSearch } from '@coderline/alphatab-language-server/server/utils';
 
 interface MetaDataCompletionData {
     tagLowerCase: string;

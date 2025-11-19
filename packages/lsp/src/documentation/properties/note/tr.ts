@@ -1,6 +1,6 @@
-import { harmonicValueDocs } from '@coderline/alphatab-lsp/documentation/properties/note/ah';
+import { harmonicValueDocs } from '@coderline/alphatab-language-server/documentation/properties/note/ah';
 import * as alphaTab from '@coderline/alphatab';
-import type { PropertyDoc, ValueItemDoc } from '@coderline/alphatab-lsp/documentation/types';
+import type { PropertyDoc, ValueItemDoc } from '@coderline/alphatab-language-server/documentation/types';
 
 export const tr: PropertyDoc = {
     property: 'tr',

@@ -1,4 +1,4 @@
-import { type MetadataDoc, properties } from '@coderline/alphatab-lsp/documentation/types';
+import { type MetadataDoc, properties } from '@coderline/alphatab-language-server/documentation/types';
 
 export const staff: MetadataDoc = {
     tag: '\\staff',

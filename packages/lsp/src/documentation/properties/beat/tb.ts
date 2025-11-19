@@ -1,5 +1,5 @@
 import * as alphaTab from '@coderline/alphatab';
-import type { PropertyDoc, ValueItemDoc } from '@coderline/alphatab-lsp/documentation/types';
+import type { PropertyDoc, ValueItemDoc } from '@coderline/alphatab-language-server/documentation/types';
 
 export const tb: PropertyDoc = {
     property: 'tb',

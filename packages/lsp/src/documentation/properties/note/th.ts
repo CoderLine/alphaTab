@@ -1,4 +1,4 @@
-import { harmonicValueDocs } from '@coderline/alphatab-lsp/documentation/properties/note/ah';
+import { harmonicValueDocs } from '@coderline/alphatab-language-server/documentation/properties/note/ah';
 import type { PropertyDoc } from '../../types';
 
 

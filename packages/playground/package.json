@@ -14,10 +14,7 @@
         "bootstrap": "^5.3.8",
         "handlebars": "^4.7.8",
         "monaco-editor": "^0.54.0",
-        "serve-static": "^2.2.0",
-        "vscode-languageserver-protocol": "^3.17.5",
-        "vscode-oniguruma": "^2.0.1",
-        "vscode-textmate": "^9.2.1"
+        "serve-static": "^2.2.0"
     },
     "scripts": {
         "lint": "biome lint",

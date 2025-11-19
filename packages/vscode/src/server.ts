@@ -1,3 +1,3 @@
-import { startNodeLanguageServer } from '@coderline/alphatab-lsp';
+import { startNodeLanguageServer } from '@coderline/alphatab-language-server';
 
 startNodeLanguageServer();
