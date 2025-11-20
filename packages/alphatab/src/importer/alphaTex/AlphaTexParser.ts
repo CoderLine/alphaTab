@@ -23,7 +23,7 @@ import {
     type AlphaTexPropertyNode,
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
-    type AlphaTexValueList
+    type AlphaTexArgumentList
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
 import {
@@ -507,38 +507,38 @@ export class AlphaTexParser {
                 metaData.properties = this._properties(property =>
                     this._metaDataReader.readMetaDataPropertyValues(this, metaData.tag, property)
                 );
-                metaData.values = this.valueList();
-                if (!metaData.values) {
-                    metaData.values = this._metaDataReader.readMetaDataValues(this, metaData.tag);
-                    if (metaData.values && metaData.values.values.length > 1) {
+                metaData.arguments = this.valueList();
+                if (!metaData.arguments) {
+                    metaData.arguments = this._metaDataReader.readMetaDataValues(this, metaData.tag);
+                    if (metaData.arguments && metaData.arguments.arguments.length > 1) {
                         this.addParserDiagnostic({
                             code: AlphaTexDiagnosticCode.AT301,
                             message: `Metadata values should be wrapped into parenthesis.`,
                             severity: AlphaTexDiagnosticsSeverity.Warning,
-                            start: metaData.values?.start ?? metaData.start,
-                            end: metaData.values?.end ?? metaData.end
+                            start: metaData.arguments?.start ?? metaData.start,
+                            end: metaData.arguments?.end ?? metaData.end
                         });
 
                         this.addParserDiagnostic({
                             code: AlphaTexDiagnosticCode.AT302,
                             message: `Metadata values should be placed before metadata properties.`,
                             severity: AlphaTexDiagnosticsSeverity.Warning,
-                            start: metaData.values?.start ?? metaData.start,
-                            end: metaData.values?.end ?? metaData.end
+                            start: metaData.arguments?.start ?? metaData.start,
+                            end: metaData.arguments?.end ?? metaData.end
                         });
                     }
                 }
             } else {
-                metaData.values = this.valueList();
-                if (!metaData.values) {
-                    metaData.values = this._metaDataReader.readMetaDataValues(this, metaData.tag);
-                    if (metaData.values && metaData.values.values.length > 1) {
+                metaData.arguments = this.valueList();
+                if (!metaData.arguments) {
+                    metaData.arguments = this._metaDataReader.readMetaDataValues(this, metaData.tag);
+                    if (metaData.arguments && metaData.arguments.arguments.length > 1) {
                         this.addParserDiagnostic({
                             code: AlphaTexDiagnosticCode.AT301,
                             message: `Metadata values should be wrapped into parenthesis.`,
                             severity: AlphaTexDiagnosticsSeverity.Warning,
-                            start: metaData.values?.start ?? metaData.start,
-                            end: metaData.values?.end ?? metaData.end
+                            start: metaData.arguments?.start ?? metaData.start,
+                            end: metaData.arguments?.end ?? metaData.end
                         });
                     }
                 }
@@ -554,7 +554,7 @@ export class AlphaTexParser {
     }
 
     private _properties(
-        readPropertyValues: (property: AlphaTexPropertyNode) => AlphaTexValueList | undefined
+        readPropertyValues: (property: AlphaTexPropertyNode) => AlphaTexArgumentList | undefined
     ): AlphaTexPropertiesNode | undefined {
         const braceOpen = this.lexer.peekToken();
         if (!braceOpen || braceOpen.nodeType !== AlphaTexNodeType.LBrace) {
@@ -599,7 +599,7 @@ export class AlphaTexParser {
 
     private _property(
         identifier: AlphaTexIdentifier,
-        readPropertyValues: (property: AlphaTexPropertyNode) => AlphaTexValueList | undefined
+        readPropertyValues: (property: AlphaTexPropertyNode) => AlphaTexArgumentList | undefined
     ): AlphaTexPropertyNode {
         const property: AlphaTexPropertyNode = {
             nodeType: AlphaTexNodeType.Prop,
@@ -613,7 +613,7 @@ export class AlphaTexParser {
             property.values = this.valueList();
             if (!property.values) {
                 property.values = readPropertyValues(property);
-                if (property.values && property.values.values.length > 1) {
+                if (property.values && property.values.arguments.length > 1) {
                     this.addParserDiagnostic({
                         code: AlphaTexDiagnosticCode.AT303,
                         message: 'Property values should be wrapped into parenthesis.',
@@ -630,16 +630,16 @@ export class AlphaTexParser {
         return property;
     }
 
-    public valueList(): AlphaTexValueList | undefined {
+    public valueList(): AlphaTexArgumentList | undefined {
         const openParenthesis = this.lexer.peekToken();
         if (openParenthesis?.nodeType !== AlphaTexNodeType.LParen) {
             return undefined;
         }
 
-        const valueList: AlphaTexValueList = {
-            nodeType: AlphaTexNodeType.Values,
+        const valueList: AlphaTexArgumentList = {
+            nodeType: AlphaTexNodeType.Arguments,
             openParenthesis: openParenthesis as AlphaTexParenthesisOpenTokenNode,
-            values: [],
+            arguments: [],
             closeParenthesis: undefined,
             start: openParenthesis.start
         };
@@ -650,17 +650,17 @@ export class AlphaTexParser {
             while (token && token?.nodeType !== AlphaTexNodeType.RParen) {
                 switch (token.nodeType) {
                     case AlphaTexNodeType.Ident:
-                        valueList.values.push(token as AlphaTexIdentifier);
+                        valueList.arguments.push(token as AlphaTexIdentifier);
                         this.lexer.advance();
                         break;
                     case AlphaTexNodeType.String:
-                        valueList.values.push(token as AlphaTexStringLiteral);
+                        valueList.arguments.push(token as AlphaTexStringLiteral);
                         this.lexer.advance();
                         break;
                     case AlphaTexNodeType.Number:
                         // in value lists we can always assume floats
                         // (within parenthesis we have no risk of syntax overlaps)
-                        valueList.values.push(this.lexer.extendToFloat(token as AlphaTexNumberLiteral));
+                        valueList.arguments.push(this.lexer.extendToFloat(token as AlphaTexNumberLiteral));
                         this.lexer.advance();
                         break;
                     default:

@@ -28,11 +28,11 @@ export {
     type AlphaTexStringLiteral,
     type AlphaTexTextNode,
     type AlphaTexTokenNode,
-    type AlphaTexValueList,
+    type AlphaTexArgumentList as AlphaTexValueList,
     type IAlphaTexAstNode,
     type IAlphaTexMetaDataTagPrefixNode,
     type IAlphaTexNoteValueNode,
-    type IAlphaTexValueListItem
+    type IAlphaTexArgumentValue as IAlphaTexValueListItem
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 export { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
 export { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';

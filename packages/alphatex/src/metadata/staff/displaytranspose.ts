@@ -1,0 +1,35 @@
+import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
+import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
+
+export const displayTranspose: MetadataTagDefinition = {
+    tag: '\\displayTranspose',
+    snippet: '\\displayTranspose {$1}$0',
+    shortDescription: 'Set the transpose for the standard notation display.',
+    longDescription: `
+    Defines the number of semitones by which the standard notation should be transposed.
+
+    This only affects the display of the notes, not their audio.
+
+    It is typically used in situations like for guitars where the standard notation is displayed 1 octave lower to fit better into the standard staff.
+
+    It is a common practice to show a standard clef on guitar notes even though they are transposed by 1 octave to better fit into the standard staff lines.
+    `,
+    signatures: [
+        {
+            parameters: [
+                {
+                    name: 'semitones',
+                    shortDescription: 'The number of semitones by which the notes should be transposed',
+                    type: AlphaTexNodeType.Number,
+                    parseMode: ValueListParseTypesMode.Required
+                }
+            ]
+        }
+    ],
+    examples: `
+        \\track \\staff \\instrument piano
+        \\displayTranspose -12
+            C4.4 D4 E4 F4 | r.1
+        `
+};

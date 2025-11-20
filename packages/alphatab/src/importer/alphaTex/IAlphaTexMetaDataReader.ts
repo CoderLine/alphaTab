@@ -1,7 +1,7 @@
 import type {
     AlphaTexMetaDataTagNode,
     AlphaTexPropertyNode,
-    AlphaTexValueList
+    AlphaTexArgumentList
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 
@@ -9,20 +9,20 @@ import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/Alpha
  * @internal
  */
 export interface IAlphaTexMetaDataReader {
-    readMetaDataValues(parser: AlphaTexParser, metaData: AlphaTexMetaDataTagNode): AlphaTexValueList | undefined;
+    readMetaDataValues(parser: AlphaTexParser, metaData: AlphaTexMetaDataTagNode): AlphaTexArgumentList | undefined;
 
     readMetaDataPropertyValues(
         parser: AlphaTexParser,
         metaData: AlphaTexMetaDataTagNode,
         property: AlphaTexPropertyNode
-    ): AlphaTexValueList | undefined;
+    ): AlphaTexArgumentList | undefined;
 
-    readBeatPropertyValues(parser: AlphaTexParser, property: AlphaTexPropertyNode): AlphaTexValueList | undefined;
+    readBeatPropertyValues(parser: AlphaTexParser, property: AlphaTexPropertyNode): AlphaTexArgumentList | undefined;
 
     readDurationChangePropertyValues(
         parser: AlphaTexParser,
         property: AlphaTexPropertyNode
-    ): AlphaTexValueList | undefined;
+    ): AlphaTexArgumentList | undefined;
 
-    readNotePropertyValues(parser: AlphaTexParser, property: AlphaTexPropertyNode): AlphaTexValueList | undefined;
+    readNotePropertyValues(parser: AlphaTexParser, property: AlphaTexPropertyNode): AlphaTexArgumentList | undefined;
 }

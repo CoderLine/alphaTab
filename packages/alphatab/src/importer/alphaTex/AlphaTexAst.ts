@@ -19,7 +19,7 @@ export enum AlphaTexNodeType {
     Ident,
     Tag,
     Meta,
-    Values,
+    Arguments,
     Props,
     Prop,
     Number,
@@ -210,7 +210,7 @@ export interface AlphaTexAsteriskTokenNode extends AlphaTexTokenNode {
  * @record
  * @public
  */
-export interface AlphaTexNumberLiteral extends AlphaTexAstNode, IAlphaTexValueListItem, IAlphaTexNoteValueNode {
+export interface AlphaTexNumberLiteral extends AlphaTexAstNode, IAlphaTexArgumentValue, IAlphaTexNoteValueNode {
     nodeType: AlphaTexNodeType.Number;
     /**
      * The numeric value described by this literal.
@@ -223,15 +223,15 @@ export interface AlphaTexNumberLiteral extends AlphaTexAstNode, IAlphaTexValueLi
  * @record
  * @public
  */
-export interface AlphaTexStringLiteral extends AlphaTexTextNode, IAlphaTexValueListItem, IAlphaTexNoteValueNode {
+export interface AlphaTexStringLiteral extends AlphaTexTextNode, IAlphaTexArgumentValue, IAlphaTexNoteValueNode {
     nodeType: AlphaTexNodeType.String;
 }
 
 /**
- * Defines the possible types for values in a {@link AlphaTexValueList}
+ * Base marker interface for nodes which can be values in an {@link AlphaTexArgumentList}
  * @public
  */
-export interface IAlphaTexValueListItem extends IAlphaTexAstNode {}
+export interface IAlphaTexArgumentValue extends IAlphaTexAstNode {}
 
 /**
  * A node holding multiple values optionally grouped by parenthesis.
@@ -240,8 +240,8 @@ export interface IAlphaTexValueListItem extends IAlphaTexAstNode {}
  * @record
  * @public
  */
-export interface AlphaTexValueList extends AlphaTexAstNode {
-    nodeType: AlphaTexNodeType.Values;
+export interface AlphaTexArgumentList extends AlphaTexAstNode {
+    nodeType: AlphaTexNodeType.Arguments;
     /**
      * The open parenthesis token grouping the values.
      */
@@ -249,7 +249,7 @@ export interface AlphaTexValueList extends AlphaTexAstNode {
     /**
      * The list of values.
      */
-    values: IAlphaTexValueListItem[];
+    arguments: IAlphaTexArgumentValue[];
     /**
      * The close parenthesis token grouping the values.
      */
@@ -277,17 +277,19 @@ export interface AlphaTexMetaDataNode extends AlphaTexAstNode {
     tag: AlphaTexMetaDataTagNode;
 
     /**
-     * A value list directly listed after the metadata (not within braces).
+     * A argument list directly listed after the metadata.
      */
-    values?: AlphaTexValueList;
+    arguments?: AlphaTexArgumentList;
 
     /**
-     * The optional properties attached to the metadata.
+     * The optional properties defined for the metadata.
      */
     properties?: AlphaTexPropertiesNode;
 
     /**
      * Whether the properties are listed before the values (if both are present).
+     * This information serves backwards compatibility.
+     * @internal
      */
     propertiesBeforeValues: boolean;
 }
@@ -329,7 +331,7 @@ export interface AlphaTexPropertyNode extends AlphaTexAstNode {
     /**
      * The values attached to the property.
      */
-    values?: AlphaTexValueList;
+    values?: AlphaTexArgumentList;
 }
 
 /**
@@ -351,7 +353,7 @@ export interface AlphaTexTextNode extends AlphaTexAstNode {
  * @record
  * @public
  */
-export interface AlphaTexIdentifier extends AlphaTexTextNode, IAlphaTexValueListItem, IAlphaTexNoteValueNode {
+export interface AlphaTexIdentifier extends AlphaTexTextNode, IAlphaTexArgumentValue, IAlphaTexNoteValueNode {
     nodeType: AlphaTexNodeType.Ident;
 }
 

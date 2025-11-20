@@ -108,7 +108,7 @@ export class AlphaTex1LanguageDefinitions {
         AlphaTex1LanguageDefinitions._valueType(
             [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
             ValueListParseTypesMode.Optional,
-             Array.from(AlphaTex1EnumMappings.textAligns.keys())
+            Array.from(AlphaTex1EnumMappings.textAligns.keys())
         )
     ];
 
@@ -117,7 +117,7 @@ export class AlphaTex1LanguageDefinitions {
         AlphaTex1LanguageDefinitions._valueType(
             [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
             ValueListParseTypesMode.Optional,
-             Array.from(AlphaTex1EnumMappings.textAligns.keys())
+            Array.from(AlphaTex1EnumMappings.textAligns.keys())
         )
     ];
     private static readonly _numberOnlyValueListTypes = AlphaTex1LanguageDefinitions._basicList([

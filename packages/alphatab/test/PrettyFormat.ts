@@ -384,7 +384,7 @@ import {
     type AlphaTexPropertyNode,
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
-    type AlphaTexValueList
+    type AlphaTexArgumentList
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import { MidiEvent } from '@coderline/alphatab/midi/MidiEvent';
 import { Bar } from '@coderline/alphatab/model/Bar';
@@ -496,21 +496,21 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 if (metaData.tag) {
                     children.push(['tag', metaData.tag]);
                 }
-                if (metaData.values) {
-                    children.push(['values', metaData.values]);
+                if (metaData.arguments) {
+                    children.push(['values', metaData.arguments]);
                 }
                 if (metaData.properties) {
                     children.push(['properties', metaData.properties]);
                 }
                 break;
 
-            case AlphaTexNodeType.Values:
-                const valueList = node as AlphaTexValueList;
+            case AlphaTexNodeType.Arguments:
+                const valueList = node as AlphaTexArgumentList;
                 if (valueList.openParenthesis) {
                     children.push(['openParenthesis', valueList.openParenthesis]);
                 }
-                if (valueList.values) {
-                    children.push(['values', valueList.values]);
+                if (valueList.arguments) {
+                    children.push(['values', valueList.arguments]);
                 }
                 if (valueList.closeParenthesis) {
                     children.push(['closeParenthesis', valueList.closeParenthesis]);

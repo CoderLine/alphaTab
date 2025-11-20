@@ -24,7 +24,6 @@ export const acc: PropertyDoc = {
                         { name: 'x', snippet: 'x', shortDescription: 'Force a double-sharp accidental' },
                         { name: '#', snippet: '#', shortDescription: 'Force a flat accidental' },
                         { name: '#', snippet: '#', shortDescription: 'Force a double flat accidental' },
-                        { name: 'd', snippet: 'd', shortDescription: 'Auto-detect the accidentals' },
                         { name: 'forceNone', snippet: 'forceNone', shortDescription: 'Force no accidentals' },
                         { name: 'forceNatural', snippet: 'forceNatural', shortDescription: 'Force a naturalize accidental' },
                         { name: 'forceSharp', snippet: 'forceSharp', shortDescription: 'Force a sharp accidental' },

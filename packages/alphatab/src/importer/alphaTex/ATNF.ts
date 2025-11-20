@@ -12,8 +12,8 @@ import {
     type AlphaTexPropertiesNode,
     type AlphaTexPropertyNode,
     type AlphaTexStringLiteral,
-    type AlphaTexValueList,
-    type IAlphaTexValueListItem
+    type AlphaTexArgumentList,
+    type IAlphaTexArgumentValue
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 /**
@@ -39,7 +39,7 @@ export class Atnf {
 
     public static meta(
         tag: string,
-        values?: AlphaTexValueList,
+        values?: AlphaTexArgumentList,
         properties?: AlphaTexPropertiesNode
     ): AlphaTexMetaDataNode {
         return {
@@ -54,7 +54,7 @@ export class Atnf {
                     text: tag
                 } as AlphaTexIdentifier
             } as AlphaTexMetaDataTagNode,
-            values,
+            arguments: values,
             properties,
             propertiesBeforeValues: false
         } as AlphaTexMetaDataNode;
@@ -69,15 +69,15 @@ export class Atnf {
     }
 
     public static values(
-        values: (IAlphaTexValueListItem | undefined)[],
+        values: (IAlphaTexArgumentValue | undefined)[],
         parentheses: boolean | undefined = undefined
-    ): AlphaTexValueList | undefined {
+    ): AlphaTexArgumentList | undefined {
         const valueList = {
-            nodeType: AlphaTexNodeType.Values,
-            values: values.filter(v => v !== undefined)
-        } as AlphaTexValueList;
+            nodeType: AlphaTexNodeType.Arguments,
+            arguments: values.filter(v => v !== undefined)
+        } as AlphaTexArgumentList;
 
-        const addParenthesis: boolean = parentheses === undefined ? valueList.values.length > 1 : parentheses;
+        const addParenthesis: boolean = parentheses === undefined ? valueList.arguments.length > 1 : parentheses;
 
         if (addParenthesis) {
             valueList.openParenthesis = {
@@ -88,27 +88,27 @@ export class Atnf {
             } as AlphaTexParenthesisCloseTokenNode;
         }
 
-        if (valueList.values.length === 0) {
+        if (valueList.arguments.length === 0) {
             return undefined;
         }
 
         return valueList;
     }
 
-    public static stringValue(text: string): AlphaTexValueList {
+    public static stringValue(text: string): AlphaTexArgumentList {
         return Atnf.values([Atnf.string(text)])!;
     }
 
-    public static identValue(text: string): AlphaTexValueList {
+    public static identValue(text: string): AlphaTexArgumentList {
         return Atnf.values([Atnf.ident(text)])!;
     }
 
-    public static numberValue(value: number): AlphaTexValueList {
+    public static numberValue(value: number): AlphaTexArgumentList {
         return Atnf.values([Atnf.number(value)])!;
     }
 
     public static props(
-        properties: ([string, AlphaTexValueList | undefined] | undefined)[]
+        properties: ([string, AlphaTexArgumentList | undefined] | undefined)[]
     ): AlphaTexPropertiesNode {
         const node = {
             nodeType: AlphaTexNodeType.Props,
@@ -134,7 +134,7 @@ export class Atnf {
         return node;
     }
 
-    public static prop(properties: AlphaTexPropertyNode[], identifier: string, values?: AlphaTexValueList) {
+    public static prop(properties: AlphaTexPropertyNode[], identifier: string, values?: AlphaTexArgumentList) {
         properties.push({
             nodeType: AlphaTexNodeType.Prop,
             property: Atnf.ident(identifier),

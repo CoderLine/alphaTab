@@ -4,7 +4,15 @@
         {
             "label": "Start Development",
             "type": "shell",
-            "command": "npm run dev",
+            "windows": {
+                "command": "npm i; npm run dev",
+            },
+            "linux": {
+                "command": "npm i && npm run dev"
+            },
+            "osx": {
+                "command": "npm i && npm run dev"
+            },
             "presentation": {
                 "reveal": "always",
                 "panel": "new"
