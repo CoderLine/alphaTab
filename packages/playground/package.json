@@ -10,7 +10,7 @@
         "@fortawesome/fontawesome-free": "^7.1.0",
         "@popperjs/core": "^2.11.8",
         "@types/serve-static": "^2.2.0",
-        "ace-builds": "^1.43.3",
+        "ace-builds": "^1.43.4",
         "bootstrap": "^5.3.8",
         "handlebars": "^4.7.8",
         "serve-static": "^2.2.0"
