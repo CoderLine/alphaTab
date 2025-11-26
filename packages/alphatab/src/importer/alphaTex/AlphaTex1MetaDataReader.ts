@@ -1,9 +1,9 @@
 import {
     AlphaTex1LanguageDefinitions,
-    type ValueListParseTypesExtended,
-    ValueListParseTypesMode
+    type ValueListParseTypesExtended
 } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import {
+    type AlphaTexArgumentList,
     type AlphaTexAstNode,
     type AlphaTexIdentifier,
     type AlphaTexMetaDataTagNode,
@@ -11,13 +11,13 @@ import {
     type AlphaTexNumberLiteral,
     type AlphaTexPropertyNode,
     type AlphaTexStringLiteral,
-    type AlphaTexArgumentList,
     type IAlphaTexArgumentValue
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import {
     AlphaTexDiagnosticCode,
-    AlphaTexDiagnosticsSeverity
+    AlphaTexDiagnosticsSeverity,
+    ValueListParseTypesMode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { Atnf } from '@coderline/alphatab/importer/alphaTex/ATNF';
 import type { IAlphaTexMetaDataReader } from '@coderline/alphatab/importer/alphaTex/IAlphaTexMetaDataReader';

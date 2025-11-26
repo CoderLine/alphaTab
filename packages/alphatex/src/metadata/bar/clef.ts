@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
+import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const clef: MetadataTagDefinition = {
     tag: '\\clef',

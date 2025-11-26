@@ -1,5 +1,5 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
+import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import type { MetadataTagDefinition } from '../../types';
 
 export const barlineLeft: MetadataTagDefinition = {

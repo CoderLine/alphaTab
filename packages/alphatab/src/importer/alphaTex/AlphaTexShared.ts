@@ -306,3 +306,62 @@ export interface IAlphaTexImporter {
     startNewStaff(): Staff;
     addSemanticDiagnostic(diagnostic: AlphaTexDiagnostic): void;
 }
+
+
+/**
+ * Defines how the value of the meta data tag is parsed.
+ * @internal
+ */
+export enum ValueListParseTypesMode {
+    /**
+     * Indicates that the value of the given types is required.
+     * If the token matches, it is added to the value list.
+     * If the token does not match, an error diagnostic is added and parsing is stopped.
+     */
+    Required,
+    /**
+     * Indicates that the value of the given types is optional.
+     * If the token matches, it is added to the value list.
+     * If the token does not match, the value list completes and parsing continues.
+     */
+    Optional,
+    /**
+     * Same as {@link Required} but the next value is interpreted as a float.
+     */
+    RequiredAsFloat,
+    /**
+     * Same as {@link Optional} but the next value is interpreted as a float.
+     */
+    OptionalAsFloat,
+    /**
+     * Same as {@link Optional} but the next value is interpreted as a float.
+     * But this value is only handled on value lists with parenthesis.
+     * @remarks
+     * This mode primarily serves the need of preventing tempo automations
+     * to overlap with stringed notes:
+     *    `\tempo 120 "Moderate" 1.0 2.0` - 1.0 should be a fretted note not the ratio position
+     * but here it is the ratio position:
+     *    `\tempo (120 "Moderate" 1.0) 2.0
+     */
+    OptionalAsFloatInValueList,
+    /**
+     * Indicates that the value of the given types is optional and if matched the
+     * only value of this list.
+     * If the token matches, it is added to the value list and the parsing continues.
+     * If the token does not match, the value list completes and parsing continues.
+     */
+    OptionalAndStop,
+    /**
+     * Indicates that multiple values of the same types should be parsed as a value list.
+     * If the token is a open parenthesis, it starts reading the specified types as value list. If an unexpected item is
+     * encountered an error diagnostic is added.
+     * If the token is not an open parenthesis, an error diagnostic is added and parsing is stopped.
+     */
+    RequiredAsValueList,
+    /**
+     * Indicates that multiple values of the same types should be parsed.
+     * If the token matches, it is added to the value list. Parsing stays on the current type.
+     * If the token does not match, the value list completes and parsing continues.
+     */
+    ValueListWithoutParenthesis
+}

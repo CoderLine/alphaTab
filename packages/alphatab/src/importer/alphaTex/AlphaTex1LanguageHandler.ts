@@ -7,8 +7,7 @@
 import { AlphaTex1EnumMappings } from '@coderline/alphatab/importer/alphaTex/AlphaTex1EnumMappings';
 import {
     AlphaTex1LanguageDefinitions,
-    type ValueListParseTypesExtended,
-    ValueListParseTypesMode
+    type ValueListParseTypesExtended
 } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import {
     type AlphaTexAstNode,
@@ -26,6 +25,7 @@ import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
     AlphaTexStaffNoteKind,
+    ValueListParseTypesMode,
     type IAlphaTexImporter
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { Atnf } from '@coderline/alphatab/importer/alphaTex/ATNF';
@@ -458,7 +458,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'accidentals':
                 return AlphaTex1LanguageHandler._handleAccidentalMode(importer, metaData.arguments!);
             case 'displaytranspose':
-                staff.displayTranspositionPitch = (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value * -1;
+                staff.displayTranspositionPitch =
+                    (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value * -1;
                 importer.state.staffHasExplicitDisplayTransposition.add(staff);
                 return ApplyNodeResult.Applied;
             case 'transpose':
@@ -1770,7 +1771,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 const balanceAutomation: Automation = new Automation();
                 balanceAutomation.isLinear = true;
                 balanceAutomation.type = AutomationType.Balance;
-                balanceAutomation.value = ModelUtils.clamp((p.values!.arguments[0] as AlphaTexNumberLiteral).value, 0, 16);
+                balanceAutomation.value = ModelUtils.clamp(
+                    (p.values!.arguments[0] as AlphaTexNumberLiteral).value,
+                    0,
+                    16
+                );
                 beat.automations.push(balanceAutomation);
                 return ApplyNodeResult.Applied;
             case 'tp':
@@ -1972,7 +1977,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         importer: IAlphaTexImporter,
         beat: Beat,
         pedalType: SustainPedalMarkerType,
-        end:boolean = false
+        end: boolean = false
     ) {
         const sustainPedal = new SustainPedalMarker();
         sustainPedal.pedalType = pedalType;

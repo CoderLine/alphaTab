@@ -1,4 +1,4 @@
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
+import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
 

@@ -1,5 +1,5 @@
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
+import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import { generalMidiInstruments } from '../../common';
 
@@ -28,6 +28,7 @@ export const instrument: PropertyDefinition = {
                     shortDescription: 'MIDI program name',
                     parseMode: ValueListParseTypesMode.Required,
                     type: AlphaTexNodeType.String,
+                    valuesOnlyForCompletion: true,
                     values: generalMidiInstruments.map(v => ({
                         name: v,
                         snippet: JSON.stringify(v),

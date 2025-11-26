@@ -1,6 +1,6 @@
 import { instrument } from '@coderline/alphatab-alphatex/properties/beat/instrument';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
+import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const track: MetadataTagDefinition = {

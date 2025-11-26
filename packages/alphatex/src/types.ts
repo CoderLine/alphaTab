@@ -1,6 +1,6 @@
 import type { SettingsJson } from '@coderline/alphatab/generated/SettingsJson';
-import type { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import type { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import type { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 /**
  * Common props for elements with descriptions.
@@ -74,6 +74,13 @@ export interface ParameterDefinition extends WithDescription {
      * The default value of this parameter if not provided.
      */
     defaultValue?: unknown;
+
+    /**
+     * Whether the values list should only be used for providing completion items.
+     * If set to true the parser will parse tokens of any value into the AST and
+     * separately semantic errors have to be created.
+     */
+    valuesOnlyForCompletion?: true;
 
     /**
      * A list of possible values

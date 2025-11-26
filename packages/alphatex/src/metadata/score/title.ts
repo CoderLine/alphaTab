@@ -1,4 +1,4 @@
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
+import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type {

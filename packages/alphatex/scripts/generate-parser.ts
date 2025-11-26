@@ -3,7 +3,13 @@ import * as definitions from '@coderline/alphatab-alphatex/definitions';
 import ts from 'typescript';
 import fs from 'node:fs';
 import path from 'node:path';
-import { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
+import child_process from 'node:child_process';
+import type {
+    MetadataTagDefinition,
+    ParameterDefinition,
+    PropertyDefinition,
+    SignatureDefinition
+} from '@coderline/alphatab-alphatex/types';
 
 type LanguageDefinitionsVisitorContext = {
     foundDefinitions?: true;
@@ -11,17 +17,52 @@ type LanguageDefinitionsVisitorContext = {
     foundStaffMetaDataSignatures?: true;
     foundStructuralMetaDataSignatures?: true;
     foundBarMetaDataSignatures?: true;
+    foundMetaDataProperties?: true;
 };
+
+function createAlphaTexParameterDefinition(e: ParameterDefinition) {
+    const typeArray = Array.isArray(e.type) ? e.type : [e.type];
+
+    return ts.factory.createArrayLiteralExpression([
+        ts.factory.createArrayLiteralExpression(typeArray.map(t => ts.factory.createNumericLiteral(t))),
+        ts.factory.createNumericLiteral(e.parseMode),
+        ts.factory.createArrayLiteralExpression(
+            e.values && !e.valuesOnlyForCompletion
+                ? e.values.map(v => ts.factory.createStringLiteral(v.name.toLowerCase()))
+                : undefined
+        )
+    ]);
+}
+
+function createAlphaTexSignatureDefinition(e: SignatureDefinition) {
+    return ts.factory.createArrayLiteralExpression(e.parameters.map(createAlphaTexParameterDefinition));
+}
 
 function updateMetaDataSignatures(element: ts.PropertyDeclaration, definitions: MetadataTagDefinition[]) {
     console.log(`Start update of ${element.name.getText()}`);
 
-    const newMap = ts.factory.createNewExpression(ts.factory.createIdentifier('Map'), [
-        ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-        ts.factory.createArrayTypeNode(ts.factory.createTypeReferenceNode('AlphaTexSignatureDefinition')),
-    ], [
-
-    ]);
+    const sigs = ts.factory.createCallExpression(
+        ts.factory.createPropertyAccessExpression(
+            ts.factory.createIdentifier('AlphaTex1LanguageDefinitions'),
+            '_signatures'
+        ),
+        undefined,
+        [
+            ts.factory.createArrayLiteralExpression(
+                definitions.map(d =>
+                    ts.factory.createArrayLiteralExpression([
+                        ts.factory.createStringLiteral(d.tag.substring(1).toLowerCase()),
+                        d.signatures.length === 1 && d.signatures[0].parameters.length === 0
+                            ? ts.factory.createNull()
+                            : ts.factory.createArrayLiteralExpression(
+                                  d.signatures.map(createAlphaTexSignatureDefinition)
+                              )
+                    ])
+                ),
+                true
+            )
+        ]
+    );
 
     return ts.factory.updatePropertyDeclaration(
         element,
@@ -29,7 +70,52 @@ function updateMetaDataSignatures(element: ts.PropertyDeclaration, definitions: 
         element.name,
         element.questionToken,
         element.type,
-        newMap
+        sigs
+    );
+}
+
+function createAlphaTexPropertyDefinition(p: PropertyDefinition) {
+    return ts.factory.createArrayLiteralExpression([
+        ts.factory.createStringLiteral(p.property.toLowerCase()),
+        p.signatures.length === 1 && p.signatures[0].parameters.length === 0
+            ? ts.factory.createNull()
+            : ts.factory.createArrayLiteralExpression(p.signatures.map(createAlphaTexSignatureDefinition))
+    ]);
+}
+
+function updateMetaDataProperties(element: ts.PropertyDeclaration, tags: MetadataTagDefinition[]) {
+    console.log(`Start update of ${element.name.getText()}`);
+
+    const props = ts.factory.createCallExpression(
+        ts.factory.createPropertyAccessExpression(
+            ts.factory.createIdentifier('AlphaTex1LanguageDefinitions'),
+            '_metaProps'
+        ),
+        undefined,
+        [
+            ts.factory.createArrayLiteralExpression(
+                tags.map(d =>
+                    ts.factory.createArrayLiteralExpression([
+                        ts.factory.createStringLiteral(d.tag.substring(1).toLowerCase()),
+                        d.properties === undefined
+                            ? ts.factory.createNull()
+                            : ts.factory.createArrayLiteralExpression(
+                                  d.properties.map(createAlphaTexPropertyDefinition)
+                              )
+                    ])
+                ),
+                true
+            )
+        ]
+    );
+
+    return ts.factory.updatePropertyDeclaration(
+        element,
+        element.modifiers,
+        element.name,
+        element.questionToken,
+        element.type,
+        props
     );
 }
 
@@ -56,6 +142,17 @@ function languageDefinitionsVisitor<TNode extends ts.Node>(
             case 'barMetaDataSignatures':
                 context.foundBarMetaDataSignatures = true;
                 return updateMetaDataSignatures(node, definitions.barMetaData) as unknown as TNode;
+            case 'metaDataProperties':
+                context.foundMetaDataProperties = true;
+                return updateMetaDataProperties(
+                    node,
+                    [
+                        definitions.scoreMetaData,
+                        definitions.structuralMetaData,
+                        definitions.staffMetaData,
+                        definitions.barMetaData
+                    ].flat()
+                ) as unknown as TNode;
         }
     }
     return node;
@@ -90,4 +187,6 @@ export async function generateParser() {
     });
 
     await fs.promises.writeFile(languageDefinitionsFile, printer.printFile(source));
+
+    child_process.execSync(`npx @biomejs/biome format --write "${languageDefinitionsFile}"`);
 }
