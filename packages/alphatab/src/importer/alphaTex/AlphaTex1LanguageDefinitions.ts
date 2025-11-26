@@ -77,6 +77,25 @@ export interface ValueListParseTypesExtended {
 }
 
 /**
+ * @record
+ * @internal
+ */
+export interface AlphaTexParameterDefinition {
+    expectedTypes: Set<AlphaTexNodeType>;
+    parseMode: ValueListParseTypesMode;
+    allowedValues?: Set<string>;
+    reservedIdentifiers?: Set<string>;
+}
+
+/**
+ * @record
+ * @internal
+ */
+export interface AlphaTexSignatureDefinition {
+    parameters: AlphaTexParameterDefinition[];
+}
+
+/**
  * @internal
  */
 export class AlphaTex1LanguageDefinitions {
@@ -879,4 +898,9 @@ export class AlphaTex1LanguageDefinitions {
         AlphaTex1LanguageDefinitions.structuralMetaDataValueListTypes,
         AlphaTex1LanguageDefinitions.barMetaDataValueListTypes
     ];
+
+    public static readonly scoreMetaDataSignatures = new Map<string, AlphaTexSignatureDefinition[]>([]);
+    public static readonly staffMetaDataSignatures = new Map<string, AlphaTexSignatureDefinition[]>([]);
+    public static readonly structuralMetaDataSignatures = new Map<string, AlphaTexSignatureDefinition[]>([]);
+    public static readonly barMetaDataSignatures = new Map<string, AlphaTexSignatureDefinition[]>([]);
 }

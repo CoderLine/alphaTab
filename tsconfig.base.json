@@ -93,7 +93,7 @@
     "include": [
         "${configDir}/*.ts",
         "${configDir}/src",
-        "${configDir}/test"
+        "${configDir}/test",
     ],
     "exclude": [
         // monorepo root

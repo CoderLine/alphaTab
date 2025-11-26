@@ -4,7 +4,8 @@
     "private": true,
     "scripts": {
         "lint": "biome lint",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "generate": "tsx scripts/generate.ts"
     },
     "devDependencies": {
         "rimraf": "^6.0.1",

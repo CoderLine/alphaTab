@@ -6,21 +6,24 @@
         "includes": [
             "*.ts",
             "src/**",
-            "test/**"
+            "test/**",
+            "scripts/**"
         ]
     },
     "formatter": {
         "includes": [
             "*.ts",
             "src/**",
-            "test/**"
+            "test/**",
+            "scripts/**"
         ]
     },
     "linter": {
         "includes": [
             "*.ts",
             "src/**",
-            "test/**"
+            "test/**",
+            "scripts/**"
         ],
         "rules": {
             "suspicious": {
