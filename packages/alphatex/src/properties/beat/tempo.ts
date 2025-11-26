@@ -1,17 +1,17 @@
 import type { ParameterDefinition, PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 const bpm: ParameterDefinition = {
     name: 'bpm',
     shortDescription: 'The new tempo in BPM',
     type: AlphaTexNodeType.Number,
-    parseMode: ValueListParseTypesMode.Required
+    parseMode: ArgumentListParseTypesMode.Required
 };
 const label: ParameterDefinition = {
     name: 'label',
     shortDescription: 'A textual label for the tempo',
-    parseMode: ValueListParseTypesMode.Required,
+    parseMode: ArgumentListParseTypesMode.Required,
     type: AlphaTexNodeType.String,
     defaultValue: '""'
 };
@@ -20,7 +20,7 @@ const hide: ParameterDefinition = {
     name: 'hide',
     shortDescription: 'If specified, the tempo change is not shown in the music sheet',
     type: AlphaTexNodeType.Ident,
-    parseMode: ValueListParseTypesMode.Optional,
+    parseMode: ArgumentListParseTypesMode.Optional,
     values: [
         {
             name: 'hide',

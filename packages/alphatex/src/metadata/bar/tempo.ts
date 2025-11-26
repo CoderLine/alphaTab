@@ -1,5 +1,5 @@
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const tempo: MetadataTagDefinition = {
@@ -20,19 +20,19 @@ export const tempo: MetadataTagDefinition = {
                     name: 'tempo',
                     shortDescription: 'The new tempo in BPM',
                     type: AlphaTexNodeType.Number,
-                    parseMode: ValueListParseTypesMode.RequiredAsFloat
+                    parseMode: ArgumentListParseTypesMode.RequiredAsFloat
                 },
                 {
                     name: 'label',
                     shortDescription: 'A textual label for the tempo',
                     type: AlphaTexNodeType.String,
-                    parseMode: ValueListParseTypesMode.Optional,
+                    parseMode: ArgumentListParseTypesMode.Optional,
                     defaultValue: '""'
                 },
                 {
                     name: 'position',
                     shortDescription: 'A relative (ratio) position where within the bar the tempo change should happen',
-                    parseMode: ValueListParseTypesMode.OptionalAsFloatInValueList,
+                    parseMode: ArgumentListParseTypesMode.OptionalAsFloat,
                     defaultValue: '0',
                     type: AlphaTexNodeType.Number
                 },
@@ -40,7 +40,7 @@ export const tempo: MetadataTagDefinition = {
                     name: 'hide',
                     shortDescription: 'If specified the tempo change is not visually shown',
                     type: AlphaTexNodeType.Ident,
-                    parseMode: ValueListParseTypesMode.Optional,
+                    parseMode: ArgumentListParseTypesMode.Optional,
                     values: [
                         {
                             name: 'hide',

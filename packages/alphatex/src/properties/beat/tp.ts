@@ -1,5 +1,5 @@
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const tp: PropertyDefinition = {
@@ -14,7 +14,7 @@ export const tp: PropertyDefinition = {
                     name: 'speed',
                     shortDescription: 'The tremolo picking speed',
                     type: AlphaTexNodeType.Number,
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     values: [
                         { name: '8', snippet: '8', shortDescription: '8th Notes' },
                         { name: '16', snippet: '16', shortDescription: '16th Notes' },

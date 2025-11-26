@@ -1,5 +1,5 @@
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const section: MetadataTagDefinition = {
@@ -14,7 +14,7 @@ export const section: MetadataTagDefinition = {
                     shortDescription: 'The text/description of the new section',
                     type: AlphaTexNodeType.String,
                     allowAllStringTypes: true,
-                    parseMode: ValueListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required
                 }
             ]
         },
@@ -25,14 +25,14 @@ export const section: MetadataTagDefinition = {
                     shortDescription: 'The marker for the section, typically a single letter',
                     type: AlphaTexNodeType.String,
                     allowAllStringTypes: true,
-                    parseMode: ValueListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required
                 },
                 {
                     name: 'text',
                     shortDescription: 'The text/description of the new section',
                     type: AlphaTexNodeType.String,
                     allowAllStringTypes: true,
-                    parseMode: ValueListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required
                 }
             ]
         }

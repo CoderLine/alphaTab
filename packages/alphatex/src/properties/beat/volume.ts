@@ -1,5 +1,5 @@
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const volume: PropertyDefinition = {
@@ -18,7 +18,7 @@ export const volume: PropertyDefinition = {
                     name: 'value',
                     shortDescription: 'The new volume',
                     longDescription: 'The absolute volume of the track within the song in the range of 0-16',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Number
                 }
             ]

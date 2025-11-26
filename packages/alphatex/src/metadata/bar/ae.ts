@@ -1,5 +1,5 @@
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const ae: MetadataTagDefinition = {
@@ -13,7 +13,7 @@ export const ae: MetadataTagDefinition = {
                 {
                     name: 'ending',
                     shortDescription: 'The repeats on which the bar should be played',
-                    parseMode: ValueListParseTypesMode.RequiredAsValueList,
+                    parseMode: ArgumentListParseTypesMode.RequiredAsValueList,
                     type: AlphaTexNodeType.Number
                 }
             ]

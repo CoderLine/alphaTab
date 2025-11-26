@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const firstSystemTrackNameOrientation: MetadataTagDefinition = {
     tag: '\\firstSystemTrackNameOrientation',
@@ -15,7 +15,7 @@ export const firstSystemTrackNameOrientation: MetadataTagDefinition = {
                 {
                     name: 'orientation',
                     shortDescription: 'The orientation to use',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     ...enumParameter('TrackNameOrientation')
                 }
             ]

@@ -1,4 +1,4 @@
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
 
@@ -22,7 +22,7 @@ export const displayTranspose: MetadataTagDefinition = {
                     name: 'semitones',
                     shortDescription: 'The number of semitones by which the notes should be transposed',
                     type: AlphaTexNodeType.Number,
-                    parseMode: ValueListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required
                 }
             ]
         }

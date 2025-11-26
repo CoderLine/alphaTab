@@ -1,5 +1,5 @@
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const beam: PropertyDefinition = {
@@ -16,7 +16,7 @@ export const beam: PropertyDefinition = {
                 {
                     name: 'type',
                     shortDescription: 'The mode to apply',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Ident,
                     allowAllStringTypes: true,
                     values: [

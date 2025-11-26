@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const acc: PropertyDefinition = {
     property: 'acc',
@@ -13,7 +13,7 @@ export const acc: PropertyDefinition = {
                 {
                     name: 'mode',
                     shortDescription: 'The accidental mode',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     ...enumParameter('NoteAccidentalMode')
                 }
             ]

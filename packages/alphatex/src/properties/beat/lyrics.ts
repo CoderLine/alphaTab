@@ -1,5 +1,5 @@
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const beatLyrics: PropertyDefinition = {
@@ -18,7 +18,7 @@ export const beatLyrics: PropertyDefinition = {
                     name: 'text',
                     shortDescription: 'The lyrics to show',
                     type: AlphaTexNodeType.String,
-                    parseMode: ValueListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required
                 }
             ]
         },
@@ -28,13 +28,13 @@ export const beatLyrics: PropertyDefinition = {
                     name: 'line',
                     shortDescription: 'The line number (e.g. for multiple verses)',
                     type: AlphaTexNodeType.Number,
-                    parseMode: ValueListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required
                 },
                 {
                     name: 'text',
                     shortDescription: 'The lyrics to show',
                     type: AlphaTexNodeType.String,
-                    parseMode: ValueListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required
                 }
             ]
         }

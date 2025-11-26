@@ -25,7 +25,7 @@ import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
     AlphaTexStaffNoteKind,
-    ValueListParseTypesMode,
+    ArgumentListParseTypesMode,
     type IAlphaTexImporter
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { Atnf } from '@coderline/alphatab/importer/alphaTex/ATNF';
@@ -880,9 +880,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (!values) {
             const anyRequired = expectedValues.some(
                 v =>
-                    v.parseMode === ValueListParseTypesMode.Required ||
-                    v.parseMode === ValueListParseTypesMode.RequiredAsFloat ||
-                    v.parseMode === ValueListParseTypesMode.RequiredAsValueList
+                    v.parseMode === ArgumentListParseTypesMode.Required ||
+                    v.parseMode === ArgumentListParseTypesMode.RequiredAsFloat ||
+                    v.parseMode === ArgumentListParseTypesMode.RequiredAsValueList
             );
             if (anyRequired) {
                 const expectedTypes = AlphaTex1LanguageHandler._buildExpectedTypesMessage(expectedValues);
@@ -912,13 +912,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
             if (value && expected.expectedTypes.has(value.nodeType) && this._checkRestrictions(expected, value)) {
                 switch (expected.parseMode) {
-                    case ValueListParseTypesMode.OptionalAndStop:
+                    case ArgumentListParseTypesMode.OptionalAndStop:
                         // stop reading values
                         expectedIndex = expectedValues.length;
                         actualIndex++;
                         break;
-                    case ValueListParseTypesMode.ValueListWithoutParenthesis:
-                    case ValueListParseTypesMode.RequiredAsValueList:
+                    case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+                    case ArgumentListParseTypesMode.RequiredAsValueList:
                         // stay on current element
                         actualIndex++;
                         break;
@@ -932,13 +932,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             // not matched value?
             else if (value) {
                 switch (expected.parseMode) {
-                    case ValueListParseTypesMode.ValueListWithoutParenthesis:
-                    case ValueListParseTypesMode.RequiredAsValueList:
+                    case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+                    case ArgumentListParseTypesMode.RequiredAsValueList:
                         // end of value list as soon we have a different type
                         expectedIndex++;
                         break;
-                    case ValueListParseTypesMode.Required:
-                    case ValueListParseTypesMode.RequiredAsFloat:
+                    case ArgumentListParseTypesMode.Required:
+                    case ArgumentListParseTypesMode.RequiredAsFloat:
                         error = true;
                         importer.addSemanticDiagnostic({
                             code: AlphaTexDiagnosticCode.AT209,
@@ -952,10 +952,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         expectedIndex++;
                         actualIndex++;
                         break;
-                    case ValueListParseTypesMode.Optional:
-                    case ValueListParseTypesMode.OptionalAsFloat:
-                    case ValueListParseTypesMode.OptionalAsFloatInValueList:
-                    case ValueListParseTypesMode.OptionalAndStop:
+                    case ArgumentListParseTypesMode.Optional:
+                    case ArgumentListParseTypesMode.OptionalAsFloat:
+                    case ArgumentListParseTypesMode.OptionalAsFloatInArgumentList:
+                    case ArgumentListParseTypesMode.OptionalAndStop:
                         // Skip value and try next
                         expectedIndex++;
                         break;
@@ -964,14 +964,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             // no value anymore
             else {
                 switch (expected.parseMode) {
-                    case ValueListParseTypesMode.ValueListWithoutParenthesis:
-                    case ValueListParseTypesMode.RequiredAsValueList:
+                    case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+                    case ArgumentListParseTypesMode.RequiredAsValueList:
                         // end of list
                         expectedIndex++;
                         break;
 
-                    case ValueListParseTypesMode.Required:
-                    case ValueListParseTypesMode.RequiredAsFloat:
+                    case ArgumentListParseTypesMode.Required:
+                    case ArgumentListParseTypesMode.RequiredAsFloat:
                         error = true;
                         importer.addSemanticDiagnostic({
                             code: AlphaTexDiagnosticCode.AT210,
@@ -985,10 +985,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         expectedIndex = expectedValues.length;
                         break;
 
-                    case ValueListParseTypesMode.Optional:
-                    case ValueListParseTypesMode.OptionalAsFloat:
-                    case ValueListParseTypesMode.OptionalAsFloatInValueList:
-                    case ValueListParseTypesMode.OptionalAndStop:
+                    case ArgumentListParseTypesMode.Optional:
+                    case ArgumentListParseTypesMode.OptionalAsFloat:
+                    case ArgumentListParseTypesMode.OptionalAsFloatInArgumentList:
+                    case ArgumentListParseTypesMode.OptionalAndStop:
                         // no value for optional item
                         expectedIndex++;
                         break;
@@ -1085,18 +1085,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 .map(t => AlphaTexNodeType[t])
                 .join('|');
             switch (v.parseMode) {
-                case ValueListParseTypesMode.Required:
-                case ValueListParseTypesMode.RequiredAsFloat:
+                case ArgumentListParseTypesMode.Required:
+                case ArgumentListParseTypesMode.RequiredAsFloat:
                     parts.push(`required(${types})`);
                     break;
-                case ValueListParseTypesMode.Optional:
-                case ValueListParseTypesMode.OptionalAsFloat:
+                case ArgumentListParseTypesMode.Optional:
+                case ArgumentListParseTypesMode.OptionalAsFloat:
                     parts.push(`optional(${types})`);
                     break;
-                case ValueListParseTypesMode.OptionalAndStop:
+                case ArgumentListParseTypesMode.OptionalAndStop:
                     parts.push(`only(${types})`);
                     break;
-                case ValueListParseTypesMode.ValueListWithoutParenthesis:
+                case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
                     parts.push(`listOf(${types})`);
                     break;
             }

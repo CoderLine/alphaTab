@@ -1,19 +1,19 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { ParameterDefinition, PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 const type: ParameterDefinition = {
     name: 'type',
     shortDescription: 'The type of whammy (affects the display).',
-    parseMode: ValueListParseTypesMode.Required,
+    parseMode: ArgumentListParseTypesMode.Required,
     ...enumParameter('WhammyType')
 };
 
 const style: ParameterDefinition = {
     name: 'style',
     shortDescription: 'The style of the whammy.',
-    parseMode: ValueListParseTypesMode.Required,
+    parseMode: ArgumentListParseTypesMode.Required,
     ...enumParameter('BendStyle')
 };
 
@@ -25,7 +25,7 @@ const values: ParameterDefinition = {
     The offset and value are actually two parameters: 
     \`3.3.1{tbe (0 0 5 4 30 8 60 0)}\`
     `,
-    parseMode: ValueListParseTypesMode.RequiredAsValueList,
+    parseMode: ArgumentListParseTypesMode.RequiredAsValueList,
     type: AlphaTexNodeType.Number
 };
 

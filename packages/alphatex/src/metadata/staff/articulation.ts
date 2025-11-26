@@ -1,4 +1,4 @@
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
 
@@ -123,7 +123,7 @@ export const articulation: MetadataTagDefinition = {
             parameters: [
                 {
                     name: 'defaults',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Ident,
                     shortDescription: '',
                     values: [
@@ -140,13 +140,13 @@ export const articulation: MetadataTagDefinition = {
             parameters: [
                 {
                     name: 'name',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.String,
                     shortDescription: 'The string used in the note values'
                 },
                 {
                     name: 'value',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Ident,
                     shortDescription: 'The numeric value of the built-in articulation'
                 }
@@ -156,13 +156,13 @@ export const articulation: MetadataTagDefinition = {
             parameters: [
                 {
                     name: 'name',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Ident,
                     shortDescription: 'The string used in the note values'
                 },
                 {
                     name: 'value',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Ident,
                     shortDescription: 'The numeric value of the built-in articulation'
                 }

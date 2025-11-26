@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const ot: PropertyDefinition = {
     property: 'ot',
@@ -13,7 +13,7 @@ export const ot: PropertyDefinition = {
                 {
                     name: 'value',
                     shortDescription: 'The octave shift to apply',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     ...enumParameter('Ottavia')
                 }
             ]

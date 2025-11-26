@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const dy: PropertyDefinition = {
     property: 'dy',
@@ -13,7 +13,7 @@ export const dy: PropertyDefinition = {
                 {
                     name: 'dynamic',
                     shortDescription: 'The dynamic value to apply',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     ...enumParameter('DynamicValue')
                 }
             ]

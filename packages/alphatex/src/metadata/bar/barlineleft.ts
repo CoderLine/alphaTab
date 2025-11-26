@@ -1,5 +1,5 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import type { MetadataTagDefinition } from '../../types';
 
 export const barlineLeft: MetadataTagDefinition = {
@@ -19,7 +19,7 @@ export const barlineLeft: MetadataTagDefinition = {
                 {
                     name: 'style',
                     shortDescription: 'The line style to use',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     ...enumParameter('BarLineStyle')
                 }
             ]

@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const tf: MetadataTagDefinition = {
     tag: '\\tf',
@@ -13,7 +13,7 @@ export const tf: MetadataTagDefinition = {
                 {
                     name: 'tripletFeel',
                     shortDescription: 'The triplet feel style',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     ...enumParameter('TripletFeel')
                 }
             ]

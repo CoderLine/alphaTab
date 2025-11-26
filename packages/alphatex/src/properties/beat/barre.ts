@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const barre: PropertyDefinition = {
@@ -14,13 +14,13 @@ export const barre: PropertyDefinition = {
                 {
                     name: 'fret',
                     shortDescription: 'The numeric fret for the barre chord',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Number
                 },
                 {
                     name: 'mode',
                     shortDescription: 'The barre mode',
-                    parseMode: ValueListParseTypesMode.Optional,
+                    parseMode: ArgumentListParseTypesMode.Optional,
                     defaultValue: 'Full',
                     ...enumParameter('BarreShape')
                 }

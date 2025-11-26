@@ -1,4 +1,4 @@
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
 
@@ -38,7 +38,7 @@ export const staff: MetadataTagDefinition = {
                         {
                             name: 'lineCount',
                             shortDescription: 'The number of staff lines',
-                            parseMode: ValueListParseTypesMode.Optional,
+                            parseMode: ArgumentListParseTypesMode.Optional,
                             type: AlphaTexNodeType.Number,
                             defaultValue: 5
                         }

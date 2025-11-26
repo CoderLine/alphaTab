@@ -288,9 +288,9 @@ export interface IAlphaTexImporterState {
  * @public
  */
 export enum AlphaTexStaffNoteKind {
-    Pitched,
-    Fretted,
-    Articulation
+    Pitched = 0,
+    Fretted = 1,
+    Articulation = 2
 }
 
 
@@ -309,59 +309,44 @@ export interface IAlphaTexImporter {
 
 
 /**
- * Defines how the value of the meta data tag is parsed.
+ * Defines how the arguments of the meta data tag is parsed.
  * @internal
  */
-export enum ValueListParseTypesMode {
+export enum ArgumentListParseTypesMode {
     /**
-     * Indicates that the value of the given types is required.
+     * Indicates that the parameter of the given types is required.
      * If the token matches, it is added to the value list.
      * If the token does not match, an error diagnostic is added and parsing is stopped.
      */
-    Required,
+    Required = 0,
     /**
-     * Indicates that the value of the given types is optional.
+     * Indicates that the parameter of the given types is optional.
      * If the token matches, it is added to the value list.
      * If the token does not match, the value list completes and parsing continues.
      */
-    Optional,
+    Optional = 1,
     /**
-     * Same as {@link Required} but the next value is interpreted as a float.
+     * Same as {@link Required} but the next argument is interpreted as a float.
      */
-    RequiredAsFloat,
+    RequiredAsFloat = 2,
     /**
-     * Same as {@link Optional} but the next value is interpreted as a float.
+     * Same as {@link Optional} but the next argument is interpreted as a float.
      */
-    OptionalAsFloat,
+    OptionalAsFloat = 3,
     /**
-     * Same as {@link Optional} but the next value is interpreted as a float.
-     * But this value is only handled on value lists with parenthesis.
-     * @remarks
-     * This mode primarily serves the need of preventing tempo automations
-     * to overlap with stringed notes:
-     *    `\tempo 120 "Moderate" 1.0 2.0` - 1.0 should be a fretted note not the ratio position
-     * but here it is the ratio position:
-     *    `\tempo (120 "Moderate" 1.0) 2.0
-     */
-    OptionalAsFloatInValueList,
-    /**
-     * Indicates that the value of the given types is optional and if matched the
-     * only value of this list.
-     * If the token matches, it is added to the value list and the parsing continues.
-     * If the token does not match, the value list completes and parsing continues.
-     */
-    OptionalAndStop,
-    /**
-     * Indicates that multiple values of the same types should be parsed as a value list.
+     * Indicates that multiple arguments of the same types should be parsed as a list
+     * Think: rest-parameter that allows parameters to follow if the type doesn't match anymore.
      * If the token is a open parenthesis, it starts reading the specified types as value list. If an unexpected item is
      * encountered an error diagnostic is added.
-     * If the token is not an open parenthesis, an error diagnostic is added and parsing is stopped.
+     * If the token matches the expected type, a single value is read.
+     * If the token is any other type, an error diagnostic is added and parsing is stopped.
      */
-    RequiredAsValueList,
+    RequiredAsValueList = 4,
+
     /**
-     * Indicates that multiple values of the same types should be parsed.
+     * Indicates that multiple parameters of the same types should be parsed. (this is mainly for backwards compatibility with older alphaTex files)
      * If the token matches, it is added to the value list. Parsing stays on the current type.
      * If the token does not match, the value list completes and parsing continues.
      */
-    ValueListWithoutParenthesis
+    ValueListWithoutParenthesis = 5
 }

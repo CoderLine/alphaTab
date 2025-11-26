@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const firstSystemTrackNameMode: MetadataTagDefinition = {
     tag: '\\firstSystemTrackNameMode',
@@ -15,7 +15,7 @@ export const firstSystemTrackNameMode: MetadataTagDefinition = {
                 {
                     name: 'mode',
                     shortDescription: 'The mode to use',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     ...enumParameter('TrackNameMode')
                 }
             ]

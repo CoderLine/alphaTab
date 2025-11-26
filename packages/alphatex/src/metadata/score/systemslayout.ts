@@ -1,5 +1,5 @@
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const systemsLayout: MetadataTagDefinition = {
@@ -16,7 +16,7 @@ export const systemsLayout: MetadataTagDefinition = {
             parameters: [
                 {
                     name: 'numberOfBars',
-                    parseMode: ValueListParseTypesMode.ValueListWithoutParenthesis,
+                    parseMode: ArgumentListParseTypesMode.ValueListWithoutParenthesis,
                     type: AlphaTexNodeType.Number,
                     shortDescription: 'Defines for every system (line) the number of bars it should contain'
                 }

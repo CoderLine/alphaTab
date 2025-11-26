@@ -1,6 +1,6 @@
 import { instrument } from '@coderline/alphatab-alphatex/properties/beat/instrument';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const track: MetadataTagDefinition = {
@@ -14,14 +14,14 @@ export const track: MetadataTagDefinition = {
                 {
                     name: 'name',
                     shortDescription: 'The full name of the track',
-                    parseMode: ValueListParseTypesMode.Optional,
+                    parseMode: ArgumentListParseTypesMode.Optional,
                     defaultValue: '',
                     type: AlphaTexNodeType.String
                 },
                 {
                     name: 'shortName',
                     shortDescription: 'The short name of the track',
-                    parseMode: ValueListParseTypesMode.Optional,
+                    parseMode: ArgumentListParseTypesMode.Optional,
                     defaultValue: '`/*computed from name*/`',
                     type: AlphaTexNodeType.String
                 }
@@ -50,7 +50,7 @@ export const track: MetadataTagDefinition = {
                             longDescription:
                                 'The colorCode in [any supported color format](https://next.alphatab.net/docs/reference/settings/display/resources#colors)',
                             type: AlphaTexNodeType.String,
-                            parseMode: ValueListParseTypesMode.Required
+                            parseMode: ArgumentListParseTypesMode.Required
                         }
                     ]
                 }
@@ -78,7 +78,7 @@ export const track: MetadataTagDefinition = {
                             shortDescription: 'The number of bars to display per system',
                             longDescription: 'Defines for every system (line) the number of bars it should contain',
                             type: AlphaTexNodeType.Number,
-                            parseMode: ValueListParseTypesMode.ValueListWithoutParenthesis
+                            parseMode: ArgumentListParseTypesMode.ValueListWithoutParenthesis
                         }
                     ]
                 }
@@ -105,7 +105,7 @@ export const track: MetadataTagDefinition = {
                             name: 'numberOfBars',
                             shortDescription: 'Defines for every system (line) the number of bars it should contain',
                             type: AlphaTexNodeType.Number,
-                            parseMode: ValueListParseTypesMode.Required
+                            parseMode: ArgumentListParseTypesMode.Required
                         }
                     ]
                 }
@@ -159,7 +159,7 @@ export const track: MetadataTagDefinition = {
                             name: 'value',
                             shortDescription: 'The volume to set (0-16)',
                             type: AlphaTexNodeType.Number,
-                            parseMode: ValueListParseTypesMode.Required
+                            parseMode: ArgumentListParseTypesMode.Required
                         }
                     ]
                 }
@@ -182,7 +182,7 @@ export const track: MetadataTagDefinition = {
                             name: 'value',
                             shortDescription: 'The balance to set (0-16; 8 is centered)',
                             type: AlphaTexNodeType.Number,
-                            parseMode: ValueListParseTypesMode.Required
+                            parseMode: ArgumentListParseTypesMode.Required
                         }
                     ]
                 }
@@ -221,7 +221,7 @@ export const track: MetadataTagDefinition = {
                         {
                             name: 'value',
                             shortDescription: 'The midi bank to set',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.Number
                         }
                     ]

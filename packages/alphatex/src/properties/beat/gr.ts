@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const gr: PropertyDefinition = {
     property: 'gr',
@@ -15,7 +15,7 @@ export const gr: PropertyDefinition = {
                 {
                     name: 'type',
                     shortDescription: 'The type of grace notes',
-                    parseMode: ValueListParseTypesMode.Optional,
+                    parseMode: ArgumentListParseTypesMode.Optional,
                     defaultValue: 'bb',
                     ...enumParameter('GraceType')
                 }

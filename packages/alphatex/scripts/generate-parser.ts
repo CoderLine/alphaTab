@@ -10,14 +10,19 @@ import type {
     PropertyDefinition,
     SignatureDefinition
 } from '@coderline/alphatab-alphatex/types';
+import {
+    alphaTexMappedEnumLookup,
+    alphaTexMappedEnumMapping,
+    type AlphaTexMappedEnumName
+} from '@coderline/alphatab-alphatex/enum';
 
 type LanguageDefinitionsVisitorContext = {
-    foundDefinitions?: true;
-    foundScoreMetaDataSignatures?: true;
-    foundStaffMetaDataSignatures?: true;
-    foundStructuralMetaDataSignatures?: true;
-    foundBarMetaDataSignatures?: true;
-    foundMetaDataProperties?: true;
+    foundDefinitions: boolean;
+    foundScoreMetaDataSignatures: boolean;
+    foundStaffMetaDataSignatures: boolean;
+    foundStructuralMetaDataSignatures: boolean;
+    foundBarMetaDataSignatures: boolean;
+    foundMetaDataProperties: boolean;
 };
 
 function createAlphaTexParameterDefinition(e: ParameterDefinition) {
@@ -158,14 +163,11 @@ function languageDefinitionsVisitor<TNode extends ts.Node>(
     return node;
 }
 
-export async function generateParser() {
-    const languageDefinitionsFile = path.resolve(
-        import.meta.dirname,
-        '../../alphatab/src/importer/alphaTex/AlphaTex1LanguageDefinitions.ts'
-    );
+async function generateFile(alphaTabRelativeFile: string, visitor: ts.Visitor) {
+    const fullFile = path.resolve(import.meta.dirname, '../../alphatab/src/', alphaTabRelativeFile);
     let source = ts.createSourceFile(
-        'AlphaTex1LanguageDefinitions.ts',
-        await fs.promises.readFile(languageDefinitionsFile, 'utf-8'),
+        'file.ts',
+        await fs.promises.readFile(fullFile, 'utf-8'),
         {
             languageVersion: ts.ScriptTarget.ES2022,
             jsDocParsingMode: ts.JSDocParsingMode.ParseAll
@@ -173,9 +175,6 @@ export async function generateParser() {
         true,
         ts.ScriptKind.TS
     );
-
-    const ctx: LanguageDefinitionsVisitorContext = {};
-    const visitor = (node: ts.Node) => languageDefinitionsVisitor(node, ctx, visitor);
 
     source = ts.visitEachChild(source, visitor, undefined);
 
@@ -186,7 +185,151 @@ export async function generateParser() {
         removeComments: false
     });
 
-    await fs.promises.writeFile(languageDefinitionsFile, printer.printFile(source));
+    await fs.promises.writeFile(fullFile, printer.printFile(source));
 
-    child_process.execSync(`npx @biomejs/biome format --write "${languageDefinitionsFile}"`);
+    child_process.execSync(`npx @biomejs/biome format --write "${fullFile}"`);
+}
+
+async function generateLanguageDefinitions() {
+    const ctx: LanguageDefinitionsVisitorContext = {
+        foundBarMetaDataSignatures: false,
+        foundDefinitions: false,
+        foundMetaDataProperties: false,
+        foundScoreMetaDataSignatures: false,
+        foundStaffMetaDataSignatures: false,
+        foundStructuralMetaDataSignatures: false
+    };
+    const visitor = (node: ts.Node) => languageDefinitionsVisitor(node, ctx, visitor);
+
+    await generateFile('importer/alphaTex/AlphaTex1LanguageDefinitions.ts', visitor);
+    const error = Object.values(ctx).includes(false);
+    if (error) {
+        throw new Error(
+            `AlphaTex1LanguageDefinitions.ts changed unexpectedly, some props are missing: ${JSON.stringify(ctx)}`
+        );
+    }
+}
+
+type EnumMappingsVisitorContext = {
+    foundEnumMappings: boolean;
+};
+
+function generateEnumMapping(type: AlphaTexMappedEnumName) {
+    return [
+        ts.factory.createPropertyDeclaration(
+            [
+                ts.factory.createModifier(ts.SyntaxKind.PublicKeyword),
+                ts.factory.createModifier(ts.SyntaxKind.StaticKeyword),
+                ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword)
+            ],
+            type.substring(0, 1).toLowerCase() + type.substring(1),
+            undefined,
+            undefined,
+            ts.factory.createNewExpression(
+                ts.factory.createIdentifier('Map'),
+                [
+                    ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                    ts.factory.createTypeReferenceNode(type)
+                ],
+                [
+                    ts.factory.createArrayLiteralExpression([
+                        ...Object.entries(alphaTexMappedEnumMapping[type])
+                            .filter(e => e[1] !== null)
+                            .map(e =>
+                                ts.factory.createArrayLiteralExpression([
+                                    ts.factory.createStringLiteral(e[1]!.snippet.toLowerCase()),
+                                    createNumericLiteral((alphaTexMappedEnumLookup[type] as any)[e[0]])
+                                ])
+                            ),
+                        ...Object.entries(alphaTexMappedEnumMapping[type])
+                            .filter(e => e[1]?.aliases)
+                            .flatMap(e =>
+                                e[1]!.aliases!.map(a =>
+                                    ts.factory.createArrayLiteralExpression([
+                                        ts.factory.createStringLiteral(a.toLowerCase()),
+                                        createNumericLiteral((alphaTexMappedEnumLookup[type] as any)[e[0]])
+                                    ])
+                                )
+                            )
+                    ])
+                ]
+            )
+        ),
+        ts.factory.createPropertyDeclaration(
+            [
+                ts.factory.createModifier(ts.SyntaxKind.PublicKeyword),
+                ts.factory.createModifier(ts.SyntaxKind.StaticKeyword),
+                ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword)
+            ],
+            `${type.substring(0, 1).toLowerCase() + type.substring(1)}Reversed`,
+            undefined,
+            undefined,
+            ts.factory.createCallExpression(
+                ts.factory.createPropertyAccessExpression(
+                    ts.factory.createIdentifier('AlphaTex1EnumMappings'),
+                    '_reverse'
+                ),
+                undefined,
+                [
+                    ts.factory.createPropertyAccessExpression(
+                        ts.factory.createIdentifier('AlphaTex1EnumMappings'),
+                        `${type.substring(0, 1).toLowerCase() + type.substring(1)}`
+                    )
+                ]
+            )
+        )
+    ];
+}
+
+function enumMappingsVisitor<TNode extends ts.Node>(
+    node: TNode,
+    context: EnumMappingsVisitorContext
+): TNode | undefined {
+    if (ts.isClassDeclaration(node) && node.name?.text === 'AlphaTex1EnumMappings') {
+        context.foundEnumMappings = true;
+        const members = node.members.filter(m => m.name?.getText().startsWith('_'));
+        members.push(
+            ...Object.keys(alphaTexMappedEnumMapping).flatMap(e => generateEnumMapping(e as AlphaTexMappedEnumName))
+        );
+        return ts.factory.updateClassDeclaration(
+            node,
+            node.modifiers,
+            node.name,
+            node.typeParameters,
+            node.heritageClauses,
+            members
+        ) as unknown as TNode;
+    }
+    return node;
+}
+
+async function generateEnumMappings() {
+    const ctx: EnumMappingsVisitorContext = {
+        foundEnumMappings: false
+    };
+    const visitor = (node: ts.Node) => enumMappingsVisitor(node, ctx);
+
+    await generateFile('importer/alphaTex/AlphaTex1EnumMappings.ts', visitor);
+
+    const error = Object.values(ctx).includes(false);
+    if (error) {
+        throw new Error(
+            `AlphaTex1EnumMappings.ts changed unexpectedly, some props are missing: ${JSON.stringify(ctx)}`
+        );
+    }
+}
+
+export async function generateParser() {
+    await generateLanguageDefinitions();
+    await generateEnumMappings();
+}
+function createNumericLiteral(value: number): ts.Expression {
+    if (value < 0) {
+        return ts.factory.createPrefixUnaryExpression(
+            ts.SyntaxKind.MinusToken,
+            ts.factory.createNumericLiteral(Math.abs(value))
+        );
+    } else {
+        return ts.factory.createNumericLiteral(value);
+    }
 }

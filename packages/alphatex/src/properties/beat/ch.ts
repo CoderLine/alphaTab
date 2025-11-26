@@ -1,5 +1,5 @@
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const ch: PropertyDefinition = {
@@ -19,7 +19,7 @@ export const ch: PropertyDefinition = {
                     shortDescription: 'The name of the chord',
                     type: AlphaTexNodeType.String,
                     allowAllStringTypes: true,
-                    parseMode: ValueListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required
                 }
             ]
         }

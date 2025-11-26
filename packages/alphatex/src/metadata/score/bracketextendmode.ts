@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const bracketExtendMode: MetadataTagDefinition = {
     tag: '\\bracketExtendMode',
@@ -12,7 +12,7 @@ export const bracketExtendMode: MetadataTagDefinition = {
         parameters: [
           {
             name: 'mode',
-            parseMode: ValueListParseTypesMode.Required,
+            parseMode: ArgumentListParseTypesMode.Required,
             shortDescription: 'The mode to use',
             ...enumParameter('BracketExtendMode')
           }

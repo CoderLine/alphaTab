@@ -17,7 +17,7 @@ import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/Alpha
 import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
-    ValueListParseTypesMode
+    ArgumentListParseTypesMode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { Atnf } from '@coderline/alphatab/importer/alphaTex/ATNF';
 import type { IAlphaTexMetaDataReader } from '@coderline/alphatab/importer/alphaTex/IAlphaTexMetaDataReader';
@@ -171,7 +171,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
 
             // prevent parsing of special float values which could overlap
             // with stringed notes
-            if (expected.parseMode === ValueListParseTypesMode.OptionalAsFloatInValueList) {
+            if (expected.parseMode === ArgumentListParseTypesMode.OptionalAsFloatInArgumentList) {
                 parseRemaining = false;
                 break;
             }
@@ -187,11 +187,11 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                     this._handleTypeValueListItem(parser, values, value, expected)
             ) {
                 switch (expected.parseMode) {
-                    case ValueListParseTypesMode.OptionalAndStop:
+                    case ArgumentListParseTypesMode.OptionalAndStop:
                         // stop reading values
                         i = expectedValues.length;
                         break;
-                    case ValueListParseTypesMode.ValueListWithoutParenthesis:
+                    case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
                         // stay on current element
                         break;
                     default:
@@ -202,23 +202,23 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             } else {
                 switch (expected.parseMode) {
                     // end of value list
-                    case ValueListParseTypesMode.ValueListWithoutParenthesis:
+                    case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
                         i++;
                         break;
-                    case ValueListParseTypesMode.Required:
-                    case ValueListParseTypesMode.RequiredAsFloat:
+                    case ArgumentListParseTypesMode.Required:
+                    case ArgumentListParseTypesMode.RequiredAsFloat:
                         parser.unexpectedToken(value, Array.from(expected.expectedTypes), false);
                         error = true;
                         break;
 
-                    case ValueListParseTypesMode.Optional:
-                    case ValueListParseTypesMode.OptionalAsFloat:
-                    case ValueListParseTypesMode.OptionalAndStop:
+                    case ArgumentListParseTypesMode.Optional:
+                    case ArgumentListParseTypesMode.OptionalAsFloat:
+                    case ArgumentListParseTypesMode.OptionalAndStop:
                         // optional not matched -> try next
                         i++;
                         break;
 
-                    case ValueListParseTypesMode.RequiredAsValueList:
+                    case ArgumentListParseTypesMode.RequiredAsValueList:
                         // optional -> not matched, value listed ended, check next
                         i++;
                         break;
@@ -294,10 +294,10 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
 
                 return true;
             case AlphaTexNodeType.Number:
-                const parseMode = expected?.parseMode ?? ValueListParseTypesMode.Optional;
+                const parseMode = expected?.parseMode ?? ArgumentListParseTypesMode.Optional;
                 switch (parseMode) {
-                    case ValueListParseTypesMode.RequiredAsFloat:
-                    case ValueListParseTypesMode.OptionalAsFloat:
+                    case ArgumentListParseTypesMode.RequiredAsFloat:
+                    case ArgumentListParseTypesMode.OptionalAsFloat:
                         valueList.push(parser.lexer.extendToFloat(value as AlphaTexNumberLiteral));
                         parser.lexer.advance();
                         break;
@@ -326,8 +326,8 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
 
         return (
             expected.expectedTypes.has(AlphaTexNodeType.Arguments) ||
-            expected.parseMode === ValueListParseTypesMode.ValueListWithoutParenthesis ||
-            expected.parseMode === ValueListParseTypesMode.RequiredAsValueList
+            expected.parseMode === ArgumentListParseTypesMode.ValueListWithoutParenthesis ||
+            expected.parseMode === ArgumentListParseTypesMode.RequiredAsValueList
         );
     }
 }

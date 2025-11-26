@@ -27,7 +27,7 @@ import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { WhammyType } from '@coderline/alphatab/model/WhammyType';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 
-const alphaTexMappedEnumLookup = {
+export const alphaTexMappedEnumLookup = {
     WhammyType,
     BendStyle,
     GraceType,
@@ -52,7 +52,7 @@ const alphaTexMappedEnumLookup = {
     SimileMark,
     Direction
 };
-type AlphaTexMappedEnumName = keyof typeof alphaTexMappedEnumLookup;
+export type AlphaTexMappedEnumName = keyof typeof alphaTexMappedEnumLookup;
 
 type AlphaTexMappedEnumMappingEntry =
     | (Pick<ParameterValueDefinition, 'shortDescription' | 'longDescription' | 'snippet'> &
@@ -61,7 +61,7 @@ type AlphaTexMappedEnumMappingEntry =
           })
     | null;
 
-const alphaTexMappedEnumMapping: {
+export const alphaTexMappedEnumMapping: {
     [K in AlphaTexMappedEnumName]: Record<keyof (typeof alphaTexMappedEnumLookup)[K], AlphaTexMappedEnumMappingEntry>;
 } = {
     WhammyType: {

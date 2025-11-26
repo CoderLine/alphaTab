@@ -1,6 +1,6 @@
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
 import { harmonicValueDocs } from '@coderline/alphatab-language-server/documentation/properties/note/ah';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const sh: PropertyDefinition = {
@@ -16,7 +16,7 @@ export const sh: PropertyDefinition = {
                     shortDescription: 'The harmonic value',
                     longDescription: harmonicValueDocs,
                     type: AlphaTexNodeType.Number,
-                    parseMode: ValueListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required
                 }
             ]
         }

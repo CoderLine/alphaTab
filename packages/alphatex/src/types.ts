@@ -1,6 +1,6 @@
 import type { SettingsJson } from '@coderline/alphatab/generated/SettingsJson';
 import type { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
-import type { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import type { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 /**
  * Common props for elements with descriptions.
@@ -58,7 +58,7 @@ export interface ParameterDefinition extends WithDescription {
     /**
      * The mode used to parse this parameter.
      */
-    parseMode: ValueListParseTypesMode;
+    parseMode: ArgumentListParseTypesMode;
 
     /**
      * The node type for this parameter.

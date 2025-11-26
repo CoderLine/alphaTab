@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const fermata: PropertyDefinition = {
@@ -14,14 +14,14 @@ export const fermata: PropertyDefinition = {
                 {
                     name: 'type',
                     shortDescription: 'The fermata type',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     ...enumParameter('FermataType')
                 },
                 {
                     name: 'length',
                     shortDescription: 'The fermata length',
                     type: AlphaTexNodeType.Number,
-                    parseMode: ValueListParseTypesMode.Optional,
+                    parseMode: ArgumentListParseTypesMode.Optional,
                     defaultValue: 0
                 }
             ]

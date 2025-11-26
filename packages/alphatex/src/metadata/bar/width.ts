@@ -1,5 +1,5 @@
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const width: MetadataTagDefinition = {
@@ -14,7 +14,7 @@ export const width: MetadataTagDefinition = {
                     name: 'width',
                     shortDescription: 'The absolute width of the bar',
                     type: AlphaTexNodeType.Number,
-                    parseMode: ValueListParseTypesMode.RequiredAsFloat
+                    parseMode: ArgumentListParseTypesMode.RequiredAsFloat
                 }
             ]
         }

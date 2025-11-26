@@ -1,4 +1,4 @@
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type {
@@ -14,18 +14,18 @@ export const songMetaDataSignatures: SignatureDefinition[] = [
                 shortDescription: 'The value to set',
                 type: AlphaTexNodeType.String,
                 allowAllStringTypes: true,
-                parseMode: ValueListParseTypesMode.Required
+                parseMode: ArgumentListParseTypesMode.Required
             },
             {
                 name: 'template',
                 shortDescription: 'The template used to render the text',
                 type: AlphaTexNodeType.String,
-                parseMode: ValueListParseTypesMode.Optional
+                parseMode: ArgumentListParseTypesMode.Optional
             },
             {
                 name: 'textAlign',
                 shortDescription: 'The alignment of the text on the music sheet',
-                parseMode: ValueListParseTypesMode.Optional,
+                parseMode: ArgumentListParseTypesMode.Optional,
                 ...enumParameter('TextAlign')
             }
         ]
@@ -38,12 +38,12 @@ export const noValueSongMetaDataSignatures: SignatureDefinition[] = [
                 name: 'template',
                 shortDescription: 'The template used to render the text',
                 type: AlphaTexNodeType.String,
-                parseMode: ValueListParseTypesMode.Required
+                parseMode: ArgumentListParseTypesMode.Required
             },
             {
                 name: 'textAlign',
                 shortDescription: 'The alignment of the text on the music sheet',
-                parseMode: ValueListParseTypesMode.Optional,
+                parseMode: ArgumentListParseTypesMode.Optional,
                 ...enumParameter('TextAlign')
             }
         ]

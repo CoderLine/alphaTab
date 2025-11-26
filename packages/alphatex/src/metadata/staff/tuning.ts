@@ -1,4 +1,4 @@
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
 
@@ -13,7 +13,7 @@ export const tuning: MetadataTagDefinition = {
                 {
                     name: 'mode',
                     shortDescription: 'A built-in standard mode for tunings',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Ident,
                     allowAllStringTypes: true,
                     values: [
@@ -47,7 +47,7 @@ export const tuning: MetadataTagDefinition = {
                     longDescription: `The tuning values as [pitched notes](https://next.alphatab.net/docs/alphatex/document-structure#pitched-notes)`,
                     type: AlphaTexNodeType.Ident,
                     allowAllStringTypes: true,
-                    parseMode: ValueListParseTypesMode.ValueListWithoutParenthesis
+                    parseMode: ArgumentListParseTypesMode.ValueListWithoutParenthesis
                 }
             ]
         }
@@ -92,7 +92,7 @@ export const tuning: MetadataTagDefinition = {
                         {
                             name: 'text',
                             shortDescription: 'The label to set.',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.String
                         }
                     ]

@@ -1,5 +1,5 @@
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const ts: MetadataTagDefinition = {
@@ -19,7 +19,7 @@ export const ts: MetadataTagDefinition = {
                     name: 'common',
                     shortDescription: '',
                     type: AlphaTexNodeType.Ident,
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     values: [
                         {
                             name: 'common',
@@ -35,13 +35,13 @@ export const ts: MetadataTagDefinition = {
                 {
                     name: 'numerator',
                     shortDescription: 'The time signature numerator',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Number
                 },
                 {
                     name: 'numerator',
                     shortDescription: 'The time signature denominator',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Number
                 }
             ]

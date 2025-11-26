@@ -1,5 +1,5 @@
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const sync: MetadataTagDefinition = {
@@ -23,25 +23,25 @@ export const sync: MetadataTagDefinition = {
                 {
                     name: 'barIndex',
                     shortDescription: 'The index of the bar being synced',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Number
                 },
                 {
                     name: 'occurence',
                     shortDescription: 'The occurence of the bar for which this sync point applies (on repeats)',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Number
                 },
                 {
                     name: 'millisecondOffset',
                     shortDescription: 'The absolute millisecond offset within the external media',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.Number
                 },
                 {
                     name: 'ratioPosition',
                     shortDescription: 'The relative position within the bar where the synchronization happens',
-                    parseMode: ValueListParseTypesMode.OptionalAsFloat,
+                    parseMode: ArgumentListParseTypesMode.OptionalAsFloat,
                     defaultValue: '0',
                     type: AlphaTexNodeType.Number
                 }

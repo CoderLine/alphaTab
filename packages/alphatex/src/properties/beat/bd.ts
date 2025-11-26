@@ -1,5 +1,5 @@
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const bd: PropertyDefinition = {
@@ -14,7 +14,7 @@ export const bd: PropertyDefinition = {
                     name: 'duration',
                     shortDescription: 'A custom duration of the stroke speed in MIDI ticks',
                     type: AlphaTexNodeType.Number,
-                    parseMode: ValueListParseTypesMode.Optional
+                    parseMode: ArgumentListParseTypesMode.Optional
                 }
             ]
         }

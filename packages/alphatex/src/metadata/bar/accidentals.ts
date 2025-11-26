@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const accidentals: MetadataTagDefinition = {
     tag: '\\accidentals',
@@ -17,7 +17,7 @@ export const accidentals: MetadataTagDefinition = {
                 {
                     name: 'mode',
                     shortDescription: 'The mode which should be active',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     ...enumParameter('AlphaTexAccidentalMode')
                 }
             ]

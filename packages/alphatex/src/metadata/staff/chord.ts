@@ -1,4 +1,4 @@
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
 
@@ -18,7 +18,7 @@ export const chord: MetadataTagDefinition = {
                 {
                     name: 'name',
                     shortDescription: 'The name of the chord',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.String,
                     allowAllStringTypes: true
                 },
@@ -26,7 +26,7 @@ export const chord: MetadataTagDefinition = {
                     name: 'strings',
                     shortDescription:
                         'For every string of the staff tuning, the fret to be played or `x` for strings not played.',
-                    parseMode: ValueListParseTypesMode.ValueListWithoutParenthesis,
+                    parseMode: ArgumentListParseTypesMode.ValueListWithoutParenthesis,
                     type: [AlphaTexNodeType.Ident, AlphaTexNodeType.String, AlphaTexNodeType.Number]
                 }
             ]
@@ -48,7 +48,7 @@ export const chord: MetadataTagDefinition = {
                         {
                             name: 'fret',
                             shortDescription: 'The index of the first fret',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.Number
                         }
                     ]
@@ -70,7 +70,7 @@ export const chord: MetadataTagDefinition = {
                         {
                             name: 'fret',
                             shortDescription: 'The frets on which a barré should be played',
-                            parseMode: ValueListParseTypesMode.ValueListWithoutParenthesis,
+                            parseMode: ArgumentListParseTypesMode.ValueListWithoutParenthesis,
                             type: AlphaTexNodeType.Number
                         }
                     ]
@@ -96,7 +96,7 @@ export const chord: MetadataTagDefinition = {
                         {
                             name: 'visibility',
                             shortDescription: 'The visibility of the diagram',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.String,
                             values: [
                                 { name: 'true', snippet: '"true"', shortDescription: 'Show the diagram' },
@@ -110,7 +110,7 @@ export const chord: MetadataTagDefinition = {
                         {
                             name: 'visibility',
                             shortDescription: 'The visibility of the diagram',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.Ident,
                             values: [
                                 { name: 'true', snippet: 'true', shortDescription: 'Show the diagram' },
@@ -124,7 +124,7 @@ export const chord: MetadataTagDefinition = {
                         {
                             name: 'visibility',
                             shortDescription: 'The visibility of the diagram',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.Number,
                             values: [
                                 { name: '1', snippet: '1', shortDescription: 'Show the diagram' },
@@ -152,7 +152,7 @@ export const chord: MetadataTagDefinition = {
                         {
                             name: 'visibility',
                             shortDescription: 'The visibility of the finger position',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.String,
                             values: [
                                 { name: 'true', snippet: '"true"', shortDescription: 'Show the fingering' },
@@ -166,7 +166,7 @@ export const chord: MetadataTagDefinition = {
                         {
                             name: 'visibility',
                             shortDescription: 'The visibility of the finger position',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.Ident,
                             values: [
                                 { name: 'true', snippet: 'true', shortDescription: 'Show the fingering' },
@@ -180,7 +180,7 @@ export const chord: MetadataTagDefinition = {
                         {
                             name: 'visibility',
                             shortDescription: 'The visibility of the finger position',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.Number,
                             values: [
                                 { name: '1', snippet: '1', shortDescription: 'Show the fingering' },
@@ -208,7 +208,7 @@ export const chord: MetadataTagDefinition = {
                         {
                             name: 'visibility',
                             shortDescription: 'The visibility of the chord name in the diagram',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.String,
                             values: [
                                 { name: 'true', snippet: '"true"', shortDescription: 'Show the chord name' },
@@ -222,7 +222,7 @@ export const chord: MetadataTagDefinition = {
                         {
                             name: 'visibility',
                             shortDescription: 'The visibility of the chord name in the diagram',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.Ident,
                             values: [
                                 { name: 'true', snippet: 'true', shortDescription: 'Show the chord name' },
@@ -236,7 +236,7 @@ export const chord: MetadataTagDefinition = {
                         {
                             name: 'visibility',
                             shortDescription: 'The visibility of the chord name in the diagram',
-                            parseMode: ValueListParseTypesMode.Required,
+                            parseMode: ArgumentListParseTypesMode.Required,
                             type: AlphaTexNodeType.Number,
                             values: [
                                 { name: '1', snippet: '1', shortDescription: 'Show the chord name' },

@@ -1,23 +1,20 @@
 import type { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
-import type { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import type { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 /**
  * @internal
  */
 export class AlphaTex1LanguageDefinitions {
     // helpers for correct typing and potential future transformations
-
     private static _metaProps(
-        props: [string, [string, [AlphaTexNodeType[], ValueListParseTypesMode, string[]][][] | null][] | null][]
+        props: [string, [string, [AlphaTexNodeType[], ArgumentListParseTypesMode, string[]][][] | null][] | null][]
     ) {
         return props;
     }
-
     private static _signatures(
-        signatures: [string, [AlphaTexNodeType[], ValueListParseTypesMode, string[]][][] | null][]
+        signatures: [string, [AlphaTexNodeType[], ArgumentListParseTypesMode, string[]][][] | null][]
     ) {
         return signatures;
     }
-
     // The following definitions age auto-generated from the central definitions in
     // the `packages/alphatex`. Do not make manual changes here,
     // to reduce code size, the parameter types are specified as number values and then
@@ -123,7 +120,7 @@ export class AlphaTex1LanguageDefinitions {
                 ]
             ]
         ],
-        ['systemslayout', [[[[16], 7, []]]]],
+        ['systemslayout', [[[[16], 5, []]]]],
         ['defaultsystemslayout', [[[[16], 0, []]]]],
         ['showdynamics', null],
         ['hidedynamics', null],
@@ -138,13 +135,13 @@ export class AlphaTex1LanguageDefinitions {
         ['othersystemstracknameorientation', [[[[10], 0, ['horizontal', 'vertical']]]]]
     ]);
     public static readonly staffMetaDataSignatures = AlphaTex1LanguageDefinitions._signatures([
-        ['tuning', [[[[10], 0, ['piano', 'none', 'voice']]], [[[10], 7, []]]]],
+        ['tuning', [[[[10], 0, ['piano', 'none', 'voice']]], [[[10], 5, []]]]],
         [
             'chord',
             [
                 [
                     [[17], 0, []],
-                    [[10, 17, 16], 7, []]
+                    [[10, 17, 16], 5, []]
                 ]
             ]
         ],
@@ -202,7 +199,7 @@ export class AlphaTex1LanguageDefinitions {
         ],
         ['ro', null],
         ['rc', [[[[16], 0, []]]]],
-        ['ae', [[[[16], 6, []]]]],
+        ['ae', [[[[16], 4, []]]]],
         ['ks', [[[[10], 0, ['cb', 'gb', 'db', 'ab', 'eb', 'bb', 'f', 'c', 'g', 'd', 'a', 'e', 'b', 'f#', 'c#']]]]],
         ['clef', [[[[10], 0, ['neutral', 'c3', 'c4', 'f4', 'g2']]]]],
         ['ottava', [[[[10], 0, ['15ma', '8va', 'regular', '8vb', '15mb']]]]],
@@ -212,7 +209,7 @@ export class AlphaTex1LanguageDefinitions {
                 [
                     [[16], 2, []],
                     [[17], 1, []],
-                    [[16], 4, []],
+                    [[16], 3, []],
                     [[10], 1, ['hide']]
                 ]
             ]
@@ -372,7 +369,7 @@ export class AlphaTex1LanguageDefinitions {
             'track',
             [
                 ['color', [[[[17], 0, []]]]],
-                ['systemslayout', [[[[16], 7, []]]]],
+                ['systemslayout', [[[[16], 5, []]]]],
                 ['defaultsystemslayout', [[[[16], 0, []]]]],
                 ['solo', null],
                 ['mute', null],
@@ -404,7 +401,7 @@ export class AlphaTex1LanguageDefinitions {
             'chord',
             [
                 ['firstfret', [[[[16], 0, []]]]],
-                ['barre', [[[[16], 7, []]]]],
+                ['barre', [[[[16], 5, []]]]],
                 [
                     'showdiagram',
                     [[], [[[17], 0, ['true', 'false']]], [[[10], 0, ['true', 'false']]], [[[16], 0, ['1', '0']]]]
@@ -448,7 +445,6 @@ export class AlphaTex1LanguageDefinitions {
         ['sph', null],
         ['spu', null]
     ]);
-
     public static readonly metaDataSignatures = [
         AlphaTex1LanguageDefinitions.scoreMetaDataSignatures,
         AlphaTex1LanguageDefinitions.staffMetaDataSignatures,

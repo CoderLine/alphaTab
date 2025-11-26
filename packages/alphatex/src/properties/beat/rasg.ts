@@ -1,6 +1,6 @@
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const rasg: PropertyDefinition = {
     property: 'rasg',
@@ -13,7 +13,7 @@ export const rasg: PropertyDefinition = {
                 {
                     name: 'pattern',
                     shortDescription: 'The pattern to apply',
-                    parseMode: ValueListParseTypesMode.Required,
+                    parseMode: ArgumentListParseTypesMode.Required,
                     ...enumParameter('Rasgueado')
                 }
             ]

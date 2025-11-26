@@ -1,5 +1,5 @@
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ValueListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const slur: PropertyDefinition = {
@@ -14,7 +14,7 @@ export const slur: PropertyDefinition = {
                     name: 'id',
                     shortDescription: 'A unique ID to mark the start and end of the slur.',
                     type: AlphaTexNodeType.String,
-                    parseMode: ValueListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required
                 }
             ]
         },
@@ -24,7 +24,7 @@ export const slur: PropertyDefinition = {
                     name: 'id',
                     shortDescription: 'A unique ID to mark the start and end of the slur.',
                     type: AlphaTexNodeType.Ident,
-                    parseMode: ValueListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required
                 }
             ]
         }
