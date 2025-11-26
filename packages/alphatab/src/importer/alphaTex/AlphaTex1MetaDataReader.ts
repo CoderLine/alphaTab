@@ -1,6 +1,6 @@
 import {
     AlphaTex1LanguageDefinitions,
-    type ValueListParseTypesExtended
+    type AlphaTexParameterDefinition
 } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import {
     type AlphaTexArgumentList,
@@ -33,11 +33,11 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         metaData: AlphaTexMetaDataTagNode
     ): AlphaTexArgumentList | undefined {
         const tag = metaData.tag.text.toLowerCase();
-        for (const lookup of AlphaTex1LanguageDefinitions.metaDataValueListTypes) {
+        for (const lookup of AlphaTex1LanguageDefinitions.metaDataSignatures) {
             if (lookup.has(tag)) {
                 const types = lookup.get(tag);
                 if (types) {
-                    return this._readTypedValueList(parser, types);
+                    return this._readArguments(parser, types);
                 } else {
                     return undefined;
                 }
@@ -60,71 +60,42 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         metaData: AlphaTexMetaDataTagNode,
         property: AlphaTexPropertyNode
     ): AlphaTexArgumentList | undefined {
-        switch (metaData.tag.text.toLowerCase()) {
-            case 'track':
-                return this._readPropertyValues(
-                    parser,
-                    [AlphaTex1LanguageDefinitions.trackPropertyValueListTypes],
-                    property
-                );
-            case 'chord':
-                return this._readPropertyValues(
-                    parser,
-                    [AlphaTex1LanguageDefinitions.chordPropertyValueListTypes],
-                    property
-                );
-            case 'tuning':
-                return this._readPropertyValues(
-                    parser,
-                    [AlphaTex1LanguageDefinitions.tuningPropertyValueListTypes],
-                    property
-                );
-            case 'staff':
-                return this._readPropertyValues(
-                    parser,
-                    [AlphaTex1LanguageDefinitions.staffPropertyValueListTypes],
-                    property
-                );
-            default:
-                return undefined;
+        const tag = metaData.tag.text.toLowerCase();
+        if (!AlphaTex1LanguageDefinitions.metaDataProperties.has(tag)) {
+            return undefined;
         }
+        const props = AlphaTex1LanguageDefinitions.metaDataProperties.get(tag)!;
+        return this._readPropertyArguments(parser, [props], property);
     }
 
     public readBeatPropertyValues(
         parser: AlphaTexParser,
         property: AlphaTexPropertyNode
     ): AlphaTexArgumentList | undefined {
-        return this._readPropertyValues(parser, [AlphaTex1LanguageDefinitions.beatPropertyValueListTypes], property);
+        return this._readPropertyArguments(parser, [AlphaTex1LanguageDefinitions.beatProperties], property);
     }
 
     public readDurationChangePropertyValues(
         parser: AlphaTexParser,
         property: AlphaTexPropertyNode
     ): AlphaTexArgumentList | undefined {
-        return this._readPropertyValues(
-            parser,
-            [AlphaTex1LanguageDefinitions.beatDurationPropertyValueListTypes],
-            property
-        );
+        return this._readPropertyArguments(parser, [AlphaTex1LanguageDefinitions.durationChangeProperties], property);
     }
 
     public readNotePropertyValues(
         parser: AlphaTexParser,
         property: AlphaTexPropertyNode
     ): AlphaTexArgumentList | undefined {
-        return this._readPropertyValues(
+        return this._readPropertyArguments(
             parser,
-            [
-                AlphaTex1LanguageDefinitions.notePropertyValueListTypes,
-                AlphaTex1LanguageDefinitions.beatPropertyValueListTypes
-            ],
+            [AlphaTex1LanguageDefinitions.noteProperties, AlphaTex1LanguageDefinitions.beatProperties],
             property
         );
     }
 
-    private _readPropertyValues(
+    private _readPropertyArguments(
         parser: AlphaTexParser,
-        lookups: Map<string, ValueListParseTypesExtended[] | undefined>[],
+        lookups: Map<string, AlphaTexParameterDefinition[][] | null>[],
         property: AlphaTexPropertyNode
     ): AlphaTexArgumentList | undefined {
         const tag = property.property.text.toLowerCase();
@@ -133,7 +104,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             if (lookup.has(tag)) {
                 const types = lookup.get(tag);
                 if (types) {
-                    return this._readTypedValueList(parser, types, endOfProperty);
+                    return this._readArguments(parser, types, endOfProperty);
                 } else {
                     return undefined;
                 }
@@ -150,81 +121,73 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         return undefined;
     }
 
-    private _readTypedValueList(
+    private _readArguments(
         parser: AlphaTexParser,
-        expectedValues: ValueListParseTypesExtended[],
+        signatures: AlphaTexParameterDefinition[][],
         endOfListTypes?: Set<AlphaTexNodeType>
     ): AlphaTexArgumentList | undefined {
         const values: IAlphaTexArgumentValue[] = [];
         const valueListStart = parser.lexer.peekToken()?.start;
+        const parseRemaining = endOfListTypes !== undefined;
+
         let error = false;
-        let parseRemaining = endOfListTypes !== undefined;
-        let i = 0;
-        while (!error && i < expectedValues.length) {
-            const expected = expectedValues[i];
 
-            const value = parser.lexer.peekToken();
+        // TODO: parsing using available overloads
 
-            if(value?.nodeType === AlphaTexNodeType.Tag) {
-                break;
-            }
+        // let i = 0;
+        // while (!error && i < expectedValues.length) {
+        //     const expected = expectedValues[i];
 
-            // prevent parsing of special float values which could overlap
-            // with stringed notes
-            if (expected.parseMode === ArgumentListParseTypesMode.OptionalAsFloatInArgumentList) {
-                parseRemaining = false;
-                break;
-            }
+        //     const value = parser.lexer.peekToken();
 
-            // NOTE: The parser already handles parenthesized value lists, we only need to handle this
-            // parse mode in the validation.
+        //     if (value?.nodeType === AlphaTexNodeType.Tag) {
+        //         break;
+        //     }
 
-            if (
-                value &&
-                (expected.expectedTypes.has(value.nodeType) ||
-                    // value lists start with a parenthesis open token
-                    AlphaTex1MetaDataReader._isValueListMatch(value, expected)) &&
-                    this._handleTypeValueListItem(parser, values, value, expected)
-            ) {
-                switch (expected.parseMode) {
-                    case ArgumentListParseTypesMode.OptionalAndStop:
-                        // stop reading values
-                        i = expectedValues.length;
-                        break;
-                    case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-                        // stay on current element
-                        break;
-                    default:
-                        // advance to next item
-                        i++;
-                        break;
-                }
-            } else {
-                switch (expected.parseMode) {
-                    // end of value list
-                    case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-                        i++;
-                        break;
-                    case ArgumentListParseTypesMode.Required:
-                    case ArgumentListParseTypesMode.RequiredAsFloat:
-                        parser.unexpectedToken(value, Array.from(expected.expectedTypes), false);
-                        error = true;
-                        break;
+        //     // NOTE: The parser already handles parenthesized value lists, we only need to handle this
+        //     // parse mode in the validation.
 
-                    case ArgumentListParseTypesMode.Optional:
-                    case ArgumentListParseTypesMode.OptionalAsFloat:
-                    case ArgumentListParseTypesMode.OptionalAndStop:
-                        // optional not matched -> try next
-                        i++;
-                        break;
+        //     if (
+        //         value &&
+        //         (expected.expectedTypes.has(value.nodeType) ||
+        //             // value lists start with a parenthesis open token
+        //             AlphaTex1MetaDataReader._isValueListMatch(value, expected)) &&
+        //         this._handleTypeValueListItem(parser, values, value, expected)
+        //     ) {
+        //         switch (expected.parseMode) {
+        //             case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+        //                 // stay on current element
+        //                 break;
+        //             default:
+        //                 // advance to next item
+        //                 i++;
+        //                 break;
+        //         }
+        //     } else {
+        //         switch (expected.parseMode) {
+        //             // end of value list
+        //             case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+        //                 i++;
+        //                 break;
+        //             case ArgumentListParseTypesMode.Required:
+        //             case ArgumentListParseTypesMode.RequiredAsFloat:
+        //                 parser.unexpectedToken(value, Array.from(expected.expectedTypes), false);
+        //                 error = true;
+        //                 break;
 
-                    case ArgumentListParseTypesMode.RequiredAsValueList:
-                        // optional -> not matched, value listed ended, check next
-                        i++;
-                        break;
-                }
-            }
-        }
+        //             case ArgumentListParseTypesMode.Optional:
+        //             case ArgumentListParseTypesMode.OptionalAsFloat:
+        //                 // optional not matched -> try next
+        //                 i++;
+        //                 break;
+
+        //             case ArgumentListParseTypesMode.RequiredAsValueList:
+        //                 // optional -> not matched, value listed ended, check next
+        //                 i++;
+        //                 break;
+        //         }
+        //     }
+        // }
 
         // read remaining values user might have supplied
         if (parseRemaining) {
@@ -254,20 +217,13 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         parser: AlphaTexParser,
         valueList: IAlphaTexArgumentValue[],
         value: AlphaTexAstNode,
-        expected: ValueListParseTypesExtended | undefined
+        expected: AlphaTexParameterDefinition | undefined
     ): boolean {
         switch (value.nodeType) {
             case AlphaTexNodeType.Ident:
                 const identifier = value as AlphaTexIdentifier;
                 if (expected?.allowedValues) {
                     if (expected.allowedValues.has(identifier.text.toLowerCase())) {
-                        valueList.push(identifier);
-                        parser.lexer.advance();
-                    } else {
-                        return false;
-                    }
-                } else if (expected?.reservedIdentifiers) {
-                    if (!expected.reservedIdentifiers.has(identifier.text.toLowerCase())) {
                         valueList.push(identifier);
                         parser.lexer.advance();
                     } else {
@@ -319,7 +275,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         return false;
     }
 
-    private static _isValueListMatch(value: AlphaTexAstNode, expected: ValueListParseTypesExtended): boolean {
+    private static _isValueListMatch(value: AlphaTexAstNode, expected: AlphaTexParameterDefinition): boolean {
         if (value.nodeType !== AlphaTexNodeType.LParen) {
             return false;
         }

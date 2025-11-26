@@ -7,9 +7,10 @@
 import { AlphaTex1EnumMappings } from '@coderline/alphatab/importer/alphaTex/AlphaTex1EnumMappings';
 import {
     AlphaTex1LanguageDefinitions,
-    type ValueListParseTypesExtended
+    type AlphaTexParameterDefinition
 } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import {
+    type AlphaTexArgumentList,
     type AlphaTexAstNode,
     type AlphaTexIdentifier,
     type AlphaTexMetaDataNode,
@@ -18,14 +19,12 @@ import {
     type AlphaTexPropertyNode,
     type AlphaTexStringLiteral,
     type AlphaTexTextNode,
-    type AlphaTexArgumentList,
     type IAlphaTexArgumentValue
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
     AlphaTexStaffNoteKind,
-    ArgumentListParseTypesMode,
     type IAlphaTexImporter
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { Atnf } from '@coderline/alphatab/importer/alphaTex/ATNF';
@@ -54,7 +53,6 @@ import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
-import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
 import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
@@ -90,9 +88,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         score: Score,
         metaData: AlphaTexMetaDataNode
     ): ApplyNodeResult {
-        const result = this._checkValueListTypes(
+        const result = this._checkArgumentTypes(
             importer,
-            [AlphaTex1LanguageDefinitions.scoreMetaDataValueListTypes],
+            [AlphaTex1LanguageDefinitions.scoreMetaDataSignatures],
             metaData,
             metaData.tag.tag.text.toLowerCase(),
             metaData.arguments
@@ -165,7 +163,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     metaData.arguments!,
                     'bracket extend mode',
-                    AlphaTex1EnumMappings.bracketExtendModes
+                    AlphaTex1EnumMappings.bracketExtendMode
                 );
                 if (bracketExtendMode === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -183,7 +181,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     metaData.arguments!,
                     'track name policy',
-                    AlphaTex1EnumMappings.trackNamePolicies
+                    AlphaTex1EnumMappings.trackNamePolicy
                 );
                 if (singleTrackTrackNamePolicy === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -195,7 +193,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     metaData.arguments!,
                     'track name policy',
-                    AlphaTex1EnumMappings.trackNamePolicies
+                    AlphaTex1EnumMappings.trackNamePolicy
                 );
                 if (multiTrackTrackNamePolicy === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -231,7 +229,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     metaData.arguments!,
                     'track name orientation',
-                    AlphaTex1EnumMappings.trackNameOrientations
+                    AlphaTex1EnumMappings.trackNameOrientation
                 );
                 if (firstSystemTrackNameOrientation === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -243,7 +241,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     metaData.arguments!,
                     'track name orientation',
-                    AlphaTex1EnumMappings.trackNameOrientations
+                    AlphaTex1EnumMappings.trackNameOrientation
                 );
                 if (otherSystemsTrackNameOrientation === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -255,9 +253,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private _checkValueListTypes(
+    private _checkArgumentTypes(
         importer: IAlphaTexImporter,
-        lookupList: Map<string, ValueListParseTypesExtended[] | undefined>[],
+        lookupList: Map<string, AlphaTexParameterDefinition[][] | null>[],
         parent: AlphaTexAstNode,
         tag: string,
         values: AlphaTexArgumentList | undefined
@@ -272,7 +270,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             if (values) {
                 importer.addSemanticDiagnostic({
                     code: AlphaTexDiagnosticCode.AT300,
-                    message: `Expected no values, but found some. Values are ignored.`,
+                    message: `Expected no arguments, but found some.`,
                     start: values.start,
                     end: values.end,
                     severity: AlphaTexDiagnosticsSeverity.Warning
@@ -281,7 +279,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return undefined;
         }
 
-        if (!this._validateValueListTypes(importer, types, parent, values)) {
+        if (!this._validateArgumentTypes(importer, types, parent, values)) {
             return ApplyNodeResult.NotAppliedSemanticError;
         }
 
@@ -293,9 +291,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         staff: Staff,
         metaData: AlphaTexMetaDataNode
     ): ApplyNodeResult {
-        const result = this._checkValueListTypes(
+        const result = this._checkArgumentTypes(
             importer,
-            [AlphaTex1LanguageDefinitions.staffMetaDataValueListTypes],
+            [AlphaTex1LanguageDefinitions.staffMetaDataSignatures],
             metaData,
             metaData.tag.tag.text.toLowerCase(),
             metaData.arguments
@@ -471,9 +469,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     }
 
     public applyBarMetaData(importer: IAlphaTexImporter, bar: Bar, metaData: AlphaTexMetaDataNode): ApplyNodeResult {
-        const result = this._checkValueListTypes(
+        const result = this._checkArgumentTypes(
             importer,
-            [AlphaTex1LanguageDefinitions.barMetaDataValueListTypes],
+            [AlphaTex1LanguageDefinitions.barMetaDataSignatures],
             metaData,
             metaData.tag.tag.text.toLowerCase(),
             metaData.arguments
@@ -591,7 +589,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     metaData.arguments!,
                     'key signature',
-                    AlphaTex1EnumMappings.keySignatures
+                    AlphaTex1EnumMappings.keySignature
                 );
                 if (keySignature === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -601,7 +599,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     metaData.arguments!,
                     'key signature type',
-                    AlphaTex1EnumMappings.keySignatureTypes
+                    AlphaTex1EnumMappings.keySignatureType
                 );
                 if (keySignatureType === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -619,7 +617,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             importer,
                             metaData.arguments!,
                             'clef',
-                            AlphaTex1EnumMappings.clefs
+                            AlphaTex1EnumMappings.clef
                         );
                         if (clef === undefined) {
                             return ApplyNodeResult.NotAppliedSemanticError;
@@ -649,7 +647,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             default:
                                 importer.addSemanticDiagnostic({
                                     code: AlphaTexDiagnosticCode.AT209,
-                                    message: `Unexpected clef value '${clefValue}', expected: ${Array.from(AlphaTex1EnumMappings.clefs.keys()).join(',')}`,
+                                    message: `Unexpected clef value '${clefValue}', expected: ${Array.from(AlphaTex1EnumMappings.clef.keys()).join(',')}`,
                                     severity: AlphaTexDiagnosticsSeverity.Error,
                                     start: metaData.arguments!.arguments[0].start,
                                     end: metaData.arguments!.arguments[0].end
@@ -679,7 +677,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             importer,
                             metaData.arguments!,
                             'triplet feel',
-                            AlphaTex1EnumMappings.tripletFeels
+                            AlphaTex1EnumMappings.tripletFeel
                         );
                         if (tripletFeel === undefined) {
                             return ApplyNodeResult.NotAppliedSemanticError;
@@ -715,7 +713,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             default:
                                 importer.addSemanticDiagnostic({
                                     code: AlphaTexDiagnosticCode.AT209,
-                                    message: `Unexpected triplet feel value '${tripletFeelValue}', expected: ${Array.from(AlphaTex1EnumMappings.tripletFeels.keys()).join(',')}`,
+                                    message: `Unexpected triplet feel value '${tripletFeelValue}', expected: ${Array.from(AlphaTex1EnumMappings.tripletFeel.keys()).join(',')}`,
                                     severity: AlphaTexDiagnosticsSeverity.Error,
                                     start: metaData.arguments!.arguments[0].start,
                                     end: metaData.arguments!.arguments[0].end
@@ -731,7 +729,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     metaData.arguments!,
                     'bar line',
-                    AlphaTex1EnumMappings.barLines
+                    AlphaTex1EnumMappings.barLineStyle
                 );
                 if (barLineLeft === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -743,7 +741,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     metaData.arguments!,
                     'bar line',
-                    AlphaTex1EnumMappings.barLines
+                    AlphaTex1EnumMappings.barLineStyle
                 );
                 if (barLineRight === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -757,7 +755,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     metaData.arguments!,
                     'direction',
-                    AlphaTex1EnumMappings.directions
+                    AlphaTex1EnumMappings.direction
                 );
                 if (direction === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -781,7 +779,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     metaData.arguments!,
                     'simile mark',
-                    AlphaTex1EnumMappings.simileMarks
+                    AlphaTex1EnumMappings.simileMark
                 );
                 if (simile === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -837,7 +835,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             importer,
             values,
             'accidental mode',
-            AlphaTex1EnumMappings.accidentalModes
+            AlphaTex1EnumMappings.alphaTexAccidentalMode
         );
         if (accidentalMode === undefined) {
             return ApplyNodeResult.NotAppliedSemanticError;
@@ -867,174 +865,175 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         };
     }
 
-    private _validateValueListTypes(
+    private _validateArgumentTypes(
         importer: IAlphaTexImporter,
-        expectedValues: ValueListParseTypesExtended[],
+        signatures: AlphaTexParameterDefinition[][] | null,
         parent: AlphaTexAstNode,
         values: AlphaTexArgumentList | undefined
     ) {
         let error = false;
-        let expectedIndex = 0;
-        let actualIndex = 0;
 
-        if (!values) {
-            const anyRequired = expectedValues.some(
-                v =>
-                    v.parseMode === ArgumentListParseTypesMode.Required ||
-                    v.parseMode === ArgumentListParseTypesMode.RequiredAsFloat ||
-                    v.parseMode === ArgumentListParseTypesMode.RequiredAsValueList
-            );
-            if (anyRequired) {
-                const expectedTypes = AlphaTex1LanguageHandler._buildExpectedTypesMessage(expectedValues);
+        // TODO: Signature based validation
 
-                importer.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT210,
-                    message: `Missing value. Expected following values: ${expectedTypes}`,
-                    severity: AlphaTexDiagnosticsSeverity.Error,
-                    start: parent.start,
-                    end: parent.end
-                });
-                return false;
-            } else {
-                return true;
-            }
-        }
+        // let expectedIndex = 0;
+        // let actualIndex = 0;
 
-        if (values.validated) {
-            return true;
-        }
+        // if (!values) {
+        //     const anyRequired = expectedValues.some(
+        //         v =>
+        //             v.parseMode === ArgumentListParseTypesMode.Required ||
+        //             v.parseMode === ArgumentListParseTypesMode.RequiredAsFloat ||
+        //             v.parseMode === ArgumentListParseTypesMode.RequiredAsValueList
+        //     );
+        //     if (anyRequired) {
+        //         const expectedTypes = AlphaTex1LanguageHandler._buildExpectedTypesMessage(expectedValues);
 
-        while (expectedIndex < expectedValues.length) {
-            const expected = expectedValues[expectedIndex];
+        //         importer.addSemanticDiagnostic({
+        //             code: AlphaTexDiagnosticCode.AT210,
+        //             message: `Missing value. Expected following values: ${expectedTypes}`,
+        //             severity: AlphaTexDiagnosticsSeverity.Error,
+        //             start: parent.start,
+        //             end: parent.end
+        //         });
+        //         return false;
+        //     } else {
+        //         return true;
+        //     }
+        // }
 
-            const value: IAlphaTexArgumentValue | undefined =
-                actualIndex < values.arguments.length ? values.arguments[actualIndex] : undefined;
+        // if (values.validated) {
+        //     return true;
+        // }
 
-            if (value && expected.expectedTypes.has(value.nodeType) && this._checkRestrictions(expected, value)) {
-                switch (expected.parseMode) {
-                    case ArgumentListParseTypesMode.OptionalAndStop:
-                        // stop reading values
-                        expectedIndex = expectedValues.length;
-                        actualIndex++;
-                        break;
-                    case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-                    case ArgumentListParseTypesMode.RequiredAsValueList:
-                        // stay on current element
-                        actualIndex++;
-                        break;
-                    default:
-                        // advance to next item
-                        expectedIndex++;
-                        actualIndex++;
-                        break;
-                }
-            }
-            // not matched value?
-            else if (value) {
-                switch (expected.parseMode) {
-                    case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-                    case ArgumentListParseTypesMode.RequiredAsValueList:
-                        // end of value list as soon we have a different type
-                        expectedIndex++;
-                        break;
-                    case ArgumentListParseTypesMode.Required:
-                    case ArgumentListParseTypesMode.RequiredAsFloat:
-                        error = true;
-                        importer.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT209,
-                            message: `Unexpected required value '${AlphaTexNodeType[value.nodeType]}', expected: ${AlphaTex1LanguageHandler._buildExpectedTypesMessage(
-                                [expected]
-                            )}`,
-                            severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: value.start,
-                            end: value.end
-                        });
-                        expectedIndex++;
-                        actualIndex++;
-                        break;
-                    case ArgumentListParseTypesMode.Optional:
-                    case ArgumentListParseTypesMode.OptionalAsFloat:
-                    case ArgumentListParseTypesMode.OptionalAsFloatInArgumentList:
-                    case ArgumentListParseTypesMode.OptionalAndStop:
-                        // Skip value and try next
-                        expectedIndex++;
-                        break;
-                }
-            }
-            // no value anymore
-            else {
-                switch (expected.parseMode) {
-                    case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-                    case ArgumentListParseTypesMode.RequiredAsValueList:
-                        // end of list
-                        expectedIndex++;
-                        break;
+        // while (expectedIndex < expectedValues.length) {
+        //     const expected = expectedValues[expectedIndex];
 
-                    case ArgumentListParseTypesMode.Required:
-                    case ArgumentListParseTypesMode.RequiredAsFloat:
-                        error = true;
-                        importer.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT210,
-                            message: `Missing values. Expected following values: ${AlphaTex1LanguageHandler._buildExpectedTypesMessage(
-                                [expected]
-                            )}`,
-                            severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: values.end,
-                            end: values.end
-                        });
-                        expectedIndex = expectedValues.length;
-                        break;
+        //     const value: IAlphaTexArgumentValue | undefined =
+        //         actualIndex < values.arguments.length ? values.arguments[actualIndex] : undefined;
 
-                    case ArgumentListParseTypesMode.Optional:
-                    case ArgumentListParseTypesMode.OptionalAsFloat:
-                    case ArgumentListParseTypesMode.OptionalAsFloatInArgumentList:
-                    case ArgumentListParseTypesMode.OptionalAndStop:
-                        // no value for optional item
-                        expectedIndex++;
-                        break;
-                }
-            }
-        }
+        //     if (value && expected.expectedTypes.has(value.nodeType) && this._checkRestrictions(expected, value)) {
+        //         switch (expected.parseMode) {
+        //             case ArgumentListParseTypesMode.OptionalAndStop:
+        //                 // stop reading values
+        //                 expectedIndex = expectedValues.length;
+        //                 actualIndex++;
+        //                 break;
+        //             case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+        //             case ArgumentListParseTypesMode.RequiredAsValueList:
+        //                 // stay on current element
+        //                 actualIndex++;
+        //                 break;
+        //             default:
+        //                 // advance to next item
+        //                 expectedIndex++;
+        //                 actualIndex++;
+        //                 break;
+        //         }
+        //     }
+        //     // not matched value?
+        //     else if (value) {
+        //         switch (expected.parseMode) {
+        //             case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+        //             case ArgumentListParseTypesMode.RequiredAsValueList:
+        //                 // end of value list as soon we have a different type
+        //                 expectedIndex++;
+        //                 break;
+        //             case ArgumentListParseTypesMode.Required:
+        //             case ArgumentListParseTypesMode.RequiredAsFloat:
+        //                 error = true;
+        //                 importer.addSemanticDiagnostic({
+        //                     code: AlphaTexDiagnosticCode.AT209,
+        //                     message: `Unexpected required value '${AlphaTexNodeType[value.nodeType]}', expected: ${AlphaTex1LanguageHandler._buildExpectedTypesMessage(
+        //                         [expected]
+        //                     )}`,
+        //                     severity: AlphaTexDiagnosticsSeverity.Error,
+        //                     start: value.start,
+        //                     end: value.end
+        //                 });
+        //                 expectedIndex++;
+        //                 actualIndex++;
+        //                 break;
+        //             case ArgumentListParseTypesMode.Optional:
+        //             case ArgumentListParseTypesMode.OptionalAsFloat:
+        //             case ArgumentListParseTypesMode.OptionalAsFloatInArgumentList:
+        //             case ArgumentListParseTypesMode.OptionalAndStop:
+        //                 // Skip value and try next
+        //                 expectedIndex++;
+        //                 break;
+        //         }
+        //     }
+        //     // no value anymore
+        //     else {
+        //         switch (expected.parseMode) {
+        //             case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+        //             case ArgumentListParseTypesMode.RequiredAsValueList:
+        //                 // end of list
+        //                 expectedIndex++;
+        //                 break;
 
-        // remaining values?
-        if (actualIndex < values.arguments.length) {
-            while (actualIndex < values.arguments.length) {
-                const expectedTypes = AlphaTex1LanguageHandler._buildExpectedTypesMessage(expectedValues);
-                const value = values.arguments[actualIndex];
-                importer.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT209,
-                    message: `Unexpected additional value '${AlphaTexNodeType[value.nodeType]}', expected: ${expectedTypes}`,
-                    severity: AlphaTexDiagnosticsSeverity.Error,
-                    start: value.start,
-                    end: value.end
-                });
-                actualIndex++;
-            }
-        }
+        //             case ArgumentListParseTypesMode.Required:
+        //             case ArgumentListParseTypesMode.RequiredAsFloat:
+        //                 error = true;
+        //                 importer.addSemanticDiagnostic({
+        //                     code: AlphaTexDiagnosticCode.AT210,
+        //                     message: `Missing values. Expected following values: ${AlphaTex1LanguageHandler._buildExpectedTypesMessage(
+        //                         [expected]
+        //                     )}`,
+        //                     severity: AlphaTexDiagnosticsSeverity.Error,
+        //                     start: values.end,
+        //                     end: values.end
+        //                 });
+        //                 expectedIndex = expectedValues.length;
+        //                 break;
+
+        //             case ArgumentListParseTypesMode.Optional:
+        //             case ArgumentListParseTypesMode.OptionalAsFloat:
+        //             case ArgumentListParseTypesMode.OptionalAsFloatInArgumentList:
+        //             case ArgumentListParseTypesMode.OptionalAndStop:
+        //                 // no value for optional item
+        //                 expectedIndex++;
+        //                 break;
+        //         }
+        //     }
+        // }
+
+        // // remaining values?
+        // if (actualIndex < values.arguments.length) {
+        //     while (actualIndex < values.arguments.length) {
+        //         const expectedTypes = AlphaTex1LanguageHandler._buildExpectedTypesMessage(expectedValues);
+        //         const value = values.arguments[actualIndex];
+        //         importer.addSemanticDiagnostic({
+        //             code: AlphaTexDiagnosticCode.AT209,
+        //             message: `Unexpected additional value '${AlphaTexNodeType[value.nodeType]}', expected: ${expectedTypes}`,
+        //             severity: AlphaTexDiagnosticsSeverity.Error,
+        //             start: value.start,
+        //             end: value.end
+        //         });
+        //         actualIndex++;
+        //     }
+        // }
 
         return !error;
     }
 
-    private _checkRestrictions(expected: ValueListParseTypesExtended, value: IAlphaTexArgumentValue) {
-        switch (value.nodeType) {
-            case AlphaTexNodeType.Ident:
-                const identifier = value as AlphaTexIdentifier;
-                if (expected?.allowedValues) {
-                    return expected.allowedValues.has(identifier.text.toLowerCase());
-                } else if (expected?.reservedIdentifiers) {
-                    return !expected.reservedIdentifiers.has(identifier.text.toLowerCase());
-                }
-                return true;
-            case AlphaTexNodeType.String:
-                const str = value as AlphaTexStringLiteral;
-                if (expected?.allowedValues) {
-                    return expected.allowedValues.has(str.text.toLowerCase());
-                }
-                return true;
-            default:
-                return true;
-        }
-    }
+    // private _checkRestrictions(expected: AlphaTexParameterDefinition, value: IAlphaTexArgumentValue) {
+    //     switch (value.nodeType) {
+    //         case AlphaTexNodeType.Ident:
+    //             const identifier = value as AlphaTexIdentifier;
+    //             if (expected?.allowedValues) {
+    //                 return expected.allowedValues.has(identifier.text.toLowerCase());
+    //             }
+    //             return true;
+    //         case AlphaTexNodeType.String:
+    //             const str = value as AlphaTexStringLiteral;
+    //             if (expected?.allowedValues) {
+    //                 return expected.allowedValues.has(str.text.toLowerCase());
+    //             }
+    //             return true;
+    //         default:
+    //             return true;
+    //     }
+    // }
 
     private _headerFooterStyle(
         importer: IAlphaTexImporter,
@@ -1068,7 +1067,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             importer,
             metaData.arguments!,
             'textAlign',
-            AlphaTex1EnumMappings.textAligns,
+            AlphaTex1EnumMappings.textAlign,
             startIndex + 1
         );
         if (textAlign === undefined) {
@@ -1077,30 +1076,32 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         style.textAlign = textAlign!;
     }
 
-    private static _buildExpectedTypesMessage(values: ValueListParseTypesExtended[]) {
+    private static _buildExpectedTypesMessage(signatures: AlphaTexParameterDefinition[][]) {
         const parts: string[] = [];
 
-        for (const v of values) {
-            const types = Array.from(v.expectedTypes)
-                .map(t => AlphaTexNodeType[t])
-                .join('|');
-            switch (v.parseMode) {
-                case ArgumentListParseTypesMode.Required:
-                case ArgumentListParseTypesMode.RequiredAsFloat:
-                    parts.push(`required(${types})`);
-                    break;
-                case ArgumentListParseTypesMode.Optional:
-                case ArgumentListParseTypesMode.OptionalAsFloat:
-                    parts.push(`optional(${types})`);
-                    break;
-                case ArgumentListParseTypesMode.OptionalAndStop:
-                    parts.push(`only(${types})`);
-                    break;
-                case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-                    parts.push(`listOf(${types})`);
-                    break;
-            }
-        }
+        // TODO: signature message
+
+        // for (const v of values) {
+        //     const types = Array.from(v.expectedTypes)
+        //         .map(t => AlphaTexNodeType[t])
+        //         .join('|');
+        //     switch (v.parseMode) {
+        //         case ArgumentListParseTypesMode.Required:
+        //         case ArgumentListParseTypesMode.RequiredAsFloat:
+        //             parts.push(`required(${types})`);
+        //             break;
+        //         case ArgumentListParseTypesMode.Optional:
+        //         case ArgumentListParseTypesMode.OptionalAsFloat:
+        //             parts.push(`optional(${types})`);
+        //             break;
+        //         case ArgumentListParseTypesMode.OptionalAndStop:
+        //             parts.push(`only(${types})`);
+        //             break;
+        //         case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+        //             parts.push(`listOf(${types})`);
+        //             break;
+        //     }
+        // }
 
         return parts.join(',');
     }
@@ -1143,7 +1144,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         for (const p of metaData.properties.properties) {
-            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.chordPropertyValueListTypes], p)) {
+            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.metaDataProperties.get('chord')!], p)) {
                 continue;
             }
 
@@ -1178,7 +1179,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         for (const p of metaData.properties.properties) {
-            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.tuningPropertyValueListTypes], p)) {
+            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.metaDataProperties.get('tuning')!], p)) {
                 continue;
             }
 
@@ -1246,10 +1247,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
     private _checkProperty(
         importer: IAlphaTexImporter,
-        lookupList: Map<string, ValueListParseTypesExtended[] | undefined>[],
+        lookupList: Map<string, AlphaTexParameterDefinition[][] | null>[],
         p: AlphaTexPropertyNode
     ): boolean {
-        const result = this._checkValueListTypes(importer, lookupList, p, p.property.text.toLowerCase(), p.values);
+        const result = this._checkArgumentTypes(importer, lookupList, p, p.property.text.toLowerCase(), p.values);
         if (result !== undefined) {
             switch (result!) {
                 case ApplyNodeResult.Applied:
@@ -1283,7 +1284,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         let showNumbered: boolean = false;
 
         for (const p of metaData.properties.properties) {
-            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.staffPropertyValueListTypes], p)) {
+            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.metaDataProperties.get('staff')!], p)) {
                 continue;
             }
 
@@ -1320,7 +1321,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         for (const p of metaData.properties.properties) {
-            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.trackPropertyValueListTypes], p)) {
+            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.metaDataProperties.get('track')!], p)) {
                 continue;
             }
 
@@ -1373,9 +1374,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     }
 
     public applyBeatDurationProperty(importer: IAlphaTexImporter, p: AlphaTexPropertyNode): ApplyNodeResult {
-        const result = this._checkValueListTypes(
+        const result = this._checkArgumentTypes(
             importer,
-            [AlphaTex1LanguageDefinitions.beatDurationPropertyValueListTypes],
+            [AlphaTex1LanguageDefinitions.durationChangeProperties],
             p,
             p.property.text.toLowerCase(),
             p.values
@@ -1440,10 +1441,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (!this._allKnownBarMetaDataTags) {
             this._allKnownBarMetaDataTags = new Set<string>();
             const lists: Iterable<string>[] = [
-                AlphaTex1LanguageDefinitions.scoreMetaDataValueListTypes.keys(),
-                AlphaTex1LanguageDefinitions.structuralMetaDataValueListTypes.keys(),
-                AlphaTex1LanguageDefinitions.staffMetaDataValueListTypes.keys(),
-                AlphaTex1LanguageDefinitions.barMetaDataValueListTypes.keys()
+                AlphaTex1LanguageDefinitions.scoreMetaDataSignatures.keys(),
+                AlphaTex1LanguageDefinitions.structuralMetaDataSignatures.keys(),
+                AlphaTex1LanguageDefinitions.staffMetaDataSignatures.keys(),
+                AlphaTex1LanguageDefinitions.barMetaDataSignatures.keys()
             ];
             for (const l of lists) {
                 for (const v of l) {
@@ -1458,7 +1459,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     public get knownScoreMetaDataTags() {
         if (!this._knownScoreMetaDataTags) {
             this._knownScoreMetaDataTags = new Set<string>(
-                AlphaTex1LanguageDefinitions.scoreMetaDataValueListTypes.keys()
+                AlphaTex1LanguageDefinitions.scoreMetaDataSignatures.keys()
             );
         }
         return this._knownScoreMetaDataTags;
@@ -1468,7 +1469,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     public get knownStructuralMetaDataTags() {
         if (!this._knownStructuralMetaDataTags) {
             this._knownStructuralMetaDataTags = new Set<string>(
-                AlphaTex1LanguageDefinitions.structuralMetaDataValueListTypes.keys()
+                AlphaTex1LanguageDefinitions.structuralMetaDataSignatures.keys()
             );
         }
         return this._knownStructuralMetaDataTags;
@@ -1477,7 +1478,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     private _knownBarMetaDataTags: Set<string> | undefined = undefined;
     public get knownBarMetaDataTags() {
         if (!this._knownBarMetaDataTags) {
-            this._knownBarMetaDataTags = new Set<string>(AlphaTex1LanguageDefinitions.barMetaDataValueListTypes.keys());
+            this._knownBarMetaDataTags = new Set<string>(AlphaTex1LanguageDefinitions.barMetaDataSignatures.keys());
         }
         return this._knownBarMetaDataTags;
     }
@@ -1486,7 +1487,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     public get knownStaffMetaDataTags() {
         if (!this._knownStaffMetaDataTags) {
             this._knownStaffMetaDataTags = new Set<string>(
-                AlphaTex1LanguageDefinitions.staffMetaDataValueListTypes.keys()
+                AlphaTex1LanguageDefinitions.staffMetaDataSignatures.keys()
             );
         }
         return this._knownStaffMetaDataTags;
@@ -1496,7 +1497,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     public get knownBeatDurationProperties() {
         if (!this._knownBeatDurationProperties) {
             this._knownBeatDurationProperties = new Set<string>(
-                AlphaTex1LanguageDefinitions.beatDurationPropertyValueListTypes.keys()
+                AlphaTex1LanguageDefinitions.durationChangeProperties.keys()
             );
         }
         return this._knownBeatDurationProperties;
@@ -1505,7 +1506,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     private _knownBeatProperties: Set<string> | undefined = undefined;
     public get knownBeatProperties() {
         if (!this._knownBeatProperties) {
-            this._knownBeatProperties = new Set<string>(AlphaTex1LanguageDefinitions.beatPropertyValueListTypes.keys());
+            this._knownBeatProperties = new Set<string>(AlphaTex1LanguageDefinitions.beatProperties.keys());
         }
         return this._knownBeatProperties;
     }
@@ -1513,16 +1514,16 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     private _knownNoteProperties: Set<string> | undefined = undefined;
     public get knownNoteProperties() {
         if (!this._knownNoteProperties) {
-            this._knownNoteProperties = new Set<string>(AlphaTex1LanguageDefinitions.notePropertyValueListTypes.keys());
+            this._knownNoteProperties = new Set<string>(AlphaTex1LanguageDefinitions.noteProperties.keys());
         }
         return this._knownNoteProperties;
     }
 
     public applyBeatProperty(importer: IAlphaTexImporter, beat: Beat, p: AlphaTexPropertyNode): ApplyNodeResult {
         const tag = p.property.text.toLowerCase();
-        const result = this._checkValueListTypes(
+        const result = this._checkArgumentTypes(
             importer,
-            [AlphaTex1LanguageDefinitions.beatPropertyValueListTypes],
+            [AlphaTex1LanguageDefinitions.beatProperties],
             p,
             tag,
             p.values
@@ -1625,7 +1626,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             importer,
                             p.values!,
                             'whammy type',
-                            AlphaTex1EnumMappings.whammyTypes,
+                            AlphaTex1EnumMappings.whammyType,
                             tbi
                         );
                         if (whammyBarType === undefined) {
@@ -1643,7 +1644,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             importer,
                             p.values!,
                             'whammy style',
-                            AlphaTex1EnumMappings.bendStyles,
+                            AlphaTex1EnumMappings.bendStyle,
                             tbi
                         );
                         if (whammyBarStyle === undefined) {
@@ -1691,7 +1692,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         importer,
                         p.values!,
                         'whammy style',
-                        AlphaTex1EnumMappings.graceTypes
+                        AlphaTex1EnumMappings.graceType
                     );
                     if (graceType === undefined) {
                         return ApplyNodeResult.NotAppliedSemanticError;
@@ -1706,7 +1707,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     p.values!,
                     'dynamic',
-                    AlphaTex1EnumMappings.dynamics
+                    AlphaTex1EnumMappings.dynamicValue
                 );
                 if (dyn === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -1845,7 +1846,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         importer,
                         p.values!,
                         'barre shape',
-                        AlphaTex1EnumMappings.barreShapes,
+                        AlphaTex1EnumMappings.barreShape,
                         1
                     );
                     if (barreShape === undefined) {
@@ -1859,7 +1860,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     p.values!,
                     'rasgueado pattern',
-                    AlphaTex1EnumMappings.rasgueadoPatterns
+                    AlphaTex1EnumMappings.rasgueado
                 );
                 if (rasg === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -1871,7 +1872,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     p.values!,
                     'ottava',
-                    AlphaTex1EnumMappings.ottava
+                    AlphaTex1EnumMappings.ottavia
                 );
                 if (ottava === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -1913,7 +1914,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     importer,
                     p.values!,
                     'fermata',
-                    AlphaTex1EnumMappings.fermataTypes
+                    AlphaTex1EnumMappings.fermataType
                 );
                 if (fermataType === undefined) {
                     return ApplyNodeResult.NotAppliedSemanticError;
@@ -2004,9 +2005,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
     public applyNoteProperty(importer: IAlphaTexImporter, note: Note, p: AlphaTexPropertyNode): ApplyNodeResult {
         const tag = p.property.text.toLowerCase();
-        const result = this._checkValueListTypes(
+        const result = this._checkArgumentTypes(
             importer,
-            [AlphaTex1LanguageDefinitions.notePropertyValueListTypes],
+            [AlphaTex1LanguageDefinitions.noteProperties],
             p,
             tag,
             p.values
@@ -2026,7 +2027,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             importer,
                             p.values!,
                             'bend type',
-                            AlphaTex1EnumMappings.bendTypes,
+                            AlphaTex1EnumMappings.bendType,
                             tbi
                         );
                         if (bendType === undefined) {
@@ -2044,7 +2045,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             importer,
                             p.values!,
                             'bend style',
-                            AlphaTex1EnumMappings.bendStyles,
+                            AlphaTex1EnumMappings.bendStyle,
                             tbi
                         );
                         if (bendStyle === undefined) {
@@ -2457,7 +2458,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(
                 Atnf.identMeta(
                     'bracketExtendMode',
-                    AlphaTex1EnumMappings.bracketExtendModesReversed.get(stylesheet.bracketExtendMode)!
+                    AlphaTex1EnumMappings.bracketExtendModeReversed.get(stylesheet.bracketExtendMode)!
                 )
             );
         }
@@ -2474,7 +2475,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(
                 Atnf.identMeta(
                     'singleTrackTrackNamePolicy',
-                    AlphaTex1EnumMappings.trackNamePoliciesReversed.get(stylesheet.singleTrackTrackNamePolicy)!
+                    AlphaTex1EnumMappings.trackNamePolicyReversed.get(stylesheet.singleTrackTrackNamePolicy)!
                 )
             );
         }
@@ -2485,7 +2486,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(
                 Atnf.identMeta(
                     'multiTrackTrackNamePolicy',
-                    AlphaTex1EnumMappings.trackNamePoliciesReversed.get(stylesheet.multiTrackTrackNamePolicy)!
+                    AlphaTex1EnumMappings.trackNamePolicyReversed.get(stylesheet.multiTrackTrackNamePolicy)!
                 )
             );
         }
@@ -2518,7 +2519,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(
                 Atnf.identMeta(
                     'firstSystemTrackNameOrientation',
-                    AlphaTex1EnumMappings.trackNameOrientationsReversed.get(stylesheet.firstSystemTrackNameOrientation)!
+                    AlphaTex1EnumMappings.trackNameOrientationReversed.get(stylesheet.firstSystemTrackNameOrientation)!
                 )
             );
         }
@@ -2529,7 +2530,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(
                 Atnf.identMeta(
                     'otherSystemsTrackNameOrientation',
-                    AlphaTex1EnumMappings.trackNameOrientationsReversed.get(
+                    AlphaTex1EnumMappings.trackNameOrientationReversed.get(
                         stylesheet.otherSystemsTrackNameOrientation
                     )!
                 )
@@ -2582,7 +2583,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 : undefined;
             if (style && (!defaultStyle || !HeaderFooterStyle.equals(defaultStyle, style))) {
                 values.push(Atnf.string(style.isVisible === false ? '' : style.template));
-                values.push(Atnf.ident(AlphaTex1EnumMappings.textAlignsReversed.get(style.textAlign)!));
+                values.push(Atnf.ident(AlphaTex1EnumMappings.textAlignReversed.get(style.textAlign)!));
             }
         }
 
@@ -2644,15 +2645,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (bar.index === 0 || bar.clef !== bar.previousBar?.clef) {
-            nodes.push(Atnf.identMeta('clef', AlphaTex1EnumMappings.clefsReversed.get(bar.clef)!));
+            nodes.push(Atnf.identMeta('clef', AlphaTex1EnumMappings.clefReversed.get(bar.clef)!));
         }
 
         if ((bar.index === 0 && bar.clefOttava !== Ottavia.Regular) || bar.clefOttava !== bar.previousBar?.clefOttava) {
-            nodes.push(Atnf.identMeta('ottava', AlphaTex1EnumMappings.ottavaReversed.get(bar.clefOttava)!));
+            nodes.push(Atnf.identMeta('ottava', AlphaTex1EnumMappings.ottaviaReversed.get(bar.clefOttava)!));
         }
 
         if ((bar.index === 0 && bar.simileMark !== SimileMark.None) || bar.simileMark !== bar.previousBar?.simileMark) {
-            nodes.push(Atnf.identMeta('simile', AlphaTex1EnumMappings.simileMarksReversed.get(bar.simileMark)!));
+            nodes.push(Atnf.identMeta('simile', AlphaTex1EnumMappings.simileMarkReversed.get(bar.simileMark)!));
         }
 
         if (bar.displayScale !== 1) {
@@ -2683,11 +2684,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (bar.barLineLeft !== BarLineStyle.Automatic) {
-            nodes.push(Atnf.identMeta('barLineLeft', AlphaTex1EnumMappings.barLinesReversed.get(bar.barLineLeft)!));
+            nodes.push(Atnf.identMeta('barLineLeft', AlphaTex1EnumMappings.barLineStyleReversed.get(bar.barLineLeft)!));
         }
 
         if (bar.barLineRight !== BarLineStyle.Automatic) {
-            nodes.push(Atnf.identMeta('barLineRight', AlphaTex1EnumMappings.barLinesReversed.get(bar.barLineRight)!));
+            nodes.push(Atnf.identMeta('barLineRight', AlphaTex1EnumMappings.barLineStyleReversed.get(bar.barLineRight)!));
         }
 
         if (
@@ -2696,11 +2697,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             bar.keySignatureType !== bar.previousBar!.keySignatureType
         ) {
             let ks = '';
-            if (bar.keySignatureType === KeySignatureType.Minor) {
-                ks = AlphaTex1EnumMappings.keySignaturesMinorReversed.get(bar.keySignature)!;
-            } else {
-                ks = AlphaTex1EnumMappings.keySignaturesMajorReversed.get(bar.keySignature)!;
-            }
+            // TODO generate key signature reverse lookup
+            // if (bar.keySignatureType === KeySignatureType.Minor) {
+            //     ks = AlphaTex1EnumMappings.keySignaturesMinorReversed.get(bar.keySignature)!;
+            // } else {
+            //     ks = AlphaTex1EnumMappings.keySignaturesMajorReversed.get(bar.keySignature)!;
+            // }
             nodes.push(Atnf.identMeta('ks', ks));
         }
 
@@ -2849,7 +2851,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             (masterBar.index > 0 && masterBar.tripletFeel !== masterBar.previousMasterBar?.tripletFeel) ||
             (masterBar.index === 0 && masterBar.tripletFeel !== TripletFeel.NoTripletFeel)
         ) {
-            nodes.push(Atnf.identMeta('tf', AlphaTex1EnumMappings.tripletFeelsReversed.get(masterBar.tripletFeel)!));
+            nodes.push(Atnf.identMeta('tf', AlphaTex1EnumMappings.tripletFeelReversed.get(masterBar.tripletFeel)!));
         }
 
         if (masterBar.isFreeTime) {
@@ -2879,7 +2881,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         if (masterBar.directions) {
             for (const d of masterBar.directions!) {
-                nodes.push(Atnf.identMeta('jump', AlphaTex1EnumMappings.directionsReversed.get(d)!));
+                nodes.push(Atnf.identMeta('jump', AlphaTex1EnumMappings.directionReversed.get(d)!));
             }
         }
 
@@ -3030,9 +3032,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (note.hasBend) {
             const beValue = Atnf.values(
                 [
-                    Atnf.ident(AlphaTex1EnumMappings.bendTypesReversed.get(note.bendType)!),
+                    Atnf.ident(AlphaTex1EnumMappings.bendTypeReversed.get(note.bendType)!),
                     note.bendStyle !== BendStyle.Default
-                        ? Atnf.ident(AlphaTex1EnumMappings.bendStylesReversed.get(note.bendStyle)!)
+                        ? Atnf.ident(AlphaTex1EnumMappings.bendStyleReversed.get(note.bendStyle)!)
                         : undefined
                 ],
                 true
@@ -3267,8 +3269,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (beat.hasWhammyBar) {
             const tbeValues = Atnf.values(
                 [
-                    Atnf.ident(AlphaTex1EnumMappings.whammyTypesReversed.get(beat.whammyBarType)!),
-                    Atnf.ident(AlphaTex1EnumMappings.bendStylesReversed.get(beat.whammyStyle)!)
+                    Atnf.ident(AlphaTex1EnumMappings.whammyTypeReversed.get(beat.whammyBarType)!),
+                    Atnf.ident(AlphaTex1EnumMappings.bendStyleReversed.get(beat.whammyStyle)!)
                 ],
                 true
             )!;
@@ -3305,14 +3307,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (beat.ottava !== Ottavia.Regular) {
-            Atnf.prop(properties, 'ot', Atnf.identValue(AlphaTex1EnumMappings.ottavaReversed.get(beat.ottava)!));
+            Atnf.prop(properties, 'ot', Atnf.identValue(AlphaTex1EnumMappings.ottaviaReversed.get(beat.ottava)!));
         }
 
         if (beat.hasRasgueado) {
             Atnf.prop(
                 properties,
                 'rasg',
-                Atnf.identValue(AlphaTex1EnumMappings.rasgueadoPatternsReversed.get(beat.rasgueado)!)
+                Atnf.identValue(AlphaTex1EnumMappings.rasgueadoReversed.get(beat.rasgueado)!)
             );
         }
 
@@ -3336,7 +3338,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 'gr',
                 beat.graceType === GraceType.BeforeBeat
                     ? undefined
-                    : Atnf.identValue(AlphaTex1EnumMappings.graceTypesReversed.get(beat.graceType)!)
+                    : Atnf.identValue(AlphaTex1EnumMappings.graceTypeReversed.get(beat.graceType)!)
             );
         }
 
@@ -3354,7 +3356,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if ((beat.voice.bar.index === 0 && beat.index === 0) || beat.dynamics !== beat.previousBeat?.dynamics) {
-            Atnf.prop(properties, 'dy', Atnf.identValue(AlphaTex1EnumMappings.dynamicsReversed.get(beat.dynamics)!));
+            Atnf.prop(properties, 'dy', Atnf.identValue(AlphaTex1EnumMappings.dynamicValueReversed.get(beat.dynamics)!));
         }
 
         const fermata = beat.fermata;
@@ -3363,7 +3365,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 properties,
                 'fermata',
                 Atnf.values([
-                    Atnf.ident(AlphaTex1EnumMappings.fermataTypesReversed.get(beat.fermata!.type)!),
+                    Atnf.ident(AlphaTex1EnumMappings.fermataTypeReversed.get(beat.fermata!.type)!),
                     Atnf.number(beat.fermata!.length)
                 ])
             );
@@ -3414,7 +3416,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 'barre',
                 Atnf.values([
                     Atnf.number(beat.barreFret),
-                    Atnf.ident(AlphaTex1EnumMappings.barreShapesReversed.get(beat.barreShape)!)
+                    Atnf.ident(AlphaTex1EnumMappings.barreShapeReversed.get(beat.barreShape)!)
                 ])
             );
         }

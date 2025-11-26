@@ -187,7 +187,7 @@ export enum AlphaTexDiagnosticCode {
     AT218 = 218,
 
     /**
-     * Expected no values, but found some. Values are ignored.
+     * Expected no arguments, but found some.
      */
     AT300 = 300,
 

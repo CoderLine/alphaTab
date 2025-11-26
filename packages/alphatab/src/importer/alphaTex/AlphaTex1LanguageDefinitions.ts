@@ -1,19 +1,48 @@
 import type { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+type SimpleAlphaTexParameterDefinition = [AlphaTexNodeType[], ArgumentListParseTypesMode, string[]];
+
+/**
+ * @record
+ * @internal
+ */
+export interface AlphaTexParameterDefinition {
+    expectedTypes: Set<AlphaTexNodeType>;
+    parseMode: ArgumentListParseTypesMode;
+    allowedValues?: Set<string>;
+}
+
 /**
  * @internal
  */
 export class AlphaTex1LanguageDefinitions {
-    // helpers for correct typing and potential future transformations
-    private static _metaProps(
-        props: [string, [string, [AlphaTexNodeType[], ArgumentListParseTypesMode, string[]][][] | null][] | null][]
-    ) {
-        return props;
+    private static _param(simple: SimpleAlphaTexParameterDefinition): AlphaTexParameterDefinition {
+        return {
+            expectedTypes: new Set(simple[0]),
+            parseMode: simple[1],
+            allowedValues: simple[2] ? new Set(simple[2]) : undefined
+        };
     }
-    private static _signatures(
-        signatures: [string, [AlphaTexNodeType[], ArgumentListParseTypesMode, string[]][][] | null][]
-    ) {
-        return signatures;
+
+    private static _simple(
+        signature: SimpleAlphaTexParameterDefinition[][] | null
+    ): AlphaTexParameterDefinition[][] | null {
+        return signature === null ? null : signature.map(s => s.map(AlphaTex1LanguageDefinitions._param));
+    }
+
+    private static _metaProps(props: [string, [string, SimpleAlphaTexParameterDefinition[][] | null][] | null][]) {
+        return new Map(
+            props.map(p => [
+                p[0],
+                p[1] === null ? null : new Map(p[1].map(p => [p[0], AlphaTex1LanguageDefinitions._simple(p[1])]))
+            ])
+        );
+    }
+    private static _props(props: [string, SimpleAlphaTexParameterDefinition[][] | null][]) {
+        return new Map(props.map(p => [p[0], AlphaTex1LanguageDefinitions._simple(p[1])]));
+    }
+    private static _signatures(signatures: [string, SimpleAlphaTexParameterDefinition[][] | null][]) {
+        return new Map(signatures.map(s => [s[0], AlphaTex1LanguageDefinitions._simple(s[1])]));
     }
     // The following definitions age auto-generated from the central definitions in
     // the `packages/alphatex`. Do not make manual changes here,
@@ -451,4 +480,339 @@ export class AlphaTex1LanguageDefinitions {
         AlphaTex1LanguageDefinitions.structuralMetaDataSignatures,
         AlphaTex1LanguageDefinitions.barMetaDataSignatures
     ];
+    public static readonly durationChangeProperties = AlphaTex1LanguageDefinitions._props([
+        [
+            'tu',
+            [
+                [[[16], 0, ['3', '5', '6', '7', '9', '10', '12']]],
+                [
+                    [[16], 0, []],
+                    [[16], 0, []]
+                ]
+            ]
+        ]
+    ]);
+    public static readonly beatProperties = AlphaTex1LanguageDefinitions._props([
+        ['f', null],
+        ['fo', null],
+        ['vs', null],
+        ['v', null],
+        ['vw', null],
+        ['s', null],
+        ['p', null],
+        ['tt', null],
+        ['d', null],
+        ['dd', null],
+        ['su', null],
+        ['sd', null],
+        ['cre', null],
+        ['dec', null],
+        ['spd', null],
+        ['sph', null],
+        ['spu', null],
+        ['spe', null],
+        ['slashed', null],
+        ['ds', null],
+        ['glpf', null],
+        ['glpt', null],
+        ['waho', null],
+        ['wahc', null],
+        ['legatoorigin', null],
+        ['timer', null],
+        [
+            'tu',
+            [
+                [[[16], 0, ['3', '5', '6', '7', '9', '10', '12']]],
+                [
+                    [[16], 0, []],
+                    [[16], 0, []]
+                ]
+            ]
+        ],
+        ['txt', [[[[17], 0, []]]]],
+        [
+            'lyrics',
+            [
+                [[[17], 0, []]],
+                [
+                    [[16], 0, []],
+                    [[17], 0, []]
+                ]
+            ]
+        ],
+        [
+            'tb',
+            [
+                [[[16], 4, []]],
+                [
+                    [[10], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
+                    [[16], 4, []]
+                ],
+                [
+                    [[10], 0, ['default', 'gradual', 'fast']],
+                    [[16], 4, []]
+                ],
+                [
+                    [[10], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
+                    [[10], 0, ['default', 'gradual', 'fast']],
+                    [[16], 4, []]
+                ]
+            ]
+        ],
+        [
+            'tbe',
+            [
+                [[[16], 4, []]],
+                [
+                    [[10], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
+                    [[16], 4, []]
+                ],
+                [
+                    [[10], 0, ['default', 'gradual', 'fast']],
+                    [[16], 4, []]
+                ],
+                [
+                    [[10], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
+                    [[10], 0, ['default', 'gradual', 'fast']],
+                    [[16], 4, []]
+                ]
+            ]
+        ],
+        ['bu', [[[[16], 1, []]]]],
+        ['bd', [[[[16], 1, []]]]],
+        ['au', [[[[16], 1, []]]]],
+        ['ad', [[[[16], 1, []]]]],
+        ['ch', [[[[17], 0, []]]]],
+        ['gr', [[[[10], 1, ['onbeat', 'beforebeat', 'bendgrace']]]]],
+        [
+            'dy',
+            [
+                [
+                    [
+                        [10],
+                        0,
+                        [
+                            'ppp',
+                            'pp',
+                            'p',
+                            'mp',
+                            'mf',
+                            'f',
+                            'ff',
+                            'fff',
+                            'pppp',
+                            'ppppp',
+                            'pppppp',
+                            'ffff',
+                            'fffff',
+                            'ffffff',
+                            'sf',
+                            'sfp',
+                            'sfpp',
+                            'fp',
+                            'rf',
+                            'rfz',
+                            'sfz',
+                            'sffz',
+                            'fz',
+                            'n',
+                            'pf',
+                            'sfzp'
+                        ]
+                    ]
+                ]
+            ]
+        ],
+        [
+            'tempo',
+            [
+                [
+                    [[16], 0, []],
+                    [[10], 1, ['hide']]
+                ],
+                [
+                    [[16], 0, []],
+                    [[17], 0, []],
+                    [[10], 1, ['hide']]
+                ]
+            ]
+        ],
+        ['volume', [[[[16], 0, []]]]],
+        ['balance', [[[[16], 0, []]]]],
+        ['tp', [[[[16], 0, ['8', '16', '32']]]]],
+        [
+            'barre',
+            [
+                [
+                    [[16], 0, []],
+                    [[10], 1, ['full', 'half']]
+                ]
+            ]
+        ],
+        [
+            'rasg',
+            [
+                [
+                    [
+                        [10],
+                        0,
+                        [
+                            'ii',
+                            'mi',
+                            'miitriplet',
+                            'miianapaest',
+                            'pmptriplet',
+                            'pmpanapaest',
+                            'peitriplet',
+                            'peianapaest',
+                            'paitriplet',
+                            'paianapaest',
+                            'amitriplet',
+                            'amianapaest',
+                            'ppp',
+                            'amii',
+                            'amip',
+                            'eami',
+                            'eamii',
+                            'peami'
+                        ]
+                    ]
+                ]
+            ]
+        ],
+        ['ot', [[[[10], 0, ['15ma', '8va', 'regular', '8vb', '15mb']]]]],
+        ['instrument', [[[[16], 0, []]], [[[17], 0, []]], [[[10], 0, ['percussion']]]]],
+        ['bank', [[[[16], 0, []]]]],
+        [
+            'fermata',
+            [
+                [
+                    [[10], 0, ['short', 'medium', 'long']],
+                    [[16], 1, []]
+                ]
+            ]
+        ],
+        ['beam', [[[[10], 0, ['invert', 'up', 'down', 'auto', 'split', 'merge', 'splitsecondary']]]]]
+    ]);
+    public static readonly noteProperties = AlphaTex1LanguageDefinitions._props([
+        ['nh', null],
+        ['ah', [[[[16], 0, []]]]],
+        ['th', [[[[16], 0, []]]]],
+        ['ph', [[[[16], 0, []]]]],
+        ['sh', [[[[16], 0, []]]]],
+        ['fh', [[[[16], 0, []]]]],
+        ['v', null],
+        ['vw', null],
+        ['sl', null],
+        ['ss', null],
+        ['sib', null],
+        ['sia', null],
+        ['sou', null],
+        ['sod', null],
+        ['psu', null],
+        ['psd', null],
+        ['h', null],
+        ['lht', null],
+        ['g', null],
+        ['ac', null],
+        ['hac', null],
+        ['ten', null],
+        [
+            'tr',
+            [
+                [
+                    [[16], 0, []],
+                    [[16], 1, ['16', '32', '64']]
+                ]
+            ]
+        ],
+        ['pm', null],
+        ['st', null],
+        ['lr', null],
+        ['x', null],
+        ['t', null],
+        ['turn', null],
+        ['iturn', null],
+        ['umordent', null],
+        ['lmordent', null],
+        ['string', null],
+        ['hide', null],
+        [
+            'b',
+            [
+                [[[16], 4, []]],
+                [
+                    [
+                        [10],
+                        0,
+                        ['custom', 'bend', 'release', 'bendrelease', 'hold', 'prebend', 'prebendbend', 'prebendrelease']
+                    ],
+                    [[16], 4, []]
+                ],
+                [
+                    [[10], 0, ['default', 'gradual', 'fast']],
+                    [[16], 4, []]
+                ],
+                [
+                    [
+                        [10],
+                        0,
+                        ['custom', 'bend', 'release', 'bendrelease', 'hold', 'prebend', 'prebendbend', 'prebendrelease']
+                    ],
+                    [[10], 0, ['default', 'gradual', 'fast']],
+                    [[16], 4, []]
+                ]
+            ]
+        ],
+        [
+            'be',
+            [
+                [[[16], 4, []]],
+                [
+                    [
+                        [10],
+                        0,
+                        ['custom', 'bend', 'release', 'bendrelease', 'hold', 'prebend', 'prebendbend', 'prebendrelease']
+                    ],
+                    [[16], 4, []]
+                ],
+                [
+                    [[10], 0, ['default', 'gradual', 'fast']],
+                    [[16], 4, []]
+                ],
+                [
+                    [
+                        [10],
+                        0,
+                        ['custom', 'bend', 'release', 'bendrelease', 'hold', 'prebend', 'prebendbend', 'prebendrelease']
+                    ],
+                    [[10], 0, ['default', 'gradual', 'fast']],
+                    [[16], 4, []]
+                ]
+            ]
+        ],
+        ['lf', [[[[16], 0, ['1', '2', '3', '4', '5']]]]],
+        ['rf', [[[[16], 0, ['1', '2', '3', '4', '5']]]]],
+        [
+            'acc',
+            [
+                [
+                    [
+                        [10],
+                        0,
+                        [
+                            'default',
+                            'forcenone',
+                            'forcenatural',
+                            'forcesharp',
+                            'forcedoublesharp',
+                            'forceflat',
+                            'forcedoubleflat'
+                        ]
+                    ]
+                ]
+            ]
+        ],
+        ['slur', [[[[17], 0, []]], [[[10], 0, []]]]]
+    ]);
 }

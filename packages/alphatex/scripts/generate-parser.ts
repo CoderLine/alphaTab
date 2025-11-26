@@ -23,6 +23,9 @@ type LanguageDefinitionsVisitorContext = {
     foundStructuralMetaDataSignatures: boolean;
     foundBarMetaDataSignatures: boolean;
     foundMetaDataProperties: boolean;
+    foundDurationChangeProperties: boolean;
+    foundBeatProperties: boolean;
+    foundNoteProperties: boolean;
 };
 
 function createAlphaTexParameterDefinition(e: ParameterDefinition) {
@@ -124,6 +127,33 @@ function updateMetaDataProperties(element: ts.PropertyDeclaration, tags: Metadat
     );
 }
 
+function updateProperties(element: ts.PropertyDeclaration, props: PropertyDefinition[]) {
+    console.log(`Start update of ${element.name.getText()}`);
+
+    const expr = ts.factory.createCallExpression(
+        ts.factory.createPropertyAccessExpression(
+            ts.factory.createIdentifier('AlphaTex1LanguageDefinitions'),
+            '_props'
+        ),
+        undefined,
+        [
+            ts.factory.createArrayLiteralExpression(
+                props.map(d => createAlphaTexPropertyDefinition(d)),
+                true
+            )
+        ]
+    );
+
+    return ts.factory.updatePropertyDeclaration(
+        element,
+        element.modifiers,
+        element.name,
+        element.questionToken,
+        element.type,
+        expr
+    );
+}
+
 function languageDefinitionsVisitor<TNode extends ts.Node>(
     node: TNode,
     context: LanguageDefinitionsVisitorContext,
@@ -158,6 +188,15 @@ function languageDefinitionsVisitor<TNode extends ts.Node>(
                         definitions.barMetaData
                     ].flat()
                 ) as unknown as TNode;
+            case 'durationChangeProperties':
+                context.foundDurationChangeProperties = true;
+                return updateProperties(node, definitions.durationChangeProperties) as unknown as TNode;
+            case 'beatProperties':
+                context.foundBeatProperties = true;
+                return updateProperties(node, definitions.beatProperties) as unknown as TNode;
+            case 'noteProperties':
+                context.foundNoteProperties = true;
+                return updateProperties(node, definitions.noteProperties) as unknown as TNode;
         }
     }
     return node;
@@ -197,7 +236,10 @@ async function generateLanguageDefinitions() {
         foundMetaDataProperties: false,
         foundScoreMetaDataSignatures: false,
         foundStaffMetaDataSignatures: false,
-        foundStructuralMetaDataSignatures: false
+        foundStructuralMetaDataSignatures: false,
+        foundDurationChangeProperties: false,
+        foundBeatProperties: false,
+        foundNoteProperties: false
     };
     const visitor = (node: ts.Node) => languageDefinitionsVisitor(node, ctx, visitor);
 
