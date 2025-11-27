@@ -54,7 +54,7 @@ export const alphaTexMappedEnumLookup = {
 };
 export type AlphaTexMappedEnumName = keyof typeof alphaTexMappedEnumLookup;
 
-type AlphaTexMappedEnumMappingEntry =
+export type AlphaTexMappedEnumMappingEntry =
     | (Pick<ParameterValueDefinition, 'shortDescription' | 'longDescription' | 'snippet'> &
           Partial<ParameterValueDefinition> & {
               aliases?: string[];

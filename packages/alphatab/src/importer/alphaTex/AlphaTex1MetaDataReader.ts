@@ -5,12 +5,11 @@ import {
 import {
     type AlphaTexArgumentList,
     type AlphaTexAstNode,
-    type AlphaTexIdentifier,
     type AlphaTexMetaDataTagNode,
     AlphaTexNodeType,
     type AlphaTexNumberLiteral,
     type AlphaTexPropertyNode,
-    type AlphaTexStringLiteral,
+    type AlphaTexTextNode,
     type IAlphaTexArgumentValue
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
@@ -21,6 +20,15 @@ import {
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { Atnf } from '@coderline/alphatab/importer/alphaTex/ATNF';
 import type { IAlphaTexMetaDataReader } from '@coderline/alphatab/importer/alphaTex/IAlphaTexMetaDataReader';
+
+/**
+ * @internal
+ * @record
+ */
+export interface SignatureResolutionInfo {
+    signature: AlphaTexParameterDefinition[];
+    parameterIndex: number;
+}
 
 /**
  * @internal
@@ -126,74 +134,75 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         signatures: AlphaTexParameterDefinition[][],
         endOfListTypes?: Set<AlphaTexNodeType>
     ): AlphaTexArgumentList | undefined {
+        if (signatures.length === 1 && signatures[0].length === 0) {
+            return undefined;
+        }
+
         const values: IAlphaTexArgumentValue[] = [];
         const valueListStart = parser.lexer.peekToken()?.start;
         const parseRemaining = endOfListTypes !== undefined;
 
         let error = false;
 
-        // TODO: parsing using available overloads
+        const candidates = new Map<number, SignatureResolutionInfo>(
+            signatures.map((v, i) => [
+                i,
+                {
+                    signature: v,
+                    parameterIndex: 0
+                }
+            ])
+        );
 
-        // let i = 0;
-        // while (!error && i < expectedValues.length) {
-        //     const expected = expectedValues[i];
+        function addValue(value: IAlphaTexArgumentValue) {
+            values.push(value);
+            parser.lexer.advance();
+        }
 
-        //     const value = parser.lexer.peekToken();
+        function extendToFloat(value: AlphaTexNumberLiteral) {
+            parser.lexer.extendToFloat(value);
+        }
 
-        //     if (value?.nodeType === AlphaTexNodeType.Tag) {
-        //         break;
-        //     }
+        while (candidates.size > 1) {
+            const value = parser.lexer.peekToken();
+            if (!value) {
+                break;
+            }
 
-        //     // NOTE: The parser already handles parenthesized value lists, we only need to handle this
-        //     // parse mode in the validation.
+            if (value.nodeType === AlphaTexNodeType.Tag) {
+                break;
+            }
 
-        //     if (
-        //         value &&
-        //         (expected.expectedTypes.has(value.nodeType) ||
-        //             // value lists start with a parenthesis open token
-        //             AlphaTex1MetaDataReader._isValueListMatch(value, expected)) &&
-        //         this._handleTypeValueListItem(parser, values, value, expected)
-        //     ) {
-        //         switch (expected.parseMode) {
-        //             case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-        //                 // stay on current element
-        //                 break;
-        //             default:
-        //                 // advance to next item
-        //                 i++;
-        //                 break;
-        //         }
-        //     } else {
-        //         switch (expected.parseMode) {
-        //             // end of value list
-        //             case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-        //                 i++;
-        //                 break;
-        //             case ArgumentListParseTypesMode.Required:
-        //             case ArgumentListParseTypesMode.RequiredAsFloat:
-        //                 parser.unexpectedToken(value, Array.from(expected.expectedTypes), false);
-        //                 error = true;
-        //                 break;
+            AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value, addValue, extendToFloat);
+        }
 
-        //             case ArgumentListParseTypesMode.Optional:
-        //             case ArgumentListParseTypesMode.OptionalAsFloat:
-        //                 // optional not matched -> try next
-        //                 i++;
-        //                 break;
+        AlphaTex1MetaDataReader.filterIncompleteCandidates(candidates);
 
-        //             case ArgumentListParseTypesMode.RequiredAsValueList:
-        //                 // optional -> not matched, value listed ended, check next
-        //                 i++;
-        //                 break;
-        //         }
-        //     }
-        // }
+        if (candidates.size === 0) {
+            parser.addParserDiagnostic({
+                code: AlphaTexDiagnosticCode.AT219,
+                message: `Error parsing arguments: no overload matched. Signatures:\n${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: valueListStart,
+                end: parser.lexer.previousTokenEndLocation()
+            });
+            error = true;
+        } else if (candidates.size > 1) {
+            parser.addParserDiagnostic({
+                code: AlphaTexDiagnosticCode.AT220,
+                message: `Error parsing arguments: ambgiuous overloads, wrap arguments into parenthesis. Signatures (ambiguous ones marked with ~):\n${AlphaTex1MetaDataReader.generateSignatures(signatures, new Set(candidates.keys()))}`,
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: valueListStart,
+                end: parser.lexer.previousTokenEndLocation()
+            });
+            error = true;
+        }
 
         // read remaining values user might have supplied
         if (parseRemaining) {
             let remaining = parser.lexer.peekToken();
             while (remaining && !endOfListTypes!.has(remaining.nodeType)) {
-                if (this._handleTypeValueListItem(parser, values, remaining, undefined)) {
+                if (AlphaTex1MetaDataReader._handleTypeValueListItem(remaining, undefined, extendToFloat)) {
                     remaining = parser.lexer.peekToken();
                 } else {
                     remaining = undefined;
@@ -213,64 +222,177 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         return valueList;
     }
 
-    private _handleTypeValueListItem(
-        parser: AlphaTexParser,
-        valueList: IAlphaTexArgumentValue[],
+    public static filterIncompleteCandidates(candidates: Map<number, SignatureResolutionInfo>) {
+        const toRemove = new Set<number>();
+        for (const [k, v] of candidates) {
+            for (let i = v.parameterIndex; i < v.signature.length; i++) {
+                const remaining = v.signature[i];
+                switch (remaining.parseMode) {
+                    case ArgumentListParseTypesMode.Required:
+                    case ArgumentListParseTypesMode.RequiredAsFloat:
+                    case ArgumentListParseTypesMode.RequiredAsValueList:
+                        toRemove.add(k);
+                        break;
+                }
+            }
+        }
+
+        for (const v of toRemove) {
+            candidates.delete(v);
+        }
+    }
+
+    public static generateSignatures(signatures: AlphaTexParameterDefinition[][], ambiguousOverloads?: Set<number>) {
+        return signatures
+            .map((v, i) =>
+                AlphaTex1MetaDataReader._generateSignature(
+                    v,
+                    ambiguousOverloads !== undefined && ambiguousOverloads.has(i)
+                )
+            )
+            .join('\n');
+    }
+
+    private static _generateSignature(signature: AlphaTexParameterDefinition[], isAmbiguous: boolean) {
+        const suffix = isAmbiguous ? '' : ' ~';
+        return `(${signature.map(AlphaTex1MetaDataReader._generateSignatureParameter).join(', ')})${suffix}`;
+    }
+
+    private static _generateSignatureParameter(parameter: AlphaTexParameterDefinition, index: number) {
+        const typeArray = Array.from(parameter.expectedTypes);
+        let p: string = `v${index}`;
+        switch (parameter.parseMode) {
+            case ArgumentListParseTypesMode.Optional:
+            case ArgumentListParseTypesMode.OptionalAsFloat:
+                p += '?';
+                break;
+        }
+
+        if (parameter.allowedValues) {
+            const valueArray = Array.from(parameter.allowedValues);
+            switch (typeArray[0]) {
+                case AlphaTexNodeType.String:
+                    p = valueArray.map(v => `"${v}"`).join('|');
+                    break;
+                default:
+                    p = valueArray.join('|');
+                    break;
+            }
+        } else {
+            p = Array.from(parameter.expectedTypes)
+                .map(t => AlphaTexNodeType[t])
+                .join('|');
+        }
+
+        switch (parameter.parseMode) {
+            case ArgumentListParseTypesMode.RequiredAsValueList:
+            case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+                p += '[]';
+        }
+
+        return p;
+    }
+
+    public static filterSignatureCandidates(
+        candidates: Map<number, SignatureResolutionInfo>,
         value: AlphaTexAstNode,
-        expected: AlphaTexParameterDefinition | undefined
+        addValue?: (value: IAlphaTexArgumentValue) => void,
+        extendToFloat?: (value: AlphaTexNumberLiteral) => void,
+    ) {
+        const toRemove = new Set<number>();
+        let valueAdded = false;
+        for (const [overloadIndex, overload] of candidates) {
+            let handled = false;
+            while (!handled) {
+                const expected =
+                    overload.parameterIndex < overload.signature.length
+                        ? overload.signature[overload.parameterIndex]
+                        : undefined;
+
+                if (!expected) {
+                    toRemove.add(overloadIndex);
+                    handled = true;
+                } else if (
+                    (expected.expectedTypes.has(value?.nodeType) ||
+                        // value lists start with a parenthesis open token
+                        AlphaTex1MetaDataReader._isValueListMatch(value, expected)) &&
+                    AlphaTex1MetaDataReader._handleTypeValueListItem(value, expected, extendToFloat)
+                ) {
+                    handled = false;
+
+                    if (!valueAdded) {
+                        valueAdded = true;
+                        addValue?.(value);
+                    }
+
+                    switch (expected.parseMode) {
+                        case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+                            // stay on current element
+                            break;
+                        default:
+                            // advance to next item
+                            overload.parameterIndex++;
+                            break;
+                    }
+                } else {
+                    switch (expected.parseMode) {
+                        case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+                            // end of value list -> try next
+                            overload.parameterIndex++;
+                            break;
+                        case ArgumentListParseTypesMode.Required:
+                        case ArgumentListParseTypesMode.RequiredAsFloat:
+                            toRemove.add(overloadIndex);
+                            handled = true;
+                            break;
+
+                        case ArgumentListParseTypesMode.Optional:
+                        case ArgumentListParseTypesMode.OptionalAsFloat:
+                            // optional not matched -> try next
+                            overload.parameterIndex++;
+                            break;
+
+                        case ArgumentListParseTypesMode.RequiredAsValueList:
+                            //  not matched, value listed ended, check next
+                            overload.parameterIndex++;
+                            break;
+                    }
+                }
+            }
+        }
+
+        for (const v of toRemove) {
+            candidates.delete(v);
+        }
+    }
+
+    private static _handleTypeValueListItem(
+        value: AlphaTexAstNode,
+        expected: AlphaTexParameterDefinition | undefined,
+        extendToFloat?: (value: AlphaTexNumberLiteral) => void
     ): boolean {
         switch (value.nodeType) {
             case AlphaTexNodeType.Ident:
-                const identifier = value as AlphaTexIdentifier;
+            case AlphaTexNodeType.String:
+                const textNode = value as AlphaTexTextNode;
                 if (expected?.allowedValues) {
-                    if (expected.allowedValues.has(identifier.text.toLowerCase())) {
-                        valueList.push(identifier);
-                        parser.lexer.advance();
+                    if (expected.allowedValues.has(textNode.text.toLowerCase())) {
+                        return true;
                     } else {
                         return false;
                     }
-                } else {
-                    valueList.push(identifier);
-                    parser.lexer.advance();
                 }
-
-                return true;
-            case AlphaTexNodeType.String:
-                const str = value as AlphaTexStringLiteral;
-
-                if (expected?.allowedValues) {
-                    if (expected.allowedValues.has(str.text.toLowerCase())) {
-                        valueList.push(str);
-                        parser.lexer.advance();
-                    }
-                } else {
-                    valueList.push(str);
-                    parser.lexer.advance();
-                }
-
                 return true;
             case AlphaTexNodeType.Number:
                 const parseMode = expected?.parseMode ?? ArgumentListParseTypesMode.Optional;
                 switch (parseMode) {
                     case ArgumentListParseTypesMode.RequiredAsFloat:
                     case ArgumentListParseTypesMode.OptionalAsFloat:
-                        valueList.push(parser.lexer.extendToFloat(value as AlphaTexNumberLiteral));
-                        parser.lexer.advance();
-                        break;
+                        extendToFloat?.(value as AlphaTexNumberLiteral);
+                        return true;
                     default:
-                        valueList.push(value as AlphaTexNumberLiteral);
-                        parser.lexer.advance();
-                        break;
+                        return true;
                 }
-                return true;
-            case AlphaTexNodeType.LParen:
-                const nestedList = parser.valueList();
-                if (nestedList) {
-                    for (const v of nestedList.arguments) {
-                        valueList.push(v);
-                    }
-                }
-                return true;
         }
         return false;
     }

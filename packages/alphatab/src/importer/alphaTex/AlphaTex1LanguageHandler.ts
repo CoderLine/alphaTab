@@ -10,6 +10,10 @@ import {
     type AlphaTexParameterDefinition
 } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import {
+    AlphaTex1MetaDataReader,
+    type SignatureResolutionInfo
+} from '@coderline/alphatab/importer/alphaTex/AlphaTex1MetaDataReader';
+import {
     type AlphaTexArgumentList,
     type AlphaTexAstNode,
     type AlphaTexIdentifier,
@@ -25,6 +29,7 @@ import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
     AlphaTexStaffNoteKind,
+    ArgumentListParseTypesMode,
     type IAlphaTexImporter
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { Atnf } from '@coderline/alphatab/importer/alphaTex/ATNF';
@@ -53,6 +58,7 @@ import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
 import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
@@ -266,7 +272,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         const types = lookup.get(tag);
-        if (types === undefined) {
+        if (!types) {
             if (values) {
                 importer.addSemanticDiagnostic({
                     code: AlphaTexDiagnosticCode.AT300,
@@ -867,173 +873,77 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
     private _validateArgumentTypes(
         importer: IAlphaTexImporter,
-        signatures: AlphaTexParameterDefinition[][] | null,
+        signatures: AlphaTexParameterDefinition[][],
         parent: AlphaTexAstNode,
         values: AlphaTexArgumentList | undefined
     ) {
+        if (!values) {
+            const hasEmptyParameterOverload = signatures.some(
+                c =>
+                    c.length === 0 ||
+                    !c.some(
+                        v =>
+                            v.parseMode === ArgumentListParseTypesMode.Required ||
+                            v.parseMode === ArgumentListParseTypesMode.RequiredAsFloat ||
+                            v.parseMode === ArgumentListParseTypesMode.RequiredAsValueList
+                    )
+            );
+
+            if (hasEmptyParameterOverload) {
+                return true;
+            }
+
+            importer.addSemanticDiagnostic({
+                code: AlphaTexDiagnosticCode.AT219,
+                message: `Error parsing arguments: no overload matched. Signatures: ${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: parent.start,
+                end: parent.end
+            });
+            return false;
+        }
+
+        if (values.validated) {
+            return true;
+        }
+
         let error = false;
+        const candidates = new Map<number, SignatureResolutionInfo>(
+            signatures.map((v, i) => [
+                i,
+                {
+                    signature: v,
+                    parameterIndex: 0
+                }
+            ])
+        );
 
-        // TODO: Signature based validation
+        if (values.validated) {
+            return true;
+        }
 
-        // let expectedIndex = 0;
-        // let actualIndex = 0;
+        for (const value of values.arguments) {
+            AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value);
+            if (candidates.size === 0) {
+                break;
+            }
+        }
 
-        // if (!values) {
-        //     const anyRequired = expectedValues.some(
-        //         v =>
-        //             v.parseMode === ArgumentListParseTypesMode.Required ||
-        //             v.parseMode === ArgumentListParseTypesMode.RequiredAsFloat ||
-        //             v.parseMode === ArgumentListParseTypesMode.RequiredAsValueList
-        //     );
-        //     if (anyRequired) {
-        //         const expectedTypes = AlphaTex1LanguageHandler._buildExpectedTypesMessage(expectedValues);
+        AlphaTex1MetaDataReader.filterIncompleteCandidates(candidates);
 
-        //         importer.addSemanticDiagnostic({
-        //             code: AlphaTexDiagnosticCode.AT210,
-        //             message: `Missing value. Expected following values: ${expectedTypes}`,
-        //             severity: AlphaTexDiagnosticsSeverity.Error,
-        //             start: parent.start,
-        //             end: parent.end
-        //         });
-        //         return false;
-        //     } else {
-        //         return true;
-        //     }
-        // }
-
-        // if (values.validated) {
-        //     return true;
-        // }
-
-        // while (expectedIndex < expectedValues.length) {
-        //     const expected = expectedValues[expectedIndex];
-
-        //     const value: IAlphaTexArgumentValue | undefined =
-        //         actualIndex < values.arguments.length ? values.arguments[actualIndex] : undefined;
-
-        //     if (value && expected.expectedTypes.has(value.nodeType) && this._checkRestrictions(expected, value)) {
-        //         switch (expected.parseMode) {
-        //             case ArgumentListParseTypesMode.OptionalAndStop:
-        //                 // stop reading values
-        //                 expectedIndex = expectedValues.length;
-        //                 actualIndex++;
-        //                 break;
-        //             case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-        //             case ArgumentListParseTypesMode.RequiredAsValueList:
-        //                 // stay on current element
-        //                 actualIndex++;
-        //                 break;
-        //             default:
-        //                 // advance to next item
-        //                 expectedIndex++;
-        //                 actualIndex++;
-        //                 break;
-        //         }
-        //     }
-        //     // not matched value?
-        //     else if (value) {
-        //         switch (expected.parseMode) {
-        //             case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-        //             case ArgumentListParseTypesMode.RequiredAsValueList:
-        //                 // end of value list as soon we have a different type
-        //                 expectedIndex++;
-        //                 break;
-        //             case ArgumentListParseTypesMode.Required:
-        //             case ArgumentListParseTypesMode.RequiredAsFloat:
-        //                 error = true;
-        //                 importer.addSemanticDiagnostic({
-        //                     code: AlphaTexDiagnosticCode.AT209,
-        //                     message: `Unexpected required value '${AlphaTexNodeType[value.nodeType]}', expected: ${AlphaTex1LanguageHandler._buildExpectedTypesMessage(
-        //                         [expected]
-        //                     )}`,
-        //                     severity: AlphaTexDiagnosticsSeverity.Error,
-        //                     start: value.start,
-        //                     end: value.end
-        //                 });
-        //                 expectedIndex++;
-        //                 actualIndex++;
-        //                 break;
-        //             case ArgumentListParseTypesMode.Optional:
-        //             case ArgumentListParseTypesMode.OptionalAsFloat:
-        //             case ArgumentListParseTypesMode.OptionalAsFloatInArgumentList:
-        //             case ArgumentListParseTypesMode.OptionalAndStop:
-        //                 // Skip value and try next
-        //                 expectedIndex++;
-        //                 break;
-        //         }
-        //     }
-        //     // no value anymore
-        //     else {
-        //         switch (expected.parseMode) {
-        //             case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-        //             case ArgumentListParseTypesMode.RequiredAsValueList:
-        //                 // end of list
-        //                 expectedIndex++;
-        //                 break;
-
-        //             case ArgumentListParseTypesMode.Required:
-        //             case ArgumentListParseTypesMode.RequiredAsFloat:
-        //                 error = true;
-        //                 importer.addSemanticDiagnostic({
-        //                     code: AlphaTexDiagnosticCode.AT210,
-        //                     message: `Missing values. Expected following values: ${AlphaTex1LanguageHandler._buildExpectedTypesMessage(
-        //                         [expected]
-        //                     )}`,
-        //                     severity: AlphaTexDiagnosticsSeverity.Error,
-        //                     start: values.end,
-        //                     end: values.end
-        //                 });
-        //                 expectedIndex = expectedValues.length;
-        //                 break;
-
-        //             case ArgumentListParseTypesMode.Optional:
-        //             case ArgumentListParseTypesMode.OptionalAsFloat:
-        //             case ArgumentListParseTypesMode.OptionalAsFloatInArgumentList:
-        //             case ArgumentListParseTypesMode.OptionalAndStop:
-        //                 // no value for optional item
-        //                 expectedIndex++;
-        //                 break;
-        //         }
-        //     }
-        // }
-
-        // // remaining values?
-        // if (actualIndex < values.arguments.length) {
-        //     while (actualIndex < values.arguments.length) {
-        //         const expectedTypes = AlphaTex1LanguageHandler._buildExpectedTypesMessage(expectedValues);
-        //         const value = values.arguments[actualIndex];
-        //         importer.addSemanticDiagnostic({
-        //             code: AlphaTexDiagnosticCode.AT209,
-        //             message: `Unexpected additional value '${AlphaTexNodeType[value.nodeType]}', expected: ${expectedTypes}`,
-        //             severity: AlphaTexDiagnosticsSeverity.Error,
-        //             start: value.start,
-        //             end: value.end
-        //         });
-        //         actualIndex++;
-        //     }
-        // }
+        if (candidates.size === 0) {
+            importer.addSemanticDiagnostic({
+                code: AlphaTexDiagnosticCode.AT219,
+                message: `Error parsing arguments: no overload matched. Signatures:\n${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: values.start,
+                end: values.end
+            });
+            error = true;
+        }
 
         return !error;
     }
-
-    // private _checkRestrictions(expected: AlphaTexParameterDefinition, value: IAlphaTexArgumentValue) {
-    //     switch (value.nodeType) {
-    //         case AlphaTexNodeType.Ident:
-    //             const identifier = value as AlphaTexIdentifier;
-    //             if (expected?.allowedValues) {
-    //                 return expected.allowedValues.has(identifier.text.toLowerCase());
-    //             }
-    //             return true;
-    //         case AlphaTexNodeType.String:
-    //             const str = value as AlphaTexStringLiteral;
-    //             if (expected?.allowedValues) {
-    //                 return expected.allowedValues.has(str.text.toLowerCase());
-    //             }
-    //             return true;
-    //         default:
-    //             return true;
-    //     }
-    // }
 
     private _headerFooterStyle(
         importer: IAlphaTexImporter,
@@ -1074,36 +984,6 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return;
         }
         style.textAlign = textAlign!;
-    }
-
-    private static _buildExpectedTypesMessage(signatures: AlphaTexParameterDefinition[][]) {
-        const parts: string[] = [];
-
-        // TODO: signature message
-
-        // for (const v of values) {
-        //     const types = Array.from(v.expectedTypes)
-        //         .map(t => AlphaTexNodeType[t])
-        //         .join('|');
-        //     switch (v.parseMode) {
-        //         case ArgumentListParseTypesMode.Required:
-        //         case ArgumentListParseTypesMode.RequiredAsFloat:
-        //             parts.push(`required(${types})`);
-        //             break;
-        //         case ArgumentListParseTypesMode.Optional:
-        //         case ArgumentListParseTypesMode.OptionalAsFloat:
-        //             parts.push(`optional(${types})`);
-        //             break;
-        //         case ArgumentListParseTypesMode.OptionalAndStop:
-        //             parts.push(`only(${types})`);
-        //             break;
-        //         case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
-        //             parts.push(`listOf(${types})`);
-        //             break;
-        //     }
-        // }
-
-        return parts.join(',');
     }
 
     private _readTrackInstrument(importer: IAlphaTexImporter, track: Track, values: AlphaTexArgumentList) {
@@ -1458,9 +1338,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     private _knownScoreMetaDataTags: Set<string> | undefined = undefined;
     public get knownScoreMetaDataTags() {
         if (!this._knownScoreMetaDataTags) {
-            this._knownScoreMetaDataTags = new Set<string>(
-                AlphaTex1LanguageDefinitions.scoreMetaDataSignatures.keys()
-            );
+            this._knownScoreMetaDataTags = new Set<string>(AlphaTex1LanguageDefinitions.scoreMetaDataSignatures.keys());
         }
         return this._knownScoreMetaDataTags;
     }
@@ -1486,9 +1364,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     private _knownStaffMetaDataTags: Set<string> | undefined = undefined;
     public get knownStaffMetaDataTags() {
         if (!this._knownStaffMetaDataTags) {
-            this._knownStaffMetaDataTags = new Set<string>(
-                AlphaTex1LanguageDefinitions.staffMetaDataSignatures.keys()
-            );
+            this._knownStaffMetaDataTags = new Set<string>(AlphaTex1LanguageDefinitions.staffMetaDataSignatures.keys());
         }
         return this._knownStaffMetaDataTags;
     }
@@ -2530,9 +2406,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(
                 Atnf.identMeta(
                     'otherSystemsTrackNameOrientation',
-                    AlphaTex1EnumMappings.trackNameOrientationReversed.get(
-                        stylesheet.otherSystemsTrackNameOrientation
-                    )!
+                    AlphaTex1EnumMappings.trackNameOrientationReversed.get(stylesheet.otherSystemsTrackNameOrientation)!
                 )
             );
         }
@@ -2688,7 +2562,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (bar.barLineRight !== BarLineStyle.Automatic) {
-            nodes.push(Atnf.identMeta('barLineRight', AlphaTex1EnumMappings.barLineStyleReversed.get(bar.barLineRight)!));
+            nodes.push(
+                Atnf.identMeta('barLineRight', AlphaTex1EnumMappings.barLineStyleReversed.get(bar.barLineRight)!)
+            );
         }
 
         if (
@@ -2697,12 +2573,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             bar.keySignatureType !== bar.previousBar!.keySignatureType
         ) {
             let ks = '';
-            // TODO generate key signature reverse lookup
-            // if (bar.keySignatureType === KeySignatureType.Minor) {
-            //     ks = AlphaTex1EnumMappings.keySignaturesMinorReversed.get(bar.keySignature)!;
-            // } else {
-            //     ks = AlphaTex1EnumMappings.keySignaturesMajorReversed.get(bar.keySignature)!;
-            // }
+            if (bar.keySignatureType === KeySignatureType.Minor) {
+                ks = AlphaTex1EnumMappings.keySignaturesMinorReversed.get(bar.keySignature)!;
+            } else {
+                ks = AlphaTex1EnumMappings.keySignaturesMajorReversed.get(bar.keySignature)!;
+            }
             nodes.push(Atnf.identMeta('ks', ks));
         }
 
@@ -3356,7 +3231,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if ((beat.voice.bar.index === 0 && beat.index === 0) || beat.dynamics !== beat.previousBeat?.dynamics) {
-            Atnf.prop(properties, 'dy', Atnf.identValue(AlphaTex1EnumMappings.dynamicValueReversed.get(beat.dynamics)!));
+            Atnf.prop(
+                properties,
+                'dy',
+                Atnf.identValue(AlphaTex1EnumMappings.dynamicValueReversed.get(beat.dynamics)!)
+            );
         }
 
         const fermata = beat.fermata;

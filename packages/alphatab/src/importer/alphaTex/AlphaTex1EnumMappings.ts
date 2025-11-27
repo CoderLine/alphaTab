@@ -389,4 +389,38 @@ export class AlphaTex1EnumMappings {
         ['dadoublecoda', 18]
     ]);
     public static readonly directionReversed = AlphaTex1EnumMappings._reverse(AlphaTex1EnumMappings.direction);
+    public static readonly keySignaturesMinorReversed = new Map<KeySignature, string>([
+        [-7, 'abminor'],
+        [-6, 'ebminor'],
+        [-5, 'bbminor'],
+        [-4, 'fminor'],
+        [-3, 'cminor'],
+        [-2, 'gminor'],
+        [-1, 'dminor'],
+        [0, 'aminor'],
+        [1, 'eminor'],
+        [2, 'bminor'],
+        [3, 'f#minor'],
+        [4, 'c#minor'],
+        [5, 'g#minor'],
+        [6, 'd#minor'],
+        [7, 'a#minor']
+    ]);
+    public static readonly keySignaturesMajorReversed = new Map<KeySignature, string>([
+        [-7, 'cb'],
+        [-6, 'gb'],
+        [-5, 'db'],
+        [-4, 'ab'],
+        [-3, 'eb'],
+        [-2, 'bb'],
+        [-1, 'f'],
+        [0, 'c'],
+        [1, 'g'],
+        [2, 'd'],
+        [3, 'a'],
+        [4, 'e'],
+        [5, 'b'],
+        [6, 'f#'],
+        [7, 'c#']
+    ]);
 }

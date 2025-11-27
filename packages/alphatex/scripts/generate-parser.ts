@@ -13,6 +13,7 @@ import type {
 import {
     alphaTexMappedEnumLookup,
     alphaTexMappedEnumMapping,
+    type AlphaTexMappedEnumMappingEntry,
     type AlphaTexMappedEnumName
 } from '@coderline/alphatab-alphatex/enum';
 
@@ -323,6 +324,38 @@ function generateEnumMapping(type: AlphaTexMappedEnumName) {
     ];
 }
 
+function generateKeySignaturesReversed(name: string, selectMapping: (entry: AlphaTexMappedEnumMappingEntry) => string) {
+    return ts.factory.createPropertyDeclaration(
+        [
+            ts.factory.createModifier(ts.SyntaxKind.PublicKeyword),
+            ts.factory.createModifier(ts.SyntaxKind.StaticKeyword),
+            ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword)
+        ],
+        name,
+        undefined,
+        undefined,
+        ts.factory.createNewExpression(
+            ts.factory.createIdentifier('Map'),
+            [
+                ts.factory.createTypeReferenceNode('KeySignature'),
+                ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
+            ],
+            [
+                ts.factory.createArrayLiteralExpression([
+                    ...Object.entries(alphaTexMappedEnumMapping.KeySignature)
+                        .filter(e => e[1] !== null)
+                        .map(e =>
+                            ts.factory.createArrayLiteralExpression([
+                                createNumericLiteral((alphaTexMappedEnumLookup.KeySignature as any)[e[0]]),
+                                ts.factory.createStringLiteral(selectMapping(e[1]))
+                            ])
+                        )
+                ])
+            ]
+        )
+    );
+}
+
 function enumMappingsVisitor<TNode extends ts.Node>(
     node: TNode,
     context: EnumMappingsVisitorContext
@@ -333,6 +366,18 @@ function enumMappingsVisitor<TNode extends ts.Node>(
         members.push(
             ...Object.keys(alphaTexMappedEnumMapping).flatMap(e => generateEnumMapping(e as AlphaTexMappedEnumName))
         );
+
+        members.push(
+            generateKeySignaturesReversed('keySignaturesMinorReversed', (entry: AlphaTexMappedEnumMappingEntry) => {
+                return entry?.aliases!.find(a => a.endsWith('minor'))!;
+            })
+        );
+        members.push(
+            generateKeySignaturesReversed('keySignaturesMajorReversed', (entry: AlphaTexMappedEnumMappingEntry) => {
+                return entry!.snippet.toLowerCase();
+            })
+        );
+
         return ts.factory.updateClassDeclaration(
             node,
             node.modifiers,

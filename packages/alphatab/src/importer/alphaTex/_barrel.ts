@@ -1,4 +1,5 @@
 export {
+    type AlphaTexArgumentList,
     type AlphaTexAsteriskTokenNode,
     type AlphaTexAstNode,
     type AlphaTexAstNodeLocation,
@@ -28,11 +29,10 @@ export {
     type AlphaTexStringLiteral,
     type AlphaTexTextNode,
     type AlphaTexTokenNode,
-    type AlphaTexArgumentList as AlphaTexValueList,
+    type IAlphaTexArgumentValue, 
     type IAlphaTexAstNode,
     type IAlphaTexMetaDataTagPrefixNode,
-    type IAlphaTexNoteValueNode,
-    type IAlphaTexArgumentValue as IAlphaTexValueListItem
+    type IAlphaTexNoteValueNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 export { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
 export { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';

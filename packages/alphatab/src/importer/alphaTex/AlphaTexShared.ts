@@ -137,7 +137,7 @@ export enum AlphaTexDiagnosticCode {
     AT208 = 208,
 
     /**
-     * Unexpected %s value '%s', expected: %s
+     * Unexpected %s arguments '%s', Signature: %s
      */
     AT209 = 209,
 
@@ -185,6 +185,16 @@ export enum AlphaTexDiagnosticCode {
      * Wrong note kind '%s' for staff with note kind '%s'. Do not mix incompatible staves and notes.
      */
     AT218 = 218,
+
+    /**
+     * Error parsing arguments: no overload matched. Signatures: %s
+     */
+    AT219 = 219,
+
+    /**
+     * Error parsing arguments: ambgiuous overloads, wrap arguments into parenthesis. Signatures (ambiguous ones marked with *): %s
+     */
+    AT220 = 220,
 
     /**
      * Expected no arguments, but found some.

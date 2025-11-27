@@ -1,7 +1,6 @@
 import type { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 type SimpleAlphaTexParameterDefinition = [AlphaTexNodeType[], ArgumentListParseTypesMode, string[]];
-
 /**
  * @record
  * @internal
@@ -11,7 +10,6 @@ export interface AlphaTexParameterDefinition {
     parseMode: ArgumentListParseTypesMode;
     allowedValues?: Set<string>;
 }
-
 /**
  * @internal
  */
@@ -23,13 +21,11 @@ export class AlphaTex1LanguageDefinitions {
             allowedValues: simple[2] ? new Set(simple[2]) : undefined
         };
     }
-
     private static _simple(
         signature: SimpleAlphaTexParameterDefinition[][] | null
     ): AlphaTexParameterDefinition[][] | null {
         return signature === null ? null : signature.map(s => s.map(AlphaTex1LanguageDefinitions._param));
     }
-
     private static _metaProps(props: [string, [string, SimpleAlphaTexParameterDefinition[][] | null][] | null][]) {
         return new Map(
             props.map(p => [
