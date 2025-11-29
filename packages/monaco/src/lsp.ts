@@ -132,7 +132,7 @@ export async function basicEditorLspIntegration(
     });
 
     setupDocumentHandling(editor, documentUri, connection);
-    setupDiagnostics(editor, documentUri, connection);
+    setupDiagnostics(editor, connection);
     setupCompletion(documentUri, info.languageId, connection, initResponse);
     setupHover(documentUri, info.languageId, connection, initResponse);
     setupSignatureHelp(documentUri, info.languageId, connection, initResponse);
@@ -156,7 +156,6 @@ function setupDocumentHandling(
 
 function setupDiagnostics(
     editor: monaco.editor.IStandaloneCodeEditor,
-    documentUri: string,
     connection: ProtocolConnection
 ) {
     connection.onNotification(PublishDiagnosticsNotification.type, e => {

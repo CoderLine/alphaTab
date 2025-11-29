@@ -10,20 +10,20 @@ import type { Staff } from '@coderline/alphatab/model/Staff';
  * @internal
  */
 export enum ApplyNodeResult {
-    Applied,
-    NotAppliedSemanticError,
-    NotAppliedUnrecognizedMarker
+    Applied = 0,
+    NotAppliedSemanticError = 1,
+    NotAppliedUnrecognizedMarker = 2
 }
 
 /**
  * @internal
  */
 export enum ApplyStructuralMetaDataResult {
-    AppliedNewTrack,
-    AppliedNewStaff,
-    AppliedNewVoice,
-    NotAppliedSemanticError,
-    NotAppliedUnrecognizedMarker
+    AppliedNewTrack = 0,
+    AppliedNewStaff = 1,
+    AppliedNewVoice = 2,
+    NotAppliedSemanticError = 3,
+    NotAppliedUnrecognizedMarker = 4
 }
 
 /**
