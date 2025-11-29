@@ -16,8 +16,6 @@ import {
     CompletionResolveRequest,
     DidChangeTextDocumentNotification,
     DidOpenTextDocumentNotification,
-    type DocumentDiagnosticParams,
-    DocumentDiagnosticRequest,
     type HoverParams,
     HoverRequest,
     type InitializeParams,
@@ -26,6 +24,7 @@ import {
     type Logger,
     PositionEncodingKind,
     type ProtocolConnection,
+    PublishDiagnosticsNotification,
     type SignatureHelpParams,
     SignatureHelpRequest
 } from 'vscode-languageserver-protocol';
@@ -132,32 +131,18 @@ export async function basicEditorLspIntegration(
         }
     });
 
-    setupDocumentHandlingAndDiagnostics(editor, documentUri, connection);
+    setupDocumentHandling(editor, documentUri, connection);
+    setupDiagnostics(editor, documentUri, connection);
     setupCompletion(documentUri, info.languageId, connection, initResponse);
     setupHover(documentUri, info.languageId, connection, initResponse);
     setupSignatureHelp(documentUri, info.languageId, connection, initResponse);
 }
 
-function setupDocumentHandlingAndDiagnostics(
+function setupDocumentHandling(
     editor: monaco.editor.IStandaloneCodeEditor,
     documentUri: string,
     connection: ProtocolConnection
 ) {
-    async function updateDiagnostics() {
-        const params: DocumentDiagnosticParams = {
-            textDocument: {
-                uri: documentUri
-            }
-        };
-        const result = await connection.sendRequest(DocumentDiagnosticRequest.type, params);
-        if (result.kind === 'unchanged') {
-            return;
-        }
-
-        monaco.editor.setModelMarkers(editor.getModel()!, 'lsp', result.items.map(lspToMonacoMarker));
-    }
-    updateDiagnostics();
-
     editor.onDidChangeModelContent(async e => {
         await connection.sendNotification(DidChangeTextDocumentNotification.type, {
             textDocument: {
@@ -166,8 +151,16 @@ function setupDocumentHandlingAndDiagnostics(
             },
             contentChanges: e.changes.map(monacoToLspContentChange)
         });
+    });
+}
 
-        await updateDiagnostics();
+function setupDiagnostics(
+    editor: monaco.editor.IStandaloneCodeEditor,
+    documentUri: string,
+    connection: ProtocolConnection
+) {
+    connection.onNotification(PublishDiagnosticsNotification.type, e => {
+        monaco.editor.setModelMarkers(editor.getModel()!, 'lsp', e.diagnostics.map(lspToMonacoMarker));
     });
 }
 
