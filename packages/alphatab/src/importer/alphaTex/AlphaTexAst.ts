@@ -240,7 +240,7 @@ export interface IAlphaTexArgumentValue extends IAlphaTexAstNode {
      * the documentation or alphaTex language definition. As paramters can be optional this value 
      * allows a reverse lookup to the parameter information.
      */
-    parameterIndices?: number[];
+    parameterIndices?: Map<number,number>;
 }
 
 /**
@@ -271,13 +271,6 @@ export interface AlphaTexArgumentList extends AlphaTexAstNode {
      * @internal
      */
     validated?: boolean;
-
-    /**
-     * The index of the signature with which these arguments were matched.
-     * This value can be used to lookup the respective signature definition in
-     * the documentation or alphaTex language definition.
-     */
-    matchedSignatureIndex?: number;
 
     /**
      * A list of indices to signatures which were selected as candidates matching

@@ -60,8 +60,6 @@ export function resolveSignature(
         for (const i of args.signatureCandidateIndices) {
             resolved.set(i, signatures[i]);
         }
-    } else if (args.matchedSignatureIndex !== undefined) {
-        resolved.set(args.matchedSignatureIndex, signatures[args.matchedSignatureIndex]);
     }
 
     return resolved;

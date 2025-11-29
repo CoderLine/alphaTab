@@ -12,7 +12,15 @@ Score (1,1) -> (1,19) {
           },
           arguments: Arguments (1,8) -> (1,11) {
             arguments: Array [
-              Number "120" (1,8) -> (1,11),
+              Number "120" (1,8) -> (1,11) {
+                parameterIndices: Map {
+                  0 => 0,
+                  1 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -69,8 +77,19 @@ Score (1,1) -> (3,9) {
           },
           arguments: Arguments (3,6) -> (3,9) {
             arguments: Array [
-              Number "3" (3,6) -> (3,7),
-              Number "4" (3,8) -> (3,9),
+              Number "3" (3,6) -> (3,7) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "4" (3,8) -> (3,9) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              1,
             ],
           },
         },
@@ -100,8 +119,19 @@ line**/",
           },
           arguments: Arguments (3,12) -> (3,15) {
             arguments: Array [
-              Number "3" (3,12) -> (3,13),
-              Number "4" (3,14) -> (3,15),
+              Number "3" (3,12) -> (3,13) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "4" (3,14) -> (3,15) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              1,
             ],
           },
         },
@@ -128,8 +158,18 @@ Score (1,1) -> (3,9) {
                   "/** multi
 line**/",
                 ],
+                parameterIndices: Map {
+                  1 => 0,
+                },
               },
-              Number "4" (3,8) -> (3,9),
+              Number "4" (3,8) -> (3,9) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              1,
             ],
           },
         },
@@ -459,7 +499,14 @@ line**/",
           },
           arguments: Arguments (2,15) -> (2,20) {
             arguments: Array [
-              String "Test" (2,15) -> (2,20),
+              String "Test" (2,15) -> (2,20) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -485,7 +532,14 @@ line**/",
           },
           arguments: Arguments (2,8) -> (2,13) {
             arguments: Array [
-              String "Test" (2,8) -> (2,13),
+              String "Test" (2,8) -> (2,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -518,7 +572,14 @@ Score (1,1) -> (2,14) {
           },
           arguments: Arguments (2,9) -> (2,14) {
             arguments: Array [
-              String "Test" (2,9) -> (2,14),
+              String "Test" (2,9) -> (2,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -1053,7 +1114,14 @@ Score (1,1) -> (1,25) {
           },
           arguments: Arguments (1,10) -> (1,15) {
             arguments: Array [
-              String "Test" (1,10) -> (1,15),
+              String "Test" (1,10) -> (1,15) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
           properties: Props (1,17) -> (1,25) {
@@ -1115,7 +1183,14 @@ Score (1,1) -> (1,20) {
                       property: Ident "barre" (1,5) -> (1,10),
                       properties: Arguments (1,11) -> (1,12) {
                         arguments: Array [
-                          Number "1" (1,11) -> (1,12),
+                          Number "1" (1,11) -> (1,12) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
                         ],
                       },
                     },
@@ -1600,7 +1675,14 @@ Score (1,1) -> (1,13) {
           },
           arguments: Arguments (1,10) -> (1,13) {
             arguments: Array [
-              Number "0.5" (1,10) -> (1,13),
+              Number "0.5" (1,10) -> (1,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -1655,7 +1737,14 @@ Score (1,1) -> (1,49) {
           },
           arguments: Arguments (1,8) -> (1,14) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -1673,7 +1762,14 @@ Score (1,1) -> (1,49) {
                       property: Ident "slur" (1,23) -> (1,27),
                       properties: Arguments (1,28) -> (1,31) {
                         arguments: Array [
-                          String "S1" (1,28) -> (1,31),
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
                         ],
                       },
                     },
@@ -1692,7 +1788,14 @@ Score (1,1) -> (1,49) {
                 property: Ident "rasg" (1,41) -> (1,45),
                 properties: Arguments (1,46) -> (1,49) {
                   arguments: Array [
-                    String "ii" (1,46) -> (1,49),
+                    String "ii" (1,46) -> (1,49) {
+                      parameterIndices: Map {
+                        0 => 0,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    0,
                   ],
                 },
               },
@@ -1734,7 +1837,14 @@ Score (1,1) -> (1,24) {
           },
           arguments: Arguments (1,8) -> (1,10) {
             arguments: Array [
-              String "X" (1,8) -> (1,10),
+              String "X" (1,8) -> (1,10) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
           properties: Props (1,12) -> (1,24) {
@@ -1744,7 +1854,14 @@ Score (1,1) -> (1,24) {
                 property: Ident "color" (1,14) -> (1,19),
                 properties: Arguments (1,20) -> (1,24) {
                   arguments: Array [
-                    String "red" (1,20) -> (1,24),
+                    String "red" (1,20) -> (1,24) {
+                      parameterIndices: Map {
+                        0 => 0,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    0,
                   ],
                 },
               },
@@ -1786,7 +1903,14 @@ Score (1,1) -> (1,31) {
           },
           arguments: Arguments (1,8) -> (1,14) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -1804,7 +1928,14 @@ Score (1,1) -> (1,31) {
                       property: Ident "slur" (1,23) -> (1,27),
                       properties: Arguments (1,28) -> (1,31) {
                         arguments: Array [
-                          String "S1" (1,28) -> (1,31),
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
                         ],
                       },
                     },
@@ -1849,7 +1980,14 @@ Score (1,1) -> (1,36) {
           },
           arguments: Arguments (1,8) -> (1,14) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -1867,7 +2005,14 @@ Score (1,1) -> (1,36) {
                       property: Ident "slur" (1,23) -> (1,27),
                       properties: Arguments (1,28) -> (1,31) {
                         arguments: Array [
-                          String "S1" (1,28) -> (1,31),
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
                         ],
                       },
                     },
@@ -1901,7 +2046,14 @@ Score (1,1) -> (1,44) {
           },
           arguments: Arguments (1,8) -> (1,14) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -1919,7 +2071,14 @@ Score (1,1) -> (1,44) {
                       property: Ident "slur" (1,23) -> (1,27),
                       properties: Arguments (1,28) -> (1,31) {
                         arguments: Array [
-                          String "S1" (1,28) -> (1,31),
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
                         ],
                       },
                     },
@@ -1985,7 +2144,14 @@ Score (1,1) -> (1,45) {
           },
           arguments: Arguments (1,8) -> (1,14) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -2003,7 +2169,14 @@ Score (1,1) -> (1,45) {
                       property: Ident "slur" (1,23) -> (1,27),
                       properties: Arguments (1,28) -> (1,31) {
                         arguments: Array [
-                          String "S1" (1,28) -> (1,31),
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
                         ],
                       },
                     },
@@ -2082,7 +2255,14 @@ Score (1,1) -> (1,40) {
           },
           arguments: Arguments (1,8) -> (1,14) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -2100,7 +2280,14 @@ Score (1,1) -> (1,40) {
                       property: Ident "slur" (1,23) -> (1,27),
                       properties: Arguments (1,28) -> (1,31) {
                         arguments: Array [
-                          String "S1" (1,28) -> (1,31),
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
                         ],
                       },
                     },
@@ -2188,7 +2375,14 @@ Score (1,1) -> (1,13) {
           },
           arguments: Arguments (1,8) -> (1,10) {
             arguments: Array [
-              String "X" (1,8) -> (1,10),
+              String "X" (1,8) -> (1,10) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
           properties: Props (1,12) -> (1,13) {
@@ -2231,7 +2425,14 @@ Score (1,1) -> (1,16) {
           },
           arguments: Arguments (1,8) -> (1,10) {
             arguments: Array [
-              String "X" (1,8) -> (1,10),
+              String "X" (1,8) -> (1,10) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
           properties: Props (1,12) -> (1,16) {
@@ -2288,7 +2489,14 @@ Score (1,1) -> (1,19) {
           },
           arguments: Arguments (1,8) -> (1,10) {
             arguments: Array [
-              String "X" (1,8) -> (1,10),
+              String "X" (1,8) -> (1,10) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
           properties: Props (1,12) -> (1,19) {
@@ -2422,7 +2630,14 @@ Score (1,1) -> (1,26) {
           },
           arguments: Arguments (1,8) -> (1,14) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -2490,7 +2705,14 @@ Score (1,1) -> (1,27) {
           },
           arguments: Arguments (1,8) -> (1,14) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -2571,7 +2793,14 @@ Score (1,1) -> (1,22) {
           },
           arguments: Arguments (1,8) -> (1,14) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -2625,7 +2854,14 @@ Score (1,1) -> (1,19) {
           },
           arguments: Arguments (1,8) -> (1,14) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -2662,8 +2898,19 @@ Score (1,1) -> (1,16) {
           },
           arguments: Arguments (1,5) -> (1,8) {
             arguments: Array [
-              Number "3" (1,5) -> (1,6),
-              Number "4" (1,7) -> (1,8),
+              Number "3" (1,5) -> (1,6) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "4" (1,7) -> (1,8) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              1,
             ],
           },
         },
@@ -2714,8 +2961,19 @@ Score (1,1) -> (1,29) {
           },
           arguments: Arguments (1,7) -> (1,10) {
             arguments: Array [
-              Number "3" (1,7) -> (1,8),
-              Number "4" (1,9) -> (1,10),
+              Number "3" (1,7) -> (1,8) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "4" (1,9) -> (1,10) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              1,
             ],
           },
         },
@@ -3069,7 +3327,14 @@ Score (1,1) -> (1,24) {
           },
           arguments: Arguments (1,8) -> (1,13) {
             arguments: Array [
-              String "Test" (1,8) -> (1,13),
+              String "Test" (1,8) -> (1,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -3161,8 +3426,20 @@ Score (1,1) -> (1,14) {
                 property: Ident "tu" (1,7) -> (1,9),
                 properties: Arguments (1,10) -> (1,13) {
                   arguments: Array [
-                    Number "2" (1,10) -> (1,11),
-                    Number "3" (1,12) -> (1,13),
+                    Number "2" (1,10) -> (1,11) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "3" (1,12) -> (1,13) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -3261,8 +3538,20 @@ Score (1,1) -> (1,30) {
                 property: Ident "tu" (1,23) -> (1,25),
                 properties: Arguments (1,26) -> (1,29) {
                   arguments: Array [
-                    Number "3" (1,26) -> (1,27),
-                    Number "2" (1,28) -> (1,29),
+                    Number "3" (1,26) -> (1,27) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,28) -> (1,29) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -3394,8 +3683,20 @@ Score (1,1) -> (1,26) {
                 property: Ident "tu" (1,19) -> (1,21),
                 properties: Arguments (1,22) -> (1,25) {
                   arguments: Array [
-                    Number "3" (1,22) -> (1,23),
-                    Number "2" (1,24) -> (1,25),
+                    Number "3" (1,22) -> (1,23) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,24) -> (1,25) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -3602,8 +3903,20 @@ Score (1,1) -> (1,31) {
                 property: Ident "tu" (1,24) -> (1,26),
                 properties: Arguments (1,27) -> (1,30) {
                   arguments: Array [
-                    Number "3" (1,27) -> (1,28),
-                    Number "2" (1,29) -> (1,30),
+                    Number "3" (1,27) -> (1,28) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,29) -> (1,30) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -3808,8 +4121,20 @@ Score (1,1) -> (1,25) {
                 property: Ident "tu" (1,18) -> (1,20),
                 properties: Arguments (1,21) -> (1,24) {
                   arguments: Array [
-                    Number "3" (1,21) -> (1,22),
-                    Number "2" (1,23) -> (1,24),
+                    Number "3" (1,21) -> (1,22) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,23) -> (1,24) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -4000,8 +4325,20 @@ Score (1,1) -> (1,29) {
                 property: Ident "tu" (1,22) -> (1,24),
                 properties: Arguments (1,25) -> (1,28) {
                   arguments: Array [
-                    Number "3" (1,25) -> (1,26),
-                    Number "2" (1,27) -> (1,28),
+                    Number "3" (1,25) -> (1,26) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,27) -> (1,28) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -4147,8 +4484,20 @@ Score (1,1) -> (1,32) {
                 property: Ident "tu" (1,25) -> (1,27),
                 properties: Arguments (1,28) -> (1,31) {
                   arguments: Array [
-                    Number "3" (1,28) -> (1,29),
-                    Number "2" (1,30) -> (1,31),
+                    Number "3" (1,28) -> (1,29) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,30) -> (1,31) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -4411,8 +4760,20 @@ Score (1,1) -> (1,43) {
                 property: Ident "tu" (1,36) -> (1,38),
                 properties: Arguments (1,39) -> (1,42) {
                   arguments: Array [
-                    Number "3" (1,39) -> (1,40),
-                    Number "2" (1,41) -> (1,42),
+                    Number "3" (1,39) -> (1,40) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,41) -> (1,42) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -4599,8 +4960,20 @@ Score (1,1) -> (1,30) {
                 property: Ident "tu" (1,23) -> (1,25),
                 properties: Arguments (1,26) -> (1,29) {
                   arguments: Array [
-                    Number "3" (1,26) -> (1,27),
-                    Number "2" (1,28) -> (1,29),
+                    Number "3" (1,26) -> (1,27) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,28) -> (1,29) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -4823,8 +5196,20 @@ Score (1,1) -> (1,35) {
                 property: Ident "tu" (1,28) -> (1,30),
                 properties: Arguments (1,31) -> (1,34) {
                   arguments: Array [
-                    Number "3" (1,31) -> (1,32),
-                    Number "2" (1,33) -> (1,34),
+                    Number "3" (1,31) -> (1,32) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,33) -> (1,34) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -4914,8 +5299,20 @@ Score (1,1) -> (1,24) {
                 property: Ident "tu" (1,17) -> (1,19),
                 properties: Arguments (1,20) -> (1,23) {
                   arguments: Array [
-                    Number "3" (1,20) -> (1,21),
-                    Number "2" (1,22) -> (1,23),
+                    Number "3" (1,20) -> (1,21) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,22) -> (1,23) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -5058,8 +5455,20 @@ Score (1,1) -> (1,27) {
                 property: Ident "tu" (1,20) -> (1,22),
                 properties: Arguments (1,23) -> (1,26) {
                   arguments: Array [
-                    Number "3" (1,23) -> (1,24),
-                    Number "2" (1,25) -> (1,26),
+                    Number "3" (1,23) -> (1,24) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,25) -> (1,26) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -5143,8 +5552,20 @@ Score (1,1) -> (1,14) {
                       property: Ident "tu" (1,6) -> (1,8),
                       properties: Arguments (1,9) -> (1,12) {
                         arguments: Array [
-                          Number "3" (1,9) -> (1,10),
-                          Number "2" (1,11) -> (1,12),
+                          Number "3" (1,9) -> (1,10) {
+                            parameterIndices: Map {
+                              0 => 0,
+                              1 => 0,
+                            },
+                          },
+                          Number "2" (1,11) -> (1,12) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          1,
                         ],
                       },
                     },
@@ -5211,8 +5632,19 @@ Score (1,1) -> (1,12) {
                       property: Ident "tr" (1,5) -> (1,7),
                       properties: Arguments (1,8) -> (1,11) {
                         arguments: Array [
-                          Number "4" (1,8) -> (1,9),
-                          Number "4" (1,10) -> (1,11),
+                          Number "4" (1,8) -> (1,9) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                          Number "4" (1,10) -> (1,11) {
+                            parameterIndices: Map {
+                              0 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
                         ],
                       },
                     },
@@ -5465,8 +5897,20 @@ Score (1,1) -> (1,59) {
                 property: Ident "tu" (1,51) -> (1,53),
                 properties: Arguments (1,54) -> (1,57) {
                   arguments: Array [
-                    Number "3" (1,54) -> (1,55),
-                    Number "2" (1,56) -> (1,57),
+                    Number "3" (1,54) -> (1,55) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,56) -> (1,57) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -5578,8 +6022,20 @@ Score (1,1) -> (1,31) {
                 property: Ident "tu" (1,23) -> (1,25),
                 properties: Arguments (1,26) -> (1,29) {
                   arguments: Array [
-                    Number "3" (1,26) -> (1,27),
-                    Number "2" (1,28) -> (1,29),
+                    Number "3" (1,26) -> (1,27) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,28) -> (1,29) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
                   ],
                 },
               },
@@ -5621,7 +6077,14 @@ Score (1,1) -> (1,33) {
           },
           arguments: Arguments (1,8) -> (1,14) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -5632,7 +6095,14 @@ Score (1,1) -> (1,33) {
           },
           arguments: Arguments (1,26) -> (1,30) {
             arguments: Array [
-              String "Sub" (1,26) -> (1,30),
+              String "Sub" (1,26) -> (1,30) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -5658,7 +6128,14 @@ Score (1,1) -> (1,30) {
           },
           arguments: Arguments (1,8) -> (1,13) {
             arguments: Array [
-              String "Name" (1,8) -> (1,13),
+              String "Name" (1,8) -> (1,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
           properties: Props (1,15) -> (1,28) {
@@ -5668,7 +6145,14 @@ Score (1,1) -> (1,30) {
                 property: Ident "color" (1,16) -> (1,21),
                 properties: Arguments (1,22) -> (1,26) {
                   arguments: Array [
-                    String "red" (1,22) -> (1,26),
+                    String "red" (1,22) -> (1,26) {
+                      parameterIndices: Map {
+                        0 => 0,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    0,
                   ],
                 },
               },
@@ -5694,7 +6178,14 @@ Score (1,1) -> (1,30) {
           },
           arguments: Arguments (1,22) -> (1,27) {
             arguments: Array [
-              String "Name" (1,22) -> (1,27),
+              String "Name" (1,22) -> (1,27) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
           properties: Props (1,8) -> (1,21) {
@@ -5704,7 +6195,14 @@ Score (1,1) -> (1,30) {
                 property: Ident "color" (1,9) -> (1,14),
                 properties: Arguments (1,15) -> (1,19) {
                   arguments: Array [
-                    String "red" (1,15) -> (1,19),
+                    String "red" (1,15) -> (1,19) {
+                      parameterIndices: Map {
+                        0 => 0,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    0,
                   ],
                 },
               },
@@ -5738,9 +6236,24 @@ Score (1,1) -> (1,33) {
           },
           arguments: Arguments (1,8) -> (1,31) {
             arguments: Array [
-              String "Title" (1,8) -> (1,14),
-              String "Template" (1,16) -> (1,25),
-              Ident "left" (1,27) -> (1,31),
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              String "Template" (1,16) -> (1,25) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+              Ident "left" (1,27) -> (1,31) {
+                parameterIndices: Map {
+                  0 => 2,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -5957,9 +6470,24 @@ Score (1,1) -> (1,21) {
           },
           arguments: Arguments (1,16) -> (1,21) {
             arguments: Array [
-              Number "1" (1,16) -> (1,17),
-              Number "1" (1,18) -> (1,19),
-              Number "1" (1,20) -> (1,21),
+              Number "1" (1,16) -> (1,17) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "1" (1,18) -> (1,19) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+              Number "1" (1,20) -> (1,21) {
+                parameterIndices: Map {
+                  0 => 2,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -5998,9 +6526,24 @@ Score (1,1) -> (1,20) {
           },
           arguments: Arguments (1,15) -> (1,20) {
             arguments: Array [
-              Number "1" (1,15) -> (1,16),
-              Number "1" (1,17) -> (1,18),
-              Number "1" (1,19) -> (1,20),
+              Number "1" (1,15) -> (1,16) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "1" (1,17) -> (1,18) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+              Number "1" (1,19) -> (1,20) {
+                parameterIndices: Map {
+                  0 => 2,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -6039,9 +6582,24 @@ Score (1,1) -> (1,20) {
           },
           arguments: Arguments (1,15) -> (1,20) {
             arguments: Array [
-              Number "1" (1,15) -> (1,16),
-              Number "1" (1,17) -> (1,18),
-              Number "1" (1,19) -> (1,20),
+              Number "1" (1,15) -> (1,16) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "1" (1,17) -> (1,18) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+              Number "1" (1,19) -> (1,20) {
+                parameterIndices: Map {
+                  0 => 2,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -6158,7 +6716,14 @@ Score (1,1) -> (1,36) {
           },
           arguments: Arguments (1,9) -> (1,14) {
             arguments: Array [
-              String "Test" (1,9) -> (1,14),
+              String "Test" (1,9) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },
@@ -6186,9 +6751,24 @@ Score (1,1) -> (1,36) {
           },
           arguments: Arguments (1,31) -> (1,36) {
             arguments: Array [
-              Number "1" (1,31) -> (1,32),
-              Number "1" (1,33) -> (1,34),
-              Number "1" (1,35) -> (1,36),
+              Number "1" (1,31) -> (1,32) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "1" (1,33) -> (1,34) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+              Number "1" (1,35) -> (1,36) {
+                parameterIndices: Map {
+                  0 => 2,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
             ],
           },
         },

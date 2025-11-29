@@ -906,8 +906,6 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (values.validated) {
             return true;
         }
-        
-        // TODO: determine and fill the signatureIndex and parameterIndex values for the AST
 
         let error = false;
         const candidates = new Map<number, SignatureResolutionInfo>(
@@ -924,13 +922,23 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return true;
         }
 
+        function trackValue(value: AlphaTexAstNode, overloadIndex: number) {
+            const overload = candidates.get(overloadIndex)!;
+            const valueNode = value as IAlphaTexArgumentValue;
+            if (!valueNode.parameterIndices) {
+                valueNode.parameterIndices = new Map<number, number>();
+            }
+            valueNode.parameterIndices.set(overloadIndex, overload.parameterIndex);
+        }
+
         for (const value of values.arguments) {
-            AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value);
+            AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value, trackValue);
             if (candidates.size === 0) {
                 break;
             }
         }
 
+        const allCandidates = Array.from(candidates.keys());
         AlphaTex1MetaDataReader.filterIncompleteCandidates(candidates);
 
         if (candidates.size === 0) {
@@ -942,6 +950,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 end: values.end
             });
             error = true;
+        }
+        else {
+            values.signatureCandidateIndices = allCandidates;
         }
 
         return !error;
@@ -1271,7 +1282,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'tu':
                 if (p.arguments!.arguments.length === 2) {
                     importer.state.currentTupletNumerator = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
-                    importer.state.currentTupletDenominator = (p.arguments!.arguments[1] as AlphaTexNumberLiteral).value;
+                    importer.state.currentTupletDenominator = (
+                        p.arguments!.arguments[1] as AlphaTexNumberLiteral
+                    ).value;
                 } else {
                     const numerator = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                     importer.state.currentTupletNumerator = numerator;
@@ -2082,7 +2095,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 note.rightHandFinger = rightFinger;
                 return ApplyNodeResult.Applied;
             case 'acc':
-                note.accidentalMode = ModelUtils.parseAccidentalMode((p.arguments!.arguments[0] as AlphaTexTextNode).text);
+                note.accidentalMode = ModelUtils.parseAccidentalMode(
+                    (p.arguments!.arguments[0] as AlphaTexTextNode).text
+                );
                 return ApplyNodeResult.Applied;
             case 'turn':
                 note.ornament = NoteOrnament.Turn;
@@ -2854,10 +2869,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     private static _buildNewTrackNode(track: Track): AlphaTexMetaDataNode {
         const node = Atnf.meta(
             'track',
-            Atnf.args([
-                Atnf.string(track.name),
-                track.shortName.length > 0 ? Atnf.string(track.shortName) : undefined
-            ]),
+            Atnf.args([Atnf.string(track.name), track.shortName.length > 0 ? Atnf.string(track.shortName) : undefined]),
             Atnf.props([
                 track.color.rgba !== AlphaTex1LanguageHandler._defaultTrack.color.rgba
                     ? ['color', Atnf.stringValue(track.color.rgba)]

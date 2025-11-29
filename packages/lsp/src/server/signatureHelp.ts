@@ -161,15 +161,14 @@ function createArgumentsSignatureHelp(
         return help;
     }
 
-    help.activeSignature = values.matchedSignatureIndex;
-    if (values.matchedSignatureIndex !== undefined) {
+    if (values.signatureCandidateIndices !== undefined) {
+        help.activeSignature = values.signatureCandidateIndices[0];
         const value = binaryNodeSearch(values.arguments, offset);
         if (value) {
             if (value.parameterIndices !== undefined) {
-                for (let i = 0; i < value.parameterIndices.length; i++) {
-                    const parameterIndex = value.parameterIndices[i];
+                for (const [signatureIndex, parameterIndex] of value.parameterIndices) {
                     if (parameterIndex >= 0) {
-                        help.signatures[i].activeParameter = parameterIndex;
+                        help.signatures[signatureIndex].activeParameter = parameterIndex;
                     }
                 }
             }

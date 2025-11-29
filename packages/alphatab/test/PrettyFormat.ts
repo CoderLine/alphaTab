@@ -384,7 +384,8 @@ import {
     type AlphaTexPropertyNode,
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
-    type AlphaTexArgumentList
+    type AlphaTexArgumentList,
+    type IAlphaTexArgumentValue
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import { MidiEvent } from '@coderline/alphatab/midi/MidiEvent';
 import { Bar } from '@coderline/alphatab/model/Bar';
@@ -479,7 +480,15 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
             // case AlphaTexNodeType.ColonToken:
             // case AlphaTexNodeType.AsteriskToken:
 
-            // case AlphaTexNodeType.Identifier:
+            case AlphaTexNodeType.Ident:
+            case AlphaTexNodeType.String:
+            case AlphaTexNodeType.Number:
+                const value = node as IAlphaTexArgumentValue;
+                if (value.parameterIndices) {
+                    children.push(['parameterIndices', value.parameterIndices]);
+                }
+                break;
+
             case AlphaTexNodeType.Tag:
                 const tag = node as AlphaTexMetaDataTagNode;
                 if (tag.prefix) {
@@ -514,6 +523,9 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 }
                 if (valueList.closeParenthesis) {
                     children.push(['closeParenthesis', valueList.closeParenthesis]);
+                }
+                if (valueList.signatureCandidateIndices) {
+                    children.push(['signatureCandidateIndices', valueList.signatureCandidateIndices]);
                 }
                 break;
 

@@ -435,8 +435,8 @@ function createArgumentCompletions(
         if (value?.parameterIndices) {
             const signatureCandidates = resolveSignature(signatures, actualValues);
             for (const [k, v] of signatureCandidates) {
-                const parameterIndex = value.parameterIndices[k];
-                const values = v.parameters[parameterIndex].values;
+                const parameterIndex = value.parameterIndices.get(k);
+                const values = parameterIndex !== undefined ? v.parameters[parameterIndex].values : undefined;
                 if (values) {
                     return values.map(i =>
                         valueItemToCompletion(i, {

@@ -11,8 +11,7 @@ import {
     type AlphaTexNumberLiteral,
     type AlphaTexPropertyNode,
     type AlphaTexTextNode,
-    type IAlphaTexArgumentValue,
-    type IAlphaTexNoteValueNode
+    type IAlphaTexArgumentValue
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import {
@@ -144,8 +143,6 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         const valueListStart = parser.lexer.peekToken()?.start;
         const parseRemaining = endOfListTypes !== undefined;
 
-        // TODO: determine and fill the signatureIndex and parameterIndex values for the AST 
-
         let error = false;
 
         const candidates = new Map<number, SignatureResolutionInfo>(
@@ -158,17 +155,29 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             ])
         );
 
-        function addValue(value: AlphaTexAstNode) {
+        function trackValue(value: AlphaTexAstNode, overloadIndex: number) {
+            const candidate = candidates.get(overloadIndex)!;
             if (value.nodeType === AlphaTexNodeType.LParen) {
                 const args = parser.argumentList();
                 if (args) {
                     for (const v of args.arguments) {
+                        if (!v.parameterIndices) {
+                            v.parameterIndices = new Map<number, number>();
+                        }
+                        v.parameterIndices.set(overloadIndex, candidate.parameterIndex);
                         values.push(v);
                     }
                 }
             } else {
-                values.push(value as IAlphaTexNoteValueNode);
-                parser.lexer.advance();
+                const valueNode = value as IAlphaTexArgumentValue;
+                if (!valueNode.parameterIndices) {
+                    valueNode.parameterIndices = new Map<number, number>();
+                }
+                valueNode.parameterIndices.set(overloadIndex, candidate.parameterIndex);
+                if (values[values.length - 1] !== valueNode) {
+                    values.push(valueNode);
+                    parser.lexer.advance();
+                }
             }
         }
 
@@ -186,7 +195,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 break;
             }
 
-            if (!AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value, addValue, extendToFloat)) {
+            if (!AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value, trackValue, extendToFloat)) {
                 break;
             }
         }
@@ -224,7 +233,8 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             let remaining = parser.lexer.peekToken();
             while (remaining && !endOfListTypes!.has(remaining.nodeType)) {
                 if (AlphaTex1MetaDataReader._handleTypeValueListItem(remaining, undefined, extendToFloat)) {
-                    addValue(remaining);
+                    values.push(remaining);
+                    parser.lexer.advance();
                     remaining = parser.lexer.peekToken();
                 } else {
                     remaining = undefined;
@@ -240,6 +250,9 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         valueList.start = valueListStart;
         valueList.end = parser.lexer.previousTokenEndLocation();
         valueList.validated = !error;
+        if (candidates.size > 0) {
+            valueList.signatureCandidateIndices = Array.from(candidates.keys());
+        }
 
         return valueList;
     }
@@ -334,7 +347,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
     public static filterSignatureCandidates(
         candidates: Map<number, SignatureResolutionInfo>,
         value: AlphaTexAstNode,
-        addValue?: (value: IAlphaTexArgumentValue) => void,
+        trackValue?: (value: IAlphaTexArgumentValue, signature: number) => void,
         extendToFloat?: (value: AlphaTexNumberLiteral) => void
     ) {
         const toRemove = new Set<number>();
@@ -361,10 +374,8 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 ) {
                     handled = true;
 
-                    if (!foundMatchingOverload) {
-                        foundMatchingOverload = true;
-                        addValue?.(value);
-                    }
+                    foundMatchingOverload = true;
+                    trackValue?.(value, overloadIndex);
 
                     switch (expected.parseMode) {
                         case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
