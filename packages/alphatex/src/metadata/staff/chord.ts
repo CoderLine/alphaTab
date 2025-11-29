@@ -1,6 +1,7 @@
 import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
+import { properties } from '@coderline/alphatab-alphatex/common';
 
 export const chord: MetadataTagDefinition = {
     tag: '\\chord',
@@ -37,7 +38,7 @@ export const chord: MetadataTagDefinition = {
         \\ts 2 4
         (0.1 1.2 0.3 2.4 3.5){ch "C"} (0.1 1.2 0.3 2.4 3.5)
         `,
-    properties: [
+    properties: properties(
         {
             property: 'firstFret',
             snippet: 'firstFret $0',
@@ -253,5 +254,5 @@ export const chord: MetadataTagDefinition = {
                 (3.1 3.2 3.3 1.4 1.5 1.6){ch "Special"}
                 `
         }
-    ]
+    )
 };

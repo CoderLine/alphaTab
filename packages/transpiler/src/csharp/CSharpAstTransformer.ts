@@ -2024,12 +2024,12 @@ export default class CSharpAstTransformer {
                 return this.visitReturnStatement(parent, s as ts.ReturnStatement);
             case ts.SyntaxKind.WithStatement:
                 this.context.addTsNodeDiagnostics(s, 'With statement is not supported', ts.DiagnosticCategory.Error);
-                return {} as cs.ThrowStatement;
+                return null;
             case ts.SyntaxKind.SwitchStatement:
                 return this.visitSwitchStatement(parent, s as ts.SwitchStatement);
             case ts.SyntaxKind.LabeledStatement:
                 this.context.addTsNodeDiagnostics(s, 'Labeled statement is not supported', ts.DiagnosticCategory.Error);
-                return {} as cs.ThrowStatement;
+                return null;
             case ts.SyntaxKind.ThrowStatement:
                 return this.visitThrowStatement(parent, s as ts.ThrowStatement);
             case ts.SyntaxKind.TryStatement:
@@ -2038,7 +2038,7 @@ export default class CSharpAstTransformer {
             case ts.SyntaxKind.FunctionDeclaration:
                 return this.visitFunctionDeclaration(parent, s as ts.FunctionDeclaration);
         }
-        return {} as cs.ThrowStatement;
+        return null;
     }
 
     protected visitEmptyStatement(parent: cs.Node, s: ts.EmptyStatement) {
@@ -2049,14 +2049,7 @@ export default class CSharpAstTransformer {
         } as cs.EmptyStatement;
     }
     protected visitDebuggerStatement(_parent: cs.Node, _s: ts.DebuggerStatement) {
-        return {} as cs.ThrowStatement;
-
-        // {
-        //     nodeType: cs.SyntaxKind.ExpressionStatement,
-        //     parent: parent,
-        //     tsNode: s,
-        //     expression: {} as cs.Expression // TOOD: call System.Diagnostics.Debugger.Break();
-        // } as cs.ExpressionStatement;
+        return null;
     }
 
     protected visitBlock(parent: cs.Node, block: ts.Block): cs.Block {

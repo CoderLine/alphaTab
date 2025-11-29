@@ -906,6 +906,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (values.validated) {
             return true;
         }
+        
+        // TODO: determine and fill the signatureIndex and parameterIndex values for the AST
 
         let error = false;
         const candidates = new Map<number, SignatureResolutionInfo>(

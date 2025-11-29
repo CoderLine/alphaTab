@@ -2,6 +2,7 @@ import { instrument } from '@coderline/alphatab-alphatex/properties/beat/instrum
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
 import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { properties } from '@coderline/alphatab-alphatex/common';
 
 export const track: MetadataTagDefinition = {
     tag: '\\track',
@@ -34,7 +35,7 @@ export const track: MetadataTagDefinition = {
         \\track
             C5 D5 E5 F5
         `,
-    properties: [
+    properties: properties(
         {
             property: 'color',
             snippet: 'color $0',
@@ -252,5 +253,5 @@ export const track: MetadataTagDefinition = {
                 `
             ]
         }
-    ]
+    )
 };

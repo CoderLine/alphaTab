@@ -1,6 +1,7 @@
 import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
+import { properties } from '@coderline/alphatab-alphatex/common';
 
 export const staff: MetadataTagDefinition = {
     tag: '\\staff',
@@ -27,7 +28,7 @@ export const staff: MetadataTagDefinition = {
           \\staff{tabs slash} \\capo 5
           1.2 3.2 0.1 1.1
         `,
-    properties: [
+    properties: properties(
         {
             property: 'score',
             snippet: 'score $0',
@@ -103,5 +104,5 @@ export const staff: MetadataTagDefinition = {
                     C4 D4 E4 F4
                 `
         }
-    ]
+    )
 };

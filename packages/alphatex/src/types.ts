@@ -185,5 +185,5 @@ export interface MetadataTagDefinition extends WithSignatures {
      * A lookup containing the properties available for this metadata.
      * The key is the lowercase identifier of the property.
      */
-    properties?: PropertyDefinition[];
+    properties?: Map<string, PropertyDefinition>;
 }

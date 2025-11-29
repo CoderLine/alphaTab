@@ -82,7 +82,7 @@ function createAlphaTexSignatureDefinition(e: SignatureDefinition) {
     return ts.factory.createArrayLiteralExpression(params);
 }
 
-function updateMetaDataSignatures(element: ts.PropertyDeclaration, definitions: MetadataTagDefinition[]) {
+function updateMetaDataSignatures(element: ts.PropertyDeclaration, definitions: Map<string, MetadataTagDefinition>) {
     console.log(`Start update of ${element.name.getText()}`);
 
     const sigs = ts.factory.createCallExpression(
@@ -93,7 +93,7 @@ function updateMetaDataSignatures(element: ts.PropertyDeclaration, definitions: 
         undefined,
         [
             ts.factory.createArrayLiteralExpression(
-                definitions.map(d =>
+                Array.from(definitions.values()).map(d =>
                     ts.factory.createArrayLiteralExpression([
                         ts.factory.createStringLiteral(d.tag.substring(1).toLowerCase()),
                         d.signatures.length === 1 && d.signatures[0].parameters.length === 0
@@ -127,7 +127,7 @@ function createAlphaTexPropertyDefinition(p: PropertyDefinition) {
     ]);
 }
 
-function updateMetaDataProperties(element: ts.PropertyDeclaration, tags: MetadataTagDefinition[]) {
+function updateMetaDataProperties(element: ts.PropertyDeclaration, tags: Map<string, MetadataTagDefinition>) {
     console.log(`Start update of ${element.name.getText()}`);
 
     const props = ts.factory.createCallExpression(
@@ -138,13 +138,13 @@ function updateMetaDataProperties(element: ts.PropertyDeclaration, tags: Metadat
         undefined,
         [
             ts.factory.createArrayLiteralExpression(
-                tags.map(d =>
+                Array.from(tags.values()).map(d =>
                     ts.factory.createArrayLiteralExpression([
                         ts.factory.createStringLiteral(d.tag.substring(1).toLowerCase()),
                         d.properties === undefined
                             ? ts.factory.createNull()
                             : ts.factory.createArrayLiteralExpression(
-                                  d.properties.map(createAlphaTexPropertyDefinition)
+                                  Array.from(d.properties.values()).map(createAlphaTexPropertyDefinition)
                               )
                     ])
                 ),
@@ -163,7 +163,7 @@ function updateMetaDataProperties(element: ts.PropertyDeclaration, tags: Metadat
     );
 }
 
-function updateProperties(element: ts.PropertyDeclaration, props: PropertyDefinition[]) {
+function updateProperties(element: ts.PropertyDeclaration, props: Map<string, PropertyDefinition>) {
     console.log(`Start update of ${element.name.getText()}`);
 
     const expr = ts.factory.createCallExpression(
@@ -174,7 +174,7 @@ function updateProperties(element: ts.PropertyDeclaration, props: PropertyDefini
         undefined,
         [
             ts.factory.createArrayLiteralExpression(
-                props.map(d => createAlphaTexPropertyDefinition(d)),
+                Array.from(props.values()).map(d => createAlphaTexPropertyDefinition(d)),
                 true
             )
         ]
@@ -215,15 +215,7 @@ function languageDefinitionsVisitor<TNode extends ts.Node>(
                 return updateMetaDataSignatures(node, definitions.barMetaData) as unknown as TNode;
             case 'metaDataProperties':
                 context.foundMetaDataProperties = true;
-                return updateMetaDataProperties(
-                    node,
-                    [
-                        definitions.scoreMetaData,
-                        definitions.structuralMetaData,
-                        definitions.staffMetaData,
-                        definitions.barMetaData
-                    ].flat()
-                ) as unknown as TNode;
+                return updateMetaDataProperties(node, definitions.allMetadata) as unknown as TNode;
             case 'durationChangeProperties':
                 context.foundDurationChangeProperties = true;
                 return updateProperties(node, definitions.durationChangeProperties) as unknown as TNode;

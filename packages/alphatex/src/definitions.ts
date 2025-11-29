@@ -145,12 +145,13 @@ import { umordent } from '@coderline/alphatab-alphatex//properties/note/umordent
 import { noteVibrato } from '@coderline/alphatab-alphatex//properties/note/v';
 import { noteVibratoWide } from '@coderline/alphatab-alphatex//properties/note/vw';
 import { x } from '@coderline/alphatab-alphatex//properties/note/x';
+import { metadata, properties } from '@coderline/alphatab-alphatex/common';
 import { db } from '@coderline/alphatab-alphatex/metadata/bar/db';
 import { instrumentMeta } from '@coderline/alphatab-alphatex/metadata/staff/instrument';
 import type { WithDescription, WithSignatures } from '@coderline/alphatab-alphatex/types';
 
-export const structuralMetaData = [track, staff, voice];
-export const scoreMetaData = [
+export const structuralMetaData = metadata(track, staff, voice);
+export const scoreMetaData = metadata(
     title,
     subtitle,
     artist,
@@ -176,11 +177,20 @@ export const scoreMetaData = [
     otherSystemsTrackNameMode,
     firstSystemTrackNameOrientation,
     otherSystemsTrackNameOrientation
-];
+);
 
-export const staffMetaData = [tuning, chord, capo, lyrics, articulation, displayTranspose, transpose, instrumentMeta];
+export const staffMetaData = metadata(
+    tuning,
+    chord,
+    capo,
+    lyrics,
+    articulation,
+    displayTranspose,
+    transpose,
+    instrumentMeta
+);
 
-export const barMetaData = [
+export const barMetaData = metadata(
     ts,
     ro,
     rc,
@@ -205,11 +215,18 @@ export const barMetaData = [
     sph,
     spu,
     db
-];
+);
 
-export const durationChangeProperties = [tu];
+export const allMetadata = new Map([
+    ...structuralMetaData.entries(),
+    ...scoreMetaData.entries(),
+    ...staffMetaData.entries(),
+    ...barMetaData.entries()
+]);
 
-export const beatProperties = [
+export const durationChangeProperties = properties(tu);
+
+export const beatProperties = properties(
     f,
     fo,
     vs,
@@ -259,9 +276,9 @@ export const beatProperties = [
     bank,
     fermata,
     beam
-];
+);
 
-export const noteProperties = [
+export const noteProperties = properties(
     nh,
     ah,
     th,
@@ -303,7 +320,7 @@ export const noteProperties = [
     acc,
     slur,
     tiedNoteDash
-];
+);
 
 const spaces = /^([ ]+)/;
 
@@ -339,19 +356,19 @@ function prepareWithSignatures(d: WithSignatures) {
     }
 }
 
-for (const d of [structuralMetaData, scoreMetaData, staffMetaData, barMetaData].flat()) {
+for (const d of allMetadata.values()) {
     prepareWithSignatures(d);
     if (d.properties) {
-        for (const p of d.properties) {
+        for (const p of d.properties.values()) {
             prepareWithSignatures(p);
         }
     }
 }
 
-for (const d of beatProperties) {
+for (const d of beatProperties.values()) {
     prepareWithSignatures(d);
 }
 
-for (const d of noteProperties) {
+for (const d of noteProperties.values()) {
     prepareWithSignatures(d);
 }

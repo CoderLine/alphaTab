@@ -1,3 +1,4 @@
+import type { MetadataTagDefinition, PropertyDefinition } from '@coderline/alphatab-alphatex/types';
 
 export const generalMidiInstruments = [
     'Acoustic Grand Piano',
@@ -129,3 +130,11 @@ export const generalMidiInstruments = [
     'Applause',
     'Gunshot'
 ];
+
+export function properties(...props: PropertyDefinition[]): Map<string, PropertyDefinition> {
+    return new Map(props.map(p => [p.property.toLowerCase(), p]));
+}
+
+export function metadata(...metadata: MetadataTagDefinition[]) {
+    return new Map<string, MetadataTagDefinition>(metadata.map(t => [t.tag.toLowerCase(), t]));
+}

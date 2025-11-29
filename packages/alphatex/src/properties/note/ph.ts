@@ -1,7 +1,7 @@
-import { harmonicValueDocs } from '@coderline/alphatab-language-server/documentation/properties/note/ah';
-import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { harmonicValueDocs } from '@coderline/alphatab-alphatex/properties/note/ah';
+import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
 
 export const ph: PropertyDefinition = {
     property: 'ph',

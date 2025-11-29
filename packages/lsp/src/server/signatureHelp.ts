@@ -4,9 +4,13 @@ import {
     beatProperties,
     durationChangeProperties,
     noteProperties
-} from '@coderline/alphatab-language-server/documentation/documentation';
-import type { CommonDoc, PropertyDoc, ValueDoc } from '@coderline/alphatab-language-server/documentation/types';
-import { binaryNodeSearch } from '@coderline/alphatab-language-server/server/utils';
+} from '@coderline/alphatab-alphatex/definitions';
+import type {
+    ParameterDefinition,
+    PropertyDefinition,
+    SignatureDefinition,
+    WithSignatures
+} from '@coderline/alphatab-alphatex/types';
 import {
     type AlphaTexTextDocument,
     type Connection,
@@ -15,6 +19,7 @@ import {
     SignatureInformation,
     type TextDocuments
 } from '@coderline/alphatab-language-server/server/types';
+import { binaryNodeSearch, parameterToSyntax } from '@coderline/alphatab-language-server/server/utils';
 
 export function setupSignatureHelp(connection: Connection, documents: TextDocuments<AlphaTexTextDocument>) {
     connection.onSignatureHelp(params => {
@@ -54,15 +59,15 @@ function createMetaDataSignatureHelp(
         return null;
     }
 
-    const endOfValues = metaData.values?.end!.offset ?? metaData.properties?.start!.offset ?? metaData.end!.offset;
+    const endOfValues = metaData.arguments?.end!.offset ?? metaData.properties?.start!.offset ?? metaData.end!.offset;
     if (metaData.start!.offset <= offset && offset < endOfValues) {
-        return createValuesSignatureHelp(`\\${metaData.tag.tag.text}`, metaDataDocs, metaData.values, offset);
+        return createArgumentsSignatureHelp(`\\${metaData.tag.tag.text}`, metaDataDocs, metaData.arguments, offset);
     }
 
     if (metaData.properties && metaDataDocs.properties) {
-        const hover = createPropertiesSignatureHelp(metaData.properties, metaDataDocs.properties, offset);
-        if (hover != null) {
-            return hover;
+        const help = createPropertiesSignatureHelp(metaData.properties, metaDataDocs.properties, offset);
+        if (help != null) {
+            return help;
         }
     }
 
@@ -113,7 +118,7 @@ function createNoteSignatureHelp(
 
 function createPropertiesSignatureHelp(
     properties: alphaTab.importer.alphaTex.AlphaTexPropertiesNode,
-    propertiesDocs: Map<string, PropertyDoc> | Map<string, PropertyDoc>[],
+    propertiesDocs: Map<string, PropertyDefinition> | Map<string, PropertyDefinition>[],
     offset: number
 ): SignatureHelp | null {
     const prop = binaryNodeSearch(properties.properties, offset);
@@ -121,7 +126,7 @@ function createPropertiesSignatureHelp(
         return null;
     }
 
-    let propDocs: PropertyDoc | undefined;
+    let propDocs: PropertyDefinition | undefined;
     if (Array.isArray(propertiesDocs)) {
         for (const d of propertiesDocs) {
             propDocs = d.get(prop.property.text.toLowerCase());
@@ -134,71 +139,39 @@ function createPropertiesSignatureHelp(
     }
 
     if (propDocs) {
-        return createValuesSignatureHelp(prop.property.text, propDocs, prop.values, offset);
+        return createArgumentsSignatureHelp(prop.property.text, propDocs, prop.arguments, offset);
     }
 
     return null;
 }
 
-function createValuesSignatureHelp(
+function createArgumentsSignatureHelp(
     parentItemLabel: string,
-    docs: { values: ValueDoc[] } & CommonDoc,
-    values: alphaTab.importer.alphaTex.AlphaTexValueList | undefined,
+    docs: WithSignatures,
+    values: alphaTab.importer.alphaTex.AlphaTexArgumentList | undefined,
     offset: number
 ): SignatureHelp | null {
     const help: SignatureHelp = {
-        signatures: [],
+        signatures: docs.signatures.map(s => signatureDefinitionToHelp(parentItemLabel, docs, s)),
         activeSignature: undefined,
         activeParameter: undefined
     };
 
-    if (docs.values.length === 0) {
-        help.signatures.push(
-            SignatureInformation.create(parentItemLabel, docs.longDescription ?? docs.shortDescription)
-        );
+    if (!values) {
         return help;
     }
 
-    // \track name
-    const requiredValues = docs.values.filter(d => d.required);
-    if (requiredValues.length < 2 && !docs.values[0].isList) {
-        const signature = SignatureInformation.create(
-            `${parentItemLabel} `,
-            docs.longDescription ?? docs.shortDescription
-        );
-        createParameterInfo(signature, docs.values[0]);
-        help.signatures.push(signature);
-    }
-
-    if (docs.values.length > 1 || docs.values[0].isList) {
-        // \title (fullName shortName)
-        const signature = SignatureInformation.create(parentItemLabel, docs.longDescription ?? docs.shortDescription);
-        signature.label += ' (';
-        for (let i = 0; i < docs.values.length; i++) {
-            if (i > 0) {
-                signature.label += ' ';
-            }
-            createParameterInfo(signature, docs.values[i]);
-        }
-
-        signature.label += ')';
-        help.signatures.push(signature);
-    }
-
-    if (values) {
-        if (values.openParenthesis && help.signatures.length > 1) {
-            help.activeSignature = 1;
-        } else {
-            help.activeSignature = 0;
-        }
-
-        const value = binaryNodeSearch(values.values, offset);
+    help.activeSignature = values.matchedSignatureIndex;
+    if (values.matchedSignatureIndex !== undefined) {
+        const value = binaryNodeSearch(values.arguments, offset);
         if (value) {
-            const valueIndex = values.values.indexOf(value);
-            if (valueIndex < docs.values.length) {
-                help.activeParameter = valueIndex;
-            } else {
-                help.activeParameter = docs.values.length - 1;
+            if (value.parameterIndices !== undefined) {
+                for (let i = 0; i < value.parameterIndices.length; i++) {
+                    const parameterIndex = value.parameterIndices[i];
+                    if (parameterIndex >= 0) {
+                        help.signatures[i].activeParameter = parameterIndex;
+                    }
+                }
             }
         }
     }
@@ -206,9 +179,29 @@ function createValuesSignatureHelp(
     return help;
 }
 
-function createParameterInfo(signature: SignatureInformation, doc: ValueDoc) {
+function createParameterInfo(signature: SignatureInformation, doc: ParameterDefinition) {
     const start = signature.label.length;
-    signature.label += doc.name;
+    signature.label += parameterToSyntax(doc);
+
     const end = signature.label.length;
     signature.parameters!.push(ParameterInformation.create([start, end], doc.longDescription ?? doc.shortDescription));
+}
+
+function signatureDefinitionToHelp(
+    label: string,
+    docs: WithSignatures,
+    signature: SignatureDefinition
+): SignatureInformation {
+    const signatureDocs = SignatureInformation.create(`${label} `, docs.longDescription ?? docs.shortDescription);
+
+    signatureDocs.label += ' (';
+    for (let i = 0; i < signature.parameters.length; i++) {
+        if (i > 0) {
+            signatureDocs.label += ' ';
+        }
+        createParameterInfo(signatureDocs, signature.parameters[i]);
+    }
+
+    signatureDocs.label += ')';
+    return signatureDocs;
 }

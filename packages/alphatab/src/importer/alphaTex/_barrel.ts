@@ -29,7 +29,7 @@ export {
     type AlphaTexStringLiteral,
     type AlphaTexTextNode,
     type AlphaTexTokenNode,
-    type IAlphaTexArgumentValue, 
+    type IAlphaTexArgumentValue,
     type IAlphaTexAstNode,
     type IAlphaTexMetaDataTagPrefixNode,
     type IAlphaTexNoteValueNode
@@ -42,7 +42,8 @@ export {
     AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
-    AlphaTexStaffNoteKind, 
+    AlphaTexStaffNoteKind,
+    ArgumentListParseTypesMode,
     type IAlphaTexImporter,
     type IAlphaTexImporterState
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';

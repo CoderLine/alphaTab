@@ -1,6 +1,7 @@
 import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
+import { properties } from '@coderline/alphatab-alphatex/common';
 
 export const tuning: MetadataTagDefinition = {
     tag: '\\tuning',
@@ -61,7 +62,7 @@ export const tuning: MetadataTagDefinition = {
           \\tuning piano
           C4 D4 E4 F4
         `,
-    properties: [
+    properties: properties(
         {
             property: 'hide',
             snippet: 'hide',
@@ -105,5 +106,5 @@ export const tuning: MetadataTagDefinition = {
                   4.1 3.1 2.1 1.1
                 `
         }
-    ]
+    )
 };

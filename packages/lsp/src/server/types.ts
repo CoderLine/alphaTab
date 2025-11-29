@@ -15,27 +15,14 @@ export interface AlphaTexTextDocument extends TextDocument {
 
 export { type RemoteConsole, type TextDocumentPositionParams, TextDocuments } from 'vscode-languageserver';
 
-export {
-    type DocumentDiagnosticReport,
-    DocumentDiagnosticReportKind,
-    type InitializeParams,
-    type InitializeResult,
-    PositionEncodingKind,
-    TextDocumentSyncKind
+export {type DocumentDiagnosticReport, 
+    DocumentDiagnosticReportKind, type InitializeParams,
+    type InitializeResult, PositionEncodingKind,
+    TextDocumentSyncKind 
 } from 'vscode-languageserver-protocol';
-
-export {
-    type CompletionItem,
-    type Diagnostic,
-    DiagnosticSeverity,
-    CompletionItemKind,
-    InsertTextFormat,
-    type Hover,
-    TextEdit,
-    uinteger,
-    ParameterInformation,
-    type SignatureHelp,
-    SignatureInformation,
-} from 'vscode-languageserver-types';
-
 export { TextDocument } from 'vscode-languageserver-textdocument';
+export {type CompletionItem,
+    CompletionItemKind, 
+    type Diagnostic, DiagnosticSeverity, type Hover, InsertTextFormat, ParameterInformation, type SignatureHelp, SignatureInformation, TextEdit,
+    uinteger 
+} from 'vscode-languageserver-types';

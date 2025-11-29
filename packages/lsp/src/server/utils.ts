@@ -1,4 +1,5 @@
-import type * as alphaTab from '@coderline/alphatab';
+import * as alphaTab from '@coderline/alphatab';
+import type { ParameterDefinition, SignatureDefinition } from '@coderline/alphatab-alphatex/types';
 
 function binaryNodeSearchInner<T extends alphaTab.importer.alphaTex.AlphaTexAstNode>(
     items: T[],
@@ -47,4 +48,59 @@ export function binaryNodeSearch<T extends alphaTab.importer.alphaTex.AlphaTexAs
     }
 
     return binaryNodeSearchInner(items, offset, 0, items.length, trailingEnd);
+}
+
+export function resolveSignature(
+    signatures: SignatureDefinition[],
+    args: alphaTab.importer.alphaTex.AlphaTexArgumentList
+): Map<number, SignatureDefinition> {
+    const resolved = new Map<number, SignatureDefinition>();
+
+    if (args.signatureCandidateIndices !== undefined) {
+        for (const i of args.signatureCandidateIndices) {
+            resolved.set(i, signatures[i]);
+        }
+    } else if (args.matchedSignatureIndex !== undefined) {
+        resolved.set(args.matchedSignatureIndex, signatures[args.matchedSignatureIndex]);
+    }
+
+    return resolved;
+}
+
+export function parameterToSyntax(parameter: ParameterDefinition) {
+    let p: string = parameter.name;
+    switch (parameter.parseMode) {
+        case alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional:
+        case alphaTab.importer.alphaTex.ArgumentListParseTypesMode.OptionalAsFloat:
+            p += '?';
+            break;
+    }
+    p += `: ${nodeTypesToTypeDocs(parameter)}`;
+    return p;
+}
+
+export function nodeTypesToTypeDocs(parameter: ParameterDefinition) {
+    const typeArray = Array.isArray(parameter.type) ? parameter.type : [parameter.type];
+    let p: string = '';
+    if (parameter.values && !parameter.valuesOnlyForCompletion && parameter.values.length < 5) {
+        const valueArray = parameter.values.map(v => v.name);
+        switch (typeArray[0]) {
+            case alphaTab.importer.alphaTex.AlphaTexNodeType.String:
+                p = valueArray.map(v => `"${v}"`).join('|');
+                break;
+            default:
+                p = valueArray.join('|');
+                break;
+        }
+    } else {
+        p = typeArray.map(t => alphaTab.importer.alphaTex.AlphaTexNodeType[t]).join('|');
+    }
+
+    switch (parameter.parseMode) {
+        case alphaTab.importer.alphaTex.ArgumentListParseTypesMode.RequiredAsValueList:
+        case alphaTab.importer.alphaTex.ArgumentListParseTypesMode.ValueListWithoutParenthesis:
+            p += '[]';
+    }
+
+    return p;
 }

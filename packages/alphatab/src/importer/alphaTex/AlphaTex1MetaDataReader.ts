@@ -144,6 +144,8 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         const valueListStart = parser.lexer.peekToken()?.start;
         const parseRemaining = endOfListTypes !== undefined;
 
+        // TODO: determine and fill the signatureIndex and parameterIndex values for the AST 
+
         let error = false;
 
         const candidates = new Map<number, SignatureResolutionInfo>(
