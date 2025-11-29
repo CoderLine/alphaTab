@@ -65,15 +65,22 @@ export function resolveSignature(
     return resolved;
 }
 
-export function parameterToSyntax(parameter: ParameterDefinition) {
+export function parameterToSyntax(parameter: ParameterDefinition, onlyParameterNames: boolean) {
     let p: string = parameter.name;
-    switch (parameter.parseMode) {
-        case alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional:
-        case alphaTab.importer.alphaTex.ArgumentListParseTypesMode.OptionalAsFloat:
-            p += '?';
-            break;
+    if (!onlyParameterNames) {
+        switch (parameter.parseMode) {
+            case alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional:
+            case alphaTab.importer.alphaTex.ArgumentListParseTypesMode.OptionalAsFloat:
+                p += '?';
+                break;
+        }
+        p += `: ${nodeTypesToTypeDocs(parameter)}`;
+
+        if (parameter.defaultValue) {
+            p += ` = ${parameter.defaultValue}`;
+        }
     }
-    p += `: ${nodeTypesToTypeDocs(parameter)}`;
+
     return p;
 }
 

@@ -177,7 +177,7 @@ export type AlphaTexExample =
  */
 export interface MetadataTagDefinition extends WithSignatures {
     /**
-     * The metadata tag (excluding the backslash)
+     * The metadata tag (including the backslash)
      */
     tag: string;
 

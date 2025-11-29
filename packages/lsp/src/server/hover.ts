@@ -63,7 +63,7 @@ function createMetaDataHover(metaData: alphaTab.importer.alphaTex.AlphaTexMetaDa
         return {
             contents: {
                 kind: 'markdown',
-                value: withSignaturesToMarkdown(metaDataDocs, `\\${metaDataDocs.tag}`, 'Tag Syntax')
+                value: withSignaturesToMarkdown(metaDataDocs, metaDataDocs.tag, 'Tag Syntax')
             }
         };
     }
@@ -204,7 +204,7 @@ function withSignaturesToMarkdown(docs: WithSignatures, prefix: string, syntaxNa
         '',
         `**${syntaxName}:**`,
         '```alphatex',
-        ...docs.signatures.map((s, i) => `${prefix} ${signatureToSyntax(s, i)}`),
+        ...docs.signatures.map((s, i) => signatureToSyntax(prefix, s, i, docs.signatures.length > 1)),
         '```',
         '',
         signatureParametersToMarkdownTable(docs.signatures)
@@ -220,10 +220,10 @@ function signatureParametersToMarkdownTable(signatures: SignatureDefinition[]): 
               '| Name | Description | Type | Required |',
               '|------|-------------|------|----------|',
               ...signatures.flatMap((s, si) =>
-                  s.parameters.map(
-                      v =>
-                          `| \`${v.name}\` [^${si + 1}}] | ${(v.longDescription ?? v.shortDescription)?.replaceAll('\n', '<br />') ?? ''} | ${nodeTypesToSyntax(v)} | ${isRequiredParameter(v.parseMode) ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`
-                  )
+                  s.parameters.map(v => {
+                      const index = signatures.length > 1 ? `[^${si + 1}] ` : '';
+                      return `| \`${v.name}\` ${index}| ${(v.longDescription ?? v.shortDescription)?.replaceAll('\n', '<br />') ?? ''} | \`${nodeTypesToSyntax(v).replaceAll('|', '\\|')}\` | ${isRequiredParameter(v.parseMode) ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`;
+                  })
               )
           ].join('\n');
 }
@@ -232,14 +232,16 @@ function parameterValueDocsToMarkDown(docs: ParameterValueDefinition): string {
     return [`## ${docs.name}`, docs.longDescription ?? docs.shortDescription, ''].join('\n');
 }
 
-function signatureToSyntax(value: SignatureDefinition, index: number): string {
+function signatureToSyntax(prefix: string, value: SignatureDefinition, index: number, hasOverloads: boolean): string {
     let syntax = '';
 
-    if (value.description) {
-        syntax += `// ${value.description}`;
+    if (hasOverloads) {
+        syntax += `// [^${index + 1}]: ${value.description}\n`;
+    } else if (value.description) {
+        syntax += `//  ${value.description}\n`;
     }
 
-    syntax += `[^${index + 1}]: (${value.parameters.map(parameterToSyntax).join(', ')})`;
+    syntax += `${prefix} (${value.parameters.map(p => parameterToSyntax(p, true)).join(', ')})`;
 
     return syntax;
 }

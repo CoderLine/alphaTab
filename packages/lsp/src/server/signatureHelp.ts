@@ -180,7 +180,7 @@ function createArgumentsSignatureHelp(
 
 function createParameterInfo(signature: SignatureInformation, doc: ParameterDefinition) {
     const start = signature.label.length;
-    signature.label += parameterToSyntax(doc);
+    signature.label += parameterToSyntax(doc, false);
 
     const end = signature.label.length;
     signature.parameters!.push(ParameterInformation.create([start, end], doc.longDescription ?? doc.shortDescription));
