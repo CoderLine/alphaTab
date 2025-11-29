@@ -1,5 +1,5 @@
 // unfortunately the "old" alphaTex syntax had no strict delimiters
-// for values and properties. That's why we need to parse the properties exactly
+// for arguments and properties. That's why we need to parse the properties exactly
 // as needed for the identifiers. In an alphaTex2 we should make this parsing simpler.
 // the parser should not need to do that semantic checks, that's the importers job
 // but we emit "Hint" diagnostics for now.
@@ -264,7 +264,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         lookupList: Map<string, AlphaTexSignatureDefinition[] | null>[],
         parent: AlphaTexAstNode,
         tag: string,
-        values: AlphaTexArgumentList | undefined
+        args: AlphaTexArgumentList | undefined
     ): ApplyNodeResult | undefined {
         const lookup = lookupList.find(l => l.has(tag));
         if (!lookup) {
@@ -273,19 +273,19 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         const types = lookup.get(tag);
         if (!types) {
-            if (values) {
+            if (args) {
                 importer.addSemanticDiagnostic({
                     code: AlphaTexDiagnosticCode.AT300,
                     message: `Expected no arguments, but found some.`,
-                    start: values.start,
-                    end: values.end,
+                    start: args.start,
+                    end: args.end,
                     severity: AlphaTexDiagnosticsSeverity.Warning
                 });
             }
             return undefined;
         }
 
-        if (!this._validateArgumentTypes(importer, types, parent, values)) {
+        if (!this._validateArgumentTypes(importer, types, parent, args)) {
             return ApplyNodeResult.NotAppliedSemanticError;
         }
 
@@ -836,10 +836,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private static _handleAccidentalMode(importer: IAlphaTexImporter, values: AlphaTexArgumentList): ApplyNodeResult {
+    private static _handleAccidentalMode(importer: IAlphaTexImporter, args: AlphaTexArgumentList): ApplyNodeResult {
         const accidentalMode = AlphaTex1LanguageHandler._parseEnumValue(
             importer,
-            values,
+            args,
             'accidental mode',
             AlphaTex1EnumMappings.alphaTexAccidentalMode
         );
@@ -875,9 +875,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         importer: IAlphaTexImporter,
         signatures: AlphaTexSignatureDefinition[],
         parent: AlphaTexAstNode,
-        values: AlphaTexArgumentList | undefined
+        args: AlphaTexArgumentList | undefined
     ) {
-        if (!values) {
+        if (!args) {
             const hasEmptyParameterOverload = signatures.some(
                 c =>
                     c.parameters.length === 0 ||
@@ -895,7 +895,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
             importer.addSemanticDiagnostic({
                 code: AlphaTexDiagnosticCode.AT219,
-                message: `Error parsing arguments: no overload matched arguments ${AlphaTex1MetaDataReader.generateSignaturesFromValues(undefined)}. Signatures: ${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
+                message: `Error parsing arguments: no overload matched arguments ${AlphaTex1MetaDataReader.generateSignaturesFromArguments(undefined)}. Signatures: ${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: parent.start,
                 end: parent.end
@@ -903,7 +903,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return false;
         }
 
-        if (values.validated) {
+        if (args.validated) {
             return true;
         }
 
@@ -918,7 +918,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             ])
         );
 
-        if (values.validated) {
+        if (args.validated) {
             return true;
         }
 
@@ -931,7 +931,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             valueNode.parameterIndices.set(overloadIndex, overload.parameterIndex);
         }
 
-        for (const value of values.arguments) {
+        for (const value of args.arguments) {
             AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value, trackValue);
             if (candidates.size === 0) {
                 break;
@@ -944,15 +944,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (candidates.size === 0) {
             importer.addSemanticDiagnostic({
                 code: AlphaTexDiagnosticCode.AT219,
-                message: `Error parsing arguments: no overload matched arguments ${AlphaTex1MetaDataReader.generateSignaturesFromValues(values.arguments)}. Signatures:\n${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
+                message: `Error parsing arguments: no overload matched arguments ${AlphaTex1MetaDataReader.generateSignaturesFromArguments(args.arguments)}. Signatures:\n${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
-                start: values.start,
-                end: values.end
+                start: args.start,
+                end: args.end
             });
             error = true;
         }
         else {
-            values.signatureCandidateIndices = allCandidates;
+            args.signatureCandidateIndices = allCandidates;
         }
 
         return !error;
@@ -999,25 +999,25 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         style.textAlign = textAlign!;
     }
 
-    private _readTrackInstrument(importer: IAlphaTexImporter, track: Track, values: AlphaTexArgumentList) {
-        switch (values!.arguments[0].nodeType) {
+    private _readTrackInstrument(importer: IAlphaTexImporter, track: Track, args: AlphaTexArgumentList) {
+        switch (args!.arguments[0].nodeType) {
             case AlphaTexNodeType.Number:
-                const instrument = (values!.arguments[0] as AlphaTexNumberLiteral).value;
+                const instrument = (args!.arguments[0] as AlphaTexNumberLiteral).value;
                 if (instrument >= 0 && instrument <= 127) {
                     track.playbackInfo.program = instrument;
                 } else {
                     importer.addSemanticDiagnostic({
                         code: AlphaTexDiagnosticCode.AT211,
                         message: `Value is out of valid range. Allowed range: 0-127, Actual Value: ${instrument}`,
-                        start: values!.arguments[0].start,
-                        end: values!.arguments[0].end,
+                        start: args!.arguments[0].start,
+                        end: args!.arguments[0].end,
                         severity: AlphaTexDiagnosticsSeverity.Error
                     });
                 }
                 break;
             case AlphaTexNodeType.Ident:
             case AlphaTexNodeType.String:
-                const instrumentName = (values!.arguments[0] as AlphaTexTextNode).text.toLowerCase();
+                const instrumentName = (args!.arguments[0] as AlphaTexTextNode).text.toLowerCase();
                 if (instrumentName === 'percussion') {
                     for (const staff of track.staves) {
                         importer.applyStaffNoteKind(staff, AlphaTexStaffNoteKind.Articulation);
@@ -1090,12 +1090,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private static _booleanLikeValue(values: IAlphaTexArgumentValue[], i: number): boolean {
-        if (i >= values.length) {
+    private static _booleanLikeValue(args: IAlphaTexArgumentValue[], i: number): boolean {
+        if (i >= args.length) {
             return true;
         }
 
-        const v = values[i];
+        const v = args[i];
         switch (v.nodeType) {
             case AlphaTexNodeType.String:
             case AlphaTexNodeType.Ident:
@@ -2138,8 +2138,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         return ApplyNodeResult.NotAppliedUnrecognizedMarker;
     }
 
-    private static _toFinger(importer: IAlphaTexImporter, values: AlphaTexArgumentList): Fingers | undefined {
-        const value = (values.arguments[0] as AlphaTexNumberLiteral).value;
+    private static _toFinger(importer: IAlphaTexImporter, args: AlphaTexArgumentList): Fingers | undefined {
+        const value = (args.arguments[0] as AlphaTexNumberLiteral).value;
         switch (value) {
             case 1:
                 return Fingers.Thumb;
@@ -2155,17 +2155,17 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 importer.addSemanticDiagnostic({
                     code: AlphaTexDiagnosticCode.AT211,
                     message: `Value is out of valid range. Allowed range: 1-5, Actual Value: ${value}`,
-                    start: values!.arguments[0].start,
-                    end: values!.arguments[0].end,
+                    start: args!.arguments[0].start,
+                    end: args!.arguments[0].end,
                     severity: AlphaTexDiagnosticsSeverity.Error
                 });
                 return undefined;
         }
     }
 
-    private static _harmonicValue(values: AlphaTexArgumentList | undefined, harmonicValue: number): number {
-        if (values) {
-            harmonicValue = (values!.arguments[0] as AlphaTexNumberLiteral).value;
+    private static _harmonicValue(args: AlphaTexArgumentList | undefined, harmonicValue: number): number {
+        if (args) {
+            harmonicValue = (args!.arguments[0] as AlphaTexNumberLiteral).value;
         }
         return harmonicValue;
     }
@@ -2173,28 +2173,28 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     private _getBendPoints(
         importer: IAlphaTexImporter,
         p: AlphaTexPropertyNode,
-        valueStartIndex: number,
+        argStartIndex: number,
         exact: boolean
     ): BendPoint[] | undefined {
-        let values = p.arguments!.arguments;
-        let remainingValues = values.length - valueStartIndex;
+        let args = p.arguments!.arguments;
+        let remainingArgs = args.length - argStartIndex;
         let errorNode: AlphaTexAstNode = p.arguments!;
 
         // unwrap value list
-        if (remainingValues > 0 && values[valueStartIndex].nodeType === AlphaTexNodeType.Arguments) {
-            values = (values[valueStartIndex] as AlphaTexArgumentList).arguments;
-            valueStartIndex = 0;
-            remainingValues = values.length;
-            errorNode = values[valueStartIndex] as AlphaTexAstNode;
+        if (remainingArgs > 0 && args[argStartIndex].nodeType === AlphaTexNodeType.Arguments) {
+            args = (args[argStartIndex] as AlphaTexArgumentList).arguments;
+            argStartIndex = 0;
+            remainingArgs = args.length;
+            errorNode = args[argStartIndex] as AlphaTexAstNode;
         }
 
-        const valuesPerItem = exact ? 2 : 1;
-        if (remainingValues % valuesPerItem !== 0) {
-            const pointCount = Math.ceil(remainingValues / valuesPerItem);
-            const neededValues = pointCount * valuesPerItem;
+        const argsPerItem = exact ? 2 : 1;
+        if (remainingArgs % argsPerItem !== 0) {
+            const pointCount = Math.ceil(remainingArgs / argsPerItem);
+            const neededArgs = pointCount * argsPerItem;
             importer.addSemanticDiagnostic({
                 code: AlphaTexDiagnosticCode.AT214,
-                message: `The '${p.property.text}' effect needs ${valuesPerItem} values per item. With ${pointCount} points, ${neededValues} values are needed, only ${remainingValues} values found.`,
+                message: `The '${p.property.text}' effect needs ${argsPerItem} arguments per item. With ${pointCount} points, ${neededArgs} arguments are needed, only ${remainingArgs} arguments found.`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: errorNode!.end,
                 end: errorNode!.end
@@ -2203,16 +2203,16 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         const points: BendPoint[] = [];
-        let vi = valueStartIndex;
-        while (vi < values.length) {
+        let vi = argStartIndex;
+        while (vi < args.length) {
             let offset = 0;
             let value = 0;
             if (exact) {
-                offset = (values[vi++] as AlphaTexNumberLiteral).value;
-                value = (values[vi++] as AlphaTexNumberLiteral).value;
+                offset = (args[vi++] as AlphaTexNumberLiteral).value;
+                value = (args[vi++] as AlphaTexNumberLiteral).value;
             } else {
                 offset = 0;
-                value = (values[vi++] as AlphaTexNumberLiteral).value;
+                value = (args[vi++] as AlphaTexNumberLiteral).value;
             }
             points.push(new BendPoint(offset, value));
         }

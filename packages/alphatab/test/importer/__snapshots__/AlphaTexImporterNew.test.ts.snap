@@ -863,7 +863,7 @@ Array [
       "line": 1,
       "offset": 8,
     },
-    "message": "Missing values. Expected following values: required(NumberLiteral)",
+    "message": "Missing arguments. Expected following arguments: required(NumberLiteral)",
     "severity": 2,
     "start": Object {
       "col": 9,
@@ -887,7 +887,7 @@ Array [
       "line": 1,
       "offset": 9,
     },
-    "message": "Missing values. Expected following values: required(NumberLiteral)",
+    "message": "Missing arguments. Expected following arguments: required(NumberLiteral)",
     "severity": 2,
     "start": Object {
       "col": 10,
@@ -911,7 +911,7 @@ Array [
       "line": 1,
       "offset": 9,
     },
-    "message": "Missing values. Expected following values: required(StringLiteral|Identifier)",
+    "message": "Missing arguments. Expected following arguments: required(StringLiteral|Identifier)",
     "severity": 2,
     "start": Object {
       "col": 10,

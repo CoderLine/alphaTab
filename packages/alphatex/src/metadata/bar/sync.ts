@@ -13,7 +13,7 @@ export const sync: MetadataTagDefinition = {
 
         It is recommended to add the sync points at the very end of the song but it is also possible to define them inbetween.
 
-        The \`barIndex\`, \`occurence\`, \`ratioPosition\` values define the absolute position within the music sheet. The millisecondOffset defines the absolute position within the external media.
+        The \`barIndex\`, \`occurence\`, \`ratioPosition\` parameters define the absolute position within the music sheet. The millisecondOffset defines the absolute position within the external media.
 
         With this information known, alphaTab can synchronize the external media with the music sheet.
     `,

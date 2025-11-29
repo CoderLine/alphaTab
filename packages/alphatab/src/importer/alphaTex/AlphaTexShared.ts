@@ -142,7 +142,7 @@ export enum AlphaTexDiagnosticCode {
     AT209 = 209,
 
     /**
-     * Missing values. Expected following values: %s
+     * Missing arguments. Expected following arguments: %s
      */
     AT210 = 210,
 
@@ -162,7 +162,7 @@ export enum AlphaTexDiagnosticCode {
     AT213 = 213,
 
     /**
-     * The '%s' effect needs %s values per item. With %s points, %s values are needed, only %s values found.
+     * The '%s' effect needs %s arguments per item. With %s points, %s arguments are needed, only %s arguments found.
      */
     AT214 = 214,
 
@@ -197,17 +197,17 @@ export enum AlphaTexDiagnosticCode {
     AT300 = 300,
 
     /**
-     * Metadata values should be wrapped into parenthesis.
+     * Metadata arguments should be wrapped into parenthesis.
      */
     AT301 = 301,
 
     /**
-     * Metadata values should be placed before metadata properties.
+     * Metadata arguments should be placed before metadata properties.
      */
     AT302 = 302,
 
     /**
-     * Property values should be wrapped into parenthesis.
+     * Property arguments should be wrapped into parenthesis.
      */
     AT303 = 303,
 

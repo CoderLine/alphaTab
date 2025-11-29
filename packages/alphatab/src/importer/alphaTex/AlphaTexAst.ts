@@ -228,7 +228,7 @@ export interface AlphaTexStringLiteral extends AlphaTexTextNode, IAlphaTexArgume
 }
 
 /**
- * Base marker interface for nodes which can be values in an {@link AlphaTexArgumentList}
+ * Base marker interface for nodes which can be arguments in an {@link AlphaTexArgumentList}
  * @public
  */
 export interface IAlphaTexArgumentValue extends IAlphaTexAstNode {
@@ -244,7 +244,7 @@ export interface IAlphaTexArgumentValue extends IAlphaTexAstNode {
 }
 
 /**
- * A node holding multiple values optionally grouped by parenthesis.
+ * A node holding multiple arguments optionally grouped by parenthesis.
  * Whether parenthesis are needed depends on the context.
  * Used in contexts like bend effects `3.3{b (0 4)}`.
  * @record
@@ -253,15 +253,15 @@ export interface IAlphaTexArgumentValue extends IAlphaTexAstNode {
 export interface AlphaTexArgumentList extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.Arguments;
     /**
-     * The open parenthesis token grouping the values.
+     * The open parenthesis token grouping the arguments.
      */
     openParenthesis?: AlphaTexParenthesisOpenTokenNode;
     /**
-     * The list of values.
+     * The list of arguments.
      */
     arguments: IAlphaTexArgumentValue[];
     /**
-     * The close parenthesis token grouping the values.
+     * The close parenthesis token grouping the arguments.
      */
     closeParenthesis?: AlphaTexParenthesisCloseTokenNode;
 
@@ -275,14 +275,14 @@ export interface AlphaTexArgumentList extends AlphaTexAstNode {
     /**
      * A list of indices to signatures which were selected as candidates matching
      * this argument list.
-     * Theses values can be used to lookup the respective signature definition in
+     * These values can be used to lookup the respective signature definition in
      * the documentation or alphaTex language definition.
      */
     signatureCandidateIndices?: number[];
 }
 
 /**
- * A metadata tag with optional values and optional properties like:
+ * A metadata tag with optional arguments and optional properties like:
  * `\track "Name" {color "#F00"}` .
  * @record
  * @public
@@ -305,11 +305,11 @@ export interface AlphaTexMetaDataNode extends AlphaTexAstNode {
     properties?: AlphaTexPropertiesNode;
 
     /**
-     * Whether the properties are listed before the values (if both are present).
+     * Whether the properties are listed before the arguments (if both are present).
      * This information serves backwards compatibility.
      * @internal
      */
-    propertiesBeforeValues: boolean;
+    propertiesBeforeArguments: boolean;
 }
 
 /**
@@ -335,7 +335,7 @@ export interface AlphaTexPropertiesNode extends AlphaTexAstNode {
 }
 
 /**
- * A node describing a property with attached values.
+ * A node describing a property with attached arguments.
  * @record
  * @public
  */

@@ -39,7 +39,7 @@ export class Atnf {
 
     public static meta(
         tag: string,
-        values?: AlphaTexArgumentList,
+        args?: AlphaTexArgumentList,
         properties?: AlphaTexPropertiesNode
     ): AlphaTexMetaDataNode {
         return {
@@ -54,9 +54,9 @@ export class Atnf {
                     text: tag
                 } as AlphaTexIdentifier
             } as AlphaTexMetaDataTagNode,
-            arguments: values,
+            arguments: args,
             properties,
-            propertiesBeforeValues: false
+            propertiesBeforeArguments: false
         } as AlphaTexMetaDataNode;
     }
 
@@ -69,12 +69,12 @@ export class Atnf {
     }
 
     public static args(
-        values: (IAlphaTexArgumentValue | undefined)[],
+        args: (IAlphaTexArgumentValue | undefined)[],
         parentheses: boolean | undefined = undefined
     ): AlphaTexArgumentList | undefined {
         const valueList = {
             nodeType: AlphaTexNodeType.Arguments,
-            arguments: values.filter(v => v !== undefined)
+            arguments: args.filter(v => v !== undefined)
         } as AlphaTexArgumentList;
 
         const addParenthesis: boolean = parentheses === undefined ? valueList.arguments.length > 1 : parentheses;
@@ -134,11 +134,11 @@ export class Atnf {
         return node;
     }
 
-    public static prop(properties: AlphaTexPropertyNode[], identifier: string, values?: AlphaTexArgumentList) {
+    public static prop(properties: AlphaTexPropertyNode[], identifier: string, args?: AlphaTexArgumentList) {
         properties.push({
             nodeType: AlphaTexNodeType.Prop,
             property: Atnf.ident(identifier),
-            arguments: values
+            arguments: args
         });
     }
 }

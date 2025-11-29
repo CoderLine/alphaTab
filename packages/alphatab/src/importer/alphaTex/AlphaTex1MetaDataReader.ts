@@ -37,7 +37,7 @@ export interface SignatureResolutionInfo {
 export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
     public static readonly instance = new AlphaTex1MetaDataReader();
 
-    public readMetaDataValues(
+    public readMetaDataArguments(
         parser: AlphaTexParser,
         metaData: AlphaTexMetaDataTagNode
     ): AlphaTexArgumentList | undefined {
@@ -64,7 +64,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         return undefined;
     }
 
-    public readMetaDataPropertyValues(
+    public readMetaDataPropertyArguments(
         parser: AlphaTexParser,
         metaData: AlphaTexMetaDataTagNode,
         property: AlphaTexPropertyNode
@@ -77,21 +77,21 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         return this._readPropertyArguments(parser, [props], property);
     }
 
-    public readBeatPropertyValues(
+    public readBeatPropertyArguments(
         parser: AlphaTexParser,
         property: AlphaTexPropertyNode
     ): AlphaTexArgumentList | undefined {
         return this._readPropertyArguments(parser, [AlphaTex1LanguageDefinitions.beatProperties], property);
     }
 
-    public readDurationChangePropertyValues(
+    public readDurationChangePropertyArguments(
         parser: AlphaTexParser,
         property: AlphaTexPropertyNode
     ): AlphaTexArgumentList | undefined {
         return this._readPropertyArguments(parser, [AlphaTex1LanguageDefinitions.durationChangeProperties], property);
     }
 
-    public readNotePropertyValues(
+    public readNotePropertyArguments(
         parser: AlphaTexParser,
         property: AlphaTexPropertyNode
     ): AlphaTexArgumentList | undefined {
@@ -139,7 +139,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             return undefined;
         }
 
-        const values: IAlphaTexArgumentValue[] = [];
+        const argValues: IAlphaTexArgumentValue[] = [];
         const valueListStart = parser.lexer.peekToken()?.start;
         const parseRemaining = endOfListTypes !== undefined;
 
@@ -165,7 +165,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                             v.parameterIndices = new Map<number, number>();
                         }
                         v.parameterIndices.set(overloadIndex, candidate.parameterIndex);
-                        values.push(v);
+                        argValues.push(v);
                     }
                 }
             } else {
@@ -174,8 +174,8 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                     valueNode.parameterIndices = new Map<number, number>();
                 }
                 valueNode.parameterIndices.set(overloadIndex, candidate.parameterIndex);
-                if (values[values.length - 1] !== valueNode) {
-                    values.push(valueNode);
+                if (argValues[argValues.length - 1] !== valueNode) {
+                    argValues.push(valueNode);
                     parser.lexer.advance();
                 }
             }
@@ -214,12 +214,12 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 });
                 error = true;
             } else if (candidates.size === 0) {
-                if (!eof && values.length === 0) {
-                    values.push(parser.lexer.peekToken()!);
+                if (!eof && argValues.length === 0) {
+                    argValues.push(parser.lexer.peekToken()!);
                 }
                 parser.addParserDiagnostic({
                     code: AlphaTexDiagnosticCode.AT219,
-                    message: `Error parsing arguments: no overload matched arguments ${AlphaTex1MetaDataReader.generateSignaturesFromValues(values)}. Signatures:\n${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
+                    message: `Error parsing arguments: no overload matched arguments ${AlphaTex1MetaDataReader.generateSignaturesFromArguments(argValues)}. Signatures:\n${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: valueListStart,
                     end: parser.lexer.previousTokenEndLocation()
@@ -228,12 +228,12 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             }
         }
 
-        // read remaining values user might have supplied
+        // read remaining args user might have supplied
         if (parseRemaining) {
             let remaining = parser.lexer.peekToken();
             while (remaining && !endOfListTypes!.has(remaining.nodeType)) {
                 if (AlphaTex1MetaDataReader._handleTypeValueListItem(remaining, undefined, extendToFloat)) {
-                    values.push(remaining);
+                    argValues.push(remaining);
                     parser.lexer.advance();
                     remaining = parser.lexer.peekToken();
                 } else {
@@ -242,11 +242,11 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             }
         }
 
-        if (values.length === 0) {
+        if (argValues.length === 0) {
             return undefined;
         }
 
-        const valueList = Atnf.args(values, false)!;
+        const valueList = Atnf.args(argValues, false)!;
         valueList.start = valueListStart;
         valueList.end = parser.lexer.previousTokenEndLocation();
         valueList.validated = !error;
@@ -286,11 +286,11 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         }
     }
 
-    public static generateSignaturesFromValues(values: IAlphaTexArgumentValue[] | undefined) {
-        if (!values) {
+    public static generateSignaturesFromArguments(args: IAlphaTexArgumentValue[] | undefined) {
+        if (!args) {
             return '()';
         }
-        return `(${values.map(v => AlphaTexNodeType[v.nodeType]).join(', ')})`;
+        return `(${args.map(v => AlphaTexNodeType[v.nodeType]).join(', ')})`;
     }
 
     public static generateSignatures(signatures: AlphaTexSignatureDefinition[], ambiguousOverloads?: Set<number>) {

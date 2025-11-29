@@ -5561,7 +5561,7 @@ Array [
   Map {
     "code" => 210,
     "severity" => 2,
-    "message" => "Missing values. Expected following values: required(Number)",
+    "message" => "Missing arguments. Expected following arguments: required(Number)",
     "start" => Map {
       "col" => 9,
       "line" => 1,
@@ -5580,7 +5580,7 @@ Array [
   Map {
     "code" => 210,
     "severity" => 2,
-    "message" => "Missing values. Expected following values: required(Number)",
+    "message" => "Missing arguments. Expected following arguments: required(Number)",
     "start" => Map {
       "col" => 10,
       "line" => 1,
@@ -5599,7 +5599,7 @@ Array [
   Map {
     "code" => 210,
     "severity" => 2,
-    "message" => "Missing values. Expected following values: required(String|Ident)",
+    "message" => "Missing arguments. Expected following arguments: required(String|Ident)",
     "start" => Map {
       "col" => 10,
       "line" => 1,

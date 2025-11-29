@@ -241,7 +241,7 @@ class AlphaTexPrinter {
         this._writeValue(m.tag.tag);
 
         let newLineAfterMeta = true;
-        if (m.propertiesBeforeValues) {
+        if (m.propertiesBeforeArguments) {
             if (m.properties) {
                 this._writer.write(' ');
                 this._writeProperties(m.properties, false);

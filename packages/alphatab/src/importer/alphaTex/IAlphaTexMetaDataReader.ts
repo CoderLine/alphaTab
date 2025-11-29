@@ -9,20 +9,20 @@ import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/Alpha
  * @internal
  */
 export interface IAlphaTexMetaDataReader {
-    readMetaDataValues(parser: AlphaTexParser, metaData: AlphaTexMetaDataTagNode): AlphaTexArgumentList | undefined;
+    readMetaDataArguments(parser: AlphaTexParser, metaData: AlphaTexMetaDataTagNode): AlphaTexArgumentList | undefined;
 
-    readMetaDataPropertyValues(
+    readMetaDataPropertyArguments(
         parser: AlphaTexParser,
         metaData: AlphaTexMetaDataTagNode,
         property: AlphaTexPropertyNode
     ): AlphaTexArgumentList | undefined;
 
-    readBeatPropertyValues(parser: AlphaTexParser, property: AlphaTexPropertyNode): AlphaTexArgumentList | undefined;
+    readBeatPropertyArguments(parser: AlphaTexParser, property: AlphaTexPropertyNode): AlphaTexArgumentList | undefined;
 
-    readDurationChangePropertyValues(
+    readDurationChangePropertyArguments(
         parser: AlphaTexParser,
         property: AlphaTexPropertyNode
     ): AlphaTexArgumentList | undefined;
 
-    readNotePropertyValues(parser: AlphaTexParser, property: AlphaTexPropertyNode): AlphaTexArgumentList | undefined;
+    readNotePropertyArguments(parser: AlphaTexParser, property: AlphaTexPropertyNode): AlphaTexArgumentList | undefined;
 }

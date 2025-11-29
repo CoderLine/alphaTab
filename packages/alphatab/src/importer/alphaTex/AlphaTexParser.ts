@@ -208,7 +208,7 @@ export class AlphaTexParser {
             this._beatMultiplier(beat);
 
             beat.beatEffects = this._properties(property =>
-                this._metaDataReader.readBeatPropertyValues(this, property)
+                this._metaDataReader.readBeatPropertyArguments(this, property)
             );
 
             if (beat.beatMultiplierValue !== undefined && beat.beatEffects?.openBrace) {
@@ -292,7 +292,7 @@ export class AlphaTexParser {
             durationChange.value = durationValue as AlphaTexNumberLiteral;
 
             durationChange.properties = this._properties(property =>
-                this._metaDataReader.readDurationChangePropertyValues(this, property)
+                this._metaDataReader.readDurationChangePropertyArguments(this, property)
             );
         } finally {
             durationChange.end = this.lexer.previousTokenEndLocation();
@@ -473,7 +473,7 @@ export class AlphaTexParser {
             }
 
             note.noteEffects = this._properties(property =>
-                this._metaDataReader.readNotePropertyValues(this, property)
+                this._metaDataReader.readNotePropertyArguments(this, property)
             );
         } finally {
             note.end = this.lexer.previousTokenEndLocation();
@@ -493,27 +493,27 @@ export class AlphaTexParser {
             tag: tag as AlphaTexMetaDataTagNode,
             start: tag.start,
             properties: undefined,
-            propertiesBeforeValues: false
+            propertiesBeforeArguments: false
         };
         this.lexer.advance();
         metaDataList.push(metaData);
 
         try {
-            // properties can be before or after the values, this is a again a historical
+            // properties can be before or after the arguments, this is a again a historical
             // inconsistency on chords
             const braceCandidate = this.lexer.peekToken();
             if (braceCandidate?.nodeType === AlphaTexNodeType.LBrace) {
-                metaData.propertiesBeforeValues = true;
+                metaData.propertiesBeforeArguments = true;
                 metaData.properties = this._properties(property =>
-                    this._metaDataReader.readMetaDataPropertyValues(this, metaData.tag, property)
+                    this._metaDataReader.readMetaDataPropertyArguments(this, metaData.tag, property)
                 );
                 metaData.arguments = this.argumentList();
                 if (!metaData.arguments) {
-                    metaData.arguments = this._metaDataReader.readMetaDataValues(this, metaData.tag);
+                    metaData.arguments = this._metaDataReader.readMetaDataArguments(this, metaData.tag);
                     if (metaData.arguments && metaData.arguments.arguments.length > 1) {
                         this.addParserDiagnostic({
                             code: AlphaTexDiagnosticCode.AT301,
-                            message: `Metadata values should be wrapped into parenthesis.`,
+                            message: `Metadata arguments should be wrapped into parenthesis.`,
                             severity: AlphaTexDiagnosticsSeverity.Warning,
                             start: metaData.arguments?.start ?? metaData.start,
                             end: metaData.arguments?.end ?? metaData.end
@@ -521,7 +521,7 @@ export class AlphaTexParser {
 
                         this.addParserDiagnostic({
                             code: AlphaTexDiagnosticCode.AT302,
-                            message: `Metadata values should be placed before metadata properties.`,
+                            message: `Metadata arguments should be placed before metadata properties.`,
                             severity: AlphaTexDiagnosticsSeverity.Warning,
                             start: metaData.arguments?.start ?? metaData.start,
                             end: metaData.arguments?.end ?? metaData.end
@@ -531,11 +531,11 @@ export class AlphaTexParser {
             } else {
                 metaData.arguments = this.argumentList();
                 if (!metaData.arguments) {
-                    metaData.arguments = this._metaDataReader.readMetaDataValues(this, metaData.tag);
+                    metaData.arguments = this._metaDataReader.readMetaDataArguments(this, metaData.tag);
                     if (metaData.arguments && metaData.arguments.arguments.length > 1) {
                         this.addParserDiagnostic({
                             code: AlphaTexDiagnosticCode.AT301,
-                            message: `Metadata values should be wrapped into parenthesis.`,
+                            message: `Metadata arguments should be wrapped into parenthesis.`,
                             severity: AlphaTexDiagnosticsSeverity.Warning,
                             start: metaData.arguments?.start ?? metaData.start,
                             end: metaData.arguments?.end ?? metaData.end
@@ -544,7 +544,7 @@ export class AlphaTexParser {
                 }
 
                 metaData.properties = this._properties(property =>
-                    this._metaDataReader.readMetaDataPropertyValues(this, metaData.tag, property)
+                    this._metaDataReader.readMetaDataPropertyArguments(this, metaData.tag, property)
                 );
             }
         } finally {
@@ -554,7 +554,7 @@ export class AlphaTexParser {
     }
 
     private _properties(
-        readPropertyValues: (property: AlphaTexPropertyNode) => AlphaTexArgumentList | undefined
+        readPropertyArgs: (property: AlphaTexPropertyNode) => AlphaTexArgumentList | undefined
     ): AlphaTexPropertiesNode | undefined {
         const braceOpen = this.lexer.peekToken();
         if (!braceOpen || braceOpen.nodeType !== AlphaTexNodeType.LBrace) {
@@ -573,7 +573,7 @@ export class AlphaTexParser {
         try {
             let token = this.lexer.peekToken();
             while (token?.nodeType === AlphaTexNodeType.Ident) {
-                properties.properties.push(this._property(token as AlphaTexIdentifier, readPropertyValues));
+                properties.properties.push(this._property(token as AlphaTexIdentifier, readPropertyArgs));
                 token = this.lexer.peekToken();
             }
 
@@ -599,7 +599,7 @@ export class AlphaTexParser {
 
     private _property(
         identifier: AlphaTexIdentifier,
-        readPropertyValues: (property: AlphaTexPropertyNode) => AlphaTexArgumentList | undefined
+        readPropertyArgs: (property: AlphaTexPropertyNode) => AlphaTexArgumentList | undefined
     ): AlphaTexPropertyNode {
         const property: AlphaTexPropertyNode = {
             nodeType: AlphaTexNodeType.Prop,
@@ -612,11 +612,11 @@ export class AlphaTexParser {
         try {
             property.arguments = this.argumentList();
             if (!property.arguments) {
-                property.arguments = readPropertyValues(property);
+                property.arguments = readPropertyArgs(property);
                 if (property.arguments && property.arguments.arguments.length > 1) {
                     this.addParserDiagnostic({
                         code: AlphaTexDiagnosticCode.AT303,
-                        message: 'Property values should be wrapped into parenthesis.',
+                        message: 'Property args should be wrapped into parenthesis.',
                         severity: AlphaTexDiagnosticsSeverity.Warning,
                         start: property.arguments.start,
                         end: property.arguments.end
