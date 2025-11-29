@@ -322,9 +322,9 @@ class AlphaTexPrinter {
         this._writeComments(p.leadingComments);
 
         this._writeValue(p.property);
-        if (p.values) {
+        if (p.arguments) {
             this._writer.write(' ');
-            this._writeValues(p.values);
+            this._writeValues(p.arguments);
         }
 
         this._writeComments(p.trailingComments);

@@ -32,7 +32,8 @@ export const section: MetadataTagDefinition = {
                     shortDescription: 'The text/description of the new section',
                     type: AlphaTexNodeType.String,
                     allowAllStringTypes: true,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Required,
+                    reservedIdentifiers: ['x', '-', 'r']
                 }
             ]
         }

@@ -16,6 +16,8 @@ import {
     type AlphaTexMappedEnumMappingEntry,
     type AlphaTexMappedEnumName
 } from '@coderline/alphatab-alphatex/enum';
+import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 type LanguageDefinitionsVisitorContext = {
     foundDefinitions: boolean;
@@ -31,20 +33,53 @@ type LanguageDefinitionsVisitorContext = {
 
 function createAlphaTexParameterDefinition(e: ParameterDefinition) {
     const typeArray = Array.isArray(e.type) ? e.type : [e.type];
+    if (e.allowAllStringTypes) {
+        switch (typeArray[0]) {
+            case AlphaTexNodeType.Ident:
+                typeArray.push(AlphaTexNodeType.String);
+                break;
+            case AlphaTexNodeType.String:
+                typeArray.push(AlphaTexNodeType.Ident);
+                break;
+        }
+    }
+    if (e.parseMode === ArgumentListParseTypesMode.RequiredAsValueList) {
+        typeArray.push(AlphaTexNodeType.Arguments);
+    }
 
-    return ts.factory.createArrayLiteralExpression([
+    const args: ts.Expression[] = [
         ts.factory.createArrayLiteralExpression(typeArray.map(t => ts.factory.createNumericLiteral(t))),
-        ts.factory.createNumericLiteral(e.parseMode),
-        ts.factory.createArrayLiteralExpression(
-            e.values && !e.valuesOnlyForCompletion
-                ? e.values.map(v => ts.factory.createStringLiteral(v.name.toLowerCase()))
-                : undefined
-        )
-    ]);
+        ts.factory.createNumericLiteral(e.parseMode)
+    ];
+
+    if (e.values && !e.valuesOnlyForCompletion) {
+        args.push(
+            ts.factory.createArrayLiteralExpression(
+                e.values.map(v => ts.factory.createStringLiteral(v.name.toLowerCase()))
+            )
+        );
+    }
+
+    if (e.reservedIdentifiers) {
+        if (args.length === 2) {
+            args.push(ts.factory.createNull());
+        }
+        args.push(
+            ts.factory.createArrayLiteralExpression(
+                e.reservedIdentifiers.map(v => ts.factory.createStringLiteral(v.toLowerCase()))
+            )
+        );
+    }
+
+    return ts.factory.createArrayLiteralExpression(args);
 }
 
 function createAlphaTexSignatureDefinition(e: SignatureDefinition) {
-    return ts.factory.createArrayLiteralExpression(e.parameters.map(createAlphaTexParameterDefinition));
+    const params: ts.Expression[] = [...e.parameters.map(createAlphaTexParameterDefinition)];
+    if (e.strict) {
+        params.unshift(ts.factory.createNull());
+    }
+    return ts.factory.createArrayLiteralExpression(params);
 }
 
 function updateMetaDataSignatures(element: ts.PropertyDeclaration, definitions: MetadataTagDefinition[]) {

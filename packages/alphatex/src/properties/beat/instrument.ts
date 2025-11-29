@@ -21,13 +21,14 @@ export const instrument: PropertyDefinition = {
             ]
         },
         {
-            description: 'Set the midi instrument as midi program name (string)',
+            description: 'Set the midi instrument as midi program name',
             parameters: [
                 {
                     name: 'programName',
                     shortDescription: 'MIDI program name',
                     parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.String,
+                    allowAllStringTypes: true,
                     valuesOnlyForCompletion: true,
                     values: generalMidiInstruments.map(v => ({
                         name: v,

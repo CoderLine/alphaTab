@@ -20,6 +20,7 @@ export const ts: MetadataTagDefinition = {
                     shortDescription: '',
                     type: AlphaTexNodeType.Ident,
                     parseMode: ArgumentListParseTypesMode.Required,
+                    allowAllStringTypes: true,
                     values: [
                         {
                             name: 'common',

@@ -58,6 +58,7 @@ export type AlphaTexMappedEnumMappingEntry =
     | (Pick<ParameterValueDefinition, 'shortDescription' | 'longDescription' | 'snippet'> &
           Partial<ParameterValueDefinition> & {
               aliases?: string[];
+              allowNumeric?: boolean;
           })
     | null;
 
@@ -355,47 +356,54 @@ export const alphaTexMappedEnumMapping: {
         }
     },
     Clef: {
-        Neutral: { snippet: 'neutral', shortDescription: '', aliases: ['n'] },
-        C3: { snippet: 'c3', shortDescription: '', aliases: ['alto'] },
-        C4: { snippet: 'c4', shortDescription: '', aliases: ['tenor'] },
-        F4: { snippet: 'f4', shortDescription: '', aliases: ['bass'] },
-        G2: { snippet: 'g2', shortDescription: '', aliases: ['treble'] }
+        Neutral: { snippet: 'neutral', shortDescription: '', aliases: ['n'], allowNumeric: true },
+        C3: { snippet: 'c3', shortDescription: '', aliases: ['alto'], allowNumeric: true },
+        C4: { snippet: 'c4', shortDescription: '', aliases: ['tenor'], allowNumeric: true },
+        F4: { snippet: 'f4', shortDescription: '', aliases: ['bass'], allowNumeric: true },
+        G2: { snippet: 'g2', shortDescription: '', aliases: ['treble'], allowNumeric: true }
     },
     TripletFeel: {
         NoTripletFeel: {
             snippet: 'none',
             shortDescription: 'No triplet feel',
-            aliases: ['none', 'no']
+            aliases: ['none', 'no', 'noTripletFeel'],
+            allowNumeric: true
         },
         Triplet16th: {
             snippet: 'triplet16th',
             shortDescription: 'Triplet 16th',
-            aliases: ['t16', 'triplet-16th']
+            aliases: ['t16', 'triplet-16th'],
+            allowNumeric: true
         },
         Triplet8th: {
             snippet: 'triplet8th',
             shortDescription: 'Triplet 8th',
-            aliases: ['t8', 'triplet-8th']
+            aliases: ['t8', 'triplet-8th'],
+            allowNumeric: true
         },
         Dotted16th: {
             snippet: 'dotted16th',
             shortDescription: 'Dotted 16th',
-            aliases: ['d16', 'dotted-16th']
+            aliases: ['d16', 'dotted-16th'],
+            allowNumeric: true
         },
         Dotted8th: {
             snippet: 'dotted8th',
             shortDescription: 'Dotted 8th',
-            aliases: ['d8', 'dotted-8th']
+            aliases: ['d8', 'dotted-8th'],
+            allowNumeric: true
         },
         Scottish16th: {
             snippet: 'scottish16th',
             shortDescription: 'Scottish 16th',
-            aliases: ['s16', 'scottish-16th']
+            aliases: ['s16', 'scottish-16th'],
+            allowNumeric: true
         },
         Scottish8th: {
             snippet: 'scottish8th',
             shortDescription: 'Scottish 8th',
-            aliases: ['s8', 'scottish-8th']
+            aliases: ['s8', 'scottish-8th'],
+            allowNumeric: true
         }
     },
     BarLineStyle: {
@@ -456,22 +464,39 @@ export const alphaTexMappedEnumMapping: {
 
 export function enumParameter<TType extends AlphaTexMappedEnumName>(type: TType) {
     const mapping = alphaTexMappedEnumMapping[type] as Record<string, AlphaTexMappedEnumMappingEntry>;
+    const allowNumeric = Object.values(mapping).some(v => v?.allowNumeric);
     return {
-        type: AlphaTexNodeType.Ident,
+        type: allowNumeric ? [AlphaTexNodeType.Ident, AlphaTexNodeType.Number] : AlphaTexNodeType.Ident,
         allowAllStringTypes: true,
-        values: Object.values(mapping)
-            .map(val =>
-                val === null
-                    ? null
-                    : ({
-                          name: val.snippet,
-                          snippet: val.snippet,
-                          shortDescription: val.shortDescription,
-                          deprecated: val.deprecated,
-                          longDescription: val.longDescription,
-                          skip: val.skip
-                      } satisfies ParameterValueDefinition)
-            )
-            .filter(f => f !== null)
+        values: [
+            ...Object.values(mapping)
+                .filter(f => f !== null)
+                .map(
+                    val =>
+                        ({
+                            name: val.snippet,
+                            snippet: val.snippet,
+                            shortDescription: val.shortDescription,
+                            deprecated: val.deprecated,
+                            longDescription: val.longDescription,
+                            skip: val.skip
+                        }) satisfies ParameterValueDefinition
+                ),
+            ...Object.values(mapping)
+                .filter(f => f !== null && f.aliases)
+                .flatMap(val =>
+                    val!.aliases!.map(
+                        a =>
+                            ({
+                                name: a,
+                                snippet: a,
+                                shortDescription: val!.shortDescription,
+                                deprecated: val!.deprecated,
+                                longDescription: val!.longDescription,
+                                skip: val!.skip
+                            }) satisfies ParameterValueDefinition
+                    )
+                )
+        ]
     };
 }

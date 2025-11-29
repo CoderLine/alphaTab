@@ -142,12 +142,13 @@ export const articulation: MetadataTagDefinition = {
                     name: 'name',
                     parseMode: ArgumentListParseTypesMode.Required,
                     type: AlphaTexNodeType.String,
+                    allowAllStringTypes: true,
                     shortDescription: 'The string used in the note values'
                 },
                 {
                     name: 'value',
                     parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Ident,
+                    type: AlphaTexNodeType.Number,
                     shortDescription: 'The numeric value of the built-in articulation'
                 }
             ]

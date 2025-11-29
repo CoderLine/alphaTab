@@ -497,7 +497,7 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                     children.push(['tag', metaData.tag]);
                 }
                 if (metaData.arguments) {
-                    children.push(['values', metaData.arguments]);
+                    children.push(['arguments', metaData.arguments]);
                 }
                 if (metaData.properties) {
                     children.push(['properties', metaData.properties]);
@@ -510,7 +510,7 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                     children.push(['openParenthesis', valueList.openParenthesis]);
                 }
                 if (valueList.arguments) {
-                    children.push(['values', valueList.arguments]);
+                    children.push(['arguments', valueList.arguments]);
                 }
                 if (valueList.closeParenthesis) {
                     children.push(['closeParenthesis', valueList.closeParenthesis]);
@@ -534,8 +534,8 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 if (property.property) {
                     children.push(['property', property.property]);
                 }
-                if (property.values) {
-                    children.push(['properties', property.values]);
+                if (property.arguments) {
+                    children.push(['properties', property.arguments]);
                 }
                 break;
             // case AlphaTexNodeType.NumberLiteral:

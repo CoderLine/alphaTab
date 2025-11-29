@@ -187,14 +187,9 @@ export enum AlphaTexDiagnosticCode {
     AT218 = 218,
 
     /**
-     * Error parsing arguments: no overload matched. Signatures: %s
+     * Error parsing arguments: no overload matched arguments %s. Signatures: %s
      */
     AT219 = 219,
-
-    /**
-     * Error parsing arguments: ambgiuous overloads, wrap arguments into parenthesis. Signatures (ambiguous ones marked with *): %s
-     */
-    AT220 = 220,
 
     /**
      * Expected no arguments, but found some.
@@ -358,5 +353,5 @@ export enum ArgumentListParseTypesMode {
      * If the token matches, it is added to the value list. Parsing stays on the current type.
      * If the token does not match, the value list completes and parsing continues.
      */
-    ValueListWithoutParenthesis = 5
+    ValueListWithoutParenthesis = 5,
 }

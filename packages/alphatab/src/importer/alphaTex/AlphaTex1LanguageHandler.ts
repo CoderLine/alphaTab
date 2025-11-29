@@ -7,7 +7,7 @@
 import { AlphaTex1EnumMappings } from '@coderline/alphatab/importer/alphaTex/AlphaTex1EnumMappings';
 import {
     AlphaTex1LanguageDefinitions,
-    type AlphaTexParameterDefinition
+    type AlphaTexSignatureDefinition
 } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import {
     AlphaTex1MetaDataReader,
@@ -261,7 +261,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
     private _checkArgumentTypes(
         importer: IAlphaTexImporter,
-        lookupList: Map<string, AlphaTexParameterDefinition[][] | null>[],
+        lookupList: Map<string, AlphaTexSignatureDefinition[] | null>[],
         parent: AlphaTexAstNode,
         tag: string,
         values: AlphaTexArgumentList | undefined
@@ -873,15 +873,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
     private _validateArgumentTypes(
         importer: IAlphaTexImporter,
-        signatures: AlphaTexParameterDefinition[][],
+        signatures: AlphaTexSignatureDefinition[],
         parent: AlphaTexAstNode,
         values: AlphaTexArgumentList | undefined
     ) {
         if (!values) {
             const hasEmptyParameterOverload = signatures.some(
                 c =>
-                    c.length === 0 ||
-                    !c.some(
+                    c.parameters.length === 0 ||
+                    !c.parameters.some(
                         v =>
                             v.parseMode === ArgumentListParseTypesMode.Required ||
                             v.parseMode === ArgumentListParseTypesMode.RequiredAsFloat ||
@@ -895,7 +895,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
             importer.addSemanticDiagnostic({
                 code: AlphaTexDiagnosticCode.AT219,
-                message: `Error parsing arguments: no overload matched. Signatures: ${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
+                message: `Error parsing arguments: no overload matched arguments ${AlphaTex1MetaDataReader.generateSignaturesFromValues(undefined)}. Signatures: ${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: parent.start,
                 end: parent.end
@@ -934,7 +934,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (candidates.size === 0) {
             importer.addSemanticDiagnostic({
                 code: AlphaTexDiagnosticCode.AT219,
-                message: `Error parsing arguments: no overload matched. Signatures:\n${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
+                message: `Error parsing arguments: no overload matched arguments ${AlphaTex1MetaDataReader.generateSignaturesFromValues(values.arguments)}. Signatures:\n${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: values.start,
                 end: values.end
@@ -1030,19 +1030,19 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
             switch (p.property.text.toLowerCase()) {
                 case 'firstfret':
-                    chord.firstFret = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                    chord.firstFret = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                     break;
                 case 'showdiagram':
-                    chord.showDiagram = AlphaTex1LanguageHandler._booleanLikeValue(p.values!.arguments, 0);
+                    chord.showDiagram = AlphaTex1LanguageHandler._booleanLikeValue(p.arguments!.arguments, 0);
                     break;
                 case 'showfingering':
-                    chord.showFingering = AlphaTex1LanguageHandler._booleanLikeValue(p.values!.arguments, 0);
+                    chord.showFingering = AlphaTex1LanguageHandler._booleanLikeValue(p.arguments!.arguments, 0);
                     break;
                 case 'showname':
-                    chord.showName = AlphaTex1LanguageHandler._booleanLikeValue(p.values!.arguments, 0);
+                    chord.showName = AlphaTex1LanguageHandler._booleanLikeValue(p.arguments!.arguments, 0);
                     break;
                 case 'barre':
-                    chord.barreFrets = p.values!.arguments.map(v => (v as AlphaTexNumberLiteral).value);
+                    chord.barreFrets = p.arguments!.arguments.map(v => (v as AlphaTexNumberLiteral).value);
                     break;
             }
         }
@@ -1071,7 +1071,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     staff.track.score.stylesheet.perTrackDisplayTuning!.set(staff.track.index, false);
                     break;
                 case 'label':
-                    tuning.name = (p.values!.arguments[0] as AlphaTexStringLiteral).text;
+                    tuning.name = (p.arguments!.arguments[0] as AlphaTexStringLiteral).text;
                     break;
             }
         }
@@ -1127,10 +1127,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
     private _checkProperty(
         importer: IAlphaTexImporter,
-        lookupList: Map<string, AlphaTexParameterDefinition[][] | null>[],
+        lookupList: Map<string, AlphaTexSignatureDefinition[] | null>[],
         p: AlphaTexPropertyNode
     ): boolean {
-        const result = this._checkArgumentTypes(importer, lookupList, p, p.property.text.toLowerCase(), p.values);
+        const result = this._checkArgumentTypes(importer, lookupList, p, p.property.text.toLowerCase(), p.arguments);
         if (result !== undefined) {
             switch (result!) {
                 case ApplyNodeResult.Applied:
@@ -1171,8 +1171,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             switch (p.property.text.toLowerCase()) {
                 case 'score':
                     showStandardNotation = true;
-                    if (p.values && p.values.arguments.length > 0) {
-                        staff.standardNotationLineCount = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                    if (p.arguments && p.arguments.arguments.length > 0) {
+                        staff.standardNotationLineCount = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                     }
                     break;
                 case 'tabs':
@@ -1208,28 +1208,28 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             switch (p.property.text.toLowerCase()) {
                 case 'color':
                     try {
-                        track.color = Color.fromJson((p.values!.arguments[0] as AlphaTexTextNode).text)!;
+                        track.color = Color.fromJson((p.arguments!.arguments[0] as AlphaTexTextNode).text)!;
                     } catch {
                         importer.addSemanticDiagnostic({
                             code: AlphaTexDiagnosticCode.AT213,
                             message: `Invalid format for color`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: p.values!.arguments[0].start,
-                            end: p.values!.arguments[0].end
+                            start: p.arguments!.arguments[0].start,
+                            end: p.arguments!.arguments[0].end
                         });
                     }
                     break;
                 case 'defaultsystemslayout':
-                    track.defaultSystemsLayout = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                    track.defaultSystemsLayout = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                     break;
                 case 'systemslayout':
-                    track.systemsLayout = p.values!.arguments.map(v => (v as AlphaTexNumberLiteral).value);
+                    track.systemsLayout = p.arguments!.arguments.map(v => (v as AlphaTexNumberLiteral).value);
                     break;
                 case 'volume':
-                    track.playbackInfo.volume = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                    track.playbackInfo.volume = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                     break;
                 case 'balance':
-                    track.playbackInfo.balance = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                    track.playbackInfo.balance = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                     break;
                 case 'mute':
                     track.playbackInfo.isMute = true;
@@ -1244,10 +1244,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     track.score.stylesheet.perTrackMultiBarRest!.add(track.index);
                     break;
                 case 'instrument':
-                    this._readTrackInstrument(importer, track, p.values!);
+                    this._readTrackInstrument(importer, track, p.arguments!);
                     break;
                 case 'bank':
-                    track.playbackInfo.bank = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                    track.playbackInfo.bank = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                     break;
             }
         }
@@ -1259,7 +1259,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             [AlphaTex1LanguageDefinitions.durationChangeProperties],
             p,
             p.property.text.toLowerCase(),
-            p.values
+            p.arguments
         );
         if (result !== undefined) {
             return result;
@@ -1267,11 +1267,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         switch (p.property.text.toLowerCase()) {
             case 'tu':
-                if (p.values!.arguments.length === 2) {
-                    importer.state.currentTupletNumerator = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
-                    importer.state.currentTupletDenominator = (p.values!.arguments[1] as AlphaTexNumberLiteral).value;
+                if (p.arguments!.arguments.length === 2) {
+                    importer.state.currentTupletNumerator = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
+                    importer.state.currentTupletDenominator = (p.arguments!.arguments[1] as AlphaTexNumberLiteral).value;
                 } else {
-                    const numerator = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                    const numerator = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                     importer.state.currentTupletNumerator = numerator;
                     const denominator = AlphaTex1LanguageHandler._getTupletDenominator(numerator);
                     if (denominator < 0) {
@@ -1279,8 +1279,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             code: AlphaTexDiagnosticCode.AT209,
                             message: `Unexpected default tuplet value '${numerator}', expected: 3, 5, 6, 7, 9, 10, 11 or 12`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: p.values!.arguments[0].start,
-                            end: p.values!.arguments[0].end
+                            start: p.arguments!.arguments[0].start,
+                            end: p.arguments!.arguments[0].end
                         });
                         importer.state.currentTupletNumerator = -1;
                         importer.state.currentTupletDenominator = -1;
@@ -1402,7 +1402,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             [AlphaTex1LanguageDefinitions.beatProperties],
             p,
             tag,
-            p.values
+            p.arguments
         );
         if (result !== undefined) {
             return result;
@@ -1434,16 +1434,16 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 beat.tap = true;
                 return ApplyNodeResult.Applied;
             case 'txt':
-                beat.text = (p.values!.arguments[0] as AlphaTexTextNode).text;
+                beat.text = (p.arguments!.arguments[0] as AlphaTexTextNode).text;
                 return ApplyNodeResult.Applied;
             case 'lyrics':
                 let lyricsLine = 0;
                 let lyricsText = '';
-                if (p.values!.arguments.length === 2) {
-                    lyricsLine = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
-                    lyricsText = (p.values!.arguments[1] as AlphaTexTextNode).text;
+                if (p.arguments!.arguments.length === 2) {
+                    lyricsLine = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
+                    lyricsText = (p.arguments!.arguments[1] as AlphaTexTextNode).text;
                 } else {
-                    lyricsText = (p.values!.arguments[0] as AlphaTexTextNode).text;
+                    lyricsText = (p.arguments!.arguments[0] as AlphaTexTextNode).text;
                 }
 
                 if (!beat.lyrics) {
@@ -1469,11 +1469,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 beat.pickStroke = PickStroke.Down;
                 return ApplyNodeResult.Applied;
             case 'tu':
-                if (p.values!.arguments.length === 2) {
-                    beat.tupletNumerator = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
-                    beat.tupletDenominator = (p.values!.arguments[1] as AlphaTexNumberLiteral).value;
+                if (p.arguments!.arguments.length === 2) {
+                    beat.tupletNumerator = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
+                    beat.tupletDenominator = (p.arguments!.arguments[1] as AlphaTexNumberLiteral).value;
                 } else {
-                    const numerator = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                    const numerator = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                     beat.tupletNumerator = numerator;
                     const denominator = AlphaTex1LanguageHandler._getTupletDenominator(numerator);
                     if (denominator < 0) {
@@ -1481,8 +1481,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             code: AlphaTexDiagnosticCode.AT209,
                             message: `Unexpected default tuplet value '${numerator}', expected: 3, 5, 6, 7, 9, 10, 11 or 12`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: p.values!.arguments[0].start,
-                            end: p.values!.arguments[0].end
+                            start: p.arguments!.arguments[0].start,
+                            end: p.arguments!.arguments[0].end
                         });
                         beat.tupletNumerator = -1;
                         beat.tupletDenominator = -1;
@@ -1495,12 +1495,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'tb':
             case 'tbe':
                 let tbi = 0;
-                switch (p.values!.arguments[tbi].nodeType) {
+                switch (p.arguments!.arguments[tbi].nodeType) {
                     case AlphaTexNodeType.Ident:
                     case AlphaTexNodeType.String:
                         const whammyBarType = AlphaTex1LanguageHandler._parseEnumValue(
                             importer,
-                            p.values!,
+                            p.arguments!,
                             'whammy type',
                             AlphaTex1EnumMappings.whammyType,
                             tbi
@@ -1513,12 +1513,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         break;
                 }
 
-                switch (p.values!.arguments[tbi].nodeType) {
+                switch (p.arguments!.arguments[tbi].nodeType) {
                     case AlphaTexNodeType.Ident:
                     case AlphaTexNodeType.String:
                         const whammyBarStyle = AlphaTex1LanguageHandler._parseEnumValue(
                             importer,
-                            p.values!,
+                            p.arguments!,
                             'whammy style',
                             AlphaTex1EnumMappings.bendStyle,
                             tbi
@@ -1552,7 +1552,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 AlphaTex1LanguageHandler._applyBrush(beat, p, BrushType.ArpeggioDown, 1);
                 return ApplyNodeResult.Applied;
             case 'ch':
-                const chordName: string = (p.values!.arguments[0] as AlphaTexTextNode).text;
+                const chordName: string = (p.arguments!.arguments[0] as AlphaTexTextNode).text;
                 const chordId: string = AlphaTex1LanguageHandler._getChordId(beat.voice.bar.staff, chordName);
                 if (!beat.voice.bar.staff.hasChord(chordId)) {
                     const chord: Chord = new Chord();
@@ -1563,10 +1563,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 beat.chordId = chordId;
                 return ApplyNodeResult.Applied;
             case 'gr':
-                if (p.values && p.values.arguments.length > 0) {
+                if (p.arguments && p.arguments.arguments.length > 0) {
                     const graceType = AlphaTex1LanguageHandler._parseEnumValue(
                         importer,
-                        p.values!,
+                        p.arguments!,
                         'whammy style',
                         AlphaTex1EnumMappings.graceType
                     );
@@ -1581,7 +1581,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'dy':
                 const dyn = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
-                    p.values!,
+                    p.arguments!,
                     'dynamic',
                     AlphaTex1EnumMappings.dynamicValue
                 );
@@ -1599,13 +1599,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'tempo':
                 // NOTE: playbackRatio is calculated on score finish when playback positions are known
-                const tempo = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                const tempo = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                 let tempoLabel = '';
                 let isVisible = true;
 
-                if (p.values!.arguments.length > 2) {
-                    tempoLabel = (p.values!.arguments[1] as AlphaTexTextNode).text;
-                    const hideText = (p.values!.arguments[2] as AlphaTexTextNode).text;
+                if (p.arguments!.arguments.length > 2) {
+                    tempoLabel = (p.arguments!.arguments[1] as AlphaTexTextNode).text;
+                    const hideText = (p.arguments!.arguments[2] as AlphaTexTextNode).text;
                     if (hideText === 'hide') {
                         isVisible = false;
                     } else {
@@ -1613,13 +1613,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             code: AlphaTexDiagnosticCode.AT209,
                             message: `Unexpected third tempo property value '${hideText}', expected: 'hide'`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: p.values!.arguments[2].start,
-                            end: p.values!.arguments[2].end
+                            start: p.arguments!.arguments[2].start,
+                            end: p.arguments!.arguments[2].end
                         });
                         return ApplyNodeResult.NotAppliedSemanticError;
                     }
-                } else if (p.values!.arguments.length > 1) {
-                    tempoLabel = (p.values!.arguments[1] as AlphaTexTextNode).text;
+                } else if (p.arguments!.arguments.length > 1) {
+                    tempoLabel = (p.arguments!.arguments[1] as AlphaTexTextNode).text;
                     if (tempoLabel === 'hide') {
                         isVisible = false;
                         tempoLabel = '';
@@ -1640,7 +1640,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 const volumeAutomation: Automation = new Automation();
                 volumeAutomation.isLinear = true;
                 volumeAutomation.type = AutomationType.Volume;
-                volumeAutomation.value = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                volumeAutomation.value = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                 beat.automations.push(volumeAutomation);
                 return ApplyNodeResult.Applied;
             case 'balance':
@@ -1649,7 +1649,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 balanceAutomation.isLinear = true;
                 balanceAutomation.type = AutomationType.Balance;
                 balanceAutomation.value = ModelUtils.clamp(
-                    (p.values!.arguments[0] as AlphaTexNumberLiteral).value,
+                    (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value,
                     0,
                     16
                 );
@@ -1657,8 +1657,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'tp':
                 beat.tremoloSpeed = Duration.Eighth;
-                if (p.values && p.values.arguments.length > 0) {
-                    const tremoloSpeedValue = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                if (p.arguments && p.arguments.arguments.length > 0) {
+                    const tremoloSpeedValue = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                     switch (tremoloSpeedValue) {
                         case 8:
                             beat.tremoloSpeed = Duration.Eighth;
@@ -1674,8 +1674,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                                 code: AlphaTexDiagnosticCode.AT209,
                                 message: `Unexpected tremolo speed value '${tremoloSpeedValue}, expected: 8, 16 or 32`,
                                 severity: AlphaTexDiagnosticsSeverity.Error,
-                                start: p.values!.arguments[0].start,
-                                end: p.values!.arguments[0].end
+                                start: p.arguments!.arguments[0].start,
+                                end: p.arguments!.arguments[0].end
                             });
                             return ApplyNodeResult.NotAppliedSemanticError;
                     }
@@ -1715,12 +1715,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 beat.wahPedal = WahPedal.Closed;
                 return ApplyNodeResult.Applied;
             case 'barre':
-                beat.barreFret = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                beat.barreFret = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                 beat.barreShape = BarreShape.Full;
-                if (p.values!.arguments.length > 1) {
+                if (p.arguments!.arguments.length > 1) {
                     const barreShape = AlphaTex1LanguageHandler._parseEnumValue(
                         importer,
-                        p.values!,
+                        p.arguments!,
                         'barre shape',
                         AlphaTex1EnumMappings.barreShape,
                         1
@@ -1734,7 +1734,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'rasg':
                 const rasg = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
-                    p.values!,
+                    p.arguments!,
                     'rasgueado pattern',
                     AlphaTex1EnumMappings.rasgueado
                 );
@@ -1746,7 +1746,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'ot':
                 const ottava = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
-                    p.values!,
+                    p.arguments!,
                     'ottava',
                     AlphaTex1EnumMappings.ottavia
                 );
@@ -1761,14 +1761,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'instrument':
                 let program = 0;
 
-                switch (p.values!.arguments[0].nodeType) {
+                switch (p.arguments!.arguments[0].nodeType) {
                     case AlphaTexNodeType.Ident:
                     case AlphaTexNodeType.String:
-                        program = GeneralMidi.getValue((p.values!.arguments[0] as AlphaTexTextNode).text);
+                        program = GeneralMidi.getValue((p.arguments!.arguments[0] as AlphaTexTextNode).text);
                         break;
 
                     case AlphaTexNodeType.Number:
-                        program = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                        program = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                         break;
                 }
 
@@ -1782,13 +1782,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 const bankAutomation = new Automation();
                 bankAutomation.isLinear = false;
                 bankAutomation.type = AutomationType.Bank;
-                bankAutomation.value = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                bankAutomation.value = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                 beat.automations.push(bankAutomation);
                 return ApplyNodeResult.Applied;
             case 'fermata':
                 const fermataType = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
-                    p.values!,
+                    p.arguments!,
                     'fermata',
                     AlphaTex1EnumMappings.fermataType
                 );
@@ -1799,15 +1799,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 const fermata = new Fermata();
                 fermata.type = fermataType!;
 
-                if (p.values!.arguments.length > 1) {
-                    fermata.length = (p.values!.arguments[1] as AlphaTexNumberLiteral).value;
+                if (p.arguments!.arguments.length > 1) {
+                    fermata.length = (p.arguments!.arguments[1] as AlphaTexNumberLiteral).value;
                 }
 
                 beat.fermata = fermata;
                 return ApplyNodeResult.Applied;
 
             case 'beam':
-                const beamMode = (p.values!.arguments[0] as AlphaTexTextNode).text;
+                const beamMode = (p.arguments!.arguments[0] as AlphaTexTextNode).text;
                 switch (beamMode.toLowerCase()) {
                     case 'invert':
                         beat.invertBeamDirection = true;
@@ -1836,8 +1836,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             code: AlphaTexDiagnosticCode.AT209,
                             message: `Unexpected beam value '${beamMode}', expected: ${allowedValues.join(',')}`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: p.values!.arguments[0].start,
-                            end: p.values!.arguments[0].end
+                            start: p.arguments!.arguments[0].start,
+                            end: p.arguments!.arguments[0].end
                         });
                         return ApplyNodeResult.NotAppliedSemanticError;
                 }
@@ -1871,8 +1871,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
     private static _applyBrush(beat: Beat, p: AlphaTexPropertyNode, brushType: BrushType, durationFactor: number) {
         beat.brushType = brushType;
-        if (p.values && p.values.arguments.length > 0) {
-            beat.brushDuration = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+        if (p.arguments && p.arguments.arguments.length > 0) {
+            beat.brushDuration = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
         } else {
             beat.updateDurations();
             beat.brushDuration = (beat.playbackDuration * durationFactor) / beat.notes.length;
@@ -1886,7 +1886,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             [AlphaTex1LanguageDefinitions.noteProperties],
             p,
             tag,
-            p.values
+            p.arguments
         );
         if (result !== undefined) {
             return result;
@@ -1896,12 +1896,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'b':
             case 'be':
                 let tbi = 0;
-                switch (p.values!.arguments[tbi].nodeType) {
+                switch (p.arguments!.arguments[tbi].nodeType) {
                     case AlphaTexNodeType.Ident:
                     case AlphaTexNodeType.String:
                         const bendType = AlphaTex1LanguageHandler._parseEnumValue(
                             importer,
-                            p.values!,
+                            p.arguments!,
                             'bend type',
                             AlphaTex1EnumMappings.bendType,
                             tbi
@@ -1914,12 +1914,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         break;
                 }
 
-                switch (p.values!.arguments[tbi].nodeType) {
+                switch (p.arguments!.arguments[tbi].nodeType) {
                     case AlphaTexNodeType.Ident:
                     case AlphaTexNodeType.String:
                         const bendStyle = AlphaTex1LanguageHandler._parseEnumValue(
                             importer,
-                            p.values!,
+                            p.arguments!,
                             'bend style',
                             AlphaTex1EnumMappings.bendStyle,
                             tbi
@@ -1946,29 +1946,29 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'ah':
                 note.harmonicType = HarmonicType.Artificial;
-                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.values, note.harmonicValue);
+                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.arguments, note.harmonicValue);
                 return ApplyNodeResult.Applied;
             case 'th':
                 note.harmonicType = HarmonicType.Tap;
-                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.values, note.harmonicValue);
+                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.arguments, note.harmonicValue);
                 return ApplyNodeResult.Applied;
             case 'ph':
                 note.harmonicType = HarmonicType.Pinch;
-                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.values, note.harmonicValue);
+                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.arguments, note.harmonicValue);
                 return ApplyNodeResult.Applied;
             case 'sh':
                 note.harmonicType = HarmonicType.Semi;
-                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.values, note.harmonicValue);
+                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.arguments, note.harmonicValue);
                 return ApplyNodeResult.Applied;
             case 'fh':
                 note.harmonicType = HarmonicType.Feedback;
-                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.values, note.harmonicValue);
+                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.arguments, note.harmonicValue);
                 return ApplyNodeResult.Applied;
             case 'tr':
-                const trillFret = (p.values!.arguments[0] as AlphaTexNumberLiteral).value;
+                const trillFret = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                 let trillDuration: Duration = Duration.Sixteenth;
-                if (p.values!.arguments.length > 1) {
-                    const trillDurationValue = (p.values!.arguments[1] as AlphaTexNumberLiteral).value;
+                if (p.arguments!.arguments.length > 1) {
+                    const trillDurationValue = (p.arguments!.arguments[1] as AlphaTexNumberLiteral).value;
                     switch (trillDurationValue) {
                         case 16:
                             trillDuration = Duration.Sixteenth;
@@ -1984,8 +1984,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                                 code: AlphaTexDiagnosticCode.AT209,
                                 message: `Unexpected trill duration value '${trillDurationValue}', expected: 16, 32 or 64`,
                                 severity: AlphaTexDiagnosticsSeverity.Error,
-                                start: p.values!.arguments[1].start,
-                                end: p.values!.arguments[1].end
+                                start: p.arguments!.arguments[1].start,
+                                end: p.arguments!.arguments[1].end
                             });
                             return ApplyNodeResult.NotAppliedSemanticError;
                     }
@@ -2059,8 +2059,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'lf':
                 let leftFinger = Fingers.Thumb;
-                if (p.values && p.values.arguments.length > 0) {
-                    const customFinger = AlphaTex1LanguageHandler._toFinger(importer, p.values);
+                if (p.arguments && p.arguments.arguments.length > 0) {
+                    const customFinger = AlphaTex1LanguageHandler._toFinger(importer, p.arguments);
                     if (customFinger === undefined) {
                         return ApplyNodeResult.NotAppliedSemanticError;
                     }
@@ -2070,8 +2070,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'rf':
                 let rightFinger = Fingers.Thumb;
-                if (p.values && p.values.arguments.length > 0) {
-                    const customFinger = AlphaTex1LanguageHandler._toFinger(importer, p.values);
+                if (p.arguments && p.arguments.arguments.length > 0) {
+                    const customFinger = AlphaTex1LanguageHandler._toFinger(importer, p.arguments);
                     if (customFinger === undefined) {
                         return ApplyNodeResult.NotAppliedSemanticError;
                     }
@@ -2080,7 +2080,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 note.rightHandFinger = rightFinger;
                 return ApplyNodeResult.Applied;
             case 'acc':
-                note.accidentalMode = ModelUtils.parseAccidentalMode((p.values!.arguments[0] as AlphaTexTextNode).text);
+                note.accidentalMode = ModelUtils.parseAccidentalMode((p.arguments!.arguments[0] as AlphaTexTextNode).text);
                 return ApplyNodeResult.Applied;
             case 'turn':
                 note.ornament = NoteOrnament.Turn;
@@ -2101,7 +2101,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 note.isVisible = false;
                 return ApplyNodeResult.Applied;
             case 'slur':
-                const slurId = (p.values!.arguments[0] as AlphaTexTextNode).text;
+                const slurId = (p.arguments!.arguments[0] as AlphaTexTextNode).text;
                 if (importer.state.slurs.has(slurId)) {
                     const slurOrigin = importer.state.slurs.get(slurId)!;
                     slurOrigin.slurDestination = note;
@@ -2159,9 +2159,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         valueStartIndex: number,
         exact: boolean
     ): BendPoint[] | undefined {
-        let values = p.values!.arguments;
+        let values = p.arguments!.arguments;
         let remainingValues = values.length - valueStartIndex;
-        let errorNode: AlphaTexAstNode = p.values!;
+        let errorNode: AlphaTexAstNode = p.arguments!;
 
         // unwrap value list
         if (remainingValues > 0 && values[valueStartIndex].nodeType === AlphaTexNodeType.Arguments) {
@@ -2305,7 +2305,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(
                 Atnf.meta(
                     'systemsLayout',
-                    Atnf.values(score.systemsLayout.map(l => Atnf.number(l) as IAlphaTexArgumentValue))
+                    Atnf.args(score.systemsLayout.map(l => Atnf.number(l) as IAlphaTexArgumentValue))
                 )
             );
         }
@@ -2468,7 +2468,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return;
         }
 
-        nodes.push(Atnf.meta(tag, Atnf.values(values)));
+        nodes.push(Atnf.meta(tag, Atnf.args(values)));
     }
 
     public buildSyncPointNodes(score: Score): AlphaTexMetaDataNode[] {
@@ -2479,7 +2479,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(
                 Atnf.meta(
                     'sync',
-                    Atnf.values([
+                    Atnf.args([
                         Atnf.number(p.barIndex),
                         Atnf.number(p.barOccurence),
                         Atnf.number(p.millisecondOffset),
@@ -2603,7 +2603,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         } else if (staff.isStringed) {
             const tuning = Atnf.meta(
                 'tuning',
-                Atnf.values(
+                Atnf.args(
                     staff.stringTuning.tunings.map(
                         t => Atnf.ident(Tuning.getTextForTuning(t, true)) as IAlphaTexArgumentValue
                     )
@@ -2654,14 +2654,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     private static _buildChordNode(chord: Chord): AlphaTexMetaDataNode {
         const chordNode = Atnf.meta(
             'chord',
-            Atnf.values([Atnf.string(chord.name)], true),
+            Atnf.args([Atnf.string(chord.name)], true),
             Atnf.props([
                 chord.firstFret >= 0 ? ['firstfret', Atnf.numberValue(chord.firstFret)] : undefined,
                 ['showdiagram', Atnf.identValue(chord.showDiagram ? 'true' : 'false')],
                 ['showfingering', Atnf.identValue(chord.showFingering ? 'true' : 'false')],
                 ['showname', Atnf.identValue(chord.showName ? 'true' : 'false')],
                 chord.barreFrets.length > 0
-                    ? ['barre', Atnf.values(chord.barreFrets.map(f => Atnf.number(f) as IAlphaTexArgumentValue))]
+                    ? ['barre', Atnf.args(chord.barreFrets.map(f => Atnf.number(f) as IAlphaTexArgumentValue))]
                     : undefined
             ])
         );
@@ -2684,7 +2684,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(
                 Atnf.meta(
                     'ae',
-                    Atnf.values(
+                    Atnf.args(
                         ModelUtils.getAlternateEndingsList(masterBar.alternateEndings).map(
                             i => Atnf.number(i + 1) as IAlphaTexArgumentValue
                         )
@@ -2713,7 +2713,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 nodes.push(
                     Atnf.meta(
                         'ts',
-                        Atnf.values([
+                        Atnf.args([
                             Atnf.number(masterBar.timeSignatureNumerator),
                             Atnf.number(masterBar.timeSignatureDenominator)
                         ])
@@ -2737,7 +2737,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(
                 Atnf.meta(
                     'section',
-                    Atnf.values([Atnf.string(masterBar.section.marker), Atnf.string(masterBar.section.text)])
+                    Atnf.args([Atnf.string(masterBar.section.marker), Atnf.string(masterBar.section.text)])
                 )
             );
         }
@@ -2763,7 +2763,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         for (const a of masterBar.tempoAutomations) {
             const tempo = Atnf.meta(
                 'tempo',
-                Atnf.values([
+                Atnf.args([
                     Atnf.number(a.value),
                     a.text ? Atnf.string(a.text) : undefined,
                     a.ratioPosition > 0 ? Atnf.number(a.ratioPosition) : undefined,
@@ -2824,7 +2824,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 staff.showStandardNotation
                     ? [
                           'score',
-                          Atnf.values([
+                          Atnf.args([
                               staff.standardNotationLineCount !== Staff.DefaultStandardNotationLineCount
                                   ? Atnf.number(staff.standardNotationLineCount)
                                   : undefined
@@ -2852,7 +2852,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     private static _buildNewTrackNode(track: Track): AlphaTexMetaDataNode {
         const node = Atnf.meta(
             'track',
-            Atnf.values([
+            Atnf.args([
                 Atnf.string(track.name),
                 track.shortName.length > 0 ? Atnf.string(track.shortName) : undefined
             ]),
@@ -2866,7 +2866,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 track.systemsLayout.length
                     ? [
                           'systemsLayout',
-                          Atnf.values(track.systemsLayout.map(d => Atnf.number(d) as IAlphaTexArgumentValue))
+                          Atnf.args(track.systemsLayout.map(d => Atnf.number(d) as IAlphaTexArgumentValue))
                       ]
                     : undefined,
                 ['volume', Atnf.numberValue(track.playbackInfo.volume)],
@@ -2905,7 +2905,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         const properties: AlphaTexPropertyNode[] = [];
 
         if (note.hasBend) {
-            const beValue = Atnf.values(
+            const beValue = Atnf.args(
                 [
                     Atnf.ident(AlphaTex1EnumMappings.bendTypeReversed.get(note.bendType)!),
                     note.bendStyle !== BendStyle.Default
@@ -2955,7 +2955,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             Atnf.prop(
                 properties,
                 'tr',
-                Atnf.values([Atnf.number(note.trillFret), Atnf.number(note.trillSpeed as number)])
+                Atnf.args([Atnf.number(note.trillFret), Atnf.number(note.trillSpeed as number)])
             );
         }
 
@@ -3137,12 +3137,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             Atnf.prop(
                 properties,
                 'tu',
-                Atnf.values([Atnf.number(beat.tupletNumerator), Atnf.number(beat.tupletDenominator)])
+                Atnf.args([Atnf.number(beat.tupletNumerator), Atnf.number(beat.tupletDenominator)])
             );
         }
 
         if (beat.hasWhammyBar) {
-            const tbeValues = Atnf.values(
+            const tbeValues = Atnf.args(
                 [
                     Atnf.ident(AlphaTex1EnumMappings.whammyTypeReversed.get(beat.whammyBarType)!),
                     Atnf.ident(AlphaTex1EnumMappings.bendStyleReversed.get(beat.whammyStyle)!)
@@ -3200,7 +3200,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (beat.lyrics != null && beat.lyrics!.length > 0) {
             if (beat.lyrics.length > 1) {
                 for (let i = 0; i < beat.lyrics.length; i++) {
-                    Atnf.prop(properties, 'lyrics', Atnf.values([Atnf.number(i), Atnf.string(beat.lyrics[i])]));
+                    Atnf.prop(properties, 'lyrics', Atnf.args([Atnf.number(i), Atnf.string(beat.lyrics[i])]));
                 }
             } else {
                 Atnf.prop(properties, 'lyrics', Atnf.stringValue(beat.lyrics[0]));
@@ -3243,7 +3243,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             Atnf.prop(
                 properties,
                 'fermata',
-                Atnf.values([
+                Atnf.args([
                     Atnf.ident(AlphaTex1EnumMappings.fermataTypeReversed.get(beat.fermata!.type)!),
                     Atnf.number(beat.fermata!.length)
                 ])
@@ -3260,7 +3260,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     Atnf.prop(
                         properties,
                         'tempo',
-                        Atnf.values([
+                        Atnf.args([
                             Atnf.number(automation.value),
                             automation.text.length === 0 ? undefined : Atnf.string(automation.text)
                         ])
@@ -3293,7 +3293,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             Atnf.prop(
                 properties,
                 'barre',
-                Atnf.values([
+                Atnf.args([
                     Atnf.number(beat.barreFret),
                     Atnf.ident(AlphaTex1EnumMappings.barreShapeReversed.get(beat.barreShape)!)
                 ])

@@ -507,7 +507,7 @@ export class AlphaTexParser {
                 metaData.properties = this._properties(property =>
                     this._metaDataReader.readMetaDataPropertyValues(this, metaData.tag, property)
                 );
-                metaData.arguments = this.valueList();
+                metaData.arguments = this.argumentList();
                 if (!metaData.arguments) {
                     metaData.arguments = this._metaDataReader.readMetaDataValues(this, metaData.tag);
                     if (metaData.arguments && metaData.arguments.arguments.length > 1) {
@@ -529,7 +529,7 @@ export class AlphaTexParser {
                     }
                 }
             } else {
-                metaData.arguments = this.valueList();
+                metaData.arguments = this.argumentList();
                 if (!metaData.arguments) {
                     metaData.arguments = this._metaDataReader.readMetaDataValues(this, metaData.tag);
                     if (metaData.arguments && metaData.arguments.arguments.length > 1) {
@@ -604,22 +604,22 @@ export class AlphaTexParser {
         const property: AlphaTexPropertyNode = {
             nodeType: AlphaTexNodeType.Prop,
             property: identifier as AlphaTexIdentifier,
-            values: undefined
+            arguments: undefined
         };
         this.lexer.advance();
 
         property.start = property.property.start;
         try {
-            property.values = this.valueList();
-            if (!property.values) {
-                property.values = readPropertyValues(property);
-                if (property.values && property.values.arguments.length > 1) {
+            property.arguments = this.argumentList();
+            if (!property.arguments) {
+                property.arguments = readPropertyValues(property);
+                if (property.arguments && property.arguments.arguments.length > 1) {
                     this.addParserDiagnostic({
                         code: AlphaTexDiagnosticCode.AT303,
                         message: 'Property values should be wrapped into parenthesis.',
                         severity: AlphaTexDiagnosticsSeverity.Warning,
-                        start: property.values.start,
-                        end: property.values.end
+                        start: property.arguments.start,
+                        end: property.arguments.end
                     });
                 }
             }
@@ -630,7 +630,7 @@ export class AlphaTexParser {
         return property;
     }
 
-    public valueList(): AlphaTexArgumentList | undefined {
+    public argumentList(): AlphaTexArgumentList | undefined {
         const openParenthesis = this.lexer.peekToken();
         if (openParenthesis?.nodeType !== AlphaTexNodeType.LParen) {
             return undefined;

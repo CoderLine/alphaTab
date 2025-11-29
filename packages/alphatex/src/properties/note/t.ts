@@ -39,3 +39,11 @@ export const t: PropertyDefinition = {
         `
     ]
 };
+
+
+export const tiedNoteDash: PropertyDefinition = {
+    ...t,
+    property: '-',
+    snippet: '-',
+    hidden : true
+};

@@ -136,7 +136,7 @@ import { sou } from '@coderline/alphatab-alphatex//properties/note/sou';
 import { ss } from '@coderline/alphatab-alphatex//properties/note/ss';
 import { st } from '@coderline/alphatab-alphatex//properties/note/st';
 import { string } from '@coderline/alphatab-alphatex//properties/note/string';
-import { t } from '@coderline/alphatab-alphatex//properties/note/t';
+import { tiedNoteDash, t } from '@coderline/alphatab-alphatex//properties/note/t';
 import { ten } from '@coderline/alphatab-alphatex//properties/note/ten';
 import { th } from '@coderline/alphatab-alphatex//properties/note/th';
 import { tr } from '@coderline/alphatab-alphatex//properties/note/tr';
@@ -145,6 +145,8 @@ import { umordent } from '@coderline/alphatab-alphatex//properties/note/umordent
 import { noteVibrato } from '@coderline/alphatab-alphatex//properties/note/v';
 import { noteVibratoWide } from '@coderline/alphatab-alphatex//properties/note/vw';
 import { x } from '@coderline/alphatab-alphatex//properties/note/x';
+import { db } from '@coderline/alphatab-alphatex/metadata/bar/db';
+import { instrumentMeta } from '@coderline/alphatab-alphatex/metadata/staff/instrument';
 import type { WithDescription, WithSignatures } from '@coderline/alphatab-alphatex/types';
 
 export const structuralMetaData = [track, staff, voice];
@@ -176,7 +178,7 @@ export const scoreMetaData = [
     otherSystemsTrackNameOrientation
 ];
 
-export const staffMetaData = [tuning, chord, capo, lyrics, articulation, displayTranspose, transpose];
+export const staffMetaData = [tuning, chord, capo, lyrics, articulation, displayTranspose, transpose, instrumentMeta];
 
 export const barMetaData = [
     ts,
@@ -201,7 +203,8 @@ export const barMetaData = [
     accidentals,
     spd,
     sph,
-    spu
+    spu,
+    db
 ];
 
 export const durationChangeProperties = [tu];
@@ -298,7 +301,8 @@ export const noteProperties = [
     lf,
     rf,
     acc,
-    slur
+    slur,
+    tiedNoteDash
 ];
 
 const spaces = /^([ ]+)/;

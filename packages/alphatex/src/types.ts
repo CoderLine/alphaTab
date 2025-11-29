@@ -19,12 +19,12 @@ export interface WithDescription {
     /**
      * If defined, the element is deprecated.
      */
-    deprecated?:string;
+    deprecated?: string;
 
     /**
      * Additional remarks relevant for this item.
      */
-    remarks?:string;
+    remarks?: string;
 }
 
 /**
@@ -41,9 +41,9 @@ export interface ParameterValueDefinition extends WithDescription {
     snippet: string;
 
     /**
-     * Whether this value has no code completion and mapping but for completeness on enum mappings 
+     * Whether this value has no code completion and mapping but for completeness on enum mappings
      */
-    skip?:true;
+    skip?: true;
 }
 
 /**
@@ -66,7 +66,7 @@ export interface ParameterDefinition extends WithDescription {
     type: AlphaTexNodeType | AlphaTexNodeType[];
 
     /**
-     * Whether to allow strings in place of identifiers and vice versa. 
+     * Whether to allow strings in place of identifiers and vice versa.
      */
     allowAllStringTypes?: boolean;
 
@@ -86,6 +86,11 @@ export interface ParameterDefinition extends WithDescription {
      * A list of possible values
      */
     values?: ParameterValueDefinition[];
+
+    /**
+     * A list of identifiers which are reserved and cannot be used for this parameter.
+     */
+    reservedIdentifiers?: string[];
 }
 
 /**
@@ -97,6 +102,12 @@ export interface SignatureDefinition {
      * An additional description specific for this signature.
      */
     description?: string;
+
+    /**
+     * Whether parsing should be strict, meaning: single values can be without parenthesis
+     * multiple values need parenthesis.
+     */
+    strict?: boolean;
 
     /**
      * The parameters which can be passed into this signature.
@@ -122,6 +133,12 @@ export interface WithSignatures extends WithDescription {
      * One or more examples demonstrating the usage of this element.
      */
     examples: AlphaTexExample | AlphaTexExample[];
+
+    /**
+     * Whether this item is hidden from auto completes and the docs
+     * (e.g. because of outdated mechanisms or aliases)
+     */
+    hidden?: true;
 }
 
 /**

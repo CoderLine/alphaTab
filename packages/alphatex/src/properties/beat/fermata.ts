@@ -21,7 +21,7 @@ export const fermata: PropertyDefinition = {
                     name: 'length',
                     shortDescription: 'The fermata length',
                     type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Optional,
+                    parseMode: ArgumentListParseTypesMode.OptionalAsFloat,
                     defaultValue: 0
                 }
             ]

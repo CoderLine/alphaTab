@@ -4,34 +4,34 @@
  */
 export enum AlphaTexNodeType {
     // Tokens
-    Dot,
-    Backslash,
-    DoubleBackslash,
-    Pipe,
-    LBrace,
-    RBrace,
-    LParen,
-    RParen,
-    Colon,
-    Asterisk,
+    Dot = 0,
+    Backslash = 1,
+    DoubleBackslash = 2,
+    Pipe = 3,
+    LBrace = 4,
+    RBrace = 5,
+    LParen = 6,
+    RParen = 7,
+    Colon = 8,
+    Asterisk = 9,
 
     // General Nodes
-    Ident,
-    Tag,
-    Meta,
-    Arguments,
-    Props,
-    Prop,
-    Number,
-    String,
+    Ident = 10,
+    Tag = 11,
+    Meta = 12,
+    Arguments = 13,
+    Props = 14,
+    Prop = 15,
+    Number = 16,
+    String = 17,
 
     // Semantic Nodes
-    Score,
-    Bar,
-    Beat,
-    Duration,
-    NoteList,
-    Note
+    Score = 18,
+    Bar = 19,
+    Beat = 20,
+    Duration = 21,
+    NoteList = 22,
+    Note = 23
 }
 
 //
@@ -329,9 +329,9 @@ export interface AlphaTexPropertyNode extends AlphaTexAstNode {
      */
     property: AlphaTexIdentifier;
     /**
-     * The values attached to the property.
+     * The arguments passed into to the property.
      */
-    values?: AlphaTexArgumentList;
+    arguments?: AlphaTexArgumentList;
 }
 
 /**

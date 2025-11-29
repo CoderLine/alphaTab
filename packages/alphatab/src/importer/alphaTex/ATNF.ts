@@ -68,7 +68,7 @@ export class Atnf {
         return Atnf.meta(tag, Atnf.numberValue(value));
     }
 
-    public static values(
+    public static args(
         values: (IAlphaTexArgumentValue | undefined)[],
         parentheses: boolean | undefined = undefined
     ): AlphaTexArgumentList | undefined {
@@ -96,15 +96,15 @@ export class Atnf {
     }
 
     public static stringValue(text: string): AlphaTexArgumentList {
-        return Atnf.values([Atnf.string(text)])!;
+        return Atnf.args([Atnf.string(text)])!;
     }
 
     public static identValue(text: string): AlphaTexArgumentList {
-        return Atnf.values([Atnf.ident(text)])!;
+        return Atnf.args([Atnf.ident(text)])!;
     }
 
     public static numberValue(value: number): AlphaTexArgumentList {
-        return Atnf.values([Atnf.number(value)])!;
+        return Atnf.args([Atnf.number(value)])!;
     }
 
     public static props(
@@ -126,7 +126,7 @@ export class Atnf {
                 node.properties.push({
                     nodeType: AlphaTexNodeType.Prop,
                     property: Atnf.ident(p[0]),
-                    values: p[1]
+                    arguments: p[1]
                 } as AlphaTexPropertyNode);
             }
         }
@@ -138,7 +138,7 @@ export class Atnf {
         properties.push({
             nodeType: AlphaTexNodeType.Prop,
             property: Atnf.ident(identifier),
-            values
+            arguments: values
         });
     }
 }

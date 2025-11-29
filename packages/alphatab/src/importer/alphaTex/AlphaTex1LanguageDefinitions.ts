@@ -1,6 +1,12 @@
 import type { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-type SimpleAlphaTexParameterDefinition = [AlphaTexNodeType[], ArgumentListParseTypesMode, string[]];
+/**
+ * @target web
+ */
+type SimpleAlphaTexParameterDefinition =
+    | [AlphaTexNodeType[], ArgumentListParseTypesMode]
+    | [AlphaTexNodeType[], ArgumentListParseTypesMode, string[]]
+    | [AlphaTexNodeType[], ArgumentListParseTypesMode, string[] | null, string[]];
 /**
  * @record
  * @internal
@@ -9,6 +15,15 @@ export interface AlphaTexParameterDefinition {
     expectedTypes: Set<AlphaTexNodeType>;
     parseMode: ArgumentListParseTypesMode;
     allowedValues?: Set<string>;
+    reservedIdentifiers?: Set<string>;
+}
+/**
+ * @record
+ * @internal
+ */
+export interface AlphaTexSignatureDefinition {
+    isStrict: boolean;
+    parameters: AlphaTexParameterDefinition[];
 }
 /**
  * @internal
@@ -18,13 +33,20 @@ export class AlphaTex1LanguageDefinitions {
         return {
             expectedTypes: new Set(simple[0]),
             parseMode: simple[1],
-            allowedValues: simple[2] ? new Set(simple[2]) : undefined
+            allowedValues: simple.length > 2 && simple[2] && simple[2].length > 0 ? new Set(simple[2]) : undefined,
+            reservedIdentifiers: simple.length > 3 && simple[3] && simple[3].length > 0 ? new Set(simple[3]) : undefined
         };
     }
     private static _simple(
-        signature: SimpleAlphaTexParameterDefinition[][] | null
-    ): AlphaTexParameterDefinition[][] | null {
-        return signature === null ? null : signature.map(s => s.map(AlphaTex1LanguageDefinitions._param));
+        signature: (SimpleAlphaTexParameterDefinition | null)[][] | null
+    ): AlphaTexSignatureDefinition[] | null {
+        if (signature == null) {
+            return null;
+        }
+        return signature.map(s => ({
+            isStrict: s.length > 0 && s[0] === null,
+            parameters: s.filter(p => p !== null).map(AlphaTex1LanguageDefinitions._param)
+        }));
     }
     private static _metaProps(props: [string, [string, SimpleAlphaTexParameterDefinition[][] | null][] | null][]) {
         return new Map(
@@ -37,7 +59,7 @@ export class AlphaTex1LanguageDefinitions {
     private static _props(props: [string, SimpleAlphaTexParameterDefinition[][] | null][]) {
         return new Map(props.map(p => [p[0], AlphaTex1LanguageDefinitions._simple(p[1])]));
     }
-    private static _signatures(signatures: [string, SimpleAlphaTexParameterDefinition[][] | null][]) {
+    private static _signatures(signatures: [string, (SimpleAlphaTexParameterDefinition | null)[][] | null][]) {
         return new Map(signatures.map(s => [s[0], AlphaTex1LanguageDefinitions._simple(s[1])]));
     }
     // The following definitions age auto-generated from the central definitions in
@@ -49,9 +71,9 @@ export class AlphaTex1LanguageDefinitions {
             'title',
             [
                 [
-                    [[17], 0, []],
-                    [[17], 1, []],
-                    [[10], 1, ['left', 'center', 'right']]
+                    [[17, 10], 0],
+                    [[17], 1],
+                    [[10, 17], 1, ['left', 'center', 'right']]
                 ]
             ]
         ],
@@ -59,9 +81,9 @@ export class AlphaTex1LanguageDefinitions {
             'subtitle',
             [
                 [
-                    [[17], 0, []],
-                    [[17], 1, []],
-                    [[10], 1, ['left', 'center', 'right']]
+                    [[17, 10], 0],
+                    [[17], 1],
+                    [[10, 17], 1, ['left', 'center', 'right']]
                 ]
             ]
         ],
@@ -69,9 +91,9 @@ export class AlphaTex1LanguageDefinitions {
             'artist',
             [
                 [
-                    [[17], 0, []],
-                    [[17], 1, []],
-                    [[10], 1, ['left', 'center', 'right']]
+                    [[17, 10], 0],
+                    [[17], 1],
+                    [[10, 17], 1, ['left', 'center', 'right']]
                 ]
             ]
         ],
@@ -79,9 +101,9 @@ export class AlphaTex1LanguageDefinitions {
             'album',
             [
                 [
-                    [[17], 0, []],
-                    [[17], 1, []],
-                    [[10], 1, ['left', 'center', 'right']]
+                    [[17, 10], 0],
+                    [[17], 1],
+                    [[10, 17], 1, ['left', 'center', 'right']]
                 ]
             ]
         ],
@@ -89,9 +111,9 @@ export class AlphaTex1LanguageDefinitions {
             'words',
             [
                 [
-                    [[17], 0, []],
-                    [[17], 1, []],
-                    [[10], 1, ['left', 'center', 'right']]
+                    [[17, 10], 0],
+                    [[17], 1],
+                    [[10, 17], 1, ['left', 'center', 'right']]
                 ]
             ]
         ],
@@ -99,9 +121,9 @@ export class AlphaTex1LanguageDefinitions {
             'music',
             [
                 [
-                    [[17], 0, []],
-                    [[17], 1, []],
-                    [[10], 1, ['left', 'center', 'right']]
+                    [[17, 10], 0],
+                    [[17], 1],
+                    [[10, 17], 1, ['left', 'center', 'right']]
                 ]
             ]
         ],
@@ -109,8 +131,8 @@ export class AlphaTex1LanguageDefinitions {
             'wordsandmusic',
             [
                 [
-                    [[17], 0, []],
-                    [[10], 1, ['left', 'center', 'right']]
+                    [[17], 0],
+                    [[10, 17], 1, ['left', 'center', 'right']]
                 ]
             ]
         ],
@@ -118,9 +140,9 @@ export class AlphaTex1LanguageDefinitions {
             'copyright',
             [
                 [
-                    [[17], 0, []],
-                    [[17], 1, []],
-                    [[10], 1, ['left', 'center', 'right']]
+                    [[17, 10], 0],
+                    [[17], 1],
+                    [[10, 17], 1, ['left', 'center', 'right']]
                 ]
             ]
         ],
@@ -128,56 +150,56 @@ export class AlphaTex1LanguageDefinitions {
             'copyright2',
             [
                 [
-                    [[17], 0, []],
-                    [[10], 1, ['left', 'center', 'right']]
+                    [[17], 0],
+                    [[10, 17], 1, ['left', 'center', 'right']]
                 ]
             ]
         ],
-        ['instructions', [[[[17], 0, []]]]],
-        ['notices', [[[[17], 0, []]]]],
+        ['instructions', [[[[17, 10], 0]]]],
+        ['notices', [[[[17, 10], 0]]]],
         [
             'tab',
             [
                 [
-                    [[17], 0, []],
-                    [[17], 1, []],
-                    [[10], 1, ['left', 'center', 'right']]
+                    [[17, 10], 0],
+                    [[17], 1],
+                    [[10, 17], 1, ['left', 'center', 'right']]
                 ]
             ]
         ],
-        ['systemslayout', [[[[16], 5, []]]]],
-        ['defaultsystemslayout', [[[[16], 0, []]]]],
+        ['systemslayout', [[[[16], 5]]]],
+        ['defaultsystemslayout', [[[[16], 0]]]],
         ['showdynamics', null],
         ['hidedynamics', null],
         ['usesystemsignseparator', null],
         ['multibarrest', null],
-        ['bracketextendmode', [[[[10], 0, ['nobrackets', 'groupstaves', 'groupsimilarinstruments']]]]],
-        ['singletracktracknamepolicy', [[[[10], 0, ['hidden', 'firstsystem', 'allsystems']]]]],
-        ['multitracktracknamepolicy', [[[[10], 0, ['hidden', 'firstsystem', 'allsystems']]]]],
-        ['firstsystemtracknamemode', [[[[10], 0, ['fullname', 'shortname']]]]],
-        ['othersystemstracknamemode', [[[[10], 0, ['fullname', 'shortname']]]]],
-        ['firstsystemtracknameorientation', [[[[10], 0, ['horizontal', 'vertical']]]]],
-        ['othersystemstracknameorientation', [[[[10], 0, ['horizontal', 'vertical']]]]]
+        ['bracketextendmode', [[[[10, 17], 0, ['nobrackets', 'groupstaves', 'groupsimilarinstruments']]]]],
+        ['singletracktracknamepolicy', [[[[10, 17], 0, ['hidden', 'firstsystem', 'allsystems']]]]],
+        ['multitracktracknamepolicy', [[[[10, 17], 0, ['hidden', 'firstsystem', 'allsystems']]]]],
+        ['firstsystemtracknamemode', [[[[10, 17], 0, ['fullname', 'shortname']]]]],
+        ['othersystemstracknamemode', [[[[10, 17], 0, ['fullname', 'shortname']]]]],
+        ['firstsystemtracknameorientation', [[[[10, 17], 0, ['horizontal', 'vertical']]]]],
+        ['othersystemstracknameorientation', [[[[10, 17], 0, ['horizontal', 'vertical']]]]]
     ]);
     public static readonly staffMetaDataSignatures = AlphaTex1LanguageDefinitions._signatures([
-        ['tuning', [[[[10], 0, ['piano', 'none', 'voice']]], [[[10], 5, []]]]],
+        ['tuning', [[[[10, 17], 0, ['piano', 'none', 'voice']]], [[[10, 17], 5]]]],
         [
             'chord',
             [
                 [
-                    [[17], 0, []],
-                    [[10, 17, 16], 5, []]
+                    [[17, 10], 0],
+                    [[10, 17, 16], 5]
                 ]
             ]
         ],
-        ['capo', [[[[16], 0, []]]]],
+        ['capo', [[[[16], 0]]]],
         [
             'lyrics',
             [
-                [[[17], 0, []]],
+                [[[17], 0]],
                 [
-                    [[16], 0, []],
-                    [[17], 0, []]
+                    [[16], 0],
+                    [[17], 0]
                 ]
             ]
         ],
@@ -186,25 +208,26 @@ export class AlphaTex1LanguageDefinitions {
             [
                 [[[10], 0, ['defaults']]],
                 [
-                    [[17], 0, []],
-                    [[10], 0, []]
+                    [[17, 10], 0],
+                    [[16], 0]
                 ],
                 [
-                    [[10], 0, []],
-                    [[10], 0, []]
+                    [[10], 0],
+                    [[10], 0]
                 ]
             ]
         ],
-        ['displaytranspose', [[[[16], 0, []]]]],
-        ['transpose', [[[[16], 0, []]]]]
+        ['displaytranspose', [[[[16], 0]]]],
+        ['transpose', [[[[16], 0]]]],
+        ['instrument', [[[[16], 0]], [[[17, 10], 0]], [[[10], 0, ['percussion']]]]]
     ]);
     public static readonly structuralMetaDataSignatures = AlphaTex1LanguageDefinitions._signatures([
         [
             'track',
             [
                 [
-                    [[17], 1, []],
-                    [[17], 1, []]
+                    [[17], 1],
+                    [[17], 1]
                 ]
             ]
         ],
@@ -215,28 +238,86 @@ export class AlphaTex1LanguageDefinitions {
         [
             'ts',
             [
-                [[[10], 0, ['common']]],
+                [[[10, 17], 0, ['common']]],
                 [
-                    [[16], 0, []],
-                    [[16], 0, []]
+                    [[16], 0],
+                    [[16], 0]
                 ]
             ]
         ],
         ['ro', null],
-        ['rc', [[[[16], 0, []]]]],
-        ['ae', [[[[16], 4, []]]]],
-        ['ks', [[[[10], 0, ['cb', 'gb', 'db', 'ab', 'eb', 'bb', 'f', 'c', 'g', 'd', 'a', 'e', 'b', 'f#', 'c#']]]]],
-        ['clef', [[[[10], 0, ['neutral', 'c3', 'c4', 'f4', 'g2']]]]],
-        ['ottava', [[[[10], 0, ['15ma', '8va', 'regular', '8vb', '15mb']]]]],
+        ['rc', [[[[16], 0]]]],
+        ['ae', [[[[16, 13], 4]]]],
+        [
+            'ks',
+            [
+                [
+                    [
+                        [10, 17],
+                        0,
+                        [
+                            'cb',
+                            'gb',
+                            'db',
+                            'ab',
+                            'eb',
+                            'bb',
+                            'f',
+                            'c',
+                            'g',
+                            'd',
+                            'a',
+                            'e',
+                            'b',
+                            'f#',
+                            'c#',
+                            'cbmajor',
+                            'abminor',
+                            'gbmajor',
+                            'ebminor',
+                            'dbmajor',
+                            'bbminor',
+                            'abmajor',
+                            'fminor',
+                            'ebmajor',
+                            'cminor',
+                            'bbmajor',
+                            'gminor',
+                            'fmajor',
+                            'dminor',
+                            'cmajor',
+                            'aminor',
+                            'gmajor',
+                            'eminor',
+                            'dmajor',
+                            'bminor',
+                            'amajor',
+                            'f#minor',
+                            'emajor',
+                            'c#minor',
+                            'bmajor',
+                            'g#minor',
+                            'f#major',
+                            'd#minor',
+                            'f#',
+                            'c#major',
+                            'a#minor',
+                            'c#'
+                        ]
+                    ]
+                ]
+            ]
+        ],
+        ['clef', [[[[10, 16, 17], 0, ['neutral', 'c3', 'c4', 'f4', 'g2', 'n', 'alto', 'tenor', 'bass', 'treble']]]]],
+        ['ottava', [[[[10, 17], 0, ['15ma', '8va', 'regular', '8vb', '15mb', '15ma', '8va', '8vb', '15mb']]]]],
         [
             'tempo',
             [
                 [
-                    [[16], 2, []],
-                    [[17], 1, []],
-                    [[16], 3, []],
-                    [[10], 1, ['hide']]
-                ]
+                    [[16], 2],
+                    [[17], 1]
+                ],
+                [null, [[16], 2], [[17], 0], [[16], 1], [[10], 1, ['hide']]]
             ]
         ],
         [
@@ -244,9 +325,32 @@ export class AlphaTex1LanguageDefinitions {
             [
                 [
                     [
-                        [10],
+                        [10, 16, 17],
                         0,
-                        ['none', 'triplet16th', 'triplet8th', 'dotted16th', 'dotted8th', 'scottish16th', 'scottish8th']
+                        [
+                            'none',
+                            'triplet16th',
+                            'triplet8th',
+                            'dotted16th',
+                            'dotted8th',
+                            'scottish16th',
+                            'scottish8th',
+                            'none',
+                            'no',
+                            'notripletfeel',
+                            't16',
+                            'triplet-16th',
+                            't8',
+                            'triplet-8th',
+                            'd16',
+                            'dotted-16th',
+                            'd8',
+                            'dotted-8th',
+                            's16',
+                            'scottish-16th',
+                            's8',
+                            'scottish-8th'
+                        ]
                     ]
                 ]
             ]
@@ -255,10 +359,10 @@ export class AlphaTex1LanguageDefinitions {
         [
             'section',
             [
-                [[[17], 0, []]],
+                [[[17, 10], 0]],
                 [
-                    [[17], 0, []],
-                    [[17], 0, []]
+                    [[17, 10], 0],
+                    [[17, 10], 0, null, ['x', '-', 'r']]
                 ]
             ]
         ],
@@ -267,7 +371,7 @@ export class AlphaTex1LanguageDefinitions {
             [
                 [
                     [
-                        [10],
+                        [10, 17],
                         0,
                         [
                             'fine',
@@ -295,13 +399,13 @@ export class AlphaTex1LanguageDefinitions {
             ]
         ],
         ['ft', null],
-        ['simile', [[[[10], 0, ['none', 'simple', 'firstofdouble', 'secondofdouble']]]]],
+        ['simile', [[[[10, 17], 0, ['none', 'simple', 'firstofdouble', 'secondofdouble']]]]],
         [
             'barlineleft',
             [
                 [
                     [
-                        [10],
+                        [10, 17],
                         0,
                         [
                             'automatic',
@@ -326,7 +430,7 @@ export class AlphaTex1LanguageDefinitions {
             [
                 [
                     [
-                        [10],
+                        [10, 17],
                         0,
                         [
                             'automatic',
@@ -346,23 +450,24 @@ export class AlphaTex1LanguageDefinitions {
                 ]
             ]
         ],
-        ['scale', [[[[16], 2, []]]]],
-        ['width', [[[[16], 2, []]]]],
+        ['scale', [[[[16], 2]]]],
+        ['width', [[[[16], 2]]]],
         [
             'sync',
             [
                 [
-                    [[16], 0, []],
-                    [[16], 0, []],
-                    [[16], 0, []],
-                    [[16], 3, []]
+                    [[16], 0],
+                    [[16], 0],
+                    [[16], 0],
+                    [[16], 3]
                 ]
             ]
         ],
-        ['accidentals', [[[[10], 0, ['auto', 'explicit']]]]],
-        ['spd', [[[[16], 2, []]]]],
-        ['sph', [[[[16], 2, []]]]],
-        ['spu', [[[[16], 2, []]]]]
+        ['accidentals', [[[[10, 17], 0, ['auto', 'explicit']]]]],
+        ['spd', [[[[16], 2]]]],
+        ['sph', [[[[16], 2]]]],
+        ['spu', [[[[16], 2]]]],
+        ['db', null]
     ]);
     public static readonly metaDataProperties = AlphaTex1LanguageDefinitions._metaProps([
         ['title', null],
@@ -393,22 +498,22 @@ export class AlphaTex1LanguageDefinitions {
         [
             'track',
             [
-                ['color', [[[[17], 0, []]]]],
-                ['systemslayout', [[[[16], 5, []]]]],
-                ['defaultsystemslayout', [[[[16], 0, []]]]],
+                ['color', [[[[17], 0]]]],
+                ['systemslayout', [[[[16], 5]]]],
+                ['defaultsystemslayout', [[[[16], 0]]]],
                 ['solo', null],
                 ['mute', null],
-                ['volume', [[[[16], 0, []]]]],
-                ['balance', [[[[16], 0, []]]]],
-                ['instrument', [[[[16], 0, []]], [[[17], 0, []]], [[[10], 0, ['percussion']]]]],
-                ['bank', [[[[16], 0, []]]]],
+                ['volume', [[[[16], 0]]]],
+                ['balance', [[[[16], 0]]]],
+                ['instrument', [[[[16], 0]], [[[17, 10], 0]], [[[10], 0, ['percussion']]]]],
+                ['bank', [[[[16], 0]]]],
                 ['multibarrest', null]
             ]
         ],
         [
             'staff',
             [
-                ['score', [[[[16], 1, []]]]],
+                ['score', [[[[16], 1]]]],
                 ['tabs', null],
                 ['slash', null],
                 ['numbered', null]
@@ -419,14 +524,14 @@ export class AlphaTex1LanguageDefinitions {
             'tuning',
             [
                 ['hide', null],
-                ['label', [[[[17], 0, []]]]]
+                ['label', [[[[17], 0]]]]
             ]
         ],
         [
             'chord',
             [
-                ['firstfret', [[[[16], 0, []]]]],
-                ['barre', [[[[16], 5, []]]]],
+                ['firstfret', [[[[16], 0]]]],
+                ['barre', [[[[16], 5]]]],
                 [
                     'showdiagram',
                     [[], [[[17], 0, ['true', 'false']]], [[[10], 0, ['true', 'false']]], [[[16], 0, ['1', '0']]]]
@@ -446,6 +551,7 @@ export class AlphaTex1LanguageDefinitions {
         ['articulation', null],
         ['displaytranspose', null],
         ['transpose', null],
+        ['instrument', null],
         ['ts', null],
         ['ro', null],
         ['rc', null],
@@ -468,7 +574,8 @@ export class AlphaTex1LanguageDefinitions {
         ['accidentals', null],
         ['spd', null],
         ['sph', null],
-        ['spu', null]
+        ['spu', null],
+        ['db', null]
     ]);
     public static readonly metaDataSignatures = [
         AlphaTex1LanguageDefinitions.scoreMetaDataSignatures,
@@ -482,8 +589,8 @@ export class AlphaTex1LanguageDefinitions {
             [
                 [[[16], 0, ['3', '5', '6', '7', '9', '10', '12']]],
                 [
-                    [[16], 0, []],
-                    [[16], 0, []]
+                    [[16], 0],
+                    [[16], 0]
                 ]
             ]
         ]
@@ -520,72 +627,72 @@ export class AlphaTex1LanguageDefinitions {
             [
                 [[[16], 0, ['3', '5', '6', '7', '9', '10', '12']]],
                 [
-                    [[16], 0, []],
-                    [[16], 0, []]
+                    [[16], 0],
+                    [[16], 0]
                 ]
             ]
         ],
-        ['txt', [[[[17], 0, []]]]],
+        ['txt', [[[[17, 10], 0]]]],
         [
             'lyrics',
             [
-                [[[17], 0, []]],
+                [[[17], 0]],
                 [
-                    [[16], 0, []],
-                    [[17], 0, []]
+                    [[16], 0],
+                    [[17], 0]
                 ]
             ]
         ],
         [
             'tb',
             [
-                [[[16], 4, []]],
+                [[[16, 13], 4]],
                 [
-                    [[10], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
-                    [[16], 4, []]
+                    [[10, 17], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
+                    [[16, 13], 4]
                 ],
                 [
-                    [[10], 0, ['default', 'gradual', 'fast']],
-                    [[16], 4, []]
+                    [[10, 17], 0, ['default', 'gradual', 'fast']],
+                    [[16, 13], 4]
                 ],
                 [
-                    [[10], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
-                    [[10], 0, ['default', 'gradual', 'fast']],
-                    [[16], 4, []]
+                    [[10, 17], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
+                    [[10, 17], 0, ['default', 'gradual', 'fast']],
+                    [[16, 13], 4]
                 ]
             ]
         ],
         [
             'tbe',
             [
-                [[[16], 4, []]],
+                [[[16, 13], 4]],
                 [
-                    [[10], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
-                    [[16], 4, []]
+                    [[10, 17], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
+                    [[16, 13], 4]
                 ],
                 [
-                    [[10], 0, ['default', 'gradual', 'fast']],
-                    [[16], 4, []]
+                    [[10, 17], 0, ['default', 'gradual', 'fast']],
+                    [[16, 13], 4]
                 ],
                 [
-                    [[10], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
-                    [[10], 0, ['default', 'gradual', 'fast']],
-                    [[16], 4, []]
+                    [[10, 17], 0, ['custom', 'dive', 'dip', 'hold', 'predive', 'predivedive']],
+                    [[10, 17], 0, ['default', 'gradual', 'fast']],
+                    [[16, 13], 4]
                 ]
             ]
         ],
-        ['bu', [[[[16], 1, []]]]],
-        ['bd', [[[[16], 1, []]]]],
-        ['au', [[[[16], 1, []]]]],
-        ['ad', [[[[16], 1, []]]]],
-        ['ch', [[[[17], 0, []]]]],
-        ['gr', [[[[10], 1, ['onbeat', 'beforebeat', 'bendgrace']]]]],
+        ['bu', [[[[16], 1]]]],
+        ['bd', [[[[16], 1]]]],
+        ['au', [[[[16], 1]]]],
+        ['ad', [[[[16], 1]]]],
+        ['ch', [[[[17, 10], 0]]]],
+        ['gr', [[[[10, 17], 1, ['onbeat', 'beforebeat', 'bendgrace', 'ob', 'bb', 'b']]]]],
         [
             'dy',
             [
                 [
                     [
-                        [10],
+                        [10, 17],
                         0,
                         [
                             'ppp',
@@ -623,25 +730,25 @@ export class AlphaTex1LanguageDefinitions {
             'tempo',
             [
                 [
-                    [[16], 0, []],
+                    [[16], 0],
                     [[10], 1, ['hide']]
                 ],
                 [
-                    [[16], 0, []],
-                    [[17], 0, []],
+                    [[16], 0],
+                    [[17], 0],
                     [[10], 1, ['hide']]
                 ]
             ]
         ],
-        ['volume', [[[[16], 0, []]]]],
-        ['balance', [[[[16], 0, []]]]],
+        ['volume', [[[[16], 0]]]],
+        ['balance', [[[[16], 0]]]],
         ['tp', [[[[16], 0, ['8', '16', '32']]]]],
         [
             'barre',
             [
                 [
-                    [[16], 0, []],
-                    [[10], 1, ['full', 'half']]
+                    [[16], 0],
+                    [[10, 17], 1, ['full', 'half']]
                 ]
             ]
         ],
@@ -650,7 +757,7 @@ export class AlphaTex1LanguageDefinitions {
             [
                 [
                     [
-                        [10],
+                        [10, 17],
                         0,
                         [
                             'ii',
@@ -676,27 +783,27 @@ export class AlphaTex1LanguageDefinitions {
                 ]
             ]
         ],
-        ['ot', [[[[10], 0, ['15ma', '8va', 'regular', '8vb', '15mb']]]]],
-        ['instrument', [[[[16], 0, []]], [[[17], 0, []]], [[[10], 0, ['percussion']]]]],
-        ['bank', [[[[16], 0, []]]]],
+        ['ot', [[[[10, 17], 0, ['15ma', '8va', 'regular', '8vb', '15mb', '15ma', '8va', '8vb', '15mb']]]]],
+        ['instrument', [[[[16], 0]], [[[17, 10], 0]], [[[10], 0, ['percussion']]]]],
+        ['bank', [[[[16], 0]]]],
         [
             'fermata',
             [
                 [
-                    [[10], 0, ['short', 'medium', 'long']],
-                    [[16], 1, []]
+                    [[10, 17], 0, ['short', 'medium', 'long']],
+                    [[16], 3]
                 ]
             ]
         ],
-        ['beam', [[[[10], 0, ['invert', 'up', 'down', 'auto', 'split', 'merge', 'splitsecondary']]]]]
+        ['beam', [[[[10, 17], 0, ['invert', 'up', 'down', 'auto', 'split', 'merge', 'splitsecondary']]]]]
     ]);
     public static readonly noteProperties = AlphaTex1LanguageDefinitions._props([
         ['nh', null],
-        ['ah', [[[[16], 0, []]]]],
-        ['th', [[[[16], 0, []]]]],
-        ['ph', [[[[16], 0, []]]]],
-        ['sh', [[[[16], 0, []]]]],
-        ['fh', [[[[16], 0, []]]]],
+        ['ah', [[[[16], 1]]]],
+        ['th', [[[[16], 1]]]],
+        ['ph', [[[[16], 1]]]],
+        ['sh', [[[[16], 1]]]],
+        ['fh', [[[[16], 1]]]],
         ['v', null],
         ['vw', null],
         ['sl', null],
@@ -717,7 +824,7 @@ export class AlphaTex1LanguageDefinitions {
             'tr',
             [
                 [
-                    [[16], 0, []],
+                    [[16], 0],
                     [[16], 1, ['16', '32', '64']]
                 ]
             ]
@@ -736,54 +843,54 @@ export class AlphaTex1LanguageDefinitions {
         [
             'b',
             [
-                [[[16], 4, []]],
+                [[[16, 13], 4]],
                 [
                     [
-                        [10],
+                        [10, 17],
                         0,
                         ['custom', 'bend', 'release', 'bendrelease', 'hold', 'prebend', 'prebendbend', 'prebendrelease']
                     ],
-                    [[16], 4, []]
+                    [[16, 13], 4]
                 ],
                 [
-                    [[10], 0, ['default', 'gradual', 'fast']],
-                    [[16], 4, []]
+                    [[10, 17], 0, ['default', 'gradual', 'fast']],
+                    [[16, 13], 4]
                 ],
                 [
                     [
-                        [10],
+                        [10, 17],
                         0,
                         ['custom', 'bend', 'release', 'bendrelease', 'hold', 'prebend', 'prebendbend', 'prebendrelease']
                     ],
-                    [[10], 0, ['default', 'gradual', 'fast']],
-                    [[16], 4, []]
+                    [[10, 17], 0, ['default', 'gradual', 'fast']],
+                    [[16, 13], 4]
                 ]
             ]
         ],
         [
             'be',
             [
-                [[[16], 4, []]],
+                [[[16, 13], 4]],
                 [
                     [
-                        [10],
+                        [10, 17],
                         0,
                         ['custom', 'bend', 'release', 'bendrelease', 'hold', 'prebend', 'prebendbend', 'prebendrelease']
                     ],
-                    [[16], 4, []]
+                    [[16, 13], 4]
                 ],
                 [
-                    [[10], 0, ['default', 'gradual', 'fast']],
-                    [[16], 4, []]
+                    [[10, 17], 0, ['default', 'gradual', 'fast']],
+                    [[16, 13], 4]
                 ],
                 [
                     [
-                        [10],
+                        [10, 17],
                         0,
                         ['custom', 'bend', 'release', 'bendrelease', 'hold', 'prebend', 'prebendbend', 'prebendrelease']
                     ],
-                    [[10], 0, ['default', 'gradual', 'fast']],
-                    [[16], 4, []]
+                    [[10, 17], 0, ['default', 'gradual', 'fast']],
+                    [[16, 13], 4]
                 ]
             ]
         ],
@@ -794,7 +901,7 @@ export class AlphaTex1LanguageDefinitions {
             [
                 [
                     [
-                        [10],
+                        [10, 17],
                         0,
                         [
                             'default',
@@ -803,12 +910,21 @@ export class AlphaTex1LanguageDefinitions {
                             'forcesharp',
                             'forcedoublesharp',
                             'forceflat',
-                            'forcedoubleflat'
+                            'forcedoubleflat',
+                            'd',
+                            '-',
+                            'n',
+                            '#',
+                            '##',
+                            'x',
+                            'b',
+                            'bb'
                         ]
                     ]
                 ]
             ]
         ],
-        ['slur', [[[[17], 0, []]], [[[10], 0, []]]]]
+        ['slur', [[[[17], 0]], [[[10], 0]]]],
+        ['-', null]
     ]);
 }

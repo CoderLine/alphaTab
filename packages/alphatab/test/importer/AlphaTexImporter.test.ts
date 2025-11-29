@@ -26,7 +26,12 @@ import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@coderline/alphatab/model/RenderStylesheet';
+import {
+    BracketExtendMode,
+    TrackNameMode,
+    TrackNameOrientation,
+    TrackNamePolicy
+} from '@coderline/alphatab/model/RenderStylesheet';
 import { type Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
@@ -1627,7 +1632,7 @@ describe('AlphaTexImporterTest', () => {
 
     it('tempo-label', () => {
         const score = parseTex(`
-            \\tempo 80 "Label"
+            \\tempo (80 "Label")
             .
         `);
         expect(score.tempo).to.equal(80);
@@ -1821,9 +1826,9 @@ describe('AlphaTexImporterTest', () => {
 
     it('tempo-automation-text', () => {
         const score = parseTex(`
-        \\tempo 100 "T1"
+        \\tempo (100 "T1")
         .
-        3.3.4 * 4 | \\tempo 80 "T2" 4.3.4*4
+        3.3.4 * 4 | \\tempo (80 "T2") 4.3.4*4
         `);
         expect(score.tempo).to.equal(100);
         expect(score.tempoLabel).to.equal('T1');
@@ -2342,15 +2347,23 @@ describe('AlphaTexImporterTest', () => {
         describe('at209', () => {
             it('tuning', () => importErrorTest('\\tuning Invalid'));
             it('articulation', () => importErrorTest('\\articulation "Test" 0'));
+            it('duration tuplet', () => importErrorTest('. :4 {tu 0}'));
+            it('beat tuplet', () => importErrorTest('. C4 {tu 0}'));
+            it('tremolo speed', () => importErrorTest('. C4 {tp 0}'));
+            it('trill', () => importErrorTest('. 3.3 {tr 4 0}'));
+            it('textalign', () => importErrorTest('\\title "Test" "" invalid'));
+        });
+
+        describe('at219', () => {
+            it('score empty', () => importErrorTest('\\title ()'));
+            it('bar empty', () => importErrorTest('. \\ts ()'));
+            it('bar missing', () => importErrorTest('. \\ts (3)'));
+
             it('score required', () => importErrorTest('\\title (1)'));
             it('bar required', () => importErrorTest('. \\rc ("a")'));
             it('score optional', () => importErrorTest('\\title ("Title" 1)'));
             it('bar optional', () => importErrorTest('. \\section ("a" 1)'));
-            it('duration tuplet', () => importErrorTest('. :4 {tu 0}'));
-            it('beat tuplet', () => importErrorTest('. C4 {tu 0}'));
-            it('tremolo speed', () => importErrorTest('. C4 {tp 0}'));
-            it('beam', () => importErrorTest('. C4 {beam invalid}'));
-            it('trill', () => importErrorTest('. 3.3 {tr 4 0}'));
+
             it('bracketextendmode', () => importErrorTest('\\bracketextendmode invalid'));
             it('singletracktracknamepolicy', () => importErrorTest('\\singletracktracknamepolicy invalid'));
             it('multitracktracknamepolicy', () => importErrorTest('\\multitracktracknamepolicy invalid'));
@@ -2359,7 +2372,6 @@ describe('AlphaTexImporterTest', () => {
             it('firstsystemtracknameorientation', () => importErrorTest('\\firstsystemtracknameorientation invalid'));
             it('othersystemstracknameorientation', () => importErrorTest('\\firstsystemtracknameorientation invalid'));
             it('accidentalmode', () => importErrorTest('\\accidentals invalid'));
-            it('textalign', () => importErrorTest('\\title "Test" "" invalid'));
             it('whammybartype', () => importErrorTest('C4 {tb invalid (0 1)}'));
             it('whammybarstyle', () => importErrorTest('C4 {tb none invalid (0 1)}'));
             it('dynamic', () => importErrorTest('C4 {dy invalid}'));
@@ -2370,12 +2382,8 @@ describe('AlphaTexImporterTest', () => {
             it('bendstyle', () => importErrorTest('C4 {b bend invalid (0 4)}'));
             it('gracetype', () => importErrorTest('C4 {gr (invalid)}'));
             it('barre', () => importErrorTest('C4 {barre (1 invalid)    }'));
-        });
 
-        describe('at210', () => {
-            it('score empty', () => importErrorTest('\\title ()'));
-            it('bar empty', () => importErrorTest('. \\ts ()'));
-            it('bar missing', () => importErrorTest('. \\ts (3)'));
+            it('beam', () => importErrorTest('. C4 {beam invalid}'));
         });
     });
 

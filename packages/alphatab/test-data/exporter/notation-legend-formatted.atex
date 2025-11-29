@@ -95,7 +95,7 @@
         7.3{t}.2{beam Down}
       |
         // Bar 4 / Voice 1 contents
-        7.3{be (bend 0 0 59.4 4)}.8{gr ob beam Up}
+        7.3{be (bend 0 0 59.4 4)}.8{gr onbeat beam Up}
         7.3{be (release 0 4 59.4 0) t}.4{beam Down}
         7.3{t}.2{d beam Down}
       |
@@ -112,7 +112,7 @@
         7.3{t}.2{beam Down}
       |
         // Bar 8 / Voice 1 contents
-        7.3{be (bend 0 0 59.4 4)}.8{gr ob beam Up}
+        7.3{be (bend 0 0 59.4 4)}.8{gr onbeat beam Up}
         7.3{be (release 0 4 59.4 0) t}.4{txt "grad." beam Down}
         7.3{t}.2{d beam Down}
       |
@@ -127,7 +127,7 @@
         7.3{be (prebendrelease 0 4 15 0)}.1{txt "grad." beam Down}
       |
         // Bar 12 / Voice 1 contents
-        7.3{be (prebendrelease 0 4 15 0)}.8{gr ob beam Up}
+        7.3{be (prebendrelease 0 4 15 0)}.8{gr onbeat beam Up}
         7.3{t}.1{beam Down}
       |
         // Bar 13 / Voice 1 contents
@@ -136,7 +136,7 @@
         7.3{t}.2{beam Down}
       |
         // Bar 14 / Voice 1 contents
-        7.3{be (prebendbend 0 4 15 6)}.8{gr ob beam Up}
+        7.3{be (prebendbend 0 4 15 6)}.8{gr onbeat beam Up}
         7.3{t}.1{beam Down}
       |
         // Bar 15 / Voice 1 contents
@@ -151,7 +151,7 @@
         (7.3{t} 7.2{t acc #}).2{beam Down}
       |
         // Bar 18 / Voice 1 contents
-        (7.2{be (bend 0 0 14.399999999999999 2) acc #} 7.3{be (bend 0 0 15 4)}).8{gr ob beam Up}
+        (7.2{be (bend 0 0 14.399999999999999 2) acc #} 7.3{be (bend 0 0 15 4)}).8{gr onbeat beam Up}
         (7.2{be (release 0 2 15 0) t} 7.3{be (release 0 4 15 0) t}).4{beam Down}
         (7.3{t} 7.2{t acc #}).2{d beam Down}
       |
@@ -168,19 +168,19 @@
         (15.2 12.3{t}).2{beam Down}
       |
         // Bar 22 / Voice 1 contents
-        7.3{be (bend 0 0 15 4)}.8{gr ob beam Up}
+        7.3{be (bend 0 0 15 4)}.8{gr onbeat beam Up}
         7.3{be (hold 0 4 60 4) t}.4{beam Down}
         (7.3{be (release 0 4 15 0) lr t} 8.2{lr}).4{beam Down}
         7.3{lr t}.2{beam Down}
       |
         // Bar 23 / Voice 1 contents
-        7.3{be (bend 0 0 15 4)}.8{gr ob beam Up}
+        7.3{be (bend 0 0 15 4)}.8{gr onbeat beam Up}
         7.3{be (hold 0 4 60 4) t}.4{beam Up}
         7.3{be (release 0 4 15 0) t}.4{beam Up}
         7.3{t}.2{beam Up}
       |
         // Bar 24 / Voice 1 contents
-        7.3{be (bend 0 0 15 4)}.8{gr ob beam Up}
+        7.3{be (bend 0 0 15 4)}.8{gr onbeat beam Up}
         7.3{be (hold 0 4 60 4) t}.4{beam Up}
         7.3{be (hold 0 4 60 4) t}.4{beam Up}
         7.3{be (prebendrelease 0 4 15 0)}.8{beam Up}
@@ -218,11 +218,11 @@
         5.3.4{d beam Down}
       |
         // Bar 30 / Voice 1 contents
-        5.3{h}.8{gr ob beam Up}
+        5.3{h}.8{gr onbeat beam Up}
         7.3.1{beam Down}
       |
         // Bar 31 / Voice 1 contents
-        5.3{sl}.8{gr ob beam Up}
+        5.3{sl}.8{gr onbeat beam Up}
         7.3.1{beam Down}
       |
         // Bar 32 / Voice 1 contents
@@ -238,23 +238,23 @@
         7.3.1{vw beam Down}
       |
         // Bar 36 / Voice 1 contents
-        12.3{x}.16{sd gr ob beam Up}
-        12.2{x}.16{sd gr ob beam Up}
+        12.3{x}.16{sd gr onbeat beam Up}
+        12.2{x}.16{sd gr onbeat beam Up}
         12.1.1{sd beam Down}
       |
         // Bar 37 / Voice 1 contents
-        5.1{x}.16{sd gr ob beam Up}
-        5.2{x}.16{sd gr ob beam Up}
+        5.1{x}.16{sd gr onbeat beam Up}
+        5.2{x}.16{sd gr onbeat beam Up}
         5.3.1{sd beam Down}
       |
         // Bar 38 / Voice 1 contents
-        12.3.16{sd gr ob beam Up}
-        12.2.16{sd gr ob beam Up}
+        12.3.16{sd gr onbeat beam Up}
+        12.2.16{sd gr onbeat beam Up}
         12.1.1{sd beam Down}
       |
         // Bar 39 / Voice 1 contents
-        5.1.16{sd gr ob beam Up}
-        5.2.16{sd gr ob beam Up}
+        5.1.16{sd gr onbeat beam Up}
+        5.2.16{sd gr onbeat beam Up}
         5.3.1{sd beam Down}
       |
         // Bar 40 / Voice 1 contents
@@ -489,7 +489,7 @@
         0.6.1{fermata (medium 0.5) beam Up}
       |
       // Masterbar 79 Metadata
-      \tf notripletfeel
+      \tf none
         // Bar 79 / Voice 1 contents
         21.1{acc #}.8{ot 8va beam Down}
         21.1{acc #}.8{ot 8va beam Down}
@@ -843,7 +843,7 @@
         12.3{lf 2}.4{sd beam Down}
         14.3{lf 4}.8{sd beam Down}
         12.3{lf 2}.8{su beam Down}
-        14.3{be (bendrelease 0 0 21.599999999999998 2 27.599999999999998 2 41.4 0) lf 4}.8{sd gr ob beam Up}
+        14.3{be (bendrelease 0 0 21.599999999999998 2 27.599999999999998 2 41.4 0) lf 4}.8{sd gr onbeat beam Up}
         14.3{t}.8{beam Down}
         14.3{t}.8{beam Down}
         14.4{lf 3}.4{su beam Down}

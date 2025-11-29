@@ -16,7 +16,7 @@ export const th: PropertyDefinition = {
                     shortDescription: 'The harmonic value',
                     longDescription: harmonicValueDocs,
                     type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    parseMode: ArgumentListParseTypesMode.Optional
                 }
             ]
         }

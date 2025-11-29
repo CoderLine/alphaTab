@@ -331,6 +331,7 @@ export class AlphaTex1EnumMappings {
         ['scottish8th', 6],
         ['none', 0],
         ['no', 0],
+        ['notripletfeel', 0],
         ['t16', 1],
         ['triplet-16th', 1],
         ['t8', 2],

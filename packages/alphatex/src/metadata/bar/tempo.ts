@@ -28,11 +28,29 @@ export const tempo: MetadataTagDefinition = {
                     type: AlphaTexNodeType.String,
                     parseMode: ArgumentListParseTypesMode.Optional,
                     defaultValue: '""'
+                }
+            ]
+        },
+        {
+            strict: true,
+            parameters: [
+                {
+                    name: 'tempo',
+                    shortDescription: 'The new tempo in BPM',
+                    type: AlphaTexNodeType.Number,
+                    parseMode: ArgumentListParseTypesMode.RequiredAsFloat
+                },
+                {
+                    name: 'label',
+                    shortDescription: 'A textual label for the tempo',
+                    type: AlphaTexNodeType.String,
+                    parseMode: ArgumentListParseTypesMode.Required,
+                    defaultValue: '""'
                 },
                 {
                     name: 'position',
                     shortDescription: 'A relative (ratio) position where within the bar the tempo change should happen',
-                    parseMode: ArgumentListParseTypesMode.OptionalAsFloat,
+                    parseMode: ArgumentListParseTypesMode.Optional,
                     defaultValue: '0',
                     type: AlphaTexNodeType.Number
                 },

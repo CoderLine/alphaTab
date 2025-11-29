@@ -14,6 +14,7 @@ export const txt: PropertyDefinition = {
                     name: 'text',
                     shortDescription: 'The text to show above the beat',
                     type: AlphaTexNodeType.String,
+                    allowAllStringTypes: true,
                     parseMode: ArgumentListParseTypesMode.Required
                 }
             ]
