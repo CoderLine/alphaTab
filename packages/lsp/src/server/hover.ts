@@ -212,7 +212,7 @@ function withSignaturesToMarkdown(docs: WithSignatures, prefix: string, syntaxNa
 }
 
 function signatureParametersToMarkdownTable(signatures: SignatureDefinition[]): string {
-    return signatures.length === 0
+    return signatures.length === 0 || (signatures.length === 1 && signatures[0].parameters.length === 0)
         ? ''
         : [
               '',
@@ -241,7 +241,11 @@ function signatureToSyntax(prefix: string, value: SignatureDefinition, index: nu
         syntax += `//  ${value.description}\n`;
     }
 
-    syntax += `${prefix} (${value.parameters.map(p => parameterToSyntax(p, true)).join(', ')})`;
+
+    syntax += prefix;
+    if(value.parameters.length > 0) {
+        syntax += `(${value.parameters.map(p => parameterToSyntax(p, true)).join(', ')})`;
+    }
 
     return syntax;
 }
