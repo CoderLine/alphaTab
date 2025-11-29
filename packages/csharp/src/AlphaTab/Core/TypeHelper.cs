@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -133,6 +133,7 @@ namespace AlphaTab.Core
         {
             return new List<T>(data.GetRange((int)start, (int)end - (int)start));
         }
+
         public static IEnumerable<T> Concat<T>(this IEnumerable<T> a, IEnumerable<T> b)
         {
             return Enumerable.Concat(a, b);
@@ -438,6 +439,13 @@ namespace AlphaTab.Core
             Func<TSource, TResult> func)
         {
             return source.Select(func).ToList();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IList<TResult> Map<TSource, TResult>(this IList<TSource> source,
+            Func<TSource, double, TResult> func)
+        {
+            return source.Select((v, i) => func(v, i)).ToList();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

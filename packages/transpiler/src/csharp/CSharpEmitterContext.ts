@@ -1093,6 +1093,15 @@ export default class CSharpEmitterContext {
         if ((tsType.flags & ts.TypeFlags.Object) !== 0 && !tsType.symbol) {
             if (this.typeChecker.isTupleType(tsType)) {
                 // Note: named tuples here if we start using it
+                if (tsType.aliasSymbol) {
+                    const type = this.typeChecker.getTypeOfSymbol(tsType.aliasSymbol);
+                    const aliasTuple = this.getTypeFromTsType(parent, type, tsType.aliasSymbol);
+                    // nullable?
+                    if (this.typeChecker.getNonNullableType(type) !== type) {
+                        aliasTuple!.isNullable = true;
+                    }
+                    return aliasTuple;
+                }
 
                 // Array style tuples: [unknown,unknown]
                 return this.makeArrayTupleType(parent, this.typeChecker.getTypeArguments(tsType as ts.TypeReference));
@@ -1231,6 +1240,14 @@ export default class CSharpEmitterContext {
                             reference.typeArguments!.push(parameterType);
                         }
                     }
+                }
+            }
+
+            // union type alias with nullable?
+            if (cs.isUsingDeclaration(declaration)) {
+                const nonNullable = this.typeChecker.getNonNullableType(tsType);
+                if (nonNullable !== tsType) {
+                    reference.isNullable = true;
                 }
             }
 
@@ -2120,5 +2137,56 @@ export default class CSharpEmitterContext {
         }
 
         return this.toMethodName(methodName);
+    }
+
+    public isSymbolArrayTupleInstance(expression: ts.Expression) {
+        const symbol = this.typeChecker.getSymbolAtLocation(expression);
+        let type: ts.Type;
+        if (symbol) {
+            type = this.typeChecker.getTypeOfSymbolAtLocation(symbol!, expression);
+            if (this.typeChecker.isTupleType(type)) {
+                return true;
+            }
+
+            type = this.typeChecker.getTypeOfSymbol(symbol!);
+            if (this.typeChecker.isTupleType(type)) {
+                return true;
+            }
+
+            if (type.aliasSymbol) {
+                const alias = type.aliasSymbol;
+                type = this.typeChecker.getTypeOfSymbol(alias);
+                if (this.typeChecker.isTupleType(type)) {
+                    return true;
+                }
+
+                type = this.typeChecker.getDeclaredTypeOfSymbol(alias);
+                if (this.typeChecker.isTupleType(type)) {
+                    return true;
+                }
+
+                if (type.isUnion()) {
+                    let tupleTypes = 0;
+                    for (const t of type.types) {
+                        if (this.typeChecker.isTupleType(t)) {
+                            tupleTypes++;
+                        } else if (t === this.typeChecker.getNullType()) {
+                            tupleTypes++; // nullable tuple
+                        }
+                    }
+
+                    if (tupleTypes === type.types.length) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        type = this.typeChecker.getTypeAtLocation(expression);
+        if (this.typeChecker.isTupleType(type)) {
+            return true;
+        }
+
+        return false;
     }
 }

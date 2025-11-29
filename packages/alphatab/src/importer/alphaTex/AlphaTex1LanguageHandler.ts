@@ -23,7 +23,8 @@ import {
     type AlphaTexPropertyNode,
     type AlphaTexStringLiteral,
     type AlphaTexTextNode,
-    type IAlphaTexArgumentValue
+    type IAlphaTexArgumentValue,
+    type IAlphaTexAstNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import {
     AlphaTexDiagnosticCode,
@@ -914,7 +915,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 {
                     signature: v,
                     parameterIndex: 0
-                }
+                } as SignatureResolutionInfo
             ])
         );
 
@@ -922,7 +923,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return true;
         }
 
-        function trackValue(value: AlphaTexAstNode, overloadIndex: number) {
+        const trackValue = (value: IAlphaTexAstNode, overloadIndex: number) => {
             const overload = candidates.get(overloadIndex)!;
             const valueNode = value as IAlphaTexArgumentValue;
             if (!valueNode.parameterIndices) {
@@ -2458,10 +2459,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return;
         }
 
-        const values: IAlphaTexArgumentValue[] = [];
+        const args: IAlphaTexArgumentValue[] = [];
 
         if (value !== undefined) {
-            values.push(Atnf.string(value));
+            args.push(Atnf.string(value));
         }
 
         if (element !== undefined) {
@@ -2473,19 +2474,19 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 ? ScoreStyle.defaultHeaderAndFooter.get(element)
                 : undefined;
             if (style && (!defaultStyle || !HeaderFooterStyle.equals(defaultStyle, style))) {
-                values.push(Atnf.string(style.isVisible === false ? '' : style.template));
-                values.push(Atnf.ident(AlphaTex1EnumMappings.textAlignReversed.get(style.textAlign)!));
+                args.push(Atnf.string(style.isVisible === false ? '' : style.template));
+                args.push(Atnf.ident(AlphaTex1EnumMappings.textAlignReversed.get(style.textAlign)!));
             }
         }
 
         // do not write with all defaults
-        if (value === undefined && values.length === 0) {
+        if (value === undefined && args.length === 0) {
             return;
-        } else if (value !== undefined && value.length === 0 && values.length === 1) {
+        } else if (value !== undefined && value.length === 0 && args.length === 1) {
             return;
         }
 
-        nodes.push(Atnf.meta(tag, Atnf.args(values)));
+        nodes.push(Atnf.meta(tag, Atnf.args(args)));
     }
 
     public buildSyncPointNodes(score: Score): AlphaTexMetaDataNode[] {
@@ -3156,7 +3157,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (beat.hasWhammyBar) {
-            const tbeValues = Atnf.args(
+            const tbeArgs = Atnf.args(
                 [
                     Atnf.ident(AlphaTex1EnumMappings.whammyTypeReversed.get(beat.whammyBarType)!),
                     Atnf.ident(AlphaTex1EnumMappings.bendStyleReversed.get(beat.whammyStyle)!)
@@ -3164,11 +3165,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 true
             )!;
             for (const p of beat.whammyBarPoints!) {
-                tbeValues.arguments.push(Atnf.number(p.offset));
-                tbeValues.arguments.push(Atnf.number(p.value));
+                tbeArgs.arguments.push(Atnf.number(p.offset));
+                tbeArgs.arguments.push(Atnf.number(p.value));
             }
 
-            Atnf.prop(properties, 'tbe', tbeValues);
+            Atnf.prop(properties, 'tbe', tbeArgs);
         }
 
         let brushType = '';

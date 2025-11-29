@@ -5,13 +5,13 @@ import {
 } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import {
     type AlphaTexArgumentList,
-    type AlphaTexAstNode,
     type AlphaTexMetaDataTagNode,
     AlphaTexNodeType,
     type AlphaTexNumberLiteral,
     type AlphaTexPropertyNode,
     type AlphaTexTextNode,
-    type IAlphaTexArgumentValue
+    type IAlphaTexArgumentValue,
+    type IAlphaTexAstNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import {
@@ -151,11 +151,11 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 {
                     signature: v,
                     parameterIndex: 0
-                }
+                } as SignatureResolutionInfo
             ])
         );
 
-        function trackValue(value: AlphaTexAstNode, overloadIndex: number) {
+        const trackValue = (value: IAlphaTexAstNode, overloadIndex: number) => {
             const candidate = candidates.get(overloadIndex)!;
             if (value.nodeType === AlphaTexNodeType.LParen) {
                 const args = parser.argumentList();
@@ -174,14 +174,14 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                     valueNode.parameterIndices = new Map<number, number>();
                 }
                 valueNode.parameterIndices.set(overloadIndex, candidate.parameterIndex);
-                if (argValues[argValues.length - 1] !== valueNode) {
+                if (argValues.length === 0 || argValues[argValues.length - 1] !== valueNode) {
                     argValues.push(valueNode);
                     parser.lexer.advance();
                 }
             }
         }
 
-        function extendToFloat(value: AlphaTexNumberLiteral) {
+        const extendToFloat = (value: AlphaTexNumberLiteral) => {
             parser.lexer.extendToFloat(value);
         }
 
@@ -215,7 +215,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 error = true;
             } else if (candidates.size === 0) {
                 if (!eof && argValues.length === 0) {
-                    argValues.push(parser.lexer.peekToken()!);
+                    argValues.push(parser.lexer.peekToken() as IAlphaTexArgumentValue);
                 }
                 parser.addParserDiagnostic({
                     code: AlphaTexDiagnosticCode.AT219,
@@ -233,7 +233,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             let remaining = parser.lexer.peekToken();
             while (remaining && !endOfListTypes!.has(remaining.nodeType)) {
                 if (AlphaTex1MetaDataReader._handleTypeValueListItem(remaining, undefined, extendToFloat)) {
-                    argValues.push(remaining);
+                    argValues.push(remaining as IAlphaTexArgumentValue);
                     parser.lexer.advance();
                     remaining = parser.lexer.peekToken();
                 } else {
@@ -339,6 +339,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             case ArgumentListParseTypesMode.RequiredAsValueList:
             case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
                 p += '[]';
+                break;
         }
 
         return p;
@@ -346,8 +347,8 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
 
     public static filterSignatureCandidates(
         candidates: Map<number, SignatureResolutionInfo>,
-        value: AlphaTexAstNode,
-        trackValue?: (value: IAlphaTexArgumentValue, signature: number) => void,
+        value: IAlphaTexAstNode,
+        trackValue?: (value: IAlphaTexAstNode, signature: number) => void,
         extendToFloat?: (value: AlphaTexNumberLiteral) => void
     ) {
         const toRemove = new Set<number>();
@@ -367,7 +368,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                     toRemove.add(overloadIndex);
                     handled = true;
                 } else if (
-                    (expected.expectedTypes.has(value?.nodeType) ||
+                    (expected.expectedTypes.has(value.nodeType) ||
                         // value lists start with a parenthesis open token
                         AlphaTex1MetaDataReader._isValueListMatch(value, expected)) &&
                     AlphaTex1MetaDataReader._handleTypeValueListItem(value, expected, extendToFloat)
@@ -423,7 +424,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
     }
 
     private static _handleTypeValueListItem(
-        value: AlphaTexAstNode,
+        value: IAlphaTexAstNode,
         expected: AlphaTexParameterDefinition | undefined,
         extendToFloat?: (value: AlphaTexNumberLiteral) => void
     ): boolean {
@@ -463,7 +464,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         return false;
     }
 
-    private static _isValueListMatch(value: AlphaTexAstNode, expected: AlphaTexParameterDefinition): boolean {
+    private static _isValueListMatch(value: IAlphaTexAstNode, expected: AlphaTexParameterDefinition): boolean {
         if (value.nodeType !== AlphaTexNodeType.LParen) {
             return false;
         }

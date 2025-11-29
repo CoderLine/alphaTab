@@ -483,9 +483,9 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
             case AlphaTexNodeType.Ident:
             case AlphaTexNodeType.String:
             case AlphaTexNodeType.Number:
-                const value = node as IAlphaTexArgumentValue;
-                if (value.parameterIndices) {
-                    children.push(['parameterIndices', value.parameterIndices]);
+                const arg = node as IAlphaTexArgumentValue;
+                if (arg.parameterIndices) {
+                    children.push(['parameterIndices', arg.parameterIndices]);
                 }
                 break;
 

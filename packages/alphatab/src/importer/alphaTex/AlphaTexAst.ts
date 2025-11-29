@@ -237,10 +237,10 @@ export interface IAlphaTexArgumentValue extends IAlphaTexAstNode {
      * array contains the index to the parameter definition in the alphaTex language definitino.
      *
      * This value can be used to lookup the respective parameter definition in
-     * the documentation or alphaTex language definition. As paramters can be optional this value 
+     * the documentation or alphaTex language definition. As paramters can be optional this value
      * allows a reverse lookup to the parameter information.
      */
-    parameterIndices?: Map<number,number>;
+    parameterIndices?: Map<number, number>;
 }
 
 /**

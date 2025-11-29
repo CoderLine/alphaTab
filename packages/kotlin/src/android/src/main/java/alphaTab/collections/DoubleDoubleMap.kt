@@ -46,7 +46,7 @@ public class DoubleDoubleMapEntryInternal : DoubleDoubleMapEntry(), IMapEntryInt
 
 public class DoubleDoubleMap : MapBase<DoubleDoubleMapEntry, DoubleDoubleMapEntryInternal> {
     public constructor()
-    public constructor(items: Iterable<alphaTab.core.DoubleDoubleArrayTuple>) {
+    public constructor(items: Iterable<alphaTab.core.IDoubleDoubleArrayTuple>) {
         for ((k, v) in items) {
             set(k, v)
         }

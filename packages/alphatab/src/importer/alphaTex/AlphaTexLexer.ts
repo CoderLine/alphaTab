@@ -170,7 +170,7 @@ export class AlphaTexLexer {
 
     private _readToken(): AlphaTexAstNode | undefined {
         this._leadingComments = undefined;
-        while (this._codepoint !== AlphaTexLexer._eof) {
+        while (this._codepoint !== AlphaTexLexer._eof && !this.fatalError) {
             this._tokenStart = this._currentLexerLocation();
             if (AlphaTexLexer._terminalTokens.has(this._codepoint)) {
                 const token = AlphaTexLexer._terminalTokens.get(this._codepoint)!(this);

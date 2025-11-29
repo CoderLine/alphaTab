@@ -54,7 +54,7 @@ public class ObjectBooleanMapEntryInternal<TKey> : ObjectBooleanMapEntry<TKey>()
 public class ObjectBooleanMap<TKey> :
     MapBase<ObjectBooleanMapEntry<TKey>, ObjectBooleanMapEntryInternal<TKey>> {
     public constructor()
-    public constructor(iterable: Iterable<ObjectBooleanArrayTuple<TKey>>) {
+    public constructor(iterable: Iterable<alphaTab.core.IObjectBooleanArrayTuple<TKey>>) {
         for (it in iterable) {
             set(it.v0, it.v1)
         }

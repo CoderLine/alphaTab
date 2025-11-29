@@ -6,7 +6,9 @@ import type { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/al
 type SimpleAlphaTexParameterDefinition =
     | [AlphaTexNodeType[], ArgumentListParseTypesMode]
     | [AlphaTexNodeType[], ArgumentListParseTypesMode, string[]]
-    | [AlphaTexNodeType[], ArgumentListParseTypesMode, string[] | null, string[]];
+    | [AlphaTexNodeType[], ArgumentListParseTypesMode, string[] | null, string[]]
+    | null;
+
 /**
  * @record
  * @internal
@@ -29,12 +31,16 @@ export interface AlphaTexSignatureDefinition {
  * @internal
  */
 export class AlphaTex1LanguageDefinitions {
-    private static _param(simple: SimpleAlphaTexParameterDefinition): AlphaTexParameterDefinition {
+    private static _param(simple: SimpleAlphaTexParameterDefinition): AlphaTexParameterDefinition | null {
+        if (!simple) {
+            return null;
+        }
+        
         return {
-            expectedTypes: new Set(simple[0]),
+            expectedTypes: new Set<AlphaTexNodeType>(simple[0]),
             parseMode: simple[1],
-            allowedValues: simple.length > 2 && simple[2] && simple[2].length > 0 ? new Set(simple[2]) : undefined,
-            reservedIdentifiers: simple.length > 3 && simple[3] && simple[3].length > 0 ? new Set(simple[3]) : undefined
+            allowedValues: simple.length > 2 && simple[2] && simple[2]!.length > 0 ? new Set<string>(simple[2]!) : undefined,
+            reservedIdentifiers: simple.length > 3 && simple[3] && simple[3]!.length > 0 ? new Set<string>(simple[3]!) : undefined
         };
     }
     private static _simple(
@@ -45,21 +51,21 @@ export class AlphaTex1LanguageDefinitions {
         }
         return signature.map(s => ({
             isStrict: s.length > 0 && s[0] === null,
-            parameters: s.filter(p => p !== null).map(AlphaTex1LanguageDefinitions._param)
-        }));
+            parameters: s.map(AlphaTex1LanguageDefinitions._param).filter(p => p !== null)
+        } as AlphaTexSignatureDefinition));
     }
     private static _metaProps(props: [string, [string, SimpleAlphaTexParameterDefinition[][] | null][] | null][]) {
         return new Map(
             props.map(p => [
                 p[0],
-                p[1] === null ? null : new Map(p[1].map(p => [p[0], AlphaTex1LanguageDefinitions._simple(p[1])]))
+                p[1] === null ? null : new Map(p[1]!.map(p => [p[0], AlphaTex1LanguageDefinitions._simple(p[1])]))
             ])
         );
     }
     private static _props(props: [string, SimpleAlphaTexParameterDefinition[][] | null][]) {
         return new Map(props.map(p => [p[0], AlphaTex1LanguageDefinitions._simple(p[1])]));
     }
-    private static _signatures(signatures: [string, (SimpleAlphaTexParameterDefinition | null)[][] | null][]) {
+    private static _signatures(signatures: [string, SimpleAlphaTexParameterDefinition[][] | null][]) {
         return new Map(signatures.map(s => [s[0], AlphaTex1LanguageDefinitions._simple(s[1])]));
     }
     // The following definitions age auto-generated from the central definitions in
