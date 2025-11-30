@@ -1,7 +1,6 @@
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const fermata: PropertyDefinition = {
     property: 'fermata',
@@ -14,14 +13,14 @@ export const fermata: PropertyDefinition = {
                 {
                     name: 'type',
                     shortDescription: 'The fermata type',
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     ...enumParameter('FermataType')
                 },
                 {
                     name: 'length',
                     shortDescription: 'The fermata length',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.OptionalAsFloat,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.OptionalAsFloat,
                     defaultValue: 0
                 }
             ]

@@ -1,5 +1,4 @@
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
 
 export const capo: MetadataTagDefinition = {
@@ -13,8 +12,8 @@ export const capo: MetadataTagDefinition = {
                 {
                     name: 'fret',
                     shortDescription: 'The fret on which a capo is placed',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 }
             ]
         }

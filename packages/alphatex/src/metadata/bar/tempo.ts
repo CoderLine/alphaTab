@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const tempo: MetadataTagDefinition = {
     tag: '\\tempo',
@@ -19,14 +18,14 @@ export const tempo: MetadataTagDefinition = {
                 {
                     name: 'tempo',
                     shortDescription: 'The new tempo in BPM',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.RequiredAsFloat
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.RequiredAsFloat
                 },
                 {
                     name: 'label',
                     shortDescription: 'A textual label for the tempo',
-                    type: AlphaTexNodeType.String,
-                    parseMode: ArgumentListParseTypesMode.Optional,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional,
                     defaultValue: '""'
                 }
             ]
@@ -37,28 +36,28 @@ export const tempo: MetadataTagDefinition = {
                 {
                     name: 'tempo',
                     shortDescription: 'The new tempo in BPM',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.RequiredAsFloat
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.RequiredAsFloat
                 },
                 {
                     name: 'label',
                     shortDescription: 'A textual label for the tempo',
-                    type: AlphaTexNodeType.String,
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     defaultValue: '""'
                 },
                 {
                     name: 'position',
                     shortDescription: 'A relative (ratio) position where within the bar the tempo change should happen',
-                    parseMode: ArgumentListParseTypesMode.Optional,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional,
                     defaultValue: '0',
-                    type: AlphaTexNodeType.Number
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 },
                 {
                     name: 'hide',
                     shortDescription: 'If specified the tempo change is not visually shown',
-                    type: AlphaTexNodeType.Ident,
-                    parseMode: ArgumentListParseTypesMode.Optional,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Ident,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional,
                     values: [
                         {
                             name: 'hide',

@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const tu: PropertyDefinition = {
     property: 'tu',
@@ -17,8 +16,8 @@ export const tu: PropertyDefinition = {
                 {
                     name: 'simple',
                     shortDescription: 'The simple tuplet',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     values: [
                         { name: '3', snippet: '3', shortDescription: '3:2 Tuplet' },
                         { name: '5', snippet: '5', shortDescription: '5:4 Tuplet' },
@@ -36,14 +35,14 @@ export const tu: PropertyDefinition = {
                 {
                     name: 'numerator',
                     shortDescription: 'The tuplet numerator',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 },
                 {
                     name: 'denominator',
                     shortDescription: 'The tuplet denominator',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 }
             ]
         }

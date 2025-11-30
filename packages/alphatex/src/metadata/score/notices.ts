@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const notices: MetadataTagDefinition = {
     tag: '\\notices',
@@ -12,9 +11,9 @@ export const notices: MetadataTagDefinition = {
                 {
                     name: 'value',
                     shortDescription: 'The value to set',
-                    type: AlphaTexNodeType.String,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
                     allowAllStringTypes: true,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 }
             ]
         }

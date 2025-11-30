@@ -1,19 +1,18 @@
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { ParameterDefinition, PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 const type: ParameterDefinition = {
     name: 'type',
     shortDescription: 'The type of bend (affects the display).',
-    parseMode: ArgumentListParseTypesMode.Required,
+    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
     ...enumParameter('BendType')
 };
 
 const style: ParameterDefinition = {
     name: 'style',
     shortDescription: 'The style of the whammy play style.',
-    parseMode: ArgumentListParseTypesMode.Required,
+    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
     ...enumParameter('BendStyle')
 };
 
@@ -25,8 +24,8 @@ const values: ParameterDefinition = {
     The offset and value are actually two parameters: 
     \`3.3 {be (0 0 5 2 30 4)}\`
     `,
-    parseMode: ArgumentListParseTypesMode.ValueListWithoutParenthesis,
-    type: AlphaTexNodeType.Number
+    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.ValueListWithoutParenthesis,
+    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
 };
 
 export const be: PropertyDefinition = {

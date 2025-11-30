@@ -1,5 +1,4 @@
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
 
 export const list: [string, number][] = [
@@ -123,8 +122,8 @@ export const articulation: MetadataTagDefinition = {
             parameters: [
                 {
                     name: 'defaults',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Ident,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Ident,
                     shortDescription: '',
                     values: [
                         {
@@ -140,15 +139,15 @@ export const articulation: MetadataTagDefinition = {
             parameters: [
                 {
                     name: 'name',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.String,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
                     allowAllStringTypes: true,
                     shortDescription: 'The string used in the note values'
                 },
                 {
                     name: 'value',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
                     shortDescription: 'The numeric value of the built-in articulation'
                 }
             ]

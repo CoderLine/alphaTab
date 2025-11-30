@@ -10,7 +10,9 @@ export const useSystemSignSeparator: MetadataTagDefinition = {
             parameters: []
         }
     ],
-    examples: `
+    examples: {
+        options: { display: { systemsLayoutMode: 'UseModelLayout' } },
+        tex: `
         \\useSystemSignSeparator
         \\defaultSystemsLayout 2
         \\track "T1"
@@ -18,4 +20,5 @@ export const useSystemSignSeparator: MetadataTagDefinition = {
         \\track "T2"
         :1 C4 | C4 | C4
         `
+    }
 };

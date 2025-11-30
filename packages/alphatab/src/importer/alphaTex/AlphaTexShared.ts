@@ -318,7 +318,7 @@ export interface IAlphaTexImporter {
 
 /**
  * Defines how the arguments of the meta data tag is parsed.
- * @internal
+ * @public
  */
 export enum ArgumentListParseTypesMode {
     /**

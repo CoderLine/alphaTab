@@ -1,23 +1,23 @@
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const bracketExtendMode: MetadataTagDefinition = {
     tag: '\\bracketExtendMode',
     snippet: '\\bracketExtendMode ${1:groupStaves}$0',
     shortDescription: `Set the mode for brackets and braces.`,
-    longDescription: `Set the mode for [brackets and braces](https://next.alphatab.net/docs/showcase/general#brackets-and-braces).`,
+    longDescription: `Set the mode for [brackets and braces](https://alphatab.net/docs/showcase/general#brackets-and-braces).`,
     signatures: [
-      {
-        parameters: [
-          {
-            name: 'mode',
-            parseMode: ArgumentListParseTypesMode.Required,
-            shortDescription: 'The mode to use',
-            ...enumParameter('BracketExtendMode')
-          }
-        ]
-      }
+        {
+            parameters: [
+                {
+                    name: 'mode',
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    shortDescription: 'The mode to use',
+                    ...enumParameter('BracketExtendMode')
+                }
+            ]
+        }
     ],
     examples: `
         \\bracketextendmode GroupSimilarInstruments

@@ -216,7 +216,7 @@ function signatureParametersToMarkdownTable(signatures: SignatureDefinition[]): 
         ? ''
         : [
               '',
-              '**Values:**',
+              '**Parameters:**',
               '| Name | Description | Type | Required |',
               '|------|-------------|------|----------|',
               ...signatures.flatMap((s, si) =>
@@ -244,7 +244,7 @@ function signatureToSyntax(prefix: string, value: SignatureDefinition, index: nu
 
     syntax += prefix;
     if(value.parameters.length > 0) {
-        syntax += `(${value.parameters.map(p => parameterToSyntax(p, true)).join(', ')})`;
+        syntax += `(${value.parameters.map(p => parameterToSyntax(p, true)).join(' ')})`;
     }
 
     return syntax;

@@ -1,13 +1,13 @@
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const otherSystemsTrackNameOrientation: MetadataTagDefinition = {
     tag: '\\otherSystemsTrackNameOrientation',
     snippet: '\\otherSystemsTrackNameOrientation ${1:vertical}$0',
     shortDescription: 'The orientation of track names to show for systems after the first one.',
     longDescription: `
-    Configures the orientation of the [track names](https://next.alphatab.net/docs/showcase/general#track-names) on the second and subsequent systems.
+    Configures the orientation of the [track names](https://alphatab.net/docs/showcase/general#track-names) on the second and subsequent systems.
     `,
     signatures: [
         {
@@ -15,7 +15,7 @@ export const otherSystemsTrackNameOrientation: MetadataTagDefinition = {
                 {
                     name: 'orientation',
                     shortDescription: 'The orientation to use',
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     ...enumParameter('TrackNameOrientation')
                 }
             ]

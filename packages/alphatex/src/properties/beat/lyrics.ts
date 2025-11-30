@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const beatLyrics: PropertyDefinition = {
     property: 'lyrics',
@@ -17,8 +16,8 @@ export const beatLyrics: PropertyDefinition = {
                 {
                     name: 'text',
                     shortDescription: 'The lyrics to show',
-                    type: AlphaTexNodeType.String,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 }
             ]
         },
@@ -27,14 +26,14 @@ export const beatLyrics: PropertyDefinition = {
                 {
                     name: 'line',
                     shortDescription: 'The line number (e.g. for multiple verses)',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 },
                 {
                     name: 'text',
                     shortDescription: 'The lyrics to show',
-                    type: AlphaTexNodeType.String,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 }
             ]
         }

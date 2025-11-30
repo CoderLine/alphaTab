@@ -1,6 +1,7 @@
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+
 
 export const jump: MetadataTagDefinition = {
     tag: '\\jump',
@@ -12,7 +13,7 @@ export const jump: MetadataTagDefinition = {
                 {
                     name: 'direction',
                     shortDescription: 'The direction to add',
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     ...enumParameter('Direction')
                 }
             ]

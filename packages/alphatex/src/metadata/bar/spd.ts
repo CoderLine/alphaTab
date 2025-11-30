@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const spd: MetadataTagDefinition = {
     tag: '\\spd',
@@ -17,8 +16,8 @@ export const spd: MetadataTagDefinition = {
                 {
                     name: 'position',
                     shortDescription: 'The relative position within the bar for the marker (0-1)',
-                    parseMode: ArgumentListParseTypesMode.RequiredAsFloat,
-                    type: AlphaTexNodeType.Number
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.RequiredAsFloat,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 }
             ]
         }

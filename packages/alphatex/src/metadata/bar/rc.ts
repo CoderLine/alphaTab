@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const rc: MetadataTagDefinition = {
     tag: '\\rc',
@@ -13,8 +12,8 @@ export const rc: MetadataTagDefinition = {
                 {
                     name: 'repeats',
                     shortDescription: 'The number of repeats which should be played',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 }
             ]
         }

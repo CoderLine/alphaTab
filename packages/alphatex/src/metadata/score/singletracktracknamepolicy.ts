@@ -1,13 +1,13 @@
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const singleTrackTrackNamePolicy: MetadataTagDefinition = {
     tag: '\\singleTrackTrackNamePolicy',
     snippet: '\\singleTrackTrackNamePolicy ${1:firstSystem}$0',
     shortDescription: 'Sets the track name visibility when rendering single tracks.',
     longDescription: `
-    Configures on which systems to show the [track names](https://next.alphatab.net/docs/showcase/general#track-names) when only a single track is rendered.
+    Configures on which systems to show the [track names](https://alphatab.net/docs/showcase/general#track-names) when only a single track is rendered.
     `,
     signatures: [
         {
@@ -15,7 +15,7 @@ export const singleTrackTrackNamePolicy: MetadataTagDefinition = {
                 {
                     name: 'mode',
                     shortDescription: 'The mode to use',
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     ...enumParameter('TrackNamePolicy')
                 }
             ]

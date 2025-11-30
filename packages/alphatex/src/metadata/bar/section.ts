@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const section: MetadataTagDefinition = {
     tag: '\\section',
@@ -12,9 +11,9 @@ export const section: MetadataTagDefinition = {
                 {
                     name: 'text',
                     shortDescription: 'The text/description of the new section',
-                    type: AlphaTexNodeType.String,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
                     allowAllStringTypes: true,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 }
             ]
         },
@@ -23,16 +22,16 @@ export const section: MetadataTagDefinition = {
                 {
                     name: 'marker',
                     shortDescription: 'The marker for the section, typically a single letter',
-                    type: AlphaTexNodeType.String,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
                     allowAllStringTypes: true,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 },
                 {
                     name: 'text',
                     shortDescription: 'The text/description of the new section',
-                    type: AlphaTexNodeType.String,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
                     allowAllStringTypes: true,
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     reservedIdentifiers: ['x', '-', 'r']
                 }
             ]

@@ -157,7 +157,9 @@ async function showBackingTrack(at: alphaTab.AlphaTabApi) {
     backingTrackScore = at.score;
 
     const audioContext = new AudioContext();
-    const rawData = await audioContext.decodeAudioData(structuredClone(at.score!.backingTrack.rawAudioFile!.buffer) as ArrayBuffer);
+    const rawData = await audioContext.decodeAudioData(
+        structuredClone(at.score!.backingTrack.rawAudioFile!.buffer) as ArrayBuffer
+    );
 
     const topChannel = rawData.getChannelData(0);
     const bottomChannel = rawData.numberOfChannels > 1 ? rawData.getChannelData(1) : topChannel;
@@ -541,7 +543,7 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
                 const neededSize = totalSamples + chunk.samples.length;
                 if (generated.length < neededSize) {
                     const needed = neededSize - generated.length;
-                    const newBuffer:Float32Array = new Float32Array(generated.length + needed);
+                    const newBuffer: Float32Array = new Float32Array(generated.length + needed);
                     newBuffer.set(generated, 0);
                     generated = newBuffer;
                 }
@@ -564,7 +566,13 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
                     ? `${at.score!.title}_${exportOptions.sampleRate}_float32.pcm`
                     : `song_${exportOptions.sampleRate}_float32.pcm`;
             a.href = URL.createObjectURL(
-                new Blob([new Uint8Array<ArrayBuffer>(generated.buffer as ArrayBuffer, generated.byteOffset, generated.byteLength)])
+                new Blob([
+                    new Uint8Array<ArrayBuffer>(
+                        generated.buffer as ArrayBuffer,
+                        generated.byteOffset,
+                        generated.byteLength
+                    )
+                ])
             );
             document.body.appendChild(a);
             a.click();
@@ -610,7 +618,225 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
         new bootstrap.Tooltip(t);
     }
 
+    at.playbackRangeChanged.on(e => {
+        if (e.playbackRange) {
+        }
+    });
+
+    setupSelectionHandles(el, at);
+
+    // expose api for fiddling in developer tools
+    (window as any).api = at;
+
     return at;
+}
+
+function createSelectionHandles(element: HTMLElement): { startHandle: HTMLElement; endHandle: HTMLElement } {
+    // create
+    const handleWrapper = document.createElement('div');
+    handleWrapper.classList.add('at-selection-handles');
+    element.insertBefore(handleWrapper, element.querySelector('at-surface'));
+
+    const startHandle = document.createElement('div');
+    startHandle.classList.add('at-selection-handle', 'at-selection-handle-start');
+    handleWrapper.appendChild(startHandle);
+
+    const endHandle = document.createElement('div');
+    endHandle.classList.add('at-selection-handle', 'at-selection-handle-end');
+    handleWrapper.appendChild(endHandle);
+
+    return { startHandle, endHandle };
+}
+
+interface HandleDragState {
+    isDragging: 'start' | 'end' | undefined;
+}
+function setupHandleDrag(
+    element: HTMLElement,
+    handle: HTMLElement,
+    dragState: HandleDragState,
+    type: HandleDragState['isDragging'],
+    onMove: (e: MouseEvent) => void,
+    onDragEnd: (e: MouseEvent) => void
+) {
+    handle.addEventListener(
+        'mousedown',
+        e => {
+            e.preventDefault();
+            element.classList.add('at-selection-handle-drag');
+            handle.classList.add('at-selection-handle-drag');
+            dragState.isDragging = type;
+        },
+        false
+    );
+    document.addEventListener(
+        'mousemove',
+        e => {
+            if (dragState.isDragging !== type) {
+                return;
+            }
+            e.preventDefault();
+            onMove(e);
+        },
+        true
+    );
+    document.addEventListener(
+        'mouseup',
+        e => {
+            if (dragState.isDragging !== type) {
+                return;
+            }
+            e.preventDefault();
+            dragState.isDragging = undefined;
+            element.classList.remove('at-selection-handle-drag');
+            handle.classList.remove('at-selection-handle-drag');
+            onDragEnd(e);
+        },
+        true
+    );
+}
+
+function getRelativePosition(parent: HTMLElement, e: MouseEvent): { relX: number; relY: number } {
+    const parentPos = parent.getBoundingClientRect();
+    const parentLeft: number = parentPos.left + parent.ownerDocument!.defaultView!.pageXOffset;
+    const parentTop: number = parentPos.top + parent.ownerDocument!.defaultView!.pageYOffset;
+
+    const relX = e.pageX - parentLeft;
+    const relY = e.pageY - parentTop;
+
+    return { relX, relY };
+}
+
+function getBeatFromEvent(
+    element: HTMLElement,
+    api: alphaTab.AlphaTabApi,
+    e: MouseEvent
+): alphaTab.model.Beat | undefined {
+    const { relX, relY } = getRelativePosition(element, e);
+    const beat = api.boundsLookup?.getBeatAtPos(relX, relY);
+    if (!beat) {
+        return undefined;
+    }
+
+    const bounds = api.boundsLookup!.findBeat(beat);
+    if (!bounds) {
+        return undefined;
+    }
+
+    // only snap to beat beat if we are over the whitespace after the beat
+    const visualBoundsEnd = bounds.visualBounds.x + bounds.visualBounds.w;
+    const realBoundsEnd = bounds.realBounds.x + bounds.realBounds.w;
+    if (relX < visualBoundsEnd || relX > realBoundsEnd) {
+        return undefined;
+    }
+
+    return beat;
+}
+
+function setupSelectionHandles(element: HTMLElement, api: alphaTab.AlphaTabApi) {
+    const { startHandle, endHandle } = createSelectionHandles(element);
+
+    // override internal logic for updating selection UI
+    interface SelectionInfo {
+        beat: alphaTab.model.Beat;
+        bounds: alphaTab.rendering.BeatBounds | null;
+    }
+    interface AlphaTabApiSelectionInternals {
+        _selectionStart: SelectionInfo | null;
+        _selectionEnd: SelectionInfo | null;
+        _cursorSelectRange(startBeat: SelectionInfo | null, endBeat: SelectionInfo | null): void;
+    }
+
+    const apiWithInternals = api as unknown as AlphaTabApiSelectionInternals;
+
+    // listen to selection range changes to place handles
+    const oldMethod = apiWithInternals._cursorSelectRange;
+    apiWithInternals._cursorSelectRange = function (startBeat, endBeat) {
+        oldMethod.call(this, startBeat, endBeat);
+
+        // no selection
+        if (!startBeat || !endBeat || startBeat.beat === endBeat.beat) {
+            startHandle.classList.remove('active');
+            endHandle.classList.remove('active');
+            return;
+        }
+
+        const selectionItems = element.querySelectorAll('.at-selection > div');
+        if (selectionItems.length === 0) {
+            return;
+        }
+
+        startHandle.classList.add('active');
+        startHandle.style.left = `${startBeat.bounds!.realBounds.x}px`;
+        startHandle.style.top = `${startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y}px`;
+        startHandle.style.height = `${startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h}px`;
+
+        endHandle.classList.add('active');
+        endHandle.style.left = `${endBeat.bounds!.realBounds.x + endBeat.bounds!.realBounds.w}px`;
+        endHandle.style.top = `${endBeat.bounds!.barBounds.masterBarBounds.visualBounds.y}px`;
+        endHandle.style.height = `${endBeat.bounds!.barBounds.masterBarBounds.visualBounds.h}px`;
+    };
+
+    // setup dragging of handles
+    const dragState: HandleDragState = { isDragging: undefined };
+
+    function updatePlaybackRange() {
+        const realMasterBarStart: number = api.tickCache!.getMasterBarStart(
+            apiWithInternals._selectionStart!.beat.voice.bar.masterBar
+        );
+
+        const realMasterBarEnd: number = api.tickCache!.getMasterBarStart(
+            apiWithInternals._selectionEnd!.beat.voice.bar.masterBar
+        );
+
+        const range = new alphaTab.synth.PlaybackRange();
+        range.startTick = realMasterBarStart + apiWithInternals._selectionStart!.beat.playbackStart;
+        range.endTick =
+            realMasterBarEnd +
+            apiWithInternals._selectionEnd!.beat.playbackStart +
+            apiWithInternals._selectionEnd!.beat.playbackDuration -
+            50;
+        api.playbackRange = range;
+    }
+
+    setupHandleDrag(
+        element,
+        startHandle,
+        dragState,
+        'start',
+        e => {
+            const beat = getBeatFromEvent(element, api, e);
+            if (!beat) {
+                return;
+            }
+
+            apiWithInternals._selectionStart = {
+                beat,
+                bounds: null
+            };
+            apiWithInternals._cursorSelectRange(apiWithInternals._selectionStart, apiWithInternals._selectionEnd);
+        },
+        updatePlaybackRange
+    );
+
+    setupHandleDrag(
+        element,
+        endHandle,
+        dragState,
+        'end',
+        e => {
+            const beat = getBeatFromEvent(element, api, e);
+            if (!beat) {
+                return;
+            }
+            apiWithInternals._selectionEnd = {
+                beat,
+                bounds: null
+            };
+            apiWithInternals._cursorSelectRange(apiWithInternals._selectionStart, apiWithInternals._selectionEnd);
+        },
+        updatePlaybackRange
+    );
 }
 
 function percentageToDegrees(percentage: number) {

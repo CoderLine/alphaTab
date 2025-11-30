@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const ts: MetadataTagDefinition = {
     tag: '\\ts',
@@ -18,8 +17,8 @@ export const ts: MetadataTagDefinition = {
                 {
                     name: 'common',
                     shortDescription: '',
-                    type: AlphaTexNodeType.Ident,
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Ident,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     allowAllStringTypes: true,
                     values: [
                         {
@@ -36,14 +35,14 @@ export const ts: MetadataTagDefinition = {
                 {
                     name: 'numerator',
                     shortDescription: 'The time signature numerator',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Number
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 },
                 {
-                    name: 'numerator',
+                    name: 'denominator',
                     shortDescription: 'The time signature denominator',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Number
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 }
             ]
         }

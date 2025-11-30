@@ -1,30 +1,30 @@
+import * as alphaTab from '@coderline/alphatab';
 import { instrument } from '@coderline/alphatab-alphatex/properties/beat/instrument';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+
 import { properties } from '@coderline/alphatab-alphatex/common';
 
 export const track: MetadataTagDefinition = {
     tag: '\\track',
     snippet: '\\track "$1"$0',
     shortDescription: 'Start a new track',
-    remarks: `The displayed name depends on the configured [Track Name Policy](https://next.alphatab.net/docs/alphatex/score-metadata#singletracktracknamepolicy-and-multitracktracknamepolicy). If the short name is not specified, the first 10 characters of the long name are used as short name.`,
+    remarks: `The displayed name depends on the configured [Track Name Policy](https://alphatab.net/docs/alphatex/score-metadata#singletracktracknamepolicy-and-multitracktracknamepolicy). If the short name is not specified, the first 10 characters of the long name are used as short name.`,
     signatures: [
         {
             parameters: [
                 {
                     name: 'name',
                     shortDescription: 'The full name of the track',
-                    parseMode: ArgumentListParseTypesMode.Optional,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional,
                     defaultValue: '',
-                    type: AlphaTexNodeType.String
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String
                 },
                 {
                     name: 'shortName',
                     shortDescription: 'The short name of the track',
-                    parseMode: ArgumentListParseTypesMode.Optional,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional,
                     defaultValue: '`/*computed from name*/`',
-                    type: AlphaTexNodeType.String
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String
                 }
             ]
         }
@@ -49,9 +49,9 @@ export const track: MetadataTagDefinition = {
                             name: 'colorCode',
                             shortDescription: 'The color as CSS color',
                             longDescription:
-                                'The colorCode in [any supported color format](https://next.alphatab.net/docs/reference/settings/display/resources#colors)',
-                            type: AlphaTexNodeType.String,
-                            parseMode: ArgumentListParseTypesMode.Required
+                                'The colorCode in [any supported color format](https://alphatab.net/docs/reference/settings/display/resources#colors)',
+                            type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
+                            parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                         }
                     ]
                 }
@@ -69,7 +69,7 @@ export const track: MetadataTagDefinition = {
                 Defines the number of bars to display per system. 
 
                 The \`systemsLayout\` and \`defaultSystemsLayout\` allow configuring the system layout. 
-                The system layout, defines how many bars should be displayed per system (line) if enabled via [\`systemsLayoutMode\`](https://next.alphatab.net/docs/reference/settings/display/systemslayoutmode).
+                The system layout, defines how many bars should be displayed per system (line) if enabled via [\`systemsLayoutMode\`](https://alphatab.net/docs/reference/settings/display/systemslayoutmode).
                 `,
             signatures: [
                 {
@@ -78,17 +78,20 @@ export const track: MetadataTagDefinition = {
                             name: 'numberOfBars',
                             shortDescription: 'The number of bars to display per system',
                             longDescription: 'Defines for every system (line) the number of bars it should contain',
-                            type: AlphaTexNodeType.Number,
-                            parseMode: ArgumentListParseTypesMode.ValueListWithoutParenthesis
+                            type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                            parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.ValueListWithoutParenthesis
                         }
                     ]
                 }
             ],
-            examples: `
+            examples: {
+                options: { display: { systemsLayoutMode: 'UseModelLayout' } },
+                tex: `
                 \\title "Single Track"
                 \\track { systemsLayout (2 3 2) }
                 :1 c4 | c4 | c4 | c4 | c4 | c4 | c4
                 `
+            }
         },
         {
             property: 'defaultSystemsLayout',
@@ -98,24 +101,27 @@ export const track: MetadataTagDefinition = {
                 Defines the default number of bars to display per system. 
 
                 The \`systemsLayout\` and \`defaultSystemsLayout\` allow configuring the system layout. 
-                The system layout, defines how many bars should be displayed per system (line) if enabled via [\`systemsLayoutMode\`](https://next.alphatab.net//docs/reference/settings/display/systemslayoutmode).`,
+                The system layout, defines how many bars should be displayed per system (line) if enabled via [\`systemsLayoutMode\`](https://alphatab.net//docs/reference/settings/display/systemslayoutmode).`,
             signatures: [
                 {
                     parameters: [
                         {
                             name: 'numberOfBars',
                             shortDescription: 'Defines for every system (line) the number of bars it should contain',
-                            type: AlphaTexNodeType.Number,
-                            parseMode: ArgumentListParseTypesMode.Required
+                            type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                            parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                         }
                     ]
                 }
             ],
-            examples: `
+            examples: {
+                options: { display: { systemsLayoutMode: 'UseModelLayout' } },
+                tex: `
                 \\title "Single Track"
                 \\track { defaultSystemsLayout 2 }
                     :1 c4 | c4 | c4 | c4 | c4 | c4 | c4
                 `
+            }
         },
         {
             property: 'solo',
@@ -159,8 +165,8 @@ export const track: MetadataTagDefinition = {
                         {
                             name: 'value',
                             shortDescription: 'The volume to set (0-16)',
-                            type: AlphaTexNodeType.Number,
-                            parseMode: ArgumentListParseTypesMode.Required
+                            type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                            parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                         }
                     ]
                 }
@@ -182,8 +188,8 @@ export const track: MetadataTagDefinition = {
                         {
                             name: 'value',
                             shortDescription: 'The balance to set (0-16; 8 is centered)',
-                            type: AlphaTexNodeType.Number,
-                            parseMode: ArgumentListParseTypesMode.Required
+                            type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                            parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                         }
                     ]
                 }
@@ -222,8 +228,8 @@ export const track: MetadataTagDefinition = {
                         {
                             name: 'value',
                             shortDescription: 'The midi bank to set',
-                            parseMode: ArgumentListParseTypesMode.Required,
-                            type: AlphaTexNodeType.Number
+                            parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                            type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                         }
                     ]
                 }

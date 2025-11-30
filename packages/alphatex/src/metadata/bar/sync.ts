@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const sync: MetadataTagDefinition = {
     tag: '\\sync',
@@ -9,7 +8,7 @@ export const sync: MetadataTagDefinition = {
     longDescription: `
         Adds a new sync point for synchronizing the music sheet with an external media source like a backing track or video player.
 
-        alphaTex support specifying sync points for the  [synchronization with external media](https://next.alphatab.net/docs/guides/audio-video-sync).
+        alphaTex support specifying sync points for the  [synchronization with external media](https://alphatab.net/docs/guides/audio-video-sync).
 
         It is recommended to add the sync points at the very end of the song but it is also possible to define them inbetween.
 
@@ -23,27 +22,27 @@ export const sync: MetadataTagDefinition = {
                 {
                     name: 'barIndex',
                     shortDescription: 'The index of the bar being synced',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Number
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 },
                 {
                     name: 'occurence',
                     shortDescription: 'The occurence of the bar for which this sync point applies (on repeats)',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Number
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 },
                 {
                     name: 'millisecondOffset',
                     shortDescription: 'The absolute millisecond offset within the external media',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Number
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 },
                 {
                     name: 'ratioPosition',
                     shortDescription: 'The relative position within the bar where the synchronization happens',
-                    parseMode: ArgumentListParseTypesMode.OptionalAsFloat,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.OptionalAsFloat,
                     defaultValue: '0',
-                    type: AlphaTexNodeType.Number
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 }
             ]
         }

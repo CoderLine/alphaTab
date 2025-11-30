@@ -1,27 +1,26 @@
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { ParameterDefinition, PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 const type: ParameterDefinition = {
     name: 'type',
     shortDescription: 'The type of bend (affects the display).',
-    parseMode: ArgumentListParseTypesMode.Required,
+    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
     ...enumParameter('BendType')
 };
 
 const style: ParameterDefinition = {
     name: 'style',
     shortDescription: 'The style of the bend.',
-    parseMode: ArgumentListParseTypesMode.Required,
+    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
     ...enumParameter('BendStyle')
 };
 
 const values: ParameterDefinition = {
     name: 'values',
     shortDescription: 'The values of the bend in quarter-tones relative to the original note, decimals supported',
-    parseMode: ArgumentListParseTypesMode.ValueListWithoutParenthesis,
-    type: AlphaTexNodeType.Number
+    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.ValueListWithoutParenthesis,
+    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
 };
 
 export const b: PropertyDefinition = {

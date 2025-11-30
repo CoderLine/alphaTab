@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const defaultSystemsLayout: MetadataTagDefinition = {
     tag: '\\defaultSystemsLayout',
@@ -9,7 +8,7 @@ export const defaultSystemsLayout: MetadataTagDefinition = {
     longDescription: `
     Defines the default number of bars to display per system when rendering multiple tracks.
 
-    The \`systemsLayout\` and \`defaultSystemsLayout\` allow configuring the system layout. The system layout, defines how many bars should be displayed per system (line) if enabled via [\`systemsLayoutMode\`](https://next.alphatab.net/docs/reference/settings/display/systemslayoutmode).
+    The \`systemsLayout\` and \`defaultSystemsLayout\` allow configuring the system layout. The system layout, defines how many bars should be displayed per system (line) if enabled via [\`systemsLayoutMode\`](https://alphatab.net/docs/reference/settings/display/systemslayoutmode).
     `,
     signatures: [
         {
@@ -17,8 +16,8 @@ export const defaultSystemsLayout: MetadataTagDefinition = {
                 {
                     name: 'numberOfBars',
                     shortDescription: 'The number of bars the system should contain.',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Number
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 }
             ]
         }

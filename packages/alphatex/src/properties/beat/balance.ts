@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const balance: PropertyDefinition = {
     property: 'balance',
@@ -18,8 +17,8 @@ export const balance: PropertyDefinition = {
                     name: 'value',
                     shortDescription: 'The new balance',
                     longDescription: 'The new balance where 0 is left, 16 is right, and 8 is centered.',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Number
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 }
             ]
         }

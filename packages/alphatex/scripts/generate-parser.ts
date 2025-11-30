@@ -16,8 +16,9 @@ import {
     type AlphaTexMappedEnumMappingEntry,
     type AlphaTexMappedEnumName
 } from '@coderline/alphatab-alphatex/enum';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+
+import * as alphaTab from '@coderline/alphatab'
+
 
 type LanguageDefinitionsVisitorContext = {
     foundDefinitions: boolean;
@@ -35,16 +36,16 @@ function createAlphaTexParameterDefinition(e: ParameterDefinition) {
     const typeArray = Array.isArray(e.type) ? e.type : [e.type];
     if (e.allowAllStringTypes) {
         switch (typeArray[0]) {
-            case AlphaTexNodeType.Ident:
-                typeArray.push(AlphaTexNodeType.String);
+            case alphaTab.importer.alphaTex.AlphaTexNodeType.Ident:
+                typeArray.push(alphaTab.importer.alphaTex.AlphaTexNodeType.String);
                 break;
-            case AlphaTexNodeType.String:
-                typeArray.push(AlphaTexNodeType.Ident);
+            case alphaTab.importer.alphaTex.AlphaTexNodeType.String:
+                typeArray.push(alphaTab.importer.alphaTex.AlphaTexNodeType.Ident);
                 break;
         }
     }
-    if (e.parseMode === ArgumentListParseTypesMode.RequiredAsValueList) {
-        typeArray.push(AlphaTexNodeType.Arguments);
+    if (e.parseMode === alphaTab.importer.alphaTex.ArgumentListParseTypesMode.RequiredAsValueList) {
+        typeArray.push(alphaTab.importer.alphaTex.AlphaTexNodeType.Arguments);
     }
 
     const args: ts.Expression[] = [

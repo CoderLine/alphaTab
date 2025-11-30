@@ -1,10 +1,6 @@
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
-import type {
-    MetadataTagDefinition,
-    SignatureDefinition
-} from '@coderline/alphatab-alphatex/types';
+import type { MetadataTagDefinition, SignatureDefinition } from '@coderline/alphatab-alphatex/types';
 
 export const songMetaDataSignatures: SignatureDefinition[] = [
     {
@@ -12,20 +8,20 @@ export const songMetaDataSignatures: SignatureDefinition[] = [
             {
                 name: 'value',
                 shortDescription: 'The value to set',
-                type: AlphaTexNodeType.String,
+                type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
                 allowAllStringTypes: true,
-                parseMode: ArgumentListParseTypesMode.Required
+                parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
             },
             {
                 name: 'template',
                 shortDescription: 'The template used to render the text',
-                type: AlphaTexNodeType.String,
-                parseMode: ArgumentListParseTypesMode.Optional
+                type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
+                parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional
             },
             {
                 name: 'textAlign',
                 shortDescription: 'The alignment of the text on the music sheet',
-                parseMode: ArgumentListParseTypesMode.Optional,
+                parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional,
                 ...enumParameter('TextAlign')
             }
         ]
@@ -37,13 +33,13 @@ export const noValueSongMetaDataSignatures: SignatureDefinition[] = [
             {
                 name: 'template',
                 shortDescription: 'The template used to render the text',
-                type: AlphaTexNodeType.String,
-                parseMode: ArgumentListParseTypesMode.Required
+                type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
+                parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
             },
             {
                 name: 'textAlign',
                 shortDescription: 'The alignment of the text on the music sheet',
-                parseMode: ArgumentListParseTypesMode.Optional,
+                parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional,
                 ...enumParameter('TextAlign')
             }
         ]
@@ -55,7 +51,7 @@ export const title: MetadataTagDefinition = {
     snippet: '\\title "$1"$0',
     shortDescription: `Set the title of the song.`,
     signatures: songMetaDataSignatures,
-    examples: `y
+    examples: `
         \\title ("Song Title" "Title: %TITLE%" left)
         C4
         `

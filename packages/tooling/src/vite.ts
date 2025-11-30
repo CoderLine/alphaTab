@@ -104,7 +104,7 @@ export function defaultBuildUserConfig(): UserConfig {
                     'os',
                     'crypto',
                     'net',
-                    /^vscode/, 
+                    /^vscode/
                 ],
                 output: [],
                 onLog(level, log, handler) {
@@ -244,7 +244,8 @@ export function esm(
                                 generateDts(
                                     projectDir,
                                     path.resolve(options.dir!, dtsBundleFile)!,
-                                    path.resolve(options.dir!, file.replace('.mjs', '.d.ts'))
+                                    path.resolve(options.dir!, file.replace('.mjs', '.d.ts')),
+                                    config.build!.rollupOptions!.external! as (string | RegExp)[]
                                 );
                             } else {
                                 this.error('Could not find entry d.ts');

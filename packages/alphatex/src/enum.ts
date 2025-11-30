@@ -1,56 +1,32 @@
 /** biome-ignore-all lint/style/useNamingConvention: Quite many mappings in here */
+
+import * as alphaTab from '@coderline/alphatab';
 import type { ParameterValueDefinition } from '@coderline/alphatab-alphatex/types';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
-import { AlphaTexAccidentalMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { BarLineStyle } from '@coderline/alphatab/model/Bar';
-import { BarreShape } from '@coderline/alphatab/model/BarreShape';
-import { BendStyle } from '@coderline/alphatab/model/BendStyle';
-import { BendType } from '@coderline/alphatab/model/BendType';
-import { Clef } from '@coderline/alphatab/model/Clef';
-import { Direction } from '@coderline/alphatab/model/Direction';
-import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
-import { FermataType } from '@coderline/alphatab/model/Fermata';
-import { GraceType } from '@coderline/alphatab/model/GraceType';
-import { KeySignature } from '@coderline/alphatab/model/KeySignature';
-import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
-import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
-import { Ottavia } from '@coderline/alphatab/model/Ottavia';
-import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
-import {
-    BracketExtendMode,
-    TrackNameMode,
-    TrackNameOrientation,
-    TrackNamePolicy
-} from '@coderline/alphatab/model/RenderStylesheet';
-import { SimileMark } from '@coderline/alphatab/model/SimileMark';
-import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
-import { WhammyType } from '@coderline/alphatab/model/WhammyType';
-import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 
 export const alphaTexMappedEnumLookup = {
-    WhammyType,
-    BendStyle,
-    GraceType,
-    FermataType,
-    AlphaTexAccidentalMode,
-    NoteAccidentalMode,
-    BarreShape,
-    Ottavia,
-    Rasgueado,
-    DynamicValue,
-    BracketExtendMode,
-    TrackNamePolicy,
-    TrackNameOrientation,
-    TrackNameMode,
-    TextAlign,
-    BendType,
-    KeySignature,
-    KeySignatureType,
-    Clef,
-    TripletFeel,
-    BarLineStyle,
-    SimileMark,
-    Direction
+    WhammyType: alphaTab.model.WhammyType,
+    BendStyle: alphaTab.model.BendStyle,
+    GraceType: alphaTab.model.GraceType,
+    FermataType: alphaTab.model.FermataType,
+    AlphaTexAccidentalMode: alphaTab.importer.alphaTex.AlphaTexAccidentalMode,
+    NoteAccidentalMode: alphaTab.model.NoteAccidentalMode,
+    BarreShape: alphaTab.model.BarreShape,
+    Ottavia: alphaTab.model.Ottavia,
+    Rasgueado: alphaTab.model.Rasgueado,
+    DynamicValue: alphaTab.model.DynamicValue,
+    BracketExtendMode: alphaTab.model.BracketExtendMode,
+    TrackNamePolicy: alphaTab.model.TrackNamePolicy,
+    TrackNameOrientation: alphaTab.model.TrackNameOrientation,
+    TrackNameMode: alphaTab.model.TrackNameMode,
+    TextAlign: alphaTab.platform.TextAlign,
+    BendType: alphaTab.model.BendType,
+    KeySignature: alphaTab.model.KeySignature,
+    KeySignatureType: alphaTab.model.KeySignatureType,
+    Clef: alphaTab.model.Clef,
+    TripletFeel: alphaTab.model.TripletFeel,
+    BarLineStyle: alphaTab.model.BarLineStyle,
+    SimileMark: alphaTab.model.SimileMark,
+    Direction: alphaTab.model.Direction
 };
 export type AlphaTexMappedEnumName = keyof typeof alphaTexMappedEnumLookup;
 
@@ -466,7 +442,9 @@ export function enumParameter<TType extends AlphaTexMappedEnumName>(type: TType)
     const mapping = alphaTexMappedEnumMapping[type] as Record<string, AlphaTexMappedEnumMappingEntry>;
     const allowNumeric = Object.values(mapping).some(v => v?.allowNumeric);
     return {
-        type: allowNumeric ? [AlphaTexNodeType.Ident, AlphaTexNodeType.Number] : AlphaTexNodeType.Ident,
+        type: allowNumeric
+            ? [alphaTab.importer.alphaTex.AlphaTexNodeType.Ident, alphaTab.importer.alphaTex.AlphaTexNodeType.Number]
+            : alphaTab.importer.alphaTex.AlphaTexNodeType.Ident,
         allowAllStringTypes: true,
         values: [
             ...Object.values(mapping)

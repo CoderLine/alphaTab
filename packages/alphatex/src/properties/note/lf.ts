@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const lf: PropertyDefinition = {
     property: 'lf',
@@ -13,8 +12,8 @@ export const lf: PropertyDefinition = {
                 {
                     name: 'finger',
                     shortDescription: 'The finger',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     values: [
                         { name: '1', snippet: '1', shortDescription: 'Thumb' },
                         { name: '2', snippet: '2', shortDescription: 'Index-Finger' },

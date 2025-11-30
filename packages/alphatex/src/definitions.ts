@@ -148,7 +148,7 @@ import { x } from '@coderline/alphatab-alphatex//properties/note/x';
 import { metadata, properties } from '@coderline/alphatab-alphatex/common';
 import { db } from '@coderline/alphatab-alphatex/metadata/bar/db';
 import { instrumentMeta } from '@coderline/alphatab-alphatex/metadata/staff/instrument';
-import type { WithDescription, WithSignatures } from '@coderline/alphatab-alphatex/types';
+import type { AlphaTexExample, WithDescription, WithSignatures } from '@coderline/alphatab-alphatex/types';
 
 export const structuralMetaData = metadata(track, staff, voice);
 export const scoreMetaData = metadata(
@@ -324,6 +324,22 @@ export const noteProperties = properties(
 
 const spaces = /^([ ]+)/;
 
+function trimIdention(txt: string) {
+    const lines = txt.split('\n');
+    const firstLineWithContent = lines.findIndex(l => l.trim() !== '');
+    if (firstLineWithContent === -1) {
+        return txt;
+    }
+    lines.splice(0, firstLineWithContent);
+
+    const space = spaces.exec(lines[0]);
+    if (space) {
+        const trimmed = lines.map(l => l.substring(space[0].length));
+        return trimmed.join('\n');
+    }
+    return lines.join('\n');
+}
+
 function prepareDescription(item: WithDescription) {
     const txt = item.longDescription;
     if (txt === undefined) {
@@ -347,12 +363,28 @@ function prepareDescription(item: WithDescription) {
     }
 }
 
+function prepareExample(d: AlphaTexExample) {
+    if (typeof d === 'string') {
+        return trimIdention(d);
+    } else {
+        d.tex = trimIdention(d.tex);
+        return d;
+    }
+}
 function prepareWithSignatures(d: WithSignatures) {
     prepareDescription(d);
     for (const s of d.signatures) {
         for (const p of s.parameters) {
             prepareDescription(p);
         }
+    }
+
+    if (Array.isArray(d.examples)) {
+        for (const [i, e] of d.examples.entries()) {
+            d.examples[i] = prepareExample(e);
+        }
+    } else {
+        d.examples = prepareExample(d.examples);
     }
 }
 

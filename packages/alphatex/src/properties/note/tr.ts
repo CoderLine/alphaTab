@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const tr: PropertyDefinition = {
     property: 'tr',
@@ -13,14 +12,14 @@ export const tr: PropertyDefinition = {
                 {
                     name: 'fret',
                     shortDescription: 'The fret on which to trill',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 },
                 {
                     name: 'duration',
                     shortDescription: 'The duration/speed of the trills',
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Optional,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional,
                     defaultValue: '16',
                     values: [
                         { name: '16', snippet: '16', shortDescription: '16th Note' },

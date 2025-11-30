@@ -1,6 +1,7 @@
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+
 
 export const ks: MetadataTagDefinition = {
     tag: '\\ks',
@@ -13,7 +14,7 @@ export const ks: MetadataTagDefinition = {
                 {
                     name: 'key',
                     shortDescription: 'The key signature',
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     ...enumParameter('KeySignature')
                 }
             ]

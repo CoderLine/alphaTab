@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const harmonicValueDocs = [
     'The harmonic value determines a relative fret-offset changing the note pitch when played. For natural harmonics the played fret determines the harmonic value. The rules are a bit special but mostly are aligned with the frequency adjustments happening when harmonics are played at respective frets:',
@@ -41,8 +40,8 @@ export const ah: PropertyDefinition = {
                     name: 'value',
                     shortDescription: 'The harmonic value',
                     longDescription: harmonicValueDocs,
-                    type: AlphaTexNodeType.Number,
-                    parseMode: ArgumentListParseTypesMode.Optional
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional
                 }
             ]
         }

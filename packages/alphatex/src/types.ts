@@ -1,6 +1,4 @@
-import type { SettingsJson } from '@coderline/alphatab/generated/SettingsJson';
-import type { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
-import type { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import type * as alphaTab from '@coderline/alphatab'
 
 /**
  * Common props for elements with descriptions.
@@ -58,12 +56,12 @@ export interface ParameterDefinition extends WithDescription {
     /**
      * The mode used to parse this parameter.
      */
-    parseMode: ArgumentListParseTypesMode;
+    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode;
 
     /**
      * The node type for this parameter.
      */
-    type: AlphaTexNodeType | AlphaTexNodeType[];
+    type: alphaTab.importer.alphaTex.AlphaTexNodeType | alphaTab.importer.alphaTex.AlphaTexNodeType[];
 
     /**
      * Whether to allow strings in place of identifiers and vice versa.
@@ -160,7 +158,7 @@ export type AlphaTexExample =
           /**
            * The options to apply when rendering the example
            */
-          options?: SettingsJson;
+          options?: alphaTab.json.SettingsJson;
           /**
            * The plain alphaTex code.
            */

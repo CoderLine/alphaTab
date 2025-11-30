@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const txt: PropertyDefinition = {
     property: 'txt',
@@ -13,9 +12,9 @@ export const txt: PropertyDefinition = {
                 {
                     name: 'text',
                     shortDescription: 'The text to show above the beat',
-                    type: AlphaTexNodeType.String,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
                     allowAllStringTypes: true,
-                    parseMode: ArgumentListParseTypesMode.Required
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required
                 }
             ]
         }

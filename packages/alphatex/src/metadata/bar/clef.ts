@@ -1,6 +1,7 @@
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+
 
 export const clef: MetadataTagDefinition = {
     tag: '\\clef',
@@ -13,7 +14,7 @@ export const clef: MetadataTagDefinition = {
                 {
                     name: 'clef',
                     shortDescription: 'The clef',
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     ...enumParameter('Clef')
                 }
             ]

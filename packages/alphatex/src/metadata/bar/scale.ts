@@ -1,6 +1,5 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 
 export const scale: MetadataTagDefinition = {
     tag: '\\scale',
@@ -13,8 +12,8 @@ export const scale: MetadataTagDefinition = {
                 {
                     name: 'scale',
                     shortDescription: 'The scale of the bar within the system',
-                    parseMode: ArgumentListParseTypesMode.RequiredAsFloat,
-                    type: AlphaTexNodeType.Number
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.RequiredAsFloat,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 }
             ]
         }

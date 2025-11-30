@@ -1,6 +1,6 @@
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const simile: MetadataTagDefinition = {
     tag: '\\simile',
@@ -14,7 +14,7 @@ export const simile: MetadataTagDefinition = {
                 {
                     name: 'mark',
                     shortDescription: 'The mark to add',
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     ...enumParameter('SimileMark')
                 }
             ]

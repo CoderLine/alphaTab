@@ -1,6 +1,6 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { PropertyDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+
 import { generalMidiInstruments } from '../../common';
 
 export const instrument: PropertyDefinition = {
@@ -15,8 +15,8 @@ export const instrument: PropertyDefinition = {
                 {
                     name: 'program',
                     shortDescription: 'MIDI program number (0-127)',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Number
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 }
             ]
         },
@@ -26,8 +26,8 @@ export const instrument: PropertyDefinition = {
                 {
                     name: 'programName',
                     shortDescription: 'MIDI program name',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.String,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
                     allowAllStringTypes: true,
                     valuesOnlyForCompletion: true,
                     values: generalMidiInstruments.map(v => ({
@@ -44,8 +44,8 @@ export const instrument: PropertyDefinition = {
                 {
                     name: 'percussion',
                     shortDescription: 'Percussion',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Ident,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Ident,
                     values: [
                         {
                             name: 'percussion',

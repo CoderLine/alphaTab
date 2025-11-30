@@ -1,13 +1,13 @@
+import * as alphaTab from '@coderline/alphatab';
 import { enumParameter } from '@coderline/alphatab-alphatex/enum';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 export const firstSystemTrackNameMode: MetadataTagDefinition = {
     tag: '\\firstSystemTrackNameMode',
     snippet: '\\firstSystemTrackNameMode ${1:shortName}$0',
     shortDescription: 'The text how to show as track names',
     longDescription: `
-    Configures the text how to show as [track names](https://next.alphatab.net/docs/showcase/general#track-names) on the first system.
+    Configures the text how to show as [track names](https://alphatab.net/docs/showcase/general#track-names) on the first system.
     `,
     signatures: [
         {
@@ -15,7 +15,7 @@ export const firstSystemTrackNameMode: MetadataTagDefinition = {
                 {
                     name: 'mode',
                     shortDescription: 'The mode to use',
-                    parseMode: ArgumentListParseTypesMode.Required,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
                     ...enumParameter('TrackNameMode')
                 }
             ]

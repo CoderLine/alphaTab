@@ -1,5 +1,4 @@
-import { ArgumentListParseTypesMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { AlphaTexNodeType } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import * as alphaTab from '@coderline/alphatab';
 import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
 import { properties } from '@coderline/alphatab-alphatex/common';
 
@@ -14,8 +13,8 @@ export const tuning: MetadataTagDefinition = {
                 {
                     name: 'mode',
                     shortDescription: 'A built-in standard mode for tunings',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Ident,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Ident,
                     allowAllStringTypes: true,
                     values: [
                         {
@@ -45,10 +44,10 @@ export const tuning: MetadataTagDefinition = {
                 {
                     name: 'strings',
                     shortDescription: 'The tuning values as pitched notes',
-                    longDescription: `The tuning values as [pitched notes](https://next.alphatab.net/docs/alphatex/document-structure#pitched-notes)`,
-                    type: AlphaTexNodeType.Ident,
+                    longDescription: `The tuning values as [pitched notes](https://alphatab.net/docs/alphatex/document-structure#pitched-notes)`,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Ident,
                     allowAllStringTypes: true,
-                    parseMode: ArgumentListParseTypesMode.ValueListWithoutParenthesis
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.ValueListWithoutParenthesis
                 }
             ]
         }
@@ -93,8 +92,8 @@ export const tuning: MetadataTagDefinition = {
                         {
                             name: 'text',
                             shortDescription: 'The label to set.',
-                            parseMode: ArgumentListParseTypesMode.Required,
-                            type: AlphaTexNodeType.String
+                            parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                            type: alphaTab.importer.alphaTex.AlphaTexNodeType.String
                         }
                     ]
                 }
