@@ -525,7 +525,6 @@ Score (1,1) -> (1,25) {
                 parameterIndices: Map {
                   0 => 0,
                   1 => 0,
-                  2 => 0,
                 },
               },
             ],
@@ -533,7 +532,6 @@ Score (1,1) -> (1,25) {
             signatureCandidateIndices: Array [
               0,
               1,
-              2,
             ],
           },
         },
@@ -565,7 +563,6 @@ Score (1,1) -> (1,21) {
               Ident "A" (1,16) -> (1,17) {
                 parameterIndices: Map {
                   1 => 0,
-                  2 => 0,
                 },
               },
               Number "38" (1,18) -> (1,20) {
@@ -2215,6 +2212,53 @@ exports[`AlphaTexParameterTests parser metadata list single: lexer-diagnostics 1
 
 exports[`AlphaTexParameterTests parser metadata list single: parser-diagnostics 1`] = `Array []`;
 
+exports[`AlphaTexParameterTests parser metadata list switch to note 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      metaData: Array [
+        Meta (1,1) -> (1,6) {
+          tag: Tag "ae" (1,1) -> (1,4) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "ae" (1,2) -> (1,4),
+          },
+          arguments: Arguments (1,5) -> (1,6) {
+            arguments: Array [
+              Number "1" (1,5) -> (1,6) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,7) -> (1,10) {
+          notes: NoteList (1,7) -> (1,10) {
+            notes: Array [
+              Note (1,7) -> (1,10) {
+                noteValue: Number "1" (1,7) -> (1,8),
+                noteStringDot: Dot (1,8) -> (1,9),
+                noteString: Number "1" (1,9) -> (1,10),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata list switch to note: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata list switch to note: parser-diagnostics 1`] = `Array []`;
+
 exports[`AlphaTexParameterTests parser metadata optional overloads multi 1`] = `
 Score (1,1) -> (1,25) {
   bars: Array [
@@ -2581,14 +2625,12 @@ Score (1,1) -> (1,23) {
                 parameterIndices: Map {
                   0 => 0,
                   1 => 0,
-                  2 => 0,
                 },
               },
             ],
             signatureCandidateIndices: Array [
               0,
               1,
-              2,
             ],
             validated: true,
           },
@@ -2657,7 +2699,6 @@ Score (1,1) -> (1,18) {
               Ident "A" (1,15) -> (1,16) {
                 parameterIndices: Map {
                   1 => 0,
-                  2 => 0,
                 },
               },
               Number "1" (1,17) -> (1,18) {

@@ -25,7 +25,7 @@ const values: ParameterDefinition = {
     The offset and value are actually two parameters: 
     \`3.3.1{tbe (0 0 5 4 30 8 60 0)}\`
     `,
-    parseMode: ArgumentListParseTypesMode.RequiredAsValueList,
+    parseMode: ArgumentListParseTypesMode.ValueListWithoutParenthesis,
     type: AlphaTexNodeType.Number
 };
 

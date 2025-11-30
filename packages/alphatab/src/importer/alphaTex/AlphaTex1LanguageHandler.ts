@@ -909,11 +909,6 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return true;
         }
 
-        // optimized path for single overload causing less allocations and checks
-        // if (signatures.length === 1) {
-        //     return this._validateArgumentTypesSingle(importer, signatures[0], args);
-        // }
-
         let error = false;
         const candidates = new Map<number, SignatureResolutionInfo>(
             signatures.map((v, i) => [
@@ -966,10 +961,6 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         return !error;
-    }
-
-    private _validateArgumentTypesSingle(importer: IAlphaTexImporter, signature: AlphaTexSignatureDefinition, args: AlphaTexArgumentList) {
-        throw new Error('Method not implemented.');
     }
 
     private _headerFooterStyle(

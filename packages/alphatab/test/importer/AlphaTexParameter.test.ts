@@ -41,6 +41,7 @@ describe('AlphaTexParameterTests', () => {
             describe('list', () => {
                 it('single', () => parserTest('\\systemslayout 3'));
                 it('multi', () => parserTest('\\systemslayout 3 2 3'));
+                it('switch to note', () => parserTest('\\ae 1 1.1'));
             });
 
             describe('type overloads', () => {

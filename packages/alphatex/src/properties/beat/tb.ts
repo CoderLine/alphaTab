@@ -20,7 +20,7 @@ const style: ParameterDefinition = {
 const values: ParameterDefinition = {
     name: 'values',
     shortDescription: 'The values of the whammy in quarter-tones relative to the original note, decimals supported',
-    parseMode: ArgumentListParseTypesMode.RequiredAsValueList,
+    parseMode: ArgumentListParseTypesMode.ValueListWithoutParenthesis,
     type: AlphaTexNodeType.Number
 };
 

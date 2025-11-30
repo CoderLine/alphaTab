@@ -5616,7 +5616,7 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
 (auto|explicit)",
     "start" => Map {
       "col" => 13,
@@ -5723,8 +5723,8 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
-(invert|up|down|auto|split|merge|splitsecondary)",
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
     "start" => Map {
       "col" => 11,
       "line" => 1,
@@ -5735,16 +5735,6 @@ Array [
     "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'invalid'.",
-    "start" => Map {
-      "col" => 19,
-      "line" => 1,
-      "offset" => 18,
-    },
-  },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
       "col" => 19,
       "line" => 1,
@@ -5766,33 +5756,7 @@ exports[`AlphaTexImporterTest errors at219 bendtype: lexer-diagnostics 1`] = `Ar
 
 exports[`AlphaTexImporterTest errors at219 bendtype: parser-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexImporterTest errors at219 bendtype: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 219,
-    "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (). Signatures: (Number|Arguments[])
-(custom|bend|release|bendrelease|hold|prebend|prebendbend|prebendrelease, Number|Arguments[])
-(default|gradual|fast, Number|Arguments[])
-(custom|bend|release|bendrelease|hold|prebend|prebendbend|prebendrelease, default|gradual|fast, Number|Arguments[])",
-    "start" => Map {
-      "col" => 6,
-      "line" => 1,
-      "offset" => 5,
-    },
-  },
-  Map {
-    "code" => 212,
-    "severity" => 2,
-    "message" => "Unrecogized property 'invalid', expected one of nh,ah,th,ph,sh,fh,v,vw,sl,ss,sib,sia,sou,sod,psu,psd,h,lht,g,ac,hac,ten,tr,pm,st,lr,x,t,turn,iturn,umordent,lmordent,string,hide,b,be,lf,rf,acc,slur,-,f,fo,vs,v,vw,s,p,tt,d,dd,su,sd,cre,dec,spd,sph,spu,spe,slashed,ds,glpf,glpt,waho,wahc,legatoorigin,timer,tu,txt,lyrics,tb,tbe,bu,bd,au,ad,ch,gr,dy,tempo,volume,balance,tp,barre,rasg,ot,instrument,bank,fermata,beam",
-    "start" => Map {
-      "col" => 20,
-      "line" => 1,
-      "offset" => 19,
-    },
-  },
-]
-`;
+exports[`AlphaTexImporterTest errors at219 bendtype: semantic-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexImporterTest errors at219 bracketextendmode: lexer-diagnostics 1`] = `Array []`;
 
@@ -5801,7 +5765,7 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
 (nobrackets|groupstaves|groupsimilarinstruments)",
     "start" => Map {
       "col" => 19,
@@ -5821,8 +5785,8 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
-(ppp|pp|p|mp|mf|f|ff|fff|pppp|ppppp|pppppp|ffff|fffff|ffffff|sf|sfp|sfpp|fp|rf|rfz|sfz|sffz|fz|n|pf|sfzp)",
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
     "start" => Map {
       "col" => 7,
       "line" => 1,
@@ -5833,16 +5797,6 @@ Array [
     "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'invalid'.",
-    "start" => Map {
-      "col" => 15,
-      "line" => 1,
-      "offset" => 14,
-    },
-  },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
       "col" => 15,
       "line" => 1,
@@ -5881,7 +5835,7 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
 (fullname|shortname)",
     "start" => Map {
       "col" => 26,
@@ -5901,7 +5855,7 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
 (horizontal|vertical)",
     "start" => Map {
       "col" => 33,
@@ -5940,7 +5894,7 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
 (hidden|firstsystem|allsystems)",
     "start" => Map {
       "col" => 27,
@@ -5960,7 +5914,7 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
 (fullname|shortname)",
     "start" => Map {
       "col" => 27,
@@ -5980,7 +5934,7 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
 (horizontal|vertical)",
     "start" => Map {
       "col" => 33,
@@ -6000,8 +5954,8 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
-(15ma|8va|regular|8vb|15mb)",
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
     "start" => Map {
       "col" => 7,
       "line" => 1,
@@ -6012,16 +5966,6 @@ Array [
     "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'invalid'.",
-    "start" => Map {
-      "col" => 15,
-      "line" => 1,
-      "offset" => 14,
-    },
-  },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
       "col" => 15,
       "line" => 1,
@@ -6040,8 +5984,8 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
-(ii|mi|miitriplet|miianapaest|pmptriplet|pmpanapaest|peitriplet|peianapaest|paitriplet|paianapaest|amitriplet|amianapaest|ppp|amii|amip|eami|eamii|peami)",
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
     "start" => Map {
       "col" => 9,
       "line" => 1,
@@ -6052,16 +5996,6 @@ Array [
     "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'invalid'.",
-    "start" => Map {
-      "col" => 17,
-      "line" => 1,
-      "offset" => 16,
-    },
-  },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
       "col" => 17,
       "line" => 1,
@@ -6126,7 +6060,7 @@ Array [
   Map {
     "code" => 219,
     "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
 (hidden|firstsystem|allsystems)",
     "start" => Map {
       "col" => 28,
@@ -6148,16 +6082,6 @@ Array [
     "severity" => 2,
     "message" => "Unrecognized property 'none'.",
     "start" => Map {
-      "col" => 12,
-      "line" => 1,
-      "offset" => 11,
-    },
-  },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
-    "start" => Map {
       "col" => 13,
       "line" => 1,
       "offset" => 12,
@@ -6172,33 +6096,7 @@ exports[`AlphaTexImporterTest errors at219 whammybartype: lexer-diagnostics 1`] 
 
 exports[`AlphaTexImporterTest errors at219 whammybartype: parser-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexImporterTest errors at219 whammybartype: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 219,
-    "severity" => 2,
-    "message" => "Error parsing arguments: no overload matched arguments (). Signatures: (Number|Arguments[])
-(custom|dive|dip|hold|predive|predivedive, Number|Arguments[])
-(default|gradual|fast, Number|Arguments[])
-(custom|dive|dip|hold|predive|predivedive, default|gradual|fast, Number|Arguments[])",
-    "start" => Map {
-      "col" => 7,
-      "line" => 1,
-      "offset" => 6,
-    },
-  },
-  Map {
-    "code" => 212,
-    "severity" => 2,
-    "message" => "Unrecogized property 'invalid', expected one of nh,ah,th,ph,sh,fh,v,vw,sl,ss,sib,sia,sou,sod,psu,psd,h,lht,g,ac,hac,ten,tr,pm,st,lr,x,t,turn,iturn,umordent,lmordent,string,hide,b,be,lf,rf,acc,slur,-,f,fo,vs,v,vw,s,p,tt,d,dd,su,sd,cre,dec,spd,sph,spu,spe,slashed,ds,glpf,glpt,waho,wahc,legatoorigin,timer,tu,txt,lyrics,tb,tbe,bu,bd,au,ad,ch,gr,dy,tempo,volume,balance,tp,barre,rasg,ot,instrument,bank,fermata,beam",
-    "start" => Map {
-      "col" => 21,
-      "line" => 1,
-      "offset" => 20,
-    },
-  },
-]
-`;
+exports[`AlphaTexImporterTest errors at219 whammybartype: semantic-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexImporterTest sync 1`] = `
 Map {

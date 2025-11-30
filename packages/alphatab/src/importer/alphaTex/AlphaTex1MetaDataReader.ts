@@ -5,6 +5,7 @@ import {
 } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import {
     type AlphaTexArgumentList,
+    type AlphaTexAstNodeLocation,
     type AlphaTexMetaDataTagNode,
     AlphaTexNodeType,
     type AlphaTexNumberLiteral,
@@ -157,16 +158,9 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             return undefined;
         }
 
-        // optimized path for single overload causing less allocations and checks
-        // if (signatures.length === 1) {
-        //     return this._readArgumentsSingle(parser, signatures[0], endOfListTypes);
-        // }
-
         const argValues: IAlphaTexArgumentValue[] = [];
         const valueListStart = parser.lexer.peekToken()?.start;
         const parseRemaining = endOfListTypes !== undefined;
-
-        let error = false;
 
         const candidates = new Map<number, SignatureResolutionInfo>(
             signatures.map((v, i) => [
@@ -180,6 +174,103 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             ])
         );
 
+        const allCandidates = this._filterCandidates(parser, candidates, argValues, endOfListTypes);
+
+        const error = this._validateArguments(
+            parser,
+            candidates,
+            argValues,
+            endOfListTypes,
+            signatures,
+            valueListStart
+        );
+
+        // Recovery: read remaining args user might have supplied
+        if (parseRemaining) {
+            this._skipRemainingArguments(parser, signatures, endOfListTypes!);
+        }
+
+        return this._createArgumentList(
+            argValues,
+            valueListStart,
+            parser.lexer.previousTokenEndLocation(),
+            error,
+            allCandidates
+        );
+    }
+
+    private _validateArguments(
+        parser: AlphaTexParser,
+        candidates: Map<number, SignatureResolutionInfo>,
+        argValues: IAlphaTexArgumentValue[],
+        endOfListTypes: Set<AlphaTexNodeType> | undefined,
+        signatures: AlphaTexSignatureDefinition[],
+        valueListStart: AlphaTexAstNodeLocation | undefined
+    ) {
+        const lastToken = parser.lexer.peekToken();
+        let error = false;
+        if (candidates.size !== 1 && lastToken === undefined) {
+            parser.addParserDiagnostic({
+                code: AlphaTexDiagnosticCode.AT203,
+                start: parser.lexer.currentTokenLocation(),
+                end: parser.lexer.currentTokenLocation(),
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                message: 'Unexpected end of file.'
+            });
+            error = true;
+        } else if (candidates.size === 0) {
+            if (lastToken !== undefined && argValues.length === 0) {
+                if (endOfListTypes && !endOfListTypes.has(lastToken.nodeType)) {
+                    argValues.push(parser.lexer.peekToken() as IAlphaTexArgumentValue);
+                    parser.lexer.advance();
+                }
+            }
+            parser.addParserDiagnostic({
+                code: AlphaTexDiagnosticCode.AT219,
+                message: `Error parsing arguments: no overload matched arguments ${AlphaTex1MetaDataReader.generateSignaturesFromArguments(argValues)}. Signatures:\n${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: valueListStart,
+                end: parser.lexer.previousTokenEndLocation()
+            });
+            error = true;
+        }
+        return error;
+    }
+
+    private _createArgumentList(
+        argValues: IAlphaTexArgumentValue[],
+        start: AlphaTexAstNodeLocation | undefined,
+        end: AlphaTexAstNodeLocation | undefined,
+        error: boolean,
+        allCandidates: [number, SignatureResolutionInfo][] | undefined
+    ) {
+        if (argValues.length === 0) {
+            return undefined;
+        }
+
+        const valueList = Atnf.args(argValues, false)!;
+        valueList.start = start;
+        valueList.end = end;
+        valueList.validated = !error;
+
+        if (allCandidates) {
+            // sort by how well the candidate matches
+            if (allCandidates.length > 1) {
+                AlphaTex1MetaDataReader.sortCandidates(allCandidates);
+            }
+
+            valueList.signatureCandidateIndices = allCandidates.map(c => c[0]);
+        }
+
+        return valueList;
+    }
+
+    private _filterCandidates(
+        parser: AlphaTexParser,
+        candidates: Map<number, SignatureResolutionInfo>,
+        argValues: IAlphaTexArgumentValue[],
+        endOfListTypes: Set<AlphaTexNodeType> | undefined
+    ) {
         const parseFull = parser.mode === AlphaTexParseMode.Full;
         const trackValue = (value: IAlphaTexAstNode, overloadIndex: number) => {
             const candidate = candidates.get(overloadIndex)!;
@@ -237,68 +328,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
 
         const allCandidates = parser.mode === AlphaTexParseMode.Full ? Array.from(candidates.entries()) : undefined;
         AlphaTex1MetaDataReader.filterIncompleteCandidates(candidates);
-
-        if (!error) {
-            const lastToken = parser.lexer.peekToken();
-            if (candidates.size !== 1 && lastToken === undefined) {
-                parser.addParserDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT203,
-                    start: parser.lexer.currentTokenLocation(),
-                    end: parser.lexer.currentTokenLocation(),
-                    severity: AlphaTexDiagnosticsSeverity.Error,
-                    message: 'Unexpected end of file.'
-                });
-                error = true;
-            } else if (candidates.size === 0) {
-                if (lastToken !== undefined && argValues.length === 0) {
-                    if (endOfListTypes && !endOfListTypes.has(lastToken.nodeType)) {
-                        argValues.push(parser.lexer.peekToken() as IAlphaTexArgumentValue);
-                        parser.lexer.advance();
-                    }
-                }
-                parser.addParserDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT219,
-                    message: `Error parsing arguments: no overload matched arguments ${AlphaTex1MetaDataReader.generateSignaturesFromArguments(argValues)}. Signatures:\n${AlphaTex1MetaDataReader.generateSignatures(signatures)}`,
-                    severity: AlphaTexDiagnosticsSeverity.Error,
-                    start: valueListStart,
-                    end: parser.lexer.previousTokenEndLocation()
-                });
-                error = true;
-            }
-        }
-
-        // Recovery: read remaining args user might have supplied
-        if (parseRemaining) {
-            this._skipRemainingArguments(parser, signatures, endOfListTypes!);
-        }
-
-        if (argValues.length === 0) {
-            return undefined;
-        }
-
-        const valueList = Atnf.args(argValues, false)!;
-        valueList.start = valueListStart;
-        valueList.end = parser.lexer.previousTokenEndLocation();
-        valueList.validated = !error;
-
-        if (allCandidates) {
-            // sort by how well the candidate matches
-            if (allCandidates.length > 1) {
-                AlphaTex1MetaDataReader.sortCandidates(allCandidates);
-            }
-
-            valueList.signatureCandidateIndices = allCandidates.map(c => c[0]);
-        }
-
-        return valueList;
-    }
-
-    private _readArgumentsSingle(
-        parser: AlphaTexParser,
-        signature: AlphaTexSignatureDefinition,
-        endOfListTypes: Set<AlphaTexNodeType> | undefined
-    ): AlphaTexArgumentList | undefined {
-        throw new Error('Method not implemented.');
+        return allCandidates;
     }
 
     public static sortCandidates(allCandidates: [number, SignatureResolutionInfo][]) {
@@ -482,14 +512,8 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                             overload.parameterHasValues = true;
                             break;
                         case ArgumentListParseTypesMode.RequiredAsValueList:
-                            // if we had a list with parenthesis -> we consider the parameter complete
-                            if (value.nodeType === AlphaTexNodeType.LParen) {
-                                overload.parameterIndex++;
-                                overload.parameterHasValues = false;
-                            } else {
-                                // otherwise stay on current element like ValueListWithoutParenthesis
-                                overload.parameterHasValues = true;
-                            }
+                            overload.parameterIndex++;
+                            overload.parameterHasValues = false;
                             break;
                         default:
                             // advance to next item

@@ -21,7 +21,9 @@ Score (1,1) -> (1,19) {
             ],
             signatureCandidateIndices: Array [
               0,
+              1,
             ],
+            validated: true,
           },
         },
       ],
@@ -91,6 +93,7 @@ Score (1,1) -> (3,9) {
             signatureCandidateIndices: Array [
               1,
             ],
+            validated: true,
           },
         },
       ],
@@ -133,6 +136,7 @@ line**/",
             signatureCandidateIndices: Array [
               1,
             ],
+            validated: true,
           },
         },
       ],
@@ -171,6 +175,7 @@ line**/",
             signatureCandidateIndices: Array [
               1,
             ],
+            validated: true,
           },
         },
       ],
@@ -508,6 +513,7 @@ line**/",
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -541,6 +547,7 @@ line**/",
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -581,6 +588,7 @@ Score (1,1) -> (2,14) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -1103,11 +1111,11 @@ Array [
 `;
 
 exports[`AlphaTexParserTest errors at205 bar 1`] = `
-Score (1,1) -> (1,25) {
+Score (1,1) -> (1,26) {
   bars: Array [
-    Bar (1,1) -> (1,25) {
+    Bar (1,1) -> (1,26) {
       metaData: Array [
-        Meta (1,3) -> (1,25) {
+        Meta (1,3) -> (1,26) {
           tag: Tag "track" (1,3) -> (1,9) {
             prefix: Backslash (1,3) -> (1,4),
             tag: Ident "track" (1,4) -> (1,9),
@@ -1123,14 +1131,16 @@ Score (1,1) -> (1,25) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
-          properties: Props (1,17) -> (1,25) {
+          properties: Props (1,17) -> (1,26) {
             openBrace: LBrace (1,17) -> (1,18),
             properties: Array [
               Prop (1,18) -> (1,25) {
                 property: Ident "unknown" (1,18) -> (1,25),
               },
             ],
+            closeBrace: RBrace (1,25) -> (1,26),
           },
         },
       ],
@@ -1153,30 +1163,20 @@ Array [
       "offset" => 24,
     },
   },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
-    "start" => Map {
-      "col" => 25,
-      "line" => 1,
-      "offset" => 24,
-    },
-  },
 ]
 `;
 
 exports[`AlphaTexParserTest errors at205 barre 1`] = `
-Score (1,1) -> (1,20) {
+Score (1,1) -> (1,21) {
   bars: Array [
-    Bar (1,1) -> (1,20) {
+    Bar (1,1) -> (1,21) {
       beats: Array [
-        Beat (1,1) -> (1,20) {
-          notes: NoteList (1,1) -> (1,20) {
+        Beat (1,1) -> (1,21) {
+          notes: NoteList (1,1) -> (1,21) {
             notes: Array [
-              Note (1,1) -> (1,20) {
+              Note (1,1) -> (1,21) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
-                noteEffects: Props (1,4) -> (1,20) {
+                noteEffects: Props (1,4) -> (1,21) {
                   openBrace: LBrace (1,4) -> (1,5),
                   properties: Array [
                     Prop (1,5) -> (1,12) {
@@ -1192,12 +1192,14 @@ Score (1,1) -> (1,20) {
                         signatureCandidateIndices: Array [
                           0,
                         ],
+                        validated: true,
                       },
                     },
                     Prop (1,13) -> (1,20) {
                       property: Ident "invalid" (1,13) -> (1,20),
                     },
                   ],
+                  closeBrace: RBrace (1,20) -> (1,21),
                 },
               },
             ],
@@ -1223,25 +1225,15 @@ Array [
       "offset" => 19,
     },
   },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
-    "start" => Map {
-      "col" => 20,
-      "line" => 1,
-      "offset" => 19,
-    },
-  },
 ]
 `;
 
 exports[`AlphaTexParserTest errors at205 beat 1`] = `
-Score (1,1) -> (1,16) {
+Score (1,1) -> (1,17) {
   bars: Array [
-    Bar (1,1) -> (1,16) {
+    Bar (1,1) -> (1,17) {
       beats: Array [
-        Beat (1,3) -> (1,16) {
+        Beat (1,3) -> (1,17) {
           notes: NoteList (1,3) -> (1,7) {
             openParenthesis: LParen (1,3) -> (1,4),
             notes: Array [
@@ -1251,13 +1243,14 @@ Score (1,1) -> (1,16) {
             ],
             closeParenthesis: RParen (1,6) -> (1,7),
           },
-          beatEffects: Props (1,8) -> (1,16) {
+          beatEffects: Props (1,8) -> (1,17) {
             openBrace: LBrace (1,8) -> (1,9),
             properties: Array [
               Prop (1,9) -> (1,16) {
                 property: Ident "unknown" (1,9) -> (1,16),
               },
             ],
+            closeBrace: RBrace (1,16) -> (1,17),
           },
         },
       ],
@@ -1274,16 +1267,6 @@ Array [
     "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'unknown'.",
-    "start" => Map {
-      "col" => 16,
-      "line" => 1,
-      "offset" => 15,
-    },
-  },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
       "col" => 16,
       "line" => 1,
@@ -1352,16 +1335,16 @@ Array [
 `;
 
 exports[`AlphaTexParserTest errors at205 gracetype 1`] = `
-Score (1,1) -> (1,15) {
+Score (1,1) -> (1,16) {
   bars: Array [
-    Bar (1,1) -> (1,15) {
+    Bar (1,1) -> (1,16) {
       beats: Array [
-        Beat (1,1) -> (1,15) {
-          notes: NoteList (1,1) -> (1,15) {
+        Beat (1,1) -> (1,16) {
+          notes: NoteList (1,1) -> (1,16) {
             notes: Array [
-              Note (1,1) -> (1,15) {
+              Note (1,1) -> (1,16) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
-                noteEffects: Props (1,4) -> (1,15) {
+                noteEffects: Props (1,4) -> (1,16) {
                   openBrace: LBrace (1,4) -> (1,5),
                   properties: Array [
                     Prop (1,5) -> (1,7) {
@@ -1371,6 +1354,7 @@ Score (1,1) -> (1,15) {
                       property: Ident "invalid" (1,8) -> (1,15),
                     },
                   ],
+                  closeBrace: RBrace (1,15) -> (1,16),
                 },
               },
             ],
@@ -1396,40 +1380,32 @@ Array [
       "offset" => 14,
     },
   },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
-    "start" => Map {
-      "col" => 15,
-      "line" => 1,
-      "offset" => 14,
-    },
-  },
 ]
 `;
 
 exports[`AlphaTexParserTest errors at205 note 1`] = `
-Score (1,1) -> (1,14) {
+Score (1,1) -> (1,16) {
   bars: Array [
-    Bar (1,1) -> (1,14) {
+    Bar (1,1) -> (1,16) {
       beats: Array [
-        Beat (1,3) -> (1,14) {
-          notes: NoteList (1,3) -> (1,14) {
+        Beat (1,3) -> (1,16) {
+          notes: NoteList (1,3) -> (1,16) {
             openParenthesis: LParen (1,3) -> (1,4),
             notes: Array [
-              Note (1,4) -> (1,14) {
+              Note (1,4) -> (1,15) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
-                noteEffects: Props (1,6) -> (1,14) {
+                noteEffects: Props (1,6) -> (1,15) {
                   openBrace: LBrace (1,6) -> (1,7),
                   properties: Array [
                     Prop (1,7) -> (1,14) {
                       property: Ident "unknown" (1,7) -> (1,14),
                     },
                   ],
+                  closeBrace: RBrace (1,14) -> (1,15),
                 },
               },
             ],
+            closeParenthesis: RParen (1,15) -> (1,16),
           },
         },
       ],
@@ -1446,26 +1422,6 @@ Array [
     "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'unknown'.",
-    "start" => Map {
-      "col" => 14,
-      "line" => 1,
-      "offset" => 13,
-    },
-  },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
-    "start" => Map {
-      "col" => 14,
-      "line" => 1,
-      "offset" => 13,
-    },
-  },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
       "col" => 14,
       "line" => 1,
@@ -1684,6 +1640,7 @@ Score (1,1) -> (1,13) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -1746,6 +1703,7 @@ Score (1,1) -> (1,49) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -1771,6 +1729,7 @@ Score (1,1) -> (1,49) {
                         signatureCandidateIndices: Array [
                           0,
                         ],
+                        validated: true,
                       },
                     },
                   ],
@@ -1797,6 +1756,7 @@ Score (1,1) -> (1,49) {
                   signatureCandidateIndices: Array [
                     0,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -1846,6 +1806,7 @@ Score (1,1) -> (1,24) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
           properties: Props (1,12) -> (1,24) {
             openBrace: LBrace (1,12) -> (1,13),
@@ -1863,6 +1824,7 @@ Score (1,1) -> (1,24) {
                   signatureCandidateIndices: Array [
                     0,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -1912,6 +1874,7 @@ Score (1,1) -> (1,31) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -1937,6 +1900,7 @@ Score (1,1) -> (1,31) {
                         signatureCandidateIndices: Array [
                           0,
                         ],
+                        validated: true,
                       },
                     },
                   ],
@@ -1989,6 +1953,7 @@ Score (1,1) -> (1,36) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -2014,6 +1979,7 @@ Score (1,1) -> (1,36) {
                         signatureCandidateIndices: Array [
                           0,
                         ],
+                        validated: true,
                       },
                     },
                   ],
@@ -2055,6 +2021,7 @@ Score (1,1) -> (1,44) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -2080,6 +2047,7 @@ Score (1,1) -> (1,44) {
                         signatureCandidateIndices: Array [
                           0,
                         ],
+                        validated: true,
                       },
                     },
                   ],
@@ -2153,6 +2121,7 @@ Score (1,1) -> (1,45) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -2178,6 +2147,7 @@ Score (1,1) -> (1,45) {
                         signatureCandidateIndices: Array [
                           0,
                         ],
+                        validated: true,
                       },
                     },
                   ],
@@ -2264,6 +2234,7 @@ Score (1,1) -> (1,40) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -2289,6 +2260,7 @@ Score (1,1) -> (1,40) {
                         signatureCandidateIndices: Array [
                           0,
                         ],
+                        validated: true,
                       },
                     },
                   ],
@@ -2384,6 +2356,7 @@ Score (1,1) -> (1,13) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
           properties: Props (1,12) -> (1,13) {
             openBrace: LBrace (1,12) -> (1,13),
@@ -2434,6 +2407,7 @@ Score (1,1) -> (1,16) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
           properties: Props (1,12) -> (1,16) {
             openBrace: LBrace (1,12) -> (1,13),
@@ -2498,6 +2472,7 @@ Score (1,1) -> (1,19) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
           properties: Props (1,12) -> (1,19) {
             openBrace: LBrace (1,12) -> (1,13),
@@ -2639,6 +2614,7 @@ Score (1,1) -> (1,26) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -2714,6 +2690,7 @@ Score (1,1) -> (1,27) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -2802,6 +2779,7 @@ Score (1,1) -> (1,22) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -2863,6 +2841,7 @@ Score (1,1) -> (1,19) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -3048,6 +3027,9 @@ Score (1,1) -> (1,24) {
                         arguments: Array [
                           String "invalid" (1,11) -> (1,19),
                         ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
                       },
                     },
                     Prop (1,21) -> (1,22) {
@@ -3110,6 +3092,7 @@ Score (1,1) -> (1,16) {
             signatureCandidateIndices: Array [
               1,
             ],
+            validated: true,
           },
         },
       ],
@@ -3173,6 +3156,7 @@ Score (1,1) -> (1,29) {
             signatureCandidateIndices: Array [
               1,
             ],
+            validated: true,
           },
         },
       ],
@@ -3534,6 +3518,7 @@ Score (1,1) -> (1,24) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -3639,6 +3624,7 @@ Score (1,1) -> (1,14) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -3751,6 +3737,7 @@ Score (1,1) -> (1,30) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -3896,6 +3883,7 @@ Score (1,1) -> (1,26) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -4116,6 +4104,7 @@ Score (1,1) -> (1,31) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -4334,6 +4323,7 @@ Score (1,1) -> (1,25) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -4538,6 +4528,7 @@ Score (1,1) -> (1,29) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -4697,6 +4688,7 @@ Score (1,1) -> (1,32) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -4973,6 +4965,7 @@ Score (1,1) -> (1,43) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -5173,6 +5166,7 @@ Score (1,1) -> (1,30) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -5409,6 +5403,7 @@ Score (1,1) -> (1,35) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -5512,6 +5507,7 @@ Score (1,1) -> (1,24) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -5668,6 +5664,7 @@ Score (1,1) -> (1,27) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -5765,6 +5762,7 @@ Score (1,1) -> (1,14) {
                         signatureCandidateIndices: Array [
                           1,
                         ],
+                        validated: true,
                       },
                     },
                   ],
@@ -5844,6 +5842,7 @@ Score (1,1) -> (1,12) {
                         signatureCandidateIndices: Array [
                           0,
                         ],
+                        validated: true,
                       },
                     },
                   ],
@@ -6110,6 +6109,7 @@ Score (1,1) -> (1,59) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -6235,6 +6235,7 @@ Score (1,1) -> (1,31) {
                   signatureCandidateIndices: Array [
                     1,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -6284,6 +6285,7 @@ Score (1,1) -> (1,33) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
         Meta (1,16) -> (1,30) {
@@ -6302,6 +6304,7 @@ Score (1,1) -> (1,33) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -6335,6 +6338,7 @@ Score (1,1) -> (1,30) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
           properties: Props (1,15) -> (1,28) {
             openBrace: LBrace (1,15) -> (1,16),
@@ -6352,6 +6356,7 @@ Score (1,1) -> (1,30) {
                   signatureCandidateIndices: Array [
                     0,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -6385,6 +6390,7 @@ Score (1,1) -> (1,30) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
           properties: Props (1,8) -> (1,21) {
             openBrace: LBrace (1,8) -> (1,9),
@@ -6402,6 +6408,7 @@ Score (1,1) -> (1,30) {
                   signatureCandidateIndices: Array [
                     0,
                   ],
+                  validated: true,
                 },
               },
             ],
@@ -6453,6 +6460,7 @@ Score (1,1) -> (1,33) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -6687,6 +6695,7 @@ Score (1,1) -> (1,21) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -6743,6 +6752,7 @@ Score (1,1) -> (1,20) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -6799,6 +6809,7 @@ Score (1,1) -> (1,20) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -6923,6 +6934,7 @@ Score (1,1) -> (1,36) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
@@ -6968,6 +6980,7 @@ Score (1,1) -> (1,36) {
             signatureCandidateIndices: Array [
               0,
             ],
+            validated: true,
           },
         },
       ],
