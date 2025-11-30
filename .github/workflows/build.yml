@@ -40,6 +40,8 @@ jobs:
       - run: npm ci
       - run: npm run build-web
       - run: npm run test-web
+      - run: npm run build-language-server
+      - run: npm run build-monaco
         id: test
       - uses: actions/upload-artifact@v5
         if: ${{ failure() && steps.test.conclusion == 'failure' }}

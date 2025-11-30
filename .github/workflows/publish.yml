@@ -37,6 +37,8 @@ jobs:
       - run: npm run update-version -- alpha ${{github.run_number}}
       - run: npm ci
       - run: npm run build-web
+      - run: npm run build-language-server
+      - run: npm run build-monaco      
       - run: npm pack
         working-directory: ./packages/alphatab/
       - run: npm pack

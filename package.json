@@ -38,7 +38,10 @@
         "test-vite": "npm run test --workspace=packages/vite",
 
         "build-webpack": "npm run build --workspace=packages/webpack",
-        "test-webpack": "npm run test --workspace=packages/webpack"
+        "test-webpack": "npm run test --workspace=packages/webpack",
+
+        "build-monaco": "npm run build --workspace=packages/monaco"
+
     },
     "devDependencies": {
         "concurrently": "^9.2.1"
