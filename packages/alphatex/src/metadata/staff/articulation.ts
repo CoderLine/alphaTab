@@ -152,22 +152,6 @@ export const articulation: MetadataTagDefinition = {
                     shortDescription: 'The numeric value of the built-in articulation'
                 }
             ]
-        },
-        {
-            parameters: [
-                {
-                    name: 'name',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Ident,
-                    shortDescription: 'The string used in the note values'
-                },
-                {
-                    name: 'value',
-                    parseMode: ArgumentListParseTypesMode.Required,
-                    type: AlphaTexNodeType.Ident,
-                    shortDescription: 'The numeric value of the built-in articulation'
-                }
-            ]
         }
     ],
     examples: `

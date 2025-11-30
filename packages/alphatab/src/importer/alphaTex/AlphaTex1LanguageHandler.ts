@@ -933,7 +933,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         for (const value of args.arguments) {
-            AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value, trackValue);
+            AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value, false, trackValue);
             if (candidates.size === 0) {
                 break;
             }

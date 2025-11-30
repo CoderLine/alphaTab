@@ -13,14 +13,16 @@ import {
     type IAlphaTexArgumentValue,
     type IAlphaTexAstNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
-import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
+import type {AlphaTexParser} from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
     ArgumentListParseTypesMode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
-import { Atnf } from '@coderline/alphatab/importer/alphaTex/ATNF';
-import type { IAlphaTexMetaDataReader } from '@coderline/alphatab/importer/alphaTex/IAlphaTexMetaDataReader';
+import {Atnf} from '@coderline/alphatab/importer/alphaTex/ATNF';
+import type {
+    IAlphaTexMetaDataReader
+} from '@coderline/alphatab/importer/alphaTex/IAlphaTexMetaDataReader';
 
 /**
  * @internal
@@ -29,6 +31,7 @@ import type { IAlphaTexMetaDataReader } from '@coderline/alphatab/importer/alpha
 export interface SignatureResolutionInfo {
     signature: AlphaTexSignatureDefinition;
     parameterIndex: number;
+    parameterHasValues: boolean;
 }
 
 /**
@@ -150,7 +153,8 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 i,
                 {
                     signature: v,
-                    parameterIndex: 0
+                    parameterIndex: 0,
+                    parameterHasValues: false
                 } as SignatureResolutionInfo
             ])
         );
@@ -179,11 +183,11 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                     parser.lexer.advance();
                 }
             }
-        }
+        };
 
         const extendToFloat = (value: AlphaTexNumberLiteral) => {
             parser.lexer.extendToFloat(value);
-        }
+        };
 
         while (candidates.size > 1 || (candidates.size > 0 && !AlphaTex1MetaDataReader._hasExactMatch(candidates))) {
             const value = parser.lexer.peekToken();
@@ -195,7 +199,9 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 break;
             }
 
-            if (!AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value, trackValue, extendToFloat)) {
+            if (!AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value,
+                endOfListTypes !== undefined && endOfListTypes.has(value.nodeType),
+                trackValue, extendToFloat)) {
                 break;
             }
         }
@@ -203,8 +209,8 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         AlphaTex1MetaDataReader.filterIncompleteCandidates(candidates);
 
         if (!error) {
-            const eof = parser.lexer.peekToken() === undefined;
-            if (candidates.size !== 1 && eof) {
+            const lastToken = parser.lexer.peekToken();
+            if (candidates.size !== 1 && lastToken === undefined) {
                 parser.addParserDiagnostic({
                     code: AlphaTexDiagnosticCode.AT203,
                     start: parser.lexer.currentTokenLocation(),
@@ -214,8 +220,14 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 });
                 error = true;
             } else if (candidates.size === 0) {
-                if (!eof && argValues.length === 0) {
-                    argValues.push(parser.lexer.peekToken() as IAlphaTexArgumentValue);
+                if (lastToken !== undefined && argValues.length === 0) {
+                    switch (lastToken.nodeType) {
+                        case AlphaTexNodeType.String:
+                        case AlphaTexNodeType.Number:
+                        case AlphaTexNodeType.Ident:
+                            argValues.push(parser.lexer.peekToken() as IAlphaTexArgumentValue);
+                            break;
+                    }
                 }
                 parser.addParserDiagnostic({
                     code: AlphaTexDiagnosticCode.AT219,
@@ -233,7 +245,6 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             let remaining = parser.lexer.peekToken();
             while (remaining && !endOfListTypes!.has(remaining.nodeType)) {
                 if (AlphaTex1MetaDataReader._handleTypeValueListItem(remaining, undefined, extendToFloat)) {
-                    argValues.push(remaining as IAlphaTexArgumentValue);
                     parser.lexer.advance();
                     remaining = parser.lexer.peekToken();
                 } else {
@@ -274,7 +285,6 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 switch (remaining.parseMode) {
                     case ArgumentListParseTypesMode.Required:
                     case ArgumentListParseTypesMode.RequiredAsFloat:
-                    case ArgumentListParseTypesMode.RequiredAsValueList:
                         toRemove.add(k);
                         break;
                 }
@@ -348,8 +358,9 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
     public static filterSignatureCandidates(
         candidates: Map<number, SignatureResolutionInfo>,
         value: IAlphaTexAstNode,
+        valueCanBeEndOfList: boolean,
         trackValue?: (value: IAlphaTexAstNode, signature: number) => void,
-        extendToFloat?: (value: AlphaTexNumberLiteral) => void
+        extendToFloat?: (value: AlphaTexNumberLiteral) => void,
     ) {
         const toRemove = new Set<number>();
         let foundMatchingOverload = false;
@@ -362,7 +373,9 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                         : undefined;
 
                 if (!expected) {
-                    toRemove.add(overloadIndex);
+                    if (!valueCanBeEndOfList) {
+                        toRemove.add(overloadIndex);
+                    }
                     handled = true;
                 } else if (overload.signature.isStrict && overload.parameterIndex > 0) {
                     toRemove.add(overloadIndex);
@@ -381,10 +394,22 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                     switch (expected.parseMode) {
                         case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
                             // stay on current element
+                            overload.parameterHasValues = true;
+                            break;
+                        case ArgumentListParseTypesMode.RequiredAsValueList:
+                            // if we had a list with parenthesis -> we consider the parameter complete
+                            if (value.nodeType === AlphaTexNodeType.LParen) {
+                                overload.parameterIndex++;
+                                overload.parameterHasValues = false;
+                            } else {
+                                // otherwise stay on current element like ValueListWithoutParenthesis
+                                overload.parameterHasValues = true;
+                            }
                             break;
                         default:
                             // advance to next item
                             overload.parameterIndex++;
+                            overload.parameterHasValues = false;
                             break;
                     }
                 } else {
@@ -392,6 +417,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                         case ArgumentListParseTypesMode.ValueListWithoutParenthesis:
                             // end of value list -> try next
                             overload.parameterIndex++;
+                            overload.parameterHasValues = false;
                             break;
                         case ArgumentListParseTypesMode.Required:
                         case ArgumentListParseTypesMode.RequiredAsFloat:
@@ -403,11 +429,13 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                         case ArgumentListParseTypesMode.OptionalAsFloat:
                             // optional not matched -> try next
                             overload.parameterIndex++;
+                            overload.parameterHasValues = false;
                             break;
 
                         case ArgumentListParseTypesMode.RequiredAsValueList:
                             //  not matched, value listed ended, check next
                             overload.parameterIndex++;
+                            overload.parameterHasValues = false;
                             break;
                     }
                 }
