@@ -20,7 +20,7 @@
         "type": "git",
         "url": "git+https://github.com/coderline/alphaTab.git"
     },
-    "type": "commonjs",
+    "type": "module",
     "main": "dist/alphaTab.js",
     "module": "dist/alphaTab.mjs",
     "typings": "dist/alphaTab.d.ts",
