@@ -339,6 +339,21 @@ export function dtsPathsTransformer(mapping?: Record<string, string>, externals?
         };
     };
 }
+export function defineEsmCjsLibConfig(setup?: (config: UserConfig) => void) {
+    return defineEsmLibConfig(config => {
+        const output = config.build!.rollupOptions!.output as OutputOptions[];
+
+        output.push({
+            dir: 'dist/',
+            format: 'cjs',
+            entryFileNames: '[name].cjs',
+            chunkFileNames: '[name].cjs'
+        });
+
+        setup?.(config);
+        return config;
+    });
+}
 
 export function defineEsmLibConfig(setup?: (config: UserConfig) => void) {
     return defineConfig(() => {

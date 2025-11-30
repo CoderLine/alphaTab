@@ -22,9 +22,18 @@
         "url": "git+https://github.com/coderline/alphaTab.git"
     },
     "type": "module",
-    "main": "dist/alphaTab.vite.mjs",
-    "module": "dist/alphaTab.vite.mjs",
-    "typings": "dist/alphaTab.vite.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/alphaTab.vite.cjs",
+            "import": "./dist/alphaTab.vite.mjs",
+            "types": "./dist/alphaTab.vite.d.ts"
+        },
+        "./*": {
+            "require": "./dist/*.cjs",
+            "import": "./dist/*.mjs",
+            "types": "./dist/*.d.ts"
+        }
+    },
     "scripts": {
         "clean": "rimraf dist",
         "lint": "biome lint",

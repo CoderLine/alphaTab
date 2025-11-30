@@ -1,3 +1,3 @@
-import { defineEsmLibConfig } from '../tooling/src/vite';
+import { defineEsmCjsLibConfig } from '../tooling/src/vite';
 
-export default defineEsmLibConfig();
+export default defineEsmCjsLibConfig();

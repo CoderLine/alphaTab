@@ -22,11 +22,17 @@
         "url": "git+https://github.com/coderline/alphaTab.git"
     },
     "type": "module",
-    "main": "dist/alphaTab.webpack.mjs",
-    "module": "dist/alphaTab.webpack.mjs",
-    "types": "dist/alphaTab.webpack.d.ts",
     "exports": {
-        "./*": "./dist/*"
+        ".": {
+            "require": "./dist/alphaTab.webpack.cjs",
+            "import": "./dist/alphaTab.webpack.mjs",
+            "types": "./dist/alphaTab.webpack.d.ts"
+        },
+        "./*": {
+            "require": "./dist/*.cjs",
+            "import": "./dist/*.mjs",
+            "types": "./dist/*.d.ts"
+        }
     },
     "scripts": {
         "clean": "rimraf dist",
