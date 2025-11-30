@@ -16,7 +16,7 @@ import {
     type AlphaTexPropertyNode,
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
-    type AlphaTexValueList,
+    type AlphaTexArgumentList,
     type IAlphaTexAstNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { IAlphaTexLanguageImportHandler } from '@coderline/alphatab/importer/alphaTex/IAlphaTexLanguageImportHandler';
@@ -241,19 +241,19 @@ class AlphaTexPrinter {
         this._writeValue(m.tag.tag);
 
         let newLineAfterMeta = true;
-        if (m.propertiesBeforeValues) {
+        if (m.propertiesBeforeArguments) {
             if (m.properties) {
                 this._writer.write(' ');
                 this._writeProperties(m.properties, false);
             }
-            if (m.values) {
+            if (m.arguments) {
                 this._writer.write(' ');
-                this._writeValues(m.values);
+                this._writeValues(m.arguments);
             }
         } else {
-            if (m.values) {
+            if (m.arguments) {
                 this._writer.write(' ');
-                this._writeValues(m.values);
+                this._writeValues(m.arguments);
             }
 
             if (m.properties) {
@@ -322,19 +322,19 @@ class AlphaTexPrinter {
         this._writeComments(p.leadingComments);
 
         this._writeValue(p.property);
-        if (p.values) {
+        if (p.arguments) {
             this._writer.write(' ');
-            this._writeValues(p.values);
+            this._writeValues(p.arguments);
         }
 
         this._writeComments(p.trailingComments);
     }
 
-    private _writeValues(values: AlphaTexValueList) {
+    private _writeValues(values: AlphaTexArgumentList) {
         this._writeComments(values.leadingComments);
         this._writeToken(values.openParenthesis, false);
         let first = true;
-        for (const v of values.values) {
+        for (const v of values.arguments) {
             if (!first) {
                 this._writer.write(' ');
             }
@@ -355,8 +355,8 @@ class AlphaTexPrinter {
                 this._writer.write((v as AlphaTexIdentifier).text);
                 break;
 
-            case AlphaTexNodeType.Values:
-                this._writeValues(v as AlphaTexValueList);
+            case AlphaTexNodeType.Arguments:
+                this._writeValues(v as AlphaTexArgumentList);
                 break;
             case AlphaTexNodeType.Number:
                 this._writer.write((v as AlphaTexNumberLiteral).value.toString());

@@ -7,8 +7,13 @@ import {
     noteProperties,
     scoreMetaData,
     structuralMetaData
-} from '@coderline/alphatab-language-server/documentation/documentation';
-import type { MetadataDoc, PropertyDoc, ValueDoc, ValueItemDoc } from '@coderline/alphatab-language-server/documentation/types';
+} from '@coderline/alphatab-alphatex/definitions';
+import type {
+    MetadataTagDefinition,
+    ParameterValueDefinition,
+    PropertyDefinition,
+    SignatureDefinition
+} from '@coderline/alphatab-alphatex/types';
 import type { AlphaTexTextDocument, Connection } from '@coderline/alphatab-language-server/server/types';
 import {
     type CompletionItem,
@@ -19,7 +24,7 @@ import {
     type TextDocuments,
     TextEdit
 } from '@coderline/alphatab-language-server/server/types';
-import { binaryNodeSearch } from '@coderline/alphatab-language-server/server/utils';
+import { binaryNodeSearch, resolveSignature } from '@coderline/alphatab-language-server/server/utils';
 
 interface MetaDataCompletionData {
     tagLowerCase: string;
@@ -276,7 +281,7 @@ function createNoteCompletions(
     return completions;
 }
 
-function propertyToCompletion(p: PropertyDoc, more?: Partial<CompletionItem>): CompletionItem {
+function propertyToCompletion(p: PropertyDefinition, more?: Partial<CompletionItem>): CompletionItem {
     return {
         label: p.property,
         kind: CompletionItemKind.Property,
@@ -296,7 +301,7 @@ function propertyToCompletion(p: PropertyDoc, more?: Partial<CompletionItem>): C
         ...more
     };
 }
-function valueItemToCompletion(i: ValueItemDoc, more?: Partial<CompletionItem>): CompletionItem {
+function valueItemToCompletion(i: ParameterValueDefinition, more?: Partial<CompletionItem>): CompletionItem {
     return {
         label: i.name,
         kind: CompletionItemKind.Value,
@@ -317,7 +322,7 @@ function valueItemToCompletion(i: ValueItemDoc, more?: Partial<CompletionItem>):
     };
 }
 
-function metaDataDocToCompletion(d: MetadataDoc): CompletionItemWithData<MetaDataCompletionData> {
+function metaDataDocToCompletion(d: MetadataTagDefinition): CompletionItemWithData<MetaDataCompletionData> {
     return {
         label: d.tag,
         kind: CompletionItemKind.Function,
@@ -360,7 +365,7 @@ function createMetaDataCompletions(
         }
 
         if (metaData) {
-            const keepValues = metaData.values || metaData.properties;
+            const keepValues = metaData.arguments || metaData.properties;
             completions = completions.map(c => ({
                 ...c,
                 insertText: keepValues ? c.label : c.insertText,
@@ -396,12 +401,16 @@ function createMetaDataCompletions(
         return completions;
     }
 
-    const endOfValues =
-        metaData.values?.closeParenthesis?.start!.offset ??
-        metaData.values?.end!.offset ??
+    const endOfArguments =
+        metaData.arguments?.closeParenthesis?.start!.offset ??
+        metaData.arguments?.end!.offset ??
         metaData.properties?.start!.offset ??
         endOfMetaData;
-    completions.splice(0, 0, ...createValueCompletions(metaDataDocs.values, metaData.values, offset, endOfValues));
+    completions.splice(
+        0,
+        0,
+        ...createArgumentCompletions(metaDataDocs.signatures, metaData.arguments, offset, endOfArguments)
+    );
 
     if (metaDataDocs?.properties) {
         const endOfProperties = metaData.properties?.closeBrace?.start!.offset ?? endOfMetaData;
@@ -415,55 +424,51 @@ function createMetaDataCompletions(
     return completions;
 }
 
-function createValueCompletions(
-    expectedValues: ValueDoc[],
-    actualValues: alphaTab.importer.alphaTex.AlphaTexValueList | undefined,
+function createArgumentCompletions(
+    signatures: SignatureDefinition[],
+    actualValues: alphaTab.importer.alphaTex.AlphaTexArgumentList | undefined,
     offset: number,
     trailingEnd: number
 ) {
-    const requiredValues = expectedValues.filter(v => v.required);
-    if (!actualValues && requiredValues.length > 0) {
-        if (requiredValues[0].values) {
-            const identifiers =
-                requiredValues[0].values.get(alphaTab.importer.alphaTex.AlphaTexNodeType.Ident) ??
-                requiredValues[0].values.get(alphaTab.importer.alphaTex.AlphaTexNodeType.String) ??
-                requiredValues[0].values.get(alphaTab.importer.alphaTex.AlphaTexNodeType.Number);
-            if (identifiers) {
-                return identifiers.map(i => valueItemToCompletion(i));
+    if (actualValues) {
+        const value = binaryNodeSearch(actualValues.arguments, offset, trailingEnd);
+        if (value?.parameterIndices) {
+            const signatureCandidates = resolveSignature(signatures, actualValues);
+            for (const [k, v] of signatureCandidates) {
+                const parameterIndex = value.parameterIndices.get(k);
+                const values = parameterIndex !== undefined ? v.parameters[parameterIndex].values : undefined;
+                if (values) {
+                    return values.map(i =>
+                        valueItemToCompletion(i, {
+                            additionalTextEdits: [
+                                TextEdit.del({
+                                    start: {
+                                        line: value.start!.line - 1,
+                                        character: value.start!.col - 1
+                                    },
+                                    end: {
+                                        line: value.end!.line - 1,
+                                        character: value.end!.col - 1
+                                    }
+                                })
+                            ]
+                        })
+                    );
+                }
             }
         }
-    } else if (actualValues) {
-        const value = binaryNodeSearch(actualValues.values, offset, trailingEnd);
-        if (value) {
-            const valueIndex = actualValues.values.indexOf(value);
-            const values =
-                valueIndex < expectedValues.length ? expectedValues[valueIndex].values?.get(value.nodeType) : undefined;
-            if (values) {
-                return values.map(i =>
-                    valueItemToCompletion(i, {
-                        additionalTextEdits: [
-                            TextEdit.del({
-                                start: {
-                                    line: value.start!.line - 1,
-                                    character: value.start!.col - 1
-                                },
-                                end: {
-                                    line: value.end!.line - 1,
-                                    character: value.end!.col - 1
-                                }
-                            })
-                        ]
-                    })
-                );
-            }
-        }
+    } else {
+        const firstParameterValues = signatures.flatMap(s =>
+            s.parameters.length > 0 ? (s.parameters[0].values ?? []) : []
+        );
+        return firstParameterValues.map(i => valueItemToCompletion(i));
     }
 
     return [];
 }
 
 function createMetaDataDocCompletions(
-    metaData: Map<string, MetadataDoc>
+    metaData: Map<string, MetadataTagDefinition>
 ): CompletionItemWithData<MetaDataCompletionData>[] {
     return Array.from(metaData.values()).map(metaDataDocToCompletion);
 }
@@ -471,7 +476,7 @@ function createMetaDataDocCompletions(
 function createPropertiesCompletions(
     properties: alphaTab.importer.alphaTex.AlphaTexPropertiesNode | undefined,
     offset: number,
-    availableProperties: Map<string, PropertyDoc>,
+    availableProperties: Map<string, PropertyDefinition>,
     endOfProperties: number
 ): CompletionItem[] {
     if (!properties) {
@@ -503,7 +508,7 @@ function createPropertiesCompletions(
 function createPropertyCompletions(
     property: alphaTab.importer.alphaTex.AlphaTexPropertyNode,
     offset: number,
-    availableProperties: Map<string, PropertyDoc>,
+    availableProperties: Map<string, PropertyDefinition>,
     allPropCompletions: CompletionItem[],
     endOfProperty: number
 ) {
@@ -538,7 +543,11 @@ function createPropertyCompletions(
         return completions;
     }
 
-    completions.splice(0, 0, ...createValueCompletions(propDocs.values, property.values, offset, endOfProperty));
+    completions.splice(
+        0,
+        0,
+        ...createArgumentCompletions(propDocs.signatures, property.arguments, offset, endOfProperty)
+    );
 
     return completions;
 }

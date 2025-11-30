@@ -10,10 +10,20 @@ Score (1,1) -> (1,19) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "tempo" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,11) {
-            values: Array [
-              Number "120" (1,8) -> (1,11),
+          arguments: Arguments (1,8) -> (1,11) {
+            arguments: Array [
+              Number "120" (1,8) -> (1,11) {
+                parameterIndices: Map {
+                  0 => 0,
+                  1 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+              1,
+            ],
+            validated: true,
           },
         },
       ],
@@ -50,42 +60,6 @@ exports[`AlphaTexParserTest ambiguous tempo and stringed note: lexer-diagnostics
 
 exports[`AlphaTexParserTest ambiguous tempo and stringed note: parser-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest ambiguous tempo, temponame and stringed note 1`] = `
-Score (1,1) -> (1,26) {
-  bars: Array [
-    Bar (1,1) -> (1,26) {
-      metaData: Array [
-        Meta (1,1) -> (1,21) {
-          tag: Tag "tempo" (1,1) -> (1,7) {
-            prefix: Backslash (1,1) -> (1,2),
-            tag: Ident "tempo" (1,2) -> (1,7),
-          },
-          values: Values (1,8) -> (1,21) {
-            values: Array [
-              Number "120" (1,8) -> (1,11),
-              String "Moderate" (1,12) -> (1,21),
-            ],
-          },
-        },
-      ],
-      beats: Array [
-        Beat (1,23) -> (1,26) {
-          notes: NoteList (1,23) -> (1,26) {
-            notes: Array [
-              Note (1,23) -> (1,26) {
-                noteValue: Number "3" (1,23) -> (1,24),
-                noteStringDot: Dot (1,24) -> (1,25),
-                noteString: Number "4" (1,25) -> (1,26),
-              },
-            ],
-          },
-        },
-      ],
-    },
-  ],
-}
-`;
-
 exports[`AlphaTexParserTest ambiguous tempo, temponame and stringed note: lexer-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest ambiguous tempo, temponame and stringed note: parser-diagnostics 1`] = `Array []`;
@@ -103,11 +77,23 @@ Score (1,1) -> (3,9) {
             prefix: Backslash (3,2) -> (3,3),
             tag: Ident "ts" (3,3) -> (3,5),
           },
-          values: Values (3,6) -> (3,9) {
-            values: Array [
-              Number "3" (3,6) -> (3,7),
-              Number "4" (3,8) -> (3,9),
+          arguments: Arguments (3,6) -> (3,9) {
+            arguments: Array [
+              Number "3" (3,6) -> (3,7) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "4" (3,8) -> (3,9) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              1,
+            ],
+            validated: true,
           },
         },
       ],
@@ -134,11 +120,23 @@ line**/",
             prefix: Backslash (3,8) -> (3,9),
             tag: Ident "ts" (3,9) -> (3,11),
           },
-          values: Values (3,12) -> (3,15) {
-            values: Array [
-              Number "3" (3,12) -> (3,13),
-              Number "4" (3,14) -> (3,15),
+          arguments: Arguments (3,12) -> (3,15) {
+            arguments: Array [
+              Number "3" (3,12) -> (3,13) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "4" (3,14) -> (3,15) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              1,
+            ],
+            validated: true,
           },
         },
       ],
@@ -157,16 +155,27 @@ Score (1,1) -> (3,9) {
             prefix: Backslash (2,1) -> (2,2),
             tag: Ident "ts" (2,2) -> (2,4),
           },
-          values: Values (2,5) -> (3,9) {
-            values: Array [
+          arguments: Arguments (2,5) -> (3,9) {
+            arguments: Array [
               Number "3" (2,5) -> (2,6) {
                 trailingComments: Array [
                   "/** multi
 line**/",
                 ],
+                parameterIndices: Map {
+                  1 => 0,
+                },
               },
-              Number "4" (3,8) -> (3,9),
+              Number "4" (3,8) -> (3,9) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              1,
+            ],
+            validated: true,
           },
         },
       ],
@@ -493,10 +502,18 @@ line**/",
             prefix: Backslash (2,8) -> (2,9),
             tag: Ident "title" (2,9) -> (2,14),
           },
-          values: Values (2,15) -> (2,20) {
-            values: Array [
-              String "Test" (2,15) -> (2,20),
+          arguments: Arguments (2,15) -> (2,20) {
+            arguments: Array [
+              String "Test" (2,15) -> (2,20) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -519,10 +536,18 @@ line**/",
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (2,8) -> (2,13) {
-            values: Array [
-              String "Test" (2,8) -> (2,13),
+          arguments: Arguments (2,8) -> (2,13) {
+            arguments: Array [
+              String "Test" (2,8) -> (2,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -552,10 +577,18 @@ Score (1,1) -> (2,14) {
             prefix: Backslash (2,2) -> (2,3),
             tag: Ident "title" (2,3) -> (2,8),
           },
-          values: Values (2,9) -> (2,14) {
-            values: Array [
-              String "Test" (2,9) -> (2,14),
+          arguments: Arguments (2,9) -> (2,14) {
+            arguments: Array [
+              String "Test" (2,9) -> (2,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -902,9 +935,9 @@ Score (1,1) -> (1,19) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "meta" (1,2) -> (1,6),
           },
-          values: Values (1,7) -> (1,19) {
+          arguments: Arguments (1,7) -> (1,19) {
             openParenthesis: LParen (1,7) -> (1,8),
-            values: Array [],
+            arguments: Array [],
             closeParenthesis: RParen (1,18) -> (1,19),
           },
         },
@@ -1078,27 +1111,36 @@ Array [
 `;
 
 exports[`AlphaTexParserTest errors at205 bar 1`] = `
-Score (1,1) -> (1,25) {
+Score (1,1) -> (1,26) {
   bars: Array [
-    Bar (1,1) -> (1,25) {
+    Bar (1,1) -> (1,26) {
       metaData: Array [
-        Meta (1,3) -> (1,25) {
+        Meta (1,3) -> (1,26) {
           tag: Tag "track" (1,3) -> (1,9) {
             prefix: Backslash (1,3) -> (1,4),
             tag: Ident "track" (1,4) -> (1,9),
           },
-          values: Values (1,10) -> (1,15) {
-            values: Array [
-              String "Test" (1,10) -> (1,15),
+          arguments: Arguments (1,10) -> (1,15) {
+            arguments: Array [
+              String "Test" (1,10) -> (1,15) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
-          properties: Props (1,17) -> (1,25) {
+          properties: Props (1,17) -> (1,26) {
             openBrace: LBrace (1,17) -> (1,18),
             properties: Array [
               Prop (1,18) -> (1,25) {
                 property: Ident "unknown" (1,18) -> (1,25),
               },
             ],
+            closeBrace: RBrace (1,25) -> (1,26),
           },
         },
       ],
@@ -1121,44 +1163,43 @@ Array [
       "offset" => 24,
     },
   },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
-    "start" => Map {
-      "col" => 25,
-      "line" => 1,
-      "offset" => 24,
-    },
-  },
 ]
 `;
 
 exports[`AlphaTexParserTest errors at205 barre 1`] = `
-Score (1,1) -> (1,20) {
+Score (1,1) -> (1,21) {
   bars: Array [
-    Bar (1,1) -> (1,20) {
+    Bar (1,1) -> (1,21) {
       beats: Array [
-        Beat (1,1) -> (1,20) {
-          notes: NoteList (1,1) -> (1,20) {
+        Beat (1,1) -> (1,21) {
+          notes: NoteList (1,1) -> (1,21) {
             notes: Array [
-              Note (1,1) -> (1,20) {
+              Note (1,1) -> (1,21) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
-                noteEffects: Props (1,4) -> (1,20) {
+                noteEffects: Props (1,4) -> (1,21) {
                   openBrace: LBrace (1,4) -> (1,5),
                   properties: Array [
                     Prop (1,5) -> (1,12) {
                       property: Ident "barre" (1,5) -> (1,10),
-                      properties: Values (1,11) -> (1,12) {
-                        values: Array [
-                          Number "1" (1,11) -> (1,12),
+                      properties: Arguments (1,11) -> (1,12) {
+                        arguments: Array [
+                          Number "1" (1,11) -> (1,12) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
                         ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
                       },
                     },
                     Prop (1,13) -> (1,20) {
                       property: Ident "invalid" (1,13) -> (1,20),
                     },
                   ],
+                  closeBrace: RBrace (1,20) -> (1,21),
                 },
               },
             ],
@@ -1184,25 +1225,15 @@ Array [
       "offset" => 19,
     },
   },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
-    "start" => Map {
-      "col" => 20,
-      "line" => 1,
-      "offset" => 19,
-    },
-  },
 ]
 `;
 
 exports[`AlphaTexParserTest errors at205 beat 1`] = `
-Score (1,1) -> (1,16) {
+Score (1,1) -> (1,17) {
   bars: Array [
-    Bar (1,1) -> (1,16) {
+    Bar (1,1) -> (1,17) {
       beats: Array [
-        Beat (1,3) -> (1,16) {
+        Beat (1,3) -> (1,17) {
           notes: NoteList (1,3) -> (1,7) {
             openParenthesis: LParen (1,3) -> (1,4),
             notes: Array [
@@ -1212,13 +1243,14 @@ Score (1,1) -> (1,16) {
             ],
             closeParenthesis: RParen (1,6) -> (1,7),
           },
-          beatEffects: Props (1,8) -> (1,16) {
+          beatEffects: Props (1,8) -> (1,17) {
             openBrace: LBrace (1,8) -> (1,9),
             properties: Array [
               Prop (1,9) -> (1,16) {
                 property: Ident "unknown" (1,9) -> (1,16),
               },
             ],
+            closeBrace: RBrace (1,16) -> (1,17),
           },
         },
       ],
@@ -1235,16 +1267,6 @@ Array [
     "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'unknown'.",
-    "start" => Map {
-      "col" => 16,
-      "line" => 1,
-      "offset" => 15,
-    },
-  },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
       "col" => 16,
       "line" => 1,
@@ -1313,16 +1335,16 @@ Array [
 `;
 
 exports[`AlphaTexParserTest errors at205 gracetype 1`] = `
-Score (1,1) -> (1,15) {
+Score (1,1) -> (1,16) {
   bars: Array [
-    Bar (1,1) -> (1,15) {
+    Bar (1,1) -> (1,16) {
       beats: Array [
-        Beat (1,1) -> (1,15) {
-          notes: NoteList (1,1) -> (1,15) {
+        Beat (1,1) -> (1,16) {
+          notes: NoteList (1,1) -> (1,16) {
             notes: Array [
-              Note (1,1) -> (1,15) {
+              Note (1,1) -> (1,16) {
                 noteValue: Ident "C4" (1,1) -> (1,3),
-                noteEffects: Props (1,4) -> (1,15) {
+                noteEffects: Props (1,4) -> (1,16) {
                   openBrace: LBrace (1,4) -> (1,5),
                   properties: Array [
                     Prop (1,5) -> (1,7) {
@@ -1332,6 +1354,7 @@ Score (1,1) -> (1,15) {
                       property: Ident "invalid" (1,8) -> (1,15),
                     },
                   ],
+                  closeBrace: RBrace (1,15) -> (1,16),
                 },
               },
             ],
@@ -1357,40 +1380,32 @@ Array [
       "offset" => 14,
     },
   },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
-    "start" => Map {
-      "col" => 15,
-      "line" => 1,
-      "offset" => 14,
-    },
-  },
 ]
 `;
 
 exports[`AlphaTexParserTest errors at205 note 1`] = `
-Score (1,1) -> (1,14) {
+Score (1,1) -> (1,16) {
   bars: Array [
-    Bar (1,1) -> (1,14) {
+    Bar (1,1) -> (1,16) {
       beats: Array [
-        Beat (1,3) -> (1,14) {
-          notes: NoteList (1,3) -> (1,14) {
+        Beat (1,3) -> (1,16) {
+          notes: NoteList (1,3) -> (1,16) {
             openParenthesis: LParen (1,3) -> (1,4),
             notes: Array [
-              Note (1,4) -> (1,14) {
+              Note (1,4) -> (1,15) {
                 noteValue: Ident "C4" (1,4) -> (1,6),
-                noteEffects: Props (1,6) -> (1,14) {
+                noteEffects: Props (1,6) -> (1,15) {
                   openBrace: LBrace (1,6) -> (1,7),
                   properties: Array [
                     Prop (1,7) -> (1,14) {
                       property: Ident "unknown" (1,7) -> (1,14),
                     },
                   ],
+                  closeBrace: RBrace (1,14) -> (1,15),
                 },
               },
             ],
+            closeParenthesis: RParen (1,15) -> (1,16),
           },
         },
       ],
@@ -1407,26 +1422,6 @@ Array [
     "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'unknown'.",
-    "start" => Map {
-      "col" => 14,
-      "line" => 1,
-      "offset" => 13,
-    },
-  },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
-    "start" => Map {
-      "col" => 14,
-      "line" => 1,
-      "offset" => 13,
-    },
-  },
-  Map {
-    "code" => 206,
-    "severity" => 2,
-    "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
       "col" => 14,
       "line" => 1,
@@ -1484,8 +1479,8 @@ Score (1,1) -> (1,26) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,13) {
-            values: Array [
+          arguments: Arguments (1,8) -> (1,13) {
+            arguments: Array [
               String "Test" (1,8) -> (1,13),
             ],
           },
@@ -1494,8 +1489,8 @@ Score (1,1) -> (1,26) {
             properties: Array [
               Prop (1,17) -> (1,26) {
                 property: Ident "color" (1,17) -> (1,22),
-                properties: Values (1,23) -> (1,26) {
-                  values: Array [
+                properties: Arguments (1,23) -> (1,26) {
+                  arguments: Array [
                     Ident "red" (1,23) -> (1,26),
                   ],
                 },
@@ -1536,9 +1531,9 @@ Score (1,1) -> (1,14) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
+          arguments: Arguments (1,8) -> (1,14) {
             openParenthesis: LParen (1,8) -> (1,9),
-            values: Array [
+            arguments: Array [
               String "Test" (1,9) -> (1,14),
             ],
           },
@@ -1571,28 +1566,16 @@ Score (1,1) -> (1,28) {
   bars: Array [
     Bar (1,1) -> (1,28) {
       metaData: Array [
-        Meta (1,3) -> (1,23) {
+        Meta (1,3) -> (1,28) {
           tag: Tag "tempo" (1,3) -> (1,9) {
             prefix: Backslash (1,3) -> (1,4),
             tag: Ident "tempo" (1,4) -> (1,9),
           },
-          values: Values (1,10) -> (1,23) {
-            values: Array [
+          arguments: Arguments (1,10) -> (1,28) {
+            arguments: Array [
               Number "120" (1,10) -> (1,13),
               String "Moderate" (1,14) -> (1,23),
-            ],
-          },
-        },
-      ],
-      beats: Array [
-        Beat (1,25) -> (1,28) {
-          notes: NoteList (1,25) -> (1,28) {
-            notes: Array [
-              Note (1,25) -> (1,28) {
-                noteValue: Number "0" (1,25) -> (1,26),
-                noteStringDot: Dot (1,26) -> (1,27),
-                noteString: Number "5" (1,27) -> (1,28),
-              },
+              Number "0.5" (1,25) -> (1,28),
             ],
           },
         },
@@ -1612,9 +1595,9 @@ Score (1,1) -> (1,30) {
             prefix: Backslash (1,3) -> (1,4),
             tag: Ident "tempo" (1,4) -> (1,9),
           },
-          values: Values (1,10) -> (1,30) {
+          arguments: Arguments (1,10) -> (1,30) {
             openParenthesis: LParen (1,10) -> (1,11),
-            values: Array [
+            arguments: Array [
               Number "120" (1,11) -> (1,14),
               String "Moderate" (1,15) -> (1,24),
               Number "0.5" (1,26) -> (1,29),
@@ -1646,10 +1629,18 @@ Score (1,1) -> (1,13) {
             prefix: Backslash (1,3) -> (1,4),
             tag: Ident "scale" (1,4) -> (1,9),
           },
-          values: Values (1,10) -> (1,13) {
-            values: Array [
-              Number "0.5" (1,10) -> (1,13),
+          arguments: Arguments (1,10) -> (1,13) {
+            arguments: Array [
+              Number "0.5" (1,10) -> (1,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -1668,9 +1659,9 @@ Score (1,1) -> (1,19) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "unknown" (1,2) -> (1,9),
           },
-          values: Values (1,10) -> (1,19) {
+          arguments: Arguments (1,10) -> (1,19) {
             openParenthesis: LParen (1,10) -> (1,11),
-            values: Array [
+            arguments: Array [
               Number "1.2" (1,11) -> (1,14),
               Number "2.3" (1,15) -> (1,18),
             ],
@@ -1692,24 +1683,32 @@ exports[`AlphaTexParserTest floats valuelist: lexer-diagnostics 1`] = `Array []`
 exports[`AlphaTexParserTest floats valuelist: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest intermediate finished beat effect value, not closed 1`] = `
-Score (1,1) -> (1,48) {
+Score (1,1) -> (1,49) {
   bars: Array [
-    Bar (1,1) -> (1,48) {
+    Bar (1,1) -> (1,49) {
       metaData: Array [
         Meta (1,1) -> (1,14) {
           tag: Tag "title" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
+          arguments: Arguments (1,8) -> (1,14) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
       beats: Array [
-        Beat (1,18) -> (1,48) {
+        Beat (1,18) -> (1,49) {
           notes: NoteList (1,18) -> (1,34) {
             notes: Array [
               Note (1,18) -> (1,34) {
@@ -1719,10 +1718,18 @@ Score (1,1) -> (1,48) {
                   properties: Array [
                     Prop (1,23) -> (1,31) {
                       property: Ident "slur" (1,23) -> (1,27),
-                      properties: Values (1,28) -> (1,31) {
-                        values: Array [
-                          String "S1" (1,28) -> (1,31),
+                      properties: Arguments (1,28) -> (1,31) {
+                        arguments: Array [
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
                         ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
                       },
                     },
                   ],
@@ -1733,15 +1740,23 @@ Score (1,1) -> (1,48) {
           },
           durationDot: Dot (1,35) -> (1,36),
           durationValue: Number "4" (1,37) -> (1,38),
-          beatEffects: Props (1,39) -> (1,48) {
+          beatEffects: Props (1,39) -> (1,49) {
             openBrace: LBrace (1,39) -> (1,40),
             properties: Array [
-              Prop (1,41) -> (1,48) {
+              Prop (1,41) -> (1,49) {
                 property: Ident "rasg" (1,41) -> (1,45),
-                properties: Values (1,46) -> (1,48) {
-                  values: Array [
-                    String "i" (1,46) -> (1,48),
+                properties: Arguments (1,46) -> (1,49) {
+                  arguments: Array [
+                    String "ii" (1,46) -> (1,49) {
+                      parameterIndices: Map {
+                        0 => 0,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    0,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -1762,9 +1777,9 @@ Array [
     "severity" => 2,
     "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
-      "col" => 50,
+      "col" => 51,
       "line" => 1,
-      "offset" => 49,
+      "offset" => 50,
     },
   },
 ]
@@ -1780,20 +1795,36 @@ Score (1,1) -> (1,24) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,10) {
-            values: Array [
-              String "X" (1,8) -> (1,10),
+          arguments: Arguments (1,8) -> (1,10) {
+            arguments: Array [
+              String "X" (1,8) -> (1,10) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
           properties: Props (1,12) -> (1,24) {
             openBrace: LBrace (1,12) -> (1,13),
             properties: Array [
               Prop (1,14) -> (1,24) {
                 property: Ident "color" (1,14) -> (1,19),
-                properties: Values (1,20) -> (1,24) {
-                  values: Array [
-                    String "red" (1,20) -> (1,24),
+                properties: Arguments (1,20) -> (1,24) {
+                  arguments: Array [
+                    String "red" (1,20) -> (1,24) {
+                      parameterIndices: Map {
+                        0 => 0,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    0,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -1832,10 +1863,18 @@ Score (1,1) -> (1,31) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
+          arguments: Arguments (1,8) -> (1,14) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -1850,10 +1889,18 @@ Score (1,1) -> (1,31) {
                   properties: Array [
                     Prop (1,23) -> (1,31) {
                       property: Ident "slur" (1,23) -> (1,27),
-                      properties: Values (1,28) -> (1,31) {
-                        values: Array [
-                          String "S1" (1,28) -> (1,31),
+                      properties: Arguments (1,28) -> (1,31) {
+                        arguments: Array [
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
                         ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
                       },
                     },
                   ],
@@ -1895,10 +1942,18 @@ Score (1,1) -> (1,36) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
+          arguments: Arguments (1,8) -> (1,14) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -1913,10 +1968,18 @@ Score (1,1) -> (1,36) {
                   properties: Array [
                     Prop (1,23) -> (1,31) {
                       property: Ident "slur" (1,23) -> (1,27),
-                      properties: Values (1,28) -> (1,31) {
-                        values: Array [
-                          String "S1" (1,28) -> (1,31),
+                      properties: Arguments (1,28) -> (1,31) {
+                        arguments: Array [
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
                         ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
                       },
                     },
                   ],
@@ -1947,10 +2010,18 @@ Score (1,1) -> (1,44) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
+          arguments: Arguments (1,8) -> (1,14) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -1965,10 +2036,18 @@ Score (1,1) -> (1,44) {
                   properties: Array [
                     Prop (1,23) -> (1,31) {
                       property: Ident "slur" (1,23) -> (1,27),
-                      properties: Values (1,28) -> (1,31) {
-                        values: Array [
-                          String "S1" (1,28) -> (1,31),
+                      properties: Arguments (1,28) -> (1,31) {
+                        arguments: Array [
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
                         ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
                       },
                     },
                   ],
@@ -2031,10 +2110,18 @@ Score (1,1) -> (1,45) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
+          arguments: Arguments (1,8) -> (1,14) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -2049,10 +2136,18 @@ Score (1,1) -> (1,45) {
                   properties: Array [
                     Prop (1,23) -> (1,31) {
                       property: Ident "slur" (1,23) -> (1,27),
-                      properties: Values (1,28) -> (1,31) {
-                        values: Array [
-                          String "S1" (1,28) -> (1,31),
+                      properties: Arguments (1,28) -> (1,31) {
+                        arguments: Array [
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
                         ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
                       },
                     },
                   ],
@@ -2128,10 +2223,18 @@ Score (1,1) -> (1,40) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
+          arguments: Arguments (1,8) -> (1,14) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -2146,10 +2249,18 @@ Score (1,1) -> (1,40) {
                   properties: Array [
                     Prop (1,23) -> (1,31) {
                       property: Ident "slur" (1,23) -> (1,27),
-                      properties: Values (1,28) -> (1,31) {
-                        values: Array [
-                          String "S1" (1,28) -> (1,31),
+                      properties: Arguments (1,28) -> (1,31) {
+                        arguments: Array [
+                          String "S1" (1,28) -> (1,31) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
                         ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
                       },
                     },
                   ],
@@ -2234,10 +2345,18 @@ Score (1,1) -> (1,13) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,10) {
-            values: Array [
-              String "X" (1,8) -> (1,10),
+          arguments: Arguments (1,8) -> (1,10) {
+            arguments: Array [
+              String "X" (1,8) -> (1,10) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
           properties: Props (1,12) -> (1,13) {
             openBrace: LBrace (1,12) -> (1,13),
@@ -2277,10 +2396,18 @@ Score (1,1) -> (1,16) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,10) {
-            values: Array [
-              String "X" (1,8) -> (1,10),
+          arguments: Arguments (1,8) -> (1,10) {
+            arguments: Array [
+              String "X" (1,8) -> (1,10) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
           properties: Props (1,12) -> (1,16) {
             openBrace: LBrace (1,12) -> (1,13),
@@ -2334,10 +2461,18 @@ Score (1,1) -> (1,19) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,10) {
-            values: Array [
-              String "X" (1,8) -> (1,10),
+          arguments: Arguments (1,8) -> (1,10) {
+            arguments: Array [
+              String "X" (1,8) -> (1,10) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
           properties: Props (1,12) -> (1,19) {
             openBrace: LBrace (1,12) -> (1,13),
@@ -2468,10 +2603,18 @@ Score (1,1) -> (1,26) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
+          arguments: Arguments (1,8) -> (1,14) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -2536,10 +2679,18 @@ Score (1,1) -> (1,27) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
+          arguments: Arguments (1,8) -> (1,14) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -2617,10 +2768,18 @@ Score (1,1) -> (1,22) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
+          arguments: Arguments (1,8) -> (1,14) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -2671,10 +2830,18 @@ Score (1,1) -> (1,19) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
+          arguments: Arguments (1,8) -> (1,14) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -2698,6 +2865,207 @@ exports[`AlphaTexParserTest intermediate started pitched note: lexer-diagnostics
 
 exports[`AlphaTexParserTest intermediate started pitched note: parser-diagnostics 1`] = `Array []`;
 
+exports[`AlphaTexParserTest recovery props additional values 1`] = `
+Score (1,1) -> (1,30) {
+  bars: Array [
+    Bar (1,1) -> (1,30) {
+      beats: Array [
+        Beat (1,1) -> (1,30) {
+          notes: NoteList (1,1) -> (1,30) {
+            notes: Array [
+              Note (1,1) -> (1,30) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,30) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,22) {
+                      property: Ident "slur" (1,6) -> (1,10),
+                      properties: Arguments (1,11) -> (1,22) {
+                        arguments: Array [
+                          String "S1" (1,11) -> (1,14) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
+                      },
+                    },
+                    Prop (1,23) -> (1,26) {
+                      property: Ident "v" (1,23) -> (1,24),
+                    },
+                    Prop (1,27) -> (1,29) {
+                      property: Ident "vw" (1,27) -> (1,29),
+                    },
+                  ],
+                  closeBrace: RBrace (1,29) -> (1,30),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParserTest recovery props additional values: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest recovery props additional values: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 220,
+    "severity" => 2,
+    "message" => "Error parsing arguments: unexpected additional arguments. Signatures:
+(String)
+(Ident)",
+    "start" => Map {
+      "col" => 22,
+      "line" => 1,
+      "offset" => 21,
+    },
+  },
+  Map {
+    "code" => 220,
+    "severity" => 2,
+    "message" => "Error parsing arguments: unexpected additional arguments. Signatures:
+()",
+    "start" => Map {
+      "col" => 26,
+      "line" => 1,
+      "offset" => 25,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParserTest recovery props unknown property 1`] = `
+Score (1,1) -> (1,45) {
+  bars: Array [
+    Bar (1,1) -> (1,45) {
+      beats: Array [
+        Beat (1,1) -> (1,45) {
+          notes: NoteList (1,1) -> (1,45) {
+            notes: Array [
+              Note (1,1) -> (1,45) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,45) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,14) {
+                      property: Ident "slur" (1,6) -> (1,10),
+                      properties: Arguments (1,11) -> (1,14) {
+                        arguments: Array [
+                          String "s1" (1,11) -> (1,14) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
+                      },
+                    },
+                    Prop (1,16) -> (1,41) {
+                      property: Ident "invalid" (1,16) -> (1,23),
+                    },
+                    Prop (1,42) -> (1,43) {
+                      property: Ident "v" (1,42) -> (1,43),
+                    },
+                  ],
+                  closeBrace: RBrace (1,44) -> (1,45),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParserTest recovery props unknown property: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest recovery props unknown property: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 42,
+      "line" => 1,
+      "offset" => 41,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParserTest recovery props unknown value 1`] = `
+Score (1,1) -> (1,24) {
+  bars: Array [
+    Bar (1,1) -> (1,24) {
+      beats: Array [
+        Beat (1,1) -> (1,24) {
+          notes: NoteList (1,1) -> (1,24) {
+            notes: Array [
+              Note (1,1) -> (1,24) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,24) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,19) {
+                      property: Ident "rasg" (1,6) -> (1,10),
+                      properties: Arguments (1,11) -> (1,19) {
+                        arguments: Array [
+                          String "invalid" (1,11) -> (1,19),
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                      },
+                    },
+                    Prop (1,21) -> (1,22) {
+                      property: Ident "v" (1,21) -> (1,22),
+                    },
+                  ],
+                  closeBrace: RBrace (1,23) -> (1,24),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParserTest recovery props unknown value: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest recovery props unknown value: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (String). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 19,
+      "line" => 1,
+      "offset" => 18,
+    },
+  },
+]
+`;
+
 exports[`AlphaTexParserTest valid-bar-meta known no score meta 1`] = `
 Score (1,1) -> (1,16) {
   bars: Array [
@@ -2708,11 +3076,23 @@ Score (1,1) -> (1,16) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "ts" (1,2) -> (1,4),
           },
-          values: Values (1,5) -> (1,8) {
-            values: Array [
-              Number "3" (1,5) -> (1,6),
-              Number "4" (1,7) -> (1,8),
+          arguments: Arguments (1,5) -> (1,8) {
+            arguments: Array [
+              Number "3" (1,5) -> (1,6) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "4" (1,7) -> (1,8) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              1,
+            ],
+            validated: true,
           },
         },
       ],
@@ -2760,11 +3140,23 @@ Score (1,1) -> (1,29) {
             prefix: Backslash (1,3) -> (1,4),
             tag: Ident "ts" (1,4) -> (1,6),
           },
-          values: Values (1,7) -> (1,10) {
-            values: Array [
-              Number "3" (1,7) -> (1,8),
-              Number "4" (1,9) -> (1,10),
+          arguments: Arguments (1,7) -> (1,10) {
+            arguments: Array [
+              Number "3" (1,7) -> (1,8) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "4" (1,9) -> (1,10) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              1,
+            ],
+            validated: true,
           },
         },
       ],
@@ -2823,9 +3215,9 @@ Score (1,1) -> (1,31) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: Values (1,14) -> (1,23) {
+          arguments: Arguments (1,14) -> (1,23) {
             openParenthesis: LParen (1,14) -> (1,15),
-            values: Array [
+            arguments: Array [
               String "Value" (1,15) -> (1,21),
             ],
             closeParenthesis: RParen (1,22) -> (1,23),
@@ -2876,9 +3268,9 @@ Score (1,1) -> (1,33) {
             prefix: Backslash (1,3) -> (1,4),
             tag: Ident "notExisting" (1,4) -> (1,15),
           },
-          values: Values (1,16) -> (1,25) {
+          arguments: Arguments (1,16) -> (1,25) {
             openParenthesis: LParen (1,16) -> (1,17),
-            values: Array [
+            arguments: Array [
               String "Value" (1,17) -> (1,23),
             ],
             closeParenthesis: RParen (1,24) -> (1,25),
@@ -3115,10 +3507,18 @@ Score (1,1) -> (1,24) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,13) {
-            values: Array [
-              String "Test" (1,8) -> (1,13),
+          arguments: Arguments (1,8) -> (1,13) {
+            arguments: Array [
+              String "Test" (1,8) -> (1,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -3207,11 +3607,24 @@ Score (1,1) -> (1,14) {
             properties: Array [
               Prop (1,7) -> (1,13) {
                 property: Ident "tu" (1,7) -> (1,9),
-                properties: Values (1,10) -> (1,13) {
-                  values: Array [
-                    Number "2" (1,10) -> (1,11),
-                    Number "3" (1,12) -> (1,13),
+                properties: Arguments (1,10) -> (1,13) {
+                  arguments: Array [
+                    Number "2" (1,10) -> (1,11) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "3" (1,12) -> (1,13) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -3244,9 +3657,9 @@ Score (1,1) -> (1,19) {
             properties: Array [
               Prop (1,7) -> (1,18) {
                 property: Ident "tb" (1,7) -> (1,9),
-                properties: Values (1,10) -> (1,18) {
+                properties: Arguments (1,10) -> (1,18) {
                   openParenthesis: LParen (1,10) -> (1,11),
-                  values: Array [
+                  arguments: Array [
                     Number "0" (1,11) -> (1,12),
                     Number "-2" (1,13) -> (1,15),
                     Number "0" (1,16) -> (1,17),
@@ -3295,9 +3708,9 @@ Score (1,1) -> (1,30) {
               },
               Prop (1,11) -> (1,22) {
                 property: Ident "tb" (1,11) -> (1,13),
-                properties: Values (1,14) -> (1,22) {
+                properties: Arguments (1,14) -> (1,22) {
                   openParenthesis: LParen (1,14) -> (1,15),
-                  values: Array [
+                  arguments: Array [
                     Number "0" (1,15) -> (1,16),
                     Number "-2" (1,17) -> (1,19),
                     Number "0" (1,20) -> (1,21),
@@ -3307,11 +3720,24 @@ Score (1,1) -> (1,30) {
               },
               Prop (1,23) -> (1,29) {
                 property: Ident "tu" (1,23) -> (1,25),
-                properties: Values (1,26) -> (1,29) {
-                  values: Array [
-                    Number "3" (1,26) -> (1,27),
-                    Number "2" (1,28) -> (1,29),
+                properties: Arguments (1,26) -> (1,29) {
+                  arguments: Array [
+                    Number "3" (1,26) -> (1,27) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,28) -> (1,29) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -3348,9 +3774,9 @@ Score (1,1) -> (1,23) {
             properties: Array [
               Prop (1,7) -> (1,22) {
                 property: Ident "unknown" (1,7) -> (1,14),
-                properties: Values (1,15) -> (1,22) {
+                properties: Arguments (1,15) -> (1,22) {
                   openParenthesis: LParen (1,15) -> (1,16),
-                  values: Array [
+                  arguments: Array [
                     Number "1" (1,16) -> (1,17),
                     Number "2" (1,18) -> (1,19),
                     Number "3" (1,20) -> (1,21),
@@ -3440,11 +3866,24 @@ Score (1,1) -> (1,26) {
               },
               Prop (1,19) -> (1,25) {
                 property: Ident "tu" (1,19) -> (1,21),
-                properties: Values (1,22) -> (1,25) {
-                  values: Array [
-                    Number "3" (1,22) -> (1,23),
-                    Number "2" (1,24) -> (1,25),
+                properties: Arguments (1,22) -> (1,25) {
+                  arguments: Array [
+                    Number "3" (1,22) -> (1,23) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,24) -> (1,25) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -3648,11 +4087,24 @@ Score (1,1) -> (1,31) {
               },
               Prop (1,24) -> (1,30) {
                 property: Ident "tu" (1,24) -> (1,26),
-                properties: Values (1,27) -> (1,30) {
-                  values: Array [
-                    Number "3" (1,27) -> (1,28),
-                    Number "2" (1,29) -> (1,30),
+                properties: Arguments (1,27) -> (1,30) {
+                  arguments: Array [
+                    Number "3" (1,27) -> (1,28) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,29) -> (1,30) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -3854,11 +4306,24 @@ Score (1,1) -> (1,25) {
               },
               Prop (1,18) -> (1,24) {
                 property: Ident "tu" (1,18) -> (1,20),
-                properties: Values (1,21) -> (1,24) {
-                  values: Array [
-                    Number "3" (1,21) -> (1,22),
-                    Number "2" (1,23) -> (1,24),
+                properties: Arguments (1,21) -> (1,24) {
+                  arguments: Array [
+                    Number "3" (1,21) -> (1,22) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,23) -> (1,24) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -4046,11 +4511,24 @@ Score (1,1) -> (1,29) {
               },
               Prop (1,22) -> (1,28) {
                 property: Ident "tu" (1,22) -> (1,24),
-                properties: Values (1,25) -> (1,28) {
-                  values: Array [
-                    Number "3" (1,25) -> (1,26),
-                    Number "2" (1,27) -> (1,28),
+                properties: Arguments (1,25) -> (1,28) {
+                  arguments: Array [
+                    Number "3" (1,25) -> (1,26) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,27) -> (1,28) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -4193,11 +4671,24 @@ Score (1,1) -> (1,32) {
               },
               Prop (1,25) -> (1,31) {
                 property: Ident "tu" (1,25) -> (1,27),
-                properties: Values (1,28) -> (1,31) {
-                  values: Array [
-                    Number "3" (1,28) -> (1,29),
-                    Number "2" (1,30) -> (1,31),
+                properties: Arguments (1,28) -> (1,31) {
+                  arguments: Array [
+                    Number "3" (1,28) -> (1,29) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,30) -> (1,31) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -4457,11 +4948,24 @@ Score (1,1) -> (1,43) {
               },
               Prop (1,36) -> (1,42) {
                 property: Ident "tu" (1,36) -> (1,38),
-                properties: Values (1,39) -> (1,42) {
-                  values: Array [
-                    Number "3" (1,39) -> (1,40),
-                    Number "2" (1,41) -> (1,42),
+                properties: Arguments (1,39) -> (1,42) {
+                  arguments: Array [
+                    Number "3" (1,39) -> (1,40) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,41) -> (1,42) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -4645,11 +5149,24 @@ Score (1,1) -> (1,30) {
               },
               Prop (1,23) -> (1,29) {
                 property: Ident "tu" (1,23) -> (1,25),
-                properties: Values (1,26) -> (1,29) {
-                  values: Array [
-                    Number "3" (1,26) -> (1,27),
-                    Number "2" (1,28) -> (1,29),
+                properties: Arguments (1,26) -> (1,29) {
+                  arguments: Array [
+                    Number "3" (1,26) -> (1,27) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,28) -> (1,29) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -4869,11 +5386,24 @@ Score (1,1) -> (1,35) {
               },
               Prop (1,28) -> (1,34) {
                 property: Ident "tu" (1,28) -> (1,30),
-                properties: Values (1,31) -> (1,34) {
-                  values: Array [
-                    Number "3" (1,31) -> (1,32),
-                    Number "2" (1,33) -> (1,34),
+                properties: Arguments (1,31) -> (1,34) {
+                  arguments: Array [
+                    Number "3" (1,31) -> (1,32) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,33) -> (1,34) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -4960,11 +5490,24 @@ Score (1,1) -> (1,24) {
               },
               Prop (1,17) -> (1,23) {
                 property: Ident "tu" (1,17) -> (1,19),
-                properties: Values (1,20) -> (1,23) {
-                  values: Array [
-                    Number "3" (1,20) -> (1,21),
-                    Number "2" (1,22) -> (1,23),
+                properties: Arguments (1,20) -> (1,23) {
+                  arguments: Array [
+                    Number "3" (1,20) -> (1,21) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,22) -> (1,23) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -5104,11 +5647,24 @@ Score (1,1) -> (1,27) {
               },
               Prop (1,20) -> (1,26) {
                 property: Ident "tu" (1,20) -> (1,22),
-                properties: Values (1,23) -> (1,26) {
-                  values: Array [
-                    Number "3" (1,23) -> (1,24),
-                    Number "2" (1,25) -> (1,26),
+                properties: Arguments (1,23) -> (1,26) {
+                  arguments: Array [
+                    Number "3" (1,23) -> (1,24) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,25) -> (1,26) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -5189,11 +5745,24 @@ Score (1,1) -> (1,14) {
                   properties: Array [
                     Prop (1,6) -> (1,12) {
                       property: Ident "tu" (1,6) -> (1,8),
-                      properties: Values (1,9) -> (1,12) {
-                        values: Array [
-                          Number "3" (1,9) -> (1,10),
-                          Number "2" (1,11) -> (1,12),
+                      properties: Arguments (1,9) -> (1,12) {
+                        arguments: Array [
+                          Number "3" (1,9) -> (1,10) {
+                            parameterIndices: Map {
+                              0 => 0,
+                              1 => 0,
+                            },
+                          },
+                          Number "2" (1,11) -> (1,12) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
                         ],
+                        signatureCandidateIndices: Array [
+                          1,
+                        ],
+                        validated: true,
                       },
                     },
                   ],
@@ -5257,11 +5826,23 @@ Score (1,1) -> (1,12) {
                   properties: Array [
                     Prop (1,5) -> (1,11) {
                       property: Ident "tr" (1,5) -> (1,7),
-                      properties: Values (1,8) -> (1,11) {
-                        values: Array [
-                          Number "4" (1,8) -> (1,9),
-                          Number "4" (1,10) -> (1,11),
+                      properties: Arguments (1,8) -> (1,11) {
+                        arguments: Array [
+                          Number "4" (1,8) -> (1,9) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                          Number "4" (1,10) -> (1,11) {
+                            parameterIndices: Map {
+                              0 => 1,
+                            },
+                          },
                         ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
                       },
                     },
                   ],
@@ -5292,9 +5873,9 @@ Score (1,1) -> (1,15) {
                   properties: Array [
                     Prop (1,5) -> (1,14) {
                       property: Ident "b" (1,5) -> (1,6),
-                      properties: Values (1,7) -> (1,14) {
+                      properties: Arguments (1,7) -> (1,14) {
                         openParenthesis: LParen (1,7) -> (1,8),
-                        values: Array [
+                        arguments: Array [
                           Number "0" (1,8) -> (1,9),
                           Number "4" (1,10) -> (1,11),
                           Number "0" (1,12) -> (1,13),
@@ -5341,9 +5922,9 @@ Score (1,1) -> (1,20) {
                     },
                     Prop (1,8) -> (1,17) {
                       property: Ident "b" (1,8) -> (1,9),
-                      properties: Values (1,10) -> (1,17) {
+                      properties: Arguments (1,10) -> (1,17) {
                         openParenthesis: LParen (1,10) -> (1,11),
-                        values: Array [
+                        arguments: Array [
                           Number "0" (1,11) -> (1,12),
                           Number "4" (1,13) -> (1,14),
                           Number "0" (1,15) -> (1,16),
@@ -5386,9 +5967,9 @@ Score (1,1) -> (1,48) {
                     },
                     Prop (1,9) -> (1,18) {
                       property: Ident "b" (1,9) -> (1,10),
-                      properties: Values (1,11) -> (1,18) {
+                      properties: Arguments (1,11) -> (1,18) {
                         openParenthesis: LParen (1,11) -> (1,12),
-                        values: Array [
+                        arguments: Array [
                           Number "0" (1,12) -> (1,13),
                           Number "4" (1,14) -> (1,15),
                           Number "0" (1,16) -> (1,17),
@@ -5416,9 +5997,9 @@ Score (1,1) -> (1,48) {
                     },
                     Prop (1,31) -> (1,46) {
                       property: Ident "unknown" (1,31) -> (1,38),
-                      properties: Values (1,39) -> (1,46) {
+                      properties: Arguments (1,39) -> (1,46) {
                         openParenthesis: LParen (1,39) -> (1,40),
-                        values: Array [
+                        arguments: Array [
                           Number "1" (1,40) -> (1,41),
                           Number "2" (1,42) -> (1,43),
                           Number "3" (1,44) -> (1,45),
@@ -5459,9 +6040,9 @@ Score (1,1) -> (1,59) {
                     },
                     Prop (1,9) -> (1,18) {
                       property: Ident "b" (1,9) -> (1,10),
-                      properties: Values (1,11) -> (1,18) {
+                      properties: Arguments (1,11) -> (1,18) {
                         openParenthesis: LParen (1,11) -> (1,12),
-                        values: Array [
+                        arguments: Array [
                           Number "0" (1,12) -> (1,13),
                           Number "4" (1,14) -> (1,15),
                           Number "0" (1,16) -> (1,17),
@@ -5489,9 +6070,9 @@ Score (1,1) -> (1,59) {
                     },
                     Prop (1,31) -> (1,46) {
                       property: Ident "unknown" (1,31) -> (1,38),
-                      properties: Values (1,39) -> (1,46) {
+                      properties: Arguments (1,39) -> (1,46) {
                         openParenthesis: LParen (1,39) -> (1,40),
-                        values: Array [
+                        arguments: Array [
                           Number "1" (1,40) -> (1,41),
                           Number "2" (1,42) -> (1,43),
                           Number "3" (1,44) -> (1,45),
@@ -5511,11 +6092,24 @@ Score (1,1) -> (1,59) {
             properties: Array [
               Prop (1,51) -> (1,57) {
                 property: Ident "tu" (1,51) -> (1,53),
-                properties: Values (1,54) -> (1,57) {
-                  values: Array [
-                    Number "3" (1,54) -> (1,55),
-                    Number "2" (1,56) -> (1,57),
+                properties: Arguments (1,54) -> (1,57) {
+                  arguments: Array [
+                    Number "3" (1,54) -> (1,55) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,56) -> (1,57) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -5555,9 +6149,9 @@ Score (1,1) -> (1,21) {
                   properties: Array [
                     Prop (1,5) -> (1,20) {
                       property: Ident "unknown" (1,5) -> (1,12),
-                      properties: Values (1,13) -> (1,20) {
+                      properties: Arguments (1,13) -> (1,20) {
                         openParenthesis: LParen (1,13) -> (1,14),
-                        values: Array [
+                        arguments: Array [
                           Number "1" (1,14) -> (1,15),
                           Number "2" (1,16) -> (1,17),
                           Number "3" (1,18) -> (1,19),
@@ -5600,9 +6194,9 @@ Score (1,1) -> (1,31) {
                     },
                     Prop (1,8) -> (1,17) {
                       property: Ident "b" (1,8) -> (1,9),
-                      properties: Values (1,10) -> (1,17) {
+                      properties: Arguments (1,10) -> (1,17) {
                         openParenthesis: LParen (1,10) -> (1,11),
-                        values: Array [
+                        arguments: Array [
                           Number "0" (1,11) -> (1,12),
                           Number "4" (1,13) -> (1,14),
                           Number "0" (1,15) -> (1,16),
@@ -5624,11 +6218,24 @@ Score (1,1) -> (1,31) {
             properties: Array [
               Prop (1,23) -> (1,29) {
                 property: Ident "tu" (1,23) -> (1,25),
-                properties: Values (1,26) -> (1,29) {
-                  values: Array [
-                    Number "3" (1,26) -> (1,27),
-                    Number "2" (1,28) -> (1,29),
+                properties: Arguments (1,26) -> (1,29) {
+                  arguments: Array [
+                    Number "3" (1,26) -> (1,27) {
+                      parameterIndices: Map {
+                        0 => 0,
+                        1 => 0,
+                      },
+                    },
+                    Number "2" (1,28) -> (1,29) {
+                      parameterIndices: Map {
+                        1 => 1,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -5667,10 +6274,18 @@ Score (1,1) -> (1,33) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,14) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
+          arguments: Arguments (1,8) -> (1,14) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
         Meta (1,16) -> (1,30) {
@@ -5678,10 +6293,18 @@ Score (1,1) -> (1,33) {
             prefix: Backslash (1,16) -> (1,17),
             tag: Ident "subtitle" (1,17) -> (1,25),
           },
-          values: Values (1,26) -> (1,30) {
-            values: Array [
-              String "Sub" (1,26) -> (1,30),
+          arguments: Arguments (1,26) -> (1,30) {
+            arguments: Array [
+              String "Sub" (1,26) -> (1,30) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -5704,20 +6327,36 @@ Score (1,1) -> (1,30) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,13) {
-            values: Array [
-              String "Name" (1,8) -> (1,13),
+          arguments: Arguments (1,8) -> (1,13) {
+            arguments: Array [
+              String "Name" (1,8) -> (1,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
           properties: Props (1,15) -> (1,28) {
             openBrace: LBrace (1,15) -> (1,16),
             properties: Array [
               Prop (1,16) -> (1,26) {
                 property: Ident "color" (1,16) -> (1,21),
-                properties: Values (1,22) -> (1,26) {
-                  values: Array [
-                    String "red" (1,22) -> (1,26),
+                properties: Arguments (1,22) -> (1,26) {
+                  arguments: Array [
+                    String "red" (1,22) -> (1,26) {
+                      parameterIndices: Map {
+                        0 => 0,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    0,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -5740,20 +6379,36 @@ Score (1,1) -> (1,30) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "track" (1,2) -> (1,7),
           },
-          values: Values (1,22) -> (1,27) {
-            values: Array [
-              String "Name" (1,22) -> (1,27),
+          arguments: Arguments (1,22) -> (1,27) {
+            arguments: Array [
+              String "Name" (1,22) -> (1,27) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
           properties: Props (1,8) -> (1,21) {
             openBrace: LBrace (1,8) -> (1,9),
             properties: Array [
               Prop (1,9) -> (1,19) {
                 property: Ident "color" (1,9) -> (1,14),
-                properties: Values (1,15) -> (1,19) {
-                  values: Array [
-                    String "red" (1,15) -> (1,19),
+                properties: Arguments (1,15) -> (1,19) {
+                  arguments: Array [
+                    String "red" (1,15) -> (1,19) {
+                      parameterIndices: Map {
+                        0 => 0,
+                      },
+                    },
                   ],
+                  signatureCandidateIndices: Array [
+                    0,
+                  ],
+                  validated: true,
                 },
               },
             ],
@@ -5784,12 +6439,28 @@ Score (1,1) -> (1,33) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,31) {
-            values: Array [
-              String "Title" (1,8) -> (1,14),
-              String "Template" (1,16) -> (1,25),
-              Ident "left" (1,27) -> (1,31),
+          arguments: Arguments (1,8) -> (1,31) {
+            arguments: Array [
+              String "Title" (1,8) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              String "Template" (1,16) -> (1,25) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+              Ident "left" (1,27) -> (1,31) {
+                parameterIndices: Map {
+                  0 => 2,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -5812,9 +6483,9 @@ Score (1,1) -> (1,19) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "title" (1,2) -> (1,7),
           },
-          values: Values (1,8) -> (1,17) {
+          arguments: Arguments (1,8) -> (1,17) {
             openParenthesis: LParen (1,8) -> (1,9),
-            values: Array [
+            arguments: Array [
               String "Title" (1,9) -> (1,15),
             ],
             closeParenthesis: RParen (1,16) -> (1,17),
@@ -5840,9 +6511,9 @@ Score (1,1) -> (1,43) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: Values (1,14) -> (1,23) {
+          arguments: Arguments (1,14) -> (1,23) {
             openParenthesis: LParen (1,14) -> (1,15),
-            values: Array [
+            arguments: Array [
               String "Value" (1,15) -> (1,21),
             ],
             closeParenthesis: RParen (1,22) -> (1,23),
@@ -5853,9 +6524,9 @@ Score (1,1) -> (1,43) {
             prefix: Backslash (1,24) -> (1,25),
             tag: Ident "notExisting" (1,25) -> (1,36),
           },
-          values: Values (1,37) -> (1,41) {
+          arguments: Arguments (1,37) -> (1,41) {
             openParenthesis: LParen (1,37) -> (1,38),
-            values: Array [
+            arguments: Array [
               String "" (1,38) -> (1,39),
             ],
             closeParenthesis: RParen (1,40) -> (1,41),
@@ -5881,9 +6552,9 @@ Score (1,1) -> (1,25) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: Values (1,14) -> (1,23) {
+          arguments: Arguments (1,14) -> (1,23) {
             openParenthesis: LParen (1,14) -> (1,15),
-            values: Array [
+            arguments: Array [
               String "Value" (1,15) -> (1,21),
             ],
             closeParenthesis: RParen (1,22) -> (1,23),
@@ -5909,9 +6580,9 @@ Score (1,1) -> (1,28) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: Values (1,14) -> (1,23) {
+          arguments: Arguments (1,14) -> (1,23) {
             openParenthesis: LParen (1,14) -> (1,15),
-            values: Array [
+            arguments: Array [
               String "Value" (1,15) -> (1,21),
             ],
             closeParenthesis: RParen (1,22) -> (1,23),
@@ -5942,9 +6613,9 @@ Score (1,1) -> (1,43) {
             prefix: Backslash (1,1) -> (1,2),
             tag: Ident "notExisting" (1,2) -> (1,13),
           },
-          values: Values (1,14) -> (1,23) {
+          arguments: Arguments (1,14) -> (1,23) {
             openParenthesis: LParen (1,14) -> (1,15),
-            values: Array [
+            arguments: Array [
               String "Value" (1,15) -> (1,21),
             ],
             closeParenthesis: RParen (1,22) -> (1,23),
@@ -5954,9 +6625,9 @@ Score (1,1) -> (1,43) {
             properties: Array [
               Prop (1,25) -> (1,40) {
                 property: Ident "unknown" (1,25) -> (1,32),
-                properties: Values (1,33) -> (1,40) {
+                properties: Arguments (1,33) -> (1,40) {
                   openParenthesis: LParen (1,33) -> (1,34),
-                  values: Array [
+                  arguments: Array [
                     Number "1" (1,34) -> (1,35),
                     Number "2" (1,36) -> (1,37),
                     Number "3" (1,38) -> (1,39),
@@ -6003,12 +6674,28 @@ Score (1,1) -> (1,21) {
             prefix: Backslash (1,10) -> (1,11),
             tag: Ident "sync" (1,11) -> (1,15),
           },
-          values: Values (1,16) -> (1,21) {
-            values: Array [
-              Number "1" (1,16) -> (1,17),
-              Number "1" (1,18) -> (1,19),
-              Number "1" (1,20) -> (1,21),
+          arguments: Arguments (1,16) -> (1,21) {
+            arguments: Array [
+              Number "1" (1,16) -> (1,17) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "1" (1,18) -> (1,19) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+              Number "1" (1,20) -> (1,21) {
+                parameterIndices: Map {
+                  0 => 2,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -6044,12 +6731,28 @@ Score (1,1) -> (1,20) {
             prefix: Backslash (1,9) -> (1,10),
             tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: Values (1,15) -> (1,20) {
-            values: Array [
-              Number "1" (1,15) -> (1,16),
-              Number "1" (1,17) -> (1,18),
-              Number "1" (1,19) -> (1,20),
+          arguments: Arguments (1,15) -> (1,20) {
+            arguments: Array [
+              Number "1" (1,15) -> (1,16) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "1" (1,17) -> (1,18) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+              Number "1" (1,19) -> (1,20) {
+                parameterIndices: Map {
+                  0 => 2,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -6085,12 +6788,28 @@ Score (1,1) -> (1,20) {
             prefix: Backslash (1,9) -> (1,10),
             tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: Values (1,15) -> (1,20) {
-            values: Array [
-              Number "1" (1,15) -> (1,16),
-              Number "1" (1,17) -> (1,18),
-              Number "1" (1,19) -> (1,20),
+          arguments: Arguments (1,15) -> (1,20) {
+            arguments: Array [
+              Number "1" (1,15) -> (1,16) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "1" (1,17) -> (1,18) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+              Number "1" (1,19) -> (1,20) {
+                parameterIndices: Map {
+                  0 => 2,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -6204,10 +6923,18 @@ Score (1,1) -> (1,36) {
             prefix: Backslash (1,2) -> (1,3),
             tag: Ident "title" (1,3) -> (1,8),
           },
-          values: Values (1,9) -> (1,14) {
-            values: Array [
-              String "Test" (1,9) -> (1,14),
+          arguments: Arguments (1,9) -> (1,14) {
+            arguments: Array [
+              String "Test" (1,9) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -6232,12 +6959,28 @@ Score (1,1) -> (1,36) {
             prefix: Backslash (1,25) -> (1,26),
             tag: Ident "sync" (1,26) -> (1,30),
           },
-          values: Values (1,31) -> (1,36) {
-            values: Array [
-              Number "1" (1,31) -> (1,32),
-              Number "1" (1,33) -> (1,34),
-              Number "1" (1,35) -> (1,36),
+          arguments: Arguments (1,31) -> (1,36) {
+            arguments: Array [
+              Number "1" (1,31) -> (1,32) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "1" (1,33) -> (1,34) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+              Number "1" (1,35) -> (1,36) {
+                parameterIndices: Map {
+                  0 => 2,
+                },
+              },
             ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
           },
         },
       ],
@@ -6273,9 +7016,9 @@ Score (1,1) -> (1,25) {
             prefix: Backslash (1,9) -> (1,10),
             tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: Values (1,15) -> (1,22) {
+          arguments: Arguments (1,15) -> (1,22) {
             openParenthesis: LParen (1,15) -> (1,16),
-            values: Array [
+            arguments: Array [
               Number "1" (1,16) -> (1,17),
               Number "1" (1,18) -> (1,19),
               Number "1" (1,20) -> (1,21),
@@ -6321,9 +7064,9 @@ Score (1,1) -> (1,42) {
             prefix: Backslash (1,9) -> (1,10),
             tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: Values (1,15) -> (1,22) {
+          arguments: Arguments (1,15) -> (1,22) {
             openParenthesis: LParen (1,15) -> (1,16),
-            values: Array [
+            arguments: Array [
               Number "1" (1,16) -> (1,17),
               Number "1" (1,18) -> (1,19),
               Number "1" (1,20) -> (1,21),
@@ -6335,9 +7078,9 @@ Score (1,1) -> (1,42) {
             properties: Array [
               Prop (1,25) -> (1,40) {
                 property: Ident "unknown" (1,25) -> (1,32),
-                properties: Values (1,33) -> (1,40) {
+                properties: Arguments (1,33) -> (1,40) {
                   openParenthesis: LParen (1,33) -> (1,34),
-                  values: Array [
+                  arguments: Array [
                     Number "1" (1,34) -> (1,35),
                     Number "2" (1,36) -> (1,37),
                     Number "3" (1,38) -> (1,39),
@@ -6382,9 +7125,9 @@ Score (1,1) -> (1,22) {
             prefix: Backslash (1,9) -> (1,10),
             tag: Ident "sync" (1,10) -> (1,14),
           },
-          values: Values (1,15) -> (1,22) {
+          arguments: Arguments (1,15) -> (1,22) {
             openParenthesis: LParen (1,15) -> (1,16),
-            values: Array [
+            arguments: Array [
               Number "1" (1,16) -> (1,17),
               Number "1" (1,18) -> (1,19),
               Number "1" (1,20) -> (1,21),

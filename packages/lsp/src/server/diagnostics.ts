@@ -26,8 +26,13 @@ export function setupDiagnostics(connection: Connection, documents: TextDocument
         }
     });
 
-    documents.onDidChangeContent(change => {
-        validateTextDocument(change.document);
+    documents.onDidChangeContent(async change => {
+        const diagnostics = await validateTextDocument(change.document);
+        connection.sendDiagnostics({
+            diagnostics: diagnostics,
+            uri: change.document.uri,
+            version: change.document.version
+        });
     });
 }
 

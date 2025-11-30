@@ -6,7 +6,7 @@ import {
     scoreMetaData,
     staffMetaData,
     structuralMetaData
-} from '@coderline/alphatab-language-server/documentation/documentation';
+} from '@coderline/alphatab-alphatex/definitions';
 import { startNodeLanguageServer, startWebWorkerLanguageServer } from '@coderline/alphatab-language-server/server';
 
 const documentation = {
@@ -21,13 +21,14 @@ const documentation = {
 
 import type {
     AlphaTexExample,
-    CommonDoc,
-    MetadataDoc,
-    PropertyDoc,
-    ValueDoc,
-    ValueItemDoc,
-    WithDescription
-} from '@coderline/alphatab-language-server/documentation/types';
+    MetadataTagDefinition,
+    ParameterDefinition,
+    ParameterValueDefinition,
+    PropertyDefinition,
+    SignatureDefinition,
+    WithDescription,
+    WithSignatures
+} from '@coderline/alphatab-alphatex/types';
 
 import textMateGrammarJson from './alphatex.tmLanguage.json';
 import languageConfigurationJson from './language-configuration.json';
@@ -45,18 +46,9 @@ const textMateGrammar: any = textMateGrammarJson;
 const languageConfiguration: any = languageConfigurationJson;
 
 export {
-    startNodeLanguageServer,
-    startWebWorkerLanguageServer,
-    documentation,
-    textMateGrammar,
-    languageConfiguration,
-    type WithDescription,
-    type CommonDoc,
-    type ValueItemDoc,
-    type ValueDoc,
-    type PropertyDoc,
-    type AlphaTexExample as Example,
-    type MetadataDoc
+    documentation, languageConfiguration, startNodeLanguageServer,
+    startWebWorkerLanguageServer, textMateGrammar, type AlphaTexExample,
+    type MetadataTagDefinition, type ParameterDefinition, type ParameterValueDefinition, type PropertyDefinition, type SignatureDefinition, type WithDescription, type WithSignatures
 };
 
 if (import.meta.main) {

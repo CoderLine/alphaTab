@@ -1,0 +1,4358 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`AlphaTexParameterTests handler-validation metadata empty signature empty 1`] = `
+Score (1,1) -> (1,9) {
+  bars: Array [
+    Bar (1,1) -> (1,9) {
+      metaData: Array [
+        Meta (1,1) -> (1,6) {
+          tag: Tag "ac" (1,1) -> (1,4) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "ac" (1,2) -> (1,4),
+          },
+          arguments: Arguments (1,4) -> (1,6) {
+            openParenthesis: LParen (1,4) -> (1,5),
+            arguments: Array [],
+            closeParenthesis: RParen (1,5) -> (1,6),
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,7) -> (1,9) {
+          notes: NoteList (1,7) -> (1,9) {
+            notes: Array [
+              Note (1,7) -> (1,9) {
+                noteValue: Ident "C4" (1,7) -> (1,9),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata empty signature empty: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata empty signature empty: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata empty signature empty: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata list multi 1`] = `
+Score (1,1) -> (1,23) {
+  bars: Array [
+    Bar (1,1) -> (1,23) {
+      metaData: Array [
+        Meta (1,1) -> (1,23) {
+          tag: Tag "systemslayout" (1,1) -> (1,15) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "systemslayout" (1,2) -> (1,15),
+          },
+          arguments: Arguments (1,16) -> (1,23) {
+            openParenthesis: LParen (1,16) -> (1,17),
+            arguments: Array [
+              Number "3" (1,17) -> (1,18) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "2" (1,19) -> (1,20) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "3" (1,21) -> (1,22) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,22) -> (1,23),
+            signatureCandidateIndices: Array [
+              0,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata list multi: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata list multi: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata list multi: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata list single 1`] = `
+Score (1,1) -> (1,19) {
+  bars: Array [
+    Bar (1,1) -> (1,19) {
+      metaData: Array [
+        Meta (1,1) -> (1,19) {
+          tag: Tag "systemslayout" (1,1) -> (1,15) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "systemslayout" (1,2) -> (1,15),
+          },
+          arguments: Arguments (1,16) -> (1,19) {
+            openParenthesis: LParen (1,16) -> (1,17),
+            arguments: Array [
+              Number "3" (1,17) -> (1,18) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,18) -> (1,19),
+            signatureCandidateIndices: Array [
+              0,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata list single: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata list single: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata list single: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads multi 1`] = `
+Score (1,1) -> (1,28) {
+  bars: Array [
+    Bar (1,1) -> (1,28) {
+      metaData: Array [
+        Meta (1,1) -> (1,28) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          arguments: Arguments (1,8) -> (1,28) {
+            openParenthesis: LParen (1,8) -> (1,9),
+            arguments: Array [
+              String "Name" (1,9) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              String "ShortName" (1,16) -> (1,26) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,27) -> (1,28),
+            signatureCandidateIndices: Array [
+              0,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads multi: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads multi: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads multi: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads none 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      metaData: Array [
+        Meta (1,1) -> (1,10) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          arguments: Arguments (1,8) -> (1,10) {
+            openParenthesis: LParen (1,8) -> (1,9),
+            arguments: Array [],
+            closeParenthesis: RParen (1,9) -> (1,10),
+            signatureCandidateIndices: Array [
+              0,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads none: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads none: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads none: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads single 1`] = `
+Score (1,1) -> (1,16) {
+  bars: Array [
+    Bar (1,1) -> (1,16) {
+      metaData: Array [
+        Meta (1,1) -> (1,16) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          arguments: Arguments (1,8) -> (1,16) {
+            openParenthesis: LParen (1,8) -> (1,9),
+            arguments: Array [
+              String "Name" (1,9) -> (1,14) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,15) -> (1,16),
+            signatureCandidateIndices: Array [
+              0,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads single: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads single: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata optional overloads single: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata required overloads overload1 1`] = `
+Score (1,1) -> (1,18) {
+  bars: Array [
+    Bar (1,1) -> (1,18) {
+      metaData: Array [
+        Meta (1,1) -> (1,18) {
+          tag: Tag "section" (1,1) -> (1,9) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "section" (1,2) -> (1,9),
+          },
+          arguments: Arguments (1,10) -> (1,18) {
+            openParenthesis: LParen (1,10) -> (1,11),
+            arguments: Array [
+              String "Text" (1,11) -> (1,16) {
+                parameterIndices: Map {
+                  0 => 0,
+                  1 => 0,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,17) -> (1,18),
+            signatureCandidateIndices: Array [
+              0,
+              1,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata required overloads overload1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata required overloads overload1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata required overloads overload1: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata required overloads overload2 1`] = `
+Score (1,1) -> (1,22) {
+  bars: Array [
+    Bar (1,1) -> (1,22) {
+      metaData: Array [
+        Meta (1,1) -> (1,22) {
+          tag: Tag "section" (1,1) -> (1,9) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "section" (1,2) -> (1,9),
+          },
+          arguments: Arguments (1,10) -> (1,22) {
+            openParenthesis: LParen (1,10) -> (1,11),
+            arguments: Array [
+              String "T" (1,11) -> (1,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                  1 => 0,
+                },
+              },
+              String "Text" (1,15) -> (1,20) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,21) -> (1,22),
+            signatureCandidateIndices: Array [
+              1,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata required overloads overload2: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata required overloads overload2: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata required overloads overload2: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload correct 1`] = `
+Score (1,1) -> (1,17) {
+  bars: Array [
+    Bar (1,1) -> (1,17) {
+      metaData: Array [
+        Meta (1,1) -> (1,14) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+          arguments: Arguments (1,7) -> (1,14) {
+            openParenthesis: LParen (1,7) -> (1,8),
+            arguments: Array [
+              Ident "Segno" (1,8) -> (1,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,13) -> (1,14),
+            signatureCandidateIndices: Array [
+              0,
+            ],
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,15) -> (1,17) {
+          notes: NoteList (1,15) -> (1,17) {
+            notes: Array [
+              Note (1,15) -> (1,17) {
+                noteValue: Ident "C4" (1,15) -> (1,17),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload correct: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload correct: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload correct: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload missing 1`] = `
+Score (1,1) -> (1,13) {
+  bars: Array [
+    Bar (1,1) -> (1,13) {
+      metaData: Array [
+        Meta (1,1) -> (1,9) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+          arguments: Arguments (1,7) -> (1,9) {
+            openParenthesis: LParen (1,7) -> (1,8),
+            arguments: Array [],
+            closeParenthesis: RParen (1,8) -> (1,9),
+            signatureCandidateIndices: Array [
+              0,
+            ],
+          },
+        },
+        Meta (1,10) -> (1,13) {
+          tag: Tag "ac" (1,10) -> (1,13) {
+            prefix: Backslash (1,10) -> (1,11),
+            tag: Ident "ac" (1,11) -> (1,13),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload missing: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload missing: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload missing: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 9,
+      "line" => 1,
+      "offset" => 8,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload wrong identifier 1`] = `
+Score (1,1) -> (1,11) {
+  bars: Array [
+    Bar (1,1) -> (1,11) {
+      metaData: Array [
+        Meta (1,1) -> (1,11) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+          arguments: Arguments (1,7) -> (1,11) {
+            openParenthesis: LParen (1,7) -> (1,8),
+            arguments: Array [
+              Ident "C4" (1,8) -> (1,10),
+            ],
+            closeParenthesis: RParen (1,10) -> (1,11),
+            signatureCandidateIndices: Array [
+              0,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload wrong identifier: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload wrong identifier: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload wrong identifier: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload wrong type 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      metaData: Array [
+        Meta (1,1) -> (1,10) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+          arguments: Arguments (1,7) -> (1,10) {
+            openParenthesis: LParen (1,7) -> (1,8),
+            arguments: Array [
+              Number "3" (1,8) -> (1,9),
+            ],
+            closeParenthesis: RParen (1,9) -> (1,10),
+            signatureCandidateIndices: Array [
+              0,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload wrong type: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload wrong type: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata single overload wrong type: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (Number). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload1-ident 1`] = `
+Score (1,1) -> (1,25) {
+  bars: Array [
+    Bar (1,1) -> (1,25) {
+      metaData: Array [
+        Meta (1,1) -> (1,25) {
+          tag: Tag "articulation" (1,1) -> (1,14) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "articulation" (1,2) -> (1,14),
+          },
+          arguments: Arguments (1,15) -> (1,25) {
+            openParenthesis: LParen (1,15) -> (1,16),
+            arguments: Array [
+              Ident "defaults" (1,16) -> (1,24) {
+                parameterIndices: Map {
+                  0 => 0,
+                  1 => 0,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,24) -> (1,25),
+            signatureCandidateIndices: Array [
+              0,
+              1,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload1-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload1-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload1-ident: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload2-ident 1`] = `
+Score (1,1) -> (1,21) {
+  bars: Array [
+    Bar (1,1) -> (1,21) {
+      metaData: Array [
+        Meta (1,1) -> (1,21) {
+          tag: Tag "articulation" (1,1) -> (1,14) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "articulation" (1,2) -> (1,14),
+          },
+          arguments: Arguments (1,15) -> (1,21) {
+            openParenthesis: LParen (1,15) -> (1,16),
+            arguments: Array [
+              Ident "A" (1,16) -> (1,17) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "38" (1,18) -> (1,20) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,20) -> (1,21),
+            signatureCandidateIndices: Array [
+              1,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload2-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload2-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload2-ident: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload2-string 1`] = `
+Score (1,1) -> (1,23) {
+  bars: Array [
+    Bar (1,1) -> (1,23) {
+      metaData: Array [
+        Meta (1,1) -> (1,23) {
+          tag: Tag "articulation" (1,1) -> (1,14) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "articulation" (1,2) -> (1,14),
+          },
+          arguments: Arguments (1,15) -> (1,23) {
+            openParenthesis: LParen (1,15) -> (1,16),
+            arguments: Array [
+              String "A" (1,16) -> (1,18) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "38" (1,20) -> (1,22) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,22) -> (1,23),
+            signatureCandidateIndices: Array [
+              1,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload2-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload2-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata type overloads overload2-string: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata value overloads overload1 1`] = `
+Score (1,1) -> (1,13) {
+  bars: Array [
+    Bar (1,1) -> (1,13) {
+      metaData: Array [
+        Meta (1,1) -> (1,13) {
+          tag: Tag "ts" (1,1) -> (1,4) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "ts" (1,2) -> (1,4),
+          },
+          arguments: Arguments (1,5) -> (1,13) {
+            openParenthesis: LParen (1,5) -> (1,6),
+            arguments: Array [
+              Ident "common" (1,6) -> (1,12) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,12) -> (1,13),
+            signatureCandidateIndices: Array [
+              0,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata value overloads overload1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata value overloads overload1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata value overloads overload1: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata value overloads overload2 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      metaData: Array [
+        Meta (1,1) -> (1,10) {
+          tag: Tag "ts" (1,1) -> (1,4) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "ts" (1,2) -> (1,4),
+          },
+          arguments: Arguments (1,5) -> (1,10) {
+            openParenthesis: LParen (1,5) -> (1,6),
+            arguments: Array [
+              Number "3" (1,6) -> (1,7) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "4" (1,8) -> (1,9) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            closeParenthesis: RParen (1,9) -> (1,10),
+            signatureCandidateIndices: Array [
+              1,
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation metadata value overloads overload2: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata value overloads overload2: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation metadata value overloads overload2: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props ambiguous incomplete 1`] = `
+Score (1,1) -> (1,14) {
+  bars: Array [
+    Bar (1,1) -> (1,14) {
+      beats: Array [
+        Beat (1,1) -> (1,14) {
+          notes: NoteList (1,1) -> (1,14) {
+            notes: Array [
+              Note (1,1) -> (1,14) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,14) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,12) {
+                      property: Ident "tu" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,12) {
+                        openParenthesis: LParen (1,9) -> (1,10),
+                        arguments: Array [
+                          Number "3" (1,10) -> (1,11) {
+                            parameterIndices: Map {
+                              0 => 0,
+                              1 => 0,
+                            },
+                          },
+                        ],
+                        closeParenthesis: RParen (1,11) -> (1,12),
+                        signatureCandidateIndices: Array [
+                          0,
+                          1,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,13) -> (1,14),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props ambiguous incomplete: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props ambiguous incomplete: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props ambiguous incomplete: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props empty signature empty1 1`] = `
+Score (1,1) -> (1,9) {
+  bars: Array [
+    Bar (1,1) -> (1,9) {
+      beats: Array [
+        Beat (1,1) -> (1,9) {
+          notes: NoteList (1,1) -> (1,9) {
+            notes: Array [
+              Note (1,1) -> (1,9) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,9) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,8) {
+                      property: Ident "v" (1,5) -> (1,6),
+                      properties: Arguments (1,6) -> (1,8) {
+                        openParenthesis: LParen (1,6) -> (1,7),
+                        arguments: Array [],
+                        closeParenthesis: RParen (1,7) -> (1,8),
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,8) -> (1,9),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props empty signature empty1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props empty signature empty1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props empty signature empty1: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props empty signature empty2 1`] = `
+Score (1,1) -> (1,12) {
+  bars: Array [
+    Bar (1,1) -> (1,12) {
+      beats: Array [
+        Beat (1,1) -> (1,12) {
+          notes: NoteList (1,1) -> (1,12) {
+            notes: Array [
+              Note (1,1) -> (1,12) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,12) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,8) {
+                      property: Ident "v" (1,5) -> (1,6),
+                      properties: Arguments (1,6) -> (1,8) {
+                        openParenthesis: LParen (1,6) -> (1,7),
+                        arguments: Array [],
+                        closeParenthesis: RParen (1,7) -> (1,8),
+                      },
+                    },
+                    Prop (1,9) -> (1,11) {
+                      property: Ident "ac" (1,9) -> (1,11),
+                    },
+                  ],
+                  closeBrace: RBrace (1,11) -> (1,12),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props empty signature empty2: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props empty signature empty2: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props empty signature empty2: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload correct 1`] = `
+Score (1,1) -> (1,14) {
+  bars: Array [
+    Bar (1,1) -> (1,14) {
+      beats: Array [
+        Beat (1,1) -> (1,14) {
+          notes: NoteList (1,1) -> (1,14) {
+            notes: Array [
+              Note (1,1) -> (1,14) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,14) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,13) {
+                      property: Ident "ad" (1,5) -> (1,7),
+                      properties: Arguments (1,8) -> (1,13) {
+                        openParenthesis: LParen (1,8) -> (1,9),
+                        arguments: Array [
+                          Number "100" (1,9) -> (1,12) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        closeParenthesis: RParen (1,12) -> (1,13),
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,13) -> (1,14),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload correct: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload correct: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload correct: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload missing 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      beats: Array [
+        Beat (1,1) -> (1,10) {
+          notes: NoteList (1,1) -> (1,10) {
+            notes: Array [
+              Note (1,1) -> (1,10) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,10) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,9) {
+                      property: Ident "ad" (1,5) -> (1,7),
+                      properties: Arguments (1,7) -> (1,9) {
+                        openParenthesis: LParen (1,7) -> (1,8),
+                        arguments: Array [],
+                        closeParenthesis: RParen (1,8) -> (1,9),
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,9) -> (1,10),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload missing: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload missing: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload missing: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload wrong identifier 1`] = `
+Score (1,1) -> (1,20) {
+  bars: Array [
+    Bar (1,1) -> (1,20) {
+      beats: Array [
+        Beat (1,1) -> (1,20) {
+          notes: NoteList (1,1) -> (1,20) {
+            notes: Array [
+              Note (1,1) -> (1,20) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,20) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,19) {
+                      property: Ident "beam" (1,5) -> (1,9),
+                      properties: Arguments (1,10) -> (1,19) {
+                        openParenthesis: LParen (1,10) -> (1,11),
+                        arguments: Array [
+                          Ident "invalid" (1,11) -> (1,18),
+                        ],
+                        closeParenthesis: RParen (1,18) -> (1,19),
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,19) -> (1,20),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload wrong identifier: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload wrong identifier: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload wrong identifier: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 19,
+      "line" => 1,
+      "offset" => 18,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload wrong type 1`] = `
+Score (1,1) -> (1,14) {
+  bars: Array [
+    Bar (1,1) -> (1,14) {
+      beats: Array [
+        Beat (1,1) -> (1,14) {
+          notes: NoteList (1,1) -> (1,14) {
+            notes: Array [
+              Note (1,1) -> (1,14) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,14) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,13) {
+                      property: Ident "ad" (1,5) -> (1,7),
+                      properties: Arguments (1,8) -> (1,13) {
+                        openParenthesis: LParen (1,8) -> (1,9),
+                        arguments: Array [
+                          String "1" (1,9) -> (1,11),
+                        ],
+                        closeParenthesis: RParen (1,12) -> (1,13),
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,13) -> (1,14),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload wrong type: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload wrong type: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props optional overload wrong type: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload1-number 1`] = `
+Score (1,1) -> (1,27) {
+  bars: Array [
+    Bar (1,1) -> (1,27) {
+      metaData: Array [
+        Meta (1,1) -> (1,27) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          properties: Props (1,8) -> (1,27) {
+            openBrace: LBrace (1,8) -> (1,9),
+            properties: Array [
+              Prop (1,10) -> (1,25) {
+                property: Ident "instrument" (1,10) -> (1,20),
+                properties: Arguments (1,21) -> (1,25) {
+                  openParenthesis: LParen (1,21) -> (1,22),
+                  arguments: Array [
+                    Number "20" (1,22) -> (1,24) {
+                      parameterIndices: Map {
+                        0 => 0,
+                      },
+                    },
+                  ],
+                  closeParenthesis: RParen (1,24) -> (1,25),
+                  signatureCandidateIndices: Array [
+                    0,
+                  ],
+                },
+              },
+            ],
+            closeBrace: RBrace (1,26) -> (1,27),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload1-number: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload1-number: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload1-number: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload2-identifier 1`] = `
+Score (1,1) -> (1,43) {
+  bars: Array [
+    Bar (1,1) -> (1,43) {
+      metaData: Array [
+        Meta (1,1) -> (1,43) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          properties: Props (1,8) -> (1,43) {
+            openBrace: LBrace (1,8) -> (1,9),
+            properties: Array [
+              Prop (1,10) -> (1,41) {
+                property: Ident "instrument" (1,10) -> (1,20),
+                properties: Arguments (1,21) -> (1,41) {
+                  openParenthesis: LParen (1,21) -> (1,22),
+                  arguments: Array [
+                    Ident "AcousticGrandPiano" (1,22) -> (1,40) {
+                      parameterIndices: Map {
+                        1 => 0,
+                      },
+                    },
+                  ],
+                  closeParenthesis: RParen (1,40) -> (1,41),
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                },
+              },
+            ],
+            closeBrace: RBrace (1,42) -> (1,43),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload2-identifier: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload2-identifier: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload2-identifier: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload2-string 1`] = `
+Score (1,1) -> (1,46) {
+  bars: Array [
+    Bar (1,1) -> (1,46) {
+      metaData: Array [
+        Meta (1,1) -> (1,46) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          properties: Props (1,8) -> (1,46) {
+            openBrace: LBrace (1,8) -> (1,9),
+            properties: Array [
+              Prop (1,10) -> (1,45) {
+                property: Ident "instrument" (1,10) -> (1,20),
+                properties: Arguments (1,21) -> (1,45) {
+                  openParenthesis: LParen (1,21) -> (1,22),
+                  arguments: Array [
+                    String "Acoustic Grand Piano" (1,22) -> (1,43) {
+                      parameterIndices: Map {
+                        1 => 0,
+                      },
+                    },
+                  ],
+                  closeParenthesis: RParen (1,44) -> (1,45),
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                },
+              },
+            ],
+            closeBrace: RBrace (1,45) -> (1,46),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload2-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload2-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload2-string: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload3-percussion 1`] = `
+Score (1,1) -> (1,35) {
+  bars: Array [
+    Bar (1,1) -> (1,35) {
+      metaData: Array [
+        Meta (1,1) -> (1,35) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          properties: Props (1,8) -> (1,35) {
+            openBrace: LBrace (1,8) -> (1,9),
+            properties: Array [
+              Prop (1,10) -> (1,33) {
+                property: Ident "instrument" (1,10) -> (1,20),
+                properties: Arguments (1,21) -> (1,33) {
+                  openParenthesis: LParen (1,21) -> (1,22),
+                  arguments: Array [
+                    Ident "percussion" (1,22) -> (1,32) {
+                      parameterIndices: Map {
+                        1 => 0,
+                        2 => 0,
+                      },
+                    },
+                  ],
+                  closeParenthesis: RParen (1,32) -> (1,33),
+                  signatureCandidateIndices: Array [
+                    2,
+                    1,
+                  ],
+                },
+              },
+            ],
+            closeBrace: RBrace (1,34) -> (1,35),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload3-percussion: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload3-percussion: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props type overloads overload3-percussion: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload1 1`] = `
+Score (1,1) -> (1,16) {
+  bars: Array [
+    Bar (1,1) -> (1,16) {
+      beats: Array [
+        Beat (1,1) -> (1,16) {
+          notes: NoteList (1,1) -> (1,16) {
+            notes: Array [
+              Note (1,1) -> (1,16) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,16) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,14) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,14) {
+                        openParenthesis: LParen (1,9) -> (1,10),
+                        arguments: Array [
+                          Number "0" (1,10) -> (1,11) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                          Number "4" (1,12) -> (1,13) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        closeParenthesis: RParen (1,13) -> (1,14),
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,15) -> (1,16),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload1: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload2-ident 1`] = `
+Score (1,1) -> (1,23) {
+  bars: Array [
+    Bar (1,1) -> (1,23) {
+      beats: Array [
+        Beat (1,1) -> (1,23) {
+          notes: NoteList (1,1) -> (1,23) {
+            notes: Array [
+              Note (1,1) -> (1,23) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,23) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,21) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,21) {
+                        openParenthesis: LParen (1,9) -> (1,10),
+                        arguments: Array [
+                          Ident "custom" (1,10) -> (1,16) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Number "0" (1,17) -> (1,18) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                          Number "4" (1,19) -> (1,20) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                        ],
+                        closeParenthesis: RParen (1,20) -> (1,21),
+                        signatureCandidateIndices: Array [
+                          1,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,22) -> (1,23),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload2-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload2-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload2-ident: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload2-string 1`] = `
+Score (1,1) -> (1,25) {
+  bars: Array [
+    Bar (1,1) -> (1,25) {
+      beats: Array [
+        Beat (1,1) -> (1,25) {
+          notes: NoteList (1,1) -> (1,25) {
+            notes: Array [
+              Note (1,1) -> (1,25) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,25) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,23) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,23) {
+                        openParenthesis: LParen (1,9) -> (1,10),
+                        arguments: Array [
+                          String "custom" (1,10) -> (1,17) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Number "0" (1,19) -> (1,20) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                          Number "4" (1,21) -> (1,22) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                        ],
+                        closeParenthesis: RParen (1,22) -> (1,23),
+                        signatureCandidateIndices: Array [
+                          1,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,24) -> (1,25),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload2-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload2-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload2-string: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload3-ident 1`] = `
+Score (1,1) -> (1,24) {
+  bars: Array [
+    Bar (1,1) -> (1,24) {
+      beats: Array [
+        Beat (1,1) -> (1,24) {
+          notes: NoteList (1,1) -> (1,24) {
+            notes: Array [
+              Note (1,1) -> (1,24) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,24) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,22) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,22) {
+                        openParenthesis: LParen (1,9) -> (1,10),
+                        arguments: Array [
+                          Ident "gradual" (1,10) -> (1,17) {
+                            parameterIndices: Map {
+                              2 => 0,
+                            },
+                          },
+                          Number "0" (1,18) -> (1,19) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                          Number "4" (1,20) -> (1,21) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                        ],
+                        closeParenthesis: RParen (1,21) -> (1,22),
+                        signatureCandidateIndices: Array [
+                          2,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,23) -> (1,24),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload3-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload3-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload3-ident: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload3-string 1`] = `
+Score (1,1) -> (1,26) {
+  bars: Array [
+    Bar (1,1) -> (1,26) {
+      beats: Array [
+        Beat (1,1) -> (1,26) {
+          notes: NoteList (1,1) -> (1,26) {
+            notes: Array [
+              Note (1,1) -> (1,26) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,26) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,24) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,24) {
+                        openParenthesis: LParen (1,9) -> (1,10),
+                        arguments: Array [
+                          String "gradual" (1,10) -> (1,18) {
+                            parameterIndices: Map {
+                              2 => 0,
+                            },
+                          },
+                          Number "0" (1,20) -> (1,21) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                          Number "4" (1,22) -> (1,23) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                        ],
+                        closeParenthesis: RParen (1,23) -> (1,24),
+                        signatureCandidateIndices: Array [
+                          2,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,25) -> (1,26),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload3-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload3-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload3-string: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload4-ident 1`] = `
+Score (1,1) -> (1,31) {
+  bars: Array [
+    Bar (1,1) -> (1,31) {
+      beats: Array [
+        Beat (1,1) -> (1,31) {
+          notes: NoteList (1,1) -> (1,31) {
+            notes: Array [
+              Note (1,1) -> (1,31) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,31) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,29) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,29) {
+                        openParenthesis: LParen (1,9) -> (1,10),
+                        arguments: Array [
+                          Ident "custom" (1,10) -> (1,16) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Ident "gradual" (1,17) -> (1,24) {
+                            parameterIndices: Map {
+                              3 => 1,
+                            },
+                          },
+                          Number "0" (1,25) -> (1,26) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                          Number "4" (1,27) -> (1,28) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                        ],
+                        closeParenthesis: RParen (1,28) -> (1,29),
+                        signatureCandidateIndices: Array [
+                          3,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,30) -> (1,31),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload4-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload4-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload4-ident: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload4-string 1`] = `
+Score (1,1) -> (1,35) {
+  bars: Array [
+    Bar (1,1) -> (1,35) {
+      beats: Array [
+        Beat (1,1) -> (1,35) {
+          notes: NoteList (1,1) -> (1,35) {
+            notes: Array [
+              Note (1,1) -> (1,35) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,35) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,33) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,33) {
+                        openParenthesis: LParen (1,9) -> (1,10),
+                        arguments: Array [
+                          String "custom" (1,10) -> (1,17) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          String "gradual" (1,19) -> (1,27) {
+                            parameterIndices: Map {
+                              3 => 1,
+                            },
+                          },
+                          Number "0" (1,29) -> (1,30) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                          Number "4" (1,31) -> (1,32) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                        ],
+                        closeParenthesis: RParen (1,32) -> (1,33),
+                        signatureCandidateIndices: Array [
+                          3,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,34) -> (1,35),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload4-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload4-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads flat overload4-string: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload1 1`] = `
+Score (1,1) -> (1,16) {
+  bars: Array [
+    Bar (1,1) -> (1,16) {
+      beats: Array [
+        Beat (1,1) -> (1,16) {
+          notes: NoteList (1,1) -> (1,16) {
+            notes: Array [
+              Note (1,1) -> (1,16) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,16) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,14) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,14) {
+                        openParenthesis: LParen (1,9) -> (1,10),
+                        arguments: Array [
+                          Number "0" (1,10) -> (1,11) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                          Number "4" (1,12) -> (1,13) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        closeParenthesis: RParen (1,13) -> (1,14),
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,15) -> (1,16),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload1: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload2-ident 1`] = `
+Score (1,1) -> (1,23) {
+  bars: Array [
+    Bar (1,1) -> (1,23) {
+      beats: Array [
+        Beat (1,1) -> (1,23) {
+          notes: NoteList (1,1) -> (1,23) {
+            notes: Array [
+              Note (1,1) -> (1,23) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,23) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,21) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,21) {
+                        arguments: Array [
+                          Ident "custom" (1,9) -> (1,15) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Number "0" (1,17) -> (1,18) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                          Number "4" (1,19) -> (1,20) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          1,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,22) -> (1,23),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload2-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload2-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload2-ident: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload2-string 1`] = `
+Score (1,1) -> (1,25) {
+  bars: Array [
+    Bar (1,1) -> (1,25) {
+      beats: Array [
+        Beat (1,1) -> (1,25) {
+          notes: NoteList (1,1) -> (1,25) {
+            notes: Array [
+              Note (1,1) -> (1,25) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,25) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,23) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,23) {
+                        arguments: Array [
+                          String "custom" (1,9) -> (1,16) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Number "0" (1,19) -> (1,20) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                          Number "4" (1,21) -> (1,22) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          1,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,24) -> (1,25),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload2-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload2-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload2-string: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload3-ident 1`] = `
+Score (1,1) -> (1,24) {
+  bars: Array [
+    Bar (1,1) -> (1,24) {
+      beats: Array [
+        Beat (1,1) -> (1,24) {
+          notes: NoteList (1,1) -> (1,24) {
+            notes: Array [
+              Note (1,1) -> (1,24) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,24) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,22) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,22) {
+                        arguments: Array [
+                          Ident "gradual" (1,9) -> (1,16) {
+                            parameterIndices: Map {
+                              2 => 0,
+                            },
+                          },
+                          Number "0" (1,18) -> (1,19) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                          Number "4" (1,20) -> (1,21) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          2,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,23) -> (1,24),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload3-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload3-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload3-ident: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload3-string 1`] = `
+Score (1,1) -> (1,26) {
+  bars: Array [
+    Bar (1,1) -> (1,26) {
+      beats: Array [
+        Beat (1,1) -> (1,26) {
+          notes: NoteList (1,1) -> (1,26) {
+            notes: Array [
+              Note (1,1) -> (1,26) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,26) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,24) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,24) {
+                        arguments: Array [
+                          String "gradual" (1,9) -> (1,17) {
+                            parameterIndices: Map {
+                              2 => 0,
+                            },
+                          },
+                          Number "0" (1,20) -> (1,21) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                          Number "4" (1,22) -> (1,23) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          2,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,25) -> (1,26),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload3-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload3-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload3-string: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload4-ident 1`] = `
+Score (1,1) -> (1,31) {
+  bars: Array [
+    Bar (1,1) -> (1,31) {
+      beats: Array [
+        Beat (1,1) -> (1,31) {
+          notes: NoteList (1,1) -> (1,31) {
+            notes: Array [
+              Note (1,1) -> (1,31) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,31) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,29) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,29) {
+                        arguments: Array [
+                          Ident "custom" (1,9) -> (1,15) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Ident "gradual" (1,16) -> (1,23) {
+                            parameterIndices: Map {
+                              3 => 1,
+                            },
+                          },
+                          Number "0" (1,25) -> (1,26) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                          Number "4" (1,27) -> (1,28) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          3,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,30) -> (1,31),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload4-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload4-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload4-ident: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload4-string 1`] = `
+Score (1,1) -> (1,35) {
+  bars: Array [
+    Bar (1,1) -> (1,35) {
+      beats: Array [
+        Beat (1,1) -> (1,35) {
+          notes: NoteList (1,1) -> (1,35) {
+            notes: Array [
+              Note (1,1) -> (1,35) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,35) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,33) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,33) {
+                        arguments: Array [
+                          String "custom" (1,9) -> (1,16) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          String "gradual" (1,18) -> (1,26) {
+                            parameterIndices: Map {
+                              3 => 1,
+                            },
+                          },
+                          Number "0" (1,29) -> (1,30) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                          Number "4" (1,31) -> (1,32) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          3,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,34) -> (1,35),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload4-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload4-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests handler-validation props vararg overloads parenthesis overload4-string: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata empty signature empty1 1`] = `
+Score (1,1) -> (1,7) {
+  bars: Array [
+    Bar (1,1) -> (1,7) {
+      metaData: Array [
+        Meta (1,1) -> (1,4) {
+          tag: Tag "ac" (1,1) -> (1,4) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "ac" (1,2) -> (1,4),
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,5) -> (1,7) {
+          notes: NoteList (1,5) -> (1,7) {
+            notes: Array [
+              Note (1,5) -> (1,7) {
+                noteValue: Ident "C4" (1,5) -> (1,7),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata empty signature empty1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata empty signature empty1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata empty signature empty2 1`] = `
+Score (1,1) -> (1,11) {
+  bars: Array [
+    Bar (1,1) -> (1,11) {
+      metaData: Array [
+        Meta (1,1) -> (1,4) {
+          tag: Tag "ac" (1,1) -> (1,4) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "ac" (1,2) -> (1,4),
+          },
+        },
+        Meta (1,5) -> (1,8) {
+          tag: Tag "ft" (1,5) -> (1,8) {
+            prefix: Backslash (1,5) -> (1,6),
+            tag: Ident "ft" (1,6) -> (1,8),
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,9) -> (1,11) {
+          notes: NoteList (1,9) -> (1,11) {
+            notes: Array [
+              Note (1,9) -> (1,11) {
+                noteValue: Ident "C4" (1,9) -> (1,11),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata empty signature empty2: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata empty signature empty2: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata list multi 1`] = `
+Score (1,1) -> (1,21) {
+  bars: Array [
+    Bar (1,1) -> (1,21) {
+      metaData: Array [
+        Meta (1,1) -> (1,21) {
+          tag: Tag "systemslayout" (1,1) -> (1,15) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "systemslayout" (1,2) -> (1,15),
+          },
+          arguments: Arguments (1,16) -> (1,21) {
+            arguments: Array [
+              Number "3" (1,16) -> (1,17) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "2" (1,18) -> (1,19) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              Number "3" (1,20) -> (1,21) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata list multi: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata list multi: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata list single 1`] = `
+Score (1,1) -> (1,17) {
+  bars: Array [
+    Bar (1,1) -> (1,17) {
+      metaData: Array [
+        Meta (1,1) -> (1,17) {
+          tag: Tag "systemslayout" (1,1) -> (1,15) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "systemslayout" (1,2) -> (1,15),
+          },
+          arguments: Arguments (1,16) -> (1,17) {
+            arguments: Array [
+              Number "3" (1,16) -> (1,17) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata list single: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata list single: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata list switch to note 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      metaData: Array [
+        Meta (1,1) -> (1,6) {
+          tag: Tag "ae" (1,1) -> (1,4) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "ae" (1,2) -> (1,4),
+          },
+          arguments: Arguments (1,5) -> (1,6) {
+            arguments: Array [
+              Number "1" (1,5) -> (1,6) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,7) -> (1,10) {
+          notes: NoteList (1,7) -> (1,10) {
+            notes: Array [
+              Note (1,7) -> (1,10) {
+                noteValue: Number "1" (1,7) -> (1,8),
+                noteStringDot: Dot (1,8) -> (1,9),
+                noteString: Number "1" (1,9) -> (1,10),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata list switch to note: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata list switch to note: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata optional overloads multi 1`] = `
+Score (1,1) -> (1,25) {
+  bars: Array [
+    Bar (1,1) -> (1,25) {
+      metaData: Array [
+        Meta (1,1) -> (1,25) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          arguments: Arguments (1,8) -> (1,25) {
+            arguments: Array [
+              String "Name" (1,8) -> (1,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+              String "ShortName" (1,15) -> (1,25) {
+                parameterIndices: Map {
+                  0 => 1,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata optional overloads multi: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata optional overloads multi: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata optional overloads none 1`] = `
+Score (1,1) -> (1,7) {
+  bars: Array [
+    Bar (1,1) -> (1,7) {
+      metaData: Array [
+        Meta (1,1) -> (1,7) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata optional overloads none: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata optional overloads none: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata optional overloads single 1`] = `
+Score (1,1) -> (1,13) {
+  bars: Array [
+    Bar (1,1) -> (1,13) {
+      metaData: Array [
+        Meta (1,1) -> (1,13) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          arguments: Arguments (1,8) -> (1,13) {
+            arguments: Array [
+              String "Name" (1,8) -> (1,13) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata optional overloads single: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata optional overloads single: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata required overloads overload1 1`] = `
+Score (1,1) -> (1,15) {
+  bars: Array [
+    Bar (1,1) -> (1,15) {
+      metaData: Array [
+        Meta (1,1) -> (1,15) {
+          tag: Tag "section" (1,1) -> (1,9) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "section" (1,2) -> (1,9),
+          },
+          arguments: Arguments (1,10) -> (1,15) {
+            arguments: Array [
+              String "Text" (1,10) -> (1,15) {
+                parameterIndices: Map {
+                  0 => 0,
+                  1 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+              1,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata required overloads overload1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata required overloads overload1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata required overloads overload2 1`] = `
+Score (1,1) -> (1,19) {
+  bars: Array [
+    Bar (1,1) -> (1,19) {
+      metaData: Array [
+        Meta (1,1) -> (1,19) {
+          tag: Tag "section" (1,1) -> (1,9) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "section" (1,2) -> (1,9),
+          },
+          arguments: Arguments (1,10) -> (1,19) {
+            arguments: Array [
+              String "T" (1,10) -> (1,12) {
+                parameterIndices: Map {
+                  0 => 0,
+                  1 => 0,
+                },
+              },
+              String "Text" (1,14) -> (1,19) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              1,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata required overloads overload2: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata required overloads overload2: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata single overload correct 1`] = `
+Score (1,1) -> (1,15) {
+  bars: Array [
+    Bar (1,1) -> (1,15) {
+      metaData: Array [
+        Meta (1,1) -> (1,12) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+          arguments: Arguments (1,7) -> (1,12) {
+            arguments: Array [
+              Ident "Segno" (1,7) -> (1,12) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,13) -> (1,15) {
+          notes: NoteList (1,13) -> (1,15) {
+            notes: Array [
+              Note (1,13) -> (1,15) {
+                noteValue: Ident "C4" (1,13) -> (1,15),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata single overload correct: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata single overload correct: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata single overload missing 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      metaData: Array [
+        Meta (1,1) -> (1,6) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+        },
+        Meta (1,7) -> (1,10) {
+          tag: Tag "ac" (1,7) -> (1,10) {
+            prefix: Backslash (1,7) -> (1,8),
+            tag: Ident "ac" (1,8) -> (1,10),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata single overload missing: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata single overload missing: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 6,
+      "line" => 1,
+      "offset" => 5,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests parser metadata single overload wrong identifier 1`] = `
+Score (1,1) -> (1,9) {
+  bars: Array [
+    Bar (1,1) -> (1,9) {
+      metaData: Array [
+        Meta (1,1) -> (1,6) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,7) -> (1,9) {
+          notes: NoteList (1,7) -> (1,9) {
+            notes: Array [
+              Note (1,7) -> (1,9) {
+                noteValue: Ident "C4" (1,7) -> (1,9),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata single overload wrong identifier: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata single overload wrong identifier: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 6,
+      "line" => 1,
+      "offset" => 5,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests parser metadata single overload wrong type 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      metaData: Array [
+        Meta (1,1) -> (1,6) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,7) -> (1,10) {
+          notes: NoteList (1,7) -> (1,10) {
+            notes: Array [
+              Note (1,7) -> (1,10) {
+                noteValue: Number "3" (1,7) -> (1,8),
+                noteStringDot: Dot (1,8) -> (1,9),
+                noteString: Number "3" (1,9) -> (1,10),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata single overload wrong type: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata single overload wrong type: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 6,
+      "line" => 1,
+      "offset" => 5,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests parser metadata type overloads overload1 1`] = `
+Score (1,1) -> (1,23) {
+  bars: Array [
+    Bar (1,1) -> (1,23) {
+      metaData: Array [
+        Meta (1,1) -> (1,23) {
+          tag: Tag "articulation" (1,1) -> (1,14) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "articulation" (1,2) -> (1,14),
+          },
+          arguments: Arguments (1,15) -> (1,23) {
+            arguments: Array [
+              Ident "defaults" (1,15) -> (1,23) {
+                parameterIndices: Map {
+                  0 => 0,
+                  1 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+              1,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata type overloads overload1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata type overloads overload1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata type overloads overload2 1`] = `
+Score (1,1) -> (1,20) {
+  bars: Array [
+    Bar (1,1) -> (1,20) {
+      metaData: Array [
+        Meta (1,1) -> (1,20) {
+          tag: Tag "articulation" (1,1) -> (1,14) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "articulation" (1,2) -> (1,14),
+          },
+          arguments: Arguments (1,15) -> (1,20) {
+            arguments: Array [
+              String "A" (1,15) -> (1,17) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "1" (1,19) -> (1,20) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              1,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata type overloads overload2: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata type overloads overload2: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata type overloads overload3 1`] = `
+Score (1,1) -> (1,18) {
+  bars: Array [
+    Bar (1,1) -> (1,18) {
+      metaData: Array [
+        Meta (1,1) -> (1,18) {
+          tag: Tag "articulation" (1,1) -> (1,14) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "articulation" (1,2) -> (1,14),
+          },
+          arguments: Arguments (1,15) -> (1,18) {
+            arguments: Array [
+              Ident "A" (1,15) -> (1,16) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "1" (1,17) -> (1,18) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              1,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata type overloads overload3: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata type overloads overload3: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata value overloads overload1 1`] = `
+Score (1,1) -> (1,11) {
+  bars: Array [
+    Bar (1,1) -> (1,11) {
+      metaData: Array [
+        Meta (1,1) -> (1,11) {
+          tag: Tag "ts" (1,1) -> (1,4) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "ts" (1,2) -> (1,4),
+          },
+          arguments: Arguments (1,5) -> (1,11) {
+            arguments: Array [
+              Ident "common" (1,5) -> (1,11) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata value overloads overload1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata value overloads overload1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata value overloads overload2 1`] = `
+Score (1,1) -> (1,8) {
+  bars: Array [
+    Bar (1,1) -> (1,8) {
+      metaData: Array [
+        Meta (1,1) -> (1,8) {
+          tag: Tag "ts" (1,1) -> (1,4) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "ts" (1,2) -> (1,4),
+          },
+          arguments: Arguments (1,5) -> (1,8) {
+            arguments: Array [
+              Number "3" (1,5) -> (1,6) {
+                parameterIndices: Map {
+                  1 => 0,
+                },
+              },
+              Number "4" (1,7) -> (1,8) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              1,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser metadata value overloads overload2: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser metadata value overloads overload2: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props ambiguous incomplete 1`] = `
+Score (1,1) -> (1,12) {
+  bars: Array [
+    Bar (1,1) -> (1,12) {
+      beats: Array [
+        Beat (1,1) -> (1,12) {
+          notes: NoteList (1,1) -> (1,12) {
+            notes: Array [
+              Note (1,1) -> (1,12) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,12) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,10) {
+                      property: Ident "tu" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,10) {
+                        arguments: Array [
+                          Number "3" (1,9) -> (1,10) {
+                            parameterIndices: Map {
+                              0 => 0,
+                              1 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
+                          1,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,11) -> (1,12),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props ambiguous incomplete: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props ambiguous incomplete: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props empty signature empty1 1`] = `
+Score (1,1) -> (1,7) {
+  bars: Array [
+    Bar (1,1) -> (1,7) {
+      beats: Array [
+        Beat (1,1) -> (1,7) {
+          notes: NoteList (1,1) -> (1,7) {
+            notes: Array [
+              Note (1,1) -> (1,7) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,7) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,6) {
+                      property: Ident "v" (1,5) -> (1,6),
+                    },
+                  ],
+                  closeBrace: RBrace (1,6) -> (1,7),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props empty signature empty1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props empty signature empty1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props empty signature empty2 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      beats: Array [
+        Beat (1,1) -> (1,10) {
+          notes: NoteList (1,1) -> (1,10) {
+            notes: Array [
+              Note (1,1) -> (1,10) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,10) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,6) {
+                      property: Ident "v" (1,5) -> (1,6),
+                    },
+                    Prop (1,7) -> (1,9) {
+                      property: Ident "ac" (1,7) -> (1,9),
+                    },
+                  ],
+                  closeBrace: RBrace (1,9) -> (1,10),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props empty signature empty2: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props empty signature empty2: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props mixed overloads overload1 1`] = `
+Score (1,1) -> (1,15) {
+  bars: Array [
+    Bar (1,1) -> (1,15) {
+      metaData: Array [
+        Meta (1,1) -> (1,15) {
+          tag: Tag "section" (1,1) -> (1,9) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "section" (1,2) -> (1,9),
+          },
+          arguments: Arguments (1,10) -> (1,15) {
+            arguments: Array [
+              String "Text" (1,10) -> (1,15) {
+                parameterIndices: Map {
+                  0 => 0,
+                  1 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+              1,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props mixed overloads overload1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props mixed overloads overload1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props mixed overloads overload2 1`] = `
+Score (1,1) -> (1,19) {
+  bars: Array [
+    Bar (1,1) -> (1,19) {
+      metaData: Array [
+        Meta (1,1) -> (1,19) {
+          tag: Tag "section" (1,1) -> (1,9) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "section" (1,2) -> (1,9),
+          },
+          arguments: Arguments (1,10) -> (1,19) {
+            arguments: Array [
+              String "T" (1,10) -> (1,12) {
+                parameterIndices: Map {
+                  0 => 0,
+                  1 => 0,
+                },
+              },
+              String "Text" (1,14) -> (1,19) {
+                parameterIndices: Map {
+                  1 => 1,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              1,
+            ],
+            validated: true,
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props mixed overloads overload2: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props mixed overloads overload2: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props optional overload correct 1`] = `
+Score (1,1) -> (1,12) {
+  bars: Array [
+    Bar (1,1) -> (1,12) {
+      beats: Array [
+        Beat (1,1) -> (1,12) {
+          notes: NoteList (1,1) -> (1,12) {
+            notes: Array [
+              Note (1,1) -> (1,12) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,12) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,11) {
+                      property: Ident "ad" (1,5) -> (1,7),
+                      properties: Arguments (1,8) -> (1,11) {
+                        arguments: Array [
+                          Number "100" (1,8) -> (1,11) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,11) -> (1,12),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props optional overload correct: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props optional overload correct: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props optional overload missing1 1`] = `
+Score (1,1) -> (1,8) {
+  bars: Array [
+    Bar (1,1) -> (1,8) {
+      beats: Array [
+        Beat (1,1) -> (1,8) {
+          notes: NoteList (1,1) -> (1,8) {
+            notes: Array [
+              Note (1,1) -> (1,8) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,8) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,7) {
+                      property: Ident "ad" (1,5) -> (1,7),
+                    },
+                  ],
+                  closeBrace: RBrace (1,7) -> (1,8),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props optional overload missing1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props optional overload missing1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props optional overload missing2 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      beats: Array [
+        Beat (1,1) -> (1,10) {
+          notes: NoteList (1,1) -> (1,10) {
+            notes: Array [
+              Note (1,1) -> (1,10) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,10) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,7) {
+                      property: Ident "ad" (1,5) -> (1,7),
+                    },
+                    Prop (1,8) -> (1,9) {
+                      property: Ident "v" (1,8) -> (1,9),
+                    },
+                  ],
+                  closeBrace: RBrace (1,9) -> (1,10),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props optional overload missing2: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props optional overload missing2: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props optional overload wrong identifier 1`] = `
+Score (1,1) -> (1,18) {
+  bars: Array [
+    Bar (1,1) -> (1,18) {
+      beats: Array [
+        Beat (1,1) -> (1,18) {
+          notes: NoteList (1,1) -> (1,18) {
+            notes: Array [
+              Note (1,1) -> (1,18) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,18) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,9) {
+                      property: Ident "beam" (1,5) -> (1,9),
+                    },
+                    Prop (1,10) -> (1,17) {
+                      property: Ident "invalid" (1,10) -> (1,17),
+                    },
+                  ],
+                  closeBrace: RBrace (1,17) -> (1,18),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props optional overload wrong identifier: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props optional overload wrong identifier: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 9,
+      "line" => 1,
+      "offset" => 8,
+    },
+  },
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 17,
+      "line" => 1,
+      "offset" => 16,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests parser props optional overload wrong type 1`] = `
+Score (1,1) -> (1,12) {
+  bars: Array [
+    Bar (1,1) -> (1,12) {
+      beats: Array [
+        Beat (1,1) -> (1,12) {
+          notes: NoteList (1,1) -> (1,12) {
+            notes: Array [
+              Note (1,1) -> (1,12) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,12) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,5) -> (1,10) {
+                      property: Ident "ad" (1,5) -> (1,7),
+                    },
+                  ],
+                  closeBrace: RBrace (1,11) -> (1,12),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props optional overload wrong type: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props optional overload wrong type: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 220,
+    "severity" => 2,
+    "message" => "Error parsing arguments: unexpected additional arguments. Signatures:
+(Number)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests parser props single overload correct 1`] = `
+Score (1,1) -> (1,15) {
+  bars: Array [
+    Bar (1,1) -> (1,15) {
+      metaData: Array [
+        Meta (1,1) -> (1,12) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+          arguments: Arguments (1,7) -> (1,12) {
+            arguments: Array [
+              Ident "Segno" (1,7) -> (1,12) {
+                parameterIndices: Map {
+                  0 => 0,
+                },
+              },
+            ],
+            signatureCandidateIndices: Array [
+              0,
+            ],
+            validated: true,
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,13) -> (1,15) {
+          notes: NoteList (1,13) -> (1,15) {
+            notes: Array [
+              Note (1,13) -> (1,15) {
+                noteValue: Ident "C4" (1,13) -> (1,15),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props single overload correct: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props single overload correct: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props single overload missing 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      metaData: Array [
+        Meta (1,1) -> (1,6) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+        },
+        Meta (1,7) -> (1,10) {
+          tag: Tag "ac" (1,7) -> (1,10) {
+            prefix: Backslash (1,7) -> (1,8),
+            tag: Ident "ac" (1,8) -> (1,10),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props single overload missing: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props single overload missing: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 6,
+      "line" => 1,
+      "offset" => 5,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests parser props single overload wrong identifier 1`] = `
+Score (1,1) -> (1,9) {
+  bars: Array [
+    Bar (1,1) -> (1,9) {
+      metaData: Array [
+        Meta (1,1) -> (1,6) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,7) -> (1,9) {
+          notes: NoteList (1,7) -> (1,9) {
+            notes: Array [
+              Note (1,7) -> (1,9) {
+                noteValue: Ident "C4" (1,7) -> (1,9),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props single overload wrong identifier: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props single overload wrong identifier: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 6,
+      "line" => 1,
+      "offset" => 5,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests parser props single overload wrong type 1`] = `
+Score (1,1) -> (1,10) {
+  bars: Array [
+    Bar (1,1) -> (1,10) {
+      metaData: Array [
+        Meta (1,1) -> (1,6) {
+          tag: Tag "jump" (1,1) -> (1,6) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "jump" (1,2) -> (1,6),
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,7) -> (1,10) {
+          notes: NoteList (1,7) -> (1,10) {
+            notes: Array [
+              Note (1,7) -> (1,10) {
+                noteValue: Number "3" (1,7) -> (1,8),
+                noteStringDot: Dot (1,8) -> (1,9),
+                noteString: Number "3" (1,9) -> (1,10),
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props single overload wrong type: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props single overload wrong type: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 6,
+      "line" => 1,
+      "offset" => 5,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload1-number 1`] = `
+Score (1,1) -> (1,25) {
+  bars: Array [
+    Bar (1,1) -> (1,25) {
+      metaData: Array [
+        Meta (1,1) -> (1,25) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          properties: Props (1,8) -> (1,25) {
+            openBrace: LBrace (1,8) -> (1,9),
+            properties: Array [
+              Prop (1,10) -> (1,23) {
+                property: Ident "instrument" (1,10) -> (1,20),
+                properties: Arguments (1,21) -> (1,23) {
+                  arguments: Array [
+                    Number "20" (1,21) -> (1,23) {
+                      parameterIndices: Map {
+                        0 => 0,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    0,
+                  ],
+                  validated: true,
+                },
+              },
+            ],
+            closeBrace: RBrace (1,24) -> (1,25),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload1-number: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload1-number: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload2-identifier 1`] = `
+Score (1,1) -> (1,41) {
+  bars: Array [
+    Bar (1,1) -> (1,41) {
+      metaData: Array [
+        Meta (1,1) -> (1,41) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          properties: Props (1,8) -> (1,41) {
+            openBrace: LBrace (1,8) -> (1,9),
+            properties: Array [
+              Prop (1,10) -> (1,39) {
+                property: Ident "instrument" (1,10) -> (1,20),
+                properties: Arguments (1,21) -> (1,39) {
+                  arguments: Array [
+                    Ident "AcousticGrandPiano" (1,21) -> (1,39) {
+                      parameterIndices: Map {
+                        1 => 0,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
+                },
+              },
+            ],
+            closeBrace: RBrace (1,40) -> (1,41),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload2-identifier: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload2-identifier: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload2-string 1`] = `
+Score (1,1) -> (1,44) {
+  bars: Array [
+    Bar (1,1) -> (1,44) {
+      metaData: Array [
+        Meta (1,1) -> (1,44) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          properties: Props (1,8) -> (1,44) {
+            openBrace: LBrace (1,8) -> (1,9),
+            properties: Array [
+              Prop (1,10) -> (1,42) {
+                property: Ident "instrument" (1,10) -> (1,20),
+                properties: Arguments (1,21) -> (1,42) {
+                  arguments: Array [
+                    String "Acoustic Grand Piano" (1,21) -> (1,42) {
+                      parameterIndices: Map {
+                        1 => 0,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    1,
+                  ],
+                  validated: true,
+                },
+              },
+            ],
+            closeBrace: RBrace (1,43) -> (1,44),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload2-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload2-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload3-percussion 1`] = `
+Score (1,1) -> (1,33) {
+  bars: Array [
+    Bar (1,1) -> (1,33) {
+      metaData: Array [
+        Meta (1,1) -> (1,33) {
+          tag: Tag "track" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "track" (1,2) -> (1,7),
+          },
+          properties: Props (1,8) -> (1,33) {
+            openBrace: LBrace (1,8) -> (1,9),
+            properties: Array [
+              Prop (1,10) -> (1,31) {
+                property: Ident "instrument" (1,10) -> (1,20),
+                properties: Arguments (1,21) -> (1,31) {
+                  arguments: Array [
+                    Ident "percussion" (1,21) -> (1,31) {
+                      parameterIndices: Map {
+                        1 => 0,
+                        2 => 0,
+                      },
+                    },
+                  ],
+                  signatureCandidateIndices: Array [
+                    2,
+                    1,
+                  ],
+                  validated: true,
+                },
+              },
+            ],
+            closeBrace: RBrace (1,32) -> (1,33),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload3-percussion: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props type overloads overload3-percussion: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload1 1`] = `
+Score (1,1) -> (1,14) {
+  bars: Array [
+    Bar (1,1) -> (1,14) {
+      beats: Array [
+        Beat (1,1) -> (1,14) {
+          notes: NoteList (1,1) -> (1,14) {
+            notes: Array [
+              Note (1,1) -> (1,14) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,14) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,12) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,12) {
+                        arguments: Array [
+                          Number "0" (1,9) -> (1,10) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                          Number "4" (1,11) -> (1,12) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,13) -> (1,14),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload2-ident 1`] = `
+Score (1,1) -> (1,21) {
+  bars: Array [
+    Bar (1,1) -> (1,21) {
+      beats: Array [
+        Beat (1,1) -> (1,21) {
+          notes: NoteList (1,1) -> (1,21) {
+            notes: Array [
+              Note (1,1) -> (1,21) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,21) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,19) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,19) {
+                        arguments: Array [
+                          Ident "custom" (1,9) -> (1,15) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Number "0" (1,16) -> (1,17) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                          Number "4" (1,18) -> (1,19) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          1,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,20) -> (1,21),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload2-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload2-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload2-string 1`] = `
+Score (1,1) -> (1,23) {
+  bars: Array [
+    Bar (1,1) -> (1,23) {
+      beats: Array [
+        Beat (1,1) -> (1,23) {
+          notes: NoteList (1,1) -> (1,23) {
+            notes: Array [
+              Note (1,1) -> (1,23) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,23) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,21) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,21) {
+                        arguments: Array [
+                          String "custom" (1,9) -> (1,16) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Number "0" (1,18) -> (1,19) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                          Number "4" (1,20) -> (1,21) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          1,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,22) -> (1,23),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload2-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload2-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload3-ident 1`] = `
+Score (1,1) -> (1,22) {
+  bars: Array [
+    Bar (1,1) -> (1,22) {
+      beats: Array [
+        Beat (1,1) -> (1,22) {
+          notes: NoteList (1,1) -> (1,22) {
+            notes: Array [
+              Note (1,1) -> (1,22) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,22) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,20) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,20) {
+                        arguments: Array [
+                          Ident "gradual" (1,9) -> (1,16) {
+                            parameterIndices: Map {
+                              2 => 0,
+                            },
+                          },
+                          Number "0" (1,17) -> (1,18) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                          Number "4" (1,19) -> (1,20) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          2,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,21) -> (1,22),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload3-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload3-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload3-string 1`] = `
+Score (1,1) -> (1,24) {
+  bars: Array [
+    Bar (1,1) -> (1,24) {
+      beats: Array [
+        Beat (1,1) -> (1,24) {
+          notes: NoteList (1,1) -> (1,24) {
+            notes: Array [
+              Note (1,1) -> (1,24) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,24) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,22) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,22) {
+                        arguments: Array [
+                          String "gradual" (1,9) -> (1,17) {
+                            parameterIndices: Map {
+                              2 => 0,
+                            },
+                          },
+                          Number "0" (1,19) -> (1,20) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                          Number "4" (1,21) -> (1,22) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          2,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,23) -> (1,24),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload3-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload3-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload4-ident 1`] = `
+Score (1,1) -> (1,29) {
+  bars: Array [
+    Bar (1,1) -> (1,29) {
+      beats: Array [
+        Beat (1,1) -> (1,29) {
+          notes: NoteList (1,1) -> (1,29) {
+            notes: Array [
+              Note (1,1) -> (1,29) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,29) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,27) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,27) {
+                        arguments: Array [
+                          Ident "custom" (1,9) -> (1,15) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Ident "gradual" (1,16) -> (1,23) {
+                            parameterIndices: Map {
+                              3 => 1,
+                            },
+                          },
+                          Number "0" (1,24) -> (1,25) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                          Number "4" (1,26) -> (1,27) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          3,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,28) -> (1,29),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload4-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload4-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload4-string 1`] = `
+Score (1,1) -> (1,33) {
+  bars: Array [
+    Bar (1,1) -> (1,33) {
+      beats: Array [
+        Beat (1,1) -> (1,33) {
+          notes: NoteList (1,1) -> (1,33) {
+            notes: Array [
+              Note (1,1) -> (1,33) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,33) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,31) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,31) {
+                        arguments: Array [
+                          String "custom" (1,9) -> (1,16) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          String "gradual" (1,18) -> (1,26) {
+                            parameterIndices: Map {
+                              3 => 1,
+                            },
+                          },
+                          Number "0" (1,28) -> (1,29) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                          Number "4" (1,30) -> (1,31) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          3,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,32) -> (1,33),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload4-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads flat overload4-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload1 1`] = `
+Score (1,1) -> (1,16) {
+  bars: Array [
+    Bar (1,1) -> (1,16) {
+      beats: Array [
+        Beat (1,1) -> (1,16) {
+          notes: NoteList (1,1) -> (1,16) {
+            notes: Array [
+              Note (1,1) -> (1,16) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,16) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,14) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,14) {
+                        openParenthesis: LParen (1,9) -> (1,10),
+                        arguments: Array [
+                          Number "0" (1,10) -> (1,11),
+                          Number "4" (1,12) -> (1,13),
+                        ],
+                        closeParenthesis: RParen (1,13) -> (1,14),
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,15) -> (1,16),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload1: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload1: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload2-ident 1`] = `
+Score (1,1) -> (1,23) {
+  bars: Array [
+    Bar (1,1) -> (1,23) {
+      beats: Array [
+        Beat (1,1) -> (1,23) {
+          notes: NoteList (1,1) -> (1,23) {
+            notes: Array [
+              Note (1,1) -> (1,23) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,23) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,21) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,21) {
+                        arguments: Array [
+                          Ident "custom" (1,9) -> (1,15) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Number "0" (1,17) -> (1,18) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                          Number "4" (1,19) -> (1,20) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          1,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,22) -> (1,23),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload2-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload2-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload2-string 1`] = `
+Score (1,1) -> (1,25) {
+  bars: Array [
+    Bar (1,1) -> (1,25) {
+      beats: Array [
+        Beat (1,1) -> (1,25) {
+          notes: NoteList (1,1) -> (1,25) {
+            notes: Array [
+              Note (1,1) -> (1,25) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,25) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,23) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,23) {
+                        arguments: Array [
+                          String "custom" (1,9) -> (1,16) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Number "0" (1,19) -> (1,20) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                          Number "4" (1,21) -> (1,22) {
+                            parameterIndices: Map {
+                              1 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          1,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,24) -> (1,25),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload2-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload2-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload3-ident 1`] = `
+Score (1,1) -> (1,24) {
+  bars: Array [
+    Bar (1,1) -> (1,24) {
+      beats: Array [
+        Beat (1,1) -> (1,24) {
+          notes: NoteList (1,1) -> (1,24) {
+            notes: Array [
+              Note (1,1) -> (1,24) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,24) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,22) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,22) {
+                        arguments: Array [
+                          Ident "gradual" (1,9) -> (1,16) {
+                            parameterIndices: Map {
+                              2 => 0,
+                            },
+                          },
+                          Number "0" (1,18) -> (1,19) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                          Number "4" (1,20) -> (1,21) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          2,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,23) -> (1,24),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload3-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload3-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload3-string 1`] = `
+Score (1,1) -> (1,26) {
+  bars: Array [
+    Bar (1,1) -> (1,26) {
+      beats: Array [
+        Beat (1,1) -> (1,26) {
+          notes: NoteList (1,1) -> (1,26) {
+            notes: Array [
+              Note (1,1) -> (1,26) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,26) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,24) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,24) {
+                        arguments: Array [
+                          String "gradual" (1,9) -> (1,17) {
+                            parameterIndices: Map {
+                              2 => 0,
+                            },
+                          },
+                          Number "0" (1,20) -> (1,21) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                          Number "4" (1,22) -> (1,23) {
+                            parameterIndices: Map {
+                              2 => 1,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          2,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,25) -> (1,26),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload3-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload3-string: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload4-ident 1`] = `
+Score (1,1) -> (1,31) {
+  bars: Array [
+    Bar (1,1) -> (1,31) {
+      beats: Array [
+        Beat (1,1) -> (1,31) {
+          notes: NoteList (1,1) -> (1,31) {
+            notes: Array [
+              Note (1,1) -> (1,31) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,31) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,29) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,29) {
+                        arguments: Array [
+                          Ident "custom" (1,9) -> (1,15) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          Ident "gradual" (1,16) -> (1,23) {
+                            parameterIndices: Map {
+                              3 => 1,
+                            },
+                          },
+                          Number "0" (1,25) -> (1,26) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                          Number "4" (1,27) -> (1,28) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          3,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,30) -> (1,31),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload4-ident: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload4-ident: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload4-string 1`] = `
+Score (1,1) -> (1,35) {
+  bars: Array [
+    Bar (1,1) -> (1,35) {
+      beats: Array [
+        Beat (1,1) -> (1,35) {
+          notes: NoteList (1,1) -> (1,35) {
+            notes: Array [
+              Note (1,1) -> (1,35) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,35) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,33) {
+                      property: Ident "tb" (1,6) -> (1,8),
+                      properties: Arguments (1,9) -> (1,33) {
+                        arguments: Array [
+                          String "custom" (1,9) -> (1,16) {
+                            parameterIndices: Map {
+                              1 => 0,
+                              3 => 0,
+                            },
+                          },
+                          String "gradual" (1,18) -> (1,26) {
+                            parameterIndices: Map {
+                              3 => 1,
+                            },
+                          },
+                          Number "0" (1,29) -> (1,30) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                          Number "4" (1,31) -> (1,32) {
+                            parameterIndices: Map {
+                              3 => 2,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          3,
+                        ],
+                        validated: true,
+                      },
+                    },
+                  ],
+                  closeBrace: RBrace (1,34) -> (1,35),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload4-string: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParameterTests parser props vararg overloads parenthesis overload4-string: parser-diagnostics 1`] = `Array []`;

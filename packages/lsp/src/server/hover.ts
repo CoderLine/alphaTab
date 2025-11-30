@@ -4,10 +4,25 @@ import {
     beatProperties,
     durationChangeProperties,
     noteProperties
-} from '@coderline/alphatab-language-server/documentation/documentation';
-import type { CommonDoc, PropertyDoc, ValueDoc, ValueItemDoc } from '@coderline/alphatab-language-server/documentation/types';
-import type { AlphaTexTextDocument, Connection, Hover, TextDocuments } from '@coderline/alphatab-language-server/server/types';
-import { binaryNodeSearch } from '@coderline/alphatab-language-server/server/utils';
+} from '@coderline/alphatab-alphatex/definitions';
+import type {
+    ParameterValueDefinition,
+    PropertyDefinition,
+    SignatureDefinition,
+    WithSignatures
+} from '@coderline/alphatab-alphatex/types';
+import type {
+    AlphaTexTextDocument,
+    Connection,
+    Hover,
+    TextDocuments
+} from '@coderline/alphatab-language-server/server/types';
+import {
+    binaryNodeSearch,
+    nodeTypesToTypeDocs as nodeTypesToSyntax,
+    parameterToSyntax,
+    resolveSignature
+} from '@coderline/alphatab-language-server/server/utils';
 
 export function setupHover(connection: Connection, documents: TextDocuments<AlphaTexTextDocument>) {
     connection.onHover(params => {
@@ -48,13 +63,13 @@ function createMetaDataHover(metaData: alphaTab.importer.alphaTex.AlphaTexMetaDa
         return {
             contents: {
                 kind: 'markdown',
-                value: commonDocsToMarkdown(metaDataDocs, 'Tag Syntax')
+                value: withSignaturesToMarkdown(metaDataDocs, metaDataDocs.tag, 'Tag Syntax')
             }
         };
     }
 
-    if (metaData.values) {
-        const hover = createValuesHover(metaData.values, metaDataDocs.values, offset);
+    if (metaData.arguments) {
+        const hover = createArgumentsHover(metaData.arguments, metaDataDocs.signatures, offset);
         if (hover != null) {
             return hover;
         }
@@ -108,12 +123,12 @@ function createNoteHover(note: alphaTab.importer.alphaTex.AlphaTexNoteNode, offs
 
 function createPropertiesHover(
     properties: alphaTab.importer.alphaTex.AlphaTexPropertiesNode,
-    propertiesDocs: Map<string, PropertyDoc> | Map<string, PropertyDoc>[],
+    propertiesDocs: Map<string, PropertyDefinition> | Map<string, PropertyDefinition>[],
     offset: number
 ): Hover | null {
     const prop = binaryNodeSearch(properties.properties, offset);
     if (prop) {
-        let propDocs: PropertyDoc | undefined;
+        let propDocs: PropertyDefinition | undefined;
         if (Array.isArray(propertiesDocs)) {
             for (const d of propertiesDocs) {
                 propDocs = d.get(prop.property.text.toLowerCase());
@@ -130,11 +145,11 @@ function createPropertiesHover(
                 return {
                     contents: {
                         kind: 'markdown',
-                        value: commonDocsToMarkdown(propDocs)
+                        value: withSignaturesToMarkdown(propDocs, propDocs.property)
                     }
                 };
-            } else if (prop.values) {
-                const hover = createValuesHover(prop.values, propDocs.values, offset);
+            } else if (prop.arguments) {
+                const hover = createArgumentsHover(prop.arguments, propDocs.signatures, offset);
                 if (hover) {
                     return hover;
                 }
@@ -144,7 +159,7 @@ function createPropertiesHover(
     return null;
 }
 
-function valueToText(value: alphaTab.importer.alphaTex.IAlphaTexValueListItem): string {
+function valueToText(value: alphaTab.importer.alphaTex.IAlphaTexArgumentValue): string {
     switch (value.nodeType) {
         case alphaTab.importer.alphaTex.AlphaTexNodeType.Ident:
         case alphaTab.importer.alphaTex.AlphaTexNodeType.String:
@@ -156,23 +171,24 @@ function valueToText(value: alphaTab.importer.alphaTex.IAlphaTexValueListItem): 
     return '';
 }
 
-function createValuesHover(
-    values: alphaTab.importer.alphaTex.AlphaTexValueList,
-    valueDocs: ValueDoc[],
+function createArgumentsHover(
+    values: alphaTab.importer.alphaTex.AlphaTexArgumentList,
+    signatures: SignatureDefinition[],
     offset: number
 ): Hover | null {
-    const value = binaryNodeSearch(values.values, offset);
+    const value = binaryNodeSearch(values.arguments, offset);
     if (value) {
-        const valueIndex = values.values.indexOf(value);
-        if (valueIndex < valueDocs.length) {
-            const valueDoc = valueDocs[valueIndex];
+        const valueIndex = values.arguments.indexOf(value);
+        const signature = resolveSignature(signatures, values).values().next().value;
+        if (signature && valueIndex < signature.parameters.length) {
+            const parameterDoc = signature.parameters[valueIndex];
             const valueText = valueToText(value).toLowerCase();
-            const valueItem = valueDoc.values?.get(value.nodeType)?.find(d => d.name.toLowerCase() === valueText);
+            const valueItem = parameterDoc.values?.find(d => d.name.toLowerCase() === valueText);
             if (valueItem) {
                 return {
                     contents: {
                         kind: 'markdown',
-                        value: valueItemDocsToMarkDown(valueItem)
+                        value: parameterValueDocsToMarkDown(valueItem)
                     }
                 };
             }
@@ -181,35 +197,66 @@ function createValuesHover(
     return null;
 }
 
-function commonDocsToMarkdown(docs: CommonDoc, syntaxName: string = 'Syntax'): string {
+function withSignaturesToMarkdown(docs: WithSignatures, prefix: string, syntaxName: string = 'Syntax'): string {
     return [
         `## ${docs.shortDescription}`,
         docs.longDescription ? `**Description:** ${docs.longDescription}` : '',
         '',
         `**${syntaxName}:**`,
         '```alphatex',
-        ...docs.syntax,
+        ...docs.signatures.map((s, i) => signatureToSyntax(prefix, s, i, docs.signatures.length > 1)),
         '```',
         '',
-        valueDocsToMarkdownTable(docs.values)
+        signatureParametersToMarkdownTable(docs.signatures)
     ].join('\n');
 }
 
-function valueDocsToMarkdownTable(values: ValueDoc[]): string {
-    return values.length === 0
+function signatureParametersToMarkdownTable(signatures: SignatureDefinition[]): string {
+    return signatures.length === 0 || (signatures.length === 1 && signatures[0].parameters.length === 0)
         ? ''
         : [
               '',
-              '**Values:**',
+              '**Parameters:**',
               '| Name | Description | Type | Required |',
               '|------|-------------|------|----------|',
-              ...values.map(
-                  v =>
-                      `| \`${v.name}\` | ${(v.longDescription ?? v.shortDescription)?.replaceAll('\n', '<br />') ?? ''} | ${v.type} | ${v.required ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`
+              ...signatures.flatMap((s, si) =>
+                  s.parameters.map(v => {
+                      const index = signatures.length > 1 ? `[^${si + 1}] ` : '';
+                      return `| \`${v.name}\` ${index}| ${(v.longDescription ?? v.shortDescription)?.replaceAll('\n', '<br />') ?? ''} | \`${nodeTypesToSyntax(v).replaceAll('|', '\\|')}\` | ${isRequiredParameter(v.parseMode) ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`;
+                  })
               )
           ].join('\n');
 }
 
-function valueItemDocsToMarkDown(docs: ValueItemDoc): string {
+function parameterValueDocsToMarkDown(docs: ParameterValueDefinition): string {
     return [`## ${docs.name}`, docs.longDescription ?? docs.shortDescription, ''].join('\n');
+}
+
+function signatureToSyntax(prefix: string, value: SignatureDefinition, index: number, hasOverloads: boolean): string {
+    let syntax = '';
+
+    if (hasOverloads) {
+        syntax += `// [^${index + 1}]: ${value.description}\n`;
+    } else if (value.description) {
+        syntax += `//  ${value.description}\n`;
+    }
+
+
+    syntax += prefix;
+    if(value.parameters.length > 0) {
+        syntax += `(${value.parameters.map(p => parameterToSyntax(p, true)).join(' ')})`;
+    }
+
+    return syntax;
+}
+
+function isRequiredParameter(parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode) {
+    switch (parseMode) {
+        case alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required:
+        case alphaTab.importer.alphaTex.ArgumentListParseTypesMode.RequiredAsFloat:
+        case alphaTab.importer.alphaTex.ArgumentListParseTypesMode.RequiredAsValueList:
+            return true;
+        default:
+            return false;
+    }
 }

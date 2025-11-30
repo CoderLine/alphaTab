@@ -14,7 +14,7 @@ import {
     type AlphaTexScoreNode,
     type AlphaTexTextNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
-import { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
+import { AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import {
     AlphaTexAccidentalMode,
     type AlphaTexDiagnostic,
@@ -175,7 +175,7 @@ class AlphaTexImportState implements IAlphaTexImporterState {
  * @public
  */
 export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter {
-    private _parser!: AlphaTexParser;
+    private _parser?: AlphaTexParser;
     private _handler: IAlphaTexLanguageImportHandler = AlphaTex1LanguageHandler.instance;
 
     private _state = new AlphaTexImportState();
@@ -193,11 +193,22 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
     }
 
     public get lexerDiagnostics() {
-        return this._parser.lexerDiagnostics;
+        return this._parser!.lexerDiagnostics;
     }
 
     public get parserDiagnostics() {
-        return this._parser.parserDiagnostics;
+        return this._parser!.parserDiagnostics;
+    }
+
+    /**
+     * The underlying parser used for parsing the AST. Available after initialization of the importer.
+     */
+    public get parser(): AlphaTexParser | undefined {
+        return this._parser;
+    }
+
+    public get parseMode(): AlphaTexParseMode {
+        return this._parser!.mode;
     }
 
     public logErrors: boolean = false;
@@ -226,7 +237,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
         let scoreNode: AlphaTexScoreNode;
         try {
-            scoreNode = this._parser.read();
+            scoreNode = this._parser!.read();
             this._state.scoreNode = scoreNode;
         } catch (e) {
             if (this.logErrors) {
@@ -235,7 +246,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             throw new UnsupportedFormatError('Error parsing alphaTex, check inner error for details', e as Error);
         }
 
-        if (this._parser.parserDiagnostics.hasErrors || this._parser.lexer.lexerDiagnostics.hasErrors) {
+        if (this._parser!.parserDiagnostics.hasErrors || this._parser!.lexer.lexerDiagnostics.hasErrors) {
             const error = new AlphaTexErrorWithDiagnostics(
                 'There are errors in the parsed alphaTex, check the diagnostics for details',
                 this.lexerDiagnostics,

@@ -54,7 +54,7 @@ public class MapEntryInternal<TKey, TValue> : MapEntry<TKey, TValue>(),
 public open class Map<TKey, TValue>:
     MapBase<MapEntry<TKey, TValue>, MapEntryInternal<TKey, TValue>> {
     public constructor()
-    public constructor(iterable: Iterable<ArrayTuple<TKey, TValue>>) {
+    public constructor(iterable: Iterable<IArrayTuple<TKey, TValue>>) {
         for (it in iterable) {
             set(it.v0, it.v1)
         }

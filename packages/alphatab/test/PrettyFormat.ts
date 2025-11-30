@@ -384,7 +384,8 @@ import {
     type AlphaTexPropertyNode,
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
-    type AlphaTexValueList
+    type AlphaTexArgumentList,
+    type IAlphaTexArgumentValue
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import { MidiEvent } from '@coderline/alphatab/midi/MidiEvent';
 import { Bar } from '@coderline/alphatab/model/Bar';
@@ -479,7 +480,15 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
             // case AlphaTexNodeType.ColonToken:
             // case AlphaTexNodeType.AsteriskToken:
 
-            // case AlphaTexNodeType.Identifier:
+            case AlphaTexNodeType.Ident:
+            case AlphaTexNodeType.String:
+            case AlphaTexNodeType.Number:
+                const arg = node as IAlphaTexArgumentValue;
+                if (arg.parameterIndices) {
+                    children.push(['parameterIndices', arg.parameterIndices]);
+                }
+                break;
+
             case AlphaTexNodeType.Tag:
                 const tag = node as AlphaTexMetaDataTagNode;
                 if (tag.prefix) {
@@ -496,24 +505,30 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 if (metaData.tag) {
                     children.push(['tag', metaData.tag]);
                 }
-                if (metaData.values) {
-                    children.push(['values', metaData.values]);
+                if (metaData.arguments) {
+                    children.push(['arguments', metaData.arguments]);
                 }
                 if (metaData.properties) {
                     children.push(['properties', metaData.properties]);
                 }
                 break;
 
-            case AlphaTexNodeType.Values:
-                const valueList = node as AlphaTexValueList;
+            case AlphaTexNodeType.Arguments:
+                const valueList = node as AlphaTexArgumentList;
                 if (valueList.openParenthesis) {
                     children.push(['openParenthesis', valueList.openParenthesis]);
                 }
-                if (valueList.values) {
-                    children.push(['values', valueList.values]);
+                if (valueList.arguments) {
+                    children.push(['arguments', valueList.arguments]);
                 }
                 if (valueList.closeParenthesis) {
                     children.push(['closeParenthesis', valueList.closeParenthesis]);
+                }
+                if (valueList.signatureCandidateIndices) {
+                    children.push(['signatureCandidateIndices', valueList.signatureCandidateIndices]);
+                }
+                if (valueList.validated) {
+                    children.push(['validated', valueList.validated]);
                 }
                 break;
 
@@ -534,8 +549,8 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 if (property.property) {
                     children.push(['property', property.property]);
                 }
-                if (property.values) {
-                    children.push(['properties', property.values]);
+                if (property.arguments) {
+                    children.push(['properties', property.arguments]);
                 }
                 break;
             // case AlphaTexNodeType.NumberLiteral:

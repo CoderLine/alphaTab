@@ -1,4 +1,5 @@
 export {
+    type AlphaTexArgumentList,
     type AlphaTexAsteriskTokenNode,
     type AlphaTexAstNode,
     type AlphaTexAstNodeLocation,
@@ -28,21 +29,21 @@ export {
     type AlphaTexStringLiteral,
     type AlphaTexTextNode,
     type AlphaTexTokenNode,
-    type AlphaTexValueList,
+    type IAlphaTexArgumentValue,
     type IAlphaTexAstNode,
     type IAlphaTexMetaDataTagPrefixNode,
-    type IAlphaTexNoteValueNode,
-    type IAlphaTexValueListItem
+    type IAlphaTexNoteValueNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 export { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
-export { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
+export { AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 export {
     AlphaTexAccidentalMode,
     type AlphaTexDiagnostic,
     AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
-    AlphaTexStaffNoteKind, 
+    AlphaTexStaffNoteKind,
+    ArgumentListParseTypesMode,
     type IAlphaTexImporter,
     type IAlphaTexImporterState
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
