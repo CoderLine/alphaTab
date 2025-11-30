@@ -372,12 +372,21 @@ export function defineEsmLibConfig() {
                     name: 'dts',
                     async writeBundle(config, bundle) {
                         const files = Object.keys(bundle);
-                        const dtsBaseDir = path.resolve(config.dir!, 'types', 'src');
+
+                        const firstMjs = files.find(f => f.endsWith('.mjs'));
+                        const firstDtsFile = files.find(
+                            f =>
+                                f.startsWith('types') &&
+                                f.includes('/src/') &&
+                                f.endsWith(firstMjs!.replace('.mjs', '.d.ts'))
+                        );
+                        const dtsBaseDir = firstDtsFile!.substring(0, firstDtsFile!.indexOf('/src/') + 5);
+
                         const dtsFiles = files
-                            .filter(f => f.endsWith('d.ts') && f.startsWith('types/src/'))
+                            .filter(f => f.endsWith('d.ts') && f.startsWith(dtsBaseDir))
                             .map(f => path.resolve(config.dir!, f));
                         const ctx = this;
-                        await createApiDtsFiles(dtsBaseDir, dtsFiles, cwd(), config.dir!, {
+                        await createApiDtsFiles(path.resolve(config.dir!, dtsBaseDir), dtsFiles, cwd(), config.dir!, {
                             error(message) {
                                 ctx.error(message);
                             },
