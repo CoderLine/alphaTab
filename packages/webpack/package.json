@@ -22,7 +22,7 @@
         "url": "git+https://github.com/coderline/alphaTab.git"
     },
     "type": "module",
-    "main": "dist/alphaTab.webpack.js",
+    "main": "dist/alphaTab.webpack.mjs",
     "module": "dist/alphaTab.webpack.mjs",
     "types": "dist/alphaTab.webpack.d.ts",
     "exports": {
