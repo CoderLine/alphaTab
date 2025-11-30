@@ -32,6 +32,7 @@
     },
     "dependencies": {
         "@coderline/alphatab": "^1.7.0",
+        "@coderline/alphatab-language-server": "^1.7.0",
         "monaco-editor": "^0.54.0",
         "vscode-languageserver-types": "^3.17.5",
         "vscode-oniguruma": "^2.0.1",
@@ -54,5 +55,12 @@
     "bin": "./dist/alphaTab.monaco.mjs",
     "main": "./dist/alphaTab.monaco.mjs",
     "types": "./dist/alphaTab.monaco.d.ts",
-    "type": "module"
+    "type": "module",
+    "files": [
+        "/dist/",
+        "!/dist/types/",
+        "README.md",
+        "LICENSE",
+        "LICENSE.header"
+    ]
 }

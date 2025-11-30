@@ -340,7 +340,7 @@ export function dtsPathsTransformer(mapping?: Record<string, string>, externals?
     };
 }
 
-export function defineEsmLibConfig() {
+export function defineEsmLibConfig(setup?: (config: UserConfig) => void) {
     return defineConfig(() => {
         const config = defaultBuildUserConfig();
         enableTypeScript(
@@ -404,6 +404,8 @@ export function defineEsmLibConfig() {
                 }
             ]
         });
+
+        setup?.(config);
         return config;
     });
 }

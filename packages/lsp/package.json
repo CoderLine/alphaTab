@@ -55,5 +55,12 @@
     "bin": "./dist/server.mjs",
     "main": "./dist/server.mjs",
     "types": "./dist/server.d.ts",
-    "type": "module"
+    "type": "module",
+    "files": [
+        "dist/",
+        "!dist/types/",
+        "README.md",
+        "LICENSE",
+        "LICENSE.header"
+    ]
 }
