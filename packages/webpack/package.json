@@ -24,14 +24,14 @@
     "type": "module",
     "exports": {
         ".": {
+            "types": "./dist/alphaTab.webpack.d.ts",
             "require": "./dist/alphaTab.webpack.cjs",
-            "import": "./dist/alphaTab.webpack.mjs",
-            "types": "./dist/alphaTab.webpack.d.ts"
+            "import": "./dist/alphaTab.webpack.mjs"
         },
         "./*": {
+            "types": "./dist/*.d.ts",
             "require": "./dist/*.cjs",
-            "import": "./dist/*.mjs",
-            "types": "./dist/*.d.ts"
+            "import": "./dist/*.mjs"
         }
     },
     "scripts": {

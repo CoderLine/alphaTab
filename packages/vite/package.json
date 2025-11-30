@@ -24,14 +24,14 @@
     "type": "module",
     "exports": {
         ".": {
+            "types": "./dist/alphaTab.vite.d.ts",
             "require": "./dist/alphaTab.vite.cjs",
-            "import": "./dist/alphaTab.vite.mjs",
-            "types": "./dist/alphaTab.vite.d.ts"
+            "import": "./dist/alphaTab.vite.mjs"
         },
         "./*": {
+            "types": "./dist/*.d.ts",
             "require": "./dist/*.cjs",
-            "import": "./dist/*.mjs",
-            "types": "./dist/*.d.ts"
+            "import": "./dist/*.mjs"
         }
     },
     "scripts": {
