@@ -1,9 +1,10 @@
-import { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
+import { AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import { expect } from 'chai';
 
 describe('AlphaTexParserTest', () => {
     function parserTest(source: string) {
         const parser = new AlphaTexParser(source);
+        parser.mode = AlphaTexParseMode.Full;
         const node = parser.read();
         expect(node).to.be.ok;
         expect(node).toMatchSnapshot();
@@ -161,10 +162,6 @@ describe('AlphaTexParserTest', () => {
         it('tempo and stringed note', () => parserTest('\\tempo 120 3.3 3.4'));
     });
 
-    // TODO: check how much of the AST we need to provide code completion
-    // currently the parser/lexer are rather "fail fast" and do not
-    // provide many intermediately parsed nodes.
-
     describe('intermediate', () => {
         it('started initial meta', () => parserTest('\\'));
         it('started meta', () => parserTest('\\tr'));
@@ -186,6 +183,14 @@ describe('AlphaTexParserTest', () => {
         it('started beat effect value', () => parserTest('\\title "Title" . C4 { slur "S1" } . 4 { rasg "i'));
         it('finished beat effect value, not closed', () =>
             parserTest('\\title "Title" . C4 { slur "S1" } . 4 { rasg "ii" '));
+    });
+
+    describe('recovery', () => {
+        describe('props', () => {
+            it('additional values', () => parserTest('C4 { slur "S1" "S2" 3 v 3 vw} '));
+            it('unknown property', () => parserTest('C4 { slur "s1" invalid "invalid value" 3 v }'));
+            it('unknown value', () => parserTest('C4 { rasg "invalid" v }'));
+        });
     });
 
     describe('errors', () => {

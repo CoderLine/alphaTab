@@ -35,6 +35,26 @@ import {
 import type { IAlphaTexMetaDataReader } from '@coderline/alphatab/importer/alphaTex/IAlphaTexMetaDataReader';
 
 /**
+ * The different modes of the alphaTex parser.
+ * @public
+ */
+export enum AlphaTexParseMode {
+    /**
+     * Optimizes the parser for only the model importing.
+     * The model importing does not need all details from the AST allowing a more lightweight
+     * parsing.
+     */
+    ForModelImport = 0,
+
+    /**
+     * Performs the full AST parsing with all details.
+     * This mode is mainly used by the Language Server providing IDE support.
+     * All AST information is parsed and filled.
+     */
+    Full = 1
+}
+
+/**
  * A parser for translating a given alphaTex source into an AST for further use
  * in the alphaTex importer, editors etc.
  * @public
@@ -43,6 +63,11 @@ export class AlphaTexParser {
     public readonly lexer: AlphaTexLexer;
     private _scoreNode!: AlphaTexScoreNode;
     private _metaDataReader: IAlphaTexMetaDataReader = AlphaTex1MetaDataReader.instance;
+
+    /**
+     * The parsing mode.
+     */
+    public mode:AlphaTexParseMode = AlphaTexParseMode.ForModelImport;
 
     public get lexerDiagnostics(): AlphaTexDiagnosticBag {
         return this.lexer.lexerDiagnostics;
@@ -260,7 +285,7 @@ export class AlphaTexParser {
         }
     }
 
-    private _beatDurationChange(beat:AlphaTexBeatNode) {
+    private _beatDurationChange(beat: AlphaTexBeatNode) {
         const colon = this.lexer.peekToken();
         if (colon?.nodeType !== AlphaTexNodeType.Colon) {
             return;

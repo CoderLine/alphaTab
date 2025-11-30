@@ -1,4 +1,5 @@
 ﻿import type { AlphaTexAstNodeLocation } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { AlphaTexParseMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import type { FlatSyncPoint } from '@coderline/alphatab/model/Automation';
 import type { SustainPedalMarker } from '@coderline/alphatab/model/Bar';
 import type { Beat } from '@coderline/alphatab/model/Beat';
@@ -192,6 +193,11 @@ export enum AlphaTexDiagnosticCode {
     AT219 = 219,
 
     /**
+     * Error parsing arguments: unexpected additional arguments. Signatures: %s
+     */
+    AT220 = 220,
+
+    /**
      * Expected no arguments, but found some.
      */
     AT300 = 300,
@@ -229,7 +235,7 @@ export enum AlphaTexDiagnosticCode {
     /**
      * The dots separating score metadata, score contents and the sync points can be removed.
      */
-    AT400 = 400,
+    AT400 = 400
 }
 
 /**
@@ -238,7 +244,7 @@ export enum AlphaTexDiagnosticCode {
 export class AlphaTexDiagnosticBag implements Iterable<AlphaTexDiagnostic> {
     private _hasErrors = false;
     public readonly items: AlphaTexDiagnostic[] = [];
-    
+
     public get errors(): AlphaTexDiagnostic[] {
         return this.items.filter(i => i.severity === AlphaTexDiagnosticsSeverity.Error);
     }
@@ -276,7 +282,6 @@ export interface IAlphaTexImporterState {
     currentDynamics: DynamicValue;
     currentTupletNumerator: number;
     currentTupletDenominator: number;
-
     readonly syncPoints: FlatSyncPoint[];
     readonly slurs: Map<string, Note>;
     readonly percussionArticulationNames: Map<string, number>;
@@ -286,7 +291,6 @@ export interface IAlphaTexImporterState {
     readonly staffTuningApplied: Set<Staff>;
     readonly sustainPedalToBeat: Map<SustainPedalMarker, Beat>;
 }
-
 
 /**
  * Lists the note kinds we can detect
@@ -298,12 +302,12 @@ export enum AlphaTexStaffNoteKind {
     Articulation = 2
 }
 
-
 /**
  * @public
  */
 export interface IAlphaTexImporter {
     readonly state: IAlphaTexImporterState;
+    readonly parseMode: AlphaTexParseMode;
 
     applyStaffNoteKind(staff: Staff, staffNoteKind: AlphaTexStaffNoteKind): void;
     startNewVoice(): void;
@@ -311,7 +315,6 @@ export interface IAlphaTexImporter {
     startNewStaff(): Staff;
     addSemanticDiagnostic(diagnostic: AlphaTexDiagnostic): void;
 }
-
 
 /**
  * Defines how the arguments of the meta data tag is parsed.
@@ -353,5 +356,5 @@ export enum ArgumentListParseTypesMode {
      * If the token matches, it is added to the value list. Parsing stays on the current type.
      * If the token does not match, the value list completes and parsing continues.
      */
-    ValueListWithoutParenthesis = 5,
+    ValueListWithoutParenthesis = 5
 }

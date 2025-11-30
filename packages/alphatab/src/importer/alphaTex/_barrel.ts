@@ -35,7 +35,7 @@ export {
     type IAlphaTexNoteValueNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 export { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
-export { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
+export { AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 export {
     AlphaTexAccidentalMode,
     type AlphaTexDiagnostic,

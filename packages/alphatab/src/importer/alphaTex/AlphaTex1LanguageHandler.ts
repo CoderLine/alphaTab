@@ -26,6 +26,7 @@ import {
     type IAlphaTexArgumentValue,
     type IAlphaTexAstNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { AlphaTexParseMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
@@ -908,29 +909,34 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return true;
         }
 
+        // optimized path for single overload causing less allocations and checks
+        // if (signatures.length === 1) {
+        //     return this._validateArgumentTypesSingle(importer, signatures[0], args);
+        // }
+
         let error = false;
         const candidates = new Map<number, SignatureResolutionInfo>(
             signatures.map((v, i) => [
                 i,
                 {
                     signature: v,
-                    parameterIndex: 0
+                    parameterIndex: 0,
+                    parameterValueMatches: 0
                 } as SignatureResolutionInfo
             ])
         );
 
-        if (args.validated) {
-            return true;
-        }
-
-        const trackValue = (value: IAlphaTexAstNode, overloadIndex: number) => {
-            const overload = candidates.get(overloadIndex)!;
-            const valueNode = value as IAlphaTexArgumentValue;
-            if (!valueNode.parameterIndices) {
-                valueNode.parameterIndices = new Map<number, number>();
-            }
-            valueNode.parameterIndices.set(overloadIndex, overload.parameterIndex);
-        }
+        const parseFull = importer.parseMode === AlphaTexParseMode.Full;
+        const trackValue = parseFull
+            ? (value: IAlphaTexAstNode, overloadIndex: number) => {
+                  const overload = candidates.get(overloadIndex)!;
+                  const valueNode = value as IAlphaTexArgumentValue;
+                  if (!valueNode.parameterIndices) {
+                      valueNode.parameterIndices = new Map<number, number>();
+                  }
+                  valueNode.parameterIndices.set(overloadIndex, overload.parameterIndex);
+              }
+            : (_value: IAlphaTexAstNode, _overloadIndex: number) => {};
 
         for (const value of args.arguments) {
             AlphaTex1MetaDataReader.filterSignatureCandidates(candidates, value, false, trackValue);
@@ -939,7 +945,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             }
         }
 
-        const allCandidates = Array.from(candidates.keys());
+        const allCandidates = parseFull ? Array.from(candidates.entries()) : undefined;
         AlphaTex1MetaDataReader.filterIncompleteCandidates(candidates);
 
         if (candidates.size === 0) {
@@ -952,11 +958,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             });
             error = true;
         }
-        else {
-            args.signatureCandidateIndices = allCandidates;
+
+        if (allCandidates) {
+            // sort by how well the candidate matches
+            AlphaTex1MetaDataReader.sortCandidates(allCandidates);
+            args.signatureCandidateIndices = allCandidates.map(c => c[0]);
         }
 
         return !error;
+    }
+
+    private _validateArgumentTypesSingle(importer: IAlphaTexImporter, signature: AlphaTexSignatureDefinition, args: AlphaTexArgumentList) {
+        throw new Error('Method not implemented.');
     }
 
     private _headerFooterStyle(
@@ -1112,6 +1125,22 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         importer: IAlphaTexImporter,
         metaData: AlphaTexMetaDataNode
     ): ApplyStructuralMetaDataResult {
+        const result = this._checkArgumentTypes(
+            importer,
+            [AlphaTex1LanguageDefinitions.structuralMetaDataSignatures],
+            metaData,
+            metaData.tag.tag.text.toLowerCase(),
+            metaData.arguments
+        );
+        if (result !== undefined) {
+            switch (result) {
+                case ApplyNodeResult.NotAppliedSemanticError:
+                    return ApplyStructuralMetaDataResult.NotAppliedSemanticError;
+                case ApplyNodeResult.NotAppliedUnrecognizedMarker:
+                    return ApplyStructuralMetaDataResult.NotAppliedUnrecognizedMarker;
+            }
+        }
+
         switch (metaData.tag.tag.text.toLowerCase()) {
             case 'staff':
                 const staff = importer.startNewStaff();
@@ -1511,40 +1540,47 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'tb':
             case 'tbe':
                 let tbi = 0;
-                switch (p.arguments!.arguments[tbi].nodeType) {
-                    case AlphaTexNodeType.Ident:
-                    case AlphaTexNodeType.String:
-                        const whammyBarType = AlphaTex1LanguageHandler._parseEnumValue(
-                            importer,
-                            p.arguments!,
-                            'whammy type',
-                            AlphaTex1EnumMappings.whammyType,
-                            tbi
-                        );
-                        if (whammyBarType === undefined) {
-                            return ApplyNodeResult.NotAppliedSemanticError;
-                        }
-                        beat.whammyBarType = whammyBarType;
-                        tbi++;
-                        break;
-                }
+                let typeAndStyle = true;
+                let typeSet = false;
+                while (typeAndStyle) {
+                    switch (p.arguments!.arguments[tbi].nodeType) {
+                        case AlphaTexNodeType.Ident:
+                        case AlphaTexNodeType.String:
+                            const txt = (p.arguments!.arguments[tbi] as AlphaTexTextNode).text.toLowerCase();
+                            if (AlphaTex1EnumMappings.whammyType.has(txt)) {
+                                beat.whammyBarType = AlphaTex1EnumMappings.whammyType.get(txt)!;
+                                typeSet = true;
+                                tbi++;
+                            } else if (AlphaTex1EnumMappings.bendStyle.has(txt)) {
+                                beat.whammyStyle = AlphaTex1EnumMappings.bendStyle.get(txt)!;
+                                tbi++;
+                            } else {
+                                // will trigger semantic error on type
+                                if (typeSet) {
+                                    AlphaTex1LanguageHandler._parseEnumValue(
+                                        importer,
+                                        p.arguments!,
+                                        'whammy style',
+                                        AlphaTex1EnumMappings.bendStyle,
+                                        tbi
+                                    );
+                                } else {
+                                    AlphaTex1LanguageHandler._parseEnumValue(
+                                        importer,
+                                        p.arguments!,
+                                        'whammy type',
+                                        AlphaTex1EnumMappings.whammyType,
+                                        tbi
+                                    );
+                                }
 
-                switch (p.arguments!.arguments[tbi].nodeType) {
-                    case AlphaTexNodeType.Ident:
-                    case AlphaTexNodeType.String:
-                        const whammyBarStyle = AlphaTex1LanguageHandler._parseEnumValue(
-                            importer,
-                            p.arguments!,
-                            'whammy style',
-                            AlphaTex1EnumMappings.bendStyle,
-                            tbi
-                        );
-                        if (whammyBarStyle === undefined) {
-                            return ApplyNodeResult.NotAppliedSemanticError;
-                        }
-                        beat.whammyStyle = whammyBarStyle!;
-                        tbi++;
-                        break;
+                                return ApplyNodeResult.NotAppliedSemanticError;
+                            }
+                            break;
+                        default:
+                            typeAndStyle = false;
+                            break;
+                    }
                 }
 
                 const points = this._getBendPoints(importer, p, tbi, tag === 'tbe');
@@ -1912,40 +1948,48 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'b':
             case 'be':
                 let tbi = 0;
-                switch (p.arguments!.arguments[tbi].nodeType) {
-                    case AlphaTexNodeType.Ident:
-                    case AlphaTexNodeType.String:
-                        const bendType = AlphaTex1LanguageHandler._parseEnumValue(
-                            importer,
-                            p.arguments!,
-                            'bend type',
-                            AlphaTex1EnumMappings.bendType,
-                            tbi
-                        );
-                        if (bendType === undefined) {
-                            return ApplyNodeResult.NotAppliedSemanticError;
-                        }
-                        note.bendType = bendType;
-                        tbi++;
-                        break;
-                }
 
-                switch (p.arguments!.arguments[tbi].nodeType) {
-                    case AlphaTexNodeType.Ident:
-                    case AlphaTexNodeType.String:
-                        const bendStyle = AlphaTex1LanguageHandler._parseEnumValue(
-                            importer,
-                            p.arguments!,
-                            'bend style',
-                            AlphaTex1EnumMappings.bendStyle,
-                            tbi
-                        );
-                        if (bendStyle === undefined) {
-                            return ApplyNodeResult.NotAppliedSemanticError;
-                        }
-                        note.bendStyle = bendStyle!;
-                        tbi++;
-                        break;
+                let typeAndStyle = true;
+                let typeSet = false;
+                while (typeAndStyle) {
+                    switch (p.arguments!.arguments[tbi].nodeType) {
+                        case AlphaTexNodeType.Ident:
+                        case AlphaTexNodeType.String:
+                            const txt = (p.arguments!.arguments[tbi] as AlphaTexTextNode).text.toLowerCase();
+                            if (AlphaTex1EnumMappings.bendType.has(txt)) {
+                                note.bendType = AlphaTex1EnumMappings.bendType.get(txt)!;
+                                typeSet = true;
+                                tbi++;
+                            } else if (AlphaTex1EnumMappings.bendStyle.has(txt)) {
+                                note.bendStyle = AlphaTex1EnumMappings.bendStyle.get(txt)!;
+                                tbi++;
+                            } else {
+                                // will trigger semantic error on type
+                                if (typeSet) {
+                                    AlphaTex1LanguageHandler._parseEnumValue(
+                                        importer,
+                                        p.arguments!,
+                                        'bend style',
+                                        AlphaTex1EnumMappings.bendStyle,
+                                        tbi
+                                    );
+                                } else {
+                                    AlphaTex1LanguageHandler._parseEnumValue(
+                                        importer,
+                                        p.arguments!,
+                                        'bend type',
+                                        AlphaTex1EnumMappings.bendType,
+                                        tbi
+                                    );
+                                }
+
+                                return ApplyNodeResult.NotAppliedSemanticError;
+                            }
+                            break;
+                        default:
+                            typeAndStyle = false;
+                            break;
+                    }
                 }
 
                 const points = this._getBendPoints(importer, p, tbi, tag === 'be');

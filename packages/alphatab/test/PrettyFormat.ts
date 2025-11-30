@@ -527,6 +527,9 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 if (valueList.signatureCandidateIndices) {
                     children.push(['signatureCandidateIndices', valueList.signatureCandidateIndices]);
                 }
+                if (valueList.validated) {
+                    children.push(['validated', valueList.validated]);
+                }
                 break;
 
             case AlphaTexNodeType.Props:

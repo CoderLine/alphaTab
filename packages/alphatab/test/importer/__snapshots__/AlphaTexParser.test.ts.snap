@@ -2886,6 +2886,204 @@ exports[`AlphaTexParserTest intermediate started pitched note: lexer-diagnostics
 
 exports[`AlphaTexParserTest intermediate started pitched note: parser-diagnostics 1`] = `Array []`;
 
+exports[`AlphaTexParserTest recovery props additional values 1`] = `
+Score (1,1) -> (1,30) {
+  bars: Array [
+    Bar (1,1) -> (1,30) {
+      beats: Array [
+        Beat (1,1) -> (1,30) {
+          notes: NoteList (1,1) -> (1,30) {
+            notes: Array [
+              Note (1,1) -> (1,30) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,30) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,22) {
+                      property: Ident "slur" (1,6) -> (1,10),
+                      properties: Arguments (1,11) -> (1,22) {
+                        arguments: Array [
+                          String "S1" (1,11) -> (1,14) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
+                      },
+                    },
+                    Prop (1,23) -> (1,26) {
+                      property: Ident "v" (1,23) -> (1,24),
+                    },
+                    Prop (1,27) -> (1,29) {
+                      property: Ident "vw" (1,27) -> (1,29),
+                    },
+                  ],
+                  closeBrace: RBrace (1,29) -> (1,30),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParserTest recovery props additional values: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest recovery props additional values: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 220,
+    "severity" => 2,
+    "message" => "Error parsing arguments: unexpected additional arguments. Signatures:
+(String)
+(Ident)",
+    "start" => Map {
+      "col" => 22,
+      "line" => 1,
+      "offset" => 21,
+    },
+  },
+  Map {
+    "code" => 220,
+    "severity" => 2,
+    "message" => "Error parsing arguments: unexpected additional arguments. Signatures:
+()",
+    "start" => Map {
+      "col" => 26,
+      "line" => 1,
+      "offset" => 25,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParserTest recovery props unknown property 1`] = `
+Score (1,1) -> (1,45) {
+  bars: Array [
+    Bar (1,1) -> (1,45) {
+      beats: Array [
+        Beat (1,1) -> (1,45) {
+          notes: NoteList (1,1) -> (1,45) {
+            notes: Array [
+              Note (1,1) -> (1,45) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,45) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,14) {
+                      property: Ident "slur" (1,6) -> (1,10),
+                      properties: Arguments (1,11) -> (1,14) {
+                        arguments: Array [
+                          String "s1" (1,11) -> (1,14) {
+                            parameterIndices: Map {
+                              0 => 0,
+                            },
+                          },
+                        ],
+                        signatureCandidateIndices: Array [
+                          0,
+                        ],
+                        validated: true,
+                      },
+                    },
+                    Prop (1,16) -> (1,41) {
+                      property: Ident "invalid" (1,16) -> (1,23),
+                    },
+                    Prop (1,42) -> (1,43) {
+                      property: Ident "v" (1,42) -> (1,43),
+                    },
+                  ],
+                  closeBrace: RBrace (1,44) -> (1,45),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParserTest recovery props unknown property: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest recovery props unknown property: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 42,
+      "line" => 1,
+      "offset" => 41,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParserTest recovery props unknown value 1`] = `
+Score (1,1) -> (1,24) {
+  bars: Array [
+    Bar (1,1) -> (1,24) {
+      beats: Array [
+        Beat (1,1) -> (1,24) {
+          notes: NoteList (1,1) -> (1,24) {
+            notes: Array [
+              Note (1,1) -> (1,24) {
+                noteValue: Ident "C4" (1,1) -> (1,3),
+                noteEffects: Props (1,4) -> (1,24) {
+                  openBrace: LBrace (1,4) -> (1,5),
+                  properties: Array [
+                    Prop (1,6) -> (1,19) {
+                      property: Ident "rasg" (1,6) -> (1,10),
+                      properties: Arguments (1,11) -> (1,19) {
+                        arguments: Array [
+                          String "invalid" (1,11) -> (1,19),
+                        ],
+                      },
+                    },
+                    Prop (1,21) -> (1,22) {
+                      property: Ident "v" (1,21) -> (1,22),
+                    },
+                  ],
+                  closeBrace: RBrace (1,23) -> (1,24),
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParserTest recovery props unknown value: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest recovery props unknown value: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (String). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 19,
+      "line" => 1,
+      "offset" => 18,
+    },
+  },
+]
+`;
+
 exports[`AlphaTexParserTest valid-bar-meta known no score meta 1`] = `
 Score (1,1) -> (1,16) {
   bars: Array [
