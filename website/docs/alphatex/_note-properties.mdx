@@ -1,0 +1,874 @@
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+import { ParameterValuesTable } from '@site/src/components/ParameterValuesTable';
+
+## `nh`
+
+```plain title="Syntax"
+nh ()
+```
+
+**Description:** Applies a natural harmonic effect to the note (for fretted instruments).
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:8 3.3{nh} 3.3{ah} 3.3{ph} 3.3{th} 3.3{sh}
+
+`}</AlphaTexSample>
+
+## `ah`
+
+```plain title="Syntax"
+ah value
+```
+
+**Description:** Applies an artificial harmonic effect to the note (for fretted instruments).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The harmonic value determines a relative fret-offset changing the note pitch when played. For natural harmonics the played fret determines the harmonic value. The rules are a bit special but mostly are aligned with the frequency adjustments happening when harmonics are played at respective frets:<br /><br />* `2.4` adds 36 frets<br />* `2.7` adds 34 frets<br />* `< 3` adds 0 frets<br />* `<= 3.5` adds 31 frets<br />* `<= 4` adds 28 frets<br />* `<= 5` adds 34 frets<br />* `<= 7` adds 19 frets<br />* `<= 8.5` adds 36 frets<br />* `<= 9` adds 28 frets<br />* `<= 10` adds 34 frets<br />* `<= 11` adds 0 frets<br />* `<= 12` adds 12 frets<br />* `< 14` adds 0 frets<br />* `<= 15` adds 34 frets<br />* `<= 16` adds 28 frets<br />* `<= 17` adds 36 frets<br />* `<= 18` adds 0 frets<br />* `<= 19` adds 19 frets<br />* `<= 21` adds 0 frets<br />* `<= 22` adds 36 frets<br />* `<= 24` adds 24 frets<br />* `other: adds 0 frets | `Number` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 {volume 8} D4 E4 {tempo 16} F4
+
+`}</AlphaTexSample>
+
+## `th`
+
+```plain title="Syntax"
+th value
+```
+
+**Description:** Applies a tapped harmonic effect to the note (for fretted instruments).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The harmonic value determines a relative fret-offset changing the note pitch when played. For natural harmonics the played fret determines the harmonic value. The rules are a bit special but mostly are aligned with the frequency adjustments happening when harmonics are played at respective frets:<br /><br />* `2.4` adds 36 frets<br />* `2.7` adds 34 frets<br />* `< 3` adds 0 frets<br />* `<= 3.5` adds 31 frets<br />* `<= 4` adds 28 frets<br />* `<= 5` adds 34 frets<br />* `<= 7` adds 19 frets<br />* `<= 8.5` adds 36 frets<br />* `<= 9` adds 28 frets<br />* `<= 10` adds 34 frets<br />* `<= 11` adds 0 frets<br />* `<= 12` adds 12 frets<br />* `< 14` adds 0 frets<br />* `<= 15` adds 34 frets<br />* `<= 16` adds 28 frets<br />* `<= 17` adds 36 frets<br />* `<= 18` adds 0 frets<br />* `<= 19` adds 19 frets<br />* `<= 21` adds 0 frets<br />* `<= 22` adds 36 frets<br />* `<= 24` adds 24 frets<br />* `other: adds 0 frets | `Number` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:8 3.3{nh} 3.3{ah} 3.3{ph} 3.3{th} 3.3{sh}
+
+`}</AlphaTexSample>
+
+## `ph`
+
+```plain title="Syntax"
+ph value
+```
+
+**Description:** Applies a pinch harmonic effect to the note (for fretted instruments).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The harmonic value determines a relative fret-offset changing the note pitch when played. For natural harmonics the played fret determines the harmonic value. The rules are a bit special but mostly are aligned with the frequency adjustments happening when harmonics are played at respective frets:<br /><br />* `2.4` adds 36 frets<br />* `2.7` adds 34 frets<br />* `< 3` adds 0 frets<br />* `<= 3.5` adds 31 frets<br />* `<= 4` adds 28 frets<br />* `<= 5` adds 34 frets<br />* `<= 7` adds 19 frets<br />* `<= 8.5` adds 36 frets<br />* `<= 9` adds 28 frets<br />* `<= 10` adds 34 frets<br />* `<= 11` adds 0 frets<br />* `<= 12` adds 12 frets<br />* `< 14` adds 0 frets<br />* `<= 15` adds 34 frets<br />* `<= 16` adds 28 frets<br />* `<= 17` adds 36 frets<br />* `<= 18` adds 0 frets<br />* `<= 19` adds 19 frets<br />* `<= 21` adds 0 frets<br />* `<= 22` adds 36 frets<br />* `<= 24` adds 24 frets<br />* `other: adds 0 frets | `Number` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:8 3.3{nh} 3.3{ah} 3.3{ph} 3.3{th} 3.3{sh}
+
+`}</AlphaTexSample>
+
+## `sh`
+
+```plain title="Syntax"
+sh value
+```
+
+**Description:** Applies a semi harmonic effect to the note (for fretted instruments).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The harmonic value determines a relative fret-offset changing the note pitch when played. For natural harmonics the played fret determines the harmonic value. The rules are a bit special but mostly are aligned with the frequency adjustments happening when harmonics are played at respective frets:<br /><br />* `2.4` adds 36 frets<br />* `2.7` adds 34 frets<br />* `< 3` adds 0 frets<br />* `<= 3.5` adds 31 frets<br />* `<= 4` adds 28 frets<br />* `<= 5` adds 34 frets<br />* `<= 7` adds 19 frets<br />* `<= 8.5` adds 36 frets<br />* `<= 9` adds 28 frets<br />* `<= 10` adds 34 frets<br />* `<= 11` adds 0 frets<br />* `<= 12` adds 12 frets<br />* `< 14` adds 0 frets<br />* `<= 15` adds 34 frets<br />* `<= 16` adds 28 frets<br />* `<= 17` adds 36 frets<br />* `<= 18` adds 0 frets<br />* `<= 19` adds 19 frets<br />* `<= 21` adds 0 frets<br />* `<= 22` adds 36 frets<br />* `<= 24` adds 24 frets<br />* `other: adds 0 frets | `Number` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:8 3.3{nh} 3.3{ah} 3.3{ph} 3.3{th} 3.3{sh}
+
+`}</AlphaTexSample>
+
+## `fh`
+
+```plain title="Syntax"
+fh value
+```
+
+**Description:** Applies a feedback harmonic effect to the note (for fretted instruments).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The harmonic value determines a relative fret-offset changing the note pitch when played. For natural harmonics the played fret determines the harmonic value. The rules are a bit special but mostly are aligned with the frequency adjustments happening when harmonics are played at respective frets:<br /><br />* `2.4` adds 36 frets<br />* `2.7` adds 34 frets<br />* `< 3` adds 0 frets<br />* `<= 3.5` adds 31 frets<br />* `<= 4` adds 28 frets<br />* `<= 5` adds 34 frets<br />* `<= 7` adds 19 frets<br />* `<= 8.5` adds 36 frets<br />* `<= 9` adds 28 frets<br />* `<= 10` adds 34 frets<br />* `<= 11` adds 0 frets<br />* `<= 12` adds 12 frets<br />* `< 14` adds 0 frets<br />* `<= 15` adds 34 frets<br />* `<= 16` adds 28 frets<br />* `<= 17` adds 36 frets<br />* `<= 18` adds 0 frets<br />* `<= 19` adds 19 frets<br />* `<= 21` adds 0 frets<br />* `<= 22` adds 36 frets<br />* `<= 24` adds 24 frets<br />* `other: adds 0 frets | `Number` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:8 3.3{fh} 3.3{ah} 3.3{ph} 3.3{th} 3.3{sh}
+
+`}</AlphaTexSample>
+
+## `v`
+
+```plain title="Syntax"
+v ()
+```
+
+**Description:** Adds a slight vibrato effect to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{v}
+
+`}</AlphaTexSample>
+
+## `vw`
+
+```plain title="Syntax"
+vw ()
+```
+
+**Description:** Adds a wide vibrato effect to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{vw}
+
+`}</AlphaTexSample>
+
+## `sl`
+
+```plain title="Syntax"
+sl ()
+```
+
+**Description:** Adds a legato slide effect to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{sl} 4.3 3.3{ss} 4.3 |
+3.3{sib} 3.3{sia} 3.3{sou} 3.3{sod} |
+3.3{sib sou} 3.3{sib sod} 3.3{sia sod} 3.3{sia sou} |
+x.3{psd} 3.3 |
+x.3{psu} 3.3 |
+
+`}</AlphaTexSample>
+
+## `ss`
+
+```plain title="Syntax"
+ss ()
+```
+
+**Description:** Adds a shift slide effect to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{sl} 4.3 3.3{ss} 4.3 |
+3.3{sib} 3.3{sia} 3.3{sou} 3.3{sod} |
+3.3{sib sou} 3.3{sib sod} 3.3{sia sod} 3.3{sia sou} |
+x.3{psd} 3.3 |
+x.3{psu} 3.3 |
+
+`}</AlphaTexSample>
+
+## `sib`
+
+```plain title="Syntax"
+sib ()
+```
+
+**Description:** Adds a slide effect into the note from below.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{sl} 4.3 3.3{ss} 4.3 |
+3.3{sib} 3.3{sia} 3.3{sou} 3.3{sod} |
+3.3{sib sou} 3.3{sib sod} 3.3{sia sod} 3.3{sia sou} |
+x.3{psd} 3.3 |
+x.3{psu} 3.3 |
+
+`}</AlphaTexSample>
+
+## `sia`
+
+```plain title="Syntax"
+sia ()
+```
+
+**Description:** Adds a slide effect into the note from above.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{sl} 4.3 3.3{ss} 4.3 |
+3.3{sib} 3.3{sia} 3.3{sou} 3.3{sod} |
+3.3{sib sou} 3.3{sib sod} 3.3{sia sod} 3.3{sia sou} |
+x.3{psd} 3.3 |
+x.3{psu} 3.3 |
+
+`}</AlphaTexSample>
+
+## `sou`
+
+```plain title="Syntax"
+sou ()
+```
+
+**Description:** Adds a slide effect out from note upwards.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{sl} 4.3 3.3{ss} 4.3 |
+3.3{sib} 3.3{sou} 3.3{sou} 3.3{sod} |
+3.3{sib sou} 3.3{sib sod} 3.3{sou sod} 3.3{sou sou} |
+x.3{psd} 3.3 |
+x.3{psu} 3.3 |
+
+`}</AlphaTexSample>
+
+## `sod`
+
+```plain title="Syntax"
+sod ()
+```
+
+**Description:** Adds a slide effect out from note downwards.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{sl} 4.3 3.3{ss} 4.3 |
+3.3{sib} 3.3{sod} 3.3{sod} 3.3{sod} |
+3.3{sib sod} 3.3{sib sod} 3.3{sod sod} 3.3{sod sod} |
+x.3{psd} 3.3 |
+x.3{psu} 3.3 |
+
+`}</AlphaTexSample>
+
+## `psu`
+
+```plain title="Syntax"
+psu ()
+```
+
+**Description:** Adds a pick slide effect out from note upwards.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{sl} 4.3 3.3{ss} 4.3 |
+3.3{sib} 3.3{psu} 3.3{psu} 3.3{psu} |
+3.3{sib psu} 3.3{sib psu} 3.3{psu psu} 3.3{psu psu} |
+x.3{psd} 3.3 |
+x.3{psu} 3.3 |
+
+`}</AlphaTexSample>
+
+## `psd`
+
+```plain title="Syntax"
+psd ()
+```
+
+**Description:** Adds a pick slide effect out from note downwards.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{sl} 4.3 3.3{ss} 4.3 |
+3.3{sib} 3.3{psd} 3.3{psd} 3.3{psd} |
+3.3{sib psd} 3.3{sib psd} 3.3{psd psd} 3.3{psd psd} |
+x.3{psd} 3.3 |
+x.3{psd} 3.3 |
+
+`}</AlphaTexSample>
+
+## `h`
+
+```plain title="Syntax"
+h ()
+```
+
+**Description:** Applies a hammer on / pull-off effect to the note.
+
+The fret of the following note on the same string defines whether it is a hammer-on or pull-of.
+
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{h} 4.3 4.3{h} 3.3 | 3.3{h} 4.3{h} 3.3{h} 4.3
+
+`}</AlphaTexSample>
+
+## `lht`
+
+```plain title="Syntax"
+lht ()
+```
+
+**Description:** Applies a left-hand-tapped annotation to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:16 15.1{h} 13.1{h} 12.1{h} 15.2{lht}
+
+`}</AlphaTexSample>
+
+## `g`
+
+```plain title="Syntax"
+g ()
+```
+
+**Description:** Marks the note as a ghost note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{g}
+
+`}</AlphaTexSample>
+
+## `ac`
+
+```plain title="Syntax"
+ac ()
+```
+
+**Description:** Applies a simple accentuation to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{ac} 3.3{hac} 3.3{ten}
+
+`}</AlphaTexSample>
+
+## `hac`
+
+```plain title="Syntax"
+hac ()
+```
+
+**Description:** Applies a heavy accentuation to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{ac} 3.3{hac} 3.3{ten}
+
+`}</AlphaTexSample>
+
+## `ten`
+
+```plain title="Syntax"
+ten ()
+```
+
+**Description:** Applies a tenuto accentuation to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{ac} 3.3{ten} 3.3{ten}
+
+`}</AlphaTexSample>
+
+## `tr`
+
+```plain title="Syntax"
+tr (fret duration)
+```
+
+**Description:** Applies a trill effect to the note.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `fret` | The fret on which to trill | `Number` | yes  |
+|  `duration` | The duration/speed of the trills | `16\|32\|64` | no `16` |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `duration` | <ParameterValuesTable values={[["16","16th Note"],["32","32nd Note"],["64","64th Note"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:4 3.3{tr 4} 3.3{tr 4 16} 3.3{tr 5 32} 3.3{tr 6 64}
+
+`}</AlphaTexSample>
+
+## `pm`
+
+```plain title="Syntax"
+pm ()
+```
+
+**Description:** Applies a palm mute effect to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{pm} 3.3{pm} 3.3{pm} 3.3{pm}
+
+`}</AlphaTexSample>
+
+## `st`
+
+```plain title="Syntax"
+st ()
+```
+
+**Description:** Applies a staccato effect to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{st}
+
+`}</AlphaTexSample>
+
+## `lr`
+
+```plain title="Syntax"
+lr ()
+```
+
+**Description:** Applies a LetRing effect to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.4{lr} 3.3{lr} 3.2{lr} 3.1{lr}
+
+`}</AlphaTexSample>
+
+## `x`
+
+```plain title="Syntax"
+x ()
+```
+
+**Description:** Marks the note as a dead note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+x.3 3.3{x}
+
+`}</AlphaTexSample>
+
+## `t`
+
+```plain title="Syntax"
+t ()
+```
+
+**Description:** Marks the note as a tied note.
+
+This is an alternative syntax to directly specifying the fret as `-`.
+
+For non stringed instrument it can be a bit more tricky as we cannot use the string to identify which note to tie. There are multiple ways to work around this problem. AlphaTab will try to find the start note for the tie via several rules, if this does not match the desired behavior, you can specify the note value as alternative and indicate the tie via a note effect.
+
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3 -.3 | (1.1 3.2 2.3 0.4) (-.1 -.4)
+
+`}</AlphaTexSample>
+<AlphaTexSample tracks="all" player={true} >{`
+\\tuning piano
+.
+// If there is a single note on the previous beat, we tie to this one
+// Then a simple - is enough for a tie
+:2 a4 - |
+// Alternatively you can specify a '-' or 't' as note effect to indicate a tie
+:2 a4 a4{-} |
+:2 a4 a4{t} |
+// This also works for chords using correct note ordering
+:2 (a4 a3) (- a3) |
+:2 (a4 a3) (a4 -) |
+// If nothing helps, always the explicit note value and tie effect should allow
+// specifying the correct behavior
+:2 (a4 a3) (a4{t} a3) |
+:4 (a4 a3) (b2 b3) a4{t} a3{-} |
+
+`}</AlphaTexSample>
+
+## `turn`
+
+```plain title="Syntax"
+turn ()
+```
+
+**Description:** Applies a turn ornament to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:1 C4{turn} |
+
+`}</AlphaTexSample>
+
+## `iturn`
+
+```plain title="Syntax"
+iturn ()
+```
+
+**Description:** Applies an inverted turn ornament to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:1 C4{iturn} |
+
+`}</AlphaTexSample>
+
+## `umordent`
+
+```plain title="Syntax"
+umordent ()
+```
+
+**Description:** Applies an upper mordent ornament to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:1 C4{umordent} |
+
+`}</AlphaTexSample>
+
+## `lmordent`
+
+```plain title="Syntax"
+lmordent ()
+```
+
+**Description:** Applies an lower mordent ornament to the note.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:1 C4{lmordent} |
+
+`}</AlphaTexSample>
+
+## `string`
+
+```plain title="Syntax"
+string ()
+```
+
+**Description:** Adds an annotation showing the string number of the note above the staff.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{string} 3.4{string} 3.5{string}
+
+`}</AlphaTexSample>
+
+## `hide`
+
+```plain title="Syntax"
+hide ()
+```
+
+**Description:** Hides the note from being displayed in the music sheet.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:8 3.3 (4.4{hide} 5.5)
+
+`}</AlphaTexSample>
+
+## `b`
+
+```plain title="Syntax"
+// [1]: 
+b (values)
+// [2]: 
+b (type values)
+// [3]: 
+b (style values)
+// [4]: 
+b (type style values)
+```
+
+**Description:** Adds a bend effect to the note.
+
+* The `b` variant automatically spreads the values across the duration of the beat.
+* The `be` (exact) variant allows specifying exactly at which offset a value is placed.
+
+It is recommended to rely on the auto-detection of the type and only specify the type explicitly if something is wrong.
+
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `values` | The values of the bend in quarter-tones relative to the original note, decimals supported | `Number[]` | no  |
+| `[2]` |  `type` | The type of bend (affects the display). | `Ident` | yes  |
+| `[2]` |  `values` | The values of the bend in quarter-tones relative to the original note, decimals supported | `Number[]` | no  |
+| `[3]` |  `style` | The style of the bend. | `default\|gradual\|fast` | yes  |
+| `[3]` |  `values` | The values of the bend in quarter-tones relative to the original note, decimals supported | `Number[]` | no  |
+| `[4]` |  `type` | The type of bend (affects the display). | `Ident` | yes  |
+| `[4]` |  `style` | The style of the bend. | `default\|gradual\|fast` | yes  |
+| `[4]` |  `values` | The values of the bend in quarter-tones relative to the original note, decimals supported | `Number[]` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `type` | <ParameterValuesTable values={[["custom","A non-standard custom bends with multiple points"],["bend","A simple bend up to a higher note"],["release","A release of bends down to a lower note"],["bendRelease","A bend directly followed by a release"],["hold","A bend which is held from the previous note"],["prebend","A bend applied before the note is played"],["prebendBend","A pre-bend followed by a bend"],["prebendRelease","A pre-bend followed by a release"]]} /> |
+| `[3]` | `style` | <ParameterValuesTable values={[["default",""],["gradual",""],["fast",""]]} /> |
+| `[4]` | `type` | <ParameterValuesTable values={[["custom","A non-standard custom bends with multiple points"],["bend","A simple bend up to a higher note"],["release","A release of bends down to a lower note"],["bendRelease","A bend directly followed by a release"],["hold","A bend which is held from the previous note"],["prebend","A bend applied before the note is played"],["prebendBend","A pre-bend followed by a bend"],["prebendRelease","A pre-bend followed by a release"]]} /> |
+| `[4]` | `style` | <ParameterValuesTable values={[["default",""],["gradual",""],["fast",""]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{b (0 4)} |
+3.3{b (0 4 0 8)} |
+
+`}</AlphaTexSample>
+
+## `be`
+
+```plain title="Syntax"
+// [1]: 
+be (valueAndOffset)
+// [2]: 
+be (type valueAndOffset)
+// [3]: 
+be (style valueAndOffset)
+// [4]: 
+be (type style valueAndOffset)
+```
+
+**Description:** Adds an exact bend effect to the note.
+
+* The `b` variant automatically spreads the values across the duration of the beat.
+* The `be` (exact) variant allows specifying exactly at which offset a value is placed.
+
+It is recommended to rely on the auto-detection of the type and only specify the type explicitly if something is wrong.
+
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `valueAndOffset` | The offset at which the value becomes valid in range of 0-60 and <br />    The value of the bend in quarter-tones relative to the original note.<br />    The offset and value are actually two parameters: <br />    `3.3 {be (0 0 5 2 30 4)}`<br />     | `Number[]` | no  |
+| `[2]` |  `type` | The type of bend (affects the display). | `Ident` | yes  |
+| `[2]` |  `valueAndOffset` | The offset at which the value becomes valid in range of 0-60 and <br />    The value of the bend in quarter-tones relative to the original note.<br />    The offset and value are actually two parameters: <br />    `3.3 {be (0 0 5 2 30 4)}`<br />     | `Number[]` | no  |
+| `[3]` |  `style` | The style of the whammy play style. | `default\|gradual\|fast` | yes  |
+| `[3]` |  `valueAndOffset` | The offset at which the value becomes valid in range of 0-60 and <br />    The value of the bend in quarter-tones relative to the original note.<br />    The offset and value are actually two parameters: <br />    `3.3 {be (0 0 5 2 30 4)}`<br />     | `Number[]` | no  |
+| `[4]` |  `type` | The type of bend (affects the display). | `Ident` | yes  |
+| `[4]` |  `style` | The style of the whammy play style. | `default\|gradual\|fast` | yes  |
+| `[4]` |  `valueAndOffset` | The offset at which the value becomes valid in range of 0-60 and <br />    The value of the bend in quarter-tones relative to the original note.<br />    The offset and value are actually two parameters: <br />    `3.3 {be (0 0 5 2 30 4)}`<br />     | `Number[]` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `type` | <ParameterValuesTable values={[["custom","A non-standard custom bends with multiple points"],["bend","A simple bend up to a higher note"],["release","A release of bends down to a lower note"],["bendRelease","A bend directly followed by a release"],["hold","A bend which is held from the previous note"],["prebend","A bend applied before the note is played"],["prebendBend","A pre-bend followed by a bend"],["prebendRelease","A pre-bend followed by a release"]]} /> |
+| `[3]` | `style` | <ParameterValuesTable values={[["default",""],["gradual",""],["fast",""]]} /> |
+| `[4]` | `type` | <ParameterValuesTable values={[["custom","A non-standard custom bends with multiple points"],["bend","A simple bend up to a higher note"],["release","A release of bends down to a lower note"],["bendRelease","A bend directly followed by a release"],["hold","A bend which is held from the previous note"],["prebend","A bend applied before the note is played"],["prebendBend","A pre-bend followed by a bend"],["prebendRelease","A pre-bend followed by a release"]]} /> |
+| `[4]` | `style` | <ParameterValuesTable values={[["default",""],["gradual",""],["fast",""]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:1 3.3 {be (0 0 5 2 30 4)}
+
+`}</AlphaTexSample>
+
+## `lf`
+
+```plain title="Syntax"
+lf finger
+```
+
+**Description:** Adds a left-hand fingering annotation to the note.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `finger` | The finger | `Number` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `finger` | <ParameterValuesTable values={[["1","Thumb"],["2","Index-Finger"],["3","Middle-Finger"],["4","Annual-Finger"],["5","Little-Finger"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5} (2.2{lf 4} 2.3{lf 3} 2.4{lf 2}) |
+:8 3.3{rf 1} 3.3{rf 2} 3.3{rf 3} 3.3{rf 4} 3.3{lf 5}
+
+`}</AlphaTexSample>
+
+## `rf`
+
+```plain title="Syntax"
+rf finger
+```
+
+**Description:** Adds a right-hand fingering annotation to the note.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `finger` | The finger | `Number` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `finger` | <ParameterValuesTable values={[["1","Thumb"],["2","Index-Finger"],["3","Middle-Finger"],["4","Annual-Finger"],["5","Little-Finger"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5} (2.2{lf 4} 2.3{lf 3} 2.4{lf 2}) |
+:8 3.3{rf 1} 3.3{rf 2} 3.3{rf 3} 3.3{rf 4} 3.3{lf 5}
+
+`}</AlphaTexSample>
+
+## `acc`
+
+```plain title="Syntax"
+acc mode
+```
+
+**Description:** Changes the mode to determine the accidentals for this note.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The accidental mode | `Ident` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["default","Auto-detect the accidentals"],["forceNone","Force no accidentals"],["forceNatural","Force a naturalize accidental"],["forceSharp","Force a sharp accidental"],["forceDoubleSharp","Force a double-sharp accidental"],["forceFlat","Force a flat accidental"],["forceDoubleFlat","Force a double flat accidental"],["d","Auto-detect the accidentals"],["-","Force no accidentals"],["n","Force a naturalize accidental"],["#","Force a sharp accidental"],["##","Force a double-sharp accidental"],["x","Force a double-sharp accidental"],["b","Force a flat accidental"],["bb","Force a double flat accidental"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5} (2.2{lf 4} 2.3{lf 3} 2.4{lf 2}) |
+:8 3.3{rf 1} 3.3{rf 2} 3.3{rf 3} 3.3{rf 4} 3.3{lf 5}
+
+`}</AlphaTexSample>
+
+## `slur`
+
+```plain title="Syntax"
+// [1]: 
+slur id
+// [2]: 
+slur id
+```
+
+**Description:** Marks the start or end of a slur for the note.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `id` | A unique ID to mark the start and end of the slur. | `String` | yes  |
+| `[2]` |  `id` | A unique ID to mark the start and end of the slur. | `Ident` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(3.3 {slur s1} 4.4).4 7.3.8 8.3.8 10.3 {slur s1} .8
+
+`}</AlphaTexSample>
+
+## `-`
+
+```plain title="Syntax"
+- ()
+```
+
+**Description:** Marks the note as a tied note.
+
+This is an alternative syntax to directly specifying the fret as `-`.
+
+For non stringed instrument it can be a bit more tricky as we cannot use the string to identify which note to tie. There are multiple ways to work around this problem. AlphaTab will try to find the start note for the tie via several rules, if this does not match the desired behavior, you can specify the note value as alternative and indicate the tie via a note effect.
+
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3 -.3 | (1.1 3.2 2.3 0.4) (-.1 -.4)
+
+`}</AlphaTexSample>
+<AlphaTexSample tracks="all" player={true} >{`
+\\tuning piano
+.
+// If there is a single note on the previous beat, we tie to this one
+// Then a simple - is enough for a tie
+:2 a4 - |
+// Alternatively you can specify a '-' or 't' as note effect to indicate a tie
+:2 a4 a4{-} |
+:2 a4 a4{t} |
+// This also works for chords using correct note ordering
+:2 (a4 a3) (- a3) |
+:2 (a4 a3) (a4 -) |
+// If nothing helps, always the explicit note value and tie effect should allow
+// specifying the correct behavior
+:2 (a4 a3) (a4{t} a3) |
+:4 (a4 a3) (b2 b3) a4{t} a3{-} |
+
+`}</AlphaTexSample>
+

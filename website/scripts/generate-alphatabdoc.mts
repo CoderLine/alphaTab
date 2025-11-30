@@ -6,6 +6,7 @@ import { GenerateContext, repositoryRoot } from "./typeschema.mjs";
 import { generateTypeDocs } from "./generate-typedocs.mjs";
 import { cconsole, TypeReferencedCodeToken } from "./generate-common.mjs";
 import { generateApiDocs } from "./generate-api.mjs";
+import { generateAlphaTexDocs } from "./generate-alphatex.mjs";
 
 const alphaTabEntryFile = url.fileURLToPath(
   import.meta.resolve("@coderline/alphatab")
@@ -157,6 +158,7 @@ context.emptyFiles = process.argv.includes("--empty");
 await generateSettings(context);
 await generateTypeDocs(context);
 await generateApiDocs(context);
+await generateAlphaTexDocs();
 
 // styles for syntax highlighting
 import { PrismTheme, PrismThemeEntry, themes as prismThemes } from "prism-react-renderer";

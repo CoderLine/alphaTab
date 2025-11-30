@@ -1,0 +1,764 @@
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+import { ParameterValuesTable } from '@site/src/components/ParameterValuesTable';
+
+## `\title`
+
+```plain title="Syntax"
+\title (value template textAlign)
+```
+
+**Description:** Set the title of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\title ("Song Title" "Title: %TITLE%" left)
+C4
+
+`}</AlphaTexSample>
+
+## `\subtitle`
+
+```plain title="Syntax"
+\subtitle (value template textAlign)
+```
+
+**Description:** Set the subtitle of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\title ("Song Title" "Title: %TITLE%" left)
+\\subtitle ("Subtitle" "[%SUBTITLE%]" left)
+C4
+
+`}</AlphaTexSample>
+
+## `\artist`
+
+```plain title="Syntax"
+\artist (value template textAlign)
+```
+
+**Description:** Set the artist of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\title ("Song Title" "Title: %TITLE%" left)
+\\artist "alphaTab"
+    C4
+
+`}</AlphaTexSample>
+
+## `\album`
+
+```plain title="Syntax"
+\album (value template textAlign)
+```
+
+**Description:** Set the album of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\title ("Song Title" "Title: %TITLE%" left)
+\\album "alphaTab vol.1"
+C4
+
+`}</AlphaTexSample>
+
+## `\words`
+
+```plain title="Syntax"
+\words (value template textAlign)
+```
+
+**Description:** Set the lyrics author of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\words "CoderLine"
+C4
+
+`}</AlphaTexSample>
+
+## `\music`
+
+```plain title="Syntax"
+\music (value template textAlign)
+```
+
+**Description:** Set the music author of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\music "CoderLine and Contributors"
+C4
+
+`}</AlphaTexSample>
+
+## `\wordsAndMusic`
+
+```plain title="Syntax"
+\wordsAndMusic (template textAlign)
+```
+
+**Description:** Sets the template and text align for combined words and music authors.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `template` | The template used to render the text | `String` | yes  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\words "CoderLine"
+\\music "CoderLine"
+\\wordsAndMusic ("Words & Music: %WORDS%")
+C4
+
+`}</AlphaTexSample>
+
+## `\copyright`
+
+```plain title="Syntax"
+\copyright (value template textAlign)
+```
+
+**Description:** Set the copyright owner of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\copyright "CoderLine"
+C4
+
+`}</AlphaTexSample>
+
+## `\copyright2`
+
+```plain title="Syntax"
+\copyright2 (template textAlign)
+```
+
+**Description:** Sets the template and text align for the second copyright line.
+    
+    There is no own "value" as it is typically used to just define a static text like "All rights reserved". The "template" can be used for defining the display.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `template` | The template used to render the text | `String` | yes  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\copyright "CoderLine"
+\\copyright2 "All rights reserved"
+C4
+
+`}</AlphaTexSample>
+
+## `\instructions`
+
+```plain title="Syntax"
+\instructions value
+```
+
+**Description:** Sets additional textual instructions for the song (not displayed).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\instructions "Practice this piece until you get it perfect."
+C4
+
+`}</AlphaTexSample>
+
+## `\notices`
+
+```plain title="Syntax"
+\notices value
+```
+
+**Description:** Sets general notices for the song (not displayed).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\notices "I hope you appreciate this music sheet, it was a lot of effort to create!"
+C4
+
+`}</AlphaTexSample>
+
+## `\tab`
+
+```plain title="Syntax"
+\tab (value template textAlign)
+```
+
+**Description:** Set the transcriber of the music sheet.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\tab "Transcribed by me"
+C4
+
+`}</AlphaTexSample>
+
+## `\systemsLayout`
+
+```plain title="Syntax"
+\systemsLayout (numberOfBars)
+```
+
+**Description:** Defines the number of bars to display per system when rendering multiple tracks.
+
+The `systemsLayout` and `defaultSystemsLayout` allow configuring the system layout. The system layout, defines how many bars should be displayed per system (line) if enabled via [`systemsLayoutMode`](/docs/reference/settings/display/systemslayoutmode).
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `numberOfBars` | Defines for every system (line) the number of bars it should contain | `Number[]` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\systemsLayout (2 3 2)
+\\track 
+    :1 c4 | c4 | c4 | c4 | c4 | c4 | c4
+\\track 
+    :1 c4 | c4 | c4 | c4 | c4 | c4 | c4
+
+`}</AlphaTexSample>
+
+## `\defaultSystemsLayout`
+
+```plain title="Syntax"
+\defaultSystemsLayout numberOfBars
+```
+
+**Description:** Defines the default number of bars to display per system when rendering multiple tracks.
+
+The `systemsLayout` and `defaultSystemsLayout` allow configuring the system layout. The system layout, defines how many bars should be displayed per system (line) if enabled via [`systemsLayoutMode`](/docs/reference/settings/display/systemslayoutmode).
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `numberOfBars` | The number of bars the system should contain. | `Number` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\defaultSystemsLayout 2
+\\track 
+    :1 c4 | c4 | c4 | c4 | c4 | c4 | c4
+\\track 
+    :1 c4 | c4 | c4 | c4 | c4 | c4 | c4
+
+`}</AlphaTexSample>
+
+## `\showDynamics`
+
+```plain title="Syntax"
+\showDynamics ()
+```
+
+**Description:** Enables the display of dynamics.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\showDynamics
+    C4 {dy FFF} D4
+    E4 {dy PP} F4
+
+`}</AlphaTexSample>
+
+## `\hideDynamics`
+
+```plain title="Syntax"
+\hideDynamics ()
+```
+
+**Description:** Disables the display of dynamics.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\hideDynamics
+    C4 {dy FFF} D4
+    E4 {dy PP} F4
+
+`}</AlphaTexSample>
+
+## `\useSystemSignSeparator`
+
+```plain title="Syntax"
+\useSystemSignSeparator ()
+```
+
+**Description:** Configures whether a system sign separator should be added (in case multiple tracks are shown).
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\useSystemSignSeparator
+\\defaultSystemsLayout 2
+\\track "T1"
+:1 C4 | C4 | C4
+\\track "T2"
+:1 C4 | C4 | C4
+
+`}</AlphaTexSample>
+
+## `\multiBarRest`
+
+```plain title="Syntax"
+\multiBarRest ()
+```
+
+**Description:** Show multibar rests when rendering multiple tracks.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\title "Multi Track"
+\\multiBarRest
+\\track "Piano 1" "pno1"
+  \\staff {score}
+  C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | C4
+
+\\track "Piano 2" "pno1"
+  \\staff {score}
+  C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | r |
+
+`}</AlphaTexSample>
+
+## `\bracketExtendMode`
+
+```plain title="Syntax"
+\bracketExtendMode mode
+```
+
+**Description:** Set the mode for [brackets and braces](/docs/showcase/general#brackets-and-braces).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `noBrackets\|groupStaves\|groupSimilarInstruments` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["noBrackets","No brackets"],["groupStaves","Group staves of same track"],["groupSimilarInstruments","Group similar instruments"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\bracketextendmode GroupSimilarInstruments
+\\track "Piano1"
+  \\staff {score}
+\\instrument piano
+  C4 D4 E4 F4
+  \\staff {score}
+  \\clef f4 C3 D3 E3 F3
+\\track "Piano2"
+  \\staff {score}
+\\instrument piano
+  C4 D4 E4 F4
+\\track "Flute 1"
+  \\staff { score }
+\\instrument flute
+  C4 D4 E4 F4
+\\track "Flute 2"
+  \\staff { score }
+\\instrument flute
+  \\clef f4 C3 D3 E3 F3
+\\track "Guitar 1"
+  \\staff { score tabs }
+  0.3.4 2.3.4 5.3.4 7.3.4
+
+`}</AlphaTexSample>
+
+## `\singleTrackTrackNamePolicy`
+
+```plain title="Syntax"
+\singleTrackTrackNamePolicy mode
+```
+
+**Description:** Configures on which systems to show the [track names](/docs/showcase/general#track-names) when only a single track is rendered.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `hidden\|firstSystem\|allSystems` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["hidden","Track names are hidden everywhere."],["firstSystem","Track names are displayed on the first system."],["allSystems","Track names are displayed on all systems."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+    \\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+      C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+
+## `\multiTrackTrackNamePolicy`
+
+```plain title="Syntax"
+\multiTrackTrackNamePolicy mode
+```
+
+**Description:** Configures on which systems to show the [track names](/docs/showcase/general#track-names) when multiple tracks are rendered.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `hidden\|firstSystem\|allSystems` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["hidden","Track names are hidden everywhere."],["firstSystem","Track names are displayed on the first system."],["allSystems","Track names are displayed on all systems."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+    \\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+      C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+
+## `\firstSystemTrackNameMode`
+
+```plain title="Syntax"
+\firstSystemTrackNameMode mode
+```
+
+**Description:** Configures the text how to show as [track names](/docs/showcase/general#track-names) on the first system.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `fullName\|shortName` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["fullName","Short track names (abbreviations) are displayed."],["shortName","Full track names are displayed."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+\\firstsystemtracknamemode fullname
+\\othersystemstracknamemode shortname
+\\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+  C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+
+## `\otherSystemsTrackNameMode`
+
+```plain title="Syntax"
+\otherSystemsTrackNameMode mode
+```
+
+**Description:** Configures the text how to show as [track names](/docs/showcase/general#track-names) on the second and subsequent systems.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `fullName\|shortName` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["fullName","Short track names (abbreviations) are displayed."],["shortName","Full track names are displayed."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+\\firstsystemtracknamemode fullname
+\\othersystemstracknamemode shortname
+\\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+  C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+
+## `\firstSystemTrackNameOrientation`
+
+```plain title="Syntax"
+\firstSystemTrackNameOrientation orientation
+```
+
+**Description:** Configures the orientation of the [track names](/docs/showcase/general#track-names) on the first system.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `orientation` | The orientation to use | `horizontal\|vertical` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `orientation` | <ParameterValuesTable values={[["horizontal","Text is shown horizontally (left-to-right)."],["vertical","Vertically rotated (bottom-to-top)."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+\\firstsystemtracknamemode fullname
+\\othersystemstracknamemode shortname
+\\firstsystemtracknameorientation horizontal
+\\othersystemstracknameorientation vertical
+
+\\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+  \\staff {score}
+  C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+
+## `\otherSystemsTrackNameOrientation`
+
+```plain title="Syntax"
+\otherSystemsTrackNameOrientation orientation
+```
+
+**Description:** Configures the orientation of the [track names](/docs/showcase/general#track-names) on the second and subsequent systems.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `orientation` | The orientation to use | `horizontal\|vertical` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `orientation` | <ParameterValuesTable values={[["horizontal","Text is shown horizontally (left-to-right)."],["vertical","Vertically rotated (bottom-to-top)."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+  \\firstsystemtracknamemode fullname
+  \\othersystemstracknamemode shortname
+  \\firstsystemtracknameorientation horizontal
+  \\othersystemstracknameorientation vertical
+
+  \\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+    \\staff {score}
+    C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+

@@ -39,10 +39,10 @@ Examples:
 * `0.5`
 * `-4.5`
 
-## Value Lists
+## Parameters / Argument Lists
 
-At various places value lists are used to describe items like time signatures or bend points.
-Value lists should be wrapped with parenthesis `(values)` if there are multiple values. If there is only a single value, the parenthesis can be omitted. 
+At various places parameters are used to describe values like time signatures or bend points. 
+Arguments should be wrapped with parenthesis `(values)` if there are multiple values. If there is only a single value, the parenthesis can be omitted. 
 
 The individual values can be: 
 
@@ -50,7 +50,6 @@ The individual values can be:
 * Decimal Numbers: `3.3`, `-10.5`
 * Strings: `"Hello"`, `'Hello'`
 * Special identifiers: `true`, `hide`, `x`
-
 
 Basic Examples 
 
@@ -62,6 +61,9 @@ Real examples
 * `\ts (3 4)` A 3/4 time signature (specified on bar level)
 * `12.2 { b (0 4 0) }` A note bend describing a full note bend and release
 * `\title ("Song Title" "Title: %TITLE%" left)` A song title shown as `Title: Song Title` left aligned.
+
+You can compare this syntax construct with calling a function in scripting or programming languages: `myFunction(value1, value2)`. The difference in alphaTex is that the individual arguments
+are separated by simple spaces and single argument calls do not need parentehsis.
 
 ## Properties
 
@@ -81,8 +83,8 @@ Property identifiers are case-insensitive.
 
 Metadata tags are the most similar construct to LaTeX. Metadata are used to describe various elements within the data model.
 
-The main syntax of metadata tags is: `\tag values {properties}`.
-Both the `values` and `{properties}` are optional from a syntax perspective. Depending on the `tag` values might be expected to be specified.
+The main syntax of metadata tags is: `\tag parameters {properties}`.
+Both the `parameters` and `{properties}` are optional from a syntax perspective. Depending on the `tag` values might be expected to be specified.
 
 Examples:
 
@@ -92,10 +94,10 @@ Examples:
 
 Metadata tags identifiers are case-insensitive.
 
-### Metadata tag values
+### Metadata tag parameters
 
-Metadata tags might have one or multiple values. The exact values supported (required or optional) depend on the tag.
-See [Value Lists](#value-lists) above for more details.
+Metadata tags might have one or multiple values passed into them as arguments. The exact values supported (required or optional) depend on the tag.
+See [Arguments](#parameters--argument-lists) above for more details.
 
 ### Metadata tag properties
 

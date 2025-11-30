@@ -1,0 +1,604 @@
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+import { ParameterValuesTable } from '@site/src/components/ParameterValuesTable';
+
+## `\tuning`
+
+```plain title="Syntax"
+// [1]: 
+\tuning mode
+// [2]: 
+\tuning (strings)
+```
+
+**Description:** Defines the number of strings and their tuning for stringed (and fretted) instruments.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `mode` | A built-in standard mode for tunings | `piano\|none\|voice` | yes  |
+| `[2]` |  `strings` | The tuning values as [pitched notes](/docs/alphatex/document-structure#pitched-notes) | `Ident[]` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[1]` | `mode` | <ParameterValuesTable values={[["piano","Indicates that this staff is NOT stringed, but a piano with pitched notes."],["none","Indicates that this staff is NOT stringed and has no tuning and uses pitched notes."],["voice","Indicates that this staff is NOT stringed, but a vocal voice with pitched notes."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\track "Track 1"
+  \\staff {tabs}
+  \\tuning (A1 D2 A2 D3 G3 B3 E4) { hide label "Special Guitar Tuning" }
+  4.1 3.1 2.1 1.1
+\\track "Track 2"
+  \\tuning piano
+  C4 D4 E4 F4
+
+`}</AlphaTexSample>
+
+**Properties:**
+
+### `hide`
+
+```plain title="Syntax"
+hide ()
+```
+
+**Description:** Hides the tuning from being displayed above the first staff.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\track
+  \\staff {tabs}
+  \\tuning (E4 B3 G3 D3 A2 D2)
+  4.1 3.1 2.1 1.1   
+\\track
+  \\staff {tabs}
+  \\tuning (F2 C2 G1 D1) { hide}
+  4.1 3.1 2.1 1.1
+
+`}</AlphaTexSample>
+
+### `label`
+
+```plain title="Syntax"
+label text
+```
+
+**Description:** Defines the textual label for the tuning.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `text` | The label to set. | `String` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\track
+  \\staff {tabs}
+  \\tuning (E4 B3 G3 D3 A2 D2) { label "Dropped D Tuning" }
+  4.1 3.1 2.1 1.1
+
+`}</AlphaTexSample>
+
+## `\chord`
+
+```plain title="Syntax"
+\chord (name strings)
+```
+
+**Description:** Defines a new chord for a chord diagram display defining how to play it.
+
+To avoid inconsistencies with tunings, chords should be defined after the tuning is set.
+
+To use the defined chord the `ch chordName` beat property has to be applied. The notes for the chord still have to be specified separately, the definition in this metadata is purely for the chord diagram.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `name` | The name of the chord | `String` | yes  |
+|  `strings` | For every string of the staff tuning, the fret to be played or `x` for strings not played. | `Ident\|String\|Number[]` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\chord ("C" 0 1 0 2 3 x)
+\\ts 2 4
+(0.1 1.2 0.3 2.4 3.5){ch "C"} (0.1 1.2 0.3 2.4 3.5)
+
+`}</AlphaTexSample>
+
+**Properties:**
+
+### `firstFret`
+
+```plain title="Syntax"
+firstFret fret
+```
+
+**Description:** Shifts the first fret shown in the diagram higher
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `fret` | The index of the first fret | `Number` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\chord ("D#" 6 8 8 8 6 x) {firstfret 6}
+(6.1 8.2 8.3 8.4 6.5){ch "D#"}
+
+`}</AlphaTexSample>
+
+### `barre`
+
+```plain title="Syntax"
+barre (fret)
+```
+
+**Description:** Defines on which frets a barré should be played (visually joins the dots to a bar).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `fret` | The frets on which a barré should be played | `Number[]` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\chord ("D#" 6 8 8 8 6 x) {firstfret 6 barre 6}
+\\chord ("Special" 3 3 3 1 1 1) {showname false barre (1 3)}
+(6.1 8.2 8.3 8.4 6.5){ch "D#"} 
+(3.1 3.2 3.3 1.4 1.5 1.6){ch "Special"}
+
+`}</AlphaTexSample>
+
+### `showDiagram`
+
+```plain title="Syntax"
+// [1]: 
+showDiagram ()
+// [2]: 
+showDiagram visibility
+// [3]: 
+showDiagram visibility
+// [4]: 
+showDiagram visibility
+```
+
+**Description:** Set the chord diagram visibility.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[2]` |  `visibility` | The visibility of the diagram | `"true"\|"false"` | yes  |
+| `[3]` |  `visibility` | The visibility of the diagram | `true\|false` | yes  |
+| `[4]` |  `visibility` | The visibility of the diagram | `1\|0` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `visibility` | <ParameterValuesTable values={[["\"true\"","Show the diagram"],["\"false\"","Hide the diagram"]]} /> |
+| `[3]` | `visibility` | <ParameterValuesTable values={[["true","Show the diagram"],["false","Hide the diagram"]]} /> |
+| `[4]` | `visibility` | <ParameterValuesTable values={[["1","Show the diagram"],["0","Hide the diagram"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\chord ("E" 0 0 1 2 2 0) {showdiagram false}
+(0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
+
+`}</AlphaTexSample>
+
+### `showFingering`
+
+```plain title="Syntax"
+// [1]: 
+showFingering ()
+// [2]: 
+showFingering visibility
+// [3]: 
+showFingering visibility
+// [4]: 
+showFingering visibility
+```
+
+**Description:** Set the finger position visibility.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[2]` |  `visibility` | The visibility of the finger position | `"true"\|"false"` | yes  |
+| `[3]` |  `visibility` | The visibility of the finger position | `true\|false` | yes  |
+| `[4]` |  `visibility` | The visibility of the finger position | `1\|0` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `visibility` | <ParameterValuesTable values={[["\"true\"","Show the fingering"],["\"false\"","Hide the fingering"]]} /> |
+| `[3]` | `visibility` | <ParameterValuesTable values={[["true","Show the fingering"],["false","Hide the fingering"]]} /> |
+| `[4]` | `visibility` | <ParameterValuesTable values={[["1","Show the fingering"],["0","Hide the fingering"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\chord ("E" 0 0 1 2 2 0) {showfingers false}
+(0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
+
+`}</AlphaTexSample>
+
+### `showName`
+
+```plain title="Syntax"
+// [1]: 
+showName ()
+// [2]: 
+showName visibility
+// [3]: 
+showName visibility
+// [4]: 
+showName visibility
+```
+
+**Description:** Set the chord name visibility.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[2]` |  `visibility` | The visibility of the chord name in the diagram | `"true"\|"false"` | yes  |
+| `[3]` |  `visibility` | The visibility of the chord name in the diagram | `true\|false` | yes  |
+| `[4]` |  `visibility` | The visibility of the chord name in the diagram | `1\|0` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `visibility` | <ParameterValuesTable values={[["\"true\"","Show the chord name"],["\"false\"","Hide the chord name"]]} /> |
+| `[3]` | `visibility` | <ParameterValuesTable values={[["true","Show the chord name"],["false","Hide the chord name"]]} /> |
+| `[4]` | `visibility` | <ParameterValuesTable values={[["1","Show the chord name"],["0","Hide the chord name"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+// Hide name
+\\chord ("Special" 3 3 3 1 1 1) {showname false}
+.
+(3.1 3.2 3.3 1.4 1.5 1.6){ch "Special"}
+
+`}</AlphaTexSample>
+
+## `\capo`
+
+```plain title="Syntax"
+\capo fret
+```
+
+**Description:** Defines the fret on which a capo should be placed.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `fret` | The fret on which a capo is placed | `Number` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\track "Guitar"
+\\staff{tabs} 
+\\capo 5
+1.2 3.2 0.1 1.1
+
+`}</AlphaTexSample>
+
+## `\lyrics`
+
+```plain title="Syntax"
+// [1]: 
+\lyrics lyrics
+// [2]: 
+\lyrics (startBar lyrics)
+```
+
+**Description:** Define the lyrics shown on the beats of the staff.
+
+The lyrics system of alphaTab is borrowed from Guitar Pro. For every track multiple "lines" of lyrics can be defined which can either start at the beginning or at a later bar. The syllables of the provided lyrics are spread automatically across the beats of the track. Syllables are separated with spaces. If multiple words/syllables should stay on the same beat the space can be replaced with a `+`. Comments which should not be displayed can be put `[into brackets]`.
+
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `lyrics` | The lyrics text to apply to the beats | `String` | yes  |
+| `[2]` |  `startBar` | The first bar on which the notes should be applied | `Number` | yes  |
+| `[2]` |  `lyrics` | The lyrics text to apply to the beats | `String` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\title "With Lyrics"
+\\instrument piano
+\\lyrics "Do Re Mi Fa So La Ti"
+C4 D4 E4 F4 | G4 A4 B4 r
+
+`}</AlphaTexSample>
+<AlphaTexSample tracks="all" player={true} >{`
+\\title "Combine Syllables (and empty beats)"
+\\instrument piano
+\\lyrics "Do+Do  Mi+Mi"
+C4 C4 E4 E4
+
+`}</AlphaTexSample>
+<AlphaTexSample tracks="all" player={true} >{`
+\\title "Start Later"
+\\instrument piano
+\\lyrics 2 "Do Re Mi Fa So La Ti"
+r r r r | r r r r |
+C4 D4 E4 F4 | G4 A4 B4 r
+
+`}</AlphaTexSample>
+<AlphaTexSample tracks="all" player={true} >{`
+\\title "Comment"
+\\subtitle "Useful when loading lyrics from a different source"
+\\instrument piano
+\\lyrics "[This is a comment]Do Re Mi Fa"
+C4 D4 E4 F4        
+
+`}</AlphaTexSample>
+
+## `\articulation`
+
+```plain title="Syntax"
+// [1]: Registers all standard articulation names
+\articulation defaults
+// [2]: 
+\articulation (name value)
+```
+
+**Description:** Defines the articulations available to write percussion and drum tabs.
+
+Currently alphaTex does not defining completely custom articulations (note heads, staff line, technical symbols etc.).
+
+    | Number | Name Long | Name Short |
+|--------|-----------|------------|
+| `29` | `Ride (choke)` | `Ridechoke` |
+| `30` | `Cymbal (hit)` | `Cymbalhit` |
+| `31` | `Snare (side stick)` | `Snaresidestick` |
+| `33` | `Snare (side stick) 2` | `Snaresidestick2` |
+| `34` | `Snare (hit)` | `Snarehit` |
+| `35` | `Kick (hit)` | `Kickhit` |
+| `36` | `Kick (hit) 2` | `Kickhit2` |
+| `37` | `Snare (side stick) 3` | `Snaresidestick3` |
+| `38` | `Snare (hit) 2` | `Snarehit2` |
+| `39` | `Hand Clap (hit)` | `HandClaphit` |
+| `40` | `Snare (hit) 3` | `Snarehit3` |
+| `41` | `Low Floor Tom (hit)` | `LowFloorTomhit` |
+| `42` | `Hi-Hat (closed)` | `HiHatclosed` |
+| `43` | `Very Low Tom (hit)` | `VeryLowTomhit` |
+| `44` | `Pedal Hi-Hat (hit)` | `PedalHiHathit` |
+| `45` | `Low Tom (hit)` | `LowTomhit` |
+| `46` | `Hi-Hat (open)` | `HiHatopen` |
+| `47` | `Mid Tom (hit)` | `MidTomhit` |
+| `48` | `High Tom (hit)` | `HighTomhit` |
+| `49` | `Crash high (hit)` | `Crashhighhit` |
+| `50` | `High Floor Tom (hit)` | `HighFloorTomhit` |
+| `51` | `Ride (middle)` | `Ridemiddle` |
+| `52` | `China (hit)` | `Chinahit` |
+| `53` | `Ride (bell)` | `Ridebell` |
+| `54` | `Tambourine (hit)` | `Tambourinehit` |
+| `55` | `Splash (hit)` | `Splashhit` |
+| `56` | `Cowbell medium (hit)` | `Cowbellmediumhit` |
+| `57` | `Crash medium (hit)` | `Crashmediumhit` |
+| `58` | `Vibraslap (hit)` | `Vibraslaphit` |
+| `59` | `Ride (edge)` | `Rideedge` |
+| `60` | `Hand (hit)` | `Handhit` |
+| `61` | `Hand (hit)` | `Handhit` |
+| `62` | `Conga high (mute)` | `Congahighmute` |
+| `63` | `Conga high (hit)` | `Congahighhit` |
+| `64` | `Conga low (hit)` | `Congalowhit` |
+| `65` | `Timbale high (hit)` | `Timbalehighhit` |
+| `66` | `Timbale low (hit)` | `Timbalelowhit` |
+| `67` | `Agogo high (hit)` | `Agogohighhit` |
+| `68` | `Agogo tow (hit)` | `Agogotowhit` |
+| `69` | `Cabasa (hit)` | `Cabasahit` |
+| `70` | `Left Maraca (hit)` | `LeftMaracahit` |
+| `71` | `Whistle high (hit)` | `Whistlehighhit` |
+| `72` | `Whistle low (hit)` | `Whistlelowhit` |
+| `73` | `Guiro (hit)` | `Guirohit` |
+| `74` | `Guiro (scrap-return)` | `Guiroscrapreturn` |
+| `75` | `Claves (hit)` | `Claveshit` |
+| `76` | `Woodblock high (hit)` | `Woodblockhighhit` |
+| `77` | `Woodblock low (hit)` | `Woodblocklowhit` |
+| `78` | `Cuica (mute)` | `Cuicamute` |
+| `79` | `Cuica (open)` | `Cuicaopen` |
+| `80` | `Triangle (rnute)` | `Trianglernute` |
+| `81` | `Triangle (hit)` | `Trianglehit` |
+| `82` | `Shaker (hit)` | `Shakerhit` |
+| `83` | `Tinkle Bell (hat)` | `TinkleBellhat` |
+| `83` | `Jingle Bell (hit)` | `JingleBellhit` |
+| `84` | `Bell Tree (hit)` | `BellTreehit` |
+| `85` | `Castanets (hit)` | `Castanetshit` |
+| `86` | `Surdo (hit)` | `Surdohit` |
+| `87` | `Surdo (mute)` | `Surdomute` |
+| `91` | `Snare (rim shot)` | `Snarerimshot` |
+| `92` | `Hi-Hat (half)` | `HiHathalf` |
+| `93` | `Ride (edge) 2` | `Rideedge2` |
+| `94` | `Ride (choke) 2` | `Ridechoke2` |
+| `95` | `Splash (choke)` | `Splashchoke` |
+| `96` | `China (choke)` | `Chinachoke` |
+| `97` | `Crash high (choke)` | `Crashhighchoke` |
+| `98` | `Crash medium (choke)` | `Crashmediumchoke` |
+| `99` | `Cowbell low (hit)` | `Cowbelllowhit` |
+| `100` | `Cowbell low (tip)` | `Cowbelllowtip` |
+| `101` | `Cowbell medium (tip)` | `Cowbellmediumtip` |
+| `102` | `Cowbell high (hit)` | `Cowbellhighhit` |
+| `103` | `Cowbell high (tip)` | `Cowbellhightip` |
+| `104` | `Hand (mute)` | `Handmute` |
+| `105` | `Hand (slap)` | `Handslap` |
+| `106` | `Hand (mute) 2` | `Handmute2` |
+| `107` | `Hand (slap) 2` | `Handslap2` |
+| `108` | `Conga low (slap)` | `Congalowslap` |
+| `109` | `Conga low (mute)` | `Congalowmute` |
+| `110` | `Conga high (slap)` | `Congahighslap` |
+| `111` | `Tambourine (return)` | `Tambourinereturn` |
+| `112` | `Tambourine (roll)` | `Tambourineroll` |
+| `113` | `Tambourine (hand)` | `Tambourinehand` |
+| `114` | `Grancassa (hit)` | `Grancassahit` |
+| `115` | `Piatti (hat)` | `Piattihat` |
+| `116` | `Piatti (hand)` | `Piattihand` |
+| `117` | `Cabasa (return)` | `Cabasareturn` |
+| `118` | `Left Maraca (return)` | `LeftMaracareturn` |
+| `119` | `Right Maraca (hit)` | `RightMaracahit` |
+| `120` | `Right Maraca (return)` | `RightMaracareturn` |
+| `122` | `Shaker (return)` | `Shakerreturn` |
+| `123` | `Bell Tee (return)` | `BellTeereturn` |
+| `124` | `Golpe (thumb)` | `Golpethumb` |
+| `125` | `Golpe (finger)` | `Golpefinger` |
+| `126` | `Ride (middle) 2` | `Ridemiddle2` |
+| `127` | `Ride (bell) 2` | `Ridebell2` |
+
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `defaults` | Registers all standard articulation names | `defaults` | yes  |
+| `[2]` |  `name` | The string used in the note values | `String` | yes  |
+| `[2]` |  `value` | The numeric value of the built-in articulation | `Number` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[1]` | `defaults` | <ParameterValuesTable values={[["defaults",""]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\track "Drums"
+\\instrument percussion
+\\tempo 120
+\\clef neutral
+\\articulation defaults
+(KickHit RideBell).16 r KickHit KickHit (KickHit RideBell).16 r KickHit KickHit (KickHit RideBell).16 r KickHit KickHit (KickHit RideBell).16 r KickHit KickHit |
+(KickHit HiHatOpen) KickHit KickHit KickHit (KickHit HiHatOpen) KickHit KickHit KickHit (KickHit SnareHit HiHatOpen) KickHit KickHit.32 KickHit KickHit.16 (KickHit HiHatOpen) KickHit KickHit KickHit |
+(KickHit HiHatOpen).8{tu 3} KickHit{tu 3} KickHit{tu 3} (KickHit SnareHit HiHatOpen){tu 3} KickHit.16{tu 3} KickHit{tu 3} KickHit.8{tu 3} (KickHit HiHatOpen).8{tu 3} KickHit{tu 3} KickHit{tu 3} (KickHit SnareHit HiHatOpen).8{tu 3} KickHit{tu 3} KickHit{tu 3}
+
+`}</AlphaTexSample>
+
+## `\displayTranspose`
+
+```plain title="Syntax"
+\displayTranspose semitones
+```
+
+**Description:** Defines the number of semitones by which the standard notation should be transposed.
+
+This only affects the display of the notes, not their audio.
+
+It is typically used in situations like for guitars where the standard notation is displayed 1 octave lower to fit better into the standard staff.
+
+It is a common practice to show a standard clef on guitar notes even though they are transposed by 1 octave to better fit into the standard staff lines.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `semitones` | The number of semitones by which the notes should be transposed | `Number` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\track \\staff \\instrument piano
+\\displayTranspose -12
+    C4.4 D4 E4 F4 | r.1
+
+`}</AlphaTexSample>
+
+## `\transpose`
+
+```plain title="Syntax"
+\transpose semitones
+```
+
+**Description:** Defines the number of semitones by which the standard notation should be transposed.
+
+This affects the display and audio.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `semitones` | The number of semitones by which the notes should be transposed | `Number` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\track \\staff \\instrument piano
+\\transpose -12
+    C4.4 D4 E4 F4 | r.1
+
+`}</AlphaTexSample>
+
+## `\instrument`
+
+```plain title="Syntax"
+// [1]: Set the midi instrument as midi program number
+\instrument program
+// [2]: Set the midi instrument as midi program name
+\instrument programName
+// [3]: Set the instrument to percussion
+\instrument percussion
+```
+
+**Description:** Defines the instrument for the track.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `program` | MIDI program number (0-127) | `Number` | yes  |
+| `[2]` |  `programName` | MIDI program name | `String` | yes  |
+| `[3]` |  `percussion` | Percussion | `percussion` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `programName` | <ParameterValuesTable values={[["\"Acoustic Grand Piano\"",""],["\"Bright Grand Piano\"",""],["\"Electric Grand Piano\"",""],["\"Honky tonk Piano\"",""],["\"Electric Piano 1\"",""],["\"Electric Piano 2\"",""],["\"Harpsichord\"",""],["\"Clavinet\"",""],["\"Celesta\"",""],["\"Glockenspiel\"",""],["\"Musicbox\"",""],["\"Vibraphone\"",""],["\"Marimba\"",""],["\"Xylophone\"",""],["\"Tubularbells\"",""],["\"Dulcimer\"",""],["\"Drawbar Organ\"",""],["\"Percussive Organ\"",""],["\"Rock Organ\"",""],["\"Church Organ\"",""],["\"Reed Organ\"",""],["\"Accordion\"",""],["\"Harmonica\"",""],["\"Tango Accordion\"",""],["\"Acoustic Guitar Nylon\"",""],["\"Acoustic Guitar Steel\"",""],["\"Electric Guitar Jazz\"",""],["\"Electric Guitar Clean\"",""],["\"Electric Guitar Muted\"",""],["\"Overdriven Guitar\"",""],["\"Distortion Guitar\"",""],["\"Guitar Harmonics\"",""],["\"Acoustic Bass\"",""],["\"Electric Bass Finger\"",""],["\"Electric Bass Pick\"",""],["\"Fretless Bass\"",""],["\"Slap Bass 1\"",""],["\"Slap Bass 2\"",""],["\"Synth Bass 1\"",""],["\"Synth Bass 2\"",""],["\"Violin\"",""],["\"Viola\"",""],["\"Cello\"",""],["\"Contrabass\"",""],["\"Tremolo Strings\"",""],["\"Pizzicato Strings\"",""],["\"Orchestral Harp\"",""],["\"Timpani\"",""],["\"String Ensemble 1\"",""],["\"String Ensemble 2\"",""],["\"Synth Strings 1\"",""],["\"Synth Strings 2\"",""],["\"Choir Aahs\"",""],["\"Voice Oohs\"",""],["\"Synth Voice\"",""],["\"Orchestra Hit\"",""],["\"Trumpet\"",""],["\"Trombone\"",""],["\"Tuba\"",""],["\"Muted Trumpet\"",""],["\"French Horn\"",""],["\"Brass Section\"",""],["\"Synth Brass 1\"",""],["\"Synth Brass 2\"",""],["\"Soprano Sax\"",""],["\"Alto Sax\"",""],["\"Tenor Sax\"",""],["\"Baritone Sax\"",""],["\"Oboe\"",""],["\"English Horn\"",""],["\"Bassoon\"",""],["\"Clarinet\"",""],["\"Piccolo\"",""],["\"Flute\"",""],["\"Recorder\"",""],["\"Pan Flute\"",""],["\"Blown bottle\"",""],["\"Shakuhachi\"",""],["\"Whistle\"",""],["\"Ocarina\"",""],["\"Lead 1 Square\"",""],["\"Lead 2 Sawtooth\"",""],["\"Lead 3 Calliope\"",""],["\"Lead 4 Chiff\"",""],["\"Lead 5 Charang\"",""],["\"Lead 6 Voice\"",""],["\"Lead 7 Fifths\"",""],["\"Lead 8 Bass and Lead\"",""],["\"Pad 1 newage\"",""],["\"Pad 2 warm\"",""],["\"Pad 3 polysynth\"",""],["\"Pad 4 choir\"",""],["\"Pad 5 bowed\"",""],["\"Pad 6 metallic\"",""],["\"Pad 7 halo\"",""],["\"Pad 8 sweep\"",""],["\"Fx 1 rain\"",""],["\"Fx 2 soundtrack\"",""],["\"Fx 3 crystal\"",""],["\"Fx 4 atmosphere\"",""],["\"Fx 5 brightness\"",""],["\"Fx 6 goblins\"",""],["\"Fx 7 echoes\"",""],["\"Fx 8 scifi\"",""],["\"Sitar\"",""],["\"Banjo\"",""],["\"Shamisen\"",""],["\"Koto\"",""],["\"Kalimba\"",""],["\"Bag pipe\"",""],["\"Fiddle\"",""],["\"Shanai\"",""],["\"Tinkle Bell\"",""],["\"Agogo\"",""],["\"Steel Drums\"",""],["\"Woodblock\"",""],["\"Taiko Drum\"",""],["\"Melodic Tom\"",""],["\"Synth Drum\"",""],["\"Reverse Cymbal\"",""],["\"Guitar Fret Noise\"",""],["\"Breath Noise\"",""],["\"Seashore\"",""],["\"Bird Tweet\"",""],["\"Telephone Ring\"",""],["\"Helicopter\"",""],["\"Applause\"",""],["\"Gunshot\"",""]]} /> |
+| `[3]` | `percussion` | <ParameterValuesTable values={[["percussion",""]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+
+`}</AlphaTexSample>
+

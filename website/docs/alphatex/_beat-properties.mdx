@@ -1,0 +1,1131 @@
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+import { ParameterValuesTable } from '@site/src/components/ParameterValuesTable';
+
+## `f`
+
+```plain title="Syntax"
+f ()
+```
+
+**Description:** Adds a fade-in effect to the beat. Applies to all notes.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(0.1 2.2 2.3 2.4 0.5).2 { f }
+
+`}</AlphaTexSample>
+
+## `fo`
+
+```plain title="Syntax"
+fo ()
+```
+
+**Description:** Adds a fade-out effect to the beat. Applies to all notes.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(0.1 2.2 2.3 2.4 0.5).1 { fo }
+
+`}</AlphaTexSample>
+
+## `vs`
+
+```plain title="Syntax"
+vs ()
+```
+
+**Description:** Adds a volume-swell effect to the beat. Applies to all notes.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(0.1 2.2 2.3 2.4 0.5).1 { vs }
+
+`}</AlphaTexSample>
+
+## `v`
+
+```plain title="Syntax"
+v ()
+```
+
+**Description:** Adds a slight vibrato effect to the beat. Applies to all notes.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(0.1 2.2 2.3 2.4 0.5).1 { v }
+
+`}</AlphaTexSample>
+
+## `vw`
+
+```plain title="Syntax"
+vw ()
+```
+
+**Description:** Adds a wide vibrato effect to the beat. Applies to all notes.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(0.1 2.2 2.3 2.4 0.5).1 { vw }
+
+`}</AlphaTexSample>
+
+## `s`
+
+```plain title="Syntax"
+s ()
+```
+
+**Description:** Adds a bass slap annotation to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\track {instrument "Electric Bass Finger"}
+(3 4) 3.4.8 {s} (5.1 5.2).4 {p}  3.4.8 {s} (5.1 5.2).4 {p}
+
+`}</AlphaTexSample>
+
+## `p`
+
+```plain title="Syntax"
+p ()
+```
+
+**Description:** Adds a bass pop annotation to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\track {instrument "Electric Bass Finger"}
+(3 4) 3.4.8 {s} (5.1 5.2).4 {p}  3.4.8 {s} (5.1 5.2).4 {p}
+
+`}</AlphaTexSample>
+
+## `tt`
+
+```plain title="Syntax"
+tt ()
+```
+
+**Description:** Adds a guitar or bass tapping annotation to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\track {instrument "Electric Bass Finger"}
+:8 {tu 3} 
+18.1 {tt h} 10.1 {h} 14.1
+18.1 {tt h} 10.1 {h} 14.1
+18.1 {tt h} 10.1 {h} 14.1
+18.1 {tt h} 10.1 {h} 14.1
+
+`}</AlphaTexSample>
+
+## `d`
+
+```plain title="Syntax"
+d ()
+```
+
+**Description:** Marks the beat with a single augmentation dot.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(0.1 2.2 2.3 2.4 0.5).1 { d }
+
+`}</AlphaTexSample>
+
+## `dd`
+
+```plain title="Syntax"
+dd ()
+```
+
+**Description:** Marks the beat with a double augmentation dot.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(0.1 2.2 2.3 2.4 0.5).1 { dd }
+
+`}</AlphaTexSample>
+
+## `su`
+
+```plain title="Syntax"
+su ()
+```
+
+**Description:** Adds an upwards pick-stroke annotation to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+0.1 { su }
+
+`}</AlphaTexSample>
+
+## `sd`
+
+```plain title="Syntax"
+sd ()
+```
+
+**Description:** Adds an downwards pick-stroke annotation to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+0.1 { sd }
+
+`}</AlphaTexSample>
+
+## `cre`
+
+```plain title="Syntax"
+cre ()
+```
+
+**Description:** Adds a crescendo effect to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3 { cre } -.3 { cre }
+
+`}</AlphaTexSample>
+
+## `dec`
+
+```plain title="Syntax"
+dec ()
+```
+
+**Description:** Adds a decrescendo (diminuendo) effect to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3 { dec } -.3 { dec }
+
+`}</AlphaTexSample>
+
+## `spd`
+
+```plain title="Syntax"
+spd ()
+```
+
+**Description:** Add a sustain pedal down-press to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 {spd} C4 {sph} C4 {sph} C4 {spu} |
+C4 {spd} C4 {sph} C4 {sph} C4 {spe}
+
+`}</AlphaTexSample>
+
+## `sph`
+
+```plain title="Syntax"
+sph ()
+```
+
+**Description:** Add a sustain pedal hold to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 {spd} C4 {sph} C4 {sph} C4 {spu} |
+C4 {spd} C4 {sph} C4 {sph} C4 {spe}
+
+`}</AlphaTexSample>
+
+## `spu`
+
+```plain title="Syntax"
+spu ()
+```
+
+**Description:** Add a sustain pedal up (release) to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 {spd} C4 {sph} C4 {sph} C4 {spu} |
+C4 {spd} C4 {sph} C4 {sph} C4 {spe}
+
+`}</AlphaTexSample>
+
+## `spe`
+
+```plain title="Syntax"
+spe ()
+```
+
+**Description:** Add a sustain pedal up (release) to the end of the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 {spd} C4 {sph} C4 {sph} C4 {spu} |
+C4 {spd} C4 {sph} C4 {sph} C4 {spe}
+
+`}</AlphaTexSample>
+
+## `slashed`
+
+```plain title="Syntax"
+slashed ()
+```
+
+**Description:** Marks the beat to be displayed with slash notation.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(0.1 2.2 2.3 2.4 0.5).2  (0.1 2.2 2.3 2.4 0.5).2 { slashed }
+
+`}</AlphaTexSample>
+
+## `ds`
+
+```plain title="Syntax"
+ds ()
+```
+
+**Description:** Marks the beat to be a dead-slap beat.
+
+As no notes should be on such a beat, simply use () to indicate the empty beat which is not a rest.
+
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+().4 {ds} ().4 {ds}
+
+`}</AlphaTexSample>
+
+## `glpf`
+
+```plain title="Syntax"
+glpf ()
+```
+
+**Description:** Adds a golpe finger-tap effect to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{glpf} 3.3{glpt}
+
+`}</AlphaTexSample>
+
+## `glpt`
+
+```plain title="Syntax"
+glpt ()
+```
+
+**Description:** Adds a golpe thumb-tap effect to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{glpf} 3.3{glpt}
+
+`}</AlphaTexSample>
+
+## `waho`
+
+```plain title="Syntax"
+waho ()
+```
+
+**Description:** Adds a Wah-pedal opening effect to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3 3.3{waho} 3.3 3.3 {wahc}
+
+`}</AlphaTexSample>
+
+## `wahc`
+
+```plain title="Syntax"
+wahc ()
+```
+
+**Description:** Adds a Wah-pedal close effect to the beat.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3 3.3{waho} 3.3 3.3 {wahc}
+
+`}</AlphaTexSample>
+
+## `legatoOrigin`
+
+```plain title="Syntax"
+legatoOrigin ()
+```
+
+**Description:** Adds a legato from this beat to the next one.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3.4{ legatoOrigin } 10.3.4
+
+`}</AlphaTexSample>
+
+## `timer`
+
+```plain title="Syntax"
+timer ()
+```
+
+**Description:** Adds a timestamp marker to the beat.
+
+Timers are showing the exact timestamp when a beat is played the first time (respecting aspects like repeats).
+
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\tempo 120
+3.3.4 { timer } 3.3.4*3 |
+\\ro 3.3.4 { timer } 3.3.4*3 |
+3.3.4 { timer } 3.3.4*3 |
+\\jump fine 3.3.4 { timer } 3.3.4*3 |
+\\ae (1) 3.3.4 { timer } 3.3.4*3 |
+\\ae (2 3) \\rc 3 3.3.4 { timer } 3.3.4*3 |
+3.3.4 { timer } 3.3.4*3 |
+\\jump DaCapoAlFine 3.3.4 { timer } 3.3.4*3 |
+3.3.4 { timer } 3.3.4*3
+
+`}</AlphaTexSample>
+
+## `tu`
+
+```plain title="Syntax"
+// [1]: 
+tu simple
+// [2]: 
+tu (numerator denominator)
+```
+
+**Description:** Adds a tuplet to the beat duration.
+
+There are some built-in simple tuplet variants or you can specify the exact division.
+
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `simple` | The simple tuplet | `Number` | yes  |
+| `[2]` |  `numerator` | The tuplet numerator | `Number` | yes  |
+| `[2]` |  `denominator` | The tuplet denominator | `Number` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[1]` | `simple` | <ParameterValuesTable values={[["3","3:2 Tuplet"],["5","5:4 Tuplet"],["6","6:4 Tuplet"],["7","7:4 Tuplet"],["9","9:8 Tuplet"],["10","10:8 Tuplet"],["12","12:8 Tuplet"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 {tu 3} * 3 |
+C4 {tu 5} * 5 |
+C4 {tu 5 2} * 5
+
+`}</AlphaTexSample>
+
+## `txt`
+
+```plain title="Syntax"
+txt text
+```
+
+**Description:** Adds a text annotation to the beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `text` | The text to show above the beat | `String` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 {txt "This is a C4 Note"}
+
+`}</AlphaTexSample>
+
+## `lyrics`
+
+```plain title="Syntax"
+// [1]: 
+lyrics text
+// [2]: 
+lyrics (line text)
+```
+
+**Description:** Adds a lyric text to the beat.
+
+This is an alternative way of applying the exact lyrics to beats instead of using the `\lyrics` metadata where a special syntax is used to spread the text across beats.
+
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `text` | The lyrics to show | `String` | yes  |
+| `[2]` |  `line` | The line number (e.g. for multiple verses) | `Number` | yes  |
+| `[2]` |  `text` | The lyrics to show | `String` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 {lyrics "Do"} 
+D4 {lyrics "Re"} 
+E4 {lyrics "Mi"} 
+F4 {lyrics "Fa"} |
+G4 {lyrics 0 "So" lyrics 1 "G"}
+A4 {lyrics 0 "La" lyrics 1 "A"}
+B4 {lyrics 0 "Ti" lyrics 1 "B"}
+r
+
+`}</AlphaTexSample>
+
+## `tb`
+
+```plain title="Syntax"
+// [1]: 
+tb (values)
+// [2]: 
+tb (type values)
+// [3]: 
+tb (style values)
+// [4]: 
+tb (type style values)
+```
+
+**Description:** Adds a whammy bar (aka. tremolo bar) effect to the beat.
+
+* The `tb` variant automatically spreads the values across the duration of the beat.
+* The `tbe` (exact) variant allows specifying exactly at which offset a value is placed.
+
+It is recommended to rely on the auto-detection of the type and only specify the type explicitly if something is wrong.
+
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `values` | The values of the whammy in quarter-tones relative to the original note, decimals supported | `Number[]` | no  |
+| `[2]` |  `type` | The type of whammy (affects the display). | `Ident` | yes  |
+| `[2]` |  `values` | The values of the whammy in quarter-tones relative to the original note, decimals supported | `Number[]` | no  |
+| `[3]` |  `style` | The style of the whammy play style. | `default\|gradual\|fast` | yes  |
+| `[3]` |  `values` | The values of the whammy in quarter-tones relative to the original note, decimals supported | `Number[]` | no  |
+| `[4]` |  `type` | The type of whammy (affects the display). | `Ident` | yes  |
+| `[4]` |  `style` | The style of the whammy play style. | `default\|gradual\|fast` | yes  |
+| `[4]` |  `values` | The values of the whammy in quarter-tones relative to the original note, decimals supported | `Number[]` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `type` | <ParameterValuesTable values={[["custom","Non standard custom whammys with multiple points"],["dive","A gradual change between two points"],["dip","A A->B->A whammy pattern."],["hold","Holding whammys (on tied notes)."],["predive","Press/pull before playing the note and then kept"],["prediveDive","Whammy bar is pressed/pulled before playing the note and then further pressed/released"]]} /> |
+| `[3]` | `style` | <ParameterValuesTable values={[["default",""],["gradual",""],["fast",""]]} /> |
+| `[4]` | `type` | <ParameterValuesTable values={[["custom","Non standard custom whammys with multiple points"],["dive","A gradual change between two points"],["dip","A A->B->A whammy pattern."],["hold","Holding whammys (on tied notes)."],["predive","Press/pull before playing the note and then kept"],["prediveDive","Whammy bar is pressed/pulled before playing the note and then further pressed/released"]]} /> |
+| `[4]` | `style` | <ParameterValuesTable values={[["default",""],["gradual",""],["fast",""]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3.1{tb (0 4 0 8)} | r |
+3.3.1{tb (0 -4 0 -8)} | r |
+3.3.1{tbe (0 0 5 4 30 8 60 0)}
+
+`}</AlphaTexSample>
+
+## `tbe`
+
+```plain title="Syntax"
+// [1]: 
+tbe (valuesAndOffsets)
+// [2]: 
+tbe (type valuesAndOffsets)
+// [3]: 
+tbe (style valuesAndOffsets)
+// [4]: 
+tbe (type style valuesAndOffsets)
+```
+
+**Description:** Adds a whammy bar (aka. tremolo bar) effect to the beat.
+
+* The `tb` variant automatically spreads the values across the duration of the beat.
+* The `tbe` (exact) variant allows specifying exactly at which offset a value is placed.
+ 
+It is recommended to rely on the auto-detection of the type and only specify the type explicitly if something is wrong.
+
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `valuesAndOffsets` | The offset at which the value becomes valid in range of 0-60 and <br />    The value of the whammy in quarter-tones relative to the original note, decimals supported.<br />    The offset and value are actually two parameters: <br />    `3.3.1{tbe (0 0 5 4 30 8 60 0)}`<br />     | `Number[]` | no  |
+| `[2]` |  `type` | The type of whammy (affects the display). | `Ident` | yes  |
+| `[2]` |  `valuesAndOffsets` | The offset at which the value becomes valid in range of 0-60 and <br />    The value of the whammy in quarter-tones relative to the original note, decimals supported.<br />    The offset and value are actually two parameters: <br />    `3.3.1{tbe (0 0 5 4 30 8 60 0)}`<br />     | `Number[]` | no  |
+| `[3]` |  `style` | The style of the whammy. | `default\|gradual\|fast` | yes  |
+| `[3]` |  `valuesAndOffsets` | The offset at which the value becomes valid in range of 0-60 and <br />    The value of the whammy in quarter-tones relative to the original note, decimals supported.<br />    The offset and value are actually two parameters: <br />    `3.3.1{tbe (0 0 5 4 30 8 60 0)}`<br />     | `Number[]` | no  |
+| `[4]` |  `type` | The type of whammy (affects the display). | `Ident` | yes  |
+| `[4]` |  `style` | The style of the whammy. | `default\|gradual\|fast` | yes  |
+| `[4]` |  `valuesAndOffsets` | The offset at which the value becomes valid in range of 0-60 and <br />    The value of the whammy in quarter-tones relative to the original note, decimals supported.<br />    The offset and value are actually two parameters: <br />    `3.3.1{tbe (0 0 5 4 30 8 60 0)}`<br />     | `Number[]` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `type` | <ParameterValuesTable values={[["custom","Non standard custom whammys with multiple points"],["dive","A gradual change between two points"],["dip","A A->B->A whammy pattern."],["hold","Holding whammys (on tied notes)."],["predive","Press/pull before playing the note and then kept"],["prediveDive","Whammy bar is pressed/pulled before playing the note and then further pressed/released"]]} /> |
+| `[3]` | `style` | <ParameterValuesTable values={[["default",""],["gradual",""],["fast",""]]} /> |
+| `[4]` | `type` | <ParameterValuesTable values={[["custom","Non standard custom whammys with multiple points"],["dive","A gradual change between two points"],["dip","A A->B->A whammy pattern."],["hold","Holding whammys (on tied notes)."],["predive","Press/pull before playing the note and then kept"],["prediveDive","Whammy bar is pressed/pulled before playing the note and then further pressed/released"]]} /> |
+| `[4]` | `style` | <ParameterValuesTable values={[["default",""],["gradual",""],["fast",""]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3.1{tb (0 4 0 8)} | r |
+3.3.1{tb (0 -4 0 -8)} | r |
+3.3.1{tbe (0 0 5 4 30 8 60 0)}
+
+`}</AlphaTexSample>
+
+## `bu`
+
+```plain title="Syntax"
+bu duration
+```
+
+**Description:** Adds a brush stroke effect to the beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `duration` | A custom duration of the stroke speed in MIDI ticks | `Number` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:2 (0.1 0.2 0.3 2.4 2.5 0.6){bd} (0.1 0.2 0.3 2.4 2.5 0.6){bu} |
+(0.1 0.2 0.3 2.4 2.5 0.6){bd 360} (0.1 0.2 0.3 2.4 2.5 0.6){bu 60}
+
+`}</AlphaTexSample>
+
+## `bd`
+
+```plain title="Syntax"
+bd duration
+```
+
+**Description:** Adds a brush stroke effect to the beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `duration` | A custom duration of the stroke speed in MIDI ticks | `Number` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:2 (0.1 0.2 0.3 2.4 2.5 0.6){bd} (0.1 0.2 0.3 2.4 2.5 0.6){bu} |
+(0.1 0.2 0.3 2.4 2.5 0.6){bd 360} (0.1 0.2 0.3 2.4 2.5 0.6){bu 60}
+
+`}</AlphaTexSample>
+
+## `au`
+
+```plain title="Syntax"
+au duration
+```
+
+**Description:** Adds an arpeggio effect to the beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `duration` | A custom duration of the stroke speed in MIDI ticks | `Number` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(0.1 0.2 0.3 2.4 2.5 0.6){ad} (0.1 0.2 0.3 2.4 2.5 0.6){au} |
+
+`}</AlphaTexSample>
+
+## `ad`
+
+```plain title="Syntax"
+ad duration
+```
+
+**Description:** Adds an arpeggio effect to the beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `duration` | A custom duration of the stroke speed in MIDI ticks | `Number` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(0.1 0.2 0.3 2.4 2.5 0.6){ad} (0.1 0.2 0.3 2.4 2.5 0.6){au} |
+
+`}</AlphaTexSample>
+
+## `ch`
+
+```plain title="Syntax"
+ch chordName
+```
+
+**Description:** Adds a chord annotation to the beat.
+
+If the staff has a definition for this chord it will be shown in the chord diagram list to indicate its usage. The beat still has to define the notes separately.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `chordName` | The name of the chord | `String` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+1.1.8{dy ppp} 1.1{dy pp} 1.1{dy p} 1.1{dy mp} 1.1{dy mf} 1.1{dy f} 1.1{dy ff} 1.1{dy fff}
+
+`}</AlphaTexSample>
+
+## `gr`
+
+```plain title="Syntax"
+gr type
+```
+
+**Description:** Marks the beat as a grace beat holding grace notes.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `type` | The type of grace notes | `Ident` | no `bb` |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `type` | <ParameterValuesTable values={[["onBeat","On-Beat"],["beforeBeat","Before-Beat"],["bendGrace","Bend"],["ob","On-Beat"],["bb","Before-Beat"],["b","Bend"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C5
+D5 {gr} C5
+C5
+D5 {gr} C5
+    |
+    C5
+    D5 {gr ob} C5
+    C5
+    D5 {gr ob} C5
+    
+`}</AlphaTexSample>
+
+## `dy`
+
+```plain title="Syntax"
+dy dynamic
+```
+
+**Description:** Defines the play dynamics for this beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `dynamic` | The dynamic value to apply | `Ident` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `dynamic` | <ParameterValuesTable values={[["ppp",""],["pp",""],["p",""],["mp",""],["mf",""],["f",""],["ff",""],["fff",""],["pppp",""],["ppppp",""],["pppppp",""],["ffff",""],["fffff",""],["ffffff",""],["sf",""],["sfp",""],["sfpp",""],["fp",""],["rf",""],["rfz",""],["sfz",""],["sffz",""],["fz",""],["n",""],["pf",""],["sfzp",""]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\chord ("C" 0 1 0 2 3 x)
+\\ts 2 4
+(0.1 1.2 0.3 2.4 3.5){ch "C"} (0.1 1.2 0.3 2.4 3.5) |
+(0.1 2.2 2.3 2.4 0.5){ch "A"}
+
+`}</AlphaTexSample>
+
+## `tempo`
+
+```plain title="Syntax"
+// [1]: 
+tempo (bpm hide)
+// [2]: 
+tempo (bpm label hide)
+```
+
+**Description:** Add a tempo change to the beat.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `bpm` | The new tempo in BPM | `Number` | yes  |
+| `[1]` |  `hide` | If specified, the tempo change is not shown in the music sheet | `hide` | no  |
+| `[2]` |  `bpm` | The new tempo in BPM | `Number` | yes  |
+| `[2]` |  `label` | A textual label for the tempo | `String` | yes `""` |
+| `[2]` |  `hide` | If specified, the tempo change is not shown in the music sheet | `hide` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[1]` | `hide` | <ParameterValuesTable values={[["hide","If specified, the tempo change is not shown in the music sheet"]]} /> |
+| `[2]` | `hide` | <ParameterValuesTable values={[["hide","If specified, the tempo change is not shown in the music sheet"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 {tempo 120} D4 E4 {tempo 140} F4 | C4.8 {tempo 80} C4 D4 {tempo 100} D4 E4 {tempo 120} E4 F4 {tempo 240} F4
+
+`}</AlphaTexSample>
+
+## `volume`
+
+```plain title="Syntax"
+volume value
+```
+
+**Description:** Add a volume change to the beat.
+
+The change affects all beats after this one.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The absolute volume of the track within the song in the range of 0-16 | `Number` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 {volume 8} D4 E4 {tempo 16} F4
+
+`}</AlphaTexSample>
+
+## `balance`
+
+```plain title="Syntax"
+balance value
+```
+
+**Description:** Add a balance (pan) change to the beat.
+
+The change affects all beats after this one.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The new balance where 0 is left, 16 is right, and 8 is centered. | `Number` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 {balance 0} D4 E4 {balance 16} F4
+
+`}</AlphaTexSample>
+
+## `tp`
+
+```plain title="Syntax"
+tp speed
+```
+
+**Description:** Add a tremolo picking to the beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `speed` | The tremolo picking speed | `8\|16\|32` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `speed` | <ParameterValuesTable values={[["8","8th Notes"],["16","16th Notes"],["32","32nd Notes"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3{tp 8} 3.3{tp 16} 3.3{tp 32}
+
+`}</AlphaTexSample>
+
+## `barre`
+
+```plain title="Syntax"
+barre (fret mode)
+```
+
+**Description:** Add a barré chord notation to the beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `fret` | The numeric fret for the barre chord | `Number` | yes  |
+|  `mode` | The barre mode | `full\|half` | no `Full` |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["full",""],["half",""]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+1.1 {barre 24} 2.1 {barre 24} 3.1 {barre 24} 4.1 |
+1.1 {barre 4 half} 2.1 {barre 4 half} 3.1 {barre 4 half} 4.1 {barre 4 half} |
+
+`}</AlphaTexSample>
+
+## `rasg`
+
+```plain title="Syntax"
+rasg pattern
+```
+
+**Description:** Add a rasgueado play pattern to the beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `pattern` | The pattern to apply | `Ident` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `pattern` | <ParameterValuesTable values={[["ii","ii"],["mi","mi"],["miiTriplet","mii (triplet)"],["miiAnapaest","mii (anapaest)"],["pmpTriplet","pmp (triplet)"],["pmpAnapaest","pmp (anapaest)"],["peiTriplet","pei (triplet)"],["peiAnapaest","pei (anapaest)"],["paiTriplet","pai (triplet)"],["paiAnapaest","pai (anapaest)"],["amiTriplet","ami (triplet)"],["amiAnapaest","ami (anapaest)"],["ppp","ppp"],["amii","amii"],["amip","amip"],["eami","eami"],["eamii","eamii"],["peami","peami"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+(1.1 3.2 2.3 0.4) * 4 {rasg amii}
+
+`}</AlphaTexSample>
+
+## `ot`
+
+```plain title="Syntax"
+ot value
+```
+
+**Description:** Adds a octave change (ottava) to the beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The octave shift to apply | `Ident` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `value` | <ParameterValuesTable values={[["15ma","Quindicesima (+2 octaves)"],["8va","Ottava (+1 octave)"],["regular","Regular"],["8vb","Ottava Bassa (-1 octave)"],["15mb","Quindicesima bassa (-2 octaves)"],["15ma","Quindicesima (+2 octaves)"],["8va","Ottava (+1 octave)"],["8vb","Ottava Bassa (-1 octave)"],["15mb","Quindicesima bassa (-2 octaves)"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3.4{ ot 15ma } 3.3.4{ ot 8vb }
+
+`}</AlphaTexSample>
+
+## `instrument`
+
+```plain title="Syntax"
+// [1]: Set the midi instrument as midi program number
+instrument program
+// [2]: Set the midi instrument as midi program name
+instrument programName
+// [3]: Set the instrument to percussion
+instrument percussion
+```
+
+**Description:** Adds a instrument change to the beat.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `program` | MIDI program number (0-127) | `Number` | yes  |
+| `[2]` |  `programName` | MIDI program name | `String` | yes  |
+| `[3]` |  `percussion` | Percussion | `percussion` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `programName` | <ParameterValuesTable values={[["\"Acoustic Grand Piano\"",""],["\"Bright Grand Piano\"",""],["\"Electric Grand Piano\"",""],["\"Honky tonk Piano\"",""],["\"Electric Piano 1\"",""],["\"Electric Piano 2\"",""],["\"Harpsichord\"",""],["\"Clavinet\"",""],["\"Celesta\"",""],["\"Glockenspiel\"",""],["\"Musicbox\"",""],["\"Vibraphone\"",""],["\"Marimba\"",""],["\"Xylophone\"",""],["\"Tubularbells\"",""],["\"Dulcimer\"",""],["\"Drawbar Organ\"",""],["\"Percussive Organ\"",""],["\"Rock Organ\"",""],["\"Church Organ\"",""],["\"Reed Organ\"",""],["\"Accordion\"",""],["\"Harmonica\"",""],["\"Tango Accordion\"",""],["\"Acoustic Guitar Nylon\"",""],["\"Acoustic Guitar Steel\"",""],["\"Electric Guitar Jazz\"",""],["\"Electric Guitar Clean\"",""],["\"Electric Guitar Muted\"",""],["\"Overdriven Guitar\"",""],["\"Distortion Guitar\"",""],["\"Guitar Harmonics\"",""],["\"Acoustic Bass\"",""],["\"Electric Bass Finger\"",""],["\"Electric Bass Pick\"",""],["\"Fretless Bass\"",""],["\"Slap Bass 1\"",""],["\"Slap Bass 2\"",""],["\"Synth Bass 1\"",""],["\"Synth Bass 2\"",""],["\"Violin\"",""],["\"Viola\"",""],["\"Cello\"",""],["\"Contrabass\"",""],["\"Tremolo Strings\"",""],["\"Pizzicato Strings\"",""],["\"Orchestral Harp\"",""],["\"Timpani\"",""],["\"String Ensemble 1\"",""],["\"String Ensemble 2\"",""],["\"Synth Strings 1\"",""],["\"Synth Strings 2\"",""],["\"Choir Aahs\"",""],["\"Voice Oohs\"",""],["\"Synth Voice\"",""],["\"Orchestra Hit\"",""],["\"Trumpet\"",""],["\"Trombone\"",""],["\"Tuba\"",""],["\"Muted Trumpet\"",""],["\"French Horn\"",""],["\"Brass Section\"",""],["\"Synth Brass 1\"",""],["\"Synth Brass 2\"",""],["\"Soprano Sax\"",""],["\"Alto Sax\"",""],["\"Tenor Sax\"",""],["\"Baritone Sax\"",""],["\"Oboe\"",""],["\"English Horn\"",""],["\"Bassoon\"",""],["\"Clarinet\"",""],["\"Piccolo\"",""],["\"Flute\"",""],["\"Recorder\"",""],["\"Pan Flute\"",""],["\"Blown bottle\"",""],["\"Shakuhachi\"",""],["\"Whistle\"",""],["\"Ocarina\"",""],["\"Lead 1 Square\"",""],["\"Lead 2 Sawtooth\"",""],["\"Lead 3 Calliope\"",""],["\"Lead 4 Chiff\"",""],["\"Lead 5 Charang\"",""],["\"Lead 6 Voice\"",""],["\"Lead 7 Fifths\"",""],["\"Lead 8 Bass and Lead\"",""],["\"Pad 1 newage\"",""],["\"Pad 2 warm\"",""],["\"Pad 3 polysynth\"",""],["\"Pad 4 choir\"",""],["\"Pad 5 bowed\"",""],["\"Pad 6 metallic\"",""],["\"Pad 7 halo\"",""],["\"Pad 8 sweep\"",""],["\"Fx 1 rain\"",""],["\"Fx 2 soundtrack\"",""],["\"Fx 3 crystal\"",""],["\"Fx 4 atmosphere\"",""],["\"Fx 5 brightness\"",""],["\"Fx 6 goblins\"",""],["\"Fx 7 echoes\"",""],["\"Fx 8 scifi\"",""],["\"Sitar\"",""],["\"Banjo\"",""],["\"Shamisen\"",""],["\"Koto\"",""],["\"Kalimba\"",""],["\"Bag pipe\"",""],["\"Fiddle\"",""],["\"Shanai\"",""],["\"Tinkle Bell\"",""],["\"Agogo\"",""],["\"Steel Drums\"",""],["\"Woodblock\"",""],["\"Taiko Drum\"",""],["\"Melodic Tom\"",""],["\"Synth Drum\"",""],["\"Reverse Cymbal\"",""],["\"Guitar Fret Noise\"",""],["\"Breath Noise\"",""],["\"Seashore\"",""],["\"Bird Tweet\"",""],["\"Telephone Ring\"",""],["\"Helicopter\"",""],["\"Applause\"",""],["\"Gunshot\"",""]]} /> |
+| `[3]` | `percussion` | <ParameterValuesTable values={[["percussion",""]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+3.3.4{ ot 15ma } 3.3.4{ ot 8vb }
+    
+`}</AlphaTexSample>
+
+## `bank`
+
+```plain title="Syntax"
+bank value
+```
+
+**Description:** Adds a instrument bank change to the beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The new MIDI bank | `Number` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+C4 C4 C4 {instrument 25 bank 2} C4
+
+`}</AlphaTexSample>
+
+## `fermata`
+
+```plain title="Syntax"
+fermata (type length)
+```
+
+**Description:** Adds a fermata to the beat.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `type` | The fermata type | `short\|medium\|long` | yes  |
+|  `length` | The fermata length | `Number` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `type` | <ParameterValuesTable values={[["short",""],["medium",""],["long",""]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+G4 G4 G4 { fermata medium 4 }
+
+`}</AlphaTexSample>
+
+## `beam`
+
+```plain title="Syntax"
+beam type
+```
+
+**Description:** Changes the beaming and stem direction for the beat.
+Can be specified multiple times.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `type` | The mode to apply | `Ident` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `type` | <ParameterValuesTable values={[["invert","Inverts the default stem direction."],["up","Forces the stem to point upwards."],["down","Forces the stem to point downwards."],["auto","Sets the beaming mode to automatic."],["split","Forces a split of the beam to the next beat (if there would be any)."],["merge","Forces a merge of the beam to the next beat (even if there would be none)."],["splitsecondary","Forces a split of the last bar connecting two beats (if there is any)."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+:8 3.3{ beam invert } 3.3 |
+3.1{ beam up } 3.1 |
+3.6{ beam down } 3.6 |
+3.3{ beam auto } 3.3 |
+3.3{ beam split } 3.3 |
+    3.3 3.3 { beam merge } 3.3 3.3 |
+    3.3.16 {beam splitsecondary} 3.3
+
+`}</AlphaTexSample>
+
