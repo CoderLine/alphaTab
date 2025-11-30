@@ -916,7 +916,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 {
                     signature: v,
                     parameterIndex: 0,
-                    parameterValueMatches: 0
+                    parameterValueMatches: 0,
+                    parameterHasValues: false
                 } as SignatureResolutionInfo
             ])
         );

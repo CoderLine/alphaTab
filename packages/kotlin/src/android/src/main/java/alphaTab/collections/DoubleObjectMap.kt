@@ -103,6 +103,10 @@ public class DoubleObjectMap<TValue> :
         return _keys!!
     }
 
+    public fun entries(): Iterable<DoubleObjectArrayTuple<TValue>> {
+        return this.map { DoubleObjectArrayTuple(it.key, it.value) }
+    }
+
     override fun createEntries(size: Int): Array<DoubleObjectMapEntryInternal<TValue>> {
         return Array(size) {
             DoubleObjectMapEntryInternal()
