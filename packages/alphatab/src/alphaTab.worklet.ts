@@ -1,3 +1,3 @@
 /**@target web */
-import * as alphaTab from '@src/alphaTab.core';
+import * as alphaTab from '@coderline/alphatab/alphaTab.core';
 alphaTab.Environment.initializeAudioWorklet();

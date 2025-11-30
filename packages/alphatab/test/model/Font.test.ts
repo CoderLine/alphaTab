@@ -1,4 +1,4 @@
-import { Font, FontStyle, FontWeight } from '@src/model/Font';
+import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
 import { expect } from 'chai';
 
 describe('FontTests', () => {

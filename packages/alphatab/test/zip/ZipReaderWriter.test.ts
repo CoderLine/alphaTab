@@ -1,9 +1,9 @@
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IOHelper } from '@src/io/IOHelper';
-import { ZipEntry } from '@src/zip/ZipEntry';
-import { ZipReader } from '@src/zip/ZipReader';
-import { ZipWriter } from '@src/zip/ZipWriter';
-import { TestPlatform } from '@test/TestPlatform';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
+import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
+import { ZipWriter } from '@coderline/alphatab/zip/ZipWriter';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
 
 describe('ZipReaderWriter', () => {

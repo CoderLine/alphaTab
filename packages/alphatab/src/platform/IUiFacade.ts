@@ -1,14 +1,14 @@
-import type { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
-import type { IEventEmitter } from '@src/EventEmitter';
-import type { Score } from '@src/model/Score';
-import type { IContainer } from '@src/platform/IContainer';
-import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import type { Cursors } from '@src/platform/Cursors';
-import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import type { Bounds } from '@src/rendering/utils/Bounds';
-import type { IAudioExporterWorker } from '@src/synth/IAudioExporter';
+import type { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
+import type { IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
+import type { IEventEmitter } from '@coderline/alphatab/EventEmitter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { IContainer } from '@coderline/alphatab/platform/IContainer';
+import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
+import type { Cursors } from '@coderline/alphatab/platform/Cursors';
+import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import type { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import type { IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExporter';
 
 /**
  * This interface represents the UI abstraction between alphaTab and the corresponding UI framework being used.

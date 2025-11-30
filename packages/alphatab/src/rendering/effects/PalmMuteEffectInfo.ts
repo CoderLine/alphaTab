@@ -1,11 +1,11 @@
-import type { Beat } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { NoteEffectInfoBase } from '@src/rendering/effects/NoteEffectInfoBase';
-import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { LineRangedGlyph } from '@src/rendering/glyphs/LineRangedGlyph';
-import { NotationElement } from '@src/NotationSettings';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { NoteEffectInfoBase } from '@coderline/alphatab/rendering/effects/NoteEffectInfoBase';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { LineRangedGlyph } from '@coderline/alphatab/rendering/glyphs/LineRangedGlyph';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal

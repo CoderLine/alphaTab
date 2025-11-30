@@ -484,3 +484,39 @@ input[type='range']::-moz-range-thumb {
     width: 1px;
     background: rgba(64, 64, 255, 0.75);
 }
+
+.at-selection-handles {
+    position : absolute;
+    pointer-events: none;
+    z-index: 1001;
+    display: inline;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.at-selection-handle {
+    position : absolute;
+    pointer-events: auto;
+    cursor: ew-resize;
+    background: #7cb9ff;
+    width: 4px;
+    opacity: 0;
+    transition: opacity 150ms ease-in-out;
+    display: none;
+}
+
+.at-selection-handle:hover,
+.at-selection-handle.at-selection-handle-drag {
+    opacity: 1;
+}
+
+.at-selection-handle.active {
+    display: block;
+}
+
+.at-selection-handle-drag *  {
+    cursor: ew-resize !important;
+}
+

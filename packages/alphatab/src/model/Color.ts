@@ -1,5 +1,5 @@
-import { FormatError } from '@src/FormatError';
-import { ModelUtils } from '@src/model/ModelUtils';
+import { FormatError } from '@coderline/alphatab/FormatError';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 
 /**
  * Describes a color for rendering.

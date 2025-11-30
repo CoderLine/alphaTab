@@ -1,8 +1,8 @@
-import type { Chord } from '@src/model/Chord';
-import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { RenderingResources } from '@src/RenderingResources';
+import type { Chord } from '@coderline/alphatab/model/Chord';
+import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 
 /**
  * @internal

@@ -1,16 +1,16 @@
-import type { Color } from '@src/model/Color';
-import { AccidentalType } from '@src/model/AccidentalType';
-import type { Beat } from '@src/model/Beat';
-import { Duration } from '@src/model/Duration';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
-import { AccidentalGroupGlyph } from '@src/rendering/glyphs/AccidentalGroupGlyph';
-import { GhostNoteContainerGlyph } from '@src/rendering/glyphs/GhostNoteContainerGlyph';
-import type { Glyph } from '@src/rendering/glyphs/Glyph';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { ScoreNoteChordGlyphBase } from '@src/rendering/glyphs/ScoreNoteChordGlyphBase';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import type { Color } from '@coderline/alphatab/model/Color';
+import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
+import { AccidentalGroupGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGroupGlyph';
+import { GhostNoteContainerGlyph } from '@coderline/alphatab/rendering/glyphs/GhostNoteContainerGlyph';
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { ScoreNoteChordGlyphBase } from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyphBase';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal

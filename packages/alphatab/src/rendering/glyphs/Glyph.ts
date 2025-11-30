@@ -1,5 +1,5 @@
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 
 /**
  * A glyph is a single symbol which can be added to a GlyphBarRenderer for automated

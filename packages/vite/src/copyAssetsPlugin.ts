@@ -1,9 +1,12 @@
-import * as fs from 'node:fs';
+import fs from 'node:fs';
 import * as path from 'node:path';
 import * as url from 'node:url';
 import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
 import type { Plugin, ResolvedConfig } from './bridge';
 
+/**
+ * @public
+ */
 export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
     let resolvedConfig: ResolvedConfig;
     let output = false;
@@ -36,6 +39,28 @@ export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
                     }
 
                     alphaTabSourceDir = path.resolve(alphaTabSourceDir, '..');
+
+                    // walk up to package.json
+                    while (alphaTabSourceDir) {
+                        if (
+                            await fs.promises
+                                .access(path.join(alphaTabSourceDir, 'package.json'), fs.constants.F_OK)
+                                .then(() => true)
+                                .catch(() => false)
+                        ) {
+                            // found package directory
+                            alphaTabSourceDir = path.resolve(alphaTabSourceDir, 'dist');
+                            break;
+                        } else {
+                            // reached root
+                            const parent = path.resolve(alphaTabSourceDir, '..');
+                            if (parent === alphaTabSourceDir) {
+                                alphaTabSourceDir = undefined;
+                            } else {
+                                alphaTabSourceDir = parent;
+                            }
+                        }
+                    }
                 } catch {
                     alphaTabSourceDir = path.join(resolvedConfig.root, 'node_modules/@coderline/alphatab/dist/');
                 }

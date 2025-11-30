@@ -1,9 +1,9 @@
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@src/EventEmitter';
-import { Logger } from '@src/Logger';
-import type { BackingTrack } from '@src/model/BackingTrack';
-import { WebAudioHelper } from '@src/platform/javascript/AlphaSynthWebAudioOutputBase';
-import type { IBackingTrackSynthOutput } from '@src/synth/BackingTrackPlayer';
-import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
+import { WebAudioHelper } from '@coderline/alphatab/platform/javascript/AlphaSynthWebAudioOutputBase';
+import type { IBackingTrackSynthOutput } from '@coderline/alphatab/synth/BackingTrackPlayer';
+import type { ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
 
 /**
  * A {@link IBackingTrackSynthOutput} which uses a HTMLAudioElement as playback mechanism.

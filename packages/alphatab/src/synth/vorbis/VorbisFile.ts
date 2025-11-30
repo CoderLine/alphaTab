@@ -1,7 +1,7 @@
-import type { IReadable } from '@src/io/IReadable';
-import { OggReader } from '@src/synth/vorbis/OggReader';
-import type { VorbisStream } from '@src/synth/vorbis/VorbisStream';
-import { VorbisStreamReader } from '@src/synth/vorbis/VorbisStreamReader';
+import type { IReadable } from '@coderline/alphatab/io/IReadable';
+import { OggReader } from '@coderline/alphatab/synth/vorbis/OggReader';
+import type { VorbisStream } from '@coderline/alphatab/synth/vorbis/VorbisStream';
+import { VorbisStreamReader } from '@coderline/alphatab/synth/vorbis/VorbisStreamReader';
 
 /**
  * @internal

@@ -3,17 +3,17 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Score } from "@src/model/Score";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { MasterBarSerializer } from "@src/generated/model/MasterBarSerializer";
-import { TrackSerializer } from "@src/generated/model/TrackSerializer";
-import { RenderStylesheetSerializer } from "@src/generated/model/RenderStylesheetSerializer";
-import { BackingTrackSerializer } from "@src/generated/model/BackingTrackSerializer";
-import { ScoreStyleSerializer } from "@src/generated/model/ScoreStyleSerializer";
-import { MasterBar } from "@src/model/MasterBar";
-import { Track } from "@src/model/Track";
-import { BackingTrack } from "@src/model/BackingTrack";
-import { ScoreStyle } from "@src/model/Score";
+import { Score } from "@coderline/alphatab/model/Score";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { MasterBarSerializer } from "@coderline/alphatab/generated/model/MasterBarSerializer";
+import { TrackSerializer } from "@coderline/alphatab/generated/model/TrackSerializer";
+import { RenderStylesheetSerializer } from "@coderline/alphatab/generated/model/RenderStylesheetSerializer";
+import { BackingTrackSerializer } from "@coderline/alphatab/generated/model/BackingTrackSerializer";
+import { ScoreStyleSerializer } from "@coderline/alphatab/generated/model/ScoreStyleSerializer";
+import { MasterBar } from "@coderline/alphatab/model/MasterBar";
+import { Track } from "@coderline/alphatab/model/Track";
+import { BackingTrack } from "@coderline/alphatab/model/BackingTrack";
+import { ScoreStyle } from "@coderline/alphatab/model/Score";
 /**
  * @internal
  */

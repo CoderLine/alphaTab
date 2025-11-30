@@ -1,7 +1,7 @@
-import { LayoutMode } from '@src/LayoutMode';
-import { Settings } from '@src/Settings';
-import { VisualTestHelper, VisualTestOptions } from '@test/visualTests/VisualTestHelper';
-import { NotationElement } from '@src/NotationSettings';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { Settings } from '@coderline/alphatab/Settings';
+import { VisualTestHelper, VisualTestOptions } from 'test/visualTests/VisualTestHelper';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 describe('NotationElements', () => {
     async function testScoreInfo(element: NotationElement | null, referenceName: string, tex?: string) {

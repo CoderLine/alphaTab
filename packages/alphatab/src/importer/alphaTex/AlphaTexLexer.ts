@@ -19,13 +19,13 @@
     type AlphaTexStringLiteral,
     type AlphaTexTokenNode,
     type IAlphaTexMetaDataTagPrefixNode
-} from '@src/importer/alphaTex/AlphaTexAst';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import {
     AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity
-} from '@src/importer/alphaTex/AlphaTexShared';
-import { IOHelper } from '@src/io/IOHelper';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 
 /**
  * @public
@@ -40,7 +40,7 @@ export class AlphaTexLexer {
     private _line: number = 1;
     private _col: number = 1;
 
-    private _fatalError = false;
+    public fatalError = false;
 
     private _tokenStart: AlphaTexAstNodeLocation = { line: 0, col: 0, offset: 0 };
     private _leadingComments: AlphaTexComment[] | undefined;
@@ -60,7 +60,7 @@ export class AlphaTexLexer {
     }
 
     public peekToken(): AlphaTexAstNode | undefined {
-        if (this._fatalError) {
+        if (this.fatalError) {
             return undefined;
         }
 
@@ -124,41 +124,24 @@ export class AlphaTexLexer {
         this._peekedToken = undefined;
     }
 
-    // public nextToken(): AlphaTexAstNode | undefined {
-    //     if (this._fatalError) {
-    //         return undefined;
-    //     }
-
-    //     const reverted = this._revertedToken;
-    //     if (reverted) {
-    //         this._revertedToken = undefined;
-    //         return reverted;
-    //     }
-
-    //     const peeked = this._peekedToken;
-    //     if (peeked) {
-    //         this._peekedToken = undefined;
-    //         return peeked;
-    //     }
-
-    //     return this._readToken();
-    // }
-
     private _nextCodepoint(): number {
         const codePoints = this._codepoints;
         let offset = this._offset;
 
         if (offset < codePoints.length - 1) {
-            ++offset;
-            const codepoint = codePoints[offset];
-            this._codepoint = codepoint;
-            if (codepoint === 0x0a /* \n */) {
+            // at the point we move after the new line we trigger the execution logic
+            const previousCodepoint = codePoints[offset];
+            if (previousCodepoint === 0x0a /* \n */) {
                 this._trailingCommentNode = undefined;
                 ++this._line;
                 this._col = 1;
             } else {
                 ++this._col;
             }
+
+            ++offset;
+            const codepoint = codePoints[offset];
+            this._codepoint = codepoint;
             this._offset = offset;
             return codepoint;
         } else if (this._codepoint !== AlphaTexLexer._eof) {
@@ -187,7 +170,7 @@ export class AlphaTexLexer {
 
     private _readToken(): AlphaTexAstNode | undefined {
         this._leadingComments = undefined;
-        while (this._codepoint !== AlphaTexLexer._eof) {
+        while (this._codepoint !== AlphaTexLexer._eof && !this.fatalError) {
             this._tokenStart = this._currentLexerLocation();
             if (AlphaTexLexer._terminalTokens.has(this._codepoint)) {
                 const token = AlphaTexLexer._terminalTokens.get(this._codepoint)!(this);
@@ -224,7 +207,7 @@ export class AlphaTexLexer {
                 start: this._tokenStart,
                 end: this._currentLexerLocation()
             });
-            this._fatalError = true;
+            this.fatalError = true;
         }
         return undefined;
     }
@@ -312,9 +295,9 @@ export class AlphaTexLexer {
     private _token<T extends AlphaTexTokenNode>(t: T): T {
         t.leadingComments = this._leadingComments;
         t.start = this._tokenStart;
-        t.end = this._currentLexerLocation();
         // consume char
         this._codepoint = this._nextCodepoint();
+        t.end = this._currentLexerLocation();
         return t;
     }
 
@@ -355,7 +338,7 @@ export class AlphaTexLexer {
                                 start: this._tokenStart,
                                 end: this._currentLexerLocation()
                             });
-                            this._fatalError = true;
+                            this.fatalError = true;
                             return undefined;
                         }
                         hex += String.fromCodePoint(this._codepoint);
@@ -370,7 +353,7 @@ export class AlphaTexLexer {
                             start: this._tokenStart,
                             end: this._currentLexerLocation()
                         });
-                        this._fatalError = true;
+                        this.fatalError = true;
                         return undefined;
                     }
                 } else {
@@ -381,7 +364,7 @@ export class AlphaTexLexer {
                         start: this._tokenStart,
                         end: this._currentLexerLocation()
                     });
-                    this._fatalError = true;
+                    this.fatalError = true;
                     return undefined;
                 }
             } else {
@@ -418,7 +401,7 @@ export class AlphaTexLexer {
                 start: this._tokenStart,
                 end: this._currentLexerLocation()
             });
-            this._fatalError = true;
+            this.fatalError = true;
             return undefined;
         }
 

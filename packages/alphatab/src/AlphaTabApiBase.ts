@@ -1,11 +1,11 @@
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import type { CoreSettings } from '@src/CoreSettings';
-import { Environment } from '@src/Environment';
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@src/EventEmitter';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { Logger } from '@src/Logger';
-import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
-import type { BeatTickLookupItem } from '@src/midi/BeatTickLookup';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import type { CoreSettings } from '@coderline/alphatab/CoreSettings';
+import { Environment } from '@coderline/alphatab/Environment';
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
+import { Logger } from '@coderline/alphatab/Logger';
+import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+import type { BeatTickLookupItem } from '@coderline/alphatab/midi/BeatTickLookup';
 import type {
     MetaDataEvent,
     MetaEvent,
@@ -13,7 +13,7 @@ import type {
     Midi20PerNotePitchBendEvent,
     SystemCommonEvent,
     SystemExclusiveEvent
-} from '@src/midi/DeprecatedEvents';
+} from '@coderline/alphatab/midi/DeprecatedEvents';
 import type {
     AlphaTabMetronomeEvent,
     AlphaTabRestEvent,
@@ -28,48 +28,48 @@ import type {
     ProgramChangeEvent,
     TempoChangeEvent,
     TimeSignatureEvent
-} from '@src/midi/MidiEvent';
-import { MidiFile } from '@src/midi/MidiFile';
-import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
+} from '@coderline/alphatab/midi/MidiEvent';
+import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import {
     type MidiTickLookup,
     type MidiTickLookupFindBeatResult,
     MidiTickLookupFindBeatResultCursorMode
-} from '@src/midi/MidiTickLookup';
+} from '@coderline/alphatab/midi/MidiTickLookup';
 
-import type { Beat } from '@src/model/Beat';
-import { ModelUtils } from '@src/model/ModelUtils';
-import type { Note } from '@src/model/Note';
-import type { Score } from '@src/model/Score';
-import type { Track } from '@src/model/Track';
-import { PlayerMode, ScrollMode } from '@src/PlayerSettings';
-import type { IContainer } from '@src/platform/IContainer';
-import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import type { IUiFacade } from '@src/platform/IUiFacade';
-import { ResizeEventArgs } from '@src/ResizeEventArgs';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { ScoreRendererWrapper } from '@src/rendering/ScoreRendererWrapper';
-import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import type { Bounds } from '@src/rendering/utils/Bounds';
-import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import type { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
-import type { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
-import type { Settings } from '@src/Settings';
-import { ActiveBeatsChangedEventArgs } from '@src/synth/ActiveBeatsChangedEventArgs';
-import { AlphaSynthWrapper } from '@src/synth/AlphaSynthWrapper';
-import { ExternalMediaPlayer } from '@src/synth/ExternalMediaPlayer';
-import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
-import { AudioExportOptions, type IAudioExporter, type IAudioExporterWorker } from '@src/synth/IAudioExporter';
-import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
-import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import { PlaybackRange } from '@src/synth/PlaybackRange';
-import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
-import { PlayerState } from '@src/synth/PlayerState';
-import type { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
-import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { Track } from '@coderline/alphatab/model/Track';
+import { PlayerMode, ScrollMode } from '@coderline/alphatab/PlayerSettings';
+import type { IContainer } from '@coderline/alphatab/platform/IContainer';
+import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
+import type { IUiFacade } from '@coderline/alphatab/platform/IUiFacade';
+import { ResizeEventArgs } from '@coderline/alphatab/ResizeEventArgs';
+import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { ScoreRendererWrapper } from '@coderline/alphatab/rendering/ScoreRendererWrapper';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import type { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
+import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
+import type { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { ActiveBeatsChangedEventArgs } from '@coderline/alphatab/synth/ActiveBeatsChangedEventArgs';
+import { AlphaSynthWrapper } from '@coderline/alphatab/synth/AlphaSynthWrapper';
+import { ExternalMediaPlayer } from '@coderline/alphatab/synth/ExternalMediaPlayer';
+import type { IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
+import { AudioExportOptions, type IAudioExporter, type IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExporter';
+import type { ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
+import type { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
+import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import type { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/PlaybackRangeChangedEventArgs';
+import { PlayerState } from '@coderline/alphatab/synth/PlayerState';
+import type { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerStateChangedEventArgs';
+import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
 
 /**
  * @internal

@@ -3,15 +3,15 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 
-import { RiffChunk } from '@src/synth/soundfont/RiffChunk';
+import { RiffChunk } from '@coderline/alphatab/synth/soundfont/RiffChunk';
 
-import { IOHelper } from '@src/io/IOHelper';
-import type { IReadable } from '@src/io/IReadable';
-import { TypeConversions } from '@src/io/TypeConversions';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import type { IReadable } from '@coderline/alphatab/io/IReadable';
+import { TypeConversions } from '@coderline/alphatab/io/TypeConversions';
 
-import { FormatError } from '@src/FormatError';
-import { VorbisFile } from '@src/synth/vorbis/VorbisFile';
-import { ByteBuffer } from '@src/io/ByteBuffer';
+import { FormatError } from '@coderline/alphatab/FormatError';
+import { VorbisFile } from '@coderline/alphatab/synth/vorbis/VorbisFile';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 
 /**
  * @internal

@@ -1,15 +1,15 @@
-import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { FingeringMode } from '@src/NotationSettings';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { type Note, NoteSubElement } from '@src/model/Note';
-import type { Color } from '@src/model/Color';
-import { MusicFontTextGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { Settings } from '@src/Settings';
-import type { Beat } from '@src/model/Beat';
-import { Fingers } from '@src/model/Fingers';
-import { GeneralMidi } from '@src/midi/GeneralMidi';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { FingeringMode } from '@coderline/alphatab/NotationSettings';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import type { Color } from '@coderline/alphatab/model/Color';
+import { MusicFontTextGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { Settings } from '@coderline/alphatab/Settings';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { Fingers } from '@coderline/alphatab/model/Fingers';
+import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
 
 /**
  * @internal

@@ -1,6 +1,6 @@
-import type { Note } from '@src/model/Note';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import { SlashTieGlyph } from '@src/rendering/glyphs/SlashTieGlyph';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import { SlashTieGlyph } from '@coderline/alphatab/rendering/glyphs/SlashTieGlyph';
 
 /**
  * @internal

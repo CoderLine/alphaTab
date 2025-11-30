@@ -1,12 +1,12 @@
-import { NotationElement } from '@src/NotationSettings';
-import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import type { Settings } from '@src/Settings';
-import type { Beat } from '@src/model/Beat';
-import type { GolpeType } from '@src/model/GolpeType';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { GuitarGolpeGlyph } from '@src/rendering/glyphs/GuitarGolpeGlyph';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import type { Settings } from '@coderline/alphatab/Settings';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { GolpeType } from '@coderline/alphatab/model/GolpeType';
+import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { GuitarGolpeGlyph } from '@coderline/alphatab/rendering/glyphs/GuitarGolpeGlyph';
 
 /**
  * @internal

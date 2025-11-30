@@ -1,6 +1,6 @@
-import type { IWriteable } from '@src/io/IWriteable';
-import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
+import { MidiEvent, MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
 
 /**
  * @deprecated Move to the new concrete Midi Event Types.

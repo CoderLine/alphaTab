@@ -1,9 +1,9 @@
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IOHelper } from '@src/io/IOHelper';
-import type { IWriteable } from '@src/io/IWriteable';
-import { Crc32 } from '@src/zip/Crc32';
-import { Deflater } from '@src/zip/Deflater';
-import { ZipEntry } from '@src/zip/ZipEntry';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
+import { Crc32 } from '@coderline/alphatab/zip/Crc32';
+import { Deflater } from '@coderline/alphatab/zip/Deflater';
+import { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
 
 /**
  * @internal

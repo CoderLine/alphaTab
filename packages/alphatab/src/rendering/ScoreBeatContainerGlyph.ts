@@ -1,15 +1,15 @@
-import type { Beat } from '@src/model/Beat';
-import { GraceType } from '@src/model/GraceType';
-import type { Note } from '@src/model/Note';
-import { SlideInType } from '@src/model/SlideInType';
-import { SlideOutType } from '@src/model/SlideOutType';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import { ScoreBendGlyph } from '@src/rendering/glyphs/ScoreBendGlyph';
-import { ScoreLegatoGlyph } from '@src/rendering/glyphs/ScoreLegatoGlyph';
-import { ScoreSlideLineGlyph } from '@src/rendering/glyphs/ScoreSlideLineGlyph';
-import { ScoreSlurGlyph } from '@src/rendering/glyphs/ScoreSlurGlyph';
-import { ScoreTieGlyph } from '@src/rendering/glyphs/ScoreTieGlyph';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { SlideInType } from '@coderline/alphatab/model/SlideInType';
+import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import { ScoreBendGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBendGlyph';
+import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
+import { ScoreSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlideLineGlyph';
+import { ScoreSlurGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlurGlyph';
+import { ScoreTieGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTieGlyph';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal

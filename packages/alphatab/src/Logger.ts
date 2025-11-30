@@ -1,4 +1,4 @@
-import { LogLevel } from '@src/LogLevel';
+import { LogLevel } from '@coderline/alphatab/LogLevel';
 
 /**
  * @public

@@ -4,34 +4,34 @@
  */
 export enum AlphaTexNodeType {
     // Tokens
-    Dot,
-    Backslash,
-    DoubleBackslash,
-    Pipe,
-    LBrace,
-    RBrace,
-    LParen,
-    RParen,
-    Colon,
-    Asterisk,
+    Dot = 0,
+    Backslash = 1,
+    DoubleBackslash = 2,
+    Pipe = 3,
+    LBrace = 4,
+    RBrace = 5,
+    LParen = 6,
+    RParen = 7,
+    Colon = 8,
+    Asterisk = 9,
 
     // General Nodes
-    Ident,
-    Tag,
-    Meta,
-    Values,
-    Props,
-    Prop,
-    Number,
-    String,
+    Ident = 10,
+    Tag = 11,
+    Meta = 12,
+    Arguments = 13,
+    Props = 14,
+    Prop = 15,
+    Number = 16,
+    String = 17,
 
     // Semantic Nodes
-    Score,
-    Bar,
-    Beat,
-    Duration,
-    NoteList,
-    Note
+    Score = 18,
+    Bar = 19,
+    Beat = 20,
+    Duration = 21,
+    NoteList = 22,
+    Note = 23
 }
 
 //
@@ -210,7 +210,7 @@ export interface AlphaTexAsteriskTokenNode extends AlphaTexTokenNode {
  * @record
  * @public
  */
-export interface AlphaTexNumberLiteral extends AlphaTexAstNode, IAlphaTexValueListItem, IAlphaTexNoteValueNode {
+export interface AlphaTexNumberLiteral extends AlphaTexAstNode, IAlphaTexArgumentValue, IAlphaTexNoteValueNode {
     nodeType: AlphaTexNodeType.Number;
     /**
      * The numeric value described by this literal.
@@ -223,35 +223,45 @@ export interface AlphaTexNumberLiteral extends AlphaTexAstNode, IAlphaTexValueLi
  * @record
  * @public
  */
-export interface AlphaTexStringLiteral extends AlphaTexTextNode, IAlphaTexValueListItem, IAlphaTexNoteValueNode {
+export interface AlphaTexStringLiteral extends AlphaTexTextNode, IAlphaTexArgumentValue, IAlphaTexNoteValueNode {
     nodeType: AlphaTexNodeType.String;
 }
 
 /**
- * Defines the possible types for values in a {@link AlphaTexValueList}
+ * Base marker interface for nodes which can be arguments in an {@link AlphaTexArgumentList}
  * @public
  */
-export interface IAlphaTexValueListItem extends IAlphaTexAstNode {}
+export interface IAlphaTexArgumentValue extends IAlphaTexAstNode {
+    /**
+     * For every signature candidate available for parent current argument list, this
+     * array contains the index to the parameter definition in the alphaTex language definitino.
+     *
+     * This value can be used to lookup the respective parameter definition in
+     * the documentation or alphaTex language definition. As paramters can be optional this value
+     * allows a reverse lookup to the parameter information.
+     */
+    parameterIndices?: Map<number, number>;
+}
 
 /**
- * A node holding multiple values optionally grouped by parenthesis.
+ * A node holding multiple arguments optionally grouped by parenthesis.
  * Whether parenthesis are needed depends on the context.
  * Used in contexts like bend effects `3.3{b (0 4)}`.
  * @record
  * @public
  */
-export interface AlphaTexValueList extends AlphaTexAstNode {
-    nodeType: AlphaTexNodeType.Values;
+export interface AlphaTexArgumentList extends AlphaTexAstNode {
+    nodeType: AlphaTexNodeType.Arguments;
     /**
-     * The open parenthesis token grouping the values.
+     * The open parenthesis token grouping the arguments.
      */
     openParenthesis?: AlphaTexParenthesisOpenTokenNode;
     /**
-     * The list of values.
+     * The list of arguments.
      */
-    values: IAlphaTexValueListItem[];
+    arguments: IAlphaTexArgumentValue[];
     /**
-     * The close parenthesis token grouping the values.
+     * The close parenthesis token grouping the arguments.
      */
     closeParenthesis?: AlphaTexParenthesisCloseTokenNode;
 
@@ -261,10 +271,18 @@ export interface AlphaTexValueList extends AlphaTexAstNode {
      * @internal
      */
     validated?: boolean;
+
+    /**
+     * A list of indices to signatures which were selected as candidates matching
+     * this argument list.
+     * These values can be used to lookup the respective signature definition in
+     * the documentation or alphaTex language definition.
+     */
+    signatureCandidateIndices?: number[];
 }
 
 /**
- * A metadata tag with optional values and optional properties like:
+ * A metadata tag with optional arguments and optional properties like:
  * `\track "Name" {color "#F00"}` .
  * @record
  * @public
@@ -277,19 +295,21 @@ export interface AlphaTexMetaDataNode extends AlphaTexAstNode {
     tag: AlphaTexMetaDataTagNode;
 
     /**
-     * A value list directly listed after the metadata (not within braces).
+     * A argument list directly listed after the metadata.
      */
-    values?: AlphaTexValueList;
+    arguments?: AlphaTexArgumentList;
 
     /**
-     * The optional properties attached to the metadata.
+     * The optional properties defined for the metadata.
      */
     properties?: AlphaTexPropertiesNode;
 
     /**
-     * Whether the properties are listed before the values (if both are present).
+     * Whether the properties are listed before the arguments (if both are present).
+     * This information serves backwards compatibility.
+     * @internal
      */
-    propertiesBeforeValues: boolean;
+    propertiesBeforeArguments: boolean;
 }
 
 /**
@@ -315,7 +335,7 @@ export interface AlphaTexPropertiesNode extends AlphaTexAstNode {
 }
 
 /**
- * A node describing a property with attached values.
+ * A node describing a property with attached arguments.
  * @record
  * @public
  */
@@ -327,9 +347,9 @@ export interface AlphaTexPropertyNode extends AlphaTexAstNode {
      */
     property: AlphaTexIdentifier;
     /**
-     * The values attached to the property.
+     * The arguments passed into to the property.
      */
-    values?: AlphaTexValueList;
+    arguments?: AlphaTexArgumentList;
 }
 
 /**
@@ -351,7 +371,7 @@ export interface AlphaTexTextNode extends AlphaTexAstNode {
  * @record
  * @public
  */
-export interface AlphaTexIdentifier extends AlphaTexTextNode, IAlphaTexValueListItem, IAlphaTexNoteValueNode {
+export interface AlphaTexIdentifier extends AlphaTexTextNode, IAlphaTexArgumentValue, IAlphaTexNoteValueNode {
     nodeType: AlphaTexNodeType.Ident;
 }
 

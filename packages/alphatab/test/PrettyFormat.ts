@@ -360,14 +360,14 @@ export class PrettyFormat {
     }
 }
 
-import { BarSerializer } from '@src/generated/model/BarSerializer';
-import { BeatSerializer } from '@src/generated/model/BeatSerializer';
-import { MasterBarSerializer } from '@src/generated/model/MasterBarSerializer';
-import { NoteSerializer } from '@src/generated/model/NoteSerializer';
-import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
-import { StaffSerializer } from '@src/generated/model/StaffSerializer';
-import { TrackSerializer } from '@src/generated/model/TrackSerializer';
-import { VoiceSerializer } from '@src/generated/model/VoiceSerializer';
+import { BarSerializer } from '@coderline/alphatab/generated/model/BarSerializer';
+import { BeatSerializer } from '@coderline/alphatab/generated/model/BeatSerializer';
+import { MasterBarSerializer } from '@coderline/alphatab/generated/model/MasterBarSerializer';
+import { NoteSerializer } from '@coderline/alphatab/generated/model/NoteSerializer';
+import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
+import { StaffSerializer } from '@coderline/alphatab/generated/model/StaffSerializer';
+import { TrackSerializer } from '@coderline/alphatab/generated/model/TrackSerializer';
+import { VoiceSerializer } from '@coderline/alphatab/generated/model/VoiceSerializer';
 import {
     type AlphaTexAstNode,
     type AlphaTexBarNode,
@@ -384,20 +384,21 @@ import {
     type AlphaTexPropertyNode,
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
-    type AlphaTexValueList
-} from '@src/importer/alphaTex/AlphaTexAst';
-import { MidiEvent } from '@src/midi/MidiEvent';
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
-import { JsonConverter } from '@src/model/JsonConverter';
-import { MasterBar } from '@src/model/MasterBar';
-import { Note } from '@src/model/Note';
-import { Score } from '@src/model/Score';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { Voice } from '@src/model/Voice';
+    type AlphaTexArgumentList,
+    type IAlphaTexArgumentValue
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { MidiEvent } from '@coderline/alphatab/midi/MidiEvent';
+import { Bar } from '@coderline/alphatab/model/Bar';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { Note } from '@coderline/alphatab/model/Note';
+import { Score } from '@coderline/alphatab/model/Score';
+import { Staff } from '@coderline/alphatab/model/Staff';
+import { Track } from '@coderline/alphatab/model/Track';
+import { Voice } from '@coderline/alphatab/model/Voice';
 import { TestPlatform } from './TestPlatform';
-import type { AlphaTexDiagnostic } from '@src/importer/alphaTex/AlphaTexShared';
+import type { AlphaTexDiagnostic } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 
 /**
  * @partial
@@ -479,7 +480,15 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
             // case AlphaTexNodeType.ColonToken:
             // case AlphaTexNodeType.AsteriskToken:
 
-            // case AlphaTexNodeType.Identifier:
+            case AlphaTexNodeType.Ident:
+            case AlphaTexNodeType.String:
+            case AlphaTexNodeType.Number:
+                const arg = node as IAlphaTexArgumentValue;
+                if (arg.parameterIndices) {
+                    children.push(['parameterIndices', arg.parameterIndices]);
+                }
+                break;
+
             case AlphaTexNodeType.Tag:
                 const tag = node as AlphaTexMetaDataTagNode;
                 if (tag.prefix) {
@@ -496,24 +505,30 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 if (metaData.tag) {
                     children.push(['tag', metaData.tag]);
                 }
-                if (metaData.values) {
-                    children.push(['values', metaData.values]);
+                if (metaData.arguments) {
+                    children.push(['arguments', metaData.arguments]);
                 }
                 if (metaData.properties) {
                     children.push(['properties', metaData.properties]);
                 }
                 break;
 
-            case AlphaTexNodeType.Values:
-                const valueList = node as AlphaTexValueList;
+            case AlphaTexNodeType.Arguments:
+                const valueList = node as AlphaTexArgumentList;
                 if (valueList.openParenthesis) {
                     children.push(['openParenthesis', valueList.openParenthesis]);
                 }
-                if (valueList.values) {
-                    children.push(['values', valueList.values]);
+                if (valueList.arguments) {
+                    children.push(['arguments', valueList.arguments]);
                 }
                 if (valueList.closeParenthesis) {
                     children.push(['closeParenthesis', valueList.closeParenthesis]);
+                }
+                if (valueList.signatureCandidateIndices) {
+                    children.push(['signatureCandidateIndices', valueList.signatureCandidateIndices]);
+                }
+                if (valueList.validated) {
+                    children.push(['validated', valueList.validated]);
                 }
                 break;
 
@@ -534,8 +549,8 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 if (property.property) {
                     children.push(['property', property.property]);
                 }
-                if (property.values) {
-                    children.push(['properties', property.values]);
+                if (property.arguments) {
+                    children.push(['properties', property.arguments]);
                 }
                 break;
             // case AlphaTexNodeType.NumberLiteral:

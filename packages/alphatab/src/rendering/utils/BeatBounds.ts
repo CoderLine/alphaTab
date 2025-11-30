@@ -1,8 +1,8 @@
-import type { Beat } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import type { BarBounds } from '@src/rendering/utils/BarBounds';
-import type { Bounds } from '@src/rendering/utils/Bounds';
-import type { NoteBounds } from '@src/rendering/utils/NoteBounds';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
+import type { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import type { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
 
 /**
  * Represents the bounds of a single beat.

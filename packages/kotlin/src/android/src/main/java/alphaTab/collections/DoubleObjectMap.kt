@@ -53,7 +53,7 @@ public class DoubleObjectMapEntryInternal<TValue> : DoubleObjectMapEntry<TValue>
 public class DoubleObjectMap<TValue> :
     MapBase<DoubleObjectMapEntry<TValue>, DoubleObjectMapEntryInternal<TValue>> {
     public constructor()
-    public constructor(iterable: Iterable<DoubleObjectArrayTuple<TValue>>) {
+    public constructor(iterable: Iterable<alphaTab.core.IDoubleObjectArrayTuple<TValue>>) {
         for (it in iterable) {
             set(it.v0, it.v1)
         }
@@ -101,6 +101,10 @@ public class DoubleObjectMap<TValue> :
     public fun keys(): IDoubleIterable {
         _keys = _keys ?: KeyCollection(this)
         return _keys!!
+    }
+
+    public fun entries(): Iterable<DoubleObjectArrayTuple<TValue>> {
+        return this.map { DoubleObjectArrayTuple(it.key, it.value) }
     }
 
     override fun createEntries(size: Int): Array<DoubleObjectMapEntryInternal<TValue>> {

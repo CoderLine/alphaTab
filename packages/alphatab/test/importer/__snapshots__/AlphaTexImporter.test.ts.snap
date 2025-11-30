@@ -5561,11 +5561,11 @@ Array [
   Map {
     "code" => 210,
     "severity" => 2,
-    "message" => "Missing values. Expected following values: required(Number)",
+    "message" => "Missing arguments. Expected following arguments: required(Number)",
     "start" => Map {
-      "col" => 8,
+      "col" => 9,
       "line" => 1,
-      "offset" => 7,
+      "offset" => 8,
     },
   },
 ]
@@ -5580,11 +5580,11 @@ Array [
   Map {
     "code" => 210,
     "severity" => 2,
-    "message" => "Missing values. Expected following values: required(Number)",
+    "message" => "Missing arguments. Expected following arguments: required(Number)",
     "start" => Map {
-      "col" => 9,
+      "col" => 10,
       "line" => 1,
-      "offset" => 8,
+      "offset" => 9,
     },
   },
 ]
@@ -5599,7 +5599,48 @@ Array [
   Map {
     "code" => 210,
     "severity" => 2,
-    "message" => "Missing values. Expected following values: required(String|Ident)",
+    "message" => "Missing arguments. Expected following arguments: required(String|Ident)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 accidentalmode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 accidentalmode: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(auto|explicit)",
+    "start" => Map {
+      "col" => 13,
+      "line" => 1,
+      "offset" => 12,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 accidentalmode: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar empty: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar empty: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar empty: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(common)
+(Number, Number)",
     "start" => Map {
       "col" => 9,
       "line" => 1,
@@ -5608,6 +5649,454 @@ Array [
   },
 ]
 `;
+
+exports[`AlphaTexImporterTest errors at219 bar missing: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar missing: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar missing: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (Number). Signatures:
+(common)
+(Number, Number)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 bar optional: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar optional: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar optional: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar required: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar required: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar required: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (String). Signatures:
+(Number)",
+    "start" => Map {
+      "col" => 12,
+      "line" => 1,
+      "offset" => 11,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 barre: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 barre: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 barre: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected barre shape value 'invalid', expected: full,half",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 beam: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 beam: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
+    },
+  },
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 19,
+      "line" => 1,
+      "offset" => 18,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 beam: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendstyle: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendstyle: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendstyle: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendtype: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendtype: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendtype: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bracketextendmode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bracketextendmode: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(nobrackets|groupstaves|groupsimilarinstruments)",
+    "start" => Map {
+      "col" => 19,
+      "line" => 1,
+      "offset" => 18,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 bracketextendmode: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 dynamic: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 dynamic: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 7,
+      "line" => 1,
+      "offset" => 6,
+    },
+  },
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 dynamic: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 fermata: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 fermata: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 fermata: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+(short|medium|long, Number)",
+    "start" => Map {
+      "col" => 22,
+      "line" => 1,
+      "offset" => 21,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknamemode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknamemode: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(fullname|shortname)",
+    "start" => Map {
+      "col" => 26,
+      "line" => 1,
+      "offset" => 25,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknamemode: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknameorientation: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknameorientation: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(horizontal|vertical)",
+    "start" => Map {
+      "col" => 33,
+      "line" => 1,
+      "offset" => 32,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknameorientation: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 gracetype: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 gracetype: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 gracetype: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected whammy style value 'invalid', expected: onbeat,beforebeat,bendgrace,ob,bb,b",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 multitracktracknamepolicy: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 multitracktracknamepolicy: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(hidden|firstsystem|allsystems)",
+    "start" => Map {
+      "col" => 27,
+      "line" => 1,
+      "offset" => 26,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 multitracktracknamepolicy: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknamemode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknamemode: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(fullname|shortname)",
+    "start" => Map {
+      "col" => 27,
+      "line" => 1,
+      "offset" => 26,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknamemode: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknameorientation: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknameorientation: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(horizontal|vertical)",
+    "start" => Map {
+      "col" => 33,
+      "line" => 1,
+      "offset" => 32,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknameorientation: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 ottava: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 ottava: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 7,
+      "line" => 1,
+      "offset" => 6,
+    },
+  },
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 ottava: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 rasg: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 rasg: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 9,
+      "line" => 1,
+      "offset" => 8,
+    },
+  },
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 17,
+      "line" => 1,
+      "offset" => 16,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 rasg: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score empty: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score empty: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score empty: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(String|Ident, String, left|center|right)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 score optional: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score optional: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score optional: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score required: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score required: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score required: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (Number). Signatures:
+(String|Ident, String, left|center|right)",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 singletracktracknamepolicy: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 singletracktracknamepolicy: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(hidden|firstsystem|allsystems)",
+    "start" => Map {
+      "col" => 28,
+      "line" => 1,
+      "offset" => 27,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 singletracktracknamepolicy: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 whammybarstyle: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 whammybarstyle: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'none'.",
+    "start" => Map {
+      "col" => 13,
+      "line" => 1,
+      "offset" => 12,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 whammybarstyle: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 whammybartype: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 whammybartype: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 whammybartype: semantic-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexImporterTest sync 1`] = `
 Map {

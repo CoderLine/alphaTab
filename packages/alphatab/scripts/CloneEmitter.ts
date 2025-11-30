@@ -13,7 +13,7 @@ function removeExtension(fileName: string) {
 }
 
 function toImportPath(fileName: string) {
-    return `@${removeExtension(fileName).split('\\').join('/')}`;
+    return `@${removeExtension(fileName).split('\\').join('/')}`.replace('@src/', '@coderline/alphatab/');
 }
 
 function isCloneMember(propertyDeclaration: ts.PropertyDeclaration) {
@@ -78,7 +78,7 @@ function generateClonePropertyStatements(
                 .filter(t => t.tagName.text === 'clone_add')
                 .map(t => t.comment ?? '')[0] as string;
 
-            importer(`${arrayItemType.typeAsString}Cloner`, `@src/generated/model/${arrayItemType.typeAsString}Cloner`);
+            importer(`${arrayItemType.typeAsString}Cloner`, `@coderline/alphatab/generated/model/${arrayItemType.typeAsString}Cloner`);
             const loopItems = [
                 ...assign(ts.factory.createArrayLiteralExpression(undefined)),
 
@@ -203,7 +203,7 @@ function generateClonePropertyStatements(
             }
         }
     } else if (propertyType.isCloneable) {
-        importer(`${propertyType.typeAsString}Cloner`, `@src/generated/model/${propertyType.typeAsString}Cloner`);
+        importer(`${propertyType.typeAsString}Cloner`, `@coderline/alphatab/generated/model/${propertyType.typeAsString}Cloner`);
 
         // clone.prop = original.prop ? TypeNameCloner.clone(original.prop) : null
         // clone.prop = original.prop ? TypeNameCloner.clone(original.prop) : undefined

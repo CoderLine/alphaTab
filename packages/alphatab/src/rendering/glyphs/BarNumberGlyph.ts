@@ -1,8 +1,8 @@
-import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import type { RenderingResources } from '@src/RenderingResources';
-import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal

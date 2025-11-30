@@ -1,13 +1,12 @@
 import path from 'node:path';
 import url from 'node:url';
-import { esm as defaultEsm, dtsPathsTransformer } from '@coderline/alphatab-tooling/src/vite';
 import type { RollupTypescriptOptions } from '@rollup/plugin-typescript';
 import MagicString from 'magic-string';
 import type { OutputOptions } from 'rollup';
 import { defineConfig, type LibraryOptions, type Plugin } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import { defaultBuildUserConfig, umd } from '../tooling/src/vite';
-import { elementStyleUsingTransformer } from './scripts/element-style-transformer';
+import { defaultBuildUserConfig, umd, esm as defaultEsm, dtsPathsTransformer } from '../tooling/src/vite';
+import { elementStyleUsingTransformer } from '../tooling/src/typescript';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -19,7 +18,7 @@ const adjustScriptPathsPlugin = (min: boolean) => {
             const modifiedCode = new MagicString(code);
             const extension = min ? '.min.mjs' : '.mjs';
             modifiedCode.replaceAll(
-                /(@src|\.)\/alphaTab\.(core|worker|worklet)(\.ts)?(['"])/g,
+                /(@coderline\/alphatab|\.)\/alphaTab\.(core|worker|worklet)(\.ts)?(['"])/g,
                 `./alphaTab.$2${extension}$4`
             );
 
@@ -49,11 +48,7 @@ export default defineConfig(({ mode }) => {
         return {
             transformers: {
                 before: [elementStyleUsingTransformer()],
-                afterDeclarations: [
-                    dtsPathsTransformer({
-                        '@src/': path.resolve(__dirname, 'src')
-                    })
-                ]
+                afterDeclarations: [dtsPathsTransformer()]
             }
         };
     };
@@ -68,7 +63,7 @@ export default defineConfig(({ mode }) => {
             chunk => !chunk.facadeModuleId!.endsWith('alphaTab.core.ts')
         );
 
-        (config.build!.rollupOptions!.external as string[]).push('@src/alphaTab.core');
+        (config.build!.rollupOptions!.external as string[]).push('@coderline/alphatab/alphaTab.core');
     };
 
     switch (mode) {

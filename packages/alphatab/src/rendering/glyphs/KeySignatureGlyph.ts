@@ -1,7 +1,7 @@
-import type { ICanvas } from '@src/platform/ICanvas';
-import { LeftToRightLayoutingGlyphGroup } from '@src/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { BarSubElement } from '@src/model/Bar';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { BarSubElement } from '@coderline/alphatab/model/Bar';
 
 /**
  * @internal

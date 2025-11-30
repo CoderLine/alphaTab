@@ -1,4 +1,4 @@
-import { Color } from '@src/model/Color';
+import { Color } from '@coderline/alphatab/model/Color';
 import { expect } from 'chai';
 
 describe('ColorTests', () => {

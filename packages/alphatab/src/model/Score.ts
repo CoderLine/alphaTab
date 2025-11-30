@@ -1,17 +1,17 @@
-import type { MasterBar } from '@src/model/MasterBar';
-import { RenderStylesheet } from '@src/model/RenderStylesheet';
-import { RepeatGroup } from '@src/model/RepeatGroup';
-import type { Track } from '@src/model/Track';
-import type { Settings } from '@src/Settings';
-import { ElementStyle } from '@src/model/ElementStyle';
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
-import { Voice } from '@src/model/Voice';
-import { Note } from '@src/model/Note';
-import type { NotationSettings } from '@src/NotationSettings';
-import { TextAlign } from '@src/platform/ICanvas';
-import type { BackingTrack } from '@src/model/BackingTrack';
-import { Automation, AutomationType, type FlatSyncPoint, SyncPointData } from '@src/model/Automation';
+import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { RenderStylesheet } from '@coderline/alphatab/model/RenderStylesheet';
+import { RepeatGroup } from '@coderline/alphatab/model/RepeatGroup';
+import type { Track } from '@coderline/alphatab/model/Track';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
+import { Bar } from '@coderline/alphatab/model/Bar';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import { Voice } from '@coderline/alphatab/model/Voice';
+import { Note } from '@coderline/alphatab/model/Note';
+import type { NotationSettings } from '@coderline/alphatab/NotationSettings';
+import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
+import { Automation, AutomationType, type FlatSyncPoint, SyncPointData } from '@coderline/alphatab/model/Automation';
 
 /**
  * Lists all graphical sub elements within a {@link Score} which can be styled via {@link Score.style}

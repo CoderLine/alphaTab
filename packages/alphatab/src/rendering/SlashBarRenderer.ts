@@ -1,21 +1,21 @@
-import { type Bar, BarSubElement } from '@src/model/Bar';
-import { type Beat, BeatSubElement } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import type { Voice } from '@src/model/Voice';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { NoteYPosition } from '@src/rendering/BarRendererBase';
-import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { LineBarRenderer } from '@src/rendering//LineBarRenderer';
-import { SlashBeatContainerGlyph } from '@src/rendering/SlashBeatContainerGlyph';
-import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import { SlashBeatGlyph } from '@src/rendering/glyphs/SlashBeatGlyph';
-import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
-import { ScoreTimeSignatureGlyph } from '@src/rendering/glyphs/ScoreTimeSignatureGlyph';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
+import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { Voice } from '@coderline/alphatab/model/Voice';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import { LineBarRenderer } from '@coderline/alphatab/rendering//LineBarRenderer';
+import { SlashBeatContainerGlyph } from '@coderline/alphatab/rendering/SlashBeatContainerGlyph';
+import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
+import { SlashBeatGlyph } from '@coderline/alphatab/rendering/glyphs/SlashBeatGlyph';
+import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
+import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using Slash Rhythm notation

@@ -1,13 +1,13 @@
-import type { Beat } from '@src/model/Beat';
-import type { MasterBar } from '@src/model/MasterBar';
-import type { Note } from '@src/model/Note';
-import type { Score } from '@src/model/Score';
-import { BarBounds } from '@src/rendering/utils/BarBounds';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
-import { NoteBounds } from '@src/rendering/utils/NoteBounds';
-import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
+import { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
+import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
+import { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
 
 /**
  * @public

@@ -1,7 +1,7 @@
-import { Environment } from '@src/Environment';
-import { LogLevel } from '@src/LogLevel';
-import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import type { EngravingSettings } from '@src/EngravingSettings';
+import { Environment } from '@coderline/alphatab/Environment';
+import { LogLevel } from '@coderline/alphatab/LogLevel';
+import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
+import type { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 
 /**
  * Lists the known file formats for font files.

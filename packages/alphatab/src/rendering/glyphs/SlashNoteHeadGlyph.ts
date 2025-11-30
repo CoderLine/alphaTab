@@ -1,13 +1,13 @@
-import { Duration } from '@src/model/Duration';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import type { Glyph } from '@src/rendering/glyphs/Glyph';
-import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { NoteSubElement } from '@src/model/Note';
-import { type Beat, BeatSubElement } from '@src/model/Beat';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { NoteSubElement } from '@coderline/alphatab/model/Note';
+import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 
 /**
  * @internal

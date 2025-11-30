@@ -531,9 +531,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this._returnRunTest.pop();
     }
 
-    protected writeThisLiteral(expr: cs.ThisLiteral): void {
+    protected override writeThisLiteral(expr: cs.ThisLiteral): void {
         super.writeThisLiteral(expr);
-        const scope = this._thisScope.at(-1);
+        const scope = this._thisScope[this._thisScope.length - 1];
         if (scope) {
             this.write(`@${scope}`);
         }
@@ -674,8 +674,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         return true;
     }
 
-    protected writeReturnStatement(r: cs.ReturnStatement): void {
-        if (this._returnRunTest.at(-1)) {
+    protected override writeReturnStatement(r: cs.ReturnStatement): void {
+        if (this._returnRunTest[this._returnRunTest.length - 1]) {
             this.writeLine('return@runTest');
         } else {
             super.writeReturnStatement(r);
@@ -902,8 +902,16 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 const typeReference = type as cs.TypeReference;
 
                 const targetType = (type as cs.TypeReference).reference;
+                let typeArguments = typeReference.typeArguments;
                 if (typeof targetType === 'string') {
-                    this.write(targetType);
+                    if (forNew && targetType === this._context.makeIterableType() && typeArguments) {
+                        this.write('alphaTab.collections.SimpleIterable<');
+                        this.writeType(typeArguments[0]);
+                        this.write('>');
+                        typeArguments = undefined;
+                    } else {
+                        this.write(targetType);
+                    }
                 } else {
                     if (typeReference.isAsync && allowPromise) {
                         this.write('kotlinx.coroutines.Deferred<');
@@ -911,10 +919,10 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                     this.writeType(targetType, forNew);
                 }
 
-                if (typeReference.typeArguments && typeReference.typeArguments.length > 0) {
+                if (typeArguments && typeArguments.length > 0) {
                     this.write('<');
 
-                    this.writeCommaSeparated(typeReference.typeArguments, p => this.writeType(p));
+                    this.writeCommaSeparated(typeArguments, p => this.writeType(p));
 
                     this.write('>');
                 } else if (typeReference.tsSymbol) {
@@ -945,6 +953,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             case cs.SyntaxKind.EnumDeclaration:
             case cs.SyntaxKind.DelegateDeclaration:
                 this.write(this._context.getFullName(type as cs.NamedTypeDeclaration));
+                break;
+            case cs.SyntaxKind.UsingDeclaration:
+                this.write((type as cs.UsingDeclaration).name);
                 break;
             case cs.SyntaxKind.TypeParameterDeclaration:
                 this.writeIdentifier((type as cs.TypeParameterDeclaration).name);
@@ -1199,30 +1210,33 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     protected writeArrayCreationExpression(expr: cs.ArrayCreationExpression) {
         if (expr.type) {
             if (expr.values) {
-                let elementType: cs.TypeNode | null = null;
-                if (cs.isArrayTypeNode(expr.type)) {
-                    elementType = expr.type.elementType;
-                } else if (
-                    cs.isTypeReference(expr.type) &&
-                    typeof expr.type.reference !== 'string' &&
-                    cs.isArrayTypeNode(expr.type.reference)
-                ) {
-                    elementType = expr.type.reference.elementType;
-                }
+                this.writeType(expr.type, true);
+                // let elementType: cs.TypeNode | null = null;
+                // if (cs.isArrayTypeNode(expr.type)) {
+                //     elementType = expr.type.elementType;
+                // } else if (
+                //     cs.isTypeReference(expr.type) &&
+                //     typeof expr.type.reference !== 'string' &&
+                //     cs.isArrayTypeNode(expr.type.reference)
+                // ) {
+                //     elementType = expr.type.reference.elementType;
+                // }
 
-                const type = elementType ? this._getContainerTypeName(elementType) : null;
-                this.write('alphaTab.collections.');
-                if (type) {
-                    this.write(type);
-                    this.write('List');
-                } else {
-                    this.write('List');
-                    if (expr.type && cs.isArrayTypeNode(expr.type)) {
-                        this.write('<');
-                        this.writeType(expr.type.elementType);
-                        this.write('>');
-                    }
-                }
+                // const type = elementType ? this._getContainerTypeName(elementType) : null;
+                // this.write('alphaTab.collections.');
+                // if (type) {
+                //     this.write(type);
+                //     this.write('List');
+                // } else {
+                //     this.write('List');
+                //     if (expr.type && cs.isArrayTypeNode(expr.type)) {
+                //         this.write('<');
+                //         this.writeType(expr.type.elementType);
+                //         this.write('>');
+                //     } else {
+                //         debugger;
+                //     }
+                // }
                 this.writeLine('(');
                 this._indent++;
                 this.writeCommaSeparated(expr.values, v => {
@@ -1576,7 +1590,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             this.writeStatement(s.statement);
             this._indent--;
         }
-        this._writeForIncrementors(this._forLoopIncrementors.at(-1));
+        this._writeForIncrementors(this._forLoopIncrementors[this._forLoopIncrementors.length - 1]);
         this.endBlock();
         this.endBlock();
         // }
@@ -1617,8 +1631,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
     }
 
-    protected writeContinueStatement(c: cs.ContinueStatement): void {
-        this._writeForIncrementors(this._forLoopIncrementors.at(-1));
+    protected override writeContinueStatement(c: cs.ContinueStatement): void {
+        this._writeForIncrementors(this._forLoopIncrementors[this._forLoopIncrementors.length - 1]);
         super.writeContinueStatement(c);
     }
 
@@ -1806,7 +1820,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         return true;
     }
 
-    protected beginBlock() {
+    protected override beginBlock() {
         super.beginBlock();
         this._useScopes.push(0);
     }
@@ -1951,7 +1965,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
     }
 
-    protected writeDefaultExpression(d: cs.DefaultExpression): void {
+    protected override writeDefaultExpression(d: cs.DefaultExpression): void {
         if (d.parent && cs.isParameterDeclaration(d.parent) && d.parent.type) {
             if (d.parent.type.isNullable) {
                 this.write('null');
@@ -2019,7 +2033,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.write(')');
     }
 
-    protected writeInvocationExpression(expr: cs.InvocationExpression): void {
+    protected override writeInvocationExpression(expr: cs.InvocationExpression): void {
         if (expr.arguments.length === 1 && expr.arguments[0].nodeType === cs.SyntaxKind.Block) {
             this.writeExpression(expr.expression);
             if (expr.typeArguments) {

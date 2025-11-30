@@ -1,15 +1,15 @@
-import { type Beat, BeatSubElement } from '@src/model/Beat';
-import { BendPoint } from '@src/model/BendPoint';
-import { BendStyle } from '@src/model/BendStyle';
-import { WhammyType } from '@src/model/WhammyType';
-import { NotationMode, NotationElement } from '@src/NotationSettings';
-import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { TabBendGlyph } from '@src/rendering/glyphs/TabBendGlyph';
-import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { BendPoint } from '@coderline/alphatab/model/BendPoint';
+import { BendStyle } from '@coderline/alphatab/model/BendStyle';
+import { WhammyType } from '@coderline/alphatab/model/WhammyType';
+import { NotationMode, NotationElement } from '@coderline/alphatab/NotationSettings';
+import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { TabBendGlyph } from '@coderline/alphatab/rendering/glyphs/TabBendGlyph';
+import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal

@@ -1,6 +1,6 @@
-import type { Glyph } from '@src/rendering/glyphs/Glyph';
-import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import type { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
+import type { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
 
 /**
  * @internal

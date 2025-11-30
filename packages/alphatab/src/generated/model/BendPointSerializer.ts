@@ -3,8 +3,8 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { BendPoint } from "@src/model/BendPoint";
-import { JsonHelper } from "@src/io/JsonHelper";
+import { BendPoint } from "@coderline/alphatab/model/BendPoint";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 /**
  * @internal
  */

@@ -7,6 +7,9 @@ import * as path from 'node:path';
 import { BuildEnvironment } from 'vite';
 import { injectEnvironmentToHooks } from './build';
 
+/**
+ * @internal
+ */
 // biome-ignore lint/suspicious/noConstEnum: Exception where we use them
 export const enum AlphaTabWorkerTypes {
     WorkerClassic = 'worker_classic',
@@ -28,9 +31,18 @@ interface WorkerCache {
     // <hash, fileName>
     fileNameHash: Map<string, string>;
 }
+/**
+ * @internal
+ */
 export const workerCache = new WeakMap<ResolvedConfig, WorkerCache>();
 
+/**
+ * @internal
+ */
 export const WORKER_FILE_ID = 'alphatab_worker';
+/**
+ * @internal
+ */
 export const WORKER_ASSET_ID = '__ALPHATAB_WORKER_ASSET__';
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/plugins/worker.ts#L47
@@ -40,6 +52,9 @@ function saveEmitWorkerAsset(config: ResolvedConfig, asset: WorkerBundleAsset): 
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/plugins/worker.ts#L161
+/**
+ * @internal
+ */
 export async function workerFileToUrl(config: ResolvedConfig, id: string): Promise<string> {
     const workerMap = workerCache.get(config.mainConfig || config)!;
     let fileName = workerMap.bundle.get(id);
@@ -143,6 +158,9 @@ function emitSourcemapForWorkerEntry(config: ResolvedConfig, chunk: OutputChunk)
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/plugins/worker.ts#L458
+/**
+ * @internal
+ */
 export function isSameContent(a: string | Uint8Array, b: string | Uint8Array) {
     if (typeof a === 'string') {
         if (typeof b === 'string') {

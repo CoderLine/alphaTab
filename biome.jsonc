@@ -23,6 +23,7 @@
         "enabled": true,
         "rules": {
             "style": {
+                "useEnumInitializers": "error",
                 "noInferrableTypes": "off", // we want to be explicit (for transpiler)
                 "noNonNullAssertion": "off", // we use these assertions often.
                 "noParameterAssign": "off", // useful for default values

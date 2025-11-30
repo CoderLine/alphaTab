@@ -1,8 +1,8 @@
-import { BeatSubElement } from '@src/model/Beat';
-import { BrushType } from '@src/model/BrushType';
-import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
-import { TabBrushGlyph } from '@src/rendering/glyphs/TabBrushGlyph';
+import { BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { BrushType } from '@coderline/alphatab/model/BrushType';
+import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
+import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import { TabBrushGlyph } from '@coderline/alphatab/rendering/glyphs/TabBrushGlyph';
 
 /**
  * @internal

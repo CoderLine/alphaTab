@@ -21,8 +21,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-import { XmlError } from '@src/xml/XmlError';
-import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
+import { XmlError } from '@coderline/alphatab/xml/XmlError';
+import { XmlNode, XmlNodeType } from '@coderline/alphatab/xml/XmlNode';
 
 /**
  * @internal

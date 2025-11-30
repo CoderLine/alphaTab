@@ -1,6 +1,6 @@
-import type { MasterBar } from '@src/model/MasterBar';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
+import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 
 /**
  * This container represents a single column of bar renderers independent from any staves.

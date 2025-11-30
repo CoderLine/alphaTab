@@ -1,13 +1,13 @@
-import type { Note } from '@src/model/Note';
-import { SlideInType } from '@src/model/SlideInType';
-import { SlideOutType } from '@src/model/SlideOutType';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import { TabBendGlyph } from '@src/rendering/glyphs/TabBendGlyph';
-import { TabSlideLineGlyph } from '@src/rendering/glyphs/TabSlideLineGlyph';
-import { TabSlurGlyph } from '@src/rendering/glyphs/TabSlurGlyph';
-import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
-import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { SlideInType } from '@coderline/alphatab/model/SlideInType';
+import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import { TabBendGlyph } from '@coderline/alphatab/rendering/glyphs/TabBendGlyph';
+import { TabSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/TabSlideLineGlyph';
+import { TabSlurGlyph } from '@coderline/alphatab/rendering/glyphs/TabSlurGlyph';
+import { TabTieGlyph } from '@coderline/alphatab/rendering/glyphs/TabTieGlyph';
+import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 
 /**
  * @internal

@@ -1,8 +1,8 @@
-import { Direction } from '@src/model/Direction';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { type ICanvas, TextBaseline, TextAlign } from '@src/platform/ICanvas';
+import { Direction } from '@coderline/alphatab/model/Direction';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { type ICanvas, TextBaseline, TextAlign } from '@coderline/alphatab/platform/ICanvas';
 
 /**
  * @internal

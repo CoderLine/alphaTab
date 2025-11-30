@@ -1,7 +1,7 @@
-import { FermataType } from '@src/model/Fermata';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { FermataType } from '@coderline/alphatab/model/Fermata';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * @internal

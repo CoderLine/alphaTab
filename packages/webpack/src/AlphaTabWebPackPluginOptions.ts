@@ -1,3 +1,6 @@
+/**
+ * @public
+ */
 export interface AlphaTabWebPackPluginOptions {
     /**
      * The location where alphaTab can be found.

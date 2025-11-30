@@ -1,6 +1,6 @@
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { expect } from 'chai';
 
 describe('ModelUtilsTests', () => {

@@ -2,16 +2,16 @@
 // developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
-import { LoopMode } from '@src/synth/synthesis/LoopMode';
-import { OutputMode } from '@src/synth/synthesis/OutputMode';
-import type { Region } from '@src/synth/synthesis/Region';
-import type { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
-import { VoiceEnvelope, VoiceEnvelopeSegment } from '@src/synth/synthesis/VoiceEnvelope';
-import { VoiceLfo } from '@src/synth/synthesis/VoiceLfo';
-import { VoiceLowPass } from '@src/synth/synthesis/VoiceLowPass';
-import { SynthHelper } from '@src/synth/SynthHelper';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import type { Channel } from '@src/synth/synthesis/Channel';
+import { LoopMode } from '@coderline/alphatab/synth/synthesis/LoopMode';
+import { OutputMode } from '@coderline/alphatab/synth/synthesis/OutputMode';
+import type { Region } from '@coderline/alphatab/synth/synthesis/Region';
+import type { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
+import { VoiceEnvelope, VoiceEnvelopeSegment } from '@coderline/alphatab/synth/synthesis/VoiceEnvelope';
+import { VoiceLfo } from '@coderline/alphatab/synth/synthesis/VoiceLfo';
+import { VoiceLowPass } from '@coderline/alphatab/synth/synthesis/VoiceLowPass';
+import { SynthHelper } from '@coderline/alphatab/synth/SynthHelper';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import type { Channel } from '@coderline/alphatab/synth/synthesis/Channel';
 
 /**
  * @internal

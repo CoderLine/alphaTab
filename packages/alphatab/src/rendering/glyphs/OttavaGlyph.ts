@@ -1,8 +1,8 @@
-import { Ottavia } from '@src/model/Ottavia';
-import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
-import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { GroupedEffectGlyph } from '@coderline/alphatab/rendering/glyphs/GroupedEffectGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * @internal

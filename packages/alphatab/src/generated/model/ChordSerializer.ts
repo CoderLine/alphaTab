@@ -3,8 +3,8 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Chord } from "@src/model/Chord";
-import { JsonHelper } from "@src/io/JsonHelper";
+import { Chord } from "@coderline/alphatab/model/Chord";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 /**
  * @internal
  */

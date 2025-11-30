@@ -1,6 +1,6 @@
-import type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
-import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { SynthConstants } from '@src/synth/SynthConstants';
+import type { ISynthOutput, ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 
 /**
  * @internal

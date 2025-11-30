@@ -1,13 +1,13 @@
-import { BinaryStylesheet } from '@src/importer/BinaryStylesheet';
-import { GpifParser } from '@src/importer/GpifParser';
-import { GpxFileSystem } from '@src/importer/GpxFileSystem';
-import { PartConfiguration } from '@src/importer/PartConfiguration';
-import { ScoreImporter } from '@src/importer/ScoreImporter';
-import type { Score } from '@src/model/Score';
-import { Logger } from '@src/Logger';
-import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { IOHelper } from '@src/io/IOHelper';
-import { LayoutConfiguration } from '@src/importer/LayoutConfiguration';
+import { BinaryStylesheet } from '@coderline/alphatab/importer/BinaryStylesheet';
+import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
+import { GpxFileSystem } from '@coderline/alphatab/importer/GpxFileSystem';
+import { PartConfiguration } from '@coderline/alphatab/importer/PartConfiguration';
+import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Logger } from '@coderline/alphatab/Logger';
+import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { LayoutConfiguration } from '@coderline/alphatab/importer/LayoutConfiguration';
 
 /**
  * This ScoreImporter can read Guitar Pro 6 (gpx) files.

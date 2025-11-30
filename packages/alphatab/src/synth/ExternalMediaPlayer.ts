@@ -1,7 +1,7 @@
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@src/EventEmitter';
-import type { BackingTrack } from '@src/model/BackingTrack';
-import { type IBackingTrackSynthOutput, BackingTrackPlayer } from '@src/synth/BackingTrackPlayer';
-import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
+import { type IBackingTrackSynthOutput, BackingTrackPlayer } from '@coderline/alphatab/synth/BackingTrackPlayer';
+import type { ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
 
 /**
  * A custom handler for integrating alphaTab with an external media source.

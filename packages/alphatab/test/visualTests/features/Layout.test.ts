@@ -1,7 +1,7 @@
-import { SystemsLayoutMode } from '@src/DisplaySettings';
-import { LayoutMode } from '@src/LayoutMode';
-import { Settings } from '@src/Settings';
-import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
+import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { Settings } from '@coderline/alphatab/Settings';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
 
 describe('LayoutTests', () => {
     it('page-layout', async () => {

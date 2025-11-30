@@ -1,5 +1,5 @@
-import { TextAlign } from '@src/platform/ICanvas';
-import { RowContainerGlyph } from '@src/rendering/glyphs/RowContainerGlyph';
+import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { RowContainerGlyph } from '@coderline/alphatab/rendering/glyphs/RowContainerGlyph';
 
 /**
  * @internal

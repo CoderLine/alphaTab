@@ -1,18 +1,18 @@
-import type { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@src/EventEmitter';
-import { Settings } from '@src/Settings';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { Score } from '@src/model/Score';
-import type { Cursors } from '@src/platform/Cursors';
-import type { IContainer } from '@src/platform/IContainer';
-import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import type { IUiFacade } from '@src/platform/IUiFacade';
-import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
-import type { IAudioExporterWorker } from '@src/synth/IAudioExporter';
-import { TestPlatform } from '@test/TestPlatform';
+import type { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { Settings } from '@coderline/alphatab/Settings';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { Score } from '@coderline/alphatab/model/Score';
+import type { Cursors } from '@coderline/alphatab/platform/Cursors';
+import type { IContainer } from '@coderline/alphatab/platform/IContainer';
+import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
+import type { IUiFacade } from '@coderline/alphatab/platform/IUiFacade';
+import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import type { IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
+import type { IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExporter';
+import { TestPlatform } from 'test/TestPlatform';
 
 /**
  * @internal

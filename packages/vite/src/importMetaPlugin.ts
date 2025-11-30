@@ -106,6 +106,9 @@ function getWorkerType(code: string, match: RegExpExecArray): AlphaTabWorkerType
     return AlphaTabWorkerTypes.WorkerClassic;
 }
 
+/**
+ * @public
+ */
 export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin {
     let resolvedConfig: ResolvedConfig;
     let isBuild: boolean;

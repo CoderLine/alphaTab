@@ -1,9 +1,10 @@
-import { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
+import { AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import { expect } from 'chai';
 
 describe('AlphaTexParserTest', () => {
     function parserTest(source: string) {
         const parser = new AlphaTexParser(source);
+        parser.mode = AlphaTexParseMode.Full;
         const node = parser.read();
         expect(node).to.be.ok;
         expect(node).toMatchSnapshot();
@@ -135,7 +136,6 @@ describe('AlphaTexParserTest', () => {
     });
 
     describe('floats', () => {
-        it('tempo', () => parserTest('. \\tempo 120 "Moderate" 0.5'));
         it('tempo parenthesis', () => parserTest('. \\tempo (120 "Moderate" 0.5)'));
         it('valuelist parenthesis', () => parserTest('\\unknown (1.2 2.3)'));
         it('valuelist', () => parserTest('. \\scale 0.5'));
@@ -160,12 +160,7 @@ describe('AlphaTexParserTest', () => {
 
     describe('ambiguous', () => {
         it('tempo and stringed note', () => parserTest('\\tempo 120 3.3 3.4'));
-        it('tempo, temponame and stringed note', () => parserTest('\\tempo 120 "Moderate" 3.4'));
     });
-
-    // TODO: check how much of the AST we need to provide code completion
-    // currently the parser/lexer are rather "fail fast" and do not
-    // provide many intermediately parsed nodes.
 
     describe('intermediate', () => {
         it('started initial meta', () => parserTest('\\'));
@@ -187,7 +182,15 @@ describe('AlphaTexParserTest', () => {
         it('started beat effect name', () => parserTest('\\title "Title" . C4 { slur "S1" } . 4 { ras'));
         it('started beat effect value', () => parserTest('\\title "Title" . C4 { slur "S1" } . 4 { rasg "i'));
         it('finished beat effect value, not closed', () =>
-            parserTest('\\title "Title" . C4 { slur "S1" } . 4 { rasg "i" '));
+            parserTest('\\title "Title" . C4 { slur "S1" } . 4 { rasg "ii" '));
+    });
+
+    describe('recovery', () => {
+        describe('props', () => {
+            it('additional values', () => parserTest('C4 { slur "S1" "S2" 3 v 3 vw} '));
+            it('unknown property', () => parserTest('C4 { slur "s1" invalid "invalid value" 3 v }'));
+            it('unknown value', () => parserTest('C4 { rasg "invalid" v }'));
+        });
     });
 
     describe('errors', () => {
@@ -205,8 +208,6 @@ describe('AlphaTexParserTest', () => {
             it('beat duration', () => parserTest('(C4).A'));
             it('note string', () => parserTest('3.A'));
             it('note value', () => parserTest(' . ( \\notevalue )'));
-            it('value list', () => parserTest('\\meta (\\metavalue)'));
-            it('meta value', () => parserTest('\\title 10'));
         });
 
         describe('at203', () => {
@@ -225,12 +226,10 @@ describe('AlphaTexParserTest', () => {
             it('note', () => parserTest('. (C4{unknown})'));
             it('gracetype', () => parserTest('C4 {gr invalid}'));
             it('barre', () => parserTest('C4 {barre 1 invalid}'));
-            it('fermata', () => parserTest('C4 {fermata invalid}'));
         });
 
         describe('at206', () => {
             it('note list', () => parserTest('(C4'));
-            it('properties', () => parserTest('\\track "Test" { color red'));
             it('values', () => parserTest('\\title ("Test"'));
         });
     });

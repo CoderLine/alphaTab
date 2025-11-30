@@ -1,4 +1,4 @@
-import type { IContainer } from '@src/platform/IContainer';
+import type { IContainer } from '@coderline/alphatab/platform/IContainer';
 
 /**
  * This wrapper holds all cursor related elements.

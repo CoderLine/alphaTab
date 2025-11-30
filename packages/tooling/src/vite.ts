@@ -1,14 +1,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { cwd } from 'node:process';
 import url from 'node:url';
 import typescript, { type RollupTypescriptOptions } from '@rollup/plugin-typescript';
 import type { OutputChunk, OutputOptions, OutputPlugin } from 'rollup';
 import license from 'rollup-plugin-license';
+import { nodeExternals } from 'rollup-plugin-node-externals';
 import type { MinifyOptions } from 'terser';
 import ts from 'typescript';
-import type { LibraryOptions, UserConfig } from 'vite';
-import generateDts from './vite.plugin.dts.ts';
-import min from './vite.plugin.min.ts';
+import { defineConfig, type LibraryOptions, type UserConfig } from 'vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import { createApiDtsFiles } from './typescript';
+import generateDts from './vite.plugin.dts';
+import min from './vite.plugin.min';
 
 const terserOptions: MinifyOptions = {
     mangle: {
@@ -58,6 +62,25 @@ export function licenseHeaderPlugin() {
     });
 }
 
+export function defineEsmAndCommonJsConfig(entry: string) {
+    return defineConfig(({ mode }) => {
+        const config = defaultBuildUserConfig();
+
+        const libName = path.parse(entry).name;
+
+        switch (mode) {
+            case 'cjs':
+                commonjs(config, __dirname, libName, entry);
+                break;
+            // case 'esm':
+            default:
+                esm(config, __dirname, libName, entry);
+                break;
+        }
+
+        return config;
+    });
+}
 export function defaultBuildUserConfig(): UserConfig {
     return {
         esbuild: false,
@@ -69,11 +92,26 @@ export function defaultBuildUserConfig(): UserConfig {
             },
             minify: false,
             rollupOptions: {
-                external: ['jQuery', 'vite', 'rollup', /node:.*/],
+                external: [
+                    'jQuery',
+                    'vite',
+                    'rollup',
+                    /node:\w+/,
+                    'child_process',
+                    'fs',
+                    'path',
+                    'url',
+                    'os',
+                    'crypto',
+                    'net',
+                    /^vscode/
+                ],
                 output: [],
                 onLog(level, log, handler) {
-                    if (log.code === 'CIRCULAR_DEPENDENCY') {
-                        return; // Ignore circular dependency warnings
+                    switch (log.code) {
+                        case 'CIRCULAR_DEPENDENCY': // Ignore circular dependency warnings
+                        case 'EMPTY_BUNDLE': // ignore empty bundles
+                            return;
                     }
                     handler(level, log);
                 }
@@ -84,16 +122,18 @@ export function defaultBuildUserConfig(): UserConfig {
 
 export function enableTypeScript(config: UserConfig, o: Partial<RollupTypescriptOptions> = {}, types: boolean = false) {
     config.plugins!.unshift(
+        tsconfigPaths(),
         typescript({
             tsconfig: './tsconfig.json',
             ...o,
             ...(types
                 ? {
                       declaration: true,
-                      declarationMap: true,
+                      declarationMap: false,
                       declarationDir: './dist/types'
                   }
-                : {})
+                : {}),
+            include: ['**/*.ts']
         })
     );
 }
@@ -156,8 +196,7 @@ export function commonjs(
         dir: 'dist/',
         format: 'cjs',
         name: name,
-        entryFileNames: '[name].js',
-        chunkFileNames: '[name].js'
+        entryFileNames: '[name].js'
     });
 }
 
@@ -186,7 +225,7 @@ export function esm(
         plugins: [
             {
                 name: 'dts',
-                async writeBundle(_, bundle) {
+                async writeBundle(options, bundle) {
                     const files = Object.keys(bundle);
 
                     for (const file of files) {
@@ -198,7 +237,19 @@ export function esm(
                             shouldCreateDts(chunk)
                         ) {
                             this.info(`Creating types for bundle ${file}`);
-                            await generateDts(projectDir, chunk.facadeModuleId!, file.replace('.mjs', '.d.ts'));
+                            const originalFilePath = path.parse(path.relative(process.cwd(), chunk.facadeModuleId!));
+                            const dtsSubPath = `${originalFilePath.dir}/${originalFilePath.name}.d.ts`;
+                            const dtsBundleFile = files.find(f => f.endsWith(dtsSubPath));
+                            if (dtsBundleFile) {
+                                generateDts(
+                                    projectDir,
+                                    path.resolve(options.dir!, dtsBundleFile)!,
+                                    path.resolve(options.dir!, file.replace('.mjs', '.d.ts')),
+                                    config.build!.rollupOptions!.external! as (string | RegExp)[]
+                                );
+                            } else {
+                                this.error('Could not find entry d.ts');
+                            }
                         }
                     }
                 }
@@ -213,18 +264,45 @@ export function esm(
     }
 }
 
-export function dtsPathsTransformer(mapping: Record<string, string>) {
-    const mapPath = (filePath: string, input: string): string | undefined => {
-        for (const [k, v] of Object.entries(mapping)) {
-            if (input.startsWith(k)) {
-                const absoluteFile = path.resolve(v, input.substring(k.length));
-                return './' + path.relative(path.dirname(filePath), absoluteFile).replaceAll('\\', '/');
+export function dtsPathsTransformer(mapping?: Record<string, string>, externals?: (string | RegExp)[]) {
+    return (context: ts.TransformationContext) => {
+        if (!mapping) {
+            mapping = {};
+            const options = context.getCompilerOptions();
+            if (options.paths) {
+                for (const [k, v] of Object.entries(options.paths)) {
+                    if (k.endsWith('*') && v[0].endsWith('*')) {
+                        mapping[k.substring(0, k.length - 1)] = v[0].substring(0, v[0].length - 1);
+                    }
+                }
             }
         }
-        return undefined;
-    };
 
-    return (context: ts.TransformationContext) => {
+        const isExternal = (input: string) => {
+            if (!externals) {
+                return false;
+            }
+
+            for (const e of externals) {
+                if (typeof e === 'string') {
+                    return input === e;
+                } else if (e instanceof RegExp) {
+                    return e.test(input);
+                }
+            }
+            return false;
+        };
+
+        const mapPath = (filePath: string, input: string): string | undefined => {
+            for (const [k, v] of Object.entries(mapping!)) {
+                if (input.startsWith(k) && !isExternal(input)) {
+                    const absoluteFile = path.resolve(v, input.substring(k.length));
+                    return `./${path.relative(path.dirname(filePath), absoluteFile).replaceAll('\\', '/')}`;
+                }
+            }
+            return undefined;
+        };
+
         return (source: ts.SourceFile | ts.Bundle) => {
             const sourceFilePath = ts.isSourceFile(source) ? source.fileName : source.sourceFiles[0].fileName;
 
@@ -260,4 +338,63 @@ export function dtsPathsTransformer(mapping: Record<string, string>) {
             return ts.visitEachChild(source, visitor, context);
         };
     };
+}
+
+export function defineEsmLibConfig() {
+    return defineConfig(() => {
+        const config = defaultBuildUserConfig();
+        enableTypeScript(
+            config,
+            {
+                transformers: {
+                    afterDeclarations: [dtsPathsTransformer()]
+                }
+            },
+            true
+        );
+        const lib = config.build!.lib! as LibraryOptions;
+        const libEntry = lib.entry! as Record<string, string>;
+
+        config.plugins!.push(nodeExternals());
+        for (const file of fs.globSync('src/**/*.ts')) {
+            libEntry[path.relative('src', file.slice(0, file.length - path.extname(file).length))] = file;
+        }
+
+        const output = config.build!.rollupOptions!.output as OutputOptions[];
+
+        output.push({
+            dir: 'dist/',
+            format: 'es',
+            entryFileNames: '[name].mjs',
+            chunkFileNames: '[name].mjs',
+            plugins: [
+                {
+                    name: 'dts',
+                    async writeBundle(config, bundle) {
+                        const files = Object.keys(bundle);
+                        const dtsBaseDir = path.resolve(config.dir!, 'types', 'src');
+                        const dtsFiles = files
+                            .filter(f => f.endsWith('d.ts') && f.startsWith('types/src/'))
+                            .map(f => path.resolve(config.dir!, f));
+                        const ctx = this;
+                        await createApiDtsFiles(dtsBaseDir, dtsFiles, cwd(), config.dir!, {
+                            error(message) {
+                                ctx.error(message);
+                            },
+                            info(message) {
+                                ctx.info(message);
+                            },
+                            log(message) {
+                                ctx.debug(message);
+                            },
+                            warn(message) {
+                                ctx.warn(message);
+                            }
+                        });
+                    }
+                }
+            ]
+        });
+        return config;
+    });
 }

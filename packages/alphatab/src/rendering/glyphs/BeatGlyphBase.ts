@@ -1,10 +1,10 @@
-import type { BeatSubElement } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import type { Glyph } from '@src/rendering/glyphs/Glyph';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import type { ICanvas } from '@src/platform/ICanvas';
+import type { BeatSubElement } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 
 /**
  * @internal

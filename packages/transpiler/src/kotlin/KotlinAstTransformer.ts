@@ -435,7 +435,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return method;
     }
 
-    protected visitFunctionDeclaration(
+    protected override visitFunctionDeclaration(
         parent: cs.Node,
         expression: ts.FunctionDeclaration
     ): cs.LocalFunctionDeclaration {
@@ -588,7 +588,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return false;
     }
 
-    protected applyPropertyOverride(
+    protected override applyPropertyOverride(
         csProperty: cs.PropertyDeclaration,
         classElement:
             | ts.PropertyDeclaration
@@ -613,7 +613,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         super.applyPropertyOverride(csProperty, classElement);
     }
 
-    protected applyMethodOverride(csMethod: cs.MethodDeclaration, classElement: ts.MethodDeclaration) {
+    protected override applyMethodOverride(csMethod: cs.MethodDeclaration, classElement: ts.MethodDeclaration) {
         super.applyMethodOverride(csMethod, classElement);
         if (!csMethod.isOverride) {
             if (
@@ -625,7 +625,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         }
     }
 
-    protected visitExpressionStatement(parent: cs.Node, s: ts.ExpressionStatement): cs.Statement | null {
+    protected override visitExpressionStatement(parent: cs.Node, s: ts.ExpressionStatement): cs.Statement | null {
         // array tuple destruction
 
         // (x,y) = someCallOrExpression()
@@ -698,7 +698,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return super.visitExpressionStatement(parent, s);
     }
 
-    protected visitPropertyDeclaration(
+    protected override visitPropertyDeclaration(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
         classElement: ts.PropertyDeclaration
     ) {
@@ -714,7 +714,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return prop;
     }
 
-    protected visitTypeParameterDeclaration(
+    protected override visitTypeParameterDeclaration(
         parent: cs.Node,
         p: ts.TypeParameterDeclaration
     ): cs.TypeParameterDeclaration {

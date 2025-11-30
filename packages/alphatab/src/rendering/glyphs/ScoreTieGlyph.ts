@@ -1,10 +1,10 @@
-import type { Beat } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import { type BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { type BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 
 /**
  * @internal

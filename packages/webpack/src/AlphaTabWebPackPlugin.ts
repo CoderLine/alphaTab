@@ -1,5 +1,5 @@
 /**@target web */
-import * as fs from 'node:fs';
+import fs from 'node:fs';
 import * as path from 'node:path';
 import * as url from 'node:url';
 
@@ -136,6 +136,9 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
 
 const contextify = makeCacheableWithContext(_contextify);
 
+/**
+ * @public
+ */
 export class AlphaTabWebPackPlugin {
     private _webPackWithAlphaTab!: webPackWithAlphaTab;
     options: AlphaTabWebPackPluginOptions;
@@ -168,11 +171,11 @@ export class AlphaTabWebPackPlugin {
 
         this._webPackWithAlphaTab = webPackWithAlphaTab;
 
-        this.configureSoundFont(compiler);
-        this.configure(compiler);
+        this._configureSoundFont(compiler);
+        this._configure(compiler);
     }
 
-    configureSoundFont(compiler: webpackTypes.Compiler) {
+    private _configureSoundFont(compiler: webpackTypes.Compiler) {
         if (this.options.assetOutputDir === false) {
             return;
         }
@@ -188,7 +191,7 @@ export class AlphaTabWebPackPlugin {
         });
     }
 
-    configure(compiler: webpackTypes.Compiler) {
+    private _configure(compiler: webpackTypes.Compiler) {
         const pluginName = this.constructor.name;
 
         const cachedContextify = contextify.bindContextCache(compiler.context, compiler.root);
@@ -215,11 +218,11 @@ export class AlphaTabWebPackPlugin {
                 normalModuleFactory,
                 cachedContextify
             );
-            this.configureAssetCopy(this._webPackWithAlphaTab, pluginName, compiler, compilation);
+            this._configureAssetCopy(this._webPackWithAlphaTab, pluginName, compiler, compilation);
         });
     }
 
-    configureAssetCopy(
+    private _configureAssetCopy(
         webPackWithAlphaTab: webPackWithAlphaTab,
         pluginName: string,
         compiler: webpackTypes.Compiler,
@@ -247,6 +250,28 @@ export class AlphaTabWebPackPlugin {
                         }
 
                         alphaTabSourceDir = path.resolve(alphaTabSourceDir, '..');
+
+                        // walk up to package.json
+                        while (alphaTabSourceDir) {
+                            if (
+                                await fs.promises
+                                    .access(path.join(alphaTabSourceDir, 'package.json'), fs.constants.F_OK)
+                                    .then(() => true)
+                                    .catch(() => false)
+                            ) {
+                                // found package directory
+                                alphaTabSourceDir = path.resolve(alphaTabSourceDir, 'dist');
+                                break;
+                            } else {
+                                // reached root
+                                const parent = path.resolve(alphaTabSourceDir, '..');
+                                if (parent === alphaTabSourceDir) {
+                                    alphaTabSourceDir = undefined;
+                                } else {
+                                    alphaTabSourceDir = parent;
+                                }
+                            }
+                        }
                     } catch {
                         alphaTabSourceDir = compilation.getPath('node_modules/@coderline/alphatab/dist/');
                     }

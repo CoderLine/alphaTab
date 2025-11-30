@@ -1,10 +1,10 @@
-import { BeatSubElement } from '@src/model/Beat';
-import type { Duration } from '@src/model/Duration';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
-import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { BeatSubElement } from '@coderline/alphatab/model/Beat';
+import type { Duration } from '@coderline/alphatab/model/Duration';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { ScoreRestGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreRestGlyph';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal

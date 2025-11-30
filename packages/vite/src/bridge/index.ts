@@ -29,14 +29,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/**
+ * @internal
+ */
 export type { Plugin } from 'vite';
+/**
+ * @internal
+ */
 export { fileToUrl } from './asset';
+/**
+ * @internal
+ */
 export { createToImportMetaURLBasedRelativeRuntime, toOutputFilePathInJS } from './build';
+/**
+ * @internal
+ */
 export type { ResolvedConfig } from './config';
+/**
+ * @internal
+ */
 export { ENV_PUBLIC_PATH } from './constants';
+/**
+ * @internal
+ */
 export { tryOptimizedDepResolve } from './optimizer';
+/**
+ * @internal
+ */
 export { tryFsResolve } from './resolve';
+/**
+ * @internal
+ */
 export { cleanUrl, encodeURIPath, evalValue, injectQuery } from './utils';
+/**
+ * @internal
+ */
 export {
     AlphaTabWorkerTypes,
     isSameContent, 

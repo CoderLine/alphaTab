@@ -1,14 +1,14 @@
-import type { Beat } from '@src/model/Beat';
-import { Fingers } from '@src/model/Fingers';
-import type { Note } from '@src/model/Note';
-import { FingeringMode, NotationElement } from '@src/NotationSettings';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import type { Settings } from '@src/Settings';
-import { FingeringGroupGlyph } from '@src/rendering/glyphs/FingeringGroupGlyph';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { Fingers } from '@coderline/alphatab/model/Fingers';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { FingeringMode, NotationElement } from '@coderline/alphatab/NotationSettings';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { FingeringGroupGlyph } from '@coderline/alphatab/rendering/glyphs/FingeringGroupGlyph';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 
 /**
  * @internal

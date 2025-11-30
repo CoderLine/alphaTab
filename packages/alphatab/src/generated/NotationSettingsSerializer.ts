@@ -3,12 +3,12 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { NotationSettings } from "@src/NotationSettings";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { NotationMode } from "@src/NotationSettings";
-import { FingeringMode } from "@src/NotationSettings";
-import { NotationElement } from "@src/NotationSettings";
-import { TabRhythmMode } from "@src/NotationSettings";
+import { NotationSettings } from "@coderline/alphatab/NotationSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { NotationMode } from "@coderline/alphatab/NotationSettings";
+import { FingeringMode } from "@coderline/alphatab/NotationSettings";
+import { NotationElement } from "@coderline/alphatab/NotationSettings";
+import { TabRhythmMode } from "@coderline/alphatab/NotationSettings";
 /**
  * @internal
  */

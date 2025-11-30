@@ -1,8 +1,8 @@
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { Logger } from '@src/Logger';
-import { MidiPlaybackController } from '@src/midi/MidiPlaybackController';
-import type { Score } from '@src/model/Score';
-import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { Logger } from '@coderline/alphatab/Logger';
+import { MidiPlaybackController } from '@coderline/alphatab/midi/MidiPlaybackController';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { assert, expect } from 'chai';
 
 describe('MidiPlaybackControllerTest', () => {

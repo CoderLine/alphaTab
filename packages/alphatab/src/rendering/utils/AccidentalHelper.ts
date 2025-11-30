@@ -1,14 +1,14 @@
-import { AccidentalType } from '@src/model/AccidentalType';
-import type { Bar } from '@src/model/Bar';
-import type { Beat } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { PercussionMapper } from '@src/model/PercussionMapper';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
-import type { Clef } from '@src/model/Clef';
-import type { KeySignature } from '@src/model/KeySignature';
+import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import type { Clef } from '@coderline/alphatab/model/Clef';
+import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
 
 /**
  * @internal

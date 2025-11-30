@@ -1,6 +1,6 @@
 
-import { Duration } from '@src/model/Duration';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 
 /**

@@ -69,7 +69,7 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
         } else if (prop.type.isEnumType) {
             importer(prop.type.typeAsString, prop.type.modulePath);
-            importer('JsonHelper', '@src/io/JsonHelper');
+            importer('JsonHelper', '@coderline/alphatab/io/JsonHelper');
             if (prop.type.isNullable) {
                 caseStatements.push(
                     createNodeFromSource<ts.ExpressionStatement>(
@@ -142,7 +142,7 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
             let mapKey: ts.Expression;
             if (prop.type.typeArguments![0].isEnumType) {
                 importer(prop.type.typeArguments![0].typeAsString, prop.type.typeArguments![0].modulePath);
-                importer('JsonHelper', '@src/io/JsonHelper');
+                importer('JsonHelper', '@coderline/alphatab/io/JsonHelper');
                 mapKey = createNodeFromSource<ts.NonNullExpression>(
                     `JsonHelper.parseEnum<${prop.type.typeArguments![0].typeAsString}>(k, ${
                         prop.type.typeArguments![0].typeAsString
@@ -283,7 +283,7 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
                 }
             } else if (prop.type.typeArguments![0].isEnumType) {
                 importer(prop.type.typeArguments![0].typeAsString, prop.type.typeArguments![0].modulePath);
-                importer('JsonHelper', '@src/io/JsonHelper');
+                importer('JsonHelper', '@coderline/alphatab/io/JsonHelper');
 
                 if (collectionAddMethod) {
                     caseStatements.push(

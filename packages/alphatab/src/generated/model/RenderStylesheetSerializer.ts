@@ -3,12 +3,12 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { RenderStylesheet } from "@src/model/RenderStylesheet";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { BracketExtendMode } from "@src/model/RenderStylesheet";
-import { TrackNamePolicy } from "@src/model/RenderStylesheet";
-import { TrackNameMode } from "@src/model/RenderStylesheet";
-import { TrackNameOrientation } from "@src/model/RenderStylesheet";
+import { RenderStylesheet } from "@coderline/alphatab/model/RenderStylesheet";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { BracketExtendMode } from "@coderline/alphatab/model/RenderStylesheet";
+import { TrackNamePolicy } from "@coderline/alphatab/model/RenderStylesheet";
+import { TrackNameMode } from "@coderline/alphatab/model/RenderStylesheet";
+import { TrackNameOrientation } from "@coderline/alphatab/model/RenderStylesheet";
 /**
  * @internal
  */

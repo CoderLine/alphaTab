@@ -1,7 +1,7 @@
-import type { RepeatGroup } from '@src/model/RepeatGroup';
-import { Direction } from '@src/model/Direction';
-import type { MasterBar } from '@src/model/MasterBar';
-import type { Score } from '@src/model/Score';
+import type { RepeatGroup } from '@coderline/alphatab/model/RepeatGroup';
+import { Direction } from '@coderline/alphatab/model/Direction';
+import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import type { Score } from '@coderline/alphatab/model/Score';
 
 /**
  * Helper container to handle repeats correctly

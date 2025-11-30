@@ -13,15 +13,15 @@ import {
     ProgramChangeEvent,
     TempoChangeEvent,
     TimeSignatureEvent
-} from '@src/midi/MidiEvent';
-import { MidiFile, MidiTrack } from '@src/midi/MidiFile';
-import { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
-import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
-import { SettingsSerializer } from '@src/generated/SettingsSerializer';
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import type { ControllerType } from '@src/midi/ControllerType';
-import { JsonHelper } from '@src/io/JsonHelper';
+} from '@coderline/alphatab/midi/MidiEvent';
+import { MidiFile, MidiTrack } from '@coderline/alphatab/midi/MidiFile';
+import { Score } from '@coderline/alphatab/model/Score';
+import { Settings } from '@coderline/alphatab/Settings';
+import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
+import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import type { ControllerType } from '@coderline/alphatab/midi/ControllerType';
+import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
 
 /**
  * This class can convert a full {@link Score} instance to a simple JavaScript object and back for further

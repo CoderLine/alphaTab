@@ -1,19 +1,19 @@
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
-import { ControllerType } from '@src/midi/ControllerType';
-import { type ControlChangeEvent, MidiEventType } from '@src/midi/MidiEvent';
-import { MidiFile } from '@src/midi/MidiFile';
-import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
-import type { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
-import { AlphaSynth } from '@src/synth/AlphaSynth';
-import { AudioExportOptions } from '@src/synth/IAudioExporter';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
-import { VorbisFile } from '@src/synth/vorbis/VorbisFile';
-import { TestOutput } from '@test/audio/TestOutput';
-import { TestPlatform } from '@test/TestPlatform';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+import { ControllerType } from '@coderline/alphatab/midi/ControllerType';
+import { type ControlChangeEvent, MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
+import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Settings } from '@coderline/alphatab/Settings';
+import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
+import { AudioExportOptions } from '@coderline/alphatab/synth/IAudioExporter';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
+import { VorbisFile } from '@coderline/alphatab/synth/vorbis/VorbisFile';
+import { TestOutput } from 'test/audio/TestOutput';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
 
 describe('AlphaSynthTests', () => {

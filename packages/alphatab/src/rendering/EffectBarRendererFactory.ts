@@ -1,12 +1,12 @@
-import type { Bar } from '@src/model/Bar';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
-import { EffectBarRenderer } from '@src/rendering/EffectBarRenderer';
-import type { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
-import type { Staff } from '@src/model/Staff';
-import type { Track } from '@src/model/Track';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
+import { EffectBarRenderer } from '@coderline/alphatab/rendering/EffectBarRenderer';
+import type { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { Track } from '@coderline/alphatab/model/Track';
 
 /**
  * @internal

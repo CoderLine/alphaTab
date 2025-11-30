@@ -1,5 +1,5 @@
-import { ResizeObserverPolyfill } from '@src/platform/javascript/ResizeObserverPolyfill';
-import { IntersectionObserverPolyfill } from '@src/platform/javascript/IntersectionObserverPolyfill';
+import { ResizeObserverPolyfill } from '@coderline/alphatab/platform/javascript/ResizeObserverPolyfill';
+import { IntersectionObserverPolyfill } from '@coderline/alphatab/platform/javascript/IntersectionObserverPolyfill';
 
 /*@target web*/
 (() => {

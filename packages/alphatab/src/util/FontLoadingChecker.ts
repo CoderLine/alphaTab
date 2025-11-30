@@ -1,6 +1,6 @@
-import { type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { Logger } from '@src/Logger';
-import { Environment } from '@src/Environment';
+import { type IEventEmitterOfT, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { Logger } from '@coderline/alphatab/Logger';
+import { Environment } from '@coderline/alphatab/Environment';
 
 /**
  * This small utility helps to detect whether a particular font is already loaded.

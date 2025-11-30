@@ -1,15 +1,15 @@
-import { LayoutMode } from '@src/LayoutMode';
-import { Environment } from '@src/Environment';
-import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import type { Score } from '@src/model/Score';
-import type { Track } from '@src/model/Track';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import type { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import type { Settings } from '@src/Settings';
-import { Logger } from '@src/Logger';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { Environment } from '@coderline/alphatab/Environment';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { Track } from '@coderline/alphatab/model/Track';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
+import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { Logger } from '@coderline/alphatab/Logger';
 
 /**
  * This is the main wrapper of the rendering engine which

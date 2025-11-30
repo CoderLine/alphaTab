@@ -1,19 +1,19 @@
-import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
-import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
-import { MidiFile, MidiFileFormat } from '@src/midi/MidiFile';
-import { LayoutMode } from '@src/LayoutMode';
-import { type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import type { Track } from '@src/model/Track';
-import { BrowserUiFacade } from '@src/platform/javascript/BrowserUiFacade';
-import { ProgressEventArgs } from '@src/ProgressEventArgs';
-import type { Settings } from '@src/Settings';
-import { JsonConverter } from '@src/model/JsonConverter';
-import { SettingsSerializer } from '@src/generated/SettingsSerializer';
-import type { SettingsJson } from '@src/generated/SettingsJson';
-import { PlayerMode } from '@src/PlayerSettings';
-import { Logger } from '@src/Logger';
-import { FileLoadError } from '@src/FileLoadError';
+import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
+import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
+import { MidiFile, MidiFileFormat } from '@coderline/alphatab/midi/MidiFile';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { type IEventEmitterOfT, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import type { Track } from '@coderline/alphatab/model/Track';
+import { BrowserUiFacade } from '@coderline/alphatab/platform/javascript/BrowserUiFacade';
+import { ProgressEventArgs } from '@coderline/alphatab/ProgressEventArgs';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
+import type { SettingsJson } from '@coderline/alphatab/generated/SettingsJson';
+import { PlayerMode } from '@coderline/alphatab/PlayerSettings';
+import { Logger } from '@coderline/alphatab/Logger';
+import { FileLoadError } from '@coderline/alphatab/FileLoadError';
 
 /**
  * @target web
@@ -38,7 +38,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
     /**
      * @inheritdoc
      */
-    public override tex(tex: string, tracks?: number[]): void {
+    public override tex(tex: string, tracks?: number[] | 'all'): void {
         const browser: BrowserUiFacade = this.uiFacade as BrowserUiFacade;
         super.tex(tex, browser.parseTracks(tracks));
     }

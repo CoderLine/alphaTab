@@ -3,14 +3,14 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Settings } from "@src/Settings";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { CoreSettingsSerializer } from "@src/generated/CoreSettingsSerializer";
-import { DisplaySettingsSerializer } from "@src/generated/DisplaySettingsSerializer";
-import { NotationSettingsSerializer } from "@src/generated/NotationSettingsSerializer";
-import { ImporterSettingsSerializer } from "@src/generated/ImporterSettingsSerializer";
-import { PlayerSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
-import { ExporterSettingsSerializer } from "@src/generated/ExporterSettingsSerializer";
+import { Settings } from "@coderline/alphatab/Settings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { CoreSettingsSerializer } from "@coderline/alphatab/generated/CoreSettingsSerializer";
+import { DisplaySettingsSerializer } from "@coderline/alphatab/generated/DisplaySettingsSerializer";
+import { NotationSettingsSerializer } from "@coderline/alphatab/generated/NotationSettingsSerializer";
+import { ImporterSettingsSerializer } from "@coderline/alphatab/generated/ImporterSettingsSerializer";
+import { PlayerSettingsSerializer } from "@coderline/alphatab/generated/PlayerSettingsSerializer";
+import { ExporterSettingsSerializer } from "@coderline/alphatab/generated/ExporterSettingsSerializer";
 /**
  * @internal
  */

@@ -3,8 +3,8 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Note } from "@src/model/Note";
-import { BendPointCloner } from "@src/generated/model/BendPointCloner";
+import { Note } from "@coderline/alphatab/model/Note";
+import { BendPointCloner } from "@coderline/alphatab/generated/model/BendPointCloner";
 /**
  * @internal
  */

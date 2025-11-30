@@ -1,8 +1,8 @@
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { NumberGlyph } from '@src/rendering/glyphs/NumberGlyph';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { NumberGlyph } from '@coderline/alphatab/rendering/glyphs/NumberGlyph';
 
 /**
  * @internal

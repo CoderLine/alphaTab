@@ -11,6 +11,9 @@ function splitFileAndPostfix(path: string) {
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/plugins/resolve.ts#L566-L574
+/**
+ * @internal
+ */
 export function tryFsResolve(fsPath: string, preserveSymlinks: boolean): string | undefined {
     const { file, postfix } = splitFileAndPostfix(fsPath);
     const res = tryCleanFsResolve(file, preserveSymlinks);

@@ -1,8 +1,8 @@
-import type { Note } from '@src/model/Note';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { TabTieGlyph } from '@coderline/alphatab/rendering/glyphs/TabTieGlyph';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal

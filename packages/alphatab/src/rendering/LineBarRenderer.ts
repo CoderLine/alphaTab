@@ -1,23 +1,23 @@
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
-import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { NotationMode } from '@src/NotationSettings';
-import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { BarLineGlyph } from '@src/rendering/glyphs/BarLineGlyph';
-import { RepeatCountGlyph } from '@src/rendering/glyphs/RepeatCountGlyph';
-import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
-import { type Beat, BeatBeamingMode, type BeatSubElement } from '@src/model/Beat';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import type { BarSubElement } from '@src/model/Bar';
-import { Duration } from '@src/model/Duration';
-import { GraceType } from '@src/model/GraceType';
-import type { TupletGroup } from '@src/model/TupletGroup';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
+import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { NotationMode } from '@coderline/alphatab/NotationSettings';
+import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
+import { RepeatCountGlyph } from '@coderline/alphatab/rendering/glyphs/RepeatCountGlyph';
+import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
+import { type Beat, BeatBeamingMode, type BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import type { BarSubElement } from '@coderline/alphatab/model/Bar';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 
 /**
  * This is a base class for any bar renderer which renders music notation on a staff

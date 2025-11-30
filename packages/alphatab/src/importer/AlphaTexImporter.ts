@@ -1,6 +1,6 @@
-﻿import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { BeatCloner } from '@src/generated/model/BeatCloner';
-import { AlphaTex1LanguageHandler } from '@src/importer/alphaTex/AlphaTex1LanguageHandler';
+﻿import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { BeatCloner } from '@coderline/alphatab/generated/model/BeatCloner';
+import { AlphaTex1LanguageHandler } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageHandler';
 import {
     type AlphaTexAstNode,
     type AlphaTexBarNode,
@@ -13,8 +13,8 @@ import {
     type AlphaTexPropertiesNode,
     type AlphaTexScoreNode,
     type AlphaTexTextNode
-} from '@src/importer/alphaTex/AlphaTexAst';
-import { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import {
     AlphaTexAccidentalMode,
     type AlphaTexDiagnostic,
@@ -24,36 +24,36 @@ import {
     type IAlphaTexImporter,
     type IAlphaTexImporterState,
     AlphaTexStaffNoteKind
-} from '@src/importer/alphaTex/AlphaTexShared';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import {
     ApplyNodeResult,
     ApplyStructuralMetaDataResult,
     type IAlphaTexLanguageImportHandler
-} from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
-import { ScoreImporter } from '@src/importer/ScoreImporter';
-import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IOHelper } from '@src/io/IOHelper';
-import { Logger } from '@src/Logger';
-import type { FlatSyncPoint } from '@src/model/Automation';
-import { Bar, type SustainPedalMarker } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
-import { Clef } from '@src/model/Clef';
-import { Duration } from '@src/model/Duration';
-import { DynamicValue } from '@src/model/DynamicValue';
-import type { Lyrics } from '@src/model/Lyrics';
-import { MasterBar } from '@src/model/MasterBar';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { Note } from '@src/model/Note';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { PercussionMapper } from '@src/model/PercussionMapper';
-import { Score } from '@src/model/Score';
-import type { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { Tuning } from '@src/model/Tuning';
-import { Voice } from '@src/model/Voice';
-import type { Settings } from '@src/Settings';
-import { Lazy } from '@src/util/Lazy';
+} from '@coderline/alphatab/importer/alphaTex/IAlphaTexLanguageImportHandler';
+import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
+import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { FlatSyncPoint } from '@coderline/alphatab/model/Automation';
+import { Bar, type SustainPedalMarker } from '@coderline/alphatab/model/Bar';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import { Clef } from '@coderline/alphatab/model/Clef';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import type { Lyrics } from '@coderline/alphatab/model/Lyrics';
+import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { Note } from '@coderline/alphatab/model/Note';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { Score } from '@coderline/alphatab/model/Score';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import { Track } from '@coderline/alphatab/model/Track';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { Voice } from '@coderline/alphatab/model/Voice';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { Lazy } from '@coderline/alphatab/util/Lazy';
 
 /**
  * @public
@@ -168,13 +168,14 @@ class AlphaTexImportState implements IAlphaTexImporterState {
     public accidentalMode = AlphaTexAccidentalMode.Explicit;
     public currentTupletNumerator = -1;
     public currentTupletDenominator = -1;
+    public scoreNode: AlphaTexScoreNode | undefined;
 }
 
 /**
  * @public
  */
 export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter {
-    private _parser!: AlphaTexParser;
+    private _parser?: AlphaTexParser;
     private _handler: IAlphaTexLanguageImportHandler = AlphaTex1LanguageHandler.instance;
 
     private _state = new AlphaTexImportState();
@@ -183,16 +184,31 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         return this._state;
     }
 
+    public get scoreNode(): AlphaTexScoreNode | undefined {
+        return this._state.scoreNode;
+    }
+
     public get name(): string {
         return 'AlphaTex';
     }
 
     public get lexerDiagnostics() {
-        return this._parser.lexerDiagnostics;
+        return this._parser!.lexerDiagnostics;
     }
 
     public get parserDiagnostics() {
-        return this._parser.parserDiagnostics;
+        return this._parser!.parserDiagnostics;
+    }
+
+    /**
+     * The underlying parser used for parsing the AST. Available after initialization of the importer.
+     */
+    public get parser(): AlphaTexParser | undefined {
+        return this._parser;
+    }
+
+    public get parseMode(): AlphaTexParseMode {
+        return this._parser!.mode;
     }
 
     public logErrors: boolean = false;
@@ -221,7 +237,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
         let scoreNode: AlphaTexScoreNode;
         try {
-            scoreNode = this._parser.read();
+            scoreNode = this._parser!.read();
+            this._state.scoreNode = scoreNode;
         } catch (e) {
             if (this.logErrors) {
                 Logger.error('AlphaTex', `Error while parsing alphaTex: ${(e as Error).toString()}`);
@@ -229,7 +246,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             throw new UnsupportedFormatError('Error parsing alphaTex, check inner error for details', e as Error);
         }
 
-        if (this._parser.parserDiagnostics.hasErrors || this._parser.lexer.lexerDiagnostics.hasErrors) {
+        if (this._parser!.parserDiagnostics.hasErrors || this._parser!.lexer.lexerDiagnostics.hasErrors) {
             const error = new AlphaTexErrorWithDiagnostics(
                 'There are errors in the parsed alphaTex, check the diagnostics for details',
                 this.lexerDiagnostics,
@@ -534,7 +551,11 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 isTie = str === '-';
                 if (isTie || isDead) {
                     numericValue = 0;
-                    detectedNoteKind = undefined; // don't know on those notes
+                    if (node.noteStringDot && node.noteString) {
+                        detectedNoteKind = AlphaTexStaffNoteKind.Fretted;
+                    } else {
+                        detectedNoteKind = undefined; // don't know on those notes
+                    }
                 } else {
                     const tuning = ModelUtils.parseTuning(str);
                     if (tuning) {
@@ -583,7 +604,9 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 this.addSemanticDiagnostic({
                     code: AlphaTexDiagnosticCode.AT218,
                     message: `Wrong note kind '${AlphaTexStaffNoteKind[detectedNoteKind]}' for staff with note kind ''${AlphaTexStaffNoteKind[staffNoteKind]}'. Do not mix incompatible staves and notes.`,
-                    severity: AlphaTexDiagnosticsSeverity.Error
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: noteValue.start,
+                    end: noteValue.end
                 });
             }
         } else if (staffNoteKind !== undefined) {
@@ -937,13 +960,13 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 // backwards compatiblity (staff metadata tags)
                 this._state.hasAnyProperData = true;
                 this._handler.applyStaffMetaData(this, this._state.currentStaff!, m);
-                this.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT306,
-                    message: 'This staff metadata tag should be specified as staff property.',
-                    severity: AlphaTexDiagnosticsSeverity.Warning,
-                    start: m.start,
-                    end: m.end
-                });
+                // this.addSemanticDiagnostic({
+                //     code: AlphaTexDiagnosticCode.AT306,
+                //     message: 'This staff metadata tag should be specified as staff property.',
+                //     severity: AlphaTexDiagnosticsSeverity.Warning,
+                //     start: m.start,
+                //     end: m.end
+                // });
             } else if (this._handler.knownBarMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
                 this._state.hasAnyProperData = true;
                 if (initialBarMeta) {

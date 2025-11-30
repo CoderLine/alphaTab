@@ -1,0 +1,60 @@
+{
+    "name": "@coderline/alphatab-language-server",
+    "version": "1.7.0",
+    "private": true,
+    "description": "A language server for alphaTab providing coding assistance for alphaTex.",
+    "keywords": [
+        "guitar",
+        "music-notation",
+        "music-sheet",
+        "html5",
+        "svg",
+        "guitar-tablature",
+        "alphaTab",
+        "alphaTex",
+        "language",
+        "server",
+        "lsp"
+    ],
+    "homepage": "https://alphatab.net",
+    "bugs": {
+        "url": "https://github.com/coderline/alphaTab/issues"
+    },
+    "author": "Daniel Kuschny",
+    "license": "MPL-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/coderline/alphaTab.git"
+    },
+    "scripts": {
+        "clean": "rimraf dist",
+        "lint": "biome lint",
+        "typecheck": "tsc --noEmit",
+        "build": "vite build",
+        "dev": "vite build --watch",
+        "test": "mocha"
+    },
+    "dependencies": {
+        "@coderline/alphatab": "^1.7.0",
+        "vscode-languageserver": "^9.0.1",
+        "vscode-languageserver-textdocument": "^1.0.12"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^2.2.6",
+        "@microsoft/api-extractor": "^7.53.1",
+        "@types/chai": "^5.2.2",
+        "@types/mocha": "^10.0.10",
+        "@types/node": "^24.8.1",
+        "assert": "^2.1.0",
+        "chai": "^6.2.0",
+        "mocha": "^11.7.4",
+        "rimraf": "^6.0.1",
+        "tslib": "^2.8.1",
+        "tsx": "^4.20.6",
+        "typescript": "^5.9.3"
+    },
+    "bin": "./dist/server.mjs",
+    "main": "./dist/server.mjs",
+    "types": "./dist/server.d.ts",
+    "type": "module"
+}

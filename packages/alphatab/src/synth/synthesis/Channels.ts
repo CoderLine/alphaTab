@@ -3,9 +3,9 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 
-import type { Channel } from '@src/synth/synthesis/Channel';
-import type { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
-import type { Voice } from '@src/synth/synthesis/Voice';
+import type { Channel } from '@coderline/alphatab/synth/synthesis/Channel';
+import type { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
+import type { Voice } from '@coderline/alphatab/synth/synthesis/Voice';
 
 /**
  * @internal

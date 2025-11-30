@@ -1,6 +1,6 @@
-import { Environment } from '@src/Environment';
-import { ScoreExporter } from '@src/exporter/ScoreExporter';
-import { AlphaTex1LanguageHandler } from '@src/importer/alphaTex/AlphaTex1LanguageHandler';
+import { Environment } from '@coderline/alphatab/Environment';
+import { ScoreExporter } from '@coderline/alphatab/exporter/ScoreExporter';
+import { AlphaTex1LanguageHandler } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageHandler';
 import {
     type AlphaTexBarNode,
     type AlphaTexBeatDurationChangeNode,
@@ -16,20 +16,20 @@ import {
     type AlphaTexPropertyNode,
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
-    type AlphaTexValueList,
+    type AlphaTexArgumentList,
     type IAlphaTexAstNode
-} from '@src/importer/alphaTex/AlphaTexAst';
-import type { IAlphaTexLanguageImportHandler } from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
-import { IOHelper } from '@src/io/IOHelper';
-import type { Bar } from '@src/model/Bar';
-import type { Beat } from '@src/model/Beat';
-import type { Note } from '@src/model/Note';
-import { PercussionMapper } from '@src/model/PercussionMapper';
-import type { Score } from '@src/model/Score';
-import type { Staff } from '@src/model/Staff';
-import type { Track } from '@src/model/Track';
-import { Tuning } from '@src/model/Tuning';
-import { Settings } from '@src/Settings';
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import type { IAlphaTexLanguageImportHandler } from '@coderline/alphatab/importer/alphaTex/IAlphaTexLanguageImportHandler';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { Track } from '@coderline/alphatab/model/Track';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * A small helper to write formatted alphaTex code to a string buffer.
@@ -241,19 +241,19 @@ class AlphaTexPrinter {
         this._writeValue(m.tag.tag);
 
         let newLineAfterMeta = true;
-        if (m.propertiesBeforeValues) {
+        if (m.propertiesBeforeArguments) {
             if (m.properties) {
                 this._writer.write(' ');
                 this._writeProperties(m.properties, false);
             }
-            if (m.values) {
+            if (m.arguments) {
                 this._writer.write(' ');
-                this._writeValues(m.values);
+                this._writeValues(m.arguments);
             }
         } else {
-            if (m.values) {
+            if (m.arguments) {
                 this._writer.write(' ');
-                this._writeValues(m.values);
+                this._writeValues(m.arguments);
             }
 
             if (m.properties) {
@@ -322,19 +322,19 @@ class AlphaTexPrinter {
         this._writeComments(p.leadingComments);
 
         this._writeValue(p.property);
-        if (p.values) {
+        if (p.arguments) {
             this._writer.write(' ');
-            this._writeValues(p.values);
+            this._writeValues(p.arguments);
         }
 
         this._writeComments(p.trailingComments);
     }
 
-    private _writeValues(values: AlphaTexValueList) {
+    private _writeValues(values: AlphaTexArgumentList) {
         this._writeComments(values.leadingComments);
         this._writeToken(values.openParenthesis, false);
         let first = true;
-        for (const v of values.values) {
+        for (const v of values.arguments) {
             if (!first) {
                 this._writer.write(' ');
             }
@@ -355,8 +355,8 @@ class AlphaTexPrinter {
                 this._writer.write((v as AlphaTexIdentifier).text);
                 break;
 
-            case AlphaTexNodeType.Values:
-                this._writeValues(v as AlphaTexValueList);
+            case AlphaTexNodeType.Arguments:
+                this._writeValues(v as AlphaTexArgumentList);
                 break;
             case AlphaTexNodeType.Number:
                 this._writer.write((v as AlphaTexNumberLiteral).value.toString());

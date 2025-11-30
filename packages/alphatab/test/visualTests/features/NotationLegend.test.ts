@@ -1,10 +1,10 @@
-import { LayoutMode } from '@src/LayoutMode';
-import { Settings } from '@src/Settings';
-import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
-import { TestPlatform } from '@test/TestPlatform';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import type { Score } from '@src/model/Score';
-import type { SmuflMetadata } from '@src/SmuflMetadata';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { Settings } from '@coderline/alphatab/Settings';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
+import { TestPlatform } from 'test/TestPlatform';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { SmuflMetadata } from '@coderline/alphatab/SmuflMetadata';
 
 describe('NotationLegend', () => {
     it('full-default', async () => {

@@ -1,10 +1,10 @@
-import { EngravingSettingsCloner } from '@src/generated/EngravingSettingsCloner';
-import { JsonHelper } from '@src/io/JsonHelper';
-import { Logger } from '@src/Logger';
-import { Duration } from '@src/model/Duration';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { SmuflMetadata } from '@src/SmuflMetadata';
+import { EngravingSettingsCloner } from '@coderline/alphatab/generated/EngravingSettingsCloner';
+import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
+import { Logger } from '@coderline/alphatab/Logger';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { SmuflMetadata } from '@coderline/alphatab/SmuflMetadata';
 
 /**
  * @json

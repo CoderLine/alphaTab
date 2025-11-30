@@ -1,25 +1,25 @@
-import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
-import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Logger } from '@src/Logger';
-import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
-import { ControllerType } from '@src/midi/ControllerType';
-import { type MidiEvent, MidiEventType, NoteOnEvent, type TimeSignatureEvent } from '@src/midi/MidiEvent';
-import { MidiFile } from '@src/midi/MidiFile';
-import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
-import type { MidiTickLookup } from '@src/midi/MidiTickLookup';
-import { MidiUtils } from '@src/midi/MidiUtils';
-import { AccentuationType } from '@src/model/AccentuationType';
-import type { Beat } from '@src/model/Beat';
-import { Duration } from '@src/model/Duration';
-import { DynamicValue } from '@src/model/DynamicValue';
-import { GraceType } from '@src/model/GraceType';
-import type { Note } from '@src/model/Note';
-import type { PlaybackInformation } from '@src/model/PlaybackInformation';
-import type { Score } from '@src/model/Score';
-import { VibratoType } from '@src/model/VibratoType';
-import { Settings } from '@src/Settings';
+import { Gp3To5Importer } from '@coderline/alphatab/importer/Gp3To5Importer';
+import { Gp7To8Importer } from '@coderline/alphatab/importer/Gp7To8Importer';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { Logger } from '@coderline/alphatab/Logger';
+import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+import { ControllerType } from '@coderline/alphatab/midi/ControllerType';
+import { type MidiEvent, MidiEventType, NoteOnEvent, type TimeSignatureEvent } from '@coderline/alphatab/midi/MidiEvent';
+import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
+import type { MidiTickLookup } from '@coderline/alphatab/midi/MidiTickLookup';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import { Settings } from '@coderline/alphatab/Settings';
 import {
     FlatControlChangeEvent,
     type FlatMidiEvent,
@@ -31,8 +31,8 @@ import {
     FlatTempoEvent,
     FlatTimeSignatureEvent,
     FlatTrackEndEvent
-} from '@test/audio/FlatMidiEventGenerator';
-import { TestPlatform } from '@test/TestPlatform';
+} from 'test/audio/FlatMidiEventGenerator';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
 
 describe('MidiFileGeneratorTest', () => {

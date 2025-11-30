@@ -1,14 +1,14 @@
-import type { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { EventEmitter, type IEventEmitterOfT, type IEventEmitter, EventEmitterOfT } from '@src/EventEmitter';
-import { JsonConverter } from '@src/model/JsonConverter';
-import type { Score } from '@src/model/Score';
-import { FontSizes } from '@src/platform/svg/FontSizes';
-import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import type { Settings } from '@src/Settings';
-import { Logger } from '@src/Logger';
-import { Environment } from '@src/Environment';
+import type { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
+import { EventEmitter, type IEventEmitterOfT, type IEventEmitter, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
+import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { Logger } from '@coderline/alphatab/Logger';
+import { Environment } from '@coderline/alphatab/Environment';
 
 /**
  * @target web

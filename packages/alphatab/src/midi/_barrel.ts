@@ -1,12 +1,12 @@
-export { BeatTickLookup, BeatTickLookupItem } from '@src/midi/BeatTickLookup';
-export { MasterBarTickLookup, MasterBarTickLookupTempoChange } from '@src/midi/MasterBarTickLookup';
+export { BeatTickLookup, BeatTickLookupItem } from '@coderline/alphatab/midi/BeatTickLookup';
+export { MasterBarTickLookup, MasterBarTickLookupTempoChange } from '@coderline/alphatab/midi/MasterBarTickLookup';
 export {
     MidiTickLookup,
     MidiTickLookupFindBeatResult,
     MidiTickLookupFindBeatResultCursorMode
-} from '@src/midi/MidiTickLookup';
-export { MidiFile, MidiFileFormat, MidiTrack } from '@src/midi/MidiFile';
-export { ControllerType } from '@src/midi/ControllerType';
+} from '@coderline/alphatab/midi/MidiTickLookup';
+export { MidiFile, MidiFileFormat, MidiTrack } from '@coderline/alphatab/midi/MidiFile';
+export { ControllerType } from '@coderline/alphatab/midi/ControllerType';
 export {
     MidiEvent,
     MidiEventType,
@@ -23,7 +23,7 @@ export {
     NoteBendEvent,
     EndOfTrackEvent,
     AlphaTabSysExEvent
-} from '@src/midi/MidiEvent';
+} from '@coderline/alphatab/midi/MidiEvent';
 export {
     DeprecatedMidiEvent,
     MetaEventType,
@@ -35,7 +35,7 @@ export {
     SystemCommonEvent,
     AlphaTabSystemExclusiveEvents,
     SystemExclusiveEvent
-} from '@src/midi/DeprecatedEvents';
-export { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
-export { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
-export type { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
+} from '@coderline/alphatab/midi/DeprecatedEvents';
+export { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
+export { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+export type { IMidiFileHandler } from '@coderline/alphatab/midi/IMidiFileHandler';

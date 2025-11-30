@@ -1,4 +1,4 @@
-import { MusicXmlImporterTestHelper } from '@test/importer/MusicXmlImporterTestHelper';
+import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
 
 describe('MusicXmlImporterSamplesTests', () => {
     it('BeetAnGeSample', async () => {

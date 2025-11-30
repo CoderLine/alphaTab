@@ -1,7 +1,7 @@
-import type { ICanvas } from '@src/platform/ICanvas';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
-import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { GroupedEffectGlyph } from '@coderline/alphatab/rendering/glyphs/GroupedEffectGlyph';
 
 /**
  * @internal

@@ -1,12 +1,12 @@
-import type { Bar } from '@src/model/Bar';
-import type { Staff } from '@src/model/Staff';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import type { BarRendererFactory } from '@src/rendering/BarRendererFactory';
-import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import type { StaffSystem } from '@src/rendering/staves/StaffSystem';
-import type { StaffTrackGroup } from '@src/rendering/staves/StaffTrackGroup';
-import { InternalSystemsLayoutMode } from '@src/rendering/layout/ScoreLayout';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
+import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
+import type { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
+import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 
 /**
  * A Staff represents a single line within a StaffSystem.

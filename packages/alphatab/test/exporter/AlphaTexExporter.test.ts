@@ -1,10 +1,10 @@
-import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
-import { AlphaTexErrorWithDiagnostics } from '@src/importer/AlphaTexImporter';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import type { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
-import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
-import { TestPlatform } from '@test/TestPlatform';
+import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
+import { AlphaTexErrorWithDiagnostics } from '@coderline/alphatab/importer/AlphaTexImporter';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Settings } from '@coderline/alphatab/Settings';
+import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
+import { TestPlatform } from 'test/TestPlatform';
 import { assert } from 'chai';
 
 describe('AlphaTexExporterTest', () => {

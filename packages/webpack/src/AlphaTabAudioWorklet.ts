@@ -15,6 +15,7 @@ const workletIndexMap = new WeakMap<webpackTypes.ParserState, number>();
  * @param normalModuleFactory
  * @param cachedContextify
  * @returns
+ * @internal
  */
 export function configureAudioWorklet(
     webPackWithAlphaTab: webPackWithAlphaTab,

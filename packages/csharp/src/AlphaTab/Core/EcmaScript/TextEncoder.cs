@@ -1,0 +1,18 @@
+﻿using System.Text;
+
+namespace AlphaTab.Core.EcmaScript;
+
+internal class TextEncoder
+{
+    private readonly Encoding _encoding;
+
+    public TextEncoder()
+    {
+        _encoding = Encoding.UTF8;
+    }
+
+    public Uint8Array Encode(string value)
+    {
+        return _encoding.GetBytes(value);
+    }
+}

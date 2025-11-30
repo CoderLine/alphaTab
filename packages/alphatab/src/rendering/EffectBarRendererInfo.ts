@@ -1,9 +1,9 @@
-import type { Beat } from '@src/model/Beat';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import type { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import type { Settings } from '@src/Settings';
-import type { NotationElement } from '@src/NotationSettings';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import type { Settings } from '@coderline/alphatab/Settings';
+import type { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * A classes inheriting from this base can provide the

@@ -1,7 +1,7 @@
-import { TextBaseline, type ICanvas } from '@src/platform/ICanvas';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
-import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
-import type { RenderingResources } from '@src/RenderingResources';
+import { TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { GroupedEffectGlyph } from '@coderline/alphatab/rendering/glyphs/GroupedEffectGlyph';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 
 /**
  * @internal

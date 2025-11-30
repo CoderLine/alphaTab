@@ -1,4 +1,4 @@
-import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 
 /**
  * @internal

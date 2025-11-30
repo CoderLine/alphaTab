@@ -1,13 +1,14 @@
-﻿import type { AlphaTexAstNodeLocation } from '@src/importer/alphaTex/AlphaTexAst';
-import type { FlatSyncPoint } from '@src/model/Automation';
-import type { SustainPedalMarker } from '@src/model/Bar';
-import type { Beat } from '@src/model/Beat';
-import type { DynamicValue } from '@src/model/DynamicValue';
-import type { Lyrics } from '@src/model/Lyrics';
-import type { Note } from '@src/model/Note';
-import type { Score } from '@src/model/Score';
-import type { Staff } from '@src/model/Staff';
-import type { Track } from '@src/model/Track';
+﻿import type { AlphaTexAstNodeLocation } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { AlphaTexParseMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
+import type { FlatSyncPoint } from '@coderline/alphatab/model/Automation';
+import type { SustainPedalMarker } from '@coderline/alphatab/model/Bar';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import type { Lyrics } from '@coderline/alphatab/model/Lyrics';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { Track } from '@coderline/alphatab/model/Track';
 
 /**
  * The different severity levels for diagnostics parsing alphaTex.
@@ -137,12 +138,12 @@ export enum AlphaTexDiagnosticCode {
     AT208 = 208,
 
     /**
-     * Unexpected %s value '%s', expected: %s
+     * Unexpected %s arguments '%s', Signature: %s
      */
     AT209 = 209,
 
     /**
-     * Missing values. Expected following values: %s
+     * Missing arguments. Expected following arguments: %s
      */
     AT210 = 210,
 
@@ -162,7 +163,7 @@ export enum AlphaTexDiagnosticCode {
     AT213 = 213,
 
     /**
-     * The '%s' effect needs %s values per item. With %s points, %s values are needed, only %s values found.
+     * The '%s' effect needs %s arguments per item. With %s points, %s arguments are needed, only %s arguments found.
      */
     AT214 = 214,
 
@@ -187,22 +188,32 @@ export enum AlphaTexDiagnosticCode {
     AT218 = 218,
 
     /**
-     * Expected no values, but found some. Values are ignored.
+     * Error parsing arguments: no overload matched arguments %s. Signatures: %s
+     */
+    AT219 = 219,
+
+    /**
+     * Error parsing arguments: unexpected additional arguments. Signatures: %s
+     */
+    AT220 = 220,
+
+    /**
+     * Expected no arguments, but found some.
      */
     AT300 = 300,
 
     /**
-     * Metadata values should be wrapped into parenthesis.
+     * Metadata arguments should be wrapped into parenthesis.
      */
     AT301 = 301,
 
     /**
-     * Metadata values should be placed before metadata properties.
+     * Metadata arguments should be placed before metadata properties.
      */
     AT302 = 302,
 
     /**
-     * Property values should be wrapped into parenthesis.
+     * Property arguments should be wrapped into parenthesis.
      */
     AT303 = 303,
 
@@ -224,7 +235,7 @@ export enum AlphaTexDiagnosticCode {
     /**
      * The dots separating score metadata, score contents and the sync points can be removed.
      */
-    AT400 = 400,
+    AT400 = 400
 }
 
 /**
@@ -233,7 +244,7 @@ export enum AlphaTexDiagnosticCode {
 export class AlphaTexDiagnosticBag implements Iterable<AlphaTexDiagnostic> {
     private _hasErrors = false;
     public readonly items: AlphaTexDiagnostic[] = [];
-    
+
     public get errors(): AlphaTexDiagnostic[] {
         return this.items.filter(i => i.severity === AlphaTexDiagnosticsSeverity.Error);
     }
@@ -255,12 +266,6 @@ export class AlphaTexDiagnosticBag implements Iterable<AlphaTexDiagnostic> {
 }
 
 /**
- * An error used to abort the parsing of the alphaTex source into an
- * @internal
- */
-export class AlphaTexParserAbort extends Error {}
-
-/**
  * @public
  */
 export enum AlphaTexAccidentalMode {
@@ -277,7 +282,6 @@ export interface IAlphaTexImporterState {
     currentDynamics: DynamicValue;
     currentTupletNumerator: number;
     currentTupletDenominator: number;
-
     readonly syncPoints: FlatSyncPoint[];
     readonly slurs: Map<string, Note>;
     readonly percussionArticulationNames: Map<string, number>;
@@ -288,27 +292,69 @@ export interface IAlphaTexImporterState {
     readonly sustainPedalToBeat: Map<SustainPedalMarker, Beat>;
 }
 
-
 /**
  * Lists the note kinds we can detect
  * @public
  */
 export enum AlphaTexStaffNoteKind {
-    Pitched,
-    Fretted,
-    Articulation
+    Pitched = 0,
+    Fretted = 1,
+    Articulation = 2
 }
-
 
 /**
  * @public
  */
 export interface IAlphaTexImporter {
     readonly state: IAlphaTexImporterState;
+    readonly parseMode: AlphaTexParseMode;
 
     applyStaffNoteKind(staff: Staff, staffNoteKind: AlphaTexStaffNoteKind): void;
     startNewVoice(): void;
     startNewTrack(): Track;
     startNewStaff(): Staff;
     addSemanticDiagnostic(diagnostic: AlphaTexDiagnostic): void;
+}
+
+/**
+ * Defines how the arguments of the meta data tag is parsed.
+ * @public
+ */
+export enum ArgumentListParseTypesMode {
+    /**
+     * Indicates that the parameter of the given types is required.
+     * If the token matches, it is added to the value list.
+     * If the token does not match, an error diagnostic is added and parsing is stopped.
+     */
+    Required = 0,
+    /**
+     * Indicates that the parameter of the given types is optional.
+     * If the token matches, it is added to the value list.
+     * If the token does not match, the value list completes and parsing continues.
+     */
+    Optional = 1,
+    /**
+     * Same as {@link Required} but the next argument is interpreted as a float.
+     */
+    RequiredAsFloat = 2,
+    /**
+     * Same as {@link Optional} but the next argument is interpreted as a float.
+     */
+    OptionalAsFloat = 3,
+    /**
+     * Indicates that multiple arguments of the same types should be parsed as a list
+     * Think: rest-parameter that allows parameters to follow if the type doesn't match anymore.
+     * If the token is a open parenthesis, it starts reading the specified types as value list. If an unexpected item is
+     * encountered an error diagnostic is added.
+     * If the token matches the expected type, a single value is read.
+     * If the token is any other type, an error diagnostic is added and parsing is stopped.
+     */
+    RequiredAsValueList = 4,
+
+    /**
+     * Indicates that multiple parameters of the same types should be parsed. (this is mainly for backwards compatibility with older alphaTex files)
+     * If the token matches, it is added to the value list. Parsing stays on the current type.
+     * If the token does not match, the value list completes and parsing continues.
+     */
+    ValueListWithoutParenthesis = 5
 }

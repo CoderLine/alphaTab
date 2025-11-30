@@ -1,8 +1,8 @@
-import type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
-import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import type { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
-import { Logger } from '@src/Logger';
-import { Environment } from '@src/Environment';
+import type { ISynthOutput, ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import type { IWorkerScope } from '@coderline/alphatab/platform/javascript/IWorkerScope';
+import { Logger } from '@coderline/alphatab/Logger';
+import { Environment } from '@coderline/alphatab/Environment';
 
 /**
  * @target web

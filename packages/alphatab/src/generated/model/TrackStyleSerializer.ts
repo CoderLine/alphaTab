@@ -3,10 +3,10 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { TrackStyle } from "@src/model/Track";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { TrackSubElement } from "@src/model/Track";
-import { Color } from "@src/model/Color";
+import { TrackStyle } from "@coderline/alphatab/model/Track";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { TrackSubElement } from "@coderline/alphatab/model/Track";
+import { Color } from "@coderline/alphatab/model/Color";
 /**
  * @internal
  */

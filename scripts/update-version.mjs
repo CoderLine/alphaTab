@@ -1,7 +1,6 @@
-import * as fs from 'node:fs';
+import fs from 'node:fs';
 import url from 'node:url';
 import path from 'node:path';
-import { exec } from 'node:child_process';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -19,14 +18,11 @@ function updateNpmVersion(packageJsonFilePath) {
     console.log(`NPM Path: ${packageJsonFilePath}`);
     console.log(`Updating version to ${version}`);
 
-    const parent = path.dirname(packageJsonFilePath);
-    const currentDir = process.cwd();
-    process.chdir(parent);
-    try {
-        exec(`npm --no-git-tag-version version ${version}`);
-    } finally {
-        process.chdir(currentDir);
-    }
+    let packageJson = fs.readFileSync(packageJsonFilePath, 'utf-8');
+    packageJson = packageJson
+        .replace(/"version": "[^"]+"/, `"version": "${version}"`)
+        .replaceAll(/("@coderline\/alphatab[^"]*"): "\^[^"]+"/g, `$1: "^${version}"`);
+    fs.writeFileSync(packageJsonFilePath, packageJson);
 }
 
 function updateCSharpVersion(propsPath) {

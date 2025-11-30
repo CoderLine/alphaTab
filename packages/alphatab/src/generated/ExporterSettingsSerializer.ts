@@ -3,8 +3,8 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { ExporterSettings } from "@src/ExporterSettings";
-import { JsonHelper } from "@src/io/JsonHelper";
+import { ExporterSettings } from "@coderline/alphatab/ExporterSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 /**
  * @internal
  */

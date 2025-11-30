@@ -1,9 +1,9 @@
-import type { Bar } from '@src/model/Bar';
-import type { Staff } from '@src/model/Staff';
-import type { Track } from '@src/model/Track';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { Track } from '@coderline/alphatab/model/Track';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 
 /**
  * This is the base public class for creating factories providing BarRenderers

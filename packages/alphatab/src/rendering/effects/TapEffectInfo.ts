@@ -1,13 +1,13 @@
-import type { Beat } from '@src/model/Beat';
-import { TextAlign } from '@src/platform/ICanvas';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import type { RenderingResources } from '@src/RenderingResources';
-import type { Settings } from '@src/Settings';
-import { NotationElement } from '@src/NotationSettings';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
+import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal

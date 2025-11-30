@@ -1,0 +1,9 @@
+.vscode/**
+.vscode-test/**
+node_modules/**
+src/**
+.yarnrc
+**/tsconfig.json
+**/*.map
+**/*.ts
+**/.vscode-test.*

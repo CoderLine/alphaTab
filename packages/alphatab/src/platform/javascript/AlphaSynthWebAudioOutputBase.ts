@@ -1,8 +1,8 @@
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { Environment } from '@src/Environment';
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@src/EventEmitter';
-import { Logger } from '@src/Logger';
-import type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { Environment } from '@coderline/alphatab/Environment';
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { ISynthOutput, ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
 
 declare const webkitAudioContext: any;
 

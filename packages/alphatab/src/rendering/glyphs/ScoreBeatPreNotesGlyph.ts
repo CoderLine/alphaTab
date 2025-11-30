@@ -1,23 +1,23 @@
-import { AccidentalType } from '@src/model/AccidentalType';
-import { BendType } from '@src/model/BendType';
-import { BrushType } from '@src/model/BrushType';
-import { GraceType } from '@src/model/GraceType';
-import { HarmonicType } from '@src/model/HarmonicType';
-import { type Note, NoteSubElement } from '@src/model/Note';
-import { WhammyType } from '@src/model/WhammyType';
-import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
-import { AccidentalGroupGlyph } from '@src/rendering/glyphs/AccidentalGroupGlyph';
-import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import { BendNoteHeadGroupGlyph } from '@src/rendering/glyphs/BendNoteHeadGroupGlyph';
-import { GhostNoteContainerGlyph } from '@src/rendering/glyphs/GhostNoteContainerGlyph';
-import { ScoreBrushGlyph } from '@src/rendering/glyphs/ScoreBrushGlyph';
-import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { FingeringGroupGlyph } from '@src/rendering/glyphs/FingeringGroupGlyph';
-import { BeatSubElement } from '@src/model/Beat';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { SlideInType } from '@src/model/SlideInType';
+import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
+import { BendType } from '@coderline/alphatab/model/BendType';
+import { BrushType } from '@coderline/alphatab/model/BrushType';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { WhammyType } from '@coderline/alphatab/model/WhammyType';
+import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
+import { AccidentalGroupGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGroupGlyph';
+import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
+import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
+import { GhostNoteContainerGlyph } from '@coderline/alphatab/rendering/glyphs/GhostNoteContainerGlyph';
+import { ScoreBrushGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBrushGlyph';
+import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { FingeringGroupGlyph } from '@coderline/alphatab/rendering/glyphs/FingeringGroupGlyph';
+import { BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 
 /**
  * @internal

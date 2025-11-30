@@ -1,7 +1,7 @@
-import { RenderingResources } from '@src/RenderingResources';
-import { LayoutMode } from '@src/LayoutMode';
-import { StaveProfile } from '@src/StaveProfile';
-import type { Staff } from '@src/model/Staff';
+import { RenderingResources } from '@coderline/alphatab/RenderingResources';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { StaveProfile } from '@coderline/alphatab/StaveProfile';
+import type { Staff } from '@coderline/alphatab/model/Staff';
 
 /**
  * Lists the different modes in which the staves and systems are arranged.

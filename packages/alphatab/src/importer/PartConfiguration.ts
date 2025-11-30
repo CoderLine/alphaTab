@@ -1,8 +1,8 @@
-import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IOHelper } from '@src/io/IOHelper';
-import type { Score } from '@src/model/Score';
-import type { Track } from '@src/model/Track';
+import { GpBinaryHelpers } from '@coderline/alphatab/importer/Gp3To5Importer';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { Track } from '@coderline/alphatab/model/Track';
 
 // PartConfiguration File Format Notes.
 // Based off Guitar Pro 8

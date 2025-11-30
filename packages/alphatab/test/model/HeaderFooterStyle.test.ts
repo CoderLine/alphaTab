@@ -1,5 +1,5 @@
-import { Score } from '@src/model/Score';
-import { HeaderFooterStyle } from '@src/model/Score';
+import { Score } from '@coderline/alphatab/model/Score';
+import { HeaderFooterStyle } from '@coderline/alphatab/model/Score';
 import { expect } from 'chai';
 
 describe('HeaderFooterStyleTests', () => {

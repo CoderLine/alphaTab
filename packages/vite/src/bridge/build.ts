@@ -60,6 +60,9 @@ const customRelativeUrlMechanisms = {
         getResolveUrl(`'${escapeId(partialEncodeURIPath(relativePath))}', self.location.href`)
 } as const satisfies Record<string, (relativePath: string) => string>;
 
+/**
+ * @internal
+ */
 export function createToImportMetaURLBasedRelativeRuntime(
     format: InternalModuleFormat,
     isWorker: boolean
@@ -71,6 +74,9 @@ export function createToImportMetaURLBasedRelativeRuntime(
     });
 }
 
+/**
+ * @internal
+ */
 export function toOutputFilePathInJS(
     filename: string,
     type: 'asset' | 'public',
@@ -107,6 +113,9 @@ export function toOutputFilePathInJS(
 
 // https://github.com/vitejs/vite/blob/v6.1.1/packages/vite/src/node/build.ts#L1131
 
+/**
+ * @internal
+ */
 export function injectEnvironmentToHooks(environment: BuildEnvironment, plugin: Plugin): Plugin {
     const { resolveId, load, transform } = plugin;
 

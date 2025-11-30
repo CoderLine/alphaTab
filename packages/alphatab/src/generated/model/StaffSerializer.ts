@@ -3,13 +3,13 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Staff } from "@src/model/Staff";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { BarSerializer } from "@src/generated/model/BarSerializer";
-import { ChordSerializer } from "@src/generated/model/ChordSerializer";
-import { TuningSerializer } from "@src/generated/model/TuningSerializer";
-import { Bar } from "@src/model/Bar";
-import { Chord } from "@src/model/Chord";
+import { Staff } from "@coderline/alphatab/model/Staff";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { BarSerializer } from "@coderline/alphatab/generated/model/BarSerializer";
+import { ChordSerializer } from "@coderline/alphatab/generated/model/ChordSerializer";
+import { TuningSerializer } from "@coderline/alphatab/generated/model/TuningSerializer";
+import { Bar } from "@coderline/alphatab/model/Bar";
+import { Chord } from "@coderline/alphatab/model/Chord";
 /**
  * @internal
  */

@@ -1,8 +1,8 @@
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IOHelper } from '@src/io/IOHelper';
-import type { IReadable } from '@src/io/IReadable';
-import { Inflate } from '@src/zip/Inflate';
-import { ZipEntry } from '@src/zip/ZipEntry';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import type { IReadable } from '@coderline/alphatab/io/IReadable';
+import { Inflate } from '@coderline/alphatab/zip/Inflate';
+import { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
 
 /**
  * @internal

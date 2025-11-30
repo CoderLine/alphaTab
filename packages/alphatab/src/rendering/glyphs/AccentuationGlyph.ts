@@ -1,9 +1,9 @@
-import { AccentuationType } from '@src/model/AccentuationType';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
-import type { Note } from '@src/model/Note';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal

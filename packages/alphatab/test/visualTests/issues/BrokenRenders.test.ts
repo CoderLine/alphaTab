@@ -1,11 +1,11 @@
-import { TestPlatform } from '@test/TestPlatform';
+import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper } from '../VisualTestHelper';
-import { Settings } from '@src/Settings';
-import { XmlDocument } from '@src/xml/XmlDocument';
+import { Settings } from '@coderline/alphatab/Settings';
+import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { expect } from 'chai';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 
 describe('BrokenRendersTests', () => {
     it('let-ring-empty-voice', async () => {

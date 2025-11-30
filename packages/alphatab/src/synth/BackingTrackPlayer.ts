@@ -1,15 +1,15 @@
-import type { EventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
-import type { MidiEvent } from '@src/midi/MidiEvent';
-import type { MidiFile } from '@src/midi/MidiFile';
-import type { BackingTrack } from '@src/model/BackingTrack';
-import type { Score } from '@src/model/Score';
-import { AlphaSynthBase } from '@src/synth/AlphaSynth';
-import { Queue } from '@src/synth/ds/Queue';
-import type { BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
-import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
-import type { ISynthOutput } from '@src/synth/ISynthOutput';
-import type { Hydra } from '@src/synth/soundfont/Hydra';
-import type { SynthEvent } from '@src/synth/synthesis/SynthEvent';
+import type { EventEmitter, IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import type { MidiEvent } from '@coderline/alphatab/midi/MidiEvent';
+import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { AlphaSynthBase } from '@coderline/alphatab/synth/AlphaSynth';
+import { Queue } from '@coderline/alphatab/synth/ds/Queue';
+import type { BackingTrackSyncPoint } from '@coderline/alphatab/synth/IAlphaSynth';
+import type { IAudioSampleSynthesizer } from '@coderline/alphatab/synth/IAudioSampleSynthesizer';
+import type { ISynthOutput } from '@coderline/alphatab/synth/ISynthOutput';
+import type { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
+import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
 
 /**
  * A synth output for playing backing tracks.

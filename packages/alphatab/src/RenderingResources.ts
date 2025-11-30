@@ -1,7 +1,7 @@
-import { Color } from '@src/model/Color';
-import { Font, FontStyle, FontWeight } from '@src/model/Font';
-import { ScoreSubElement } from '@src/model/Score';
-import { EngravingSettings } from '@src/EngravingSettings';
+import { Color } from '@coderline/alphatab/model/Color';
+import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
+import { ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 
 /**
  * This public class contains central definitions for controlling the visual appearance.

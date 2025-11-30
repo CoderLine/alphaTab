@@ -14,10 +14,14 @@
         "typecheck": "npm run typecheck --workspaces --if-present",
         "dev": "npm run dev --workspace=packages/playground",
 
+        "build-language-server": "npm run build --workspace=packages/lsp",
+        "dev-language-server": "npm run dev --workspace=packages/lsp",
+        "dev-vscode": "concurrently \"npm run dev --workspace=packages/lsp\" \"npm run dev --workspace=packages/vscode\"",
+
         "update-version": "node scripts/update-version.mjs",
 
         "generate-typescript": "npm run generate-typescript --workspace=packages/alphatab",
-        
+
         "build": "npm run build --workspace=packages/alphatab",
         "test": "npm run test --workspace=packages/alphatab",
 
@@ -32,8 +36,11 @@
 
         "build-vite": "npm run build --workspace=packages/vite",
         "test-vite": "npm run test --workspace=packages/vite",
-        
+
         "build-webpack": "npm run build --workspace=packages/webpack",
         "test-webpack": "npm run test --workspace=packages/webpack"
+    },
+    "devDependencies": {
+        "concurrently": "^9.2.1"
     }
 }

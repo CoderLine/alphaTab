@@ -1,12 +1,12 @@
-import '@src/alphaTab.polyfills';
+import '@coderline/alphatab/alphaTab.polyfills';
 
-export { CoreSettings, FontFileFormat } from '@src/CoreSettings';
-export { DisplaySettings, SystemsLayoutMode } from '@src/DisplaySettings';
-export { LayoutMode } from '@src/LayoutMode';
-export { StaveProfile } from '@src/StaveProfile';
-export { ImporterSettings } from '@src/ImporterSettings';
-export { ExporterSettings } from '@src/ExporterSettings';
-export { FingeringMode, NotationMode, NotationSettings, TabRhythmMode, NotationElement } from '@src/NotationSettings';
+export { CoreSettings, FontFileFormat } from '@coderline/alphatab/CoreSettings';
+export { DisplaySettings, SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
+export { LayoutMode } from '@coderline/alphatab/LayoutMode';
+export { StaveProfile } from '@coderline/alphatab/StaveProfile';
+export { ImporterSettings } from '@coderline/alphatab/ImporterSettings';
+export { ExporterSettings } from '@coderline/alphatab/ExporterSettings';
+export { FingeringMode, NotationMode, NotationSettings, TabRhythmMode, NotationElement } from '@coderline/alphatab/NotationSettings';
 export {
     PlayerSettings,
     ScrollMode,
@@ -14,45 +14,45 @@ export {
     VibratoPlaybackSettings,
     PlayerOutputMode,
     PlayerMode
-} from '@src/PlayerSettings';
-export { ProgressEventArgs } from '@src/ProgressEventArgs';
-export { RenderingResources } from '@src/RenderingResources';
+} from '@coderline/alphatab/PlayerSettings';
+export { ProgressEventArgs } from '@coderline/alphatab/ProgressEventArgs';
+export { RenderingResources } from '@coderline/alphatab/RenderingResources';
 export type {
     SmuflEngravingDefaults,
     SmuflGlyphBoundingBox,
     SmuflGlyphWithAnchor,
     SmuflMetadata,
-} from '@src/SmuflMetadata';
+} from '@coderline/alphatab/SmuflMetadata';
 export {
     EngravingSettings,
     EngravingStemInfo
-} from '@src/EngravingSettings';
-export { ResizeEventArgs } from '@src/ResizeEventArgs';
-export { Settings } from '@src/Settings';
-export { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-export { FormatError } from '@src/FormatError';
-export { LogLevel } from '@src/LogLevel';
-export { Logger, ConsoleLogger } from '@src/Logger';
-export type { ILogger } from '@src/Logger';
-export { FileLoadError } from '@src/FileLoadError';
-export { Environment, RenderEngineFactory } from '@src/Environment';
-export type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+} from '@coderline/alphatab/EngravingSettings';
+export { ResizeEventArgs } from '@coderline/alphatab/ResizeEventArgs';
+export { Settings } from '@coderline/alphatab/Settings';
+export { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+export { FormatError } from '@coderline/alphatab/FormatError';
+export { LogLevel } from '@coderline/alphatab/LogLevel';
+export { Logger, ConsoleLogger } from '@coderline/alphatab/Logger';
+export type { ILogger } from '@coderline/alphatab/Logger';
+export { FileLoadError } from '@coderline/alphatab/FileLoadError';
+export { Environment, RenderEngineFactory } from '@coderline/alphatab/Environment';
+export type { IEventEmitter, IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
 
-export { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
-export { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-export { WebPlatform } from '@src/platform/javascript/WebPlatform';
+export { AlphaTabApi } from '@coderline/alphatab/platform/javascript/AlphaTabApi';
+export { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
+export { WebPlatform } from '@coderline/alphatab/platform/javascript/WebPlatform';
 
-export { VersionInfo as meta } from '@src/generated/VersionInfo';
+export { VersionInfo as meta } from '@coderline/alphatab/generated/VersionInfo';
 
 // alphaTab2.0: We should reliminate the big bundles but ship individual
 // modules which can be imported. e.g. import { Track } from '@coderline/alphatab/model/Track'
 // for this generally some reoganization is likely needed to void circular dependencies better
-export * as importer from '@src/importer/_barrel';
-export * as io from '@src/io/_barrel';
-export * as exporter from '@src/exporter/_barrel';
-export * as midi from '@src/midi/_barrel';
-export * as model from '@src/model/_barrel';
-export * as rendering from '@src/rendering/_barrel';
-export * as platform from '@src/platform/_barrel';
-export * as synth from '@src/synth/_barrel';
-export * as json from '@src/generated/_jsonbarrel';
+export * as importer from '@coderline/alphatab/importer/_barrel';
+export * as io from '@coderline/alphatab/io/_barrel';
+export * as exporter from '@coderline/alphatab/exporter/_barrel';
+export * as midi from '@coderline/alphatab/midi/_barrel';
+export * as model from '@coderline/alphatab/model/_barrel';
+export * as rendering from '@coderline/alphatab/rendering/_barrel';
+export * as platform from '@coderline/alphatab/platform/_barrel';
+export * as synth from '@coderline/alphatab/synth/_barrel';
+export * as json from '@coderline/alphatab/generated/_jsonbarrel';

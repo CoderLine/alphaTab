@@ -1,7 +1,7 @@
-import type { Color } from '@src/model/Color';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
+import type { Color } from '@coderline/alphatab/model/Color';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 
 /**
  * @internal

@@ -1,12 +1,12 @@
-import { BarSubElement } from '@src/model/Bar';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { ScoreNoteGlyphInfo } from '@src/rendering/glyphs/ScoreNoteGlyphInfo';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import { BarSubElement } from '@coderline/alphatab/model/Bar';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { ScoreNoteGlyphInfo } from '@coderline/alphatab/rendering/glyphs/ScoreNoteGlyphInfo';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 
 /**
  * @internal

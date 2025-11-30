@@ -8,6 +8,9 @@ import {
     type NormalModuleFactory
 } from './Utils';
 
+/**
+ * @internal
+ */
 export function injectWebWorkerDependency(webPackWithAlphaTab: webPackWithAlphaTab) {
     class AlphaTabWebWorkerDependency extends webPackWithAlphaTab.webpack.dependencies.ModuleDependency {
         publicPath: string | undefined;

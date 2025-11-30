@@ -14,6 +14,7 @@ const workerIndexMap = new WeakMap<webpackTypes.ParserState, number>();
  * @param normalModuleFactory
  * @param cachedContextify
  * @returns
+ * @internal
  */
 export function configureWebWorker(
     webPackWithAlphaTab: webPackWithAlphaTab,

@@ -1,12 +1,12 @@
-import { Environment } from '@src/Environment';
-import { FileLoadError } from '@src/FileLoadError';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import type { ScoreImporter } from '@src/importer/ScoreImporter';
-import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Logger } from '@src/Logger';
-import type { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
+import { Environment } from '@coderline/alphatab/Environment';
+import { FileLoadError } from '@coderline/alphatab/FileLoadError';
+import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
+import type { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
+import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * The ScoreLoader enables you easy loading of Scores using all

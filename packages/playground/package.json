@@ -3,6 +3,7 @@
     "version": "1.7.0",
     "description": "A development playground for alphaTab to test features while developing",
     "private": true,
+    "type": "module",
     "dependencies": {
         "@coderline/alphatab": "*",
         "@fontsource/noto-sans": "^5.2.10",
@@ -10,17 +11,19 @@
         "@fortawesome/fontawesome-free": "^7.1.0",
         "@popperjs/core": "^2.11.8",
         "@types/serve-static": "^2.2.0",
-        "ace-builds": "^1.43.4",
         "bootstrap": "^5.3.8",
         "handlebars": "^4.7.8",
+        "monaco-editor": "^0.54.0",
         "serve-static": "^2.2.0"
     },
     "scripts": {
         "lint": "biome lint",
+        "typecheck": "tsc --noEmit",
         "dev": "vite"
     },
     "devDependencies": {
         "@types/bootstrap": "^5.2.10",
+        "split.js": "^1.6.5",
         "tslib": "^2.8.1",
         "typescript": "^5.9.3",
         "vite": "^7.2.2",

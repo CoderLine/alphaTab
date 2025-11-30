@@ -1,12 +1,12 @@
-import type { Beat } from '@src/model/Beat';
-import { CrescendoType } from '@src/model/CrescendoType';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { CrescendoGlyph } from '@src/rendering/glyphs/CrescendoGlyph';
-import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import type { Settings } from '@src/Settings';
-import { NotationElement } from '@src/NotationSettings';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { CrescendoGlyph } from '@coderline/alphatab/rendering/glyphs/CrescendoGlyph';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal

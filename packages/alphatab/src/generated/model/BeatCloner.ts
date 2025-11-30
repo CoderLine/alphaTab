@@ -3,10 +3,10 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Beat } from "@src/model/Beat";
-import { NoteCloner } from "@src/generated/model/NoteCloner";
-import { AutomationCloner } from "@src/generated/model/AutomationCloner";
-import { BendPointCloner } from "@src/generated/model/BendPointCloner";
+import { Beat } from "@coderline/alphatab/model/Beat";
+import { NoteCloner } from "@coderline/alphatab/generated/model/NoteCloner";
+import { AutomationCloner } from "@coderline/alphatab/generated/model/AutomationCloner";
+import { BendPointCloner } from "@coderline/alphatab/generated/model/BendPointCloner";
 /**
  * @internal
  */

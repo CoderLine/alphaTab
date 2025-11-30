@@ -1,9 +1,9 @@
-import { GpxImporter } from '@src/importer/GpxImporter';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Lyrics } from '@src/model/Lyrics';
-import type { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
-import { TestPlatform } from '@test/TestPlatform';
+import { GpxImporter } from '@coderline/alphatab/importer/GpxImporter';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { Lyrics } from '@coderline/alphatab/model/Lyrics';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Settings } from '@coderline/alphatab/Settings';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
 
 describe('LyricsTests', () => {

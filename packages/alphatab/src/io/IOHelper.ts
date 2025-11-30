@@ -1,6 +1,6 @@
-import type { IReadable } from '@src/io/IReadable';
-import { TypeConversions } from '@src/io/TypeConversions';
-import type { IWriteable } from '@src/io/IWriteable';
+import type { IReadable } from '@coderline/alphatab/io/IReadable';
+import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
+import { TypeConversions } from '@coderline/alphatab/io/TypeConversions';
 
 /**
  * @public

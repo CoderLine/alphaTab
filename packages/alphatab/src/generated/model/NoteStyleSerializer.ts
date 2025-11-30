@@ -3,11 +3,11 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { NoteStyle } from "@src/model/Note";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
-import { NoteSubElement } from "@src/model/Note";
-import { Color } from "@src/model/Color";
+import { NoteStyle } from "@coderline/alphatab/model/Note";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { MusicFontSymbol } from "@coderline/alphatab/model/MusicFontSymbol";
+import { NoteSubElement } from "@coderline/alphatab/model/Note";
+import { Color } from "@coderline/alphatab/model/Color";
 /**
  * @internal
  */

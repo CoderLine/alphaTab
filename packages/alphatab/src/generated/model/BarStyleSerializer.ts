@@ -3,10 +3,10 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { BarStyle } from "@src/model/Bar";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { BarSubElement } from "@src/model/Bar";
-import { Color } from "@src/model/Color";
+import { BarStyle } from "@coderline/alphatab/model/Bar";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { BarSubElement } from "@coderline/alphatab/model/Bar";
+import { Color } from "@coderline/alphatab/model/Color";
 /**
  * @internal
  */

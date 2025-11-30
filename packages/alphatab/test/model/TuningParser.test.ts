@@ -1,5 +1,5 @@
-import { Tuning } from '@src/model/Tuning';
-import { ModelUtils } from '@src/model/ModelUtils';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { expect } from 'chai';
 
 describe('TuningParserTest', () => {

@@ -1,7 +1,7 @@
-import { JsonConverter } from '@src/model/JsonConverter';
-import { ModelUtils } from '@src/model/ModelUtils';
-import type { Score } from '@src/model/Score';
-import { TestPlatform } from '@test/TestPlatform';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { TestPlatform } from 'test/TestPlatform';
 import { assert } from 'chai';
 
 /**

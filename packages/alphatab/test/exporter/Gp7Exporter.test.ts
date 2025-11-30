@@ -1,12 +1,12 @@
-import { Gp7Exporter } from '@src/exporter/Gp7Exporter';
-import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { JsonConverter } from '@src/model/JsonConverter';
-import type { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
-import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
-import { TestPlatform } from '@test/TestPlatform';
+import { Gp7Exporter } from '@coderline/alphatab/exporter/Gp7Exporter';
+import { Gp7To8Importer } from '@coderline/alphatab/importer/Gp7To8Importer';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Settings } from '@coderline/alphatab/Settings';
+import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
 
 describe('Gp7ExporterTest', () => {

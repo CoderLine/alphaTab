@@ -1,7 +1,7 @@
-import type { Note } from '@src/model/Note';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import { NumberedTieGlyph } from '@src/rendering//glyphs/NumberedTieGlyph';
-import { NumberedSlurGlyph } from '@src/rendering/glyphs/NumberedSlurGlyph';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import { NumberedTieGlyph } from '@coderline/alphatab/rendering//glyphs/NumberedTieGlyph';
+import { NumberedSlurGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedSlurGlyph';
 
 /**
  * @internal

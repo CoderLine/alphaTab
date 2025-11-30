@@ -1,4 +1,4 @@
-import { IOHelper } from '@src/io/IOHelper';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import fs from 'node:fs';
 import path from 'node:path';
 

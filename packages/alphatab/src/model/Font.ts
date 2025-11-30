@@ -1,4 +1,4 @@
-import { JsonHelper } from '@src/io/JsonHelper';
+import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
 
 /**
  * A very basic font parser which parses the fields according to

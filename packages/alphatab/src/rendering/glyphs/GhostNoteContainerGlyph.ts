@@ -1,11 +1,11 @@
-import { type Note, NoteSubElement } from '@src/model/Note';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { GhostParenthesisGlyph } from '@src/rendering/glyphs/GhostParenthesisGlyph';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { NotationElement } from '@src/NotationSettings';
-import type { Color } from '@src/model/Color';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { GhostParenthesisGlyph } from '@coderline/alphatab/rendering/glyphs/GhostParenthesisGlyph';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import type { Color } from '@coderline/alphatab/model/Color';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal

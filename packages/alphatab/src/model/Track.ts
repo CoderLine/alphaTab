@@ -1,12 +1,12 @@
-import type { Beat } from '@src/model/Beat';
-import { Color } from '@src/model/Color';
-import type { Lyrics } from '@src/model/Lyrics';
-import { PlaybackInformation } from '@src/model/PlaybackInformation';
-import type { Score } from '@src/model/Score';
-import { Staff } from '@src/model/Staff';
-import type { Settings } from '@src/Settings';
-import type { InstrumentArticulation } from '@src/model/InstrumentArticulation';
-import { ElementStyle } from '@src/model/ElementStyle';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { Color } from '@coderline/alphatab/model/Color';
+import type { Lyrics } from '@coderline/alphatab/model/Lyrics';
+import { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Staff } from '@coderline/alphatab/model/Staff';
+import type { Settings } from '@coderline/alphatab/Settings';
+import type { InstrumentArticulation } from '@coderline/alphatab/model/InstrumentArticulation';
+import { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
 
 /**
  * Lists all graphical sub elements within a {@link Track} which can be styled via {@link Track.style}

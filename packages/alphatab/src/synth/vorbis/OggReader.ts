@@ -1,6 +1,6 @@
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { IOHelper } from '@src/io/IOHelper';
-import type { IReadable } from '@src/io/IReadable';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import type { IReadable } from '@coderline/alphatab/io/IReadable';
 
 /**
  * @internal

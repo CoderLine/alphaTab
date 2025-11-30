@@ -3,9 +3,9 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Fermata } from "@src/model/Fermata";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { FermataType } from "@src/model/Fermata";
+import { Fermata } from "@coderline/alphatab/model/Fermata";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { FermataType } from "@coderline/alphatab/model/Fermata";
 /**
  * @internal
  */

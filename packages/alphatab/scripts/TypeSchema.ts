@@ -397,7 +397,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const root = path.resolve(__dirname, '..');
 
 export function toImportPath(fileName: string) {
-    return `@${removeExtension(path.relative(root, fileName)).split('\\').join('/')}`;
+    return `@${removeExtension(path.relative(root, fileName)).replaceAll('\\', '/')}`.replace('@src/', '@coderline/alphatab/');
 }
 
 function findModule(type: ts.Type, options: ts.CompilerOptions) {

@@ -1,9 +1,9 @@
-import { LayoutMode } from '@src/LayoutMode';
-import { NotationElement } from '@src/NotationSettings';
-import { Settings } from '@src/Settings';
-import { StaveProfile } from '@src/StaveProfile';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import { Settings } from '@coderline/alphatab/Settings';
+import { StaveProfile } from '@coderline/alphatab/StaveProfile';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
 
 describe('MusicNotationTests', () => {
     it('clefs', async () => {

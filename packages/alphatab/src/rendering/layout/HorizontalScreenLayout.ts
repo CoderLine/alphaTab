@@ -1,11 +1,11 @@
-import type { MasterBar } from '@src/model/MasterBar';
-import type { Score } from '@src/model/Score';
-import { TextAlign } from '@src/platform/ICanvas';
-import { InternalSystemsLayoutMode, ScoreLayout } from '@src/rendering/layout/ScoreLayout';
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import type { StaffSystem } from '@src/rendering/staves/StaffSystem';
-import { Logger } from '@src/Logger';
-import { SystemsLayoutMode } from '@src/DisplaySettings';
+import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { InternalSystemsLayoutMode, ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
+import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
+import { Logger } from '@coderline/alphatab/Logger';
+import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
 
 /**
  * @internal

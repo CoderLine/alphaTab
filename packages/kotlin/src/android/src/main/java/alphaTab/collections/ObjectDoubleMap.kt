@@ -57,7 +57,7 @@ public class ObjectDoubleMap<TKey> :
             set(it.key, it.value)
         }
     }
-    public constructor(iterable: Iterable<ObjectDoubleArrayTuple<TKey>>) {
+    public constructor(iterable: Iterable<alphaTab.core.IObjectDoubleArrayTuple<TKey>>) {
         for (it in iterable) {
             set(it.v0, it.v1)
         }

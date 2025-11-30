@@ -4,6 +4,9 @@ import { copyAssetsPlugin } from './copyAssetsPlugin';
 import { importMetaUrlPlugin } from './importMetaPlugin';
 import { workerPlugin } from './workerPlugin';
 
+/**
+ * @public
+ */
 export function alphaTab(options?: AlphaTabVitePluginOptions) {
     const plugins: Plugin[] = [];
 

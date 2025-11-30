@@ -1,12 +1,12 @@
-import type { Beat } from '@src/model/Beat';
-import { WahPedal } from '@src/model/WahPedal';
-import { NotationElement } from '@src/NotationSettings';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { WahPedalGlyph } from '@src/rendering/glyphs/WahPedalGlyph';
-import type { Settings } from '@src/Settings';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { WahPedal } from '@coderline/alphatab/model/WahPedal';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { WahPedalGlyph } from '@coderline/alphatab/rendering/glyphs/WahPedalGlyph';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal

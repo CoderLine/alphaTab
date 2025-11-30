@@ -1,12 +1,34 @@
-
 .at-wrap {
-    height: 70vh;
+    height: 100%;
+    width: 100%;
     margin: 0;
 }
-.editor-wrap {
-    height: 20vh;
+#editor-wrap {
+    height: 100%;
+    overflow:visible;
+    z-index: 10000;
 }
-.editor-wrap > * {
-    width: 90vw;
-    height: 20vh;
+
+#editor-wrap > * {
+    height: 100%;
+}
+
+.split {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 0;
+    left: 0; 
+    right: 0;
+    bottom: 0;
+}
+
+.gutter {
+    background-color: #eee;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.gutter.gutter-horizontal {
+    cursor: col-resize;
 }

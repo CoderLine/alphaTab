@@ -1,50 +1,55 @@
-import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
-import { AlphaTexStaffNoteKind } from '@src/importer/alphaTex/AlphaTexShared';
-import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { AutomationType } from '@src/model/Automation';
-import { BarreShape } from '@src/model/BarreShape';
-import { type Beat, BeatBeamingMode } from '@src/model/Beat';
-import { BendStyle } from '@src/model/BendStyle';
-import { BendType } from '@src/model/BendType';
-import { BrushType } from '@src/model/BrushType';
-import { Clef } from '@src/model/Clef';
-import { CrescendoType } from '@src/model/CrescendoType';
-import { Direction } from '@src/model/Direction';
-import { Duration } from '@src/model/Duration';
-import { DynamicValue } from '@src/model/DynamicValue';
-import { FadeType } from '@src/model/FadeType';
-import { FermataType } from '@src/model/Fermata';
-import { Fingers } from '@src/model/Fingers';
-import { GolpeType } from '@src/model/GolpeType';
-import { GraceType } from '@src/model/GraceType';
-import { HarmonicType } from '@src/model/HarmonicType';
-import { KeySignature } from '@src/model/KeySignature';
-import { KeySignatureType } from '@src/model/KeySignatureType';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { NoteOrnament } from '@src/model/NoteOrnament';
-import { Ottavia } from '@src/model/Ottavia';
-import { Rasgueado } from '@src/model/Rasgueado';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { type Score, ScoreSubElement } from '@src/model/Score';
-import { SimileMark } from '@src/model/SimileMark';
-import { SlideInType } from '@src/model/SlideInType';
-import { SlideOutType } from '@src/model/SlideOutType';
-import type { Staff } from '@src/model/Staff';
-import type { Track } from '@src/model/Track';
-import { TripletFeel } from '@src/model/TripletFeel';
-import { Tuning } from '@src/model/Tuning';
-import { VibratoType } from '@src/model/VibratoType';
-import { WhammyType } from '@src/model/WhammyType';
-import { TextAlign } from '@src/platform/ICanvas';
-import { BeamDirection } from '@src/rendering/_barrel';
-import { HarmonicsEffectInfo } from '@src/rendering/effects/HarmonicsEffectInfo';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { Settings } from '@src/Settings';
-import { StaveProfile } from '@src/StaveProfile';
-import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
-import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
+import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
+import { AlphaTexStaffNoteKind } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
+import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
+import { AutomationType } from '@coderline/alphatab/model/Automation';
+import { BarreShape } from '@coderline/alphatab/model/BarreShape';
+import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { BendStyle } from '@coderline/alphatab/model/BendStyle';
+import { BendType } from '@coderline/alphatab/model/BendType';
+import { BrushType } from '@coderline/alphatab/model/BrushType';
+import { Clef } from '@coderline/alphatab/model/Clef';
+import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
+import { Direction } from '@coderline/alphatab/model/Direction';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { FadeType } from '@coderline/alphatab/model/FadeType';
+import { FermataType } from '@coderline/alphatab/model/Fermata';
+import { Fingers } from '@coderline/alphatab/model/Fingers';
+import { GolpeType } from '@coderline/alphatab/model/GolpeType';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
+import {
+    BracketExtendMode,
+    TrackNameMode,
+    TrackNameOrientation,
+    TrackNamePolicy
+} from '@coderline/alphatab/model/RenderStylesheet';
+import { type Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { SimileMark } from '@coderline/alphatab/model/SimileMark';
+import { SlideInType } from '@coderline/alphatab/model/SlideInType';
+import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { Track } from '@coderline/alphatab/model/Track';
+import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import { WhammyType } from '@coderline/alphatab/model/WhammyType';
+import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
+import { HarmonicsEffectInfo } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
+import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { Settings } from '@coderline/alphatab/Settings';
+import { StaveProfile } from '@coderline/alphatab/StaveProfile';
+import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
+import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 import { assert, expect } from 'chai';
 
 describe('AlphaTexImporterTest', () => {
@@ -187,6 +192,15 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(3);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isDead).to.equal(true);
+    });
+
+    it('dead', () => {
+        const tex: string = 'x.1 3.1{x}';
+        const score = parseTex(tex);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].string).to.equal(6);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].fret).to.equal(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].string).to.equal(6);
     });
 
     it('trill-issue79', () => {
@@ -1618,7 +1632,7 @@ describe('AlphaTexImporterTest', () => {
 
     it('tempo-label', () => {
         const score = parseTex(`
-            \\tempo 80 "Label"
+            \\tempo (80 "Label")
             .
         `);
         expect(score.tempo).to.equal(80);
@@ -1812,9 +1826,9 @@ describe('AlphaTexImporterTest', () => {
 
     it('tempo-automation-text', () => {
         const score = parseTex(`
-        \\tempo 100 "T1"
+        \\tempo (100 "T1")
         .
-        3.3.4 * 4 | \\tempo 80 "T2" 4.3.4*4
+        3.3.4 * 4 | \\tempo (80 "T2") 4.3.4*4
         `);
         expect(score.tempo).to.equal(100);
         expect(score.tempoLabel).to.equal('T1');
@@ -2333,15 +2347,23 @@ describe('AlphaTexImporterTest', () => {
         describe('at209', () => {
             it('tuning', () => importErrorTest('\\tuning Invalid'));
             it('articulation', () => importErrorTest('\\articulation "Test" 0'));
+            it('duration tuplet', () => importErrorTest('. :4 {tu 0}'));
+            it('beat tuplet', () => importErrorTest('. C4 {tu 0}'));
+            it('tremolo speed', () => importErrorTest('. C4 {tp 0}'));
+            it('trill', () => importErrorTest('. 3.3 {tr 4 0}'));
+            it('textalign', () => importErrorTest('\\title "Test" "" invalid'));
+        });
+
+        describe('at219', () => {
+            it('score empty', () => importErrorTest('\\title ()'));
+            it('bar empty', () => importErrorTest('. \\ts ()'));
+            it('bar missing', () => importErrorTest('. \\ts (3)'));
+
             it('score required', () => importErrorTest('\\title (1)'));
             it('bar required', () => importErrorTest('. \\rc ("a")'));
             it('score optional', () => importErrorTest('\\title ("Title" 1)'));
             it('bar optional', () => importErrorTest('. \\section ("a" 1)'));
-            it('duration tuplet', () => importErrorTest('. :4 {tu 0}'));
-            it('beat tuplet', () => importErrorTest('. C4 {tu 0}'));
-            it('tremolo speed', () => importErrorTest('. C4 {tp 0}'));
-            it('beam', () => importErrorTest('. C4 {beam invalid}'));
-            it('trill', () => importErrorTest('. 3.3 {tr 4 0}'));
+
             it('bracketextendmode', () => importErrorTest('\\bracketextendmode invalid'));
             it('singletracktracknamepolicy', () => importErrorTest('\\singletracktracknamepolicy invalid'));
             it('multitracktracknamepolicy', () => importErrorTest('\\multitracktracknamepolicy invalid'));
@@ -2350,7 +2372,6 @@ describe('AlphaTexImporterTest', () => {
             it('firstsystemtracknameorientation', () => importErrorTest('\\firstsystemtracknameorientation invalid'));
             it('othersystemstracknameorientation', () => importErrorTest('\\firstsystemtracknameorientation invalid'));
             it('accidentalmode', () => importErrorTest('\\accidentals invalid'));
-            it('textalign', () => importErrorTest('\\title "Test" "" invalid'));
             it('whammybartype', () => importErrorTest('C4 {tb invalid (0 1)}'));
             it('whammybarstyle', () => importErrorTest('C4 {tb none invalid (0 1)}'));
             it('dynamic', () => importErrorTest('C4 {dy invalid}'));
@@ -2361,12 +2382,8 @@ describe('AlphaTexImporterTest', () => {
             it('bendstyle', () => importErrorTest('C4 {b bend invalid (0 4)}'));
             it('gracetype', () => importErrorTest('C4 {gr (invalid)}'));
             it('barre', () => importErrorTest('C4 {barre (1 invalid)    }'));
-        });
 
-        describe('at210', () => {
-            it('score empty', () => importErrorTest('\\title ()'));
-            it('bar empty', () => importErrorTest('. \\ts ()'));
-            it('bar missing', () => importErrorTest('. \\ts (3)'));
+            it('beam', () => importErrorTest('. C4 {beam invalid}'));
         });
     });
 

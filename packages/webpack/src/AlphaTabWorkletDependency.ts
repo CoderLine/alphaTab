@@ -8,6 +8,9 @@ import {
     type webpackTypes
 } from './Utils';
 
+/**
+ * @internal
+ */
 export function injectWorkletDependency(webPackWithAlphaTab: webPackWithAlphaTab) {
     /**
      * This module dependency injects the relevant code into a worklet bootstrap script

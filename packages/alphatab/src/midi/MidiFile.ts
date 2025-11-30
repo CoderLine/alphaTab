@@ -1,8 +1,8 @@
-import type { MidiEvent } from '@src/midi/MidiEvent';
-import { MidiUtils } from '@src/midi/MidiUtils';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import type { IWriteable } from '@src/io/IWriteable';
-import { IOHelper } from '@src/io/IOHelper';
+import type { MidiEvent } from '@coderline/alphatab/midi/MidiEvent';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 
 /**
  * Lists the different midi file formats which are supported for export.

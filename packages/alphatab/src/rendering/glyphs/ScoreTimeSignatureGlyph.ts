@@ -1,4 +1,4 @@
-import { TimeSignatureGlyph } from '@src/rendering/glyphs/TimeSignatureGlyph';
+import { TimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TimeSignatureGlyph';
 
 /**
  * @internal

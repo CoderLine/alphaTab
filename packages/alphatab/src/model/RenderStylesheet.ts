@@ -1,4 +1,4 @@
-import type { Track } from '@src/model/Track';
+import type { Track } from '@coderline/alphatab/model/Track';
 
 /**
  * Lists the different modes on how the brackets/braces are drawn and extended.

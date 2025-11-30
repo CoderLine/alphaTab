@@ -1,20 +1,20 @@
-import { type HeaderFooterStyle, type Score, ScoreSubElement } from '@src/model/Score';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IOHelper } from '@src/io/IOHelper';
-import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
-import { BendPoint } from '@src/model/BendPoint';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { Color } from '@src/model/Color';
+import { type HeaderFooterStyle, type Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { GpBinaryHelpers } from '@coderline/alphatab/importer/Gp3To5Importer';
+import { BendPoint } from '@coderline/alphatab/model/BendPoint';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { Color } from '@coderline/alphatab/model/Color';
 import {
     type BracketExtendMode,
     TrackNameMode,
     TrackNameOrientation,
     TrackNamePolicy
-} from '@src/model/RenderStylesheet';
-import type { IWriteable } from '@src/io/IWriteable';
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { TextAlign } from '@src/platform/ICanvas';
+} from '@coderline/alphatab/model/RenderStylesheet';
+import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 
 /**
  * @internal

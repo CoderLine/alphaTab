@@ -1,14 +1,14 @@
-import { type Beat, BeatSubElement } from '@src/model/Beat';
-import type { Voice } from '@src/model/Voice';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { EffectBandSlot } from '@src/rendering/EffectBandSlot';
-import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import type { EffectBarRenderer } from '@src/rendering/EffectBarRenderer';
-import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import type { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import type { Voice } from '@coderline/alphatab/model/Voice';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { EffectBandSlot } from '@coderline/alphatab/rendering/EffectBandSlot';
+import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import type { EffectBarRenderer } from '@coderline/alphatab/rendering/EffectBarRenderer';
+import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal

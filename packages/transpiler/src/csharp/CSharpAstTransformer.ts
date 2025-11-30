@@ -571,9 +571,11 @@ export default class CSharpAstTransformer {
     private _collectMembers(members: Map<string, ts.TypeElement>, type: ts.InterfaceDeclaration) {
         const extendsClause = type.heritageClauses?.find(c => c.token === ts.SyntaxKind.ExtendsKeyword);
         if (extendsClause) {
-            const parentInterface = this.context.getType(extendsClause.types[0]).symbol.declarations![0];
-            if (ts.isInterfaceDeclaration(parentInterface)) {
-                this._collectMembers(members, parentInterface);
+            for (const t of extendsClause.types) {
+                const parentInterface = this.context.getType(t).symbol.declarations![0];
+                if (ts.isInterfaceDeclaration(parentInterface)) {
+                    this._collectMembers(members, parentInterface);
+                }
             }
         }
 
@@ -1906,11 +1908,7 @@ export default class CSharpAstTransformer {
             partial: !!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'partial'),
             name: this.context.buildMethodName(classElement.name),
             parameters: [],
-            returnType: this.createUnresolvedTypeNode(
-                null,
-                classElement.type ?? classElement,
-                returnType
-            ),
+            returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: this.mapVisibility(classElement, cs.Visibility.Public),
             tsNode: classElement,
             tsSymbol: this.context.getSymbolForDeclaration(classElement),
@@ -2024,12 +2022,12 @@ export default class CSharpAstTransformer {
                 return this.visitReturnStatement(parent, s as ts.ReturnStatement);
             case ts.SyntaxKind.WithStatement:
                 this.context.addTsNodeDiagnostics(s, 'With statement is not supported', ts.DiagnosticCategory.Error);
-                return {} as cs.ThrowStatement;
+                return null;
             case ts.SyntaxKind.SwitchStatement:
                 return this.visitSwitchStatement(parent, s as ts.SwitchStatement);
             case ts.SyntaxKind.LabeledStatement:
                 this.context.addTsNodeDiagnostics(s, 'Labeled statement is not supported', ts.DiagnosticCategory.Error);
-                return {} as cs.ThrowStatement;
+                return null;
             case ts.SyntaxKind.ThrowStatement:
                 return this.visitThrowStatement(parent, s as ts.ThrowStatement);
             case ts.SyntaxKind.TryStatement:
@@ -2038,7 +2036,7 @@ export default class CSharpAstTransformer {
             case ts.SyntaxKind.FunctionDeclaration:
                 return this.visitFunctionDeclaration(parent, s as ts.FunctionDeclaration);
         }
-        return {} as cs.ThrowStatement;
+        return null;
     }
 
     protected visitEmptyStatement(parent: cs.Node, s: ts.EmptyStatement) {
@@ -2049,14 +2047,7 @@ export default class CSharpAstTransformer {
         } as cs.EmptyStatement;
     }
     protected visitDebuggerStatement(_parent: cs.Node, _s: ts.DebuggerStatement) {
-        return {} as cs.ThrowStatement;
-
-        // {
-        //     nodeType: cs.SyntaxKind.ExpressionStatement,
-        //     parent: parent,
-        //     tsNode: s,
-        //     expression: {} as cs.Expression // TOOD: call System.Diagnostics.Debugger.Break();
-        // } as cs.ExpressionStatement;
+        return null;
     }
 
     protected visitBlock(parent: cs.Node, block: ts.Block): cs.Block {
@@ -2806,6 +2797,17 @@ export default class CSharpAstTransformer {
     }
 
     protected visitPrefixUnaryExpression(parent: cs.Node, expression: ts.PrefixUnaryExpression) {
+        // smartcast to enum
+        if (ts.isNumericLiteral(expression.operand)) {
+            const type = this.context.typeChecker.getContextualType(expression);
+            if (type && this.context.isEnum(type)) {
+                const enumAccess = this._tryCreateEnumAccess(parent, type, expression);
+                if (enumAccess) {
+                    return enumAccess;
+                }
+            }
+        }
+
         const csExpr = {
             parent: parent,
             tsNode: expression,
@@ -2830,6 +2832,33 @@ export default class CSharpAstTransformer {
         }
 
         return csExpr;
+    }
+    private _tryCreateEnumAccess(parent: cs.Node, type: ts.Type, expression: ts.Expression) {
+        const enumValue = Number.parseInt(expression.getText(), 10);
+        const enumMember = (type as ts.UnionType).types.find(t => (t as ts.NumberLiteralType).value === enumValue);
+        if (enumMember) {
+            const access = {
+                nodeType: cs.SyntaxKind.MemberAccessExpression,
+                parent: parent,
+                expression: null!,
+                tsSymbol: enumMember.symbol,
+                member: this.context.toPropertyName(enumMember.symbol.name)
+            } as cs.MemberAccessExpression;
+
+            const identifier = {
+                parent: access,
+                tsNode: expression,
+                tsSymbol: type.symbol,
+                nodeType: cs.SyntaxKind.Identifier,
+                text: ''
+            } as cs.Identifier;
+
+            identifier.text = type.symbol.name;
+            access.expression = identifier;
+
+            return access;
+        }
+        return undefined;
     }
 
     public wrapIntoCastToTargetType(expression: cs.Expression): cs.Expression {
@@ -3666,6 +3695,15 @@ export default class CSharpAstTransformer {
             return this.wrapIntoCastToTargetType(numeric);
         }
 
+        // smartcast to enum
+        const type = this.context.typeChecker.getContextualType(expression);
+        if (type && this.context.isEnum(type)) {
+            const enumAccess = this._tryCreateEnumAccess(parent, type, expression);
+            if (enumAccess) {
+                return enumAccess;
+            }
+        }
+
         return numeric;
     }
 
@@ -3811,6 +3849,7 @@ export default class CSharpAstTransformer {
             let typeArgs = tupleType
                 ? this.context.typeChecker.getTypeArguments(tupleType as ts.TypeReference)
                 : undefined;
+            let isAliasedTuple = false;
 
             if (!typeArgs || typeArgs.length !== expression.elements.length) {
                 // x ? [tuple, type] : undefined
@@ -3831,25 +3870,40 @@ export default class CSharpAstTransformer {
                         parentContextualType?.symbol.name === 'Array' &&
                         !this.context.typeChecker.isTupleType(parentContextualType)
                     ) {
-                        const elementType = this.context.typeChecker.getNonNullableType(
+                        const elementTypeCandidates = [
                             this.context.typeChecker.getTypeArguments(parentContextualType as ts.TypeReference)![0]
+                        ];
+                        elementTypeCandidates.push(
+                            this.context.typeChecker.getNonNullableType(elementTypeCandidates[0])
                         );
-                        if (this.context.typeChecker.isTupleType(elementType)) {
-                            tupleType = elementType;
-                            typeArgs = this.context.typeChecker.getTypeArguments(tupleType as ts.TypeReference);
+                        for (const t of elementTypeCandidates) {
+                            if (this.context.typeChecker.isTupleType(t)) {
+                                tupleType = t;
+                                typeArgs = this.context.typeChecker.getTypeArguments(tupleType as ts.TypeReference);
+                                break;
+                            } else if (t.aliasSymbol) {
+                                tupleType = t;
+                                typeArgs = [];
+                                isAliasedTuple = true;
+                                break;
+                            }
                         }
                     }
                 }
             }
 
-            if (!typeArgs || typeArgs.length !== expression.elements.length) {
-                tupleType = type;
-                typeArgs = this.context.typeChecker.getTypeArguments(tupleType as ts.TypeReference);
-            }
+            if (isAliasedTuple) {
+                csExpr.type = this.createUnresolvedTypeNode(csExpr.type, expression, tupleType);
+            } else {
+                if (!typeArgs || typeArgs.length !== expression.elements.length) {
+                    tupleType = type;
+                    typeArgs = this.context.typeChecker.getTypeArguments(tupleType as ts.TypeReference);
+                }
 
-            (csExpr.type as cs.ArrayTupleNode).types = typeArgs!.map((p, i) =>
-                this.createUnresolvedTypeNode(csExpr.type, expression.elements[i], p)
-            );
+                (csExpr.type as cs.ArrayTupleNode).types = typeArgs!.map((p, i) =>
+                    this.createUnresolvedTypeNode(csExpr.type, expression.elements[i], p)
+                );
+            }
 
             for (const e of expression.elements) {
                 const ex = this.visitExpression(csExpr, e);
@@ -3876,34 +3930,6 @@ export default class CSharpAstTransformer {
             const ex = this.visitExpression(csExpr, e);
             if (ex) {
                 csExpr.values!.push(ex);
-            }
-        }
-
-        return csExpr;
-    }
-    protected createMapEntry(parent: cs.Node, expression: ts.ArrayLiteralExpression): cs.Expression {
-        const csExpr = {
-            parent: parent,
-            tsNode: expression,
-            nodeType: cs.SyntaxKind.NewExpression,
-            type: null!,
-            arguments: []
-        } as cs.NewExpression;
-
-        csExpr.type = {
-            nodeType: cs.SyntaxKind.ArrayTupleNode,
-            parent: csExpr,
-            types: [],
-            isNullable: false
-        } as cs.ArrayTupleNode;
-
-        for (const e of expression.elements) {
-            const ex = this.visitExpression(csExpr, e);
-            if (ex) {
-                (csExpr.type as cs.ArrayTupleNode).types.push(
-                    this.createUnresolvedTypeNode(csExpr.type, e, this.context.typeChecker.getTypeAtLocation(e))
-                );
-                csExpr.arguments.push(ex);
             }
         }
 
@@ -4427,13 +4453,13 @@ export default class CSharpAstTransformer {
         }
 
         const symbol = this.context.typeChecker.getSymbolAtLocation(expression.expression);
+        const isArrayTupleAccessor = this.context.isSymbolArrayTupleInstance(expression.expression);
         let type = symbol
             ? this.context.typeChecker.getTypeOfSymbolAtLocation(symbol!, expression.expression)
             : this.context.typeChecker.getTypeAtLocation(expression.expression);
         if (type) {
             type = this.context.typeChecker.getNonNullableType(type);
         }
-        const isArrayTupleAccessor = type && this.context.typeChecker.isTupleType(type);
         const isArrayAccessor =
             (!isArrayTupleAccessor && !symbol) ||
             (type && type.symbol && !!type.symbol.members?.has(ts.escapeLeadingUnderscores('slice')));

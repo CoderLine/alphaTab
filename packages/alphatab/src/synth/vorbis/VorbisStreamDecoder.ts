@@ -25,12 +25,12 @@
  * SOFTWARE.
  */
 
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import type { VorbisStream } from '@src/synth/vorbis/VorbisStream';
-import type { OggPacket } from '@src/synth/vorbis/OggReader';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { TypeConversions } from '@src/io/TypeConversions';
-import { IntBitReader } from '@src/synth/vorbis/IntBitReader';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import type { VorbisStream } from '@coderline/alphatab/synth/vorbis/VorbisStream';
+import type { OggPacket } from '@coderline/alphatab/synth/vorbis/OggReader';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { TypeConversions } from '@coderline/alphatab/io/TypeConversions';
+import { IntBitReader } from '@coderline/alphatab/synth/vorbis/IntBitReader';
 
 /**
  * @internal

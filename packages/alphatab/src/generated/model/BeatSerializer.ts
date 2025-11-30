@@ -3,33 +3,33 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Beat } from "@src/model/Beat";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { NoteSerializer } from "@src/generated/model/NoteSerializer";
-import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
-import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
-import { BeatStyleSerializer } from "@src/generated/model/BeatStyleSerializer";
-import { Note } from "@src/model/Note";
-import { BendStyle } from "@src/model/BendStyle";
-import { Ottavia } from "@src/model/Ottavia";
-import { Duration } from "@src/model/Duration";
-import { Automation } from "@src/model/Automation";
-import { FadeType } from "@src/model/FadeType";
-import { BrushType } from "@src/model/BrushType";
-import { WhammyType } from "@src/model/WhammyType";
-import { BendPoint } from "@src/model/BendPoint";
-import { VibratoType } from "@src/model/VibratoType";
-import { GraceType } from "@src/model/GraceType";
-import { PickStroke } from "@src/model/PickStroke";
-import { CrescendoType } from "@src/model/CrescendoType";
-import { GolpeType } from "@src/model/GolpeType";
-import { DynamicValue } from "@src/model/DynamicValue";
-import { BeamDirection } from "@src/rendering/utils/BeamDirection";
-import { BeatBeamingMode } from "@src/model/Beat";
-import { WahPedal } from "@src/model/WahPedal";
-import { BarreShape } from "@src/model/BarreShape";
-import { Rasgueado } from "@src/model/Rasgueado";
-import { BeatStyle } from "@src/model/Beat";
+import { Beat } from "@coderline/alphatab/model/Beat";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { NoteSerializer } from "@coderline/alphatab/generated/model/NoteSerializer";
+import { AutomationSerializer } from "@coderline/alphatab/generated/model/AutomationSerializer";
+import { BendPointSerializer } from "@coderline/alphatab/generated/model/BendPointSerializer";
+import { BeatStyleSerializer } from "@coderline/alphatab/generated/model/BeatStyleSerializer";
+import { Note } from "@coderline/alphatab/model/Note";
+import { BendStyle } from "@coderline/alphatab/model/BendStyle";
+import { Ottavia } from "@coderline/alphatab/model/Ottavia";
+import { Duration } from "@coderline/alphatab/model/Duration";
+import { Automation } from "@coderline/alphatab/model/Automation";
+import { FadeType } from "@coderline/alphatab/model/FadeType";
+import { BrushType } from "@coderline/alphatab/model/BrushType";
+import { WhammyType } from "@coderline/alphatab/model/WhammyType";
+import { BendPoint } from "@coderline/alphatab/model/BendPoint";
+import { VibratoType } from "@coderline/alphatab/model/VibratoType";
+import { GraceType } from "@coderline/alphatab/model/GraceType";
+import { PickStroke } from "@coderline/alphatab/model/PickStroke";
+import { CrescendoType } from "@coderline/alphatab/model/CrescendoType";
+import { GolpeType } from "@coderline/alphatab/model/GolpeType";
+import { DynamicValue } from "@coderline/alphatab/model/DynamicValue";
+import { BeamDirection } from "@coderline/alphatab/rendering/utils/BeamDirection";
+import { BeatBeamingMode } from "@coderline/alphatab/model/Beat";
+import { WahPedal } from "@coderline/alphatab/model/WahPedal";
+import { BarreShape } from "@coderline/alphatab/model/BarreShape";
+import { Rasgueado } from "@coderline/alphatab/model/Rasgueado";
+import { BeatStyle } from "@coderline/alphatab/model/Beat";
 /**
  * @internal
  */

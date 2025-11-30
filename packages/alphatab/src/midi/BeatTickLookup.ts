@@ -1,4 +1,4 @@
-import type { Beat } from '@src/model/Beat';
+import type { Beat } from '@coderline/alphatab/model/Beat';
 
 /**
  * Represents a beat and when it is actually played according to the generated audio.

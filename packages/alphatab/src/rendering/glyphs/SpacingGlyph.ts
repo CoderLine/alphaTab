@@ -1,4 +1,4 @@
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 
 /**
  * This simple glyph allows to put an empty region in to a BarRenderer.

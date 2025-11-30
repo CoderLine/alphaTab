@@ -3,12 +3,12 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { EngravingSettings } from "@src/EngravingSettings";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { EngravingStemInfoSerializer } from "@src/generated/EngravingStemInfoSerializer";
-import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
-import { EngravingStemInfo } from "@src/EngravingSettings";
-import { Duration } from "@src/model/Duration";
+import { EngravingSettings } from "@coderline/alphatab/EngravingSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { EngravingStemInfoSerializer } from "@coderline/alphatab/generated/EngravingStemInfoSerializer";
+import { MusicFontSymbol } from "@coderline/alphatab/model/MusicFontSymbol";
+import { EngravingStemInfo } from "@coderline/alphatab/EngravingSettings";
+import { Duration } from "@coderline/alphatab/model/Duration";
 /**
  * @internal
  */

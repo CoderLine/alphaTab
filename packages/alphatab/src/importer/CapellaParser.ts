@@ -1,31 +1,31 @@
-import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { AccentuationType } from '@src/model/AccentuationType';
-import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar, BarLineStyle } from '@src/model/Bar';
-import { Beat, BeatBeamingMode } from '@src/model/Beat';
-import { Chord } from '@src/model/Chord';
-import { Clef } from '@src/model/Clef';
-import { CrescendoType } from '@src/model/CrescendoType';
-import { Duration } from '@src/model/Duration';
-import { MasterBar } from '@src/model/MasterBar';
-import { Note } from '@src/model/Note';
-import { Score } from '@src/model/Score';
-import type { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { VibratoType } from '@src/model/VibratoType';
-import { Voice } from '@src/model/Voice';
-import type { Settings } from '@src/Settings';
-import { XmlDocument } from '@src/xml/XmlDocument';
+import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
+import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
+import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
+import { Bar, BarLineStyle } from '@coderline/alphatab/model/Bar';
+import { Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { Chord } from '@coderline/alphatab/model/Chord';
+import { Clef } from '@coderline/alphatab/model/Clef';
+import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { Note } from '@coderline/alphatab/model/Note';
+import { Score } from '@coderline/alphatab/model/Score';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import { Track } from '@coderline/alphatab/model/Track';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import { Voice } from '@coderline/alphatab/model/Voice';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 
-import type { XmlNode } from '@src/xml/XmlNode';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { TextAlign } from '@src/platform/ICanvas';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { Logger } from '@src/Logger';
-import { Fermata, FermataType } from '@src/model/Fermata';
-import { DynamicValue } from '@src/model/DynamicValue';
-import { Ottavia } from '@src/model/Ottavia';
-import type { KeySignature } from '@src/model/KeySignature';
+import type { XmlNode } from '@coderline/alphatab/xml/XmlNode';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { Logger } from '@coderline/alphatab/Logger';
+import { Fermata, FermataType } from '@coderline/alphatab/model/Fermata';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
 
 /**
  * @internal

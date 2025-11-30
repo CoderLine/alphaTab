@@ -1,13 +1,13 @@
-import { AlphaSynth, type IAlphaSynthAudioExporter } from '@src/synth/AlphaSynth';
-import type { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
-import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
-import { JsonConverter } from '@src/model/JsonConverter';
-import { AlphaSynthWorkerSynthOutput } from '@src/platform/javascript/AlphaSynthWorkerSynthOutput';
-import type { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
-import { Logger } from '@src/Logger';
-import { Environment } from '@src/Environment';
-import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
+import { AlphaSynth, type IAlphaSynthAudioExporter } from '@coderline/alphatab/synth/AlphaSynth';
+import type { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerStateChangedEventArgs';
+import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { AlphaSynthWorkerSynthOutput } from '@coderline/alphatab/platform/javascript/AlphaSynthWorkerSynthOutput';
+import type { IWorkerScope } from '@coderline/alphatab/platform/javascript/IWorkerScope';
+import { Logger } from '@coderline/alphatab/Logger';
+import { Environment } from '@coderline/alphatab/Environment';
+import type { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
+import type { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/PlaybackRangeChangedEventArgs';
 
 /**
  * This class implements a HTML5 WebWorker based version of alphaSynth

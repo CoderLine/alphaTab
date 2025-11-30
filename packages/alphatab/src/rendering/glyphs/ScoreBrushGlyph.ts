@@ -1,12 +1,12 @@
-import type { Beat } from '@src/model/Beat';
-import { BrushType } from '@src/model/BrushType';
-import { VibratoType } from '@src/model/VibratoType';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
-import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { NoteYPosition } from '@src/rendering/BarRendererBase';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { BrushType } from '@coderline/alphatab/model/BrushType';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * @internal

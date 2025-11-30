@@ -1,16 +1,16 @@
-import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { AutomationType } from '@src/model/Automation';
-import { BeatBeamingMode } from '@src/model/Beat';
-import { Direction } from '@src/model/Direction';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { ScoreSubElement } from '@src/model/Score';
-import { TextAlign } from '@src/platform/ICanvas';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { Settings } from '@src/Settings';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
-import { TestPlatform } from '@test/TestPlatform';
+import { Gp7To8Importer } from '@coderline/alphatab/importer/Gp7To8Importer';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { AutomationType } from '@coderline/alphatab/model/Automation';
+import { BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { Direction } from '@coderline/alphatab/model/Direction';
+import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@coderline/alphatab/model/RenderStylesheet';
+import { ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { Settings } from '@coderline/alphatab/Settings';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
+import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
 
 describe('Gp8ImporterTest', () => {

@@ -1,15 +1,15 @@
-import { MidiUtils } from '@src/midi/MidiUtils';
-import type { Automation } from '@src/model/Automation';
-import type { Beat } from '@src/model/Beat';
-import type { Fermata } from '@src/model/Fermata';
-import type { Bar } from '@src/model/Bar';
-import type { KeySignature } from '@src/model/KeySignature';
-import type { KeySignatureType } from '@src/model/KeySignatureType';
-import type { RepeatGroup } from '@src/model/RepeatGroup';
-import type { Score } from '@src/model/Score';
-import type { Section } from '@src/model/Section';
-import { TripletFeel } from '@src/model/TripletFeel';
-import type { Direction } from '@src/model/Direction';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import type { Automation } from '@coderline/alphatab/model/Automation';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Fermata } from '@coderline/alphatab/model/Fermata';
+import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import type { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
+import type { RepeatGroup } from '@coderline/alphatab/model/RepeatGroup';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { Section } from '@coderline/alphatab/model/Section';
+import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
+import type { Direction } from '@coderline/alphatab/model/Direction';
 
 /**
  * The MasterBar stores information about a bar which affects

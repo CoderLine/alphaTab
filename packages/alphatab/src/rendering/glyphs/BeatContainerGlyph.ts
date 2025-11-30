@@ -1,20 +1,20 @@
-import type { Beat } from '@src/model/Beat';
-import { Duration } from '@src/model/Duration';
-import { GraceType } from '@src/model/GraceType';
-import type { Note } from '@src/model/Note';
-import type { ICanvas } from '@src/platform/ICanvas';
-import type { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import type { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
-import type { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
-import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import type { BarBounds } from '@src/rendering/utils/BarBounds';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import type { Note } from '@coderline/alphatab/model/Note';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
+import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
+import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
+import { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 
 /**
  * @internal

@@ -3,8 +3,8 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { EngravingStemInfo } from "@src/EngravingSettings";
-import { JsonHelper } from "@src/io/JsonHelper";
+import { EngravingStemInfo } from "@coderline/alphatab/EngravingSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 /**
  * @internal
  */

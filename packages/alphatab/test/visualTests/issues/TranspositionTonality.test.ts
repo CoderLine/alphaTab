@@ -1,8 +1,8 @@
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { LayoutMode } from '@src/LayoutMode';
-import { Settings } from '@src/Settings';
-import { TestPlatform } from '@test/TestPlatform';
-import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { Settings } from '@coderline/alphatab/Settings';
+import { TestPlatform } from 'test/TestPlatform';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
 
 describe('TranspositionTonality', () => {
     it('renders-correctly', async () => {

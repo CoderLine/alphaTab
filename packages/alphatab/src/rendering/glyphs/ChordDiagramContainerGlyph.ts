@@ -1,9 +1,9 @@
-import type { Chord } from '@src/model/Chord';
-import type { ICanvas } from '@src/platform/ICanvas';
-import { ChordDiagramGlyph } from '@src/rendering/glyphs/ChordDiagramGlyph';
-import { RowContainerGlyph } from '@src/rendering/glyphs/RowContainerGlyph';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { ScoreSubElement } from '@src/model/Score';
+import type { Chord } from '@coderline/alphatab/model/Chord';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { ChordDiagramGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramGlyph';
+import { RowContainerGlyph } from '@coderline/alphatab/rendering/glyphs/RowContainerGlyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { ScoreSubElement } from '@coderline/alphatab/model/Score';
 
 /**
  * @internal

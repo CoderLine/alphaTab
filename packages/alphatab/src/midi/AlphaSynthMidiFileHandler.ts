@@ -9,11 +9,11 @@ import {
     ProgramChangeEvent,
     TempoChangeEvent,
     TimeSignatureEvent
-} from '@src/midi/MidiEvent';
-import type { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
-import { type MidiFile, MidiFileFormat } from '@src/midi/MidiFile';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import type { ControllerType } from '@src/midi/ControllerType';
+} from '@coderline/alphatab/midi/MidiEvent';
+import type { IMidiFileHandler } from '@coderline/alphatab/midi/IMidiFileHandler';
+import { type MidiFile, MidiFileFormat } from '@coderline/alphatab/midi/MidiFile';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import type { ControllerType } from '@coderline/alphatab/midi/ControllerType';
 
 /**
  * This implementation of the {@link IMidiFileHandler}

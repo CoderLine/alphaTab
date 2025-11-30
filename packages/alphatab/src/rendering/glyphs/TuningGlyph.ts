@@ -1,10 +1,10 @@
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { Tuning } from '@src/model/Tuning';
-import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
-import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import type { Color } from '@src/model/Color';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
+import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import type { Color } from '@coderline/alphatab/model/Color';
 
 /**
  * @internal

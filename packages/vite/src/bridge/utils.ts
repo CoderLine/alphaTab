@@ -1,9 +1,12 @@
 // index.ts for more details on contents and license of this file
 
-import * as fs from 'node:fs';
+import fs from 'node:fs';
 import { createHash } from 'node:crypto';
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L1302
+/**
+ * @internal
+ */
 export function evalValue<T = unknown>(rawValue: string): T {
     const fn = new Function(`
         var console, exports, global, module, process, require
@@ -14,11 +17,18 @@ export function evalValue<T = unknown>(rawValue: string): T {
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/shared/utils.ts#L31-L34
 const postfixRE = /[?#].*$/;
+
+/**
+ * @internal
+ */
 export function cleanUrl(url: string): string {
     return url.replace(postfixRE, '');
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L393
+/**
+ * @internal
+ */
 export function tryStatSync(file: string) {
     try {
         // The "throwIfNoEntry" is a performance optimization for cases where the file does not exist
@@ -30,6 +40,9 @@ export function tryStatSync(file: string) {
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L1030
+/**
+ * @internal
+ */
 export function getHash(text: Buffer | string, length = 8): string {
     const h = createHash('sha256').update(text).digest('hex').substring(0, length);
     if (length <= 64) {
@@ -39,6 +52,9 @@ export function getHash(text: Buffer | string, length = 8): string {
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/shared/utils.ts#L40
+/**
+ * @internal
+ */
 export function withTrailingSlash(path: string): string {
     if (path[path.length - 1] !== '/') {
         return `${path}/`;
@@ -47,6 +63,9 @@ export function withTrailingSlash(path: string): string {
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L1268
+/**
+ * @internal
+ */
 export function joinUrlSegments(a: string, b: string): string {
     if (!a || !b) {
         return a || b || '';
@@ -61,17 +80,26 @@ export function joinUrlSegments(a: string, b: string): string {
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L1281
+/**
+ * @internal
+ */
 export function removeLeadingSlash(str: string): string {
     return str[0] === '/' ? str.slice(1) : str;
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L319
+/**
+ * @internal
+ */
 export function injectQuery(builtUrl: string, query: string): string {
     const queryIndex = builtUrl.indexOf('?');
     return builtUrl + (queryIndex === -1 ? '?' : '&') + query;
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L1435
+/**
+ * @internal
+ */
 export function partialEncodeURIPath(uri: string): string {
     if (uri.startsWith('data:')) {
         return uri;
@@ -82,6 +110,9 @@ export function partialEncodeURIPath(uri: string): string {
 }
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L1424
+/**
+ * @internal
+ */
 export function encodeURIPath(uri: string): string {
     if (uri.startsWith('data:')) {
         return uri;

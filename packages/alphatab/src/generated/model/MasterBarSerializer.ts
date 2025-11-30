@@ -3,16 +3,16 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { MasterBar } from "@src/model/MasterBar";
-import { JsonHelper } from "@src/io/JsonHelper";
-import { SectionSerializer } from "@src/generated/model/SectionSerializer";
-import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
-import { FermataSerializer } from "@src/generated/model/FermataSerializer";
-import { TripletFeel } from "@src/model/TripletFeel";
-import { Section } from "@src/model/Section";
-import { Automation } from "@src/model/Automation";
-import { Fermata } from "@src/model/Fermata";
-import { Direction } from "@src/model/Direction";
+import { MasterBar } from "@coderline/alphatab/model/MasterBar";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { SectionSerializer } from "@coderline/alphatab/generated/model/SectionSerializer";
+import { AutomationSerializer } from "@coderline/alphatab/generated/model/AutomationSerializer";
+import { FermataSerializer } from "@coderline/alphatab/generated/model/FermataSerializer";
+import { TripletFeel } from "@coderline/alphatab/model/TripletFeel";
+import { Section } from "@coderline/alphatab/model/Section";
+import { Automation } from "@coderline/alphatab/model/Automation";
+import { Fermata } from "@coderline/alphatab/model/Fermata";
+import { Direction } from "@coderline/alphatab/model/Direction";
 /**
  * @internal
  */
