@@ -51,7 +51,7 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCod
             },
             seekTo(time) {
                 if (audio.current) {
-                    audio.current.currentTime = time / 1000;
+                    audio.current.currentTime = (time * audio.current.playbackRate) / 1000;
                 }
             },
             play() {
@@ -69,7 +69,7 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCod
         // handlers for audio tag -> alphaTab updates
         const onTimeUpdate = () => {
             (newApi!.player!.output as alphaTab.synth.IExternalMediaSynthOutput).updatePosition(
-                audio.current!.currentTime * 1000
+                (audio.current!.currentTime / audio.current!.playbackRate) * 1000
             );
         }
 
@@ -153,7 +153,7 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCod
                 "        audio.volume = value;",
                 "    },",
                 "    seekTo(time) {",
-                "        audio.currentTime = time / 1000;",
+                "        audio.currentTime = (time * audio.playbackRate) / 1000;",
                 "    },",
                 "    play() {",
                 "        audio.play();",
@@ -168,7 +168,7 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCod
                 "// handlers for audio tag -> alphaTab updates",
                 "const onTimeUpdate = () => {",
                 "    (api.player!.output as alphaTab.synth.IExternalMediaSynthOutput).updatePosition(",
-                "        audio.currentTime * 1000",
+                "        (audio.currentTime / audio.playbackRate) * 1000",
                 "    );",
                 "}",
                 "",
