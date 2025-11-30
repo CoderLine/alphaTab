@@ -25,6 +25,10 @@ jobs:
         working-directory: ./packages/vite/
       - run: npm pack
         working-directory: ./packages/webpack/
+      - run: npm pack
+        working-directory: ./packages/lsp/
+      - run: npm pack
+        working-directory: ./packages/monaco/
       - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
@@ -39,9 +43,14 @@ jobs:
         working-directory: ./packages/vite/
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-      - name: Publish to NPM (WebPack Plugin release)
+      - name: Publish to NPM (Language Server release)
         run: npm publish --access public
-        working-directory: ./packages/webpack/
+        working-directory: ./packages/lsp/
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+      - name: Publish to NPM (Monaco release)
+        run: npm publish --access public
+        working-directory: ./packages/monaco/
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
 

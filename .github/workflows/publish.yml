@@ -43,6 +43,10 @@ jobs:
         working-directory: ./packages/vite/
       - run: npm pack
         working-directory: ./packages/webpack/
+      - run: npm pack
+        working-directory: ./packages/lsp/
+      - run: npm pack
+        working-directory: ./packages/monaco/
 
       - uses: actions/setup-node@v6
         with:
@@ -61,6 +65,16 @@ jobs:
 
       - run: npm publish --access public --tag alpha
         working-directory: ./packages/webpack/
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+
+      - run: npm publish --access public --tag alpha
+        working-directory: ./packages/lsp/
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+
+      - run: npm publish --access public --tag alpha
+        working-directory: ./packages/monaco/
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
 
