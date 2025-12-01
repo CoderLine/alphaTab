@@ -10,6 +10,16 @@
     flex-grow: 1;
 }
 
+[data-theme="light"] .at-wrap {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #fff;
+}
+
+[data-theme="dark"] .at-wrap {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #1b1b1d;
+}
+
 .at-content {
     flex: 1 1 auto;
     overflow: hidden;
@@ -46,6 +56,14 @@
     background: #fff;
     box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.3);
     padding: 10px;
+}
+
+[data-theme="light"] .at-overlay-content {
+    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .at-overlay-content {
+    box-shadow: 0px 5px 10px 0px rgba(255, 255, 255, 0.3);
 }
 
 .at-overlay-content>.spinner-border {
@@ -205,6 +223,11 @@
     }
 }
 
+[data-theme="dark"] .at-settings {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #242526;
+}
+
 .at-settings-close {
     position: absolute;
     top: 0.5rem;
@@ -225,6 +248,16 @@
         background: #ebedf0;
     }
 }
+
+[data-theme="dark"] .at-settings {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #242526;
+
+    &>.track-item:nth-child(even) {
+        background: rgb(48 48 49);
+    }
+}
+
 
 .track-item {
     &>.settings-item:not(.track-item-info) {
@@ -455,6 +488,11 @@
     }
 }
 
+
+[data-theme="dark"] .media-sync-editor {
+    background: #242526;
+}
+
 .video {
     position: absolute;
     right: 1rem;
@@ -581,6 +619,26 @@
         }
     }
 }
+
+[data-theme="dark"] .sync-area-marker-wrap {
+    &>.masterbar-marker {
+        &>.marker-head {
+            &>.marker-arrow {
+                background: #242526;
+
+                &::after {
+                    background: #a3b9d0;
+                }
+
+            }
+
+            &>.marker-tempo {
+                background: #242526;
+            }
+        }
+    }
+}
+
 
 .modal {
     position: absolute;

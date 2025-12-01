@@ -84,7 +84,7 @@ The repository has a set of NPM scripts that take over actions like compiling an
 #### Web
 
 * `build` - compiles a web version of alphaTab using the current code state
-* `start` - used during development time to build alphaTab quickly via watchers and incremental compilation
+* `dev` - used during development time to build alphaTab quickly via watchers and incremental compilation
 * `test` - Runs the unit test suite in Chrome
 
 #### C#/.net
@@ -98,79 +98,3 @@ The repository has a set of NPM scripts that take over actions like compiling an
 * `generate-kotlin` - Translates the TypeScript codebase to Kotlin
 * `build-kotlin` - compiles a Kotlin version of alphaTab using the current code state
 * `test-kotlin` - runs the unit test suite for Kotlin
-
-### Project Structure
-
-- **dist/**
-
-  Contains the compile output. 
-
-- **font/**
-
-  Contains the text and sound fonts that alphaTab needs for operation.
-
-- **img/**
-
-  Contains some images for the repository.
-
-- **node_modules/**
-
-  Contains the downloaded NPM dependencies needed during development time. 
-
-- **playground-template/**
-
-  Contains a template for the local playground to use during development time. It contains some sample files which 
-  can be opened in the browser for testing. 
-
-- **scripts/**
-
-  Contains scripts for the continuous integration. 
-
-- **src/**
-
-  Contains the main source code of alphaTab.
-
-- **src.compiler/**
-
-  Contains the special source code which extends the TypeScript compiler. The whole TypeScript to C#/Kotlin compiler lives here but also 
-  some scripts which generate things like the JSON serializer. 
-
-- **src.csharp/**
- 
-  Contains the C# specific source code which is needed on top of the generated code from TypeScript.
-
-- **src.kotlin/**
- 
-  Contains the Kotlin specific source code which is needed on top of the generated code from TypeScript. 
-
-- **test/**
-
-  Contains the source code related to automated tests (unit tests, integration tests, visual regression tests, ...).
-
-- **test-data/**
-
-  Contains all files needed during the tests. 
-
-- **rollup.config.&lt;variant&gt;.ts**
-
-  These are the rollup configurations for the different outputs we bundle. 
-  
-- **rollup.plugin.resolve.js**
-
-  A custom rollup plugin to handle module resolving. 
-
-- **rollup.plugin.server.js**
-
-  A custom rollup plugin to handle hosting the playground. 
-
-- **tsconfig.base.json**
-
-  The main tsconfig valid for all compilations.
-
-- **tsconfig.build.json**
-
-  The tsconfig which produces the production output (no tests).
-
-- **tsconfig.json**
-
-  The tsconfig used during development and testing containing the main sources and tests.
