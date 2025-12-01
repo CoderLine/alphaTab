@@ -1,5 +1,4 @@
 import { defaultClientMainFields, defineConfig } from 'vite';
-import type { OutputOptions } from 'rollup';
 import { defaultBuildUserConfig, dtsPathsTransformer, esm } from '../tooling/src/vite';
 
 export default defineConfig(() => {
