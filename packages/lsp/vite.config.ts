@@ -15,9 +15,5 @@ export default defineConfig(() => {
         }
     });
     (config.build!.rollupOptions!.external as (RegExp | string)[]).push('@coderline/alphatab');
-    const output = config.build!.rollupOptions!.output as OutputOptions[];
-    for (const o of output) {
-        o.banner = '#!/usr/bin/env node';
-    }
     return config;
 });
