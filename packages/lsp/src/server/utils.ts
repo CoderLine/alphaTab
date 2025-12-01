@@ -1,5 +1,6 @@
 import * as alphaTab from '@coderline/alphatab';
 import type { ParameterDefinition, SignatureDefinition } from '@coderline/alphatab-alphatex/types';
+import { ClientCapabilities } from 'vscode-languageserver';
 
 function binaryNodeSearchInner<T extends alphaTab.importer.alphaTex.AlphaTexAstNode>(
     items: T[],
@@ -109,3 +110,7 @@ export function nodeTypesToTypeDocs(parameter: ParameterDefinition) {
 
     return p;
 }
+
+export type ConnectionInfo = {
+    clientCapabilities?: ClientCapabilities;
+};

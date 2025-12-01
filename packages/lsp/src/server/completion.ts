@@ -433,9 +433,15 @@ function createArgumentCompletions(
     if (actualValues) {
         const value = binaryNodeSearch(actualValues.arguments, offset, trailingEnd);
         if (value?.parameterIndices) {
+            const isNextParameter =  offset > value.end!.offset;
+
             const signatureCandidates = resolveSignature(signatures, actualValues);
             for (const [k, v] of signatureCandidates) {
-                const parameterIndex = value.parameterIndices.get(k);
+                let parameterIndex = value.parameterIndices.get(k);
+                if(parameterIndex !== undefined  && isNextParameter && parameterIndex < v.parameters.length - 1) {
+                    parameterIndex++;
+                }
+
                 const values = parameterIndex !== undefined ? v.parameters[parameterIndex].values : undefined;
                 if (values) {
                     return values.map(i =>

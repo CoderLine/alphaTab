@@ -27,12 +27,7 @@ export function setupDiagnostics(connection: Connection, documents: TextDocument
     });
 
     documents.onDidChangeContent(async change => {
-        const diagnostics = await validateTextDocument(change.document);
-        connection.sendDiagnostics({
-            diagnostics: diagnostics,
-            uri: change.document.uri,
-            version: change.document.version
-        });
+        await validateTextDocument(change.document);
     });
 }
 
@@ -110,6 +105,7 @@ async function validateTextDocument(textDocument: AlphaTexTextDocument): Promise
 
     const importer = new alphaTab.importer.AlphaTexImporter();
     importer.initFromString(text, new alphaTab.Settings());
+    importer.parser!.mode = alphaTab.importer.alphaTex.AlphaTexParseMode.Full;
     try {
         textDocument.score = importer.readScore();
         textDocument.ast = importer.scoreNode;

@@ -212,20 +212,36 @@ function withSignaturesToMarkdown(docs: WithSignatures, prefix: string, syntaxNa
 }
 
 function signatureParametersToMarkdownTable(signatures: SignatureDefinition[]): string {
-    return signatures.length === 0 || (signatures.length === 1 && signatures[0].parameters.length === 0)
-        ? ''
-        : [
-              '',
-              '**Parameters:**',
-              '| Name | Description | Type | Required |',
-              '|------|-------------|------|----------|',
-              ...signatures.flatMap((s, si) =>
-                  s.parameters.map(v => {
-                      const index = signatures.length > 1 ? `[^${si + 1}] ` : '';
-                      return `| \`${v.name}\` ${index}| ${(v.longDescription ?? v.shortDescription)?.replaceAll('\n', '<br />') ?? ''} | \`${nodeTypesToSyntax(v).replaceAll('|', '\\|')}\` | ${isRequiredParameter(v.parseMode) ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`;
-                  })
-              )
-          ].join('\n');
+    if (signatures.length === 0 || (signatures.length === 1 && signatures[0].parameters.length === 0)) {
+        return '';
+    }
+
+    const hasOverloads = signatures.length > 1;
+    if (hasOverloads) {
+        return [
+            '',
+            '**Parameters:**',
+            '| Overload | Name | Description | Type | Required |',
+            '|----------|------|-------------|------|----------|',
+            ...signatures.flatMap((s, si) =>
+                s.parameters.map(v => {
+                    return `| \`[${si + 1}]\` | \`${v.name}\` | ${(v.longDescription ?? v.shortDescription)?.replaceAll('\n', '<br />') ?? ''} | \`${nodeTypesToSyntax(v).replaceAll('|', '\\|')}\` | ${isRequiredParameter(v.parseMode) ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`;
+                })
+            )
+        ].join('\n');
+    } else {
+        return [
+            '',
+            '**Parameters:**',
+            '| Name | Description | Type | Required |',
+            '|------|-------------|------|----------|',
+            ...signatures.flatMap(s =>
+                s.parameters.map(v => {
+                    return `| \`${v.name}\` | ${(v.longDescription ?? v.shortDescription)?.replaceAll('\n', '<br />') ?? ''} | \`${nodeTypesToSyntax(v).replaceAll('|', '\\|')}\` | ${isRequiredParameter(v.parseMode) ? 'yes' : 'no'} ${v.defaultValue ?? ''} |`;
+                })
+            )
+        ].join('\n');
+    }
 }
 
 function parameterValueDocsToMarkDown(docs: ParameterValueDefinition): string {
@@ -236,14 +252,13 @@ function signatureToSyntax(prefix: string, value: SignatureDefinition, index: nu
     let syntax = '';
 
     if (hasOverloads) {
-        syntax += `// [^${index + 1}]: ${value.description}\n`;
+        syntax += `// [${index + 1}]: ${value.description ?? ''}\n`;
     } else if (value.description) {
         syntax += `//  ${value.description}\n`;
     }
 
-
     syntax += prefix;
-    if(value.parameters.length > 0) {
+    if (value.parameters.length > 0) {
         syntax += `(${value.parameters.map(p => parameterToSyntax(p, true)).join(' ')})`;
     }
 

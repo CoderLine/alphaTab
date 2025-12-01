@@ -1,4 +1,5 @@
 import { defaultClientMainFields, defineConfig } from 'vite';
+import type { OutputOptions } from 'rollup';
 import { defaultBuildUserConfig, dtsPathsTransformer, esm } from '../tooling/src/vite';
 
 export default defineConfig(() => {
@@ -10,12 +11,13 @@ export default defineConfig(() => {
     esm(config, import.meta.dirname, 'server', 'src/index.ts', {
         module: 'preserve',
         transformers: {
-            afterDeclarations: [
-                dtsPathsTransformer()
-            ]
+            afterDeclarations: [dtsPathsTransformer()]
         }
     });
     (config.build!.rollupOptions!.external as (RegExp | string)[]).push('@coderline/alphatab');
-
+    const output = config.build!.rollupOptions!.output as OutputOptions[];
+    for (const o of output) {
+        o.banner = '#!/usr/bin/env node';
+    }
     return config;
 });
