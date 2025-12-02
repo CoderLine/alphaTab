@@ -10,5 +10,10 @@
       "DOM",
       "ES2024.Promise"
     ]
-  }
+  },
+  "include": [
+    "*.ts",
+    "src/",
+    "scripts/",
+  ]
 }

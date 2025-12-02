@@ -41,6 +41,9 @@ async function generatePropertiesDocs(file: string, props: Map<string, PropertyD
 
 
     for (const t of props.values()) {
+        if (t.deprecated) {
+            return;
+        }
         await writePropertyDocs(stream, t);
     }
 }
@@ -53,6 +56,9 @@ async function generateMetaDataDocs(file: string, meta: Map<string, MetadataTagD
     await stream.writeLine();
 
     for (const t of meta.values()) {
+        if (t.deprecated) {
+            return;
+        }
         await writeMetaDataDocs(stream, t);
     }
 }
