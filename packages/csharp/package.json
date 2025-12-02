@@ -1,6 +1,6 @@
 {
     "name": "@coderline/alphatab-csharp",
-    "version": "1.7.0",
+    "version": "1.7.1",
     "description": "The C# target of alphaTab.",
     "private": true,
     "type": "module",

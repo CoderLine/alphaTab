@@ -1,6 +1,6 @@
 {
     "name": "alphatab-vscode",
-    "version": "1.7.0",
+    "version": "1.7.1",
     "private": true,
     "description": "A Visual Studio Code extension for alphaTab providing coding assistance for alphaTex.",
     "keywords": [

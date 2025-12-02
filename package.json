@@ -1,6 +1,6 @@
 {
     "name": "@coderline/alphatab-monorepo",
-    "version": "1.7.0",
+    "version": "1.7.1",
     "description": "Monorepo for alphaTab and its related packages",
     "private": true,
     "type": "module",

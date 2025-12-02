@@ -1,6 +1,6 @@
 {
     "name": "@coderline/alphatab-kotlin",
-    "version": "1.7.0",
+    "version": "1.7.1",
     "description": "The Kotlin target of alphaTab.",
     "private": true,
     "type": "module",
