@@ -1,0 +1,204 @@
+import { BarSubElement } from '@coderline/alphatab/model/Bar';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { ScoreNoteGlyphInfo } from '@coderline/alphatab/rendering/glyphs/ScoreNoteGlyphInfo';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+
+/**
+ * @internal
+ */
+export abstract class ScoreNoteChordGlyphBase extends Glyph {
+    private _infos: ScoreNoteGlyphInfo[] = [];
+
+    public minNote: ScoreNoteGlyphInfo | null = null;
+    public maxNote: ScoreNoteGlyphInfo | null = null;
+    public upLineX: number = 0;
+    public downLineX: number = 0;
+    public noteStartX: number = 0;
+
+    public constructor() {
+        super(0, 0);
+    }
+
+    public abstract get direction(): BeamDirection;
+    public abstract get scale(): number;
+
+    public getLowestNoteY(): number {
+        return this.maxNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.maxNote.steps) : 0;
+    }
+
+    public getHighestNoteY(): number {
+        return this.minNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.minNote.steps) : 0;
+    }
+
+    protected add(noteGlyph: MusicFontGlyph, noteLine: number): void {
+        const info: ScoreNoteGlyphInfo = new ScoreNoteGlyphInfo(noteGlyph, noteLine);
+        this._infos.push(info);
+        if (!this.minNote || this.minNote.steps > info.steps) {
+            this.minNote = info;
+        }
+        if (!this.maxNote || this.maxNote.steps < info.steps) {
+            this.maxNote = info;
+        }
+    }
+
+    public override doLayout(): void {
+        this._infos.sort((a, b) => {
+            return b.steps - a.steps;
+        });
+        let stemUpX: number = 0;
+        let stemDownX: number = 0;
+        let lastDisplaced: boolean = true;
+        let lastStep: number = 0;
+        let anyDisplaced = false;
+        const direction: BeamDirection = this.direction;
+
+        // first get stem position on the right side (displacedX)
+        // to align all note heads accordingly (they might have different widths)
+        const smufl = this.renderer.smuflMetrics;
+        const scale = this.scale;
+        const displaced = new Map<number, boolean>();
+        for (let i: number = 0, j: number = this._infos.length; i < j; i++) {
+            const g = this._infos[i].glyph;
+            g.renderer = this.renderer;
+            g.doLayout();
+
+            if (i > 0 && Math.abs(lastStep - this._infos[i].steps) <= 1) {
+                if (!lastDisplaced) {
+                    anyDisplaced = true;
+                    lastDisplaced = true;
+                    displaced.set(i, true);
+                } else {
+                    lastDisplaced = false;
+                    displaced.set(i, false);
+                }
+            } else {
+                lastDisplaced = false;
+                displaced.set(i, false);
+            }
+
+            if (smufl.stemUp.has(g.symbol)) {
+                const stemInfo = smufl.stemUp.get(g.symbol)!;
+                const topX = stemInfo.x * scale;
+                if (topX > stemUpX) {
+                    stemUpX = topX;
+                }
+            } else {
+                const topX = smufl.glyphWidths.get(g.symbol)! * scale;
+                if (topX > stemUpX) {
+                    stemUpX = topX;
+                }
+            }
+
+            if (smufl.stemDown.has(g.symbol)) {
+                const stemInfo = smufl.stemDown.get(g.symbol)!;
+                const topX = stemInfo.x * scale;
+                if (topX > stemDownX) {
+                    const diff = topX - stemDownX;
+                    stemDownX = topX;
+                    stemUpX += diff; // shift right accordingly
+                }
+            }
+
+            lastStep = this._infos[i].steps;
+        }
+
+        // align all notes so that they align with the stem positions
+
+        const stemPosition = anyDisplaced || direction === BeamDirection.Up ? stemUpX : stemDownX;
+
+        let w: number = 0;
+        for (let i: number = 0, j: number = this._infos.length; i < j; i++) {
+            const g = this._infos[i].glyph;
+            const alignDisplaced: boolean = displaced.get(i)!;
+
+            if (alignDisplaced) {
+                // displaced: shift note to stem position
+                g.x = stemPosition;
+                // TODO: shift left?
+            } else {
+                // not displaced: align on left side (where down stem would be for notes)
+                g.x = stemDownX;
+                if (smufl.stemDown.has(g.symbol)) {
+                    g.x -= smufl.stemDown.get(g.symbol)!.x * scale;
+                }
+            }
+
+            g.x += this.noteStartX;
+            w = Math.max(w, g.x + g.width);
+
+            // after size calculation, re-align glyph to stem if needed
+            if (g instanceof NoteHeadGlyph && (g as NoteHeadGlyph).centerOnStem) {
+                g.x = stemPosition;
+            }
+        }
+
+        if (anyDisplaced) {
+            this.upLineX = stemPosition;
+            this.downLineX = stemPosition;
+        } else {
+            this.upLineX = stemUpX;
+            this.downLineX = stemDownX;
+        }
+        this.width = w;
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        cx += this.x;
+        cy += this.y;
+        this._paintLedgerLines(cx, cy, canvas);
+        const infos: ScoreNoteGlyphInfo[] = this._infos;
+        for (const g of infos) {
+            g.glyph.renderer = this.renderer;
+            g.glyph.paint(cx, cy, canvas);
+        }
+    }
+
+    private _paintLedgerLines(cx: number, cy: number, canvas: ICanvas) {
+        if (!this.minNote) {
+            return;
+        }
+
+        const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+
+        using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationStaffLine, scoreRenderer.bar, true);
+
+        const scale = this.scale;
+        const lineExtension: number = this.renderer.smuflMetrics.legerLineExtension * scale;
+        const lineWidth: number = this.width - this.noteStartX + lineExtension * 2;
+
+        const lineSpacing = scoreRenderer.getLineHeight(1);
+        const firstTopLedgerY = scoreRenderer.getLineY(-1);
+        const firstBottomLedgerY = scoreRenderer.getLineY(scoreRenderer.drawnLineCount);
+        const minNoteLineY = scoreRenderer.getLineY(this.minNote!.steps / 2);
+        const maxNoteLineY = scoreRenderer.getLineY(this.maxNote!.steps / 2);
+
+        const lineYOffset = (this.renderer.smuflMetrics.legerLineThickness * scale) / 2;
+
+        let y = firstTopLedgerY;
+        while (y >= minNoteLineY) {
+            canvas.fillRect(
+                cx - lineExtension + this.noteStartX,
+                cy + y - lineYOffset,
+                lineWidth,
+                this.renderer.smuflMetrics.legerLineThickness * scale
+            );
+            y -= lineSpacing;
+        }
+
+        y = firstBottomLedgerY;
+        while (y <= maxNoteLineY) {
+            canvas.fillRect(
+                cx - lineExtension + this.noteStartX,
+                cy + y - lineYOffset,
+                lineWidth,
+                this.renderer.smuflMetrics.legerLineThickness * scale
+            );
+            y += lineSpacing;
+        }
+    }
+}

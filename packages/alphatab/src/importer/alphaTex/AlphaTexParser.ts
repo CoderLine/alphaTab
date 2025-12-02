@@ -1,0 +1,724 @@
+﻿import { AlphaTex1MetaDataReader } from '@coderline/alphatab/importer/alphaTex/AlphaTex1MetaDataReader';
+import {
+    type AlphaTexAsteriskTokenNode,
+    type AlphaTexAstNode,
+    type AlphaTexBarNode,
+    type AlphaTexBeatDurationChangeNode,
+    type AlphaTexBeatNode,
+    type AlphaTexBraceCloseTokenNode,
+    type AlphaTexBraceOpenTokenNode,
+    type AlphaTexColonTokenNode,
+    type AlphaTexDotTokenNode,
+    type AlphaTexIdentifier,
+    type AlphaTexMetaDataNode,
+    type AlphaTexMetaDataTagNode,
+    AlphaTexNodeType,
+    type AlphaTexNoteListNode,
+    type AlphaTexNoteNode,
+    type AlphaTexNumberLiteral,
+    type AlphaTexParenthesisCloseTokenNode,
+    type AlphaTexParenthesisOpenTokenNode,
+    type AlphaTexPipeTokenNode,
+    type AlphaTexPropertiesNode,
+    type AlphaTexPropertyNode,
+    type AlphaTexScoreNode,
+    type AlphaTexStringLiteral,
+    type AlphaTexArgumentList
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
+import {
+    type AlphaTexDiagnostic,
+    AlphaTexDiagnosticBag,
+    AlphaTexDiagnosticCode,
+    AlphaTexDiagnosticsSeverity
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import type { IAlphaTexMetaDataReader } from '@coderline/alphatab/importer/alphaTex/IAlphaTexMetaDataReader';
+
+/**
+ * The different modes of the alphaTex parser.
+ * @public
+ */
+export enum AlphaTexParseMode {
+    /**
+     * Optimizes the parser for only the model importing.
+     * The model importing does not need all details from the AST allowing a more lightweight
+     * parsing.
+     */
+    ForModelImport = 0,
+
+    /**
+     * Performs the full AST parsing with all details.
+     * This mode is mainly used by the Language Server providing IDE support.
+     * All AST information is parsed and filled.
+     */
+    Full = 1
+}
+
+/**
+ * A parser for translating a given alphaTex source into an AST for further use
+ * in the alphaTex importer, editors etc.
+ * @public
+ */
+export class AlphaTexParser {
+    public readonly lexer: AlphaTexLexer;
+    private _scoreNode!: AlphaTexScoreNode;
+    private _metaDataReader: IAlphaTexMetaDataReader = AlphaTex1MetaDataReader.instance;
+
+    /**
+     * The parsing mode.
+     */
+    public mode:AlphaTexParseMode = AlphaTexParseMode.ForModelImport;
+
+    public get lexerDiagnostics(): AlphaTexDiagnosticBag {
+        return this.lexer.lexerDiagnostics;
+    }
+
+    public readonly parserDiagnostics = new AlphaTexDiagnosticBag();
+
+    public addParserDiagnostic(diagnostics: AlphaTexDiagnostic) {
+        this.parserDiagnostics.push(diagnostics);
+    }
+
+    /**
+     * @internal
+     */
+    public unexpectedToken(actual: AlphaTexAstNode | undefined, expected: AlphaTexNodeType[], abort: boolean) {
+        if (!actual) {
+            this.addParserDiagnostic({
+                code: AlphaTexDiagnosticCode.AT203,
+                start: this.lexer.currentTokenLocation(),
+                end: this.lexer.currentTokenLocation(),
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                message: 'Unexpected end of file.'
+            });
+        } else {
+            this.addParserDiagnostic({
+                code: AlphaTexDiagnosticCode.AT202,
+                message: `Unexpected '${AlphaTexNodeType[actual.nodeType]}' token. Expected one of following: ${expected.map(v => AlphaTexNodeType[v]).join(',')}`,
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: actual.start,
+                end: actual.end
+            });
+        }
+
+        if (abort) {
+            this.lexer.fatalError = true;
+        }
+    }
+
+    public constructor(source: string) {
+        this.lexer = new AlphaTexLexer(source);
+    }
+
+    public read(): AlphaTexScoreNode {
+        this._score();
+
+        return this._scoreNode;
+    }
+
+    // recursive decent
+
+    private _score() {
+        this._scoreNode = {
+            nodeType: AlphaTexNodeType.Score,
+            bars: [],
+            start: this.lexer.currentTokenLocation()
+        };
+
+        try {
+            this._bars();
+        } finally {
+            this._scoreNode.end = this.lexer.previousTokenEndLocation();
+        }
+    }
+
+    private _bars() {
+        let token = this.lexer.peekToken();
+        while (token) {
+            // still reading bars
+            this._bar();
+
+            token = this.lexer.peekToken();
+        }
+    }
+
+    private _bar() {
+        const bar: AlphaTexBarNode = {
+            nodeType: AlphaTexNodeType.Bar,
+            metaData: [],
+            beats: [],
+            pipe: undefined,
+            start: this.lexer.currentTokenLocation()
+        };
+        this._scoreNode.bars.push(bar);
+
+        try {
+            this._barMetaData(bar);
+            this._barBeats(bar);
+
+            const next = this.lexer.peekToken();
+            if (next?.nodeType === AlphaTexNodeType.Pipe) {
+                bar.pipe = next as AlphaTexPipeTokenNode;
+                this.lexer.advance();
+            }
+
+            if (bar.metaData.length > 0 || bar.beats.length > 0 || bar.pipe) {
+                bar.end = this.lexer.previousTokenEndLocation();
+            }
+        } finally {
+            bar.end = this.lexer.previousTokenEndLocation();
+        }
+    }
+
+    private _barMetaData(bar: AlphaTexBarNode) {
+        let token = this.lexer.peekToken();
+        while (token && (token.nodeType === AlphaTexNodeType.Tag || token.nodeType === AlphaTexNodeType.Dot)) {
+            if (token.nodeType === AlphaTexNodeType.Dot) {
+                this.lexer.advance();
+                this.addParserDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT400,
+                    message: `The dots separating score metadata, score contents and the sync points can be removed.`,
+                    severity: AlphaTexDiagnosticsSeverity.Hint,
+                    start: token.start,
+                    end: token.end
+                });
+            } else {
+                this._metaData(bar.metaData);
+            }
+
+            token = this.lexer.peekToken();
+        }
+    }
+
+    private _barBeats(bar: AlphaTexBarNode) {
+        let token = this.lexer.peekToken();
+        while (
+            token &&
+            token.nodeType !== AlphaTexNodeType.Pipe &&
+            token.nodeType !== AlphaTexNodeType.Dot &&
+            token.nodeType !== AlphaTexNodeType.Tag
+        ) {
+            const beat = this._beat();
+            if (beat) {
+                bar.beats.push(beat);
+            }
+            token = this.lexer.peekToken();
+        }
+    }
+
+    private _beat(): AlphaTexBeatNode | undefined {
+        const beat: AlphaTexBeatNode = {
+            nodeType: AlphaTexNodeType.Beat,
+            durationChange: undefined,
+            notes: undefined,
+            rest: undefined,
+            beatEffects: undefined,
+            beatMultiplier: undefined,
+            beatMultiplierValue: undefined,
+            start: this.lexer.peekToken()?.start
+        };
+
+        try {
+            this._beatDurationChange(beat);
+
+            this._beatContent(beat);
+            if (!beat.notes && !beat.rest) {
+                return beat;
+            }
+
+            this._beatDuration(beat);
+
+            // pre 1.7 the multiplier was between the duration and effects
+            // for backwards compat we still allow it
+            this._beatMultiplier(beat);
+
+            beat.beatEffects = this._properties(property =>
+                this._metaDataReader.readBeatPropertyArguments(this, property)
+            );
+
+            if (beat.beatMultiplierValue !== undefined && beat.beatEffects?.openBrace) {
+                this.addParserDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT304,
+                    message: 'The beat multiplier should be specified after the beat effects.',
+                    severity: AlphaTexDiagnosticsSeverity.Warning,
+                    start: beat.beatMultiplier!.start,
+                    end: beat.beatMultiplierValue.end
+                });
+            }
+
+            this._beatMultiplier(beat);
+        } finally {
+            beat.end = this.lexer.previousTokenEndLocation();
+        }
+
+        return beat;
+    }
+
+    private _beatDuration(beat: AlphaTexBeatNode) {
+        const dot = this.lexer.peekToken();
+        if (dot?.nodeType !== AlphaTexNodeType.Dot) {
+            return;
+        }
+
+        beat.durationDot = dot as AlphaTexDotTokenNode;
+        this.lexer.advance();
+
+        const durationValue = this.lexer.peekToken();
+        if (durationValue?.nodeType === AlphaTexNodeType.Number) {
+            beat.durationValue = durationValue as AlphaTexNumberLiteral;
+            this.lexer.advance();
+            return;
+        } else if (durationValue?.nodeType === AlphaTexNodeType.Tag) {
+            // backwards compatibility with older alphaTex: there was a dot separator
+            // between the song content and sync points at the end
+
+            // handle switch to sync points like: 3.3 . \sync 1 1 1
+            // (we can drop the separation dot as it is not part of the AST)
+            beat.durationDot = undefined;
+            return;
+        } else if (!durationValue) {
+            // handle switch to sync points like: 3.3 .
+            // (no sync points yet)
+            return;
+        } else {
+            this.unexpectedToken(durationValue, [AlphaTexNodeType.Number], true);
+        }
+    }
+
+    private _beatDurationChange(beat: AlphaTexBeatNode) {
+        const colon = this.lexer.peekToken();
+        if (colon?.nodeType !== AlphaTexNodeType.Colon) {
+            return;
+        }
+        this.lexer.advance();
+
+        const durationChange: AlphaTexBeatDurationChangeNode = {
+            nodeType: AlphaTexNodeType.Duration,
+            colon: colon as AlphaTexColonTokenNode,
+            value: undefined,
+            properties: undefined,
+            start: colon.start
+        };
+        beat.durationChange = durationChange;
+
+        try {
+            const durationValue = this.lexer.peekToken();
+            if (!durationValue || durationValue.nodeType !== AlphaTexNodeType.Number) {
+                this.addParserDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT201,
+                    message: "Missing duration value after ':'.",
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: colon!.start,
+                    end: colon!.end
+                });
+                return;
+            }
+            this.lexer.advance();
+            durationChange.value = durationValue as AlphaTexNumberLiteral;
+
+            durationChange.properties = this._properties(property =>
+                this._metaDataReader.readDurationChangePropertyArguments(this, property)
+            );
+        } finally {
+            durationChange.end = this.lexer.previousTokenEndLocation();
+        }
+    }
+
+    private _beatContent(beat: AlphaTexBeatNode) {
+        const notes = this.lexer.peekToken();
+        if (!notes) {
+            return;
+        }
+        if (notes.nodeType === AlphaTexNodeType.Ident && (notes as AlphaTexIdentifier).text === 'r') {
+            beat.rest = notes as AlphaTexIdentifier;
+            this.lexer.advance();
+        } else if (notes.nodeType === AlphaTexNodeType.LParen) {
+            beat.notes = this._noteList(notes as AlphaTexParenthesisOpenTokenNode);
+        } else {
+            const note = this._note(notes);
+            if (note) {
+                beat.notes = {
+                    nodeType: AlphaTexNodeType.NoteList,
+                    openParenthesis: undefined,
+                    notes: [note],
+                    closeParenthesis: undefined,
+                    start: note.start,
+                    end: note.end
+                } as AlphaTexNoteListNode;
+            }
+        }
+    }
+
+    private _beatMultiplier(beat: AlphaTexBeatNode) {
+        const multiplier = this.lexer.peekToken();
+        if (!multiplier || multiplier.nodeType !== AlphaTexNodeType.Asterisk) {
+            return;
+        }
+        this.lexer.advance();
+        beat.beatMultiplier = multiplier as AlphaTexAsteriskTokenNode;
+
+        const multiplierValue = this.lexer.peekToken();
+        if (!multiplierValue || multiplierValue.nodeType !== AlphaTexNodeType.Number) {
+            this.addParserDiagnostic({
+                code: AlphaTexDiagnosticCode.AT200,
+                message: "Missing beat multiplier value after '*'.",
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: beat.beatMultiplier!.start,
+                end: beat.beatMultiplier!.end
+            });
+            return;
+        }
+
+        beat.beatMultiplierValue = multiplierValue as AlphaTexNumberLiteral;
+        this.lexer.advance();
+    }
+
+    private _noteList(openParenthesis: AlphaTexParenthesisOpenTokenNode): AlphaTexNoteListNode {
+        const noteList: AlphaTexNoteListNode = {
+            nodeType: AlphaTexNodeType.NoteList,
+            openParenthesis: undefined,
+            notes: [],
+            closeParenthesis: undefined,
+            start: this.lexer.currentTokenLocation()
+        };
+        try {
+            noteList.openParenthesis = openParenthesis as AlphaTexParenthesisOpenTokenNode;
+            this.lexer.advance();
+
+            let token = this.lexer.peekToken();
+            while (token && token.nodeType !== AlphaTexNodeType.RParen) {
+                const note = this._note(token);
+                if (note) {
+                    noteList.notes.push(note);
+                } else {
+                    break;
+                }
+                token = this.lexer.peekToken();
+            }
+
+            const closeParenthesis = this.lexer.peekToken();
+            if (closeParenthesis?.nodeType === AlphaTexNodeType.RParen) {
+                noteList.closeParenthesis = closeParenthesis as AlphaTexParenthesisCloseTokenNode;
+                this.lexer.advance();
+            } else {
+                this.addParserDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT206,
+                    message: 'Unexpected end of file. Group not closed.',
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: closeParenthesis?.start ?? this.lexer.currentTokenLocation(),
+                    end: closeParenthesis?.end ?? this.lexer.currentTokenLocation()
+                });
+            }
+        } finally {
+            noteList.end = this.lexer.previousTokenEndLocation();
+        }
+
+        return noteList;
+    }
+
+    private _note(noteValue: AlphaTexAstNode): AlphaTexNoteNode | undefined {
+        const note: AlphaTexNoteNode = {
+            nodeType: AlphaTexNodeType.Note,
+            noteValue: {
+                // placeholder value
+                nodeType: AlphaTexNodeType.Ident,
+                text: ''
+            } as AlphaTexIdentifier,
+            start: noteValue.start
+        };
+        try {
+            let canHaveString = false;
+            switch (noteValue.nodeType) {
+                case AlphaTexNodeType.Number:
+                    note.noteValue = noteValue as AlphaTexNumberLiteral;
+                    this.lexer.advance();
+
+                    canHaveString = true;
+
+                    break;
+                case AlphaTexNodeType.String:
+                    note.noteValue = noteValue as AlphaTexStringLiteral;
+                    this.lexer.advance();
+                    switch ((note.noteValue as AlphaTexStringLiteral).text) {
+                        case 'x':
+                        case '-':
+                            canHaveString = true;
+                            break;
+                    }
+                    break;
+                case AlphaTexNodeType.Ident:
+                    note.noteValue = noteValue as AlphaTexIdentifier;
+                    this.lexer.advance();
+                    switch ((note.noteValue as AlphaTexIdentifier).text) {
+                        case 'x':
+                        case '-':
+                            canHaveString = true;
+                            break;
+                    }
+                    break;
+                default:
+                    this.unexpectedToken(
+                        noteValue,
+                        [AlphaTexNodeType.Number, AlphaTexNodeType.String, AlphaTexNodeType.Ident],
+                        true
+                    );
+                    return undefined;
+            }
+
+            if (canHaveString) {
+                const dot = this.lexer.peekToken();
+                if (dot?.nodeType === AlphaTexNodeType.Dot) {
+                    const noteStringDot = dot as AlphaTexDotTokenNode;
+                    this.lexer.advance();
+
+                    const noteString = this.lexer.peekToken();
+                    if (!noteString) {
+                        this.unexpectedToken(noteString, [AlphaTexNodeType.Number], true);
+                        return undefined;
+                    }
+
+                    if (noteString.nodeType === AlphaTexNodeType.Tag) {
+                        // backwards compatibility with older alphaTex: there was a dot separator
+                        // between the song content and sync points at the end
+
+                        // handle switch to sync points like: 3 4 5 . \sync 1 1 1
+                        // in this example the numbers are percussion articulations
+
+                        // (we can drop the separation dot as it is not part of the AST)
+                        return note;
+                    } else if (noteString.nodeType === AlphaTexNodeType.Number) {
+                        note.noteStringDot = noteStringDot;
+                        note.noteString = noteString as AlphaTexNumberLiteral;
+                        this.lexer.advance();
+                    } else {
+                        this.unexpectedToken(noteString, [AlphaTexNodeType.Number], true);
+                        return undefined;
+                    }
+                }
+            }
+
+            note.noteEffects = this._properties(property =>
+                this._metaDataReader.readNotePropertyArguments(this, property)
+            );
+        } finally {
+            note.end = this.lexer.previousTokenEndLocation();
+        }
+
+        return note;
+    }
+
+    private _metaData(metaDataList: AlphaTexMetaDataNode[]) {
+        const tag = this.lexer.peekToken();
+        if (!tag || tag.nodeType !== AlphaTexNodeType.Tag) {
+            return undefined;
+        }
+
+        const metaData: AlphaTexMetaDataNode = {
+            nodeType: AlphaTexNodeType.Meta,
+            tag: tag as AlphaTexMetaDataTagNode,
+            start: tag.start,
+            properties: undefined,
+            propertiesBeforeArguments: false
+        };
+        this.lexer.advance();
+        metaDataList.push(metaData);
+
+        try {
+            // properties can be before or after the arguments, this is a again a historical
+            // inconsistency on chords
+            const braceCandidate = this.lexer.peekToken();
+            if (braceCandidate?.nodeType === AlphaTexNodeType.LBrace) {
+                metaData.propertiesBeforeArguments = true;
+                metaData.properties = this._properties(property =>
+                    this._metaDataReader.readMetaDataPropertyArguments(this, metaData.tag, property)
+                );
+                metaData.arguments = this.argumentList();
+                if (!metaData.arguments) {
+                    metaData.arguments = this._metaDataReader.readMetaDataArguments(this, metaData.tag);
+                    if (metaData.arguments && metaData.arguments.arguments.length > 1) {
+                        this.addParserDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT301,
+                            message: `Metadata arguments should be wrapped into parenthesis.`,
+                            severity: AlphaTexDiagnosticsSeverity.Warning,
+                            start: metaData.arguments?.start ?? metaData.start,
+                            end: metaData.arguments?.end ?? metaData.end
+                        });
+
+                        this.addParserDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT302,
+                            message: `Metadata arguments should be placed before metadata properties.`,
+                            severity: AlphaTexDiagnosticsSeverity.Warning,
+                            start: metaData.arguments?.start ?? metaData.start,
+                            end: metaData.arguments?.end ?? metaData.end
+                        });
+                    }
+                }
+            } else {
+                metaData.arguments = this.argumentList();
+                if (!metaData.arguments) {
+                    metaData.arguments = this._metaDataReader.readMetaDataArguments(this, metaData.tag);
+                    if (metaData.arguments && metaData.arguments.arguments.length > 1) {
+                        this.addParserDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT301,
+                            message: `Metadata arguments should be wrapped into parenthesis.`,
+                            severity: AlphaTexDiagnosticsSeverity.Warning,
+                            start: metaData.arguments?.start ?? metaData.start,
+                            end: metaData.arguments?.end ?? metaData.end
+                        });
+                    }
+                }
+
+                metaData.properties = this._properties(property =>
+                    this._metaDataReader.readMetaDataPropertyArguments(this, metaData.tag, property)
+                );
+            }
+        } finally {
+            metaData.end = this.lexer.previousTokenEndLocation();
+        }
+        return metaData;
+    }
+
+    private _properties(
+        readPropertyArgs: (property: AlphaTexPropertyNode) => AlphaTexArgumentList | undefined
+    ): AlphaTexPropertiesNode | undefined {
+        const braceOpen = this.lexer.peekToken();
+        if (!braceOpen || braceOpen.nodeType !== AlphaTexNodeType.LBrace) {
+            return undefined;
+        }
+
+        const properties: AlphaTexPropertiesNode = {
+            nodeType: AlphaTexNodeType.Props,
+            openBrace: braceOpen as AlphaTexBraceOpenTokenNode,
+            properties: [],
+            closeBrace: undefined,
+            start: braceOpen.start
+        };
+        this.lexer.advance();
+
+        try {
+            let token = this.lexer.peekToken();
+            while (token?.nodeType === AlphaTexNodeType.Ident) {
+                properties.properties.push(this._property(token as AlphaTexIdentifier, readPropertyArgs));
+                token = this.lexer.peekToken();
+            }
+
+            const braceClose = this.lexer.peekToken();
+            if (braceClose?.nodeType === AlphaTexNodeType.RBrace) {
+                properties.closeBrace = braceClose as AlphaTexBraceCloseTokenNode;
+                this.lexer.advance();
+            } else {
+                this.addParserDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT206,
+                    message: 'Unexpected end of file. Group not closed.',
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: this.lexer.currentTokenLocation(),
+                    end: this.lexer.currentTokenLocation()
+                });
+            }
+        } finally {
+            properties.end = this.lexer.previousTokenEndLocation();
+        }
+
+        return properties;
+    }
+
+    private _property(
+        identifier: AlphaTexIdentifier,
+        readPropertyArgs: (property: AlphaTexPropertyNode) => AlphaTexArgumentList | undefined
+    ): AlphaTexPropertyNode {
+        const property: AlphaTexPropertyNode = {
+            nodeType: AlphaTexNodeType.Prop,
+            property: identifier as AlphaTexIdentifier,
+            arguments: undefined
+        };
+        this.lexer.advance();
+
+        property.start = property.property.start;
+        try {
+            property.arguments = this.argumentList();
+            if (!property.arguments) {
+                property.arguments = readPropertyArgs(property);
+                if (property.arguments && property.arguments.arguments.length > 1) {
+                    this.addParserDiagnostic({
+                        code: AlphaTexDiagnosticCode.AT303,
+                        message: 'Property args should be wrapped into parenthesis.',
+                        severity: AlphaTexDiagnosticsSeverity.Warning,
+                        start: property.arguments.start,
+                        end: property.arguments.end
+                    });
+                }
+            }
+        } finally {
+            property.end = this.lexer.previousTokenEndLocation();
+        }
+
+        return property;
+    }
+
+    public argumentList(): AlphaTexArgumentList | undefined {
+        const openParenthesis = this.lexer.peekToken();
+        if (openParenthesis?.nodeType !== AlphaTexNodeType.LParen) {
+            return undefined;
+        }
+
+        const valueList: AlphaTexArgumentList = {
+            nodeType: AlphaTexNodeType.Arguments,
+            openParenthesis: openParenthesis as AlphaTexParenthesisOpenTokenNode,
+            arguments: [],
+            closeParenthesis: undefined,
+            start: openParenthesis.start
+        };
+        this.lexer.advance();
+
+        try {
+            let token = this.lexer.peekToken();
+            while (token && token?.nodeType !== AlphaTexNodeType.RParen) {
+                switch (token.nodeType) {
+                    case AlphaTexNodeType.Ident:
+                        valueList.arguments.push(token as AlphaTexIdentifier);
+                        this.lexer.advance();
+                        break;
+                    case AlphaTexNodeType.String:
+                        valueList.arguments.push(token as AlphaTexStringLiteral);
+                        this.lexer.advance();
+                        break;
+                    case AlphaTexNodeType.Number:
+                        // in value lists we can always assume floats
+                        // (within parenthesis we have no risk of syntax overlaps)
+                        valueList.arguments.push(this.lexer.extendToFloat(token as AlphaTexNumberLiteral));
+                        this.lexer.advance();
+                        break;
+                    default:
+                        this.unexpectedToken(
+                            token,
+                            [AlphaTexNodeType.Ident, AlphaTexNodeType.String, AlphaTexNodeType.Number],
+                            false
+                        );
+                        // try to skip and continue parsing
+                        this.lexer.advance();
+                        break;
+                }
+
+                token = this.lexer.peekToken();
+            }
+
+            const closeParenthesis = this.lexer.peekToken();
+            if (closeParenthesis?.nodeType === AlphaTexNodeType.RParen) {
+                valueList.closeParenthesis = closeParenthesis as AlphaTexParenthesisCloseTokenNode;
+                this.lexer.advance();
+            } else {
+                this.addParserDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT206,
+                    message: 'Unexpected end of file. Group not closed.',
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: this.lexer.currentTokenLocation(),
+                    end: this.lexer.currentTokenLocation()
+                });
+            }
+        } finally {
+            valueList.end = this.lexer.previousTokenEndLocation();
+        }
+
+        return valueList;
+    }
+}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>AlphaTab Test Results Diff Viewer</title>
+    <style>
+        @import url('bootstrap/dist/css/bootstrap.min.css');
+        @import url('@fontsource/noto-sans/400.css');
+
+        body {
+            padding: 1rem;
+            font-family: 'Noto Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        .comparer {
+            position: relative;
+        }
+
+        .slider {
+            position: absolute;
+            top: 30px;
+            right: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .expected {
+            background: #FFF;
+            position: absolute;
+            left: 0;
+            border: 1px solid red;
+        }
+
+        .diff {
+            border: 1px solid red;
+        }
+
+        .actual {
+            background: #FFF;
+            position: absolute;
+            right: -2px;
+            box-shadow: -7px 0 10px -5px rgba(0, 0, 0, .5);
+            overflow: hidden;
+            border: 1px solid red;
+            border-left: 0;
+        }
+
+        .actual img {
+            position: absolute;
+            right: 0;
+            top: 0;
+            border-left: 1px solid red;
+        }
+
+        .diff {
+            display: none;
+            background: #FFF;
+            position: absolute;
+            left: 0;
+        }
+
+        .controls {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .accepted .diff,
+        .accepted .expected,
+        .accepted .actual {
+            border-color: green;
+        }
+
+        .card.accepted {
+            border-color: green;
+        }
+
+        body.hide-accepted .accepted {
+            display: none;
+        }
+
+        .drop-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            display: none;
+            pointer-events: none;
+        }
+
+        body.drop .drop-area {
+            display: flex;
+        }
+
+        .drop-message {
+            width: 200px;
+            height: 200px;
+            font-weight: bold;
+            border: 5px dashed #426d9d;
+            color: #426d9d;
+            display: flex;
+            text-align: center;
+            border-radius: 10px;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>alphaTab - Visual Test Results</h1>
+    <p>
+        This page contains any failing visual tests for comparison and acceptance.
+        Run the <code>visualTests</code> via <code>npm run test</code> or using <a
+            href="https://marketplace.visualstudio.com/items?itemName=coderline.mocha-vscode">Mocha for VS Code</a>.
+    </p>
+    <p>
+        <input type="checkbox" id="hide-accepted" />
+        <label for="hide-accepted">Hide accepted</label>
+    </p>
+    <div id="results-wrapper">
+
+    </div>
+    <script type="module">
+        import './test-results.ts'
+    </script>
+
+    <div class="drop-area">
+        <div class="drop-message">
+            Drop Test-Results Zip to page
+        </div>
+    </div>
+</body>
+
+</html>

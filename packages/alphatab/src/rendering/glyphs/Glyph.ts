@@ -1,0 +1,32 @@
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+
+/**
+ * A glyph is a single symbol which can be added to a GlyphBarRenderer for automated
+ * layouting and drawing of stacked symbols.
+ * @internal
+ */
+export class Glyph {
+    public x: number;
+    public y: number;
+    public width: number = 0;
+    public height: number = 0;
+    public renderer!: BarRendererBase;
+
+    public constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public getBoundingBoxTop() {
+        return this.y;
+    }
+
+    public doLayout(): void {
+        // to be implemented in subclass
+    }
+
+    public paint(_cx: number, _cy: number, _canvas: ICanvas): void {
+        // to be implemented in subclass
+    }
+}

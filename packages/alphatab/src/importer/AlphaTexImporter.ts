@@ -1,0 +1,1099 @@
+﻿import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { BeatCloner } from '@coderline/alphatab/generated/model/BeatCloner';
+import { AlphaTex1LanguageHandler } from '@coderline/alphatab/importer/alphaTex/AlphaTex1LanguageHandler';
+import {
+    type AlphaTexAstNode,
+    type AlphaTexBarNode,
+    type AlphaTexBeatDurationChangeNode,
+    type AlphaTexBeatNode,
+    type AlphaTexMetaDataNode,
+    AlphaTexNodeType,
+    type AlphaTexNoteNode,
+    type AlphaTexNumberLiteral,
+    type AlphaTexPropertiesNode,
+    type AlphaTexScoreNode,
+    type AlphaTexTextNode
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
+import { AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
+import {
+    AlphaTexAccidentalMode,
+    type AlphaTexDiagnostic,
+    AlphaTexDiagnosticBag,
+    AlphaTexDiagnosticCode,
+    AlphaTexDiagnosticsSeverity,
+    type IAlphaTexImporter,
+    type IAlphaTexImporterState,
+    AlphaTexStaffNoteKind
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import {
+    ApplyNodeResult,
+    ApplyStructuralMetaDataResult,
+    type IAlphaTexLanguageImportHandler
+} from '@coderline/alphatab/importer/alphaTex/IAlphaTexLanguageImportHandler';
+import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
+import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { FlatSyncPoint } from '@coderline/alphatab/model/Automation';
+import { Bar, type SustainPedalMarker } from '@coderline/alphatab/model/Bar';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import { Clef } from '@coderline/alphatab/model/Clef';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import type { Lyrics } from '@coderline/alphatab/model/Lyrics';
+import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { Note } from '@coderline/alphatab/model/Note';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { Score } from '@coderline/alphatab/model/Score';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import { Track } from '@coderline/alphatab/model/Track';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { Voice } from '@coderline/alphatab/model/Voice';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { Lazy } from '@coderline/alphatab/util/Lazy';
+
+/**
+ * @public
+ */
+export class AlphaTexErrorWithDiagnostics extends AlphaTabError {
+    public lexerDiagnostics?: AlphaTexDiagnosticBag;
+    public parserDiagnostics?: AlphaTexDiagnosticBag;
+    public semanticDiagnostics?: AlphaTexDiagnosticBag;
+
+    public *iterateDiagnostics() {
+        if (this.lexerDiagnostics) {
+            for (const d of this.lexerDiagnostics.items) {
+                yield d;
+            }
+        }
+        if (this.parserDiagnostics) {
+            for (const d of this.parserDiagnostics.items) {
+                yield d;
+            }
+        }
+        if (this.semanticDiagnostics) {
+            for (const d of this.semanticDiagnostics.items) {
+                yield d;
+            }
+        }
+    }
+
+    public constructor(
+        message: string,
+        lexerDiagnostics?: AlphaTexDiagnosticBag,
+        parserDiagnostics?: AlphaTexDiagnosticBag,
+        semanticDiagnostics?: AlphaTexDiagnosticBag
+    ) {
+        super(AlphaTabErrorType.AlphaTex, message);
+        this.lexerDiagnostics = lexerDiagnostics;
+        this.parserDiagnostics = parserDiagnostics;
+        this.semanticDiagnostics = semanticDiagnostics;
+    }
+
+    public override toString(): string {
+        return [
+            this.message!,
+            'lexer diagnostics:',
+            AlphaTexErrorWithDiagnostics._diagnosticsToString(this.lexerDiagnostics, '  '),
+            'parser diagnostics:',
+            AlphaTexErrorWithDiagnostics._diagnosticsToString(this.parserDiagnostics, '  '),
+            'semantic diagnostics:',
+            AlphaTexErrorWithDiagnostics._diagnosticsToString(this.semanticDiagnostics, '  ')
+        ].join('\n');
+    }
+
+    private static _diagnosticsToString(semanticDiagnostics: AlphaTexDiagnosticBag | undefined, indent: string) {
+        if (!semanticDiagnostics) {
+            return `${indent}none`;
+        }
+
+        return semanticDiagnostics.items
+            .map(
+                d =>
+                    `${indent}${AlphaTexDiagnosticsSeverity[d.severity]} AT${(d.code as number).toString().padStart(3, '0')}${AlphaTexErrorWithDiagnostics._locationToString(d)}: ${d.message}`
+            )
+            .join('\n');
+    }
+
+    private static _locationToString(d: AlphaTexDiagnostic): string {
+        let s = '';
+        if (d.start) {
+            s += `(${d.start.line},${d.start.col})`;
+        }
+        if (d.end) {
+            if (s.length > 0) {
+                s += '->';
+            }
+            s += `(${d.end.line},${d.end.col})`;
+        }
+        return s;
+    }
+}
+
+/**
+ * @internal
+ */
+class AlphaTexImportState implements IAlphaTexImporterState {
+    public trackChannel: number = 0;
+    public score!: Score;
+    public currentTrack?: Track;
+    public currentStaff?: Staff;
+    public barIndex: number = 0;
+    public voiceIndex: number = 0;
+    public ignoredInitialVoice = false;
+    public ignoredInitialStaff = false;
+    public ignoredInitialTrack = false;
+    public currentDuration = Duration.Quarter;
+    public articulationValueToIndex = new Map<number, number>();
+
+    public hasAnyProperData = false;
+
+    public readonly percussionArticulationNames = new Map<string, number>();
+
+    public readonly slurs = new Map<string, Note>();
+    public readonly lyrics = new Map<number, Lyrics[]>();
+    public readonly sustainPedalToBeat = new Map<SustainPedalMarker, Beat>();
+    public readonly staffTuningApplied = new Set<Staff>();
+    public readonly staffNoteKind = new Map<Staff, AlphaTexStaffNoteKind>();
+    public readonly staffHasExplicitTuning = new Set<Staff>();
+    public readonly staffHasExplicitDisplayTransposition = new Set<Staff>();
+    public readonly staffDisplayTranspositionApplied = new Set<Staff>();
+    public readonly staffInitialClef = new Map<Staff, Clef>();
+    public readonly syncPoints: FlatSyncPoint[] = [];
+
+    public currentDynamics = DynamicValue.F;
+    public accidentalMode = AlphaTexAccidentalMode.Explicit;
+    public currentTupletNumerator = -1;
+    public currentTupletDenominator = -1;
+    public scoreNode: AlphaTexScoreNode | undefined;
+}
+
+/**
+ * @public
+ */
+export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter {
+    private _parser?: AlphaTexParser;
+    private _handler: IAlphaTexLanguageImportHandler = AlphaTex1LanguageHandler.instance;
+
+    private _state = new AlphaTexImportState();
+
+    public get state(): IAlphaTexImporterState {
+        return this._state;
+    }
+
+    public get scoreNode(): AlphaTexScoreNode | undefined {
+        return this._state.scoreNode;
+    }
+
+    public get name(): string {
+        return 'AlphaTex';
+    }
+
+    public get lexerDiagnostics() {
+        return this._parser!.lexerDiagnostics;
+    }
+
+    public get parserDiagnostics() {
+        return this._parser!.parserDiagnostics;
+    }
+
+    /**
+     * The underlying parser used for parsing the AST. Available after initialization of the importer.
+     */
+    public get parser(): AlphaTexParser | undefined {
+        return this._parser;
+    }
+
+    public get parseMode(): AlphaTexParseMode {
+        return this._parser!.mode;
+    }
+
+    public logErrors: boolean = false;
+
+    public readonly semanticDiagnostics = new AlphaTexDiagnosticBag();
+
+    public addSemanticDiagnostic(diagnostic: AlphaTexDiagnostic) {
+        this.semanticDiagnostics.push(diagnostic);
+    }
+
+    public initFromString(tex: string, settings: Settings) {
+        this.data = ByteBuffer.empty();
+        this._parser = new AlphaTexParser(tex);
+        this.settings = settings;
+        // when beginning reading a new score we reset the IDs.
+        Score.resetIds();
+    }
+
+    public readScore(): Score {
+        this._state = new AlphaTexImportState();
+        this._createDefaultScore();
+
+        if (this.data.length > 0) {
+            this._parser = new AlphaTexParser(IOHelper.toString(this.data.readAll(), this.settings.importer.encoding));
+        }
+
+        let scoreNode: AlphaTexScoreNode;
+        try {
+            scoreNode = this._parser!.read();
+            this._state.scoreNode = scoreNode;
+        } catch (e) {
+            if (this.logErrors) {
+                Logger.error('AlphaTex', `Error while parsing alphaTex: ${(e as Error).toString()}`);
+            }
+            throw new UnsupportedFormatError('Error parsing alphaTex, check inner error for details', e as Error);
+        }
+
+        if (this._parser!.parserDiagnostics.hasErrors || this._parser!.lexer.lexerDiagnostics.hasErrors) {
+            const error = new AlphaTexErrorWithDiagnostics(
+                'There are errors in the parsed alphaTex, check the diagnostics for details',
+                this.lexerDiagnostics,
+                this.parserDiagnostics,
+                this.semanticDiagnostics
+            );
+
+            if (this.logErrors) {
+                Logger.error('AlphaTex', `Error while parsing alphaTex: ${error.toString()}`);
+            }
+
+            throw new UnsupportedFormatError(
+                'Error parsing alphaTex, check diagnostics on inner error for details',
+                error
+            );
+        }
+
+        // even start translating when we have parser errors
+        // as long we have some nodes, we can already start semantically
+        // validating and using them
+
+        if (scoreNode.bars.length === 0) {
+            throw new UnsupportedFormatError('No alphaTex data found');
+        }
+
+        this._bars(scoreNode);
+
+        if (this.semanticDiagnostics.hasErrors) {
+            if (this._state.hasAnyProperData) {
+                const error = new AlphaTexErrorWithDiagnostics(
+                    'There are errors in the parsed alphaTex, check the diagnostics for details',
+                    this.lexerDiagnostics,
+                    this.parserDiagnostics,
+                    this.semanticDiagnostics
+                );
+                if (this.logErrors) {
+                    Logger.error('AlphaTex', `Error while parsing alphaTex: ${error.toString()}`);
+                }
+
+                throw error;
+            } else {
+                throw new UnsupportedFormatError('No alphaTex data found');
+            }
+        }
+
+        ModelUtils.consolidate(this._state.score);
+        this._state.score.finish(this.settings);
+        ModelUtils.trimEmptyBarsAtEnd(this._state.score);
+        this._state.score.rebuildRepeatGroups();
+        this._state.score.applyFlatSyncPoints(this._state.syncPoints);
+        for (const [track, lyrics] of this._state.lyrics) {
+            this._state.score.tracks[track].applyLyrics(lyrics);
+        }
+        for (const [sustainPedal, beat] of this._state.sustainPedalToBeat) {
+            if (sustainPedal.ratioPosition < 1) {
+                const duration = beat.voice.bar.masterBar.calculateDuration();
+                sustainPedal.ratioPosition = beat.playbackStart / duration;
+            }
+        }
+        return this._state.score;
+    }
+
+    private _createDefaultScore(): void {
+        this._state.score = new Score();
+        this._newTrack();
+    }
+
+    private _newTrack(): void {
+        this._state.currentTrack = new Track();
+        this._state.currentTrack.ensureStaveCount(1);
+        this._state.currentTrack.playbackInfo.program = 25;
+        this._state.currentTrack.playbackInfo.primaryChannel = this._state.trackChannel++;
+        this._state.currentTrack.playbackInfo.secondaryChannel = this._state.trackChannel++;
+        const staff = this._state.currentTrack.staves[0];
+        staff.displayTranspositionPitch = 0;
+        staff.stringTuning = Tuning.getDefaultTuningFor(6)!;
+        this._state.articulationValueToIndex.clear();
+
+        this._beginStaff(staff);
+
+        this._state.score.addTrack(this._state.currentTrack);
+        this._state.lyrics.set(this._state.currentTrack.index, []);
+        this._state.currentDynamics = DynamicValue.F;
+        this._state.currentTupletDenominator = -1;
+        this._state.currentTupletNumerator = -1;
+    }
+
+    private _beginStaff(staff: Staff) {
+        // ensure previous staff is properly initialized
+        if (this._state.currentStaff) {
+            this._detectTuningForStaff(this._state.currentStaff!);
+            this._handleTransposition(this._state.currentStaff!);
+        }
+
+        this._state.currentStaff = staff;
+        this._state.slurs.clear();
+        this._state.barIndex = 0;
+        this._state.voiceIndex = 0;
+    }
+
+    private _bars(node: AlphaTexScoreNode) {
+        if (node.bars.length > 0) {
+            for (const b of node.bars) {
+                this._bar(b);
+            }
+        } else {
+            this._newBar(this._state.currentStaff!);
+            this._detectTuningForStaff(this._state.currentStaff!);
+            this._handleTransposition(this._state.currentStaff!);
+        }
+    }
+
+    private _bar(node: AlphaTexBarNode) {
+        const bar = this._barMeta(node);
+
+        this._detectTuningForStaff(this._state.currentStaff!);
+        this._handleTransposition(this._state.currentStaff!);
+
+        if (bar.index === 0 && this._state.staffInitialClef.has(this._state.currentStaff!)) {
+            bar.clef = this._state.staffInitialClef.get(this._state.currentStaff!)!;
+        }
+
+        const voice: Voice = bar.voices[this._state.voiceIndex];
+
+        for (const b of node.beats) {
+            this._beat(voice, b);
+        }
+
+        if (voice.beats.length === 0) {
+            const emptyBeat = new Beat();
+            emptyBeat.isEmpty = true;
+            voice.addBeat(emptyBeat);
+        }
+    }
+
+    private _beat(voice: Voice, node: AlphaTexBeatNode) {
+        if (node.durationChange) {
+            this._beatDuration(node.durationChange);
+        }
+
+        if (!node.notes && !node.rest) {
+            return;
+        }
+
+        const beat = new Beat();
+        voice.addBeat(beat);
+
+        if (node.notes) {
+            for (const n of node.notes!.notes) {
+                this._note(beat, n);
+            }
+        } else if (node.rest) {
+            // beat is already a rest at start
+        }
+
+        if (node.durationValue) {
+            this._state.currentDuration = this._parseDuration(node.durationValue!);
+        }
+
+        beat.duration = this._state.currentDuration;
+        beat.dynamics = this._state.currentDynamics;
+        if (this._state.currentTupletNumerator !== -1 && !beat.hasTuplet) {
+            beat.tupletNumerator = this._state.currentTupletNumerator;
+            beat.tupletDenominator = this._state.currentTupletDenominator;
+        }
+
+        // beat multiplier (repeat beat n times)
+        let beatRepeat: number = 1;
+        if (node.beatMultiplierValue !== undefined) {
+            beatRepeat = node.beatMultiplierValue.value;
+        }
+
+        if (node.beatEffects) {
+            this._beatEffects(beat, node.beatEffects!);
+        }
+
+        for (let i: number = 0; i < beatRepeat - 1; i++) {
+            voice.addBeat(BeatCloner.clone(beat));
+        }
+    }
+
+    private _beatEffects(beat: Beat, node: AlphaTexPropertiesNode) {
+        for (const p of node.properties) {
+            const result = this._handler.applyBeatProperty(this, beat, p);
+            switch (result) {
+                case ApplyNodeResult.Applied:
+                case ApplyNodeResult.NotAppliedSemanticError:
+                    this._state.hasAnyProperData = true;
+                    break;
+
+                case ApplyNodeResult.NotAppliedUnrecognizedMarker:
+                    const knownProps = Array.from(this._handler.knownBeatProperties).join(',');
+                    this.addSemanticDiagnostic({
+                        code: AlphaTexDiagnosticCode.AT212,
+                        message: `Unrecogized property '${p.property.text}', expected one of ${knownProps}`,
+                        severity: AlphaTexDiagnosticsSeverity.Error,
+                        start: p.start,
+                        end: p.end
+                    });
+                    break;
+            }
+        }
+    }
+
+    private _beatDuration(node: AlphaTexBeatDurationChangeNode) {
+        if (node.value) {
+            this._state.currentDuration = this._parseDuration(node.value!);
+        }
+
+        this._state.currentTupletNumerator = -1;
+        this._state.currentTupletDenominator = -1;
+
+        if (node.properties) {
+            for (const p of node.properties.properties) {
+                const result = this._handler.applyBeatDurationProperty(this, p);
+                switch (result) {
+                    case ApplyNodeResult.Applied:
+                    case ApplyNodeResult.NotAppliedSemanticError:
+                        this._state.hasAnyProperData = true;
+                        break;
+
+                    case ApplyNodeResult.NotAppliedUnrecognizedMarker:
+                        const knownProps = Array.from(this._handler.knownBeatDurationProperties).join(',');
+                        this.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT212,
+                            message: `Unrecogized property '${p.property.text}', expected one of ${knownProps}`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: p.start,
+                            end: p.end
+                        });
+                        break;
+                }
+            }
+        }
+    }
+
+    private _parseDuration(duration: AlphaTexNumberLiteral): Duration {
+        switch (duration.value) {
+            case -4:
+                return Duration.QuadrupleWhole;
+            case -2:
+                return Duration.DoubleWhole;
+            case 1:
+                return Duration.Whole;
+            case 2:
+                return Duration.Half;
+            case 4:
+                return Duration.Quarter;
+            case 8:
+                return Duration.Eighth;
+            case 16:
+                return Duration.Sixteenth;
+            case 32:
+                return Duration.ThirtySecond;
+            case 64:
+                return Duration.SixtyFourth;
+            case 128:
+                return Duration.OneHundredTwentyEighth;
+            case 256:
+                return Duration.TwoHundredFiftySixth;
+            default:
+                this.addSemanticDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT209,
+                    message: `Unexpected duration value '${duration.value}', expected: -4, -2, 1, 2, 4, 8, 16, 32, 64, 128 or 256`,
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: duration.start,
+                    end: duration.end
+                });
+                return this._state.currentDuration;
+        }
+    }
+
+    private _note(beat: Beat, node: AlphaTexNoteNode) {
+        //
+        // Note value
+        let isDead: boolean = false;
+        let isTie: boolean = false;
+        let numericValue: number = -1;
+        let octave: number = -1;
+        let tone: number = -1;
+        let accidentalMode = NoteAccidentalMode.Default;
+        const noteValue = node.noteValue as AlphaTexAstNode;
+        let detectedNoteKind: AlphaTexStaffNoteKind | undefined = undefined;
+        let staffNoteKind = this._state.staffNoteKind.has(this._state.currentStaff!)
+            ? this._state.staffNoteKind.get(this._state.currentStaff!)!
+            : undefined;
+
+        switch (noteValue.nodeType) {
+            case AlphaTexNodeType.Number:
+                numericValue = (noteValue as AlphaTexNumberLiteral).value;
+                if (node.noteString !== undefined) {
+                    detectedNoteKind = AlphaTexStaffNoteKind.Fretted;
+                } else {
+                    detectedNoteKind = AlphaTexStaffNoteKind.Articulation;
+                }
+                break;
+            case AlphaTexNodeType.String:
+            case AlphaTexNodeType.Ident:
+                const str = (noteValue as AlphaTexTextNode).text;
+
+                isDead = str === 'x';
+                isTie = str === '-';
+                if (isTie || isDead) {
+                    numericValue = 0;
+                    if (node.noteStringDot && node.noteString) {
+                        detectedNoteKind = AlphaTexStaffNoteKind.Fretted;
+                    } else {
+                        detectedNoteKind = undefined; // don't know on those notes
+                    }
+                } else {
+                    const tuning = ModelUtils.parseTuning(str);
+                    if (tuning) {
+                        detectedNoteKind = AlphaTexStaffNoteKind.Pitched;
+                        octave = tuning.octave;
+                        tone = tuning.tone.noteValue;
+                        if (this._state.accidentalMode === AlphaTexAccidentalMode.Explicit) {
+                            accidentalMode = tuning.tone.accidentalMode;
+                        }
+                    } else {
+                        detectedNoteKind = AlphaTexStaffNoteKind.Articulation;
+                        const articulationName = str.toLowerCase();
+                        // apply defaults
+                        const percussionArticulationNames = this._state.percussionArticulationNames;
+                        if (staffNoteKind === undefined && percussionArticulationNames.size === 0) {
+                            for (const [defaultName, defaultValue] of PercussionMapper.instrumentArticulationNames) {
+                                percussionArticulationNames.set(defaultName.toLowerCase(), defaultValue);
+                                percussionArticulationNames.set(ModelUtils.toArticulationId(defaultName), defaultValue);
+                            }
+                        }
+
+                        if (percussionArticulationNames.has(articulationName)) {
+                            numericValue = percussionArticulationNames.get(articulationName)!;
+                        } else {
+                            this.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT209,
+                                message: `Unexpected percussion articulation value '${articulationName}', expected: oneOf(${Array.from(this._state.percussionArticulationNames.keys()).join(',')}).`,
+                                severity: AlphaTexDiagnosticsSeverity.Error,
+                                start: noteValue.start,
+                                end: noteValue.end
+                            });
+                            // avoid double error
+                            numericValue = Array.from(PercussionMapper.instrumentArticulationNames.values())[0];
+                            return;
+                        }
+                    }
+                }
+                break;
+        }
+
+        if (detectedNoteKind !== undefined) {
+            if (staffNoteKind === undefined) {
+                staffNoteKind = detectedNoteKind;
+                this.applyStaffNoteKind(this._state.currentStaff!, staffNoteKind);
+            } else if (staffNoteKind !== detectedNoteKind) {
+                this.addSemanticDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT218,
+                    message: `Wrong note kind '${AlphaTexStaffNoteKind[detectedNoteKind]}' for staff with note kind ''${AlphaTexStaffNoteKind[staffNoteKind]}'. Do not mix incompatible staves and notes.`,
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: noteValue.start,
+                    end: noteValue.end
+                });
+            }
+        } else if (staffNoteKind !== undefined) {
+            detectedNoteKind = staffNoteKind;
+        }
+
+        //
+        // Construct Note
+        const note = new Note();
+        note.isDead = isDead;
+        if (isDead || isTie) {
+            note.fret = numericValue;
+        }
+        note.isTieDestination = isTie;
+
+        // valid note kind detected, apply values, tied/dead notes at start might be rare, but can happen.
+        if (detectedNoteKind !== undefined && detectedNoteKind === staffNoteKind) {
+            switch (detectedNoteKind) {
+                case AlphaTexStaffNoteKind.Pitched:
+                    note.octave = octave;
+                    note.tone = tone;
+                    note.accidentalMode = accidentalMode;
+                    break;
+                case AlphaTexStaffNoteKind.Fretted:
+                    // Fret [Dot] String
+                    if (!node.noteString) {
+                        this.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT207,
+                            message: `Missing string for fretted note.`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: noteValue.end,
+                            end: noteValue.end
+                        });
+                        return;
+                    }
+
+                    const noteString: number = node.noteString!.value;
+                    if (noteString < 1 || noteString > this._state.currentStaff!.tuning.length) {
+                        this.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT208,
+                            message: `Note string is out of range. Available range: 1-${this._state.currentStaff!.tuning.length}`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: noteValue.end,
+                            end: noteValue.end
+                        });
+                        return;
+                    }
+
+                    note.string = this._state.currentStaff!.tuning.length - (noteString - 1);
+                    if (!isTie) {
+                        note.fret = numericValue;
+                    }
+
+                    break;
+                case AlphaTexStaffNoteKind.Articulation:
+                    let articulationIndex: number = 0;
+                    if (this._state.articulationValueToIndex.has(numericValue)) {
+                        articulationIndex = this._state.articulationValueToIndex.get(numericValue)!;
+                    } else {
+                        articulationIndex = this._state.currentTrack!.percussionArticulations.length;
+                        const articulation = PercussionMapper.getArticulationByInputMidiNumber(numericValue);
+                        if (articulation === null) {
+                            this.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT209,
+                                message: `Unexpected articulation value '${numericValue}', expected: oneOf(${Array.from(PercussionMapper.instrumentArticulations.keys()).join(',')}).`,
+                                severity: AlphaTexDiagnosticsSeverity.Error,
+                                start: noteValue.end,
+                                end: noteValue.end
+                            });
+                            return;
+                        }
+
+                        this._state.currentTrack!.percussionArticulations.push(articulation!);
+                        this._state.articulationValueToIndex.set(numericValue, articulationIndex);
+                    }
+                    note.percussionArticulation = articulationIndex;
+                    break;
+            }
+        }
+
+        beat.addNote(note);
+        this._state.hasAnyProperData = true;
+
+        //
+        // Note Effects
+        if (node.noteEffects) {
+            this._noteEffects(note, node.noteEffects!);
+        }
+    }
+
+    /**
+     * @internal
+     */
+    public getStaffNoteKind(staff: Staff): AlphaTexStaffNoteKind | undefined {
+        return this._state.staffNoteKind.has(staff) ? this._state.staffNoteKind.get(staff) : undefined;
+    }
+
+    public applyStaffNoteKind(staff: Staff, staffNoteKind: AlphaTexStaffNoteKind) {
+        this._state.staffNoteKind.set(staff, staffNoteKind);
+        switch (staffNoteKind) {
+            case AlphaTexStaffNoteKind.Pitched:
+                staff.isPercussion = false;
+                staff.stringTuning.reset();
+                if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
+                    staff.displayTranspositionPitch = 0;
+                }
+                break;
+            case AlphaTexStaffNoteKind.Fretted:
+                staff.isPercussion = false;
+                this._detectTuningForStaff(staff);
+                this._handleTransposition(staff);
+                break;
+            case AlphaTexStaffNoteKind.Articulation:
+                staff.isPercussion = true;
+                staff.stringTuning.reset();
+                if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
+                    staff.displayTranspositionPitch = 0;
+                }
+                break;
+        }
+    }
+
+    private _noteEffects(note: Note, node: AlphaTexPropertiesNode) {
+        for (const p of node.properties) {
+            let result = this._handler.applyNoteProperty(this, note, p);
+            if (result === ApplyNodeResult.NotAppliedUnrecognizedMarker) {
+                result = this._handler.applyBeatProperty(this, note.beat, p);
+            }
+
+            switch (result) {
+                case ApplyNodeResult.Applied:
+                case ApplyNodeResult.NotAppliedSemanticError:
+                    break;
+
+                case ApplyNodeResult.NotAppliedUnrecognizedMarker:
+                    const knownProps = Array.from(this._handler.knownNoteProperties)
+                        .concat(Array.from(this._handler.knownBeatProperties))
+                        .join(',');
+                    this.addSemanticDiagnostic({
+                        code: AlphaTexDiagnosticCode.AT212,
+                        message: `Unrecogized property '${p.property.text}', expected one of ${knownProps}`,
+                        severity: AlphaTexDiagnosticsSeverity.Error,
+                        start: p.start,
+                        end: p.end
+                    });
+                    break;
+            }
+        }
+    }
+
+    private _handleTransposition(staff: Staff) {
+        if (
+            !this._state.staffDisplayTranspositionApplied.has(staff) &&
+            !this._state.staffHasExplicitDisplayTransposition.has(staff)
+        ) {
+            const program = staff.track.playbackInfo.program;
+            if (ModelUtils.displayTranspositionPitches.has(program)) {
+                // guitar E4 B3 G3 D3 A2 E2
+                staff.displayTranspositionPitch = ModelUtils.displayTranspositionPitches.get(program)!;
+            } else {
+                this._state.currentStaff!.displayTranspositionPitch = 0;
+            }
+            this._state.staffDisplayTranspositionApplied.add(staff);
+        }
+    }
+
+    private _detectTuningForStaff(staff: Staff) {
+        // detect tuning for staff
+        const program = staff.track.playbackInfo.program;
+        if (!this._state.staffTuningApplied.has(staff) && !this._state.staffHasExplicitTuning.has(staff)) {
+            // reset to defaults
+            staff.stringTuning.reset();
+
+            if (program === 15) {
+                // dulcimer E4 B3 G3 D3 A2 E2
+                staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
+            } else if (program >= 24 && program <= 31) {
+                // guitar E4 B3 G3 D3 A2 E2
+                staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
+            } else if (program >= 32 && program <= 39) {
+                // bass G2 D2 A1 E1
+                staff.stringTuning.tunings = [43, 38, 33, 28];
+                this._state.staffInitialClef.set(staff, Clef.F4);
+            } else if (
+                program === 40 ||
+                program === 44 ||
+                program === 45 ||
+                program === 48 ||
+                program === 49 ||
+                program === 50 ||
+                program === 51
+            ) {
+                // violin E3 A3 D3 G2
+                staff.stringTuning.tunings = [52, 57, 50, 43];
+            } else if (program === 41) {
+                // viola A3 D3 G2 C2
+                staff.stringTuning.tunings = [57, 50, 43, 36];
+            } else if (program === 42) {
+                // cello A2 D2 G1 C1
+                staff.stringTuning.tunings = [45, 38, 31, 24];
+            } else if (program === 43) {
+                // contrabass
+                // G2 D2 A1 E1
+                staff.stringTuning.tunings = [43, 38, 33, 28];
+            } else if (program === 105) {
+                // banjo
+                // D3 B2 G2 D2 G3
+                staff.stringTuning.tunings = [50, 47, 43, 38, 55];
+            } else if (program === 106) {
+                // shamisen
+                // A3 E3 A2
+                staff.stringTuning.tunings = [57, 52, 45];
+            } else if (program === 107) {
+                // koto
+                // E3 A2 D2 G1
+                staff.stringTuning.tunings = [52, 45, 38, 31];
+            } else if (program === 110) {
+                // Fiddle
+                // E4 A3 D3 G2
+                staff.stringTuning.tunings = [64, 57, 50, 43];
+            } else {
+                // any non-guitar instrument -> use guitar 6 string tuning
+                if (
+                    this._state.staffNoteKind.has(staff) &&
+                    this._state.staffNoteKind.get(staff)! === AlphaTexStaffNoteKind.Fretted
+                ) {
+                    staff.stringTuning = Tuning.getDefaultTuningFor(6)!;
+                }
+            }
+
+            this._state.staffTuningApplied.add(staff);
+        }
+    }
+
+    private _barMeta(node: AlphaTexBarNode): Bar {
+        // it might be a bit an edge case but a valid one:
+        // one might repeat multiple structural metadata
+        // in one bar starting multiple tracks/staves/voices which are
+        // empty.
+        // for this reason we first remember the bar metadata
+        // and do not create bars directly
+        // the tricky thing is: \track, \staff, \voice might not create
+        // new items but reuse the initial ones.
+        // here we need to detect such scenarios and ensure we apply
+        // any preceeding metadata to empty bars
+
+        let initialBarMeta: AlphaTexMetaDataNode[] | undefined =
+            this._state.score.masterBars.length > 0 ? undefined : [];
+
+        let previousStaff = this._state.currentStaff!;
+        let hadNewTrack = false;
+        let hadNewStaff = false;
+        let applyInitialBarMetaToPreviousStaff = false;
+
+        const resetInitialBarMeta = () => {
+            // reset state
+            if (!initialBarMeta) {
+                return;
+            }
+
+            initialBarMeta = undefined;
+            previousStaff = this._state.currentStaff!;
+            hadNewTrack = false;
+            hadNewStaff = false;
+            applyInitialBarMetaToPreviousStaff = false;
+        };
+
+        const bar: Lazy<Bar> = new Lazy<Bar>(() => {
+            const b = this._newBar(this._state.currentStaff!);
+            if (initialBarMeta) {
+                for (const initial of initialBarMeta) {
+                    this._handler.applyBarMetaData(this, b, initial);
+                }
+                resetInitialBarMeta();
+            }
+            return b;
+        });
+
+        // bar meta
+        for (const m of node.metaData) {
+            const tag = m.tag.tag.text.toLowerCase();
+            if (this._handler.knownStructuralMetaDataTags.has(tag)) {
+                this._state.hasAnyProperData = true;
+
+                const result = this._handler.applyStructuralMetaData(this, m);
+                switch (result) {
+                    case ApplyStructuralMetaDataResult.AppliedNewTrack:
+                        if (hadNewStaff) {
+                            // new track after new staff -> apply to previous staff
+                            applyInitialBarMetaToPreviousStaff = true;
+                        } else if (hadNewTrack) {
+                            // multiple new tracks -> apply to previous staff
+                            applyInitialBarMetaToPreviousStaff = true;
+                        } else {
+                            hadNewTrack = true;
+                            previousStaff = this._state.currentStaff!;
+                        }
+
+                        bar.reset();
+
+                        break;
+                    case ApplyStructuralMetaDataResult.AppliedNewStaff:
+                        if (hadNewStaff) {
+                            applyInitialBarMetaToPreviousStaff = true;
+                        } else {
+                            hadNewStaff = true;
+                            previousStaff = this._state.currentStaff!;
+                        }
+
+                        // new bar needed on new structural level
+                        bar.reset();
+                        break;
+                }
+
+                if (initialBarMeta) {
+                    if (applyInitialBarMetaToPreviousStaff) {
+                        if (previousStaff.bars.length === 0) {
+                            // need initial bar
+                            const initialBar: Bar = new Bar();
+                            previousStaff.addBar(initialBar);
+
+                            const initialVoice: Voice = new Voice();
+                            initialBar.addVoice(initialVoice);
+
+                            if (previousStaff.bars.length > this._state.score.masterBars.length) {
+                                const master = new MasterBar();
+                                this._state.score.addMasterBar(master);
+                            }
+
+                            // apply all data
+                            for (const initial of initialBarMeta) {
+                                this._handler.applyBarMetaData(this, initialBar, initial);
+                            }
+
+                            resetInitialBarMeta();
+                        } else {
+                            // this should never occur. as far I can judge,
+                            // we only run into this case when we have multiple \ and \staff tags
+                            // without content inbetween, hence they should be empty
+                            throw new AlphaTabError(
+                                AlphaTabErrorType.AlphaTex,
+                                `Unexpected internal error, didn't expect a filled staff after multiple \\track and/or \\staff tags. Please report this problem providing the input alphaTex.`
+                            );
+                        }
+                    }
+                }
+            } else if (this._handler.knownScoreMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
+                this._state.hasAnyProperData = true;
+                this._handler.applyScoreMetaData(this, this._state.score, m);
+            } else if (this._handler.knownStaffMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
+                // backwards compatiblity (staff metadata tags)
+                this._state.hasAnyProperData = true;
+                this._handler.applyStaffMetaData(this, this._state.currentStaff!, m);
+                // this.addSemanticDiagnostic({
+                //     code: AlphaTexDiagnosticCode.AT306,
+                //     message: 'This staff metadata tag should be specified as staff property.',
+                //     severity: AlphaTexDiagnosticsSeverity.Warning,
+                //     start: m.start,
+                //     end: m.end
+                // });
+            } else if (this._handler.knownBarMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
+                this._state.hasAnyProperData = true;
+                if (initialBarMeta) {
+                    initialBarMeta.push(m);
+                } else {
+                    this._handler.applyBarMetaData(this, bar.value, m);
+                }
+            } else {
+                const knownMeta = Array.from(this._handler.allKnownMetaDataTags).join(',');
+                this.addSemanticDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT204,
+                    message: `Unrecognized metadata '${m.tag.tag.text}', expected one of: ${knownMeta}`,
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: m.tag.start,
+                    end: m.tag.end
+                });
+            }
+        }
+
+        return bar.value;
+    }
+
+    private _newBar(staff: Staff): Bar {
+        // existing bar? -> e.g. in multi-voice setups where we fill empty voices later
+        if (this._state.barIndex < staff.bars.length) {
+            const bar = staff.bars[this._state.barIndex];
+            this._state.barIndex++;
+            return bar;
+        }
+
+        const voiceCount = staff.bars.length === 0 ? 1 : staff.bars[0].voices.length;
+
+        // need new bar
+        const newBar: Bar = new Bar();
+        staff.addBar(newBar);
+        if (newBar.previousBar) {
+            newBar.clef = newBar.previousBar.clef;
+            newBar.clefOttava = newBar.previousBar.clefOttava;
+            newBar.keySignature = newBar.previousBar!.keySignature;
+            newBar.keySignatureType = newBar.previousBar!.keySignatureType;
+        }
+        this._state.barIndex++;
+
+        if (newBar.index > 0) {
+            newBar.clef = newBar.previousBar!.clef;
+        }
+
+        for (let i = 0; i < voiceCount; i++) {
+            const voice: Voice = new Voice();
+            newBar.addVoice(voice);
+        }
+
+        if (this._state.currentStaff!.bars.length > this._state.score.masterBars.length) {
+            const master = new MasterBar();
+            this._state.score.addMasterBar(master);
+            if (master.index > 0) {
+                master.timeSignatureDenominator = master.previousMasterBar!.timeSignatureDenominator;
+                master.timeSignatureNumerator = master.previousMasterBar!.timeSignatureNumerator;
+                master.tripletFeel = master.previousMasterBar!.tripletFeel;
+            }
+        }
+
+        return newBar;
+    }
+
+    public startNewStaff(): Staff {
+        this._state.ignoredInitialVoice = false;
+
+        if (this._state.ignoredInitialStaff || this._state.currentTrack!.staves[0].bars.length > 0) {
+            const previousWasPercussion = this._state.currentStaff!.isPercussion;
+            this._state.currentTrack!.ensureStaveCount(this._state.currentTrack!.staves.length + 1);
+            const staff = this._state.currentTrack!.staves[this._state.currentTrack!.staves.length - 1];
+            this._beginStaff(staff);
+
+            if (previousWasPercussion) {
+                this.applyPercussionStaff(this._state.currentStaff!);
+            }
+
+            this._state.currentDynamics = DynamicValue.F;
+        } else {
+            this._state.ignoredInitialStaff = true;
+        }
+        return this._state.currentStaff!;
+    }
+
+    public applyPercussionStaff(staff: Staff) {
+        staff.isPercussion = true;
+        staff.showTablature = false;
+        staff.track.playbackInfo.program = 0;
+    }
+
+    public startNewTrack(): Track {
+        this._state.ignoredInitialVoice = false;
+        this._state.ignoredInitialStaff = false;
+
+        // new track starting? - if no masterbars it's the \track of the initial track.
+        if (this._state.ignoredInitialTrack || this._state.score.masterBars.length > 0) {
+            this._newTrack();
+        } else {
+            this._state.ignoredInitialTrack = true;
+        }
+
+        return this._state.currentTrack!;
+    }
+
+    public startNewVoice() {
+        if (
+            this._state.voiceIndex === 0 &&
+            (this._state.currentStaff!.bars.length === 0 ||
+                (this._state.currentStaff!.bars.length === 1 &&
+                    this._state.currentStaff!.bars[0].isEmpty &&
+                    !this._state.ignoredInitialVoice))
+        ) {
+            // voice marker on the begining of the first voice without any bar yet?
+            // -> ignore
+            this._state.ignoredInitialVoice = true;
+            return;
+        }
+        // create directly a new empty voice for all bars
+        for (const b of this._state.currentStaff!.bars) {
+            const v = new Voice();
+            b.addVoice(v);
+        }
+        // start using the new voice (see newBar for details on matching)
+        this._state.voiceIndex++;
+        this._state.barIndex = 0;
+        this._state.currentTupletDenominator = -1;
+        this._state.currentTupletNumerator = -1;
+    }
+}

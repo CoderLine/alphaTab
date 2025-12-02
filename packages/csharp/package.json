@@ -1,0 +1,18 @@
+{
+    "name": "@coderline/alphatab-csharp",
+    "version": "1.7.0",
+    "description": "The C# target of alphaTab.",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "clean": "rimraf src/AlphaTab/Generated && rimraf src/AlphaTab.Test/Generated",
+        "transpile": "tsx scripts/transpile.ts",
+        "typecheck": "tsc --noEmit",
+        "build": "npm run transpile && cd src && dotnet build -c Release",
+        "test": "cd src && dotnet test -c Release"
+    },
+    "devDependencies": {
+        "@coderline/alphatab-transpiler": "*",
+        "rimraf": "^6.1.0"
+    }
+}

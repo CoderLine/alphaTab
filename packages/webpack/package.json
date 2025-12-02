@@ -1,0 +1,72 @@
+{
+    "name": "@coderline/alphatab-webpack",
+    "version": "1.7.0",
+    "description": "A plugin for WebPack to bundle alphaTab into your webapps.",
+    "keywords": [
+        "guitar",
+        "music-notation",
+        "music-sheet",
+        "html5",
+        "svg",
+        "guitar-tablature",
+        "webpack"
+    ],
+    "homepage": "https://alphatab.net",
+    "bugs": {
+        "url": "https://github.com/coderline/alphaTab/issues"
+    },
+    "author": "Daniel Kuschny",
+    "license": "MPL-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/coderline/alphaTab.git"
+    },
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/alphaTab.webpack.d.ts",
+            "require": "./dist/alphaTab.webpack.cjs",
+            "import": "./dist/alphaTab.webpack.mjs"
+        },
+        "./*": {
+            "types": "./dist/*.d.ts",
+            "require": "./dist/*.cjs",
+            "import": "./dist/*.mjs"
+        }
+    },
+    "scripts": {
+        "clean": "rimraf dist",
+        "lint": "biome lint",
+        "typecheck": "tsc --noEmit",
+        "build": "vite build",
+        "test": "mocha"
+    },
+    "dependencies": {
+        "webpack": "^5.101.3"
+    },
+    "engines": {
+        "node": ">=20.19.0"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^2.2.6",
+        "@types/chai": "^5.2.3",
+        "@types/mocha": "^10.0.10",
+        "@types/node": "^24.10.0",
+        "assert": "^2.1.0",
+        "chai": "^6.2.1",
+        "html-webpack-plugin": "^5.6.5",
+        "mocha": "^11.7.5",
+        "rimraf": "^6.1.0",
+        "tslib": "^2.8.1",
+        "tsx": "^4.20.6",
+        "typescript": "^5.9.3",
+        "webpack-cli": "^6.0.1"
+    },
+    "files": [
+        "/dist/**",
+        "!/dist/types",
+        "LICENSE",
+        "LICENSE.header",
+        "README.md"
+    ]
+}

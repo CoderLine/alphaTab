@@ -1,0 +1,26 @@
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
+
+/**
+ * @internal
+ */
+export class LeftToRightLayoutingGlyphGroup extends GlyphGroup {
+    public gap: number = 0;
+
+    public constructor() {
+        super(0, 0);
+        this.glyphs = [];
+    }
+
+    public override doLayout(): void {
+        // skip
+    }
+
+    public override addGlyph(g: Glyph): void {
+        g.x = this.width;
+        g.renderer = this.renderer;
+        g.doLayout();
+        this.width = g.x + g.width + this.gap;
+        super.addGlyph(g);
+    }
+}

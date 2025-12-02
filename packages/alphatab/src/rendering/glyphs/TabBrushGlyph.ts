@@ -1,0 +1,88 @@
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import { BrushType } from '@coderline/alphatab/model/BrushType';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
+import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+
+/**
+ * @internal
+ */
+export class TabBrushGlyph extends Glyph {
+    private _beat: Beat;
+    private _noteVibratoGlyph?: NoteVibratoGlyph;
+
+    public constructor(beat: Beat) {
+        super(0, 0);
+        this._beat = beat;
+    }
+
+    public override doLayout(): void {
+        this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
+        if (this._beat.brushType === BrushType.ArpeggioUp) {
+            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, true);
+            glyph.renderer = this.renderer;
+            glyph.doLayout();
+            this._noteVibratoGlyph = glyph;
+        } else if (this._beat.brushType === BrushType.ArpeggioDown) {
+            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, true);
+            glyph.renderer = this.renderer;
+            glyph.doLayout();
+            this._noteVibratoGlyph = glyph;
+        }
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        const tabBarRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
+        const startY: number = cy + this.x + tabBarRenderer.getNoteY(this._beat.maxStringNote!, NoteYPosition.Top);
+        const endY: number = cy + this.y + tabBarRenderer.getNoteY(this._beat.minStringNote!, NoteYPosition.Bottom);
+        const arrowX: number = cx + this.x + this.width / 2;
+        const arrowSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
+        if (this._beat.brushType !== BrushType.None) {
+            if (this._beat.brushType === BrushType.BrushUp || this._beat.brushType === BrushType.BrushDown) {
+                canvas.beginPath();
+                canvas.moveTo(arrowX, startY);
+                canvas.lineTo(arrowX, endY);
+                canvas.stroke();
+            } else if (this._beat.brushType === BrushType.ArpeggioUp) {
+                const glyph: NoteVibratoGlyph = this._noteVibratoGlyph!;
+
+                const lineStartY: number = startY;
+                const lineEndY: number = endY - arrowSize;
+                glyph.width = Math.abs(lineEndY - lineStartY);
+
+                canvas.beginRotate(cx + this.x, lineEndY, -90);
+                glyph.paint(0, (this.width - glyph.height) / 2, canvas);
+                canvas.endRotate();
+            } else if (this._beat.brushType === BrushType.ArpeggioDown) {
+                const glyph: NoteVibratoGlyph = this._noteVibratoGlyph!;
+
+                const lineStartY: number = startY + arrowSize;
+                const lineEndY: number = endY;
+                glyph.width = Math.abs(lineEndY - lineStartY);
+
+                canvas.beginRotate(cx + this.x, lineStartY, 90);
+                glyph.paint(0, - (this.width - glyph.height / 2), canvas);
+                canvas.endRotate();
+            }
+            if (this._beat.brushType === BrushType.BrushUp || this._beat.brushType === BrushType.ArpeggioUp) {
+                canvas.beginPath();
+                canvas.moveTo(arrowX, endY);
+                canvas.lineTo(arrowX + arrowSize / 2, endY - arrowSize);
+                canvas.lineTo(arrowX - arrowSize / 2, endY - arrowSize);
+                canvas.closePath();
+                canvas.fill();
+            } else {
+                canvas.beginPath();
+                canvas.moveTo(arrowX, startY);
+                canvas.lineTo(arrowX + arrowSize / 2, startY + arrowSize);
+                canvas.lineTo(arrowX - arrowSize / 2, startY + arrowSize);
+                canvas.closePath();
+                canvas.fill();
+            }
+        }
+    }
+}

@@ -1,0 +1,108 @@
+import { CircularSampleBuffer } from '@coderline/alphatab/synth/ds/CircularSampleBuffer';
+import { AlphaSynthWebAudioOutputBase } from '@coderline/alphatab/platform/javascript/AlphaSynthWebAudioOutputBase';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+
+/**
+ * This class implements a HTML5 Web Audio API based audio output device
+ * for alphaSynth using the legacy ScriptProcessor node.
+ * @target web
+ * @internal
+ */
+export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBase {
+    private _audioNode: ScriptProcessorNode | null = null;
+    private _circularBuffer!: CircularSampleBuffer;
+    private _bufferCount: number = 0;
+    private _requestedBufferCount: number = 0;
+
+    public override open(bufferTimeInMilliseconds: number) {
+        super.open(bufferTimeInMilliseconds);
+        this._bufferCount = Math.floor(
+            (bufferTimeInMilliseconds * this.sampleRate) / 1000 / AlphaSynthWebAudioOutputBase.BufferSize
+        );
+        this._circularBuffer = new CircularSampleBuffer(AlphaSynthWebAudioOutputBase.BufferSize * this._bufferCount);
+        this.onReady();
+    }
+
+    public override play(): void {
+        super.play();
+        const ctx = this.context!;
+        // create a script processor node which will replace the silence with the generated audio
+        this._audioNode = ctx.createScriptProcessor(4096, 0, 2);
+        this._audioNode.onaudioprocess = this._generateSound.bind(this);
+        this._circularBuffer.clear();
+        this._requestBuffers();
+        this.source = ctx.createBufferSource();
+        this.source.buffer = this.buffer;
+        this.source.loop = true;
+        this.source.connect(this._audioNode, 0, 0);
+        this.source.start(0);
+        this._audioNode.connect(ctx.destination, 0, 0);
+    }
+
+    public override pause(): void {
+        super.pause();
+        if (this._audioNode) {
+            this._audioNode.disconnect(0);
+        }
+        this._audioNode = null;
+    }
+
+    public addSamples(f: Float32Array): void {
+        this._circularBuffer.write(f, 0, f.length);
+        this._requestedBufferCount--;
+    }
+
+    public resetSamples(): void {
+        this._circularBuffer.clear();
+    }
+
+    private _requestBuffers(): void {
+        // if we fall under the half of buffers
+        // we request one half
+        const halfBufferCount = (this._bufferCount / 2) | 0;
+        const halfSamples: number = halfBufferCount * AlphaSynthWebAudioOutputBase.BufferSize;
+        // Issue #631: it can happen that requestBuffers is called multiple times
+        // before we already get samples via addSamples, therefore we need to
+        // remember how many buffers have been requested, and consider them as available.
+        const bufferedSamples =
+            this._circularBuffer.count + this._requestedBufferCount * AlphaSynthWebAudioOutputBase.BufferSize;
+        if (bufferedSamples < halfSamples) {
+            for (let i: number = 0; i < halfBufferCount; i++) {
+                this.onSampleRequest();
+            }
+            this._requestedBufferCount += halfBufferCount;
+        }
+    }
+
+    private _outputBuffer: Float32Array = new Float32Array(0);
+    private _generateSound(e: AudioProcessingEvent): void {
+        const left: Float32Array = e.outputBuffer.getChannelData(0);
+        const right: Float32Array = e.outputBuffer.getChannelData(1);
+        const samples: number = left.length + right.length;
+        let buffer = this._outputBuffer;
+        if (buffer.length !== samples) {
+            buffer = new Float32Array(samples);
+            this._outputBuffer = buffer;
+        }
+        const samplesFromBuffer = this._circularBuffer.read(
+            buffer,
+            0,
+            Math.min(buffer.length, this._circularBuffer.count)
+        );
+        let s: number = 0;
+        const min = Math.min(left.length, samplesFromBuffer);
+        for (let i: number = 0; i < min; i++) {
+            left[i] = buffer[s++];
+            right[i] = buffer[s++];
+        }
+        if (samplesFromBuffer < left.length) {
+            for (let i = samplesFromBuffer; i < left.length; i++) {
+                left[i] = 0;
+                right[i] = 0;
+            }
+        }
+
+        this.onSamplesPlayed(samplesFromBuffer / SynthConstants.AudioChannels);
+        this._requestBuffers();
+    }
+}

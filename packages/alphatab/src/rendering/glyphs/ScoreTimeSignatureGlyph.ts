@@ -1,0 +1,14 @@
+import { TimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TimeSignatureGlyph';
+
+/**
+ * @internal
+ */
+export class ScoreTimeSignatureGlyph extends TimeSignatureGlyph {
+    protected get commonScale(): number {
+        return 1;
+    }
+
+    protected get numberScale(): number {
+        return 1;
+    }
+}

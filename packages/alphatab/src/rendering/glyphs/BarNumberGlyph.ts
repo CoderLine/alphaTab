@@ -1,0 +1,43 @@
+import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+
+/**
+ * @internal
+ */
+export class BarNumberGlyph extends Glyph {
+    private _number: string;
+
+    public constructor(x: number, y: number, num: number) {
+        super(x, y);
+        this._number = `${num}  `;
+    }
+
+    public override doLayout(): void {
+        this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.barNumberFont;
+        this.width =
+            this.renderer.scoreRenderer.canvas!.measureText(this._number).width;
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        if (!this.renderer.staff.isFirstInSystem) {
+            return;
+        }
+
+        using _ = ElementStyleHelper.bar(
+            canvas,
+            (this.renderer as LineBarRenderer).barNumberBarSubElement,
+            this.renderer.bar,
+            true
+        );
+
+        const res: RenderingResources = this.renderer.resources;
+        const baseline = canvas.textBaseline;
+        canvas.textBaseline = TextBaseline.Top;
+        canvas.font = res.barNumberFont;
+        canvas.fillText(this._number, cx + this.x, cy + this.y);
+        canvas.textBaseline = baseline;
+    }
+}

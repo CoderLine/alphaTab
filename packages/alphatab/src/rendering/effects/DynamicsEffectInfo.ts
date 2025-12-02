@@ -1,0 +1,82 @@
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { DynamicsGlyph } from '@coderline/alphatab/rendering/glyphs/DynamicsGlyph';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
+
+/**
+ * @internal
+ */
+export class DynamicsEffectInfo extends EffectBarRendererInfo {
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectDynamics;
+    }
+
+    public get hideOnMultiTrack(): boolean {
+        return false;
+    }
+
+    public get canShareBand(): boolean {
+        return false;
+    }
+
+    public get sizingMode(): EffectBarGlyphSizing {
+        return EffectBarGlyphSizing.SingleOnBeat;
+    }
+
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
+        return this._internalShouldCreateGlyph(beat);
+    }
+
+    private _internalShouldCreateGlyph(beat: Beat): boolean {
+        if (
+            beat.voice.bar.staff.track.score.stylesheet.hideDynamics ||
+            beat.isEmpty ||
+            beat.voice.isEmpty ||
+            beat.isRest
+        ) {
+            return false;
+        }
+
+        const previousBeat = this._getPreviousDynamicsBeat(beat);
+
+        let show: boolean = (beat.voice.index === 0 && !previousBeat) || beat.dynamics !== previousBeat?.dynamics;
+        // ensure we do not show duplicate dynamics
+        if (show && beat.voice.index > 0) {
+            for (const voice of beat.voice.bar.voices) {
+                if (voice.index < beat.voice.index) {
+                    const beatAtSamePos = voice.getBeatAtPlaybackStart(beat.playbackStart);
+                    if (
+                        beatAtSamePos &&
+                        beat.dynamics === beatAtSamePos.dynamics &&
+                        this._internalShouldCreateGlyph(beatAtSamePos)
+                    ) {
+                        show = false;
+                    }
+                }
+            }
+        }
+        return show;
+    }
+    private _getPreviousDynamicsBeat(beat: Beat) {
+        let previousBeat = beat.previousBeat;
+        while (previousBeat != null) {
+            if (!previousBeat.isRest) {
+                return previousBeat;
+            }
+            previousBeat = previousBeat.previousBeat;
+        }
+        return null;
+    }
+
+    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
+        return new DynamicsGlyph(0, 0, beat.dynamics);
+    }
+
+    public canExpand(_from: Beat, _to: Beat): boolean {
+        return true;
+    }
+}

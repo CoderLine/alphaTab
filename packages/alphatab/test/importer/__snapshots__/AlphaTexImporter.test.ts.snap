@@ -1,0 +1,6334 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-staff 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-staff-staff 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-staff-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-staff-voice-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-staff 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-staff-staff 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-staff-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-staff-voice-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-track 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "T2",
+      "shortname" => "T2",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-track-meta 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "clef" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "T2",
+      "shortname" => "T2",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-voice-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-voice-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-staff 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-staff-staff 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 6,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 7,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 8,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-staff-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-staff-voice-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-staff 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-staff-staff 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 6,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 7,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 8,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-staff-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-staff-voice-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-track 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 6,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 7,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 8,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 4,
+        "secondarychannel" => 5,
+      },
+      "name" => "T2",
+      "shortname" => "T2",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-track-meta 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 6,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "clef" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 7,
+              "clef" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 8,
+              "clef" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 4,
+        "secondarychannel" => 5,
+      },
+      "name" => "T2",
+      "shortname" => "T2",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-voice-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "displaytranspositionpitch" => -12,
+          "stringtuning" => Map {
+            "isstandard" => true,
+            "name" => "Guitar Standard Tuning",
+            "tunings" => Array [
+              64,
+              59,
+              55,
+              50,
+              45,
+              40,
+            ],
+          },
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-voice-voice 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 25,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "clef" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "program" => 25,
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest barlines 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 1,
+              "barlineright" => 2,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 4,
+              "barlineright" => 4,
+            },
+          ],
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 7,
+              "barlineright" => 6,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 5,
+              "barlineright" => 1,
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest errors at209 accidentalmode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 accidentalmode: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 accidentalmode: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected accidental mode value 'invalid', expected: auto,explicit",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 articulation: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 articulation: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 articulation: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected articulation value '0', expected: 38,37,91,42,92,46,44,35,36,50,48,47,45,43,93,51,53,94,55,95,52,96,49,97,57,98,99,100,56,101,102,103,77,76,60,104,105,61,106,107,66,65,68,67,64,108,109,63,110,62,72,71,73,74,86,87,54,111,112,113,79,78,58,81,80,114,115,116,69,117,85,75,70,118,119,120,82,122,84,123,83,124,125,39,40,31,41,59,126,127,29,30,33,34",
+    "start" => Map {
+      "col" => 23,
+      "line" => 1,
+      "offset" => 22,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 bar optional: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 bar optional: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 bar optional: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected additional value 'Number', expected: required(String|Ident),optional(String|Ident)",
+    "start" => Map {
+      "col" => 18,
+      "line" => 1,
+      "offset" => 17,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 bar required: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 bar required: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 bar required: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected required value 'String', expected: required(Number)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 barre: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 barre: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 barre: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected additional value 'Ident', expected: required(Number),optional(String|Ident)",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
+    },
+  },
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected barre shape value 'invalid', expected: none,full,half",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 beam: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 beam: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 beam: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected beam value 'invalid', expected: invert,up,down,auto,split,merge,splitsecondary",
+    "start" => Map {
+      "col" => 19,
+      "line" => 1,
+      "offset" => 18,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 beat tuplet: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 beat tuplet: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 beat tuplet: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected default tuplet value '0', expected: 3, 5, 6, 7, 9, 10, 11 or 12",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 bendstyle: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 bendstyle: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 bendstyle: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected bend style value 'invalid', expected: default,gradual,fast",
+    "start" => Map {
+      "col" => 19,
+      "line" => 1,
+      "offset" => 18,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 bendtype: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 bendtype: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 bendtype: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected bend type value 'invalid', expected: none,custom,bend,release,bendrelease,hold,prebend,prebendbend,prebendrelease",
+    "start" => Map {
+      "col" => 14,
+      "line" => 1,
+      "offset" => 13,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 bracketextendmode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 bracketextendmode: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 bracketextendmode: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected bracket extend mode value 'invalid', expected: nobrackets,groupstaves,groupsimilarinstruments",
+    "start" => Map {
+      "col" => 27,
+      "line" => 1,
+      "offset" => 26,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 duration tuplet: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 duration tuplet: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 duration tuplet: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected default tuplet value '0', expected: 3, 5, 6, 7, 9, 10, 11 or 12",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 dynamic: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 dynamic: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 dynamic: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected dynamic value 'invalid', expected: ppp,pp,p,mp,mf,f,ff,fff,pppp,ppppp,pppppp,ffff,fffff,ffffff,sf,sfp,sfpp,fp,rf,rfz,sfz,sffz,fz,n,pf,sfzp",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 fermata: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 fermata: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 fermata: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected additional value 'Ident', expected: optional(String|Ident),optional(Number)",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
+    },
+  },
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected fermata value 'invalid', expected: short,medium,long",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 firstsystemtracknamemode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 firstsystemtracknamemode: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 firstsystemtracknamemode: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name mode value 'invalid', expected: fullname,shortname",
+    "start" => Map {
+      "col" => 34,
+      "line" => 1,
+      "offset" => 33,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 firstsystemtracknameorientation: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 firstsystemtracknameorientation: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 firstsystemtracknameorientation: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name orientation value 'invalid', expected: horizontal,vertical",
+    "start" => Map {
+      "col" => 41,
+      "line" => 1,
+      "offset" => 40,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 gracetype: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 gracetype: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 gracetype: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected additional value 'Ident', expected: optional(String|Ident)",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
+    },
+  },
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected whammy style value 'invalid', expected: ob,b,bb",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 multitracktracknamepolicy: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 multitracktracknamepolicy: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 multitracktracknamepolicy: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name policy value 'invalid', expected: hidden,firstsystem,allsystems",
+    "start" => Map {
+      "col" => 35,
+      "line" => 1,
+      "offset" => 34,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 othersystemstracknamemode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 othersystemstracknamemode: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 othersystemstracknamemode: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name mode value 'invalid', expected: fullname,shortname",
+    "start" => Map {
+      "col" => 35,
+      "line" => 1,
+      "offset" => 34,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 othersystemstracknameorientation: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 othersystemstracknameorientation: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 othersystemstracknameorientation: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name orientation value 'invalid', expected: horizontal,vertical",
+    "start" => Map {
+      "col" => 41,
+      "line" => 1,
+      "offset" => 40,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 ottava: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 ottava: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 ottava: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected ottava value 'invalid', expected: 15ma,8va,regular,8vb,15mb",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 rasg: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 rasg: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 rasg: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected rasgueado pattern value 'invalid', expected: none,ii,mi,miitriplet,miianapaest,pmptriplet,pmpanapaest,peitriplet,peianapaest,paitriplet,paianapaest,amitriplet,amianapaest,ppp,amii,amip,eami,eamii,peami",
+    "start" => Map {
+      "col" => 17,
+      "line" => 1,
+      "offset" => 16,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 score optional: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 score optional: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 score optional: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected additional value 'Number', expected: required(String|Ident),optional(String),optional(String|Ident)",
+    "start" => Map {
+      "col" => 18,
+      "line" => 1,
+      "offset" => 17,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 score required: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 score required: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 score required: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected required value 'Number', expected: required(String|Ident)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 singletracktracknamepolicy: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 singletracktracknamepolicy: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 singletracktracknamepolicy: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name policy value 'invalid', expected: hidden,firstsystem,allsystems",
+    "start" => Map {
+      "col" => 36,
+      "line" => 1,
+      "offset" => 35,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 textalign: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 textalign: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 textalign: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected percussion articulation value 'invalid', expected: oneOf(ride (choke),ridechoke,cymbal (hit),cymbalhit,snare (side stick),snaresidestick,snare (side stick) 2,snaresidestick2,snare (hit),snarehit,kick (hit),kickhit,kick (hit) 2,kickhit2,snare (side stick) 3,snaresidestick3,snare (hit) 2,snarehit2,hand clap (hit),handclaphit,snare (hit) 3,snarehit3,low floor tom (hit),lowfloortomhit,hi-hat (closed),hihatclosed,very low tom (hit),verylowtomhit,pedal hi-hat (hit),pedalhihathit,low tom (hit),lowtomhit,hi-hat (open),hihatopen,mid tom (hit),midtomhit,high tom (hit),hightomhit,crash high (hit),crashhighhit,high floor tom (hit),highfloortomhit,ride (middle),ridemiddle,china (hit),chinahit,ride (bell),ridebell,tambourine (hit),tambourinehit,splash (hit),splashhit,cowbell medium (hit),cowbellmediumhit,crash medium (hit),crashmediumhit,vibraslap (hit),vibraslaphit,ride (edge),rideedge,hand (hit),handhit,bongo high (hit),bongohighhit,bongo low (hit),bongolowhit,conga high (mute),congahighmute,conga high (hit),congahighhit,conga low (hit),congalowhit,timbale high (hit),timbalehighhit,timbale low (hit),timbalelowhit,agogo high (hit),agogohighhit,agogo tow (hit),agogotowhit,cabasa (hit),cabasahit,left maraca (hit),leftmaracahit,whistle high (hit),whistlehighhit,whistle low (hit),whistlelowhit,guiro (hit),guirohit,guiro (scrap-return),guiroscrapreturn,claves (hit),claveshit,woodblock high (hit),woodblockhighhit,woodblock low (hit),woodblocklowhit,cuica (mute),cuicamute,cuica (open),cuicaopen,triangle (rnute),trianglernute,triangle (hit),trianglehit,shaker (hit),shakerhit,tinkle bell (hat),tinklebellhat,jingle bell (hit),jinglebellhit,bell tree (hit),belltreehit,castanets (hit),castanetshit,surdo (hit),surdohit,surdo (mute),surdomute,snare (rim shot),snarerimshot,hi-hat (half),hihathalf,ride (edge) 2,rideedge2,ride (choke) 2,ridechoke2,splash (choke),splashchoke,china (choke),chinachoke,crash high (choke),crashhighchoke,crash medium (choke),crashmediumchoke,cowbell low (hit),cowbelllowhit,cowbell low (tip),cowbelllowtip,cowbell medium (tip),cowbellmediumtip,cowbell high (hit),cowbellhighhit,cowbell high (tip),cowbellhightip,hand (mute),handmute,hand (slap),handslap,hand (mute) 2,handmute2,hand (slap) 2,handslap2,conga low (slap),congalowslap,conga low (mute),congalowmute,conga high (slap),congahighslap,tambourine (return),tambourinereturn,tambourine (roll),tambourineroll,tambourine (hand),tambourinehand,grancassa (hit),grancassahit,piatti (hat),piattihat,piatti (hand),piattihand,cabasa (return),cabasareturn,left maraca (return),leftmaracareturn,right maraca (hit),rightmaracahit,right maraca (return),rightmaracareturn,shaker (return),shakerreturn,bell tee (return),bellteereturn,golpe (thumb),golpethumb,golpe (finger),golpefinger,ride (middle) 2,ridemiddle2,ride (bell) 2,ridebell2).",
+    "start" => Map {
+      "col" => 25,
+      "line" => 1,
+      "offset" => 24,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 tremolo speed: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 tremolo speed: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 tremolo speed: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected tremolo speed value '0, expected: 8, 16 or 32",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 trill: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 trill: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 trill: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected trill duration value '0', expected: 16, 32 or 64",
+    "start" => Map {
+      "col" => 14,
+      "line" => 1,
+      "offset" => 13,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 tuning: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 tuning: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 tuning: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected tuning value 'Invalid', expected: <note><accidental><octave> where <note>=oneOf(67,68,69,70,71,65,66,99,100,101,102,103,97,98,35) <accidental>=oneOf(default,d,,forcenone,-,forcenatural,n,forcesharp,#,forcedoublesharp,##,x,forceflat,b,forcedoubleflat,bb), <octave>=number",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 whammybarstyle: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 whammybarstyle: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 whammybarstyle: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected whammy style value 'invalid', expected: default,gradual,fast",
+    "start" => Map {
+      "col" => 20,
+      "line" => 1,
+      "offset" => 19,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at209 whammybartype: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 whammybartype: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at209 whammybartype: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected whammy type value 'invalid', expected: none,custom,dive,dip,hold,predive,predivedive",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at210 bar empty: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at210 bar empty: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at210 bar empty: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 210,
+    "severity" => 2,
+    "message" => "Missing arguments. Expected following arguments: required(Number)",
+    "start" => Map {
+      "col" => 9,
+      "line" => 1,
+      "offset" => 8,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at210 bar missing: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at210 bar missing: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at210 bar missing: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 210,
+    "severity" => 2,
+    "message" => "Missing arguments. Expected following arguments: required(Number)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at210 score empty: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at210 score empty: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at210 score empty: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 210,
+    "severity" => 2,
+    "message" => "Missing arguments. Expected following arguments: required(String|Ident)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 accidentalmode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 accidentalmode: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(auto|explicit)",
+    "start" => Map {
+      "col" => 13,
+      "line" => 1,
+      "offset" => 12,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 accidentalmode: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar empty: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar empty: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar empty: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(common)
+(Number, Number)",
+    "start" => Map {
+      "col" => 9,
+      "line" => 1,
+      "offset" => 8,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 bar missing: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar missing: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar missing: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (Number). Signatures:
+(common)
+(Number, Number)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 bar optional: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar optional: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar optional: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar required: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar required: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bar required: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (String). Signatures:
+(Number)",
+    "start" => Map {
+      "col" => 12,
+      "line" => 1,
+      "offset" => 11,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 barre: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 barre: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 barre: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected barre shape value 'invalid', expected: full,half",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 beam: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 beam: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
+    },
+  },
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 19,
+      "line" => 1,
+      "offset" => 18,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 beam: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendstyle: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendstyle: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendstyle: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendtype: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendtype: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bendtype: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bracketextendmode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 bracketextendmode: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(nobrackets|groupstaves|groupsimilarinstruments)",
+    "start" => Map {
+      "col" => 19,
+      "line" => 1,
+      "offset" => 18,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 bracketextendmode: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 dynamic: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 dynamic: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 7,
+      "line" => 1,
+      "offset" => 6,
+    },
+  },
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 dynamic: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 fermata: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 fermata: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 fermata: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (Ident). Signatures:
+(short|medium|long, Number)",
+    "start" => Map {
+      "col" => 22,
+      "line" => 1,
+      "offset" => 21,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknamemode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknamemode: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(fullname|shortname)",
+    "start" => Map {
+      "col" => 26,
+      "line" => 1,
+      "offset" => 25,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknamemode: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknameorientation: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknameorientation: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(horizontal|vertical)",
+    "start" => Map {
+      "col" => 33,
+      "line" => 1,
+      "offset" => 32,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 firstsystemtracknameorientation: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 gracetype: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 gracetype: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 gracetype: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected whammy style value 'invalid', expected: onbeat,beforebeat,bendgrace,ob,bb,b",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 multitracktracknamepolicy: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 multitracktracknamepolicy: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(hidden|firstsystem|allsystems)",
+    "start" => Map {
+      "col" => 27,
+      "line" => 1,
+      "offset" => 26,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 multitracktracknamepolicy: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknamemode: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknamemode: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(fullname|shortname)",
+    "start" => Map {
+      "col" => 27,
+      "line" => 1,
+      "offset" => 26,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknamemode: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknameorientation: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknameorientation: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(horizontal|vertical)",
+    "start" => Map {
+      "col" => 33,
+      "line" => 1,
+      "offset" => 32,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 othersystemstracknameorientation: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 ottava: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 ottava: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 7,
+      "line" => 1,
+      "offset" => 6,
+    },
+  },
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 ottava: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 rasg: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 rasg: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(Ident|String)",
+    "start" => Map {
+      "col" => 9,
+      "line" => 1,
+      "offset" => 8,
+    },
+  },
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 17,
+      "line" => 1,
+      "offset" => 16,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 rasg: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score empty: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score empty: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score empty: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(String|Ident, String, left|center|right)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 score optional: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score optional: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score optional: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score required: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score required: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 score required: semantic-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (Number). Signatures:
+(String|Ident, String, left|center|right)",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 singletracktracknamepolicy: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 singletracktracknamepolicy: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(hidden|firstsystem|allsystems)",
+    "start" => Map {
+      "col" => 28,
+      "line" => 1,
+      "offset" => 27,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 singletracktracknamepolicy: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 whammybarstyle: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 whammybarstyle: parser-diagnostics 1`] = `
+Array [
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unrecognized property 'none'.",
+    "start" => Map {
+      "col" => 13,
+      "line" => 1,
+      "offset" => 12,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest errors at219 whammybarstyle: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 whammybartype: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 whammybartype: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest errors at219 whammybartype: semantic-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexImporterTest sync 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 90,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => true,
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 0,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => true,
+        },
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 1000,
+          },
+          "ratioposition" => 0.5,
+          "text" => "",
+          "isvisible" => true,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 2000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => true,
+        },
+      ],
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "isrepeatstart" => true,
+      "start" => 7680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 3000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => true,
+        },
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 1,
+            "millisecondoffset" => 4000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => true,
+        },
+      ],
+      "start" => 11520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "repeatcount" => 2,
+      "start" => 15360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 19200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 1,
+            "millisecondoffset" => 5000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => true,
+        },
+      ],
+      "start" => 23040,
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest sync-expect-dot 1`] = `
+Map {
+  "__kind" => "Score",
+  "artist" => "J.S. Bach (1685-1750)",
+  "copyright" => "Public Domain",
+  "title" => "Prelude in D Minor",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturenumerator" => 3,
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 80,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => true,
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 0,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => true,
+        },
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 1500,
+          },
+          "ratioposition" => 0.666,
+          "text" => "",
+          "isvisible" => true,
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturenumerator" => 3,
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 4075,
+          },
+          "ratioposition" => 0.666,
+          "text" => "",
+          "isvisible" => true,
+        },
+      ],
+      "start" => 2880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturenumerator" => 3,
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 6475,
+          },
+          "ratioposition" => 0.333,
+          "text" => "",
+          "isvisible" => true,
+        },
+      ],
+      "start" => 5760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturenumerator" => 3,
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 10223,
+          },
+          "ratioposition" => 1,
+          "text" => "",
+          "isvisible" => true,
+        },
+      ],
+      "start" => 8640,
+    },
+  ],
+}
+`;

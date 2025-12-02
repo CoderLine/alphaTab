@@ -1,55 +1,47 @@
 {
-    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
     "files": {
-        "ignore": [
-            "dist",
-            ".rollup.cache",
-            "node_modules",
-            "test-data",
-            "src/generated/**"
-        ]
+        "maxSize": 5242880
     },
     "formatter": {
-        "include": [
-            "src/**",
-            "test/**",
-            "src.compiler/**",
-            "playground/**",
-            "playground-template/**"
-        ],
         "enabled": true,
         "formatWithErrors": true,
-        "ignore": [],
         "attributePosition": "auto",
         "indentStyle": "space",
         "indentWidth": 4,
         "lineWidth": 120,
         "lineEnding": "lf"
     },
+    "assist": {
+        "actions": {
+            "source": {
+                "organizeImports": "on"
+            }
+        }
+    },
     "linter": {
-        "include": [
-            "src/**",
-            "test/**",
-            "src.compiler/**",
-            "playground-template/**"
-        ],
         "enabled": true,
         "rules": {
             "style": {
+                "useEnumInitializers": "error",
                 "noInferrableTypes": "off", // we want to be explicit (for transpiler)
                 "noNonNullAssertion": "off", // we use these assertions often.
                 "noParameterAssign": "off", // useful for default values
                 "useExponentiationOperator": "off", // not supported in C# and Kotlin, lets stay with Math.pow
                 "useBlockStatements": {
+                    "options": {},
                     "level": "error",
                     "fix": "safe"
-                }
+                },
+                "noDescendingSpecificity": "off"
             },
             "suspicious": {
-                "noExplicitAny": "off" // used in areas where we work with dynamic JSON data
+                "noExplicitAny": "off", // used in areas where we work with dynamic JSON data
+                "noEmptyInterface": "off" // we use these for marker interfaces 
             },
             "correctness": {
                 "noUnusedImports": {
+                    "options": {},
                     "level": "error",
                     "fix": "safe"
                 },
@@ -57,12 +49,11 @@
             },
             "complexity": {
                 "useOptionalChain": "off", // its currently a bit sensitive with Kotlin as they evaulate things differently
-                "noStaticOnlyClass": "off" // we are strictly OOP (for transpiler)
+                "noStaticOnlyClass": "off", // we are strictly OOP (for transpiler)
+                "noUselessUndefinedInitialization": "off",
+                "noImportantStyles": "off"
             }
         }
-    },
-    "organizeImports": {
-        "enabled": true
     },
     "javascript": {
         "formatter": {

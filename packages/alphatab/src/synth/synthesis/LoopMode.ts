@@ -1,0 +1,13 @@
+// The SoundFont loading and Audio Synthesis is based on TinySoundFont, licensed under MIT,
+// developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
+// TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
+// Licensed under: MPL-2.0
+
+/**
+ * @internal
+ */
+export enum LoopMode {
+    None = 0,
+    Continuous = 1,
+    Sustain = 2
+}

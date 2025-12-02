@@ -12,10 +12,10 @@ jobs:
     name: Linting and TypeCheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           lfs: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: 'npm'
@@ -30,50 +30,52 @@ jobs:
     name: Build and Test Web
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           lfs: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: 'npm'
       - run: npm ci
-      - run: npm run build
-      - run: npm run test
+      - run: npm run build-web
+      - run: npm run test-web
+      - run: npm run build-language-server
+      - run: npm run build-monaco
         id: test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
         with: 
           name: test-results-web
           path: |
-            test-data/**/*.new.png
-            test-data/**/*.diff.png
+            packages/alphatab/test-data/**/*.new.png
+            packages/alphatab/test-data/**/*.diff.png
 
   build_csharp:
     name: Build and Test C#
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           lfs: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: 'npm'
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '8'
       - run: npm ci
       - run: npm run build-csharp
       - run: npm run test-csharp
         id: test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
         with: 
           name: test-results-csharp
           path: |
-            test-data/**/*.new.png
-            test-data/**/*.diff.png
+            packages/alphatab/test-data/**/*.new.png
+            packages/alphatab/test-data/**/*.diff.png
 
   build_kotlin:
     name: Build and Test Kotlin
@@ -88,29 +90,29 @@ jobs:
       SONATYPE_SIGNING_PASSWORD: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
       SONATYPE_SIGNING_KEY: ${{secrets.SONATYPE_SIGNING_KEY}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           lfs: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: 'npm'
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           java-version: '19'
           distribution: 'temurin'
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
         with:
           cache-read-only: false
       - run: npm ci
       - run: npm run build-kotlin
       - run: npm run test-kotlin
         id: test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
         with: 
           name: test-results-kotlin
           path: |
-            test-data/**/*.new.png
-            test-data/**/*.diff.png      
-      - run: ./src.kotlin/alphaTab/gradlew --stop
+            packages/alphatab/test-data/**/*.new.png
+            packages/alphatab/test-data/**/*.diff.png      
+      - run: ./packages/kotlin/src/gradlew --stop

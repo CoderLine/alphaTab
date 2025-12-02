@@ -1,0 +1,29 @@
+import { Color } from '@coderline/alphatab/model/Color';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+
+/**
+ * @internal
+ */
+export class DummyEffectGlyph extends EffectGlyph {
+    private _w: number;
+    private _h: number;
+
+    public constructor(x: number, y: number, w: number = 20, h: number = 20) {
+        super(x, y);
+        this._w = w;
+        this._h = h;
+    }
+
+    public override doLayout(): void {
+        this.width = this._w;
+        this.height = this._h;
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        const c = canvas.color;
+        canvas.color = Color.random();
+        canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
+        canvas.color = c;
+    }
+}

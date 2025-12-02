@@ -1,0 +1,258 @@
+import { CircularSampleBuffer } from '@coderline/alphatab/synth/ds/CircularSampleBuffer';
+import { Environment } from '@coderline/alphatab/Environment';
+import { Logger } from '@coderline/alphatab/Logger';
+import { AlphaSynthWorkerSynthOutput } from '@coderline/alphatab/platform/javascript/AlphaSynthWorkerSynthOutput';
+import { AlphaSynthWebAudioOutputBase } from '@coderline/alphatab/platform/javascript/AlphaSynthWebAudioOutputBase';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import type { Settings } from '@coderline/alphatab/Settings';
+
+/**
+ * @target web
+ * @internal
+ */
+interface AudioWorkletProcessor {
+    readonly port: MessagePort;
+    process(inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>): boolean;
+}
+
+/**
+ * @target web
+ * @internal
+ */
+declare let AudioWorkletProcessor: {
+    prototype: AudioWorkletProcessor;
+    new (options?: AudioWorkletNodeOptions): AudioWorkletProcessor;
+};
+
+// Bug 646: Safari 14.1 is buggy regarding audio worklets
+// globalThis cannot be used to access registerProcessor or samplerate
+// we need to really use them as globals
+/**
+ * @target web
+ * @internal
+ */
+declare let registerProcessor: any;
+/**
+ * @target web
+ * @internal
+ */
+declare let sampleRate: number;
+
+/**
+ * This class implements a HTML5 Web Audio API based audio output device
+ * for alphaSynth using the modern Audio Worklets.
+ * @target web
+ * @internal
+ */
+export class AlphaSynthWebWorklet {
+    private static _isRegistered = false;
+    public static init() {
+        if (AlphaSynthWebWorklet._isRegistered) {
+            return;
+        }
+        AlphaSynthWebWorklet._isRegistered = true;
+        registerProcessor(
+            'alphatab',
+            class AlphaSynthWebWorkletProcessor extends AudioWorkletProcessor {
+                public static readonly BufferSize: number = 4096;
+
+                private _outputBuffer: Float32Array = new Float32Array(0);
+                private _circularBuffer!: CircularSampleBuffer;
+                private _bufferCount: number = 0;
+                private _requestedBufferCount: number = 0;
+                private _isStopped = false;
+
+                constructor(options: AudioWorkletNodeOptions) {
+                    super(options);
+
+                    Logger.debug('WebAudio', 'creating processor');
+
+                    this._bufferCount = Math.floor(
+                        (options.processorOptions.bufferTimeInMilliseconds * sampleRate) /
+                            1000 /
+                            AlphaSynthWebWorkletProcessor.BufferSize
+                    );
+                    this._circularBuffer = new CircularSampleBuffer(
+                        AlphaSynthWebWorkletProcessor.BufferSize * this._bufferCount
+                    );
+
+                    this.port.onmessage = this._handleMessage.bind(this);
+                }
+
+                private _handleMessage(e: MessageEvent) {
+                    const data: any = e.data;
+                    const cmd: any = data.cmd;
+                    switch (cmd) {
+                        case AlphaSynthWorkerSynthOutput.CmdOutputAddSamples:
+                            const f: Float32Array = data.samples;
+                            this._circularBuffer.write(f, 0, f.length);
+                            this._requestedBufferCount--;
+                            break;
+                        case AlphaSynthWorkerSynthOutput.CmdOutputResetSamples:
+                            this._circularBuffer.clear();
+                            break;
+                        case AlphaSynthWorkerSynthOutput.CmdOutputStop:
+                            this._isStopped = true;
+                            break;
+                    }
+                }
+
+                public override process(
+                    _inputs: Float32Array[][],
+                    outputs: Float32Array[][],
+                    _parameters: Record<string, Float32Array>
+                ): boolean {
+                    if (outputs.length !== 1 && outputs[0].length !== 2) {
+                        return false;
+                    }
+
+                    const left: Float32Array = outputs[0][0];
+                    const right: Float32Array = outputs[0][1];
+
+                    if (!left || !right) {
+                        return true;
+                    }
+
+                    const samples: number = left.length + right.length;
+                    let buffer = this._outputBuffer;
+                    if (buffer.length !== samples) {
+                        buffer = new Float32Array(samples);
+                        this._outputBuffer = buffer;
+                    }
+                    const samplesFromBuffer = this._circularBuffer.read(
+                        buffer,
+                        0,
+                        Math.min(buffer.length, this._circularBuffer.count)
+                    );
+                    let s: number = 0;
+                    const min = Math.min(left.length, samplesFromBuffer);
+                    for (let i: number = 0; i < min; i++) {
+                        left[i] = buffer[s++];
+                        right[i] = buffer[s++];
+                    }
+
+                    if (samplesFromBuffer < left.length) {
+                        for (let i = samplesFromBuffer; i < left.length; i++) {
+                            left[i] = 0;
+                            right[i] = 0;
+                        }
+                    }
+
+                    this.port.postMessage({
+                        cmd: AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed,
+                        samples: samplesFromBuffer / SynthConstants.AudioChannels
+                    });
+                    this._requestBuffers();
+
+                    return this._circularBuffer.count > 0 || !this._isStopped;
+                }
+
+                private _requestBuffers(): void {
+                    // if we fall under the half of buffers
+                    // we request one half
+                    const halfBufferCount = (this._bufferCount / 2) | 0;
+                    const halfSamples: number = halfBufferCount * AlphaSynthWebWorkletProcessor.BufferSize;
+                    // Issue #631: it can happen that requestBuffers is called multiple times
+                    // before we already get samples via addSamples, therefore we need to
+                    // remember how many buffers have been requested, and consider them as available.
+                    const bufferedSamples =
+                        this._circularBuffer.count +
+                        this._requestedBufferCount * AlphaSynthWebWorkletProcessor.BufferSize;
+                    if (bufferedSamples < halfSamples) {
+                        for (let i: number = 0; i < halfBufferCount; i++) {
+                            this.port.postMessage({
+                                cmd: AlphaSynthWorkerSynthOutput.CmdOutputSampleRequest
+                            });
+                        }
+                        this._requestedBufferCount += halfBufferCount;
+                    }
+                }
+            }
+        );
+    }
+}
+
+/**
+ * This class implements a HTML5 Web Audio API based audio output device
+ * for alphaSynth. It can be controlled via a JS API.
+ * @target web
+ * @internal
+ */
+export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
+    private _worklet: AudioWorkletNode | null = null;
+    private _bufferTimeInMilliseconds: number = 0;
+    private readonly _settings: Settings;
+
+    public constructor(settings: Settings) {
+        super();
+        this._settings = settings;
+    }
+
+    public override open(bufferTimeInMilliseconds: number) {
+        super.open(bufferTimeInMilliseconds);
+        this._bufferTimeInMilliseconds = bufferTimeInMilliseconds;
+        this.onReady();
+    }
+
+    public override play(): void {
+        super.play();
+        const ctx = this.context!;
+        // create a script processor node which will replace the silence with the generated audio
+        Environment.createAudioWorklet(ctx, this._settings).then(
+            () => {
+                this._worklet = new AudioWorkletNode(ctx!, 'alphatab', {
+                    numberOfOutputs: 1,
+                    outputChannelCount: [2],
+                    processorOptions: {
+                        bufferTimeInMilliseconds: this._bufferTimeInMilliseconds
+                    }
+                });
+                this._worklet.port.onmessage = this._handleMessage.bind(this);
+                this.source!.connect(this._worklet);
+                this.source!.start(0);
+                this._worklet.connect(ctx!.destination);
+            },
+            reason => {
+                Logger.error('WebAudio', `Audio Worklet creation failed: reason=${reason}`);
+            }
+        );
+    }
+
+    private _handleMessage(e: MessageEvent) {
+        const data: any = e.data;
+        const cmd: any = data.cmd;
+        switch (cmd) {
+            case AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed:
+                this.onSamplesPlayed(data.samples);
+                break;
+            case AlphaSynthWorkerSynthOutput.CmdOutputSampleRequest:
+                this.onSampleRequest();
+                break;
+        }
+    }
+
+    public override pause(): void {
+        super.pause();
+        if (this._worklet) {
+            this._worklet.port.postMessage({
+                cmd: AlphaSynthWorkerSynthOutput.CmdOutputStop
+            });
+            this._worklet.port.onmessage = null;
+            this._worklet.disconnect();
+        }
+        this._worklet = null;
+    }
+
+    public addSamples(f: Float32Array): void {
+        this._worklet?.port.postMessage({
+            cmd: AlphaSynthWorkerSynthOutput.CmdOutputAddSamples,
+            samples: Environment.prepareForPostMessage(f)
+        });
+    }
+
+    public resetSamples(): void {
+        this._worklet?.port.postMessage({
+            cmd: AlphaSynthWorkerSynthOutput.CmdOutputResetSamples
+        });
+    }
+}

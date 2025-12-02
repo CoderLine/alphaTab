@@ -1,0 +1,17 @@
+{
+    "name": "@coderline/alphatab-alphatex",
+    "version": "1.7.0",
+    "private": true,
+    "scripts": {
+        "lint": "biome lint",
+        "typecheck": "tsc --noEmit",
+        "generate": "tsx scripts/generate.ts"
+    },
+    "devDependencies": {
+        "rimraf": "^6.0.1",
+        "tslib": "^2.8.1",
+        "tsx": "^4.20.6",
+        "typescript": "^5.9.3"
+    },
+    "type": "module"
+}

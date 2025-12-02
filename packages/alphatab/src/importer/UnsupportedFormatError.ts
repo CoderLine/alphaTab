@@ -1,0 +1,12 @@
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+
+/**
+ * The exception thrown by a {@link ScoreImporter} in case the
+ * binary data does not contain a reader compatible structure.
+ * @public
+ */
+export class UnsupportedFormatError extends AlphaTabError {
+    public constructor(message: string | null = null, inner?: Error) {
+        super(AlphaTabErrorType.Format, message ?? 'Unsupported format', inner);
+    }
+}

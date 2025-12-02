@@ -26,25 +26,57 @@ jobs:
     if: needs.check_sha.outputs.hit == 'false'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           lfs: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: 'npm'
 
-      - run: node ./scripts/update-version.js alpha ${{github.run_number}}
+      - run: npm run update-version -- alpha ${{github.run_number}}
       - run: npm ci
-      - run: npm run build
+      - run: npm run build-web
+      - run: npm run build-language-server
+      - run: npm run build-monaco      
       - run: npm pack
+        working-directory: ./packages/alphatab/
+      - run: npm pack
+        working-directory: ./packages/vite/
+      - run: npm pack
+        working-directory: ./packages/webpack/
+      - run: npm pack
+        working-directory: ./packages/lsp/
+      - run: npm pack
+        working-directory: ./packages/monaco/
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           registry-url: https://registry.npmjs.org/
 
       - run: npm publish --access public --tag alpha
+        working-directory: ./packages/alphatab/
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+
+      - run: npm publish --access public --tag alpha
+        working-directory: ./packages/vite/
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+
+      - run: npm publish --access public --tag alpha
+        working-directory: ./packages/webpack/
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+
+      - run: npm publish --access public --tag alpha
+        working-directory: ./packages/lsp/
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+
+      - run: npm publish --access public --tag alpha
+        working-directory: ./packages/monaco/
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
 
@@ -54,24 +86,26 @@ jobs:
     if: needs.check_sha.outputs.hit == 'false'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           lfs: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: 'npm'
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "8"
 
+      - run: npm run update-version -- alpha ${{github.run_number}}
       - run: npm ci
-      - run: node ./scripts/update-csharp-version.js alpha ${{github.run_number}}
       - run: npm run build-csharp
 
-      - run: dotnet nuget push src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
-      - run: dotnet nuget push src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+      - run: dotnet nuget push AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+        working-directory: ./packages/csharp/src/
+      - run: dotnet nuget push AlphaTab.Windows/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+        working-directory: ./packages/csharp/src/
 
   nightly_kotlin_android:
     name: Kotlin (Android)
@@ -85,26 +119,26 @@ jobs:
       ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
       ORG_GRADLE_PROJECT_signingInMemoryKey: ${{secrets.SONATYPE_SIGNING_KEY}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           lfs: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: 'npm'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           java-version: "19"
           distribution: "temurin"
 
+      - run: npm run update-version -- alpha ${{github.run_number}}
       - run: npm ci
-      - run: node ./scripts/update-kotlin-version.js SNAPSHOT
       - run: npm run build-kotlin
 
       - run: ./gradlew publishToMavenCentral
-        working-directory: ./src.kotlin/alphaTab/
+        working-directory: ./packages/kotlin/src/
 
       - run: ./gradlew --stop
-        working-directory: ./src.kotlin/alphaTab/
+        working-directory: ./packages/kotlin/src/
 

@@ -1,0 +1,13 @@
+{
+    "extension": [
+        "ts"
+    ],
+    "node-option": [
+        "env-file=.env",
+        "experimental-specifier-resolution=node",
+        "import=tsx/esm",
+        "no-warnings"
+    ],
+    "spec": "test/**/*.test.ts",
+    "timeout": "10000"
+}

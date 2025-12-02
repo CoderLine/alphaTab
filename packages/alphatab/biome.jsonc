@@ -1,0 +1,97 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
+    "root": false,
+    "extends": "//",
+    "files": {
+        "includes": [
+            "**/*.*",
+            "!dist",
+            "!.rollup.cache",
+            "!node_modules",
+            "!test-data",
+            "!src/generated"
+        ]
+    },
+    "formatter": {
+        "includes": [
+            "*.ts",
+            "src/**",
+            "test/**",
+            "src.compiler/**",
+            "playground/**"
+        ]
+    },
+    "linter": {
+        "includes": [
+            "*.ts",
+            "src/**",
+            "test/**",
+            "src.compiler/**"
+        ],
+        "rules": {
+            "style": {
+                "useNamingConvention": {
+                    "level": "error",
+                    "options": {
+                        "strictCase": false,
+                        "conventions": [
+                            {
+                                "selector": {
+                                    "kind": "classMember",
+                                    "modifiers": [
+                                        "private"
+                                    ]
+                                },
+                                "match": "_(.+)",
+                                "formats": [
+                                    "camelCase"
+                                ]
+                            },
+                            {
+                                "selector": {
+                                    "kind": "objectLiteralProperty"
+                                },
+                                "formats": [
+                                    "camelCase",
+                                    "PascalCase"
+                                ]
+                            },
+                            {
+                                "selector": {
+                                    "kind": "typeProperty"
+                                },
+                                "formats": [
+                                    "camelCase",
+                                    "PascalCase"
+                                ]
+                            },
+                            {
+                                "selector": {
+                                    "kind": "classProperty",
+                                    "modifiers": [
+                                        "static",
+                                        "readonly"
+                                    ]
+                                },
+                                "formats": [
+                                    "camelCase",
+                                    "PascalCase"
+                                ]
+                            },
+                            {
+                                "selector": {
+                                    "kind": "enumMember"
+                                },
+                                "match": ".+",
+                                "formats": [
+                                    "PascalCase",
+                                    "CONSTANT_CASE"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

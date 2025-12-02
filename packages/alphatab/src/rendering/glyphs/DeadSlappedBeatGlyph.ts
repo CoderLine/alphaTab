@@ -1,0 +1,40 @@
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+
+/**
+ * @internal
+ */
+export class DeadSlappedBeatGlyph extends Glyph {
+    public constructor() {
+        super(0, 0);
+    }
+
+    public override doLayout(): void {
+        this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        const renderer = this.renderer as LineBarRenderer;
+        const crossHeight = renderer.getLineHeight(renderer.heightLineCount - 1);
+
+        const staffTop = renderer.getLineY(0);
+        const staffHeight = renderer.getLineHeight(renderer.drawnLineCount - 1);
+
+        // center X on staff
+        const centerY = staffTop + staffHeight / 2 - crossHeight / 2;
+
+        const lw = canvas.lineWidth;
+        canvas.lineWidth = this.renderer.smuflMetrics.deadSlappedLineWidth;
+        canvas.moveTo(cx + this.x, cy + centerY);
+        canvas.lineTo(cx + this.x + this.width, cy + centerY + crossHeight);
+
+        canvas.moveTo(cx + this.x, cy + centerY + crossHeight);
+        canvas.lineTo(cx + this.x + this.width, cy + centerY);
+
+        canvas.stroke();
+
+        canvas.lineWidth = lw;
+    }
+}
