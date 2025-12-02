@@ -3,7 +3,7 @@ import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
 const sidebars: SidebarsConfig = {
   docs: {
     alphaTab: [
-      "introduction", 
+      "introduction",
       "contributing"
     ],
     "Release Notes": [
@@ -142,17 +142,44 @@ const sidebars: SidebarsConfig = {
   },
   alphaTex: {
     alphaTex: [
-      "alphatex/introduction",
-      "alphatex/metadata",
-      "alphatex/stylesheet",
-      "alphatex/notes",
-      "alphatex/bar-metadata",
-      "alphatex/tracks-staves",
-      "alphatex/beat-effects",
-      "alphatex/note-effects",
-      "alphatex/percussion",
-      "alphatex/lyrics",
-      "alphatex/sync-points",
+      {
+        type: 'doc',
+        id:  "alphatex/introduction"
+      },
+      {
+        type: 'doc',
+        id:  "alphatex/syntax"
+      },
+      {
+        type: 'doc',
+        id:  "alphatex/document-structure"
+      },
+      {
+        type: 'category',
+        label: 'Language Reference',
+        collapsed: false,
+        collapsible: false,
+        items: [
+          "alphatex/structural-metadata",
+          "alphatex/score-metadata",
+          "alphatex/staff-metadata",
+          "alphatex/bar-metadata",
+          "alphatex/beat-properties",
+          "alphatex/note-properties",
+        ]
+      }, 
+      {
+        type: 'doc',
+        id:  "alphatex/importer"
+      },
+      {
+        type: 'doc',
+        id:  "alphatex/lsp"
+      },
+      {
+        type: 'doc',
+        id:  "alphatex/monaco"
+      }
     ],
   },
   showcase: [

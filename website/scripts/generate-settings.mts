@@ -7,12 +7,14 @@ import {
   getCategory,
   getJsDocTagText,
   getSummary,
-  isDomWildcard,
   isJsonOnParent,
   isTargetWeb,
+  ReferencePage,
+  ReferenceTableData,
   repositoryRoot,
   writeCommonImports,
   writePropertyDetails,
+  writeReferenceTable,
 } from "./generate-common.mjs";
 import { GenerateContext } from "./typeschema.mjs";
 import { openFileStream } from "./util.mjs";
@@ -28,13 +30,19 @@ export async function generateSettings(context: GenerateContext) {
       return ts.isPropertyDeclaration(m) && !isStatic;
     }) as ts.PropertyDeclaration[];
 
+
+    const categories = new ReferenceTableData();
     for (const m of allProps) {
-      const basePath = path.join(
-        repositoryRoot,
+      const basePathRelative = path.join(
         "docs",
         "reference",
         "settings",
         m.name.getText().toLowerCase()
+      );
+
+      const basePath = path.join(
+        repositoryRoot,
+        basePathRelative
       );
 
       const subSettingType =
@@ -48,33 +56,35 @@ export async function generateSettings(context: GenerateContext) {
             );
 
           if (ts.isPropertyDeclaration(member) && !isSubSettingPropStatic) {
+            const settingFileName = member.name.getText().toLowerCase() + ".mdx";
             const settingFile = path.join(
               basePath,
-              member.name.getText().toLowerCase() + ".mdx"
+              settingFileName
             );
 
             await fs.promises.mkdir(basePath, { recursive: true });
 
             await using fileStream = await openFileStream(settingFile);
             await fileStream.write("---\n");
-            await fileStream.write(
-              `title: ${m.name.getText()}.${member.name.getText()}\n`
-            );
+
+            const page: ReferencePage = {
+              title: `${m.name.getText()}.${member.name.getText()}`,
+              description: getSummary(context, member, false),
+              javaScriptOnly: isTargetWeb(context, member),
+              url: '/' + path.join(basePathRelative, settingFileName).replaceAll('\\', '/').replaceAll('.mdx', '')
+            };
+
+            const category = getCategory(context, member, "");
+            categories.addPage(category, page);
 
             await fileStream.write(
-              `description: ${JSON.stringify(
-                getSummary(context, member, false)
-              )}\n`
+              `title: ${page.title}\n`
             );
+
             await fileStream.write(`sidebar_custom_props:\n`);
 
-            const isWebOnly = isTargetWeb(context, member);
-            if (isWebOnly) {
+            if (page.javaScriptOnly) {
               await fileStream.write(`  javaScriptOnly: true\n`);
-            }
-
-            if (isDomWildcard(context, member)) {
-              await fileStream.write(`  domWildcard: true\n`);
             }
 
             if (isJsonOnParent(context, m)) {
@@ -82,7 +92,7 @@ export async function generateSettings(context: GenerateContext) {
             }
 
             await fileStream.write(
-              `  category: ${getCategory(context, member, "")}\n`
+              `  category: ${category}\n`
             );
 
             const since = getJsDocTagText(context, member, "since");
@@ -90,18 +100,28 @@ export async function generateSettings(context: GenerateContext) {
 
             await fileStream.write("---\n");
 
-            await writeCommonImports(fileStream);
+            fileStream.suspend = context.emptyFiles;
+            await writeCommonImports(fileStream, ['PropertyDescription']);
 
-            await fileStream.write(
-              "import { SettingsHeader } from '@site/src/components/SettingsHeader';\n\n"
-            );
-            await fileStream.write(`<SettingsHeader />\n`);
+            if (since) {
+              await fileStream.write(`<SinceBadge since=${JSON.stringify(since)} />\n`);
+            }
+
+            await fileStream.write(`<PropertyDescription showJson={true} />\n`);
 
             await writePropertyDetails(context, fileStream, member);
           }
         }
       }
     }
+
+    await writeReferenceTable(path.join(
+      repositoryRoot,
+      "docs",
+      "reference",
+      "_settingsTable.mdx"
+    ), 'Property', categories);
+
   } finally {
     disableWarningsOnMissingDocs();
   }

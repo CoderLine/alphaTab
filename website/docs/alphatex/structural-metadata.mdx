@@ -1,0 +1,28 @@
+---
+title: Structural Metadata
+---
+
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+
+For some songs you might want to define that the song has multiple tracks, staves or voices.
+
+* Multiple tracks are used when multiple instruments are playing together in one song.
+* Multiple staves are typically used to write grand staff piano notation (left hand/right hand) or 
+  splitup voices for readability. 
+* Multiple voices are typically used to write notation where multiple independent timings and pitches are played. 
+  This can be if multiple vocals are singing together (hence the name voices), or special playing techniques (playing a base rhythm and melody on the same instrument). 
+
+In alphaTex new tracks, staves and voices are started with their respective metadata tags specified at the start of a bar:
+
+* `\track`
+* `\staff`
+* `\voice`
+
+alphaTab refers to these kind of metadata tags as "structural" tags as they define the general structure of the song.
+
+The initial track, staff or voice is implicitly started. Only on the "second" item you need to specify the tags. For clarity
+it is encouraged to also specify the initial item if there are multiple tracks, staves or voices.
+
+import Doc from './_structural-metadata.mdx';
+
+<Doc />

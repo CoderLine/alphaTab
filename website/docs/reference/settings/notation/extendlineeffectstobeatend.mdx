@@ -1,23 +1,14 @@
 ---
 title: notation.extendLineEffectsToBeatEnd
-description: "If set to true, line effects like w/bar and let-ring are drawn until the end of the beat instead of the start"
 sidebar_custom_props:
   category: Notation
   since: 0.9.6
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, PropertyDescription } from '@site/src/reference-commons'
 
-import { SettingsHeader } from '@site/src/components/SettingsHeader';
-
-<SettingsHeader />
+<SinceBadge since="0.9.6" />
+<PropertyDescription showJson={true} />
 
 ### Description
 If set to true, line effects like w/bar and let-ring are drawn until the end of the beat instead of the start By default effect annotations that render a line above the staff, stop on the beat. This is the typical display of Guitar Pro. In songbooks and some other tools
@@ -26,15 +17,9 @@ these effects are drawn to the end of this beat.
 |-----------------------------------------------------------------------------|-------------------------------------------------------------------------------|
 | ![Enabled](/img/reference/property/extendlineeffectstobeatend-enabled.png) | ![Disabled](/img/reference/property/extendlineeffectstobeatend-disabled.png) |
 
-<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
-<TabItem value="js">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"extendLineEffectsToBeatEnd"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"boolean"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="cs">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"bool"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"ExtendLineEffectsToBeatEnd"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="kt">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"extendLineEffectsToBeatEnd"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Boolean"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span></code></pre></div></div>
-</TabItem>
-</Tabs>
+<Signature style="block"
+           js={[["identifier","extendLineEffectsToBeatEnd"],["token",":"],["whitespace"," "],["identifier","boolean"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","false"],["token",";"]]}
+           csharp={[["identifier","bool"],["whitespace"," "],["identifier","ExtendLineEffectsToBeatEnd"],["whitespace"," "],["token","{"],["whitespace"," "],["keyword","get"],["token",";"],["whitespace"," "],["keyword","set"],["token",";"],["whitespace"," "],["token","}"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","false"]]}
+           kotlin={[["keyword","var"],["whitespace"," "],["identifier","extendLineEffectsToBeatEnd"],["token",":"],["whitespace"," "],["identifier","Boolean"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","false"]]}
+/>
 

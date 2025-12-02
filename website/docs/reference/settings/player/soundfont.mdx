@@ -1,27 +1,20 @@
 ---
 title: player.soundFont
-description: "The sound font file to load for the player."
 sidebar_custom_props:
   javaScriptOnly: true
   category: Player - JavaScript Specific
   since: 0.9.6
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, PropertyDescription } from '@site/src/reference-commons'
 
-import { SettingsHeader } from '@site/src/components/SettingsHeader';
-
-<SettingsHeader />
+<SinceBadge since="0.9.6" />
+<PropertyDescription showJson={true} />
 
 ### Description
 The sound font file to load for the player. When the player is enabled the soundfont from this URL will be loaded automatically after the player is ready.
 
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"soundFont"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"string"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"null"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"null"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+<Signature style="block"
+           js={[["identifier","soundFont"],["token",":"],["whitespace"," "],["identifier","string"],["whitespace"," "],["token","|"],["whitespace"," "],["keyword","null"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","null"],["token",";"]]}
+/>
 

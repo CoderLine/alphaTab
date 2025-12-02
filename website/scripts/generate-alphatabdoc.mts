@@ -2,10 +2,11 @@ import path from "path";
 import url from "url";
 import ts, { JSDocParsingMode } from "typescript";
 import { generateSettings } from "./generate-settings.mjs";
-import { GenerateContext } from "./typeschema.mjs";
+import { GenerateContext, repositoryRoot } from "./typeschema.mjs";
 import { generateTypeDocs } from "./generate-typedocs.mjs";
-import { cconsole } from "./generate-common.mjs";
+import { cconsole, TypeReferencedCodeToken } from "./generate-common.mjs";
 import { generateApiDocs } from "./generate-api.mjs";
+import { generateAlphaTexDocs } from "./generate-alphatex.mjs";
 
 const alphaTabEntryFile = url.fileURLToPath(
   import.meta.resolve("@coderline/alphatab")
@@ -32,6 +33,7 @@ const context: GenerateContext = {
   flatExports: new Map(),
   nameToExportName: new Map(),
   settings: null!,
+  emptyFiles: false
 };
 
 function walkModuleDeclaration(
@@ -139,7 +141,7 @@ for (const { d, identifier } of exports) {
       ts.isEnumDeclaration(d) ||
       ts.isClassDeclaration(d) ||
       ts.isInterfaceDeclaration(d) ||
-      ts.isTypeAliasDeclaration(d) 
+      ts.isTypeAliasDeclaration(d)
     ) {
       context.flatExports.set(e, d);
       context.nameToExportName.set(i, e);
@@ -150,8 +152,76 @@ for (const { d, identifier } of exports) {
 context.settings = context.flatExports.get(
   "alphaTab.Settings"
 ) as ts.ClassDeclaration;
+
+context.emptyFiles = process.argv.includes("--empty");
+
 await generateSettings(context);
 await generateTypeDocs(context);
 await generateApiDocs(context);
+await generateAlphaTexDocs();
 
-// TODO: run prettier on MDX files
+// styles for syntax highlighting
+import { PrismTheme, PrismThemeEntry, themes as prismThemes } from "prism-react-renderer";
+import { openFileStream } from "./util.mjs";
+
+await using styles = await openFileStream(path.join(
+  repositoryRoot,
+  'src',
+  'css',
+  'highlight.scss'
+));
+
+function toKebabCase(s: string): string {
+  return s.replaceAll(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)
+}
+function prismToCss(entry: PrismThemeEntry): [string, string][] {
+  return Object.entries(entry).map(e => ([toKebabCase(e[0]), e[1]]) as [string, string]);
+}
+
+async function writeStyles(theme: string, prismTheme: PrismTheme) {
+  await styles.writeLine(`[data-theme=${JSON.stringify(theme)}] {`)
+
+  const themeLookup = new Map<TypeReferencedCodeToken["kind"], PrismThemeEntry>();
+
+  themeLookup.set("identifier", prismTheme.plain);
+  themeLookup.set("token", prismTheme.plain);
+  themeLookup.set("keyword", prismTheme.plain);
+  themeLookup.set("whitespace", prismTheme.plain);
+
+  for (const styles of prismTheme.styles) {
+    if (styles.types.includes("variable")) {
+      themeLookup.set("identifier", styles.style);
+    }
+    if (styles.types.includes("punctuation")) {
+      themeLookup.set("token", styles.style);
+    }
+    if (styles.types.includes("keyword")) {
+      themeLookup.set("keyword", styles.style);
+    }
+  }
+
+  await styles.writeLine(`  code.codeBlockLines.generated, code.codeBlockLinesInline {`)
+  // plain style on container
+  for (const [k, v] of prismToCss(prismTheme.plain)) {
+    await styles.writeLine(`    ${k}: ${v};`)
+  }
+  await styles.writeLine()
+
+  // specific token kinds
+  for (const [kind, style] of themeLookup) {
+    await styles.writeLine(`    .${kind} {`)
+    for (const [k, v] of prismToCss(style)) {
+      await styles.writeLine(`      ${k}: ${v};`)
+    }
+    await styles.writeLine(`    }`)
+  }
+
+  await styles.writeLine(`  }`)
+  await styles.writeLine(`}`)
+}
+
+// aligned with "docusaurus.config.ts"
+await writeStyles('light', prismThemes.github);
+await writeStyles('dark', prismThemes.dracula);
+
+

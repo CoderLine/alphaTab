@@ -1,25 +1,15 @@
 ---
 title: display.resources
-description: "Allows adjusting of the used fonts and colors for rendering."
 sidebar_custom_props:
-  domWildcard: true
   jsOnParent: true
   category: Display
   since: 0.9.6
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, PropertyDescription } from '@site/src/reference-commons'
 
-import { SettingsHeader } from '@site/src/components/SettingsHeader';
-
-<SettingsHeader />
+<SinceBadge since="0.9.6" />
+<PropertyDescription showJson={true} />
 
 ### Description
 Allows adjusting of the used fonts and colors for rendering. AlphaTab allows configuring the colors and fonts used for rendering via the rendering resources settings. Please note that as of today
@@ -53,17 +43,11 @@ For JavaScript you can use any CSS font property compliant string. (#RGB, #RGBA,
 
 On .net simply construct the `Color` object to configure your desired color.
 
-<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
-<TabItem value="js">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"resources"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/renderingresources"}>{"RenderingResources"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="cs">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/renderingresources"}>{"RenderingResources"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Resources"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="kt">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"resources"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/renderingresources"}>{"RenderingResources"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span></code></pre></div></div>
-</TabItem>
-</Tabs>
+<Signature style="block"
+           js={[["identifier","resources"],["token",":"],["whitespace"," "],["identifier","RenderingResources","/docs/reference/types/renderingresources"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","false"],["token",";"]]}
+           csharp={[["identifier","RenderingResources","/docs/reference/types/renderingresources"],["whitespace"," "],["identifier","Resources"],["whitespace"," "],["token","{"],["whitespace"," "],["keyword","get"],["token",";"],["whitespace"," "],["keyword","set"],["token",";"],["whitespace"," "],["token","}"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","false"]]}
+           kotlin={[["keyword","var"],["whitespace"," "],["identifier","resources"],["token",":"],["whitespace"," "],["identifier","RenderingResources","/docs/reference/types/renderingresources"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","false"]]}
+/>
 
 
 import ManualDocs from './_resources.mdx';

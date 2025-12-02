@@ -3,6 +3,7 @@ import * as alphaTab from "@coderline/alphatab";
 import { useEffect, useRef } from "react";
 import styles from "./styles.module.scss";
 import environment from "@site/src/environment";
+import { useColorMode } from '@docusaurus/theme-common';
 
 type RasguadoItemMode = "down" | "up" | "head";
 type RasgueadoPatternItem = {
@@ -141,7 +142,7 @@ const RasgueadoPatternDefinition = new Map<
       {
         finger: "i",
         mode: "up",
-        flag: alphaTab.model.MusicFontSymbol.FlagEighthUp,
+        flag: alphaTab.model.MusicFontSymbol.Flag8thUp,
       },
     ],
   ],
@@ -155,7 +156,7 @@ const RasgueadoPatternDefinition = new Map<
       {
         finger: "p",
         mode: "up",
-        flag: alphaTab.model.MusicFontSymbol.FlagEighthUp,
+        flag: alphaTab.model.MusicFontSymbol.Flag8thUp,
       },
     ],
   ],
@@ -199,11 +200,13 @@ type RasgueadoPatternProps = {
 
 const canvas = alphaTab.Environment.renderEngines.get("svg")!.createCanvas();
 canvas.settings = new alphaTab.Settings();
-environment.setAlphaTabDefaults(canvas.settings);
 canvas.settings.display.scale = 1.5;
 
 export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
   const pattern = RasgueadoPatternDefinition.get(rasgueado)!;
+  const { colorMode } = useColorMode();
+
+  environment.setAlphaTabDefaults(canvas.settings, colorMode);
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -233,7 +236,7 @@ export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
 
     // canvas.fillRect(startX, 0, actualWidth, canvasHeight);
 
-    canvas.color = new alphaTab.model.Color(0, 0, 0);
+    canvas.color = canvas.settings.display.resources.mainGlyphColor;
 
     canvas.font = alphaTab.model.Font.fromJson(canvasStyle.font)!.withSize(10);
     canvas.font.families = [canvas.font.families[0]];
@@ -382,7 +385,7 @@ export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
     }
 
     canvasRef.current!.innerHTML = canvas.endRender() as string;
-  }, []);
+  }, [colorMode]);
 
   return (
     <div className={styles.rasgueado}>
@@ -402,7 +405,7 @@ export function RasgueadoPatterns() {
   return (
     <div className={styles.wrapper}>
       {patterns.map((p) => (
-        <RasgueadoPattern rasgueado={p} />
+        <RasgueadoPattern key={alphaTab.model.Rasgueado[p]} rasgueado={p} />
       ))}
     </div>
   );

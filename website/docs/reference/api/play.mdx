@@ -1,37 +1,23 @@
 ---
 title: play
-description: "Starts the playback of the current song."
 sidebar_custom_props:
   kind: method
   category: Methods - Player
   since: 0.9.4
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="0.9.4" />
 
 ### Description
 Starts the playback of the current song.
 
-<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
-<TabItem value="js">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"play"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"boolean"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="cs">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"bool"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Play"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="kt">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"play"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Boolean"}</span></code></pre></div></div>
-</TabItem>
-</Tabs>
+<Signature style="block"
+           js={[["identifier","play"],["token","("],["token",")"],["token",":"],["whitespace"," "],["identifier","boolean"]]}
+           csharp={[["identifier","bool"],["whitespace"," "],["identifier","Play"],["token","("],["token",")"]]}
+           kotlin={[["identifier","fun"],["whitespace"," "],["identifier","play"],["token","("],["token",")"],["token",":"],["whitespace"," "],["identifier","Boolean"]]}
+/>
 
 ### Returns 
 true if the playback was started, otherwise false. Reasons for not starting can be that the player is not ready or already playing. 

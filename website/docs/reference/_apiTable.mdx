@@ -1,0 +1,801 @@
+import { CodeBadge } from "@site/src/components/CodeBadge";
+import { Signature } from "@site/src/components/Signature";
+
+<table className="table table-striped table-condensed reference-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><th colSpan="4">Events - Core</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/error">
+      <CodeBadge name="error" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when an error within alphatab occurred.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/postrenderfinished">
+      <CodeBadge name="postRenderFinished" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the rendering of the whole music sheet is finished, and all handlers of `renderFinished` ran.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/renderfinished">
+      <CodeBadge name="renderFinished" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the rendering of the whole music sheet is finished.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/renderstarted">
+      <CodeBadge name="renderStarted" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the rendering of the whole music sheet is starting.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/resize">
+      <CodeBadge name="resize" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when alphaTab was resized and is about to rerender the music notation.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/scoreloaded">
+      <CodeBadge name="scoreLoaded" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired whenever a new song is loaded.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/settingsupdated">
+      <CodeBadge name="settingsUpdated" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when a settings update was requested.
+  </td>
+</tr>
+    <tr><th colSpan="4">Events - Player</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/activebeatschanged">
+      <CodeBadge name="activeBeatsChanged" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the currently active beats across all tracks change.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/beatmousedown">
+      <CodeBadge name="beatMouseDown" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired whenever a the user presses the mouse button on a beat.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/beatmousemove">
+      <CodeBadge name="beatMouseMove" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired whenever the user moves the mouse over a beat after the user already pressed the button on a beat.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/beatmouseup">
+      <CodeBadge name="beatMouseUp" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired whenever the user releases the mouse after a mouse press on a beat.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/midieventsplayed">
+      <CodeBadge name="midiEventsPlayed" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the synthesizer played certain midi events.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/midiload">
+      <CodeBadge name="midiLoad" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when a Midi file is being loaded.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/midiloaded">
+      <CodeBadge name="midiLoaded" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the Midi file needed for playback was loaded.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/notemousedown">
+      <CodeBadge name="noteMouseDown" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired whenever a the user presses the mouse button on a note head/number.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/notemousemove">
+      <CodeBadge name="noteMouseMove" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired whenever the user moves the mouse over a note after the user already pressed the button on a note.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/notemouseup">
+      <CodeBadge name="noteMouseUp" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired whenever the user releases the mouse after a mouse press on a note.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playbackrangechanged">
+      <CodeBadge name="playbackRangeChanged" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the playback range changed.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playedbeatchanged">
+      <CodeBadge name="playedBeatChanged" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the played beat changed.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playerfinished">
+      <CodeBadge name="playerFinished" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the playback of the whole song finished.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playerpositionchanged">
+      <CodeBadge name="playerPositionChanged" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the current playback position of the song changed.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playerready">
+      <CodeBadge name="playerReady" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when all required data for playback is loaded and ready.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playerstatechanged">
+      <CodeBadge name="playerStateChanged" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the playback state changed.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/soundfontload">
+      <CodeBadge name="soundFontLoad" type="js" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the SoundFont is being loaded.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/soundfontloaded">
+      <CodeBadge name="soundFontLoaded" type="all" />
+    </a>
+  </td>
+  <td>
+     This event is fired when the SoundFont needed for playback was loaded.
+  </td>
+</tr>
+    <tr><th colSpan="4">Methods - Core</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/destroy">
+      <CodeBadge name="destroy" type="all" />
+    </a>
+  </td>
+  <td>
+     Destroys the alphaTab control and restores the initial state of the UI.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/downloadmidi">
+      <CodeBadge name="downloadMidi" type="js" />
+    </a>
+  </td>
+  <td>
+     Generates an SMF1.0 file and downloads it
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/print">
+      <CodeBadge name="print" type="js" />
+    </a>
+  </td>
+  <td>
+     Opens a popup window with the rendered music notation for printing.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/render">
+      <CodeBadge name="render" type="all" />
+    </a>
+  </td>
+  <td>
+     Initiates a re-rendering of the current setup.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/renderscore">
+      <CodeBadge name="renderScore" type="all" />
+    </a>
+  </td>
+  <td>
+     Initiates a rendering of the given score.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/rendertracks">
+      <CodeBadge name="renderTracks" type="all" />
+    </a>
+  </td>
+  <td>
+     Renders the given list of tracks.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/tex">
+      <CodeBadge name="tex" type="all" />
+    </a>
+  </td>
+  <td>
+     Tells alphaTab to render the given alphaTex.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/updatesettings">
+      <CodeBadge name="updateSettings" type="all" />
+    </a>
+  </td>
+  <td>
+     Applies any changes that were done to the settings object.
+  </td>
+</tr>
+    <tr><th colSpan="4">Methods - Player</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/changetrackmute">
+      <CodeBadge name="changeTrackMute" type="all" />
+    </a>
+  </td>
+  <td>
+     Changes the given tracks to be muted or not.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/changetracksolo">
+      <CodeBadge name="changeTrackSolo" type="all" />
+    </a>
+  </td>
+  <td>
+     Changes the given tracks to be played solo or not.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/changetracktranspositionpitch">
+      <CodeBadge name="changeTrackTranspositionPitch" type="all" />
+    </a>
+  </td>
+  <td>
+     Changes the pitch transpose applied to the given tracks.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/changetrackvolume">
+      <CodeBadge name="changeTrackVolume" type="all" />
+    </a>
+  </td>
+  <td>
+     Changes the volume of the given tracks.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/enumerateoutputdevices">
+      <CodeBadge name="enumerateOutputDevices" type="all" />
+    </a>
+  </td>
+  <td>
+     Loads and lists the available output devices which can be used by the player.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/exportaudio">
+      <CodeBadge name="exportAudio" type="all" />
+    </a>
+  </td>
+  <td>
+     Starts the audio export for the currently loaded song.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/getoutputdevice">
+      <CodeBadge name="getOutputDevice" type="all" />
+    </a>
+  </td>
+  <td>
+     The currently configured output device if changed via <Signature style="inline" js={[["identifier","setOutputDevice"]]} />.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/load">
+      <CodeBadge name="load" type="all" />
+    </a>
+  </td>
+  <td>
+     Initiates a load of the score using the given data.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/loadmidiforscore">
+      <CodeBadge name="loadMidiForScore" type="all" />
+    </a>
+  </td>
+  <td>
+     Re-creates the midi for the current score and loads it.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/loadsoundfont">
+      <CodeBadge name="loadSoundFont" type="all" />
+    </a>
+  </td>
+  <td>
+     Triggers a load of the soundfont from the given data.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/loadsoundfontfromurl">
+      <CodeBadge name="loadSoundFontFromUrl" type="js" />
+    </a>
+  </td>
+  <td>
+     Triggers a load of the soundfont from the given URL.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/pause">
+      <CodeBadge name="pause" type="all" />
+    </a>
+  </td>
+  <td>
+     Pauses the playback of the current song.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/play">
+      <CodeBadge name="play" type="all" />
+    </a>
+  </td>
+  <td>
+     Starts the playback of the current song.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playbeat">
+      <CodeBadge name="playBeat" type="all" />
+    </a>
+  </td>
+  <td>
+     Triggers the play of the given beat.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playnote">
+      <CodeBadge name="playNote" type="all" />
+    </a>
+  </td>
+  <td>
+     Triggers the play of the given note.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playpause">
+      <CodeBadge name="playPause" type="all" />
+    </a>
+  </td>
+  <td>
+     Toggles between play/pause depending on the current player state.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/resetsoundfonts">
+      <CodeBadge name="resetSoundFonts" type="all" />
+    </a>
+  </td>
+  <td>
+     Unloads all presets from previously loaded SoundFonts.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/scrolltocursor">
+      <CodeBadge name="scrollToCursor" type="all" />
+    </a>
+  </td>
+  <td>
+     Initiates a scroll to the cursor.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/setoutputdevice">
+      <CodeBadge name="setOutputDevice" type="all" />
+    </a>
+  </td>
+  <td>
+     Changes the output device which should be used for playing the audio (player must be enabled).
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/stop">
+      <CodeBadge name="stop" type="all" />
+    </a>
+  </td>
+  <td>
+     Stops the playback of the current song, and moves the playback position back to the start.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/updatesyncpoints">
+      <CodeBadge name="updateSyncPoints" type="all" />
+    </a>
+  </td>
+  <td>
+     Triggers an update of the sync points for the current score after modification within the data model
+  </td>
+</tr>
+    <tr><th colSpan="4">Properties - Core</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/boundslookup">
+      <CodeBadge name="boundsLookup" type="all" />
+    </a>
+  </td>
+  <td>
+     The tick cache allowing lookup of midi ticks to beats.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/canvaselement">
+      <CodeBadge name="canvasElement" type="all" />
+    </a>
+  </td>
+  <td>
+     The UI container that will hold all rendered results.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/container">
+      <CodeBadge name="container" type="all" />
+    </a>
+  </td>
+  <td>
+     The UI container that holds the whole alphaTab control.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/renderer">
+      <CodeBadge name="renderer" type="all" />
+    </a>
+  </td>
+  <td>
+     The score renderer used for rendering the music sheet.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/score">
+      <CodeBadge name="score" type="all" />
+    </a>
+  </td>
+  <td>
+     The score holding all information about the song being rendered
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/settings">
+      <CodeBadge name="settings" type="all" />
+    </a>
+  </td>
+  <td>
+     The settings that are used for rendering the music notation.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/tracks">
+      <CodeBadge name="tracks" type="all" />
+    </a>
+  </td>
+  <td>
+     The list of the tracks that are currently rendered.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/uifacade">
+      <CodeBadge name="uiFacade" type="all" />
+    </a>
+  </td>
+  <td>
+     The UI facade used for interacting with the user interface (like the browser).
+  </td>
+</tr>
+    <tr><th colSpan="4">Properties - Player</th></tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/actualplayermode">
+      <CodeBadge name="actualPlayerMode" type="all" />
+    </a>
+  </td>
+  <td>
+     The actual player mode which is currently active.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/countinvolume">
+      <CodeBadge name="countInVolume" type="all" />
+    </a>
+  </td>
+  <td>
+     The volume of the count-in metronome ticks.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/endtick">
+      <CodeBadge name="endTick" type="all" />
+    </a>
+  </td>
+  <td>
+     The total length of the song in midi ticks.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/endtime">
+      <CodeBadge name="endTime" type="all" />
+    </a>
+  </td>
+  <td>
+     The total length of the song in milliseconds.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/islooping">
+      <CodeBadge name="isLooping" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether the playback should automatically restart after it finished.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/isreadyforplayback">
+      <CodeBadge name="isReadyForPlayback" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether the player is ready for starting the playback.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/mastervolume">
+      <CodeBadge name="masterVolume" type="all" />
+    </a>
+  </td>
+  <td>
+     The current master volume as percentage (0-1).
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/metronomevolume">
+      <CodeBadge name="metronomeVolume" type="all" />
+    </a>
+  </td>
+  <td>
+     The metronome volume as percentage (0-1).
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/midieventsplayedfilter">
+      <CodeBadge name="midiEventsPlayedFilter" type="all" />
+    </a>
+  </td>
+  <td>
+     The midi events which will trigger the `midiEventsPlayed` event
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playbackrange">
+      <CodeBadge name="playbackRange" type="all" />
+    </a>
+  </td>
+  <td>
+     The range of the song that should be played.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playbackspeed">
+      <CodeBadge name="playbackSpeed" type="all" />
+    </a>
+  </td>
+  <td>
+     The current playback speed as percentage
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/player">
+      <CodeBadge name="player" type="all" />
+    </a>
+  </td>
+  <td>
+     The alphaSynth player used for playback.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/playerstate">
+      <CodeBadge name="playerState" type="all" />
+    </a>
+  </td>
+  <td>
+     The current player state.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/tickcache">
+      <CodeBadge name="tickCache" type="all" />
+    </a>
+  </td>
+  <td>
+     The tick cache allowing lookup of midi ticks to beats.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/tickposition">
+      <CodeBadge name="tickPosition" type="all" />
+    </a>
+  </td>
+  <td>
+     The position within the song in midi ticks.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/api/timeposition">
+      <CodeBadge name="timePosition" type="all" />
+    </a>
+  </td>
+  <td>
+     The position within the song in milliseconds
+  </td>
+</tr>
+  </tbody>
+
+</table>
+

@@ -13,10 +13,12 @@ After alphaTab has loaded a full [`Score`](/docs/reference/score) object from an
 Supported export formats: 
 
 - Guitar Pro 7 (alphaTab.exporter.Gp7Exporter) <span className="badge badge--info">since 1.2.0</span>
+- alphaTex (alphaTab.exporter.AlphaTexExporter) <span className="badge badge--info">since 1.7.0</span>
 
 To export a `Score` object the corresponding exporter needs to be created and called. Then the resulting binary array can be used further to 
 trigger a download, send it to a server, save it to a file etc. 
 
+## Guitar Pro 7 (since 1.2.0)
 
 <Tabs
   defaultValue="js"
@@ -56,3 +58,28 @@ using(var fs = new System.IO.FileStream(fileName, System.IO.FileMode.Create))
 
 </TabItem>
 </Tabs>
+
+## alphaTex Exporter (since 1.7.0)
+
+Starting with 1.7.0 alphaTab can also export the data model to its own music notation language [alphaTex](/docs/alphatex/introduction).
+The exporter supports all features which the importer can also handle. If you find something, please open a feature request. 
+
+Via the exporter settings [`settings.exporter`](/docs/reference/settings.mdx#Exporter) the format of the exported code can be adjusted.
+Especially the `comments` can be quite useful for alphaTex beginners to learn about the syntax.
+
+While you can use the standard `export` to export the code into a byte array, you can also use `exportToString` to get the alphaTex code
+back as plain string.
+
+```js
+const exporter = new alphaTab.exporter.AlphaTexExporter();
+const data = exporter.export(api.score, api.settings); // will return a Uint8Array
+const texCode = exporter.exportToString(api.score, api.settings); // will return a string
+
+// trigger download
+const a = document.createElement('a');
+a.download = api.score.title.length > 0 ? api.score.title + '.atex' : 'Untitled.atex';
+a.href = URL.createObjectURL(new Blob([data]));
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+```

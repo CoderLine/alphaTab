@@ -8,6 +8,7 @@ export const repositoryRoot = path.resolve(
 );
 
 export type GenerateContext = {
+  emptyFiles: boolean;
   checker: ts.TypeChecker;
   settings: ts.ClassDeclaration;
   dts: string;

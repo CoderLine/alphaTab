@@ -1,20 +1,12 @@
 ---
 title: beatMouseUp
-description: "This event is fired whenever the user releases the mouse after a mouse press on a beat."
 sidebar_custom_props:
   kind: event
   category: Events - Player
   since: 0.9.7
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="0.9.7" />
 
@@ -22,17 +14,11 @@ import Link from '@docusaurus/Link';
 This event is fired whenever the user releases the mouse after a mouse press on a beat. This event is fired regardless of whether the mouse was released on a beat.
 The parameter is null if the mouse was released somewhere beside the beat.
 
-<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
-<TabItem value="js">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"beatMouseUp"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/beat"}>{"Beat"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"null"}</span><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="cs">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/beat"}>{"Beat"}</Link><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"BeatMouseUp"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="kt">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"beatMouseUp"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/beat"}>{"Beat"}</Link><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{">"}</span></code></pre></div></div>
-</TabItem>
-</Tabs>
+<Signature style="block"
+           js={[["keyword","readonly"],["whitespace"," "],["identifier","beatMouseUp"],["token",":"],["whitespace"," "],["identifier","IEventEmitterOfT","/docs/reference/types/ieventemitteroft"],["token","<"],["identifier","Beat","/docs/reference/types/model/beat"],["whitespace"," "],["token","|"],["whitespace"," "],["keyword","null"],["token",">"],["token",";"]]}
+           csharp={[["identifier","IEventEmitterOfT","/docs/reference/types/ieventemitteroft"],["token","<"],["identifier","Beat","/docs/reference/types/model/beat"],["token","?"],["token",">"],["whitespace"," "],["identifier","BeatMouseUp"],["whitespace"," "],["token","{"],["whitespace"," "],["keyword","get"],["token",";"],["whitespace"," "],["token","}"]]}
+           kotlin={[["keyword","val"],["whitespace"," "],["identifier","beatMouseUp"],["token",":"],["whitespace"," "],["identifier","IEventEmitterOfT","/docs/reference/types/ieventemitteroft"],["token","<"],["identifier","Beat","/docs/reference/types/model/beat"],["token","?"],["token",">"]]}
+/>
 
 
 ## Examples

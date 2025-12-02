@@ -45,6 +45,7 @@ export async function generateTypeDocs(context: GenerateContext) {
     await fileStream.write(`title: ${exportedName}\n`);
     await fileStream.write("---\n");
 
+    fileStream.suspend = context.emptyFiles;
     await writeCommonImports(fileStream);
 
     await fileStream.write(
@@ -436,6 +437,7 @@ async function writeFrontMatter(
 
   await fileStream.write("---\n");
 
+  fileStream.suspend = context.emptyFiles;
   await writeCommonImports(fileStream);
 
   if (since) {

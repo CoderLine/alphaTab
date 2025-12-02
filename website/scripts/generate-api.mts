@@ -8,10 +8,13 @@ import {
   getSummary,
   isEvent,
   isTargetWeb,
+  ReferencePage,
+  ReferenceTableData,
   writeCommonImports,
   writeEventDetails,
   writeMethodDetails,
   writePropertyDetails,
+  writeReferenceTable,
 } from "./generate-common.mjs";
 import ts from "typescript";
 import { FileStream, openFileStream } from "./util.mjs";
@@ -42,6 +45,9 @@ export async function generateApiDocs(context: GenerateContext) {
     "alphaTab.AlphaTabApi"
   ) as ts.ClassDeclaration, false);
 
+  const categories = new ReferenceTableData();
+
+
   for (const m of Array.from(members.values())) {
     if (isEvent(context, m)) {
       events.push(m as (typeof events)[0]);
@@ -56,9 +62,19 @@ export async function generateApiDocs(context: GenerateContext) {
     }
   }
 
-  await writeProperties(context, basePath, properties);
-  await writeMethods(context, basePath, methods);
-  await writeEvents(context, basePath, events);
+  await writeProperties(context, basePath, properties, categories);
+  await writeMethods(context, basePath, methods, categories);
+  await writeEvents(context, basePath, events, categories);
+
+  await writeReferenceTable(
+    path.join(repositoryRoot,
+      "docs",
+      "reference",
+      "_apiTable.mdx"
+    ),
+    'Name',
+    categories
+  )
 }
 
 async function writeProperties(
@@ -68,20 +84,22 @@ async function writeProperties(
     | ts.PropertyDeclaration
     | ts.PropertySignature
     | ts.GetAccessorDeclaration
-  )[]
+  )[],
+  referenceTable: ReferenceTableData
 ) {
   for (const member of properties) {
-    await writePropertyPage(context, basePath, member);
+    await writePropertyPage(context, basePath, member, referenceTable);
   }
 }
 
 async function writeMethods(
   context: GenerateContext,
   basePath: string,
-  methods: (ts.MethodDeclaration | ts.MethodSignature)[]
+  methods: (ts.MethodDeclaration | ts.MethodSignature)[],
+  referenceTable: ReferenceTableData
 ) {
   for (const member of methods) {
-    await writeMethodPage(context, basePath, member);
+    await writeMethodPage(context, basePath, member, referenceTable);
   }
 }
 
@@ -92,10 +110,11 @@ async function writeEvents(
     | ts.PropertyDeclaration
     | ts.PropertySignature
     | ts.GetAccessorDeclaration
-  )[]
+  )[],
+  referenceTable: ReferenceTableData
 ) {
   for (const member of events) {
-    await writeEventPage(context, basePath, member);
+    await writeEventPage(context, basePath, member, referenceTable);
   }
 }
 
@@ -104,23 +123,33 @@ async function writeFrontMatter(
   fileStream: FileStream,
   memberName: string,
   member: ts.ClassElement | ts.TypeElement,
-  kind: string
+  kind: string,
+  referenceTable: ReferenceTableData,
+  additionalDependencies: string[] = []
 ) {
+  const page: ReferencePage = {
+    title: memberName,
+    description: getSummary(context, member, false),
+    javaScriptOnly: isTargetWeb(context, member),
+    url: '/' + path.relative(
+      repositoryRoot,
+      fileStream.path
+    ).replaceAll('\\', '/').replaceAll('.mdx', '')
+  };
+  const category = getCategory(context, member, " - Core");
+  referenceTable.addPage(category, page);
+
   await fileStream.write("---\n");
-  await fileStream.write(`title: ${memberName}\n`);
-  await fileStream.write(
-    `description: ${JSON.stringify(getSummary(context, member, false))}\n`
-  );
+  await fileStream.write(`title: ${page.title}\n`);
   await fileStream.write(`sidebar_custom_props:\n`);
   await fileStream.write(`  kind: ${kind}\n`);
 
-  const isWebOnly = isTargetWeb(context, member);
-  if (isWebOnly) {
+  if (page.javaScriptOnly) {
     await fileStream.write(`  javaScriptOnly: true\n`);
   }
 
   await fileStream.write(
-    `  category: ${getCategory(context, member, " - Core")}\n`
+    `  category: ${category}\n`
   );
 
   const since = getJsDocTagText(context, member, "since");
@@ -130,8 +159,10 @@ async function writeFrontMatter(
 
   await fileStream.write("---\n");
 
-  await writeCommonImports(fileStream);
-  
+  fileStream.suspend = context.emptyFiles;
+
+  await writeCommonImports(fileStream, additionalDependencies);
+
   if (since) {
     await fileStream.write(`<SinceBadge since=${JSON.stringify(since)} />\n`);
   }
@@ -143,7 +174,8 @@ async function writePropertyPage(
   member:
     | ts.PropertyDeclaration
     | ts.PropertySignature
-    | ts.GetAccessorDeclaration
+    | ts.GetAccessorDeclaration,
+  referenceTable: ReferenceTableData
 ) {
   let memberName = member.name!.getText();
   let fileName = memberName.toLowerCase();
@@ -155,10 +187,9 @@ async function writePropertyPage(
 
   await using fileStream = await openFileStream(filePath);
 
-  await writeFrontMatter(context, fileStream, memberName, member, "property");
-
-  await fileStream.write(
-    "import { PropertyDescription } from '@site/src/components/PropertyDescription';\n\n"
+  await writeFrontMatter(context, fileStream, memberName, member, "property",
+    referenceTable,
+    ['PropertyDescription']
   );
 
   await fileStream.write("<PropertyDescription />\n");
@@ -172,28 +203,30 @@ async function writeEventPage(
   member:
     | ts.PropertyDeclaration
     | ts.PropertySignature
-    | ts.GetAccessorDeclaration
+    | ts.GetAccessorDeclaration,
+  referenceTable: ReferenceTableData
 ) {
   const memberName = member.name!.getText();
   const filePath = path.join(basePath, memberName.toLocaleLowerCase() + ".mdx");
 
   await using fileStream = await openFileStream(filePath);
 
-  await writeFrontMatter(context, fileStream, memberName, member, "event");
-
+  await writeFrontMatter(context, fileStream, memberName, member, "event", referenceTable);
   await writeEventDetails(context, fileStream, member);
 }
 
 async function writeMethodPage(
   context: GenerateContext,
   basePath: string,
-  member: ts.MethodDeclaration | ts.MethodSignature
+  member: ts.MethodDeclaration | ts.MethodSignature,
+  referenceTable: ReferenceTableData
 ) {
   const memberName = member.name!.getText();
   const filePath = path.join(basePath, memberName.toLocaleLowerCase() + ".mdx");
 
   await using fileStream = await openFileStream(filePath);
 
-  await writeFrontMatter(context, fileStream, memberName, member, "method");
+  await writeFrontMatter(context, fileStream, memberName, member, "method", referenceTable);
+
   await writeMethodDetails(context, fileStream, member);
 }

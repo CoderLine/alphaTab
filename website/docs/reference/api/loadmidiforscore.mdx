@@ -1,35 +1,21 @@
 ---
 title: loadMidiForScore
-description: "Re-creates the midi for the current score and loads it."
 sidebar_custom_props:
   kind: method
   category: Methods - Player
   since: 1.6.0
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="1.6.0" />
 
 ### Description
 Re-creates the midi for the current score and loads it. This will result in the player to stop playback. Some setting changes require re-genration of the midi song.
 
-<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
-<TabItem value="js">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"loadMidiForScore"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"void"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="cs">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"void"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"LoadMidiForScore"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="kt">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"loadMidiForScore"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Unit"}</span></code></pre></div></div>
-</TabItem>
-</Tabs>
+<Signature style="block"
+           js={[["identifier","loadMidiForScore"],["token","("],["token",")"],["token",":"],["whitespace"," "],["identifier","void"]]}
+           csharp={[["keyword","void"],["whitespace"," "],["identifier","LoadMidiForScore"],["token","("],["token",")"]]}
+           kotlin={[["identifier","fun"],["whitespace"," "],["identifier","loadMidiForScore"],["token","("],["token",")"],["token",":"],["whitespace"," "],["identifier","Unit"]]}
+/>
 

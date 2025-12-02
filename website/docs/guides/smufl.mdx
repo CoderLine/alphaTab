@@ -1,0 +1,77 @@
+--- 
+title: SMuFL font customization
+since: 1.7.0
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+import { AlphaTabPetaluma } from '@site/src/components/AlphaTabPetaluma';
+
+> SMuFL is a specification that provides a standard way of mapping the thousands of musical symbols required by conventional music notation into the Private Use Area in Unicode’s Basic Multilingual Plane for a single (format-independent) font.
+> https://www.smufl.org/
+
+<AlphaTabPetaluma>{`
+\\subtitle ("alphatab using Petaluma instead of Bravura" "%SUBTITLE%" left)
+5.3{h}.8{beam Down}
+7.3{sl}.8{beam Down}
+8.3{sl acc #}.8{beam Down}
+7.3{h}.8{beam Down}
+5.3{sl}.8{beam Down}
+3.3{h acc #}.8{beam Down}
+5.3{h}.8{beam Down}
+3.3{acc #}.8{beam Down}
+|
+7.3{tr (9 16)}.1{beam Down}
+|
+21.1{acc #}.8{ot 8va beam Down}
+21.1{acc #}.8{ot 8va beam Down}
+21.1{acc #}.8{ot 8va beam Down}
+21.1{acc #}.8{ot 8va beam Down}
+r.2
+`}</AlphaTabPetaluma>
+
+For years alphaTab was using the SmuFL font Bravura to render the music notation symbols. But historically a lot of the visual aspects like spacings, paddings and other arrangements were a custom development originating in the roots of alphaTab.
+While music sheets were generally looking good, various aspects of the SmuFL specification were not followed leading into "incorrect" display according to this spec. 
+
+With 1.7.0 we have cleaned years of accumulated customizations in layouting the music sheet bringing things closer to the spec.
+Not only brings this change alphaTab closer too the expected look&feel compared to other music notation software, it also allows the usage of custom SmuFL compliant fonts.
+
+SMuFl fonts consist of two main parts: 
+
+1. The Font itself holding drawing and text-layout information of the glyphs
+2. A separate metadata.json holding SMuFL spec specific details on sizes to use.
+
+To activate a custom font these two things have to be provided to alphaTab. The following example shows the same music sheet with different SMuFL fonts: 
+
+```ts
+import * as alphaTab from "@coderline/alphatab";
+const settings = new alphaTab.Settings();
+
+// 1. Tell alphatab where to find the font
+settings.core.smuflFontSources = new Map<alphaTab.FontFileFormat, string>([
+    [alphaTab.FontFileFormat.OpenType, 'Petaluma.otf']
+])
+
+// 2. Fill the metadata containing all sizes and spacing information
+const petalumaMetadata = await loadJsonViaAjax('petaluma_metadata.json');
+settings.display.resources.engravingSettings.fillFromSmufl(petalumaMetadata);
+
+// 3. Initialize alphaTab as usual
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphatab'), settings);
+```
+
+## Limitations
+
+### No dynamic font changes
+
+alphaTab cannot dynamically change the font used in one instance. Hence changing the `smuflFontSources` will not have any effect
+on re-rendering. In such cases destroy the current `AlphaTabApi` instance and create a new one. 
+
+### Incomplete SMuFl Fonts
+
+We noticed that there are not many fonts beside Bravura which provide all symbols used by alphaTab. alphaTab has no fallback mechanism
+to use other glyphs in such cases. Also some fonts have placeholder symbols for glyphs not supported.
+
+alphaTab tries to warn about missing glyphs using the information in the `metadata.json`.
+
+Check the console warnings when calling `fillFromSmufl`.

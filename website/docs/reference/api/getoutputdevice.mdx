@@ -1,41 +1,27 @@
 ---
 title: getOutputDevice
-description: "The currently configured output device if changed via <code style={{\"color\":\"#393A34\",\"backgroundColor\":\"#f6f8fa\"}}><span style={{\"color\":\"#36acaa\"}}>{\"setOutputDevice\"}</span></code>."
 sidebar_custom_props:
   kind: method
   category: Methods - Player
   since: 1.5.0
 ---
 
-import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import { SinceBadge } from '@site/src/components/SinceBadge';
-import DynHeading from '@site/src/components/DynHeading';
-import Link from '@docusaurus/Link';
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="1.5.0" />
 
 ### Description
-The currently configured output device if changed via <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/alphatabapibase/setoutputdevice"}>{"setOutputDevice"}</Link></code>. Assumes <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/alphatabapibase/setoutputdevice"}>{"setOutputDevice"}</Link></code> has been used.
+The currently configured output device if changed via <Signature style="inline" js={[["identifier","setOutputDevice","/docs/reference/types/alphatabapibase/setoutputdevice"]]} />. Assumes <Signature style="inline" js={[["identifier","setOutputDevice","/docs/reference/types/alphatabapibase/setoutputdevice"]]} /> has been used.
 In the web version this functionality relies on experimental APIs and might not yet be available in all browsers. https://caniuse.com/mdn-api_audiocontext_sinkid
 
-<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
-<TabItem value="js">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"getOutputDevice"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/isynthoutputdevice"}>{"Promise"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/isynthoutputdevice"}>{"ISynthOutputDevice"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"null"}</span><span style={{"color":"#393A34"}}>{">"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="cs">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1"}>{"System.Threading.Task"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/isynthoutputdevice"}>{"ISynthOutputDevice"}</Link><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"GetOutputDevice"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
-</TabItem>
-<TabItem value="kt">
-<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"suspend"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"getOutputDevice"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/isynthoutputdevice"}>{"ISynthOutputDevice"}</Link><span style={{"color":"#393A34"}}>{"?"}</span></code></pre></div></div>
-</TabItem>
-</Tabs>
+<Signature style="block"
+           js={[["identifier","getOutputDevice"],["token","("],["token",")"],["token",":"],["whitespace"," "],["identifier","Promise","/docs/reference/types/synth/isynthoutputdevice"],["token","<"],["identifier","ISynthOutputDevice","/docs/reference/types/synth/isynthoutputdevice"],["whitespace"," "],["token","|"],["whitespace"," "],["keyword","null"],["token",">"]]}
+           csharp={[["identifier","System.Threading.Task","https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1"],["token","<"],["identifier","ISynthOutputDevice","/docs/reference/types/synth/isynthoutputdevice"],["token","?"],["token",">"],["whitespace"," "],["identifier","GetOutputDevice"],["token","("],["token",")"]]}
+           kotlin={[["identifier","suspend"],["whitespace"," "],["identifier","fun"],["whitespace"," "],["identifier","getOutputDevice"],["token","("],["token",")"],["token",":"],["whitespace"," "],["identifier","ISynthOutputDevice","/docs/reference/types/synth/isynthoutputdevice"],["token","?"]]}
+/>
 
 ### Returns 
-The custom configured output device which was set via <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/alphatabapibase/setoutputdevice"}>{"setOutputDevice"}</Link></code> or `null`
+The custom configured output device which was set via <Signature style="inline" js={[["identifier","setOutputDevice","/docs/reference/types/alphatabapibase/setoutputdevice"]]} /> or `null`
 if the default outputDevice is used.
 The output device might change dynamically if devices are connected/disconnected (e.g. bluetooth headset). 
 

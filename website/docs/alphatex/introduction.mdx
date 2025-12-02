@@ -30,23 +30,3 @@ Here is an example score fully rendered using alphaTex.
 15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2 14.2 |
 12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h} 14.2{h} 15.2{h} 14.2{h} 15.2{h} 14.2{h} 15.2{h} 14.2{h} 15.2{h} 14.2{h} 15.2{h} 14.2{h} 15.2{h}
 `}</AlphaTexSample>
-
-
-## General Song Structure
-
-alphaTex has the following structure variations. Comments are supported in C-style comments via `// Single Line` and `/* Multi Line */`. 
-
-
-```title=General File Structure
-/* Song Metadata */
-.
-/* Song Contents */
-.
-/* Sync Points */
-```
-
-The Song Metadata and Sync Points are optional but the dots are mandatory to separate the sections in case there is any content filled. 
-
-* Song Metadata: This section contains all information generally about the song like title.
-* Song Contents: This section contains defines the whole song contents with all the tracks, staves, bars, beats, notes that alphaTab supports. Bars are separated by `|` symbols.
-* Sync Points: alphaTab can be synchronized with external media like audio backing tracks or videos. To have the correct cursor display and highlighting, songs have to be synchronized. This section defines such markers.

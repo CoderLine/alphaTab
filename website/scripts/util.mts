@@ -1,6 +1,7 @@
 import fs from "fs";
 
 export interface FileStream extends AsyncDisposable {
+  suspend: boolean;
   readonly path: string;
   write(s: string): Promise<void>;
   writeLine(s?: string): Promise<void>;
@@ -8,8 +9,12 @@ export interface FileStream extends AsyncDisposable {
 
 export async function openFileStream(path: string): Promise<FileStream> {
   const fileStream = await fs.promises.open(path, "w");
+  let _suspended = false;
 
   const write = async (s: string) => {
+    if (_suspended) {
+      return;
+    }
     await fileStream.write(s);
   };
   const writeLine = (s?: string) => {
@@ -28,6 +33,12 @@ export async function openFileStream(path: string): Promise<FileStream> {
     write,
     writeLine,
     [Symbol.asyncDispose]: asyncDispose,
+    get suspend() {
+      return _suspended
+    },
+    set suspend(v: boolean) {
+      _suspended = v;
+    }
   };
 }
 

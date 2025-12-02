@@ -1,1 +1,16 @@
-@import '../AlphaTab/styles.module.scss'
+.wrapper {
+  position: relative;
+
+  > button {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    opacity: 0;
+    z-index: 1100;
+    transition: all 0.2s ease-in-out;
+  }
+
+  &:hover > button {
+    opacity: 1;
+  }
+}
