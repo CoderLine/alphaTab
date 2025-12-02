@@ -60,6 +60,11 @@ jobs:
         working-directory: ./packages/vite/
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+      - name: Publish to NPM (Webpack release)
+        run: npm publish --access public
+        working-directory: ./packages/webpack/
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
       - name: Publish to NPM (Language Server release)
         run: npm publish --access public
         working-directory: ./packages/lsp/
