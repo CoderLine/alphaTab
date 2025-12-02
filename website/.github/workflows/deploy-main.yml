@@ -20,6 +20,8 @@ jobs:
         node-version: lts/*
     - run: npm install
     - run: npm install @coderline/alphatab@latest
+    - run: npm install -D @coderline/alphatab-webpack@latest
+    - run: npm install -D @coderline/alphatab-language-server@latest
     - run: npm run generate-alphatabdoc
     - run: npm run build
     - name: Package Zip
