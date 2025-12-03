@@ -152,7 +152,6 @@ export class TabBarRenderer extends LineBarRenderer {
             }
 
             this.height += this.settings.notation.rhythmHeight;
-            this.bottomPadding += this.settings.notation.rhythmHeight;
         }
     }
 
@@ -218,6 +217,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
+        super.createVoiceGlyphs(v);
         // multibar rest
         if (this.additionalMultiRestBars) {
             const container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(v)!);
@@ -232,11 +232,39 @@ export class TabBarRenderer extends LineBarRenderer {
         }
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy, canvas);
+    protected override get flagsSubElement(): BeatSubElement {
+        return BeatSubElement.GuitarTabFlags;
+    }
+
+    protected override get beamsSubElement(): BeatSubElement {
+        return BeatSubElement.GuitarTabBeams;
+    }
+
+    protected override get tupletSubElement(): BeatSubElement {
+        return BeatSubElement.GuitarTabTuplet;
+    }
+
+    protected override paintBeams(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        flagsElement: BeatSubElement,
+        beamsElement: BeatSubElement
+    ): void {
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
-            this.paintBeams(cx, cy, canvas, BeatSubElement.GuitarTabFlags, BeatSubElement.GuitarTabBeams);
-            this.paintTuplets(cx, cy, canvas, BeatSubElement.GuitarTabTuplet);
+            super.paintBeams(cx, cy, canvas, flagsElement, beamsElement);
+        }
+    }
+
+    protected override paintTuplets(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        beatElement: BeatSubElement,
+        bracketsAsArcs?: boolean
+    ): void {
+        if (this.rhythmMode !== TabRhythmMode.Hidden) {
+            super.paintTuplets(cx, cy, canvas, beatElement, bracketsAsArcs);
         }
     }
 

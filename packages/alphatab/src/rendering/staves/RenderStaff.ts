@@ -108,11 +108,15 @@ export class RenderStaff {
     }
 
     public registerStaffTop(offset: number): void {
-        this.staveTop = offset;
+        if (offset > this.staveTop) {
+            this.staveTop = offset;
+        }
     }
 
     public registerStaffBottom(offset: number): void {
-        this.staveBottom = offset;
+        if (offset > this.staveBottom) {
+            this.staveBottom = offset;
+        }
     }
 
     public addBarRenderer(renderer: BarRendererBase): void {
@@ -147,17 +151,17 @@ export class RenderStaff {
         }
 
         this.barRenderers.push(renderer);
-        if (bar) {
-            this.system.layout.registerBarRenderer(this.staffId, renderer);
-        }
+        this.system.layout.registerBarRenderer(this.staffId, renderer);
     }
 
     public revertLastBar(): BarRendererBase {
         const lastBar: BarRendererBase = this.barRenderers[this.barRenderers.length - 1];
         this.barRenderers.splice(this.barRenderers.length - 1, 1);
         this.system.layout.unregisterBarRenderer(this.staffId, lastBar);
+        this.topOverflow = 0;
+        this.bottomOverflow = 0;
         for (const r of this.barRenderers) {
-            r.applyLayoutingInfo();
+            r.afterStaffBarReverted();
         }
         return lastBar;
     }
@@ -217,26 +221,18 @@ export class RenderStaff {
         }
     }
 
-    public get topOverflow(): number {
-        let m: number = 0;
-        for (let i: number = 0, j: number = this.barRenderers.length; i < j; i++) {
-            const r: BarRendererBase = this.barRenderers[i];
-            if (r.topOverflow > m) {
-                m = r.topOverflow;
-            }
+    public topOverflow = 0;
+    public registerOverflowTop(overflow: number) {
+        if (overflow > this.topOverflow) {
+            this.topOverflow = overflow;
         }
-        return m;
     }
 
-    public get bottomOverflow(): number {
-        let m: number = 0;
-        for (let i: number = 0, j: number = this.barRenderers.length; i < j; i++) {
-            const r: BarRendererBase = this.barRenderers[i];
-            if (r.bottomOverflow > m) {
-                m = r.bottomOverflow;
-            }
+    public bottomOverflow = 0;
+    public registerOverflowBottom(overflow: number) {
+        if (overflow > this.bottomOverflow) {
+            this.bottomOverflow = overflow;
         }
-        return m;
     }
 
     /**

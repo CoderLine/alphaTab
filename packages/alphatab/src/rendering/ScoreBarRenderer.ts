@@ -267,10 +267,16 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas, BeatSubElement.StandardNotationFlags, BeatSubElement.StandardNotationBeams);
-        this.paintTuplets(cx, cy, canvas, BeatSubElement.StandardNotationTuplet);
+    protected override get flagsSubElement(): BeatSubElement {
+        return BeatSubElement.StandardNotationFlags;
+    }
+
+    protected override get beamsSubElement(): BeatSubElement {
+        return BeatSubElement.StandardNotationBeams;
+    }
+
+    protected override get tupletSubElement(): BeatSubElement {
+        return BeatSubElement.StandardNotationTuplet;
     }
 
     private _getSlashFlagY() {
@@ -821,6 +827,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
+        super.createVoiceGlyphs(v);
         for (const b of v.beats) {
             const container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new ScoreBeatPreNotesGlyph();

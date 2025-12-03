@@ -1,32 +1,34 @@
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
+import { EffectBandSizingInfo } from '@coderline/alphatab/rendering/EffectBandSizingInfo';
 import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
+import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
+import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
+import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import { BarHelpers } from '@coderline/alphatab/rendering/utils/BarHelpers';
+import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { Settings } from '@coderline/alphatab/Settings';
-import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
-import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
-import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
-import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
@@ -93,6 +95,10 @@ export class BarRendererBase {
 
     private _ties: Glyph[] = [];
 
+    private _bands: EffectBand[] = [];
+    private _bandLookup: Map<string, EffectBand> = new Map();
+    private _effectBandSizingInfo: EffectBandSizingInfo | null = null;
+
     public get nextRenderer(): BarRendererBase | null {
         if (!this.bar || !this.bar.nextBar) {
             return null;
@@ -126,8 +132,17 @@ export class BarRendererBase {
     public computedWidth: number = 0;
     public height: number = 0;
     public index: number = 0;
-    public topOverflow: number = 0;
-    public bottomOverflow: number = 0;
+    private _contentTopOverflow: number = 0;
+
+    public get topOverflow() {
+        return this._contentTopOverflow + this._effectBandHeight;
+    }
+
+    private _contentBottomOverflow: number = 0;
+    public get bottomOverflow() {
+        return this._contentBottomOverflow;
+    }
+
     public helpers!: BarHelpers;
 
     public topEffectInfos!: EffectInfo[];
@@ -168,8 +183,8 @@ export class BarRendererBase {
 
     public registerOverflowTop(topOverflow: number): boolean {
         topOverflow = Math.ceil(topOverflow);
-        if (topOverflow > this.topOverflow) {
-            this.topOverflow = topOverflow;
+        if (topOverflow > this._contentTopOverflow) {
+            this._contentTopOverflow = topOverflow;
             return true;
         }
         return false;
@@ -177,8 +192,8 @@ export class BarRendererBase {
 
     public registerOverflowBottom(bottomOverflow: number): boolean {
         bottomOverflow = Math.ceil(bottomOverflow);
-        if (bottomOverflow > this.bottomOverflow) {
-            this.bottomOverflow = bottomOverflow;
+        if (bottomOverflow > this._contentBottomOverflow) {
+            this._contentBottomOverflow = bottomOverflow;
             return true;
         }
         return false;
@@ -192,6 +207,10 @@ export class BarRendererBase {
         }
         this._postBeatGlyphs.x = this._preBeatGlyphs.x + this._preBeatGlyphs.width + containerWidth;
         this.width = width;
+
+        for (const effectBand of this._bands) {
+            effectBand.alignGlyphs();
+        }
     }
 
     public get resources(): RenderingResources {
@@ -254,10 +273,18 @@ export class BarRendererBase {
 
     private _appliedLayoutingInfo: number = 0;
 
+    public afterStaffBarReverted() {
+        this._resetEffectBandSizingInfo();
+        this._sizeAndAlignEffectBands();
+        this._registerStaffOverflow();
+    }
+
     public applyLayoutingInfo(): boolean {
         if (this._appliedLayoutingInfo >= this.layoutingInfo.version) {
             return false;
         }
+        this._resetEffectBandSizingInfo();
+
         this._appliedLayoutingInfo = this.layoutingInfo.version;
         // if we need additional space in the preBeat group we simply
         // add a new spacer
@@ -290,6 +317,9 @@ export class BarRendererBase {
             this.computedWidth = fixedBarWidth;
         }
 
+        this._sizeAndAlignEffectBands();
+        this._registerStaffOverflow();
+
         return true;
     }
 
@@ -320,21 +350,46 @@ export class BarRendererBase {
             }
         }
 
+        if (this._updateEffectBandHeight()) {
+            didChangeOverflows = true;
+        }
+
+        if (didChangeOverflows) {
+            this.updateSizes();
+        }
+
         return didChangeOverflows;
     }
 
-    /**
-     * Gets the top padding for the main content of the renderer.
-     * Can be used to specify where i.E. the score lines of the notation start.
-     * @returns
-     */
-    public topPadding: number = 0;
+    private _effectBandHeight = 0;
 
-    /**
-     * Gets the bottom padding for the main content of the renderer.
-     * Can be used to specify where i.E. the score lines of the notation end.
-     */
-    public bottomPadding: number = 0;
+    private _updateEffectBandHeight(): boolean {
+        if (!this._effectBandSizingInfo) {
+            return false;
+        }
+        let y: number = 0;
+        for (const slot of this._effectBandSizingInfo.slots) {
+            slot.shared.y = y;
+            for (const band of slot.bands) {
+                band.y = y;
+                band.height = slot.shared.height;
+            }
+            y += slot.shared.height + this.settings.display.effectBandPaddingBottom;
+        }
+        y = Math.ceil(y);
+
+        if (y !== this._effectBandHeight) {
+            this._effectBandHeight = y;
+            this._registerStaffOverflow();
+            return true;
+        }
+        return false;
+    }
+
+    private _registerStaffOverflow() {
+        this.staff.registerOverflowTop(this.topOverflow);
+        this.staff.registerOverflowBottom(this.bottomOverflow);
+    }
 
     public doLayout(): void {
         if (!this.bar) {
@@ -347,6 +402,7 @@ export class BarRendererBase {
         this._voiceContainers.clear();
         this._postBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
         this._postBeatGlyphs.renderer = this;
+
         for (let i: number = 0; i < this.bar.voices.length; i++) {
             const voice: Voice = this.bar.voices[i];
             if (this.hasVoiceContainer(voice)) {
@@ -358,6 +414,7 @@ export class BarRendererBase {
         if (this.bar.simileMark === SimileMark.SecondOfDouble) {
             this.canWrap = false;
         }
+
         this.createPreBeatGlyphs();
 
         // multibar rest
@@ -369,6 +426,10 @@ export class BarRendererBase {
         }
 
         this.createPostBeatGlyphs();
+
+        // registering happened during creation
+        this._sizeAndAlignEffectBands(false);
+
         this.updateSizes();
 
         // finish up all helpers
@@ -412,6 +473,17 @@ export class BarRendererBase {
         }
     }
 
+    private _sizeAndAlignEffectBands(register: boolean = true) {
+        for (const effectBand of this._bands) {
+            effectBand.resetHeight();
+            effectBand.alignGlyphs();
+            if (register && !effectBand.isEmpty) {
+                // find a slot that ended before the start of the band
+                this._effectBandSizingInfo!.register(effectBand);
+            }
+        }
+    }
+
     protected hasVoiceContainer(voice: Voice): boolean {
         if (this.additionalMultiRestBars || voice.index === 0) {
             return true;
@@ -420,8 +492,8 @@ export class BarRendererBase {
     }
 
     protected updateSizes(): void {
-        this.staff.registerStaffTop(this.topPadding);
-        this.staff.registerStaffBottom(this.height - this.bottomPadding);
+        this.staff.registerStaffTop(0);
+
         const voiceContainers: Map<number, VoiceContainerGlyph> = this._voiceContainers;
         const beatGlyphsStart: number = this.beatGlyphsStart;
         let postBeatStart: number = beatGlyphsStart;
@@ -435,8 +507,13 @@ export class BarRendererBase {
         }
         this._postBeatGlyphs.x = Math.floor(postBeatStart);
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
+
+        this._updateEffectBandHeight();
+
         this.height += this.layoutingInfo.height;
         this.height = Math.ceil(this.height);
+
+        this.staff.registerStaffBottom(this.height);
     }
 
     protected addPreBeatGlyph(g: Glyph): void {
@@ -469,6 +546,23 @@ export class BarRendererBase {
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
+        // canvas.color = Color.random();
+        // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
+
+        this.paintContent(cx, cy, canvas);
+
+        const effectBandY = cy + this.y - this.staff.topOverflow;
+        for (const effectBand of this._bands) {
+            canvas.color =
+                effectBand.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
+            if (!effectBand.isEmpty) {
+                effectBand.paint(cx + this.x, effectBandY, canvas);
+            }
+        }
+        canvas.color = this.resources.mainGlyphColor;
+    }
+
+    protected paintContent(cx: number, cy: number, canvas: ICanvas): void {
         this.paintBackground(cx, cy, canvas);
 
         canvas.color = this.resources.mainGlyphColor;
@@ -497,9 +591,9 @@ export class BarRendererBase {
         barBounds.bar = this.bar;
         barBounds.visualBounds = new Bounds();
         barBounds.visualBounds.x = cx + this.x;
-        barBounds.visualBounds.y = cy + this.y + this.topPadding;
+        barBounds.visualBounds.y = cy + this.y;
         barBounds.visualBounds.w = this.width;
-        barBounds.visualBounds.h = this.height - this.topPadding - this.bottomPadding;
+        barBounds.visualBounds.h = this.height;
 
         barBounds.realBounds = new Bounds();
         barBounds.realBounds.x = cx + this.x;
@@ -528,15 +622,52 @@ export class BarRendererBase {
     }
 
     protected createBeatGlyphs(): void {
+        this._bands = [];
+        this._bandLookup = new Map<string, EffectBand>();
+        this._resetEffectBandSizingInfo();
+
         for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 this.createVoiceGlyphs(voice);
             }
         }
+
+        for (const effectBand of this._bands) {
+            if (effectBand.isLinkedToPrevious) {
+                this.isLinkedToPrevious = true;
+            }
+        }
     }
 
-    protected createVoiceGlyphs(_v: Voice): void {
-        // filled in subclasses
+    private _resetEffectBandSizingInfo() {
+        if (this.index > 0) {
+            this._effectBandSizingInfo = this.previousRenderer!._effectBandSizingInfo;
+        } else {
+            this._effectBandSizingInfo = new EffectBandSizingInfo();
+        }
+    }
+
+    protected createVoiceGlyphs(voice: Voice): void {
+        for (const info of this.topEffectInfos) {
+            const band: EffectBand = new EffectBand(voice, info);
+            band.renderer = this;
+            band.doLayout();
+            this._bands.push(band);
+            this._bandLookup.set(`${voice.index}.${info.effectId}`, band);
+            for (const b of voice.beats) {
+                band.createGlyph(b);
+            }
+        }
+        for (const info of this.bottomEffectInfos) {
+            const band: EffectBand = new EffectBand(voice, info);
+            band.renderer = this;
+            band.doLayout();
+            this._bands.push(band);
+            this._bandLookup.set(`${voice.index}.${info.effectId}`, band);
+            for (const b of voice.beats) {
+                band.createGlyph(b);
+            }
+        }
     }
 
     protected createPostBeatGlyphs(): void {
@@ -606,12 +737,17 @@ export class BarRendererBase {
     }
 
     public reLayout(): void {
+        this._resetEffectBandSizingInfo();
+        this._sizeAndAlignEffectBands();
+        this.updateSizes();
+
         // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
         // but we only need to recreate them for the renderers that were the first of the line or are now the first of the line
         if ((this.wasFirstOfLine && !this.isFirstOfLine) || (!this.wasFirstOfLine && this.isFirstOfLine)) {
             this.recreatePreBeatGlyphs();
+            this._postBeatGlyphs.doLayout();
         }
-        this.updateSizes();
+
         this.registerLayoutingInfo();
     }
 
@@ -663,5 +799,13 @@ export class BarRendererBase {
 
     public getBeatDirection(beat: Beat): BeamDirection {
         return this.helpers.getBeamingHelperForBeat(beat).direction;
+    }
+
+    public getBand(voice: Voice, effectId: string): EffectBand | null {
+        const id: string = `${voice.index}.${effectId}`;
+        if (this._bandLookup.has(id)) {
+            return this._bandLookup.get(id)!;
+        }
+        return null;
     }
 }

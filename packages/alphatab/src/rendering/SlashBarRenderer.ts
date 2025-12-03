@@ -66,10 +66,16 @@ export class SlashBarRenderer extends LineBarRenderer {
         return 0;
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas, BeatSubElement.SlashFlags, BeatSubElement.SlashBeams);
-        this.paintTuplets(cx, cy, canvas, BeatSubElement.SlashTuplet);
+    protected override get flagsSubElement(): BeatSubElement {
+        return BeatSubElement.SlashFlags;
+    }
+
+    protected override get beamsSubElement(): BeatSubElement {
+        return BeatSubElement.SlashBeams;
+    }
+
+    protected override get tupletSubElement(): BeatSubElement {
+        return BeatSubElement.SlashTuplet;
     }
 
     public override doLayout(): void {
@@ -171,6 +177,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
+        super.createVoiceGlyphs(v);
         for (const b of v.beats) {
             const container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new BeatGlyphBase();

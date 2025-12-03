@@ -91,10 +91,16 @@ export class NumberedBarRenderer extends LineBarRenderer {
         return 0;
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas, BeatSubElement.NumberedDuration, BeatSubElement.NumberedDuration);
-        this.paintTuplets(cx, cy, canvas, BeatSubElement.NumberedTuplet, true);
+    protected override get flagsSubElement(): BeatSubElement {
+        return BeatSubElement.NumberedDuration;
+    }
+
+    protected override get beamsSubElement(): BeatSubElement {
+        return BeatSubElement.NumberedDuration;
+    }
+
+    protected override get tupletSubElement(): BeatSubElement {
+        return BeatSubElement.NumberedTuplet;
     }
 
     public override doLayout(): void {
@@ -214,7 +220,14 @@ export class NumberedBarRenderer extends LineBarRenderer {
             dotCount = Math.abs(dotCount);
 
             for (let d = 0; d < dotCount; d++) {
-                CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x + dotX, dotsY, 1, MusicFontSymbol.AugmentationDot, true);
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
+                    cx + this.x + dotX,
+                    dotsY,
+                    1,
+                    MusicFontSymbol.AugmentationDot,
+                    true
+                );
                 dotsY += dotsOffset;
             }
         }
@@ -225,7 +238,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     public override get tupletOffset(): number {
-        // Shift tuplet above the number by: 
+        // Shift tuplet above the number by:
         // * 1 to get back to the center (calculateBeamYWithDirection places the beam below the number)
         // * 1.5 to get back to the top of the number
         return super.tupletOffset + this.resources.numberedNotationFont.size * 1.5;
@@ -329,6 +342,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
+        super.createVoiceGlyphs(v);
         for (const b of v.beats) {
             const container: NumberedBeatContainerGlyph = new NumberedBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = v.index === 0 ? new NumberedBeatPreNotesGlyph() : new BeatGlyphBase();
