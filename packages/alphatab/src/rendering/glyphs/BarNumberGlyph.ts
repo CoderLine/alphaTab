@@ -20,7 +20,6 @@ export class BarNumberGlyph extends Glyph {
         const size = this.renderer.scoreRenderer.canvas!.measureText(this._number);
         this.width = size.width;
         this.height = size.height;
-        this.y -= this.height;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

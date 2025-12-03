@@ -3,7 +3,7 @@ import { BendStyle } from '@coderline/alphatab/model/BendStyle';
 import { BendType } from '@coderline/alphatab/model/BendType';
 import type { Color } from '@coderline/alphatab/model/Color';
 import type { Note } from '@coderline/alphatab/model/Note';
-import { TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { type BarRendererBase, NoteYPosition, NoteXPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
@@ -126,11 +126,7 @@ export class TabBendGlyph extends Glyph {
 
     public override doLayout(): void {
         super.doLayout();
-        const c = this.renderer.scoreRenderer.canvas!;
-        c.font = this.renderer.resources.tablatureFont;
-        const textHeight = c.measureText('full');
-        const bendHeight: number = this._maxBendValue * this.renderer.smuflMetrics.tabBendPerValueHeight + textHeight.height;
-
+        const bendHeight: number = this._maxBendValue * this.renderer.smuflMetrics.tabBendPerValueHeight;
         this.renderer.registerOverflowTop(bendHeight);
         let value: number = 0;
         for (const note of this._notes) {
@@ -340,7 +336,6 @@ export class TabBendGlyph extends Glyph {
         const overflowOffset: number = r.lineOffset / 2;
         const x1: number = cx + dX * firstPt.offset;
         const bendValueHeight: number = this.renderer.smuflMetrics.tabBendPerValueHeight;
-
         let y1: number = cy - bendValueHeight * firstPt.lineValue;
         if (firstPt.value === 0) {
             if (secondPt.offset === firstPt.offset) {
@@ -349,12 +344,15 @@ export class TabBendGlyph extends Glyph {
                 y1 += r.getNoteY(note, NoteYPosition.Center);
             }
         } else {
-            y1 += r.getNoteY(note, NoteYPosition.Center);
+            y1 += overflowOffset;
         }
         const x2: number = cx + dX * secondPt.offset;
         let y2: number = cy - bendValueHeight * secondPt.lineValue;
-        y2 += r.getNoteY(note, NoteYPosition.Center);
-
+        if (secondPt.lineValue === 0) {
+            y2 += r.getNoteY(note, NoteYPosition.Center);
+        } else {
+            y2 += overflowOffset;
+        }
         // what type of arrow? (up/down)
         let arrowOffset: number = 0;
         const arrowSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
@@ -382,9 +380,7 @@ export class TabBendGlyph extends Glyph {
             arrowOffset = -arrowSize;
         }
         const l = canvas.lineWidth;
-        const bl = canvas.textBaseline;
         canvas.lineWidth = this.renderer.smuflMetrics.arrowShaftThickness;
-        canvas.textBaseline = TextBaseline.Alphabetic;
         canvas.beginPath();
         if (firstPt.value === secondPt.value) {
             // draw horizontal dashed line
@@ -462,14 +458,13 @@ export class TabBendGlyph extends Glyph {
                 // draw label
                 canvas.font = res.tablatureFont;
                 const size = canvas.measureText(s);
-                const y: number = startY;
+                const y: number = startY - size.height / 1.5;
                 const x: number = x2 - size.width / 2;
                 canvas.fillText(s, x, y - res.engravingSettings.tabBendLabelPadding);
             }
         }
 
         canvas.lineWidth = l;
-        canvas.textBaseline = bl;
     }
 
     public static getFractionSign(steps: number): string {

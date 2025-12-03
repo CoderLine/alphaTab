@@ -152,6 +152,7 @@ export class TabBarRenderer extends LineBarRenderer {
             }
 
             this.height += this.settings.notation.rhythmHeight;
+            this.bottomPadding += this.settings.notation.rhythmHeight;
         }
     }
 

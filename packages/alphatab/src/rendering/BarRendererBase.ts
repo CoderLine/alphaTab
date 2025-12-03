@@ -98,6 +98,7 @@ export class BarRendererBase {
     private _bands: EffectBand[] = [];
     private _bandLookup: Map<string, EffectBand> = new Map();
     private _effectBandSizingInfo: EffectBandSizingInfo | null = null;
+    private _effectInfosSortOrder: Map<EffectInfo, number> = new Map<EffectInfo, number>();
 
     public get nextRenderer(): BarRendererBase | null {
         if (!this.bar || !this.bar.nextBar) {
@@ -385,6 +386,18 @@ export class BarRendererBase {
         }
         return false;
     }
+    /**
+     * Gets the top padding for the main content of the renderer.
+     * Can be used to specify where i.E. the score lines of the notation start.
+     * @returns
+     */
+    public topPadding: number = 0;
+
+    /**
+     * Gets the bottom padding for the main content of the renderer.
+     * Can be used to specify where i.E. the score lines of the notation end.
+     */
+    public bottomPadding: number = 0;
 
     private _registerStaffOverflow() {
         this.staff.registerOverflowTop(this.topOverflow);
@@ -402,6 +415,7 @@ export class BarRendererBase {
         this._voiceContainers.clear();
         this._postBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
         this._postBeatGlyphs.renderer = this;
+        this._effectInfosSortOrder.clear();
 
         for (let i: number = 0; i < this.bar.voices.length; i++) {
             const voice: Voice = this.bar.voices[i];
@@ -482,6 +496,12 @@ export class BarRendererBase {
                 this._effectBandSizingInfo!.register(effectBand);
             }
         }
+
+        // if we're registering new slots for the effects, we need to sort the
+        // slots afterwards to keep the registered order. we don't want the "first occured" effect on top but the "first registered"
+        if (register) {
+            this._effectBandSizingInfo!.sortSlots(this._effectInfosSortOrder);
+        }
     }
 
     protected hasVoiceContainer(voice: Voice): boolean {
@@ -492,8 +512,7 @@ export class BarRendererBase {
     }
 
     protected updateSizes(): void {
-        this.staff.registerStaffTop(0);
-
+        this.staff.registerStaffTop(this.topPadding);
         const voiceContainers: Map<number, VoiceContainerGlyph> = this._voiceContainers;
         const beatGlyphsStart: number = this.beatGlyphsStart;
         let postBeatStart: number = beatGlyphsStart;
@@ -513,7 +532,7 @@ export class BarRendererBase {
         this.height += this.layoutingInfo.height;
         this.height = Math.ceil(this.height);
 
-        this.staff.registerStaffBottom(this.height);
+        this.staff.registerStaffBottom(this.height - this.bottomPadding);
     }
 
     protected addPreBeatGlyph(g: Glyph): void {
@@ -591,9 +610,9 @@ export class BarRendererBase {
         barBounds.bar = this.bar;
         barBounds.visualBounds = new Bounds();
         barBounds.visualBounds.x = cx + this.x;
-        barBounds.visualBounds.y = cy + this.y;
+        barBounds.visualBounds.y = cy + this.y + this.topPadding;
         barBounds.visualBounds.w = this.width;
-        barBounds.visualBounds.h = this.height;
+        barBounds.visualBounds.h = this.height - this.topPadding - this.bottomPadding;
 
         barBounds.realBounds = new Bounds();
         barBounds.realBounds.x = cx + this.x;
@@ -648,6 +667,7 @@ export class BarRendererBase {
     }
 
     protected createVoiceGlyphs(voice: Voice): void {
+        let i = 0;
         for (const info of this.topEffectInfos) {
             const band: EffectBand = new EffectBand(voice, info);
             band.renderer = this;
@@ -657,7 +677,10 @@ export class BarRendererBase {
             for (const b of voice.beats) {
                 band.createGlyph(b);
             }
+            this._effectInfosSortOrder.set(info, i++);
         }
+
+        // TODO: ensure bottom effect infos are rendered below staff (own height and overflow)
         for (const info of this.bottomEffectInfos) {
             const band: EffectBand = new EffectBand(voice, info);
             band.renderer = this;
@@ -667,6 +690,7 @@ export class BarRendererBase {
             for (const b of voice.beats) {
                 band.createGlyph(b);
             }
+            this._effectInfosSortOrder.set(info, i++);
         }
     }
 

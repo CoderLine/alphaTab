@@ -53,7 +53,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
     }
 
     protected initLineBasedSizes() {
-        this.height = this.lineOffset * (this.heightLineCount - 1);
+        this.topPadding = this.topGlyphOverflow;
+        this.bottomPadding = this.bottomGlyphOverflow;
+        this.height = this.lineOffset * (this.heightLineCount - 1) + this.topPadding + this.bottomPadding;
     }
 
     protected override updateSizes(): void {
@@ -73,7 +75,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         const actualLineHeight = (this.drawnLineCount - 1) * this.lineOffset;
         const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
 
-        this.firstLineY = (((fullLineHeight - actualLineHeight) / 2) | 0) - lineYOffset;
+        this.firstLineY = ((this.topPadding + (fullLineHeight - actualLineHeight) / 2) | 0) - lineYOffset;
     }
 
     public override doLayout(): void {
@@ -614,7 +616,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         super.createPreBeatGlyphs();
         this.addPreBeatGlyph(new BarLineGlyph(false));
         this.createLinePreBeatGlyphs();
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.25), this.bar.index + 1));
     }
 
     protected abstract createLinePreBeatGlyphs(): void;
@@ -626,7 +628,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         this.addPostBeatGlyph(new BarLineGlyph(true));
 
         if (lastBar.masterBar.isRepeatEnd && lastBar.masterBar.repeatCount > 2) {
-            this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getLineHeight(-0.5), this.bar.masterBar.repeatCount));
+            this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount));
         }
     }
 

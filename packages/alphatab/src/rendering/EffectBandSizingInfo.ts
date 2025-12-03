@@ -1,5 +1,6 @@
 import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 import { EffectBandSlot } from '@coderline/alphatab/rendering/EffectBandSlot';
+import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 
 /**
  * @internal
@@ -48,5 +49,21 @@ export class EffectBandSizingInfo {
         const freeSlot: EffectBandSlot = this.getOrCreateSlot(effectBand);
         freeSlot.update(effectBand);
         this._effectSlot.set(effectBand.info.effectId, freeSlot);
+    }
+
+    public sortSlots(sortOrder: Map<EffectInfo, number>) {
+        for (const s of this.slots) {
+            s.bands.sort((a, b) => {
+                const ai = sortOrder.get(a.info)!;
+                const bi = sortOrder.get(b.info)!;
+                return ai - bi;
+            });
+        }
+
+        this.slots.sort((a, b) => {
+            const ai = sortOrder.get(a.bands[0].info)!;
+            const bi = sortOrder.get(b.bands[0].info)!;
+            return ai - bi;
+        });
     }
 }
