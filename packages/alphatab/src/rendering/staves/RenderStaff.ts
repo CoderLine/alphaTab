@@ -75,6 +75,10 @@ export class RenderStaff {
         this.trackIndex = trackIndex;
         this.modelStaff = staff;
         for (const b of factory.effectBands) {
+            if(b.shouldCreate && !b.shouldCreate!(staff)){
+                continue;
+            }
+            
             switch (b.mode) {
                 case EffectBandMode.OwnedTop:
                 case EffectBandMode.SharedTop:

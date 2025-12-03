@@ -13,12 +13,10 @@ import { GuitarGolpeGlyph } from '@coderline/alphatab/rendering/glyphs/GuitarGol
  */
 export class GolpeEffectInfo extends EffectInfo {
     private _type: GolpeType;
-    private _shouldCreate?: (settings: Settings, beat: Beat) => boolean;
 
-    public constructor(type: GolpeType, shouldCreate?: (settings: Settings, beat: Beat) => boolean) {
+    public constructor(type: GolpeType) {
         super();
         this._type = type;
-        this._shouldCreate = shouldCreate;
     }
 
     public get notationElement(): NotationElement {
@@ -41,9 +39,8 @@ export class GolpeEffectInfo extends EffectInfo {
         return EffectBarGlyphSizing.SingleOnBeat;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
-        const shouldCreate = this._shouldCreate;
-        return beat.golpe === this._type && (!shouldCreate || shouldCreate(settings, beat));
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
+        return beat.golpe === this._type;
     }
 
     public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {

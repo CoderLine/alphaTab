@@ -369,8 +369,10 @@ export abstract class ScoreLayout {
         const system: StaffSystem = new StaffSystem(this);
         const allFactories = Environment.defaultRenderers;
 
+        const renderStaves: RenderStaff[] = [];
         for (let trackIndex: number = 0; trackIndex < this.renderer.tracks!.length; trackIndex++) {
             const track: Track = this.renderer.tracks![trackIndex];
+
             for (let staffIndex: number = 0; staffIndex < track.staves.length; staffIndex++) {
                 const staff = track.staves[staffIndex];
                 const profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
@@ -387,7 +389,8 @@ export abstract class ScoreLayout {
                         renderStaff.topEffectInfos.splice(0, 0, ...sharedTopEffects);
                         renderStaff.bottomEffectInfos.push(...sharedBottomEffects);
                         previousStaff = renderStaff;
-                        system.addStaff(track, renderStaff);
+                        // just remember staff, adding to system comes later when we have all effects collected
+                        renderStaves.push(renderStaff);
                         sharedTopEffects = [];
                         sharedBottomEffects = [];
                     } else {
@@ -415,6 +418,11 @@ export abstract class ScoreLayout {
                 }
             }
         }
+
+        for (const staff of renderStaves) {
+            system.addStaff(staff);
+        }
+
         return system;
     }
 

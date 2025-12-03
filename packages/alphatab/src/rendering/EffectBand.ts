@@ -1,7 +1,7 @@
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import type { EffectBandSlot } from '@coderline/alphatab/rendering/EffectBandSlot';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';

@@ -479,6 +479,7 @@ export class Environment {
         //
         // Score (standard notation)
         new ScoreBarRendererFactory([
+            { effect: new CapoEffectInfo(), mode: EffectBandMode.SharedTop },
             { effect: new FermataEffectInfo(), mode: EffectBandMode.SharedTop },
             { effect: new BeatBarreEffectInfo(), mode: EffectBandMode.SharedTop },
             { effect: new NoteOrnamentEffectInfo(), mode: EffectBandMode.SharedTop },
@@ -487,12 +488,35 @@ export class Environment {
             { effect: new WhammyBarEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new TrillEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new OttaviaEffectInfo(true), mode: EffectBandMode.OwnedTop },
+            { effect: new LeftHandTapEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new TapEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new WideBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new SlightBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new WideNoteVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new SlightNoteVibratoEffectInfo(false), mode: EffectBandMode.OwnedTop },
-            { effect: new LeftHandTapEffectInfo(), mode: EffectBandMode.OwnedTop },
+            {
+                effect: new FadeEffectInfo(),
+                mode: EffectBandMode.OwnedTop,
+                shouldCreate: staff => !staff.showTablature
+            },
+            {
+                effect: new LetRingEffectInfo(),
+                mode: EffectBandMode.OwnedTop,
+                shouldCreate: staff => !staff.showTablature
+            },
+            {
+                effect: new PickStrokeEffectInfo(),
+                mode: EffectBandMode.OwnedTop,
+                shouldCreate: staff => !staff.showTablature
+            },
+            {
+                effect: new PickSlideEffectInfo(),
+                mode: EffectBandMode.OwnedTop,
+                shouldCreate: staff => !staff.showTablature
+            },
+
             { effect: new GolpeEffectInfo(GolpeType.Finger), mode: EffectBandMode.OwnedTop },
+
             { effect: new GolpeEffectInfo(GolpeType.Thumb), mode: EffectBandMode.OwnedBottom },
             { effect: new CrescendoEffectInfo(), mode: EffectBandMode.SharedBottom },
             // NOTE: all octave signs are currently shown above, but 8vb could be shown as 8va below the staff
@@ -525,20 +549,21 @@ export class Environment {
             { effect: new HarmonicsEffectInfo(HarmonicType.Semi), mode: EffectBandMode.OwnedTop },
             { effect: new HarmonicsEffectInfo(HarmonicType.Feedback), mode: EffectBandMode.OwnedTop },
             { effect: new LetRingEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new CapoEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new FingeringEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new PalmMuteEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new PickStrokeEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new PickSlideEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new LeftHandTapEffectInfo(), mode: EffectBandMode.OwnedTop },
             {
-                effect: new GolpeEffectInfo(GolpeType.Finger, (_s, b) => !b.voice.bar.staff.showStandardNotation),
-                mode: EffectBandMode.OwnedTop
+                effect: new GolpeEffectInfo(GolpeType.Finger),
+                mode: EffectBandMode.OwnedTop,
+                shouldCreate: staff => !staff.showStandardNotation
             },
 
             {
-                effect: new GolpeEffectInfo(GolpeType.Thumb, (_s, b) => !b.voice.bar.staff.showStandardNotation),
-                mode: EffectBandMode.OwnedBottom
+                effect: new GolpeEffectInfo(GolpeType.Thumb),
+                mode: EffectBandMode.OwnedBottom,
+                shouldCreate: staff => !staff.showStandardNotation
             }
         ])
     ];

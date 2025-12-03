@@ -396,7 +396,8 @@ export class StaffSystem {
         return null;
     }
 
-    public addStaff(track: Track, staff: RenderStaff): void {
+    public addStaff(staff: RenderStaff): void {
+        const track = staff.modelStaff.track;
         let group: StaffTrackGroup | null = this._getStaffTrackGroup(track);
         if (!group) {
             group = new StaffTrackGroup(this, track);

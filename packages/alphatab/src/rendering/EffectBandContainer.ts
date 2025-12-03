@@ -69,14 +69,14 @@ export class EffectBandContainer {
                     band.doLayout();
                     this._bands.push(band);
                     this._bandLookup.set(`${voice.index}.${info.effectId}`, band);
+                    this._effectInfosSortOrder.set(info, i);
                 }
 
                 if (band !== undefined) {
                     band.createGlyph(b);
                 }
-            }
-
-            this._effectInfosSortOrder.set(info, i++);
+            }           
+            i++;
         }
     }
 
