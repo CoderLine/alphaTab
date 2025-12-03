@@ -191,11 +191,11 @@ export class EffectBand extends Glyph {
                 break;
             case EffectBarGlyphSizing.SingleOnBeat:
             case EffectBarGlyphSizing.GroupedOnBeat:
-                g.x = this.renderer.beatGlyphsStart + container.x;
+                g.x = this.renderer.beatGlyphsStart + container.x + container.onTimeX;
                 break;
             case EffectBarGlyphSizing.SingleOnBeatToEnd:
             case EffectBarGlyphSizing.GroupedOnBeatToEnd:
-                g.x = this.renderer.beatGlyphsStart + container.x;
+                g.x = this.renderer.beatGlyphsStart + container.x + container.onTimeX;
                 if (container.beat.isLastOfVoice) {
                     g.width = this.renderer.width - g.x;
                 } else {

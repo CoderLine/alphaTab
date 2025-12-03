@@ -709,7 +709,7 @@ export class BarRendererBase {
     public getRatioPositionX(ticks: number): number {
         const firstOnNoteX = this.bar.isEmpty
             ? this.beatGlyphsStart
-            : this.getBeatX(this.bar.voices[0].beats[0], BeatXPosition.OnNotes);
+            : this.getBeatX(this.bar.voices[0].beats[0], BeatXPosition.MiddleNotes);
         const x = firstOnNoteX;
         const w = this.postBeatGlyphsStart - firstOnNoteX;
         return x + w * ticks;
