@@ -3,31 +3,31 @@ import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Clef } from '@coderline/alphatab/model/Clef';
 import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
+import { Staff } from '@coderline/alphatab/model/Staff';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
 import { ClefGlyph } from '@coderline/alphatab/rendering/glyphs/ClefGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { KeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/KeySignatureGlyph';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import { ScoreBeatGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatGlyph';
 import { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
+import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { type BeamingHelper, BeamingHelperDrawInfo } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { KeySignature } from '@coderline/alphatab/model/KeySignature';
-import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
-import { KeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/KeySignatureGlyph';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { Staff } from '@coderline/alphatab/model/Staff';
-import { GraceType } from '@coderline/alphatab/model/GraceType';
-import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
 
 /**
  * This BarRenderer renders a bar using standard music notation.
@@ -118,7 +118,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
             const top: number = this.getScoreY(-2);
-            const bottom: number = this.getScoreY(this.heightLineCount * 2);
+            const bottom: number = this.getScoreY(this.heightLineCount * 2) + this.bottomPadding;
             const whammyOffset: number = this.simpleWhammyOverflow;
 
             const beatEffectsMinY = this.beatEffectsMinY;
