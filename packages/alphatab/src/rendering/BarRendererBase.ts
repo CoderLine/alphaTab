@@ -533,11 +533,11 @@ export class BarRendererBase {
 
         this.paintContent(cx, cy, canvas);
 
-        const topEffectBandY = cy + this.y - this.staff.topOverflow;
+        const topEffectBandY = cy + this.y - this._contentTopOverflow - this.topEffects.height;
         this.topEffects.paint(cx + this.x, topEffectBandY, canvas);
 
         // TODO: correct position
-        const bottomEffectBandY = cy + this.y + this.height + this.bottomPadding;
+        const bottomEffectBandY = cy + this.y + this.height + this._contentBottomOverflow;
         this.bottomEffects.paint(cx + this.x, bottomEffectBandY, canvas);
 
         canvas.color = this.resources.mainGlyphColor;

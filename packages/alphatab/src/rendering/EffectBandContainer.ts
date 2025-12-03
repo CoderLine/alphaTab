@@ -75,7 +75,7 @@ export class EffectBandContainer {
                 if (band !== undefined) {
                     band.createGlyph(b);
                 }
-            }           
+            }
             i++;
         }
     }
@@ -102,12 +102,15 @@ export class EffectBandContainer {
         }
         let y: number = 0;
         for (const slot of this._effectBandSizingInfo.slots) {
+            if (y > 0) {
+                y += this._renderer.settings.display.effectBandPaddingBottom;
+            }
             slot.shared.y = y;
             for (const band of slot.bands) {
                 band.y = y;
                 band.height = slot.shared.height;
             }
-            y += slot.shared.height + this._renderer.settings.display.effectBandPaddingBottom;
+            y += slot.shared.height;
         }
         y = Math.ceil(y);
 
