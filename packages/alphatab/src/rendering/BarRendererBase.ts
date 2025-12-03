@@ -346,7 +346,9 @@ export class BarRendererBase {
             }
         }
 
-        if (this.topEffects.updateEffectBandHeights() || this.bottomEffects.updateEffectBandHeights()) {
+        const topHeightChanged = this.topEffects.updateEffectBandHeights();
+        const bottomHeightChanged = this.bottomEffects.updateEffectBandHeights();
+        if (topHeightChanged || bottomHeightChanged) {
             this._registerStaffOverflow();
             didChangeOverflows = true;
         }
@@ -484,7 +486,9 @@ export class BarRendererBase {
         this._postBeatGlyphs.x = Math.floor(postBeatStart);
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
 
-        if (this.topEffects.updateEffectBandHeights() || this.bottomEffects.updateEffectBandHeights()) {
+        const topHeightChanged = this.topEffects.updateEffectBandHeights();
+        const bottomHeightChanged = this.bottomEffects.updateEffectBandHeights();
+        if (topHeightChanged || bottomHeightChanged) {
             this._registerStaffOverflow();
         }
 
@@ -684,6 +688,7 @@ export class BarRendererBase {
 
     public reLayout(): void {
         this.topEffects.reLayout();
+        this.bottomEffects.reLayout();
         this.updateSizes();
 
         // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
