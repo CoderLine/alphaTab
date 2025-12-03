@@ -1,5 +1,5 @@
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { Settings } from '@coderline/alphatab/Settings';
 import type { Beat } from '@coderline/alphatab/model/Beat';
@@ -10,7 +10,7 @@ import { BeatTimerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatTimerGl
 /**
  * @internal
  */
-export class BeatTimerEffectInfo extends EffectBarRendererInfo {
+export class BeatTimerEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectBeatTimer;
     }

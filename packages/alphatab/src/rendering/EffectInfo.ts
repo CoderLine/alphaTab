@@ -1,16 +1,16 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import type { Settings } from '@coderline/alphatab/Settings';
-import type { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * A classes inheriting from this base can provide the
  * data needed by a EffectBarRenderer to create effect glyphs dynamically.
  * @internal
  */
-export abstract class EffectBarRendererInfo {
+export abstract class EffectInfo {
     /**
      * Gets the unique effect name for this effect. (Used for grouping)
      */

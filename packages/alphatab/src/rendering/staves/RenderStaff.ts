@@ -2,11 +2,12 @@ import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
+import { type BarRendererFactory, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
+import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
-import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 
 /**
  * A Staff represents a single line within a StaffSystem.
@@ -27,6 +28,9 @@ export class RenderStaff {
     public staffIndex: number = 0;
 
     public isFirstInSystem: boolean = false;
+
+    public topEffectInfos: EffectInfo[] = [];
+    public bottomEffectInfos: EffectInfo[] = [];
 
     /**
      * This is the index of the track being rendered. This is not the index of the track within the model,
@@ -70,6 +74,18 @@ export class RenderStaff {
         this._factory = factory;
         this.trackIndex = trackIndex;
         this.modelStaff = staff;
+        for (const b of factory.effectBands) {
+            switch (b.mode) {
+                case EffectBandMode.OwnedTop:
+                case EffectBandMode.SharedTop:
+                    this.topEffectInfos.push(b.effect);
+                    break;
+
+                case EffectBandMode.OwnedBottom:
+                    this.bottomEffectInfos.push(b.effect);
+                    break;
+            }
+        }
     }
 
     public getSharedLayoutData<T>(key: string, def: T): T {
@@ -109,6 +125,10 @@ export class RenderStaff {
 
     public addBar(bar: Bar, layoutingInfo: BarLayoutingInfo, additionalMultiBarsRestBars: Bar[] | null): void {
         const renderer = this._factory.create(this.system.layout.renderer, bar);
+
+        renderer.topEffectInfos = this.topEffectInfos;
+        renderer.bottomEffectInfos = this.bottomEffectInfos;
+        
         renderer.additionalMultiRestBars = additionalMultiBarsRestBars;
         renderer.staff = this;
         renderer.index = this.barRenderers.length;

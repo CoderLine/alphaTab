@@ -3,11 +3,10 @@ import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { EffectBandSlot } from '@coderline/alphatab/rendering/EffectBandSlot';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import type { EffectBarRenderer } from '@coderline/alphatab/rendering/EffectBarRenderer';
+import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import type { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -25,10 +24,10 @@ export class EffectBand extends Glyph {
     public override height: number = 0;
     public originalHeight: number = 0;
     public voice: Voice;
-    public info: EffectBarRendererInfo;
+    public info: EffectInfo;
     public slot: EffectBandSlot | null = null;
 
-    public constructor(voice: Voice, info: EffectBarRendererInfo) {
+    public constructor(voice: Voice, info: EffectInfo) {
         super(0, 0);
         this.voice = voice;
         this.info = info;
@@ -118,8 +117,7 @@ export class EffectBand extends Glyph {
                             prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index)!;
                         } else if (this.renderer.index > 0) {
                             // load the effect from the previous renderer if possible.
-                            const previousRenderer: EffectBarRenderer = this.renderer
-                                .previousRenderer as EffectBarRenderer;
+                            const previousRenderer = this.renderer.previousRenderer!;
                             const previousBand = previousRenderer.getBand(prevBeat.voice, this.info.effectId);
                             // it can happen that we have an empty voice and then we don't have an effect band
                             if (previousBand) {

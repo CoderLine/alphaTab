@@ -2,10 +2,10 @@ import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Track } from '@coderline/alphatab/model/Track';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import { BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
+import { BarRendererFactory, type EffectBandInfo } from '@coderline/alphatab/rendering/BarRendererFactory';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
+import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 
 /**
  * This Factory produces TabBarRenderer instances
@@ -28,8 +28,8 @@ export class TabBarRendererFactory extends BarRendererFactory {
         return staff.system.layout.renderer.settings.display.notationStaffPaddingBottom;
     }
 
-    public constructor() {
-        super();
+    public constructor(effectBands: EffectBandInfo[]) {
+        super(effectBands);
         this.hideOnPercussionTrack = true;
     }
 

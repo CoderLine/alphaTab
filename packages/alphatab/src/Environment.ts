@@ -21,8 +21,7 @@ import { JQueryAlphaTab } from '@coderline/alphatab/platform/javascript/JQueryAl
 import { WebPlatform } from '@coderline/alphatab/platform/javascript/WebPlatform';
 import { SkiaCanvas } from '@coderline/alphatab/platform/skia/SkiaCanvas';
 import { CssFontSvgCanvas } from '@coderline/alphatab/platform/svg/CssFontSvgCanvas';
-import type { BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
-import { EffectBarRendererFactory } from '@coderline/alphatab/rendering/EffectBarRendererFactory';
+import { EffectBandMode, type BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { AlternateEndingsEffectInfo } from '@coderline/alphatab/rendering/effects/AlternateEndingsEffectInfo';
 import { BeatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
 import { BeatTimerEffectInfo } from '@coderline/alphatab/rendering/effects/BeatTimerEffectInfo';
@@ -62,10 +61,12 @@ import { WideNoteVibratoEffectInfo } from '@coderline/alphatab/rendering/effects
 import { HorizontalScreenLayout } from '@coderline/alphatab/rendering/layout/HorizontalScreenLayout';
 import { PageViewLayout } from '@coderline/alphatab/rendering/layout/PageViewLayout';
 import type { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
+import { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
 import { NumberedBarRendererFactory } from '@coderline/alphatab/rendering/NumberedBarRendererFactory';
 import { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { ScoreBarRendererFactory } from '@coderline/alphatab/rendering/ScoreBarRendererFactory';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRenderer';
 import { SlashBarRendererFactory } from '@coderline/alphatab/rendering/SlashBarRendererFactory';
 import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { TabBarRendererFactory } from '@coderline/alphatab/rendering/TabBarRendererFactory';
@@ -122,14 +123,6 @@ export class RenderEngineFactory {
  * @public
  */
 export class Environment {
-    private static readonly _staffIdBeforeSlashAlways = 'before-slash-always';
-    private static readonly _staffIdBeforeScoreAlways = 'before-score-always';
-    private static readonly _staffIdBeforeScoreHideable = 'before-score-hideable';
-    private static readonly _staffIdBeforeNumberedAlways = 'before-numbered-always';
-    private static readonly _staffIdBeforeTabAlways = 'before-tab-always';
-    private static readonly _staffIdBeforeTabHideable = 'before-tab-hideable';
-    private static readonly _staffIdBeforeEndAlways = 'before-end-always';
-
     /**
      * The scaling factor to use when rending raster graphics for sharper rendering on high-dpi displays.
      * @internal
@@ -379,8 +372,7 @@ export class Environment {
     /**
      * @internal
      */
-    public static readonly staveProfiles: Map<StaveProfile, BarRendererFactory[]> =
-        Environment._createDefaultStaveProfiles();
+    public static readonly staveProfiles: Map<StaveProfile, Set<string>> = Environment._createDefaultStaveProfiles();
 
     public static getRenderEngineFactory(engine: string): RenderEngineFactory {
         if (!engine || !Environment.renderEngines.has(engine)) {
@@ -466,158 +458,124 @@ export class Environment {
         );
     }
 
-    private static _createDefaultRenderers(): BarRendererFactory[] {
-        return [
-            //
-            // Slash
-            new EffectBarRendererFactory(Environment._staffIdBeforeSlashAlways, [
-                new TempoEffectInfo(),
-                new TripletFeelEffectInfo(),
-                new MarkerEffectInfo(),
-                new DirectionsEffectInfo(),
-                new AlternateEndingsEffectInfo(),
-                new FreeTimeEffectInfo(),
-                new TextEffectInfo(),
-                new BeatTimerEffectInfo(),
-                new ChordsEffectInfo()
-            ]),
-            // no before-slash-hideable
-            new SlashBarRendererFactory(),
+    /**
+     * @internal
+     */
+    public static readonly defaultRenderers: BarRendererFactory[] = [
+        //
+        // Slash
+        new SlashBarRendererFactory([
+            { effect: new TempoEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new TripletFeelEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new MarkerEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new DirectionsEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new AlternateEndingsEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new FreeTimeEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new TextEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new BeatTimerEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new ChordsEffectInfo(), mode: EffectBandMode.SharedTop }
+        ]),
 
-            //
-            // Score (standard notation)
-            new EffectBarRendererFactory(Environment._staffIdBeforeScoreAlways, [
-                new FermataEffectInfo(),
-                new BeatBarreEffectInfo(),
-                new NoteOrnamentEffectInfo(),
-                new RasgueadoEffectInfo(),
-                new WahPedalEffectInfo()
-            ]),
-            new EffectBarRendererFactory(
-                Environment._staffIdBeforeScoreHideable,
-                [
-                    new WhammyBarEffectInfo(),
-                    new TrillEffectInfo(),
-                    new OttaviaEffectInfo(true),
-                    new WideBeatVibratoEffectInfo(),
-                    new SlightBeatVibratoEffectInfo(),
-                    new WideNoteVibratoEffectInfo(),
-                    new SlightNoteVibratoEffectInfo(false),
-                    new LeftHandTapEffectInfo(),
-                    new GolpeEffectInfo(GolpeType.Finger)
-                ],
-                (_, staff) => staff.showStandardNotation
-            ),
-            new ScoreBarRendererFactory(),
+        //
+        // Score (standard notation)
+        new ScoreBarRendererFactory([
+            { effect: new FermataEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new BeatBarreEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new NoteOrnamentEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new RasgueadoEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new WahPedalEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new WhammyBarEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new TrillEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new OttaviaEffectInfo(true), mode: EffectBandMode.OwnedTop },
+            { effect: new WideBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new SlightBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new WideNoteVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new SlightNoteVibratoEffectInfo(false), mode: EffectBandMode.OwnedTop },
+            { effect: new LeftHandTapEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new GolpeEffectInfo(GolpeType.Finger), mode: EffectBandMode.OwnedTop }
+        ]),
 
-            //
-            // Numbered
-            new EffectBarRendererFactory(Environment._staffIdBeforeNumberedAlways, [
-                new CrescendoEffectInfo(),
-                new OttaviaEffectInfo(false),
-                new DynamicsEffectInfo(),
-                new GolpeEffectInfo(GolpeType.Thumb, (_s, b) => b.voice.bar.staff.showStandardNotation),
-                new SustainPedalEffectInfo()
-            ]),
-            // no before-numbered-hideable
-            new NumberedBarRendererFactory(),
+        //
+        // Numbered
+        new NumberedBarRendererFactory([
+            { effect: new CrescendoEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new OttaviaEffectInfo(false), mode: EffectBandMode.SharedTop },
+            { effect: new DynamicsEffectInfo(), mode: EffectBandMode.SharedTop },
+            {
+                effect: new GolpeEffectInfo(GolpeType.Thumb, (_s, b) => b.voice.bar.staff.showStandardNotation),
+                mode: EffectBandMode.SharedTop
+            },
+            { effect: new SustainPedalEffectInfo(), mode: EffectBandMode.SharedTop }
+        ]),
 
-            //
-            // Tabs
-            new EffectBarRendererFactory(Environment._staffIdBeforeTabAlways, [new LyricsEffectInfo()]),
-            new EffectBarRendererFactory(
-                Environment._staffIdBeforeTabHideable,
-                [
-                    // TODO: whammy line effect
-                    new TrillEffectInfo(),
-                    new WideBeatVibratoEffectInfo(),
-                    new SlightBeatVibratoEffectInfo(),
-                    new WideNoteVibratoEffectInfo(),
-                    new SlightNoteVibratoEffectInfo(true),
-                    new TapEffectInfo(),
-                    new FadeEffectInfo(),
-                    new HarmonicsEffectInfo(HarmonicType.Natural),
-                    new HarmonicsEffectInfo(HarmonicType.Artificial),
-                    new HarmonicsEffectInfo(HarmonicType.Pinch),
-                    new HarmonicsEffectInfo(HarmonicType.Tap),
-                    new HarmonicsEffectInfo(HarmonicType.Semi),
-                    new HarmonicsEffectInfo(HarmonicType.Feedback),
-                    new LetRingEffectInfo(),
-                    new CapoEffectInfo(),
-                    new FingeringEffectInfo(),
-                    new PalmMuteEffectInfo(),
-                    new PickStrokeEffectInfo(),
-                    new PickSlideEffectInfo(),
-                    new LeftHandTapEffectInfo(),
-                    new GolpeEffectInfo(GolpeType.Finger, (_s, b) => !b.voice.bar.staff.showStandardNotation)
-                ],
-                (_, staff) => staff.showTablature
-            ),
-            new TabBarRendererFactory(),
-            new EffectBarRendererFactory(Environment._staffIdBeforeEndAlways, [
-                new GolpeEffectInfo(GolpeType.Thumb, (_s, b) => !b.voice.bar.staff.showStandardNotation)
-            ])
-        ];
-    }
+        //
+        // Tabs
+        new TabBarRendererFactory([
+            { effect: new LyricsEffectInfo(), mode: EffectBandMode.SharedTop },
 
-    private static _createDefaultStaveProfiles(): Map<StaveProfile, BarRendererFactory[]> {
-        const staveProfiles = new Map<StaveProfile, BarRendererFactory[]>();
+            // TODO: whammy line effect
+            { effect: new TrillEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new WideBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new SlightBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new WideNoteVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new SlightNoteVibratoEffectInfo(true), mode: EffectBandMode.OwnedTop },
+            { effect: new TapEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new FadeEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new HarmonicsEffectInfo(HarmonicType.Natural), mode: EffectBandMode.OwnedTop },
+            { effect: new HarmonicsEffectInfo(HarmonicType.Artificial), mode: EffectBandMode.OwnedTop },
+            { effect: new HarmonicsEffectInfo(HarmonicType.Pinch), mode: EffectBandMode.OwnedTop },
+            { effect: new HarmonicsEffectInfo(HarmonicType.Tap), mode: EffectBandMode.OwnedTop },
+            { effect: new HarmonicsEffectInfo(HarmonicType.Semi), mode: EffectBandMode.OwnedTop },
+            { effect: new HarmonicsEffectInfo(HarmonicType.Feedback), mode: EffectBandMode.OwnedTop },
+            { effect: new LetRingEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new CapoEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new FingeringEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new PalmMuteEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new PickStrokeEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new PickSlideEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new LeftHandTapEffectInfo(), mode: EffectBandMode.OwnedTop },
+            {
+                effect: new GolpeEffectInfo(GolpeType.Finger, (_s, b) => !b.voice.bar.staff.showStandardNotation),
+                mode: EffectBandMode.OwnedTop
+            },
+
+            {
+                effect: new GolpeEffectInfo(GolpeType.Thumb, (_s, b) => !b.voice.bar.staff.showStandardNotation),
+                mode: EffectBandMode.OwnedBottom
+            }
+        ])
+    ];
+
+    private static _createDefaultStaveProfiles(): Map<StaveProfile, Set<string>> {
+        const staveProfiles = new Map<StaveProfile, Set<string>>();
 
         // the general layout is repeating the same pattern across the different notation staffs:
         // * general effects before notation renderer, shown also if notation renderer is hidden (`before-xxxx-always`)
         // * effects specific to the notation renderer, hidden if the nottation renderer is hidden (`before-xxxx-hideable`)
         // * the notation renderer itself, hidden based on settings (`xxxx`)
 
-        const defaultRenderers = Environment._createDefaultRenderers();
-        staveProfiles.set(StaveProfile.Default, defaultRenderers);
-        staveProfiles.set(StaveProfile.ScoreTab, defaultRenderers);
-
-        const scoreRenderers = new Set<string>([
-            Environment._staffIdBeforeSlashAlways,
-            Environment._staffIdBeforeScoreAlways,
-            Environment._staffIdBeforeNumberedAlways,
-            Environment._staffIdBeforeTabAlways,
-            ScoreBarRenderer.StaffId,
-            Environment._staffIdBeforeEndAlways
-        ]);
         staveProfiles.set(
-            StaveProfile.Score,
-            defaultRenderers.filter(r => scoreRenderers.has(r.staffId))
+            StaveProfile.Default,
+            new Set<string>([
+                SlashBarRenderer.StaffId,
+                ScoreBarRenderer.StaffId,
+                NumberedBarRenderer.StaffId,
+                TabBarRenderer.StaffId
+            ])
+        );
+        staveProfiles.set(
+            StaveProfile.ScoreTab,
+            new Set<string>([
+                SlashBarRenderer.StaffId,
+                ScoreBarRenderer.StaffId,
+                NumberedBarRenderer.StaffId,
+                TabBarRenderer.StaffId
+            ])
         );
 
-        const tabRenderers = new Set<string>([
-            Environment._staffIdBeforeSlashAlways,
-            Environment._staffIdBeforeScoreAlways,
-            Environment._staffIdBeforeNumberedAlways,
-            Environment._staffIdBeforeTabAlways,
-            TabBarRenderer.StaffId,
-            Environment._staffIdBeforeEndAlways
-        ]);
-        staveProfiles.set(
-            StaveProfile.Tab,
-            Environment._createDefaultRenderers().filter(r => {
-                if (r instanceof TabBarRendererFactory) {
-                    const tab = r as TabBarRendererFactory;
-                    tab.showTimeSignature = true;
-                    tab.showRests = true;
-                    tab.showTiedNotes = true;
-                }
-                return tabRenderers.has(r.staffId);
-            })
-        );
-
-        staveProfiles.set(
-            StaveProfile.TabMixed,
-            Environment._createDefaultRenderers().filter(r => {
-                if (r instanceof TabBarRendererFactory) {
-                    const tab = r as TabBarRendererFactory;
-                    tab.showTimeSignature = false;
-                    tab.showRests = false;
-                    tab.showTiedNotes = false;
-                }
-                return tabRenderers.has(r.staffId);
-            })
-        );
+        staveProfiles.set(StaveProfile.Score, new Set<string>([ScoreBarRenderer.StaffId]));
+        staveProfiles.set(StaveProfile.Tab, new Set<string>([TabBarRenderer.StaffId]));
+        staveProfiles.set(StaveProfile.TabMixed, new Set<string>([TabBarRenderer.StaffId]));
 
         return staveProfiles;
     }

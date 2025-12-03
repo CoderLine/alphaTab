@@ -3,7 +3,7 @@ import { WahPedal } from '@coderline/alphatab/model/WahPedal';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { WahPedalGlyph } from '@coderline/alphatab/rendering/glyphs/WahPedalGlyph';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -11,7 +11,7 @@ import type { Settings } from '@coderline/alphatab/Settings';
 /**
  * @internal
  */
-export class WahPedalEffectInfo extends EffectBarRendererInfo {
+export class WahPedalEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectWahPedal;
     }

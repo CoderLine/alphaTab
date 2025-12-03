@@ -71,6 +71,7 @@ export class DisplaySettings {
      * @remarks
      * AlphaTab has various stave profiles that define which staves will be shown in for the rendered tracks. Its recommended
      * to keep this on {@link StaveProfile.Default} and rather rely on the options available ob {@link Staff} level
+     * @deprecated Set the notation visibility by modifying the {@link Staff} properties.
      */
     public staveProfile: StaveProfile = StaveProfile.Default;
 

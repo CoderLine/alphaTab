@@ -5,6 +5,7 @@ import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
@@ -128,6 +129,9 @@ export class BarRendererBase {
     public topOverflow: number = 0;
     public bottomOverflow: number = 0;
     public helpers!: BarHelpers;
+
+    public topEffectInfos!: EffectInfo[];
+    public bottomEffectInfos!: EffectInfo[];
 
     /**
      * Gets or sets whether this renderer is linked to the next one

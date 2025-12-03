@@ -2,8 +2,8 @@ import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { Settings } from '@coderline/alphatab/Settings';
 import type { Beat } from '@coderline/alphatab/model/Beat';
-import type { GolpeType } from '@coderline/alphatab/model/GolpeType';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { GolpeType } from '@coderline/alphatab/model/GolpeType';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { GuitarGolpeGlyph } from '@coderline/alphatab/rendering/glyphs/GuitarGolpeGlyph';
@@ -11,7 +11,7 @@ import { GuitarGolpeGlyph } from '@coderline/alphatab/rendering/glyphs/GuitarGol
 /**
  * @internal
  */
-export class GolpeEffectInfo extends EffectBarRendererInfo {
+export class GolpeEffectInfo extends EffectInfo {
     private _type: GolpeType;
     private _shouldCreate?: (settings: Settings, beat: Beat) => boolean;
 
@@ -23,6 +23,10 @@ export class GolpeEffectInfo extends EffectBarRendererInfo {
 
     public get notationElement(): NotationElement {
         return NotationElement.EffectGolpe;
+    }
+
+    public override get effectId(): string {
+        return `${super.effectId}.${GolpeType[this._type]}`;
     }
 
     public get hideOnMultiTrack(): boolean {

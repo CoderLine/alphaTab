@@ -3,14 +3,14 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { FermataGlyph } from '@coderline/alphatab/rendering/glyphs/FermataGlyph';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
  */
-export class FermataEffectInfo extends EffectBarRendererInfo {
+export class FermataEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectFermata;
     }

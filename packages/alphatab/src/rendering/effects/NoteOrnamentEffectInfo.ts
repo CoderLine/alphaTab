@@ -3,7 +3,7 @@ import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { NoteOrnamentGlyph } from '@coderline/alphatab/rendering/glyphs/NoteOrnamentGlyph';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -11,7 +11,7 @@ import type { Settings } from '@coderline/alphatab/Settings';
 /**
  * @internal
  */
-export class NoteOrnamentEffectInfo extends EffectBarRendererInfo {
+export class NoteOrnamentEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectNoteOrnament;
     }

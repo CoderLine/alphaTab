@@ -1,26 +1,27 @@
 import { Environment } from '@coderline/alphatab/Environment';
+import type { EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { Logger } from '@coderline/alphatab/Logger';
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
+import { EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
+import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import { ChordDiagramContainerGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
+import { TuningContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TuningContainerGlyph';
+import { TuningGlyph } from '@coderline/alphatab/rendering/glyphs/TuningGlyph';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
-import { Logger } from '@coderline/alphatab/Logger';
-import type { EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
-import { TuningContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TuningContainerGlyph';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { TuningGlyph } from '@coderline/alphatab/rendering/glyphs/TuningGlyph';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { Lazy } from '@coderline/alphatab/util/Lazy';
 
@@ -352,10 +353,9 @@ export abstract class ScoreLayout {
                 }
             }
 
-            if(this.chordDiagrams.isEmpty) {
+            if (this.chordDiagrams.isEmpty) {
                 this.chordDiagrams = null;
             }
-
         } else {
             this.chordDiagrams = null;
         }
@@ -367,17 +367,34 @@ export abstract class ScoreLayout {
 
     protected createEmptyStaffSystem(): StaffSystem {
         const system: StaffSystem = new StaffSystem(this);
+        const allFactories = Environment.defaultRenderers;
+
         for (let trackIndex: number = 0; trackIndex < this.renderer.tracks!.length; trackIndex++) {
             const track: Track = this.renderer.tracks![trackIndex];
             for (let staffIndex: number = 0; staffIndex < track.staves.length; staffIndex++) {
-                const staff: Staff = track.staves[staffIndex];
-                const profile: BarRendererFactory[] = Environment.staveProfiles.get(
-                    this.renderer.settings.display.staveProfile
-                )!;
-                for (const factory of profile) {
-                    if (factory.canCreate(track, staff)) {
-                        system.addStaff(track, new RenderStaff(trackIndex, staff, factory));
+                const staff = track.staves[staffIndex];
+                const profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
+
+                let sharedEffectBands: EffectInfo[] = [];
+
+                let previousStaff: RenderStaff | undefined = undefined;
+
+                for (const factory of allFactories) {
+                    if (profile.has(factory.staffId) && factory.canCreate(track, staff)) {
+                        const renderStaff = new RenderStaff(trackIndex, staff, factory);
+                        previousStaff = renderStaff;
+                        system.addStaff(track, renderStaff);
+                        sharedEffectBands = [];
+                    } else {
+                        sharedEffectBands.push(
+                            ...factory.effectBands.filter(b => b.mode === EffectBandMode.SharedTop).map(e => e.effect)
+                        );
                     }
+                }
+
+                // don't forget any left-over effects at the bottom.
+                if (sharedEffectBands.length > 0 && previousStaff) {
+                    previousStaff.bottomEffectInfos.push(...sharedEffectBands);
                 }
             }
         }

@@ -4,14 +4,14 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
  */
-export class TextEffectInfo extends EffectBarRendererInfo {
+export class TextEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectText;
     }

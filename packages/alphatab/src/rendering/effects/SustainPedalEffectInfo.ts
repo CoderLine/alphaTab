@@ -4,13 +4,13 @@ import type { Settings } from '@coderline/alphatab/Settings';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import { SustainPedalGlyph } from '@coderline/alphatab/rendering/glyphs/SustainPedalGlyph';
 
 /**
  * @internal
  */
-export class SustainPedalEffectInfo extends EffectBarRendererInfo {
+export class SustainPedalEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectSustainPedal;
     }
