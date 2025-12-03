@@ -375,7 +375,8 @@ export abstract class ScoreLayout {
                 const staff = track.staves[staffIndex];
                 const profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
 
-                let sharedEffectBands: EffectInfo[] = [];
+                let sharedTopEffects: EffectInfo[] = [];
+                let sharedBottomEffects: EffectInfo[] = [];
 
                 let previousStaff: RenderStaff | undefined = undefined;
 
@@ -383,20 +384,34 @@ export abstract class ScoreLayout {
                     if (profile.has(factory.staffId) && factory.canCreate(track, staff)) {
                         const renderStaff = new RenderStaff(trackIndex, staff, factory);
                         // insert shared effect bands at front
-                        renderStaff.topEffectInfos.splice(0, 0, ...sharedEffectBands);
+                        renderStaff.topEffectInfos.splice(0, 0, ...sharedTopEffects);
+                        renderStaff.bottomEffectInfos.push(...sharedBottomEffects);
                         previousStaff = renderStaff;
                         system.addStaff(track, renderStaff);
-                        sharedEffectBands = [];
+                        sharedTopEffects = [];
+                        sharedBottomEffects = [];
                     } else {
-                        sharedEffectBands.push(
-                            ...factory.effectBands.filter(b => b.mode === EffectBandMode.SharedTop).map(e => e.effect)
-                        );
+                        for (const e of factory.effectBands) {
+                            switch (e.mode) {
+                                case EffectBandMode.SharedTop:
+                                    sharedTopEffects.push(e.effect);
+                                    break;
+                                case EffectBandMode.SharedBottom:
+                                    sharedBottomEffects.push(e.effect);
+                                    break;
+                            }
+                        }
                     }
                 }
 
-                // don't forget any left-over effects at the bottom.
-                if (sharedEffectBands.length > 0 && previousStaff) {
-                    previousStaff.bottomEffectInfos.push(...sharedEffectBands);
+                // don't forget any left-over shared effects.
+                if (previousStaff) {
+                    if (sharedTopEffects.length > 0) {
+                        previousStaff.bottomEffectInfos.push(...sharedTopEffects);
+                    }
+                    if (sharedBottomEffects.length > 0) {
+                        previousStaff.bottomEffectInfos.push(...sharedBottomEffects);
+                    }
                 }
             }
         }

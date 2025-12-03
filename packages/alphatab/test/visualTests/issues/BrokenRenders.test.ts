@@ -12,6 +12,14 @@ describe('BrokenRendersTests', () => {
         await VisualTestHelper.runVisualTest('issues/let-ring-empty-voice.gp');
     });
 
+    it('bottom-effect-band', async () => {
+        await VisualTestHelper.runVisualTestTex(`
+            \\lyrics "Do Re Mi Fa So"
+            C4 {tr 16} C4 C4 C4 | C4 c4`,
+            'test-data/visual-tests/issues/bottom-effect-band.png'
+        );
+    });
+
     it('valid-svg', async () => {
         const settings = new Settings();
         settings.core.engine = 'svg';

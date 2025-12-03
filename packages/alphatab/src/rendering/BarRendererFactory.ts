@@ -12,32 +12,41 @@ import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderSta
 export enum EffectBandMode {
     /**
      * The band is owned by the specific renderer.
-     * If the renderer is not shown, the band will not be shown either.
+     * If the owning renderer is not shown, the band will not be shown either.
      * The band is shown on top of the main renderer.
      */
     OwnedTop = 0,
     /**
      * The band is owned by the specific renderer.
-     * If the renderer is not shown, the band will not be shown either.
+     * If the owning renderer is not shown, the band will not be shown either.
      * The band is shown on bottom of the main renderer.
      */
     OwnedBottom = 1,
     /**
      * The band is shared across renderers.
-     * If the renderer is shown, the band is shown on top the main renderer.
+     * If the owning renderer is shown, the band is shown on top the main renderer.
      * If the renderer is not shown, the band is shown on the top of the next renderer which is visible.
-     * 
+     *
      * If no visible render follows, they are added to the bottom of the previous visible renderer.
      */
-    SharedTop = 2
+    SharedTop = 2,
+
+    /**
+     * The band is shared across renderers.
+     * If the owning renderer is shown, the band is shown on bottom of the main renderer.
+     * If the owning renderer is not shown, the band is shown on the **bottom** of the next renderer which is visible.
+     *
+     * If no visible render follows, they are added to the bottom of the previous visible renderer.
+     */
+    SharedBottom = 3
 }
 
 /**
  * @record
  */
 export interface EffectBandInfo {
-    mode:EffectBandMode;
-    effect:EffectInfo;
+    mode: EffectBandMode;
+    effect: EffectInfo;
 }
 
 /**

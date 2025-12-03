@@ -492,21 +492,18 @@ export class Environment {
             { effect: new WideNoteVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new SlightNoteVibratoEffectInfo(false), mode: EffectBandMode.OwnedTop },
             { effect: new LeftHandTapEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new GolpeEffectInfo(GolpeType.Finger), mode: EffectBandMode.OwnedTop }
+            { effect: new GolpeEffectInfo(GolpeType.Finger), mode: EffectBandMode.OwnedTop },
+            { effect: new GolpeEffectInfo(GolpeType.Thumb), mode: EffectBandMode.OwnedBottom },
+            { effect: new CrescendoEffectInfo(), mode: EffectBandMode.SharedBottom },
+            // NOTE: all octave signs are currently shown above, but 8vb could be shown as 8va below the staff
+            // { effect: new OttaviaEffectInfo(false), mode: EffectBandMode.SharedBottom },
+            { effect: new DynamicsEffectInfo(), mode: EffectBandMode.SharedBottom },
+            { effect: new SustainPedalEffectInfo(), mode: EffectBandMode.SharedBottom }
         ]),
 
         //
         // Numbered
-        new NumberedBarRendererFactory([
-            { effect: new CrescendoEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new OttaviaEffectInfo(false), mode: EffectBandMode.SharedTop },
-            { effect: new DynamicsEffectInfo(), mode: EffectBandMode.SharedTop },
-            {
-                effect: new GolpeEffectInfo(GolpeType.Thumb, (_s, b) => b.voice.bar.staff.showStandardNotation),
-                mode: EffectBandMode.SharedTop
-            },
-            { effect: new SustainPedalEffectInfo(), mode: EffectBandMode.SharedTop }
-        ]),
+        new NumberedBarRendererFactory([]),
 
         //
         // Tabs

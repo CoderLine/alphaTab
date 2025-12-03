@@ -6,9 +6,7 @@ import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
-import { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
-import { EffectBandSizingInfo } from '@coderline/alphatab/rendering/EffectBandSizingInfo';
-import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
 import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
@@ -95,10 +93,8 @@ export class BarRendererBase {
 
     private _ties: Glyph[] = [];
 
-    private _bands: EffectBand[] = [];
-    private _bandLookup: Map<string, EffectBand> = new Map();
-    private _effectBandSizingInfo: EffectBandSizingInfo | null = null;
-    private _effectInfosSortOrder: Map<EffectInfo, number> = new Map<EffectInfo, number>();
+    public topEffects: EffectBandContainer;
+    public bottomEffects: EffectBandContainer;
 
     public get nextRenderer(): BarRendererBase | null {
         if (!this.bar || !this.bar.nextBar) {
@@ -136,18 +132,15 @@ export class BarRendererBase {
     private _contentTopOverflow: number = 0;
 
     public get topOverflow() {
-        return this._contentTopOverflow + this._effectBandHeight;
+        return this._contentTopOverflow + this.topEffects.height;
     }
 
     private _contentBottomOverflow: number = 0;
     public get bottomOverflow() {
-        return this._contentBottomOverflow;
+        return this._contentBottomOverflow + this.bottomEffects.height;
     }
 
     public helpers!: BarHelpers;
-
-    public topEffectInfos!: EffectInfo[];
-    public bottomEffectInfos!: EffectInfo[];
 
     /**
      * Gets or sets whether this renderer is linked to the next one
@@ -169,9 +162,9 @@ export class BarRendererBase {
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         this.scoreRenderer = renderer;
         this.bar = bar;
-        if (bar) {
-            this.helpers = new BarHelpers(this);
-        }
+        this.helpers = new BarHelpers(this);
+        this.topEffects = new EffectBandContainer(this, true);
+        this.bottomEffects = new EffectBandContainer(this, false);
     }
 
     public registerTies(ties: Glyph[]) {
@@ -209,9 +202,8 @@ export class BarRendererBase {
         this._postBeatGlyphs.x = this._preBeatGlyphs.x + this._preBeatGlyphs.width + containerWidth;
         this.width = width;
 
-        for (const effectBand of this._bands) {
-            effectBand.alignGlyphs();
-        }
+        this.topEffects.alignGlyphs();
+        this.bottomEffects.alignGlyphs();
     }
 
     public get resources(): RenderingResources {
@@ -275,8 +267,8 @@ export class BarRendererBase {
     private _appliedLayoutingInfo: number = 0;
 
     public afterStaffBarReverted() {
-        this._resetEffectBandSizingInfo();
-        this._sizeAndAlignEffectBands();
+        this.topEffects.afterStaffBarReverted();
+        this.bottomEffects.afterStaffBarReverted();
         this._registerStaffOverflow();
     }
 
@@ -284,7 +276,9 @@ export class BarRendererBase {
         if (this._appliedLayoutingInfo >= this.layoutingInfo.version) {
             return false;
         }
-        this._resetEffectBandSizingInfo();
+
+        this.topEffects.resetEffectBandSizingInfo();
+        this.bottomEffects.resetEffectBandSizingInfo();
 
         this._appliedLayoutingInfo = this.layoutingInfo.version;
         // if we need additional space in the preBeat group we simply
@@ -318,7 +312,8 @@ export class BarRendererBase {
             this.computedWidth = fixedBarWidth;
         }
 
-        this._sizeAndAlignEffectBands();
+        this.topEffects.sizeAndAlignEffectBands();
+        this.bottomEffects.sizeAndAlignEffectBands();
         this._registerStaffOverflow();
 
         return true;
@@ -351,7 +346,8 @@ export class BarRendererBase {
             }
         }
 
-        if (this._updateEffectBandHeight()) {
+        if (this.topEffects.updateEffectBandHeights() || this.bottomEffects.updateEffectBandHeights()) {
+            this._registerStaffOverflow();
             didChangeOverflows = true;
         }
 
@@ -362,30 +358,6 @@ export class BarRendererBase {
         return didChangeOverflows;
     }
 
-    private _effectBandHeight = 0;
-
-    private _updateEffectBandHeight(): boolean {
-        if (!this._effectBandSizingInfo) {
-            return false;
-        }
-        let y: number = 0;
-        for (const slot of this._effectBandSizingInfo.slots) {
-            slot.shared.y = y;
-            for (const band of slot.bands) {
-                band.y = y;
-                band.height = slot.shared.height;
-            }
-            y += slot.shared.height + this.settings.display.effectBandPaddingBottom;
-        }
-        y = Math.ceil(y);
-
-        if (y !== this._effectBandHeight) {
-            this._effectBandHeight = y;
-            this._registerStaffOverflow();
-            return true;
-        }
-        return false;
-    }
     /**
      * Gets the top padding for the main content of the renderer.
      * Can be used to specify where i.E. the score lines of the notation start.
@@ -415,7 +387,8 @@ export class BarRendererBase {
         this._voiceContainers.clear();
         this._postBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
         this._postBeatGlyphs.renderer = this;
-        this._effectInfosSortOrder.clear();
+        this.topEffects.doLayout();
+        this.bottomEffects.doLayout();
 
         for (let i: number = 0; i < this.bar.voices.length; i++) {
             const voice: Voice = this.bar.voices[i];
@@ -442,7 +415,8 @@ export class BarRendererBase {
         this.createPostBeatGlyphs();
 
         // registering happened during creation
-        this._sizeAndAlignEffectBands(false);
+        this.topEffects.sizeAndAlignEffectBands(false);
+        this.bottomEffects.sizeAndAlignEffectBands(false);
 
         this.updateSizes();
 
@@ -487,23 +461,6 @@ export class BarRendererBase {
         }
     }
 
-    private _sizeAndAlignEffectBands(register: boolean = true) {
-        for (const effectBand of this._bands) {
-            effectBand.resetHeight();
-            effectBand.alignGlyphs();
-            if (register && !effectBand.isEmpty) {
-                // find a slot that ended before the start of the band
-                this._effectBandSizingInfo!.register(effectBand);
-            }
-        }
-
-        // if we're registering new slots for the effects, we need to sort the
-        // slots afterwards to keep the registered order. we don't want the "first occured" effect on top but the "first registered"
-        if (register) {
-            this._effectBandSizingInfo!.sortSlots(this._effectInfosSortOrder);
-        }
-    }
-
     protected hasVoiceContainer(voice: Voice): boolean {
         if (this.additionalMultiRestBars || voice.index === 0) {
             return true;
@@ -527,7 +484,9 @@ export class BarRendererBase {
         this._postBeatGlyphs.x = Math.floor(postBeatStart);
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
 
-        this._updateEffectBandHeight();
+        if (this.topEffects.updateEffectBandHeights() || this.bottomEffects.updateEffectBandHeights()) {
+            this._registerStaffOverflow();
+        }
 
         this.height += this.layoutingInfo.height;
         this.height = Math.ceil(this.height);
@@ -570,14 +529,13 @@ export class BarRendererBase {
 
         this.paintContent(cx, cy, canvas);
 
-        const effectBandY = cy + this.y - this.staff.topOverflow;
-        for (const effectBand of this._bands) {
-            canvas.color =
-                effectBand.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
-            if (!effectBand.isEmpty) {
-                effectBand.paint(cx + this.x, effectBandY, canvas);
-            }
-        }
+        const topEffectBandY = cy + this.y - this.staff.topOverflow;
+        this.topEffects.paint(cx + this.x, topEffectBandY, canvas);
+
+        // TODO: correct position
+        const bottomEffectBandY = cy + this.y + this.height + this.bottomPadding;
+        this.bottomEffects.paint(cx + this.x, bottomEffectBandY, canvas);
+
         canvas.color = this.resources.mainGlyphColor;
     }
 
@@ -603,6 +561,7 @@ export class BarRendererBase {
         );
         // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
+        // canvas.strokeRect(cx + this.x, cy + this.y - this.topOverflow, this.width, this.height + this.topOverflow + this.bottomOverflow);
     }
 
     public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {
@@ -641,57 +600,20 @@ export class BarRendererBase {
     }
 
     protected createBeatGlyphs(): void {
-        this._bands = [];
-        this._bandLookup = new Map<string, EffectBand>();
-        this._resetEffectBandSizingInfo();
-
         for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 this.createVoiceGlyphs(voice);
             }
         }
 
-        for (const effectBand of this._bands) {
-            if (effectBand.isLinkedToPrevious) {
-                this.isLinkedToPrevious = true;
-            }
-        }
-    }
-
-    private _resetEffectBandSizingInfo() {
-        if (this.index > 0) {
-            this._effectBandSizingInfo = this.previousRenderer!._effectBandSizingInfo;
-        } else {
-            this._effectBandSizingInfo = new EffectBandSizingInfo();
+        if (this.topEffects.isLinkedToPreviousRenderer || this.bottomEffects.isLinkedToPreviousRenderer) {
+            this.isLinkedToPrevious = true;
         }
     }
 
     protected createVoiceGlyphs(voice: Voice): void {
-        let i = 0;
-        for (const info of this.topEffectInfos) {
-            const band: EffectBand = new EffectBand(voice, info);
-            band.renderer = this;
-            band.doLayout();
-            this._bands.push(band);
-            this._bandLookup.set(`${voice.index}.${info.effectId}`, band);
-            for (const b of voice.beats) {
-                band.createGlyph(b);
-            }
-            this._effectInfosSortOrder.set(info, i++);
-        }
-
-        // TODO: ensure bottom effect infos are rendered below staff (own height and overflow)
-        for (const info of this.bottomEffectInfos) {
-            const band: EffectBand = new EffectBand(voice, info);
-            band.renderer = this;
-            band.doLayout();
-            this._bands.push(band);
-            this._bandLookup.set(`${voice.index}.${info.effectId}`, band);
-            for (const b of voice.beats) {
-                band.createGlyph(b);
-            }
-            this._effectInfosSortOrder.set(info, i++);
-        }
+        this.topEffects.createVoiceGlyphs(voice);
+        this.bottomEffects.createVoiceGlyphs(voice);
     }
 
     protected createPostBeatGlyphs(): void {
@@ -761,8 +683,7 @@ export class BarRendererBase {
     }
 
     public reLayout(): void {
-        this._resetEffectBandSizingInfo();
-        this._sizeAndAlignEffectBands();
+        this.topEffects.reLayout();
         this.updateSizes();
 
         // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
@@ -823,13 +744,5 @@ export class BarRendererBase {
 
     public getBeatDirection(beat: Beat): BeamDirection {
         return this.helpers.getBeamingHelperForBeat(beat).direction;
-    }
-
-    public getBand(voice: Voice, effectId: string): EffectBand | null {
-        const id: string = `${voice.index}.${effectId}`;
-        if (this._bandLookup.has(id)) {
-            return this._bandLookup.get(id)!;
-        }
-        return null;
     }
 }

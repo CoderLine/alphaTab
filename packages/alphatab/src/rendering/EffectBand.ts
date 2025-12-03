@@ -1,6 +1,8 @@
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import type { EffectBandSlot } from '@coderline/alphatab/rendering/EffectBandSlot';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
@@ -15,6 +17,7 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 export class EffectBand extends Glyph {
     private _uniqueEffectGlyphs: EffectGlyph[][] = [];
     private _effectGlyphs: Map<number, EffectGlyph>[] = [];
+    private _container: EffectBandContainer;
     public isEmpty: boolean = true;
 
     public previousBand: EffectBand | null = null;
@@ -27,10 +30,11 @@ export class EffectBand extends Glyph {
     public info: EffectInfo;
     public slot: EffectBandSlot | null = null;
 
-    public constructor(voice: Voice, info: EffectInfo) {
+    public constructor(voice: Voice, info: EffectInfo, container: EffectBandContainer) {
         super(0, 0);
         this.voice = voice;
         this.info = info;
+        this._container = container;
     }
 
     public override doLayout(): void {
@@ -41,16 +45,20 @@ export class EffectBand extends Glyph {
         }
     }
 
+    public static shouldCreateGlyph(beat: Beat, info: EffectInfo, renderer: BarRendererBase) {
+        return (
+            info.shouldCreateGlyph(renderer.settings, beat) &&
+            (!info.hideOnMultiTrack || renderer.staff.trackIndex === 0)
+        );
+    }
+
     public createGlyph(beat: Beat): void {
         if (beat.voice !== this.voice) {
             return;
         }
         // NOTE: the track order will never change. even if the staff behind the renderer changes, the trackIndex will not.
         // so it's okay to access the staff here while creating the glyphs.
-        if (
-            this.info.shouldCreateGlyph(this.renderer.settings, beat) &&
-            (!this.info.hideOnMultiTrack || this.renderer.staff.trackIndex === 0)
-        ) {
+        if (EffectBand.shouldCreateGlyph(beat, this.info, this.renderer)) {
             this.isEmpty = false;
             if (!this.firstBeat || beat.isBefore(this.firstBeat)) {
                 this.firstBeat = beat;
@@ -117,8 +125,8 @@ export class EffectBand extends Glyph {
                             prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index)!;
                         } else if (this.renderer.index > 0) {
                             // load the effect from the previous renderer if possible.
-                            const previousRenderer = this.renderer.previousRenderer!;
-                            const previousBand = previousRenderer.getBand(prevBeat.voice, this.info.effectId);
+                            const previousContainer = this._container.previousContainer!;
+                            const previousBand = previousContainer.getBand(prevBeat.voice, this.info.effectId);
                             // it can happen that we have an empty voice and then we don't have an effect band
                             if (previousBand) {
                                 const voiceGlyphs: Map<number, EffectGlyph> =

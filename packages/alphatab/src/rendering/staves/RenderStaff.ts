@@ -82,6 +82,7 @@ export class RenderStaff {
                     break;
 
                 case EffectBandMode.OwnedBottom:
+                case EffectBandMode.SharedBottom:
                     this.bottomEffectInfos.push(b.effect);
                     break;
             }
@@ -130,9 +131,9 @@ export class RenderStaff {
     public addBar(bar: Bar, layoutingInfo: BarLayoutingInfo, additionalMultiBarsRestBars: Bar[] | null): void {
         const renderer = this._factory.create(this.system.layout.renderer, bar);
 
-        renderer.topEffectInfos = this.topEffectInfos;
-        renderer.bottomEffectInfos = this.bottomEffectInfos;
-        
+        renderer.topEffects.infos = this.topEffectInfos;
+        renderer.bottomEffects.infos = this.bottomEffectInfos;
+
         renderer.additionalMultiRestBars = additionalMultiBarsRestBars;
         renderer.staff = this;
         renderer.index = this.barRenderers.length;
