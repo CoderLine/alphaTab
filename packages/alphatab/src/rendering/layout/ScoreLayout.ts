@@ -382,6 +382,8 @@ export abstract class ScoreLayout {
                 for (const factory of allFactories) {
                     if (profile.has(factory.staffId) && factory.canCreate(track, staff)) {
                         const renderStaff = new RenderStaff(trackIndex, staff, factory);
+                        // insert shared effect bands at front
+                        renderStaff.topEffectInfos.splice(0, 0, ...sharedEffectBands);
                         previousStaff = renderStaff;
                         system.addStaff(track, renderStaff);
                         sharedEffectBands = [];
