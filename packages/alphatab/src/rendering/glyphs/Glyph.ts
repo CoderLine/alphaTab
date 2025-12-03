@@ -22,6 +22,10 @@ export class Glyph {
         return this.y;
     }
 
+    public getBoundingBoxBottom() {
+        return this.getBoundingBoxTop() + this.height;
+    }
+
     public doLayout(): void {
         // to be implemented in subclass
     }

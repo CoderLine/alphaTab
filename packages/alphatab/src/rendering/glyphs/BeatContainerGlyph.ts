@@ -1,20 +1,20 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
 import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
+import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import type { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 
 /**
  * @internal
@@ -41,6 +41,14 @@ export class BeatContainerGlyph extends Glyph {
     public addTie(tie: Glyph) {
         tie.renderer = this.renderer;
         this.ties.push(tie);
+    }
+
+    public override getBoundingBoxTop(): number {
+        return Math.min(this.preNotes.getBoundingBoxTop(), this.onNotes.getBoundingBoxTop());
+    }
+
+    public override getBoundingBoxBottom(): number {
+        return Math.max(this.preNotes.getBoundingBoxBottom(), this.onNotes.getBoundingBoxBottom());
     }
 
     protected drawBeamHelperAsFlags(helper: BeamingHelper): boolean {
@@ -127,6 +135,13 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        // var c = canvas.color;
+        // canvas.color = Color.random();
+        // canvas.fillRect(cx + this.x, cy + this.y + this.preNotes.getBoundingBoxTop(), this.width, this.renderer.height);
+        // canvas.color = Color.random();
+        // canvas.fillRect(cx + this.x, cy + this.y + this.onNotes.getBoundingBoxTop(), this.width, this.renderer.height);
+        // canvas.color = c;
+
         // var c = canvas.color;
         // var ta = canvas.textAlign;
         // canvas.color = new Color(255, 0, 0);

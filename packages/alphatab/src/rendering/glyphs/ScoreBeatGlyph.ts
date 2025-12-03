@@ -61,6 +61,26 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
+    public override getBoundingBoxTop(): number {
+        if (this.noteHeads) {
+            return this.noteHeads.getBoundingBoxTop();
+        }
+        if (this.restGlyph) {
+            return this.restGlyph.getBoundingBoxTop();
+        }
+        return this.y;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        if (this.noteHeads) {
+            return this.noteHeads.getBoundingBoxBottom();
+        }
+        if (this.restGlyph) {
+            return this.restGlyph.getBoundingBoxBottom();
+        }
+        return this.y + this.height;
+    }
+
     public override getLowestNoteY(): number {
         return this.noteHeads ? this.noteHeads.getLowestNoteY() : 0;
     }
@@ -279,7 +299,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         // calculate y position
         let line: number;
         if (n.beat.slashed) {
-            line = (sr.heightLineCount - 1);
+            line = sr.heightLineCount - 1;
         } else {
             line = sr.getNoteLine(n);
         }
