@@ -28,11 +28,11 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     public abstract get scale(): number;
 
     public override getBoundingBoxTop(): number {
-        return this.maxNote ? this.maxNote.glyph.getBoundingBoxTop() : this.y;
+        return this.minNote ? this.minNote.glyph.getBoundingBoxTop() : this.y;
     }
 
     public override getBoundingBoxBottom(): number {
-        return this.minNote ? this.minNote.glyph.getBoundingBoxBottom() : this.y + this.height;
+        return this.maxNote ? this.maxNote.glyph.getBoundingBoxBottom() : this.y + this.height;
     }
 
     public getLowestNoteY(): number {
