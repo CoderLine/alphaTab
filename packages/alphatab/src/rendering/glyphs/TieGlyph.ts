@@ -269,7 +269,7 @@ export class TieGlyph extends Glyph {
         offset *= scale;
         size *= scale;
 
-        if(down) {
+        if (down) {
             offset *= -1;
             size *= -1;
         }
@@ -357,6 +357,37 @@ export class TieGlyph extends Glyph {
         // canvas.fillRect(bbox.x, bbox.y, bbox.w, bbox.h);
 
         // canvas.color = c;
+    }
+
+    public static calculateBendSlurTopY(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        down: boolean,
+        scale: number,
+        bendSlurHeight: number
+    ) {
+        let normalVectorX: number = y2 - y1;
+        let normalVectorY: number = x2 - x1;
+        const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
+        if (down) {
+            normalVectorX *= -1;
+        } else {
+            normalVectorY *= -1;
+        }
+        // make to unit vector
+        normalVectorX /= length;
+        normalVectorY /= length;
+
+        let offset: number = bendSlurHeight * scale;
+        if (x2 - x1 < 20) {
+            offset /= 2;
+        }
+        const centerY: number = (y2 + y1) / 2;
+        const cp1Y: number = centerY + offset * normalVectorY;
+
+        return cp1Y;
     }
 
     public static drawBendSlur(

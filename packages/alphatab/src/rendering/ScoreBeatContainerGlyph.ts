@@ -30,6 +30,22 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         }
     }
 
+    public override getBoundingBoxTop(): number {
+        if (this._bend !== null) {
+            return Math.min(this._bend.getBoundingBoxTop(), super.getBoundingBoxTop());
+        } else {
+            return super.getBoundingBoxTop();
+        }
+    }
+
+    public override getBoundingBoxBottom(): number {
+        if (this._bend !== null) {
+            return Math.max(this._bend.getBoundingBoxBottom(), super.getBoundingBoxTop());
+        } else {
+            return super.getBoundingBoxBottom();
+        }
+    }
+
     protected override createTies(n: Note): void {
         // create a tie if any effect requires it
         if (!n.isVisible) {

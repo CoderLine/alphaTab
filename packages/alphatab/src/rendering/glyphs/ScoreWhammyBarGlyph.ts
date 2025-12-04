@@ -55,7 +55,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         }
                     }
                     endGlyphs.doLayout();
-                    this.bendNoteHeads.push(endGlyphs);
+                    this.glyphs.push(endGlyphs);
                 }
                 break;
             case WhammyType.Dip:
@@ -78,7 +78,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             }
                         }
                         middleGlyphs.doLayout();
-                        this.bendNoteHeads.push(middleGlyphs);
+                        this.glyphs.push(middleGlyphs);
                         const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                         endGlyphs.renderer = this.renderer;
                         this._endGlyph = endGlyphs;
@@ -95,7 +95,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             }
                         }
                         endGlyphs.doLayout();
-                        this.bendNoteHeads.push(endGlyphs);
+                        this.glyphs.push(endGlyphs);
                     }
                 }
                 break;
@@ -180,8 +180,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             let endY: number = 0;
             let bendTie: boolean = false;
 
-            if (this.bendNoteHeads.length > 0 && this.bendNoteHeads[0].containsNoteValue(endValue)) {
-                endY = this.bendNoteHeads[0].getNoteValueY(endValue) + heightOffset;
+            if (this.glyphs.length > 0 && this.glyphs[0].containsNoteValue(endValue)) {
+                endY = this.glyphs[0].getNoteValueY(endValue) + heightOffset;
                 bendTie = true;
             } else if (
                 endNoteRenderer &&
@@ -221,13 +221,13 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                     break;
                 case WhammyType.Dive:
                     if (i === 0) {
-                        this.bendNoteHeads[0].x = endX - this.bendNoteHeads[0].noteHeadOffset;
-                        const previousY = this.bendNoteHeads[0].y;
-                        this.bendNoteHeads[0].y = cy + startNoteRenderer.y;
-                        this.bendNoteHeads[0].paint(0, 0, canvas);
-                        if (this.bendNoteHeads[0].containsNoteValue(endValue)) {
+                        this.glyphs[0].x = endX - this.glyphs[0].noteHeadOffset;
+                        const previousY = this.glyphs[0].y;
+                        this.glyphs[0].y = cy + startNoteRenderer.y;
+                        this.glyphs[0].paint(0, 0, canvas);
+                        if (this.glyphs[0].containsNoteValue(endValue)) {
                             endY -= previousY;
-                            endY += this.bendNoteHeads[0].y;
+                            endY += this.glyphs[0].y;
                         }
                     }
                     if (bendTie) {
@@ -302,11 +302,11 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         }
                     } else {
                         const middleX: number = (startX + endX) / 2;
-                        this.bendNoteHeads[0].x = middleX - this.bendNoteHeads[0].noteHeadOffset;
-                        this.bendNoteHeads[0].y = cy + startNoteRenderer.y;
-                        this.bendNoteHeads[0].paint(0, 0, canvas);
+                        this.glyphs[0].x = middleX - this.glyphs[0].noteHeadOffset;
+                        this.glyphs[0].y = cy + startNoteRenderer.y;
+                        this.glyphs[0].paint(0, 0, canvas);
                         const middleValue: number = this._getBendNoteValue(note, beat.whammyBarPoints![1]);
-                        const middleY: number = this.bendNoteHeads[0].getNoteValueY(middleValue) + heightOffset;
+                        const middleY: number = this.glyphs[0].getNoteValueY(middleValue) + heightOffset;
                         this.drawBendSlur(
                             canvas,
                             startX,
@@ -317,10 +317,10 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             1,
                             slurText
                         );
-                        this.bendNoteHeads[1].x = endX - this.bendNoteHeads[1].noteHeadOffset;
-                        this.bendNoteHeads[1].y = cy + startNoteRenderer.y;
-                        this.bendNoteHeads[1].paint(0, 0, canvas);
-                        endY = this.bendNoteHeads[1].getNoteValueY(endValue) + heightOffset;
+                        this.glyphs[1].x = endX - this.glyphs[1].noteHeadOffset;
+                        this.glyphs[1].y = cy + startNoteRenderer.y;
+                        this.glyphs[1].paint(0, 0, canvas);
+                        endY = this.glyphs[1].getNoteValueY(endValue) + heightOffset;
                         this.drawBendSlur(
                             canvas,
                             middleX,
@@ -359,10 +359,10 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         1,
                         slurText
                     );
-                    if (this.bendNoteHeads.length > 0) {
-                        this.bendNoteHeads[0].x = endX - this.bendNoteHeads[0].noteHeadOffset;
-                        this.bendNoteHeads[0].y = cy + startNoteRenderer.y;
-                        this.bendNoteHeads[0].paint(0, 0, canvas);
+                    if (this.glyphs.length > 0) {
+                        this.glyphs[0].x = endX - this.glyphs[0].noteHeadOffset;
+                        this.glyphs[0].y = cy + startNoteRenderer.y;
+                        this.glyphs[0].paint(0, 0, canvas);
                         this.drawBendSlur(
                             canvas,
                             startX,

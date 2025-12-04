@@ -126,7 +126,15 @@ export class TabBendGlyph extends Glyph {
 
     public override doLayout(): void {
         super.doLayout();
-        const bendHeight: number = this._maxBendValue * this.renderer.smuflMetrics.tabBendPerValueHeight;
+
+        const res = this.renderer.resources;
+        let bendHeight: number = this._maxBendValue * this.renderer.smuflMetrics.tabBendPerValueHeight;
+
+        const canvas = this.renderer.scoreRenderer.canvas!;
+        canvas.font = res.tablatureFont;
+        const size = canvas.measureText('full');
+        bendHeight += size.height + res.engravingSettings.tabBendLabelPadding;
+
         this.renderer.registerOverflowTop(bendHeight);
         let value: number = 0;
         for (const note of this._notes) {
@@ -215,7 +223,7 @@ export class TabBendGlyph extends Glyph {
         }
         for (const note of this._notes) {
             const renderPoints: TabBendRenderPoint[] = this._renderPoints.get(note.id)!;
-            const startNoteRenderer: BarRendererBase = this.renderer;
+            const startNoteRenderer = this.renderer as TabBarRenderer;
             let endNote: Note = note;
             let isMultiBeatBend: boolean = false;
             let endNoteRenderer: BarRendererBase | null = null;
@@ -303,12 +311,14 @@ export class TabBendGlyph extends Glyph {
                 }
             }
 
-            if (endNote.vibrato !== VibratoType.None) {
-                const vibratoStartX = endX - cx + tabBendArrowSize - endNoteRenderer.x;
+            if (endNote.isTieDestination && endNote.vibrato !== VibratoType.None && !endNote.hasBend) {
+                const vibratoStartX = endX - cx + tabBendArrowSize * 0.5 - endNoteRenderer.x;
+                const overflowOffset: number = startNoteRenderer.lineOffset / 2;
                 const vibratoStartY: number =
                     topY -
                     cy -
-                    this.renderer.smuflMetrics.tabBendPerValueHeight * renderPoints[renderPoints.length - 1].lineValue;
+                    this.renderer.smuflMetrics.tabBendPerValueHeight * renderPoints[renderPoints.length - 1].lineValue +
+                    overflowOffset;
 
                 const vibrato = new NoteVibratoGlyph(vibratoStartX, vibratoStartY, endNote.vibrato);
                 vibrato.beat = endNote.beat;
