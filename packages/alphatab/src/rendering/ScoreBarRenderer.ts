@@ -159,71 +159,35 @@ export class ScoreBarRenderer extends LineBarRenderer {
                                 maxNoteY = bottomY;
                             }
                         }
-                    } else if (h.beats.length === 1) {
-                        const beatContainer = this.getBeatContainer(h.beats[0]);
-                        if (beatContainer) {
-                            const bBoxTop = beatContainer.getBoundingBoxTop();
-                            const bBoxBottom = beatContainer.getBoundingBoxBottom();
-
-                            // notes with stems
-                            if (h.beats[0].duration >= Duration.Half) {
-                                if (h.direction === BeamDirection.Up) {
-                                    let topY = this.getFlagTopY(h.beats[0], h.direction);
-                                    if (h.hasTuplet) {
-                                        topY -= this.tupletSize + this.tupletOffset;
-                                    }
-                                    if (bBoxTop < topY) {
-                                        topY = bBoxTop;
-                                    }
-                                    if (topY < maxNoteY) {
-                                        maxNoteY = topY;
-                                    }
-
-                                    const bottomY = bBoxBottom;
-                                    if (bottomY > minNoteY) {
-                                        minNoteY = bottomY;
-                                    }
-                                } else {
-                                    let bottomY = this.getFlagBottomY(h.beats[0], h.direction);
-                                    if (h.hasTuplet) {
-                                        bottomY += this.tupletSize + this.tupletOffset;
-                                    }
-                                    if (bottomY > minNoteY) {
-                                        minNoteY = bottomY;
-                                    }
-
-                                    const topY = bBoxTop;
-                                    if (topY < maxNoteY) {
-                                        maxNoteY = topY;
-                                    }
-                                }
+                    }
+                    // notes with stems
+                    else if (h.beats.length === 1 && h.beats[0].duration >= Duration.Half) {
+                        if (h.direction === BeamDirection.Up) {
+                            let topY = this.getFlagTopY(h.beats[0], h.direction);
+                            if (h.hasTuplet) {
+                                topY -= this.tupletSize + this.tupletOffset;
                             }
-                            // standalone notes without stems
-                            else {
-                                let topY = bBoxTop;
-                                let bottomY = bBoxBottom;
-                                if (h.direction === BeamDirection.Up) {
-                                    if (h.hasTuplet) {
-                                        topY -= this.tupletSize + this.tupletOffset;
-                                    }
-                                } else {
-                                    if (h.hasTuplet) {
-                                        bottomY += this.tupletSize + this.tupletOffset;
-                                    }
-                                }
-
-                                if (bottomY > minNoteY) {
-                                    minNoteY = bottomY;
-                                }
-                                if (topY < maxNoteY) {
-                                    maxNoteY = topY;
-                                }
+                            if (topY < maxNoteY) {
+                                maxNoteY = topY;
                             }
+
+                            // bottom handled via beat container bBox
+                        } else {
+                            let bottomY = this.getFlagBottomY(h.beats[0], h.direction);
+                            if (h.hasTuplet) {
+                                bottomY += this.tupletSize + this.tupletOffset;
+                            }
+                            if (bottomY > minNoteY) {
+                                minNoteY = bottomY;
+                            }
+
+                            // top handled via beat container bBox
                         }
                     }
-                    // beamed notes
+                    // beamed notes and notes without stems
+                    // (see paintTuplets in case of doubts how we handle tuplets on non beamed notes)
                     else {
-                        this._ensureDrawingInfo(h, h.direction);
+                        this._ensureBeamDrawingInfo(h, h.direction);
                         const drawingInfo = h.drawingInfos.get(h.direction)!;
 
                         if (h.direction === BeamDirection.Up) {
@@ -257,6 +221,18 @@ export class ScoreBarRenderer extends LineBarRenderer {
                             if (topY < maxNoteY) {
                                 maxNoteY = topY;
                             }
+                        }
+                    }
+
+                    const beatContainer = this.getBeatContainer(h.beats[0]);
+                    if (beatContainer) {
+                        const bBoxTop = beatContainer.getBoundingBoxTop();
+                        const bBoxBottom = beatContainer.getBoundingBoxBottom();
+                        if (bBoxBottom > minNoteY) {
+                            minNoteY = bBoxBottom;
+                        }
+                        if (bBoxTop < maxNoteY) {
+                            maxNoteY = bBoxTop;
                         }
                     }
                 }
@@ -454,11 +430,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 : this.getFlagBottomY(h.beats[0], direction);
         }
 
-        this._ensureDrawingInfo(h, direction);
+        this._ensureBeamDrawingInfo(h, direction);
         return h.drawingInfos.get(direction)!.calcY(x);
     }
 
-    private _ensureDrawingInfo(h: BeamingHelper, direction: BeamDirection) {
+    private _ensureBeamDrawingInfo(h: BeamingHelper, direction: BeamDirection) {
         if (!h.drawingInfos.has(direction)) {
             const scale = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
             const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
