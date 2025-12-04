@@ -1,5 +1,4 @@
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
-import { Color } from '@coderline/alphatab/model/Color';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
@@ -175,10 +174,10 @@ export class EffectBand extends Glyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
 
-        const c = canvas.color;
-        canvas.color = Color.random();
-        canvas.fillRect(cx + this.x, cy + this.y, this.renderer.width, this.slot!.shared.height);
-        canvas.color = c;
+        // const c = canvas.color;
+        // canvas.color = Color.random();
+        // canvas.fillRect(cx + this.x, cy + this.y, this.renderer.width, this.slot!.shared.height);
+        // canvas.color = c;
 
         for (let i: number = 0, j: number = this._uniqueEffectGlyphs.length; i < j; i++) {
             const v: EffectGlyph[] = this._uniqueEffectGlyphs[i];
@@ -198,20 +197,16 @@ export class EffectBand extends Glyph {
             }
         }
         this.info.onAlignGlyphs(this);
-
     }
 
     private _alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {
         const g: EffectGlyph = this._effectGlyphs[beat.voice.index].get(beat.index)!;
         const container: BeatContainerGlyph = this.renderer.getBeatContainer(beat)!;
 
-        // container is aligned with the "onTimeX" position of the beat in effect renders
-
         switch (sizing) {
             case EffectBarGlyphSizing.SinglePreBeat:
-                // shift to the start using the biggest pre-beat size of the respective beat
                 const offsetToBegin = this.renderer.layoutingInfo.getPreBeatSize(beat);
-                g.x = this.renderer.beatGlyphsStart + container.x - offsetToBegin;
+                g.x = this.renderer.beatGlyphsStart + container.x + container.onTimeX - offsetToBegin;
                 break;
             case EffectBarGlyphSizing.SingleOnBeat:
             case EffectBarGlyphSizing.GroupedOnBeat:
