@@ -1,6 +1,8 @@
-import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
+import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
@@ -13,15 +15,13 @@ import { TabClefGlyph } from '@coderline/alphatab/rendering/glyphs/TabClefGlyph'
 import type { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteChordGlyph';
 import { TabTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TabTimeSignatureGlyph';
 import type { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
-import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
+import { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import type { ReservedLayoutAreaSlot } from '@coderline/alphatab/rendering/utils/BarCollisionHelper';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
-import { GraceType } from '@coderline/alphatab/model/GraceType';
-import type { ReservedLayoutAreaSlot } from '@coderline/alphatab/rendering/utils/BarCollisionHelper';
-import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
@@ -56,17 +56,6 @@ export class TabBarRenderer extends LineBarRenderer {
 
     public override get staffLineBarSubElement(): BarSubElement {
         return BarSubElement.GuitarTabsStaffLine;
-    }
-
-    public constructor(renderer: ScoreRenderer, bar: Bar) {
-        super(renderer, bar);
-
-        if (!bar.staff.showStandardNotation) {
-            this.showTimeSignature = true;
-            this.showRests = true;
-            this.showTiedNotes = true;
-            this._showMultiBarRest = true;
-        }
     }
 
     public override get lineSpacing(): number {
@@ -157,6 +146,16 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     public override doLayout(): void {
+        const hasStandardNotation =
+            this.bar.staff.showStandardNotation && this.scoreRenderer.layout!.profile.has(ScoreBarRenderer.StaffId);
+
+        if (!hasStandardNotation) {
+            this.showTimeSignature = true;
+            this.showRests = true;
+            this.showTiedNotes = true;
+            this._showMultiBarRest = true;
+        }
+
         super.doLayout();
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
             this._hasTuplets = false;

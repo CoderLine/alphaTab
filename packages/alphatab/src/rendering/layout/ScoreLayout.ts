@@ -10,7 +10,7 @@ import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import { EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
+import { type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { ChordDiagramContainerGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import { TuningContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TuningContainerGlyph';
@@ -66,6 +66,8 @@ export abstract class ScoreLayout {
 
     protected pagePadding: number[] | null = null;
 
+    public profile: Set<string> = new Set<string>();
+
     public abstract get name(): string;
 
     public renderer: ScoreRenderer;
@@ -100,6 +102,7 @@ export abstract class ScoreLayout {
 
     public layoutAndRender(): void {
         this._lazyPartials.clear();
+        this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
 
         const score: Score = this.renderer.score!;
 
@@ -374,7 +377,6 @@ export abstract class ScoreLayout {
 
             for (let staffIndex: number = 0; staffIndex < track.staves.length; staffIndex++) {
                 const staff = track.staves[staffIndex];
-                const profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
 
                 let sharedTopEffects: EffectBandInfo[] = [];
                 let sharedBottomEffects: EffectBandInfo[] = [];
@@ -382,7 +384,7 @@ export abstract class ScoreLayout {
                 let previousStaff: RenderStaff | undefined = undefined;
 
                 for (const factory of allFactories) {
-                    if (profile.has(factory.staffId) && factory.canCreate(track, staff)) {
+                    if (this.profile.has(factory.staffId) && factory.canCreate(track, staff)) {
                         const renderStaff = new RenderStaff(trackIndex, staff, factory);
                         // insert shared effect bands at front
                         renderStaff.topEffectInfos.splice(0, 0, ...sharedTopEffects);
