@@ -45,16 +45,16 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public abstract get drawnLineCount(): number;
 
     protected get topGlyphOverflow() {
-        return this.smuflMetrics.oneStaffSpace;
+        return 0;
     }
 
     protected get bottomGlyphOverflow() {
-        return this.smuflMetrics.oneStaffSpace;
+        return 0;
     }
 
     protected initLineBasedSizes() {
-        this.topPadding = this.topGlyphOverflow;
-        this.bottomPadding = this.bottomGlyphOverflow;
+        this.topPadding = 0;
+        this.bottomPadding = 0;
         this.height = this.lineOffset * (this.heightLineCount - 1) + this.topPadding + this.bottomPadding;
     }
 

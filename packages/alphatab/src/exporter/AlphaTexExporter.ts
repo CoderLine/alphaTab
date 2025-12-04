@@ -220,6 +220,9 @@ class AlphaTexPrinter {
         // outdent from previous items if we had indents
         switch (m.tag.tag.text) {
             case 'track':
+                if (this._staffIndex > 0) {
+                    this._writer.outdent();
+                }
                 if (this._trackIndex > 0) {
                     this._writer.outdent();
                 }

@@ -756,7 +756,7 @@ export class StaffSystem {
             cy +
             this.y +
             _firstStaffInBrackets.y +
-            _firstStaffInBrackets.topSpacing +
+            _firstStaffInBrackets.topPadding +
             _firstStaffInBrackets.topOverflow +
             (_firstStaffInBrackets.barRenderers.length > 0 ? _firstStaffInBrackets.barRenderers[0].topPadding : 0);
         const lineBottom: number =
@@ -764,7 +764,7 @@ export class StaffSystem {
             this.y +
             lastStaff.y +
             lastStaff.height -
-            lastStaff.bottomSpacing -
+            lastStaff.bottomPadding -
             lastStaff.bottomOverflow -
             (lastStaff.barRenderers.length > 0 ? lastStaff.barRenderers[0].bottomPadding : 0);
         const visualHeight: number = visualBottom - visualTop;

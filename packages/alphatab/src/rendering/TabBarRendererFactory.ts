@@ -4,7 +4,6 @@ import type { Track } from '@coderline/alphatab/model/Track';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BarRendererFactory, type EffectBandInfo } from '@coderline/alphatab/rendering/BarRendererFactory';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 
 /**
@@ -14,14 +13,6 @@ import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 export class TabBarRendererFactory extends BarRendererFactory {
     public get staffId(): string {
         return TabBarRenderer.StaffId;
-    }
-
-    public override getStaffPaddingTop(staff: RenderStaff): number {
-        return staff.system.layout.renderer.settings.display.notationStaffPaddingTop;
-    }
-
-    public override getStaffPaddingBottom(staff: RenderStaff): number {
-        return staff.system.layout.renderer.settings.display.notationStaffPaddingBottom;
     }
 
     public constructor(effectBands: EffectBandInfo[]) {

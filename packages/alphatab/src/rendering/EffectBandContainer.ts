@@ -117,9 +117,6 @@ export class EffectBandContainer {
 
         let y: number = 0;
         for (const slot of this._effectBandSizingInfo.slots) {
-            if (y > 0) {
-                y += this._renderer.settings.display.effectBandPaddingBottom;
-            }
             slot.shared.y = y;
             for (const band of slot.bands) {
                 band.y = y;
@@ -128,7 +125,7 @@ export class EffectBandContainer {
                 }
                 band.height = slot.shared.height;
             }
-            y += slot.shared.height;
+            y += slot.shared.height + this._renderer.settings.display.effectBandPaddingBottom;
         }
         y = Math.ceil(y);
 

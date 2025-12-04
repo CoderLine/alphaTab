@@ -4,7 +4,6 @@ import type { Track } from '@coderline/alphatab/model/Track';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 
 /**
  * The different modes on how effect bands are applied to bar renderers.
@@ -64,8 +63,6 @@ export abstract class BarRendererFactory {
     public effectBands: EffectBandInfo[];
 
     public abstract get staffId(): string;
-    public abstract getStaffPaddingTop(staff: RenderStaff): number;
-    public abstract getStaffPaddingBottom(staff: RenderStaff): number;
 
     public constructor(effectBands: EffectBandInfo[]) {
         this.effectBands = effectBands;

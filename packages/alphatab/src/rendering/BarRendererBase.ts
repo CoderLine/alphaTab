@@ -326,8 +326,8 @@ export class BarRendererBase {
 
         let didChangeOverflows = false;
         // allow spacing to be used for tie overflows
-        const barTop = this.y - this.staff.topSpacing;
-        const barBottom = this.y + this.height + this.staff.bottomSpacing;
+        const barTop = this.y - this.staff.topPadding;
+        const barBottom = this.y + this.height + this.staff.bottomPadding;
         for (const tie of this._ties) {
             tie.doLayout();
             if (tie.height > 0) {

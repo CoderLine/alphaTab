@@ -2,7 +2,11 @@ import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import { type BarRendererFactory, type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
+import {
+    type BarRendererFactory,
+    type EffectBandInfo,
+    EffectBandMode
+} from '@coderline/alphatab/rendering/BarRendererFactory';
 import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
@@ -51,8 +55,8 @@ export class RenderStaff {
      */
     public staveTop: number = 0;
 
-    public topSpacing: number = 0;
-    public bottomSpacing: number = 0;
+    public topPadding: number = 0;
+    public bottomPadding: number = 0;
 
     /**
      * This is the visual offset from top where the
@@ -62,11 +66,11 @@ export class RenderStaff {
     public staveBottom: number = 0;
 
     public get contentTop() {
-        return this.y + this.staveTop + this.topSpacing + this.topOverflow;
+        return this.y + this.staveTop + this.topPadding + this.topOverflow;
     }
 
     public get contentBottom() {
-        return this.y + this.topSpacing + this.topOverflow + this.staveBottom;
+        return this.y + this.topPadding + this.topOverflow + this.staveBottom;
     }
 
     public constructor(trackIndex: number, staff: Staff, factory: BarRendererFactory) {
@@ -74,10 +78,10 @@ export class RenderStaff {
         this.trackIndex = trackIndex;
         this.modelStaff = staff;
         for (const b of factory.effectBands) {
-            if(b.shouldCreate && !b.shouldCreate!(staff)){
+            if (b.shouldCreate && !b.shouldCreate!(staff)) {
                 continue;
             }
-            
+
             switch (b.mode) {
                 case EffectBandMode.OwnedTop:
                 case EffectBandMode.SharedTop:
@@ -184,7 +188,7 @@ export class RenderStaff {
                 const spacePerBar: number = difference / this.barRenderers.length;
                 for (const renderer of this.barRenderers) {
                     renderer.x = x;
-                    renderer.y = this.topSpacing + topOverflow;
+                    renderer.y = this.topPadding + topOverflow;
 
                     const actualBarWidth = renderer.computedWidth + spacePerBar;
                     renderer.scaleToWidth(actualBarWidth);
@@ -200,7 +204,7 @@ export class RenderStaff {
 
                 for (const renderer of this.barRenderers) {
                     renderer.x = x;
-                    renderer.y = this.topSpacing + topOverflow;
+                    renderer.y = this.topPadding + topOverflow;
 
                     const actualBarWidth = (renderer.barDisplayScale * width) / totalScale;
                     renderer.scaleToWidth(actualBarWidth);
@@ -212,7 +216,7 @@ export class RenderStaff {
             case InternalSystemsLayoutMode.FromModelWithWidths:
                 for (const renderer of this.barRenderers) {
                     renderer.x = x;
-                    renderer.y = this.topSpacing + topOverflow;
+                    renderer.y = this.topPadding + topOverflow;
                     const displayWidth = renderer.barDisplayWidth;
                     if (displayWidth > 0) {
                         renderer.scaleToWidth(displayWidth);
@@ -246,19 +250,25 @@ export class RenderStaff {
      * and we can do an early placement of the render staffs.
      */
     public calculateHeightForAccolade() {
-        this.topSpacing = this._factory.getStaffPaddingTop(this);
-        this.bottomSpacing = this._factory.getStaffPaddingBottom(this);
+        this._applyStaffPaddings();
 
         this.height = this.barRenderers.length > 0 ? this.barRenderers[0].height : 0;
 
         if (this.height > 0) {
-            this.height += Math.ceil(this.topSpacing + this.topOverflow + this.bottomOverflow + this.bottomSpacing);
+            this.height += Math.ceil(this.topPadding + this.topOverflow + this.bottomOverflow + this.bottomPadding);
         }
     }
 
+    private _applyStaffPaddings() {
+        const isFirst = this.index === 0;
+        const isLast = this.index === this.system.staves.length - 1;
+        const settings = this.system.layout.renderer.settings.display;
+        this.topPadding = isFirst ? settings.firstNotationStaffPaddingTop : settings.notationStaffPaddingTop;
+        this.bottomPadding = isLast ? settings.lastNotationStaffPaddingBottom : settings.notationStaffPaddingBottom;
+    }
+
     public finalizeStaff(): void {
-        this.topSpacing = this._factory.getStaffPaddingTop(this);
-        this.bottomSpacing = this._factory.getStaffPaddingBottom(this);
+        this._applyStaffPaddings();
 
         this.height = 0;
 
@@ -267,7 +277,7 @@ export class RenderStaff {
         let needsSecondPass = false;
         let topOverflow: number = this.topOverflow;
         for (let i: number = 0; i < this.barRenderers.length; i++) {
-            this.barRenderers[i].y = this.topSpacing + topOverflow;
+            this.barRenderers[i].y = this.topPadding + topOverflow;
             this.height = Math.max(this.height, this.barRenderers[i].height);
             if (this.barRenderers[i].finalizeRenderer()) {
                 needsSecondPass = true;
@@ -279,7 +289,7 @@ export class RenderStaff {
             topOverflow = this.topOverflow;
             // shift all the renderers to the new position to match required spacing
             for (let i: number = 0; i < this.barRenderers.length; i++) {
-                this.barRenderers[i].y = this.topSpacing + topOverflow;
+                this.barRenderers[i].y = this.topPadding + topOverflow;
             }
 
             // finalize again (to align ties)
@@ -289,7 +299,7 @@ export class RenderStaff {
         }
 
         if (this.height > 0) {
-            this.height += this.topSpacing + topOverflow + this.bottomOverflow + this.bottomSpacing;
+            this.height += this.topPadding + topOverflow + this.bottomOverflow + this.bottomPadding;
         }
 
         this.height = Math.ceil(this.height);

@@ -191,6 +191,8 @@ export class DisplaySettings {
      */
     public padding: number[] = [35, 35];
 
+    // system paddings
+
     /**
      * The top padding applied to first system.
      * @since 1.4.0
@@ -247,13 +249,31 @@ export class DisplaySettings {
      */
     public accoladeBarPaddingRight: number = 3;
 
+    // Staff padding
+
     /**
-     * The bottom padding applied to main notation staves (standard, tabs, numbered, slash).
+     * The top padding applied to the first main notation staff (standard, tabs, numbered, slash).
+     * @since 1.8.0
+     * @category Display
+     * @defaultValue `0`
+     */
+    public firstNotationStaffPaddingTop: number = 0;
+
+    /**
+     * The bottom padding applied to last main notation staff (standard, tabs, numbered, slash).
+     * @since 1.8.0
+     * @category Display
+     * @defaultValue `0`
+     */
+    public lastNotationStaffPaddingBottom: number = 0;
+
+    /**
+     * The top padding applied to main notation staves (standard, tabs, numbered, slash).
      * @since 1.4.0
      * @category Display
-     * @defaultValue `5`
+     * @defaultValue `0`
      */
-    public notationStaffPaddingTop: number = 5;
+    public notationStaffPaddingTop: number = 0;
 
     /**
      * The bottom padding applied to main notation staves (standard, tabs, numbered, slash).
@@ -268,6 +288,8 @@ export class DisplaySettings {
      * @since 1.4.0
      * @category Display
      * @defaultValue `0`
+     * @deprecated Effect staves do not exist anymore, effects are now part of the main notation staves. This value has no effect anymore.
+     * Use {@link effectBandPaddingBottom} to control the padding after effect bands.
      */
     public effectStaffPaddingTop: number = 0;
 
@@ -276,6 +298,8 @@ export class DisplaySettings {
      * @since 1.4.0
      * @category Display
      * @defaultValue `0`
+     * @deprecated Effect staves do not exist anymore, effects are now part of the main notation staves. This value has no effect anymore.
+     * Use {@link effectBandPaddingBottom} to control the padding after effect bands.
      */
     public effectStaffPaddingBottom: number = 0;
 
@@ -296,7 +320,7 @@ export class DisplaySettings {
     public staffPaddingLeft: number = 2;
 
     /**
-     * The padding between individual effect bands. 
+     * The padding between individual effect bands.
      * @since 1.7.0
      * @category Display
      * @defaultValue `2`
