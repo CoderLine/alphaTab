@@ -21,6 +21,7 @@ export class RepeatCountGlyph extends Glyph {
         const size = this.renderer.scoreRenderer.canvas!.measureText(`x${this._count}`);
         this.width = 0; // do not account width
         this.height = size.height;
+        this.y -= size.height;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

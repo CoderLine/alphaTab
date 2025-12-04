@@ -117,8 +117,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
         super.doLayout();
 
         if (!this.bar.isEmpty) {
-            const top: number = this.getScoreY(-2);
-            const bottom: number = this.getScoreY(this.heightLineCount * 2);
+            const top: number = this.getScoreY(0);
+            const bottom: number = this.getScoreY((this.heightLineCount - 1) * 2);
             const whammyOffset: number = this.simpleWhammyOverflow;
 
             const beatEffectsMinY = this.beatEffectsMinY;

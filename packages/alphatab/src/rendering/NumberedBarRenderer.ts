@@ -284,7 +284,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
             this.addPreBeatGlyph(new BarLineGlyph(false));
         }
         this.createLinePreBeatGlyphs();
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.25), this.bar.index + 1));
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
     }
 
     protected override createLinePreBeatGlyphs(): void {

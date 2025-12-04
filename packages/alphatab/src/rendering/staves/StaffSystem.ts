@@ -757,16 +757,14 @@ export class StaffSystem {
             this.y +
             _firstStaffInBrackets.y +
             _firstStaffInBrackets.topPadding +
-            _firstStaffInBrackets.topOverflow +
-            (_firstStaffInBrackets.barRenderers.length > 0 ? _firstStaffInBrackets.barRenderers[0].topPadding : 0);
+            _firstStaffInBrackets.topOverflow;
         const lineBottom: number =
             cy +
             this.y +
             lastStaff.y +
             lastStaff.height -
             lastStaff.bottomPadding -
-            lastStaff.bottomOverflow -
-            (lastStaff.barRenderers.length > 0 ? lastStaff.barRenderers[0].bottomPadding : 0);
+            lastStaff.bottomOverflow;
         const visualHeight: number = visualBottom - visualTop;
         const lineHeight: number = lineBottom - lineTop;
         const realHeight: number = realBottom - realTop;

@@ -360,19 +360,6 @@ export class BarRendererBase {
         return didChangeOverflows;
     }
 
-    /**
-     * Gets the top padding for the main content of the renderer.
-     * Can be used to specify where i.E. the score lines of the notation start.
-     * @returns
-     */
-    public topPadding: number = 0;
-
-    /**
-     * Gets the bottom padding for the main content of the renderer.
-     * Can be used to specify where i.E. the score lines of the notation end.
-     */
-    public bottomPadding: number = 0;
-
     private _registerStaffOverflow() {
         this.staff.registerOverflowTop(this.topOverflow);
         this.staff.registerOverflowBottom(this.bottomOverflow);
@@ -471,7 +458,7 @@ export class BarRendererBase {
     }
 
     protected updateSizes(): void {
-        this.staff.registerStaffTop(this.topPadding);
+        this.staff.registerStaffTop(0);
         const voiceContainers: Map<number, VoiceContainerGlyph> = this._voiceContainers;
         const beatGlyphsStart: number = this.beatGlyphsStart;
         let postBeatStart: number = beatGlyphsStart;
@@ -495,7 +482,7 @@ export class BarRendererBase {
         this.height += this.layoutingInfo.height;
         this.height = Math.ceil(this.height);
 
-        this.staff.registerStaffBottom(this.height - this.bottomPadding);
+        this.staff.registerStaffBottom(this.height);
     }
 
     protected addPreBeatGlyph(g: Glyph): void {
@@ -570,9 +557,9 @@ export class BarRendererBase {
         barBounds.bar = this.bar;
         barBounds.visualBounds = new Bounds();
         barBounds.visualBounds.x = cx + this.x;
-        barBounds.visualBounds.y = cy + this.y + this.topPadding;
+        barBounds.visualBounds.y = cy + this.y;
         barBounds.visualBounds.w = this.width;
-        barBounds.visualBounds.h = this.height - this.topPadding - this.bottomPadding;
+        barBounds.visualBounds.h = this.height;
 
         barBounds.realBounds = new Bounds();
         barBounds.realBounds.x = cx + this.x;

@@ -1,23 +1,23 @@
-import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
-import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import { NotationMode } from '@coderline/alphatab/NotationSettings';
-import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
-import { RepeatCountGlyph } from '@coderline/alphatab/rendering/glyphs/RepeatCountGlyph';
-import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
-import { type Beat, BeatBeamingMode, type BeatSubElement } from '@coderline/alphatab/model/Beat';
-import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import type { BarSubElement } from '@coderline/alphatab/model/Bar';
+import { type Beat, BeatBeamingMode, type BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
-import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
+import { NotationMode } from '@coderline/alphatab/NotationSettings';
+import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
+import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
+import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { RepeatCountGlyph } from '@coderline/alphatab/rendering/glyphs/RepeatCountGlyph';
+import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * This is a base class for any bar renderer which renders music notation on a staff
@@ -53,9 +53,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     }
 
     protected initLineBasedSizes() {
-        this.topPadding = 0;
-        this.bottomPadding = 0;
-        this.height = this.lineOffset * (this.heightLineCount - 1) + this.topPadding + this.bottomPadding;
+        this.height = this.lineOffset * (this.heightLineCount - 1);
     }
 
     protected override updateSizes(): void {
@@ -75,7 +73,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         const actualLineHeight = (this.drawnLineCount - 1) * this.lineOffset;
         const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
 
-        this.firstLineY = ((this.topPadding + (fullLineHeight - actualLineHeight) / 2) | 0) - lineYOffset;
+        this.firstLineY = (((fullLineHeight - actualLineHeight) / 2) | 0) - lineYOffset;
     }
 
     public override doLayout(): void {
@@ -616,7 +614,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         super.createPreBeatGlyphs();
         this.addPreBeatGlyph(new BarLineGlyph(false));
         this.createLinePreBeatGlyphs();
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.25), this.bar.index + 1));
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
     }
 
     protected abstract createLinePreBeatGlyphs(): void;
@@ -628,7 +626,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         this.addPostBeatGlyph(new BarLineGlyph(true));
 
         if (lastBar.masterBar.isRepeatEnd && lastBar.masterBar.repeatCount > 2) {
-            this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount));
+            this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getLineHeight(-0.5), this.bar.masterBar.repeatCount));
         }
     }
 
