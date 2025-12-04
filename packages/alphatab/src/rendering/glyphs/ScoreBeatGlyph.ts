@@ -178,7 +178,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     }
                 }
             } else {
-                let line = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
+                let steps = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
 
                 // this positioning is quite strange, for most staff line counts
                 // the whole/rest are aligned as half below the whole rest.
@@ -188,10 +188,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     this.renderer.bar.staff.standardNotationLineCount !== 1 &&
                     this.renderer.bar.staff.standardNotationLineCount !== 3
                 ) {
-                    line -= 2;
+                    steps -= 2;
                 }
 
-                const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(line), this.container.beat.duration);
+                const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(steps), this.container.beat.duration);
                 this.restGlyph = restGlyph;
                 restGlyph.beat = this.container.beat;
                 restGlyph.beamingHelper = this.beamingHelper;
@@ -209,7 +209,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 }
 
                 if (this.beamingHelper) {
-                    this.beamingHelper.applyRest(this.container.beat, line);
+                    this.beamingHelper.applyRest(this.container.beat, steps);
                 }
 
                 //
@@ -219,7 +219,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         const group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
-                        this._createBeatDot(line, group);
+                        this._createBeatDot(steps, group);
                         this.addEffect(group);
                     }
                 }

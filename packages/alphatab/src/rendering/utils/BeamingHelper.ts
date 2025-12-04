@@ -82,11 +82,11 @@ export class BeamingHelper {
     public preferredBeamDirection: BeamDirection | null = null;
     public graceType: GraceType = GraceType.None;
 
-    public minRestLine: number | null = null;
-    public beatOfMinRestLine: Beat | null = null;
+    public minRestSteps: number | null = null;
+    public beatOfMinRestSteps: Beat | null = null;
 
-    public maxRestLine: number | null = null;
-    public beatOfMaxRestLine: Beat | null = null;
+    public maxRestSteps: number | null = null;
+    public beatOfMaxRestSteps: Beat | null = null;
 
     public get isRestBeamHelper(): boolean {
         return this.beats.length === 1 && this.beats[0].isRest;
@@ -233,9 +233,9 @@ export class BeamingHelper {
      * Registers a rest beat within the accidental helper so the rest
      * symbol is considered properly during beaming.
      * @param beat The rest beat.
-     * @param line The line on which the rest symbol is placed
+     * @param steps The steps on which the rest symbol is placed
      */
-    public applyRest(beat: Beat, line: number): void {
+    public applyRest(beat: Beat, steps: number): void {
         // do not accept rests after the last beat which has notes
         if (
             (this._lastNonRestBeat && beat.index >= this._lastNonRestBeat.index) ||
@@ -246,20 +246,20 @@ export class BeamingHelper {
 
         // correct the line of the glyph to a note which would
         // be placed at the upper / lower end of the glyph.
-        let aboveRest = line;
-        let belowRest = line;
+        let aboveRest = steps;
+        let belowRest = steps;
         const offsets = BeamingHelper.computeLineHeightsForRest(beat.duration);
         aboveRest -= offsets[0];
         belowRest += offsets[1];
-        const minRestLine = this.minRestLine;
-        const maxRestLine = this.maxRestLine;
-        if (minRestLine === null || minRestLine > aboveRest) {
-            this.minRestLine = aboveRest;
-            this.beatOfMinRestLine = beat;
+        const minRestSteps = this.minRestSteps;
+        const maxRestSteps = this.maxRestSteps;
+        if (minRestSteps === null || minRestSteps > aboveRest) {
+            this.minRestSteps = aboveRest;
+            this.beatOfMinRestSteps = beat;
         }
-        if (maxRestLine === null || maxRestLine < belowRest) {
-            this.maxRestLine = belowRest;
-            this.beatOfMaxRestLine = beat;
+        if (maxRestSteps === null || maxRestSteps < belowRest) {
+            this.maxRestSteps = belowRest;
+            this.beatOfMaxRestSteps = beat;
         }
     }
 

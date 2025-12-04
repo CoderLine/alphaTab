@@ -116,7 +116,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     public override doLayout(): void {
         super.doLayout();
 
-        if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
+        if (!this.bar.isEmpty) {
             const top: number = this.getScoreY(-2);
             const bottom: number = this.getScoreY(this.heightLineCount * 2);
             const whammyOffset: number = this.simpleWhammyOverflow;
@@ -147,14 +147,14 @@ export class ScoreBarRenderer extends LineBarRenderer {
             for (const v of this.helpers.beamHelpers) {
                 for (const h of v) {
                     if (h.isRestBeamHelper) {
-                        if (h.minRestLine) {
-                            const topY = this.getScoreY(h.maxRestLine!) - noteOverflowPadding;
+                        if (h.minRestSteps) {
+                            const topY = this.getScoreY(h.maxRestSteps!) - noteOverflowPadding;
                             if (topY < maxNoteY) {
                                 maxNoteY = topY;
                             }
                         }
-                        if (h.maxRestLine) {
-                            const bottomY = this.getScoreY(h.maxRestLine!) + noteOverflowPadding;
+                        if (h.maxRestSteps) {
+                            const bottomY = this.getScoreY(h.maxRestSteps!) + noteOverflowPadding;
                             if (bottomY < maxNoteY) {
                                 maxNoteY = bottomY;
                             }
@@ -502,7 +502,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             drawingInfo.startX = h.getBeatLineX(firstBeat);
             if (isRest) {
                 drawingInfo.startY =
-                    direction === BeamDirection.Up ? this.getScoreY(h.minRestLine!) : this.getScoreY(h.maxRestLine!);
+                    direction === BeamDirection.Up ? this.getScoreY(h.minRestSteps!) : this.getScoreY(h.maxRestSteps!);
             } else {
                 drawingInfo.startY =
                     direction === BeamDirection.Up
@@ -514,7 +514,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             drawingInfo.endX = h.getBeatLineX(lastBeat);
             if (isRest) {
                 drawingInfo.endY =
-                    direction === BeamDirection.Up ? this.getScoreY(h.minRestLine!) : this.getScoreY(h.maxRestLine!);
+                    direction === BeamDirection.Up ? this.getScoreY(h.minRestSteps!) : this.getScoreY(h.maxRestSteps!);
             } else {
                 drawingInfo.endY =
                     direction === BeamDirection.Up
@@ -581,24 +581,24 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 }
 
                 // check if rest shifts bar up or down
-                if (h.minRestLine !== null || h.maxRestLine !== null) {
+                if (h.minRestSteps !== null || h.maxRestSteps !== null) {
                     const scaleMod: number = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
                     let barSpacing: number =
                         barCount * (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
                     barSpacing += this.smuflMetrics.beamSpacing;
 
-                    if (direction === BeamDirection.Up && h.minRestLine !== null) {
-                        const yNeededForRest = this.getScoreY(h.minRestLine!) - barSpacing;
-                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMinRestLine!));
+                    if (direction === BeamDirection.Up && h.minRestSteps !== null) {
+                        const yNeededForRest = this.getScoreY(h.minRestSteps!) - barSpacing;
+                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMinRestSteps!));
 
                         const diff = yGivenByCurrentValues - yNeededForRest;
                         if (diff > 0) {
                             drawingInfo.startY -= diff;
                             drawingInfo.endY -= diff;
                         }
-                    } else if (direction === BeamDirection.Down && h.maxRestLine !== null) {
-                        const yNeededForRest = this.getScoreY(h.maxRestLine!) + barSpacing;
-                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMaxRestLine!));
+                    } else if (direction === BeamDirection.Down && h.maxRestSteps !== null) {
+                        const yNeededForRest = this.getScoreY(h.maxRestSteps!) + barSpacing;
+                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMaxRestSteps!));
 
                         const diff = yNeededForRest - yGivenByCurrentValues;
                         if (diff > 0) {
