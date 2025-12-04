@@ -7,7 +7,6 @@ import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteNumberGlyph } from '@coderline/alphatab/rendering/glyphs/NoteNumberGlyph';
 import { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteChordGlyph';
 import { TabRestGlyph } from '@coderline/alphatab/rendering/glyphs/TabRestGlyph';
-import { TabWhammyBarGlyph } from '@coderline/alphatab/rendering/glyphs/TabWhammyBarGlyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import type { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
@@ -91,16 +90,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 this.addNormal(tabNoteNumbers);
                 beatEffects = tabNoteNumbers.beatEffects;
             }
-
-            //
-            // Whammy Bar
-            if (this.container.beat.hasWhammyBar) {
-                const whammy: TabWhammyBarGlyph = new TabWhammyBarGlyph(this.container.beat);
-                whammy.renderer = this.renderer;
-                whammy.doLayout();
-                this.container.ties.push(whammy);
-            }
-
+            
             //
             // Tremolo Picking
             if (this.container.beat.isTremolo && !beatEffects.has('tremolo')) {

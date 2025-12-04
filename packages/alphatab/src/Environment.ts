@@ -49,6 +49,7 @@ import { RasgueadoEffectInfo } from '@coderline/alphatab/rendering/effects/Rasgu
 import { SlightBeatVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/SlightBeatVibratoEffectInfo';
 import { SlightNoteVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/SlightNoteVibratoEffectInfo';
 import { SustainPedalEffectInfo } from '@coderline/alphatab/rendering/effects/SustainPedalEffectInfo';
+import { TabWhammyEffectInfo } from '@coderline/alphatab/rendering/effects/TabWhammyEffectInfo';
 import { TapEffectInfo } from '@coderline/alphatab/rendering/effects/TapEffectInfo';
 import { TempoEffectInfo } from '@coderline/alphatab/rendering/effects/TempoEffectInfo';
 import { TextEffectInfo } from '@coderline/alphatab/rendering/effects/TextEffectInfo';
@@ -534,7 +535,7 @@ export class Environment {
         new TabBarRendererFactory([
             { effect: new LyricsEffectInfo(), mode: EffectBandMode.SharedTop },
 
-            // TODO: whammy line effect
+            { effect: new TabWhammyEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new TrillEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new WideBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new SlightBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },

@@ -341,7 +341,13 @@ export enum NotationElement {
     /**
      * The absolute playback time of beats.
      */
-    EffectBeatTimer = 49
+    EffectBeatTimer = 49,
+
+    /**
+     * The whammy bar line effect shown above the tab staff
+     */
+    EffectWhammyBarLine = 50,
+
 }
 
 /**

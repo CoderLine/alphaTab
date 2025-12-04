@@ -180,7 +180,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             let endY: number = 0;
             let bendTie: boolean = false;
 
-
             if (this.glyphs && (this.glyphs![0] as BendNoteHeadGroupGlyph).containsNoteValue(endValue)) {
                 endY = (this.glyphs[0] as BendNoteHeadGroupGlyph).getNoteValueY(endValue) + heightOffset;
                 bendTie = true;
@@ -369,12 +368,13 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         g0.x = endX - g0.noteHeadOffset;
                         g0.y = cy + startNoteRenderer.y;
                         g0.paint(0, 0, canvas);
+                        endY = g0.getNoteValueY(endValue) + heightOffset;
                         this.drawBendSlur(
                             canvas,
                             startX,
                             startY,
                             endX,
-                            cy + startNoteRenderer.y + endY,
+                            endY,
                             direction === BeamDirection.Down,
                             1,
                             slurText

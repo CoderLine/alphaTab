@@ -100,6 +100,7 @@ export class EffectBandContainer {
         if (!this._effectBandSizingInfo) {
             return false;
         }
+
         let y: number = 0;
         for (const slot of this._effectBandSizingInfo.slots) {
             if (y > 0) {
@@ -108,6 +109,7 @@ export class EffectBandContainer {
             slot.shared.y = y;
             for (const band of slot.bands) {
                 band.y = y;
+                band.info.finalizeBand(band);
                 band.height = slot.shared.height;
             }
             y += slot.shared.height;

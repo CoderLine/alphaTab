@@ -37,6 +37,14 @@ export class EffectBand extends Glyph {
         this._container = container;
     }
 
+    public *iterateGlyphs() {
+        for (const v of this._uniqueEffectGlyphs) {
+            for (const g of v) {
+                yield g;
+            }
+        }
+    }
+
     public override doLayout(): void {
         super.doLayout();
         for (let i: number = 0; i < this.renderer.bar.voices.length; i++) {

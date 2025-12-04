@@ -1,6 +1,7 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 import type { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -69,4 +70,11 @@ export abstract class EffectInfo {
      * @returns true if the glyph can be expanded, false if a new glyph needs to be created.
      */
     public abstract canExpand(from: Beat, to: Beat): boolean;
+
+    /**
+     * Override this method to finalize an effect band with all glyphs created.
+     * Allows special layout logic like for whammys where we center-align the glyphs and size the band accordingly.
+     * @param _band The band which is being finalized.
+     */
+    public finalizeBand(_band: EffectBand): void {}
 }
