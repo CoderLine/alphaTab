@@ -19,6 +19,8 @@ export class TabWhammyBarGlyph extends EffectGlyph {
     private _renderPoints: BendPoint[];
     private _isSimpleDip: boolean = false;
 
+    public originalTopOffset = 0;
+    public originalBottomOffset = 0;
     public topOffset = 0;
     public bottomOffset = 0;
 
@@ -87,6 +89,9 @@ export class TabWhammyBarGlyph extends EffectGlyph {
 
         this.topOffset = topOffset;
         this.bottomOffset = bottomOffset;
+        this.originalTopOffset = topOffset;
+        this.originalBottomOffset = bottomOffset;
+
         this.height = topOffset + bottomOffset;
     }
 

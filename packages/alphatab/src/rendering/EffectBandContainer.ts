@@ -93,11 +93,24 @@ export class EffectBandContainer {
         if (this._renderer.index > 0) {
             this._effectBandSizingInfo = this.previousContainer!._effectBandSizingInfo;
         } else {
-            this._effectBandSizingInfo = new EffectBandSizingInfo();
+            // try reusing current one to avoid GC pressure
+            if (this._effectBandSizingInfo && this._effectBandSizingInfo.owner === this) {
+                this._effectBandSizingInfo.reset();
+            } else {
+                this._effectBandSizingInfo = new EffectBandSizingInfo(this);
+            }
         }
     }
 
+    public finalizeEffects() {
+        return this._updateEffectBandHeights(true);
+    }
+
     public updateEffectBandHeights(): boolean {
+        return this._updateEffectBandHeights(false);
+    }
+
+    private _updateEffectBandHeights(finalize: boolean): boolean {
         if (!this._effectBandSizingInfo) {
             return false;
         }
@@ -110,7 +123,9 @@ export class EffectBandContainer {
             slot.shared.y = y;
             for (const band of slot.bands) {
                 band.y = y;
-                band.info.finalizeBand(band);
+                if (finalize) {
+                    band.finalize();
+                }
                 band.height = slot.shared.height;
             }
             y += slot.shared.height;

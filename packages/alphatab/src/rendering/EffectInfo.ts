@@ -77,4 +77,10 @@ export abstract class EffectInfo {
      * @param _band The band which is being finalized.
      */
     public finalizeBand(_band: EffectBand): void {}
+
+    /**
+     * Override this method when glyphs are for this effect is being re-aligned during resizing.
+     * @param _band The band holding the glyph
+     */
+    public onAlignGlyphs(_band: EffectBand) {}
 }

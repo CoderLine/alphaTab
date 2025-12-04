@@ -159,6 +159,7 @@ export class RenderStaff {
     }
 
     public revertLastBar(): BarRendererBase {
+        this._sharedLayoutData = new Map<string, unknown>();
         const lastBar: BarRendererBase = this.barRenderers[this.barRenderers.length - 1];
         this.barRenderers.splice(this.barRenderers.length - 1, 1);
         this.system.layout.unregisterBarRenderer(this.staffId, lastBar);

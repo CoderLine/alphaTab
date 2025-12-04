@@ -346,8 +346,8 @@ export class BarRendererBase {
             }
         }
 
-        const topHeightChanged = this.topEffects.updateEffectBandHeights();
-        const bottomHeightChanged = this.bottomEffects.updateEffectBandHeights();
+        const topHeightChanged = this.topEffects.finalizeEffects();
+        const bottomHeightChanged = this.bottomEffects.finalizeEffects();
         if (topHeightChanged || bottomHeightChanged) {
             this._registerStaffOverflow();
             didChangeOverflows = true;

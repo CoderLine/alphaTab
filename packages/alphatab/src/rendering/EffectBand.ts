@@ -1,4 +1,5 @@
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { Color } from '@coderline/alphatab/model/Color';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
@@ -37,12 +38,16 @@ export class EffectBand extends Glyph {
         this._container = container;
     }
 
-    public *iterateGlyphs() {
-        for (const v of this._uniqueEffectGlyphs) {
-            for (const g of v) {
+    public *iterateAllGlyphs() {
+        for (const v of this._effectGlyphs) {
+            for (const g of v.values()) {
                 yield g;
             }
         }
+    }
+
+    public finalize() {
+        this.info.finalizeBand(this);
     }
 
     public override doLayout(): void {
@@ -170,10 +175,10 @@ export class EffectBand extends Glyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
 
-        // const c = canvas.color;
-        // canvas.color = Color.random();
-        // canvas.fillRect(cx + this.x, cy + this.y, this.renderer.width, this.slot!.shared.height);
-        // canvas.color = c;
+        const c = canvas.color;
+        canvas.color = Color.random();
+        canvas.fillRect(cx + this.x, cy + this.y, this.renderer.width, this.slot!.shared.height);
+        canvas.color = c;
 
         for (let i: number = 0, j: number = this._uniqueEffectGlyphs.length; i < j; i++) {
             const v: EffectGlyph[] = this._uniqueEffectGlyphs[i];
@@ -188,9 +193,12 @@ export class EffectBand extends Glyph {
     public alignGlyphs(): void {
         for (let v: number = 0; v < this._effectGlyphs.length; v++) {
             for (const beatIndex of this._effectGlyphs[v].keys()) {
-                this._alignGlyph(this.info.sizingMode, this.renderer.bar.voices[v].beats[beatIndex]);
+                const g = this.renderer.bar.voices[v].beats[beatIndex];
+                this._alignGlyph(this.info.sizingMode, g);
             }
         }
+        this.info.onAlignGlyphs(this);
+
     }
 
     private _alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {

@@ -1,4 +1,5 @@
 import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
+import type { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import { EffectBandSlot } from '@coderline/alphatab/rendering/EffectBandSlot';
 import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 
@@ -9,11 +10,19 @@ export class EffectBandSizingInfo {
     private _effectSlot: Map<string, EffectBandSlot>;
     private _assignedSlots: Map<EffectBand, EffectBandSlot>;
     public slots: EffectBandSlot[];
+    public owner: EffectBandContainer;
 
-    public constructor() {
+    public constructor(owner: EffectBandContainer) {
         this.slots = [];
         this._effectSlot = new Map<string, EffectBandSlot>();
         this._assignedSlots = new Map<EffectBand, EffectBandSlot>();
+        this.owner = owner;
+    }
+
+    public reset() {
+        this._effectSlot.clear();
+        this._assignedSlots.clear();
+        this.slots = [];
     }
 
     public getOrCreateSlot(band: EffectBand): EffectBandSlot {
