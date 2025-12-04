@@ -195,25 +195,25 @@ export class DisplaySettings {
      * The top padding applied to first system.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `5`
+     * @defaultValue `0`
      */
-    public firstSystemPaddingTop: number = 5;
+    public firstSystemPaddingTop: number = 0;
 
     /**
      * The top padding applied systems beside the first one.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `10`
+     * @defaultValue `0`
      */
-    public systemPaddingTop: number = 10;
+    public systemPaddingTop: number = 0;
 
     /**
      * The bottom padding applied to systems beside the last one.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `20`
+     * @defaultValue `0`
      */
-    public systemPaddingBottom: number = 10;
+    public systemPaddingBottom: number = 0;
 
     /**
      * The bottom padding applied to the last system.
