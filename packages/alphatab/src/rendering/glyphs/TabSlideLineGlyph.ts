@@ -8,16 +8,20 @@ import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
+import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 
 /**
  * @internal
  */
-export class TabSlideLineGlyph extends Glyph {
+export class TabSlideLineGlyph extends Glyph implements ITieGlyph {
     private _inType: SlideInType;
     private _outType: SlideOutType;
     private _startNote: Note;
     private _parent: BeatContainerGlyph;
+
+    // the slide line cannot overflow anything and there are ties drawn in here
+    public readonly checkForOverflow = false;
 
     public constructor(inType: SlideInType, outType: SlideOutType, startNote: Note, parent: BeatContainerGlyph) {
         super(0, 0);
@@ -39,7 +43,7 @@ export class TabSlideLineGlyph extends Glyph {
     private _paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
         const sizeX: number = this.renderer.smuflMetrics.simpleSlideWidth;
-        const sizeY: number =  this.renderer.smuflMetrics.simpleSlideHeight;
+        const sizeY: number = this.renderer.smuflMetrics.simpleSlideHeight;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -52,7 +56,11 @@ export class TabSlideLineGlyph extends Glyph {
                     startNoteRenderer.x +
                     startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) -
                     offsetX;
-                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) - sizeY;
+                endY =
+                    cy +
+                    startNoteRenderer.y +
+                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) -
+                    sizeY;
                 startX = endX - sizeX;
                 startY =
                     cy +
@@ -66,7 +74,11 @@ export class TabSlideLineGlyph extends Glyph {
                     startNoteRenderer.x +
                     startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) -
                     offsetX;
-                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) + sizeY;
+                endY =
+                    cy +
+                    startNoteRenderer.y +
+                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) +
+                    sizeY;
                 startX = endX - sizeX;
                 startY =
                     cy +
@@ -83,14 +95,14 @@ export class TabSlideLineGlyph extends Glyph {
     private _paintSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
         const sizeX: number = this.renderer.smuflMetrics.simpleSlideWidth;
-        const sizeY: number =  this.renderer.smuflMetrics.simpleSlideHeight;
+        const sizeY: number = this.renderer.smuflMetrics.simpleSlideHeight;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
         let endY: number = 0;
         let waves: boolean = false;
 
-        const offsetX =  this.renderer.smuflMetrics.postNoteEffectPadding;
+        const offsetX = this.renderer.smuflMetrics.postNoteEffectPadding;
 
         switch (this._outType) {
             case SlideOutType.Shift:
@@ -140,7 +152,11 @@ export class TabSlideLineGlyph extends Glyph {
                     startNoteRenderer.x +
                     startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
                     offsetX;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) + sizeY;
+                startY =
+                    cy +
+                    startNoteRenderer.y +
+                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) +
+                    sizeY;
                 endX = startX + sizeX;
                 endY =
                     cy +
@@ -154,7 +170,11 @@ export class TabSlideLineGlyph extends Glyph {
                     startNoteRenderer.x +
                     startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
                     offsetX;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) - sizeY;
+                startY =
+                    cy +
+                    startNoteRenderer.y +
+                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) -
+                    sizeY;
                 endX = startX + sizeX;
                 endY =
                     cy +

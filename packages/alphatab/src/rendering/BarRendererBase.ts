@@ -12,6 +12,7 @@ import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGly
 import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
+import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
 import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
@@ -91,7 +92,7 @@ export class BarRendererBase {
     private _voiceContainers: Map<number, VoiceContainerGlyph> = new Map();
     private _postBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
 
-    private _ties: Glyph[] = [];
+    private _ties: ITieGlyph[] = [];
 
     public topEffects: EffectBandContainer;
     public bottomEffects: EffectBandContainer;
@@ -167,8 +168,8 @@ export class BarRendererBase {
         this.bottomEffects = new EffectBandContainer(this, false);
     }
 
-    public registerTies(ties: Glyph[]) {
-        this._ties.push(...ties);
+    public registerTie(tie: ITieGlyph) {
+        this._ties.push(tie);
     }
 
     public get middleYPosition(): number {
@@ -326,18 +327,24 @@ export class BarRendererBase {
 
         let didChangeOverflows = false;
         // allow spacing to be used for tie overflows
-        const barTop = this.y - this.staff.topPadding;
-        const barBottom = this.y + this.height + this.staff.bottomPadding;
-        for (const tie of this._ties) {
+        const barTop = this.y;
+        const barBottom = this.height;
+        for (const t of this._ties) {
+            const tie = t as unknown as Glyph;
             tie.doLayout();
-            if (tie.height > 0) {
-                const bottomOverflow = tie.y + tie.height - barBottom;
+
+            if (t.checkForOverflow) {
+                // NOTE: Ties are aligned on staff level, need to subtract the bar position
+                const tieTop = tie.getBoundingBoxTop();
+                const tieBottom = tie.getBoundingBoxBottom();
+
+                const bottomOverflow = tieBottom - barBottom;
                 if (bottomOverflow > 0) {
                     if (this.registerOverflowBottom(bottomOverflow)) {
                         didChangeOverflows = true;
                     }
                 }
-                const topOverflow = tie.y - barTop;
+                const topOverflow = tieTop - barTop;
                 if (topOverflow < 0) {
                     if (this.registerOverflowTop(topOverflow * -1)) {
                         didChangeOverflows = true;
@@ -349,12 +356,12 @@ export class BarRendererBase {
         const topHeightChanged = this.topEffects.finalizeEffects();
         const bottomHeightChanged = this.bottomEffects.finalizeEffects();
         if (topHeightChanged || bottomHeightChanged) {
-            this._registerStaffOverflow();
             didChangeOverflows = true;
         }
 
         if (didChangeOverflows) {
             this.updateSizes();
+            this._registerStaffOverflow();
         }
 
         return didChangeOverflows;

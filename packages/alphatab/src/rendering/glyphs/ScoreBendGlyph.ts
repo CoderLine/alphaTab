@@ -12,7 +12,7 @@ import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/Ben
 import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreHelperNotesBaseGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreHelperNotesBaseGlyph';
-import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import { type ITieGlyph, TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -20,11 +20,13 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 /**
  * @internal
  */
-export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
+export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGlyph {
     private _beat: Beat;
     private _notes: Note[] = [];
     private _endNoteGlyph: BendNoteHeadGroupGlyph | null = null;
     private _middleNoteGlyph: BendNoteHeadGroupGlyph | null = null;
+
+    public readonly checkForOverflow = false; // handled separately in ScoreBeatContainerGlyph
 
     public constructor(beat: Beat) {
         super(0, 0);

@@ -9,7 +9,7 @@ import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
 import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreHelperNotesBaseGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreHelperNotesBaseGlyph';
-import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import { type ITieGlyph, TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
@@ -21,9 +21,11 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 /**
  * @internal
  */
-export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
+export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements ITieGlyph {
     private _beat: Beat;
     private _endGlyph: BendNoteHeadGroupGlyph | null = null;
+
+    public readonly checkForOverflow = false; // TODO: check if this needs handling
 
     public constructor(beat: Beat) {
         super(0, 0);

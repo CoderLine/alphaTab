@@ -14,11 +14,12 @@ import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 
 /**
  * @internal
  */
-export class TabBendGlyph extends Glyph {
+export class TabBendGlyph extends Glyph implements ITieGlyph {
     private _notes: Note[] = [];
     private _renderPoints: Map<number, TabBendRenderPoint[]> = new Map();
     private _preBendMinValue: number = -1;
@@ -28,6 +29,8 @@ export class TabBendGlyph extends Glyph {
     private _releaseMinValue: number = -1;
     private _releaseContinuedMinValue: number = -1;
     private _maxBendValue: number = -1;
+
+    public readonly checkForOverflow = false;
 
     public constructor() {
         super(0, 0);
@@ -127,15 +130,8 @@ export class TabBendGlyph extends Glyph {
     public override doLayout(): void {
         super.doLayout();
 
-        const res = this.renderer.resources;
-        let bendHeight: number = this._maxBendValue * this.renderer.smuflMetrics.tabBendPerValueHeight;
+        this._calculateAndRegisterOverflow();
 
-        const canvas = this.renderer.scoreRenderer.canvas!;
-        canvas.font = res.tablatureFont;
-        const size = canvas.measureText('full');
-        bendHeight += size.height + res.engravingSettings.tabBendLabelPadding;
-
-        this.renderer.registerOverflowTop(bendHeight);
         let value: number = 0;
         for (const note of this._notes) {
             const renderPoints: TabBendRenderPoint[] = this._renderPoints.get(note.id)!;
@@ -183,6 +179,23 @@ export class TabBendGlyph extends Glyph {
             }
             return a.realValue - b.realValue;
         });
+    }
+
+    private _calculateAndRegisterOverflow() {
+        const res = this.renderer.resources;
+        const smufl = this.renderer.smuflMetrics;
+        let bendHeight: number = this._maxBendValue * smufl.tabBendPerValueHeight;
+
+        // bends always go out of the staff by 1 staff space
+        bendHeight += smufl.oneStaffSpace;
+
+        // account for space
+        const canvas = this.renderer.scoreRenderer.canvas!;
+        canvas.font = res.tablatureFont;
+        const size = canvas.measureText('full');
+        bendHeight += size.height + res.engravingSettings.tabBendLabelPadding;
+
+        this.renderer.registerOverflowTop(bendHeight);
     }
 
     private _createRenderingPoints(note: Note): TabBendRenderPoint[] {
@@ -265,8 +278,9 @@ export class TabBendGlyph extends Glyph {
             }
             let startX: number = 0;
             let endX: number = 0;
-            const topY: number = cy + startNoteRenderer.y;
-            const tabBendArrowSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
+            const smufl = this.renderer.smuflMetrics;
+            const topY: number = cy + startNoteRenderer.y - smufl.oneStaffSpace;
+            const tabBendArrowSize = smufl.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
             startX = cx + startNoteRenderer.x;
             if (renderPoints[0].value > 0 || note.isContinuedBend) {
                 startX += startNoteRenderer.getBeatX(note.beat, BeatXPosition.MiddleNotes);

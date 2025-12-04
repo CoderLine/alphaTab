@@ -270,10 +270,10 @@ export class RenderStaff {
         let topOverflow: number = this.topOverflow;
         for (let i: number = 0; i < this.barRenderers.length; i++) {
             this.barRenderers[i].y = this.topPadding + topOverflow;
-            this.height = Math.max(this.height, this.barRenderers[i].height);
             if (this.barRenderers[i].finalizeRenderer()) {
                 needsSecondPass = true;
             }
+            this.height = Math.max(this.height, this.barRenderers[i].height);
         }
 
         // 2nd pass: move renderers to correct position respecting the new overflows

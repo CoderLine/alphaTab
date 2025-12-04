@@ -9,6 +9,7 @@ import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/B
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
@@ -24,7 +25,7 @@ export class BeatContainerGlyph extends Glyph {
     public beat: Beat;
     public preNotes!: BeatGlyphBase;
     public onNotes!: BeatOnNoteGlyphBase;
-    public ties: Glyph[] = [];
+    public ties: ITieGlyph[] = [];
     public minWidth: number = 0;
 
     public get onTimeX(): number {
@@ -38,9 +39,11 @@ export class BeatContainerGlyph extends Glyph {
         this.voiceContainer = voiceContainer;
     }
 
-    public addTie(tie: Glyph) {
-        tie.renderer = this.renderer;
+    public addTie(tie: ITieGlyph) {
+        const tg = tie as unknown as Glyph;
+        tg.renderer = this.renderer;
         this.ties.push(tie);
+        this.renderer.registerTie(tie);
     }
 
     public override getBoundingBoxTop(): number {
@@ -63,12 +66,15 @@ export class BeatContainerGlyph extends Glyph {
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
         if (this.beat.graceType !== GraceType.None) {
             // always use flag size as spacing on grace notes
-            postBeatStretch += this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
+            postBeatStretch +=
+                this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
         } else if (helper && this.drawBeamHelperAsFlags(helper)) {
-            postBeatStretch += this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
+            postBeatStretch +=
+                this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
         }
         for (const tie of this.ties) {
-            postBeatStretch += tie.width;
+            const tg = tie as unknown as Glyph;
+            postBeatStretch += tg.width;
         }
 
         layoutings.addBeatSpring(this.beat, preBeatStretch, postBeatStretch);
@@ -93,7 +99,6 @@ export class BeatContainerGlyph extends Glyph {
         while (i >= 0) {
             this.createTies(this.beat.notes[i--]);
         }
-        this.renderer.registerTies(this.ties);
         this.updateWidth();
     }
 
@@ -103,18 +108,20 @@ export class BeatContainerGlyph extends Glyph {
             if (this.onNotes.beamingHelper.beats.length === 1) {
                 // make space for flag
                 if (this.beat.duration >= Duration.Eighth) {
-                    const symbol = FlagGlyph.getSymbol(this.beat.duration,
+                    const symbol = FlagGlyph.getSymbol(
+                        this.beat.duration,
                         this.onNotes.beamingHelper.direction,
                         this.beat.graceType !== GraceType.None
-                    )
+                    );
                     this.minWidth += this.renderer.smuflMetrics.glyphWidths.get(symbol)!;
                 }
             }
         }
         let tieWidth: number = 0;
         for (const tie of this.ties) {
-            if (tie.width > tieWidth) {
-                tieWidth = tie.width;
+            const tg = tie as unknown as Glyph;
+            if (tg.width > tieWidth) {
+                tieWidth = tg.width;
             }
         }
         this.minWidth += tieWidth;
@@ -190,7 +197,7 @@ export class BeatContainerGlyph extends Glyph {
         const staffX: number = cx - this.voiceContainer.x - this.renderer.x;
         const staffY: number = cy - this.voiceContainer.y - this.renderer.y;
         for (let i: number = 0, j: number = this.ties.length; i < j; i++) {
-            const t: Glyph = this.ties[i];
+            const t = this.ties[i] as unknown as Glyph;
             t.renderer = this.renderer;
             t.paint(staffX, staffY, canvas);
         }

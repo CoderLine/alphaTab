@@ -8,7 +8,14 @@ import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 /**
  * @internal
  */
-export class TieGlyph extends Glyph {
+export interface ITieGlyph {
+    readonly checkForOverflow: boolean;
+}
+
+/**
+ * @internal
+ */
+export class TieGlyph extends Glyph implements ITieGlyph {
     protected startBeat: Beat | null;
     protected endBeat: Beat | null;
     protected yOffset: number = 0;
@@ -31,6 +38,25 @@ export class TieGlyph extends Glyph {
     private _endY: number = 0;
     private _tieHeight: number = 0;
     private _shouldDraw: boolean = false;
+    private _boundingBox?: Bounds;
+
+    public get checkForOverflow() {
+        return this._boundingBox !== undefined;
+    }
+
+    public override getBoundingBoxTop(): number {
+        if (this._boundingBox) {
+            return this._boundingBox!.y;
+        }
+        return this._startY;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        if (this._boundingBox) {
+            return this._boundingBox.y + this._boundingBox.h;
+        }
+        return this._startY;
+    }
 
     public override doLayout(): void {
         this.width = 0;
@@ -90,6 +116,7 @@ export class TieGlyph extends Glyph {
             this._shouldDraw = true;
         }
 
+        this._boundingBox = undefined;
         if (this._shouldDraw) {
             this.y = Math.min(this._startY, this._endY);
             if (this.shouldDrawBendSlur()) {
@@ -107,6 +134,7 @@ export class TieGlyph extends Glyph {
                     this._tieHeight,
                     this.renderer.smuflMetrics.tieMidpointThickness
                 );
+                this._boundingBox = tieBoundingBox;
 
                 this.height = tieBoundingBox.h;
 
@@ -208,13 +236,13 @@ export class TieGlyph extends Glyph {
         const midY = 0.125 * p0y + 0.375 * c1y + 0.375 * c2y + 0.125 * p1y;
 
         // Bounds are simply min/max of start, end, and midpoint
-        let xMin = Math.min(p0x, p1x, midX);
-        let xMax = Math.max(p0x, p1x, midX);
+        const xMin = Math.min(p0x, p1x, midX);
+        const xMax = Math.max(p0x, p1x, midX);
         let yMin = Math.min(p0y, p1y, midY);
         let yMax = Math.max(p0y, p1y, midY);
 
         // Account for thickness of the tie/slur
-        if(down){
+        if (down) {
             yMax += size;
         } else {
             yMin -= size;
