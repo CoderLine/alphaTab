@@ -30,7 +30,7 @@ export class RenderStaff {
     public index: number = 0;
     public staffIndex: number = 0;
 
-    public isFirstInSystem: boolean = false;
+    public get isFirstInSystem() { return this.index === 0}
 
     public topEffectInfos: EffectBandInfo[] = [];
     public bottomEffectInfos: EffectBandInfo[] = [];
@@ -105,14 +105,6 @@ export class RenderStaff {
 
     public setSharedLayoutData<T>(key: string, def: T): void {
         this._sharedLayoutData.set(key, def);
-    }
-
-    public get isInsideBracket(): boolean {
-        return this._factory.isInsideBracket;
-    }
-
-    public get isRelevantForBoundsLookup(): boolean {
-        return this._factory.isRelevantForBoundsLookup;
     }
 
     public registerStaffTop(offset: number): void {

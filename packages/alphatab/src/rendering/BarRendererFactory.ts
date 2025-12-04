@@ -55,8 +55,6 @@ export interface EffectBandInfo {
  * @internal
  */
 export abstract class BarRendererFactory {
-    public isInsideBracket: boolean = true;
-    public isRelevantForBoundsLookup: boolean = true;
     public hideOnMultiTrack: boolean = false;
     public hideOnPercussionTrack: boolean = false;
 

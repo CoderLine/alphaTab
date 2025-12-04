@@ -328,6 +328,14 @@ export class DisplaySettings {
     public effectBandPaddingBottom = 2;
 
     /**
+     * The additional padding to apply between two subsequent brackets.
+     * @since 1.8.0
+     * @category Display
+     * @defaultValue `5`
+     */
+    public bracketPaddingInBetween = 5;
+
+    /**
      * The mode used to arrange staves and systems.
      * @since 1.3.0
      * @category Display

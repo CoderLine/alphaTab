@@ -12,9 +12,6 @@ export class StaffTrackGroup {
     public track: Track;
     public staffSystem: StaffSystem;
     public staves: RenderStaff[] = [];
-    public stavesRelevantForBoundsLookup: RenderStaff[] = [];
-    public firstStaffInBracket: RenderStaff | null = null;
-    public lastStaffInBracket: RenderStaff | null = null;
     public bracket: SystemBracket | null = null;
 
     public constructor(staffSystem: StaffSystem, track: Track) {
@@ -24,8 +21,5 @@ export class StaffTrackGroup {
 
     public addStaff(staff: RenderStaff): void {
         this.staves.push(staff);
-        if (staff.isRelevantForBoundsLookup) {
-            this.stavesRelevantForBoundsLookup.push(staff);
-        }
     }
 }

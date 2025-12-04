@@ -119,13 +119,12 @@ class SimilarInstrumentSystemBracket extends SingleTrackSystemBracket {
  */
 export class StaffSystem {
     private _allStaves: RenderStaff[] = [];
-    private _firstStaffInBrackets: RenderStaff | null = null;
-    private _lastStaffInBrackets: RenderStaff | null = null;
 
     private _accoladeSpacingCalculated: boolean = false;
 
     private _brackets: SystemBracket[] = [];
     private _staffToBracket = new Map<RenderStaff, SystemBracket>();
+    private _contentHeight = 0;
 
     private _hasSystemSeparator = false;
 
@@ -418,57 +417,39 @@ export class StaffSystem {
         staff.index = this._allStaves.length;
         this._allStaves.push(staff);
         group.addStaff(staff);
-        if (staff.isInsideBracket) {
-            if (!this._firstStaffInBrackets) {
-                this._firstStaffInBrackets = staff;
-                staff.isFirstInSystem = true;
-            }
-            if (!group.firstStaffInBracket) {
-                group.firstStaffInBracket = staff;
-            }
-            this._lastStaffInBrackets = staff;
-            group.lastStaffInBracket = staff;
 
-            let bracket = this._brackets.find(b => b.includesStaff(staff));
-            if (!bracket) {
-                switch (track.score.stylesheet.bracketExtendMode) {
-                    case BracketExtendMode.NoBrackets:
-                        break;
-                    case BracketExtendMode.GroupStaves:
-                        // when grouping staves, we create one bracket for the whole track across all staves
-                        bracket = new SingleTrackSystemBracket(track);
-                        bracket.index = this._brackets.length;
-                        this._brackets.push(bracket);
-                        break;
-                    case BracketExtendMode.GroupSimilarInstruments:
-                        bracket = new SimilarInstrumentSystemBracket(track);
-                        bracket.index = this._brackets.length;
-                        this._brackets.push(bracket);
-                        break;
-                }
+        let bracket = this._brackets.find(b => b.includesStaff(staff));
+        if (!bracket) {
+            switch (track.score.stylesheet.bracketExtendMode) {
+                case BracketExtendMode.NoBrackets:
+                    break;
+                case BracketExtendMode.GroupStaves:
+                    // when grouping staves, we create one bracket for the whole track across all staves
+                    bracket = new SingleTrackSystemBracket(track);
+                    bracket.index = this._brackets.length;
+                    this._brackets.push(bracket);
+                    break;
+                case BracketExtendMode.GroupSimilarInstruments:
+                    bracket = new SimilarInstrumentSystemBracket(track);
+                    bracket.index = this._brackets.length;
+                    this._brackets.push(bracket);
+                    break;
             }
+        }
 
-            if (bracket) {
-                if (!bracket.firstStaffInBracket) {
-                    bracket.firstStaffInBracket = staff;
-                }
-                bracket.lastStaffInBracket = staff;
-                // NOTE: one StaffTrackGroup can currently never have multiple brackets so we can safely keep the last known here
-                group.bracket = bracket;
-                this._staffToBracket.set(staff, bracket);
+        if (bracket) {
+            if (!bracket.firstStaffInBracket) {
+                bracket.firstStaffInBracket = staff;
             }
+            bracket.lastStaffInBracket = staff;
+            // NOTE: one StaffTrackGroup can currently never have multiple brackets so we can safely keep the last known here
+            group.bracket = bracket;
+            this._staffToBracket.set(staff, bracket);
         }
     }
 
     public get height(): number {
-        return this._allStaves.length === 0
-            ? 0
-            : Math.ceil(
-                  this._allStaves[this._allStaves.length - 1].y +
-                      this._allStaves[this._allStaves.length - 1].height +
-                      this.topPadding +
-                      this.bottomPadding
-              );
+        return Math.ceil(this._contentHeight + this.topPadding + this.bottomPadding);
     }
 
     public scaleToWidth(width: number): void {
@@ -569,9 +550,9 @@ export class StaffSystem {
                     const oldBaseLine = canvas.textBaseline;
                     const oldTextAlign = canvas.textAlign;
                     for (const g of this.staves) {
-                        if (g.firstStaffInBracket && g.lastStaffInBracket) {
-                            const firstStart: number = cy + g.firstStaffInBracket.contentTop;
-                            const lastEnd: number = cy + g.lastStaffInBracket.contentBottom;
+                        if (g.staves.length > 0) {
+                            const firstStart: number = cy + g.staves[0].contentTop;
+                            const lastEnd: number = cy + g.staves[g.staves.length - 1].contentBottom;
 
                             let trackNameText = '';
                             switch (trackNameMode) {
@@ -593,7 +574,7 @@ export class StaffSystem {
                                 const textEndX =
                                     // start at beginning of first renderer
                                     cx +
-                                    g.firstStaffInBracket.x -
+                                    g.staves[0].x -
                                     // left side of the bracket
                                     settings.display.accoladeBarPaddingRight -
                                     (g.bracket?.width ?? 0) -
@@ -634,31 +615,24 @@ export class StaffSystem {
             if (this._allStaves.length > 0) {
                 let previousStaffInBracket: RenderStaff | null = null;
                 for (const s of this._allStaves) {
-                    if (s.isInsideBracket) {
-                        if (previousStaffInBracket !== null) {
-                            const previousBottom = previousStaffInBracket.contentBottom;
-                            const thisTop = s.contentTop;
+                    if (previousStaffInBracket !== null) {
+                        const previousBottom = previousStaffInBracket.contentBottom;
+                        const thisTop = s.contentTop;
 
-                            const accoladeX: number = cx + previousStaffInBracket.x;
+                        const accoladeX: number = cx + previousStaffInBracket.x;
 
-                            const firstLineBarRenderer = previousStaffInBracket.barRenderers[0] as LineBarRenderer;
+                        const firstLineBarRenderer = previousStaffInBracket.barRenderers[0] as LineBarRenderer;
 
-                            using _ = ElementStyleHelper.bar(
-                                canvas,
-                                firstLineBarRenderer.staffLineBarSubElement,
-                                firstLineBarRenderer.bar
-                            );
-                            const h = Math.ceil(thisTop - previousBottom);
-                            canvas.fillRect(
-                                accoladeX,
-                                cy + previousBottom,
-                                res.engravingSettings.thinBarlineThickness,
-                                h
-                            );
-                        }
-
-                        previousStaffInBracket = s;
+                        using _ = ElementStyleHelper.bar(
+                            canvas,
+                            firstLineBarRenderer.staffLineBarSubElement,
+                            firstLineBarRenderer.bar
+                        );
+                        const h = Math.ceil(thisTop - previousBottom);
+                        canvas.fillRect(accoladeX, cy + previousBottom, res.engravingSettings.thinBarlineThickness, h);
                     }
+
+                    previousStaffInBracket = s;
                 }
             }
 
@@ -746,11 +720,25 @@ export class StaffSystem {
         const topBracketSpikeHeight = smufl.glyphHeights.get(MusicFontSymbol.BracketTop)!;
         const bottomBracketSpikeHeight = smufl.glyphHeights.get(MusicFontSymbol.BracketBottom)!;
 
+        let previousBracket: SystemBracket | undefined = undefined;
+
         for (const staff of this._allStaves) {
             const bracket = this._staffToBracket.has(staff) ? this._staffToBracket.get(staff) : undefined;
             const hasBracket = bracket && !bracket.drawAsBrace && bracket.canPaint;
             if (hasBracket && bracket!.firstStaffInBracket === staff) {
-                currentY += topBracketSpikeHeight;
+                const spikeOverflow = topBracketSpikeHeight - staff.topOverflow;
+                if (spikeOverflow > 0) {
+                    currentY += spikeOverflow;
+                }
+
+                // check if we need "in-between padding"
+                if (previousBracket !== undefined) {
+                    if (previousBracket.lastStaffInBracket!.index === staff.index - 1) {
+                        currentY += settings.display.bracketPaddingInBetween;
+                    }
+
+                    previousBracket = undefined;
+                }
             }
 
             staff.x = this.accoladeWidth;
@@ -759,9 +747,16 @@ export class StaffSystem {
             currentY += staff.height;
 
             if (hasBracket && bracket!.lastStaffInBracket === staff) {
-                currentY += bottomBracketSpikeHeight;
+                // remember bracket
+                previousBracket = bracket;
+
+                const spikeOverflow = bottomBracketSpikeHeight - staff.bottomOverflow;
+                if (spikeOverflow > 0) {
+                    currentY += spikeOverflow;
+                }
             }
         }
+        this._contentHeight = currentY;
 
         for (const b of this._brackets!) {
             b.finalizeBracket(smufl);
@@ -772,30 +767,25 @@ export class StaffSystem {
         if (this.layout.renderer.boundsLookup!.isFinished) {
             return;
         }
-        const _firstStaffInBrackets = this._firstStaffInBrackets;
-        const _lastStaffInBrackets = this._lastStaffInBrackets;
-        if (!_firstStaffInBrackets || !_lastStaffInBrackets) {
-            return;
-        }
+        const firstStaff = this._allStaves[0];
+        const lastStaff = this._allStaves[this._allStaves.length - 1];
+
         cy += this.topPadding;
 
-        const lastStaff: RenderStaff = this._allStaves[this._allStaves.length - 1];
-        const visualTop: number = cy + this.y + _firstStaffInBrackets.y;
-        const visualBottom: number = cy + this.y + _lastStaffInBrackets.y + _lastStaffInBrackets.height;
-        const realTop: number = cy + this.y + this._allStaves[0].y;
-        const realBottom: number = cy + this.y + lastStaff.y + lastStaff.height;
-        const lineTop: number =
-            cy +
-            this.y +
-            _firstStaffInBrackets.y +
-            _firstStaffInBrackets.topPadding +
-            _firstStaffInBrackets.topOverflow;
-        const lineBottom: number =
+        const visualTop: number = cy + this.y + firstStaff.y;
+        const visualBottom: number = cy + this.y + lastStaff.y + lastStaff.height;
+        const visualHeight = visualBottom - visualTop;
+
+        const realTop: number = cy + this.y;
+        const realBottom: number = cy + this.y + this.height;
+        const realHeight = realBottom - realTop;
+
+        const lineTop = cy + this.y + firstStaff.y + firstStaff.topPadding + firstStaff.topOverflow;
+        const lineBottom =
             cy + this.y + lastStaff.y + lastStaff.height - lastStaff.bottomPadding - lastStaff.bottomOverflow;
-        const visualHeight: number = visualBottom - visualTop;
-        const lineHeight: number = lineBottom - lineTop;
-        const realHeight: number = realBottom - realTop;
-        const x: number = this.x + _firstStaffInBrackets.x;
+        const lineHeight = lineBottom - lineTop;
+
+        const x: number = this.x + firstStaff.x;
         const staffSystemBounds = new StaffSystemBounds();
         staffSystemBounds.visualBounds = new Bounds();
         staffSystemBounds.visualBounds.x = cx + this.x;
@@ -807,10 +797,11 @@ export class StaffSystem {
         staffSystemBounds.realBounds.y = cy + this.y;
         staffSystemBounds.realBounds.w = this.width;
         staffSystemBounds.realBounds.h = this.height;
+
         this.layout.renderer.boundsLookup!.addStaffSystem(staffSystemBounds);
         const masterBarBoundsLookup: Map<number, MasterBarBounds> = new Map<number, MasterBarBounds>();
         for (let i: number = 0; i < this.staves.length; i++) {
-            for (const staff of this.staves[i].stavesRelevantForBoundsLookup) {
+            for (const staff of this.staves[i].staves) {
                 for (const renderer of staff.barRenderers) {
                     let masterBarBounds: MasterBarBounds;
                     if (!masterBarBoundsLookup.has(renderer.bar.masterBar.index)) {
@@ -846,11 +837,11 @@ export class StaffSystem {
     }
 
     public getBarX(index: number): number {
-        if (!this._firstStaffInBrackets || this.layout.renderer.tracks!.length === 0) {
+        if (this._allStaves.length === 0 || this.layout.renderer.tracks!.length === 0) {
             return 0;
         }
         const bar: Bar = this.layout.renderer.tracks![0].staves[0].bars[index];
-        const renderer: BarRendererBase = this.layout.getRendererForBar(this._firstStaffInBrackets.staffId, bar)!;
+        const renderer: BarRendererBase = this.layout.getRendererForBar(this._allStaves[0].staffId, bar)!;
         return renderer.x;
     }
 }

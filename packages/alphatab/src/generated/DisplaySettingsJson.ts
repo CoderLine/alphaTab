@@ -57,6 +57,7 @@ export interface DisplaySettingsJson {
      * @remarks
      * AlphaTab has various stave profiles that define which staves will be shown in for the rendered tracks. Its recommended
      * to keep this on {@link StaveProfile.Default} and rather rely on the options available ob {@link Staff} level
+     * @deprecated Set the notation visibility by modifying the {@link Staff} properties.
      */
     staveProfile?: StaveProfile | keyof typeof StaveProfile | Lowercase<keyof typeof StaveProfile>;
     /**
@@ -172,21 +173,21 @@ export interface DisplaySettingsJson {
      * The top padding applied to first system.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `5`
+     * @defaultValue `0`
      */
     firstSystemPaddingTop?: number;
     /**
      * The top padding applied systems beside the first one.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `10`
+     * @defaultValue `0`
      */
     systemPaddingTop?: number;
     /**
      * The bottom padding applied to systems beside the last one.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `20`
+     * @defaultValue `0`
      */
     systemPaddingBottom?: number;
     /**
@@ -218,10 +219,24 @@ export interface DisplaySettingsJson {
      */
     accoladeBarPaddingRight?: number;
     /**
-     * The bottom padding applied to main notation staves (standard, tabs, numbered, slash).
+     * The top padding applied to the first main notation staff (standard, tabs, numbered, slash).
+     * @since 1.8.0
+     * @category Display
+     * @defaultValue `0`
+     */
+    firstNotationStaffPaddingTop?: number;
+    /**
+     * The bottom padding applied to last main notation staff (standard, tabs, numbered, slash).
+     * @since 1.8.0
+     * @category Display
+     * @defaultValue `0`
+     */
+    lastNotationStaffPaddingBottom?: number;
+    /**
+     * The top padding applied to main notation staves (standard, tabs, numbered, slash).
      * @since 1.4.0
      * @category Display
-     * @defaultValue `5`
+     * @defaultValue `0`
      */
     notationStaffPaddingTop?: number;
     /**
@@ -236,6 +251,8 @@ export interface DisplaySettingsJson {
      * @since 1.4.0
      * @category Display
      * @defaultValue `0`
+     * @deprecated Effect staves do not exist anymore, effects are now part of the main notation staves. This value has no effect anymore.
+     * Use {@link effectBandPaddingBottom} to control the padding after effect bands.
      */
     effectStaffPaddingTop?: number;
     /**
@@ -243,6 +260,8 @@ export interface DisplaySettingsJson {
      * @since 1.4.0
      * @category Display
      * @defaultValue `0`
+     * @deprecated Effect staves do not exist anymore, effects are now part of the main notation staves. This value has no effect anymore.
+     * Use {@link effectBandPaddingBottom} to control the padding after effect bands.
      */
     effectStaffPaddingBottom?: number;
     /**
@@ -266,6 +285,13 @@ export interface DisplaySettingsJson {
      * @defaultValue `2`
      */
     effectBandPaddingBottom?: number;
+    /**
+     * The additional padding to apply between two subsequent brackets.
+     * @since 1.8.0
+     * @category Display
+     * @defaultValue `5`
+     */
+    bracketPaddingInBetween?: number;
     /**
      * The mode used to arrange staves and systems.
      * @since 1.3.0
