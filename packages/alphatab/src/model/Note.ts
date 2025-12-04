@@ -1,6 +1,6 @@
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import type { Beat } from '@coderline/alphatab/model/Beat';
-import type { BendPoint } from '@coderline/alphatab/model/BendPoint';
+import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { BendStyle } from '@coderline/alphatab/model/BendStyle';
 import { BendType } from '@coderline/alphatab/model/BendType';
 import { Duration } from '@coderline/alphatab/model/Duration';
@@ -982,6 +982,43 @@ export class Note {
                     }
                 } else {
                     Logger.warning('Model', 'Unsupported bend type detected, fallback to custom', null);
+                }
+            } else if (points!.length === 3) {
+                const origin: BendPoint = points[0];
+                const middle: BendPoint = points[1];
+                const destination: BendPoint = points[2];
+                // bend higher?
+                if (destination.value > origin.value) {
+                    if (middle.value > destination.value) {
+                        this.bendType = BendType.BendRelease;
+                        points.splice(1, 0, new BendPoint(middle.offset, middle.value));
+                    } else if (!this.isContinuedBend && origin.value > 0) {
+                        this.bendType = BendType.PrebendBend;
+                        points.splice(1, 1);
+                    } else {
+                        this.bendType = BendType.Bend;
+                        points.splice(1, 1);
+                    }
+                } else if (destination.value < origin.value) {
+                    // origin must be > 0 otherwise it's no release, we cannot bend negative
+                    if (this.isContinuedBend) {
+                        this.bendType = BendType.Release;
+                        points.splice(1, 1);
+                    } else {
+                        this.bendType = BendType.PrebendRelease;
+                        points.splice(1, 1);
+                    }
+                } else {
+                    if (middle.value > origin.value) {
+                        this.bendType = BendType.BendRelease;
+                        points.splice(1, 0, new BendPoint(middle.offset, middle.value));
+                    } else if (origin.value > 0 && !this.isContinuedBend) {
+                        this.bendType = BendType.Prebend;
+                        points.splice(1, 1);
+                    } else {
+                        this.bendType = BendType.Hold;
+                        points.splice(1, 1);
+                    }
                 }
             } else if (points.length === 2) {
                 const origin: BendPoint = points[0];
