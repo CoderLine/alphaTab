@@ -627,6 +627,7 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
 
     // expose api for fiddling in developer tools
     (window as any).api = at;
+    (window as any).alphaTab = alphaTab;
 
     return at;
 }
