@@ -470,11 +470,11 @@ export class Environment {
             { effect: new TripletFeelEffectInfo(), mode: EffectBandMode.SharedTop },
             { effect: new MarkerEffectInfo(), mode: EffectBandMode.SharedTop },
             { effect: new DirectionsEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new AlternateEndingsEffectInfo(), mode: EffectBandMode.SharedTop },
             { effect: new FreeTimeEffectInfo(), mode: EffectBandMode.SharedTop },
             { effect: new TextEffectInfo(), mode: EffectBandMode.SharedTop },
             { effect: new BeatTimerEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new ChordsEffectInfo(), mode: EffectBandMode.SharedTop }
+            { effect: new ChordsEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: new AlternateEndingsEffectInfo(), mode: EffectBandMode.SharedTop, order: 1000 }
         ]),
 
         //

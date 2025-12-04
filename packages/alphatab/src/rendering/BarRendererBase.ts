@@ -533,7 +533,7 @@ export class BarRendererBase {
 
         this.paintContent(cx, cy, canvas);
 
-        const topEffectBandY = cy + this.y - this._contentTopOverflow - this.topEffects.height;
+        const topEffectBandY = cy + this.y - this.staff.topOverflow;
         this.topEffects.paint(cx + this.x, topEffectBandY, canvas);
 
         // TODO: correct position

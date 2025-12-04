@@ -10,8 +10,7 @@ import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import { EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
-import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { ChordDiagramContainerGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import { TuningContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TuningContainerGlyph';
@@ -377,8 +376,8 @@ export abstract class ScoreLayout {
                 const staff = track.staves[staffIndex];
                 const profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
 
-                let sharedTopEffects: EffectInfo[] = [];
-                let sharedBottomEffects: EffectInfo[] = [];
+                let sharedTopEffects: EffectBandInfo[] = [];
+                let sharedBottomEffects: EffectBandInfo[] = [];
 
                 let previousStaff: RenderStaff | undefined = undefined;
 
@@ -397,10 +396,10 @@ export abstract class ScoreLayout {
                         for (const e of factory.effectBands) {
                             switch (e.mode) {
                                 case EffectBandMode.SharedTop:
-                                    sharedTopEffects.push(e.effect);
+                                    sharedTopEffects.push(e);
                                     break;
                                 case EffectBandMode.SharedBottom:
-                                    sharedBottomEffects.push(e.effect);
+                                    sharedBottomEffects.push(e);
                                     break;
                             }
                         }

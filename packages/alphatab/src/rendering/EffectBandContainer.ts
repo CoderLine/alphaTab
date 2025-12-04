@@ -1,6 +1,7 @@
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { EffectBandInfo } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 import { EffectBandSizingInfo } from '@coderline/alphatab/rendering/EffectBandSizingInfo';
 import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
@@ -17,7 +18,7 @@ export class EffectBandContainer {
     private _effectInfosSortOrder: Map<EffectInfo, number> = new Map<EffectInfo, number>();
     public height: number = 0;
 
-    public infos!: EffectInfo[];
+    public infos!: EffectBandInfo[];
     private _renderer: BarRendererBase;
     private _isTopContainer: boolean;
 
@@ -63,13 +64,13 @@ export class EffectBandContainer {
             for (const b of voice.beats) {
                 // lazy create band to avoid creating and managing bands for all events
                 // even if only a few exist
-                if (!band && EffectBand.shouldCreateGlyph(b, info, renderer)) {
-                    band = new EffectBand(voice, info, this);
+                if (!band && EffectBand.shouldCreateGlyph(b, info.effect, renderer)) {
+                    band = new EffectBand(voice, info.effect, this);
                     band.renderer = this._renderer;
                     band.doLayout();
                     this._bands.push(band);
-                    this._bandLookup.set(`${voice.index}.${info.effectId}`, band);
-                    this._effectInfosSortOrder.set(info, i);
+                    this._bandLookup.set(`${voice.index}.${info.effect.effectId}`, band);
+                    this._effectInfosSortOrder.set(info.effect, info.order ?? i);
                 }
 
                 if (band !== undefined) {

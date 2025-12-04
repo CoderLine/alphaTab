@@ -47,6 +47,7 @@ export enum EffectBandMode {
 export interface EffectBandInfo {
     mode: EffectBandMode;
     effect: EffectInfo;
+    order?: number;
     shouldCreate?: (staff: Staff) => boolean;
 }
 

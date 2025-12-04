@@ -2,8 +2,7 @@ import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import { type BarRendererFactory, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
-import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { type BarRendererFactory, type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
@@ -29,8 +28,8 @@ export class RenderStaff {
 
     public isFirstInSystem: boolean = false;
 
-    public topEffectInfos: EffectInfo[] = [];
-    public bottomEffectInfos: EffectInfo[] = [];
+    public topEffectInfos: EffectBandInfo[] = [];
+    public bottomEffectInfos: EffectBandInfo[] = [];
 
     /**
      * This is the index of the track being rendered. This is not the index of the track within the model,
@@ -82,12 +81,12 @@ export class RenderStaff {
             switch (b.mode) {
                 case EffectBandMode.OwnedTop:
                 case EffectBandMode.SharedTop:
-                    this.topEffectInfos.push(b.effect);
+                    this.topEffectInfos.push(b);
                     break;
 
                 case EffectBandMode.OwnedBottom:
                 case EffectBandMode.SharedBottom:
-                    this.bottomEffectInfos.push(b.effect);
+                    this.bottomEffectInfos.push(b);
                     break;
             }
         }
