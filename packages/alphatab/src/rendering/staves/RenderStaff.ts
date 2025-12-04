@@ -53,7 +53,7 @@ export class RenderStaff {
      * Staff contents actually start. Used for grouping
      * using a accolade
      */
-    public staveTop: number = 0;
+    public staffTop: number = 0;
 
     public topPadding: number = 0;
     public bottomPadding: number = 0;
@@ -63,14 +63,14 @@ export class RenderStaff {
      * Staff contents actually ends. Used for grouping
      * using a accolade
      */
-    public staveBottom: number = 0;
+    public staffBottom: number = 0;
 
     public get contentTop() {
-        return this.y + this.staveTop + this.topPadding + this.topOverflow;
+        return this.y + this.staffTop + this.topPadding + this.topOverflow;
     }
 
     public get contentBottom() {
-        return this.y + this.topPadding + this.topOverflow + this.staveBottom;
+        return this.y + this.topPadding + this.topOverflow + this.staffBottom;
     }
 
     public constructor(trackIndex: number, staff: Staff, factory: BarRendererFactory) {
@@ -116,14 +116,14 @@ export class RenderStaff {
     }
 
     public registerStaffTop(offset: number): void {
-        if (offset > this.staveTop) {
-            this.staveTop = offset;
+        if (offset > this.staffTop) {
+            this.staffTop = offset;
         }
     }
 
     public registerStaffBottom(offset: number): void {
-        if (offset > this.staveBottom) {
-            this.staveBottom = offset;
+        if (offset > this.staffBottom) {
+            this.staffBottom = offset;
         }
     }
 

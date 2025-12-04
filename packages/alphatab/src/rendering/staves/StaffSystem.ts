@@ -1,23 +1,28 @@
+import type { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Font } from '@coderline/alphatab/model/Font';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import {
+    BracketExtendMode,
+    TrackNameMode,
+    TrackNameOrientation,
+    TrackNamePolicy
+} from '@coderline/alphatab/model/RenderStylesheet';
 import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
 import { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@coderline/alphatab/model/RenderStylesheet';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
-import type { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 
 /**
  * @internal
@@ -29,6 +34,9 @@ export abstract class SystemBracket {
     public braceScale: number = 1;
     public width: number = 0;
     public index: number = 0;
+    public get canPaint(): boolean {
+        return this.firstStaffInBracket !== null && this.lastStaffInBracket !== null;
+    }
 
     public abstract includesStaff(s: RenderStaff): boolean;
 
@@ -117,6 +125,8 @@ export class StaffSystem {
     private _accoladeSpacingCalculated: boolean = false;
 
     private _brackets: SystemBracket[] = [];
+    private _staffToBracket = new Map<RenderStaff, SystemBracket>();
+
     private _hasSystemSeparator = false;
 
     public x: number = 0;
@@ -445,6 +455,7 @@ export class StaffSystem {
                 bracket.lastStaffInBracket = staff;
                 // NOTE: one StaffTrackGroup can currently never have multiple brackets so we can safely keep the last known here
                 group.bracket = bracket;
+                this._staffToBracket.set(staff, bracket);
             }
         }
     }
@@ -653,51 +664,58 @@ export class StaffSystem {
 
             //
             // Draw brackets
-            for (const bracket of this._brackets!) {
-                if (bracket.firstStaffInBracket && bracket.lastStaffInBracket) {
-                    const barStartX: number = cx + bracket.firstStaffInBracket.x;
-                    const barSize: number = bracket.width;
-                    const barOffset: number = settings.display.accoladeBarPaddingRight;
-                    const firstStart: number = cy + bracket.firstStaffInBracket.contentTop;
-                    const lastEnd: number = cy + bracket.lastStaffInBracket.contentBottom;
-                    let accoladeStart: number = firstStart;
-                    let accoladeEnd: number = lastEnd;
+            this._paintBrackets(cx, cy, canvas);
+        }
+    }
 
-                    if (bracket.drawAsBrace) {
-                        CanvasHelper.fillMusicFontSymbolSafe(
-                            canvas,
-                            barStartX - barOffset - barSize,
-                            accoladeEnd,
-                            bracket.braceScale,
-                            MusicFontSymbol.Brace
-                        );
-                    } else if (bracket.firstStaffInBracket !== bracket.lastStaffInBracket) {
-                        const barOverflow = barSize / 2;
-                        accoladeStart -= barOverflow;
-                        accoladeEnd += barOverflow * 2;
-                        canvas.fillRect(
-                            barStartX - barOffset - barSize,
-                            accoladeStart,
-                            barSize,
-                            Math.ceil(accoladeEnd - accoladeStart)
-                        );
+    private _paintBrackets(cx: number, cy: number, canvas: ICanvas) {
+        const settings = this.layout.renderer.settings;
 
-                        const spikeX: number = barStartX - barOffset - barSize;
-                        CanvasHelper.fillMusicFontSymbolSafe(
-                            canvas,
-                            spikeX,
-                            accoladeStart,
-                            1,
-                            MusicFontSymbol.BracketTop
-                        );
-                        CanvasHelper.fillMusicFontSymbolSafe(
-                            canvas,
-                            spikeX,
-                            Math.floor(accoladeEnd),
-                            1,
-                            MusicFontSymbol.BracketBottom
-                        );
-                    }
+        for (const bracket of this._brackets!) {
+            if (bracket.canPaint) {
+                const barStartX: number = cx + bracket.firstStaffInBracket!.x;
+                const barSize: number = bracket.width;
+                const barOffset: number = settings.display.accoladeBarPaddingRight;
+                const firstStart: number = cy + bracket.firstStaffInBracket!.contentTop;
+                const lastEnd: number = cy + bracket.lastStaffInBracket!.contentBottom;
+                let accoladeStart: number = firstStart;
+                let accoladeEnd: number = lastEnd;
+
+                if (bracket.drawAsBrace) {
+                    CanvasHelper.fillMusicFontSymbolSafe(
+                        canvas,
+                        barStartX - barOffset - barSize,
+                        accoladeEnd,
+                        bracket.braceScale,
+                        MusicFontSymbol.Brace
+                    );
+                } else if (bracket.firstStaffInBracket !== bracket.lastStaffInBracket) {
+                    // brackets typically overflow by 1/4 staff-space
+                    const smuflMetrics = settings.display.resources.engravingSettings;
+
+                    const bracketOverflow = smuflMetrics.oneStaffSpace * 0.25;
+                    accoladeStart -= bracketOverflow;
+                    accoladeEnd += bracketOverflow;
+
+                    // we shift the bar slightly inward so that the spike will hide the edge
+                    // if we're precise we might see a slight light line on subpixel level
+                    const barShift = 3;
+                    canvas.fillRect(
+                        barStartX - barOffset - barSize,
+                        accoladeStart - barShift,
+                        barSize,
+                        Math.ceil(accoladeEnd - accoladeStart + barShift * 2)
+                    );
+
+                    const spikeX: number = barStartX - barOffset - barSize;
+                    CanvasHelper.fillMusicFontSymbolSafe(canvas, spikeX, accoladeStart, 1, MusicFontSymbol.BracketTop);
+                    CanvasHelper.fillMusicFontSymbolSafe(
+                        canvas,
+                        spikeX,
+                        Math.floor(accoladeEnd),
+                        1,
+                        MusicFontSymbol.BracketBottom
+                    );
                 }
             }
         }
@@ -724,15 +742,29 @@ export class StaffSystem {
         }
 
         let currentY: number = 0;
+        const smufl = settings.display.resources.engravingSettings;
+        const topBracketSpikeHeight = smufl.glyphHeights.get(MusicFontSymbol.BracketTop)!;
+        const bottomBracketSpikeHeight = smufl.glyphHeights.get(MusicFontSymbol.BracketBottom)!;
+
         for (const staff of this._allStaves) {
+            const bracket = this._staffToBracket.has(staff) ? this._staffToBracket.get(staff) : undefined;
+            const hasBracket = bracket && !bracket.drawAsBrace && bracket.canPaint;
+            if (hasBracket && bracket!.firstStaffInBracket === staff) {
+                currentY += topBracketSpikeHeight;
+            }
+
             staff.x = this.accoladeWidth;
             staff.y = currentY;
             staff.finalizeStaff();
             currentY += staff.height;
+
+            if (hasBracket && bracket!.lastStaffInBracket === staff) {
+                currentY += bottomBracketSpikeHeight;
+            }
         }
 
         for (const b of this._brackets!) {
-            b.finalizeBracket(settings.display.resources.engravingSettings);
+            b.finalizeBracket(smufl);
         }
     }
 
@@ -759,12 +791,7 @@ export class StaffSystem {
             _firstStaffInBrackets.topPadding +
             _firstStaffInBrackets.topOverflow;
         const lineBottom: number =
-            cy +
-            this.y +
-            lastStaff.y +
-            lastStaff.height -
-            lastStaff.bottomPadding -
-            lastStaff.bottomOverflow;
+            cy + this.y + lastStaff.y + lastStaff.height - lastStaff.bottomPadding - lastStaff.bottomOverflow;
         const visualHeight: number = visualBottom - visualTop;
         const lineHeight: number = lineBottom - lineTop;
         const realHeight: number = realBottom - realTop;
