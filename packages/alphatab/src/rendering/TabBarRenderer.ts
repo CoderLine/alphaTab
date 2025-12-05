@@ -92,8 +92,12 @@ export class TabBarRenderer extends LineBarRenderer {
         return super.getLineHeight(line);
     }
 
+    public minString = Number.NaN;
+    public maxString = Number.NaN;
+
     protected override collectSpaces(spaces: Float32Array[][]): void {
         const padding: number = this.smuflMetrics.staffLineThickness;
+        const tuning = this.bar.staff.tuning;
         for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 const vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
@@ -103,7 +107,7 @@ export class TabBarRenderer extends LineBarRenderer {
                     if (noteNumbers) {
                         for (const [str, noteNumber] of noteNumbers.notesPerString) {
                             if (!noteNumber.isEmpty) {
-                                spaces[this.bar.staff.tuning.length - str].push(
+                                spaces[tuning.length - str].push(
                                     new Float32Array([
                                         vc.x + bg.x + notes.x + noteNumbers!.x - padding,
                                         noteNumbers!.width + padding * 2
@@ -156,6 +160,16 @@ export class TabBarRenderer extends LineBarRenderer {
         }
 
         super.doLayout();
+
+        const hasNoteOnTopString = this.minString === 0;
+        if (hasNoteOnTopString) {
+            this.registerOverflowTop(this.lineSpacing / 2);
+        }
+        const hasNoteOnBottomString = this.maxString === this.bar.staff.tuning.length - 1;
+        if (hasNoteOnBottomString) {
+            this.registerOverflowBottom(this.lineSpacing / 2);
+        }
+
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
             this._hasTuplets = false;
             for (const voice of this.bar.voices) {
