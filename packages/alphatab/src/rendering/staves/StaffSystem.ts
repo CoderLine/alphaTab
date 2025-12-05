@@ -720,24 +720,20 @@ export class StaffSystem {
         const topBracketSpikeHeight = smufl.glyphHeights.get(MusicFontSymbol.BracketTop)!;
         const bottomBracketSpikeHeight = smufl.glyphHeights.get(MusicFontSymbol.BracketBottom)!;
 
-        let previousBracket: SystemBracket | undefined = undefined;
+        let previousStaff: RenderStaff | undefined = undefined;
 
         for (const staff of this._allStaves) {
+            // check if we need "in-between padding"
+            if (previousStaff !== undefined && previousStaff!.trackIndex !== staff.trackIndex) {
+                currentY += settings.display.trackStaffPaddingBetween;
+            }
+
             const bracket = this._staffToBracket.has(staff) ? this._staffToBracket.get(staff) : undefined;
             const hasBracket = bracket && !bracket.drawAsBrace && bracket.canPaint;
             if (hasBracket && bracket!.firstStaffInBracket === staff) {
                 const spikeOverflow = topBracketSpikeHeight - staff.topOverflow;
                 if (spikeOverflow > 0) {
                     currentY += spikeOverflow;
-                }
-
-                // check if we need "in-between padding"
-                if (previousBracket !== undefined) {
-                    if (previousBracket.lastStaffInBracket!.index === staff.index - 1) {
-                        currentY += settings.display.bracketPaddingInBetween;
-                    }
-
-                    previousBracket = undefined;
                 }
             }
 
@@ -747,14 +743,12 @@ export class StaffSystem {
             currentY += staff.height;
 
             if (hasBracket && bracket!.lastStaffInBracket === staff) {
-                // remember bracket
-                previousBracket = bracket;
-
                 const spikeOverflow = bottomBracketSpikeHeight - staff.bottomOverflow;
                 if (spikeOverflow > 0) {
                     currentY += spikeOverflow;
                 }
             }
+            previousStaff = staff;
         }
         this._contentHeight = currentY;
 

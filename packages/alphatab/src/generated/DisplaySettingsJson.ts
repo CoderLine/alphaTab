@@ -286,12 +286,12 @@ export interface DisplaySettingsJson {
      */
     effectBandPaddingBottom?: number;
     /**
-     * The additional padding to apply between two subsequent brackets.
+     * The additional padding to apply between the staves of two separate tracks.
      * @since 1.8.0
      * @category Display
      * @defaultValue `5`
      */
-    bracketPaddingInBetween?: number;
+    trackStaffPaddingBetween?: number;
     /**
      * The mode used to arrange staves and systems.
      * @since 1.3.0

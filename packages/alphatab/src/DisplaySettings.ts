@@ -327,12 +327,12 @@ export class DisplaySettings {
     public effectBandPaddingBottom = 2;
 
     /**
-     * The additional padding to apply between two subsequent brackets.
+     * The additional padding to apply between the staves of two separate tracks.
      * @since 1.8.0
      * @category Display
      * @defaultValue `5`
      */
-    public bracketPaddingInBetween = 5;
+    public trackStaffPaddingBetween = 5;
 
     /**
      * The mode used to arrange staves and systems.
