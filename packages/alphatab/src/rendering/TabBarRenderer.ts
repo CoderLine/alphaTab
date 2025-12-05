@@ -274,7 +274,7 @@ export class TabBarRenderer extends LineBarRenderer {
         cy: number,
         canvas: ICanvas,
         beatElement: BeatSubElement,
-        bracketsAsArcs?: boolean
+        bracketsAsArcs: boolean = false
     ): void {
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
             super.paintTuplets(cx, cy, canvas, beatElement, bracketsAsArcs);
