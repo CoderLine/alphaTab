@@ -7,6 +7,7 @@ import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer'
 
 /**
  * The different modes on how effect bands are applied to bar renderers.
+ * @internal
  */
 export enum EffectBandMode {
     /**
@@ -42,6 +43,7 @@ export enum EffectBandMode {
 
 /**
  * @record
+ * @internal
  */
 export interface EffectBandInfo {
     mode: EffectBandMode;
