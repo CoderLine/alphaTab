@@ -175,6 +175,16 @@ public class List<T> : Iterable<T> {
         _data.addAll(start.toInt(), newElements.toList())
     }
 
+    public fun splice(start: Double, deleteCount: Double, newElements: Iterable<T>) {
+        var actualStart = start.toInt()
+        if (actualStart < 0) {
+            actualStart += _data.size
+        }
+
+        _data.removeRange(start.toInt(), (start + deleteCount).toInt())
+        _data.addAll(start.toInt(), newElements.toList())
+    }
+
     public fun join(separator: String): String {
         return _data.map { it.toTemplate() }.joinToString(separator)
     }
