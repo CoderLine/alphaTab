@@ -268,7 +268,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                         cy +
                         startNoteRenderer.y +
                         startNoteRenderer.getScoreY(
-                            startNoteRenderer.accidentalHelper.getNoteLineForValue(noteValueToDraw, false)
+                            startNoteRenderer.accidentalHelper.getNoteStepsForValue(noteValueToDraw, false)
                         );
                     if (note.bendType === BendType.Hold || note.bendType === BendType.Prebend) {
                         TieGlyph.paintTie(
@@ -338,7 +338,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                             cy +
                             startNoteRenderer.y +
                             startNoteRenderer.getScoreY(
-                                startNoteRenderer.accidentalHelper.getNoteLineForValue(
+                                startNoteRenderer.accidentalHelper.getNoteStepsForValue(
                                     note.displayValue - ((note.bendPoints![0].value / 2) | 0),
                                     false
                                 )
@@ -421,7 +421,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                             cy +
                             startNoteRenderer.y +
                             startNoteRenderer.getScoreY(
-                                startNoteRenderer.accidentalHelper.getNoteLineForValue(
+                                startNoteRenderer.accidentalHelper.getNoteStepsForValue(
                                     note.displayValue - ((note.bendPoints![0].value / 2) | 0),
                                     false
                                 )

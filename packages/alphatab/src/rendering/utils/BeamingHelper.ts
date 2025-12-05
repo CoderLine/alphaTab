@@ -358,7 +358,7 @@ export class BeamingHelper {
         // For percussion we use the line as value to compare whether it is
         // higher or lower.
         if (this.voice && note.isPercussion) {
-            lowestValueForNote = -AccidentalHelper.getPercussionLine(
+            lowestValueForNote = -AccidentalHelper.getPercussionSteps(
                 this.voice.bar,
                 AccidentalHelper.getNoteValue(note)
             );

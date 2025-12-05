@@ -65,13 +65,13 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
             quarterBend,
             true
         );
-        const line: number = sr.accidentalHelper.getNoteLineForValue(noteValue, false);
-        noteHeadGlyph.y = sr.getScoreY(line);
+        const steps: number = sr.accidentalHelper.getNoteStepsForValue(noteValue, false);
+        noteHeadGlyph.y = sr.getScoreY(steps);
         if (this._showParenthesis) {
             this._preNoteParenthesis!.renderer = this.renderer;
             this._postNoteParenthesis!.renderer = this.renderer;
-            this._preNoteParenthesis!.addParenthesisOnLine(line, true);
-            this._postNoteParenthesis!.addParenthesisOnLine(line, true);
+            this._preNoteParenthesis!.addParenthesisOnSteps(steps, true);
+            this._postNoteParenthesis!.addParenthesisOnSteps(steps, true);
         }
         if (accidental !== AccidentalType.None) {
             const g = new AccidentalGlyph(0, noteHeadGlyph.y, accidental, NoteHeadGlyph.GraceScale);
@@ -80,7 +80,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
             this._accidentals.addGlyph(g);
         }
         this._noteValueLookup.set(noteValue, noteHeadGlyph);
-        this.add(noteHeadGlyph, line);
+        this.add(noteHeadGlyph, steps);
         this.isEmpty = false;
     }
 

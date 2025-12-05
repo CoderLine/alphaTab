@@ -341,7 +341,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         cy +
                         startNoteRenderer.y +
                         startNoteRenderer.getScoreY(
-                            startNoteRenderer.accidentalHelper.getNoteLineForValue(
+                            startNoteRenderer.accidentalHelper.getNoteStepsForValue(
                                 note.displayValue - ((note.beat.whammyBarPoints![0].value / 2) | 0),
                                 false
                             )

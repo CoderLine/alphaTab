@@ -141,7 +141,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             return slashY;
         }
 
-        const minNote = this.accidentalHelper.getMinLineNote(beat);
+        const minNote = this.accidentalHelper.getMinStepsNote(beat);
         if (minNote) {
             return this.getBeatContainer(beat)!.onNotes.getNoteY(
                 minNote,
@@ -149,7 +149,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             );
         }
 
-        let y = this.getScoreY(this.accidentalHelper.getMinLine(beat));
+        let y = this.getScoreY(this.accidentalHelper.getMinSteps(beat));
 
         if (direction === BeamDirection.Up) {
             const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
@@ -179,7 +179,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             return slashY;
         }
 
-        const maxNote = this.accidentalHelper.getMaxLineNote(beat);
+        const maxNote = this.accidentalHelper.getMaxStepsNote(beat);
         if (maxNote) {
             return this.getBeatContainer(beat)!.onNotes.getNoteY(
                 maxNote,
@@ -187,7 +187,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             );
         }
 
-        let y = this.getScoreY(this.accidentalHelper.getMaxLine(beat));
+        let y = this.getScoreY(this.accidentalHelper.getMaxSteps(beat));
         if (direction === BeamDirection.Down) {
             const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
             y += this.smuflMetrics.standardStemLength * scale;
@@ -232,8 +232,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
             // NOTE: some might request the note position before the glyphs have been created
             // e.g. the beaming helper, for these we just need a rough
             // estimate on the position
-            const line = AccidentalHelper.computeLineWithoutAccidentals(this.bar, note);
-            y = this.getScoreY(line);
+            const steps = AccidentalHelper.computeStepsWithoutAccidentals(this.bar, note);
+            y = this.getScoreY(steps);
             const scale = note.beat.graceType === GraceType.None ? 1 : NoteHeadGlyph.GraceScale;
             const stemHeight = this.smuflMetrics.standardStemLength * scale;
             const noteHeadHeight =
@@ -298,26 +298,26 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         if (direction === BeamDirection.Up) {
-            const maxNote = this.accidentalHelper.getMaxLineNote(beat);
+            const maxNote = this.accidentalHelper.getMaxStepsNote(beat);
             if (maxNote) {
                 return this.getBeatContainer(beat)!.onNotes.getNoteY(maxNote, NoteYPosition.StemUp);
             }
-            return this.getScoreY(this.accidentalHelper.getMaxLine(beat));
+            return this.getScoreY(this.accidentalHelper.getMaxSteps(beat));
         }
 
-        const minNote = this.accidentalHelper.getMinLineNote(beat);
+        const minNote = this.accidentalHelper.getMinStepsNote(beat);
         if (minNote) {
             return this.getBeatContainer(beat)!.onNotes.getNoteY(minNote, NoteYPosition.StemDown);
         }
-        return this.getScoreY(this.accidentalHelper.getMinLine(beat));
+        return this.getScoreY(this.accidentalHelper.getMinSteps(beat));
     }
 
     protected override getMinLineOfBeat(beat: Beat): number {
-        return this.accidentalHelper.getMinLine(beat) / 2;
+        return this.accidentalHelper.getMinSteps(beat) / 2;
     }
 
     protected override getMaxLineOfBeat(beat: Beat): number {
-        return this.accidentalHelper.getMaxLine(beat) / 2;
+        return this.accidentalHelper.getMaxSteps(beat) / 2;
     }
 
     protected override createLinePreBeatGlyphs(): void {
@@ -484,8 +484,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
     }
 
-    public getNoteLine(n: Note): number {
-        return this.accidentalHelper.getNoteLine(n);
+    public getNoteSteps(n: Note): number {
+        return this.accidentalHelper.getNoteSteps(n);
     }
 
     public override completeBeamingHelper(helper: BeamingHelper) {

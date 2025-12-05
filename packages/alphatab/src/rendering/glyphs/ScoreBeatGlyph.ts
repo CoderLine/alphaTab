@@ -177,7 +177,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         const group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
                         for (const note of this.container.beat.notes) {
-                            const g = this._createBeatDot(sr.getNoteLine(note), group);
+                            const g = this._createBeatDot(sr.getNoteSteps(note), group);
                             g.colorOverride = ElementStyleHelper.noteColor(
                                 sr.resources,
                                 NoteSubElement.StandardNotationEffects,
@@ -307,15 +307,15 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         );
 
         // calculate y position
-        let line: number;
+        let steps: number;
         if (n.beat.slashed) {
-            line = sr.heightLineCount - 1;
+            steps = sr.heightLineCount - 1;
         } else {
-            line = sr.getNoteLine(n);
+            steps = sr.getNoteSteps(n);
         }
 
-        noteHeadGlyph.y = sr.getScoreY(line);
-        this.noteHeads!.addMainNoteGlyph(noteHeadGlyph, n, line);
+        noteHeadGlyph.y = sr.getScoreY(steps);
+        this.noteHeads!.addMainNoteGlyph(noteHeadGlyph, n, steps);
 
         if (!n.beat.slashed && n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
             // create harmonic note head.
@@ -327,9 +327,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 this.container.beat.graceType !== GraceType.None
             );
             harmonicsGlyph.colorOverride = noteHeadGlyph.colorOverride;
-            line = sr.accidentalHelper.getNoteLineForValue(harmonicFret, false);
-            harmonicsGlyph.y = sr.getScoreY(line);
-            this.noteHeads!.addEffectNoteGlyph(harmonicsGlyph, line);
+            steps = sr.accidentalHelper.getNoteStepsForValue(harmonicFret, false);
+            harmonicsGlyph.y = sr.getScoreY(steps);
+            this.noteHeads!.addEffectNoteGlyph(harmonicsGlyph, steps);
         }
 
         const belowBeatEffects = this.noteHeads!.belowBeatEffects;
