@@ -476,7 +476,7 @@ export class EngravingSettings {
 
         this.songBookWhammyDipHeight = 0.6 * this.oneStaffSpace;
         this.tabWhammyPerHalfHeight = 0.6 * this.oneStaffSpace;
-        this.tabBendStaffPadding = 1 * this.oneStaffSpace;
+        this.tabBendStaffPadding = 0.5 * this.oneStaffSpace;
         this.tabBendPerValueHeight = 0.6 * this.oneStaffSpace;
         this.tabBendLabelPadding = 0.3 * this.oneStaffSpace;
 
