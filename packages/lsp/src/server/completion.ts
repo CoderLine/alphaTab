@@ -6,6 +6,7 @@ import {
     durationChangeProperties,
     noteProperties,
     scoreMetaData,
+    staffMetaData,
     structuralMetaData
 } from '@coderline/alphatab-alphatex/definitions';
 import type {
@@ -37,6 +38,7 @@ interface CompletionItemWithData<T> extends CompletionItem {
 
 const topLevelCompletions = [
     ...createMetaDataDocCompletions(structuralMetaData),
+    ...createMetaDataDocCompletions(staffMetaData),
     ...createMetaDataDocCompletions(scoreMetaData),
     ...createMetaDataDocCompletions(barMetaData)
 ];
