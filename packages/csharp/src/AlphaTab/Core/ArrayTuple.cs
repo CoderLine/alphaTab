@@ -3,7 +3,7 @@
 /// <summary>
 /// A mixed-type array tuple (like <code>[string, number]</code> in JavaScript).
 /// </summary>
-public struct ArrayTuple<T0, T1>
+public class ArrayTuple<T0, T1>
 {
     public T0 V0 { get; set; }
     public T1 V1 { get; set;}
