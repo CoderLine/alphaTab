@@ -545,7 +545,11 @@ export class BarRendererBase {
     }
 
     public getBeatContainer(beat: Beat): BeatContainerGlyph | undefined {
-        return this.getVoiceContainer(beat.voice)?.beatGlyphs?.[beat.index];
+        const beatGlyphs = this.getVoiceContainer(beat.voice)?.beatGlyphs;
+        if (beatGlyphs && beat.index < beatGlyphs.length) {
+            return beatGlyphs[beat.index];
+        }
+        return undefined;
     }
 
     public getPreNotesGlyphForBeat(beat: Beat): BeatGlyphBase | undefined {
