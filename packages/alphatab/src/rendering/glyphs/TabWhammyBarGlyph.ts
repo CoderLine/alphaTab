@@ -65,18 +65,9 @@ export class TabWhammyBarGlyph extends EffectGlyph {
             this._beat.whammyBarType === WhammyType.Dip;
         //
         // Get the min and max values for all combined whammys
-        let minValue: BendPoint | null = null;
-        let maxValue: BendPoint | null = null;
-        let beat: Beat | null = this._beat;
-        while (beat && beat.hasWhammyBar) {
-            if (!minValue || minValue.value > beat.minWhammyPoint!.value) {
-                minValue = beat.minWhammyPoint;
-            }
-            if (!maxValue || maxValue.value < beat.maxWhammyPoint!.value) {
-                maxValue = beat.maxWhammyPoint;
-            }
-            beat = beat.nextBeat;
-        }
+        const minValue: BendPoint | null = this._beat.minWhammyPoint;
+        const maxValue: BendPoint | null = this._beat.maxWhammyPoint;
+
         let topOffset: number = maxValue!.value > 0 ? Math.abs(this._getOffset(maxValue!.value)) : 0;
         if (
             topOffset > 0 ||
