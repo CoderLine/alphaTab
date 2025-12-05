@@ -315,6 +315,11 @@ export interface EngravingSettingsJson {
      */
     tabBendDashSize?: number;
     /**
+     * The additional padding between the staff and the point
+     * where bend values are calculated from.
+     */
+    tabBendStaffPadding?: number;
+    /**
      * The height applied per quarter-note.
      */
     tabBendPerValueHeight?: number;

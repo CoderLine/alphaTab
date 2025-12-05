@@ -72,6 +72,7 @@ export class EngravingSettingsCloner {
         clone.deadSlappedLineWidth = original.deadSlappedLineWidth;
         clone.leftHandTabTieWidth = original.leftHandTabTieWidth;
         clone.tabBendDashSize = original.tabBendDashSize;
+        clone.tabBendStaffPadding = original.tabBendStaffPadding;
         clone.tabBendPerValueHeight = original.tabBendPerValueHeight;
         clone.tabBendLabelPadding = original.tabBendLabelPadding;
         clone.simpleSlideWidth = original.simpleSlideWidth;
