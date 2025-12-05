@@ -5,7 +5,12 @@ import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { Logger } from '@coderline/alphatab/Logger';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
 import { ControllerType } from '@coderline/alphatab/midi/ControllerType';
-import { type MidiEvent, MidiEventType, NoteOnEvent, type TimeSignatureEvent } from '@coderline/alphatab/midi/MidiEvent';
+import {
+    type MidiEvent,
+    MidiEventType,
+    NoteOnEvent,
+    type TimeSignatureEvent
+} from '@coderline/alphatab/midi/MidiEvent';
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import type { MidiTickLookup } from '@coderline/alphatab/midi/MidiTickLookup';
@@ -20,6 +25,11 @@ import type { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInfo
 import type { Score } from '@coderline/alphatab/model/Score';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Settings } from '@coderline/alphatab/Settings';
+import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
+import { AlphaSynthWrapper } from '@coderline/alphatab/synth/AlphaSynthWrapper';
+import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
+import { expect } from 'chai';
 import {
     FlatControlChangeEvent,
     type FlatMidiEvent,
@@ -32,8 +42,8 @@ import {
     FlatTimeSignatureEvent,
     FlatTrackEndEvent
 } from 'test/audio/FlatMidiEventGenerator';
+import { TestOutput } from 'test/audio/TestOutput';
 import { TestPlatform } from 'test/TestPlatform';
-import { expect } from 'chai';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
@@ -1841,5 +1851,87 @@ describe('MidiFileGeneratorTest', () => {
 
         expect(generator.transpositionPitches.has(5)).to.be.true;
         expect(generator.transpositionPitches.get(5)!).to.equal(12);
+    });
+
+    it('tickshift-flat', () => {
+        const score = parseTex(`
+            C4 {gr bb} C4 C4 C4 C4  
+        `);
+
+        const handler = new FlatMidiEventGenerator();
+        const generator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        expect(handler.tickShift).to.equal(120);
+        const firstNote = handler.midiEvents.find(e => e instanceof FlatNoteEvent)!;
+        expect(firstNote.tick).to.equal(-120);
+    });
+
+    it('tickshift-synth', () => {
+        const score = parseTex(`
+            C4 {gr bb} C4 C4 C4 C4  
+        `);
+
+        const file = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(file);
+        const generator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        expect(handler.tickShift).to.equal(120);
+        const firstNote = file.events.find(e => e instanceof NoteOnEvent)!;
+        expect(firstNote.tick).to.equal(0);
+    });
+
+    it('synthwrapper-mapping', () => {
+        const wrapper = new AlphaSynthWrapper();
+        const output = new TestOutput();
+        const synth = new AlphaSynth(output, 100);
+        wrapper.instance = synth;
+
+        const score = parseTex(`
+            C4 {gr bb} C4 C4 C4 C4  
+        `);
+
+        const file = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(file);
+        const generator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        wrapper.midiTickShift = handler.tickShift;
+        wrapper.loadMidiFile(file);
+
+        // the synth is always a bit off internally to handle
+        // some inclusive/exclusive ranges easier
+        const tickImprecision = 1;
+
+        // check API -> Player mappings
+        wrapper.tickPosition = -120;
+        expect(synth.tickPosition).to.equal(tickImprecision);
+
+        wrapper.tickPosition = 0;
+        expect(synth.tickPosition).to.equal(120 + tickImprecision);
+
+        const range = new PlaybackRange();
+        range.startTick = 960;
+        range.endTick = 1920;
+        wrapper.playbackRange = range;
+        expect(synth.playbackRange!.startTick).to.equal(range.startTick + handler.tickShift);
+        expect(synth.playbackRange!.endTick).to.equal(range.endTick + handler.tickShift);
+
+        // check API <- Player mappings
+        wrapper.stop();
+        expect(wrapper.tickPosition).to.equal(range.startTick + tickImprecision);
+        expect(wrapper.loadedMidiInfo!.endTick).to.equal(3840);
+        expect(wrapper.playbackRange!.startTick).to.equal(range.startTick);
+        expect(wrapper.playbackRange!.endTick).to.equal(range.endTick);
+
+        wrapper.playbackRange = null;
+        let lastArgs: PositionChangedEventArgs | null = null;
+        wrapper.positionChanged.on(e => {
+            lastArgs = e;
+        });
+        wrapper.tickPosition = 0;
+        expect(lastArgs!.currentTick).to.equal(tickImprecision);
+        expect(synth.tickPosition).to.equal(handler.tickShift + tickImprecision);
     });
 });

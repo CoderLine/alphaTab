@@ -1,7 +1,12 @@
 import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
 import type { CoreSettings } from '@coderline/alphatab/CoreSettings';
 import { Environment } from '@coderline/alphatab/Environment';
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import {
+    EventEmitter,
+    EventEmitterOfT,
+    type IEventEmitter,
+    type IEventEmitterOfT
+} from '@coderline/alphatab/EventEmitter';
 import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { Logger } from '@coderline/alphatab/Logger';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
@@ -42,11 +47,10 @@ import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { Track } from '@coderline/alphatab/model/Track';
-import { PlayerMode, ScrollMode } from '@coderline/alphatab/PlayerSettings';
 import type { IContainer } from '@coderline/alphatab/platform/IContainer';
 import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
 import type { IUiFacade } from '@coderline/alphatab/platform/IUiFacade';
-import { ResizeEventArgs } from '@coderline/alphatab/ResizeEventArgs';
+import { PlayerMode, ScrollMode } from '@coderline/alphatab/PlayerSettings';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
@@ -57,12 +61,17 @@ import type { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
 import type { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
+import { ResizeEventArgs } from '@coderline/alphatab/ResizeEventArgs';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { ActiveBeatsChangedEventArgs } from '@coderline/alphatab/synth/ActiveBeatsChangedEventArgs';
 import { AlphaSynthWrapper } from '@coderline/alphatab/synth/AlphaSynthWrapper';
 import { ExternalMediaPlayer } from '@coderline/alphatab/synth/ExternalMediaPlayer';
 import type { IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
-import { AudioExportOptions, type IAudioExporter, type IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExporter';
+import {
+    AudioExportOptions,
+    type IAudioExporter,
+    type IAudioExporterWorker
+} from '@coderline/alphatab/synth/IAudioExporter';
 import type { ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
 import type { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
 import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
@@ -99,6 +108,15 @@ export class AlphaTabApiBase<TSettings> {
     private _actualPlayerMode: PlayerMode = PlayerMode.Disabled;
     private _player!: AlphaSynthWrapper;
     private _renderer: ScoreRendererWrapper;
+
+    /**
+     * An indicator by how many midi-ticks the song contents are shifted.
+     * Grace beats at start might require a shift for the first beat to start at 0.
+     * This information can be used to translate back the player time axis to the music notation.
+     */
+    public get midiTickShift() {
+        return this._player.midiTickShift;
+    }
 
     /**
      * The actual player mode which is currently active.
@@ -1537,6 +1555,7 @@ export class AlphaTabApiBase<TSettings> {
         this._onMidiLoad(midiFile);
 
         const player = this._player;
+        player.midiTickShift = handler.tickShift;
         player.loadMidiFile(midiFile);
         player.loadBackingTrack(score);
         player.updateSyncPoints(generator.syncPoints);
@@ -3578,10 +3597,12 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
-        this._previousTick = e.currentTick;
+        const currentTick = e.currentTick;
+
+        this._previousTick = currentTick;
         this.uiFacade.beginInvoke(() => {
             const cursorSpeed = e.modifiedTempo / e.originalTempo;
-            this._cursorUpdateTick(e.currentTick, false, cursorSpeed, false, e.isSeek);
+            this._cursorUpdateTick(currentTick, false, cursorSpeed, false, e.isSeek);
         });
 
         this.uiFacade.triggerEvent(this.container, 'playerPositionChanged', e);

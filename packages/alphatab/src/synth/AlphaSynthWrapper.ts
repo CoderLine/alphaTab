@@ -1,4 +1,9 @@
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import {
+    EventEmitter,
+    EventEmitterOfT,
+    type IEventEmitter,
+    type IEventEmitterOfT
+} from '@coderline/alphatab/EventEmitter';
 import { Logger } from '@coderline/alphatab/Logger';
 import type { LogLevel } from '@coderline/alphatab/LogLevel';
 import type { MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
@@ -7,7 +12,7 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import type { BackingTrackSyncPoint, IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
 import type { ISynthOutput } from '@coderline/alphatab/synth/ISynthOutput';
 import type { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
-import type { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
 import { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/PlaybackRangeChangedEventArgs';
 import { PlayerState } from '@coderline/alphatab/synth/PlayerState';
 import { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerStateChangedEventArgs';
@@ -23,7 +28,7 @@ import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
  * This wrapper is used when re-exposing the underlying player via {@link AlphaTabApiBase} to integrators.
  * Even with dynamic switching between synthesizer, backing tracks etc. aspects like volume, playbackspeed,
  * event listeners etc. should not be lost.
- * 
+ *
  * @internal
  */
 export class AlphaSynthWrapper implements IAlphaSynth {
@@ -37,6 +42,8 @@ export class AlphaSynthWrapper implements IAlphaSynth {
 
     private _instance?: IAlphaSynth;
     private _instanceEventUnregister?: (() => void)[];
+
+    public midiTickShift = 0;
 
     public constructor() {
         this.ready = new EventEmitter(() => this.isReady);
@@ -86,7 +93,9 @@ export class AlphaSynthWrapper implements IAlphaSynth {
             );
             newUnregister.push(
                 value.midiLoaded.on(e => {
-                    (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
+                    (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(
+                        this._shiftPositionChangedEventArgsToApi(e)!
+                    );
                 })
             );
             newUnregister.push(
@@ -99,7 +108,9 @@ export class AlphaSynthWrapper implements IAlphaSynth {
             );
             newUnregister.push(
                 value.positionChanged.on(e => {
-                    (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
+                    (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
+                        this._shiftPositionChangedEventArgsToApi(e)!
+                    );
                 })
             );
             newUnregister.push(
@@ -109,7 +120,9 @@ export class AlphaSynthWrapper implements IAlphaSynth {
             );
             newUnregister.push(
                 value.playbackRangeChanged.on(e =>
-                    (this.playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(e)
+                    (this.playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(
+                        this._shiftPlaybackRangeChangedEventArgsToApi(e)
+                    )
                 )
             );
 
@@ -204,21 +217,21 @@ export class AlphaSynthWrapper implements IAlphaSynth {
     }
 
     public get loadedMidiInfo(): PositionChangedEventArgs | undefined {
-        return this._instance ? this._instance.loadedMidiInfo : undefined;
+        return this._instance ? this._shiftPositionChangedEventArgsToApi(this._instance.loadedMidiInfo) : undefined;
     }
     public get currentPosition(): PositionChangedEventArgs {
         return this._instance
-            ? this._instance.currentPosition
+            ? this._shiftPositionChangedEventArgsToApi(this._instance.currentPosition)!
             : new PositionChangedEventArgs(0, 0, 0, 0, false, 120, 120);
     }
 
     public get tickPosition(): number {
-        return this._instance ? this._instance.tickPosition : 0;
+        return this._instance ? this._shiftTickToApi(this._instance.tickPosition) : 0;
     }
 
     public set tickPosition(value: number) {
         if (this._instance) {
-            this._instance.tickPosition = value;
+            this._instance.tickPosition = this._shiftTickToPlayer(value);
         }
     }
 
@@ -233,12 +246,12 @@ export class AlphaSynthWrapper implements IAlphaSynth {
     }
 
     public get playbackRange(): PlaybackRange | null {
-        return this._instance ? this._instance.playbackRange : null;
+        return this._instance ? this._shiftPlaybackRangeToApi(this._instance.playbackRange) : null;
     }
 
     public set playbackRange(value: PlaybackRange | null) {
         if (this._instance) {
-            this._instance!.playbackRange = value;
+            this._instance!.playbackRange = this._shiftPlaybackRangeToPlayer(value);
         }
     }
 
@@ -388,4 +401,78 @@ export class AlphaSynthWrapper implements IAlphaSynth {
     public readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> =
         new EventEmitterOfT<MidiEventsPlayedEventArgs>();
     public readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs>;
+
+    private _shiftPlaybackRangeChangedEventArgsToApi(e: PlaybackRangeChangedEventArgs): PlaybackRangeChangedEventArgs {
+        if (e.playbackRange == null) {
+            return e;
+        }
+
+        const tickShift = this.midiTickShift;
+        if (tickShift > 0) {
+            return new PlaybackRangeChangedEventArgs(this._shiftPlaybackRangeToApi(e.playbackRange));
+        } else {
+            return e;
+        }
+    }
+
+    private _shiftPlaybackRangeToApi(e: PlaybackRange | null): PlaybackRange | null {
+        if (e == null) {
+            return e;
+        }
+
+        const tickShift = this.midiTickShift;
+        if (tickShift > 0) {
+            const range = new PlaybackRange();
+            range.startTick = e.startTick - tickShift;
+            range.endTick = e.endTick - tickShift;
+            return range;
+        } else {
+            return e;
+        }
+    }
+
+    private _shiftPlaybackRangeToPlayer(e: PlaybackRange | null): PlaybackRange | null {
+        if (e == null) {
+            return e;
+        }
+
+        const tickShift = this.midiTickShift;
+        if (tickShift > 0) {
+            const range = new PlaybackRange();
+            range.startTick = e.startTick + tickShift;
+            range.endTick = e.endTick + tickShift;
+            return range;
+        } else {
+            return e;
+        }
+    }
+
+    private _shiftPositionChangedEventArgsToApi(
+        e: PositionChangedEventArgs | undefined
+    ): PositionChangedEventArgs | undefined {
+        if (!e) {
+            return e;
+        }
+
+        const tickShift = this.midiTickShift;
+        return tickShift > 0
+            ? new PositionChangedEventArgs(
+                  e.currentTime,
+                  e.endTime,
+                  e.currentTick - tickShift,
+                  e.endTick - tickShift,
+                  e.isSeek,
+                  e.originalTempo,
+                  e.modifiedTempo
+              )
+            : e;
+    }
+
+    private _shiftTickToApi(tickPosition: number): number {
+        return tickPosition - this.midiTickShift;
+    }
+
+    private _shiftTickToPlayer(tickPosition: number): number {
+        return tickPosition + this.midiTickShift;
+    }
 }

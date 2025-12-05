@@ -85,4 +85,13 @@ export interface IMidiFileHandler {
      * @param tick The end tick for this track.
      */
     finishTrack(track: number, tick: number): void;
+
+
+    /**
+     * Registers a general shift of the time-axis for the generate midi file. 
+     * @param tickShift The shift in midi ticks by which all midi events beside the initial channel setups are shifted. 
+     * This shift is applied in case grace beats
+     */
+    addTickShift(tickShift: number): void;
+
 }

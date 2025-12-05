@@ -137,10 +137,15 @@ export class MidiFileGenerator {
         this._calculatedBeatTimers.clear();
         this._currentTime = 0;
 
+
         // initialize tracks
         for (const track of this._score.tracks) {
             this._generateTrack(track);
         }
+
+        // tickshift is added after initial track channel details
+        this._detectTickShift();
+
 
         Logger.debug('Midi', 'Begin midi generation');
 
@@ -169,6 +174,24 @@ export class MidiFileGenerator {
         );
 
         Logger.debug('Midi', 'Midi generation done');
+    }
+
+    private _detectTickShift() {
+        let tickShift = 0;
+        for (const track of this._score.tracks) {
+            for (const staff of track.staves) {
+                for (const voice of staff.bars[0].voices) {
+                    if (!voice.isEmpty) {
+                        const beat = voice.beats[0];
+                        if (beat.playbackStart < tickShift) {
+                            tickShift = beat.playbackStart;
+                        }
+                    }
+                }
+            }
+        }
+        tickShift = Math.abs(tickShift);
+        this._handler.addTickShift(tickShift);
     }
 
     private _generateTrack(track: Track): void {
@@ -1313,7 +1336,13 @@ export class MidiFileGenerator {
         }
     }
 
-    private _generateFadeSteps(track: Track, start: number, duration: number, startVolume: number, endVolume: number): void {
+    private _generateFadeSteps(
+        track: Track,
+        start: number,
+        duration: number,
+        startVolume: number,
+        endVolume: number
+    ): void {
         const tickStep: number = 120;
         // we want to reach the target volume a bit earlier than the end of the note
         duration = (duration * 0.8) | 0;

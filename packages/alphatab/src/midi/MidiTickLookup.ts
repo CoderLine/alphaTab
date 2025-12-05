@@ -553,6 +553,9 @@ export class MidiTickLookup {
     }
 
     private _findMasterBar(tick: number): MasterBarTickLookup | null {
+        if (tick <= 0 && this.masterBars.length > 0) {
+            return this.masterBars[0];
+        }
         const bars: MasterBarTickLookup[] = this.masterBars;
         let bottom: number = 0;
         let top: number = bars.length - 1;

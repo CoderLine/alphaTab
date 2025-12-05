@@ -5,10 +5,11 @@ import type { IMidiFileHandler } from '@coderline/alphatab/midi/IMidiFileHandler
  * @internal
  */
 export class FlatMidiEventGenerator implements IMidiFileHandler {
-    public midiEvents: FlatMidiEvent[];
+    public midiEvents: FlatMidiEvent[] = [];
+    public tickShift = 0;
 
-    public constructor() {
-        this.midiEvents = [];
+    public addTickShift(tickShift: number): void {
+        this.tickShift = tickShift;
     }
 
     public addTimeSignature(tick: number, timeSignatureNumerator: number, timeSignatureDenominator: number): void {
