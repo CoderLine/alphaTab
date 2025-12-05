@@ -341,6 +341,7 @@ describe('MidiFileGeneratorTest', () => {
             new FlatNoteBendEvent(11 * 40, 0, info.secondaryChannel, note.realValue, 9131),
             new FlatNoteBendEvent(12 * 40, 0, info.secondaryChannel, note.realValue, 9216), // full bend
             new FlatNoteBendEvent(12 * 40, 0, info.secondaryChannel, note.realValue, 9216), // full bend
+            new FlatNoteBendEvent(12 * 40, 0, info.secondaryChannel, note.realValue, 9216), // full bend
             new FlatNoteBendEvent(13 * 40, 0, info.secondaryChannel, note.realValue, 9131),
             new FlatNoteBendEvent(14 * 40, 0, info.secondaryChannel, note.realValue, 9045),
             new FlatNoteBendEvent(15 * 40, 0, info.secondaryChannel, note.realValue, 8960),
