@@ -144,7 +144,7 @@ export class TabBarRenderer extends LineBarRenderer {
                     break;
             }
 
-            this.height += this.settings.notation.rhythmHeight;
+            this.registerOverflowBottom(this.settings.notation.rhythmHeight);
         }
     }
 
@@ -182,7 +182,7 @@ export class TabBarRenderer extends LineBarRenderer {
                 }
             }
             if (this._hasTuplets) {
-                this.registerOverflowBottom(this.tupletSize);
+                this.registerOverflowBottom(this.settings.notation.rhythmHeight + this.tupletSize);
             }
         }
     }
@@ -313,7 +313,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected getFlagAndBarPos(): number {
-        return this.height - (this._hasTuplets ? this.tupletSize / 2 : 0);
+        return this.height + this.settings.notation.rhythmHeight - (this._hasTuplets ? this.tupletSize / 2 : 0);
     }
 
     protected override calculateBeamYWithDirection(_h: BeamingHelper, _x: number, _direction: BeamDirection): number {
