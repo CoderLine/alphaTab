@@ -40,9 +40,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public simpleWhammyOverflow: number = 0;
 
-    public beatEffectsMinY: number | null = null;
-    public beatEffectsMaxY: number | null = null;
-
     public accidentalHelper: AccidentalHelper;
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
@@ -82,18 +79,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return this.bar.staff.standardNotationLineCount;
     }
 
-    public registerBeatEffectOverflows(beatEffectsMinY: number, beatEffectsMaxY: number) {
-        const currentBeatEffectsMinY = this.beatEffectsMinY;
-        if (currentBeatEffectsMinY == null || beatEffectsMinY < currentBeatEffectsMinY) {
-            this.beatEffectsMinY = beatEffectsMinY;
-        }
-
-        const currentBeatEffectsMaxY = this.beatEffectsMaxY;
-        if (currentBeatEffectsMaxY == null || beatEffectsMaxY > currentBeatEffectsMaxY) {
-            this.beatEffectsMaxY = beatEffectsMaxY;
-        }
-    }
-
     /**
      * Gets the relative y position of the given steps relative to first line.
      * @param steps the amount of steps while 2 steps are one line
@@ -118,25 +103,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (this.bar.isEmpty) {
             return;
         }
+        
         const top: number = this.getScoreY(0);
         const bottom: number = this.getScoreY((this.heightLineCount - 1) * 2);
         const whammyOffset: number = this.simpleWhammyOverflow;
-
-        const beatEffectsMinY = this.beatEffectsMinY;
-        if (beatEffectsMinY !== null) {
-            const beatEffectTopOverflow = top - beatEffectsMinY;
-            if (beatEffectTopOverflow > 0) {
-                this.registerOverflowTop(beatEffectTopOverflow);
-            }
-        }
-
-        const beatEffectsMaxY = this.beatEffectsMaxY;
-        if (beatEffectsMaxY !== null) {
-            const beatEffectBottomOverflow = beatEffectsMaxY - bottom;
-            if (beatEffectBottomOverflow > 0) {
-                this.registerOverflowBottom(beatEffectBottomOverflow);
-            }
-        }
 
         this.registerOverflowTop(whammyOffset);
 

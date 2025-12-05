@@ -131,12 +131,15 @@ export class BarRendererBase {
     public height: number = 0;
     public index: number = 0;
     private _contentTopOverflow: number = 0;
+    private _contentBottomOverflow: number = 0;
+
+    public beatEffectsMinY = Number.NaN;
+    public beatEffectsMaxY = Number.NaN;
 
     public get topOverflow() {
         return this._contentTopOverflow + this.topEffects.height;
     }
 
-    private _contentBottomOverflow: number = 0;
     public get bottomOverflow() {
         return this._contentBottomOverflow + this.bottomEffects.height;
     }
@@ -174,6 +177,18 @@ export class BarRendererBase {
 
     public get middleYPosition(): number {
         return 0;
+    }
+
+    public registerBeatEffectOverflows(beatEffectsMinY: number, beatEffectsMaxY: number) {
+        const currentBeatEffectsMinY = this.beatEffectsMinY;
+        if (Number.isNaN(currentBeatEffectsMinY) || beatEffectsMinY < currentBeatEffectsMinY) {
+            this.beatEffectsMinY = beatEffectsMinY;
+        }
+
+        const currentBeatEffectsMaxY = this.beatEffectsMaxY;
+        if (Number.isNaN(currentBeatEffectsMaxY) || beatEffectsMaxY > currentBeatEffectsMaxY) {
+            this.beatEffectsMaxY = beatEffectsMaxY;
+        }
     }
 
     public registerOverflowTop(topOverflow: number): boolean {
@@ -427,7 +442,7 @@ export class BarRendererBase {
 
         this.calculateOverflows();
     }
-    
+
     protected calculateOverflows() {
         const rendererBottom = this.height;
 
@@ -457,6 +472,22 @@ export class BarRendererBase {
                 if (bottomY > rendererBottom) {
                     this.registerOverflowBottom(bottomY - rendererBottom);
                 }
+            }
+        }
+
+        const beatEffectsMinY = this.beatEffectsMinY;
+        if (beatEffectsMinY !== null) {
+            const beatEffectTopOverflow = -beatEffectsMinY;
+            if (beatEffectTopOverflow > 0) {
+                this.registerOverflowTop(beatEffectTopOverflow);
+            }
+        }
+
+        const beatEffectsMaxY = this.beatEffectsMaxY;
+        if (beatEffectsMaxY !== null) {
+            const beatEffectBottomOverflow = beatEffectsMaxY - rendererBottom;
+            if (beatEffectBottomOverflow > 0) {
+                this.registerOverflowBottom(beatEffectBottomOverflow);
             }
         }
     }
