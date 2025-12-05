@@ -236,7 +236,7 @@ export class MidiFileSequencer {
         let metronomeCount: number = 0;
         let metronomeLengthInTicks: number = 0;
         let metronomeLengthInMillis: number = 0;
-        let metronomeTick: number = 0;
+        let metronomeTick: number = midiFile.tickShift; // shift metronome to content
         let metronomeTime: number = 0.0;
 
         let previousTick: number = 0;
