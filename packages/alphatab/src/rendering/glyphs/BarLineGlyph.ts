@@ -308,8 +308,12 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
 
         // round up to have pixel-aligned bar lines, x-shift will be used during rendering
         // to avoid shifting again all glyphs
-        const fullWidth= Math.ceil(this.width);;
-        const xShift = fullWidth - this.width;
+        let xShift = 0;
+        if (this._isRight) {
+            const fullWidth = Math.ceil(this.width);
+            xShift = fullWidth - this.width;
+            this.width = fullWidth;
+        }
 
         for (const g of this.glyphs!) {
             g.y = top;
@@ -317,7 +321,6 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
             g.height = h;
         }
         this.height = h;
-        this.width = fullWidth;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
