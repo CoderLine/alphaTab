@@ -8,7 +8,6 @@ import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import Split from 'split.js';
 import { setupControl } from './control';
 
-
 async function setupLspAlphaTexLanguageSupport(editor: monaco.editor.IStandaloneCodeEditor) {
     await basicEditorLspIntegration(
         editor,
@@ -94,6 +93,17 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
         automaticLayout: true
     });
 
+    let fromTex = true;
+    api.settings.exporter.comments = false;
+    api.settings.exporter.indent = 2;
+    api.scoreLoaded.on(score => {
+        if (!fromTex) {
+            const exporter = new alphaTab.exporter.AlphaTexExporter();
+            const tex = exporter.exportToString(score, api.settings);
+            editor.getModel()!.setValue(tex);
+        }
+    });
+
     function loadTex(tex: string) {
         const importer = new alphaTab.importer.AlphaTexImporter();
         importer.initFromString(tex, api.settings);
@@ -105,7 +115,9 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
         }
 
         sessionStorage.setItem('alphatex-editor.code', tex);
+        fromTex = true;
         api.renderTracks(score.tracks);
+        fromTex = false;
     }
 
     editor.onDidChangeModelContent(() => {
