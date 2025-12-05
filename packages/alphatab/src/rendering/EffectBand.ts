@@ -45,7 +45,7 @@ export class EffectBand extends Glyph {
         }
     }
 
-    public finalize() {
+    public finalizeBand() {
         this.info.finalizeBand(this);
     }
 

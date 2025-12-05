@@ -3,10 +3,10 @@
 /// <summary>
 /// A mixed-type array tuple (like <code>[string, number]</code> in JavaScript).
 /// </summary>
-public readonly struct ArrayTuple<T0, T1>
+public struct ArrayTuple<T0, T1>
 {
-    public T0 V0 { get; }
-    public T1 V1 { get; }
+    public T0 V0 { get; set; }
+    public T1 V1 { get; set;}
 
     public ArrayTuple(T0 v0, T1 v1)
     {

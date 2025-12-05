@@ -126,7 +126,7 @@ export class EffectBandContainer {
             for (const band of slot.bands) {
                 band.y = y;
                 if (finalize) {
-                    band.finalize();
+                    band.finalizeBand();
                 }
                 band.height = slot.shared.height;
             }

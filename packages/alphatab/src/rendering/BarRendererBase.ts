@@ -476,7 +476,7 @@ export class BarRendererBase {
         }
 
         const beatEffectsMinY = this.beatEffectsMinY;
-        if (beatEffectsMinY !== null) {
+        if (!Number.isNaN(beatEffectsMinY)) {
             const beatEffectTopOverflow = -beatEffectsMinY;
             if (beatEffectTopOverflow > 0) {
                 this.registerOverflowTop(beatEffectTopOverflow);
@@ -484,7 +484,7 @@ export class BarRendererBase {
         }
 
         const beatEffectsMaxY = this.beatEffectsMaxY;
-        if (beatEffectsMaxY !== null) {
+        if (!Number.isNaN(beatEffectsMaxY)) {
             const beatEffectBottomOverflow = beatEffectsMaxY - rendererBottom;
             if (beatEffectBottomOverflow > 0) {
                 this.registerOverflowBottom(beatEffectBottomOverflow);
