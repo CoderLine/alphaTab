@@ -58,7 +58,12 @@ export class EffectBandContainer {
     public createVoiceGlyphs(voice: Voice) {
         let i = 0;
         const renderer = this._renderer;
+        const notationSettings = renderer.settings.notation;
         for (const info of this.infos) {
+            if (!notationSettings.isNotationElementVisible(info.effect.notationElement)) {
+                continue;
+            }
+
             let band: EffectBand | undefined = undefined;
 
             for (const b of voice.beats) {
