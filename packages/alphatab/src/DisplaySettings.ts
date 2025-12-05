@@ -220,9 +220,9 @@ export class DisplaySettings {
      * The bottom padding applied to the last system.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `0`
+     * @defaultValue `5`
      */
-    public lastSystemPaddingBottom: number = 0;
+    public lastSystemPaddingBottom: number = 5;
 
     /**
      * The padding left to the track name label of the system.

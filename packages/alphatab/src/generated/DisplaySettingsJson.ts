@@ -180,21 +180,21 @@ export interface DisplaySettingsJson {
      * The top padding applied systems beside the first one.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `0`
+     * @defaultValue `10`
      */
     systemPaddingTop?: number;
     /**
      * The bottom padding applied to systems beside the last one.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `0`
+     * @defaultValue `10`
      */
     systemPaddingBottom?: number;
     /**
      * The bottom padding applied to the last system.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `0`
+     * @defaultValue `5`
      */
     lastSystemPaddingBottom?: number;
     /**
@@ -243,7 +243,7 @@ export interface DisplaySettingsJson {
      * The bottom padding applied to main notation staves (standard, tabs, numbered, slash).
      * @since 1.4.0
      * @category Display
-     * @defaultValue `5`
+     * @defaultValue `0`
      */
     notationStaffPaddingBottom?: number;
     /**
