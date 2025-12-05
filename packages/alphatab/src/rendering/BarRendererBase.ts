@@ -260,7 +260,7 @@ export class BarRendererBase {
         return !this.bar || this.bar.index === this.scoreRenderer.layout!.lastBarIndex;
     }
 
-    public registerLayoutingInfo(): void {
+    public _registerLayoutingInfo(): void {
         const info: BarLayoutingInfo = this.layoutingInfo;
         const preSize: number = this._preBeatGlyphs.width;
         if (info.preBeatSize < preSize) {
@@ -424,6 +424,8 @@ export class BarRendererBase {
         }
 
         this.createPostBeatGlyphs();
+
+        this._registerLayoutingInfo();
 
         // registering happened during creation
         this.topEffects.sizeAndAlignEffectBands(false);
@@ -729,7 +731,7 @@ export class BarRendererBase {
             this._postBeatGlyphs.doLayout();
         }
 
-        this.registerLayoutingInfo();
+        this._registerLayoutingInfo();
         this.calculateOverflows(0, this.height);
     }
 

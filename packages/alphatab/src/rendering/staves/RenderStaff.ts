@@ -138,7 +138,6 @@ export class RenderStaff {
         renderer.index = this.barRenderers.length;
         renderer.layoutingInfo = layoutingInfo;
         renderer.doLayout();
-        renderer.registerLayoutingInfo();
 
         // For cases like in the horizontal layout we need to set the fixed width early
         // to have correct partials splitting

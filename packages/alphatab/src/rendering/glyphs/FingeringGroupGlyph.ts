@@ -138,14 +138,14 @@ export class FingeringGroupGlyph extends GlyphGroup {
 
     private _addFinger(note: Note, symbol: MusicFontSymbol) {
         const sr = this.renderer as ScoreBarRenderer;
-        const line: number = sr.getNoteSteps(note);
+        const steps: number = sr.getNoteSteps(note);
 
-        if (!this._infos.has(line)) {
-            const info = new FingeringInfo(line, [symbol]);
+        if (!this._infos.has(steps)) {
+            const info = new FingeringInfo(steps, [symbol]);
             info.color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.StandardNotationEffects, note);
-            this._infos.set(line, info);
+            this._infos.set(steps, info);
         } else {
-            const info = this._infos.get(line)!;
+            const info = this._infos.get(steps)!;
             info.symbols.push(symbol);
         }
     }
