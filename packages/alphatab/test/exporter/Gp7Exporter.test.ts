@@ -78,7 +78,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('visual-layout', async () => {
-        await testRoundTripFolderEqual('visual-tests/layout');
+        await testRoundTripFolderEqual('visual-tests/layout', ['extended-barlines.xml']);
     });
 
     it('visual-music-notation', async () => {

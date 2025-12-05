@@ -138,7 +138,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
         // during system fitting it can happen that we have fraction widths
         // but to have lines until the full end-pixel we round up.
-        // this way we avoid holes
+        // this way we avoid holes, 
         const lineWidth = this.width;
 
         // we want the lines to be exactly virtually aligned with the respective Y-position
@@ -612,7 +612,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     protected override createPreBeatGlyphs(): void {
         super.createPreBeatGlyphs();
-        this.addPreBeatGlyph(new BarLineGlyph(false));
+        this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         this.createLinePreBeatGlyphs();
         this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
     }
@@ -623,7 +623,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         super.createPostBeatGlyphs();
         const lastBar = this.lastBar;
 
-        this.addPostBeatGlyph(new BarLineGlyph(true));
+        this.addPostBeatGlyph(new BarLineGlyph(true, this.bar.staff.track.score.stylesheet.extendBarLines));
 
         if (lastBar.masterBar.isRepeatEnd && lastBar.masterBar.repeatCount > 2) {
             this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getLineHeight(-0.5), this.bar.masterBar.repeatCount));

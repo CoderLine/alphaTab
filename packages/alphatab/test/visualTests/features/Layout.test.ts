@@ -159,4 +159,11 @@ describe('LayoutTests', () => {
             o.runs[0].referenceFileName = 'test-data/visual-tests/layout/multibar-rest-all-tracks.png';
         });
     });
+
+    it('extended-barlines', async () => {
+        await VisualTestHelper.runVisualTest('layout/extended-barlines.xml', undefined, o => {
+            o.score.stylesheet.extendBarLines = true;
+            o.tracks = [0, 1];
+        });
+    });
 });

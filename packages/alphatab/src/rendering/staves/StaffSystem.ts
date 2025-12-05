@@ -118,7 +118,6 @@ class SimilarInstrumentSystemBracket extends SingleTrackSystemBracket {
  * @internal
  */
 export class StaffSystem {
-    private _allStaves: RenderStaff[] = [];
 
     private _accoladeSpacingCalculated: boolean = false;
 
@@ -158,6 +157,7 @@ export class StaffSystem {
 
     public topPadding: number;
     public bottomPadding: number;
+    public allStaves: RenderStaff[] = [];
 
     public constructor(layout: ScoreLayout) {
         this.layout = layout;
@@ -242,8 +242,8 @@ export class StaffSystem {
             this.masterBarsRenderers.splice(this.masterBarsRenderers.length - 1, 1);
             let width: number = 0;
             let barDisplayScale: number = 0;
-            for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
-                const s: RenderStaff = this._allStaves[i];
+            for (let i: number = 0, j: number = this.allStaves.length; i < j; i++) {
+                const s: RenderStaff = this.allStaves[i];
                 const lastBar: BarRendererBase = s.revertLastBar();
                 const computedWidth = lastBar.computedWidth;
                 if (computedWidth > width) {
@@ -265,8 +265,8 @@ export class StaffSystem {
     private _updateWidthFromLastBar(): number {
         let realWidth: number = 0;
         let barDisplayScale: number = 0;
-        for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
-            const s: RenderStaff = this._allStaves[i];
+        for (let i: number = 0, j: number = this.allStaves.length; i < j; i++) {
+            const s: RenderStaff = this.allStaves[i];
 
             const last = s.barRenderers[s.barRenderers.length - 1];
             last.applyLayoutingInfo();
@@ -376,7 +376,7 @@ export class StaffSystem {
             // - requires a feature to draw glyphs with a max-width or a horizontal stretch scale
 
             let currentY: number = 0;
-            for (const staff of this._allStaves) {
+            for (const staff of this.allStaves) {
                 staff.y = currentY;
                 staff.calculateHeightForAccolade();
                 currentY += staff.height;
@@ -414,8 +414,8 @@ export class StaffSystem {
         }
         staff.staffTrackGroup = group;
         staff.system = this;
-        staff.index = this._allStaves.length;
-        this._allStaves.push(staff);
+        staff.index = this.allStaves.length;
+        this.allStaves.push(staff);
         group.addStaff(staff);
 
         let bracket = this._brackets.find(b => b.includesStaff(staff));
@@ -453,8 +453,8 @@ export class StaffSystem {
     }
 
     public scaleToWidth(width: number): void {
-        for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
-            this._allStaves[i].scaleToWidth(width);
+        for (let i: number = 0, j: number = this.allStaves.length; i < j; i++) {
+            this.allStaves[i].scaleToWidth(width);
         }
         this.width = width;
     }
@@ -471,7 +471,7 @@ export class StaffSystem {
             using _ = ElementStyleHelper.track(
                 canvas,
                 TrackSubElement.SystemSeparator,
-                this._allStaves[0].modelStaff.track
+                this.allStaves[0].modelStaff.track
             );
 
             // NOTE: the divider is currently not "nicely" centered between the systems as this would lead to cropping
@@ -499,8 +499,8 @@ export class StaffSystem {
     }
 
     public paintPartial(cx: number, cy: number, canvas: ICanvas, startIndex: number, count: number): void {
-        for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
-            this._allStaves[i].paint(cx, cy, canvas, startIndex, count);
+        for (let i: number = 0, j: number = this.allStaves.length; i < j; i++) {
+            this.allStaves[i].paint(cx, cy, canvas, startIndex, count);
         }
         const res: RenderingResources = this.layout.renderer.settings.display.resources;
 
@@ -612,9 +612,10 @@ export class StaffSystem {
                 }
             }
 
-            if (this._allStaves.length > 0) {
+            const needsSystemBarLine = !this.layout.renderer.score!.stylesheet.extendBarLines;
+            if (this.allStaves.length > 0 && needsSystemBarLine) {
                 let previousStaffInBracket: RenderStaff | null = null;
-                for (const s of this._allStaves) {
+                for (const s of this.allStaves) {
                     if (previousStaffInBracket !== null) {
                         const previousBottom = previousStaffInBracket.contentBottom;
                         const thisTop = s.contentTop;
@@ -722,7 +723,7 @@ export class StaffSystem {
 
         let previousStaff: RenderStaff | undefined = undefined;
 
-        for (const staff of this._allStaves) {
+        for (const staff of this.allStaves) {
             // check if we need "in-between padding"
             if (previousStaff !== undefined && previousStaff!.trackIndex !== staff.trackIndex) {
                 currentY += settings.display.trackStaffPaddingBetween;
@@ -761,8 +762,8 @@ export class StaffSystem {
         if (this.layout.renderer.boundsLookup!.isFinished) {
             return;
         }
-        const firstStaff = this._allStaves[0];
-        const lastStaff = this._allStaves[this._allStaves.length - 1];
+        const firstStaff = this.allStaves[0];
+        const lastStaff = this.allStaves[this.allStaves.length - 1];
 
         cy += this.topPadding;
 
@@ -831,11 +832,11 @@ export class StaffSystem {
     }
 
     public getBarX(index: number): number {
-        if (this._allStaves.length === 0 || this.layout.renderer.tracks!.length === 0) {
+        if (this.allStaves.length === 0 || this.layout.renderer.tracks!.length === 0) {
             return 0;
         }
         const bar: Bar = this.layout.renderer.tracks![0].staves[0].bars[index];
-        const renderer: BarRendererBase = this.layout.getRendererForBar(this._allStaves[0].staffId, bar)!;
+        const renderer: BarRendererBase = this.layout.getRendererForBar(this.allStaves[0].staffId, bar)!;
         return renderer.x;
     }
 }

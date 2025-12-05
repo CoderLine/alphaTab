@@ -57,6 +57,7 @@ export class RenderStylesheetSerializer {
                 a.push(v);
             }
         }
+        o.set("extendbarlines", obj.extendBarLines);
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
@@ -111,6 +112,9 @@ export class RenderStylesheetSerializer {
                 return true;
             case "pertrackmultibarrest":
                 obj.perTrackMultiBarRest = new Set<number>(v as number[]);
+                return true;
+            case "extendbarlines":
+                obj.extendBarLines = v! as boolean;
                 return true;
         }
         return false;
