@@ -309,7 +309,7 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
         // round up to have pixel-aligned bar lines, x-shift will be used during rendering
         // to avoid shifting again all glyphs
         let xShift = 0;
-        if (this._isRight) {
+        if (this._extendToNextStaff && this._isRight) {
             const fullWidth = Math.ceil(this.width);
             xShift = fullWidth - this.width;
             this.width = fullWidth;
@@ -320,7 +320,6 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
             g.x += xShift;
             g.height = h;
         }
-        this.height = h;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -337,15 +336,21 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
         let actualLineHeight = this.height;
         const thisStaff = renderer.staff;
         const allStaves = renderer.staff.system.allStaves;
+        let isExtended = false;
         if (this._extendToNextStaff && thisStaff.index < allStaves.length - 1) {
             const nextStaff = allStaves[thisStaff.index + 1];
             const lineTop = thisStaff.y + renderer.y;
             const lineBottom = nextStaff.y + nextStaff.topOverflow + renderer.smuflMetrics.staffLineThickness;
             actualLineHeight = lineBottom - lineTop;
+            isExtended = true;
         }
 
         for (const line of lines) {
-            (line as BarLineGlyphBase).paintExtended(cx, cy, canvas, actualLineHeight);
+            if (isExtended) {
+                (line as BarLineGlyphBase).paintExtended(cx, cy, canvas, actualLineHeight);
+            } else {
+                (line as BarLineGlyphBase).paint(cx, cy, canvas);
+            }
         }
     }
 }

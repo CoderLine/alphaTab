@@ -215,7 +215,7 @@ export class BarRendererBase {
         for (const container of this._voiceContainers.values()) {
             container.scaleToWidth(containerWidth);
         }
-        this._postBeatGlyphs.x = Math.ceil(this._preBeatGlyphs.x + this._preBeatGlyphs.width + containerWidth);
+        this._postBeatGlyphs.x = this._preBeatGlyphs.x + this._preBeatGlyphs.width + containerWidth;
         this.width = width;
 
         this.topEffects.alignGlyphs();
@@ -274,7 +274,7 @@ export class BarRendererBase {
                 postBeatStart = x;
             }
         }
-        const postSize: number = Math.ceil(this._postBeatGlyphs.width);
+        const postSize: number = this._postBeatGlyphs.width;
         if (info.postBeatSize < postSize) {
             info.postBeatSize = postSize;
         }
