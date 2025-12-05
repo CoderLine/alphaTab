@@ -1863,7 +1863,7 @@ describe('MidiFileGeneratorTest', () => {
         generator.generate();
 
         expect(handler.tickShift).to.equal(120);
-        const firstNote = handler.midiEvents.find(e => e instanceof FlatNoteEvent)!;
+        const firstNote = handler.midiEvents.find(e => e instanceof FlatNoteEvent) as FlatNoteEvent;
         expect(firstNote.tick).to.equal(-120);
     });
 
@@ -1878,7 +1878,7 @@ describe('MidiFileGeneratorTest', () => {
         generator.generate();
 
         expect(handler.tickShift).to.equal(120);
-        const firstNote = file.events.find(e => e instanceof NoteOnEvent)!;
+        const firstNote = file.events.find(e => e instanceof NoteOnEvent) as NoteOnEvent;
         expect(firstNote.tick).to.equal(0);
     });
 
