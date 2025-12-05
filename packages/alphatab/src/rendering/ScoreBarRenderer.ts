@@ -98,14 +98,12 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return super.getLineHeight(steps / 2);
     }
 
-    protected override calculateOverflows(): void {
-        super.calculateOverflows();
+    protected override calculateOverflows(rendererTop: number, rendererBottom: number): void {
+        super.calculateOverflows(rendererTop, rendererBottom);
         if (this.bar.isEmpty) {
             return;
         }
         
-        const top: number = this.getScoreY(0);
-        const bottom: number = this.getScoreY((this.heightLineCount - 1) * 2);
         const whammyOffset: number = this.simpleWhammyOverflow;
 
         this.registerOverflowTop(whammyOffset);
@@ -209,12 +207,12 @@ export class ScoreBarRenderer extends LineBarRenderer {
             }
         }
 
-        if (maxNoteY < top) {
+        if (maxNoteY < rendererTop) {
             this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
         }
 
-        if (minNoteY > bottom) {
-            this.registerOverflowBottom(Math.abs(minNoteY) - bottom);
+        if (minNoteY > rendererBottom) {
+            this.registerOverflowBottom(Math.abs(minNoteY) - rendererBottom);
         }
     }
 

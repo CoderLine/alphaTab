@@ -440,12 +440,10 @@ export class BarRendererBase {
 
         this.computedWidth = this.width;
 
-        this.calculateOverflows();
+        this.calculateOverflows(0, this.height);
     }
 
-    protected calculateOverflows() {
-        const rendererBottom = this.height;
-
+    protected calculateOverflows(_rendererTop: number, rendererBottom: number) {
         const preBeatGlyphs = this._preBeatGlyphs.glyphs;
         if (preBeatGlyphs) {
             for (const g of preBeatGlyphs) {
@@ -725,7 +723,7 @@ export class BarRendererBase {
         }
 
         this.registerLayoutingInfo();
-        this.calculateOverflows();
+        this.calculateOverflows(0, this.height);
     }
 
     protected recreatePreBeatGlyphs() {
