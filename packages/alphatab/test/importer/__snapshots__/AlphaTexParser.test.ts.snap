@@ -6370,18 +6370,18 @@ Score (1,1) -> (1,30) {
 `;
 
 exports[`AlphaTexParserTest valid-score-metadata known property before value 1`] = `
-Score (1,1) -> (1,30) {
+Score (1,1) -> (1,32) {
   bars: Array [
-    Bar (1,1) -> (1,30) {
+    Bar (1,1) -> (1,32) {
       metaData: Array [
-        Meta (1,1) -> (1,27) {
-          tag: Tag "track" (1,1) -> (1,7) {
+        Meta (1,1) -> (1,29) {
+          tag: Tag "chord" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
-            tag: Ident "track" (1,2) -> (1,7),
+            tag: Ident "chord" (1,2) -> (1,7),
           },
-          arguments: Arguments (1,22) -> (1,27) {
+          arguments: Arguments (1,24) -> (1,29) {
             arguments: Array [
-              String "Name" (1,22) -> (1,27) {
+              String "Name" (1,24) -> (1,29) {
                 parameterIndices: Map {
                   0 => 0,
                 },
@@ -6392,27 +6392,14 @@ Score (1,1) -> (1,30) {
             ],
             validated: true,
           },
-          properties: Props (1,8) -> (1,21) {
+          properties: Props (1,8) -> (1,23) {
             openBrace: LBrace (1,8) -> (1,9),
             properties: Array [
-              Prop (1,9) -> (1,19) {
-                property: Ident "color" (1,9) -> (1,14),
-                properties: Arguments (1,15) -> (1,19) {
-                  arguments: Array [
-                    String "red" (1,15) -> (1,19) {
-                      parameterIndices: Map {
-                        0 => 0,
-                      },
-                    },
-                  ],
-                  signatureCandidateIndices: Array [
-                    0,
-                  ],
-                  validated: true,
-                },
+              Prop (1,9) -> (1,22) {
+                property: Ident "showFingering" (1,9) -> (1,22),
               },
             ],
-            closeBrace: RBrace (1,20) -> (1,21),
+            closeBrace: RBrace (1,22) -> (1,23),
           },
         },
       ],
@@ -6500,6 +6487,58 @@ Score (1,1) -> (1,19) {
 exports[`AlphaTexParserTest valid-score-metadata known valuelist: lexer-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata known valuelist: parser-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest valid-score-metadata notelist after props 1`] = `
+Score (1,1) -> (1,28) {
+  bars: Array [
+    Bar (1,1) -> (1,28) {
+      metaData: Array [
+        Meta (1,1) -> (1,16) {
+          tag: Tag "staff" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "staff" (1,2) -> (1,7),
+          },
+          properties: Props (1,8) -> (1,16) {
+            openBrace: LBrace (1,8) -> (1,9),
+            properties: Array [
+              Prop (1,10) -> (1,14) {
+                property: Ident "tabs" (1,10) -> (1,14),
+              },
+            ],
+            closeBrace: RBrace (1,15) -> (1,16),
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,17) -> (1,28) {
+          notes: NoteList (1,17) -> (1,26) {
+            openParenthesis: LParen (1,17) -> (1,18),
+            notes: Array [
+              Note (1,18) -> (1,21) {
+                noteValue: Number "3" (1,18) -> (1,19),
+                noteStringDot: Dot (1,19) -> (1,20),
+                noteString: Number "3" (1,20) -> (1,21),
+              },
+              Note (1,22) -> (1,25) {
+                noteValue: Number "3" (1,22) -> (1,23),
+                noteStringDot: Dot (1,23) -> (1,24),
+                noteString: Number "3" (1,24) -> (1,25),
+              },
+            ],
+            closeParenthesis: RParen (1,25) -> (1,26),
+          },
+          durationDot: Dot (1,26) -> (1,27),
+          durationValue: Number "2" (1,27) -> (1,28),
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParserTest valid-score-metadata notelist after props: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest valid-score-metadata notelist after props: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata unknown multiple 1`] = `
 Score (1,1) -> (1,43) {
