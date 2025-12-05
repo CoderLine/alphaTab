@@ -424,4 +424,10 @@ describe('Gp8ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Instrument)?.value).to.equal(25);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Bank)?.value).to.equal(256);
     });
+
+    it('extend-bar-lines', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/extended-barlines.gp')).readScore();
+
+        expect(score.stylesheet.extendBarLines).to.be.true;
+    });
 });

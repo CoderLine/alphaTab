@@ -218,6 +218,10 @@ export class BinaryStylesheet {
                         score.stylesheet.otherSystemsTrackNameOrientation = TrackNameOrientation.Vertical;
                     }
                     break;
+                case 'System/ExtendedBarLines':
+                    score.stylesheet.extendBarLines = value as boolean;
+                    break;
+
                 case 'Header/Title':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).template = value as string;
                     break;
@@ -516,6 +520,8 @@ export class BinaryStylesheet {
                 binaryStylesheet.addValue('System/horizontalTrackNameOnOtherSystems', false, DataType.Boolean);
                 break;
         }
+
+        binaryStylesheet.addValue('System/ExtendedBarLines', score.stylesheet.extendBarLines, DataType.Boolean);
 
         const scoreStyle = score.style;
         if (scoreStyle) {
