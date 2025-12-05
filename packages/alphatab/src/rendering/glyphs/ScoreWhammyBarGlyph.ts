@@ -25,11 +25,33 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
     private _beat: Beat;
     private _endGlyph: BendNoteHeadGroupGlyph | null = null;
 
-    public readonly checkForOverflow = false; // TODO: check if this needs handling
+    public readonly checkForOverflow = false;
 
     public constructor(beat: Beat) {
         super(0, 0);
         this._beat = beat;
+    }
+
+    public get hasBoundingBox():boolean {
+        const endGlyph = this._endGlyph;
+        if(!endGlyph){
+            return false;
+        }
+        return !!endGlyph.minNote && !!endGlyph.maxNote;
+    }
+
+    public override getBoundingBoxTop(): number {
+        if (this._endGlyph?.minNote) {
+            return this._endGlyph.minNote.glyph.getBoundingBoxTop();
+        }
+        return super.getBoundingBoxTop();
+    }
+
+    public override getBoundingBoxBottom(): number {
+        if (this._endGlyph?.maxNote) {
+            return this._endGlyph.maxNote.glyph.getBoundingBoxBottom();
+        }
+        return super.getBoundingBoxBottom();
     }
 
     public override doLayout(): void {
@@ -104,6 +126,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
             case WhammyType.Predive:
                 break;
         }
+
         super.doLayout();
     }
 

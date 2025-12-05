@@ -43,6 +43,7 @@ import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNo
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;
     private _skipPaint: boolean = false;
+    private _whammy?: ScoreWhammyBarGlyph;
 
     public noteHeads: ScoreNoteChordGlyph | null = null;
     public restGlyph: ScoreRestGlyph | null = null;
@@ -62,23 +63,31 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     public override getBoundingBoxTop(): number {
+        let y = this.y;
         if (this.noteHeads) {
-            return this.noteHeads.getBoundingBoxTop();
+            y = this.noteHeads.getBoundingBoxTop();
+        } else if (this.restGlyph) {
+            y = this.restGlyph.getBoundingBoxTop();
         }
-        if (this.restGlyph) {
-            return this.restGlyph.getBoundingBoxTop();
+
+        if (this._whammy?.hasBoundingBox) {
+            y = Math.min(y, this._whammy.getBoundingBoxTop());
         }
-        return this.y;
+        return y;
     }
 
     public override getBoundingBoxBottom(): number {
+        let y = this.y + this.height;
         if (this.noteHeads) {
-            return this.noteHeads.getBoundingBoxBottom();
+            y = this.noteHeads.getBoundingBoxBottom();
+        } else if (this.restGlyph) {
+            y = this.restGlyph.getBoundingBoxBottom();
         }
-        if (this.restGlyph) {
-            return this.restGlyph.getBoundingBoxBottom();
+
+        if (this._whammy?.hasBoundingBox) {
+            y = Math.max(y, this._whammy.getBoundingBoxBottom());
         }
-        return this.y + this.height;
+        return y;
     }
 
     public override getLowestNoteY(): number {
@@ -155,9 +164,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 // Whammy Bar
                 if (this.container.beat.hasWhammyBar) {
                     const whammy: ScoreWhammyBarGlyph = new ScoreWhammyBarGlyph(this.container.beat);
+                    this._whammy = whammy;
                     whammy.renderer = this.renderer;
                     whammy.doLayout();
-                    this.container.ties.push(whammy);
+                    this.container.addTie(whammy);
                 }
                 //
                 // Note dots

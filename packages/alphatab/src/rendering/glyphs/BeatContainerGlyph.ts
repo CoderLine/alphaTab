@@ -21,11 +21,11 @@ import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
  * @internal
  */
 export class BeatContainerGlyph extends Glyph {
+    private _ties: ITieGlyph[] = [];
     public voiceContainer: VoiceContainerGlyph;
     public beat: Beat;
     public preNotes!: BeatGlyphBase;
     public onNotes!: BeatOnNoteGlyphBase;
-    public ties: ITieGlyph[] = [];
     public minWidth: number = 0;
 
     public get onTimeX(): number {
@@ -35,14 +35,14 @@ export class BeatContainerGlyph extends Glyph {
     public constructor(beat: Beat, voiceContainer: VoiceContainerGlyph) {
         super(0, 0);
         this.beat = beat;
-        this.ties = [];
+        this._ties = [];
         this.voiceContainer = voiceContainer;
     }
 
     public addTie(tie: ITieGlyph) {
         const tg = tie as unknown as Glyph;
         tg.renderer = this.renderer;
-        this.ties.push(tie);
+        this._ties.push(tie);
         this.renderer.registerTie(tie);
     }
 
@@ -72,7 +72,7 @@ export class BeatContainerGlyph extends Glyph {
             postBeatStretch +=
                 this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
         }
-        for (const tie of this.ties) {
+        for (const tie of this._ties) {
             const tg = tie as unknown as Glyph;
             postBeatStretch += tg.width;
         }
@@ -118,7 +118,7 @@ export class BeatContainerGlyph extends Glyph {
             }
         }
         let tieWidth: number = 0;
-        for (const tie of this.ties) {
+        for (const tie of this._ties) {
             const tg = tie as unknown as Glyph;
             if (tg.width > tieWidth) {
                 tieWidth = tg.width;
@@ -184,7 +184,7 @@ export class BeatContainerGlyph extends Glyph {
         // }
         // canvas.color = c;
 
-        const isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && this.ties.length === 0;
+        const isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && this._ties.length === 0;
         if (isEmptyGlyph) {
             return;
         }
@@ -196,8 +196,8 @@ export class BeatContainerGlyph extends Glyph {
         // reason: we have possibly multiple staves involved and need to calculate the correct positions.
         const staffX: number = cx - this.voiceContainer.x - this.renderer.x;
         const staffY: number = cy - this.voiceContainer.y - this.renderer.y;
-        for (let i: number = 0, j: number = this.ties.length; i < j; i++) {
-            const t = this.ties[i] as unknown as Glyph;
+        for (let i: number = 0, j: number = this._ties.length; i < j; i++) {
+            const t = this._ties[i] as unknown as Glyph;
             t.renderer = this.renderer;
             t.paint(staffX, staffY, canvas);
         }
