@@ -439,7 +439,7 @@ export class BarRendererBase {
                     this.registerOverflowTop(topY * -1);
                 }
 
-                const bottomY = topY + g.height;
+                const bottomY = g.getBoundingBoxBottom();
                 if (bottomY > rendererBottom) {
                     this.registerOverflowBottom(bottomY - rendererBottom);
                 }
@@ -453,7 +453,7 @@ export class BarRendererBase {
                     this.registerOverflowTop(topY * -1);
                 }
 
-                const bottomY = topY + g.height;
+                const bottomY = g.getBoundingBoxBottom();
                 if (bottomY > rendererBottom) {
                     this.registerOverflowBottom(bottomY - rendererBottom);
                 }
