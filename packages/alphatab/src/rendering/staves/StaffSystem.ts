@@ -612,7 +612,8 @@ export class StaffSystem {
                 }
             }
 
-            if (this.allStaves.length > 0) {
+            const needsSystemBarLine = !this.layout.renderer.score!.stylesheet.extendBarLines;
+            if (this.allStaves.length > 0 && needsSystemBarLine) {
                 let previousStaffInBracket: RenderStaff | null = null;
                 for (const s of this.allStaves) {
                     if (previousStaffInBracket !== null) {
