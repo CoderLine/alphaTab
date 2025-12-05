@@ -306,7 +306,8 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
             this._paintBendLines(canvas, startX, topY, endX, startNoteRenderer, note, renderPoints);
             this._paintBendVibrato(
                 canvas,
-                endX - tabBendArrowSize * 0.5,
+                cx,
+                endX + tabBendArrowSize / 2,
                 topY - smufl.tabBendPerValueHeight * renderPoints[renderPoints.length - 1].lineValue,
                 endNoteRenderer,
                 endNote
@@ -319,16 +320,20 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
     private _paintBendVibrato(
         canvas: ICanvas,
         cx: number,
-        cy: number,
+        vibratoX: number,
+        topY: number,
         endNoteRenderer: BarRendererBase,
         endNote: Note
     ) {
         if (endNote.isTieDestination && endNote.vibrato !== VibratoType.None && !endNote.hasBend) {
-            const vibrato = new NoteVibratoGlyph(0, 0, endNote.vibrato);
+            const vibratoEndX = cx + endNoteRenderer.x;
+            const vibratoStartX = vibratoX - vibratoEndX;
+            const vibrato = new NoteVibratoGlyph(vibratoStartX, 0, endNote.vibrato);
+
             vibrato.beat = endNote.beat;
             vibrato.renderer = endNoteRenderer;
             vibrato.doLayout();
-            vibrato.paint(cx, cy, canvas);
+            vibrato.paint(vibratoEndX, topY, canvas);
         }
     }
 
@@ -465,7 +470,15 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
             this._paintBendLineArrow(canvas, x2, y2, y1, arrowSize, up);
 
             this._paintBendLineSlurText(canvas, x1, y1, x2, y2, note, res.graceFont);
-            this._paintBendLineValueText(canvas, y1, x2, y2 - smufl.tabBendLabelPadding, firstPt, secondPt, res.tablatureFont);
+            this._paintBendLineValueText(
+                canvas,
+                y1,
+                x2,
+                y2 - smufl.tabBendLabelPadding,
+                firstPt,
+                secondPt,
+                res.tablatureFont
+            );
         }
     }
 
