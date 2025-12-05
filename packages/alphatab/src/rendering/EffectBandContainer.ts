@@ -65,6 +65,7 @@ export class EffectBandContainer {
             }
 
             let band: EffectBand | undefined = undefined;
+            this._effectInfosSortOrder.set(info.effect, info.order ?? i);
 
             for (const b of voice.beats) {
                 // lazy create band to avoid creating and managing bands for all events
@@ -75,7 +76,6 @@ export class EffectBandContainer {
                     band.doLayout();
                     this._bands.push(band);
                     this._bandLookup.set(`${voice.index}.${info.effect.effectId}`, band);
-                    this._effectInfosSortOrder.set(info.effect, info.order ?? i);
                 }
 
                 if (band !== undefined) {
