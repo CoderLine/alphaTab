@@ -370,7 +370,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         g0.x = endX - g0.noteHeadOffset;
                         g0.y = cy + startNoteRenderer.y;
                         g0.paint(0, 0, canvas);
-                        endY = g0.getNoteValueY(endValue) + heightOffset;
                         this.drawBendSlur(
                             canvas,
                             startX,

@@ -52,8 +52,16 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         // this logic is similar to the actual drawing but more lightweight,
         // until we rework how we handle ties this is a good estimate
         for (const note of this._notes) {
-            if (note.isTieOrigin || note.bendType === BendType.Custom) {
+            if (note.isTieOrigin) {
                 continue;
+            }
+
+            // no helper notes created in addbends for these:
+            switch(note.bendType){
+                case BendType.Custom:
+                case BendType.Prebend:
+                case BendType.Hold:
+                    continue;
             }
 
             // at this point in time the beats have not been timely-positioned yet,
@@ -65,8 +73,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
             let endX: number = 0;
             switch (note.bendType) {
                 case BendType.Bend:
-                case BendType.Hold:
-                case BendType.Prebend:
                 case BendType.PrebendBend:
                     endY = this._endNoteGlyph!.minNote!.glyph.getBoundingBoxTop();
                     endX = width;
