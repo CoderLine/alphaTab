@@ -166,6 +166,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'showdynamics':
                 score.stylesheet.hideDynamics = false;
                 return ApplyNodeResult.Applied;
+            case 'extendbarlines':
+                score.stylesheet.extendBarLines = true;
+                return ApplyNodeResult.Applied;
             case 'bracketextendmode':
                 const bracketExtendMode = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
@@ -2463,6 +2466,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     AlphaTex1EnumMappings.trackNameOrientationReversed.get(stylesheet.otherSystemsTrackNameOrientation)!
                 )
             );
+        }
+
+        if (stylesheet.extendBarLines) {
+            nodes.push(Atnf.meta('extendBarLines'));
         }
 
         // Unsupported:

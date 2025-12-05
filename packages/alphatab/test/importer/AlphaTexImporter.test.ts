@@ -51,6 +51,7 @@ import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 import { assert, expect } from 'chai';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 
 describe('AlphaTexImporterTest', () => {
     /**
@@ -2457,5 +2458,36 @@ describe('AlphaTexImporterTest', () => {
         });
 
         // - with instrument already specified
+    });
+
+    it('extend-bar-lines', () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            \\extendBarLines
+            \\track "Piano1"
+              \\staff {score}
+            \\instrument piano
+              C4 D4 E4 F4
+              \\staff {score}
+              \\clef f4 C3 D3 E3 F3
+            \\track "Piano2"
+              \\staff {score}
+            \\instrument piano
+              C4 D4 E4 F4
+            \\track "Flute 1"
+              \\staff { score }
+            \\instrument flute
+              C4 D4 E4 F4
+            \\track "Flute 2"
+              \\staff { score }
+            \\instrument flute
+              \\clef f4 C3 D3 E3 F3
+            \\track "Guitar 1"
+              \\staff { score tabs }
+              0.3.4 2.3.4 5.3.4 7.3.4
+        `);
+
+        expect(score.stylesheet.extendBarLines).to.be.true;
+
+        testExportRoundtrip(score);
     });
 });

@@ -188,7 +188,8 @@ export class AlphaTex1LanguageDefinitions {
         ['firstsystemtracknamemode', [[[[10, 17], 0, ['fullname', 'shortname']]]]],
         ['othersystemstracknamemode', [[[[10, 17], 0, ['fullname', 'shortname']]]]],
         ['firstsystemtracknameorientation', [[[[10, 17], 0, ['horizontal', 'vertical']]]]],
-        ['othersystemstracknameorientation', [[[[10, 17], 0, ['horizontal', 'vertical']]]]]
+        ['othersystemstracknameorientation', [[[[10, 17], 0, ['horizontal', 'vertical']]]]],
+        ['extendbarlines', null]
     ]);
     public static readonly staffMetaDataSignatures = AlphaTex1LanguageDefinitions._signatures([
         ['tuning', [[[[10, 17], 0, ['piano', 'none', 'voice']]], [[[10, 17], 5]]]],
@@ -525,6 +526,7 @@ export class AlphaTex1LanguageDefinitions {
         ['othersystemstracknamemode', null],
         ['firstsystemtracknameorientation', null],
         ['othersystemstracknameorientation', null],
+        ['extendbarlines', null],
         [
             'tuning',
             [
