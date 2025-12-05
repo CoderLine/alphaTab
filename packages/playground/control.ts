@@ -251,13 +251,13 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
         console.error('alphaTab error', e);
     });
 
-    el.ondragover = e => {
+    document.ondragover = e => {
         e.stopPropagation();
         e.preventDefault();
         e.dataTransfer!.dropEffect = 'link';
     };
 
-    el.ondrop = e => {
+    document.ondrop = e => {
         e.stopPropagation();
         e.preventDefault();
         const files = e.dataTransfer!.files;
