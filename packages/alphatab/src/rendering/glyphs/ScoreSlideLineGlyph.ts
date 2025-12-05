@@ -10,16 +10,20 @@ import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/Be
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
 import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
+import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 
 /**
  * @internal
  */
-export class ScoreSlideLineGlyph extends Glyph {
+export class ScoreSlideLineGlyph extends Glyph implements ITieGlyph {
     private _outType: SlideOutType;
     private _inType: SlideInType;
     private _startNote: Note;
     private _parent: BeatContainerGlyph;
+
+     // the slide line cannot overflow anything and there are ties drawn in here
+    public readonly checkForOverflow = false;
 
     public constructor(inType: SlideInType, outType: SlideOutType, startNote: Note, parent: BeatContainerGlyph) {
         super(0, 0);

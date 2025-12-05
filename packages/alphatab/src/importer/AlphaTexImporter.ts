@@ -14,7 +14,7 @@ import {
     type AlphaTexScoreNode,
     type AlphaTexTextNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
-import { AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
+import { type AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import {
     AlphaTexAccidentalMode,
     type AlphaTexDiagnostic,

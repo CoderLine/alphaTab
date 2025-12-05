@@ -1,16 +1,17 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 import type { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import type { Settings } from '@coderline/alphatab/Settings';
-import type { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * A classes inheriting from this base can provide the
  * data needed by a EffectBarRenderer to create effect glyphs dynamically.
  * @internal
  */
-export abstract class EffectBarRendererInfo {
+export abstract class EffectInfo {
     /**
      * Gets the unique effect name for this effect. (Used for grouping)
      */
@@ -69,4 +70,17 @@ export abstract class EffectBarRendererInfo {
      * @returns true if the glyph can be expanded, false if a new glyph needs to be created.
      */
     public abstract canExpand(from: Beat, to: Beat): boolean;
+
+    /**
+     * Override this method to finalize an effect band with all glyphs created.
+     * Allows special layout logic like for whammys where we center-align the glyphs and size the band accordingly.
+     * @param _band The band which is being finalized.
+     */
+    public finalizeBand(_band: EffectBand): void {}
+
+    /**
+     * Override this method when glyphs are for this effect is being re-aligned during resizing.
+     * @param _band The band holding the glyph
+     */
+    public onAlignGlyphs(_band: EffectBand) {}
 }

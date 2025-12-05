@@ -3,7 +3,7 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@coderline/alphatab/rendering/glyphs/LineRangedGlyph';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { BarreShape } from '@coderline/alphatab/model/BarreShape';
@@ -11,7 +11,7 @@ import { BarreShape } from '@coderline/alphatab/model/BarreShape';
 /**
  * @internal
  */
-export class BeatBarreEffectInfo extends EffectBarRendererInfo {
+export class BeatBarreEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectLetRing;
     }

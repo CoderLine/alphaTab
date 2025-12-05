@@ -4,14 +4,14 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { OttavaGlyph } from '@coderline/alphatab/rendering/glyphs/OttavaGlyph';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
  */
-export class OttaviaEffectInfo extends EffectBarRendererInfo {
+export class OttaviaEffectInfo extends EffectInfo {
     private _aboveStaff: boolean;
 
     public override get effectId(): string {

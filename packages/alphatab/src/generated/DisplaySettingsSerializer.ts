@@ -42,6 +42,8 @@ export class DisplaySettingsSerializer {
         o.set("systemlabelpaddingleft", obj.systemLabelPaddingLeft);
         o.set("systemlabelpaddingright", obj.systemLabelPaddingRight);
         o.set("accoladebarpaddingright", obj.accoladeBarPaddingRight);
+        o.set("firstnotationstaffpaddingtop", obj.firstNotationStaffPaddingTop);
+        o.set("lastnotationstaffpaddingbottom", obj.lastNotationStaffPaddingBottom);
         o.set("notationstaffpaddingtop", obj.notationStaffPaddingTop);
         o.set("notationstaffpaddingbottom", obj.notationStaffPaddingBottom);
         o.set("effectstaffpaddingtop", obj.effectStaffPaddingTop);
@@ -49,6 +51,7 @@ export class DisplaySettingsSerializer {
         o.set("firststaffpaddingleft", obj.firstStaffPaddingLeft);
         o.set("staffpaddingleft", obj.staffPaddingLeft);
         o.set("effectbandpaddingbottom", obj.effectBandPaddingBottom);
+        o.set("trackstaffpaddingbetween", obj.trackStaffPaddingBetween);
         o.set("systemslayoutmode", obj.systemsLayoutMode as number);
         return o;
     }
@@ -105,6 +108,12 @@ export class DisplaySettingsSerializer {
             case "accoladebarpaddingright":
                 obj.accoladeBarPaddingRight = v! as number;
                 return true;
+            case "firstnotationstaffpaddingtop":
+                obj.firstNotationStaffPaddingTop = v! as number;
+                return true;
+            case "lastnotationstaffpaddingbottom":
+                obj.lastNotationStaffPaddingBottom = v! as number;
+                return true;
             case "notationstaffpaddingtop":
                 obj.notationStaffPaddingTop = v! as number;
                 return true;
@@ -125,6 +134,9 @@ export class DisplaySettingsSerializer {
                 return true;
             case "effectbandpaddingbottom":
                 obj.effectBandPaddingBottom = v! as number;
+                return true;
+            case "trackstaffpaddingbetween":
+                obj.trackStaffPaddingBetween = v! as number;
                 return true;
             case "systemslayoutmode":
                 obj.systemsLayoutMode = JsonHelper.parseEnum<SystemsLayoutMode>(v, SystemsLayoutMode)!;

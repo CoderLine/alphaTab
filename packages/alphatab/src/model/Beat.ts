@@ -1037,6 +1037,34 @@ export class Beat {
                         points.splice(1, 1);
                     }
                 }
+            } else if (points!.length === 3) {
+                const origin: BendPoint = points[0];
+                const middle: BendPoint = points[1];
+                const destination: BendPoint = points[2];
+                // constant decrease or increase
+                if (
+                    (origin.value < middle.value && middle.value < destination.value) ||
+                    (origin.value > middle.value && middle.value > destination.value)
+                ) {
+                    if (origin.value !== 0 && !this.isContinuedWhammy) {
+                        this.whammyBarType = WhammyType.PrediveDive;
+                    } else {
+                        this.whammyBarType = WhammyType.Dive;
+                    }
+                    points.splice(1, 1);
+                } else if (
+                    (origin.value > middle.value && middle.value < destination.value) ||
+                    (origin.value < middle.value && middle.value > destination.value)
+                ) {
+                    this.whammyBarType = WhammyType.Dip;
+                } else if (origin.value === middle.value && middle.value === destination.value) {
+                    if (origin.value !== 0 && !this.isContinuedWhammy) {
+                        this.whammyBarType = WhammyType.Predive;
+                    } else {
+                        this.whammyBarType = WhammyType.Hold;
+                    }
+                    points.splice(1, 1);
+                }
             } else if (points!.length === 2) {
                 const origin: BendPoint = points[0];
                 const destination: BendPoint = points[1];

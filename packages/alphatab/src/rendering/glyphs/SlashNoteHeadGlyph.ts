@@ -13,7 +13,6 @@ import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGl
  * @internal
  */
 export class SlashNoteHeadGlyph extends MusicFontGlyph {
-
     public beatEffects: Map<string, Glyph> = new Map();
     public beamingHelper!: BeamingHelper;
     public noteHeadElement: NoteSubElement = NoteSubElement.SlashNoteHead;
@@ -47,12 +46,26 @@ export class SlashNoteHeadGlyph extends MusicFontGlyph {
         const effectSpacing: number = this.renderer.smuflMetrics.onNoteEffectPadding;
         let effectY = this.renderer.smuflMetrics.glyphHeights.get(this._symbol)!;
 
+        let minEffectY = Number.NaN;
+        let maxEffectY = Number.NaN;
+
         for (const g of this.beatEffects.values()) {
             g.y += effectY;
             g.x += this.width / 2;
             g.renderer = this.renderer;
-            g.doLayout();
             effectY += g.height + effectSpacing;
+            g.doLayout();
+
+            if (Number.isNaN(minEffectY) || minEffectY > effectY) {
+                minEffectY = effectY;
+            }
+            if (Number.isNaN(maxEffectY) || maxEffectY < effectY) {
+                maxEffectY = effectY;
+            }
+        }
+
+        if (!Number.isNaN(minEffectY)) {
+            this.renderer.registerBeatEffectOverflows(minEffectY, maxEffectY);
         }
     }
 

@@ -1,6 +1,6 @@
-import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
-import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
+import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
@@ -17,8 +17,10 @@ export class BarNumberGlyph extends Glyph {
 
     public override doLayout(): void {
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.barNumberFont;
-        this.width =
-            this.renderer.scoreRenderer.canvas!.measureText(this._number).width;
+        const size = this.renderer.scoreRenderer.canvas!.measureText(this._number);
+        this.width = size.width;
+        this.height = size.height;
+        this.y -= this.height;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -35,7 +37,6 @@ export class BarNumberGlyph extends Glyph {
 
         const res: RenderingResources = this.renderer.resources;
         const baseline = canvas.textBaseline;
-        canvas.textBaseline = TextBaseline.Top;
         canvas.font = res.barNumberFont;
         canvas.fillText(this._number, cx + this.x, cy + this.y);
         canvas.textBaseline = baseline;

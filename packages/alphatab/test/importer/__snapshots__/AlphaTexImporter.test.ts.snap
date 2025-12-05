@@ -1527,6 +1527,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
         Map {
           "__kind" => "Staff",
@@ -1729,6 +1730,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
         Map {
           "__kind" => "Staff",
@@ -2006,6 +2008,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
         Map {
           "__kind" => "Staff",
@@ -2208,6 +2211,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
         Map {
           "__kind" => "Staff",
@@ -2410,6 +2414,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {
@@ -2634,6 +2639,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {
@@ -2858,6 +2864,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {
@@ -3157,6 +3164,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {
@@ -3381,6 +3389,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {
@@ -3605,6 +3614,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {
@@ -3926,6 +3936,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {
@@ -4250,6 +4261,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {
@@ -4595,6 +4607,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {
@@ -4800,6 +4813,7 @@ Map {
               ],
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {
@@ -4893,6 +4907,7 @@ Map {
               "barlineright" => 4,
             },
           ],
+          "showtablature" => false,
         },
         Map {
           "__kind" => "Staff",
@@ -4940,6 +4955,7 @@ Map {
               "barlineright" => 1,
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {

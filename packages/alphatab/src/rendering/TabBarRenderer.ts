@@ -1,6 +1,8 @@
-import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
+import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
@@ -13,15 +15,13 @@ import { TabClefGlyph } from '@coderline/alphatab/rendering/glyphs/TabClefGlyph'
 import type { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteChordGlyph';
 import { TabTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TabTimeSignatureGlyph';
 import type { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
-import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
+import { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import type { ReservedLayoutAreaSlot } from '@coderline/alphatab/rendering/utils/BarCollisionHelper';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
-import { GraceType } from '@coderline/alphatab/model/GraceType';
-import type { ReservedLayoutAreaSlot } from '@coderline/alphatab/rendering/utils/BarCollisionHelper';
-import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
@@ -58,17 +58,6 @@ export class TabBarRenderer extends LineBarRenderer {
         return BarSubElement.GuitarTabsStaffLine;
     }
 
-    public constructor(renderer: ScoreRenderer, bar: Bar) {
-        super(renderer, bar);
-
-        if (!bar.staff.showStandardNotation) {
-            this.showTimeSignature = true;
-            this.showRests = true;
-            this.showTiedNotes = true;
-            this._showMultiBarRest = true;
-        }
-    }
-
     public override get lineSpacing(): number {
         return this.smuflMetrics.tabLineSpacing;
     }
@@ -103,8 +92,12 @@ export class TabBarRenderer extends LineBarRenderer {
         return super.getLineHeight(line);
     }
 
+    public minString = Number.NaN;
+    public maxString = Number.NaN;
+
     protected override collectSpaces(spaces: Float32Array[][]): void {
         const padding: number = this.smuflMetrics.staffLineThickness;
+        const tuning = this.bar.staff.tuning;
         for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 const vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
@@ -114,7 +107,7 @@ export class TabBarRenderer extends LineBarRenderer {
                     if (noteNumbers) {
                         for (const [str, noteNumber] of noteNumbers.notesPerString) {
                             if (!noteNumber.isEmpty) {
-                                spaces[this.bar.staff.tuning.length - str].push(
+                                spaces[tuning.length - str].push(
                                     new Float32Array([
                                         vc.x + bg.x + notes.x + noteNumbers!.x - padding,
                                         noteNumbers!.width + padding * 2
@@ -151,13 +144,32 @@ export class TabBarRenderer extends LineBarRenderer {
                     break;
             }
 
-            this.height += this.settings.notation.rhythmHeight;
-            this.bottomPadding += this.settings.notation.rhythmHeight;
+            this.registerOverflowBottom(this.settings.notation.rhythmHeight);
         }
     }
 
     public override doLayout(): void {
+        const hasStandardNotation =
+            this.bar.staff.showStandardNotation && this.scoreRenderer.layout!.profile.has(ScoreBarRenderer.StaffId);
+
+        if (!hasStandardNotation) {
+            this.showTimeSignature = true;
+            this.showRests = true;
+            this.showTiedNotes = true;
+            this._showMultiBarRest = true;
+        }
+
         super.doLayout();
+
+        const hasNoteOnTopString = this.minString === 0;
+        if (hasNoteOnTopString) {
+            this.registerOverflowTop(this.lineSpacing / 2);
+        }
+        const hasNoteOnBottomString = this.maxString === this.bar.staff.tuning.length - 1;
+        if (hasNoteOnBottomString) {
+            this.registerOverflowBottom(this.lineSpacing / 2);
+        }
+
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
             this._hasTuplets = false;
             for (const voice of this.bar.voices) {
@@ -170,7 +182,7 @@ export class TabBarRenderer extends LineBarRenderer {
                 }
             }
             if (this._hasTuplets) {
-                this.registerOverflowBottom(this.tupletSize);
+                this.registerOverflowBottom(this.settings.notation.rhythmHeight + this.tupletSize);
             }
         }
     }
@@ -218,6 +230,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
+        super.createVoiceGlyphs(v);
         // multibar rest
         if (this.additionalMultiRestBars) {
             const container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(v)!);
@@ -232,11 +245,39 @@ export class TabBarRenderer extends LineBarRenderer {
         }
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy, canvas);
+    protected override get flagsSubElement(): BeatSubElement {
+        return BeatSubElement.GuitarTabFlags;
+    }
+
+    protected override get beamsSubElement(): BeatSubElement {
+        return BeatSubElement.GuitarTabBeams;
+    }
+
+    protected override get tupletSubElement(): BeatSubElement {
+        return BeatSubElement.GuitarTabTuplet;
+    }
+
+    protected override paintBeams(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        flagsElement: BeatSubElement,
+        beamsElement: BeatSubElement
+    ): void {
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
-            this.paintBeams(cx, cy, canvas, BeatSubElement.GuitarTabFlags, BeatSubElement.GuitarTabBeams);
-            this.paintTuplets(cx, cy, canvas, BeatSubElement.GuitarTabTuplet);
+            super.paintBeams(cx, cy, canvas, flagsElement, beamsElement);
+        }
+    }
+
+    protected override paintTuplets(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        beatElement: BeatSubElement,
+        bracketsAsArcs: boolean = false
+    ): void {
+        if (this.rhythmMode !== TabRhythmMode.Hidden) {
+            super.paintTuplets(cx, cy, canvas, beatElement, bracketsAsArcs);
         }
     }
 
@@ -272,7 +313,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected getFlagAndBarPos(): number {
-        return this.height - (this._hasTuplets ? this.tupletSize / 2 : 0);
+        return this.height + this.settings.notation.rhythmHeight - (this._hasTuplets ? this.tupletSize / 2 : 0);
     }
 
     protected override calculateBeamYWithDirection(_h: BeamingHelper, _x: number, _direction: BeamDirection): number {

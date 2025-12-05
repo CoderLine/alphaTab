@@ -7,7 +7,6 @@ import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteNumberGlyph } from '@coderline/alphatab/rendering/glyphs/NoteNumberGlyph';
 import { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteChordGlyph';
 import { TabRestGlyph } from '@coderline/alphatab/rendering/glyphs/TabRestGlyph';
-import { TabWhammyBarGlyph } from '@coderline/alphatab/rendering/glyphs/TabWhammyBarGlyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import type { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
@@ -52,7 +51,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public override doLayout(): void {
         const tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
 
-        const centeredEffectGlyphs:Glyph[]=[];
+        const centeredEffectGlyphs: Glyph[] = [];
         if (!this.container.beat.isRest) {
             //
             // Note numbers
@@ -90,15 +89,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 }
                 this.addNormal(tabNoteNumbers);
                 beatEffects = tabNoteNumbers.beatEffects;
-            }
-
-            //
-            // Whammy Bar
-            if (this.container.beat.hasWhammyBar) {
-                const whammy: TabWhammyBarGlyph = new TabWhammyBarGlyph(this.container.beat);
-                whammy.renderer = this.renderer;
-                whammy.doLayout();
-                this.container.ties.push(whammy);
             }
 
             //
@@ -166,7 +156,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             this.centerX = this.slash!.x + this.slash!.width / 2;
         }
 
-        for(const g of centeredEffectGlyphs) {
+        for (const g of centeredEffectGlyphs) {
             g.x = this.centerX;
         }
     }
@@ -192,5 +182,14 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         const topY = noteNumberGlyph.y - noteNumberGlyph.height / 2;
         const bottomY = topY + noteNumberGlyph.height;
         this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, topY, bottomY);
+
+        const minString = tr.minString;
+        const maxString = tr.maxString;
+        if (Number.isNaN(minString) || minString < n.string) {
+            tr.minString = l;
+        }
+        if (Number.isNaN(maxString) || maxString > n.string) {
+            tr.maxString = l;
+        }
     }
 }

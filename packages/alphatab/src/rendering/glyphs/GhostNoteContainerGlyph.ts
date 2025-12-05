@@ -11,12 +11,12 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
  * @internal
  */
 export class GhostNoteInfo {
-    public line: number = 0;
+    public steps: number = 0;
     public isGhost: boolean;
     public color: Color | undefined;
 
     public constructor(line: number, isGhost: boolean, color: Color | undefined) {
-        this.line = line;
+        this.steps = line;
         this.isGhost = isGhost;
         this.color = color;
     }
@@ -38,7 +38,7 @@ export class GhostNoteContainerGlyph extends Glyph {
 
     public addParenthesis(n: Note): void {
         const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        const line: number = sr.getNoteLine(n);
+        const steps: number = sr.getNoteSteps(n);
         const hasParenthesis: boolean =
             n.isGhost ||
             (this._isTiedBend(n) &&
@@ -46,10 +46,10 @@ export class GhostNoteContainerGlyph extends Glyph {
 
         const color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.Effects, n);
 
-        this._add(new GhostNoteInfo(line, hasParenthesis, color));
+        this._add(new GhostNoteInfo(steps, hasParenthesis, color));
     }
 
-    public addParenthesisOnLine(line: number, hasParenthesis: boolean): void {
+    public addParenthesisOnSteps(line: number, hasParenthesis: boolean): void {
         const info: GhostNoteInfo = new GhostNoteInfo(line, hasParenthesis, undefined);
         this._add(info);
     }
@@ -74,7 +74,7 @@ export class GhostNoteContainerGlyph extends Glyph {
     public override doLayout(): void {
         const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         this._infos.sort((a, b) => {
-            return a.line - b.line;
+            return a.steps - b.steps;
         });
         let previousGlyph: GhostParenthesisGlyph | null = null;
         const sizePerLine: number = sr.getScoreHeight(1);
@@ -87,13 +87,13 @@ export class GhostNoteContainerGlyph extends Glyph {
                 g = new GhostParenthesisGlyph(this._isOpen);
                 g.colorOverride = this._infos[i].color;
                 g.renderer = this.renderer;
-                g.y = sr.getScoreY(this._infos[i].line) - sizePerLine;
+                g.y = sr.getScoreY(this._infos[i].steps) - sizePerLine;
                 g.height = sizePerLine * 2;
                 g.doLayout();
                 this._glyphs.push(g);
                 previousGlyph = g;
             } else {
-                const y: number = sr.getScoreY(this._infos[i].line) + sizePerLine;
+                const y: number = sr.getScoreY(this._infos[i].steps) + sizePerLine;
                 previousGlyph.height = y - previousGlyph.y;
             }
         }

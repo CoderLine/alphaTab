@@ -2,11 +2,15 @@ import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
+import {
+    type BarRendererFactory,
+    type EffectBandInfo,
+    EffectBandMode
+} from '@coderline/alphatab/rendering/BarRendererFactory';
+import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
-import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 
 /**
  * A Staff represents a single line within a StaffSystem.
@@ -26,7 +30,10 @@ export class RenderStaff {
     public index: number = 0;
     public staffIndex: number = 0;
 
-    public isFirstInSystem: boolean = false;
+    public get isFirstInSystem() { return this.index === 0}
+
+    public topEffectInfos: EffectBandInfo[] = [];
+    public bottomEffectInfos: EffectBandInfo[] = [];
 
     /**
      * This is the index of the track being rendered. This is not the index of the track within the model,
@@ -46,30 +53,47 @@ export class RenderStaff {
      * Staff contents actually start. Used for grouping
      * using a accolade
      */
-    public staveTop: number = 0;
+    public staffTop: number = 0;
 
-    public topSpacing: number = 0;
-    public bottomSpacing: number = 0;
+    public topPadding: number = 0;
+    public bottomPadding: number = 0;
 
     /**
      * This is the visual offset from top where the
      * Staff contents actually ends. Used for grouping
      * using a accolade
      */
-    public staveBottom: number = 0;
+    public staffBottom: number = 0;
 
     public get contentTop() {
-        return this.y + this.staveTop + this.topSpacing + this.topOverflow;
+        return this.y + this.staffTop + this.topPadding + this.topOverflow;
     }
 
     public get contentBottom() {
-        return this.y + this.topSpacing + this.topOverflow + this.staveBottom;
+        return this.y + this.topPadding + this.topOverflow + this.staffBottom;
     }
 
     public constructor(trackIndex: number, staff: Staff, factory: BarRendererFactory) {
         this._factory = factory;
         this.trackIndex = trackIndex;
         this.modelStaff = staff;
+        for (const b of factory.effectBands) {
+            if (b.shouldCreate && !b.shouldCreate!(staff)) {
+                continue;
+            }
+
+            switch (b.mode) {
+                case EffectBandMode.OwnedTop:
+                case EffectBandMode.SharedTop:
+                    this.topEffectInfos.push(b);
+                    break;
+
+                case EffectBandMode.OwnedBottom:
+                case EffectBandMode.SharedBottom:
+                    this.bottomEffectInfos.push(b);
+                    break;
+            }
+        }
     }
 
     public getSharedLayoutData<T>(key: string, def: T): T {
@@ -83,20 +107,16 @@ export class RenderStaff {
         this._sharedLayoutData.set(key, def);
     }
 
-    public get isInsideBracket(): boolean {
-        return this._factory.isInsideBracket;
-    }
-
-    public get isRelevantForBoundsLookup(): boolean {
-        return this._factory.isRelevantForBoundsLookup;
-    }
-
     public registerStaffTop(offset: number): void {
-        this.staveTop = offset;
+        if (offset > this.staffTop) {
+            this.staffTop = offset;
+        }
     }
 
     public registerStaffBottom(offset: number): void {
-        this.staveBottom = offset;
+        if (offset > this.staffBottom) {
+            this.staffBottom = offset;
+        }
     }
 
     public addBarRenderer(renderer: BarRendererBase): void {
@@ -109,12 +129,15 @@ export class RenderStaff {
 
     public addBar(bar: Bar, layoutingInfo: BarLayoutingInfo, additionalMultiBarsRestBars: Bar[] | null): void {
         const renderer = this._factory.create(this.system.layout.renderer, bar);
+
+        renderer.topEffects.infos = this.topEffectInfos;
+        renderer.bottomEffects.infos = this.bottomEffectInfos;
+
         renderer.additionalMultiRestBars = additionalMultiBarsRestBars;
         renderer.staff = this;
         renderer.index = this.barRenderers.length;
         renderer.layoutingInfo = layoutingInfo;
         renderer.doLayout();
-        renderer.registerLayoutingInfo();
 
         // For cases like in the horizontal layout we need to set the fixed width early
         // to have correct partials splitting
@@ -127,17 +150,18 @@ export class RenderStaff {
         }
 
         this.barRenderers.push(renderer);
-        if (bar) {
-            this.system.layout.registerBarRenderer(this.staffId, renderer);
-        }
+        this.system.layout.registerBarRenderer(this.staffId, renderer);
     }
 
     public revertLastBar(): BarRendererBase {
+        this._sharedLayoutData = new Map<string, unknown>();
         const lastBar: BarRendererBase = this.barRenderers[this.barRenderers.length - 1];
         this.barRenderers.splice(this.barRenderers.length - 1, 1);
         this.system.layout.unregisterBarRenderer(this.staffId, lastBar);
+        this.topOverflow = 0;
+        this.bottomOverflow = 0;
         for (const r of this.barRenderers) {
-            r.applyLayoutingInfo();
+            r.afterStaffBarReverted();
         }
         return lastBar;
     }
@@ -155,7 +179,7 @@ export class RenderStaff {
                 const spacePerBar: number = difference / this.barRenderers.length;
                 for (const renderer of this.barRenderers) {
                     renderer.x = x;
-                    renderer.y = this.topSpacing + topOverflow;
+                    renderer.y = this.topPadding + topOverflow;
 
                     const actualBarWidth = renderer.computedWidth + spacePerBar;
                     renderer.scaleToWidth(actualBarWidth);
@@ -171,7 +195,7 @@ export class RenderStaff {
 
                 for (const renderer of this.barRenderers) {
                     renderer.x = x;
-                    renderer.y = this.topSpacing + topOverflow;
+                    renderer.y = this.topPadding + topOverflow;
 
                     const actualBarWidth = (renderer.barDisplayScale * width) / totalScale;
                     renderer.scaleToWidth(actualBarWidth);
@@ -183,7 +207,7 @@ export class RenderStaff {
             case InternalSystemsLayoutMode.FromModelWithWidths:
                 for (const renderer of this.barRenderers) {
                     renderer.x = x;
-                    renderer.y = this.topSpacing + topOverflow;
+                    renderer.y = this.topPadding + topOverflow;
                     const displayWidth = renderer.barDisplayWidth;
                     if (displayWidth > 0) {
                         renderer.scaleToWidth(displayWidth);
@@ -197,26 +221,18 @@ export class RenderStaff {
         }
     }
 
-    public get topOverflow(): number {
-        let m: number = 0;
-        for (let i: number = 0, j: number = this.barRenderers.length; i < j; i++) {
-            const r: BarRendererBase = this.barRenderers[i];
-            if (r.topOverflow > m) {
-                m = r.topOverflow;
-            }
+    public topOverflow = 0;
+    public registerOverflowTop(overflow: number) {
+        if (overflow > this.topOverflow) {
+            this.topOverflow = overflow;
         }
-        return m;
     }
 
-    public get bottomOverflow(): number {
-        let m: number = 0;
-        for (let i: number = 0, j: number = this.barRenderers.length; i < j; i++) {
-            const r: BarRendererBase = this.barRenderers[i];
-            if (r.bottomOverflow > m) {
-                m = r.bottomOverflow;
-            }
+    public bottomOverflow = 0;
+    public registerOverflowBottom(overflow: number) {
+        if (overflow > this.bottomOverflow) {
+            this.bottomOverflow = overflow;
         }
-        return m;
     }
 
     /**
@@ -225,19 +241,25 @@ export class RenderStaff {
      * and we can do an early placement of the render staffs.
      */
     public calculateHeightForAccolade() {
-        this.topSpacing = this._factory.getStaffPaddingTop(this);
-        this.bottomSpacing = this._factory.getStaffPaddingBottom(this);
+        this._applyStaffPaddings();
 
         this.height = this.barRenderers.length > 0 ? this.barRenderers[0].height : 0;
 
         if (this.height > 0) {
-            this.height += Math.ceil(this.topSpacing + this.topOverflow + this.bottomOverflow + this.bottomSpacing);
+            this.height += Math.ceil(this.topPadding + this.topOverflow + this.bottomOverflow + this.bottomPadding);
         }
     }
 
+    private _applyStaffPaddings() {
+        const isFirst = this.index === 0;
+        const isLast = this.index === this.system.staves.length - 1;
+        const settings = this.system.layout.renderer.settings.display;
+        this.topPadding = isFirst ? settings.firstNotationStaffPaddingTop : settings.notationStaffPaddingTop;
+        this.bottomPadding = isLast ? settings.lastNotationStaffPaddingBottom : settings.notationStaffPaddingBottom;
+    }
+
     public finalizeStaff(): void {
-        this.topSpacing = this._factory.getStaffPaddingTop(this);
-        this.bottomSpacing = this._factory.getStaffPaddingBottom(this);
+        this._applyStaffPaddings();
 
         this.height = 0;
 
@@ -246,11 +268,11 @@ export class RenderStaff {
         let needsSecondPass = false;
         let topOverflow: number = this.topOverflow;
         for (let i: number = 0; i < this.barRenderers.length; i++) {
-            this.barRenderers[i].y = this.topSpacing + topOverflow;
-            this.height = Math.max(this.height, this.barRenderers[i].height);
+            this.barRenderers[i].y = this.topPadding + topOverflow;
             if (this.barRenderers[i].finalizeRenderer()) {
                 needsSecondPass = true;
             }
+            this.height = Math.max(this.height, this.barRenderers[i].height);
         }
 
         // 2nd pass: move renderers to correct position respecting the new overflows
@@ -258,7 +280,7 @@ export class RenderStaff {
             topOverflow = this.topOverflow;
             // shift all the renderers to the new position to match required spacing
             for (let i: number = 0; i < this.barRenderers.length; i++) {
-                this.barRenderers[i].y = this.topSpacing + topOverflow;
+                this.barRenderers[i].y = this.topPadding + topOverflow;
             }
 
             // finalize again (to align ties)
@@ -268,7 +290,7 @@ export class RenderStaff {
         }
 
         if (this.height > 0) {
-            this.height += this.topSpacing + topOverflow + this.bottomOverflow + this.bottomSpacing;
+            this.height += this.topPadding + topOverflow + this.bottomOverflow + this.bottomPadding;
         }
 
         this.height = Math.ceil(this.height);

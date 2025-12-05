@@ -722,8 +722,6 @@ export default class CSharpEmitterContext {
                         }
                     }
                     break;
-                case cs.SyntaxKind.ArrayTupleNode:
-                    return true;
                 case cs.SyntaxKind.UnresolvedTypeNode:
                     this.resolveUnresolvedTypeNode(mapValueType as cs.UnresolvedTypeNode);
                     return this.isCsValueType(mapValueType);
@@ -1602,9 +1600,6 @@ export default class CSharpEmitterContext {
 
         // actual type at location must be non nullable
         const declaredTypeNonNull = this.typeChecker.getNonNullableType(declaredType);
-        if (this.typeChecker.isTupleType(declaredTypeNonNull)) {
-            return true;
-        }
 
         const contextualType = this.typeChecker.getTypeOfSymbolAtLocation(symbol, expression);
         if (!contextualType || this.isNullableType(contextualType)) {
@@ -1946,7 +1941,7 @@ export default class CSharpEmitterContext {
             return true;
         }
 
-        return this.isEnum(tsType) || this.typeChecker.isTupleType(tsType);
+        return this.isEnum(tsType);
     }
 
     public isEnum(tsType: ts.Type) {

@@ -1,21 +1,24 @@
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { LineBarRenderer } from '@coderline/alphatab/rendering//LineBarRenderer';
 import type { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { LineBarRenderer } from '@coderline/alphatab/rendering//LineBarRenderer';
 import { SlashBeatContainerGlyph } from '@coderline/alphatab/rendering/SlashBeatContainerGlyph';
 import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
-import { SlashBeatGlyph } from '@coderline/alphatab/rendering/glyphs/SlashBeatGlyph';
 import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
+import { SlashBeatGlyph } from '@coderline/alphatab/rendering/glyphs/SlashBeatGlyph';
+import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
+import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using Slash Rhythm notation
@@ -66,10 +69,16 @@ export class SlashBarRenderer extends LineBarRenderer {
         return 0;
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas, BeatSubElement.SlashFlags, BeatSubElement.SlashBeams);
-        this.paintTuplets(cx, cy, canvas, BeatSubElement.SlashTuplet);
+    protected override get flagsSubElement(): BeatSubElement {
+        return BeatSubElement.SlashFlags;
+    }
+
+    protected override get beamsSubElement(): BeatSubElement {
+        return BeatSubElement.SlashBeams;
+    }
+
+    protected override get tupletSubElement(): BeatSubElement {
+        return BeatSubElement.SlashTuplet;
     }
 
     public override doLayout(): void {
@@ -93,22 +102,25 @@ export class SlashBarRenderer extends LineBarRenderer {
         return 0;
     }
 
-    protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
-        let y = this.getLineY(0) - noteHeadHeight / 2;
-        if (direction === BeamDirection.Up) {
-            y -= this.getFlagStemSize(beat.duration, true);
-        }
-        return y;
+    protected override getFlagTopY(beat: Beat, _direction: BeamDirection): number {
+        let slashY = this.getLineY(0);
+        const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
+        const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+
+        slashY -= this.smuflMetrics.stemUp.has(symbol) ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale : 0;
+        slashY -= this.smuflMetrics.standardStemLength + scale;
+
+        return slashY;
     }
 
-    protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
-        let y = this.getLineY(0) - noteHeadHeight / 2;
-        if (direction === BeamDirection.Down) {
-            y += this.getFlagStemSize(beat.duration, true);
-        }
-        return y;
+    protected override getFlagBottomY(beat: Beat, _direction: BeamDirection): number {
+        let slashY = this.getLineY(0);
+        const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
+        const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+
+        slashY -= this.smuflMetrics.stemUp.has(symbol) ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale : 0;
+
+        return slashY;
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -123,8 +135,15 @@ export class SlashBarRenderer extends LineBarRenderer {
         return y;
     }
 
-    protected override calculateBeamYWithDirection(_h: BeamingHelper, _x: number, _direction: BeamDirection): number {
-        return this.getLineY(0) - this.getFlagStemSize(_h.shortestDuration);
+    protected override calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
+        if (h.beats.length === 0) {
+            return direction === BeamDirection.Up
+                ? this.getFlagTopY(h.beats[0], direction)
+                : this.getFlagBottomY(h.beats[0], direction);
+        }
+
+        this.ensureBeamDrawingInfo(h, direction);
+        return h.drawingInfos.get(direction)!.calcY(x);
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
@@ -171,12 +190,21 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
+        super.createVoiceGlyphs(v);
         for (const b of v.beats) {
             const container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new BeatGlyphBase();
             container.onNotes = v.index === 0 ? new SlashBeatGlyph() : new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);
         }
+    }
+
+    protected override calculateOverflows(rendererTop: number, rendererBottom: number): void {
+        super.calculateOverflows(rendererTop, rendererBottom);
+        if (this.bar.isEmpty) {
+            return;
+        }
+        this.calculateBeamingOverflows(rendererTop, rendererBottom);
     }
 
     protected override paintBeamingStem(
@@ -188,12 +216,6 @@ export class SlashBarRenderer extends LineBarRenderer {
         canvas: ICanvas
     ): void {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.SlashStem, beat);
-        const lineWidth = canvas.lineWidth;
-        canvas.lineWidth = this.smuflMetrics.stemThickness;
-        canvas.beginPath();
-        canvas.moveTo(x, topY);
-        canvas.lineTo(x, bottomY);
-        canvas.stroke();
-        canvas.lineWidth = lineWidth;
+        canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
     }
 }

@@ -1,5 +1,6 @@
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 
 /**
  * This glyph allows to group several other glyphs to be
@@ -14,17 +15,41 @@ export class GlyphGroup extends Glyph {
     }
 
     public override getBoundingBoxTop(): number {
-        let top = 0;
+        let top = Number.NaN;
         const glyphs = this.glyphs;
         if (glyphs) {
             for (const g of glyphs) {
+                // only count real visual glyphs
+                if (g instanceof SpacingGlyph) {
+                    continue;
+                }
+
                 const gTop = g.getBoundingBoxTop();
-                if (gTop < top) {
+                if (Number.isNaN(top) || gTop < top) {
                     top = gTop;
                 }
             }
         }
-        return top;
+        return Number.isNaN(top) ? this.y : top;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        let bottom = Number.NaN;
+        const glyphs = this.glyphs;
+        if (glyphs) {
+            for (const g of glyphs) {
+                // only count real visual glyphs
+                if (g instanceof SpacingGlyph) {
+                    continue;
+                }
+
+                const gBottom = g.getBoundingBoxBottom();
+                if (Number.isNaN(bottom) || gBottom > bottom) {
+                    bottom = gBottom;
+                }
+            }
+        }
+        return Number.isNaN(bottom) ? this.y + this.height : bottom;
     }
 
     public override doLayout(): void {

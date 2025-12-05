@@ -102,6 +102,16 @@ namespace AlphaTab.Core
             return new List<T>(items);
         }
 
+        public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount,
+            IEnumerable<T> newItems)
+        {
+            var items = data.GetRange((int)start, (int)deleteCount);
+            data.RemoveRange((int)start, (int)deleteCount);
+            data.InsertRange((int)start, newItems);
+
+            return new List<T>(items);
+        }
+
         public static IList<T> Slice<T>(this IList<T> data)
         {
             return new AlphaTab.Collections.List<T>(data);

@@ -476,6 +476,7 @@ export class EngravingSettings {
 
         this.songBookWhammyDipHeight = 0.6 * this.oneStaffSpace;
         this.tabWhammyPerHalfHeight = 0.6 * this.oneStaffSpace;
+        this.tabBendStaffPadding = 0.5 * this.oneStaffSpace;
         this.tabBendPerValueHeight = 0.6 * this.oneStaffSpace;
         this.tabBendLabelPadding = 0.3 * this.oneStaffSpace;
 
@@ -657,6 +658,12 @@ export class EngravingSettings {
      * The size of the dashes on bends (e.g. on holds)
      */
     public tabBendDashSize = 0;
+    
+    /**
+     * The additional padding between the staff and the point
+     * where bend values are calculated from.
+     */
+    public tabBendStaffPadding = 0;
     
     /**
      * The height applied per quarter-note. 

@@ -43,6 +43,7 @@ import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNo
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;
     private _skipPaint: boolean = false;
+    private _whammy?: ScoreWhammyBarGlyph;
 
     public noteHeads: ScoreNoteChordGlyph | null = null;
     public restGlyph: ScoreRestGlyph | null = null;
@@ -59,6 +60,34 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (this.noteHeads) {
             this.noteHeads.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
         }
+    }
+
+    public override getBoundingBoxTop(): number {
+        let y = this.y;
+        if (this.noteHeads) {
+            y = this.noteHeads.getBoundingBoxTop();
+        } else if (this.restGlyph) {
+            y = this.restGlyph.getBoundingBoxTop();
+        }
+
+        if (this._whammy?.hasBoundingBox) {
+            y = Math.min(y, this._whammy.getBoundingBoxTop());
+        }
+        return y;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        let y = this.y + this.height;
+        if (this.noteHeads) {
+            y = this.noteHeads.getBoundingBoxBottom();
+        } else if (this.restGlyph) {
+            y = this.restGlyph.getBoundingBoxBottom();
+        }
+
+        if (this._whammy?.hasBoundingBox) {
+            y = Math.max(y, this._whammy.getBoundingBoxBottom());
+        }
+        return y;
     }
 
     public override getLowestNoteY(): number {
@@ -135,9 +164,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 // Whammy Bar
                 if (this.container.beat.hasWhammyBar) {
                     const whammy: ScoreWhammyBarGlyph = new ScoreWhammyBarGlyph(this.container.beat);
+                    this._whammy = whammy;
                     whammy.renderer = this.renderer;
                     whammy.doLayout();
-                    this.container.ties.push(whammy);
+                    this.container.addTie(whammy);
                 }
                 //
                 // Note dots
@@ -147,7 +177,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         const group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
                         for (const note of this.container.beat.notes) {
-                            const g = this._createBeatDot(sr.getNoteLine(note), group);
+                            const g = this._createBeatDot(sr.getNoteSteps(note), group);
                             g.colorOverride = ElementStyleHelper.noteColor(
                                 sr.resources,
                                 NoteSubElement.StandardNotationEffects,
@@ -158,7 +188,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     }
                 }
             } else {
-                let line = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
+                let steps = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
 
                 // this positioning is quite strange, for most staff line counts
                 // the whole/rest are aligned as half below the whole rest.
@@ -168,10 +198,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     this.renderer.bar.staff.standardNotationLineCount !== 1 &&
                     this.renderer.bar.staff.standardNotationLineCount !== 3
                 ) {
-                    line -= 2;
+                    steps -= 2;
                 }
 
-                const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(line), this.container.beat.duration);
+                const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(steps), this.container.beat.duration);
                 this.restGlyph = restGlyph;
                 restGlyph.beat = this.container.beat;
                 restGlyph.beamingHelper = this.beamingHelper;
@@ -189,7 +219,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 }
 
                 if (this.beamingHelper) {
-                    this.beamingHelper.applyRest(this.container.beat, line);
+                    this.beamingHelper.applyRest(this.container.beat, steps);
                 }
 
                 //
@@ -199,7 +229,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         const group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
-                        this._createBeatDot(line, group);
+                        this._createBeatDot(steps, group);
                         this.addEffect(group);
                     }
                 }
@@ -277,15 +307,15 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         );
 
         // calculate y position
-        let line: number;
+        let steps: number;
         if (n.beat.slashed) {
-            line = (sr.heightLineCount - 1);
+            steps = sr.heightLineCount - 1;
         } else {
-            line = sr.getNoteLine(n);
+            steps = sr.getNoteSteps(n);
         }
 
-        noteHeadGlyph.y = sr.getScoreY(line);
-        this.noteHeads!.addMainNoteGlyph(noteHeadGlyph, n, line);
+        noteHeadGlyph.y = sr.getScoreY(steps);
+        this.noteHeads!.addMainNoteGlyph(noteHeadGlyph, n, steps);
 
         if (!n.beat.slashed && n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
             // create harmonic note head.
@@ -297,9 +327,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 this.container.beat.graceType !== GraceType.None
             );
             harmonicsGlyph.colorOverride = noteHeadGlyph.colorOverride;
-            line = sr.accidentalHelper.getNoteLineForValue(harmonicFret, false);
-            harmonicsGlyph.y = sr.getScoreY(line);
-            this.noteHeads!.addEffectNoteGlyph(harmonicsGlyph, line);
+            steps = sr.accidentalHelper.getNoteStepsForValue(harmonicFret, false);
+            harmonicsGlyph.y = sr.getScoreY(steps);
+            this.noteHeads!.addEffectNoteGlyph(harmonicsGlyph, steps);
         }
 
         const belowBeatEffects = this.noteHeads!.belowBeatEffects;

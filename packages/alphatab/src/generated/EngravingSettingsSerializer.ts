@@ -134,6 +134,7 @@ export class EngravingSettingsSerializer {
         o.set("deadslappedlinewidth", obj.deadSlappedLineWidth);
         o.set("lefthandtabtiewidth", obj.leftHandTabTieWidth);
         o.set("tabbenddashsize", obj.tabBendDashSize);
+        o.set("tabbendstaffpadding", obj.tabBendStaffPadding);
         o.set("tabbendpervalueheight", obj.tabBendPerValueHeight);
         o.set("tabbendlabelpadding", obj.tabBendLabelPadding);
         o.set("simpleslidewidth", obj.simpleSlideWidth);
@@ -370,6 +371,9 @@ export class EngravingSettingsSerializer {
                 return true;
             case "tabbenddashsize":
                 obj.tabBendDashSize = v! as number;
+                return true;
+            case "tabbendstaffpadding":
+                obj.tabBendStaffPadding = v! as number;
                 return true;
             case "tabbendpervalueheight":
                 obj.tabBendPerValueHeight = v! as number;

@@ -1,12 +1,12 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
  */
-export abstract class NoteEffectInfoBase extends EffectBarRendererInfo {
+export abstract class NoteEffectInfoBase extends EffectInfo {
     protected lastCreateInfo: Note[] | null = null;
 
     public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {

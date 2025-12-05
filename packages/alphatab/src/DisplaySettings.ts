@@ -71,6 +71,7 @@ export class DisplaySettings {
      * @remarks
      * AlphaTab has various stave profiles that define which staves will be shown in for the rendered tracks. Its recommended
      * to keep this on {@link StaveProfile.Default} and rather rely on the options available ob {@link Staff} level
+     * @deprecated Set the notation visibility by modifying the {@link Staff} properties.
      */
     public staveProfile: StaveProfile = StaveProfile.Default;
 
@@ -190,13 +191,15 @@ export class DisplaySettings {
      */
     public padding: number[] = [35, 35];
 
+    // system paddings
+
     /**
      * The top padding applied to first system.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `5`
+     * @defaultValue `0`
      */
-    public firstSystemPaddingTop: number = 5;
+    public firstSystemPaddingTop: number = 0;
 
     /**
      * The top padding applied systems beside the first one.
@@ -210,17 +213,16 @@ export class DisplaySettings {
      * The bottom padding applied to systems beside the last one.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `20`
+     * @defaultValue `10`
      */
-    public systemPaddingBottom: number = 10;
-
+    public systemPaddingBottom: number = 10
     /**
      * The bottom padding applied to the last system.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `0`
+     * @defaultValue `5`
      */
-    public lastSystemPaddingBottom: number = 0;
+    public lastSystemPaddingBottom: number = 5;
 
     /**
      * The padding left to the track name label of the system.
@@ -246,27 +248,47 @@ export class DisplaySettings {
      */
     public accoladeBarPaddingRight: number = 3;
 
+    // Staff padding
+
     /**
-     * The bottom padding applied to main notation staves (standard, tabs, numbered, slash).
+     * The top padding applied to the first main notation staff (standard, tabs, numbered, slash).
+     * @since 1.8.0
+     * @category Display
+     * @defaultValue `0`
+     */
+    public firstNotationStaffPaddingTop: number = 0;
+
+    /**
+     * The bottom padding applied to last main notation staff (standard, tabs, numbered, slash).
+     * @since 1.8.0
+     * @category Display
+     * @defaultValue `0`
+     */
+    public lastNotationStaffPaddingBottom: number = 0;
+
+    /**
+     * The top padding applied to main notation staves (standard, tabs, numbered, slash).
      * @since 1.4.0
      * @category Display
-     * @defaultValue `5`
+     * @defaultValue `0`
      */
-    public notationStaffPaddingTop: number = 5;
+    public notationStaffPaddingTop: number = 0;
 
     /**
      * The bottom padding applied to main notation staves (standard, tabs, numbered, slash).
      * @since 1.4.0
      * @category Display
-     * @defaultValue `5`
+     * @defaultValue `0`
      */
-    public notationStaffPaddingBottom: number = 5;
+    public notationStaffPaddingBottom: number = 0;
 
     /**
      * The top padding applied to effect annotation staffs.
      * @since 1.4.0
      * @category Display
      * @defaultValue `0`
+     * @deprecated Effect staves do not exist anymore, effects are now part of the main notation staves. This value has no effect anymore.
+     * Use {@link effectBandPaddingBottom} to control the padding after effect bands.
      */
     public effectStaffPaddingTop: number = 0;
 
@@ -275,6 +297,8 @@ export class DisplaySettings {
      * @since 1.4.0
      * @category Display
      * @defaultValue `0`
+     * @deprecated Effect staves do not exist anymore, effects are now part of the main notation staves. This value has no effect anymore.
+     * Use {@link effectBandPaddingBottom} to control the padding after effect bands.
      */
     public effectStaffPaddingBottom: number = 0;
 
@@ -295,12 +319,20 @@ export class DisplaySettings {
     public staffPaddingLeft: number = 2;
 
     /**
-     * The padding between individual effect bands. 
+     * The padding between individual effect bands.
      * @since 1.7.0
      * @category Display
      * @defaultValue `2`
      */
     public effectBandPaddingBottom = 2;
+
+    /**
+     * The additional padding to apply between the staves of two separate tracks.
+     * @since 1.8.0
+     * @category Display
+     * @defaultValue `5`
+     */
+    public trackStaffPaddingBetween = 5;
 
     /**
      * The mode used to arrange staves and systems.

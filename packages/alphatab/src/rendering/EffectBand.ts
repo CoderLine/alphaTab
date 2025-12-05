@@ -1,13 +1,14 @@
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import type { EffectBandSlot } from '@coderline/alphatab/rendering/EffectBandSlot';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import type { EffectBarRenderer } from '@coderline/alphatab/rendering/EffectBarRenderer';
+import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import type { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -16,6 +17,7 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 export class EffectBand extends Glyph {
     private _uniqueEffectGlyphs: EffectGlyph[][] = [];
     private _effectGlyphs: Map<number, EffectGlyph>[] = [];
+    private _container: EffectBandContainer;
     public isEmpty: boolean = true;
 
     public previousBand: EffectBand | null = null;
@@ -25,13 +27,26 @@ export class EffectBand extends Glyph {
     public override height: number = 0;
     public originalHeight: number = 0;
     public voice: Voice;
-    public info: EffectBarRendererInfo;
+    public info: EffectInfo;
     public slot: EffectBandSlot | null = null;
 
-    public constructor(voice: Voice, info: EffectBarRendererInfo) {
+    public constructor(voice: Voice, info: EffectInfo, container: EffectBandContainer) {
         super(0, 0);
         this.voice = voice;
         this.info = info;
+        this._container = container;
+    }
+
+    public *iterateAllGlyphs() {
+        for (const v of this._effectGlyphs) {
+            for (const g of v.values()) {
+                yield g;
+            }
+        }
+    }
+
+    public finalizeBand() {
+        this.info.finalizeBand(this);
     }
 
     public override doLayout(): void {
@@ -42,16 +57,20 @@ export class EffectBand extends Glyph {
         }
     }
 
+    public static shouldCreateGlyph(beat: Beat, info: EffectInfo, renderer: BarRendererBase) {
+        return (
+            info.shouldCreateGlyph(renderer.settings, beat) &&
+            (!info.hideOnMultiTrack || renderer.staff.trackIndex === 0)
+        );
+    }
+
     public createGlyph(beat: Beat): void {
         if (beat.voice !== this.voice) {
             return;
         }
         // NOTE: the track order will never change. even if the staff behind the renderer changes, the trackIndex will not.
         // so it's okay to access the staff here while creating the glyphs.
-        if (
-            this.info.shouldCreateGlyph(this.renderer.settings, beat) &&
-            (!this.info.hideOnMultiTrack || this.renderer.staff.trackIndex === 0)
-        ) {
+        if (EffectBand.shouldCreateGlyph(beat, this.info, this.renderer)) {
             this.isEmpty = false;
             if (!this.firstBeat || beat.isBefore(this.firstBeat)) {
                 this.firstBeat = beat;
@@ -118,9 +137,8 @@ export class EffectBand extends Glyph {
                             prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index)!;
                         } else if (this.renderer.index > 0) {
                             // load the effect from the previous renderer if possible.
-                            const previousRenderer: EffectBarRenderer = this.renderer
-                                .previousRenderer as EffectBarRenderer;
-                            const previousBand = previousRenderer.getBand(prevBeat.voice, this.info.effectId);
+                            const previousContainer = this._container.previousContainer!;
+                            const previousBand = previousContainer.getBand(prevBeat.voice, this.info.effectId);
                             // it can happen that we have an empty voice and then we don't have an effect band
                             if (previousBand) {
                                 const voiceGlyphs: Map<number, EffectGlyph> =
@@ -174,30 +192,29 @@ export class EffectBand extends Glyph {
     public alignGlyphs(): void {
         for (let v: number = 0; v < this._effectGlyphs.length; v++) {
             for (const beatIndex of this._effectGlyphs[v].keys()) {
-                this._alignGlyph(this.info.sizingMode, this.renderer.bar.voices[v].beats[beatIndex]);
+                const g = this.renderer.bar.voices[v].beats[beatIndex];
+                this._alignGlyph(this.info.sizingMode, g);
             }
         }
+        this.info.onAlignGlyphs(this);
     }
 
     private _alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {
         const g: EffectGlyph = this._effectGlyphs[beat.voice.index].get(beat.index)!;
         const container: BeatContainerGlyph = this.renderer.getBeatContainer(beat)!;
 
-        // container is aligned with the "onTimeX" position of the beat in effect renders
-
         switch (sizing) {
             case EffectBarGlyphSizing.SinglePreBeat:
-                // shift to the start using the biggest pre-beat size of the respective beat
                 const offsetToBegin = this.renderer.layoutingInfo.getPreBeatSize(beat);
-                g.x = this.renderer.beatGlyphsStart + container.x - offsetToBegin;
+                g.x = this.renderer.beatGlyphsStart + container.x + container.onTimeX - offsetToBegin;
                 break;
             case EffectBarGlyphSizing.SingleOnBeat:
             case EffectBarGlyphSizing.GroupedOnBeat:
-                g.x = this.renderer.beatGlyphsStart + container.x;
+                g.x = this.renderer.beatGlyphsStart + container.x + container.onTimeX;
                 break;
             case EffectBarGlyphSizing.SingleOnBeatToEnd:
             case EffectBarGlyphSizing.GroupedOnBeatToEnd:
-                g.x = this.renderer.beatGlyphsStart + container.x;
+                g.x = this.renderer.beatGlyphsStart + container.x + container.onTimeX;
                 if (container.beat.isLastOfVoice) {
                     g.width = this.renderer.width - g.x;
                 } else {

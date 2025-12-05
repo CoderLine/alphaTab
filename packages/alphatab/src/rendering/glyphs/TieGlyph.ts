@@ -8,7 +8,14 @@ import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 /**
  * @internal
  */
-export class TieGlyph extends Glyph {
+export interface ITieGlyph {
+    readonly checkForOverflow: boolean;
+}
+
+/**
+ * @internal
+ */
+export class TieGlyph extends Glyph implements ITieGlyph {
     protected startBeat: Beat | null;
     protected endBeat: Beat | null;
     protected yOffset: number = 0;
@@ -31,6 +38,25 @@ export class TieGlyph extends Glyph {
     private _endY: number = 0;
     private _tieHeight: number = 0;
     private _shouldDraw: boolean = false;
+    private _boundingBox?: Bounds;
+
+    public get checkForOverflow() {
+        return this._boundingBox !== undefined;
+    }
+
+    public override getBoundingBoxTop(): number {
+        if (this._boundingBox) {
+            return this._boundingBox!.y;
+        }
+        return this._startY;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        if (this._boundingBox) {
+            return this._boundingBox.y + this._boundingBox.h;
+        }
+        return this._startY;
+    }
 
     public override doLayout(): void {
         this.width = 0;
@@ -90,6 +116,7 @@ export class TieGlyph extends Glyph {
             this._shouldDraw = true;
         }
 
+        this._boundingBox = undefined;
         if (this._shouldDraw) {
             this.y = Math.min(this._startY, this._endY);
             if (this.shouldDrawBendSlur()) {
@@ -107,6 +134,7 @@ export class TieGlyph extends Glyph {
                     this._tieHeight,
                     this.renderer.smuflMetrics.tieMidpointThickness
                 );
+                this._boundingBox = tieBoundingBox;
 
                 this.height = tieBoundingBox.h;
 
@@ -192,22 +220,33 @@ export class TieGlyph extends Glyph {
     ): Bounds {
         const cp = TieGlyph._computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
 
-        x1 = cp[0];
-        y1 = cp[1];
-        const cpx = cp[2];
-        const cpy = cp[3];
-        x2 = cp[6];
-        y2 = cp[7];
+        // For a musical tie/slur, the extrema occur predictably near the midpoint
+        // Evaluate at midpoint (t=0.5) and check endpoints
+        const p0x = cp[0];
+        const p0y = cp[1];
+        const c1x = cp[2];
+        const c1y = cp[3];
+        const c2x = cp[4];
+        const c2y = cp[5];
+        const p1x = cp[6];
+        const p1y = cp[7];
 
-        const tx = (x1 - cpx) / (x1 - 2 * cpx + x2);
-        const ex = TieGlyph._calculateExtrema(x1, y1, cpx, cpy, x2, y2, tx);
-        const xMin = ex.length > 0 ? Math.min(x1, x2, ex[0]) : Math.min(x1, x2);
-        const xMax = ex.length > 0 ? Math.max(x1, x2, ex[0]) : Math.max(x1, x2);
+        // Evaluate at t=0.5 for midpoint
+        const midX = 0.125 * p0x + 0.375 * c1x + 0.375 * c2x + 0.125 * p1x;
+        const midY = 0.125 * p0y + 0.375 * c1y + 0.375 * c2y + 0.125 * p1y;
 
-        const ty = (y1 - cpy) / (y1 - 2 * cpy + y2);
-        const ey = TieGlyph._calculateExtrema(x1, y1, cpx, cpy, x2, y2, ty);
-        const yMin = ey.length > 0 ? Math.min(y1, y2, ey[1]) : Math.min(y1, y2);
-        const yMax = ey.length > 0 ? Math.max(y1, y2, ey[1]) : Math.max(y1, y2);
+        // Bounds are simply min/max of start, end, and midpoint
+        const xMin = Math.min(p0x, p1x, midX);
+        const xMax = Math.max(p0x, p1x, midX);
+        let yMin = Math.min(p0y, p1y, midY);
+        let yMax = Math.max(p0y, p1y, midY);
+
+        // Account for thickness of the tie/slur
+        if (down) {
+            yMax += size;
+        } else {
+            yMin -= size;
+        }
 
         const b = new Bounds();
         b.x = xMin;
@@ -215,28 +254,6 @@ export class TieGlyph extends Glyph {
         b.w = xMax - xMin;
         b.h = yMax - yMin;
         return b;
-    }
-
-    private static _calculateExtrema(
-        x1: number,
-        y1: number,
-        cpx: number,
-        cpy: number,
-        x2: number,
-        y2: number,
-        t: number
-    ): number[] {
-        if (t <= 0 || 1 <= t) {
-            return [];
-        }
-
-        const c1x = x1 + (cpx - x1) * t;
-        const c1y = y1 + (cpy - y1) * t;
-
-        const c2x = cpx + (x2 - cpx) * t;
-        const c2y = cpy + (y2 - cpy) * t;
-
-        return [c1x + (c2x - c1x) * t, c1y + (c2y - c1y) * t];
     }
 
     private static _computeBezierControlPoints(
@@ -269,7 +286,7 @@ export class TieGlyph extends Glyph {
         offset *= scale;
         size *= scale;
 
-        if(down) {
+        if (down) {
             offset *= -1;
             size *= -1;
         }
@@ -357,6 +374,37 @@ export class TieGlyph extends Glyph {
         // canvas.fillRect(bbox.x, bbox.y, bbox.w, bbox.h);
 
         // canvas.color = c;
+    }
+
+    public static calculateBendSlurTopY(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        down: boolean,
+        scale: number,
+        bendSlurHeight: number
+    ) {
+        let normalVectorX: number = y2 - y1;
+        let normalVectorY: number = x2 - x1;
+        const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
+        if (down) {
+            normalVectorX *= -1;
+        } else {
+            normalVectorY *= -1;
+        }
+        // make to unit vector
+        normalVectorX /= length;
+        normalVectorY /= length;
+
+        let offset: number = bendSlurHeight * scale;
+        if (x2 - x1 < 20) {
+            offset /= 2;
+        }
+        const centerY: number = (y2 + y1) / 2;
+        const cp1Y: number = centerY + offset * normalVectorY;
+
+        return cp1Y;
     }
 
     public static drawBendSlur(

@@ -1,5 +1,5 @@
 ﻿import type { AlphaTexAstNodeLocation } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
-import { AlphaTexParseMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
+import type { AlphaTexParseMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import type { FlatSyncPoint } from '@coderline/alphatab/model/Automation';
 import type { SustainPedalMarker } from '@coderline/alphatab/model/Bar';
 import type { Beat } from '@coderline/alphatab/model/Beat';
