@@ -154,4 +154,9 @@ export class RenderStylesheet {
      * If single track: Whether to render multiple subsequent empty (or rest-only) bars together as multi-bar rest.
      */
     public perTrackMultiBarRest: Set<number> | null = null;
+
+    /**
+     * Whether barlines should be drawn across staves within the same system.
+     */
+    public extendBarLines: boolean = false;
 }
