@@ -1,3 +1,8 @@
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
+import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
+import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
+import type { ControllerType } from '@coderline/alphatab/midi/ControllerType';
 import {
     AlphaTabMetronomeEvent,
     AlphaTabRestEvent,
@@ -17,11 +22,6 @@ import {
 import { MidiFile, MidiTrack } from '@coderline/alphatab/midi/MidiFile';
 import { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
-import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
-import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
-import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
-import type { ControllerType } from '@coderline/alphatab/midi/ControllerType';
-import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
 
 /**
  * This class can convert a full {@link Score} instance to a simple JavaScript object and back for further
@@ -144,6 +144,9 @@ export class JsonConverter {
 
         JsonHelper.forEach(jsObject, (v, k) => {
             switch (k) {
+                case 'tickShift':
+                    midi2.tickShift = v as number;
+                    break;
                 case 'division':
                     midi2.division = v as number;
                     break;
@@ -271,6 +274,7 @@ export class JsonConverter {
     public static midiFileToJsObject(midi: MidiFile): Map<string, unknown> {
         const o = new Map<string, unknown>();
         o.set('division', midi.division);
+        o.set('tickShift', midi.tickShift);
 
         const tracks: Map<string, unknown>[] = [];
         for (const track of midi.tracks) {

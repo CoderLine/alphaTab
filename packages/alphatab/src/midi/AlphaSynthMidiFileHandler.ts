@@ -42,6 +42,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     }
 
     public addTickShift(tickShift: number) {
+        this._midiFile.tickShift = tickShift;
         this.tickShift = tickShift;
     }
 

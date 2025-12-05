@@ -28,7 +28,7 @@ import { Settings } from '@coderline/alphatab/Settings';
 import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import { AlphaSynthWrapper } from '@coderline/alphatab/synth/AlphaSynthWrapper';
 import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
-import { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
+import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
 import { expect } from 'chai';
 import {
     FlatControlChangeEvent,
