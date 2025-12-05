@@ -38,8 +38,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
     private static _sharpKsSteps: number[] = [-1, 2, -2, 1, 4, 0, 3];
     private static _flatKsSteps: number[] = [3, 0, 4, 1, 5, 2, 6];
 
-    public simpleWhammyOverflow: number = 0;
-
     public accidentalHelper: AccidentalHelper;
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
@@ -104,10 +102,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
             return;
         }
         
-        const whammyOffset: number = this.simpleWhammyOverflow;
-
-        this.registerOverflowTop(whammyOffset);
-
         const noteOverflowPadding = this.getScoreHeight(1);
 
         let maxNoteY = 0;
@@ -208,7 +202,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         if (maxNoteY < rendererTop) {
-            this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
+            this.registerOverflowTop(Math.abs(maxNoteY));
         }
 
         if (minNoteY > rendererBottom) {

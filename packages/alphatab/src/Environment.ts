@@ -46,6 +46,7 @@ import { PalmMuteEffectInfo } from '@coderline/alphatab/rendering/effects/PalmMu
 import { PickSlideEffectInfo } from '@coderline/alphatab/rendering/effects/PickSlideEffectInfo';
 import { PickStrokeEffectInfo } from '@coderline/alphatab/rendering/effects/PickStrokeEffectInfo';
 import { RasgueadoEffectInfo } from '@coderline/alphatab/rendering/effects/RasgueadoEffectInfo';
+import { SimpleDipWhammyBarEffectInfo } from '@coderline/alphatab/rendering/effects/SimpleDipWhammyBarEffectInfo';
 import { SlightBeatVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/SlightBeatVibratoEffectInfo';
 import { SlightNoteVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/SlightNoteVibratoEffectInfo';
 import { SustainPedalEffectInfo } from '@coderline/alphatab/rendering/effects/SustainPedalEffectInfo';
@@ -487,6 +488,7 @@ export class Environment {
             { effect: new RasgueadoEffectInfo(), mode: EffectBandMode.SharedTop },
             { effect: new WahPedalEffectInfo(), mode: EffectBandMode.SharedTop },
             { effect: new WhammyBarEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: new SimpleDipWhammyBarEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new TrillEffectInfo(), mode: EffectBandMode.OwnedTop },
             { effect: new OttaviaEffectInfo(true), mode: EffectBandMode.OwnedTop },
             { effect: new LeftHandTapEffectInfo(), mode: EffectBandMode.OwnedTop },

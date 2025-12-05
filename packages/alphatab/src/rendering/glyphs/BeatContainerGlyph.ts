@@ -78,6 +78,14 @@ export class BeatContainerGlyph extends Glyph {
         }
 
         layoutings.addBeatSpring(this.beat, preBeatStretch, postBeatStretch);
+
+        // store sizes for usages in effects
+        // we might have empty content in the individual bar renderers, but need to know
+        // the "shared" maximum widths
+        layoutings.setBeatSizes(this.beat, {
+            preBeatSize: this.preNotes.width,
+            onBeatSize: this.onNotes.width
+        });
     }
 
     public applyLayoutingInfo(_info: BarLayoutingInfo): void {

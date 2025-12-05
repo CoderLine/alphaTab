@@ -8,7 +8,7 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { TabBendGlyph } from '@coderline/alphatab/rendering/glyphs/TabBendGlyph';
-import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -70,7 +70,7 @@ export class TabWhammyBarGlyph extends EffectGlyph {
 
         const minValue: BendPoint | null = this._beat.minWhammyPoint;
         const maxValue: BendPoint | null = this._beat.maxWhammyPoint;
-       
+
         let topY: number = maxValue!.value > 0 ? -this._getOffset(maxValue!.value) : 0;
         let bottomY: number = minValue!.value < 0 ? -this._getOffset(minValue!.value) : 0;
 
@@ -89,9 +89,13 @@ export class TabWhammyBarGlyph extends EffectGlyph {
         }
 
         if (bottomY !== 0) {
-            const bottomYWithLabel = bottomY - labelSize;
-            if (bottomYWithLabel < topY) {
-                topY = bottomYWithLabel;
+            if (this._isSimpleDip) {
+                topY -= labelSize;
+            } else {
+                const bottomYWithLabel = bottomY - labelSize;
+                if (bottomYWithLabel < topY) {
+                    topY = bottomYWithLabel;
+                }
             }
         }
 
@@ -124,13 +128,13 @@ export class TabWhammyBarGlyph extends EffectGlyph {
 
         const startNoteRenderer: BarRendererBase = this.renderer;
         let endBeat: Beat | null = this._beat.nextBeat;
-        let endNoteRenderer: TabBarRenderer | null = null;
+        let endNoteRenderer: LineBarRenderer | null = null;
         let endXPositionType: BeatXPosition = BeatXPosition.PreNotes;
         if (endBeat) {
             endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                 this.renderer.staff.staffId,
                 endBeat.voice.bar
-            ) as TabBarRenderer | null;
+            ) as LineBarRenderer | null;
             if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                 endBeat = null;
                 endNoteRenderer = null;
@@ -149,19 +153,21 @@ export class TabWhammyBarGlyph extends EffectGlyph {
         let startX: number = 0;
         let endX: number = 0;
         if (this._isSimpleDip) {
-            startX = cx + startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes);
-            endX = cx + startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes);
+            startX = cx + startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes, true);
+            endX = cx + startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes, true);
         } else {
-            startX = cx + startNoteRenderer.getBeatX(this._beat, BeatXPosition.MiddleNotes);
+            startX = cx + startNoteRenderer.getBeatX(this._beat, BeatXPosition.MiddleNotes, true);
             endX = !endNoteRenderer
                 ? cx + startNoteRenderer.postBeatGlyphsStart
-                : cx - startNoteRenderer.x + endNoteRenderer.x + endNoteRenderer.getBeatX(endBeat!, endXPositionType);
+                : cx - startNoteRenderer.x + endNoteRenderer.x + endNoteRenderer.getBeatX(endBeat!, endXPositionType, true);
         }
 
         const oldAlign = canvas.textAlign;
         const oldBaseLine = canvas.textBaseline;
         canvas.textAlign = TextAlign.Center;
         canvas.textBaseline = TextBaseline.Alphabetic;
+        canvas.font = this.renderer.resources.tablatureFont;
+
 
         if (this._renderPoints.length >= 2) {
             const dx: number = (endX - startX) / BendPoint.MaxPosition;

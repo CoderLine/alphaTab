@@ -656,7 +656,11 @@ export class BarRendererBase {
         return this._postBeatGlyphs.x;
     }
 
-    public getBeatX(beat: Beat, requestedPosition: BeatXPosition = BeatXPosition.PreNotes): number {
+    public getBeatX(
+        beat: Beat,
+        requestedPosition: BeatXPosition = BeatXPosition.PreNotes,
+        useSharedSizes: boolean = false
+    ): number {
         const container = this.getBeatContainer(beat);
         if (container) {
             switch (requestedPosition) {
@@ -672,7 +676,10 @@ export class BarRendererBase {
                         : container.onNotes.x + container.onNotes.width / 2;
                     return container.voiceContainer.x + offset;
                 case BeatXPosition.PostNotes:
-                    return container.voiceContainer.x + container.x + container.onNotes.x + container.onNotes.width;
+                    const onNoteSize = useSharedSizes
+                        ? (this.layoutingInfo.getBeatSizes(beat)?.onBeatSize ?? container.onNotes.width)
+                        : container.onNotes.width;
+                    return container.voiceContainer.x + container.x + container.onNotes.x + onNoteSize;
                 case BeatXPosition.EndBeat:
                     return container.voiceContainer.x + container.x + container.width;
             }
