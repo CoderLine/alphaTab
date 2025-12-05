@@ -60,30 +60,50 @@ export class TabWhammyBarGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
+        if (this._beat.whammyBarType === WhammyType.Custom) {
+            return;
+        }
+
         this._isSimpleDip =
             this.renderer.settings.notation.notationMode === NotationMode.SongBook &&
             this._beat.whammyBarType === WhammyType.Dip;
-        //
-        // Get the min and max values for all combined whammys
+
         const minValue: BendPoint | null = this._beat.minWhammyPoint;
         const maxValue: BendPoint | null = this._beat.maxWhammyPoint;
+       
+        let topY: number = maxValue!.value > 0 ? -this._getOffset(maxValue!.value) : 0;
+        let bottomY: number = minValue!.value < 0 ? -this._getOffset(minValue!.value) : 0;
 
-        let topOffset: number = maxValue!.value > 0 ? Math.abs(this._getOffset(maxValue!.value)) : 0;
+        const c = this.renderer.scoreRenderer.canvas!;
+        c.font = this.renderer.resources.tablatureFont;
+        const labelMeasure = c.measureText('-1');
+
+        const labelSize = labelMeasure.height + this.renderer.smuflMetrics.tabWhammyTextPadding;
+
         if (
-            topOffset > 0 ||
+            topY !== 0 ||
             this._beat.whammyBarPoints![0].value !== 0 ||
             this.renderer.settings.notation.isNotationElementVisible(NotationElement.ZerosOnDiveWhammys)
         ) {
-            topOffset += this.renderer.resources.tablatureFont.size + this.renderer.smuflMetrics.tabWhammyTextPadding;
+            topY -= labelSize;
         }
-        const bottomOffset: number = minValue!.value < 0 ? Math.abs(this._getOffset(minValue!.value)) : 0;
 
-        this.topOffset = topOffset;
-        this.bottomOffset = bottomOffset;
-        this.originalTopOffset = topOffset;
-        this.originalBottomOffset = bottomOffset;
+        if (bottomY !== 0) {
+            const bottomYWithLabel = bottomY - labelSize;
+            if (bottomYWithLabel < topY) {
+                topY = bottomYWithLabel;
+            }
+        }
 
-        this.height = topOffset + bottomOffset;
+        topY = Math.abs(topY);
+        bottomY = Math.abs(bottomY);
+
+        this.topOffset = topY;
+        this.bottomOffset = bottomY;
+        this.originalTopOffset = topY;
+        this.originalBottomOffset = bottomY;
+
+        this.height = topY + bottomY;
     }
 
     private _getOffset(value: number): number {

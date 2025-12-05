@@ -78,6 +78,5 @@ export class TabWhammyEffectInfo extends EffectInfo {
         }
         band.slot!.shared.height = top + bottom;
         band.height = top + bottom;
-        band.originalHeight = top + bottom;
     }
 }

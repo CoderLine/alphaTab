@@ -713,8 +713,6 @@ export class BarRendererBase {
     }
 
     public reLayout(): void {
-        this._contentTopOverflow = 0;
-        this._contentBottomOverflow = 0;
         this.topEffects.reLayout();
         this.bottomEffects.reLayout();
         this.updateSizes();
