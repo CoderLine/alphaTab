@@ -279,9 +279,9 @@ export class DisplaySettings {
      * The bottom padding applied to main notation staves (standard, tabs, numbered, slash).
      * @since 1.4.0
      * @category Display
-     * @defaultValue `5`
+     * @defaultValue `0`
      */
-    public notationStaffPaddingBottom: number = 5;
+    public notationStaffPaddingBottom: number = 0;
 
     /**
      * The top padding applied to effect annotation staffs.
