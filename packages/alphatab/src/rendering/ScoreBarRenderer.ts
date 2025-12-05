@@ -113,137 +113,138 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return super.getLineHeight(steps / 2);
     }
 
-    public override doLayout(): void {
-        super.doLayout();
+    protected override calculateOverflows(): void {
+        super.calculateOverflows();
+        if (this.bar.isEmpty) {
+            return;
+        }
+        const top: number = this.getScoreY(0);
+        const bottom: number = this.getScoreY((this.heightLineCount - 1) * 2);
+        const whammyOffset: number = this.simpleWhammyOverflow;
 
-        if (!this.bar.isEmpty) {
-            const top: number = this.getScoreY(0);
-            const bottom: number = this.getScoreY((this.heightLineCount - 1) * 2);
-            const whammyOffset: number = this.simpleWhammyOverflow;
-
-            const beatEffectsMinY = this.beatEffectsMinY;
-            if (beatEffectsMinY !== null) {
-                const beatEffectTopOverflow = top - beatEffectsMinY;
-                if (beatEffectTopOverflow > 0) {
-                    this.registerOverflowTop(beatEffectTopOverflow);
-                }
+        const beatEffectsMinY = this.beatEffectsMinY;
+        if (beatEffectsMinY !== null) {
+            const beatEffectTopOverflow = top - beatEffectsMinY;
+            if (beatEffectTopOverflow > 0) {
+                this.registerOverflowTop(beatEffectTopOverflow);
             }
+        }
 
-            const beatEffectsMaxY = this.beatEffectsMaxY;
-            if (beatEffectsMaxY !== null) {
-                const beatEffectBottomOverflow = beatEffectsMaxY - bottom;
-                if (beatEffectBottomOverflow > 0) {
-                    this.registerOverflowBottom(beatEffectBottomOverflow);
-                }
+        const beatEffectsMaxY = this.beatEffectsMaxY;
+        if (beatEffectsMaxY !== null) {
+            const beatEffectBottomOverflow = beatEffectsMaxY - bottom;
+            if (beatEffectBottomOverflow > 0) {
+                this.registerOverflowBottom(beatEffectBottomOverflow);
             }
+        }
 
-            this.registerOverflowTop(whammyOffset);
+        this.registerOverflowTop(whammyOffset);
 
-            const noteOverflowPadding = this.getScoreHeight(1);
+        const noteOverflowPadding = this.getScoreHeight(1);
 
-            let maxNoteY = 0;
-            let minNoteY = 0;
+        let maxNoteY = 0;
+        let minNoteY = 0;
 
-            for (const v of this.helpers.beamHelpers) {
-                for (const h of v) {
-                    if (h.isRestBeamHelper) {
-                        if (h.minRestSteps) {
-                            const topY = this.getScoreY(h.maxRestSteps!) - noteOverflowPadding;
-                            if (topY < maxNoteY) {
-                                maxNoteY = topY;
-                            }
-                        }
-                        if (h.maxRestSteps) {
-                            const bottomY = this.getScoreY(h.maxRestSteps!) + noteOverflowPadding;
-                            if (bottomY < maxNoteY) {
-                                maxNoteY = bottomY;
-                            }
+        for (const v of this.helpers.beamHelpers) {
+            for (const h of v) {
+                if (h.isRestBeamHelper) {
+                    if (h.minRestSteps) {
+                        const topY = this.getScoreY(h.maxRestSteps!) - noteOverflowPadding;
+                        if (topY < maxNoteY) {
+                            maxNoteY = topY;
                         }
                     }
-                    // notes with stems
-                    else if (h.beats.length === 1 && h.beats[0].duration >= Duration.Half) {
-                        if (h.direction === BeamDirection.Up) {
-                            let topY = this.getFlagTopY(h.beats[0], h.direction);
-                            if (h.hasTuplet) {
-                                topY -= this.tupletSize + this.tupletOffset;
-                            }
-                            if (topY < maxNoteY) {
-                                maxNoteY = topY;
-                            }
-
-                            // bottom handled via beat container bBox
-                        } else {
-                            let bottomY = this.getFlagBottomY(h.beats[0], h.direction);
-                            if (h.hasTuplet) {
-                                bottomY += this.tupletSize + this.tupletOffset;
-                            }
-                            if (bottomY > minNoteY) {
-                                minNoteY = bottomY;
-                            }
-
-                            // top handled via beat container bBox
-                        }
-                    }
-                    // beamed notes and notes without stems
-                    // (see paintTuplets in case of doubts how we handle tuplets on non beamed notes)
-                    else {
-                        this._ensureBeamDrawingInfo(h, h.direction);
-                        const drawingInfo = h.drawingInfos.get(h.direction)!;
-
-                        if (h.direction === BeamDirection.Up) {
-                            let topY = Math.min(drawingInfo.startY, drawingInfo.endY);
-                            if (h.hasTuplet) {
-                                topY -= this.tupletSize + this.tupletOffset;
-                            }
-
-                            if (topY < maxNoteY) {
-                                maxNoteY = topY;
-                            }
-
-                            const bottomY: number =
-                                this.getBarLineStart(h.beatOfLowestNote, h.direction) + noteOverflowPadding;
-                            if (bottomY > minNoteY) {
-                                minNoteY = bottomY;
-                            }
-                        } else {
-                            let bottomY = Math.max(drawingInfo.startY, drawingInfo.endY);
-
-                            if (h.hasTuplet) {
-                                bottomY += this.tupletSize + this.tupletOffset;
-                            }
-
-                            if (bottomY > minNoteY) {
-                                minNoteY = bottomY;
-                            }
-
-                            const topY: number =
-                                this.getBarLineStart(h.beatOfHighestNote, h.direction) - noteOverflowPadding;
-                            if (topY < maxNoteY) {
-                                maxNoteY = topY;
-                            }
-                        }
-                    }
-
-                    const beatContainer = this.getBeatContainer(h.beats[0]);
-                    if (beatContainer) {
-                        const bBoxTop = beatContainer.getBoundingBoxTop();
-                        const bBoxBottom = beatContainer.getBoundingBoxBottom();
-                        if (bBoxBottom > minNoteY) {
-                            minNoteY = bBoxBottom;
-                        }
-                        if (bBoxTop < maxNoteY) {
-                            maxNoteY = bBoxTop;
+                    if (h.maxRestSteps) {
+                        const bottomY = this.getScoreY(h.maxRestSteps!) + noteOverflowPadding;
+                        if (bottomY < maxNoteY) {
+                            maxNoteY = bottomY;
                         }
                     }
                 }
-            }
-            if (maxNoteY < top) {
-                this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
-            }
+                // notes with stems
+                else if (h.beats.length === 1 && h.beats[0].duration >= Duration.Half) {
+                    if (h.direction === BeamDirection.Up) {
+                        let topY = this.getFlagTopY(h.beats[0], h.direction);
+                        if (h.hasTuplet) {
+                            topY -= this.tupletSize + this.tupletOffset;
+                        }
+                        if (topY < maxNoteY) {
+                            maxNoteY = topY;
+                        }
 
-            if (minNoteY > bottom) {
-                this.registerOverflowBottom(Math.abs(minNoteY) - bottom);
+                        // bottom handled via beat container bBox
+                    } else {
+                        let bottomY = this.getFlagBottomY(h.beats[0], h.direction);
+                        if (h.hasTuplet) {
+                            bottomY += this.tupletSize + this.tupletOffset;
+                        }
+                        if (bottomY > minNoteY) {
+                            minNoteY = bottomY;
+                        }
+
+                        // top handled via beat container bBox
+                    }
+                }
+                // beamed notes and notes without stems
+                // (see paintTuplets in case of doubts how we handle tuplets on non beamed notes)
+                else {
+                    this._ensureBeamDrawingInfo(h, h.direction);
+                    const drawingInfo = h.drawingInfos.get(h.direction)!;
+
+                    if (h.direction === BeamDirection.Up) {
+                        let topY = Math.min(drawingInfo.startY, drawingInfo.endY);
+                        if (h.hasTuplet) {
+                            topY -= this.tupletSize + this.tupletOffset;
+                        }
+
+                        if (topY < maxNoteY) {
+                            maxNoteY = topY;
+                        }
+
+                        const bottomY: number =
+                            this.getBarLineStart(h.beatOfLowestNote, h.direction) + noteOverflowPadding;
+                        if (bottomY > minNoteY) {
+                            minNoteY = bottomY;
+                        }
+                    } else {
+                        let bottomY = Math.max(drawingInfo.startY, drawingInfo.endY);
+
+                        if (h.hasTuplet) {
+                            bottomY += this.tupletSize + this.tupletOffset;
+                        }
+
+                        if (bottomY > minNoteY) {
+                            minNoteY = bottomY;
+                        }
+
+                        const topY: number =
+                            this.getBarLineStart(h.beatOfHighestNote, h.direction) - noteOverflowPadding;
+                        if (topY < maxNoteY) {
+                            maxNoteY = topY;
+                        }
+                    }
+                }
+
+                const beatContainer = this.getBeatContainer(h.beats[0]);
+                if (beatContainer) {
+                    const bBoxTop = beatContainer.getBoundingBoxTop();
+                    const bBoxBottom = beatContainer.getBoundingBoxBottom();
+                    if (bBoxBottom > minNoteY) {
+                        minNoteY = bBoxBottom;
+                    }
+                    if (bBoxTop < maxNoteY) {
+                        maxNoteY = bBoxTop;
+                    }
+                }
             }
+        }
+
+        if (maxNoteY < top) {
+            this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
+        }
+
+        if (minNoteY > bottom) {
+            this.registerOverflowBottom(Math.abs(minNoteY) - bottom);
         }
     }
 

@@ -425,6 +425,10 @@ export class BarRendererBase {
 
         this.computedWidth = this.width;
 
+        this.calculateOverflows();
+    }
+    
+    protected calculateOverflows() {
         const rendererBottom = this.height;
 
         const preBeatGlyphs = this._preBeatGlyphs.glyphs;
@@ -690,6 +694,7 @@ export class BarRendererBase {
         }
 
         this.registerLayoutingInfo();
+        this.calculateOverflows();
     }
 
     protected recreatePreBeatGlyphs() {
