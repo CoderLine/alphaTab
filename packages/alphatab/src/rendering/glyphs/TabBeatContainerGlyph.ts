@@ -36,47 +36,49 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         }
         const renderer: TabBarRenderer = this.renderer as TabBarRenderer;
         if (n.isTieOrigin && renderer.showTiedNotes && n.tieDestination!.isVisible) {
-            const tie: TabTieGlyph = new TabTieGlyph(n, n.tieDestination!, false);
+            const tie: TabTieGlyph = new TabTieGlyph(n, n.tieDestination!);
             this.addTie(tie);
         }
-        if (n.isTieDestination && renderer.showTiedNotes) {
-            const tie: TabTieGlyph = new TabTieGlyph(n.tieOrigin!, n, true);
-            this.addTie(tie);
-        }
+        // TODO multi-system slurs
+        // if (n.isTieDestination && renderer.showTiedNotes) {
+        //     const tie: TabTieGlyph = new TabTieGlyph(n.tieOrigin!, n, true);
+        //     this.addTie(tie);
+        // }
         if (n.isLeftHandTapped && !n.isHammerPullDestination) {
-            const tapSlur: TabTieGlyph = new TabTieGlyph(n, n, false);
+            const tapSlur: TabTieGlyph = new TabTieGlyph(n, n);
             this.addTie(tapSlur);
         }
         // start effect slur on first beat
         if (n.isEffectSlurOrigin && n.effectSlurDestination) {
             let expanded: boolean = false;
             for (const slur of this._effectSlurs) {
-                if (slur.tryExpand(n, n.effectSlurDestination, false, false)) {
+                if (slur.tryExpand(n, n.effectSlurDestination, false)) {
                     expanded = true;
                     break;
                 }
             }
             if (!expanded) {
-                const effectSlur: TabSlurGlyph = new TabSlurGlyph(n, n.effectSlurDestination, false, false);
+                const effectSlur: TabSlurGlyph = new TabSlurGlyph(n, n.effectSlurDestination, false);
                 this._effectSlurs.push(effectSlur);
                 this.addTie(effectSlur);
             }
         }
-        // end effect slur on last beat
-        if (n.isEffectSlurDestination && n.effectSlurOrigin) {
-            let expanded: boolean = false;
-            for (const slur of this._effectSlurs) {
-                if (slur.tryExpand(n.effectSlurOrigin, n, false, true)) {
-                    expanded = true;
-                    break;
-                }
-            }
-            if (!expanded) {
-                const effectSlur: TabSlurGlyph = new TabSlurGlyph(n.effectSlurOrigin, n, false, true);
-                this._effectSlurs.push(effectSlur);
-                this.addTie(effectSlur);
-            }
-        }
+        // TODO: multisystem slurs 
+        // // end effect slur on last beat
+        // if (n.isEffectSlurDestination && n.effectSlurOrigin) {
+        //     let expanded: boolean = false;
+        //     for (const slur of this._effectSlurs) {
+        //         if (slur.tryExpand(n.effectSlurOrigin, n, false, true)) {
+        //             expanded = true;
+        //             break;
+        //         }
+        //     }
+        //     if (!expanded) {
+        //         const effectSlur: TabSlurGlyph = new TabSlurGlyph(n.effectSlurOrigin, n, false, true);
+        //         this._effectSlurs.push(effectSlur);
+        //         this.addTie(effectSlur);
+        //     }
+        // }
         if (n.slideInType !== SlideInType.None || n.slideOutType !== SlideOutType.None) {
             const l: TabSlideLineGlyph = new TabSlideLineGlyph(n.slideInType, n.slideOutType, n, this);
             this.addTie(l);

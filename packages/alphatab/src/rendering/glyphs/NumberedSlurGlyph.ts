@@ -11,8 +11,8 @@ export class NumberedSlurGlyph extends TabTieGlyph {
     private _direction: BeamDirection;
     private _forSlide: boolean;
 
-    public constructor(startNote: Note, endNote: Note, forSlide: boolean, forEnd: boolean = false) {
-        super(startNote, endNote, forEnd);
+    public constructor(startNote: Note, endNote: Note, forSlide: boolean) {
+        super(startNote, endNote);
         this._direction = BeamDirection.Up;
         this._forSlide = forSlide;
     }
@@ -21,12 +21,9 @@ export class NumberedSlurGlyph extends TabTieGlyph {
         return Math.log(endX - startX + 1) * this.renderer.settings.notation.slurHeight / 2;
     }
 
-    public tryExpand(startNote: Note, endNote: Note, forSlide: boolean, forEnd: boolean): boolean {
+    public tryExpand(startNote: Note, endNote: Note, forSlide: boolean): boolean {
         // same type required
         if (this._forSlide !== forSlide) {
-            return false;
-        }
-        if (this.forEnd !== forEnd) {
             return false;
         }
         // same start and endbeat

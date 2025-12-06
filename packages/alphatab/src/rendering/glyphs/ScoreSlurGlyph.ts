@@ -13,8 +13,8 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
     private _startNote: Note;
     private _endNote: Note;
 
-    public constructor(startNote: Note, endNote: Note, forEnd: boolean = false) {
-        super(startNote.beat, endNote.beat, forEnd);
+    public constructor(startNote: Note, endNote: Note) {
+        super(startNote.beat, endNote.beat);
         this._startNote = startNote;
         this._endNote = endNote;
     }

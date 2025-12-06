@@ -11,8 +11,8 @@ export class TabTieGlyph extends TieGlyph {
     protected startNote: Note;
     protected endNote: Note;
 
-    public constructor(startNote: Note, endNote: Note, forEnd: boolean = false) {
-        super(startNote.beat, endNote.beat, forEnd);
+    public constructor(startNote: Note, endNote: Note) {
+        super(startNote.beat, endNote.beat);
         this.startNote = startNote;
         this.endNote = endNote;
     }

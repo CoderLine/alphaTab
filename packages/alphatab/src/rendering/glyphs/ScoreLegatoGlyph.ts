@@ -11,14 +11,6 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
  * @internal
  */
 export class ScoreLegatoGlyph extends TieGlyph {
-    public constructor(startBeat: Beat, endBeat: Beat, forEnd: boolean = false) {
-        super(startBeat, endBeat, forEnd);
-    }
-
-    public override doLayout(): void {
-        super.doLayout();
-    }
-
     protected override getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
         if (beat.isRest) {
             return BeamDirection.Up;

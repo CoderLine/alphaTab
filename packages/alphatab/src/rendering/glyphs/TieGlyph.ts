@@ -9,6 +9,10 @@ import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
  * @internal
  */
 export interface ITieGlyph {
+    /**
+     * Whether the tie is relevant for checking on bar renderer overflows.
+     * If set, the tie bounds will be requested and the overflow is applied.
+     */
     readonly checkForOverflow: boolean;
 }
 
@@ -19,17 +23,21 @@ export class TieGlyph extends Glyph implements ITieGlyph {
     protected startBeat: Beat | null;
     protected endBeat: Beat | null;
     protected yOffset: number = 0;
-    protected forEnd: boolean;
 
     protected startNoteRenderer: BarRendererBase | null = null;
     protected endNoteRenderer: BarRendererBase | null = null;
     protected tieDirection: BeamDirection = BeamDirection.Up;
 
-    public constructor(startBeat: Beat | null, endBeat: Beat | null, forEnd: boolean) {
+    /**
+     * Whether the tie is completed or needs continuation on subsequent staves 
+     * until the end-beat is reached.
+     */
+    public needsContinuation = false;
+
+    public constructor(startBeat: Beat | null, endBeat: Beat | null) {
         super(0, 0);
         this.startBeat = startBeat;
         this.endBeat = endBeat;
-        this.forEnd = forEnd;
     }
 
     private _startX: number = 0;
@@ -37,7 +45,6 @@ export class TieGlyph extends Glyph implements ITieGlyph {
     private _endX: number = 0;
     private _endY: number = 0;
     private _tieHeight: number = 0;
-    private _shouldDraw: boolean = false;
     private _boundingBox?: Bounds;
 
     public get checkForOverflow() {
@@ -62,14 +69,10 @@ export class TieGlyph extends Glyph implements ITieGlyph {
         this.width = 0;
         // TODO fix nullability of start/end beat,
         if (!this.endBeat) {
-            this._shouldDraw = false;
             return;
         }
 
-        const startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-            this.renderer.staff.staffId,
-            this.startBeat!.voice.bar
-        );
+        const startNoteRenderer = this.renderer;
         this.startNoteRenderer = startNoteRenderer;
         const endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staffId,
@@ -82,101 +85,90 @@ export class TieGlyph extends Glyph implements ITieGlyph {
         this._startY = 0;
         this._endY = 0;
         this.height = 0;
-        this._shouldDraw = false;
         // if we are on the tie start, we check if we
         // either can draw till the end note, or we just can draw till the bar end
         this.tieDirection = !startNoteRenderer
             ? this.getBeamDirection(this.endBeat, endNoteRenderer!)
             : this.getBeamDirection(this.startBeat!, startNoteRenderer);
-        if (!this.forEnd && startNoteRenderer) {
-            // line break or bar break
-            if (startNoteRenderer !== endNoteRenderer) {
-                this._startX = startNoteRenderer.x + this.getStartX();
-                this._startY = startNoteRenderer.y + this.getStartY() + this.yOffset;
-                // line break: to bar end
-                if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
-                    this._endX = startNoteRenderer.x + startNoteRenderer.width;
-                    this._endY = this._startY;
-                } else {
-                    this._endX = endNoteRenderer.x + this.getEndX();
-                    this._endY = endNoteRenderer.y + this.getEndY() + this.yOffset;
-                }
+            
+        // line break or bar break
+        if (startNoteRenderer !== endNoteRenderer) {
+            this._startX = startNoteRenderer.x + this.getStartX();
+            this._startY = startNoteRenderer.y + this.getStartY() + this.yOffset;
+            // line break: to bar end
+            if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
+                this.needsContinuation = true;
+                this._endX = startNoteRenderer.x + startNoteRenderer.width;
+                this._endY = this._startY;
             } else {
-                this._startX = startNoteRenderer.x + this.getStartX();
                 this._endX = endNoteRenderer.x + this.getEndX();
-                this._startY = startNoteRenderer.y + this.getStartY() + this.yOffset;
                 this._endY = endNoteRenderer.y + this.getEndY() + this.yOffset;
             }
-            this._shouldDraw = true;
-        } else if (!startNoteRenderer || startNoteRenderer.staff !== endNoteRenderer!.staff) {
-            this._startX = endNoteRenderer!.x;
-            this._endX = endNoteRenderer!.x + this.getEndX();
-            this._startY = endNoteRenderer!.y + this.getEndY() + this.yOffset;
-            this._endY = this._startY;
-            this._shouldDraw = true;
+        } else {
+            this._startX = startNoteRenderer.x + this.getStartX();
+            this._endX = endNoteRenderer.x + this.getEndX();
+            this._startY = startNoteRenderer.y + this.getStartY() + this.yOffset;
+            this._endY = endNoteRenderer.y + this.getEndY() + this.yOffset;
         }
+    
 
         this._boundingBox = undefined;
-        if (this._shouldDraw) {
-            this.y = Math.min(this._startY, this._endY);
-            if (this.shouldDrawBendSlur()) {
-                this._tieHeight = 0; // TODO: Bend slur height to be considered?
-            } else {
-                this._tieHeight = this.getTieHeight(this._startX, this._startY, this._endX, this._endY);
+        this.y = Math.min(this._startY, this._endY);
+        if (this.shouldDrawBendSlur()) {
+            this._tieHeight = 0; // TODO: Bend slur height to be considered?
+        } else {
+            this._tieHeight = this.getTieHeight(this._startX, this._startY, this._endX, this._endY);
 
-                const tieBoundingBox = TieGlyph.calculateActualTieHeight(
-                    1,
-                    this._startX,
-                    this._startY,
-                    this._endX,
-                    this._endY,
-                    this.tieDirection === BeamDirection.Down,
-                    this._tieHeight,
-                    this.renderer.smuflMetrics.tieMidpointThickness
-                );
-                this._boundingBox = tieBoundingBox;
+            const tieBoundingBox = TieGlyph.calculateActualTieHeight(
+                1,
+                this._startX,
+                this._startY,
+                this._endX,
+                this._endY,
+                this.tieDirection === BeamDirection.Down,
+                this._tieHeight,
+                this.renderer.smuflMetrics.tieMidpointThickness
+            );
+            this._boundingBox = tieBoundingBox;
 
-                this.height = tieBoundingBox.h;
+            this.height = tieBoundingBox.h;
 
-                if (this.tieDirection === BeamDirection.Up) {
-                    // the tie might go above `this.y` due to its shape
-                    // here we calculate how much this is so we can consider the
-                    // respective overflow
-                    const overlap = this.y - tieBoundingBox.y;
-                    if (overlap > 0) {
-                        this.y -= overlap;
-                    }
+            if (this.tieDirection === BeamDirection.Up) {
+                // the tie might go above `this.y` due to its shape
+                // here we calculate how much this is so we can consider the
+                // respective overflow
+                const overlap = this.y - tieBoundingBox.y;
+                if (overlap > 0) {
+                    this.y -= overlap;
                 }
             }
         }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        if (this._shouldDraw) {
-            if (this.shouldDrawBendSlur()) {
-                TieGlyph.drawBendSlur(
-                    canvas,
-                    cx + this._startX,
-                    cy + this._startY,
-                    cx + this._endX,
-                    cy + this._endY,
-                    this.tieDirection === BeamDirection.Down,
-                    1,
-                    this.renderer.smuflMetrics.tieHeight
-                );
-            } else {
-                TieGlyph.paintTie(
-                    canvas,
-                    1,
-                    cx + this._startX,
-                    cy + this._startY,
-                    cx + this._endX,
-                    cy + this._endY,
-                    this.tieDirection === BeamDirection.Down,
-                    this._tieHeight,
-                    this.renderer.smuflMetrics.tieMidpointThickness
-                );
-            }
+        if (this.shouldDrawBendSlur()) {
+            TieGlyph.drawBendSlur(
+                canvas,
+                cx + this._startX,
+                cy + this._startY,
+                cx + this._endX,
+                cy + this._endY,
+                this.tieDirection === BeamDirection.Down,
+                1,
+                this.renderer.smuflMetrics.tieHeight
+            );
+        } else {
+            TieGlyph.paintTie(
+                canvas,
+                1,
+                cx + this._startX,
+                cy + this._startY,
+                cx + this._endX,
+                cy + this._endY,
+                this.tieDirection === BeamDirection.Down,
+                this._tieHeight,
+                this.renderer.smuflMetrics.tieMidpointThickness
+            );
         }
     }
 

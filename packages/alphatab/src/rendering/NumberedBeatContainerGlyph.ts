@@ -16,46 +16,49 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
         }
 
         if (n.isTieOrigin && n.tieDestination!.isVisible) {
-            const tie = new NumberedTieGlyph(n, n.tieDestination!, false);
+            const tie = new NumberedTieGlyph(n, n.tieDestination!);
             this.addTie(tie);
         }
         if (n.isTieDestination) {
-            const tie = new NumberedTieGlyph(n.tieOrigin!, n, true);
-            this.addTie(tie);
+            // TODO: multisystem slurs
+            // const tie = new NumberedTieGlyph(n.tieOrigin!, n, true);
+            // this.addTie(tie);
         }
         if (n.isLeftHandTapped && !n.isHammerPullDestination) {
-            const tapSlur = new NumberedTieGlyph(n, n, false);
+            const tapSlur = new NumberedTieGlyph(n, n);
             this.addTie(tapSlur);
         }
         // start effect slur on first beat
         if (n.isEffectSlurOrigin && n.effectSlurDestination) {
             let expanded: boolean = false;
             for (const slur of this._effectSlurs) {
-                if (slur.tryExpand(n, n.effectSlurDestination, false, false)) {
+                if (slur.tryExpand(n, n.effectSlurDestination, false)) {
                     expanded = true;
                     break;
                 }
             }
             if (!expanded) {
-                const effectSlur = new NumberedSlurGlyph(n, n.effectSlurDestination, false, false);
+                const effectSlur = new NumberedSlurGlyph(n, n.effectSlurDestination, false);
                 this._effectSlurs.push(effectSlur);
                 this.addTie(effectSlur);
             }
         }
-        // end effect slur on last beat
-        if (n.isEffectSlurDestination && n.effectSlurOrigin) {
-            let expanded: boolean = false;
-            for (const slur of this._effectSlurs) {
-                if (slur.tryExpand(n.effectSlurOrigin, n, false, true)) {
-                    expanded = true;
-                    break;
-                }
-            }
-            if (!expanded) {
-                const effectSlur = new NumberedSlurGlyph(n.effectSlurOrigin, n, false, true);
-                this._effectSlurs.push(effectSlur);
-                this.addTie(effectSlur);
-            }
-        }
+
+        // TODO: multisystem slurs
+        // // end effect slur on last beat
+        // if (n.isEffectSlurDestination && n.effectSlurOrigin) {
+        //     let expanded: boolean = false;
+        //     for (const slur of this._effectSlurs) {
+        //         if (slur.tryExpand(n.effectSlurOrigin, n, false, true)) {
+        //             expanded = true;
+        //             break;
+        //         }
+        //     }
+        //     if (!expanded) {
+        //         const effectSlur = new NumberedSlurGlyph(n.effectSlurOrigin, n, false, true);
+        //         this._effectSlurs.push(effectSlur);
+        //         this.addTie(effectSlur);
+        //     }
+        // }
     }
 }
