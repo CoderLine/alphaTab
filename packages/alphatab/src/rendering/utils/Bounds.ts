@@ -6,27 +6,34 @@ export class Bounds {
     /**
      * Gets or sets the X-position of the rectangle within the music notation.
      */
-    public x: number = 0;
+    public x: number;
 
     /**
      * Gets or sets the Y-position of the rectangle within the music notation.
      */
-    public y: number = 0;
+    public y: number;
 
     /**
      * Gets or sets the width of the rectangle.
      */
-    public w: number = 0;
+    public w: number;
 
     /**
      * Gets or sets the height of the rectangle.
      */
-    public h: number = 0;
+    public h: number;
 
     public scaleWith(scale: number) {
         this.x *= scale;
         this.y *= scale;
         this.w *= scale;
         this.h *= scale;
+    }
+
+    public constructor(x: number = 0, y: number = 0, w: number = 0, h: number = 0) {
+        this.x = x;
+        this.y = y;
+        this.h = h;
+        this.w = w;
     }
 }
