@@ -2864,7 +2864,11 @@ export class AlphaTabApiBase<TSettings> {
             startBeat = endBeat;
             endBeat = t;
         }
-        const startX: number = startBeat.bounds!.realBounds.x;
+        let startX: number = startBeat.bounds!.realBounds.x;
+        if(startBeat.beat.index === 0) {
+            startX = startBeat.bounds!.barBounds.masterBarBounds.realBounds.x;
+        }
+
         let endX: number = endBeat.bounds!.realBounds.x + endBeat.bounds!.realBounds.w;
         if (endBeat.beat.index === endBeat.beat.voice.beats.length - 1) {
             endX =
