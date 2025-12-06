@@ -1,6 +1,6 @@
-import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { NoteXPosition, NoteYPosition, type BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
@@ -19,19 +19,13 @@ export interface ITieGlyph {
 /**
  * @internal
  */
-export class TieGlyph extends Glyph implements ITieGlyph {
-    protected startBeat: Beat;
-    protected endBeat: Beat;
+export abstract class TieGlyph extends Glyph implements ITieGlyph {
     protected yOffset: number = 0;
 
-    protected startNoteRenderer: BarRendererBase | null = null;
-    protected endNoteRenderer: BarRendererBase | null = null;
     protected tieDirection: BeamDirection = BeamDirection.Up;
 
-    public constructor(startBeat: Beat, endBeat: Beat) {
+    public constructor() {
         super(0, 0);
-        this.startBeat = startBeat;
-        this.endBeat = endBeat;
     }
 
     private _startX: number = 0;
@@ -61,18 +55,9 @@ export class TieGlyph extends Glyph implements ITieGlyph {
 
     public override doLayout(): void {
         this.width = 0;
-        // TODO fix nullability of start/end beat,
-        if (!this.endBeat) {
-            return;
-        }
 
         const startNoteRenderer = this.renderer;
-        this.startNoteRenderer = startNoteRenderer;
-        const endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-            this.renderer.staff.staffId,
-            this.endBeat.voice.bar
-        );
-        this.endNoteRenderer = endNoteRenderer;
+        const endNoteRenderer = this.getEndBeatRenderer();
 
         this._startX = 0;
         this._endX = 0;
@@ -81,14 +66,12 @@ export class TieGlyph extends Glyph implements ITieGlyph {
         this.height = 0;
         // if we are on the tie start, we check if we
         // either can draw till the end note, or we just can draw till the bar end
-        this.tieDirection = !startNoteRenderer
-            ? this.getBeamDirection(this.endBeat, endNoteRenderer!)
-            : this.getBeamDirection(this.startBeat!, startNoteRenderer);
+        this.tieDirection = this.getTieDirection();
 
         // line break or bar break
         if (startNoteRenderer !== endNoteRenderer) {
-            this._startX = startNoteRenderer.x + this.getStartX();
-            this._startY = startNoteRenderer.y + this.getStartY() + this.yOffset;
+            this._startX = this.getStartX();
+            this._startY = this.getStartY() + this.yOffset;
             // line break: to bar end
             if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
                 const lastRendererInStaff =
@@ -99,14 +82,14 @@ export class TieGlyph extends Glyph implements ITieGlyph {
 
                 startNoteRenderer.scoreRenderer.layout!.slurRegistry.startMultiSystemSlur(this);
             } else {
-                this._endX = endNoteRenderer.x + this.getEndX();
-                this._endY = endNoteRenderer.y + this.getEndY() + this.yOffset;
+                this._endX = this.getEndX();
+                this._endY = this.getEndY() + this.yOffset;
             }
         } else {
-            this._startX = startNoteRenderer.x + this.getStartX();
-            this._endX = endNoteRenderer.x + this.getEndX();
-            this._startY = startNoteRenderer.y + this.getStartY() + this.yOffset;
-            this._endY = endNoteRenderer.y + this.getEndY() + this.yOffset;
+            this._startX = this.getStartX();
+            this._endX = this.getEndX();
+            this._startY = this.getStartY() + this.yOffset;
+            this._endY = this.getEndY() + this.yOffset;
         }
 
         this._boundingBox = undefined;
@@ -169,37 +152,23 @@ export class TieGlyph extends Glyph implements ITieGlyph {
         }
     }
 
-    protected shouldDrawBendSlur() {
-        return false;
-    }
+    protected abstract shouldDrawBendSlur(): boolean;
 
     protected getTieHeight(_startX: number, _startY: number, _endX: number, _endY: number): number {
         return this.renderer.smuflMetrics.tieHeight;
     }
 
-    protected getBeamDirection(_beat: Beat, _noteRenderer: BarRendererBase): BeamDirection {
-        return BeamDirection.Down;
-    }
+    protected abstract getTieDirection(): BeamDirection;
 
-    protected getStartY(): number {
-        return 0;
-    }
+    protected abstract getEndBeatRenderer(): BarRendererBase;
 
-    protected getStartLine(): number {
-        return 0;
-    }
+    protected abstract getStartY(): number;
 
-    protected getEndY(): number {
-        return 0;
-    }
+    protected abstract getEndY(): number;
 
-    protected getStartX(): number {
-        return 0;
-    }
+    protected abstract getStartX(): number;
 
-    protected getEndX(): number {
-        return 0;
-    }
+    protected abstract getEndX(): number;
 
     public static calculateActualTieHeight(
         scale: number,
@@ -442,5 +411,107 @@ export class TieGlyph extends Glyph implements ITieGlyph {
             const textOffset: number = down ? 0 : -canvas.font.size;
             canvas.fillText(slurText, cp1X - w / 2, cp1Y + textOffset);
         }
+    }
+}
+
+/**
+ * A common tie implementation using note details for positioning
+ * @internal
+ */
+export class NoteTieGlyph extends TieGlyph {
+    protected startNote: Note;
+    protected endNote: Note;
+    protected endNoteRenderer!: BarRendererBase;
+
+    public constructor(startNote: Note, endNote: Note) {
+        super();
+        this.startNote = startNote;
+        this.endNote = endNote;
+    }
+
+    protected get isLeftHandTap() {
+        return this.startNote === this.endNote;
+    }
+
+    public override doLayout(): void {
+        this.endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+            this.renderer.staff.staffId,
+            this.endNote.beat.voice.bar
+        )!;
+        super.doLayout();
+    }
+
+    protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
+        if (this.isLeftHandTap) {
+            return this.renderer!.smuflMetrics.tieHeight;
+        }
+        return super.getTieHeight(startX, startY, endX, endY);
+    }
+
+    protected override getTieDirection(): BeamDirection {
+        // invert direction (if stems go up, ties go down to not cross them)
+        switch (this.renderer.getBeatDirection(this.startNote.beat)) {
+            case BeamDirection.Up:
+                return BeamDirection.Down;
+            default:
+                return BeamDirection.Up;
+        }
+    }
+
+    protected override getStartX(): number {
+        if (this.isLeftHandTap) {
+            return this.getEndX() - this.renderer.smuflMetrics.leftHandTabTieWidth;
+        }
+        return this.renderer.x + this.renderer!.getNoteX(this.startNote, this.getStartNotePosition());
+    }
+
+    protected getStartNotePosition() {
+        return NoteXPosition.Center;
+    }
+
+    protected override getStartY(): number {
+        if (this.isLeftHandTap) {
+            return this.renderer.y + this.renderer!.getNoteY(this.startNote, NoteYPosition.Center);
+        }
+
+        switch (this.tieDirection) {
+            case BeamDirection.Up:
+                return this.renderer.y + this.renderer!.getNoteY(this.startNote, NoteYPosition.Top);
+            default:
+                return this.renderer.y + this.renderer!.getNoteY(this.startNote, NoteYPosition.Bottom);
+        }
+    }
+
+    protected override getEndX(): number {
+        if (this.isLeftHandTap) {
+            return this.endNoteRenderer.x + this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Left);
+        }
+        return this.endNoteRenderer.x + this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Center);
+    }
+
+    protected getEndNotePosition() {
+        return NoteXPosition.Center;
+    }
+
+    protected override getEndY(): number {
+        const endNoteRenderer = this.endNoteRenderer;
+        if (this.isLeftHandTap) {
+            return endNoteRenderer.y + endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Center);
+        }
+
+        switch (this.tieDirection) {
+            case BeamDirection.Up:
+                return endNoteRenderer.y + endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Top);
+            default:
+                return endNoteRenderer.y + endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Bottom);
+        }
+    }
+
+    protected override getEndBeatRenderer(): BarRendererBase {
+        return this.endNoteRenderer;
+    }
+
+    protected override shouldDrawBendSlur(): boolean {
+        return false;
     }
 }

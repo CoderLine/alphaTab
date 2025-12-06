@@ -1,6 +1,6 @@
 import type { Note } from '@coderline/alphatab/model/Note';
-import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { NumberedTieGlyph } from '@coderline/alphatab/rendering//glyphs/NumberedTieGlyph';
+import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { NumberedSlurGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedSlurGlyph';
 
 /**
@@ -30,6 +30,7 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
         }
         // start effect slur on first beat
         if (n.isEffectSlurOrigin && n.effectSlurDestination) {
+            // TODO: ensure we have only one effect slur per start<->destination beat. 
             let expanded: boolean = false;
             for (const slur of this._effectSlurs) {
                 if (slur.tryExpand(n, n.effectSlurDestination, false)) {

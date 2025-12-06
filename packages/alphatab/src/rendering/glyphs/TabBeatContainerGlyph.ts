@@ -50,6 +50,7 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         }
         // start effect slur on first beat
         if (n.isEffectSlurOrigin && n.effectSlurDestination) {
+            // TODO: ensure we have only one effect slur per start<->destination beat. 
             let expanded: boolean = false;
             for (const slur of this._effectSlurs) {
                 if (slur.tryExpand(n, n.effectSlurDestination, false)) {
