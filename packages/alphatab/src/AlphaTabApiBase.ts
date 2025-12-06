@@ -57,7 +57,7 @@ import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/Rend
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { ScoreRendererWrapper } from '@coderline/alphatab/rendering/ScoreRendererWrapper';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import type { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
 import type { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
@@ -82,14 +82,44 @@ import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/Positio
 
 /**
  * @internal
+ * @record
  */
-class SelectionInfo {
-    public beat: Beat;
-    public bounds: BeatBounds | null = null;
+interface SelectionInfo {
+    beat: Beat;
+    bounds?: BeatBounds;
+}
 
-    public constructor(beat: Beat) {
-        this.beat = beat;
-    }
+/**
+ * Holds information about the highlights shown for the playback range.
+ * @public
+ * @record
+ */
+export interface PlaybackHighlightChangeEventArgs {
+    /**
+     * The beat where the selection starts. undefined if there is no selection.
+     */
+    startBeat?: Beat;
+
+    /**
+     * The bounds of the start beat to determine its location and size.
+     */
+    startBeatBounds?: BeatBounds;
+
+    /**
+     * The beat where the selection ends. undefined if there is no selection.
+     */
+    endBeat?: Beat;
+
+    /**
+     * The bounds of the end beat to determine its location and size.
+     */
+    endBeatBounds?: BeatBounds;
+
+    /**
+     * A list of the individual rectangular areas where highlight blocks are placed.
+     * If a selection spans multiple lines this array will hold all items.
+     */
+    highlightBlocks?: Bounds[];
 }
 
 /**
@@ -2387,8 +2417,8 @@ export class AlphaTabApiBase<TSettings> {
 
     private _isBeatMouseDown: boolean = false;
     private _isNoteMouseDown: boolean = false;
-    private _selectionStart: SelectionInfo | null = null;
-    private _selectionEnd: SelectionInfo | null = null;
+    private _selectionStart?: SelectionInfo;
+    private _selectionEnd?: SelectionInfo;
 
     /**
      * This event is fired whenever a the user presses the mouse button on a beat.
@@ -2640,8 +2670,8 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         if (this._hasCursor && this.settings.player.enableUserInteraction) {
-            this._selectionStart = new SelectionInfo(beat);
-            this._selectionEnd = null;
+            this._selectionStart = { beat };
+            this._selectionEnd = undefined;
         }
         this._isBeatMouseDown = true;
         (this.beatMouseDown as EventEmitterOfT<Beat>).trigger(beat);
@@ -2665,7 +2695,7 @@ export class AlphaTabApiBase<TSettings> {
 
         if (this.settings.player.enableUserInteraction) {
             if (!this._selectionEnd || this._selectionEnd.beat !== beat) {
-                this._selectionEnd = new SelectionInfo(beat);
+                this._selectionEnd = { beat };
                 this._cursorSelectRange(this._selectionStart, this._selectionEnd);
             }
         }
@@ -2728,7 +2758,7 @@ export class AlphaTabApiBase<TSettings> {
                         50;
                     this.playbackRange = range;
                 } else {
-                    this._selectionStart = null;
+                    this._selectionStart = undefined;
                     this.playbackRange = null;
                     this._cursorSelectRange(this._selectionStart, this._selectionEnd);
                 }
@@ -2758,12 +2788,12 @@ export class AlphaTabApiBase<TSettings> {
             const startBeat = this._tickCache.findBeat(this._trackIndexLookup!, range.startTick);
             const endBeat = this._tickCache.findBeat(this._trackIndexLookup!, range.endTick);
             if (startBeat && endBeat) {
-                const selectionStart = new SelectionInfo(startBeat.beat);
-                const selectionEnd = new SelectionInfo(endBeat.beat);
+                const selectionStart = { beat: startBeat.beat };
+                const selectionEnd = { beat: endBeat.beat };
                 this._cursorSelectRange(selectionStart, selectionEnd);
             }
         } else {
-            this._cursorSelectRange(null, null);
+            this._cursorSelectRange(undefined, undefined);
         }
     }
 
@@ -2836,27 +2866,154 @@ export class AlphaTabApiBase<TSettings> {
         });
     }
 
-    private _cursorSelectRange(startBeat: SelectionInfo | null, endBeat: SelectionInfo | null): void {
+    /**
+     * Places the highlight markers at the specified start and end-beat range.
+     * @param startBeat The start beat where the selection should start
+     * @param endBeat The end beat where the selection should end.
+     *
+     * @remarks
+     * Unlike actually setting {@link playbackRange} this method only places the selection markers without actually
+     * changing the playback range. This method can be used when building custom selection systems (e.g. having draggable handles).
+     *
+     * @category Methods - Player
+     * @since 1.8.0
+     *
+     * @example
+     * JavaScript
+     * ```js
+     * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+     * const startBeat = api.score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+     * const endBeat = api.score.tracks[0].staves[0].bars[3].voices[0].beats[0];
+     * api.highlightPlaybackRange(startBeat, endBeat);
+     * ```
+     *
+     * @example
+     * C#
+     * ```cs
+     * var api = new AlphaTabApi<MyControl>(...);
+     * api.ChangeTrackVolume(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, 1.5);
+     * api.ChangeTrackVolume(new Track[] { api.Score.Tracks[2] }, 0.5);
+     * var startBeat = api.Score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0];
+     * var endBeat = api.Score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0];
+     * api.HighlightPlaybackRange(startBeat, endBeat);
+     * ```
+     *
+     * @example
+     * Android
+     * ```kotlin
+     * val api = AlphaTabApi<MyControl>(...)
+     * val startBeat = api.score.tracks[0].staves[0].bars[0].voices[0].beats[0]
+     * val endBeat = api.score.tracks[0].staves[0].bars[3].voices[0].beats[0]
+     * api.highlightPlaybackRange(startBeat, endBeat)
+     * ```
+     */
+    public highlightPlaybackRange(startBeat: Beat, endBeat: Beat) {
+        this._cursorSelectRange({ beat: startBeat }, { beat: endBeat });
+    }
+
+    /**
+     * Clears the highlight markers marking the currently selected playback range.
+     *
+     * @remarks
+     * Unlike actually setting {@link playbackRange} this method only clears the selection markers without actually
+     * changing the playback range. This method can be used when building custom selection systems (e.g. having draggable handles).
+     *
+     * @category Methods - Player
+     * @since 1.8.0
+     *
+     * @example
+     * JavaScript
+     * ```js
+     * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+     * api.clearPlaybackRangeHighlight();
+     * ```
+     *
+     * @example
+     * C#
+     * ```cs
+     * var api = new AlphaTabApi<MyControl>(...);
+     * api.clearPlaybackRangeHighlight();
+     * ```
+     *
+     * @example
+     * Android
+     * ```kotlin
+     * val api = AlphaTabApi<MyControl>(...)
+     * api.clearPlaybackRangeHighlight()
+     * ```
+     */
+    public clearPlaybackRangeHighlight() {
+        this._cursorSelectRange(undefined, undefined);
+    }
+
+    /**
+     * This event is fired the shown highlights for the selected playback range changes.
+     *
+     * @remarks
+     * This event is fired already during selection and not only when the selection is completed.
+     * This event can be used to place additional custom selection markers (like drag handles).
+     *
+     * @eventProperty
+     * @category Events - Player
+     * @since 1.8.0
+     *
+     * @example
+     * JavaScript
+     * ```js
+     * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+     * api.playbackRangeHighlightChanged.on(e => {
+     *    updateSelectionHandles(e);
+     * });
+     * ```
+     *
+     * @example
+     * C#
+     * ```cs
+     * var api = new AlphaTabApi<MyControl>(...);
+     * api.PlaybackRangeHighlightChanged.On(e =>
+     * {
+     *    UpdateSelectionHandles(e);
+     * });
+     * ```
+     *
+     * @example
+     * Android
+     * ```kotlin
+     * val api = AlphaTabApi<MyControl>(...)
+     * api.playbackRangeHighlightChanged.on { e ->
+     *     updateSelectionHandles(e)
+     * }
+     * ```
+     *
+     */
+    public readonly playbackRangeHighlightChanged: IEventEmitterOfT<PlaybackHighlightChangeEventArgs> =
+        new EventEmitterOfT<PlaybackHighlightChangeEventArgs>();
+
+    private _cursorSelectRange(startBeat: SelectionInfo | undefined, endBeat: SelectionInfo | undefined): void {
         const cache: BoundsLookup | null = this._renderer.boundsLookup;
         if (!cache) {
+            (this.playbackRangeHighlightChanged as EventEmitterOfT<PlaybackHighlightChangeEventArgs>).trigger({});
             return;
         }
         const selectionWrapper: IContainer | null = this._selectionWrapper;
         if (!selectionWrapper) {
+            (this.playbackRangeHighlightChanged as EventEmitterOfT<PlaybackHighlightChangeEventArgs>).trigger({});
             return;
         }
 
         selectionWrapper.clear();
         if (!startBeat || !endBeat || startBeat.beat === endBeat.beat) {
+            (this.playbackRangeHighlightChanged as EventEmitterOfT<PlaybackHighlightChangeEventArgs>).trigger({});
             return;
         }
 
         if (!startBeat.bounds) {
-            startBeat.bounds = cache.findBeat(startBeat.beat);
+            startBeat.bounds = cache.findBeat(startBeat.beat) ?? undefined;
         }
         if (!endBeat.bounds) {
-            endBeat.bounds = cache.findBeat(endBeat.beat);
+            endBeat.bounds = cache.findBeat(endBeat.beat) ?? undefined;
         }
+
         const startTick: number = this._tickCache?.getBeatStart(startBeat.beat) ?? startBeat.beat.absolutePlaybackStart;
         const endTick: number = this._tickCache?.getBeatStart(endBeat.beat) ?? endBeat.beat.absolutePlaybackStart;
         if (endTick < startTick) {
@@ -2864,8 +3021,17 @@ export class AlphaTabApiBase<TSettings> {
             startBeat = endBeat;
             endBeat = t;
         }
+
+        const eventArgs: PlaybackHighlightChangeEventArgs = {
+            startBeat: startBeat.beat,
+            startBeatBounds: startBeat.bounds,
+            endBeat: endBeat.beat,
+            endBeatBounds: endBeat.bounds,
+            highlightBlocks: []
+        };
+
         let startX: number = startBeat.bounds!.realBounds.x;
-        if(startBeat.beat.index === 0) {
+        if (startBeat.beat.index === 0) {
             startX = startBeat.bounds!.barBounds.masterBarBounds.realBounds.x;
         }
 
@@ -2888,32 +3054,56 @@ export class AlphaTabApiBase<TSettings> {
                 startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.x +
                 startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.w;
             const startSelection: IContainer = this.uiFacade.createSelectionElement()!;
-            startSelection.setBounds(
+            const startSelectionBounds = new Bounds(
                 startX,
                 startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,
                 staffEndX - startX,
                 startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
             );
+            startSelection.setBounds(
+                startSelectionBounds.x,
+                startSelectionBounds.y,
+                startSelectionBounds.w,
+                startSelectionBounds.h
+            );
+            eventArgs.highlightBlocks!.push(startSelectionBounds);
+
             selectionWrapper.appendChild(startSelection);
             const staffStartIndex: number = startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.index + 1;
             const staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.index;
             for (let staffIndex: number = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
                 const staffBounds: StaffSystemBounds = cache.staffSystems[staffIndex];
                 const middleSelection: IContainer = this.uiFacade.createSelectionElement()!;
-                middleSelection.setBounds(
+                const middleSelectionBounds = new Bounds(
                     staffStartX,
                     staffBounds.visualBounds.y,
                     staffEndX - staffStartX,
                     staffBounds.visualBounds.h
                 );
+                eventArgs.highlightBlocks!.push(middleSelectionBounds);
+
+                middleSelection.setBounds(
+                    middleSelectionBounds.x,
+                    middleSelectionBounds.y,
+                    middleSelectionBounds.w,
+                    middleSelectionBounds.h
+                );
                 selectionWrapper.appendChild(middleSelection);
             }
             const endSelection: IContainer = this.uiFacade.createSelectionElement()!;
-            endSelection.setBounds(
+            const endSelectionBounds = new Bounds(
                 staffStartX,
                 endBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,
                 endX - staffStartX,
                 endBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
+            );
+            eventArgs.highlightBlocks!.push(endSelectionBounds);
+
+            endSelection.setBounds(
+                endSelectionBounds.x,
+                endSelectionBounds.y,
+                endSelectionBounds.w,
+                endSelectionBounds.h
             );
             selectionWrapper.appendChild(endSelection);
         } else {
@@ -2927,6 +3117,8 @@ export class AlphaTabApiBase<TSettings> {
             );
             selectionWrapper.appendChild(selection);
         }
+
+        (this.playbackRangeHighlightChanged as EventEmitterOfT<PlaybackHighlightChangeEventArgs>).trigger(eventArgs);
     }
 
     /**
