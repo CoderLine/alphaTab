@@ -520,3 +520,5 @@ input[type='range']::-moz-range-thumb {
     cursor: ew-resize !important;
 }
 
+
+@import url('./select-handles.css');
