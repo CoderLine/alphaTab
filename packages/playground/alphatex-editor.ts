@@ -82,8 +82,8 @@ async function load<T>(url: URL, type: XMLHttpRequest['responseType']): Promise<
 async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
     Split(['#editor-wrap', '#alphatab-wrap']);
 
-    const initialCode = sessionStorage.getItem('alphatex-editor.code') ?? trimCode(element.innerHTML);
-    element.innerHTML = '';
+    const initialCode = sessionStorage.getItem('alphatex-editor.code') ?? trimCode(element.innerText);
+    element.innerText = '';
 
     await setupMonaco();
 

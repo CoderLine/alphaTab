@@ -196,6 +196,6 @@ export class HtmlElementContainer implements IContainer {
     }
 
     public clear(): void {
-        this.element.innerHTML = '';
+        this.element.innerText = '';
     }
 }

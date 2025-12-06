@@ -203,8 +203,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         this._contents = '';
         const element: HtmlElementContainer = api.container as HtmlElementContainer;
         if (settings.core.tex) {
-            this._contents = element.element.innerHTML;
-            element.element.innerHTML = '';
+            this._contents = element.element.innerText;
+            element.element.innerText = '';
         }
         this._createStyleElements(settings);
         this._file = settings.core.file;
