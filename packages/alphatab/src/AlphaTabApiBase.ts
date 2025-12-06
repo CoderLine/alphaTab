@@ -2718,51 +2718,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         if (this._hasCursor && this.settings.player.enableUserInteraction) {
-            if (this._selectionEnd) {
-                const startTick: number =
-                    this._tickCache?.getBeatStart(this._selectionStart!.beat) ??
-                    this._selectionStart!.beat.absolutePlaybackStart;
-                const endTick: number =
-                    this._tickCache?.getBeatStart(this._selectionEnd!.beat) ??
-                    this._selectionEnd!.beat.absolutePlaybackStart;
-                if (endTick < startTick) {
-                    const t: SelectionInfo = this._selectionStart!;
-                    this._selectionStart = this._selectionEnd;
-                    this._selectionEnd = t;
-                }
-            }
-            if (this._selectionStart && this._tickCache) {
-                // get the start and stop ticks (which consider properly repeats)
-                const tickCache: MidiTickLookup = this._tickCache;
-                const realMasterBarStart: number = tickCache.getMasterBarStart(
-                    this._selectionStart.beat.voice.bar.masterBar
-                );
-                // move to selection start
-                this._currentBeat = null; // reset current beat so it is updating the cursor
-                if (this._player.state === PlayerState.Paused) {
-                    this._cursorUpdateTick(this._tickCache.getBeatStart(this._selectionStart.beat), false, 1);
-                }
-                this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
-                // set playback range
-                if (this._selectionEnd && this._selectionStart.beat !== this._selectionEnd.beat) {
-                    const realMasterBarEnd: number = tickCache.getMasterBarStart(
-                        this._selectionEnd.beat.voice.bar.masterBar
-                    );
-
-                    const range = new PlaybackRange();
-                    range.startTick = realMasterBarStart + this._selectionStart.beat.playbackStart;
-                    range.endTick =
-                        realMasterBarEnd +
-                        this._selectionEnd.beat.playbackStart +
-                        this._selectionEnd.beat.playbackDuration -
-                        50;
-                    this.playbackRange = range;
-                } else {
-                    this._selectionStart = undefined;
-                    this.playbackRange = null;
-                    this._cursorSelectRange(this._selectionStart, this._selectionEnd);
-                }
-            }
+            this.applyPlaybackRangeFromHighlight();
         }
 
         (this.beatMouseUp as EventEmitterOfT<Beat | null>).trigger(beat);
@@ -2908,7 +2864,98 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public highlightPlaybackRange(startBeat: Beat, endBeat: Beat) {
-        this._cursorSelectRange({ beat: startBeat }, { beat: endBeat });
+        this._selectionStart = { beat: startBeat };
+        this._selectionEnd = { beat: endBeat };
+        this._cursorSelectRange(this._selectionStart, this._selectionEnd);
+    }
+
+    /**
+     * Applies the playback range from the currently highlighted range.
+     *
+     * @remarks
+     * This method can be used when building custom selection systems (e.g. having draggable handles).
+     *
+     * @category Methods - Player
+     * @since 1.8.0
+     *
+     * @example
+     * JavaScript
+     * ```js
+     * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+     * const startBeat = api.score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+     * const endBeat = api.score.tracks[0].staves[0].bars[3].voices[0].beats[0];
+     * api.highlightPlaybackRange(startBeat, endBeat);
+     * api.applyPlaybackRangeFromHighlight();
+     * ```
+     *
+     * @example
+     * C#
+     * ```cs
+     * var api = new AlphaTabApi<MyControl>(...);
+     * api.ChangeTrackVolume(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, 1.5);
+     * api.ChangeTrackVolume(new Track[] { api.Score.Tracks[2] }, 0.5);
+     * var startBeat = api.Score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0];
+     * var endBeat = api.Score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0];
+     * api.HighlightPlaybackRange(startBeat, endBeat);
+     * api.ApplyPlaybackRangeFromHighlight();
+     * ```
+     *
+     * @example
+     * Android
+     * ```kotlin
+     * val api = AlphaTabApi<MyControl>(...)
+     * val startBeat = api.score.tracks[0].staves[0].bars[0].voices[0].beats[0]
+     * val endBeat = api.score.tracks[0].staves[0].bars[3].voices[0].beats[0]
+     * api.highlightPlaybackRange(startBeat, endBeat)
+     * api.applyPlaybackRangeFromHighlight()
+     * ```
+     */
+    public applyPlaybackRangeFromHighlight() {
+        if (this._selectionEnd) {
+            const startTick: number =
+                this._tickCache?.getBeatStart(this._selectionStart!.beat) ??
+                this._selectionStart!.beat.absolutePlaybackStart;
+            const endTick: number =
+                this._tickCache?.getBeatStart(this._selectionEnd!.beat) ??
+                this._selectionEnd!.beat.absolutePlaybackStart;
+            if (endTick < startTick) {
+                const t: SelectionInfo = this._selectionStart!;
+                this._selectionStart = this._selectionEnd;
+                this._selectionEnd = t;
+            }
+        }
+        if (this._selectionStart && this._tickCache) {
+            // get the start and stop ticks (which consider properly repeats)
+            const tickCache: MidiTickLookup = this._tickCache;
+            const realMasterBarStart: number = tickCache.getMasterBarStart(
+                this._selectionStart.beat.voice.bar.masterBar
+            );
+            // move to selection start
+            this._currentBeat = null; // reset current beat so it is updating the cursor
+            if (this._player.state === PlayerState.Paused) {
+                this._cursorUpdateTick(this._tickCache.getBeatStart(this._selectionStart.beat), false, 1);
+            }
+            this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
+            // set playback range
+            if (this._selectionEnd && this._selectionStart.beat !== this._selectionEnd.beat) {
+                const realMasterBarEnd: number = tickCache.getMasterBarStart(
+                    this._selectionEnd.beat.voice.bar.masterBar
+                );
+
+                const range = new PlaybackRange();
+                range.startTick = realMasterBarStart + this._selectionStart.beat.playbackStart;
+                range.endTick =
+                    realMasterBarEnd +
+                    this._selectionEnd.beat.playbackStart +
+                    this._selectionEnd.beat.playbackDuration -
+                    50;
+                this.playbackRange = range;
+            } else {
+                this._selectionStart = undefined;
+                this.playbackRange = null;
+                this._cursorSelectRange(this._selectionStart, this._selectionEnd);
+            }
+        }
     }
 
     /**
