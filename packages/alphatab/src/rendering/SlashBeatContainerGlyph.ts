@@ -15,7 +15,7 @@ export class SlashBeatContainerGlyph extends BeatContainerGlyph {
         }
 
         if (!this._tiedNoteTie && n.isTieOrigin && n.tieDestination!.isVisible) {
-            const tie: SlashTieGlyph = new SlashTieGlyph(n, n.tieDestination!);
+            const tie: SlashTieGlyph = new SlashTieGlyph('slash.tie', n, n.tieDestination!);
             this._tiedNoteTie = tie;
             this.addTie(tie);
         }

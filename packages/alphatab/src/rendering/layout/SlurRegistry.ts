@@ -28,7 +28,7 @@ export class SlurRegistry {
     }
 
     public startMultiSystemSlur(startGlyph: TieGlyph) {
-        const staffId = startGlyph.renderer.staff.staffId;
+        const staffId = startGlyph.renderer.staff.staffId + startGlyph.slurEffectId;
         let container: SlurInfoContainer;
         if (!this._staffLookup.has(staffId)) {
             container = {
@@ -43,7 +43,7 @@ export class SlurRegistry {
     }
 
     public completeMultiSystemSlur(renderer: BarRendererBase, startGlyph: TieGlyph) {
-        const staffId = renderer.staff.staffId;
+        const staffId = renderer.staff.staffId + startGlyph.slurEffectId;
         if (!this._staffLookup.has(staffId)) {
             return;
         }

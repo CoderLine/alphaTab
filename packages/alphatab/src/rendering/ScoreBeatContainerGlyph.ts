@@ -59,7 +59,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             n.tieDestination.isVisible
         ) {
             // tslint:disable-next-line: no-unnecessary-type-assertion
-            const tie: ScoreTieGlyph = new ScoreTieGlyph(n, n.tieDestination!);
+            const tie: ScoreTieGlyph = new ScoreTieGlyph('score.tie', n, n.tieDestination!);
             this.addTie(tie);
         }
         // TODO: multi system slurs
@@ -75,7 +75,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         }
         if (n.isSlurOrigin && n.slurDestination && n.slurDestination.isVisible) {
             // tslint:disable-next-line: no-unnecessary-type-assertion
-            const tie: ScoreSlurGlyph = new ScoreSlurGlyph(n, n.slurDestination!);
+            const tie: ScoreSlurGlyph = new ScoreSlurGlyph('score.slur', n, n.slurDestination!);
             this.addTie(tie);
         }
         // TODO multi system slurs
@@ -85,7 +85,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         // }
         // start effect slur on first beat
         if (!this._effectSlur && n.isEffectSlurOrigin && n.effectSlurDestination) {
-            const effectSlur = new ScoreSlurGlyph(n, n.effectSlurDestination);
+            const effectSlur = new ScoreSlurGlyph('score.slur.effect', n, n.effectSlurDestination);
             this._effectSlur = effectSlur;
             this.addTie(effectSlur);
         }
@@ -119,12 +119,10 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
                 while (destination.nextBeat && destination.nextBeat.isLegatoDestination) {
                     destination = destination.nextBeat;
                 }
-                this.addTie(new ScoreLegatoGlyph(this.beat, destination));
+                this.addTie(new ScoreLegatoGlyph('score.legato', this.beat, destination));
             }
         } else if (this.beat.isLegatoDestination) {
-
-            // TODO Multi system slurs 
-            
+            // TODO Multi system slurs
             // // only create slur for last destination of "group"
             // if (!this.beat.isLegatoOrigin) {
             //     let origin: Beat = this.beat.previousBeat!;

@@ -36,7 +36,7 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         }
         const renderer: TabBarRenderer = this.renderer as TabBarRenderer;
         if (n.isTieOrigin && renderer.showTiedNotes && n.tieDestination!.isVisible) {
-            const tie: TabTieGlyph = new TabTieGlyph(n, n.tieDestination!);
+            const tie: TabTieGlyph = new TabTieGlyph('tab.tie', n, n.tieDestination!);
             this.addTie(tie);
         }
         // TODO multi-system slurs
@@ -45,12 +45,12 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         //     this.addTie(tie);
         // }
         if (n.isLeftHandTapped && !n.isHammerPullDestination) {
-            const tapSlur: TabTieGlyph = new TabTieGlyph(n, n);
+            const tapSlur: TabTieGlyph = new TabTieGlyph('tab.tie.leftHandTap', n, n);
             this.addTie(tapSlur);
         }
         // start effect slur on first beat
         if (n.isEffectSlurOrigin && n.effectSlurDestination) {
-            // TODO: ensure we have only one effect slur per start<->destination beat. 
+            // TODO: ensure we have only one effect slur per start<->destination beat.
             let expanded: boolean = false;
             for (const slur of this._effectSlurs) {
                 if (slur.tryExpand(n, n.effectSlurDestination, false)) {
@@ -59,12 +59,12 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
                 }
             }
             if (!expanded) {
-                const effectSlur: TabSlurGlyph = new TabSlurGlyph(n, n.effectSlurDestination, false);
+                const effectSlur: TabSlurGlyph = new TabSlurGlyph('tab.slur.effect', n, n.effectSlurDestination, false);
                 this._effectSlurs.push(effectSlur);
                 this.addTie(effectSlur);
             }
         }
-        // TODO: multisystem slurs 
+        // TODO: multisystem slurs
         // // end effect slur on last beat
         // if (n.isEffectSlurDestination && n.effectSlurOrigin) {
         //     let expanded: boolean = false;

@@ -8,14 +8,13 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
 export class TabSlurGlyph extends TabTieGlyph {
     private _forSlide: boolean;
 
-    public constructor(startNote: Note, endNote: Note, forSlide: boolean) {
-        super(startNote, endNote);
+    public constructor(slurEffectId: string, startNote: Note, endNote: Note, forSlide: boolean) {
+        super(slurEffectId, startNote, endNote);
         this._forSlide = forSlide;
     }
 
-
     protected override getTieHeight(startX: number, _startY: number, endX: number, _endY: number): number {
-        return Math.log(endX - startX + 1) * this.renderer.settings.notation.slurHeight / 2;
+        return (Math.log(endX - startX + 1) * this.renderer.settings.notation.slurHeight) / 2;
     }
 
     public tryExpand(startNote: Note, endNote: Note, forSlide: boolean): boolean {

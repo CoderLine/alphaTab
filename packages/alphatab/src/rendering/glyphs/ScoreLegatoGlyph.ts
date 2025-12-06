@@ -14,8 +14,8 @@ export class ScoreLegatoGlyph extends TieGlyph {
     protected endBeat: Beat;
     protected endBeatRenderer!: BarRendererBase;
 
-    public constructor(startBeat: Beat, endBeat: Beat) {
-        super();
+    public constructor(slurEffectId: string, startBeat: Beat, endBeat: Beat) {
+        super(slurEffectId);
         this.startBeat = startBeat;
         this.endBeat = endBeat;
     }

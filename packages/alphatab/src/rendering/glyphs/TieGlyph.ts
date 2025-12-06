@@ -1,6 +1,6 @@
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { NoteXPosition, NoteYPosition, type BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
@@ -23,9 +23,11 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     protected yOffset: number = 0;
 
     protected tieDirection: BeamDirection = BeamDirection.Up;
+    public readonly slurEffectId: string;
 
-    public constructor() {
+    public constructor(slurEffectId: string) {
         super(0, 0);
+        this.slurEffectId = slurEffectId;
     }
 
     private _startX: number = 0;
@@ -418,13 +420,13 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
  * A common tie implementation using note details for positioning
  * @internal
  */
-export class NoteTieGlyph extends TieGlyph {
+export abstract class NoteTieGlyph extends TieGlyph {
     protected startNote: Note;
     protected endNote: Note;
     protected endNoteRenderer!: BarRendererBase;
 
-    public constructor(startNote: Note, endNote: Note) {
-        super();
+    public constructor(slurEffectId: string, startNote: Note, endNote: Note) {
+        super(slurEffectId);
         this.startNote = startNote;
         this.endNote = endNote;
     }
