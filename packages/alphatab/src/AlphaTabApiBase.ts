@@ -2744,8 +2744,8 @@ export class AlphaTabApiBase<TSettings> {
             const startBeat = this._tickCache.findBeat(this._trackIndexLookup!, range.startTick);
             const endBeat = this._tickCache.findBeat(this._trackIndexLookup!, range.endTick);
             if (startBeat && endBeat) {
-                const selectionStart = { beat: startBeat.beat };
-                const selectionEnd = { beat: endBeat.beat };
+                const selectionStart: SelectionInfo = { beat: startBeat.beat };
+                const selectionEnd: SelectionInfo = { beat: endBeat.beat };
                 this._cursorSelectRange(selectionStart, selectionEnd);
             }
         } else {
