@@ -1,10 +1,10 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { type BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 
 /**
  * @internal
@@ -14,7 +14,7 @@ export class ScoreTieGlyph extends TieGlyph {
     protected endNote: Note;
 
     public constructor(startNote: Note, endNote: Note) {
-        super(!startNote ? null : startNote.beat, !endNote ? null : endNote.beat);
+        super(startNote.beat, endNote.beat);
         this.startNote = startNote;
         this.endNote = endNote;
     }

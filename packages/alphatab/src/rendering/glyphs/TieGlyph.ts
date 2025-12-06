@@ -20,21 +20,15 @@ export interface ITieGlyph {
  * @internal
  */
 export class TieGlyph extends Glyph implements ITieGlyph {
-    protected startBeat: Beat | null;
-    protected endBeat: Beat | null;
+    protected startBeat: Beat;
+    protected endBeat: Beat;
     protected yOffset: number = 0;
 
     protected startNoteRenderer: BarRendererBase | null = null;
     protected endNoteRenderer: BarRendererBase | null = null;
     protected tieDirection: BeamDirection = BeamDirection.Up;
 
-    /**
-     * Whether the tie is completed or needs continuation on subsequent staves 
-     * until the end-beat is reached.
-     */
-    public needsContinuation = false;
-
-    public constructor(startBeat: Beat | null, endBeat: Beat | null) {
+    public constructor(startBeat: Beat, endBeat: Beat) {
         super(0, 0);
         this.startBeat = startBeat;
         this.endBeat = endBeat;
@@ -90,16 +84,17 @@ export class TieGlyph extends Glyph implements ITieGlyph {
         this.tieDirection = !startNoteRenderer
             ? this.getBeamDirection(this.endBeat, endNoteRenderer!)
             : this.getBeamDirection(this.startBeat!, startNoteRenderer);
-            
+
         // line break or bar break
         if (startNoteRenderer !== endNoteRenderer) {
             this._startX = startNoteRenderer.x + this.getStartX();
             this._startY = startNoteRenderer.y + this.getStartY() + this.yOffset;
             // line break: to bar end
             if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
-                this.needsContinuation = true;
                 this._endX = startNoteRenderer.x + startNoteRenderer.width;
                 this._endY = this._startY;
+
+                startNoteRenderer.scoreRenderer.layout!.slurRegistry.startMultiSystemSlur(this);
             } else {
                 this._endX = endNoteRenderer.x + this.getEndX();
                 this._endY = endNoteRenderer.y + this.getEndY() + this.yOffset;
@@ -110,7 +105,6 @@ export class TieGlyph extends Glyph implements ITieGlyph {
             this._startY = startNoteRenderer.y + this.getStartY() + this.yOffset;
             this._endY = endNoteRenderer.y + this.getEndY() + this.yOffset;
         }
-    
 
         this._boundingBox = undefined;
         this.y = Math.min(this._startY, this._endY);
@@ -185,6 +179,10 @@ export class TieGlyph extends Glyph implements ITieGlyph {
     }
 
     protected getStartY(): number {
+        return 0;
+    }
+
+    protected getStartLine(): number {
         return 0;
     }
 

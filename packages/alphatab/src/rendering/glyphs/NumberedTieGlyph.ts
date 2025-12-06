@@ -12,7 +12,7 @@ export class NumberedTieGlyph extends TieGlyph {
     protected endNote: Note;
 
     public constructor(startNote: Note, endNote: Note) {
-        super(!startNote ? null : startNote.beat, !endNote ? null : endNote.beat);
+        super(startNote.beat, endNote.beat);
         this.startNote = startNote;
         this.endNote = endNote;
     }
