@@ -91,7 +91,10 @@ export class TieGlyph extends Glyph implements ITieGlyph {
             this._startY = startNoteRenderer.y + this.getStartY() + this.yOffset;
             // line break: to bar end
             if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
-                this._endX = startNoteRenderer.x + startNoteRenderer.width;
+                const lastRendererInStaff =
+                    startNoteRenderer.staff.barRenderers[startNoteRenderer.staff.barRenderers.length - 1];
+
+                this._endX = lastRendererInStaff.x + lastRendererInStaff.width;
                 this._endY = this._startY;
 
                 startNoteRenderer.scoreRenderer.layout!.slurRegistry.startMultiSystemSlur(this);
