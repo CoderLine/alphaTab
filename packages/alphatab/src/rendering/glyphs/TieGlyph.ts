@@ -36,9 +36,10 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     private _endY: number = 0;
     private _tieHeight: number = 0;
     private _boundingBox?: Bounds;
+    private _shouldPaint: boolean = false;
 
     public get checkForOverflow() {
-        return this._boundingBox !== undefined;
+        return this._shouldPaint && this._boundingBox !== undefined;
     }
 
     public override getBoundingBoxTop(): number {
@@ -58,7 +59,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     public override doLayout(): void {
         this.width = 0;
 
-        const startNoteRenderer = this.renderer;
+        const startNoteRenderer = this.getStartBeatRenderer();
         const endNoteRenderer = this.getEndBeatRenderer();
 
         this._startX = 0;
@@ -70,11 +71,23 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         // either can draw till the end note, or we just can draw till the bar end
         this.tieDirection = this.getTieDirection();
 
-        // line break or bar break
-        if (startNoteRenderer !== endNoteRenderer) {
+        const forEnd = this.renderer === endNoteRenderer;
+
+        if (forEnd) {
+            const firstRendererInStaff = startNoteRenderer.staff.barRenderers[0];
+            this._startX = firstRendererInStaff!.x;
+
+            this._endX = this.getEndX();
+
+            this._startY = this.getEndY() + this.yOffset;
+            this._endY = this._startY;
+
+            this._shouldPaint = startNoteRenderer.staff !== endNoteRenderer.staff;
+            startNoteRenderer.scoreRenderer.layout!.slurRegistry.completeMultiSystemSlur(this);
+        } else if (startNoteRenderer !== endNoteRenderer) {
+            this._shouldPaint = true;
             this._startX = this.getStartX();
             this._startY = this.getStartY() + this.yOffset;
-            // line break: to bar end
             if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
                 const lastRendererInStaff =
                     startNoteRenderer.staff.barRenderers[startNoteRenderer.staff.barRenderers.length - 1];
@@ -88,6 +101,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 this._endY = this.getEndY() + this.yOffset;
             }
         } else {
+            this._shouldPaint = true;
             this._startX = this.getStartX();
             this._endX = this.getEndX();
             this._startY = this.getStartY() + this.yOffset;
@@ -128,6 +142,10 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        if (!this._shouldPaint) {
+            return;
+        }
+
         if (this.shouldDrawBendSlur()) {
             TieGlyph.drawBendSlur(
                 canvas,
@@ -160,8 +178,13 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         return this.renderer.smuflMetrics.tieHeight;
     }
 
+    protected get isForEnd() {
+        return this.renderer === this.getEndBeatRenderer();
+    }
+
     protected abstract getTieDirection(): BeamDirection;
 
+    protected abstract getStartBeatRenderer(): BarRendererBase;
     protected abstract getEndBeatRenderer(): BarRendererBase;
 
     protected abstract getStartY(): number;
@@ -423,7 +446,8 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 export abstract class NoteTieGlyph extends TieGlyph {
     protected startNote: Note;
     protected endNote: Note;
-    protected endNoteRenderer!: BarRendererBase;
+    protected startNoteRenderer: BarRendererBase | null = null;
+    protected endNoteRenderer: BarRendererBase | null = null;
 
     public constructor(slurEffectId: string, startNote: Note, endNote: Note) {
         super(slurEffectId);
@@ -435,12 +459,8 @@ export abstract class NoteTieGlyph extends TieGlyph {
         return this.startNote === this.endNote;
     }
 
-    public override doLayout(): void {
-        this.endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-            this.renderer.staff.staffId,
-            this.endNote.beat.voice.bar
-        )!;
-        super.doLayout();
+    protected override get isForEnd() {
+        return !this.isLeftHandTap && super.isForEnd;
     }
 
     protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
@@ -452,7 +472,7 @@ export abstract class NoteTieGlyph extends TieGlyph {
 
     protected override getTieDirection(): BeamDirection {
         // invert direction (if stems go up, ties go down to not cross them)
-        switch (this.renderer.getBeatDirection(this.startNote.beat)) {
+        switch (this.getStartBeatRenderer().getBeatDirection(this.startNote.beat)) {
             case BeamDirection.Up:
                 return BeamDirection.Down;
             default:
@@ -461,10 +481,11 @@ export abstract class NoteTieGlyph extends TieGlyph {
     }
 
     protected override getStartX(): number {
+        const startNoteRenderer = this.getStartBeatRenderer();
         if (this.isLeftHandTap) {
-            return this.getEndX() - this.renderer.smuflMetrics.leftHandTabTieWidth;
+            return this.getEndX() - startNoteRenderer.smuflMetrics.leftHandTabTieWidth;
         }
-        return this.renderer.x + this.renderer!.getNoteX(this.startNote, this.getStartNotePosition());
+        return startNoteRenderer.x + startNoteRenderer!.getNoteX(this.startNote, this.getStartNotePosition());
     }
 
     protected getStartNotePosition() {
@@ -472,23 +493,25 @@ export abstract class NoteTieGlyph extends TieGlyph {
     }
 
     protected override getStartY(): number {
+        const startNoteRenderer = this.getStartBeatRenderer();
         if (this.isLeftHandTap) {
-            return this.renderer.y + this.renderer!.getNoteY(this.startNote, NoteYPosition.Center);
+            return startNoteRenderer.y + startNoteRenderer.getNoteY(this.startNote, NoteYPosition.Center);
         }
 
         switch (this.tieDirection) {
             case BeamDirection.Up:
-                return this.renderer.y + this.renderer!.getNoteY(this.startNote, NoteYPosition.Top);
+                return startNoteRenderer.y + startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Top);
             default:
-                return this.renderer.y + this.renderer!.getNoteY(this.startNote, NoteYPosition.Bottom);
+                return startNoteRenderer.y + startNoteRenderer.getNoteY(this.startNote, NoteYPosition.Bottom);
         }
     }
 
     protected override getEndX(): number {
+        const endNoteRenderer = this.getEndBeatRenderer();
         if (this.isLeftHandTap) {
-            return this.endNoteRenderer.x + this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Left);
+            return endNoteRenderer.x + endNoteRenderer.getNoteX(this.endNote, NoteXPosition.Left);
         }
-        return this.endNoteRenderer.x + this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Center);
+        return endNoteRenderer.x + endNoteRenderer.getNoteX(this.endNote, NoteXPosition.Center);
     }
 
     protected getEndNotePosition() {
@@ -496,7 +519,7 @@ export abstract class NoteTieGlyph extends TieGlyph {
     }
 
     protected override getEndY(): number {
-        const endNoteRenderer = this.endNoteRenderer;
+        const endNoteRenderer = this.getEndBeatRenderer();
         if (this.isLeftHandTap) {
             return endNoteRenderer.y + endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Center);
         }
@@ -510,7 +533,23 @@ export abstract class NoteTieGlyph extends TieGlyph {
     }
 
     protected override getEndBeatRenderer(): BarRendererBase {
+        if (!this.endNoteRenderer) {
+            this.endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+                this.renderer.staff.staffId,
+                this.endNote.beat.voice.bar
+            )!;
+        }
         return this.endNoteRenderer;
+    }
+
+    protected override getStartBeatRenderer(): BarRendererBase {
+        if (!this.startNoteRenderer) {
+            this.startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+                this.renderer.staff.staffId,
+                this.startNote.beat.voice.bar
+            )!;
+        }
+        return this.startNoteRenderer;
     }
 
     protected override shouldDrawBendSlur(): boolean {

@@ -22,9 +22,10 @@ export class ScoreTieGlyph extends NoteTieGlyph {
     }
 
     protected override getEndX(): number {
+        const endNoteRenderer = this.getEndBeatRenderer();
         if (this.isLeftHandTap) {
-            return this.endNoteRenderer.x + this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Left);
+            return endNoteRenderer.x + endNoteRenderer.getNoteX(this.endNote, NoteXPosition.Left);
         }
-        return this.endNoteRenderer.x + this.endNoteRenderer!.getBeatX(this.endNote.beat, BeatXPosition.PreNotes);
+        return endNoteRenderer.x + endNoteRenderer.getBeatX(this.endNote.beat, BeatXPosition.PreNotes);
     }
 }

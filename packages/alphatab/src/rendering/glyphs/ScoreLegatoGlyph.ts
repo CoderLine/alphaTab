@@ -12,7 +12,8 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
 export class ScoreLegatoGlyph extends TieGlyph {
     protected startBeat: Beat;
     protected endBeat: Beat;
-    protected endBeatRenderer!: BarRendererBase;
+    protected startBeatRenderer: BarRendererBase | null = null;
+    protected endBeatRenderer: BarRendererBase | null = null;
 
     public constructor(slurEffectId: string, startBeat: Beat, endBeat: Beat) {
         super(slurEffectId);
@@ -20,15 +21,31 @@ export class ScoreLegatoGlyph extends TieGlyph {
         this.endBeat = endBeat;
     }
 
+    protected override get isForEnd(): boolean {
+        return this.startBeat !== this.endBeat && super.isForEnd;
+    }
+
     public override doLayout(): void {
-        this.endBeatRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-            this.renderer.staff.staffId,
-            this.endBeat.voice.bar
-        )!;
         super.doLayout();
     }
 
+    protected override getStartBeatRenderer(): BarRendererBase {
+        if (!this.startBeatRenderer) {
+            this.startBeatRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+                this.renderer.staff.staffId,
+                this.startBeat.voice.bar
+            )!;
+        }
+        return this.startBeatRenderer;
+    }
+
     protected override getEndBeatRenderer(): BarRendererBase {
+        if (!this.endBeatRenderer) {
+            this.endBeatRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+                this.renderer.staff.staffId,
+                this.endBeat.voice.bar
+            )!;
+        }
         return this.endBeatRenderer;
     }
 
@@ -41,7 +58,7 @@ export class ScoreLegatoGlyph extends TieGlyph {
             return BeamDirection.Up;
         }
         // invert direction (if stems go up, ties go down to not cross them)
-        switch (this.renderer.getBeatDirection(this.startBeat)) {
+        switch (this.getStartBeatRenderer().getBeatDirection(this.startBeat)) {
             case BeamDirection.Up:
                 return BeamDirection.Down;
             default:
@@ -50,19 +67,21 @@ export class ScoreLegatoGlyph extends TieGlyph {
     }
 
     protected override getStartX(): number {
-        return this.renderer.x + this.renderer!.getBeatX(this.startBeat!, BeatXPosition.MiddleNotes);
+        const startBeatRenderer = this.getStartBeatRenderer();
+        return startBeatRenderer.x + startBeatRenderer.getBeatX(this.startBeat!, BeatXPosition.MiddleNotes);
     }
 
     protected override getStartY(): number {
+        const startBeatRenderer = this.getStartBeatRenderer();
         if (this.startBeat!.isRest) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
                     return (
-                        this.renderer.y + this.renderer.getBeatContainer(this.startBeat)!.onNotes.getBoundingBoxTop()
+                        startBeatRenderer.y + startBeatRenderer.getBeatContainer(this.startBeat)!.onNotes.getBoundingBoxTop()
                     );
                 default:
                     return (
-                        this.renderer.y + this.renderer.getBeatContainer(this.startBeat)!.onNotes.getBoundingBoxBottom()
+                        startBeatRenderer.y + startBeatRenderer.getBeatContainer(this.startBeat)!.onNotes.getBoundingBoxBottom()
                     );
             }
         }
@@ -70,17 +89,18 @@ export class ScoreLegatoGlyph extends TieGlyph {
         switch (this.tieDirection) {
             case BeamDirection.Up:
                 // below lowest note
-                return this.renderer.y + this.renderer!.getNoteY(this.startBeat!.maxNote!, NoteYPosition.Top);
+                return startBeatRenderer.y + startBeatRenderer.getNoteY(this.startBeat!.maxNote!, NoteYPosition.Top);
             default:
-                return this.renderer.y + this.renderer!.getNoteY(this.startBeat!.minNote!, NoteYPosition.Bottom);
+                return startBeatRenderer.y + startBeatRenderer.getNoteY(this.startBeat!.minNote!, NoteYPosition.Bottom);
         }
     }
 
     protected override getEndX(): number {
-        const endBeamDirection = this.endBeatRenderer.getBeatDirection(this.endBeat);
+        const endBeatRenderer = this.getEndBeatRenderer();
+        const endBeamDirection = endBeatRenderer.getBeatDirection(this.endBeat);
         return (
-            this.endBeatRenderer.x +
-            this.endBeatRenderer.getBeatX(
+            endBeatRenderer.x +
+            endBeatRenderer.getBeatX(
                 this.endBeat,
                 this.endBeat.duration > Duration.Whole && endBeamDirection === this.tieDirection
                     ? BeatXPosition.Stem
@@ -90,7 +110,7 @@ export class ScoreLegatoGlyph extends TieGlyph {
     }
 
     protected override getEndY(): number {
-        const endBeatRenderer = this.endBeatRenderer;
+        const endBeatRenderer = this.getEndBeatRenderer();
         if (this.endBeat.isRest) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
@@ -105,7 +125,7 @@ export class ScoreLegatoGlyph extends TieGlyph {
             }
         }
 
-        const startBeamDirection = this.renderer.getBeatDirection(this.startBeat!);
+        const startBeamDirection = this.getStartBeatRenderer().getBeatDirection(this.startBeat!);
         const endBeamDirection = endBeatRenderer.getBeatDirection(this.endBeat!);
 
         if (startBeamDirection !== endBeamDirection && this.startBeat!.graceType === GraceType.None) {

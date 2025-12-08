@@ -19,11 +19,10 @@ export class SlashBeatContainerGlyph extends BeatContainerGlyph {
             this._tiedNoteTie = tie;
             this.addTie(tie);
         }
-        // TODO multi system slurs
-        // if (!this._tiedNoteTie && n.isTieDestination) {
-        //     const tie: SlashTieGlyph = new SlashTieGlyph(n.tieOrigin!, n, true);
-        //     this._tiedNoteTie = tie;
-        //     this.addTie(tie);
-        // }
+        if (!this._tiedNoteTie && n.isTieDestination) {
+            const tie: SlashTieGlyph = new SlashTieGlyph('slash.tie', n.tieOrigin!, n);
+            this._tiedNoteTie = tie;
+            this.addTie(tie);
+        }
     }
 }

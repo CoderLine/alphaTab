@@ -17,7 +17,7 @@ export class TabSlurGlyph extends TabTieGlyph {
         return (Math.log(endX - startX + 1) * this.renderer.settings.notation.slurHeight) / 2;
     }
 
-    public tryExpand(startNote: Note, endNote: Note, forSlide: boolean): boolean {
+    public tryExpand(startNote: Note, endNote: Note, forSlide: boolean, forEnd: boolean): boolean {
         // same type required
         if (this._forSlide !== forSlide) {
             return false;
@@ -27,6 +27,10 @@ export class TabSlurGlyph extends TabTieGlyph {
             return false;
         }
         if (this.endNote.beat.id !== endNote.beat.id) {
+            return false;
+        }
+        const isForEnd = this.renderer === this.getEndBeatRenderer();
+        if (isForEnd !== forEnd) {
             return false;
         }
         // same draw direction

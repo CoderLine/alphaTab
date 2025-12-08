@@ -2,7 +2,6 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { ScoreTieGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTieGlyph';
-import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
@@ -36,39 +35,41 @@ export class ScoreSlurGlyph extends ScoreTieGlyph {
     }
 
     protected override getEndX(): number {
+        const endNoteRenderer = this.getEndBeatRenderer();
         if (this._isEndCentered()) {
             if (this._isEndOnStem()) {
-                return this.endNoteRenderer.x + this.endNoteRenderer!.getBeatX(this.endNote.beat, BeatXPosition.Stem);
+                return endNoteRenderer.x + endNoteRenderer.getBeatX(this.endNote.beat, BeatXPosition.Stem);
             }
-            return this.endNoteRenderer.x + this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Center);
+            return endNoteRenderer.x + endNoteRenderer.getNoteX(this.endNote, NoteXPosition.Center);
         }
-        return this.endNoteRenderer.x + this.endNoteRenderer!.getBeatX(this.endNote.beat, BeatXPosition.PreNotes);
+        return endNoteRenderer.x + endNoteRenderer.getBeatX(this.endNote.beat, BeatXPosition.PreNotes);
     }
 
     protected override getEndY(): number {
+        const endNoteRenderer = this.getEndBeatRenderer();
         if (this._isEndCentered()) {
             if (this._isEndOnStem()) {
                 switch (this.tieDirection) {
                     case BeamDirection.Up:
                         return (
-                            this.endNoteRenderer.y +
-                            this.endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.TopWithStem)
+                            endNoteRenderer.y +
+                            endNoteRenderer.getNoteY(this.endNote, NoteYPosition.TopWithStem)
                         );
                     default:
                         return (
-                            this.endNoteRenderer.y +
-                            this.endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.BottomWithStem)
+                            endNoteRenderer.y +
+                            endNoteRenderer.getNoteY(this.endNote, NoteYPosition.BottomWithStem)
                         );
                 }
             }
             switch (this.tieDirection) {
                 case BeamDirection.Up:
-                    return this.endNoteRenderer.y + this.endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Top);
+                    return endNoteRenderer.y + endNoteRenderer.getNoteY(this.endNote, NoteYPosition.Top);
                 default:
-                    return this.endNoteRenderer.y + this.endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Bottom);
+                    return endNoteRenderer.y + endNoteRenderer.getNoteY(this.endNote, NoteYPosition.Bottom);
             }
         }
-        return this.endNoteRenderer.y + this.endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Center);
+        return endNoteRenderer.y + endNoteRenderer.getNoteY(this.endNote, NoteYPosition.Center);
     }
 
     private _isStartCentered() {
@@ -86,7 +87,7 @@ export class ScoreSlurGlyph extends ScoreTieGlyph {
     }
 
     private _isEndOnStem() {
-        const endNoteScoreRenderer = this.endNoteRenderer as ScoreBarRenderer;
+        const endNoteScoreRenderer = this.getEndBeatRenderer();
 
         const startBeamDirection = this.renderer.getBeatDirection(this.startNote.beat);
         const endBeamDirection = endNoteScoreRenderer.getBeatDirection(this.endNote.beat);
