@@ -70,7 +70,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         // either can draw till the end note, or we just can draw till the bar end
         this.tieDirection = this.getTieDirection();
 
-        const forEnd = this.renderer === endNoteRenderer;
+        const forEnd = this.isForEnd;
 
         if (forEnd) {
             const firstRendererInStaff = startNoteRenderer.staff!.barRenderers[0];
@@ -87,7 +87,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 
             this._endY = this.getEndY();
 
-            this._shouldPaint = startNoteRenderer.staff !== endNoteRenderer.staff;
+            this._shouldPaint = !endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff;
         } else if (startNoteRenderer !== endNoteRenderer) {
             this._shouldPaint = true;
             this._startX = this.getStartX();
@@ -183,7 +183,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     }
 
     protected get isForEnd() {
-        return this.renderer === this.getEndBeatRenderer();
+        return this.renderer !== this.getStartBeatRenderer();
     }
 
     protected abstract getTieDirection(): BeamDirection;

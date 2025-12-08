@@ -12,7 +12,7 @@ import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGly
 import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
-import { ContinuationTieGlyph, type ITieGlyph, TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import { ContinuationTieGlyph, type ITieGlyph, type TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
 import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
@@ -21,7 +21,7 @@ import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarL
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import { BarHelpers } from '@coderline/alphatab/rendering/utils/BarHelpers';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -638,29 +638,8 @@ export class BarRendererBase {
         }
 
         for (const slur of multiSystemSlurs) {
-            this._paintMultiSystemSlur(cx, cy, canvas, slur);
+            slur.paint(cx, cy, canvas);
         }
-    }
-
-    private _paintMultiSystemSlur(cx: number, cy: number, canvas: ICanvas, slur: TieGlyph) {
-        const startX = cx + this.x;
-        const startY = cy + this.y + slur.calculateMultiSystemSlurY(this);
-
-        const lastRenderer = this.staff!.barRenderers[this.staff!.barRenderers.length - 1];
-        const endX = cx + lastRenderer.x + lastRenderer.width;
-        const endY = startY;
-
-        TieGlyph.paintTie(
-            canvas,
-            1,
-            startX,
-            startY,
-            endX,
-            endY,
-            slur.tieDirection === BeamDirection.Down,
-            slur.getTieHeight(startX, startY, endX, endY),
-            this.smuflMetrics.tieMidpointThickness
-        );
     }
 
     protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {
