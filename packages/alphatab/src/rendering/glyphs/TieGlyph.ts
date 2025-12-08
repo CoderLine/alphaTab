@@ -480,12 +480,6 @@ export abstract class NoteTieGlyph extends TieGlyph {
         return this.startNote === this.endNote;
     }
 
-    public override calculateMultiSystemSlurY(renderer: BarRendererBase) {
-        const startRenderer = this.getStartBeatRenderer() as LineBarRenderer;
-        const startLine = startRenderer.getNoteLine(this.startNote);
-        return renderer.y + (renderer as LineBarRenderer).getLineY(startLine);
-    }
-
     public override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
         if (this.isLeftHandTap) {
             return this.renderer!.smuflMetrics.tieHeight;
