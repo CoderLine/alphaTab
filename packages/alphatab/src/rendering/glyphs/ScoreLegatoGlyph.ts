@@ -32,19 +32,19 @@ export class ScoreLegatoGlyph extends TieGlyph {
     protected override getStartBeatRenderer(): BarRendererBase {
         if (!this.startBeatRenderer) {
             this.startBeatRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                this.renderer.staff.staffId,
+                this.renderer.staff!.staffId,
                 this.startBeat.voice.bar
             )!;
         }
         return this.startBeatRenderer;
     }
 
-    protected override getEndBeatRenderer(): BarRendererBase {
+    protected override getEndBeatRenderer(): BarRendererBase | null {
         if (!this.endBeatRenderer) {
             this.endBeatRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                this.renderer.staff.staffId,
+                this.renderer.staff!.staffId,
                 this.endBeat.voice.bar
-            )!;
+            );
         }
         return this.endBeatRenderer;
     }
@@ -77,11 +77,13 @@ export class ScoreLegatoGlyph extends TieGlyph {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
                     return (
-                        startBeatRenderer.y + startBeatRenderer.getBeatContainer(this.startBeat)!.onNotes.getBoundingBoxTop()
+                        startBeatRenderer.y +
+                        startBeatRenderer.getBeatContainer(this.startBeat)!.onNotes.getBoundingBoxTop()
                     );
                 default:
                     return (
-                        startBeatRenderer.y + startBeatRenderer.getBeatContainer(this.startBeat)!.onNotes.getBoundingBoxBottom()
+                        startBeatRenderer.y +
+                        startBeatRenderer.getBeatContainer(this.startBeat)!.onNotes.getBoundingBoxBottom()
                     );
             }
         }
@@ -97,6 +99,9 @@ export class ScoreLegatoGlyph extends TieGlyph {
 
     protected override getEndX(): number {
         const endBeatRenderer = this.getEndBeatRenderer();
+        if (!endBeatRenderer) {
+            return this.getStartX() + this.renderer.smuflMetrics.leftHandTabTieWidth;
+        }
         const endBeamDirection = endBeatRenderer.getBeatDirection(this.endBeat);
         return (
             endBeatRenderer.x +
@@ -111,6 +116,10 @@ export class ScoreLegatoGlyph extends TieGlyph {
 
     protected override getEndY(): number {
         const endBeatRenderer = this.getEndBeatRenderer();
+        if (!endBeatRenderer) {
+            return this.getStartY();
+        }
+
         if (this.endBeat.isRest) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:

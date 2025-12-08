@@ -107,6 +107,8 @@ export abstract class ScoreLayout {
     public layoutAndRender(): void {
         this._lazyPartials.clear();
         this.slurRegistry.clear();
+        this._barRendererLookup.clear();
+        
         this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
 
         const score: Score = this.renderer.score!;
@@ -440,18 +442,6 @@ export abstract class ScoreLayout {
         if (renderer.additionalMultiRestBars) {
             for (const b of renderer.additionalMultiRestBars) {
                 this._barRendererLookup.get(key)!.set(b.id, renderer);
-            }
-        }
-    }
-
-    public unregisterBarRenderer(key: string, renderer: BarRendererBase): void {
-        if (this._barRendererLookup.has(key)) {
-            const lookup: Map<number, BarRendererBase> = this._barRendererLookup.get(key)!;
-            lookup.delete(renderer.bar.id);
-            if (renderer.additionalMultiRestBars) {
-                for (const b of renderer.additionalMultiRestBars) {
-                    lookup.delete(b.id);
-                }
             }
         }
     }

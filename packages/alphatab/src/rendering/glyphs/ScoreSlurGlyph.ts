@@ -8,7 +8,7 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
  * @internal
  */
 export class ScoreSlurGlyph extends ScoreTieGlyph {
-    protected override getTieHeight(startX: number, _startY: number, endX: number, _endY: number): number {
+    public override getTieHeight(startX: number, _startY: number, endX: number, _endY: number): number {
         return (Math.log2(endX - startX + 1) * this.renderer.settings.notation.slurHeight) / 2;
     }
 
@@ -36,6 +36,10 @@ export class ScoreSlurGlyph extends ScoreTieGlyph {
 
     protected override getEndX(): number {
         const endNoteRenderer = this.getEndBeatRenderer();
+        if (!endNoteRenderer) {
+            return this.getStartX() + this.renderer.smuflMetrics.leftHandTabTieWidth;
+        }
+
         if (this._isEndCentered()) {
             if (this._isEndOnStem()) {
                 return endNoteRenderer.x + endNoteRenderer.getBeatX(this.endNote.beat, BeatXPosition.Stem);
@@ -47,19 +51,17 @@ export class ScoreSlurGlyph extends ScoreTieGlyph {
 
     protected override getEndY(): number {
         const endNoteRenderer = this.getEndBeatRenderer();
+        if (!endNoteRenderer) {
+            return this.getStartY();
+        }
+
         if (this._isEndCentered()) {
             if (this._isEndOnStem()) {
                 switch (this.tieDirection) {
                     case BeamDirection.Up:
-                        return (
-                            endNoteRenderer.y +
-                            endNoteRenderer.getNoteY(this.endNote, NoteYPosition.TopWithStem)
-                        );
+                        return endNoteRenderer.y + endNoteRenderer.getNoteY(this.endNote, NoteYPosition.TopWithStem);
                     default:
-                        return (
-                            endNoteRenderer.y +
-                            endNoteRenderer.getNoteY(this.endNote, NoteYPosition.BottomWithStem)
-                        );
+                        return endNoteRenderer.y + endNoteRenderer.getNoteY(this.endNote, NoteYPosition.BottomWithStem);
                 }
             }
             switch (this.tieDirection) {
@@ -87,10 +89,11 @@ export class ScoreSlurGlyph extends ScoreTieGlyph {
     }
 
     private _isEndOnStem() {
-        const endNoteScoreRenderer = this.getEndBeatRenderer();
-
-        const startBeamDirection = this.renderer.getBeatDirection(this.startNote.beat);
-        const endBeamDirection = endNoteScoreRenderer.getBeatDirection(this.endNote.beat);
+        const startBeamDirection = this.getStartBeatRenderer().getBeatDirection(this.startNote.beat);
+        const endBeatRenderer = this.getEndBeatRenderer();
+        const endBeamDirection = endBeatRenderer
+            ? endBeatRenderer.getBeatDirection(this.endNote.beat)
+            : startBeamDirection;
 
         return startBeamDirection !== endBeamDirection && this.startNote.beat!.graceType === GraceType.None;
     }

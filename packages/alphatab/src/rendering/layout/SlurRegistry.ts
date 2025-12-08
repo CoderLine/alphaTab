@@ -2,14 +2,24 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import type { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 
 /**
+ * @internal
+ * @record
+ */
+interface SlurRegistration {
+    startGlyph: TieGlyph;
+    endGlyph?: TieGlyph;
+}
+
+/**
  * Holds the slur information specific for an individual staff
  * @internal
+ * @record
  */
 interface SlurInfoContainer {
     /**
      * A set of started slurs and ties.
      */
-    startedSlurs: Map<string, TieGlyph>;
+    startedSlurs: Map<string, SlurRegistration>;
 }
 
 /**
@@ -28,53 +38,44 @@ export class SlurRegistry {
     }
 
     public startMultiSystemSlur(startGlyph: TieGlyph) {
-        const staffId = startGlyph.renderer.staff.staffId;
+        const staffId = startGlyph.renderer.staff!.staffId;
         let container: SlurInfoContainer;
         if (!this._staffLookup.has(staffId)) {
             container = {
-                startedSlurs: new Map<string, TieGlyph>()
+                startedSlurs: new Map<string, SlurRegistration>()
             };
             this._staffLookup.set(staffId, container);
         } else {
             container = this._staffLookup.get(staffId)!;
         }
 
-        container.startedSlurs.set(startGlyph.slurEffectId, startGlyph);
+        container.startedSlurs.set(startGlyph.slurEffectId, { startGlyph });
     }
 
     public completeMultiSystemSlur(endGlyph: TieGlyph) {
-        const staffId = endGlyph.renderer.staff.staffId;
-        if (!this._staffLookup.has(staffId)) {
-            return;
-        }
-        const container = this._staffLookup.get(staffId)!;
-        container.startedSlurs.delete(endGlyph.slurEffectId);
-    }
-
-    public tryGetContinuationStart(renderer: BarRendererBase, slurEffectId: string): TieGlyph | undefined {
-        const staffId = renderer.staff.staffId;
+        const staffId = endGlyph.renderer.staff!.staffId;
         if (!this._staffLookup.has(staffId)) {
             return undefined;
         }
         const container = this._staffLookup.get(staffId)!;
-        if (!container.startedSlurs.has(slurEffectId)) {
+        if (container.startedSlurs.has(endGlyph.slurEffectId)) {
+            const info = container.startedSlurs.get(endGlyph.slurEffectId)!;
+            container.startedSlurs.get(endGlyph.slurEffectId)!.endGlyph = endGlyph;
+            return info.startGlyph;
+        }
+        return undefined;
+    }
+
+    public *getAllContinuations(renderer: BarRendererBase): Iterable<TieGlyph> {
+        if (!this._staffLookup.has(renderer.staff!.staffId) || renderer.index > 0) {
             return;
         }
 
-        const glyph = container.startedSlurs.get(slurEffectId)!;
-        // continuations are only on staff breaks
-        if (glyph.renderer.staff === renderer.staff) {
-            return undefined;
+        const container = this._staffLookup.get(renderer.staff!.staffId)!;
+        for (const g of container.startedSlurs.values()) {
+            if (g.startGlyph.shouldCreateMultiSystemSlur(renderer)) {
+                yield g.startGlyph;
+            }
         }
-        return;
     }
-
-    // public getAllContinuations(renderer: BarRendererBase): Map<string, TieGlyph> | undefined {
-    //     const staffId = renderer.staff.staffId;
-    //     if (!this._staffLookup.has(staffId)) {
-    //         return undefined;
-    //     }
-    //     const container = this._staffLookup.get(staffId)!;
-    //     return container.startedSlurs;
-    // }
 }

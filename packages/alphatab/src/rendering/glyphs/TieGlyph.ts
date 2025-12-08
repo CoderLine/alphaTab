@@ -2,6 +2,7 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 
@@ -20,9 +21,7 @@ export interface ITieGlyph {
  * @internal
  */
 export abstract class TieGlyph extends Glyph implements ITieGlyph {
-    protected yOffset: number = 0;
-
-    protected tieDirection: BeamDirection = BeamDirection.Up;
+    public tieDirection: BeamDirection = BeamDirection.Up;
     public readonly slurEffectId: string;
 
     public constructor(slurEffectId: string) {
@@ -74,23 +73,28 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         const forEnd = this.renderer === endNoteRenderer;
 
         if (forEnd) {
-            const firstRendererInStaff = startNoteRenderer.staff.barRenderers[0];
+            const firstRendererInStaff = startNoteRenderer.staff!.barRenderers[0];
             this._startX = firstRendererInStaff!.x;
 
             this._endX = this.getEndX();
 
-            this._startY = this.getEndY() + this.yOffset;
-            this._endY = this._startY;
+            const startGlyph = startNoteRenderer.scoreRenderer.layout!.slurRegistry.completeMultiSystemSlur(this);
+            if (startGlyph) {
+                this._startY = startGlyph.calculateMultiSystemSlurY(startNoteRenderer);
+            } else {
+                this._startY = this.getStartX();
+            }
+
+            this._endY = this.getEndY();
 
             this._shouldPaint = startNoteRenderer.staff !== endNoteRenderer.staff;
-            startNoteRenderer.scoreRenderer.layout!.slurRegistry.completeMultiSystemSlur(this);
         } else if (startNoteRenderer !== endNoteRenderer) {
             this._shouldPaint = true;
             this._startX = this.getStartX();
-            this._startY = this.getStartY() + this.yOffset;
+            this._startY = this.getStartY();
             if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
                 const lastRendererInStaff =
-                    startNoteRenderer.staff.barRenderers[startNoteRenderer.staff.barRenderers.length - 1];
+                    startNoteRenderer.staff!.barRenderers[startNoteRenderer.staff!.barRenderers.length - 1];
 
                 this._endX = lastRendererInStaff.x + lastRendererInStaff.width;
                 this._endY = this._startY;
@@ -98,14 +102,14 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 startNoteRenderer.scoreRenderer.layout!.slurRegistry.startMultiSystemSlur(this);
             } else {
                 this._endX = this.getEndX();
-                this._endY = this.getEndY() + this.yOffset;
+                this._endY = this.getEndY();
             }
         } else {
             this._shouldPaint = true;
             this._startX = this.getStartX();
             this._endX = this.getEndX();
-            this._startY = this.getStartY() + this.yOffset;
-            this._endY = this.getEndY() + this.yOffset;
+            this._startY = this.getStartY();
+            this._endY = this.getEndY();
         }
 
         this._boundingBox = undefined;
@@ -174,7 +178,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 
     protected abstract shouldDrawBendSlur(): boolean;
 
-    protected getTieHeight(_startX: number, _startY: number, _endX: number, _endY: number): number {
+    public getTieHeight(_startX: number, _startY: number, _endX: number, _endY: number): number {
         return this.renderer.smuflMetrics.tieHeight;
     }
 
@@ -185,7 +189,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     protected abstract getTieDirection(): BeamDirection;
 
     protected abstract getStartBeatRenderer(): BarRendererBase;
-    protected abstract getEndBeatRenderer(): BarRendererBase;
+    protected abstract getEndBeatRenderer(): BarRendererBase | null;
 
     protected abstract getStartY(): number;
 
@@ -194,6 +198,22 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     protected abstract getStartX(): number;
 
     protected abstract getEndX(): number;
+
+    public calculateMultiSystemSlurY(renderer: BarRendererBase) {
+        const startRenderer = this.getStartBeatRenderer();
+        const startY = this.getStartY();
+        const relY = startY - startRenderer.y;
+        return renderer.y + relY;
+    }
+
+    public shouldCreateMultiSystemSlur(renderer: BarRendererBase) {
+        const endStaff = this.getEndBeatRenderer()?.staff;
+        if (!endStaff) {
+            return true;
+        }
+
+        return renderer.staff!.system.index < endStaff.system.index;
+    }
 
     public static calculateActualTieHeight(
         scale: number,
@@ -463,7 +483,13 @@ export abstract class NoteTieGlyph extends TieGlyph {
         return !this.isLeftHandTap && super.isForEnd;
     }
 
-    protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
+    public override calculateMultiSystemSlurY(renderer: BarRendererBase) {
+        const startRenderer = this.getStartBeatRenderer() as LineBarRenderer;
+        const startLine = startRenderer.getNoteLine(this.startNote);
+        return renderer.y + (renderer as LineBarRenderer).getLineY(startLine);
+    }
+
+    public override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
         if (this.isLeftHandTap) {
             return this.renderer!.smuflMetrics.tieHeight;
         }
@@ -508,8 +534,11 @@ export abstract class NoteTieGlyph extends TieGlyph {
 
     protected override getEndX(): number {
         const endNoteRenderer = this.getEndBeatRenderer();
+        if (!endNoteRenderer) {
+            return this.getStartY() + this.renderer.smuflMetrics.leftHandTabTieWidth;
+        }
         if (this.isLeftHandTap) {
-            return endNoteRenderer.x + endNoteRenderer.getNoteX(this.endNote, NoteXPosition.Left);
+            return endNoteRenderer!.x + endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Left);
         }
         return endNoteRenderer.x + endNoteRenderer.getNoteX(this.endNote, NoteXPosition.Center);
     }
@@ -520,6 +549,10 @@ export abstract class NoteTieGlyph extends TieGlyph {
 
     protected override getEndY(): number {
         const endNoteRenderer = this.getEndBeatRenderer();
+        if (!endNoteRenderer) {
+            return this.getStartY();
+        }
+
         if (this.isLeftHandTap) {
             return endNoteRenderer.y + endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Center);
         }
@@ -532,12 +565,12 @@ export abstract class NoteTieGlyph extends TieGlyph {
         }
     }
 
-    protected override getEndBeatRenderer(): BarRendererBase {
+    protected override getEndBeatRenderer(): BarRendererBase | null {
         if (!this.endNoteRenderer) {
             this.endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                this.renderer.staff.staffId,
+                this.renderer.staff!.staffId,
                 this.endNote.beat.voice.bar
-            )!;
+            );
         }
         return this.endNoteRenderer;
     }
@@ -545,7 +578,7 @@ export abstract class NoteTieGlyph extends TieGlyph {
     protected override getStartBeatRenderer(): BarRendererBase {
         if (!this.startNoteRenderer) {
             this.startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                this.renderer.staff.staffId,
+                this.renderer.staff!.staffId,
                 this.startNote.beat.voice.bar
             )!;
         }
@@ -554,5 +587,46 @@ export abstract class NoteTieGlyph extends TieGlyph {
 
     protected override shouldDrawBendSlur(): boolean {
         return false;
+    }
+}
+
+export class ContinuationTieGlyph extends TieGlyph {
+    private _startTie: TieGlyph;
+
+    public constructor(startTie: TieGlyph) {
+        super(startTie.slurEffectId);
+        this._startTie = startTie;
+    }
+
+    protected override getStartBeatRenderer(): BarRendererBase {
+        return this.renderer;
+    }
+
+    protected override getEndBeatRenderer(): BarRendererBase {
+        return this.renderer;
+    }
+
+    protected override shouldDrawBendSlur(): boolean {
+        return false;
+    }
+
+    protected override getTieDirection(): BeamDirection {
+        return this._startTie.tieDirection;
+    }
+
+    protected override getStartY(): number {
+        return this._startTie.calculateMultiSystemSlurY(this.renderer);
+    }
+    protected override getEndY(): number {
+        return this.getStartY();
+    }
+
+    protected override getStartX(): number {
+        return this.renderer.staff!.barRenderers[0].x;
+    }
+
+    protected override getEndX(): number {
+        const last = this.renderer.staff!.barRenderers[this.renderer.staff!.barRenderers.length - 1];
+        return last.x + last.width;
     }
 }

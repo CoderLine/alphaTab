@@ -23,6 +23,9 @@ export class ScoreTieGlyph extends NoteTieGlyph {
 
     protected override getEndX(): number {
         const endNoteRenderer = this.getEndBeatRenderer();
+        if (!endNoteRenderer) {
+            return this.getStartX() + this.renderer.smuflMetrics.leftHandTabTieWidth;
+        }
         if (this.isLeftHandTap) {
             return endNoteRenderer.x + endNoteRenderer.getNoteX(this.endNote, NoteXPosition.Left);
         }

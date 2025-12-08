@@ -484,6 +484,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
     }
 
+    public override getNoteLine(note: Note): number {
+        return this.accidentalHelper.getNoteSteps(note) / 2;
+    }
+
     public getNoteSteps(n: Note): number {
         return this.accidentalHelper.getNoteSteps(n);
     }

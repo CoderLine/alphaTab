@@ -242,9 +242,9 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             sr.shortestDuration = this.container.beat.duration;
         }
 
-        const glyphY = sr.getLineY(sr.getNoteLine());
-
         if (!this.container.beat.isEmpty) {
+            const note = this.container.beat.notes[0];
+            const glyphY = sr.getLineY(0);
             let numberWithinOctave = '0';
             if (this.container.beat.notes.length > 0) {
                 const kst = this.renderer.bar.keySignatureType;
@@ -256,8 +256,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                         ? NumberedBeatGlyph.minorKeySignatureOneValues
                         : NumberedBeatGlyph.majorKeySignatureOneValues;
                 const oneNoteValue = oneNoteValues[ksi];
-
-                const note = this.container.beat.notes[0];
 
                 if (note.isDead) {
                     numberWithinOctave = 'X';
@@ -320,7 +318,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             // Note dots
             if (this.container.beat.dots > 0 && this.container.beat.duration >= Duration.Quarter) {
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
-                    const dot = new AugmentationDotGlyph(0, sr.getLineY(0));
+                    const dot = new AugmentationDotGlyph(0, glyphY);
                     dot.renderer = this.renderer;
                     this.addEffect(dot);
                 }
@@ -350,7 +348,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                 numberOfQuarterNotes += numberOfAddedQuarters;
             }
             for (let i = 0; i < numberOfQuarterNotes - 1; i++) {
-                const dash = new NumberedDashGlyph(0, sr.getLineY(0), this.container.beat);
+                const dash = new NumberedDashGlyph(0, glyphY, this.container.beat);
                 dash.renderer = this.renderer;
                 this.addNormal(dash);
             }

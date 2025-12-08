@@ -233,7 +233,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
         }
     }
 
-    public getNoteLine() {
+    public getNoteLine(_note: Note) {
         return 0;
     }
 

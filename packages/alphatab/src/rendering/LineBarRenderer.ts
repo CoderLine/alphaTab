@@ -4,6 +4,7 @@ import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { Note } from '@coderline/alphatab/model/Note';
 import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
 import { NotationMode } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
@@ -138,7 +139,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
         // during system fitting it can happen that we have fraction widths
         // but to have lines until the full end-pixel we round up.
-        // this way we avoid holes, 
+        // this way we avoid holes,
         const lineWidth = this.width;
 
         // we want the lines to be exactly virtually aligned with the respective Y-position
@@ -1120,8 +1121,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected getMinLineOfBeat(_beat: Beat): number {
         return 0;
     }
-    
+
     protected getMaxLineOfBeat(_beat: Beat): number {
         return 0;
     }
+
+    public abstract getNoteLine(note: Note): number;
 }

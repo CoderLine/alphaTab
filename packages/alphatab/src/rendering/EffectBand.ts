@@ -60,7 +60,7 @@ export class EffectBand extends Glyph {
     public static shouldCreateGlyph(beat: Beat, info: EffectInfo, renderer: BarRendererBase) {
         return (
             info.shouldCreateGlyph(renderer.settings, beat) &&
-            (!info.hideOnMultiTrack || renderer.staff.trackIndex === 0)
+            (!info.hideOnMultiTrack || renderer.staff!.trackIndex === 0)
         );
     }
 

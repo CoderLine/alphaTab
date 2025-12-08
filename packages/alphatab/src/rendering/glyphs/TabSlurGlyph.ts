@@ -13,7 +13,7 @@ export class TabSlurGlyph extends TabTieGlyph {
         this._forSlide = forSlide;
     }
 
-    protected override getTieHeight(startX: number, _startY: number, endX: number, _endY: number): number {
+    public override getTieHeight(startX: number, _startY: number, endX: number, _endY: number): number {
         return (Math.log(endX - startX + 1) * this.renderer.settings.notation.slurHeight) / 2;
     }
 
