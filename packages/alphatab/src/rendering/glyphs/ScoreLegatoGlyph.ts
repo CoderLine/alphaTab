@@ -15,14 +15,10 @@ export class ScoreLegatoGlyph extends TieGlyph {
     protected startBeatRenderer: BarRendererBase | null = null;
     protected endBeatRenderer: BarRendererBase | null = null;
 
-    public constructor(slurEffectId: string, startBeat: Beat, endBeat: Beat) {
-        super(slurEffectId);
+    public constructor(slurEffectId: string, startBeat: Beat, endBeat: Beat, forEnd:boolean) {
+        super(slurEffectId, forEnd);
         this.startBeat = startBeat;
         this.endBeat = endBeat;
-    }
-
-    protected override get isForEnd(): boolean {
-        return this.startBeat !== this.endBeat && super.isForEnd;
     }
 
     public override doLayout(): void {

@@ -1,5 +1,6 @@
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 
 /**
  * @internal
@@ -38,7 +39,7 @@ export class SlurRegistry {
     }
 
     public startMultiSystemSlur(startGlyph: TieGlyph) {
-        const staffId = startGlyph.renderer.staff!.staffId;
+        const staffId = SlurRegistry._staffId(startGlyph.renderer.staff!);
         let container: SlurInfoContainer;
         if (!this._staffLookup.has(staffId)) {
             container = {
@@ -52,8 +53,12 @@ export class SlurRegistry {
         container.startedSlurs.set(startGlyph.slurEffectId, { startGlyph });
     }
 
+    private static _staffId(staff: RenderStaff): string {
+        return `${staff.modelStaff.index}.${staff.modelStaff.track.index}.${staff.staffId}`;
+    }
+
     public completeMultiSystemSlur(endGlyph: TieGlyph) {
-        const staffId = endGlyph.renderer.staff!.staffId;
+        const staffId = SlurRegistry._staffId(endGlyph.renderer.staff!);
         if (!this._staffLookup.has(staffId)) {
             return undefined;
         }
@@ -67,11 +72,12 @@ export class SlurRegistry {
     }
 
     public *getAllContinuations(renderer: BarRendererBase): Iterable<TieGlyph> {
-        if (!this._staffLookup.has(renderer.staff!.staffId) || renderer.index > 0) {
+        const staffId = SlurRegistry._staffId(renderer.staff!);
+        if (!this._staffLookup.has(staffId) || renderer.index > 0) {
             return;
         }
 
-        const container = this._staffLookup.get(renderer.staff!.staffId)!;
+        const container = this._staffLookup.get(staffId)!;
         for (const g of container.startedSlurs.values()) {
             if (g.startGlyph.shouldCreateMultiSystemSlur(renderer)) {
                 yield g.startGlyph;

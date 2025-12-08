@@ -24,16 +24,16 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
         }
 
         if (n.isTieOrigin && n.tieDestination!.isVisible && !this._slurs.has('numbered.tie')) {
-            const tie = new NumberedTieGlyph(`numbered.tie.${n.beat.id}`, n, n.tieDestination!);
+            const tie = new NumberedTieGlyph(`numbered.tie.${n.beat.id}`, n, n.tieDestination!, false);
             this.addTie(tie);
             this._slurs.set(tie.slurEffectId, tie);
         }
         if (n.isTieDestination) {
-            const tie = new NumberedTieGlyph(`numbered.tie.${n.tieOrigin?.beat.id}`, n.tieOrigin!, n);
+            const tie = new NumberedTieGlyph(`numbered.tie.${n.tieOrigin?.beat.id}`, n.tieOrigin!, n, true);
             this.addTie(tie);
         }
         if (n.isLeftHandTapped && !n.isHammerPullDestination && !this._slurs.has(`numbered.tie.leftHandTap.${n.beat.id}`)) {
-            const tapSlur = new NumberedTieGlyph(`numbered.tie.leftHandTap.${n.beat.id}`, n, n);
+            const tapSlur = new NumberedTieGlyph(`numbered.tie.leftHandTap.${n.beat.id}`, n, n, false);
             this.addTie(tapSlur);
             this._slurs.set(tapSlur.slurEffectId, tapSlur);
         }
@@ -52,6 +52,7 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
                     `numbered.slur.effect`,
                     n,
                     n.effectSlurDestination,
+                    false,
                     false
                 );
                 this._effectSlurs.push(effectSlur);
@@ -75,7 +76,8 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
                     `numbered.slur.effect`,
                     n.effectSlurOrigin,
                     n,
-                    false
+                    false,
+                    true
                 );
                 this._effectSlurs.push(effectSlur);
                 this.addTie(effectSlur);

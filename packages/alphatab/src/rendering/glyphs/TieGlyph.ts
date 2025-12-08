@@ -23,10 +23,12 @@ export interface ITieGlyph {
 export abstract class TieGlyph extends Glyph implements ITieGlyph {
     public tieDirection: BeamDirection = BeamDirection.Up;
     public readonly slurEffectId: string;
+    protected isForEnd:boolean;
 
-    public constructor(slurEffectId: string) {
+    public constructor(slurEffectId: string, forEnd:boolean) {
         super(0, 0);
         this.slurEffectId = slurEffectId;
+        this.isForEnd = forEnd;
     }
 
     private _startX: number = 0;
@@ -71,8 +73,33 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         this.tieDirection = this.getTieDirection();
 
         const forEnd = this.isForEnd;
+        this._shouldPaint = false;
 
-        if (forEnd) {
+        if (!forEnd) {
+            if (startNoteRenderer !== endNoteRenderer) {
+                this._startX = this.getStartX();
+                this._startY = this.getStartY();
+                if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
+                    const lastRendererInStaff =
+                        startNoteRenderer.staff!.barRenderers[startNoteRenderer.staff!.barRenderers.length - 1];
+
+                    this._endX = lastRendererInStaff.x + lastRendererInStaff.width;
+                    this._endY = this._startY;
+
+                    startNoteRenderer.scoreRenderer.layout!.slurRegistry.startMultiSystemSlur(this);
+                } else {
+                    this._endX = this.getEndX();
+                    this._endY = this.getEndY();
+                }
+            } else {
+                this._shouldPaint = true;
+                this._startX = this.getStartX();
+                this._endX = this.getEndX();
+                this._startY = this.getStartY();
+                this._endY = this.getEndY();
+            }
+            this._shouldPaint = true;
+        } else if (startNoteRenderer.staff !== endNoteRenderer!.staff) {
             const firstRendererInStaff = startNoteRenderer.staff!.barRenderers[0];
             this._startX = firstRendererInStaff!.x;
 
@@ -80,36 +107,14 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 
             const startGlyph = startNoteRenderer.scoreRenderer.layout!.slurRegistry.completeMultiSystemSlur(this);
             if (startGlyph) {
-                this._startY = startGlyph.calculateMultiSystemSlurY(startNoteRenderer);
+                this._startY = startGlyph.calculateMultiSystemSlurY(endNoteRenderer!);
             } else {
                 this._startY = this.getStartX();
             }
 
             this._endY = this.getEndY();
 
-            this._shouldPaint = !endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff;
-        } else if (startNoteRenderer !== endNoteRenderer) {
-            this._shouldPaint = true;
-            this._startX = this.getStartX();
-            this._startY = this.getStartY();
-            if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
-                const lastRendererInStaff =
-                    startNoteRenderer.staff!.barRenderers[startNoteRenderer.staff!.barRenderers.length - 1];
-
-                this._endX = lastRendererInStaff.x + lastRendererInStaff.width;
-                this._endY = this._startY;
-
-                startNoteRenderer.scoreRenderer.layout!.slurRegistry.startMultiSystemSlur(this);
-            } else {
-                this._endX = this.getEndX();
-                this._endY = this.getEndY();
-            }
-        } else {
-            this._shouldPaint = true;
-            this._startX = this.getStartX();
-            this._endX = this.getEndX();
-            this._startY = this.getStartY();
-            this._endY = this.getEndY();
+            this._shouldPaint = startNoteRenderer.staff !== endNoteRenderer!.staff;
         }
 
         this._boundingBox = undefined;
@@ -180,10 +185,6 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 
     public getTieHeight(_startX: number, _startY: number, _endX: number, _endY: number): number {
         return this.renderer.smuflMetrics.tieHeight;
-    }
-
-    protected get isForEnd() {
-        return this.renderer !== this.getStartBeatRenderer();
     }
 
     protected abstract getTieDirection(): BeamDirection;
@@ -469,18 +470,14 @@ export abstract class NoteTieGlyph extends TieGlyph {
     protected startNoteRenderer: BarRendererBase | null = null;
     protected endNoteRenderer: BarRendererBase | null = null;
 
-    public constructor(slurEffectId: string, startNote: Note, endNote: Note) {
-        super(slurEffectId);
+    public constructor(slurEffectId: string, startNote: Note, endNote: Note, forEnd:boolean) {
+        super(slurEffectId, forEnd);
         this.startNote = startNote;
         this.endNote = endNote;
     }
 
     protected get isLeftHandTap() {
         return this.startNote === this.endNote;
-    }
-
-    protected override get isForEnd() {
-        return !this.isLeftHandTap && super.isForEnd;
     }
 
     public override calculateMultiSystemSlurY(renderer: BarRendererBase) {
@@ -594,7 +591,7 @@ export class ContinuationTieGlyph extends TieGlyph {
     private _startTie: TieGlyph;
 
     public constructor(startTie: TieGlyph) {
-        super(startTie.slurEffectId);
+        super(startTie.slurEffectId, false);
         this._startTie = startTie;
     }
 

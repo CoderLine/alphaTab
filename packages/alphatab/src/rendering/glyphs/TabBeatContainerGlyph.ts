@@ -36,22 +36,22 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         }
         const renderer: TabBarRenderer = this.renderer as TabBarRenderer;
         if (n.isTieOrigin && renderer.showTiedNotes && n.tieDestination!.isVisible) {
-            const tie: TabTieGlyph = new TabTieGlyph(`tab.tie.${n.id}`, n, n.tieDestination!);
+            const tie: TabTieGlyph = new TabTieGlyph(`tab.tie.${n.id}`, n, n.tieDestination!, false);
             this.addTie(tie);
         }
         if (n.isTieDestination && renderer.showTiedNotes) {
-            const tie: TabTieGlyph = new TabTieGlyph(`tab.tie.${n.tieOrigin!.id}`, n.tieOrigin!, n);
+            const tie: TabTieGlyph = new TabTieGlyph(`tab.tie.${n.tieOrigin!.id}`, n.tieOrigin!, n, true);
             this.addTie(tie);
         }
         if (n.isLeftHandTapped && !n.isHammerPullDestination) {
-            const tapSlur: TabTieGlyph = new TabTieGlyph(`tab.tie.leftHandTap.${n.id}`, n, n);
+            const tapSlur: TabTieGlyph = new TabTieGlyph(`tab.tie.leftHandTap.${n.id}`, n, n, false);
             this.addTie(tapSlur);
         }
         // start effect slur on first beat
         if (n.isEffectSlurOrigin && n.effectSlurDestination) {
             let expanded: boolean = false;
             for (const slur of this._effectSlurs) {
-                if (slur.tryExpand(n, n.effectSlurDestination, false, true)) {
+                if (slur.tryExpand(n, n.effectSlurDestination, false, false)) {
                     expanded = true;
                     break;
                 }
@@ -61,6 +61,7 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
                     `tab.slur.effect.${n.id}`,
                     n,
                     n.effectSlurDestination,
+                    false,
                     false
                 );
                 this._effectSlurs.push(effectSlur);
@@ -77,7 +78,7 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
                 }
             }
             if (!expanded) {
-                const effectSlur: TabSlurGlyph = new TabSlurGlyph(`tab.slur.effect.${n.effectSlurOrigin.id}`, n.effectSlurOrigin, n, false);
+                const effectSlur: TabSlurGlyph = new TabSlurGlyph(`tab.slur.effect.${n.effectSlurOrigin.id}`, n.effectSlurOrigin, n, false, true);
                 this._effectSlurs.push(effectSlur);
                 this.addTie(effectSlur);
             }
