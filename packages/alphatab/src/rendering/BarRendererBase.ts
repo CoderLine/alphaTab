@@ -731,7 +731,7 @@ export class BarRendererBase {
                 case BeatXPosition.OnNotes:
                     return container.voiceContainer.x + container.x + container.onNotes.x;
                 case BeatXPosition.MiddleNotes:
-                    return container.voiceContainer.x + container.x + container.onTimeX;
+                    return container.voiceContainer.x + container.x + container.onNotes.x + container.onNotes.middleX;
                 case BeatXPosition.Stem:
                     const offset = container.onNotes.beamingHelper
                         ? container.onNotes.beamingHelper.getBeatLineX(beat)

@@ -147,17 +147,18 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         this.width = w;
         this.computedWidth = w;
         if (this.container.beat.isEmpty) {
-            this.centerX = this.width / 2;
+            this.onTimeX = this.width / 2;
         } else if (this.restGlyph) {
-            this.centerX = this.restGlyph!.x + this.restGlyph!.width / 2;
+            this.onTimeX = this.restGlyph!.x + this.restGlyph!.width / 2;
         } else if (this.noteNumbers) {
-            this.centerX = this.noteNumbers!.x + this.noteNumbers!.noteStringWidth / 2;
+            this.onTimeX = this.noteNumbers!.x + this.noteNumbers!.noteStringWidth / 2;
         } else if (this.slash) {
-            this.centerX = this.slash!.x + this.slash!.width / 2;
+            this.onTimeX = this.slash!.x + this.slash!.width / 2;
         }
+        this.middleX = this.onTimeX;
 
         for (const g of centeredEffectGlyphs) {
-            g.x = this.centerX;
+            g.x = this.onTimeX;
         }
     }
 

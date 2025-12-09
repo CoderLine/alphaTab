@@ -29,7 +29,7 @@ export class BeatContainerGlyph extends Glyph {
     public minWidth: number = 0;
 
     public get onTimeX(): number {
-        return this.onNotes.x + this.onNotes.centerX;
+        return this.onNotes.x + this.onNotes.onTimeX;
     }
 
     public constructor(beat: Beat, voiceContainer: VoiceContainerGlyph) {
@@ -59,9 +59,9 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
-        const preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.centerX;
+        const preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.onTimeX;
 
-        let postBeatStretch: number = this.onNotes.computedWidth - this.onNotes.centerX;
+        let postBeatStretch: number = this.onNotes.computedWidth - this.onNotes.onTimeX;
         // make space for flag
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
         if (this.beat.graceType !== GraceType.None) {
@@ -229,7 +229,7 @@ export class BeatContainerGlyph extends Glyph {
             beatBoundings.realBounds.w = this.width;
             beatBoundings.realBounds.h = barBounds.realBounds.h;
 
-            beatBoundings.onNotesX = cx + this.x + this.onNotes.width / 2;
+            beatBoundings.onNotesX = cx + this.x + this.onNotes.x + this.onNotes.onTimeX;
         } else {
             beatBoundings.visualBounds = new Bounds();
             beatBoundings.visualBounds.x = cx + this.x;
@@ -269,7 +269,7 @@ export class BeatContainerGlyph extends Glyph {
             beatBoundings.realBounds.w = this.width;
             beatBoundings.realBounds.h = barBounds.realBounds.h;
 
-            beatBoundings.onNotesX = cx + this.x + this.onNotes.x + this.onNotes.width / 2;
+            beatBoundings.onNotesX = cx + this.x + this.onNotes.x + this.onNotes.onTimeX;
         }
 
         barBounds.addBeat(beatBoundings);

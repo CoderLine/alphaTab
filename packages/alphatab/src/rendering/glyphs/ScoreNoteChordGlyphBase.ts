@@ -20,7 +20,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     public downLineX: number = 0;
     public noteStartX: number = 0;
 
-    public centerX = 0;
+    public onTimeX = 0;
 
     public constructor() {
         super(0, 0);
@@ -168,14 +168,14 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         // * If the stem is downards, the center is the middle of the right-hand-side note head
         if (anyDisplaced) {
             if (direction === BeamDirection.Up) {
-                this.centerX = nonDisplacedWidth / 2;
+                this.onTimeX = nonDisplacedWidth / 2;
             } else {
                 const displacedRawWith = displacedWidth - stemPosition;
-                this.centerX = stemPosition + (displacedRawWith / 2);
+                this.onTimeX = stemPosition + (displacedRawWith / 2);
             }
         } else {
             // for no displaced notes it is simply the center
-            this.centerX = w / 2;
+            this.onTimeX = w / 2;
         }
 
         this.width = w;
