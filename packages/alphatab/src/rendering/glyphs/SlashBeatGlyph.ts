@@ -136,8 +136,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         // create glyphs
         const sr = this.renderer as SlashBarRenderer;
 
-        const line: number = sr.getNoteLine();
-        const glyphY = sr.getLineY(line);
+        const glyphY = sr.getLineY(0);
         if (this.container.beat.deadSlapped) {
             const deadSlapped = new DeadSlappedBeatGlyph();
             deadSlapped.renderer = this.renderer;
@@ -179,7 +178,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 this.addEffect(
                     new AugmentationDotGlyph(
                         0,
-                        sr.getLineY(sr.getNoteLine()) - sr.getLineHeight(0.5)
+                        glyphY - sr.getLineHeight(0.5)
                     )
                 );
             }

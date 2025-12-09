@@ -3,13 +3,13 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { ScoreBendGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBendGlyph';
 import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
 import { ScoreSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlideLineGlyph';
 import { ScoreSlurGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlurGlyph';
 import { ScoreTieGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTieGlyph';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal
@@ -61,12 +61,11 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             n.tieDestination &&
             n.tieDestination.isVisible
         ) {
-            // tslint:disable-next-line: no-unnecessary-type-assertion
-            const tie: ScoreTieGlyph = new ScoreTieGlyph(n, n.tieDestination!, false);
+            const tie: ScoreTieGlyph = new ScoreTieGlyph(`score.tie.${n.id}`, n, n.tieDestination!, false);
             this.addTie(tie);
         }
         if (n.isTieDestination && !n.tieOrigin!.hasBend && !n.beat.hasWhammyBar) {
-            const tie: ScoreTieGlyph = new ScoreTieGlyph(n.tieOrigin!, n, true);
+            const tie: ScoreTieGlyph = new ScoreTieGlyph(`score.tie.${n.tieOrigin!.id}`, n.tieOrigin!, n, true);
             this.addTie(tie);
         }
         // TODO: depending on the type we have other positioning
@@ -76,27 +75,26 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             this.addTie(l);
         }
         if (n.isSlurOrigin && n.slurDestination && n.slurDestination.isVisible) {
-            // tslint:disable-next-line: no-unnecessary-type-assertion
-            const tie: ScoreSlurGlyph = new ScoreSlurGlyph(n, n.slurDestination!, false);
+            const tie: ScoreSlurGlyph = new ScoreSlurGlyph(`score.slur.${n.id}`, n, n.slurDestination!, false);
             this.addTie(tie);
         }
         if (n.isSlurDestination) {
-            const tie: ScoreSlurGlyph = new ScoreSlurGlyph(n.slurOrigin!, n, true);
+            const tie: ScoreSlurGlyph = new ScoreSlurGlyph(`score.slur.${n.slurOrigin!.id}`, n.slurOrigin!, n, true);
             this.addTie(tie);
         }
         // start effect slur on first beat
         if (!this._effectSlur && n.isEffectSlurOrigin && n.effectSlurDestination) {
-            const effectSlur = new ScoreSlurGlyph(n, n.effectSlurDestination, false);
+            const effectSlur = new ScoreSlurGlyph(`score.slur.effect.${n.beat.id}`, n, n.effectSlurDestination, false);
             this._effectSlur = effectSlur;
             this.addTie(effectSlur);
         }
         // end effect slur on last beat
         if (!this._effectEndSlur && n.beat.isEffectSlurDestination && n.beat.effectSlurOrigin) {
-            const direction: BeamDirection = this.onNotes.beamingHelper.direction;
-            const startNote: Note =
+            const direction = this.onNotes.beamingHelper.direction;
+            const startNote =
                 direction === BeamDirection.Up ? n.beat.effectSlurOrigin.minNote! : n.beat.effectSlurOrigin.maxNote!;
-            const endNote: Note = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
-            const effectEndSlur = new ScoreSlurGlyph(startNote, endNote, true);
+            const endNote = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
+            const effectEndSlur = new ScoreSlurGlyph(`score.slur.effect.${startNote.beat.id}`, startNote, endNote, true);
             this._effectEndSlur = effectEndSlur;
             this.addTie(effectEndSlur);
         }
@@ -119,7 +117,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
                 while (destination.nextBeat && destination.nextBeat.isLegatoDestination) {
                     destination = destination.nextBeat;
                 }
-                this.addTie(new ScoreLegatoGlyph(this.beat, destination, false));
+                this.addTie(new ScoreLegatoGlyph(`score.legato.${this.beat.id}`, this.beat, destination, false));
             }
         } else if (this.beat.isLegatoDestination) {
             // only create slur for last destination of "group"
@@ -128,7 +126,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
                 while (origin.previousBeat && origin.previousBeat.isLegatoOrigin) {
                     origin = origin.previousBeat;
                 }
-                this.addTie(new ScoreLegatoGlyph(origin, this.beat, true));
+                this.addTie(new ScoreLegatoGlyph(`score.legato.${origin.id}`, origin, this.beat, true));
             }
         }
     }

@@ -12,7 +12,7 @@ import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGly
 import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
-import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import { ContinuationTieGlyph, type ITieGlyph, type TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
 import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
@@ -94,6 +94,8 @@ export class BarRendererBase {
 
     private _ties: ITieGlyph[] = [];
 
+    private _multiSystemSlurs?: ContinuationTieGlyph[];
+
     public topEffects: EffectBandContainer;
     public bottomEffects: EffectBandContainer;
 
@@ -101,18 +103,18 @@ export class BarRendererBase {
         if (!this.bar || !this.bar.nextBar) {
             return null;
         }
-        return this.scoreRenderer.layout!.getRendererForBar(this.staff.staffId, this.bar.nextBar);
+        return this.scoreRenderer.layout!.getRendererForBar(this.staff!.staffId, this.bar.nextBar);
     }
 
     public get previousRenderer(): BarRendererBase | null {
         if (!this.bar || !this.bar.previousBar) {
             return null;
         }
-        return this.scoreRenderer.layout!.getRendererForBar(this.staff.staffId, this.bar.previousBar);
+        return this.scoreRenderer.layout!.getRendererForBar(this.staff!.staffId, this.bar.previousBar);
     }
 
     public scoreRenderer: ScoreRenderer;
-    public staff!: RenderStaff;
+    public staff?: RenderStaff;
     public layoutingInfo!: BarLayoutingInfo;
     public bar: Bar;
     public additionalMultiRestBars: Bar[] | null = null;
@@ -239,7 +241,7 @@ export class BarRendererBase {
      * scale should be respected.
      */
     public get barDisplayScale(): number {
-        return this.staff.system.staves.length > 1 ? this.bar.masterBar.displayScale : this.bar.displayScale;
+        return this.staff!.system.staves.length > 1 ? this.bar.masterBar.displayScale : this.bar.displayScale;
     }
 
     /**
@@ -247,7 +249,7 @@ export class BarRendererBase {
      * scale should be respected.
      */
     public get barDisplayWidth(): number {
-        return this.staff.system.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
+        return this.staff!.system.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
     }
 
     protected wasFirstOfLine: boolean = false;
@@ -281,6 +283,12 @@ export class BarRendererBase {
     }
 
     private _appliedLayoutingInfo: number = 0;
+
+    public afterReverted() {
+        this.staff = undefined;
+        this.registerMultiSystemSlurs(undefined);
+        this.isFinalized = false;
+    }
 
     public afterStaffBarReverted() {
         this.topEffects.afterStaffBarReverted();
@@ -337,14 +345,30 @@ export class BarRendererBase {
 
     public isFinalized: boolean = false;
 
-    public finalizeRenderer(): boolean {
-        this.isFinalized = true;
+    public registerMultiSystemSlurs(startedTies: Generator<TieGlyph> | undefined) {
+        if (!startedTies) {
+            this._multiSystemSlurs = undefined;
+            return;
+        }
 
+        let ties: ContinuationTieGlyph[] | undefined = undefined;
+        for (const g of startedTies) {
+            const continuation = new ContinuationTieGlyph(g);
+            continuation.renderer = this;
+            continuation.tieDirection = g.tieDirection;
+
+            if (!ties) {
+                ties = [];
+            }
+            ties.push(continuation);
+        }
+
+        this._multiSystemSlurs = ties;
+    }
+
+    private _finalizeTies(ties: Iterable<ITieGlyph>, barTop: number, barBottom: number): boolean {
         let didChangeOverflows = false;
-        // allow spacing to be used for tie overflows
-        const barTop = this.y;
-        const barBottom = this.y + this.height;
-        for (const t of this._ties) {
+        for (const t of ties) {
             const tie = t as unknown as Glyph;
             tie.doLayout();
 
@@ -367,6 +391,25 @@ export class BarRendererBase {
                 }
             }
         }
+        return didChangeOverflows;
+    }
+
+    public finalizeRenderer(): boolean {
+        this.isFinalized = true;
+
+        let didChangeOverflows = false;
+        // allow spacing to be used for tie overflows
+        const barTop = this.y;
+        const barBottom = this.y + this.height;
+
+        if (this._finalizeTies(this._ties, barTop, barBottom)) {
+            didChangeOverflows = true;
+        }
+
+        const multiSystemSlurs = this._multiSystemSlurs;
+        if (multiSystemSlurs && this._finalizeTies(multiSystemSlurs, barTop, barBottom)) {
+            didChangeOverflows = true;
+        }
 
         const topHeightChanged = this.topEffects.finalizeEffects();
         const bottomHeightChanged = this.bottomEffects.finalizeEffects();
@@ -383,8 +426,8 @@ export class BarRendererBase {
     }
 
     private _registerStaffOverflow() {
-        this.staff.registerOverflowTop(this.topOverflow);
-        this.staff.registerOverflowBottom(this.bottomOverflow);
+        this.staff!.registerOverflowTop(this.topOverflow);
+        this.staff!.registerOverflowBottom(this.bottomOverflow);
     }
 
     public doLayout(): void {
@@ -500,7 +543,7 @@ export class BarRendererBase {
     }
 
     protected updateSizes(): void {
-        this.staff.registerStaffTop(0);
+        this.staff!.registerStaffTop(0);
         const voiceContainers: Map<number, VoiceContainerGlyph> = this._voiceContainers;
         const beatGlyphsStart: number = this.beatGlyphsStart;
         let postBeatStart: number = beatGlyphsStart;
@@ -524,7 +567,7 @@ export class BarRendererBase {
         this.height += this.layoutingInfo.height;
         this.height = Math.ceil(this.height);
 
-        this.staff.registerStaffBottom(this.height);
+        this.staff!.registerStaffBottom(this.height);
     }
 
     protected addPreBeatGlyph(g: Glyph): void {
@@ -566,10 +609,10 @@ export class BarRendererBase {
 
         this.paintContent(cx, cy, canvas);
 
-        const topEffectBandY = cy + this.y - this.staff.topOverflow;
+        const topEffectBandY = cy + this.y - this.staff!.topOverflow;
         this.topEffects.paint(cx + this.x, topEffectBandY, canvas);
 
-        const bottomEffectBandY = cy + this.y + this.height + this.staff.bottomOverflow - this.bottomEffects.height;
+        const bottomEffectBandY = cy + this.y + this.height + this.staff!.bottomOverflow - this.bottomEffects.height;
         this.bottomEffects.paint(cx + this.x, bottomEffectBandY, canvas);
     }
 
@@ -585,6 +628,19 @@ export class BarRendererBase {
 
         canvas.color = this.resources.mainGlyphColor;
         this._postBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
+
+        this._paintMultiSystemSlurs(cx, cy, canvas);
+    }
+
+    private _paintMultiSystemSlurs(cx: number, cy: number, canvas: ICanvas) {
+        const multiSystemSlurs = this._multiSystemSlurs;
+        if (!multiSystemSlurs) {
+            return;
+        }
+
+        for (const slur of multiSystemSlurs) {
+            slur.paint(cx, cy, canvas);
+        }
     }
 
     protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {

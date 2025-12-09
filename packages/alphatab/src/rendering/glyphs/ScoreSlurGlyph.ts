@@ -1,98 +1,100 @@
-import type { Note } from '@coderline/alphatab/model/Note';
-import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
-import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
-import { NoteYPosition, NoteXPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { ScoreTieGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTieGlyph';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal
  */
-export class ScoreSlurGlyph extends ScoreLegatoGlyph {
-    private _startNote: Note;
-    private _endNote: Note;
-
-    public constructor(startNote: Note, endNote: Note, forEnd: boolean = false) {
-        super(startNote.beat, endNote.beat, forEnd);
-        this._startNote = startNote;
-        this._endNote = endNote;
+export class ScoreSlurGlyph extends ScoreTieGlyph {
+    public override getTieHeight(startX: number, _startY: number, endX: number, _endY: number): number {
+        return (Math.log2(endX - startX + 1) * this.renderer.settings.notation.slurHeight) / 2;
     }
 
-    protected override getTieHeight(startX: number, _startY: number, endX: number, _endY: number): number {
-        return Math.log2(endX - startX + 1) * this.renderer.settings.notation.slurHeight / 2;
+    protected override calculateStartX(): number {
+        return (
+            this.renderer.x +
+            (this._isStartCentered()
+                ? this.renderer!.getBeatX(this.startNote.beat, BeatXPosition.MiddleNotes)
+                : this.renderer!.getNoteX(this.startNote, NoteXPosition.Right))
+        );
     }
 
-    protected override getStartY(): number {
+    protected override calculateStartY(): number {
         if (this._isStartCentered()) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
-                    // below lowest note
-                    return this.startNoteRenderer!.getNoteY(this._startNote, NoteYPosition.Top);
+                    return this.renderer.y + this.renderer!.getNoteY(this.startNote, NoteYPosition.Top);
                 default:
-                    return this.startNoteRenderer!.getNoteY(this._startNote, NoteYPosition.Bottom);
+                    return this.renderer.y + this.renderer!.getNoteY(this.startNote, NoteYPosition.Bottom);
             }
         }
 
-        return this.startNoteRenderer!.getNoteY(this._startNote, NoteYPosition.Center);
+        return this.renderer.y + this.renderer!.getNoteY(this.startNote, NoteYPosition.Center);
     }
 
-    protected override getEndY(): number {
+    protected override calculateEndX(): number {
+        const endNoteRenderer = this.lookupEndBeatRenderer();
+        if (!endNoteRenderer) {
+            return this.calculateStartX() + this.renderer.smuflMetrics.leftHandTabTieWidth;
+        }
+
+        if (this._isEndCentered()) {
+            if (this._isEndOnStem()) {
+                return endNoteRenderer.x + endNoteRenderer.getBeatX(this.endNote.beat, BeatXPosition.Stem);
+            }
+            return endNoteRenderer.x + endNoteRenderer.getNoteX(this.endNote, NoteXPosition.Center);
+        }
+        return endNoteRenderer.x + endNoteRenderer.getBeatX(this.endNote.beat, BeatXPosition.PreNotes);
+    }
+
+    protected override caclculateEndY(): number {
+        const endNoteRenderer = this.lookupEndBeatRenderer();
+        if (!endNoteRenderer) {
+            return this.calculateStartY();
+        }
+
         if (this._isEndCentered()) {
             if (this._isEndOnStem()) {
                 switch (this.tieDirection) {
                     case BeamDirection.Up:
-                        return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.TopWithStem);
+                        return endNoteRenderer.y + endNoteRenderer.getNoteY(this.endNote, NoteYPosition.TopWithStem);
                     default:
-                        return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.BottomWithStem);
+                        return endNoteRenderer.y + endNoteRenderer.getNoteY(this.endNote, NoteYPosition.BottomWithStem);
                 }
             }
             switch (this.tieDirection) {
                 case BeamDirection.Up:
-                    return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.Top);
+                    return endNoteRenderer.y + endNoteRenderer.getNoteY(this.endNote, NoteYPosition.Top);
                 default:
-                    return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.Bottom);
+                    return endNoteRenderer.y + endNoteRenderer.getNoteY(this.endNote, NoteYPosition.Bottom);
             }
         }
-        return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.Center);
+        return endNoteRenderer.y + endNoteRenderer.getNoteY(this.endNote, NoteYPosition.Center);
     }
 
     private _isStartCentered() {
         return (
-            (this._startNote === this._startNote.beat.maxNote && this.tieDirection === BeamDirection.Up) ||
-            (this._startNote === this._startNote.beat.minNote && this.tieDirection === BeamDirection.Down)
+            (this.startNote === this.startNote.beat.maxNote && this.tieDirection === BeamDirection.Up) ||
+            (this.startNote === this.startNote.beat.minNote && this.tieDirection === BeamDirection.Down)
         );
     }
     private _isEndCentered() {
         return (
-            this._startNote.beat.graceType === GraceType.None &&
-            ((this._endNote === this._endNote.beat.maxNote && this.tieDirection === BeamDirection.Up) ||
-                (this._endNote === this._endNote.beat.minNote && this.tieDirection === BeamDirection.Down))
+            this.startNote.beat.graceType === GraceType.None &&
+            ((this.endNote === this.endNote.beat.maxNote && this.tieDirection === BeamDirection.Up) ||
+                (this.endNote === this.endNote.beat.minNote && this.tieDirection === BeamDirection.Down))
         );
     }
 
     private _isEndOnStem() {
-        const endNoteScoreRenderer = this.endNoteRenderer as ScoreBarRenderer;
+        const startBeamDirection = this.lookupStartBeatRenderer().getBeatDirection(this.startNote.beat);
+        const endBeatRenderer = this.lookupEndBeatRenderer();
+        const endBeamDirection = endBeatRenderer
+            ? endBeatRenderer.getBeatDirection(this.endNote.beat)
+            : startBeamDirection;
 
-        const startBeamDirection = (this.startNoteRenderer as ScoreBarRenderer).getBeatDirection(this.startBeat!);
-        const endBeamDirection = endNoteScoreRenderer.getBeatDirection(this.endBeat!);
-
-        return startBeamDirection !== endBeamDirection && this.startBeat!.graceType === GraceType.None;
-    }
-
-    protected override getStartX(): number {
-        return this._isStartCentered()
-            ? this.startNoteRenderer!.getBeatX(this._startNote.beat, BeatXPosition.MiddleNotes)
-            : this.startNoteRenderer!.getNoteX(this._startNote, NoteXPosition.Right);
-    }
-
-    protected override getEndX(): number {
-        if (this._isEndCentered()) {
-            if (this._isEndOnStem()) {
-                return this.endNoteRenderer!.getBeatX(this._endNote.beat, BeatXPosition.Stem);
-            }
-            return this.endNoteRenderer!.getNoteX(this._endNote, NoteXPosition.Center);
-        }
-        return this.endNoteRenderer!.getBeatX(this._endNote.beat, BeatXPosition.PreNotes);
+        return startBeamDirection !== endBeamDirection && this.startNote.beat!.graceType === GraceType.None;
     }
 }

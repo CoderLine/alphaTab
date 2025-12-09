@@ -253,6 +253,7 @@ export class StaffSystem {
                 if (newBarDisplayScale > barDisplayScale) {
                     barDisplayScale = newBarDisplayScale;
                 }
+                lastBar.afterReverted();
             }
             this.width -= width;
             this.computedWidth -= width;

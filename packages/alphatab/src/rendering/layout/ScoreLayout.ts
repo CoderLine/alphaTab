@@ -15,6 +15,7 @@ import { ChordDiagramContainerGlyph } from '@coderline/alphatab/rendering/glyphs
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import { TuningContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TuningContainerGlyph';
 import { TuningGlyph } from '@coderline/alphatab/rendering/glyphs/TuningGlyph';
+import { SlurRegistry } from '@coderline/alphatab/rendering/layout/SlurRegistry';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
@@ -94,14 +95,20 @@ export abstract class ScoreLayout {
     public abstract get firstBarX(): number;
     public abstract get supportsResize(): boolean;
 
+    public slurRegistry = new SlurRegistry();
+
     public resize(): void {
         this._lazyPartials.clear();
+        this.slurRegistry.clear();
         this.doResize();
     }
     public abstract doResize(): void;
 
     public layoutAndRender(): void {
         this._lazyPartials.clear();
+        this.slurRegistry.clear();
+        this._barRendererLookup.clear();
+        
         this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
 
         const score: Score = this.renderer.score!;
@@ -435,18 +442,6 @@ export abstract class ScoreLayout {
         if (renderer.additionalMultiRestBars) {
             for (const b of renderer.additionalMultiRestBars) {
                 this._barRendererLookup.get(key)!.set(b.id, renderer);
-            }
-        }
-    }
-
-    public unregisterBarRenderer(key: string, renderer: BarRendererBase): void {
-        if (this._barRendererLookup.has(key)) {
-            const lookup: Map<number, BarRendererBase> = this._barRendererLookup.get(key)!;
-            lookup.delete(renderer.bar.id);
-            if (renderer.additionalMultiRestBars) {
-                for (const b of renderer.additionalMultiRestBars) {
-                    lookup.delete(b.id);
-                }
             }
         }
     }

@@ -30,7 +30,9 @@ export class RenderStaff {
     public index: number = 0;
     public staffIndex: number = 0;
 
-    public get isFirstInSystem() { return this.index === 0}
+    public get isFirstInSystem() {
+        return this.index === 0;
+    }
 
     public topEffectInfos: EffectBandInfo[] = [];
     public bottomEffectInfos: EffectBandInfo[] = [];
@@ -155,14 +157,14 @@ export class RenderStaff {
 
     public revertLastBar(): BarRendererBase {
         this._sharedLayoutData = new Map<string, unknown>();
+
         const lastBar: BarRendererBase = this.barRenderers[this.barRenderers.length - 1];
         this.barRenderers.splice(this.barRenderers.length - 1, 1);
-        this.system.layout.unregisterBarRenderer(this.staffId, lastBar);
         this.topOverflow = 0;
         this.bottomOverflow = 0;
         for (const r of this.barRenderers) {
             r.afterStaffBarReverted();
-        }
+        }       
         return lastBar;
     }
 
@@ -267,25 +269,25 @@ export class RenderStaff {
         // changes in the overflows
         let needsSecondPass = false;
         let topOverflow: number = this.topOverflow;
-        for (let i: number = 0; i < this.barRenderers.length; i++) {
-            this.barRenderers[i].y = this.topPadding + topOverflow;
-            if (this.barRenderers[i].finalizeRenderer()) {
+        for (const renderer of this.barRenderers) {
+            renderer.registerMultiSystemSlurs(this.system.layout!.slurRegistry.getAllContinuations(renderer));
+            if (renderer.finalizeRenderer()) {
                 needsSecondPass = true;
             }
-            this.height = Math.max(this.height, this.barRenderers[i].height);
+            this.height = Math.max(this.height, renderer.height);
         }
 
         // 2nd pass: move renderers to correct position respecting the new overflows
         if (needsSecondPass) {
             topOverflow = this.topOverflow;
             // shift all the renderers to the new position to match required spacing
-            for (let i: number = 0; i < this.barRenderers.length; i++) {
-                this.barRenderers[i].y = this.topPadding + topOverflow;
+            for (const renderer of this.barRenderers) {
+                renderer.y = this.topPadding + topOverflow;
             }
 
             // finalize again (to align ties)
-            for (let i: number = 0; i < this.barRenderers.length; i++) {
-                this.barRenderers[i].finalizeRenderer();
+            for (const renderer of this.barRenderers) {
+                renderer.finalizeRenderer();
             }
         }
 

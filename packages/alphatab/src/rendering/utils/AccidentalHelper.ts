@@ -204,7 +204,7 @@ export class AccidentalHelper {
                     if (note && note.isTieDestination && note.beat.index === 0) {
                         // candidate for skip, check further if start note is on the same steps
                         const tieOriginBarRenderer = this._barRenderer.scoreRenderer.layout?.getRendererForBar(
-                            this._barRenderer.staff.staffId,
+                            this._barRenderer.staff!.staffId,
                             note.tieOrigin!.beat.voice.bar
                         ) as ScoreBarRenderer | null;
                         if (tieOriginBarRenderer && tieOriginBarRenderer.staff === this._barRenderer.staff) {

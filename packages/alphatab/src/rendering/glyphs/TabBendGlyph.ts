@@ -243,7 +243,7 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
             while (endNote.isTieOrigin) {
                 const nextNote = endNote.tieDestination!;
                 endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                    this.renderer.staff.staffId,
+                    this.renderer.staff!.staffId,
                     nextNote.beat.voice.bar
                 );
                 if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
@@ -263,7 +263,7 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
 
             endBeat = endNote.beat;
             endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                this.renderer.staff.staffId,
+                this.renderer.staff!.staffId,
                 endBeat.voice.bar
             ) as TabBarRenderer;
             if (

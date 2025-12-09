@@ -3,6 +3,7 @@ import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { Note } from '@coderline/alphatab/model/Note';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
@@ -78,18 +79,8 @@ export class TabBarRenderer extends LineBarRenderer {
         return mode;
     }
 
-    /**
-     * Gets the relative y position of the given steps relative to first line.
-     * @param line the line of the particular string where 0 is the most top line
-     * @param correction
-     * @returns
-     */
-    public getTabY(line: number): number {
-        return super.getLineY(line);
-    }
-
-    public getTabHeight(line: number): number {
-        return super.getLineHeight(line);
+    public override getNoteLine(note: Note): number {
+        return this.bar.staff.tuning.length - note.string;
     }
 
     public minString = Number.NaN;
@@ -192,7 +183,7 @@ export class TabBarRenderer extends LineBarRenderer {
         if (this.isFirstOfLine) {
             const center: number = (this.bar.staff.tuning.length - 1) / 2;
             this.createStartSpacing();
-            this.addPreBeatGlyph(new TabClefGlyph(0, this.getTabY(center)));
+            this.addPreBeatGlyph(new TabClefGlyph(0, this.getLineY(center)));
         }
         // Time Signature
         if (
@@ -220,7 +211,7 @@ export class TabBarRenderer extends LineBarRenderer {
         this.addPreBeatGlyph(
             new TabTimeSignatureGlyph(
                 0,
-                this.getTabY(lines),
+                this.getLineY(lines),
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon,

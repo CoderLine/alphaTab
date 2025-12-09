@@ -1,24 +1,11 @@
-import type { Beat } from '@coderline/alphatab/model/Beat';
-import type { Note } from '@coderline/alphatab/model/Note';
-import { type BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
-import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { NoteXPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { NoteTieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 
 /**
  * @internal
  */
-export class ScoreTieGlyph extends TieGlyph {
-    protected startNote: Note;
-    protected endNote: Note;
-
-    public constructor(startNote: Note, endNote: Note, forEnd: boolean = false) {
-        super(!startNote ? null : startNote.beat, !endNote ? null : endNote.beat, forEnd);
-        this.startNote = startNote;
-        this.endNote = endNote;
-    }
-
+export class ScoreTieGlyph extends NoteTieGlyph {
     protected override shouldDrawBendSlur() {
         return (
             this.renderer.settings.notation.extendBendArrowsOnTiedNotes &&
@@ -27,58 +14,21 @@ export class ScoreTieGlyph extends TieGlyph {
         );
     }
 
-    public override doLayout(): void {
-        super.doLayout();
+    protected override calculateStartX(): number {
+        if (this.isLeftHandTap) {
+            return this.calculateEndX() - this.renderer.smuflMetrics.leftHandTabTieWidth;
+        }
+        return this.renderer.x + this.renderer!.getBeatX(this.startNote.beat, BeatXPosition.PostNotes);
     }
 
-    protected override getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
-        // invert direction (if stems go up, ties go down to not cross them)
-        switch ((noteRenderer as ScoreBarRenderer).getBeatDirection(beat)) {
-            case BeamDirection.Up:
-                return BeamDirection.Down;
-            default:
-                return BeamDirection.Up;
+    protected override calculateEndX(): number {
+        const endNoteRenderer = this.lookupEndBeatRenderer();
+        if (!endNoteRenderer) {
+            return this.calculateStartX() + this.renderer.smuflMetrics.leftHandTabTieWidth;
         }
-    }
-
-    protected override getStartY(): number {
-        if (this.startBeat!.isRest) {
-            // below all lines
-            return (this.startNoteRenderer as ScoreBarRenderer).getScoreY(9);
+        if (this.isLeftHandTap) {
+            return endNoteRenderer.x + endNoteRenderer.getNoteX(this.endNote, NoteXPosition.Left);
         }
-        switch (this.tieDirection) {
-            case BeamDirection.Up:
-                // below lowest note
-                return this.startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Top);
-            default:
-                return this.startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Bottom);
-        }
-    }
-
-    protected override getEndY(): number {
-        const endNoteScoreRenderer = this.endNoteRenderer as ScoreBarRenderer;
-        if (this.endBeat!.isRest) {
-            switch (this.tieDirection) {
-                case BeamDirection.Up:
-                    return endNoteScoreRenderer.getScoreY(9);
-                default:
-                    return endNoteScoreRenderer.getScoreY(0);
-            }
-        }
-
-        switch (this.tieDirection) {
-            case BeamDirection.Up:
-                return endNoteScoreRenderer.getNoteY(this.endNote, NoteYPosition.Top);
-            default:
-                return endNoteScoreRenderer.getNoteY(this.endNote, NoteYPosition.Bottom);
-        }
-    }
-
-    protected override getStartX(): number {
-        return this.startNoteRenderer!.getBeatX(this.startNote.beat, BeatXPosition.PostNotes);
-    }
-
-    protected override getEndX(): number {
-        return this.endNoteRenderer!.getBeatX(this.endNote.beat, BeatXPosition.PreNotes);
+        return endNoteRenderer.x + endNoteRenderer.getBeatX(this.endNote.beat, BeatXPosition.PreNotes);
     }
 }

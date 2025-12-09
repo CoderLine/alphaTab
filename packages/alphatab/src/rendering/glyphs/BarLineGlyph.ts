@@ -334,8 +334,8 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
         // extending across systems needs some more dynamic lookup, we do that during drawing
         // as during layout things are still moving
         let actualLineHeight = this.height;
-        const thisStaff = renderer.staff;
-        const allStaves = renderer.staff.system.allStaves;
+        const thisStaff = renderer.staff!;
+        const allStaves = thisStaff.system.allStaves;
         let isExtended = false;
         if (this._extendToNextStaff && thisStaff.index < allStaves.length - 1) {
             const nextStaff = allStaves[thisStaff.index + 1];

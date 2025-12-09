@@ -216,6 +216,14 @@ export class PageViewLayout extends ScoreLayout {
                 y += this._paintSystem(system, oldHeight);
             }
         } else {
+            // clear out staves during re-layout, this info is outdated during
+            // re-layout of the bars
+            for (const r of this._allMasterBarRenderers) {
+                for (const b of r.renderers) {
+                    b.afterReverted();
+                }
+            }
+
             this._systems = [];
             let currentIndex: number = 0;
             const maxWidth: number = this._maxWidth;

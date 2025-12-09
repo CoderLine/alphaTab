@@ -2371,6 +2371,23 @@ export default class CSharpAstTransformer {
     }
 
     protected visitReturnStatement(parent: cs.Node, s: ts.ReturnStatement) {
+        if(this.currentClassElement && ts.isMethodDeclaration(this.currentClassElement) && !!this.currentClassElement.asteriskToken) {
+            const yieldExpressionStmt = {
+                expression: null!,
+                nodeType: cs.SyntaxKind.ExpressionStatement,
+                parent: parent,
+                tsNode: s
+            } as cs.ExpressionStatement
+            const yieldExpression = {
+                expression: null,
+                parent: yieldExpressionStmt,
+                tsNode: s,
+                nodeType: cs.SyntaxKind.YieldExpression
+            } as cs.YieldExpression;
+            yieldExpressionStmt.expression = yieldExpression;
+            return yieldExpressionStmt;
+        }
+
         const returnStatement = {
             nodeType: cs.SyntaxKind.ReturnStatement,
             parent: parent,

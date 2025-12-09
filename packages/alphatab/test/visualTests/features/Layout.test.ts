@@ -166,4 +166,46 @@ describe('LayoutTests', () => {
             o.tracks = [0, 1];
         });
     });
+
+    it('multi-system-slur-scale-down', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            C4 {slur S1} 
+            | r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r
+            A4 {slur S1} 
+            `,
+            '',
+            undefined,
+            o => {
+                o.score.stylesheet.extendBarLines = true;
+                o.runs = [
+                    new VisualTestRun(1300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-0-1300.png'),
+                    new VisualTestRun(600, 'test-data/visual-tests/layout/multi-system-slur-scale-down-1-600.png'),
+                    new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-2-300.png'),
+                    new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-3-700.png')
+                ];
+            }
+        );
+    });
+
+    it('multi-system-slur-scale-up', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            C4 {slur S1} 
+            | r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r
+            A4 {slur S1} 
+            `,
+            '',
+            undefined,
+            o => {
+                o.score.stylesheet.extendBarLines = true;
+                o.runs = [
+                    new VisualTestRun(600, 'test-data/visual-tests/layout/multi-system-slur-scale-up-0-600.png'),
+                    new VisualTestRun(1300, 'test-data/visual-tests/layout/multi-system-slur-scale-up-1-1300.png'),
+                    new VisualTestRun(700, 'test-data/visual-tests/layout/multi-system-slur-scale-up-2-700.png'),
+                    new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-up-3-300.png')
+                ];
+            }
+        );
+    });
 });

@@ -47,11 +47,11 @@ export class TabWhammyEffectInfo extends EffectInfo {
 
     public override onAlignGlyphs(band: EffectBand): void {
         // re-register the sizes so they are available during finalization later
-        const info = band.renderer.staff.getSharedLayoutData<[number, number]>(
+        const info = band.renderer.staff!.getSharedLayoutData<[number, number]>(
             TabWhammyEffectInfo.offsetSharedDataKey,
             [0, 0]
         );
-        band.renderer.staff.setSharedLayoutData(TabWhammyEffectInfo.offsetSharedDataKey, info);
+        band.renderer.staff!.setSharedLayoutData(TabWhammyEffectInfo.offsetSharedDataKey, info);
         for (const g of band.iterateAllGlyphs()) {
             const tb = g as TabWhammyBarGlyph;
             if (tb.originalTopOffset > info[0]) {
@@ -64,7 +64,7 @@ export class TabWhammyEffectInfo extends EffectInfo {
     }
 
     public override finalizeBand(band: EffectBand): void {
-        const info = band.renderer.staff.getSharedLayoutData<[number, number]>(
+        const info = band.renderer.staff!.getSharedLayoutData<[number, number]>(
             TabWhammyEffectInfo.offsetSharedDataKey,
             [0, 0]
         );

@@ -117,7 +117,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             }
         } else {
             const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
-            const y: number = tabRenderer.getTabY(line);
+            const y: number = tabRenderer.getLineY(line);
             const restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
             this.restGlyph = restGlyph;
             restGlyph.beat = this.container.beat;
@@ -174,8 +174,8 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     private _createNoteGlyph(n: Note): void {
         const tr: TabBarRenderer = this.renderer as TabBarRenderer;
         const noteNumberGlyph: NoteNumberGlyph = new NoteNumberGlyph(0, 0, n);
-        const l: number = n.beat.voice.bar.staff.tuning.length - n.string;
-        noteNumberGlyph.y = tr.getTabY(l);
+        const l: number = tr.getNoteLine(n);
+        noteNumberGlyph.y = tr.getLineY(l);
         noteNumberGlyph.renderer = this.renderer;
         noteNumberGlyph.doLayout();
         this.noteNumbers!.addNoteGlyph(noteNumberGlyph, n);

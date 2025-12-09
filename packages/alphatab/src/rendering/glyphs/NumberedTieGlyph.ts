@@ -1,26 +1,10 @@
-import type { Beat } from '@coderline/alphatab/model/Beat';
-import type { Note } from '@coderline/alphatab/model/Note';
-import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import { NoteTieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal
  */
-export class NumberedTieGlyph extends TieGlyph {
-    protected startNote: Note;
-    protected endNote: Note;
-
-    public constructor(startNote: Note, endNote: Note, forEnd: boolean = false) {
-        super(!startNote ? null : startNote.beat, !endNote ? null : endNote.beat, forEnd);
-        this.startNote = startNote;
-        this.endNote = endNote;
-    }
-
-    private get _isLeftHandTap() {
-        return this.startNote === this.endNote;
-    }
-
+export class NumberedTieGlyph extends NoteTieGlyph {
     protected override shouldDrawBendSlur() {
         return (
             this.renderer.settings.notation.extendBendArrowsOnTiedNotes &&
@@ -29,33 +13,7 @@ export class NumberedTieGlyph extends TieGlyph {
         );
     }
 
-    public override doLayout(): void {
-        super.doLayout();
-    }
-
-    protected override getBeamDirection(_beat: Beat, _noteRenderer: BarRendererBase): BeamDirection {
+    protected override calculateTieDirection(): BeamDirection {
         return BeamDirection.Up;
-    }
-
-    protected override getStartY(): number {
-        return this.startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Top);
-    }
-
-    protected override getEndY(): number {
-        return this.getStartY();
-    }
-
-    protected override getStartX(): number {
-        if (this._isLeftHandTap) {
-            return this.getEndX() - this.startNoteRenderer!.smuflMetrics.leftHandTabTieWidth;
-        }
-        return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Center);
-    }
-
-    protected override getEndX(): number {
-        if (this._isLeftHandTap) {
-            return this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Left);
-        }
-        return this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Center);
     }
 }
