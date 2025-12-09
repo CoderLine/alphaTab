@@ -226,7 +226,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         size: number
     ): Bounds {
         const cp = TieGlyph._computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
-        if (cp.length == 0){
+        if (cp.length === 0){
             return new Bounds(x1, y1, x2 - x1, y2 - y1);
         }
 
