@@ -778,6 +778,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         beatCursor.style.willChange = 'transform';
         beatCursorContainer.width = 3;
         beatCursorContainer.height = 1;
+        beatCursorContainer.centerAtPosition = true;
         beatCursorContainer.setBounds(0, 0, 1, 1);
 
         // add cursors to UI
