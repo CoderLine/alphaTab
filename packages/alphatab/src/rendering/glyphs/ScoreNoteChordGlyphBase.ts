@@ -20,6 +20,8 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     public downLineX: number = 0;
     public noteStartX: number = 0;
 
+    public centerX = 0;
+
     public constructor() {
         super(0, 0);
     }
@@ -120,6 +122,8 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         const stemPosition = anyDisplaced || direction === BeamDirection.Up ? stemUpX : stemDownX;
 
         let w: number = 0;
+        let displacedWidth = 0;
+        let nonDisplacedWidth = 0;
         for (let i: number = 0, j: number = this._infos.length; i < j; i++) {
             const g = this._infos[i].glyph;
             const alignDisplaced: boolean = displaced.get(i)!;
@@ -127,7 +131,6 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             if (alignDisplaced) {
                 // displaced: shift note to stem position
                 g.x = stemPosition;
-                // TODO: shift left?
             } else {
                 // not displaced: align on left side (where down stem would be for notes)
                 g.x = stemDownX;
@@ -137,7 +140,13 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             }
 
             g.x += this.noteStartX;
-            w = Math.max(w, g.x + g.width);
+            const gw = g.x + g.width;
+            w = Math.max(w, gw);
+            if (alignDisplaced) {
+                displacedWidth = Math.max(displacedWidth, gw);
+            } else {
+                nonDisplacedWidth = Math.max(nonDisplacedWidth, gw);
+            }
 
             // after size calculation, re-align glyph to stem if needed
             if (g instanceof NoteHeadGlyph && (g as NoteHeadGlyph).centerOnStem) {
@@ -152,6 +161,23 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             this.upLineX = stemUpX;
             this.downLineX = stemDownX;
         }
+
+        // the center of score notes, (used for aligning the beat to the right on-time position)
+        // is always the center of the "correct note" position.
+        // * If the stem is upwards, the center is the middle of the left hand side note head
+        // * If the stem is downards, the center is the middle of the right-hand-side note head
+        if (anyDisplaced) {
+            if (direction === BeamDirection.Up) {
+                this.centerX = nonDisplacedWidth / 2;
+            } else {
+                const displacedRawWith = displacedWidth - stemPosition;
+                this.centerX = stemPosition + (displacedRawWith / 2);
+            }
+        } else {
+            // for no displaced notes it is simply the center
+            this.centerX = w / 2;
+        }
+
         this.width = w;
     }
 

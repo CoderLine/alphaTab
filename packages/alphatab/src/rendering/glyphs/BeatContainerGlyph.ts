@@ -229,7 +229,7 @@ export class BeatContainerGlyph extends Glyph {
             beatBoundings.realBounds.w = this.width;
             beatBoundings.realBounds.h = barBounds.realBounds.h;
 
-            beatBoundings.onNotesX = cx + this.x + this.onNotes.centerX;
+            beatBoundings.onNotesX = cx + this.x + this.onNotes.width / 2;
         } else {
             beatBoundings.visualBounds = new Bounds();
             beatBoundings.visualBounds.x = cx + this.x;
@@ -269,7 +269,7 @@ export class BeatContainerGlyph extends Glyph {
             beatBoundings.realBounds.w = this.width;
             beatBoundings.realBounds.h = barBounds.realBounds.h;
 
-            beatBoundings.onNotesX = cx + this.x + this.onNotes.x + this.onNotes.centerX;
+            beatBoundings.onNotesX = cx + this.x + this.onNotes.x + this.onNotes.width / 2;
         }
 
         barBounds.addBeat(beatBoundings);
