@@ -580,6 +580,10 @@ export abstract class NoteTieGlyph extends TieGlyph {
     }
 }
 
+/**
+ * A tie glyph for continued multi-system ties/slurs
+ * @internal
+ */
 export class ContinuationTieGlyph extends TieGlyph {
     private _startTie: TieGlyph;
 
