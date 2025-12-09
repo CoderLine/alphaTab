@@ -9,7 +9,8 @@ import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds'
  */
 export class BeatOnNoteGlyphBase extends BeatGlyphBase {
     public beamingHelper!: BeamingHelper;
-    public centerX: number = 0;
+    public onTimeX: number = 0;
+    public middleX: number = 0;
 
     public updateBeamingHelper(): void {
         //

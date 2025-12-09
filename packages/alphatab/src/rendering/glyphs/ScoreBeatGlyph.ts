@@ -237,11 +237,14 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
         super.doLayout();
         if (this.container.beat.isEmpty) {
-            this.centerX = this.width / 2;
+            this.onTimeX = this.width / 2;
+            this.middleX = this.onTimeX;
         } else if (this.restGlyph) {
-            this.centerX = this.restGlyph!.x + this.restGlyph!.width / 2;
+            this.onTimeX = this.restGlyph!.x + this.restGlyph!.width / 2;
+            this.middleX = this.onTimeX;
         } else if (this.noteHeads) {
-            this.centerX = this.noteHeads!.x + this.noteHeads!.width / 2;
+            this.onTimeX = this.noteHeads!.x + this.noteHeads!.onTimeX;
+            this.middleX = this.noteHeads!.x + this.noteHeads!.width / 2;
         }
     }
 

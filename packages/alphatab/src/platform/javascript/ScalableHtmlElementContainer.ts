@@ -19,6 +19,8 @@ export class ScalableHtmlElementContainer extends HtmlElementContainer {
     private _xscale: number;
     private _yscale: number;
 
+    public centerAtPosition = false;
+
     public constructor(element: HTMLElement, xscale: number, yscale: number) {
         super(element);
         this._xscale = xscale;
@@ -63,7 +65,11 @@ export class ScalableHtmlElementContainer extends HtmlElementContainer {
             h = h / this._yscale;
         }
 
-        this.element.style.transform = `translate(${x}px, ${y}px) scale(${w}, ${h})`;
+        let transform = `translate(${x}px, ${y}px) scale(${w}, ${h})`;
+        if(this.centerAtPosition) {
+            transform += ` translateX(-50%)`;
+        }
+        this.element.style.transform = transform;
         this.element.style.transformOrigin = 'top left';
         this.lastBounds.x = x;
         this.lastBounds.y = y;

@@ -153,6 +153,8 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             this._deadSlapped.renderer = this.renderer;
             this._deadSlapped.doLayout();
             this.width = this._deadSlapped.width;
+            this.onTimeX = this.width / 2;
+
         }
 
         let aboveBeatEffectsY = 0;
