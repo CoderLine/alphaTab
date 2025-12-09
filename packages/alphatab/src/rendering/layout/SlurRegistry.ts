@@ -71,7 +71,7 @@ export class SlurRegistry {
         return undefined;
     }
 
-    public *getAllContinuations(renderer: BarRendererBase): Iterable<TieGlyph> {
+    public *getAllContinuations(renderer: BarRendererBase): Generator<TieGlyph> {
         const staffId = SlurRegistry._staffId(renderer.staff!);
         if (!this._staffLookup.has(staffId) || renderer.index > 0) {
             return;

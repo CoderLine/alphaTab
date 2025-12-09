@@ -1961,7 +1961,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             this.writeExpression(expr.expression);
             this.write(')');
         } else {
-            this.write('return');
+            this.write('return@iterator');
         }
     }
 

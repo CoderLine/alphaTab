@@ -6,7 +6,7 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
  * @internal
  */
 export class SlashTieGlyph extends NoteTieGlyph {
-    protected override getTieDirection(): BeamDirection {
+    protected override calculateTieDirection(): BeamDirection {
         return BeamDirection.Down;
     }
 

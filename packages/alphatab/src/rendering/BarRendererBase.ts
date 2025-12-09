@@ -345,7 +345,7 @@ export class BarRendererBase {
 
     public isFinalized: boolean = false;
 
-    public registerMultiSystemSlurs(startedTies: Iterable<TieGlyph> | undefined) {
+    public registerMultiSystemSlurs(startedTies: Generator<TieGlyph> | undefined) {
         if (!startedTies) {
             this._multiSystemSlurs = undefined;
             return;

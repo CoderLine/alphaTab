@@ -12,7 +12,7 @@ export class ScoreSlurGlyph extends ScoreTieGlyph {
         return (Math.log2(endX - startX + 1) * this.renderer.settings.notation.slurHeight) / 2;
     }
 
-    protected override getStartX(): number {
+    protected override calculateStartX(): number {
         return (
             this.renderer.x +
             (this._isStartCentered()
@@ -21,7 +21,7 @@ export class ScoreSlurGlyph extends ScoreTieGlyph {
         );
     }
 
-    protected override getStartY(): number {
+    protected override calculateStartY(): number {
         if (this._isStartCentered()) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
@@ -34,10 +34,10 @@ export class ScoreSlurGlyph extends ScoreTieGlyph {
         return this.renderer.y + this.renderer!.getNoteY(this.startNote, NoteYPosition.Center);
     }
 
-    protected override getEndX(): number {
-        const endNoteRenderer = this.getEndBeatRenderer();
+    protected override calculateEndX(): number {
+        const endNoteRenderer = this.lookupEndBeatRenderer();
         if (!endNoteRenderer) {
-            return this.getStartX() + this.renderer.smuflMetrics.leftHandTabTieWidth;
+            return this.calculateStartX() + this.renderer.smuflMetrics.leftHandTabTieWidth;
         }
 
         if (this._isEndCentered()) {
@@ -49,10 +49,10 @@ export class ScoreSlurGlyph extends ScoreTieGlyph {
         return endNoteRenderer.x + endNoteRenderer.getBeatX(this.endNote.beat, BeatXPosition.PreNotes);
     }
 
-    protected override getEndY(): number {
-        const endNoteRenderer = this.getEndBeatRenderer();
+    protected override caclculateEndY(): number {
+        const endNoteRenderer = this.lookupEndBeatRenderer();
         if (!endNoteRenderer) {
-            return this.getStartY();
+            return this.calculateStartY();
         }
 
         if (this._isEndCentered()) {
@@ -89,8 +89,8 @@ export class ScoreSlurGlyph extends ScoreTieGlyph {
     }
 
     private _isEndOnStem() {
-        const startBeamDirection = this.getStartBeatRenderer().getBeatDirection(this.startNote.beat);
-        const endBeatRenderer = this.getEndBeatRenderer();
+        const startBeamDirection = this.lookupStartBeatRenderer().getBeatDirection(this.startNote.beat);
+        const endBeatRenderer = this.lookupEndBeatRenderer();
         const endBeamDirection = endBeatRenderer
             ? endBeatRenderer.getBeatDirection(this.endNote.beat)
             : startBeamDirection;

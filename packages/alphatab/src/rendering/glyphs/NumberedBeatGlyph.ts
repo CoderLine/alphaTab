@@ -243,10 +243,10 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         }
 
         if (!this.container.beat.isEmpty) {
-            const note = this.container.beat.notes[0];
             const glyphY = sr.getLineY(0);
             let numberWithinOctave = '0';
             if (this.container.beat.notes.length > 0) {
+                const note = this.container.beat.notes[0];
                 const kst = this.renderer.bar.keySignatureType;
                 const ks = this.renderer.bar.keySignature as number;
                 const ksi = ks + 7;

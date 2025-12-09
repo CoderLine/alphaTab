@@ -13,7 +13,7 @@ export class NumberedTieGlyph extends NoteTieGlyph {
         );
     }
 
-    protected override getTieDirection(): BeamDirection {
+    protected override calculateTieDirection(): BeamDirection {
         return BeamDirection.Up;
     }
 }

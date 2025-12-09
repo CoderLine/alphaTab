@@ -29,7 +29,7 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
             this._slurs.set(tie.slurEffectId, tie);
         }
         if (n.isTieDestination) {
-            const tie = new NumberedTieGlyph(`numbered.tie.${n.tieOrigin?.beat.id}`, n.tieOrigin!, n, true);
+            const tie = new NumberedTieGlyph(`numbered.tie.${n.tieOrigin!.beat.id}`, n.tieOrigin!, n, true);
             this.addTie(tie);
         }
         if (n.isLeftHandTapped && !n.isHammerPullDestination && !this._slurs.has(`numbered.tie.leftHandTap.${n.beat.id}`)) {

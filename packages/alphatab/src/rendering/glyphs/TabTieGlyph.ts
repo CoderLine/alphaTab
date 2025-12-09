@@ -6,7 +6,7 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
  * @internal
  */
 export class TabTieGlyph extends NoteTieGlyph {
-    protected override getTieDirection(): BeamDirection {
+    protected override calculateTieDirection(): BeamDirection {
         if (this.isLeftHandTap) {
             return BeamDirection.Up;
         }

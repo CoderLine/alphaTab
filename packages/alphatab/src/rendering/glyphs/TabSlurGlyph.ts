@@ -29,7 +29,7 @@ export class TabSlurGlyph extends TabTieGlyph {
         if (this.endNote.beat.id !== endNote.beat.id) {
             return false;
         }
-        const isForEnd = this.renderer === this.getEndBeatRenderer();
+        const isForEnd = this.renderer === this.lookupEndBeatRenderer();
         if (isForEnd !== forEnd) {
             return false;
         }
