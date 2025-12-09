@@ -65,7 +65,7 @@ export class SlurRegistry {
         const container = this._staffLookup.get(staffId)!;
         if (container.startedSlurs.has(endGlyph.slurEffectId)) {
             const info = container.startedSlurs.get(endGlyph.slurEffectId)!;
-            container.startedSlurs.get(endGlyph.slurEffectId)!.endGlyph = endGlyph;
+            info.endGlyph = endGlyph;
             return info.startGlyph;
         }
         return undefined;

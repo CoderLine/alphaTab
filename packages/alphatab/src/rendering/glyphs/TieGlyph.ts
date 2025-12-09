@@ -108,7 +108,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             if (startGlyph) {
                 this._startY = startGlyph.calculateMultiSystemSlurY(endNoteRenderer!);
             } else {
-                this._startY = this.getStartX();
+                this._startY = this.getEndY();
             }
 
             this._endY = this.getEndY();

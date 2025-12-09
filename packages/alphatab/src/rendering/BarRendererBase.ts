@@ -287,6 +287,7 @@ export class BarRendererBase {
     public afterReverted() {
         this.staff = undefined;
         this.registerMultiSystemSlurs(undefined);
+        this.isFinalized = false;
     }
 
     public afterStaffBarReverted() {

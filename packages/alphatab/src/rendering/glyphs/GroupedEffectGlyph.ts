@@ -18,14 +18,14 @@ export abstract class GroupedEffectGlyph extends EffectGlyph {
     }
 
     public get isLinkedWithPrevious(): boolean {
-        return !!this.previousGlyph && this.previousGlyph.renderer.staff!.system === this.renderer.staff!.system;
+        return !!this.previousGlyph && this.previousGlyph.renderer.staff?.system === this.renderer.staff!.system;
     }
 
     public get isLinkedWithNext(): boolean {
         return (
             !!this.nextGlyph &&
             this.nextGlyph.renderer.isFinalized &&
-            this.nextGlyph.renderer.staff!.system === this.renderer.staff!.system
+            this.nextGlyph.renderer.staff?.system === this.renderer.staff!.system
         );
     }
 

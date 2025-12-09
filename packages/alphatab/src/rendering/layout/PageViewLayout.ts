@@ -220,7 +220,7 @@ export class PageViewLayout extends ScoreLayout {
             // re-layout of the bars
             for (const r of this._allMasterBarRenderers) {
                 for (const b of r.renderers) {
-                    b.staff = undefined;
+                    b.afterReverted();
                 }
             }
 
