@@ -303,7 +303,7 @@ export class TabBarRenderer extends LineBarRenderer {
         return BeamDirection.Down;
     }
 
-    protected getFlagAndBarPos(): number {
+    public getFlagAndBarPos(): number {
         return this.height + this.settings.notation.rhythmHeight - (this._hasTuplets ? this.tupletSize / 2 : 0);
     }
 
