@@ -32,7 +32,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
 
     public override getBoundingBoxTop(): number {
         if (this._bend !== null) {
-            return Math.min(this._bend.getBoundingBoxTop(), super.getBoundingBoxTop());
+            return ModelUtils.minBoundingBox(this._bend.getBoundingBoxTop(), super.getBoundingBoxTop());
         } else {
             return super.getBoundingBoxTop();
         }
@@ -40,7 +40,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
 
     public override getBoundingBoxBottom(): number {
         if (this._bend !== null) {
-            return Math.max(this._bend.getBoundingBoxBottom(), super.getBoundingBoxTop());
+            return ModelUtils.maxBoundingBox(this._bend.getBoundingBoxBottom(), super.getBoundingBoxTop());
         } else {
             return super.getBoundingBoxBottom();
         }

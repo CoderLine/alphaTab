@@ -47,11 +47,11 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public override getBoundingBoxTop(): number {
-        return Math.min(this.preNotes.getBoundingBoxTop(), this.onNotes.getBoundingBoxTop());
+        return ModelUtils.minBoundingBox(this.preNotes.getBoundingBoxTop(), this.onNotes.getBoundingBoxTop());
     }
 
     public override getBoundingBoxBottom(): number {
-        return Math.max(this.preNotes.getBoundingBoxBottom(), this.onNotes.getBoundingBoxBottom());
+        return ModelUtils.minBoundingBox(this.preNotes.getBoundingBoxBottom(), this.onNotes.getBoundingBoxBottom());
     }
 
     protected drawBeamHelperAsFlags(helper: BeamingHelper): boolean {
