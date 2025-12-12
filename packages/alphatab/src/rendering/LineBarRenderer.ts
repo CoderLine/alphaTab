@@ -427,7 +427,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     ): void {
         for (const v of this.helpers.beamHelpers) {
             for (const h of v) {
-                this._paintBeamHelper(cx, cy, canvas, h, flagsElement, beamsElement);
+                this.paintBeamHelper(cx, cy, canvas, h, flagsElement, beamsElement);
             }
         }
     }
@@ -449,7 +449,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return BeamingHelper.beatHasFlag(beat);
     }
 
-    private _paintBeamHelper(
+    protected paintBeamHelper(
         cx: number,
         cy: number,
         canvas: ICanvas,

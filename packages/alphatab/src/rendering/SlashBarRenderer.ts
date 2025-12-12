@@ -108,7 +108,7 @@ export class SlashBarRenderer extends LineBarRenderer {
         const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
 
         slashY -= this.smuflMetrics.stemUp.has(symbol) ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale : 0;
-        if(!beat.isRest) {
+        if (!beat.isRest) {
             slashY -= this.smuflMetrics.standardStemLength + scale;
         }
 
@@ -219,5 +219,18 @@ export class SlashBarRenderer extends LineBarRenderer {
     ): void {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.SlashStem, beat);
         canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
+    }
+
+    protected override paintBeamHelper(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        h: BeamingHelper,
+        flagsElement: BeatSubElement,
+        beamsElement: BeatSubElement
+    ): void {
+        if (h.voice?.index === 0) {
+            super.paintBeamHelper(cx, cy, canvas, h, flagsElement, beamsElement);
+        }
     }
 }

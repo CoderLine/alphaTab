@@ -359,4 +359,17 @@ export class NumberedBarRenderer extends LineBarRenderer {
         _bottomY: number,
         _canvas: ICanvas
     ): void {}
+
+    protected override paintBeamHelper(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        h: BeamingHelper,
+        flagsElement: BeatSubElement,
+        beamsElement: BeatSubElement
+    ): void {
+        if (h.voice?.index === 0) {
+            super.paintBeamHelper(cx, cy, canvas, h, flagsElement, beamsElement);
+        }
+    }
 }
