@@ -38,6 +38,9 @@ export class BarHelpers {
                     helperForBeat = currentGraceBeamHelper;
                 } else {
                     helperForBeat = currentBeamHelper;
+                    if (currentGraceBeamHelper) {
+                        currentGraceBeamHelper.finish();
+                    }
                     currentGraceBeamHelper = null;
                 }
                 // if a new beaming helper was started, we close our tuplet grouping as well
