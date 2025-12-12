@@ -106,12 +106,12 @@ export class VoiceContainerGlyph extends GlyphGroup {
             // of the next glyph
             if (i > 0) {
                 const beatWidth: number = currentBeatGlyph.x - beatGlyphs[i - 1].x;
-                beatGlyphs[i - 1].scaleToWidth(beatWidth);
+                beatGlyphs[i - 1].width = beatWidth;
             }
             // for the last glyph size based on the full width
             if (i === j - 1) {
                 const beatWidth: number = this.width - beatGlyphs[beatGlyphs.length - 1].x;
-                currentBeatGlyph.scaleToWidth(beatWidth);
+                currentBeatGlyph.width = beatWidth;
             }
         }
     }

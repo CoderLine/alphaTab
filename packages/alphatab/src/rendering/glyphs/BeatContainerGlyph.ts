@@ -121,10 +121,6 @@ export class BeatContainerGlyph extends Glyph {
         this.width = this.minWidth;
     }
 
-    public scaleToWidth(beatWidth: number): void {
-        this.width = beatWidth;
-    }
-
     protected createTies(_n: Note): void {
         // no default ties
     }
