@@ -278,7 +278,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
         if (h.beats.length === 1 || !h.isFull) {
             for (const beat of h.beats) {
-                const beamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(beat.index)!;
+                const beamingHelper = this.helpers.getBeamingHelperForBeat(beat);
                 if (!beamingHelper) {
                     continue;
                 }
@@ -332,8 +332,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             //
             // calculate the y positions for our bracket
-            const firstNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstNonRestBeat.index)!;
-            const lastNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastNonRestBeat.index)!;
+            const firstNonRestBeamingHelper = this.helpers.getBeamingHelperForBeat(firstNonRestBeat)!;
+            const lastNonRestBeamingHelper = this.helpers.getBeamingHelperForBeat(lastNonRestBeat)!;
             const direction = this.getTupletBeamDirection(firstNonRestBeamingHelper);
             let startY: number = this.calculateBeamYWithDirection(firstNonRestBeamingHelper, startX, direction);
             let endY: number = this.calculateBeamYWithDirection(lastNonRestBeamingHelper, endX, direction);
@@ -440,8 +440,13 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (beat.isRest) {
             return false;
         }
+        
         const helper = this.helpers.getBeamingHelperForBeat(beat);
-        return helper.hasFlag(this.drawBeamHelperAsFlags(helper), beat);
+        if (helper) {
+            return helper.hasFlag(this.drawBeamHelperAsFlags(helper), beat);
+        }
+
+        return BeamingHelper.beatHasFlag(beat);
     }
 
     private _paintBeamHelper(

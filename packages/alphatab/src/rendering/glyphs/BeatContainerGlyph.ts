@@ -1,14 +1,11 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
-import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
 import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
@@ -58,20 +55,15 @@ export class BeatContainerGlyph extends Glyph {
         return helper.hasFlag(false, undefined);
     }
 
+    protected get postBeatStretch() {
+        return this.onNotes.computedWidth - this.onNotes.onTimeX;
+    }
+
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
         const preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.onTimeX;
 
-        let postBeatStretch: number = this.onNotes.computedWidth - this.onNotes.onTimeX;
-        // make space for flag
-        const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
-        if (this.beat.graceType !== GraceType.None) {
-            // always use flag size as spacing on grace notes
-            postBeatStretch +=
-                this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
-        } else if (helper && this.drawBeamHelperAsFlags(helper)) {
-            postBeatStretch +=
-                this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
-        }
+        let postBeatStretch: number = this.postBeatStretch;
+
         for (const tie of this._ties) {
             const tg = tie as unknown as Glyph;
             postBeatStretch += tg.width;
@@ -228,7 +220,7 @@ export class BeatContainerGlyph extends Glyph {
             let visualEndX = 0;
 
             if (!this.onNotes.isEmpty) {
-                visualEndX = cx + this.x + this.onNotes.x + this.onNotes.width;
+                visualEndX = cx + this.x + this.onNotes.x + this.onNotes.onTimeX + this.postBeatStretch;
             } else if (!this.preNotes.isEmpty) {
                 visualEndX = cx + this.x + this.preNotes.x + this.preNotes.width;
             } else {
@@ -236,13 +228,6 @@ export class BeatContainerGlyph extends Glyph {
             }
 
             beatBoundings.visualBounds.w = visualEndX - beatBoundings.visualBounds.x;
-            const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
-            if ((helper && this.drawBeamHelperAsFlags(helper)) || this.beat.graceType !== GraceType.None) {
-                beatBoundings.visualBounds.w +=
-                    this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! *
-                    (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1);
-            }
-
             beatBoundings.visualBounds.y = barBounds.visualBounds.y;
             beatBoundings.visualBounds.h = barBounds.visualBounds.h;
 

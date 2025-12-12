@@ -21,7 +21,7 @@ import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarL
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import { BarHelpers } from '@coderline/alphatab/rendering/utils/BarHelpers';
-import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -146,7 +146,11 @@ export class BarRendererBase {
         return this._contentBottomOverflow + this.bottomEffects.height;
     }
 
-    public helpers!: BarHelpers;
+    protected helpers!: BarHelpers;
+
+    public get collisionHelper() {
+        return this.helpers.collisionHelper;
+    }
 
     /**
      * Gets or sets whether this renderer is linked to the next one
@@ -846,6 +850,6 @@ export class BarRendererBase {
     }
 
     public getBeatDirection(beat: Beat): BeamDirection {
-        return this.helpers.getBeamingHelperForBeat(beat).direction;
+        return this.helpers.getBeamingHelperForBeat(beat)?.direction ?? BeamDirection.Up;
     }
 }

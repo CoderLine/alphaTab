@@ -90,12 +90,12 @@ export class BeamingHelper {
 
     public hasFlag(forceFlagOnSingleBeat: boolean, beat?: Beat): boolean {
         return (
-            (forceFlagOnSingleBeat && this._beatHasFlag(beat!)) ||
-            (!forceFlagOnSingleBeat && this.beats.length === 1 && this._beatHasFlag(this.beats[0]))
+            (forceFlagOnSingleBeat && BeamingHelper.beatHasFlag(beat!)) ||
+            (!forceFlagOnSingleBeat && this.beats.length === 1 && BeamingHelper.beatHasFlag(this.beats[0]))
         );
     }
 
-    private _beatHasFlag(beat: Beat) {
+    public static beatHasFlag(beat: Beat) {
         return (
             !beat.deadSlapped && !beat.isRest && (beat.duration > Duration.Quarter || beat.graceType !== GraceType.None)
         );

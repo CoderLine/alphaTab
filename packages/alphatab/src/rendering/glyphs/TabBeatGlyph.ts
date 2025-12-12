@@ -171,7 +171,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         this.noteNumbers!.addNoteGlyph(noteNumberGlyph, n);
         const topY = noteNumberGlyph.y - noteNumberGlyph.height / 2;
         const bottomY = topY + noteNumberGlyph.height;
-        this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, topY, bottomY);
+        this.renderer.collisionHelper.reserveBeatSlot(this.container.beat, topY, bottomY);
 
         const minString = tr.minString;
         const maxString = tr.maxString;

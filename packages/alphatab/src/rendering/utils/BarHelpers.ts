@@ -11,8 +11,8 @@ import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDire
  */
 export class BarHelpers {
     private _renderer: BarRendererBase;
+    private _beamHelperLookup = new Map<number, BeamingHelper>();
     public beamHelpers: BeamingHelper[][] = [];
-    public beamHelperLookup: Map<number, BeamingHelper>[] = [];
     public collisionHelper: BarCollisionHelper;
     public preferredBeamDirection: BeamDirection | null = null;
 
@@ -30,7 +30,6 @@ export class BarHelpers {
         for (let i: number = 0, j: number = bar.voices.length; i < j; i++) {
             const v: Voice = bar.voices[i];
             this.beamHelpers.push([]);
-            this.beamHelperLookup.push(new Map<number, BeamingHelper>());
             for (let k: number = 0, l: number = v.beats.length; k < l; k++) {
                 const b: Beat = v.beats[k];
                 let helperForBeat: BeamingHelper | null;
@@ -60,7 +59,7 @@ export class BarHelpers {
                     }
                     this.beamHelpers[v.index].push(helperForBeat);
                 }
-                this.beamHelperLookup[v.index].set(b.index, helperForBeat!);
+                this._beamHelperLookup.set(b.id, helperForBeat!);
             }
             if (currentBeamHelper) {
                 currentBeamHelper.finish();
@@ -73,7 +72,7 @@ export class BarHelpers {
         }
     }
 
-    public getBeamingHelperForBeat(beat: Beat): BeamingHelper {
-        return this.beamHelperLookup[beat.voice.index].get(beat.index)!;
+    public getBeamingHelperForBeat(beat: Beat): BeamingHelper | undefined {
+        return this._beamHelperLookup.has(beat.id) ? this._beamHelperLookup.get(beat.id)! : undefined;
     }
 }

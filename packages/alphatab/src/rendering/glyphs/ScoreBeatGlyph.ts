@@ -107,13 +107,13 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             return;
         }
         if (this.renderer.bar.isMultiVoice && Number.isNaN(this._collisionOffset)) {
-            this._collisionOffset = this.renderer.helpers.collisionHelper.applyRestCollisionOffset(
+            this._collisionOffset = this.renderer.collisionHelper.applyRestCollisionOffset(
                 this.container.beat,
                 this.restGlyph.y,
                 (this.renderer as ScoreBarRenderer).getScoreHeight(1)
             );
             this.y += this._collisionOffset;
-            const existingRests = this.renderer.helpers.collisionHelper.restDurationsByDisplayTime;
+            const existingRests = this.renderer.collisionHelper.restDurationsByDisplayTime;
             if (
                 existingRests.has(this.container.beat.playbackStart) &&
                 existingRests.get(this.container.beat.playbackStart)!.has(this.container.beat.playbackDuration) &&
@@ -208,9 +208,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
                         const restTop = restGlyph.y - sr.getScoreHeight(restSizes[0]);
                         const restBottom = restGlyph.y + sr.getScoreHeight(restSizes[1]);
-                        this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, restTop, restBottom);
+                        this.renderer.collisionHelper.reserveBeatSlot(this.container.beat, restTop, restBottom);
                     } else {
-                        this.renderer.helpers.collisionHelper.registerRest(this.container.beat);
+                        this.renderer.collisionHelper.registerRest(this.container.beat);
                     }
                 }
 
