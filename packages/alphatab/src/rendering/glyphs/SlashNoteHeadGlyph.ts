@@ -19,6 +19,9 @@ export class SlashNoteHeadGlyph extends MusicFontGlyph {
     public effectElement: BeatSubElement = BeatSubElement.SlashEffects;
     private _symbol: MusicFontSymbol;
 
+    public upLineX: number = 0;
+    public downLineX: number = 0;
+
     public constructor(x: number, y: number, duration: Duration, isGrace: boolean, beat: Beat) {
         super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, SlashNoteHeadGlyph.getSymbol(duration));
         this._symbol = SlashNoteHeadGlyph.getSymbol(duration);
@@ -67,6 +70,17 @@ export class SlashNoteHeadGlyph extends MusicFontGlyph {
         if (!Number.isNaN(minEffectY)) {
             this.renderer.registerBeatEffectOverflows(minEffectY, maxEffectY);
         }
+
+        const symbol = this._symbol;
+        const stemInfoUp = this.renderer.smuflMetrics.stemUp.has(symbol)
+            ? this.renderer.smuflMetrics.stemUp.get(symbol)!.x
+            : 0;
+        this.upLineX = stemInfoUp;
+
+        const stemInfoDown = this.renderer.smuflMetrics.stemDown.has(symbol)
+            ? this.renderer.smuflMetrics.stemDown.get(symbol)!.x
+            : 0;
+        this.upLineX = stemInfoDown;
     }
 
     public static getSymbol(duration: Duration): MusicFontSymbol {
@@ -84,19 +98,11 @@ export class SlashNoteHeadGlyph extends MusicFontGlyph {
 
     public updateBeamingHelper(cx: number) {
         if (this.beamingHelper) {
-            const symbol = this._symbol;
-            const stemInfoUp = this.renderer.smuflMetrics.stemUp.has(symbol)
-                ? this.renderer.smuflMetrics.stemUp.get(symbol)!.x
-                : 0;
-            const stemInfoDown = this.renderer.smuflMetrics.stemDown.has(symbol)
-                ? this.renderer.smuflMetrics.stemDown.get(symbol)!.x
-                : 0;
-
             this.beamingHelper.registerBeatLineX(
                 'slash',
                 this.beat!,
-                cx + this.x + stemInfoUp,
-                cx + this.x + stemInfoDown
+                cx + this.x + this.upLineX,
+                cx + this.x + this.downLineX
             );
         }
     }

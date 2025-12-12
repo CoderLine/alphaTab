@@ -1,5 +1,4 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
-import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
@@ -7,7 +6,6 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
 import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
-import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
@@ -113,19 +111,6 @@ export class BeatContainerGlyph extends Glyph {
 
     protected updateWidth(): void {
         this.minWidth = this.preNotes.width + this.onNotes.width;
-        if (!this.beat.isRest) {
-            if (this.onNotes.beamingHelper.beats.length === 1) {
-                // make space for flag
-                if (this.beat.duration >= Duration.Eighth) {
-                    const symbol = FlagGlyph.getSymbol(
-                        this.beat.duration,
-                        this.onNotes.beamingHelper.direction,
-                        this.beat.graceType !== GraceType.None
-                    );
-                    this.minWidth += this.renderer.smuflMetrics.glyphWidths.get(symbol)!;
-                }
-            }
-        }
         let tieWidth: number = 0;
         for (const tie of this._ties) {
             const tg = tie as unknown as Glyph;

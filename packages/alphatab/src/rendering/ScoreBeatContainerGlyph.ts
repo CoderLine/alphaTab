@@ -6,11 +6,13 @@ import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { ScoreBendGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBendGlyph';
 import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
 import { ScoreSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlideLineGlyph';
 import { ScoreSlurGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlurGlyph';
 import { ScoreTieGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTieGlyph';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 
 /**
  * @internal
@@ -91,11 +93,16 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         }
         // end effect slur on last beat
         if (!this._effectEndSlur && n.beat.isEffectSlurDestination && n.beat.effectSlurOrigin) {
-            const direction = this.onNotes.beamingHelper.direction;
+            const direction = this.renderer.getBeatDirection(n.beat);
             const startNote =
                 direction === BeamDirection.Up ? n.beat.effectSlurOrigin.minNote! : n.beat.effectSlurOrigin.maxNote!;
             const endNote = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
-            const effectEndSlur = new ScoreSlurGlyph(`score.slur.effect.${startNote.beat.id}`, startNote, endNote, true);
+            const effectEndSlur = new ScoreSlurGlyph(
+                `score.slur.effect.${startNote.beat.id}`,
+                startNote,
+                endNote,
+                true
+            );
             this._effectEndSlur = effectEndSlur;
             this.addTie(effectEndSlur);
         }
@@ -129,6 +136,20 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
                 }
                 this.addTie(new ScoreLegatoGlyph(`score.legato.${origin.id}`, origin, this.beat, true));
             }
+        }
+    }
+
+    protected override updateWidth(): void {
+        super.updateWidth();
+        // make space for flag
+        const sr = this.renderer as ScoreBarRenderer;
+        const beat = this.beat;
+        if (sr.hasFlag(beat)) {
+            const direction = this.renderer.getBeatDirection(beat);
+            const symbol = FlagGlyph.getSymbol(beat.duration, direction, beat.graceType !== GraceType.None);
+            const flagWidth = this.renderer.smuflMetrics.glyphWidths.get(symbol)!;
+            this.width += flagWidth;
+            this.minWidth += flagWidth;
         }
     }
 }

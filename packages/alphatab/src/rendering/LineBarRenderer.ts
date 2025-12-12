@@ -443,6 +443,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return h.beats.length === 1;
     }
 
+    public hasFlag(beat: Beat) {
+        if(beat.isRest) {
+            return false;
+        }
+        const helper = this.helpers.getBeamingHelperForBeat(beat);
+        return helper.hasFlag(this.drawBeamHelperAsFlags(helper), beat);
+    }
+
     private _paintBeamHelper(
         cx: number,
         cy: number,
