@@ -182,7 +182,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
             const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             const barStart: number = cy + this.y;
 
-            const beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes) - this.beatGlyphsStart;
+            const beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes);
 
             const beamY = this.calculateBeamY(h, beatLineX);
 
@@ -193,10 +193,10 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 const barY: number = barStart + barIndex * barSpacing;
                 if (i === h.beats.length - 1) {
                     barStartX = beatLineX;
-                    barEndX = this.getBeatX(beat, BeatXPosition.PostNotes) - this.beatGlyphsStart;
+                    barEndX = this.getBeatX(beat, BeatXPosition.PostNotes);
                 } else {
                     barStartX = beatLineX;
-                    barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.PreNotes) - this.beatGlyphsStart;
+                    barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.PreNotes);
                 }
 
                 barStartY = barY + beamY;
@@ -215,7 +215,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 dotsY = barStart + beamY + barCount * (barSpacing + barSize);
                 dotsOffset = dotSpacing;
             }
-            const dotX: number = this.getBeatX(beat, BeatXPosition.MiddleNotes) - this.beatGlyphsStart;
+            const dotX: number = this.getBeatX(beat, BeatXPosition.MiddleNotes);
 
             dotCount = Math.abs(dotCount);
 

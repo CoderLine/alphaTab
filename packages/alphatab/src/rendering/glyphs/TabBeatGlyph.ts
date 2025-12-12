@@ -74,14 +74,12 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 slashNoteHead.effectElement = BeatSubElement.GuitarTabEffects;
                 this.slash = slashNoteHead;
                 slashNoteHead.beat = this.container.beat;
-                slashNoteHead.beamingHelper = this.beamingHelper;
                 this.addNormal(slashNoteHead);
                 beatEffects = slashNoteHead.beatEffects;
             } else {
                 const tabNoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
                 this.noteNumbers = tabNoteNumbers;
                 tabNoteNumbers.beat = this.container.beat;
-                tabNoteNumbers.beamingHelper = this.beamingHelper;
                 for (const note of this.container.beat.notes) {
                     if (note.isVisible) {
                         this._createNoteGlyph(note);
@@ -121,7 +119,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             const restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
             this.restGlyph = restGlyph;
             restGlyph.beat = this.container.beat;
-            restGlyph.beamingHelper = this.beamingHelper;
             this.addNormal(restGlyph);
             //
             // Note dots
@@ -156,19 +153,10 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             this.onTimeX = this.slash!.x + this.slash!.width / 2;
         }
         this.middleX = this.onTimeX;
+        this.stemX = this.middleX;
 
         for (const g of centeredEffectGlyphs) {
             g.x = this.onTimeX;
-        }
-    }
-
-    public override updateBeamingHelper(): void {
-        if (this.noteNumbers) {
-            this.noteNumbers.updateBeamingHelper(this.container.x + this.x);
-        } else if (this.restGlyph) {
-            this.restGlyph.updateBeamingHelper(this.container.x + this.x);
-        } else if (this.slash) {
-            this.slash.updateBeamingHelper(this.container.x + this.x);
         }
     }
 

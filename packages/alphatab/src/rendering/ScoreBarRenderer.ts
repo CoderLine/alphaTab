@@ -201,7 +201,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return helper.direction;
     }
 
-    public centerStaffStemY(helper: BeamingHelper) {
+    public centerStaffStemY(direction: BeamDirection) {
         const isStandardFive = this.bar.staff.standardNotationLineCount === Staff.DefaultStandardNotationLineCount;
         if (isStandardFive) {
             // center on the middle line for a standard 5-line staff
@@ -209,7 +209,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         // for other staff line counts, we align the stem either on the top or bottom line
-        if (helper.direction === BeamDirection.Up) {
+        if (direction === BeamDirection.Up) {
             return this.getScoreY(this.bar.staff.standardNotationLineCount * 2);
         }
         return this.getScoreY(0);

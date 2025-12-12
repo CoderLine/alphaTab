@@ -13,6 +13,7 @@ import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadS
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 
 /**
  * @internal
@@ -64,7 +65,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
             beatBounds.addNote(noteBounds);
         }
     }
-        
+
     public override getLowestNoteY(): number {
         return this.noteHeads ? this.noteHeads.y : 0;
     }
@@ -115,23 +116,6 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         return 0;
     }
 
-    public override updateBeamingHelper(): void {
-        if (this.noteHeads) {
-            this.noteHeads.updateBeamingHelper(this.container.x + this.x);
-        } else if (this.deadSlapped) {
-            if (this.beamingHelper) {
-                this.beamingHelper.registerBeatLineX(
-                    'slash',
-                    this.container.beat,
-                    this.container.x + this.x + this.deadSlapped.x + this.width,
-                    this.container.x + this.x + this.deadSlapped.x
-                );
-            }
-        } else if (this.restGlyph) {
-            this.restGlyph.updateBeamingHelper(this.container.x + this.x);
-        }
-    }
-
     public override doLayout(): void {
         // create glyphs
         const sr = this.renderer as SlashBarRenderer;
@@ -155,13 +139,11 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 );
                 this.noteHeads = noteHeadGlyph;
                 noteHeadGlyph.beat = this.container.beat;
-                noteHeadGlyph.beamingHelper = this.beamingHelper;
                 this.addNormal(noteHeadGlyph);
             } else {
                 const restGlyph = new SlashRestGlyph(0, glyphY, this.container.beat.duration);
                 this.restGlyph = restGlyph;
                 restGlyph.beat = this.container.beat;
-                restGlyph.beamingHelper = this.beamingHelper;
                 this.addNormal(restGlyph);
             }
         }
@@ -171,12 +153,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         //
         if (this.container.beat.dots > 0) {
             for (let i: number = 0; i < this.container.beat.dots; i++) {
-                this.addEffect(
-                    new AugmentationDotGlyph(
-                        0,
-                        glyphY - sr.getLineHeight(0.5)
-                    )
-                );
+                this.addEffect(new AugmentationDotGlyph(0, glyphY - sr.getLineHeight(0.5)));
             }
         }
 
@@ -184,12 +161,19 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
 
         if (this.container.beat.isEmpty) {
             this.onTimeX = this.width / 2;
+            this.stemX = this.onTimeX;
         } else if (this.restGlyph) {
             this.onTimeX = this.restGlyph.x + this.restGlyph.width / 2;
+            this.stemX = this.onTimeX;
         } else if (this.noteHeads) {
             this.onTimeX = this.noteHeads.x + this.noteHeads.width / 2;
+            const direction = this.renderer.getBeatDirection(this.container.beat);
+            this.stemX =
+                this.noteHeads!.x +
+                (direction === BeamDirection.Up ? this.noteHeads!.upLineX : this.noteHeads!.downLineX);
         } else if (this.deadSlapped) {
             this.onTimeX = this.deadSlapped.x + this.deadSlapped.width / 2;
+            this.stemX = this.onTimeX;
         }
         this.middleX = this.onTimeX;
     }

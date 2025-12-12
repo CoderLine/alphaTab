@@ -1,22 +1,21 @@
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import { ScoreNoteChordGlyphBase } from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyphBase';
+import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
-import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
-import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
-import { GraceType } from '@coderline/alphatab/model/GraceType';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
-import { Duration } from '@coderline/alphatab/model/Duration';
+import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
 
 /**
  * @internal
@@ -30,10 +29,9 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     public aboveBeatEffects: Map<string, EffectGlyph> = new Map();
     public belowBeatEffects: Map<string, EffectGlyph> = new Map();
     public beat!: Beat;
-    public beamingHelper!: BeamingHelper;
 
     public get direction(): BeamDirection {
-        return this.beamingHelper.direction;
+        return this.renderer.getBeatDirection(this.beat);
     }
 
     public override get scale(): number {
@@ -83,7 +81,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                 // stem size according to duration
                 pos -= this.renderer.smuflMetrics.standardStemLength * scale;
 
-                const topCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.beamingHelper);
+                const topCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.direction);
                 return Math.min(topCenterY, pos);
 
             case NoteYPosition.Top:
@@ -103,7 +101,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                 // stem size according to duration
                 pos += this.renderer.smuflMetrics.standardStemLength * scale;
 
-                const bottomCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.beamingHelper);
+                const bottomCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.direction);
                 return Math.max(bottomCenterY, pos);
 
             case NoteYPosition.StemUp:
@@ -133,17 +131,6 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         super.add(noteGlyph, noteLine);
     }
 
-    public updateBeamingHelper(cx: number): void {
-        if (this.beamingHelper) {
-            this.beamingHelper.registerBeatLineX(
-                'score',
-                this.beat,
-                cx + this.x + this.upLineX,
-                cx + this.x + this.downLineX
-            );
-        }
-    }
-
     public override doLayout(): void {
         super.doLayout();
         const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
@@ -154,7 +141,6 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             this._deadSlapped.doLayout();
             this.width = this._deadSlapped.width;
             this.onTimeX = this.width / 2;
-
         }
 
         let aboveBeatEffectsY = 0;

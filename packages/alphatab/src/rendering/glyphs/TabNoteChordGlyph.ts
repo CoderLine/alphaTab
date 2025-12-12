@@ -1,14 +1,13 @@
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { NoteNumberGlyph } from '@coderline/alphatab/rendering/glyphs/NoteNumberGlyph';
-import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
-import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 
 /**
  * @internal
@@ -19,7 +18,6 @@ export class TabNoteChordGlyph extends Glyph {
     private _isGrace: boolean;
 
     public beat!: Beat;
-    public beamingHelper!: BeamingHelper;
     public maxStringNote: Note | null = null;
     public minStringNote: Note | null = null;
     public beatEffects: Map<string, Glyph> = new Map();
@@ -182,17 +180,6 @@ export class TabNoteChordGlyph extends Glyph {
             for (const g of this.beatEffects.values()) {
                 g.paint(cx, cy, canvas);
             }
-        }
-    }
-
-    public updateBeamingHelper(cx: number): void {
-        if (this.beamingHelper && this.beamingHelper.isPositionFrom('tab', this.beat)) {
-            this.beamingHelper.registerBeatLineX(
-                'tab',
-                this.beat,
-                cx + this.x + this.width / 2,
-                cx + this.x + this.width / 2
-            );
         }
     }
 }

@@ -217,6 +217,12 @@ export class BarRendererBase {
         for (const container of this._voiceContainers.values()) {
             container.scaleToWidth(containerWidth);
         }
+        for (const v of this.helpers.beamHelpers) {
+            for (const h of v) {
+                h.alignWithBeats();
+            }
+        }
+
         this._postBeatGlyphs.x = this._preBeatGlyphs.x + this._preBeatGlyphs.width + containerWidth;
         this.width = width;
 
@@ -597,7 +603,6 @@ export class BarRendererBase {
         g.renderer = this;
         g.preNotes.renderer = this;
         g.onNotes.renderer = this;
-        g.onNotes.beamingHelper = this.helpers.beamHelperLookup[g.beat.voice.index].get(g.beat.index)!;
         this.getVoiceContainer(g.beat.voice)!.addGlyph(g);
     }
 
@@ -743,26 +748,7 @@ export class BarRendererBase {
     ): number {
         const container = this.getBeatContainer(beat);
         if (container) {
-            switch (requestedPosition) {
-                case BeatXPosition.PreNotes:
-                    return container.voiceContainer.x + container.x;
-                case BeatXPosition.OnNotes:
-                    return container.voiceContainer.x + container.x + container.onNotes.x;
-                case BeatXPosition.MiddleNotes:
-                    return container.voiceContainer.x + container.x + container.onNotes.x + container.onNotes.middleX;
-                case BeatXPosition.Stem:
-                    const offset = container.onNotes.beamingHelper
-                        ? container.onNotes.beamingHelper.getBeatLineX(beat)
-                        : container.onNotes.x + container.onNotes.width / 2;
-                    return container.voiceContainer.x + offset;
-                case BeatXPosition.PostNotes:
-                    const onNoteSize = useSharedSizes
-                        ? (this.layoutingInfo.getBeatSizes(beat)?.onBeatSize ?? container.onNotes.width)
-                        : container.onNotes.width;
-                    return container.voiceContainer.x + container.x + container.onNotes.x + onNoteSize;
-                case BeatXPosition.EndBeat:
-                    return container.voiceContainer.x + container.x + container.width;
-            }
+            return container.voiceContainer.x + container.x + container.getBeatX(requestedPosition, useSharedSizes);
         }
         return 0;
     }

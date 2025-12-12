@@ -312,8 +312,8 @@ export class TabBarRenderer extends LineBarRenderer {
         return this.getFlagAndBarPos();
     }
 
-    protected override shouldPaintFlag(beat: Beat, h: BeamingHelper): boolean {
-        if (!super.shouldPaintFlag(beat, h)) {
+    protected override shouldPaintFlag(beat: Beat): boolean {
+        if (!super.shouldPaintFlag(beat)) {
             return false;
         }
 
@@ -321,7 +321,7 @@ export class TabBarRenderer extends LineBarRenderer {
             return false;
         }
 
-        return this.drawBeamHelperAsFlags(h);
+        return true;
     }
 
     protected override paintBeamingStem(

@@ -1,20 +1,18 @@
-import { Duration } from '@coderline/alphatab/model/Duration';
-import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { NoteSubElement } from '@coderline/alphatab/model/Note';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { NoteSubElement } from '@coderline/alphatab/model/Note';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal
  */
 export class SlashNoteHeadGlyph extends MusicFontGlyph {
     public beatEffects: Map<string, Glyph> = new Map();
-    public beamingHelper!: BeamingHelper;
     public noteHeadElement: NoteSubElement = NoteSubElement.SlashNoteHead;
     public effectElement: BeatSubElement = BeatSubElement.SlashEffects;
     private _symbol: MusicFontSymbol;
@@ -93,17 +91,6 @@ export class SlashNoteHeadGlyph extends MusicFontGlyph {
                 return MusicFontSymbol.NoteheadSlashWhiteHalf;
             default:
                 return MusicFontSymbol.NoteheadSlashHorizontalEnds;
-        }
-    }
-
-    public updateBeamingHelper(cx: number) {
-        if (this.beamingHelper) {
-            this.beamingHelper.registerBeatLineX(
-                'slash',
-                this.beat!,
-                cx + this.x + this.upLineX,
-                cx + this.x + this.downLineX
-            );
         }
     }
 }

@@ -9,17 +9,10 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import { NoteYPosition, type BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
-/**
- * @internal
- */
-class BeatLinePositions {
-    public staffId: string = '';
-    public up: number = 0;
-    public down: number = 0;
-}
 
 /**
  * @internal
@@ -55,7 +48,6 @@ export class BeamingHelperDrawInfo {
  */
 export class BeamingHelper {
     private _staff: Staff;
-    private _beatLineXPositions: Map<number, BeatLinePositions> = new Map();
     private _renderer: BarRendererBase;
 
     public voice: Voice | null = null;
@@ -115,41 +107,12 @@ export class BeamingHelper {
         this.beats = [];
     }
 
-    public getBeatLineX(beat: Beat, direction?: BeamDirection): number {
-        direction = direction ?? this.direction;
-
-        if (this.hasBeatLineX(beat)) {
-            if (direction === BeamDirection.Up) {
-                return this._beatLineXPositions.get(beat.index)!.up;
-            }
-            return this._beatLineXPositions.get(beat.index)!.down;
-        }
-        return 0;
-    }
-
-    public hasBeatLineX(beat: Beat): boolean {
-        return this._beatLineXPositions.has(beat.index);
-    }
-
-    public registerBeatLineX(staffId: string, beat: Beat, up: number, down: number): void {
-        const positions: BeatLinePositions = this._getOrCreateBeatPositions(beat);
-        positions.staffId = staffId;
-        positions.up = up;
-        positions.down = down;
+    public alignWithBeats() {
         for (const v of this.drawingInfos.values()) {
-            if (v.startBeat === beat) {
-                v.startX = this.getBeatLineX(beat);
-            } else if (v.endBeat === beat) {
-                v.endX = this.getBeatLineX(beat);
-            }
+            v.startX = this._renderer.getBeatX(v.startBeat!, BeatXPosition.Stem);
+            v.endX = this._renderer.getBeatX(v.endBeat!, BeatXPosition.Stem);
+            this.drawingInfos.clear();
         }
-    }
-
-    private _getOrCreateBeatPositions(beat: Beat): BeatLinePositions {
-        if (!this._beatLineXPositions.has(beat.index)) {
-            this._beatLineXPositions.set(beat.index, new BeatLinePositions());
-        }
-        return this._beatLineXPositions.get(beat.index)!;
     }
 
     public direction: BeamDirection = BeamDirection.Up;
@@ -417,22 +380,6 @@ export class BeamingHelper {
 
     public get beatOfHighestNote(): Beat {
         return this.highestNoteInHelper!.beat;
-    }
-
-    /**
-     * Returns whether the the position of the given beat, was registered by the staff of the given ID
-     * @param staffId
-     * @param beat
-     * @returns
-     */
-    public isPositionFrom(staffId: string, beat: Beat): boolean {
-        if (!this._beatLineXPositions.has(beat.index)) {
-            return true;
-        }
-        return (
-            this._beatLineXPositions.get(beat.index)!.staffId === staffId ||
-            !this._beatLineXPositions.get(beat.index)!.staffId
-        );
     }
 
     public drawingInfos: Map<BeamDirection, BeamingHelperDrawInfo> = new Map<BeamDirection, BeamingHelperDrawInfo>();

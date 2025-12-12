@@ -196,26 +196,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         return 0;
     }
 
-    public override updateBeamingHelper(): void {
-        if (this.beamingHelper) {
-            let g: Glyph | null = null;
-            if (this.noteHeads) {
-                g = this.noteHeads;
-            } else if (this.deadSlapped) {
-                g = this.deadSlapped;
-            }
-
-            if (g) {
-                this.beamingHelper.registerBeatLineX(
-                    'numbered',
-                    this.container.beat,
-                    this.container.x + this.x + g.x,
-                    this.container.x + this.x + g.x + g.width
-                );
-            }
-        }
-    }
-
     public static readonly majorKeySignatureOneValues: Array<number> = [
         // Flats
         59, 66, 61, 68, 63, 58, 65,
@@ -364,5 +344,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             this.onTimeX = this.deadSlapped.x + this.deadSlapped.width / 2;
         }
         this.middleX = this.onTimeX;
+        this.stemX = this.middleX;
     }
 }

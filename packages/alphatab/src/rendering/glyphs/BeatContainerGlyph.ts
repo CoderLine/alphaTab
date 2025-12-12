@@ -4,6 +4,7 @@ import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
 import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
@@ -88,7 +89,6 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public applyLayoutingInfo(_info: BarLayoutingInfo): void {
-        this.onNotes.updateBeamingHelper();
         this.updateWidth();
     }
 
@@ -101,7 +101,6 @@ export class BeatContainerGlyph extends Glyph {
         this.onNotes.renderer = this.renderer;
         this.onNotes.container = this;
         this.onNotes.doLayout();
-        this.onNotes.updateBeamingHelper();
         let i: number = this.beat.notes.length - 1;
         while (i >= 0) {
             this.createTies(this.beat.notes[i--]);
@@ -123,7 +122,6 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public scaleToWidth(beatWidth: number): void {
-        this.onNotes.updateBeamingHelper();
         this.width = beatWidth;
     }
 
@@ -265,6 +263,26 @@ export class BeatContainerGlyph extends Glyph {
 
         if (this.renderer.settings.core.includeNoteBounds) {
             this.onNotes.buildBoundingsLookup(beatBoundings, cx + this.x, cy + this.y);
+        }
+    }
+
+    public getBeatX(requestedPosition: BeatXPosition, useSharedSizes: boolean = false) {
+        switch (requestedPosition) {
+            case BeatXPosition.PreNotes:
+                return this.preNotes.x;
+            case BeatXPosition.OnNotes:
+                return this.onNotes.x;
+            case BeatXPosition.MiddleNotes:
+                return this.onNotes.x + this.onNotes.middleX;
+            case BeatXPosition.Stem:
+                return this.onNotes.x + this.onNotes.stemX;
+            case BeatXPosition.PostNotes:
+                const onNoteSize = useSharedSizes
+                    ? (this.renderer.layoutingInfo.getBeatSizes(this.beat)?.onBeatSize ?? this.onNotes.width)
+                    : this.onNotes.width;
+                return this.onNotes.x + onNoteSize;
+            case BeatXPosition.EndBeat:
+                return this.width;
         }
     }
 }
