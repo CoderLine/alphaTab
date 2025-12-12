@@ -262,7 +262,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                 // if we have a line break we draw only a line until the end
                 if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                     const endX: number = cx + startNoteRenderer.x + startNoteRenderer.width;
-                    const noteValueToDraw: number = note.tieDestination!.realValue;
+                    const noteValueToDraw: number = note.tieDestination!.displayValue;
                     startNoteRenderer.accidentalHelper.applyAccidentalForValue(note.beat, noteValueToDraw, false, true);
                     const endY: number =
                         cy +
