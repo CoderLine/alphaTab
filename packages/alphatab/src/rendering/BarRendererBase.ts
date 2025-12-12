@@ -21,7 +21,7 @@ import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarL
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import { BarHelpers } from '@coderline/alphatab/rendering/utils/BarHelpers';
-import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -146,7 +146,11 @@ export class BarRendererBase {
         return this._contentBottomOverflow + this.bottomEffects.height;
     }
 
-    public helpers!: BarHelpers;
+    protected helpers!: BarHelpers;
+
+    public get collisionHelper() {
+        return this.helpers.collisionHelper;
+    }
 
     /**
      * Gets or sets whether this renderer is linked to the next one
@@ -217,6 +221,12 @@ export class BarRendererBase {
         for (const container of this._voiceContainers.values()) {
             container.scaleToWidth(containerWidth);
         }
+        for (const v of this.helpers.beamHelpers) {
+            for (const h of v) {
+                h.alignWithBeats();
+            }
+        }
+
         this._postBeatGlyphs.x = this._preBeatGlyphs.x + this._preBeatGlyphs.width + containerWidth;
         this.width = width;
 
@@ -252,10 +262,14 @@ export class BarRendererBase {
         return this.staff!.system.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
     }
 
-    protected wasFirstOfLine: boolean = false;
+    protected wasFirstOfStaff: boolean = false;
 
-    public get isFirstOfLine(): boolean {
+    public get isFirstOfStaff(): boolean {
         return this.index === 0;
+    }
+
+    public get isLastOfStaff(): boolean {
+        return this.index === this.staff!.barRenderers.length - 1;
     }
 
     public get isLast(): boolean {
@@ -518,6 +532,20 @@ export class BarRendererBase {
             }
         }
 
+        for (const v of this._voiceContainers.values()) {
+            for (const b of v.beatGlyphs) {
+                const topY = b.getBoundingBoxTop();
+                if (topY < 0) {
+                    this.registerOverflowTop(topY * -1);
+                }
+
+                const bottomY = b.getBoundingBoxBottom();
+                if (bottomY > rendererBottom) {
+                    this.registerOverflowBottom(bottomY - rendererBottom);
+                }
+            }
+        }
+
         const beatEffectsMinY = this.beatEffectsMinY;
         if (!Number.isNaN(beatEffectsMinY)) {
             const beatEffectTopOverflow = -beatEffectsMinY;
@@ -579,7 +607,6 @@ export class BarRendererBase {
         g.renderer = this;
         g.preNotes.renderer = this;
         g.onNotes.renderer = this;
-        g.onNotes.beamingHelper = this.helpers.beamHelperLookup[g.beat.voice.index].get(g.beat.index)!;
         this.getVoiceContainer(g.beat.voice)!.addGlyph(g);
     }
 
@@ -686,7 +713,7 @@ export class BarRendererBase {
     }
 
     protected createPreBeatGlyphs(): void {
-        this.wasFirstOfLine = this.isFirstOfLine;
+        this.wasFirstOfStaff = this.isFirstOfStaff;
     }
 
     protected createBeatGlyphs(): void {
@@ -725,26 +752,7 @@ export class BarRendererBase {
     ): number {
         const container = this.getBeatContainer(beat);
         if (container) {
-            switch (requestedPosition) {
-                case BeatXPosition.PreNotes:
-                    return container.voiceContainer.x + container.x;
-                case BeatXPosition.OnNotes:
-                    return container.voiceContainer.x + container.x + container.onNotes.x;
-                case BeatXPosition.MiddleNotes:
-                    return container.voiceContainer.x + container.x + container.onNotes.x + container.onNotes.middleX;
-                case BeatXPosition.Stem:
-                    const offset = container.onNotes.beamingHelper
-                        ? container.onNotes.beamingHelper.getBeatLineX(beat)
-                        : container.onNotes.x + container.onNotes.width / 2;
-                    return container.voiceContainer.x + offset;
-                case BeatXPosition.PostNotes:
-                    const onNoteSize = useSharedSizes
-                        ? (this.layoutingInfo.getBeatSizes(beat)?.onBeatSize ?? container.onNotes.width)
-                        : container.onNotes.width;
-                    return container.voiceContainer.x + container.x + container.onNotes.x + onNoteSize;
-                case BeatXPosition.EndBeat:
-                    return container.voiceContainer.x + container.x + container.width;
-            }
+            return container.voiceContainer.x + container.x + container.getBeatX(requestedPosition, useSharedSizes);
         }
         return 0;
     }
@@ -786,7 +794,7 @@ export class BarRendererBase {
 
         // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
         // but we only need to recreate them for the renderers that were the first of the line or are now the first of the line
-        if ((this.wasFirstOfLine && !this.isFirstOfLine) || (!this.wasFirstOfLine && this.isFirstOfLine)) {
+        if ((this.wasFirstOfStaff && !this.isFirstOfStaff) || (!this.wasFirstOfStaff && this.isFirstOfStaff)) {
             this.recreatePreBeatGlyphs();
             this._postBeatGlyphs.doLayout();
         }
@@ -842,6 +850,6 @@ export class BarRendererBase {
     }
 
     public getBeatDirection(beat: Beat): BeamDirection {
-        return this.helpers.getBeamingHelperForBeat(beat).direction;
+        return this.helpers.getBeamingHelperForBeat(beat)?.direction ?? BeamDirection.Up;
     }
 }

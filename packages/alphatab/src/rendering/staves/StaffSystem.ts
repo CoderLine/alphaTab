@@ -803,7 +803,7 @@ export class StaffSystem {
                     if (!masterBarBoundsLookup.has(renderer.bar.masterBar.index)) {
                         masterBarBounds = new MasterBarBounds();
                         masterBarBounds.index = renderer.bar.masterBar.index;
-                        masterBarBounds.isFirstOfLine = renderer.isFirstOfLine;
+                        masterBarBounds.isFirstOfLine = renderer.isFirstOfStaff;
                         masterBarBounds.realBounds = new Bounds();
                         masterBarBounds.realBounds.x = x + renderer.x;
                         masterBarBounds.realBounds.y = realTop;

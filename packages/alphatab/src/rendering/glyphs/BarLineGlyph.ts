@@ -302,8 +302,20 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
         const lineRenderer = this.renderer as LineBarRenderer;
 
         const lineYOffset = lineRenderer.smuflMetrics.staffLineThickness;
-        const top: number = this.y - lineYOffset;
-        const bottom: number = this.y + this.renderer.height;
+        let top: number = this.y;
+        let bottom: number = this.y;
+        if (
+            lineRenderer.drawnLineCount < 2 ||
+            (!this._isRight && lineRenderer.isFirstOfStaff) ||
+            (this._isRight && lineRenderer.isLastOfStaff)
+        ) {
+            top -= lineYOffset;
+            bottom += lineRenderer.height;
+        } else {
+            top += lineRenderer.getLineY(0);
+            bottom += lineRenderer.getLineY(lineRenderer.drawnLineCount - 1);
+        }
+
         const h: number = bottom - top;
 
         // round up to have pixel-aligned bar lines, x-shift will be used during rendering

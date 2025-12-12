@@ -41,7 +41,7 @@ import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNo
  * @internal
  */
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
-    private _collisionOffset: number = -1000;
+    private _collisionOffset: number = Number.NaN;
     private _skipPaint: boolean = false;
     private _whammy?: ScoreWhammyBarGlyph;
 
@@ -102,27 +102,25 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         return this.noteHeads ? this.noteHeads.getNoteY(note, requestedPosition) : 0;
     }
 
-    public override updateBeamingHelper(): void {
-        if (this.noteHeads) {
-            this.noteHeads.updateBeamingHelper(this.container.x + this.x);
-        } else if (this.restGlyph) {
-            this.restGlyph.updateBeamingHelper(this.container.x + this.x);
-            if (this.renderer.bar.isMultiVoice && this._collisionOffset === -1000) {
-                this._collisionOffset = this.renderer.helpers.collisionHelper.applyRestCollisionOffset(
-                    this.container.beat,
-                    this.restGlyph.y,
-                    (this.renderer as ScoreBarRenderer).getScoreHeight(1)
-                );
-                this.y += this._collisionOffset;
-                const existingRests = this.renderer.helpers.collisionHelper.restDurationsByDisplayTime;
-                if (
-                    existingRests.has(this.container.beat.playbackStart) &&
-                    existingRests.get(this.container.beat.playbackStart)!.has(this.container.beat.playbackDuration) &&
-                    existingRests.get(this.container.beat.playbackStart)!.get(this.container.beat.playbackDuration) !==
-                        this.container.beat.id
-                ) {
-                    this._skipPaint = true;
-                }
+    public applyRestCollisionOffset() {
+        if (!this.restGlyph) {
+            return;
+        }
+        if (this.renderer.bar.isMultiVoice && Number.isNaN(this._collisionOffset)) {
+            this._collisionOffset = this.renderer.collisionHelper.applyRestCollisionOffset(
+                this.container.beat,
+                this.restGlyph.y,
+                (this.renderer as ScoreBarRenderer).getScoreHeight(1)
+            );
+            this.y += this._collisionOffset;
+            const existingRests = this.renderer.collisionHelper.restDurationsByDisplayTime;
+            if (
+                existingRests.has(this.container.beat.playbackStart) &&
+                existingRests.get(this.container.beat.playbackStart)!.has(this.container.beat.playbackDuration) &&
+                existingRests.get(this.container.beat.playbackStart)!.get(this.container.beat.playbackDuration) !==
+                    this.container.beat.id
+            ) {
+                this._skipPaint = true;
             }
         }
     }
@@ -144,7 +142,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 const noteHeads = new ScoreNoteChordGlyph();
                 this.noteHeads = noteHeads;
                 noteHeads.beat = this.container.beat;
-                noteHeads.beamingHelper = this.beamingHelper;
                 const ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(false);
                 ghost.renderer = this.renderer;
 
@@ -204,7 +201,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(steps), this.container.beat.duration);
                 this.restGlyph = restGlyph;
                 restGlyph.beat = this.container.beat;
-                restGlyph.beamingHelper = this.beamingHelper;
                 this.addNormal(restGlyph);
 
                 if (this.renderer.bar.isMultiVoice) {
@@ -212,14 +208,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
                         const restTop = restGlyph.y - sr.getScoreHeight(restSizes[0]);
                         const restBottom = restGlyph.y + sr.getScoreHeight(restSizes[1]);
-                        this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, restTop, restBottom);
+                        this.renderer.collisionHelper.reserveBeatSlot(this.container.beat, restTop, restBottom);
                     } else {
-                        this.renderer.helpers.collisionHelper.registerRest(this.container.beat);
+                        this.renderer.collisionHelper.registerRest(this.container.beat);
                     }
-                }
-
-                if (this.beamingHelper) {
-                    this.beamingHelper.applyRest(this.container.beat, steps);
                 }
 
                 //
@@ -236,15 +228,22 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             }
         }
         super.doLayout();
+        this.applyRestCollisionOffset();
         if (this.container.beat.isEmpty) {
             this.onTimeX = this.width / 2;
             this.middleX = this.onTimeX;
+            this.stemX = this.middleX;
         } else if (this.restGlyph) {
             this.onTimeX = this.restGlyph!.x + this.restGlyph!.width / 2;
             this.middleX = this.onTimeX;
+            this.stemX = this.middleX;
         } else if (this.noteHeads) {
             this.onTimeX = this.noteHeads!.x + this.noteHeads!.onTimeX;
             this.middleX = this.noteHeads!.x + this.noteHeads!.width / 2;
+            const direction = this.renderer.getBeatDirection(this.container.beat);
+            this.stemX =
+                this.noteHeads!.x +
+                (direction === BeamDirection.Up ? this.noteHeads!.upLineX : this.noteHeads!.downLineX);
         }
     }
 
@@ -338,7 +337,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         const belowBeatEffects = this.noteHeads!.belowBeatEffects;
         const aboveBeatEffects = this.noteHeads!.aboveBeatEffects;
         const outsideBeatEffects: Map<string, EffectGlyph> =
-            this.beamingHelper.direction === BeamDirection.Up
+            this.renderer.getBeatDirection(this.container.beat) === BeamDirection.Up
                 ? this.noteHeads!.belowBeatEffects
                 : this.noteHeads!.aboveBeatEffects;
 

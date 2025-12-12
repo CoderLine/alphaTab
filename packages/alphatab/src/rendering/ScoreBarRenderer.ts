@@ -69,7 +69,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     public override get heightLineCount(): number {
-        return 5;
+        return Math.max(5, this.bar.staff.standardNotationLineCount);
     }
 
     public override get drawnLineCount(): number {
@@ -135,7 +135,9 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 slashY -= this.smuflMetrics.stemUp.has(symbol)
                     ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale
                     : 0;
-                slashY -= this.smuflMetrics.standardStemLength + scale;
+                if (!beat.isRest) {
+                    slashY -= this.smuflMetrics.standardStemLength + scale;
+                }
             }
 
             return slashY;
@@ -151,7 +153,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
         let y = this.getScoreY(this.accidentalHelper.getMinSteps(beat));
 
-        if (direction === BeamDirection.Up) {
+        if (direction === BeamDirection.Up && !beat.isRest) {
             const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
             y -= this.smuflMetrics.standardStemLength * scale;
         }
@@ -199,7 +201,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return helper.direction;
     }
 
-    public centerStaffStemY(helper: BeamingHelper) {
+    public centerStaffStemY(direction: BeamDirection) {
         const isStandardFive = this.bar.staff.standardNotationLineCount === Staff.DefaultStandardNotationLineCount;
         if (isStandardFive) {
             // center on the middle line for a standard 5-line staff
@@ -207,7 +209,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         // for other staff line counts, we align the stem either on the top or bottom line
-        if (helper.direction === BeamDirection.Up) {
+        if (direction === BeamDirection.Up) {
             return this.getScoreY(this.bar.staff.standardNotationLineCount * 2);
         }
         return this.getScoreY(0);
@@ -324,7 +326,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         // Clef
         let hasClef = false;
         if (
-            this.isFirstOfLine ||
+            this.isFirstOfStaff ||
             this.bar.clef !== this.bar.previousBar!.clef ||
             this.bar.clefOttava !== this.bar.previousBar!.clefOttava
         ) {

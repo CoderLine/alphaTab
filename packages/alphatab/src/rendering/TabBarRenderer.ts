@@ -180,7 +180,7 @@ export class TabBarRenderer extends LineBarRenderer {
 
     protected override createLinePreBeatGlyphs(): void {
         // Clef
-        if (this.isFirstOfLine) {
+        if (this.isFirstOfStaff) {
             const center: number = (this.bar.staff.tuning.length - 1) / 2;
             this.createStartSpacing();
             this.addPreBeatGlyph(new TabClefGlyph(0, this.getLineY(center)));
@@ -303,7 +303,7 @@ export class TabBarRenderer extends LineBarRenderer {
         return BeamDirection.Down;
     }
 
-    protected getFlagAndBarPos(): number {
+    public getFlagAndBarPos(): number {
         return this.height + this.settings.notation.rhythmHeight - (this._hasTuplets ? this.tupletSize / 2 : 0);
     }
 
@@ -312,8 +312,8 @@ export class TabBarRenderer extends LineBarRenderer {
         return this.getFlagAndBarPos();
     }
 
-    protected override shouldPaintFlag(beat: Beat, h: BeamingHelper): boolean {
-        if (!super.shouldPaintFlag(beat, h)) {
+    protected override shouldPaintFlag(beat: Beat): boolean {
+        if (!super.shouldPaintFlag(beat)) {
             return false;
         }
 
@@ -321,7 +321,7 @@ export class TabBarRenderer extends LineBarRenderer {
             return false;
         }
 
-        return this.drawBeamHelperAsFlags(h);
+        return true;
     }
 
     protected override paintBeamingStem(

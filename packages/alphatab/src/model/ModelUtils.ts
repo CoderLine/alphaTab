@@ -26,7 +26,6 @@ export class TuningParseResult {
     }
 }
 
-
 /**
  * @internal
  */
@@ -938,7 +937,6 @@ export class ModelUtils {
         return accidentalToSet;
     }
 
-    
     /**
      * @internal
      */
@@ -946,5 +944,21 @@ export class ModelUtils {
         return plain.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     }
 
-}
+    public static minBoundingBox(a: number, b: number) {
+        if (Number.isNaN(a)) {
+            return b;
+        } else if (Number.isNaN(b)) {
+            return a;
+        }
+        return a < b ? a : b;
+    }
 
+    public static maxBoundingBox(a: number, b: number) {
+        if (Number.isNaN(a)) {
+            return b;
+        } else if (Number.isNaN(b)) {
+            return a;
+        }
+        return a > b ? a : b;
+    }
+}
