@@ -265,5 +265,6 @@ export class BeatContainerGlyph extends Glyph {
             case BeatXPosition.EndBeat:
                 return this.width;
         }
+        return this.preNotes.x;
     }
 }
