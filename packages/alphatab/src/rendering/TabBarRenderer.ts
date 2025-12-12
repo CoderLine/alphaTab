@@ -180,7 +180,7 @@ export class TabBarRenderer extends LineBarRenderer {
 
     protected override createLinePreBeatGlyphs(): void {
         // Clef
-        if (this.isFirstOfLine) {
+        if (this.isFirstOfStaff) {
             const center: number = (this.bar.staff.tuning.length - 1) / 2;
             this.createStartSpacing();
             this.addPreBeatGlyph(new TabClefGlyph(0, this.getLineY(center)));

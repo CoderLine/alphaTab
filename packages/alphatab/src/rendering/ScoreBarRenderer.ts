@@ -69,7 +69,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     public override get heightLineCount(): number {
-        return 5;
+        return Math.max(5, this.bar.staff.standardNotationLineCount);
     }
 
     public override get drawnLineCount(): number {
@@ -324,7 +324,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         // Clef
         let hasClef = false;
         if (
-            this.isFirstOfLine ||
+            this.isFirstOfStaff ||
             this.bar.clef !== this.bar.previousBar!.clef ||
             this.bar.clefOttava !== this.bar.previousBar!.clefOttava
         ) {

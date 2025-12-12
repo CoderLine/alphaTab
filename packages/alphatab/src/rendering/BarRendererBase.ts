@@ -252,11 +252,16 @@ export class BarRendererBase {
         return this.staff!.system.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
     }
 
-    protected wasFirstOfLine: boolean = false;
+    protected wasFirstOfStaff: boolean = false;
 
-    public get isFirstOfLine(): boolean {
+    public get isFirstOfStaff(): boolean {
         return this.index === 0;
     }
+    
+    public get isLastOfStaff(): boolean {
+        return this.index === this.staff!.barRenderers.length - 1;
+    }
+
 
     public get isLast(): boolean {
         return !this.bar || this.bar.index === this.scoreRenderer.layout!.lastBarIndex;
@@ -686,7 +691,7 @@ export class BarRendererBase {
     }
 
     protected createPreBeatGlyphs(): void {
-        this.wasFirstOfLine = this.isFirstOfLine;
+        this.wasFirstOfStaff = this.isFirstOfStaff;
     }
 
     protected createBeatGlyphs(): void {
@@ -786,7 +791,7 @@ export class BarRendererBase {
 
         // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
         // but we only need to recreate them for the renderers that were the first of the line or are now the first of the line
-        if ((this.wasFirstOfLine && !this.isFirstOfLine) || (!this.wasFirstOfLine && this.isFirstOfLine)) {
+        if ((this.wasFirstOfStaff && !this.isFirstOfStaff) || (!this.wasFirstOfStaff && this.isFirstOfStaff)) {
             this.recreatePreBeatGlyphs();
             this._postBeatGlyphs.doLayout();
         }

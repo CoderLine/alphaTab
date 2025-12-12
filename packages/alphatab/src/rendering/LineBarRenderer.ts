@@ -516,7 +516,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 flagY = topY;
             }
 
-            if (!h.hasLine(true, beat)) {
+            if (!h.hasStem(true, beat)) {
                 continue;
             }
 

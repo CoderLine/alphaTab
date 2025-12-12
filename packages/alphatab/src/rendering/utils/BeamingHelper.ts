@@ -92,14 +92,14 @@ export class BeamingHelper {
         return this.beats.length === 1 && this.beats[0].isRest;
     }
 
-    public hasLine(forceFlagOnSingleBeat: boolean, beat?: Beat): boolean {
+    public hasStem(forceFlagOnSingleBeat: boolean, beat?: Beat): boolean {
         return (
-            (forceFlagOnSingleBeat && this._beatHasLine(beat!)) ||
-            (!forceFlagOnSingleBeat && this.beats.length === 1 && this._beatHasLine(beat!))
+            (forceFlagOnSingleBeat && this._beatHasStem(beat!)) ||
+            (!forceFlagOnSingleBeat && this.beats.length === 1 && this._beatHasStem(beat!))
         );
     }
 
-    private _beatHasLine(beat: Beat): boolean {
+    private _beatHasStem(beat: Beat): boolean {
         return beat!.duration > Duration.Whole;
     }
 

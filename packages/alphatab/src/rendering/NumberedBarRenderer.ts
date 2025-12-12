@@ -279,7 +279,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override createPreBeatGlyphs(): void {
-        this.wasFirstOfLine = this.isFirstOfLine;
+        this.wasFirstOfStaff = this.isFirstOfStaff;
         if (this.index === 0 || (this.bar.masterBar.isRepeatStart && this._isOnlyNumbered)) {
             this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         }
