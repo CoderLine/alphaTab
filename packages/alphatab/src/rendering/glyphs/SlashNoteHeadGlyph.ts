@@ -80,7 +80,7 @@ export class SlashNoteHeadGlyph extends MusicFontGlyph {
         const stemInfoDown = this.renderer.smuflMetrics.stemDown.has(symbol)
             ? this.renderer.smuflMetrics.stemDown.get(symbol)!.x
             : 0;
-        this.upLineX = stemInfoDown;
+        this.downLineX = stemInfoDown;
     }
 
     public static getSymbol(duration: Duration): MusicFontSymbol {
