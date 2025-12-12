@@ -819,18 +819,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         for (const v of this.helpers.beamHelpers) {
             for (const h of v) {
                 if (h.isRestBeamHelper) {
-                    if (h.minRestSteps) {
-                        const topY = this.getLineY(h.maxRestSteps! / 2) - noteOverflowPadding;
-                        if (topY < maxNoteY) {
-                            maxNoteY = topY;
-                        }
-                    }
-                    if (h.maxRestSteps) {
-                        const bottomY = this.getLineY(h.maxRestSteps! & 2) + noteOverflowPadding;
-                        if (bottomY < maxNoteY) {
-                            maxNoteY = bottomY;
-                        }
-                    }
+                    // no stems or beams to consider
                 }
                 // notes with stems
                 else if (h.beats.length === 1 && h.beats[0].duration >= Duration.Half) {
@@ -895,18 +884,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
                         }
                     }
                 }
-
-                const beatContainer = this.getBeatContainer(h.beats[0]);
-                if (beatContainer) {
-                    const bBoxTop = beatContainer.getBoundingBoxTop();
-                    const bBoxBottom = beatContainer.getBoundingBoxBottom();
-                    if (bBoxBottom > minNoteY) {
-                        minNoteY = bBoxBottom;
-                    }
-                    if (bBoxTop < maxNoteY) {
-                        maxNoteY = bBoxTop;
-                    }
-                }
             }
         }
 
@@ -925,26 +902,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
         const scale = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
         const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
-        let stemSize = this.smuflMetrics.standardStemLength * scale;
-
-        if (h.tremoloDuration) {
-            // for 16th and shorter beats we need more space for all tremolos
-            // for 8th beats we need only more space for 32nd tremolos
-
-            // the logic here is not perfect but there is no SMuFL guideline
-            // on how tremolos need to extend stems
-
-            const oneBeamSize = (this.smuflMetrics.beamThickness + this.smuflMetrics.beamSpacing) * scale;
-            if (h.shortestDuration > Duration.Eighth) {
-                if (h.tremoloDuration === Duration.Eighth) {
-                    stemSize += oneBeamSize;
-                } else {
-                    stemSize += oneBeamSize * 1.5;
-                }
-            } else if (h.tremoloDuration === Duration.ThirtySecond) {
-                stemSize += oneBeamSize * 1.5;
-            }
-        }
 
         const drawingInfo = new BeamingHelperDrawInfo();
         h.drawingInfos.set(direction, drawingInfo);
@@ -963,31 +920,17 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // 1. put direct diagonal line.
         drawingInfo.startBeat = firstBeat;
         drawingInfo.startX = h.getBeatLineX(firstBeat);
-        if (isRest) {
-            drawingInfo.startY =
-                direction === BeamDirection.Up
-                    ? this.getLineY(h.minRestSteps! / 2)
-                    : this.getLineY(h.maxRestSteps! / 2);
-        } else {
-            drawingInfo.startY =
-                direction === BeamDirection.Up
-                    ? this.getFlagTopY(firstBeat, direction)
-                    : this.getFlagBottomY(firstBeat, direction);
-        }
+        drawingInfo.startY =
+            direction === BeamDirection.Up
+                ? this.getFlagTopY(firstBeat, direction)
+                : this.getFlagBottomY(firstBeat, direction);
 
         drawingInfo.endBeat = lastBeat;
         drawingInfo.endX = h.getBeatLineX(lastBeat);
-        if (isRest) {
-            drawingInfo.endY =
-                direction === BeamDirection.Up
-                    ? this.getLineY(h.minRestSteps! / 2)
-                    : this.getLineY(h.maxRestSteps! / 2);
-        } else {
-            drawingInfo.endY =
-                direction === BeamDirection.Up
-                    ? this.getFlagTopY(lastBeat, direction)
-                    : this.getFlagBottomY(lastBeat, direction);
-        }
+        drawingInfo.endY =
+            direction === BeamDirection.Up
+                ? this.getFlagTopY(lastBeat, direction)
+                : this.getFlagBottomY(lastBeat, direction);
 
         // 2. ensure max slope
         // we use the min/max notes to place the beam along their real position
@@ -1022,11 +965,41 @@ export abstract class LineBarRenderer extends BarRendererBase {
             drawingInfo.startY = drawingInfo.endY + maxSlope;
         }
 
-        // 3. let middle elements shift up/down
+        // 3. adjust beam drawing order
+        // we can only draw up to 2 beams towards the noteheads, then we have to grow to the other side
+        // here we shift accordingly
+        let barDrawingShift = 0;
+        if (barCount > 2 && !isRest) {
+            const beamSpacing = this.smuflMetrics.beamSpacing * scale;
+            const beamThickness = this.smuflMetrics.beamThickness * scale;
+            const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;
+
+            if (direction === BeamDirection.Up) {
+                const bottomBarY = drawingInfo.startY + 2 * beamThickness + beamSpacing;
+                const barTopY = bottomBarY - totalBarsHeight;
+                const diff = drawingInfo.startY - barTopY;
+                if (diff > 0) {
+                    barDrawingShift = diff * -1;
+                    drawingInfo.startY -= diff;
+                    drawingInfo.endY -= diff;
+                }
+            } else {
+                const topBarY = drawingInfo.startY - 2 * beamThickness + beamSpacing;
+                const barBottomY = topBarY + totalBarsHeight;
+                const diff = barBottomY - drawingInfo.startY;
+                if (diff > 0) {
+                    barDrawingShift = diff;
+                    drawingInfo.startY += diff;
+                    drawingInfo.endY += diff;
+                }
+            }
+        }
+
+        // 4. let middle elements shift up/down
         if (h.beats.length > 1) {
             // check if highest note shifts bar up or down
             if (direction === BeamDirection.Up) {
-                const yNeededForHighestNote = this.getLineY(this.getMinLineOfBeat(h.beatOfHighestNote)) - stemSize;
+                const yNeededForHighestNote = barDrawingShift + this.getFlagTopY(h.beatOfHighestNote, direction);
                 const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfHighestNote));
 
                 const diff = yGivenByCurrentValues - yNeededForHighestNote;
@@ -1035,7 +1008,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     drawingInfo.endY -= diff;
                 }
             } else {
-                const yNeededForLowestNote = this.getLineY(this.getMaxLineOfBeat(h.beatOfLowestNote)) + stemSize;
+                const yNeededForLowestNote = barDrawingShift + this.getFlagBottomY(h.beatOfLowestNote, direction);
                 const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfLowestNote));
 
                 const diff = yNeededForLowestNote - yGivenByCurrentValues;
@@ -1046,29 +1019,34 @@ export abstract class LineBarRenderer extends BarRendererBase {
             }
 
             // check if rest shifts bar up or down
-            if (h.minRestSteps !== null || h.maxRestSteps !== null) {
+            let barSpacing = 0;
+            if (h.restBeats.length > 0) {
+                // space needed for the bars, rests need to be below them
                 const scaleMod: number = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
-                let barSpacing: number =
-                    barCount * (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
-                barSpacing += this.smuflMetrics.beamSpacing;
+                barSpacing = barCount * (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
+            }
 
-                if (direction === BeamDirection.Up && h.minRestSteps !== null) {
-                    const yNeededForRest = this.getLineY(h.minRestSteps! / 2) - barSpacing;
-                    const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMinRestSteps!));
+            for (const b of h.restBeats) {
+                // rest beats which are "under" the beam
+                if (b.isRest && b.index < h.beats[h.beats.length - 1].index) {
+                    if (direction === BeamDirection.Up) {
+                        const yNeededForRest = this.getBeatContainer(b)!.getBoundingBoxTop() - barSpacing;
+                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(b));
 
-                    const diff = yGivenByCurrentValues - yNeededForRest;
-                    if (diff > 0) {
-                        drawingInfo.startY -= diff;
-                        drawingInfo.endY -= diff;
-                    }
-                } else if (direction === BeamDirection.Down && h.maxRestSteps !== null) {
-                    const yNeededForRest = this.getLineHeight(h.maxRestSteps! / 2) + barSpacing;
-                    const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMaxRestSteps!));
+                        const diff = yGivenByCurrentValues - yNeededForRest;
+                        if (diff > 0) {
+                            drawingInfo.startY -= diff;
+                            drawingInfo.endY -= diff;
+                        }
+                    } else if (direction === BeamDirection.Down) {
+                        const yNeededForRest = this.getBeatContainer(b)!.getBoundingBoxBottom() + barSpacing;
+                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(b));
 
-                    const diff = yNeededForRest - yGivenByCurrentValues;
-                    if (diff > 0) {
-                        drawingInfo.startY += diff;
-                        drawingInfo.endY += diff;
+                        const diff = yNeededForRest - yGivenByCurrentValues;
+                        if (diff > 0) {
+                            drawingInfo.startY += diff;
+                            drawingInfo.endY += diff;
+                        }
                     }
                 }
             }
@@ -1087,32 +1065,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
                         drawingInfo.startY += diff;
                         drawingInfo.endY += diff;
                     }
-                }
-            }
-        }
-
-        // we can only draw up to 2 beams towards the noteheads, then we have to grow to the other side
-        // here we shift accordingly
-        if (barCount > 2 && !isRest) {
-            const beamSpacing = this.smuflMetrics.beamSpacing * scale;
-            const beamThickness = this.smuflMetrics.beamThickness * scale;
-            const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;
-
-            if (direction === BeamDirection.Up) {
-                const bottomBarY = drawingInfo.startY + 2 * beamThickness + beamSpacing;
-                const barTopY = bottomBarY - totalBarsHeight;
-                const diff = drawingInfo.startY - barTopY;
-                if (diff > 0) {
-                    drawingInfo.startY -= diff;
-                    drawingInfo.endY -= diff;
-                }
-            } else {
-                const topBarY = drawingInfo.startY - 2 * beamThickness + beamSpacing;
-                const barBottomY = topBarY + totalBarsHeight;
-                const diff = barBottomY - drawingInfo.startY;
-                if (diff > 0) {
-                    drawingInfo.startY += diff;
-                    drawingInfo.endY += diff;
                 }
             }
         }

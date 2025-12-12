@@ -1,6 +1,7 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
@@ -51,7 +52,7 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public override getBoundingBoxBottom(): number {
-        return ModelUtils.minBoundingBox(this.preNotes.getBoundingBoxBottom(), this.onNotes.getBoundingBoxBottom());
+        return ModelUtils.maxBoundingBox(this.preNotes.getBoundingBoxBottom(), this.onNotes.getBoundingBoxBottom());
     }
 
     protected drawBeamHelperAsFlags(helper: BeamingHelper): boolean {
@@ -153,8 +154,11 @@ export class BeatContainerGlyph extends Glyph {
         // var c = canvas.color;
         // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y + this.preNotes.getBoundingBoxTop(), this.width, this.renderer.height);
-        // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y + this.onNotes.getBoundingBoxTop(), this.width, this.renderer.height);
+        // canvas.color = Color.random();
+        // const top = this.getBoundingBoxTop();
+        // const bottom = this.getBoundingBoxBottom();
+        // canvas.fillRect(cx + this.x, cy + this.y + top, this.width, bottom-top);
         // canvas.color = c;
 
         // var c = canvas.color;

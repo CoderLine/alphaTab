@@ -218,10 +218,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     }
                 }
 
-                if (this.beamingHelper) {
-                    this.beamingHelper.applyRest(this.container.beat, steps);
-                }
-
                 //
                 // Note dots
                 //

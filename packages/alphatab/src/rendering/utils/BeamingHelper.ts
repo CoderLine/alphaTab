@@ -1,16 +1,16 @@
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import type { Bar } from '@coderline/alphatab/model/Bar';
-import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { BeatBeamingMode, type Beat } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Voice } from '@coderline/alphatab/model/Voice';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
-import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import { NoteYPosition, type BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal
@@ -57,8 +57,6 @@ export class BeamingHelper {
     private _staff: Staff;
     private _beatLineXPositions: Map<number, BeatLinePositions> = new Map();
     private _renderer: BarRendererBase;
-    private _firstNonRestBeat: Beat | null = null;
-    private _lastNonRestBeat: Beat | null = null;
 
     public voice: Voice | null = null;
     public beats: Beat[] = [];
@@ -71,6 +69,7 @@ export class BeamingHelper {
     public hasTuplet: boolean = false;
 
     public slashBeats: Beat[] = [];
+    public restBeats: Beat[] = [];
 
     public lowestNoteInHelper: Note | null = null;
     private _lowestNoteCompareValueInHelper: number = -1;
@@ -81,12 +80,6 @@ export class BeamingHelper {
     public invertBeamDirection: boolean = false;
     public preferredBeamDirection: BeamDirection | null = null;
     public graceType: GraceType = GraceType.None;
-
-    public minRestSteps: number | null = null;
-    public beatOfMinRestSteps: Beat | null = null;
-
-    public maxRestSteps: number | null = null;
-    public beatOfMaxRestSteps: Beat | null = null;
 
     public get isRestBeamHelper(): boolean {
         return this.beats.length === 1 && this.beats[0].isRest;
@@ -229,40 +222,6 @@ export class BeamingHelper {
         return [0, 0];
     }
 
-    /**
-     * Registers a rest beat within the accidental helper so the rest
-     * symbol is considered properly during beaming.
-     * @param beat The rest beat.
-     * @param steps The steps on which the rest symbol is placed
-     */
-    public applyRest(beat: Beat, steps: number): void {
-        // do not accept rests after the last beat which has notes
-        if (
-            (this._lastNonRestBeat && beat.index >= this._lastNonRestBeat.index) ||
-            (this._firstNonRestBeat && beat.index <= this._firstNonRestBeat.index)
-        ) {
-            return;
-        }
-
-        // correct the line of the glyph to a note which would
-        // be placed at the upper / lower end of the glyph.
-        let aboveRest = steps;
-        let belowRest = steps;
-        const offsets = BeamingHelper.computeLineHeightsForRest(beat.duration);
-        aboveRest -= offsets[0];
-        belowRest += offsets[1];
-        const minRestSteps = this.minRestSteps;
-        const maxRestSteps = this.maxRestSteps;
-        if (minRestSteps === null || minRestSteps > aboveRest) {
-            this.minRestSteps = aboveRest;
-            this.beatOfMinRestSteps = beat;
-        }
-        if (maxRestSteps === null || maxRestSteps < belowRest) {
-            this.maxRestSteps = belowRest;
-            this.beatOfMaxRestSteps = beat;
-        }
-    }
-
     private _invert(direction: BeamDirection): BeamDirection {
         if (!this.invertBeamDirection) {
             return direction;
@@ -332,13 +291,12 @@ export class BeamingHelper {
                 if (this.shortestDuration < beat.duration) {
                     this.shortestDuration = beat.duration;
                 }
-                if (!this._firstNonRestBeat) {
-                    this._firstNonRestBeat = beat;
-                }
-                this._lastNonRestBeat = beat;
             } else if (this.beats.length === 0) {
                 this.beats.push(beat);
+            } else {
+                this.restBeats.push(beat);
             }
+
             if (beat.slashed) {
                 this.slashBeats.push(beat);
             }

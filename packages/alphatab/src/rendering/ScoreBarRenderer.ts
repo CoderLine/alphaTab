@@ -135,7 +135,9 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 slashY -= this.smuflMetrics.stemUp.has(symbol)
                     ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale
                     : 0;
-                slashY -= this.smuflMetrics.standardStemLength + scale;
+                if (!beat.isRest) {
+                    slashY -= this.smuflMetrics.standardStemLength + scale;
+                }
             }
 
             return slashY;
@@ -151,7 +153,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
         let y = this.getScoreY(this.accidentalHelper.getMinSteps(beat));
 
-        if (direction === BeamDirection.Up) {
+        if (direction === BeamDirection.Up && !beat.isRest) {
             const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
             y -= this.smuflMetrics.standardStemLength * scale;
         }

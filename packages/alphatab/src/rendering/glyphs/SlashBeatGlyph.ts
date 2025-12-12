@@ -163,10 +163,6 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 restGlyph.beat = this.container.beat;
                 restGlyph.beamingHelper = this.beamingHelper;
                 this.addNormal(restGlyph);
-
-                if (this.beamingHelper) {
-                    this.beamingHelper.applyRest(this.container.beat, 0);
-                }
             }
         }
 

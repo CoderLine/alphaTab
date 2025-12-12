@@ -257,11 +257,10 @@ export class BarRendererBase {
     public get isFirstOfStaff(): boolean {
         return this.index === 0;
     }
-    
+
     public get isLastOfStaff(): boolean {
         return this.index === this.staff!.barRenderers.length - 1;
     }
-
 
     public get isLast(): boolean {
         return !this.bar || this.bar.index === this.scoreRenderer.layout!.lastBarIndex;
@@ -517,6 +516,20 @@ export class BarRendererBase {
                 }
 
                 const bottomY = g.getBoundingBoxBottom();
+                if (bottomY > rendererBottom) {
+                    this.registerOverflowBottom(bottomY - rendererBottom);
+                }
+            }
+        }
+
+        for (const v of this._voiceContainers.values()) {
+            for (const b of v.beatGlyphs) {
+                const topY = b.getBoundingBoxTop();
+                if (topY < 0) {
+                    this.registerOverflowTop(topY * -1);
+                }
+
+                const bottomY = b.getBoundingBoxBottom();
                 if (bottomY > rendererBottom) {
                     this.registerOverflowBottom(bottomY - rendererBottom);
                 }

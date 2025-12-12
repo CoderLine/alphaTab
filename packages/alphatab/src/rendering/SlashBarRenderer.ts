@@ -108,7 +108,9 @@ export class SlashBarRenderer extends LineBarRenderer {
         const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
 
         slashY -= this.smuflMetrics.stemUp.has(symbol) ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale : 0;
-        slashY -= this.smuflMetrics.standardStemLength + scale;
+        if(!beat.isRest) {
+            slashY -= this.smuflMetrics.standardStemLength + scale;
+        }
 
         return slashY;
     }
