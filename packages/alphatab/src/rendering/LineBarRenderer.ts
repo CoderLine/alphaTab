@@ -269,6 +269,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // check if we need to paint simple footer
         const offset: number = this.tupletOffset;
         const size: number = this.tupletSize;
+        const shift = offset + size * 0.5;
 
         using _ = ElementStyleHelper.beat(canvas, beatElement, h.beats[0]);
 
@@ -288,12 +289,12 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 let tupletY: number = this.calculateBeamYWithDirection(beamingHelper, tupletX, direction);
 
                 if (direction === BeamDirection.Down) {
-                    tupletY += offset + size;
+                    tupletY += shift;
                 } else {
-                    tupletY -= offset + size;
+                    tupletY -= shift;
                 }
 
-                canvas.fillMusicFontSymbols(cx + this.x + tupletX, cy + this.y + tupletY, 1, s, true);
+                canvas.fillMusicFontSymbols(cx + this.x + tupletX, cy + this.y + tupletY + size * 0.5, 1, s, true);
             }
         } else {
             const firstBeat: Beat = h.beats[0];
@@ -342,7 +343,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
             }
 
             // align line centered in available space
-            const shift = offset + size * 0.5;
             if (direction === BeamDirection.Down) {
                 startY += shift;
                 endY += shift;
