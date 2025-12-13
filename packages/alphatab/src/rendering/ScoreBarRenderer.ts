@@ -60,10 +60,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return BarSubElement.StandardNotationStaffLine;
     }
 
-    public override get showMultiBarRest(): boolean {
-        return true;
-    }
-
     public override get lineSpacing(): number {
         return this.smuflMetrics.oneStaffSpace;
     }
@@ -145,7 +141,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
         const minNote = this.accidentalHelper.getMinStepsNote(beat);
         if (minNote) {
-            return this.getBeatContainer(beat)!.onNotes.getNoteY(
+            return this.getNoteY(
                 minNote,
                 direction === BeamDirection.Up ? NoteYPosition.TopWithStem : NoteYPosition.StemDown
             );
@@ -183,7 +179,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
         const maxNote = this.accidentalHelper.getMaxStepsNote(beat);
         if (maxNote) {
-            return this.getBeatContainer(beat)!.onNotes.getNoteY(
+            return this.getNoteY(
                 maxNote,
                 direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.BottomWithStem
             );
@@ -302,14 +298,14 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (direction === BeamDirection.Up) {
             const maxNote = this.accidentalHelper.getMaxStepsNote(beat);
             if (maxNote) {
-                return this.getBeatContainer(beat)!.onNotes.getNoteY(maxNote, NoteYPosition.StemUp);
+                return this.getNoteY(maxNote, NoteYPosition.StemUp);
             }
             return this.getScoreY(this.accidentalHelper.getMaxSteps(beat));
         }
 
         const minNote = this.accidentalHelper.getMinStepsNote(beat);
         if (minNote) {
-            return this.getBeatContainer(beat)!.onNotes.getNoteY(minNote, NoteYPosition.StemDown);
+            return this.getNoteY(minNote, NoteYPosition.StemDown);
         }
         return this.getScoreY(this.accidentalHelper.getMinSteps(beat));
     }
@@ -479,7 +475,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     protected override createVoiceGlyphs(v: Voice): void {
         super.createVoiceGlyphs(v);
         for (const b of v.beats) {
-            const container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+            const container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b);
             container.preNotes = new ScoreBeatPreNotesGlyph();
             container.onNotes = new ScoreBeatGlyph();
             this.addBeatGlyph(container);

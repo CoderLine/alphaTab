@@ -50,7 +50,6 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
             this.addGlyph(common);
             super.doLayout();
         } else {
-            // TODO: ensure we align them exactly so they meet in the staff center (use glyphTop and glyphBottom accordingly)
             const numerator: NumberGlyph = new NumberGlyph(
                 0,
                 0,

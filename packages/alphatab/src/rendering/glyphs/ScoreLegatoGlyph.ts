@@ -15,7 +15,7 @@ export class ScoreLegatoGlyph extends TieGlyph {
     protected startBeatRenderer: BarRendererBase | null = null;
     protected endBeatRenderer: BarRendererBase | null = null;
 
-    public constructor(slurEffectId: string, startBeat: Beat, endBeat: Beat, forEnd:boolean) {
+    public constructor(slurEffectId: string, startBeat: Beat, endBeat: Beat, forEnd: boolean) {
         super(slurEffectId, forEnd);
         this.startBeat = startBeat;
         this.endBeat = endBeat;
@@ -72,15 +72,9 @@ export class ScoreLegatoGlyph extends TieGlyph {
         if (this.startBeat!.isRest) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
-                    return (
-                        startBeatRenderer.y +
-                        startBeatRenderer.getBeatContainer(this.startBeat)!.onNotes.getBoundingBoxTop()
-                    );
+                    return startBeatRenderer.y + startBeatRenderer.getRestY(this.startBeat, NoteYPosition.Top);
                 default:
-                    return (
-                        startBeatRenderer.y +
-                        startBeatRenderer.getBeatContainer(this.startBeat)!.onNotes.getBoundingBoxBottom()
-                    );
+                    return startBeatRenderer.y + startBeatRenderer.getRestY(this.startBeat, NoteYPosition.Bottom);
             }
         }
 
@@ -119,14 +113,9 @@ export class ScoreLegatoGlyph extends TieGlyph {
         if (this.endBeat.isRest) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
-                    return (
-                        endBeatRenderer.y + endBeatRenderer.getBeatContainer(this.endBeat)!.onNotes.getBoundingBoxTop()
-                    );
+                    return endBeatRenderer.y + endBeatRenderer.getRestY(this.endBeat, NoteYPosition.Top);
                 default:
-                    return (
-                        endBeatRenderer.y +
-                        endBeatRenderer.getBeatContainer(this.endBeat)!.onNotes.getBoundingBoxBottom()
-                    );
+                    return endBeatRenderer.y + endBeatRenderer.getRestY(this.endBeat, NoteYPosition.Bottom);
             }
         }
 

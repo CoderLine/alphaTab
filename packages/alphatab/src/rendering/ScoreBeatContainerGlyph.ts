@@ -9,6 +9,7 @@ import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreBendGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBendGlyph';
 import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
 import { ScoreSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlideLineGlyph';
@@ -23,6 +24,18 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: ScoreBendGlyph | null = null;
     private _effectSlur: ScoreSlurGlyph | null = null;
     private _effectEndSlur: ScoreSlurGlyph | null = null;
+
+    public get prebendNoteHeadOffset() {
+        return (this.preNotes as ScoreBeatPreNotesGlyph).prebendNoteHeadOffset;
+    }
+
+    public get accidentalsWidth() {
+        const preNotes: ScoreBeatPreNotesGlyph = this.preNotes as ScoreBeatPreNotesGlyph;
+        if (preNotes && preNotes.accidentals) {
+            return preNotes.accidentals.width;
+        }
+        return 0;
+    }
 
     public override doLayout(): void {
         this._effectSlur = null;
@@ -128,7 +141,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         }
         if (n.hasBend) {
             if (!this._bend) {
-                const bend = new ScoreBendGlyph(n.beat);
+                const bend = new ScoreBendGlyph(this);
                 this._bend = bend;
                 bend.renderer = this.renderer;
                 this.addTie(bend);

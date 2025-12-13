@@ -1,39 +1,111 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { GraceGroup } from '@coderline/alphatab/model/GraceGroup';
+import type { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
+import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
 import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
-import type { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 
+export abstract class BeatContainerGlyphBase extends Glyph {
+    public abstract get absoluteDisplayStart(): number;
+    public abstract get displayDuration(): number;
+    public abstract get onTimeX(): number;
+    public abstract get graceType(): GraceType;
+    public abstract get graceIndex(): GraceType;
+    public abstract get graceGroup(): GraceGroup | null;
+    public abstract get voiceIndex(): number;
+    public abstract get isFirstOfTupletGroup(): boolean;
+    public abstract get tupletGroup(): TupletGroup | null;
+    public abstract get isLastOfVoice(): boolean;
+    public abstract getNoteY(note: Note, requestedPosition: NoteYPosition): number;
+    public abstract getRestY(requestedPosition: NoteYPosition): number;
+    public abstract getNoteX(note: Note, requestedPosition: NoteXPosition): number;
+    public abstract getBeatX(requestedPosition: BeatXPosition, useSharedSizes: boolean): number;
+    public abstract registerLayoutingInfo(layoutings: BarLayoutingInfo): void;
+    public abstract applyLayoutingInfo(info: BarLayoutingInfo): void;
+    public abstract buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number): void;
+    public scaleToWidth(beatWidth: number) {
+        this.width = beatWidth;
+    }
+}
+
 /**
  * @internal
  */
-export class BeatContainerGlyph extends Glyph {
+export class BeatContainerGlyph extends BeatContainerGlyphBase {
     private _ties: ITieGlyph[] = [];
-    public voiceContainer: VoiceContainerGlyph;
     public beat: Beat;
     public preNotes!: BeatGlyphBase;
     public onNotes!: BeatOnNoteGlyphBase;
     public minWidth: number = 0;
 
+    public override get isLastOfVoice(): boolean {
+        return this.beat.isLastOfVoice;
+    }
+
+    public override get displayDuration(): number {
+        return this.beat.displayDuration;
+    }
+
+    public override get graceIndex(): GraceType {
+        return this.beat.graceIndex;
+    }
+
+    public override get graceType(): GraceType {
+        return this.beat.graceType;
+    }
+
+    public override get absoluteDisplayStart(): number {
+        return this.beat.absoluteDisplayStart;
+    }
+
+    public override get graceGroup(): GraceGroup | null {
+        return this.beat.graceGroup;
+    }
+
+    public override get voiceIndex(): number {
+        return this.beat.voice.index;
+    }
+
+    public override get isFirstOfTupletGroup(): boolean {
+        return this.beat.hasTuplet && this.beat.tupletGroup!.beats[0].id === this.beat.id;
+    }
+
+    public override get tupletGroup(): TupletGroup | null {
+        return this.beat.tupletGroup;
+    }
+
     public get onTimeX(): number {
         return this.onNotes.x + this.onNotes.onTimeX;
     }
 
-    public constructor(beat: Beat, voiceContainer: VoiceContainerGlyph) {
+    public constructor(beat: Beat) {
         super(0, 0);
         this.beat = beat;
         this._ties = [];
-        this.voiceContainer = voiceContainer;
+    }
+
+    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+        return this.onNotes.y + this.onNotes.getNoteY(note, requestedPosition);
+    }
+    
+    public override getRestY(requestedPosition: NoteYPosition): number {
+        return this.onNotes.y + this.onNotes.getRestY(requestedPosition);
+    }
+
+    public override getNoteX(note: Note, requestedPosition: NoteXPosition): number {
+        return this.onNotes.x + this.onNotes.getNoteX(note, requestedPosition);
     }
 
     public addTie(tie: ITieGlyph) {
@@ -69,12 +141,12 @@ export class BeatContainerGlyph extends Glyph {
             postBeatStretch += tg.width;
         }
 
-        layoutings.addBeatSpring(this.beat, preBeatStretch, postBeatStretch);
+        layoutings.addBeatSpring(this, preBeatStretch, postBeatStretch);
 
         // store sizes for usages in effects
         // we might have empty content in the individual bar renderers, but need to know
         // the "shared" maximum widths
-        layoutings.setBeatSizes(this.beat, {
+        layoutings.setBeatSizes(this, {
             preBeatSize: this.preNotes.width,
             onBeatSize: this.onNotes.width
         });
@@ -177,8 +249,8 @@ export class BeatContainerGlyph extends Glyph {
         this.onNotes.paint(cx + this.x, cy + this.y, canvas);
 
         // reason: we have possibly multiple staves involved and need to calculate the correct positions.
-        const staffX: number = cx - this.voiceContainer.x - this.renderer.x;
-        const staffY: number = cy - this.voiceContainer.y - this.renderer.y;
+        const staffX: number = cx - this.renderer.beatGlyphsStart - this.renderer.x;
+        const staffY: number = cy - this.renderer.y;
         for (let i: number = 0, j: number = this._ties.length; i < j; i++) {
             const t = this._ties[i] as unknown as Glyph;
             t.renderer = this.renderer;
@@ -187,7 +259,7 @@ export class BeatContainerGlyph extends Glyph {
         canvas.endGroup();
     }
 
-    public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number, _isEmptyBar: boolean) {
+    public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number) {
         const beatBoundings: BeatBounds = new BeatBounds();
         beatBoundings.beat = this.beat;
 

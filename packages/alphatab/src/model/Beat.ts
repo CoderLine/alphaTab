@@ -1173,7 +1173,6 @@ export class Beat {
         return this.noteStringLookup.has(noteString);
     }
 
-    // TODO: can be likely eliminated
     public getNoteWithRealValue(noteRealValue: number): Note | null {
         if (this.noteValueLookup.has(noteRealValue)) {
             return this.noteValueLookup.get(noteRealValue)!;

@@ -189,12 +189,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
         beatElement: BeatSubElement,
         bracketsAsArcs: boolean = false
     ): void {
-        for (const voice of this.bar.voices) {
-            if (this.hasVoiceContainer(voice)) {
-                const container = this.getVoiceContainer(voice)!;
-                for (const tupletGroup of container.tupletGroups) {
-                    this._paintTupletHelper(cx, cy, canvas, tupletGroup, beatElement, bracketsAsArcs);
-                }
+        for (const voice of this.voiceContainer.tupletGroups.values()) {
+            for (const tupletGroup of voice) {
+                this._paintTupletHelper(cx, cy, canvas, tupletGroup, beatElement, bracketsAsArcs);
             }
         }
     }
@@ -440,7 +437,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (beat.isRest) {
             return false;
         }
-        
+
         const helper = this.helpers.getBeamingHelperForBeat(beat);
         if (helper) {
             return helper.hasFlag(this.drawBeamHelperAsFlags(helper), beat);

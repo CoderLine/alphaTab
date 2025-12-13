@@ -36,11 +36,14 @@ export class NumberedBarRenderer extends LineBarRenderer {
     public shortestDuration = Duration.QuadrupleWhole;
     public lowestOctave: number | null = null;
     public highestOctave: number | null = null;
+    public octaves = new Map<Beat, number>();
+
     get dotSpacing(): number {
         return this.smuflMetrics.glyphHeights.get(MusicFontSymbol.AugmentationDot)! * 2;
     }
 
-    public registerOctave(octave: number) {
+    public registerOctave(beat: Beat, octave: number) {
+        this.octaves.set(beat, octave);
         if (this.lowestOctave === null) {
             this.lowestOctave = octave;
             this.highestOctave = octave;
@@ -105,17 +108,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     public override doLayout(): void {
         super.doLayout();
-        let hasTuplets: boolean = false;
-        for (const voice of this.bar.voices) {
-            if (this.hasVoiceContainer(voice)) {
-                const c = this.getVoiceContainer(voice)!;
-                if (c.tupletGroups.length > 0) {
-                    hasTuplets = true;
-                    break;
-                }
-            }
-        }
-        if (hasTuplets) {
+        if (this.voiceContainer.tupletGroups.size > 0) {
             this.registerOverflowTop(this.tupletSize);
         }
 
@@ -203,8 +196,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 canvas.fillRect(cx + this.x + barStartX, barStartY, barEndX - barStartX, barSize);
             }
 
-            const onNotes = this.getBeatContainer(beat)!.onNotes;
-            let dotCount = onNotes instanceof NumberedBeatGlyph ? (onNotes as NumberedBeatGlyph).octaveDots : 0;
+            let dotCount = this.octaves.get(beat)!;
             const dotSpacing = this.dotSpacing;
             let dotsY = 0;
             let dotsOffset = 0;
@@ -344,7 +336,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     protected override createVoiceGlyphs(v: Voice): void {
         super.createVoiceGlyphs(v);
         for (const b of v.beats) {
-            const container: NumberedBeatContainerGlyph = new NumberedBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+            const container: NumberedBeatContainerGlyph = new NumberedBeatContainerGlyph(b);
             container.preNotes = v.index === 0 ? new NumberedBeatPreNotesGlyph() : new BeatGlyphBase();
             container.onNotes = v.index === 0 ? new NumberedBeatGlyph() : new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);

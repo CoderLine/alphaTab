@@ -10,10 +10,10 @@ import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
 import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreHelperNotesBaseGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreHelperNotesBaseGlyph';
 import { type ITieGlyph, TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import type { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
@@ -25,12 +25,14 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
     private _notes: Note[] = [];
     private _endNoteGlyph: BendNoteHeadGroupGlyph | null = null;
     private _middleNoteGlyph: BendNoteHeadGroupGlyph | null = null;
+    private _container: ScoreBeatContainerGlyph;
 
     public readonly checkForOverflow = false; // handled separately in ScoreBeatContainerGlyph
 
-    public constructor(beat: Beat) {
+    public constructor(container: ScoreBeatContainerGlyph) {
         super(0, 0);
-        this._beat = beat;
+        this._beat = container.beat;
+        this._container = container;
     }
 
     public override getBoundingBoxTop(): number {
@@ -57,7 +59,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
             }
 
             // no helper notes created in addbends for these:
-            switch(note.bendType){
+            switch (note.bendType) {
                 case BendType.Custom:
                 case BendType.Prebend:
                 case BendType.Hold:
@@ -290,7 +292,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
                     }
@@ -321,7 +322,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
                     }
@@ -332,8 +332,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                     case BendType.PrebendRelease:
                         let preX: number =
                             cx + startNoteRenderer.x + startNoteRenderer.getBeatX(note.beat, BeatXPosition.PreNotes);
-                        preX += (startNoteRenderer.getPreNotesGlyphForBeat(note.beat) as ScoreBeatPreNotesGlyph)
-                            .prebendNoteHeadOffset;
+                        preX += this._container.prebendNoteHeadOffset;
                         const preY: number =
                             cy +
                             startNoteRenderer.y +
@@ -344,7 +343,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                                 )
                             ) +
                             heightOffset;
-                        this.drawBendSlur(canvas, preX, preY, startX, startY, direction === BeamDirection.Down, 1);
+                        this.drawBendSlur(canvas, preX, preY, startX, startY, direction === BeamDirection.Down);
                         break;
                 }
             } else {
@@ -364,7 +363,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                             endBeatX,
                             endY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
                         break;
@@ -378,7 +376,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                             middleX,
                             middleY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
                         endValue = this._getBendNoteValue(note, note.bendPoints![note.bendPoints!.length - 1]);
@@ -390,7 +387,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                             endBeatX,
                             endY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
                         break;
@@ -405,7 +401,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                                 endBeatX,
                                 endY,
                                 direction === BeamDirection.Down,
-                                1,
                                 slurText
                             );
                         }
@@ -415,8 +410,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                     case BendType.PrebendRelease:
                         let preX: number =
                             cx + startNoteRenderer.x + startNoteRenderer.getBeatX(note.beat, BeatXPosition.PreNotes);
-                        preX += (startNoteRenderer.getPreNotesGlyphForBeat(note.beat) as ScoreBeatPreNotesGlyph)
-                            .prebendNoteHeadOffset;
+                        preX += this._container.prebendNoteHeadOffset;
                         const preY: number =
                             cy +
                             startNoteRenderer.y +
@@ -427,7 +421,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                                 )
                             ) +
                             heightOffset;
-                        this.drawBendSlur(canvas, preX, preY, startX, startY, direction === BeamDirection.Down, 1);
+                        this.drawBendSlur(canvas, preX, preY, startX, startY, direction === BeamDirection.Down);
                         if (this.glyphs) {
                             endValue = this._getBendNoteValue(note, note.bendPoints![note.bendPoints!.length - 1]);
                             endY = (this.glyphs[0] as BendNoteHeadGroupGlyph).getNoteValueY(endValue) + heightOffset;
@@ -438,7 +432,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                                 endBeatX,
                                 endY,
                                 direction === BeamDirection.Down,
-                                1,
                                 slurText
                             );
                         }

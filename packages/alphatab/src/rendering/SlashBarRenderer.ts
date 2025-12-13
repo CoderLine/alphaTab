@@ -83,17 +83,7 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     public override doLayout(): void {
         super.doLayout();
-        let hasTuplets: boolean = false;
-        for (const voice of this.bar.voices) {
-            if (this.hasVoiceContainer(voice)) {
-                const c = this.getVoiceContainer(voice)!;
-                if (c.tupletGroups.length > 0) {
-                    hasTuplets = true;
-                    break;
-                }
-            }
-        }
-        if (hasTuplets) {
+        if (this.voiceContainer.tupletGroups.size > 0) {
             this.registerOverflowTop(this.tupletSize);
         }
     }
@@ -194,7 +184,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     protected override createVoiceGlyphs(v: Voice): void {
         super.createVoiceGlyphs(v);
         for (const b of v.beats) {
-            const container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+            const container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b);
             container.preNotes = new BeatGlyphBase();
             container.onNotes = v.index === 0 ? new SlashBeatGlyph() : new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);

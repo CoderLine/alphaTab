@@ -1,41 +1,42 @@
+import { Logger } from '@coderline/alphatab/Logger';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
+import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { PickStroke } from '@coderline/alphatab/model/PickStroke';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
+import { type NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { AccentuationGlyph } from '@coderline/alphatab/rendering/glyphs/AccentuationGlyph';
-import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
+import { ArticStaccatoAboveGlyph } from '@coderline/alphatab/rendering/glyphs/ArticStaccatoAboveGlyph';
 import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
+import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import { DeadNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/DeadNoteHeadGlyph';
 import { DiamondNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/DiamondNoteHeadGlyph';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { GhostNoteContainerGlyph } from '@coderline/alphatab/rendering/glyphs/GhostNoteContainerGlyph';
 import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
+import { GuitarGolpeGlyph } from '@coderline/alphatab/rendering/glyphs/GuitarGolpeGlyph';
+import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { PercussionNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/PercussionNoteHeadGlyph';
+import { PickStrokeGlyph } from '@coderline/alphatab/rendering/glyphs/PickStrokeGlyph';
+import { PictEdgeOfCymbalGlyph } from '@coderline/alphatab/rendering/glyphs/PictEdgeOfCymbalGlyph';
 import { ScoreNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyph';
 import { ScoreRestGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreRestGlyph';
 import { ScoreWhammyBarGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreWhammyBarGlyph';
-import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
-import type { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
-import { PercussionNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/PercussionNoteHeadGlyph';
-import { Logger } from '@coderline/alphatab/Logger';
-import { ArticStaccatoAboveGlyph } from '@coderline/alphatab/rendering/glyphs/ArticStaccatoAboveGlyph';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { PictEdgeOfCymbalGlyph } from '@coderline/alphatab/rendering/glyphs/PictEdgeOfCymbalGlyph';
-import { PickStrokeGlyph } from '@coderline/alphatab/rendering/glyphs/PickStrokeGlyph';
-import { PickStroke } from '@coderline/alphatab/model/PickStroke';
-import { GuitarGolpeGlyph } from '@coderline/alphatab/rendering/glyphs/GuitarGolpeGlyph';
-import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { StringNumberContainerGlyph } from '@coderline/alphatab/rendering/glyphs/StringNumberContainerGlyph';
-import { BeatSubElement } from '@coderline/alphatab/model/Beat';
-import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
-import { TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
-import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
+import { StringNumberContainerGlyph } from '@coderline/alphatab/rendering/glyphs/StringNumberContainerGlyph';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import type { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
+import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal
@@ -102,6 +103,25 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         return this.noteHeads ? this.noteHeads.getNoteY(note, requestedPosition) : 0;
     }
 
+    public override getRestY(requestedPosition: NoteYPosition): number {
+        const g = this.restGlyph;
+        if (g) {
+            switch (requestedPosition) {
+                case NoteYPosition.TopWithStem:
+                case NoteYPosition.Top:
+                    return g.getBoundingBoxTop();
+                case NoteYPosition.Center:
+                case NoteYPosition.StemUp:
+                case NoteYPosition.StemDown:
+                    return g.getBoundingBoxTop() + g.height / 2;
+                case NoteYPosition.Bottom:
+                case NoteYPosition.BottomWithStem:
+                    return g.getBoundingBoxBottom();
+            }
+        }
+        return 0;
+    }
+
     public applyRestCollisionOffset() {
         if (!this.restGlyph) {
             return;
@@ -160,7 +180,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 //
                 // Whammy Bar
                 if (this.container.beat.hasWhammyBar) {
-                    const whammy: ScoreWhammyBarGlyph = new ScoreWhammyBarGlyph(this.container.beat);
+                    const whammy: ScoreWhammyBarGlyph = new ScoreWhammyBarGlyph(
+                        this.container as ScoreBeatContainerGlyph
+                    );
                     this._whammy = whammy;
                     whammy.renderer = this.renderer;
                     whammy.doLayout();

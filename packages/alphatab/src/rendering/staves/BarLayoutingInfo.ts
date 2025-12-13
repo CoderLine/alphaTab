@@ -4,6 +4,7 @@ import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { Spring } from '@coderline/alphatab/rendering/staves/Spring';
 
 /**
@@ -59,7 +60,7 @@ export class BarLayoutingInfo {
         return undefined;
     }
     
-    public setBeatSizes(beat: Beat, sizes: BarLayoutingInfoBeatSizes) {
+    public setBeatSizes(beat: BeatContainerGlyphBase, sizes: BarLayoutingInfoBeatSizes) {
         const key = beat.absoluteDisplayStart;
         if (this._beatSizes.has(key)) {
             const current = this._beatSizes.get(key)!;
@@ -172,7 +173,7 @@ export class BarLayoutingInfo {
         return spring;
     }
 
-    public addBeatSpring(beat: Beat, preBeatSize: number, postBeatSize: number): void {
+    public addBeatSpring(beat: BeatContainerGlyphBase, preBeatSize: number, postBeatSize: number): void {
         const start: number = beat.absoluteDisplayStart;
         if (beat.graceType !== GraceType.None) {
             // For grace beats we just remember the the sizes required for them

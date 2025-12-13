@@ -74,6 +74,25 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         return this.noteHeads ? this.noteHeads.y : 0;
     }
 
+    public override getRestY(requestedPosition: NoteYPosition): number {
+        const g = this.restGlyph;
+        if (g) {
+            switch (requestedPosition) {
+                case NoteYPosition.TopWithStem:
+                case NoteYPosition.Top:
+                    return g.getBoundingBoxTop();
+                case NoteYPosition.Center:
+                case NoteYPosition.StemUp:
+                case NoteYPosition.StemDown:
+                    return g.getBoundingBoxTop() + g.height / 2;
+                case NoteYPosition.Bottom:
+                case NoteYPosition.BottomWithStem:
+                    return g.getBoundingBoxBottom();
+            }
+        }
+        return 0;
+    }
+
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         let g: Glyph | null = null;
         let symbol: MusicFontSymbol = MusicFontSymbol.None;

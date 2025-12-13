@@ -163,6 +163,10 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         return this._internalGetNoteY(requestedPosition);
     }
 
+    public override getRestY(requestedPosition: NoteYPosition): number {
+        return this._internalGetNoteY(requestedPosition);
+    }
+
     private _internalGetNoteY(requestedPosition: NoteYPosition): number {
         let g: Glyph | null = null;
         if (this.noteHeads) {
@@ -249,7 +253,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                         dots *= -1;
                     }
                     this.octaveDots = dots;
-                    sr.registerOctave(dots);
+                    sr.registerOctave(this.container.beat, dots);
 
                     const stepList =
                         ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)

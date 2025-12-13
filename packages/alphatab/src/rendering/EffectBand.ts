@@ -6,7 +6,6 @@ import type { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBa
 import type { EffectBandSlot } from '@coderline/alphatab/rendering/EffectBandSlot';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
-import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -201,7 +200,7 @@ export class EffectBand extends Glyph {
 
     private _alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {
         const g: EffectGlyph = this._effectGlyphs[beat.voice.index].get(beat.index)!;
-        const container: BeatContainerGlyph = this.renderer.getBeatContainer(beat)!;
+        const container = this.renderer.getBeatContainer(beat)!;
 
         switch (sizing) {
             case EffectBarGlyphSizing.SinglePreBeat:
@@ -215,7 +214,7 @@ export class EffectBand extends Glyph {
             case EffectBarGlyphSizing.SingleOnBeatToEnd:
             case EffectBarGlyphSizing.GroupedOnBeatToEnd:
                 g.x = this.renderer.beatGlyphsStart + container.x + container.onTimeX;
-                if (container.beat.isLastOfVoice) {
+                if (container.isLastOfVoice) {
                     g.width = this.renderer.width - g.x;
                 } else {
                     // shift to the start using the biggest post-beat size of the respective beat

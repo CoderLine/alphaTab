@@ -10,10 +10,10 @@ import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
 import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreHelperNotesBaseGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreHelperNotesBaseGlyph';
 import { type ITieGlyph, TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import type { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
@@ -21,14 +21,16 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
  * @internal
  */
 export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements ITieGlyph {
+    private _container: ScoreBeatContainerGlyph;
     private _beat: Beat;
     private _endGlyph: BendNoteHeadGroupGlyph | null = null;
 
     public readonly checkForOverflow = false;
 
-    public constructor(beat: Beat) {
+    public constructor(container: ScoreBeatContainerGlyph) {
         super(0, 0);
-        this._beat = beat;
+        this._container = container;
+        this._beat = container.beat;
     }
 
     public get hasBoundingBox(): boolean {
@@ -263,7 +265,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
                     } else if (note.isTieOrigin) {
@@ -310,7 +311,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                             middleX,
                             middleY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
 
@@ -326,7 +326,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
                     }
@@ -335,8 +334,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                 case WhammyType.Predive:
                     let preX: number =
                         cx + startNoteRenderer.x + startNoteRenderer.getBeatX(note.beat, BeatXPosition.PreNotes);
-                    preX += (startNoteRenderer.getPreNotesGlyphForBeat(note.beat) as ScoreBeatPreNotesGlyph)
-                        .prebendNoteHeadOffset;
+                    preX += this._container.prebendNoteHeadOffset;
                     const preY: number =
                         cy +
                         startNoteRenderer.y +
@@ -354,7 +352,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         startX,
                         startY,
                         direction === BeamDirection.Down,
-                        1,
                         slurText
                     );
                     if (this.glyphs) {
@@ -369,7 +366,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
                     }

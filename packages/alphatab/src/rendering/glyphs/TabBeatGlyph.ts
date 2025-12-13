@@ -8,7 +8,7 @@ import { NoteNumberGlyph } from '@coderline/alphatab/rendering/glyphs/NoteNumber
 import { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteChordGlyph';
 import { TabRestGlyph } from '@coderline/alphatab/rendering/glyphs/TabRestGlyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
-import type { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { type NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
@@ -32,6 +32,25 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         return this.noteNumbers ? this.noteNumbers.getNoteY(note, requestedPosition) : 0;
+    }
+
+    public override getRestY(requestedPosition: NoteYPosition): number {
+        const g = this.restGlyph;
+        if (g) {
+            switch (requestedPosition) {
+                case NoteYPosition.TopWithStem:
+                case NoteYPosition.Top:
+                    return g.getBoundingBoxTop();
+                case NoteYPosition.Center:
+                case NoteYPosition.StemUp:
+                case NoteYPosition.StemDown:
+                    return g.getBoundingBoxTop() + g.height / 2;
+                case NoteYPosition.Bottom:
+                case NoteYPosition.BottomWithStem:
+                    return g.getBoundingBoxBottom();
+            }
+        }
+        return 0;
     }
 
     public override getLowestNoteY(): number {
@@ -106,12 +125,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 const y: number = tabRenderer.getFlagAndBarPos();
 
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
-                    this.addEffect(
-                        new AugmentationDotGlyph(
-                            0,
-                            y
-                        )
-                    );
+                    this.addEffect(new AugmentationDotGlyph(0, y));
                 }
             }
         } else {

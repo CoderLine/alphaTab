@@ -15,7 +15,6 @@ import { TabBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/TabBe
 import { TabClefGlyph } from '@coderline/alphatab/rendering/glyphs/TabClefGlyph';
 import type { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteChordGlyph';
 import { TabTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TabTimeSignatureGlyph';
-import type { VoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/VoiceContainerGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
 import { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
@@ -87,24 +86,25 @@ export class TabBarRenderer extends LineBarRenderer {
     public maxString = Number.NaN;
 
     protected override collectSpaces(spaces: Float32Array[][]): void {
+        if (this.additionalMultiRestBars) {
+            return;
+        }
+        
         const padding: number = this.smuflMetrics.staffLineThickness;
         const tuning = this.bar.staff.tuning;
-        for (const voice of this.bar.voices) {
-            if (this.hasVoiceContainer(voice)) {
-                const vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
-                for (const bg of vc.beatGlyphs) {
-                    const notes: TabBeatGlyph = bg.onNotes as TabBeatGlyph;
-                    const noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
-                    if (noteNumbers) {
-                        for (const [str, noteNumber] of noteNumbers.notesPerString) {
-                            if (!noteNumber.isEmpty) {
-                                spaces[tuning.length - str].push(
-                                    new Float32Array([
-                                        vc.x + bg.x + notes.x + noteNumbers!.x - padding,
-                                        noteNumbers!.width + padding * 2
-                                    ])
-                                );
-                            }
+        for (const voice of this.voiceContainer.beatGlyphs.values()) {
+            for (const bg of voice) {
+                const notes: TabBeatGlyph = (bg as TabBeatContainerGlyph).onNotes as TabBeatGlyph;
+                const noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
+                if (noteNumbers) {
+                    for (const [str, noteNumber] of noteNumbers.notesPerString) {
+                        if (!noteNumber.isEmpty) {
+                            spaces[tuning.length - str].push(
+                                new Float32Array([
+                                    this.beatGlyphsStart + bg.x + notes.x + noteNumbers!.x - padding,
+                                    noteNumbers!.width + padding * 2
+                                ])
+                            );
                         }
                     }
                 }
@@ -162,16 +162,7 @@ export class TabBarRenderer extends LineBarRenderer {
         }
 
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
-            this._hasTuplets = false;
-            for (const voice of this.bar.voices) {
-                if (this.hasVoiceContainer(voice)) {
-                    const c: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
-                    if (c.tupletGroups.length > 0) {
-                        this._hasTuplets = true;
-                        break;
-                    }
-                }
-            }
+            this._hasTuplets = this.voiceContainer.tupletGroups.size > 0;
             if (this._hasTuplets) {
                 this.registerOverflowBottom(this.settings.notation.rhythmHeight + this.tupletSize);
             }
@@ -224,11 +215,11 @@ export class TabBarRenderer extends LineBarRenderer {
         super.createVoiceGlyphs(v);
         // multibar rest
         if (this.additionalMultiRestBars) {
-            const container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(v)!);
+            const container = new MultiBarRestBeatContainerGlyph();
             this.addBeatGlyph(container);
         } else {
             for (const b of v.beats) {
-                const container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+                const container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b);
                 container.preNotes = new TabBeatPreNotesGlyph();
                 container.onNotes = new TabBeatGlyph();
                 this.addBeatGlyph(container);
@@ -277,14 +268,11 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(beat: Beat, _direction: BeamDirection): number {
-        const startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
-        if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
+        const container = this.getBeatContainer(beat);
+        if (!container || !beat.minStringNote || beat.duration === Duration.Half) {
             return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
         }
-        return (
-            startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
-            this.smuflMetrics.staffLineThickness
-        );
+        return container.getNoteY(beat.minStringNote, NoteYPosition.Bottom) + this.smuflMetrics.staffLineThickness;
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
