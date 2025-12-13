@@ -1,5 +1,5 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 
 /**
@@ -7,7 +7,7 @@ import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGl
  */
 export class GuitarGolpeGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, center: boolean = false) {
-        super(x, y, NoteHeadGlyph.GraceScale, MusicFontSymbol.GuitarGolpe);
+        super(x, y, EngravingSettings.GraceScale, MusicFontSymbol.GuitarGolpe);
         this.center = center;
     }
 

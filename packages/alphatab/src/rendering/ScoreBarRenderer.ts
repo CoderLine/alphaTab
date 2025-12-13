@@ -1,3 +1,4 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
@@ -121,7 +122,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (beat.slashed) {
             let slashY = this._getSlashFlagY();
             const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
-            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
 
             if (direction === BeamDirection.Down) {
                 slashY -= this.smuflMetrics.stemDown.has(symbol)
@@ -150,7 +151,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         let y = this.getScoreY(this.accidentalHelper.getMinSteps(beat));
 
         if (direction === BeamDirection.Up && !beat.isRest) {
-            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
             y -= this.smuflMetrics.standardStemLength * scale;
         }
 
@@ -161,7 +162,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (beat.slashed) {
             let slashY = this._getSlashFlagY();
             const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
-            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
 
             if (direction === BeamDirection.Down) {
                 slashY -= this.smuflMetrics.stemDown.has(symbol)
@@ -187,7 +188,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
         let y = this.getScoreY(this.accidentalHelper.getMaxSteps(beat));
         if (direction === BeamDirection.Down) {
-            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
             y += this.smuflMetrics.standardStemLength * scale;
         }
         return y;
@@ -232,7 +233,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             // estimate on the position
             const steps = AccidentalHelper.computeStepsWithoutAccidentals(this.bar, note);
             y = this.getScoreY(steps);
-            const scale = note.beat.graceType === GraceType.None ? 1 : NoteHeadGlyph.GraceScale;
+            const scale = note.beat.graceType === GraceType.None ? 1 : EngravingSettings.GraceScale;
             const stemHeight = this.smuflMetrics.standardStemLength * scale;
             const noteHeadHeight =
                 this.smuflMetrics.glyphHeights.get(NoteHeadGlyph.getSymbol(note.beat.duration))! * scale;

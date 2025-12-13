@@ -3,15 +3,15 @@ import { Duration } from '@coderline/alphatab/model/Duration';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { NoteSubElement } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal
  */
-export class SlashNoteHeadGlyph extends MusicFontGlyph {
+export class SlashNoteHeadGlyph extends NoteHeadGlyphBase {
     public beatEffects: Map<string, Glyph> = new Map();
     public noteHeadElement: NoteSubElement = NoteSubElement.SlashNoteHead;
     public effectElement: BeatSubElement = BeatSubElement.SlashEffects;
@@ -21,7 +21,7 @@ export class SlashNoteHeadGlyph extends MusicFontGlyph {
     public downLineX: number = 0;
 
     public constructor(x: number, y: number, duration: Duration, isGrace: boolean, beat: Beat) {
-        super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, SlashNoteHeadGlyph.getSymbol(duration));
+        super(x, y, isGrace, SlashNoteHeadGlyph.getSymbol(duration));
         this._symbol = SlashNoteHeadGlyph.getSymbol(duration);
         this.beat = beat;
     }

@@ -1,3 +1,4 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import type { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { BendStyle } from '@coderline/alphatab/model/BendStyle';
@@ -9,7 +10,6 @@ import type { ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import { ScoreHelperNotesBaseGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreHelperNotesBaseGlyph';
 import { type ITieGlyph, TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
@@ -195,7 +195,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                 }
             }
 
-            let heightOffset: number = noteHeadHeight * NoteHeadGlyph.GraceScale * 0.5;
+            let heightOffset: number = noteHeadHeight * EngravingSettings.GraceScale * 0.5;
             if (direction === BeamDirection.Up) {
                 heightOffset = -heightOffset;
             }
@@ -345,15 +345,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                             )
                         ) +
                         heightOffset;
-                    this.drawBendSlur(
-                        canvas,
-                        preX,
-                        preY,
-                        startX,
-                        startY,
-                        direction === BeamDirection.Down,
-                        slurText
-                    );
+                    this.drawBendSlur(canvas, preX, preY, startX, startY, direction === BeamDirection.Down, slurText);
                     if (this.glyphs) {
                         const g0 = this.glyphs![0] as BendNoteHeadGroupGlyph;
                         g0.x = endX - g0.noteHeadOffset;

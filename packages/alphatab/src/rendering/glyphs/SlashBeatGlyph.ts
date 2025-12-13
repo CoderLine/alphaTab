@@ -1,19 +1,18 @@
+import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
-import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
-import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
-import type { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRenderer';
-import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
-import { SlashRestGlyph } from '@coderline/alphatab/rendering/glyphs/SlashRestGlyph';
+import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
+import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { BeatSubElement } from '@coderline/alphatab/model/Beat';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
+import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
+import { SlashRestGlyph } from '@coderline/alphatab/rendering/glyphs/SlashRestGlyph';
+import type { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRenderer';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
 
 /**
  * @internal
@@ -186,10 +185,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
             this.stemX = this.onTimeX;
         } else if (this.noteHeads) {
             this.onTimeX = this.noteHeads.x + this.noteHeads.width / 2;
-            const direction = this.renderer.getBeatDirection(this.container.beat);
-            this.stemX =
-                this.noteHeads!.x +
-                (direction === BeamDirection.Up ? this.noteHeads!.upLineX : this.noteHeads!.downLineX);
+            this.stemX = this.noteHeads!.x + this.noteHeads!.stemX;
         } else if (this.deadSlapped) {
             this.onTimeX = this.deadSlapped.x + this.deadSlapped.width / 2;
             this.stemX = this.onTimeX;

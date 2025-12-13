@@ -1,3 +1,4 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
@@ -8,7 +9,6 @@ import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreBendGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBendGlyph';
 import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
@@ -47,14 +47,14 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         const isGrace = beat.graceType !== GraceType.None;
         if (sr.hasFlag(beat)) {
             const direction = this.renderer.getBeatDirection(beat);
-            const scale = isGrace ? NoteHeadGlyph.GraceScale : 1;
+            const scale = isGrace ? EngravingSettings.GraceScale : 1;
             const symbol = FlagGlyph.getSymbol(beat.duration, direction, isGrace);
             const flagWidth = this.renderer.smuflMetrics.glyphWidths.get(symbol)! * scale;
             this._flagStretch = flagWidth;
         } else if (isGrace) {
             // always use flag size as spacing on grace notes
             const graceSpacing =
-                this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
+                this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * EngravingSettings.GraceScale;
             this._flagStretch = graceSpacing;
         }
 

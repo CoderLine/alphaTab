@@ -1,29 +1,29 @@
-import { GraceType } from '@coderline/alphatab/model/GraceType';
-import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
-import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
-import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
-import { NumberedNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedNoteHeadGlyph';
-import type { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
-import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
-import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
-import { AccidentalGroupGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGroupGlyph';
-import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
-import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
-import { NumberedDashGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedDashGlyph';
-import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
-import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
+import { AccidentalGroupGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGroupGlyph';
+import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
+import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
+import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
+import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { NumberedDashGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedDashGlyph';
+import { NumberedNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedNoteHeadGlyph';
+import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import type { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
+import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
 
 /**
  * @internal
@@ -85,8 +85,8 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                         sr.getLineY(0),
                         accidentalToSet,
                         note.beat.graceType !== GraceType.None
-                            ? NoteHeadGlyph.GraceScale * NoteHeadGlyph.GraceScale
-                            : NoteHeadGlyph.GraceScale
+                            ? EngravingSettings.GraceScale * EngravingSettings.GraceScale
+                            : EngravingSettings.GraceScale
                     );
                     g.colorOverride = color;
                     g.renderer = this.renderer;

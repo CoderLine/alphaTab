@@ -1,3 +1,4 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
@@ -7,8 +8,11 @@ import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarR
 import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { ScoreNoteChordGlyphBase } from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyphBase';
+import type { NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import {
+    type ScoreChordNoteHeadInfo,
+    ScoreNoteChordGlyphBase
+} from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyphBase';
 import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
@@ -35,7 +39,8 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public override get scale(): number {
-        return this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+        return this.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
+    }
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
@@ -69,7 +74,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _internalGetNoteY(n: MusicFontGlyph, requestedPosition: NoteYPosition): number {
         let pos = this.y + n.y;
 
-        const scale = this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+        const scale = this.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
         switch (requestedPosition) {
             case NoteYPosition.TopWithStem:
                 // stem start
@@ -121,13 +126,13 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         return pos;
     }
 
-    public addMainNoteGlyph(noteGlyph: MusicFontGlyph, note: Note, noteLine: number): void {
+    public addMainNoteGlyph(noteGlyph: NoteHeadGlyphBase, note: Note, noteLine: number): void {
         super.add(noteGlyph, noteLine);
         this._noteGlyphLookup.set(note.id, noteGlyph);
         this._notes.push(note);
     }
 
-    public addEffectNoteGlyph(noteGlyph: MusicFontGlyph, noteLine: number): void {
+    public addEffectNoteGlyph(noteGlyph: NoteHeadGlyphBase, noteLine: number): void {
         super.add(noteGlyph, noteLine);
     }
 

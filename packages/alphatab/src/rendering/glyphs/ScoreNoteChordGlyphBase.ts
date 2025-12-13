@@ -1,12 +1,18 @@
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { ScoreNoteGlyphInfo } from '@coderline/alphatab/rendering/glyphs/ScoreNoteGlyphInfo';
+import type { NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+/**
+ * @internal
+ * @record
+ */
+export interface ScoreNoteGlyphInfo {
+    glyph: NoteHeadGlyphBase;
+    steps: number;
+}
 
 /**
  * @internal
@@ -45,8 +51,8 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         return this.minNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.minNote.steps) : 0;
     }
 
-    protected add(noteGlyph: MusicFontGlyph, noteLine: number): void {
-        const info: ScoreNoteGlyphInfo = new ScoreNoteGlyphInfo(noteGlyph, noteLine);
+    protected add(noteGlyph: NoteHeadGlyphBase, noteSteps: number): void {
+        const info: ScoreNoteGlyphInfo = { glyph: noteGlyph, steps: noteSteps };
         this._infos.push(info);
         if (!this.minNote || this.minNote.steps > info.steps) {
             this.minNote = info;

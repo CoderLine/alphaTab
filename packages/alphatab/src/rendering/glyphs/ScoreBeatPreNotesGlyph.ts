@@ -4,20 +4,18 @@ import { BrushType } from '@coderline/alphatab/model/BrushType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { WhammyType } from '@coderline/alphatab/model/WhammyType';
 import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
 import { AccidentalGroupGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGroupGlyph';
 import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
 import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
+import { FingeringGroupGlyph } from '@coderline/alphatab/rendering/glyphs/FingeringGroupGlyph';
 import { GhostNoteContainerGlyph } from '@coderline/alphatab/rendering/glyphs/GhostNoteContainerGlyph';
 import { ScoreBrushGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBrushGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { FingeringGroupGlyph } from '@coderline/alphatab/rendering/glyphs/FingeringGroupGlyph';
-import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 
 /**
  * @internal
@@ -101,7 +99,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         0,
                         0,
                         this.renderer.smuflMetrics.simpleSlideWidth *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
                     )
                 );
             }
@@ -113,7 +111,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         0,
                         0,
                         this.renderer.smuflMetrics.preNoteEffectPadding *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
                     )
                 );
             }
@@ -124,7 +122,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         0,
                         0,
                         this.renderer.smuflMetrics.preNoteEffectPadding *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
                     )
                 );
             }
@@ -135,7 +133,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                             0,
                             0,
                             this.renderer.smuflMetrics.preNoteEffectPadding *
-                                (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                                (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
                         )
                     );
                 }
@@ -146,7 +144,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         0,
                         0,
                         this.renderer.smuflMetrics.preNoteEffectPadding *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
                     )
                 );
             }
@@ -162,7 +160,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                             0,
                             0,
                             this.renderer.smuflMetrics.preNoteEffectPadding *
-                                (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                                (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
                         )
                     );
                 }
@@ -173,7 +171,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         0,
                         0,
                         this.renderer.smuflMetrics.preNoteEffectPadding *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
                     )
                 );
             }
@@ -187,7 +185,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         let noteSteps: number = sr.getNoteSteps(n);
         const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
         const color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.StandardNotationAccidentals, n);
-        const graceScale = isGrace ? NoteHeadGlyph.GraceScale : 1;
+        const graceScale = isGrace ? EngravingSettings.GraceScale : 1;
         if (accidental !== AccidentalType.None) {
             const g = new AccidentalGlyph(0, sr.getScoreY(noteSteps), accidental, graceScale);
             g.colorOverride = color;

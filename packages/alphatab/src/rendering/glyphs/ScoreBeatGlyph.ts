@@ -276,7 +276,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         return g;
     }
 
-    private _createNoteHeadGlyph(n: Note): MusicFontGlyph {
+    private _createNoteHeadGlyph(n: Note): NoteHeadGlyphBase {
         const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
 
         const style = n.style;

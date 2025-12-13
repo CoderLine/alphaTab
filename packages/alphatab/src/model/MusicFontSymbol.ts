@@ -346,3 +346,23 @@ export enum MusicFontSymbol {
     FingeringALower = 0xed1b,
     FingeringCLower = 0xed1c
 }
+
+/**
+ * @internal
+ */
+export class MusicFontSymbolLookup {
+    private static _allMusicFontSymbols: MusicFontSymbol[] = [];
+
+    /**
+     * Gets a list of all music font symbols used in alphaTab.
+     */
+    public static getAllMusicFontSymbols(): MusicFontSymbol[] {
+        if (MusicFontSymbolLookup._allMusicFontSymbols.length === 0) {
+            MusicFontSymbolLookup._allMusicFontSymbols = Object.values(MusicFontSymbol)
+                .filter<any>((k: any) => typeof k === 'number')
+                .map(v => v as number as MusicFontSymbol) as MusicFontSymbol[];
+        }
+
+        return MusicFontSymbolLookup._allMusicFontSymbols;
+    }
+}
