@@ -17,8 +17,7 @@ export class SlashNoteHeadGlyph extends NoteHeadGlyphBase {
     public effectElement: BeatSubElement = BeatSubElement.SlashEffects;
     private _symbol: MusicFontSymbol;
 
-    public upLineX: number = 0;
-    public downLineX: number = 0;
+    public stemX: number = 0;
 
     public constructor(x: number, y: number, duration: Duration, isGrace: boolean, beat: Beat) {
         super(x, y, isGrace, SlashNoteHeadGlyph.getSymbol(duration));
@@ -69,16 +68,19 @@ export class SlashNoteHeadGlyph extends NoteHeadGlyphBase {
             this.renderer.registerBeatEffectOverflows(minEffectY, maxEffectY);
         }
 
+        const direction = this.renderer.getBeatDirection(this.beat!);
         const symbol = this._symbol;
-        const stemInfoUp = this.renderer.smuflMetrics.stemUp.has(symbol)
-            ? this.renderer.smuflMetrics.stemUp.get(symbol)!.x
-            : 0;
-        this.upLineX = stemInfoUp;
-
-        const stemInfoDown = this.renderer.smuflMetrics.stemDown.has(symbol)
-            ? this.renderer.smuflMetrics.stemDown.get(symbol)!.x
-            : 0;
-        this.downLineX = stemInfoDown;
+        if (direction === BeamDirection.Up) {
+            const stemInfoUp = this.renderer.smuflMetrics.stemUp.has(symbol)
+                ? this.renderer.smuflMetrics.stemUp.get(symbol)!.x
+                : 0;
+            this.stemX = stemInfoUp;
+        } else {
+            const stemInfoDown = this.renderer.smuflMetrics.stemDown.has(symbol)
+                ? this.renderer.smuflMetrics.stemDown.get(symbol)!.x
+                : 0;
+            this.stemX = stemInfoDown;
+        }
     }
 
     public static getSymbol(duration: Duration): MusicFontSymbol {

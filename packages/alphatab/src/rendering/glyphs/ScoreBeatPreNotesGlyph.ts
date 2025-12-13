@@ -1,4 +1,6 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
+import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { BendType } from '@coderline/alphatab/model/BendType';
 import { BrushType } from '@coderline/alphatab/model/BrushType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
@@ -43,7 +45,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             const ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(true);
             ghost.renderer = this.renderer;
 
-            const preBends = new BendNoteHeadGroupGlyph(this.container.beat, true);
+            const preBends = new BendNoteHeadGroupGlyph('prebend', this.container.beat, true);
             this._prebends = preBends;
             preBends.renderer = this.renderer;
 

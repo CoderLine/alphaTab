@@ -135,7 +135,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                 {
                     let endGlyphs = this._endNoteGlyph;
                     if (!endGlyphs) {
-                        endGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
+                        endGlyphs = new BendNoteHeadGroupGlyph('postbend', note.beat, false);
                         endGlyphs.renderer = this.renderer;
                         this._endNoteGlyph = endGlyphs;
                         this.addGlyph(endGlyphs);
@@ -153,7 +153,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                     if (!note.isTieOrigin) {
                         let endGlyphs = this._endNoteGlyph;
                         if (!endGlyphs) {
-                            endGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
+                            endGlyphs = new BendNoteHeadGroupGlyph('postbend', note.beat, false);
                             endGlyphs.renderer = this.renderer;
                             this._endNoteGlyph = endGlyphs;
                             this.addGlyph(endGlyphs);
@@ -171,7 +171,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                 {
                     let middleGlyphs = this._middleNoteGlyph;
                     if (!middleGlyphs) {
-                        middleGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
+                        middleGlyphs = new BendNoteHeadGroupGlyph('middlebend', note.beat, false);
                         this._middleNoteGlyph = middleGlyphs;
                         middleGlyphs.renderer = this.renderer;
                         this.addGlyph(middleGlyphs);
@@ -184,7 +184,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                     );
                     let endGlyphs = this._endNoteGlyph;
                     if (!endGlyphs) {
-                        endGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
+                        endGlyphs = new BendNoteHeadGroupGlyph('postbend', note.beat, false);
                         endGlyphs.renderer = this.renderer;
                         this._endNoteGlyph = endGlyphs;
                         this.addGlyph(endGlyphs);
@@ -216,7 +216,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         }
 
         if (this._endNoteGlyph) {
-            endBeatX -= this._endNoteGlyph.upLineX;
+            endBeatX -= this._endNoteGlyph.stemX;
         }
 
         const middleX: number = (startX + endBeatX) / 2;

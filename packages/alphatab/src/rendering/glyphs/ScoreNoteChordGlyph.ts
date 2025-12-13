@@ -10,7 +10,7 @@ import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGly
 import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import type { NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import {
-    type ScoreChordNoteHeadInfo,
+    ScoreChordNoteHeadInfo,
     ScoreNoteChordGlyphBase
 } from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyphBase';
 import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
@@ -41,6 +41,21 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     public override get scale(): number {
         return this.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
     }
+
+    protected override getScoreChordNoteHeadInfo(): ScoreChordNoteHeadInfo {
+        // never share grace beats
+        if (this.beat.graceType !== GraceType.None) {
+            return new ScoreChordNoteHeadInfo(this.direction);
+        }
+
+        // TODO: do we need to share this spacing across all staves&tracks?
+        const key = `score.noteheads.${this.beat.id}`;
+        let existing = this.renderer.staff!.getSharedLayoutData<ScoreChordNoteHeadInfo | undefined>(key, undefined);
+        if (!existing) {
+            existing = new ScoreChordNoteHeadInfo(this.direction);
+            this.renderer.staff!.setSharedLayoutData(key, existing);
+        }
+        return existing;
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
@@ -223,7 +238,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                 tremoloY = (topY + bottomY) / 2;
             }
 
-            let tremoloX: number = direction === BeamDirection.Up ? this.upLineX : this.downLineX;
+            let tremoloX: number = this.stemX;
             const speed: Duration = this.beat.tremoloSpeed!;
 
             if (this.beat.duration < Duration.Half) {

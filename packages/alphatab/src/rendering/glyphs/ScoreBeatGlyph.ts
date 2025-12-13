@@ -22,8 +22,7 @@ import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGly
 import { GhostNoteContainerGlyph } from '@coderline/alphatab/rendering/glyphs/GhostNoteContainerGlyph';
 import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
 import { GuitarGolpeGlyph } from '@coderline/alphatab/rendering/glyphs/GuitarGolpeGlyph';
-import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { NoteHeadGlyph, type NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import { PercussionNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/PercussionNoteHeadGlyph';
 import { PickStrokeGlyph } from '@coderline/alphatab/rendering/glyphs/PickStrokeGlyph';
 import { PictEdgeOfCymbalGlyph } from '@coderline/alphatab/rendering/glyphs/PictEdgeOfCymbalGlyph';
@@ -262,10 +261,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         } else if (this.noteHeads) {
             this.onTimeX = this.noteHeads!.x + this.noteHeads!.onTimeX;
             this.middleX = this.noteHeads!.x + this.noteHeads!.width / 2;
-            const direction = this.renderer.getBeatDirection(this.container.beat);
-            this.stemX =
-                this.noteHeads!.x +
-                (direction === BeamDirection.Up ? this.noteHeads!.upLineX : this.noteHeads!.downLineX);
+            this.stemX = this.noteHeads!.x + this.noteHeads!.stemX;
         }
     }
 
