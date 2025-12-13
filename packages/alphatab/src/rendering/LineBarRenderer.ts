@@ -189,9 +189,12 @@ export abstract class LineBarRenderer extends BarRendererBase {
         beatElement: BeatSubElement,
         bracketsAsArcs: boolean = false
     ): void {
-        for (const voice of this.voiceContainer.tupletGroups.values()) {
-            for (const tupletGroup of voice) {
-                this._paintTupletHelper(cx, cy, canvas, tupletGroup, beatElement, bracketsAsArcs);
+        for (const v of this.voiceContainer.voiceDrawOrder!) {
+            if (this.voiceContainer.tupletGroups.has(v)) {
+                const voice = this.voiceContainer.tupletGroups.get(v)!;
+                for (const tupletGroup of voice) {
+                    this._paintTupletHelper(cx, cy, canvas, tupletGroup, beatElement, bracketsAsArcs);
+                }
             }
         }
     }
@@ -422,8 +425,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
         flagsElement: BeatSubElement,
         beamsElement: BeatSubElement
     ): void {
-        for (const v of this.helpers.beamHelpers) {
-            for (const h of v) {
+        for (const v of this.voiceContainer.voiceDrawOrder!) {
+            for (const h of this.helpers.beamHelpers[v]) {
                 this.paintBeamHelper(cx, cy, canvas, h, flagsElement, beamsElement);
             }
         }

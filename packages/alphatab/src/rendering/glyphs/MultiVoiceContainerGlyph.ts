@@ -21,6 +21,8 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 export class MultiVoiceContainerGlyph extends Glyph {
     public static readonly KeySizeBeat: string = 'Beat';
 
+    public voiceDrawOrder?: number[];
+
     public beatGlyphs = new Map<number, BeatContainerGlyphBase[]>();
     public tupletGroups = new Map<number, TupletGroup[]>();
 
@@ -250,12 +252,17 @@ export class MultiVoiceContainerGlyph extends Glyph {
                 this.width = x;
             }
         }
+
+        // draw order is reversed so that the main voice overlaps secondary ones
+        this.voiceDrawOrder = Array.from(this.beatGlyphs.keys());
+        this.voiceDrawOrder!.sort((a, b) => b - a);
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         // canvas.color = Color.random();
         // canvas.strokeRect(cx + this.x, cy + this.y, this.width, this.renderer.height);
-        for (const [v, beatGlyphs] of this.beatGlyphs) {
+        for (const v of this.voiceDrawOrder!) {
+            const beatGlyphs = this.beatGlyphs.get(v)!;
             const voice = this.renderer.bar.voices[v];
             using _ = ElementStyleHelper.voice(canvas, VoiceSubElement.Glyphs, voice, true);
 
