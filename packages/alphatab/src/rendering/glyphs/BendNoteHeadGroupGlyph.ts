@@ -52,7 +52,8 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
 
     protected override getScoreChordNoteHeadInfo(): ScoreChordNoteHeadInfo {
         // TODO: do we need to share this spacing across all staves&tracks?
-        const key = `score.noteheads.${this._groupId}.${this._beat.id}`;
+        const staff = this._beat.voice.bar.staff;
+        const key = `score.noteheads.${this._groupId}.${staff.track.index}.${staff.index}.${this._beat.absoluteDisplayStart}`;
         let existing = this.renderer.staff!.getSharedLayoutData<ScoreChordNoteHeadInfo | undefined>(key, undefined);
         if (!existing) {
             existing = new ScoreChordNoteHeadInfo(this.direction);
