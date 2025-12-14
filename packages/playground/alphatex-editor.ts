@@ -107,6 +107,7 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
     function loadTex(tex: string) {
         const importer = new alphaTab.importer.AlphaTexImporter();
         importer.initFromString(tex, api.settings);
+        importer.logErrors = true;
         let score: alphaTab.model.Score;
         try {
             score = importer.readScore();
