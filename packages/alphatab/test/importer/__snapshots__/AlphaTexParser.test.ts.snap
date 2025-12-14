@@ -64,6 +64,43 @@ exports[`AlphaTexParserTest ambiguous tempo, temponame and stringed note: lexer-
 
 exports[`AlphaTexParserTest ambiguous tempo, temponame and stringed note: parser-diagnostics 1`] = `Array []`;
 
+exports[`AlphaTexParserTest ambiguous voice followed by note list 1`] = `
+Score (1,1) -> (1,15) {
+  bars: Array [
+    Bar (1,1) -> (1,15) {
+      metaData: Array [
+        Meta (1,1) -> (1,7) {
+          tag: Tag "voice" (1,1) -> (1,7) {
+            prefix: Backslash (1,1) -> (1,2),
+            tag: Ident "voice" (1,2) -> (1,7),
+          },
+        },
+      ],
+      beats: Array [
+        Beat (1,8) -> (1,15) {
+          notes: NoteList (1,8) -> (1,15) {
+            openParenthesis: LParen (1,8) -> (1,9),
+            notes: Array [
+              Note (1,9) -> (1,11) {
+                noteValue: Ident "C4" (1,9) -> (1,11),
+              },
+              Note (1,12) -> (1,14) {
+                noteValue: Ident "C5" (1,12) -> (1,14),
+              },
+            ],
+            closeParenthesis: RParen (1,14) -> (1,15),
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexParserTest ambiguous voice followed by note list: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest ambiguous voice followed by note list: parser-diagnostics 1`] = `Array []`;
+
 exports[`AlphaTexParserTest comments bar meta singleline 1`] = `
 Score (1,1) -> (3,9) {
   bars: Array [

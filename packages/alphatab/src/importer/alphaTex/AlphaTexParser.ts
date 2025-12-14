@@ -67,7 +67,7 @@ export class AlphaTexParser {
     /**
      * The parsing mode.
      */
-    public mode:AlphaTexParseMode = AlphaTexParseMode.ForModelImport;
+    public mode: AlphaTexParseMode = AlphaTexParseMode.ForModelImport;
 
     public get lexerDiagnostics(): AlphaTexDiagnosticBag {
         return this.lexer.lexerDiagnostics;
@@ -509,7 +509,6 @@ export class AlphaTexParser {
 
     private static readonly _allowValuesAfterProperties = new Set<string>(['chord']);
 
-
     private _metaData(metaDataList: AlphaTexMetaDataNode[]) {
         const tag = this.lexer.peekToken();
         if (!tag || tag.nodeType !== AlphaTexNodeType.Tag) {
@@ -558,17 +557,19 @@ export class AlphaTexParser {
                     }
                 }
             } else {
-                metaData.arguments = this.argumentList();
-                if (!metaData.arguments) {
-                    metaData.arguments = this._metaDataReader.readMetaDataArguments(this, metaData.tag);
-                    if (metaData.arguments && metaData.arguments.arguments.length > 1) {
-                        this.addParserDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT301,
-                            message: `Metadata arguments should be wrapped into parenthesis.`,
-                            severity: AlphaTexDiagnosticsSeverity.Warning,
-                            start: metaData.arguments?.start ?? metaData.start,
-                            end: metaData.arguments?.end ?? metaData.end
-                        });
+                if (this._metaDataReader.hasMetaDataArguments(metaData.tag)) {
+                    metaData.arguments = this.argumentList();
+                    if (!metaData.arguments) {
+                        metaData.arguments = this._metaDataReader.readMetaDataArguments(this, metaData.tag);
+                        if (metaData.arguments && metaData.arguments.arguments.length > 1) {
+                            this.addParserDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT301,
+                                message: `Metadata arguments should be wrapped into parenthesis.`,
+                                severity: AlphaTexDiagnosticsSeverity.Warning,
+                                start: metaData.arguments?.start ?? metaData.start,
+                                end: metaData.arguments?.end ?? metaData.end
+                            });
+                        }
                     }
                 }
 
