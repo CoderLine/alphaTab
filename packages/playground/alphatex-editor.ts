@@ -111,6 +111,22 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
         let score: alphaTab.model.Score;
         try {
             score = importer.readScore();
+
+            const hasSystemsLayout = importer.scoreNode!.bars[0]?.metaData.some(
+                m =>
+                    m.tag.tag.text.toLocaleLowerCase() === 'defaultsystemslayout' ||
+                    m.tag.tag.text.toLocaleLowerCase() === 'systemslayout' ||
+                    (m.tag.tag.text === 'track' &&
+                        m.properties?.properties.some(
+                            p =>
+                                p.property.text.toLowerCase() === 'defaultsystemslayout' ||
+                                p.property.text.toLowerCase() === 'systemslayout'
+                        ))
+            );
+            api.settings.display.systemsLayoutMode = hasSystemsLayout
+                ? alphaTab.SystemsLayoutMode.UseModelLayout
+                : alphaTab.SystemsLayoutMode.Automatic;
+            api.updateSettings();
         } catch {
             return;
         }
