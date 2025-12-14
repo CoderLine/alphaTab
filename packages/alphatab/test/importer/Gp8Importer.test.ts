@@ -46,13 +46,13 @@ describe('Gp8ImporterTest', () => {
     it('beat-tempo-change', async () => {
         const score = (await prepareImporterWithFile('guitarpro8/beat-tempo-change.gp')).readScore();
 
-        expect(score.masterBars[0].tempoAutomations).to.have.length(2);
+        expect(score.masterBars[0].tempoAutomations.length).to.equal(2);
         expect(score.masterBars[0].tempoAutomations[0].value).to.have.equal(120);
         expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.equal(0);
         expect(score.masterBars[0].tempoAutomations[1].value).to.equal(60);
         expect(score.masterBars[0].tempoAutomations[1].ratioPosition).to.equal(0.5);
 
-        expect(score.masterBars[1].tempoAutomations).to.have.length(2);
+        expect(score.masterBars[1].tempoAutomations.length).to.equal(2);
         expect(score.masterBars[1].tempoAutomations[0].value).to.equal(100);
         expect(score.masterBars[1].tempoAutomations[0].ratioPosition).to.equal(0);
         expect(score.masterBars[1].tempoAutomations[1].value).to.equal(120);

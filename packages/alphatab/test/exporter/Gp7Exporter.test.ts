@@ -159,7 +159,7 @@ describe('Gp7ExporterTest', () => {
 
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
 
-        expect(actual.tracks[0].percussionArticulations).to.have.length(2);
+        expect(actual.tracks[0].percussionArticulations.length).to.equal(2);
         expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
         expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
         expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(0);
