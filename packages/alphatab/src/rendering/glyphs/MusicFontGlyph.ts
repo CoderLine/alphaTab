@@ -7,7 +7,7 @@ import type { Color } from '@coderline/alphatab/model/Color';
  * @internal
  */
 export class MusicFontGlyph extends EffectGlyph {
-    protected glyphScale: number = 0;
+    public glyphScale: number = 0;
     public symbol: MusicFontSymbol;
     public center: boolean = false;
     public colorOverride?: Color;

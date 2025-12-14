@@ -1,4 +1,5 @@
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
+import { MusicFontSymbolLookup } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
@@ -30,6 +31,17 @@ export interface ScoreChordNoteHeadGroupSide {
      * the overall shift needed to place notes within the bounds.
      */
     minX: number;
+}
+
+/**
+ * @internal
+ */
+enum NoteHeadIntersectionKind {
+    NoIntersection = 0,
+    EndsTouchingOuter = 1,
+    EndsTouchingInner = 2,
+    ExactMatch = 3,
+    FullIntersection = 4
 }
 
 /**
@@ -138,33 +150,117 @@ export class ScoreChordNoteHeadInfo {
         const mainGroup = this.groups.get(this.mainVoiceDirection)!;
 
         // no intersection -> we can align the note heads directly.
-        const hasIntersection = ScoreChordNoteHeadInfo._hasIntersection(mainGroup, noteGroup);
-        if (!hasIntersection) {
-            return;
-        }
+        const intersection = ScoreChordNoteHeadInfo._checkIntersection(mainGroup, noteGroup);
 
-        // temp: do some offset for testing intersection
-        if (mainGroup.direction === BeamDirection.Up) {
-            // shift main group to the right to make space for this group on the left side
-            mainGroup.multiVoiceShiftX = noteGroup.maxX;
-        } else {
-            // shift this group to the right to be after the main group
-            noteGroup.multiVoiceShiftX = mainGroup.maxX;
+        // TODO: take care of flags
+        switch (intersection) {
+            case NoteHeadIntersectionKind.NoIntersection:
+                return;
+            case NoteHeadIntersectionKind.ExactMatch:
+                // handling note head
+                if (!ScoreChordNoteHeadInfo._canShareNoteHead(mainGroup, noteGroup)) {
+                    // align stems back-to-back with additional spacing
+
+                    if (mainGroup.direction === BeamDirection.Up) {
+                        noteGroup.multiVoiceShiftX = mainGroup.stemX ;
+                    } else {
+                        mainGroup.multiVoiceShiftX = noteGroup.stemX;
+                    }
+                }
+                break;
+            case NoteHeadIntersectionKind.EndsTouchingOuter:
+                // align stems (but reversed)
+                if (mainGroup.direction === BeamDirection.Up) {
+                    const diff = mainGroup.stemX - noteGroup.stemX;
+                    noteGroup.multiVoiceShiftX = diff;
+                } else {
+                    const diff = noteGroup.stemX - mainGroup.stemX;
+                    mainGroup.multiVoiceShiftX = diff;
+                }
+
+                break;
+            case NoteHeadIntersectionKind.EndsTouchingInner:
+                if (mainGroup.direction === BeamDirection.Up) {
+                    mainGroup.multiVoiceShiftX = mainGroup.stemX;
+                } else {
+                    noteGroup.multiVoiceShiftX = noteGroup.stemX;
+                }
+                break;
+            case NoteHeadIntersectionKind.FullIntersection:
+                if (mainGroup.direction === BeamDirection.Up) {
+                    mainGroup.multiVoiceShiftX = mainGroup.stemX;
+                } else {
+                    noteGroup.multiVoiceShiftX = noteGroup.stemX;
+                }
+
+                break;
         }
     }
 
-    private static _hasIntersection(mainGroup: ScoreChordNoteHeadGroup, thisGroup: ScoreChordNoteHeadGroup) {
-        const mainGroupBottom =
-            mainGroup.direction === BeamDirection.Up ? mainGroup.maxStep + 1 : mainGroup.minStep - 1;
+    private static _canShareNoteHead(mainGroup: ScoreChordNoteHeadGroup, thisGroup: ScoreChordNoteHeadGroup) {
+        // TODO: check actual note head
+        const mainGroupBottom = mainGroup.direction === BeamDirection.Up ? mainGroup.maxStep : mainGroup.minStep;
         const thisGroupBottom = thisGroup.direction === BeamDirection.Up ? thisGroup.maxStep : thisGroup.minStep;
 
-        let hasIntersection: boolean;
-        if (mainGroup.direction === BeamDirection.Up) {
-            hasIntersection = thisGroupBottom <= mainGroupBottom;
-        } else {
-            hasIntersection = mainGroupBottom >= thisGroupBottom;
+        const mainGroupBottomNoteHead = mainGroup.correctNotes.notes.get(mainGroupBottom)!;
+        if (mainGroupBottomNoteHead.length > 1) {
+            return false;
         }
-        return hasIntersection;
+
+        const thisGroupBottomNoteHead = thisGroup.correctNotes.notes.get(thisGroupBottom)!;
+        if (thisGroupBottomNoteHead.length > 1) {
+            return false;
+        }
+
+        return ScoreChordNoteHeadInfo._canShareNoteHeadGlyph(
+            mainGroupBottomNoteHead[0].glyph,
+            thisGroupBottomNoteHead[0].glyph
+        );
+    }
+
+    private static _canShareNoteHeadGlyph(mainGlyph: NoteHeadGlyphBase, thisGlyph: NoteHeadGlyphBase) {
+        return (
+            mainGlyph.glyphScale === thisGlyph.glyphScale &&
+            mainGlyph.centerOnStem === thisGlyph.centerOnStem &&
+            MusicFontSymbolLookup.isBlackNoteHead(mainGlyph.symbol) &&
+            MusicFontSymbolLookup.isBlackNoteHead(thisGlyph.symbol)
+        );
+    }
+
+    private static _checkIntersection(
+        mainGroup: ScoreChordNoteHeadGroup,
+        thisGroup: ScoreChordNoteHeadGroup
+    ): NoteHeadIntersectionKind {
+        let bottomGap = 0;
+        if (mainGroup.direction === BeamDirection.Up) {
+            const mainGroupBottom = mainGroup.maxStep;
+            const thisGroupBottom = thisGroup.minStep;
+
+            bottomGap = thisGroupBottom - mainGroupBottom;
+        } else {
+            const mainGroupBottom = mainGroup.minStep;
+            const thisGroupBottom = thisGroup.maxStep;
+            bottomGap = mainGroupBottom - thisGroupBottom;
+        }
+
+        if (bottomGap === 0) {
+            console.log('bottomGap', bottomGap, 'ExactMatch');
+            return NoteHeadIntersectionKind.ExactMatch;
+        }
+        if (bottomGap === 1) {
+            console.log('bottomGap', bottomGap, 'EndsTouchingOuter');
+            return NoteHeadIntersectionKind.EndsTouchingOuter;
+        }
+        if (bottomGap === -1) {
+            console.log('bottomGap', bottomGap, 'EndsTouchingInner');
+            return NoteHeadIntersectionKind.EndsTouchingInner;
+        }
+        if (bottomGap < 0) {
+            console.log('bottomGap', bottomGap, 'FullIntersection');
+            return NoteHeadIntersectionKind.FullIntersection;
+        }
+        console.log('bottomGap', bottomGap, 'NoIntersection');
+        return NoteHeadIntersectionKind.NoIntersection;
     }
 }
 
@@ -321,11 +417,13 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
     private _updateSizes() {
         const noteGroup = this.noteGroup!;
+
+        // NOTE: no noteGroup.multiVoiceShiftX for onTimeX. we don't shift the time position on displacement
+        // otherwise the alignment would automatically be corrected and we get no actual "shift"
+
         // the center of score notes, (used for aligning the beat to the right on-time position)
         // is always the center of the "correct note" position.
-
-        // for no displaced notes it is simply the center at group
-        this.onTimeX = noteGroup.multiVoiceShiftX + noteGroup.correctNotes.minX + noteGroup.correctNotes.width / 2;
+        this.onTimeX = noteGroup.correctNotes.minX + noteGroup.correctNotes.width / 2;
 
         this.width = this.noteStartX + noteGroup.multiVoiceShiftX + noteGroup.maxX - noteGroup.minX;
     }
