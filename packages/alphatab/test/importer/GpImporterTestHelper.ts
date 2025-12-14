@@ -302,7 +302,7 @@ export class GpImporterTestHelper {
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].text).to.equal('Text');
 
         expect(score.masterBars[4].isDoubleBar).to.be.equal(true);
-        expect(score.masterBars[4].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[4].tempoAutomations.length).to.equal(1);
         expect(score.masterBars[4].tempoAutomations[0]!.value).to.equal(120.0);
         if (!skipInstrumentCheck) {
             expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)).to.be

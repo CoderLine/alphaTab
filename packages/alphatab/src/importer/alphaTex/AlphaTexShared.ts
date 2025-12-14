@@ -276,9 +276,18 @@ export enum AlphaTexAccidentalMode {
 /**
  * @public
  */
+export enum AlphaTexVoiceMode {
+    StaffWise = 0,
+    BarWise = 1
+}
+
+/**
+ * @public
+ */
 export interface IAlphaTexImporterState {
     score: Score;
     accidentalMode: AlphaTexAccidentalMode;
+    voiceMode: AlphaTexVoiceMode;
     currentDynamics: DynamicValue;
     currentTupletNumerator: number;
     currentTupletDenominator: number;

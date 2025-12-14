@@ -761,6 +761,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'accidentals':
                 return AlphaTex1LanguageHandler._handleAccidentalMode(importer, metaData.arguments!);
+            case 'voicemode':
+                return AlphaTex1LanguageHandler._handleVoiceMode(importer, metaData.arguments!);
             case 'jump':
                 const direction = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
@@ -852,6 +854,20 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return ApplyNodeResult.NotAppliedSemanticError;
         }
         importer.state.accidentalMode = accidentalMode!;
+        return ApplyNodeResult.Applied;
+    }
+
+    private static _handleVoiceMode(importer: IAlphaTexImporter, args: AlphaTexArgumentList): ApplyNodeResult {
+        const voiceMode = AlphaTex1LanguageHandler._parseEnumValue(
+            importer,
+            args,
+            'voice mode',
+            AlphaTex1EnumMappings.alphaTexVoiceMode
+        );
+        if (voiceMode === undefined) {
+            return ApplyNodeResult.NotAppliedSemanticError;
+        }
+        importer.state.voiceMode = voiceMode!;
         return ApplyNodeResult.Applied;
     }
 

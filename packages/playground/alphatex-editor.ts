@@ -94,7 +94,7 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
     });
 
     let fromTex = true;
-    api.settings.exporter.comments = false;
+    api.settings.exporter.comments = true;
     api.settings.exporter.indent = 2;
     api.scoreLoaded.on(score => {
         if (!fromTex) {

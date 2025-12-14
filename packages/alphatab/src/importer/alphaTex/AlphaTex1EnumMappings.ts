@@ -1,4 +1,4 @@
-import type { AlphaTexAccidentalMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import type { AlphaTexAccidentalMode, AlphaTexVoiceMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import type { BarLineStyle } from '@coderline/alphatab/model/Bar';
 import type { BarreShape } from '@coderline/alphatab/model/BarreShape';
 import type { BendStyle } from '@coderline/alphatab/model/BendStyle';
@@ -73,6 +73,13 @@ export class AlphaTex1EnumMappings {
     ]);
     public static readonly alphaTexAccidentalModeReversed = AlphaTex1EnumMappings._reverse(
         AlphaTex1EnumMappings.alphaTexAccidentalMode
+    );
+    public static readonly alphaTexVoiceMode = new Map<string, AlphaTexVoiceMode>([
+        ['staffwise', 0],
+        ['barwise', 1]
+    ]);
+    public static readonly alphaTexVoiceModeReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.alphaTexVoiceMode
     );
     public static readonly noteAccidentalMode = new Map<string, NoteAccidentalMode>([
         ['default', 0],

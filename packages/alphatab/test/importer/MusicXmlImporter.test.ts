@@ -45,9 +45,9 @@ describe('MusicXmlImporterTests', () => {
         );
 
         expect(score.tempo).to.be.equal(60);
-        expect(score.masterBars[0].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[0].tempoAutomations.length).to.equal(1);
         expect(score.masterBars[0].tempoAutomations[0]?.value).to.be.equal(60);
-        expect(score.masterBars[1].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[1].tempoAutomations.length).to.equal(1);
         expect(score.masterBars[1].tempoAutomations[0].value).to.be.equal(60);
     });
     it('tie-destination', async () => {

@@ -1422,7 +1422,7 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             . \\tempo 120 1.1.4 1.1 1.1{tempo 60} 1.1 | 1.1.4{tempo 100} 1.1 1.1{tempo 120} 1.1
         `);
-        expect(score.masterBars[0].tempoAutomations).to.have.length(2);
+        expect(score.masterBars[0].tempoAutomations.length).to.equal(2);
         expect(score.masterBars[0].tempoAutomations[0].value).to.equal(120);
         expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.equal(0);
         expect(score.masterBars[0].tempoAutomations[1].value).to.equal(60);
@@ -1573,7 +1573,7 @@ describe('AlphaTexImporterTest', () => {
                         c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
-        expect(score.masterBars).to.have.length(2);
+        expect(score.masterBars.length).to.equal(2);
 
         expect(score.tracks[0].staves[0].bars.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
@@ -1589,11 +1589,11 @@ describe('AlphaTexImporterTest', () => {
                 c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
-        expect(score.masterBars).to.have.length(2);
+        expect(score.masterBars.length).to.equal(2);
 
-        expect(score.tracks[0].staves[0].bars).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[1].voices.length).to.equal(2);
         testExportRoundtrip(score);
     });
 
@@ -1604,11 +1604,11 @@ describe('AlphaTexImporterTest', () => {
             c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
-        expect(score.masterBars).to.have.length(2);
+        expect(score.masterBars.length).to.equal(2);
 
-        expect(score.tracks[0].staves[0].bars).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[1].voices.length).to.equal(2);
         testExportRoundtrip(score);
     });
 
@@ -1677,13 +1677,13 @@ describe('AlphaTexImporterTest', () => {
             3.3.4{ tb dive gradual (0 -12.5) } |
         `);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarType).to.equal(WhammyType.Dive);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12.5);
 
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarType).to.equal(WhammyType.Dive);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyStyle).to.equal(BendStyle.Gradual);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12.5);
         testExportRoundtrip(score);
@@ -1722,7 +1722,7 @@ describe('AlphaTexImporterTest', () => {
             G4 G4 G4 { instrument brightacousticpiano }
         `);
         expect(score.tracks[0].playbackInfo.program).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(
             AutomationType.Instrument
         );
@@ -1746,7 +1746,7 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendType).to.equal(BendType.Bend);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendStyle).to.equal(BendStyle.Gradual);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(2);
         testExportRoundtrip(score);
     });
 
@@ -1834,7 +1834,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tempo).to.equal(100);
         expect(score.tempoLabel).to.equal('T1');
 
-        expect(score.masterBars[1].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[1].tempoAutomations.length).to.equal(1);
         expect(score.masterBars[1].tempoAutomations[0].value).to.equal(80);
         expect(score.masterBars[1].tempoAutomations[0].text).to.equal('T2');
         testExportRoundtrip(score);
@@ -1864,7 +1864,7 @@ describe('AlphaTexImporterTest', () => {
         `);
 
         expect(score.defaultSystemsLayout).to.equal(5);
-        expect(score.systemsLayout).to.have.length(3);
+        expect(score.systemsLayout.length).to.equal(3);
         expect(score.systemsLayout[0]).to.equal(3);
         expect(score.systemsLayout[1]).to.equal(2);
         expect(score.systemsLayout[2]).to.equal(3);
@@ -1905,7 +1905,7 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].color.rgba).to.equal('#FF0000');
         expect(score.tracks[0].defaultSystemsLayout).to.equal(6);
-        expect(score.tracks[0].systemsLayout).to.have.length(3);
+        expect(score.tracks[0].systemsLayout.length).to.equal(3);
         expect(score.tracks[0].systemsLayout[0]).to.equal(3);
         expect(score.tracks[0].systemsLayout[1]).to.equal(2);
         expect(score.tracks[0].systemsLayout[0]).to.equal(3);
@@ -2218,13 +2218,13 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].playbackInfo.volume).to.equal(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].type).to.equal(
             AutomationType.Volume
         );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].value).to.equal(8);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(
             AutomationType.Volume
         );
@@ -2242,13 +2242,13 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].playbackInfo.balance).to.equal(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].type).to.equal(
             AutomationType.Balance
         );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].value).to.equal(8);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(
             AutomationType.Balance
         );
@@ -2272,7 +2272,7 @@ describe('AlphaTexImporterTest', () => {
         `);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].deadSlapped).to.be.true;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes).to.have.length(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).to.equal(0);
         testExportRoundtrip(score);
     });
 
@@ -2489,5 +2489,44 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.extendBarLines).to.be.true;
 
         testExportRoundtrip(score);
+    });
+
+    describe('voice-mode', () => {
+        it('default', () => {
+            expect(
+                parseTex(`
+                    \\voice
+                        C4 | C5
+                    \\voice
+                        C3 | C4
+                `)
+            ).toMatchSnapshot();
+        });
+        it('staffWise', () => {
+            expect(
+                parseTex(`
+                    \\voiceMode staffWise
+                    \\voice
+                        C4 | C5
+                    \\voice
+                        C3 | C4
+                `)
+            ).toMatchSnapshot();
+        });
+        it('barWise', () => {
+            
+            expect(
+                parseTex(`
+                    \\voiceMode barWise
+                    // Bar 1
+                        \\voice C4 
+                        \\voice C3
+                    |
+                    // Bar 2
+                        \\voice C5 
+                        \\voice C4
+                `)
+            ).toMatchSnapshot();
+        });
     });
 });
