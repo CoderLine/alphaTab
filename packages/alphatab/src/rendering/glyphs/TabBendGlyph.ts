@@ -290,14 +290,15 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
             let endX: number = 0;
             if (!endBeat || (endBeat.isLastOfVoice && !endNoteHasBend)) {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.postBeatGlyphsStart;
+                endX -= this.renderer.smuflMetrics.postNoteEffectPadding;
             } else if (endNoteHasBend || !endBeat.nextBeat) {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat, BeatXPosition.MiddleNotes);
             } else if (note.bendType === BendType.Hold) {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat.nextBeat, BeatXPosition.OnNotes);
             } else {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat.nextBeat, BeatXPosition.PreNotes);
+                endX -= this.renderer.smuflMetrics.postNoteEffectPadding;
             }
-            endX -= this.renderer.smuflMetrics.postNoteEffectPadding;
 
             // we need some pixels for the arrow. otherwise we might draw into the next
             if (!isMultiBeatBend) {
