@@ -126,6 +126,10 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
         }
     }
 
+    public override doMultiVoiceLayout(): void {
+        // nothing to do
+    }
+
     public override getBoundingBoxTop(): number {
         return this._glyph?.getBoundingBoxTop() ?? Number.NaN;
     }

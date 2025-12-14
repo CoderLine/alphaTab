@@ -55,6 +55,10 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
         return super.getBoundingBoxBottom();
     }
 
+    public doMultiVoiceLayout(){
+        this._endGlyph?.doMultiVoiceLayout();
+    }
+
     public override doLayout(): void {
         const sr = this.renderer as ScoreBarRenderer;
         const whammyMode: NotationMode = sr.settings.notation.notationMode;

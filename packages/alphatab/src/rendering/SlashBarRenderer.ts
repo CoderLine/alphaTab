@@ -8,10 +8,7 @@ import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { LineBarRenderer } from '@coderline/alphatab/rendering//LineBarRenderer';
 import type { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
-import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
-import { SlashBeatGlyph } from '@coderline/alphatab/rendering/glyphs/SlashBeatGlyph';
 import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
@@ -182,12 +179,13 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
+        if (v.index > 0) {
+            return;
+        }
+
         super.createVoiceGlyphs(v);
         for (const b of v.beats) {
-            const container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b);
-            container.preNotes = new BeatGlyphBase();
-            container.onNotes = v.index === 0 ? new SlashBeatGlyph() : new BeatOnNoteGlyphBase();
-            this.addBeatGlyph(container);
+            this.addBeatGlyph(new SlashBeatContainerGlyph(b));
         }
     }
 

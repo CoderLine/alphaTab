@@ -52,6 +52,9 @@ export interface ScoreChordNoteHeadGroup {
      */
     direction: BeamDirection;
 
+    minStep: number;
+    maxStep: number;
+
     /**
      * The offset of the stem for this group.
      * Offset is relative to the group.
@@ -68,6 +71,11 @@ export interface ScoreChordNoteHeadGroup {
      * Offset is relative to the group.
      */
     maxX: number;
+
+    /**
+     * The shift applied for the group to avoid overlaps.
+     */
+    shiftX: number;
 }
 
 /**
@@ -86,6 +94,8 @@ export class ScoreChordNoteHeadInfo {
     public minX = 0;
     public maxX = 0;
 
+    private _isFinished = false;
+
     public constructor(mainVoiceDirection: BeamDirection) {
         this.mainVoiceDirection = mainVoiceDirection;
     }
@@ -94,15 +104,67 @@ export class ScoreChordNoteHeadInfo {
         let minX = 0;
         let maxX = 0;
         for (const g of this.groups.values()) {
-            if (g.minX < minX) {
-                minX = g.minX;
+            const gMinX = g.minX + g.shiftX;
+            const gMaxX = g.maxX + g.shiftX;
+            if (gMinX < minX) {
+                minX = gMinX;
             }
-            if (maxX < g.maxX) {
-                maxX = g.maxX;
+            if (maxX < gMaxX) {
+                maxX = gMaxX;
             }
         }
         this.minX = minX;
         this.maxX = maxX;
+    }
+
+    finish() {
+        if (this._isFinished) {
+            return;
+        }
+        this._isFinished = true;
+
+        for (const g of this.groups.values()) {
+            this._checkForGroupDisplacement(g);
+        }
+        this.update();
+    }
+
+    private _checkForGroupDisplacement(noteGroup: ScoreChordNoteHeadGroup) {
+        // no group displace if we're in the same direction
+        if (this.mainVoiceDirection === noteGroup.direction) {
+            return;
+        }
+
+        const mainGroup = this.groups.get(this.mainVoiceDirection)!;
+
+        // no intersection -> we can align the note heads directly.
+        const hasIntersection = ScoreChordNoteHeadInfo._hasIntersection(mainGroup, noteGroup);
+        if (!hasIntersection) {
+            return;
+        }
+
+        // temp: do some offset for testing intersection
+        if (mainGroup.direction === BeamDirection.Up) {
+            // shift main group to the right to make space for this group on the left side
+            mainGroup.shiftX = noteGroup.maxX;
+        } else {
+            // shift this group to the right to be after the main group
+            noteGroup.shiftX = mainGroup.maxX;
+        }
+    }
+
+    private static _hasIntersection(mainGroup: ScoreChordNoteHeadGroup, thisGroup: ScoreChordNoteHeadGroup) {
+        const mainGroupBottom =
+            mainGroup.direction === BeamDirection.Up ? mainGroup.maxStep + 1 : mainGroup.minStep - 1;
+        const thisGroupBottom = thisGroup.direction === BeamDirection.Up ? thisGroup.maxStep : thisGroup.minStep;
+
+        let hasIntersection: boolean;
+        if (mainGroup.direction === BeamDirection.Up) {
+            hasIntersection = thisGroupBottom <= mainGroupBottom;
+        } else {
+            hasIntersection = mainGroupBottom >= thisGroupBottom;
+        }
+        return hasIntersection;
     }
 }
 
@@ -123,17 +185,18 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     // TODO[perf]: keeping the whole group only for stemX prevents the GC to collect this
     // maybe we can do some better "finalization" of the groups once all voices have been done
     private _noteHeadInfo?: ScoreChordNoteHeadInfo;
-    private _noteGroup?: ScoreChordNoteHeadGroup;
+    protected noteGroup?: ScoreChordNoteHeadGroup;
 
     public minNote: ScoreNoteGlyphInfo | null = null;
     public maxNote: ScoreNoteGlyphInfo | null = null;
     public get stemX(): number {
-        if (!this._noteGroup) {
+        if (!this.noteGroup) {
             return 0;
         }
 
-        return this._noteGroup!.stemX - this._noteHeadInfo!.minX;
+        return this.noteGroup!.stemX + this.noteGroup!.shiftX;
     }
+
 
     public noteStartX: number = 0;
 
@@ -210,7 +273,10 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 direction,
                 stemX: 0,
                 maxX: 0,
-                minX: 0
+                minX: 0,
+                minStep: Number.NaN,
+                maxStep: Number.NaN,
+                shiftX: 0
             };
             info.groups.set(direction, group);
         }
@@ -243,15 +309,19 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
         const info = this.getScoreChordNoteHeadInfo();
         const noteGroup = this._prepareForLayout(info);
-        this._noteGroup = noteGroup;
+        this.noteGroup = noteGroup;
         this._noteHeadInfo = info;
 
         this._collectNoteDisplacements(noteGroup);
-
         this._alignNoteHeadsGroup(noteGroup);
 
         info.update();
 
+        this._updateSizes();
+    }
+
+    private _updateSizes() {
+        const noteGroup = this.noteGroup!;
         // the center of score notes, (used for aligning the beat to the right on-time position)
         // is always the center of the "correct note" position.
 
@@ -263,7 +333,12 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             this.onTimeX += noteGroup.stemX - noteGroup.minX;
         }
 
-        this.width = noteGroup.maxX - noteGroup.minX;
+        this.width = (noteGroup.maxX - noteGroup.minX) + noteGroup.shiftX;
+    }
+
+    public doMultiVoiceLayout() {
+        this._noteHeadInfo!.finish();
+        this._updateSizes();
     }
 
     private _alignNoteHeadsGroup(noteGroup: ScoreChordNoteHeadGroup) {
@@ -331,15 +406,16 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         }
     }
 
+    private static _hasCollision(side: ScoreChordNoteHeadGroupSide, info: ScoreNoteGlyphInfo) {
+        return side.notes.has(info.steps) || side.notes.has(info.steps + 1) || side.notes.has(info.steps - 1);
+    }
+
     private _collectNoteDisplacements(noteGroup: ScoreChordNoteHeadGroup) {
         for (const info of this._infos) {
             info.glyph.renderer = this.renderer;
             info.glyph.doLayout();
 
-            const isGroupCollision =
-                noteGroup.correctNotes.notes.has(info.steps) ||
-                noteGroup.correctNotes.notes.has(info.steps + 1) ||
-                noteGroup.correctNotes.notes.has(info.steps - 1);
+            const isGroupCollision = ScoreNoteChordGlyphBase._hasCollision(noteGroup.correctNotes, info);
 
             let noteLookup: ScoreChordNoteHeadGroupSide;
             if (isGroupCollision) {
@@ -359,6 +435,14 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 noteLookup.notes.set(info.steps, stepInfos);
             }
             stepInfos.push(info);
+
+            if (Number.isNaN(noteGroup.minStep) || info.steps < noteGroup.minStep) {
+                noteGroup.minStep = info.steps;
+            }
+
+            if (Number.isNaN(noteGroup.maxStep) || info.steps > noteGroup.maxStep) {
+                noteGroup.maxStep = info.steps;
+            }
 
             this._updateGroupStemXPosition(info, noteGroup);
         }
@@ -386,22 +470,21 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             }
         }
 
-        // respect any shifts (e.g. reserving space for parenthesis)
-        stemX += this.noteStartX;
-
         if (stemX > noteGroup.stemX) {
             noteGroup.stemX = stemX;
         }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        cx += this.x;
+        cx += this.x + this.noteStartX;
         cy += this.y;
+
         this._paintLedgerLines(cx, cy, canvas);
+        cx += this.noteGroup!.shiftX;
         const infos: ScoreNoteGlyphInfo[] = this._infos;
         for (const g of infos) {
             g.glyph.renderer = this.renderer;
-            g.glyph.paint(cx - this._noteHeadInfo!.minX, cy, canvas);
+            g.glyph.paint(cx , cy, canvas);
         }
     }
 
@@ -416,7 +499,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
         const scale = this.scale;
         const lineExtension: number = this.renderer.smuflMetrics.legerLineExtension * scale;
-        const lineWidth: number = this.width - this.noteStartX + lineExtension * 2;
+        const lineWidth: number = this.width + lineExtension * 2;
 
         const lineSpacing = scoreRenderer.getLineHeight(1);
         const firstTopLedgerY = scoreRenderer.getLineY(-1);
@@ -429,7 +512,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         let y = firstTopLedgerY;
         while (y >= minNoteLineY) {
             canvas.fillRect(
-                cx - lineExtension + this.noteStartX,
+                cx - lineExtension,
                 cy + y - lineYOffset,
                 lineWidth,
                 this.renderer.smuflMetrics.legerLineThickness * scale
@@ -440,7 +523,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         y = firstBottomLedgerY;
         while (y <= maxNoteLineY) {
             canvas.fillRect(
-                cx - lineExtension + this.noteStartX,
+                cx - lineExtension,
                 cy + y - lineYOffset,
                 lineWidth,
                 this.renderer.smuflMetrics.legerLineThickness * scale

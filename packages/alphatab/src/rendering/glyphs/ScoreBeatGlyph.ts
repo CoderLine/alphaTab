@@ -125,7 +125,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (!this.restGlyph) {
             return;
         }
-        if (this.renderer.bar.isMultiVoice && Number.isNaN(this._collisionOffset)) {
+        if (Number.isNaN(this._collisionOffset)) {
             this._collisionOffset = this.renderer.collisionHelper.applyRestCollisionOffset(
                 this.container.beat,
                 this.restGlyph.y,
@@ -150,106 +150,31 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    public override doLayout(): void {
-        // create glyphs
-        const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        if (!this.container.beat.isEmpty) {
-            if (!this.container.beat.isRest) {
-                //
-                // Note heads
-                //
-                const noteHeads = new ScoreNoteChordGlyph();
-                this.noteHeads = noteHeads;
-                noteHeads.beat = this.container.beat;
-                const ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(false);
-                ghost.renderer = this.renderer;
+    public doMultiVoiceLayout(): void {
+        this.applyRestCollisionOffset();
+        this.noteHeads?.doMultiVoiceLayout();
+        this._whammy?.doMultiVoiceLayout();
 
-                for (const note of this.container.beat.notes) {
-                    if (note.isVisible && (!note.beat.slashed || note.index === 0)) {
-                        this._createNoteGlyph(note);
-                        ghost.addParenthesis(note);
-                    }
-                }
-
-                this.addNormal(noteHeads);
-                if (!ghost.isEmpty) {
-                    this.addEffect(ghost);
-                }
-
-                //
-                // Whammy Bar
-                if (this.container.beat.hasWhammyBar) {
-                    const whammy: ScoreWhammyBarGlyph = new ScoreWhammyBarGlyph(
-                        this.container as ScoreBeatContainerGlyph
-                    );
-                    this._whammy = whammy;
-                    whammy.renderer = this.renderer;
-                    whammy.doLayout();
-                    this.container.addTie(whammy);
-                }
-                //
-                // Note dots
-                //
-                if (this.container.beat.dots > 0) {
-                    for (let i: number = 0; i < this.container.beat.dots; i++) {
-                        const group: GlyphGroup = new GlyphGroup(0, 0);
-                        group.renderer = this.renderer;
-                        for (const note of this.container.beat.notes) {
-                            const g = this._createBeatDot(sr.getNoteSteps(note), group);
-                            g.colorOverride = ElementStyleHelper.noteColor(
-                                sr.resources,
-                                NoteSubElement.StandardNotationEffects,
-                                note
-                            );
-                        }
-                        this.addEffect(group);
-                    }
-                }
-            } else {
-                let steps = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
-
-                // this positioning is quite strange, for most staff line counts
-                // the whole/rest are aligned as half below the whole rest.
-                // but for staff line count 1 and 3 they are aligned centered on the same line.
-                if (
-                    this.container.beat.duration === Duration.Whole &&
-                    this.renderer.bar.staff.standardNotationLineCount !== 1 &&
-                    this.renderer.bar.staff.standardNotationLineCount !== 3
-                ) {
-                    steps -= 2;
-                }
-
-                const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(steps), this.container.beat.duration);
-                this.restGlyph = restGlyph;
-                restGlyph.beat = this.container.beat;
-                this.addNormal(restGlyph);
-
-                if (this.renderer.bar.isMultiVoice) {
-                    if (this.container.beat.voice.index === 0) {
-                        const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
-                        const restTop = restGlyph.y - sr.getScoreHeight(restSizes[0]);
-                        const restBottom = restGlyph.y + sr.getScoreHeight(restSizes[1]);
-                        this.renderer.collisionHelper.reserveBeatSlot(this.container.beat, restTop, restBottom);
-                    } else {
-                        this.renderer.collisionHelper.registerRest(this.container.beat);
-                    }
-                }
-
-                //
-                // Note dots
-                //
-                if (this.container.beat.dots > 0) {
-                    for (let i: number = 0; i < this.container.beat.dots; i++) {
-                        const group: GlyphGroup = new GlyphGroup(0, 0);
-                        group.renderer = this.renderer;
-                        this._createBeatDot(steps, group);
-                        this.addEffect(group);
-                    }
-                }
+        let w: number = 0;
+        if (this.glyphs) {
+            for (const g of this.glyphs) {
+                g.x = w;
+                w += g.width;
             }
         }
+        this.width = w;
+        this.computedWidth = w;
+
+        this._updatePositions();
+    }
+
+    public override doLayout(): void {
+        this._createGlyphs();
         super.doLayout();
-        this.applyRestCollisionOffset();
+        this._updatePositions();
+    }
+
+    private _updatePositions() {
         if (this.container.beat.isEmpty) {
             this.onTimeX = this.width / 2;
             this.middleX = this.onTimeX;
@@ -262,6 +187,114 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             this.onTimeX = this.noteHeads!.x + this.noteHeads!.onTimeX;
             this.middleX = this.noteHeads!.x + this.noteHeads!.width / 2;
             this.stemX = this.noteHeads!.x + this.noteHeads!.stemX;
+        }
+    }
+
+    private _createGlyphs() {
+        if (this.container.beat.isEmpty) {
+            return;
+        }
+
+        if (!this.container.beat.isRest) {
+            this._createNoteGlyphs();
+        } else {
+            this._createRestGlyphs();
+        }
+    }
+
+    private _createNoteGlyphs() {
+        const sr = this.renderer as ScoreBarRenderer;
+
+        //
+        // Note heads
+        const noteHeads = new ScoreNoteChordGlyph();
+        this.noteHeads = noteHeads;
+        noteHeads.beat = this.container.beat;
+        const ghost = new GhostNoteContainerGlyph(false);
+        ghost.renderer = this.renderer;
+
+        for (const note of this.container.beat.notes) {
+            if (note.isVisible && (!note.beat.slashed || note.index === 0)) {
+                this._createNoteGlyph(note);
+                ghost.addParenthesis(note);
+            }
+        }
+
+        this.addNormal(noteHeads);
+        if (!ghost.isEmpty) {
+            this.addEffect(ghost);
+        }
+
+        //
+        // Whammy Bar
+        if (this.container.beat.hasWhammyBar) {
+            const whammy: ScoreWhammyBarGlyph = new ScoreWhammyBarGlyph(this.container as ScoreBeatContainerGlyph);
+            this._whammy = whammy;
+            whammy.renderer = this.renderer;
+            whammy.doLayout();
+            this.container.addTie(whammy);
+        }
+        //
+        // Note dots
+        if (this.container.beat.dots > 0) {
+            for (let i: number = 0; i < this.container.beat.dots; i++) {
+                const group: GlyphGroup = new GlyphGroup(0, 0);
+                group.renderer = this.renderer;
+                for (const note of this.container.beat.notes) {
+                    const g = this._createBeatDot(sr.getNoteSteps(note), group);
+                    g.colorOverride = ElementStyleHelper.noteColor(
+                        sr.resources,
+                        NoteSubElement.StandardNotationEffects,
+                        note
+                    );
+                }
+                this.addEffect(group);
+            }
+        }
+    }
+
+    private _createRestGlyphs() {
+        const sr = this.renderer as ScoreBarRenderer;
+
+        let steps = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
+
+        // this positioning is quite strange, for most staff line counts
+        // the whole/rest are aligned as half below the whole rest.
+        // but for staff line count 1 and 3 they are aligned centered on the same line.
+        if (
+            this.container.beat.duration === Duration.Whole &&
+            this.renderer.bar.staff.standardNotationLineCount !== 1 &&
+            this.renderer.bar.staff.standardNotationLineCount !== 3
+        ) {
+            steps -= 2;
+        }
+
+        const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(steps), this.container.beat.duration);
+        this.restGlyph = restGlyph;
+        restGlyph.beat = this.container.beat;
+        this.addNormal(restGlyph);
+
+        if (this.renderer.bar.isMultiVoice) {
+            if (this.container.beat.voice.index === 0) {
+                const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
+                const restTop = restGlyph.y - sr.getScoreHeight(restSizes[0]);
+                const restBottom = restGlyph.y + sr.getScoreHeight(restSizes[1]);
+                this.renderer.collisionHelper.reserveBeatSlot(this.container.beat, restTop, restBottom);
+            } else {
+                this.renderer.collisionHelper.registerRest(this.container.beat);
+            }
+        }
+
+        //
+        // Note dots
+        //
+        if (this.container.beat.dots > 0) {
+            for (let i: number = 0; i < this.container.beat.dots; i++) {
+                const group: GlyphGroup = new GlyphGroup(0, 0);
+                group.renderer = this.renderer;
+                this._createBeatDot(steps, group);
+                this.addEffect(group);
+            }
         }
     }
 

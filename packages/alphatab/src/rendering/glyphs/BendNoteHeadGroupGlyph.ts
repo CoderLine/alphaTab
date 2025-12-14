@@ -118,7 +118,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         }
         this.noteStartX = x;
         super.doLayout();
-        this.noteHeadOffset = this.noteStartX + (this.width - this.noteStartX) / 2;
+        this.noteHeadOffset = this.noteStartX + this.onTimeX;
         if (this._showParenthesis) {
             this._postNoteParenthesis!.x = this.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
             this._postNoteParenthesis!.renderer = this.renderer;

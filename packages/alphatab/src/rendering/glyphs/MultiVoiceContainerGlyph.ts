@@ -253,9 +253,28 @@ export class MultiVoiceContainerGlyph extends Glyph {
             }
         }
 
+        if (this.renderer.bar.isMultiVoice) {
+            this._doMultiVoiceLayout();
+        }
+
         // draw order is reversed so that the main voice overlaps secondary ones
         this.voiceDrawOrder = Array.from(this.beatGlyphs.keys());
         this.voiceDrawOrder!.sort((a, b) => b - a);
+    }
+
+    private _doMultiVoiceLayout() {
+        for (const v of this.beatGlyphs.values()) {
+            let x = 0;
+            for (const b of v) {
+                b.x = x;
+                b.doMultiVoiceLayout();
+                x += b.width;
+            }
+
+            if (x > this.width) {
+                this.width = x;
+            }
+        }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

@@ -43,6 +43,11 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         return super.getBoundingBoxBottom() + this._calculateMaxSlurHeight(BeamDirection.Down);
     }
 
+    public doMultiVoiceLayout(): void {
+        this._middleNoteGlyph?.doMultiVoiceLayout();
+        this._endNoteGlyph?.doMultiVoiceLayout();
+    }
+
     private _calculateMaxSlurHeight(expectedDirection: BeamDirection) {
         const direction = this.getTieDirection(this._beat, this.renderer as ScoreBarRenderer);
         if (direction !== expectedDirection) {

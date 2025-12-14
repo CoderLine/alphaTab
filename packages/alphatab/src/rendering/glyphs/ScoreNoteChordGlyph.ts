@@ -152,9 +152,10 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         super.add(noteGlyph, noteLine);
     }
 
+
     public override doLayout(): void {
         super.doLayout();
-        const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const scoreRenderer = this.renderer as ScoreBarRenderer;
 
         if (this.beat.deadSlapped) {
             this._deadSlapped = new DeadSlappedBeatGlyph();

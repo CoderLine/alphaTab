@@ -16,8 +16,6 @@ import { ClefGlyph } from '@coderline/alphatab/rendering/glyphs/ClefGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { KeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/KeySignatureGlyph';
 import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { ScoreBeatGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatGlyph';
-import { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
 import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
@@ -476,10 +474,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     protected override createVoiceGlyphs(v: Voice): void {
         super.createVoiceGlyphs(v);
         for (const b of v.beats) {
-            const container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b);
-            container.preNotes = new ScoreBeatPreNotesGlyph();
-            container.onNotes = new ScoreBeatGlyph();
-            this.addBeatGlyph(container);
+            this.addBeatGlyph(new ScoreBeatContainerGlyph(b));
         }
     }
 

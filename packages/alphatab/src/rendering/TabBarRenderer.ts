@@ -10,13 +10,11 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import { TabBeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TabBeatContainerGlyph';
-import { TabBeatGlyph } from '@coderline/alphatab/rendering/glyphs/TabBeatGlyph';
-import { TabBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/TabBeatPreNotesGlyph';
+import type { TabBeatGlyph } from '@coderline/alphatab/rendering/glyphs/TabBeatGlyph';
 import { TabClefGlyph } from '@coderline/alphatab/rendering/glyphs/TabClefGlyph';
 import type { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteChordGlyph';
 import { TabTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TabTimeSignatureGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
-import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
 import { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import type { ReservedLayoutAreaSlot } from '@coderline/alphatab/rendering/utils/BarCollisionHelper';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
@@ -89,7 +87,7 @@ export class TabBarRenderer extends LineBarRenderer {
         if (this.additionalMultiRestBars) {
             return;
         }
-        
+
         const padding: number = this.smuflMetrics.staffLineThickness;
         const tuning = this.bar.staff.tuning;
         for (const voice of this.voiceContainer.beatGlyphs.values()) {
@@ -213,17 +211,9 @@ export class TabBarRenderer extends LineBarRenderer {
 
     protected override createVoiceGlyphs(v: Voice): void {
         super.createVoiceGlyphs(v);
-        // multibar rest
-        if (this.additionalMultiRestBars) {
-            const container = new MultiBarRestBeatContainerGlyph();
-            this.addBeatGlyph(container);
-        } else {
-            for (const b of v.beats) {
-                const container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b);
-                container.preNotes = new TabBeatPreNotesGlyph();
-                container.onNotes = new TabBeatGlyph();
-                this.addBeatGlyph(container);
-            }
+
+        for (const b of v.beats) {
+            this.addBeatGlyph(new TabBeatContainerGlyph(b));
         }
     }
 

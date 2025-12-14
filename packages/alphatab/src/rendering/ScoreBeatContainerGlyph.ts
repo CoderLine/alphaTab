@@ -9,7 +9,8 @@ import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
-import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
+import { ScoreBeatGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatGlyph';
+import { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreBendGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBendGlyph';
 import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
 import { ScoreSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlideLineGlyph';
@@ -25,16 +26,31 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     private _effectSlur: ScoreSlurGlyph | null = null;
     private _effectEndSlur: ScoreSlurGlyph | null = null;
 
+    public constructor(beat: Beat) {
+        super(beat);
+        this.preNotes = new ScoreBeatPreNotesGlyph();
+        this.onNotes = new ScoreBeatGlyph();
+    }
+
     public get prebendNoteHeadOffset() {
         return (this.preNotes as ScoreBeatPreNotesGlyph).prebendNoteHeadOffset;
     }
 
     public get accidentalsWidth() {
-        const preNotes: ScoreBeatPreNotesGlyph = this.preNotes as ScoreBeatPreNotesGlyph;
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph;
         if (preNotes && preNotes.accidentals) {
             return preNotes.accidentals.width;
         }
         return 0;
+    }
+
+    public override doMultiVoiceLayout(): void {
+        this.preNotes.x = 0;
+        (this.preNotes as ScoreBeatPreNotesGlyph).doMultiVoiceLayout();
+        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        (this.onNotes as ScoreBeatGlyph).doMultiVoiceLayout();
+
+        this._bend?.doMultiVoiceLayout();
     }
 
     public override doLayout(): void {

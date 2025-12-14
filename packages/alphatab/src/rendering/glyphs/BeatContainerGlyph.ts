@@ -29,6 +29,7 @@ export abstract class BeatContainerGlyphBase extends Glyph {
     public abstract get tupletGroup(): TupletGroup | null;
     public abstract get isLastOfVoice(): boolean;
     public abstract getNoteY(note: Note, requestedPosition: NoteYPosition): number;
+    public abstract doMultiVoiceLayout(): void;
     public abstract getRestY(requestedPosition: NoteYPosition): number;
     public abstract getNoteX(note: Note, requestedPosition: NoteXPosition): number;
     public abstract getBeatX(requestedPosition: BeatXPosition, useSharedSizes: boolean): number;
@@ -99,7 +100,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         return this.onNotes.y + this.onNotes.getNoteY(note, requestedPosition);
     }
-    
+
     public override getRestY(requestedPosition: NoteYPosition): number {
         return this.onNotes.y + this.onNotes.getRestY(requestedPosition);
     }
@@ -172,6 +173,10 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         this.updateWidth();
     }
 
+    public override doMultiVoiceLayout(): void {
+        // do nothing by default, overridden when needed
+    }
+
     protected updateWidth(): void {
         this.minWidth = this.preNotes.width + this.onNotes.width;
         let tieWidth: number = 0;
@@ -231,8 +236,13 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         //     canvas.color = new Color(200, 0, 0, 100);
         //     canvas.strokeRect(cx + this.x + this.preNotes.x, cy + this.y + 10, this.preNotes.width, 10);
 
-        //     canvas.color = new Color(0, 200, 0, 100);
-        //     canvas.strokeRect(cx + this.x + this.onNotes.x, cy + this.y + 10, this.onNotes.width, 10);
+        // canvas.color = new Color(0, 200, 0, 100);
+        // canvas.strokeRect(
+        //     cx + this.x + this.onNotes.x,
+        //     cy + this.y + this.beat.voice.index * 1,
+        //     this.onNotes.width,
+        //     10
+        // );
 
         //     canvas.color = new Color(0, 200, 200, 100);
         //     canvas.strokeRect(cx + this.x  + this.onNotes.x + this.onNotes.centerX, cy, 1, this.renderer.height);

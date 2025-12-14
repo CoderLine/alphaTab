@@ -34,151 +34,162 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
 
     public accidentals: AccidentalGroupGlyph | null = null;
 
+    public doMultiVoiceLayout() {
+        this._prebends?.doMultiVoiceLayout();
+    }
+
     public override doLayout(): void {
         if (!this.container.beat.isRest) {
-            const accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
-            accidentals.renderer = this.renderer;
+            this._createGlyphs();
+        }
+        super.doLayout();
+    }
 
-            const fingering: FingeringGroupGlyph = new FingeringGroupGlyph();
-            fingering.renderer = this.renderer;
+    private _createGlyphs() {
+        const accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
+        accidentals.renderer = this.renderer;
 
-            const ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(true);
-            ghost.renderer = this.renderer;
+        const fingering: FingeringGroupGlyph = new FingeringGroupGlyph();
+        fingering.renderer = this.renderer;
 
-            const preBends = new BendNoteHeadGroupGlyph('prebend', this.container.beat, true);
-            this._prebends = preBends;
-            preBends.renderer = this.renderer;
+        const ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(true);
+        ghost.renderer = this.renderer;
 
-            let hasSimpleSlideIn = false;
+        let preBends: BendNoteHeadGroupGlyph | null = null;
 
-            for (const note of this.container.beat.notes) {
-                const color = ElementStyleHelper.noteColor(
-                    this.renderer.resources,
-                    NoteSubElement.StandardNotationEffects,
-                    note
-                );
-                if (note.isVisible) {
-                    if (note.hasBend) {
-                        switch (note.bendType) {
-                            case BendType.PrebendBend:
-                            case BendType.Prebend:
-                            case BendType.PrebendRelease:
-                                preBends.addGlyph(
-                                    note.displayValue - ((note.bendPoints![0].value / 2) | 0),
-                                    false,
-                                    color
-                                );
-                                break;
-                        }
-                    } else if (note.beat.hasWhammyBar) {
-                        switch (note.beat.whammyBarType) {
-                            case WhammyType.PrediveDive:
-                            case WhammyType.Predive:
-                                this._prebends.addGlyph(
-                                    note.displayValue - ((note.beat.whammyBarPoints![0].value / 2) | 0),
-                                    false,
-                                    color
-                                );
-                                break;
-                        }
+
+        let hasSimpleSlideIn = false;
+
+        for (const note of this.container.beat.notes) {
+            const color = ElementStyleHelper.noteColor(
+                this.renderer.resources,
+                NoteSubElement.StandardNotationEffects,
+                note
+            );
+            if (note.isVisible) {
+                if (note.hasBend) {
+                    switch (note.bendType) {
+                        case BendType.PrebendBend:
+                        case BendType.Prebend:
+                        case BendType.PrebendRelease:
+                            if (!preBends) {
+                                preBends = new BendNoteHeadGroupGlyph('prebend', this.container.beat, true);
+                                preBends.renderer = this.renderer;
+                            }
+                            preBends.addGlyph(note.displayValue - ((note.bendPoints![0].value / 2) | 0), false, color);
+                            break;
                     }
-                    this._createAccidentalGlyph(note, accidentals);
-                    ghost.addParenthesis(note);
-                    fingering.addFingers(note);
-
-                    switch (note.slideInType) {
-                        case SlideInType.IntoFromBelow:
-                        case SlideInType.IntoFromAbove:
-                            hasSimpleSlideIn = true;
+                } else if (note.beat.hasWhammyBar) {
+                    switch (note.beat.whammyBarType) {
+                        case WhammyType.PrediveDive:
+                        case WhammyType.Predive:
+                            if (!preBends) {
+                                preBends = new BendNoteHeadGroupGlyph('prebend', this.container.beat, true);
+                                preBends.renderer = this.renderer;
+                            }
+                            preBends.addGlyph(
+                                note.displayValue - ((note.beat.whammyBarPoints![0].value / 2) | 0),
+                                false,
+                                color
+                            );
                             break;
                     }
                 }
-            }
+                this._createAccidentalGlyph(note, accidentals);
+                ghost.addParenthesis(note);
+                fingering.addFingers(note);
 
-            if (hasSimpleSlideIn) {
-                this.addNormal(
-                    new SpacingGlyph(
-                        0,
-                        0,
-                        this.renderer.smuflMetrics.simpleSlideWidth *
-                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                    )
-                );
-            }
-
-            if (!preBends.isEmpty) {
-                this.addEffect(preBends);
-                this.addNormal(
-                    new SpacingGlyph(
-                        0,
-                        0,
-                        this.renderer.smuflMetrics.preNoteEffectPadding *
-                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                    )
-                );
-            }
-            if (this.container.beat.brushType !== BrushType.None) {
-                this.addEffect(new ScoreBrushGlyph(this.container.beat));
-                this.addNormal(
-                    new SpacingGlyph(
-                        0,
-                        0,
-                        this.renderer.smuflMetrics.preNoteEffectPadding *
-                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                    )
-                );
-            }
-            if (!fingering.isEmpty) {
-                if (!this.isEmpty) {
-                    this.addNormal(
-                        new SpacingGlyph(
-                            0,
-                            0,
-                            this.renderer.smuflMetrics.preNoteEffectPadding *
-                                (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                        )
-                    );
+                switch (note.slideInType) {
+                    case SlideInType.IntoFromBelow:
+                    case SlideInType.IntoFromAbove:
+                        hasSimpleSlideIn = true;
+                        break;
                 }
-
-                this.addEffect(fingering);
-                this.addNormal(
-                    new SpacingGlyph(
-                        0,
-                        0,
-                        this.renderer.smuflMetrics.preNoteEffectPadding *
-                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                    )
-                );
-            }
-
-            if (!ghost.isEmpty) {
-                this.addEffect(ghost);
-            }
-            if (!accidentals.isEmpty) {
-                this.accidentals = accidentals;
-                if (!this.isEmpty) {
-                    this.addNormal(
-                        new SpacingGlyph(
-                            0,
-                            0,
-                            this.renderer.smuflMetrics.preNoteEffectPadding *
-                                (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                        )
-                    );
-                }
-
-                this.addNormal(accidentals);
-                this.addNormal(
-                    new SpacingGlyph(
-                        0,
-                        0,
-                        this.renderer.smuflMetrics.preNoteEffectPadding *
-                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                    )
-                );
             }
         }
-        super.doLayout();
+        
+        if (hasSimpleSlideIn) {
+            this.addNormal(
+                new SpacingGlyph(
+                    0,
+                    0,
+                    this.renderer.smuflMetrics.simpleSlideWidth *
+                        (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
+                )
+            );
+        }
+
+        if (preBends) {
+            this.addEffect(preBends);
+            this.addNormal(
+                new SpacingGlyph(
+                    0,
+                    0,
+                    this.renderer.smuflMetrics.preNoteEffectPadding *
+                        (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
+                )
+            );
+        }
+        if (this.container.beat.brushType !== BrushType.None) {
+            this.addEffect(new ScoreBrushGlyph(this.container.beat));
+            this.addNormal(
+                new SpacingGlyph(
+                    0,
+                    0,
+                    this.renderer.smuflMetrics.preNoteEffectPadding *
+                        (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
+                )
+            );
+        }
+        if (!fingering.isEmpty) {
+            if (!this.isEmpty) {
+                this.addNormal(
+                    new SpacingGlyph(
+                        0,
+                        0,
+                        this.renderer.smuflMetrics.preNoteEffectPadding *
+                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
+                    )
+                );
+            }
+
+            this.addEffect(fingering);
+            this.addNormal(
+                new SpacingGlyph(
+                    0,
+                    0,
+                    this.renderer.smuflMetrics.preNoteEffectPadding *
+                        (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
+                )
+            );
+        }
+
+        if (!ghost.isEmpty) {
+            this.addEffect(ghost);
+        }
+        if (!accidentals.isEmpty) {
+            this.accidentals = accidentals;
+            if (!this.isEmpty) {
+                this.addNormal(
+                    new SpacingGlyph(
+                        0,
+                        0,
+                        this.renderer.smuflMetrics.preNoteEffectPadding *
+                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
+                    )
+                );
+            }
+
+            this.addNormal(accidentals);
+            this.addNormal(
+                new SpacingGlyph(
+                    0,
+                    0,
+                    this.renderer.smuflMetrics.preNoteEffectPadding *
+                        (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
+                )
+            );
+        }
     }
 
     private _createAccidentalGlyph(n: Note, accidentals: AccidentalGroupGlyph): void {
