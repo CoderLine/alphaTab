@@ -297,10 +297,11 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
             } else {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat.nextBeat, BeatXPosition.PreNotes);
             }
+            endX -= this.renderer.smuflMetrics.postNoteEffectPadding;
 
             // we need some pixels for the arrow. otherwise we might draw into the next
             if (!isMultiBeatBend) {
-                endX -= tabBendArrowSize;
+                endX -= tabBendArrowSize / 2;
             }
 
             this._paintBendLines(canvas, startX, topY, endX, startNoteRenderer, note, renderPoints);

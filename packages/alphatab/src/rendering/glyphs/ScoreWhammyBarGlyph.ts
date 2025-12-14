@@ -55,7 +55,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
         return super.getBoundingBoxBottom();
     }
 
-    public doMultiVoiceLayout(){
+    public doMultiVoiceLayout() {
         this._endGlyph?.doMultiVoiceLayout();
     }
 
@@ -183,15 +183,12 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                 startY += startNoteRenderer.getNoteY(note, NoteYPosition.Top);
             }
 
-            let endX: number = cx + startNoteRenderer.x;
-            if (beat.isLastOfVoice) {
-                endX += startNoteRenderer.postBeatGlyphsStart;
-            } else {
-                endX += startNoteRenderer.getBeatX(beat, BeatXPosition.EndBeat);
-            }
+            let endX: number = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(beat, BeatXPosition.EndBeat);
+            endX -= this.renderer.smuflMetrics.postNoteEffectPadding;
 
             if (this._endGlyph) {
-                endX -= this._endGlyph.stemX;
+                const postBeatSize = this._endGlyph.width - this._endGlyph.onTimeX;
+                endX -= postBeatSize;
             }
 
             const slurText: string = beat.whammyStyle === BendStyle.Gradual && i === 0 ? 'grad.' : '';
@@ -264,7 +261,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                 case WhammyType.Dive:
                     if (i === 0) {
                         const g0 = this.glyphs![0] as BendNoteHeadGroupGlyph;
-                        g0.x = endX - g0.noteHeadOffset;
+                        g0.x = endX - g0.onTimeX;
                         const previousY = this.glyphs![0].y;
                         g0.y = cy + startNoteRenderer.y;
                         g0.paint(0, 0, canvas);
@@ -315,7 +312,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                     } else {
                         const middleX: number = (startX + endX) / 2;
                         const g0 = this.glyphs![0] as BendNoteHeadGroupGlyph;
-                        g0.x = middleX - g0.noteHeadOffset;
+                        g0.x = middleX - g0.onTimeX;
                         g0.y = cy + startNoteRenderer.y;
                         g0.paint(0, 0, canvas);
                         const middleValue: number = this._getBendNoteValue(note, beat.whammyBarPoints![1]);
@@ -331,7 +328,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         );
 
                         const g1 = this.glyphs![1] as BendNoteHeadGroupGlyph;
-                        g1.x = endX - g1.noteHeadOffset;
+                        g1.x = endX - g1.onTimeX;
                         g1.y = cy + startNoteRenderer.y;
                         g1.paint(0, 0, canvas);
                         endY = g1.getNoteValueY(endValue) + heightOffset;
@@ -364,7 +361,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                     this.drawBendSlur(canvas, preX, preY, startX, startY, direction === BeamDirection.Down, slurText);
                     if (this.glyphs) {
                         const g0 = this.glyphs![0] as BendNoteHeadGroupGlyph;
-                        g0.x = endX - g0.noteHeadOffset;
+                        g0.x = endX - g0.onTimeX;
                         g0.y = cy + startNoteRenderer.y;
                         g0.paint(0, 0, canvas);
                         this.drawBendSlur(

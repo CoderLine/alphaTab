@@ -215,23 +215,25 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
             cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.MiddleNotes);
         let endBeatX: number = cx + startNoteRenderer.x;
         if (this._beat.isLastOfVoice) {
-            endBeatX += startNoteRenderer.postBeatGlyphsStart;
+            endBeatX += startNoteRenderer.getBeatX(this._beat!, BeatXPosition.EndBeat);
         } else {
             endBeatX += startNoteRenderer.getBeatX(this._beat.nextBeat!, BeatXPosition.PreNotes);
         }
+        endBeatX -= this.renderer.smuflMetrics.postNoteEffectPadding;
 
         if (this._endNoteGlyph) {
-            endBeatX -= this._endNoteGlyph.stemX;
+            const postBeatSize = this._endNoteGlyph.width - this._endNoteGlyph.onTimeX;
+            endBeatX -= postBeatSize;
         }
 
         const middleX: number = (startX + endBeatX) / 2;
         if (this._middleNoteGlyph) {
-            this._middleNoteGlyph.x = middleX - this._middleNoteGlyph.noteHeadOffset;
+            this._middleNoteGlyph.x = middleX - this._middleNoteGlyph.onTimeX;
             this._middleNoteGlyph.y = cy + startNoteRenderer.y;
             this._middleNoteGlyph.paint(0, 0, canvas);
         }
         if (this._endNoteGlyph) {
-            this._endNoteGlyph.x = endBeatX - this._endNoteGlyph.noteHeadOffset;
+            this._endNoteGlyph.x = endBeatX - this._endNoteGlyph.onTimeX;
             this._endNoteGlyph.y = cy + startNoteRenderer.y;
             this._endNoteGlyph.paint(0, 0, canvas);
         }

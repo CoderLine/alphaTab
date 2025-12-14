@@ -25,7 +25,7 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     private _prebends: BendNoteHeadGroupGlyph | null = null;
     public get prebendNoteHeadOffset(): number {
-        return this._prebends ? this._prebends.x + this._prebends.noteHeadOffset : 0;
+        return this._prebends ? this._prebends.x + this._prebends.onTimeX : 0;
     }
 
     protected override get effectElement() {
@@ -119,6 +119,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             );
         }
 
+        this._prebends = preBends;
         if (preBends) {
             this.addEffect(preBends);
             this.addNormal(

@@ -37,8 +37,6 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         return BeamDirection.Up;
     }
 
-    public noteHeadOffset: number = 0;
-
     public constructor(groupId: string, beat: Beat, showParenthesis: boolean = false) {
         super();
         this._beat = beat;
@@ -118,7 +116,6 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         }
         this.noteStartX = x;
         super.doLayout();
-        this.noteHeadOffset = this.noteStartX + this.onTimeX;
         if (this._showParenthesis) {
             this._postNoteParenthesis!.x = this.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
             this._postNoteParenthesis!.renderer = this.renderer;

@@ -197,7 +197,6 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         return this.noteGroup!.stemX + this.noteGroup!.shiftX;
     }
 
-
     public noteStartX: number = 0;
 
     public onTimeX = 0;
@@ -268,12 +267,12 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 correctNotes: {
                     notes: new Map(),
                     width: 0,
-                    minX: 0
+                    minX: Number.NaN
                 },
                 direction,
                 stemX: 0,
-                maxX: 0,
-                minX: 0,
+                maxX: Number.NaN,
+                minX: Number.NaN,
                 minStep: Number.NaN,
                 maxStep: Number.NaN,
                 shiftX: 0
@@ -333,7 +332,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             this.onTimeX += noteGroup.stemX - noteGroup.minX;
         }
 
-        this.width = (noteGroup.maxX - noteGroup.minX) + noteGroup.shiftX;
+        this.width = this.noteStartX + noteGroup.maxX - noteGroup.minX + noteGroup.shiftX;
     }
 
     public doMultiVoiceLayout() {
@@ -390,16 +389,16 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
                 // update side
                 side.width = Math.max(side.width, info.glyph.width);
-                if (info.glyph.x < side.minX) {
+                if (Number.isNaN(side.minX) || info.glyph.x < side.minX) {
                     side.minX = info.glyph.x;
                 }
 
                 // update whole group
-                if (info.glyph.x < noteGroup.minX) {
+                if (Number.isNaN(noteGroup.minX) || info.glyph.x < noteGroup.minX) {
                     noteGroup.minX = info.glyph.x;
                 }
                 const maxX = info.glyph.x + info.glyph.width;
-                if (maxX > noteGroup.maxX) {
+                if (Number.isNaN(noteGroup.maxX) ||maxX > noteGroup.maxX) {
                     noteGroup.maxX = maxX;
                 }
             }
@@ -470,13 +469,15 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             }
         }
 
+        stemX += this.noteStartX;
+
         if (stemX > noteGroup.stemX) {
             noteGroup.stemX = stemX;
         }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        cx += this.x + this.noteStartX;
+        cx += this.x;
         cy += this.y;
 
         this._paintLedgerLines(cx, cy, canvas);
@@ -484,7 +485,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         const infos: ScoreNoteGlyphInfo[] = this._infos;
         for (const g of infos) {
             g.glyph.renderer = this.renderer;
-            g.glyph.paint(cx , cy, canvas);
+            g.glyph.paint(cx, cy, canvas);
         }
     }
 
@@ -512,7 +513,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         let y = firstTopLedgerY;
         while (y >= minNoteLineY) {
             canvas.fillRect(
-                cx - lineExtension,
+                cx - lineExtension + this.noteStartX,
                 cy + y - lineYOffset,
                 lineWidth,
                 this.renderer.smuflMetrics.legerLineThickness * scale
@@ -523,7 +524,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         y = firstBottomLedgerY;
         while (y <= maxNoteLineY) {
             canvas.fillRect(
-                cx - lineExtension,
+                cx - lineExtension + this.noteStartX,
                 cy + y - lineYOffset,
                 lineWidth,
                 this.renderer.smuflMetrics.legerLineThickness * scale
