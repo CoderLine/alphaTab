@@ -79,6 +79,7 @@ describe('AlphaTexImporterOldNewCompat', () => {
 
         // use exporters to create alphaTex code for comparison test
 
+        settings.exporter.comments = true;
         const exportedOld = new AlphaTexExporterOld().exportToString(expected, settings);
         await readAndCompare(name, ignoreKeys, exportedOld, settings);
 

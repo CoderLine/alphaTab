@@ -23,7 +23,8 @@ import {
     AlphaTexDiagnosticsSeverity,
     type IAlphaTexImporter,
     type IAlphaTexImporterState,
-    AlphaTexStaffNoteKind
+    AlphaTexStaffNoteKind,
+    AlphaTexVoiceMode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import {
     ApplyNodeResult,
@@ -166,6 +167,7 @@ class AlphaTexImportState implements IAlphaTexImporterState {
 
     public currentDynamics = DynamicValue.F;
     public accidentalMode = AlphaTexAccidentalMode.Explicit;
+    public voiceMode = AlphaTexVoiceMode.StaffWise;
     public currentTupletNumerator = -1;
     public currentTupletDenominator = -1;
     public scoreNode: AlphaTexScoreNode | undefined;
@@ -349,18 +351,38 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
     private _bars(node: AlphaTexScoreNode) {
         if (node.bars.length > 0) {
+            let previousBarCompleted = false;
             for (const b of node.bars) {
-                this._bar(b);
+                this._bar(b, previousBarCompleted);
+
+                switch (this.state.voiceMode) {
+                    case AlphaTexVoiceMode.StaffWise:
+                        // if voices are staff-wise, we definitly have a new bar here
+                        this._state.barIndex++;
+                        previousBarCompleted = true;
+                        break;
+                    case AlphaTexVoiceMode.BarWise:
+                        // if voices are bar-wise, the next bar might be another voice in the same bar
+                        // (barIndex increment is handled inside _barMeta)
+                        // if we have an explicit bar end, we can increase already
+                        if (b.pipe) {
+                            this._state.barIndex++;
+                            this._state.voiceIndex = 0;
+                            this._state.ignoredInitialVoice = false;
+                            previousBarCompleted = true;
+                        }
+                        break;
+                }
             }
         } else {
-            this._newBar(this._state.currentStaff!);
+            this._getBar(this._state.currentStaff!);
             this._detectTuningForStaff(this._state.currentStaff!);
             this._handleTransposition(this._state.currentStaff!);
         }
     }
 
-    private _bar(node: AlphaTexBarNode) {
-        const bar = this._barMeta(node);
+    private _bar(node: AlphaTexBarNode, previousBarCompleted: boolean) {
+        const bar = this._barMeta(node, previousBarCompleted);
 
         this._detectTuningForStaff(this._state.currentStaff!);
         this._handleTransposition(this._state.currentStaff!);
@@ -841,7 +863,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
     }
 
-    private _barMeta(node: AlphaTexBarNode): Bar {
+    private _barMeta(node: AlphaTexBarNode, previousBarCompleted: boolean): Bar {
         // it might be a bit an edge case but a valid one:
         // one might repeat multiple structural metadata
         // in one bar starting multiple tracks/staves/voices which are
@@ -859,6 +881,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         let previousStaff = this._state.currentStaff!;
         let hadNewTrack = false;
         let hadNewStaff = false;
+        let hadNewVoice = false;
         let applyInitialBarMetaToPreviousStaff = false;
 
         const resetInitialBarMeta = () => {
@@ -871,11 +894,18 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             previousStaff = this._state.currentStaff!;
             hadNewTrack = false;
             hadNewStaff = false;
+            hadNewVoice = false;
             applyInitialBarMetaToPreviousStaff = false;
         };
 
         const bar: Lazy<Bar> = new Lazy<Bar>(() => {
-            const b = this._newBar(this._state.currentStaff!);
+            // had a \voice in this bar -> barIndex and voice were updated already
+            // if not, we start a new bar here
+            if (!hadNewVoice && !previousBarCompleted) {
+                this._state.barIndex++;
+            }
+
+            const b = this._getBar(this._state.currentStaff!);
             if (initialBarMeta) {
                 for (const initial of initialBarMeta) {
                     this._handler.applyBarMetaData(this, b, initial);
@@ -918,6 +948,9 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
                         // new bar needed on new structural level
                         bar.reset();
+                        break;
+                    case ApplyStructuralMetaDataResult.AppliedNewVoice:
+                        hadNewVoice = true;
                         break;
                 }
 
@@ -989,15 +1022,14 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         return bar.value;
     }
 
-    private _newBar(staff: Staff): Bar {
+    private _getBar(staff: Staff): Bar {
         // existing bar? -> e.g. in multi-voice setups where we fill empty voices later
         if (this._state.barIndex < staff.bars.length) {
             const bar = staff.bars[this._state.barIndex];
-            this._state.barIndex++;
             return bar;
         }
 
-        const voiceCount = staff.bars.length === 0 ? 1 : staff.bars[0].voices.length;
+        const voiceCount = staff.bars.length === 0 ? this._state.voiceIndex + 1 : staff.bars[0].voices.length;
 
         // need new bar
         const newBar: Bar = new Bar();
@@ -1008,7 +1040,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             newBar.keySignature = newBar.previousBar!.keySignature;
             newBar.keySignatureType = newBar.previousBar!.keySignatureType;
         }
-        this._state.barIndex++;
+        this._state.barIndex = newBar.index;
 
         if (newBar.index > 0) {
             newBar.clef = newBar.previousBar!.clef;
@@ -1073,27 +1105,67 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
     }
 
     public startNewVoice() {
-        if (
-            this._state.voiceIndex === 0 &&
-            (this._state.currentStaff!.bars.length === 0 ||
-                (this._state.currentStaff!.bars.length === 1 &&
-                    this._state.currentStaff!.bars[0].isEmpty &&
-                    !this._state.ignoredInitialVoice))
-        ) {
-            // voice marker on the begining of the first voice without any bar yet?
-            // -> ignore
+        // only if we're on the first voice we might skip the initial \voice meta
+        let shouldIgnoreInitialVoice = this._state.voiceIndex === 0 && !this._state.ignoredInitialVoice;
+
+        // this logic is expanded for readability
+        if (shouldIgnoreInitialVoice) {
+            // if we have no bars created yet, we stay on the initial voice
+            if (this._state.currentStaff!.bars.length === 0) {
+                shouldIgnoreInitialVoice = true;
+            } else {
+                switch (this._state.voiceMode) {
+                    case AlphaTexVoiceMode.StaffWise:
+                        // on staffwise voices, we can only ignore the "initial" voice if the
+                        // first bar we have is completely empty
+                        shouldIgnoreInitialVoice =
+                            this._state.currentStaff!.bars.length === 1 && this._state.currentStaff!.bars[0].isEmpty;
+                        break;
+                    case AlphaTexVoiceMode.BarWise:
+                        // on barwise voices, we ignore the bar count but check only the first voice of the current bar
+                        // to find out if it is the initial empty one
+                        if (this._state.barIndex < this._state.currentStaff!.bars.length) {
+                            // bar exists -> check if empty
+                            const bar = this._state.currentStaff!.bars[this._state.barIndex];
+                            shouldIgnoreInitialVoice = bar.voices[0].isEmpty;
+                        } else {
+                            // bar doesn't exist yet
+                            shouldIgnoreInitialVoice = true;
+                        }
+                        break;
+                }
+            }
+        }
+
+        if (shouldIgnoreInitialVoice) {
             this._state.ignoredInitialVoice = true;
             return;
         }
-        // create directly a new empty voice for all bars
-        for (const b of this._state.currentStaff!.bars) {
-            const v = new Voice();
-            b.addVoice(v);
+
+        switch (this._state.voiceMode) {
+            case AlphaTexVoiceMode.StaffWise:
+                // start using the new voice (see newBar for details on matching)
+                this._state.voiceIndex++;
+                this._state.barIndex = 0;
+                this._state.currentTupletDenominator = -1;
+                this._state.currentTupletNumerator = -1;
+
+                break;
+            case AlphaTexVoiceMode.BarWise:
+                this._state.voiceIndex++;
+
+                this._state.currentTupletDenominator = -1;
+                this._state.currentTupletNumerator = -1;
+                break;
         }
-        // start using the new voice (see newBar for details on matching)
-        this._state.voiceIndex++;
-        this._state.barIndex = 0;
-        this._state.currentTupletDenominator = -1;
-        this._state.currentTupletNumerator = -1;
+
+        // create all missing voices
+        for (const b of this._state.currentStaff!.bars) {
+            while (b.voices.length <= this._state.voiceIndex) {
+                b.addVoice(new Voice());
+            }
+        }
+
+        // create voices
     }
 }

@@ -147,6 +147,7 @@ import { noteVibratoWide } from '@coderline/alphatab-alphatex//properties/note/v
 import { x } from '@coderline/alphatab-alphatex//properties/note/x';
 import { metadata, properties } from '@coderline/alphatab-alphatex/common';
 import { db } from '@coderline/alphatab-alphatex/metadata/bar/db';
+import { voiceMode } from '@coderline/alphatab-alphatex/metadata/bar/voiceMode';
 import { extendBarLines } from '@coderline/alphatab-alphatex/metadata/score/extendbarlines';
 import { instrumentMeta } from '@coderline/alphatab-alphatex/metadata/staff/instrument';
 import type { AlphaTexExample, WithDescription, WithSignatures } from '@coderline/alphatab-alphatex/types';
@@ -216,7 +217,8 @@ export const barMetaData = metadata(
     spd,
     sph,
     spu,
-    db
+    db,
+    voiceMode
 );
 
 export const allMetadata = new Map([
