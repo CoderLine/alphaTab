@@ -152,7 +152,6 @@ export class ScoreChordNoteHeadInfo {
         // no intersection -> we can align the note heads directly.
         const intersection = ScoreChordNoteHeadInfo._checkIntersection(mainGroup, noteGroup);
 
-        // TODO: take care of flags
         switch (intersection) {
             case NoteHeadIntersectionKind.NoIntersection:
                 return;
@@ -244,22 +243,17 @@ export class ScoreChordNoteHeadInfo {
         }
 
         if (bottomGap === 0) {
-            console.log('bottomGap', bottomGap, 'ExactMatch');
             return NoteHeadIntersectionKind.ExactMatch;
         }
         if (bottomGap === 1) {
-            console.log('bottomGap', bottomGap, 'EndsTouchingOuter');
             return NoteHeadIntersectionKind.EndsTouchingOuter;
         }
         if (bottomGap === -1) {
-            console.log('bottomGap', bottomGap, 'EndsTouchingInner');
             return NoteHeadIntersectionKind.EndsTouchingInner;
         }
         if (bottomGap < 0) {
-            console.log('bottomGap', bottomGap, 'FullIntersection');
             return NoteHeadIntersectionKind.FullIntersection;
         }
-        console.log('bottomGap', bottomGap, 'NoIntersection');
         return NoteHeadIntersectionKind.NoIntersection;
     }
 }
@@ -401,6 +395,12 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         //    * if the note heads are on the exact same position and have both the same "black" note head (grace, shape etc. are accounted)
         //      there is no shift and the same "spot" can be used
         //    * if there is a +/- 1 overlap a shift of the whole group is applied
+
+        // NOTE: 
+        // * This logic is close to what MuseScore does
+        // * Dorico has own "note groups" for every voice, even if they are in the same stem-direction.
+        //   Then they displace the groups similarly like with different stem-directions (never merging note heads)
+
 
         const info = this.getScoreChordNoteHeadInfo();
         const noteGroup = this._prepareForLayout(info);
