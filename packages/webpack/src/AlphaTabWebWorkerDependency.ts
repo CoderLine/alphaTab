@@ -81,8 +81,8 @@ export function injectWebWorkerDependency(webPackWithAlphaTab: webPackWithAlphaT
             runtimeRequirements.add(webPackWithAlphaTab.webpack.RuntimeGlobals.getChunkScriptFilename);
 
             source.replace(
-                dep.range[0],
-                dep.range[1] - 1,
+                dep.range![0],
+                dep.range![1] - 1,
                 `/* worker import */ ${workerImportBaseUrl} + ${
                     webPackWithAlphaTab.webpack.RuntimeGlobals.getChunkScriptFilename
                 }(${JSON.stringify(chunk.id)}), ${webPackWithAlphaTab.webpack.RuntimeGlobals.baseURI}`

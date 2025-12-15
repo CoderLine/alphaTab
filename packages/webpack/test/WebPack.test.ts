@@ -30,10 +30,7 @@ describe('WebPack', () => {
                             filename: '[name]-[contenthash:8].js',
                             path: path.resolve('./out')
                         },
-                        plugins: [
-                            new AlphaTabWebPackPlugin(),
-                            new HtmlWebpackPlugin()
-                        ],
+                        plugins: [new AlphaTabWebPackPlugin(), new HtmlWebpackPlugin()],
                         optimization: {
                             minimize: false,
                             splitChunks: {
@@ -105,7 +102,8 @@ describe('WebPack', () => {
                     expect(text).to.include('class AlphaTabApiBase');
                     // ensure the library mode is active as needed
                     expect(text).to.include('alphaTabApp = __webpack_exports__');
-
+                    // ensure __ALPHATAB_WEBPACK__ got replaced
+                    expect(text).to.not.include('__ALPHATAB_WEBPACK__');
                     appValidated = true;
                 } else if (file.name.endsWith('.js')) {
                     if (text.includes('class AlphaTabApiBase')) {
