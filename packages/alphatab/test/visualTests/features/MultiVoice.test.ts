@@ -176,8 +176,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 Quarter Chord,-v2 Half Chord
-        it('v1 Quarter Chord,-v2 Half Chord-Automatic Stem', async () =>
+        // v1 Quarter Chord-v2 Half Chord
+        it('v1 Quarter Chord-v2 Half Chord-Automatic Stem', async () =>
             await test(
                 `
             \\voice 
@@ -186,7 +186,7 @@ describe('MultiVoiceTests', () => {
             (C5 B4).2 (D5 C5) (E5 D5) (F5 E5) (G5 F5)
             `
             ));
-        it('v1 Quarter Chord,-v2 Half Chord-Reversed Stem', async () =>
+        it('v1 Quarter Chord-v2 Half Chord-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -195,7 +195,7 @@ describe('MultiVoiceTests', () => {
             (C5 B4).2{beam up} (D5 C5){beam up} (E5 D5){beam up} (F5 E5){beam up} (G5 F5){beam up}
             `
             ));
-        it('v1 Quarter Chord,-v2 Half Chord-Same Stem', async () =>
+        it('v1 Quarter Chord-v2 Half Chord-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -205,8 +205,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 8th Flag Single,-v2 8th Flag Single
-        it('v1 8th Flag Single,-v2 8th Flag Single-Automatic Stem', async () =>
+        // v1 8th Flag Single-v2 8th Flag Single
+        it('v1 8th Flag Single-v2 8th Flag Single-Automatic Stem', async () =>
             await test(
                 `
             \\ts (5 4)
@@ -216,7 +216,7 @@ describe('MultiVoiceTests', () => {
             C5 r D5 r E5 r F5 r G5 r
             `
             ));
-        it('v1 8th Flag Single,-v2 8th Flag Single-Reversed Stem', async () =>
+        it('v1 8th Flag Single-v2 8th Flag Single-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -225,7 +225,7 @@ describe('MultiVoiceTests', () => {
             C5{beam up} r D5{beam up} r E5{beam up} r F5{beam up} r G5 {beam up} r
             `
             ));
-        it('v1 8th Flag Single,-v2 8th Flag Single-Same Stem', async () =>
+        it('v1 8th Flag Single-v2 8th Flag Single-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -293,8 +293,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 8th Flag Single,-v2 Quarter Single
-        it('v1 8th Flag Single,-v2 Quarter Single-Automatic Stem', async () =>
+        // v1 8th Flag Single-v2 Quarter Single
+        it('v1 8th Flag Single-v2 Quarter Single-Automatic Stem', async () =>
             await test(
                 `
             \\voice 
@@ -303,7 +303,7 @@ describe('MultiVoiceTests', () => {
             C5.4 D5 E5 F5 G5
             `
             ));
-        it('v1 8th Flag Single,-v2 Quarter Single-Reversed Stem', async () =>
+        it('v1 8th Flag Single-v2 Quarter Single-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -312,7 +312,7 @@ describe('MultiVoiceTests', () => {
             C5.4{beam up} D5{beam up} E5{beam up} F5{beam up} G5 {beam up}
             `
             ));
-        it('v1 8th Flag Single,-v2 Quarter Single-Same Stem', async () =>
+        it('v1 8th Flag Single-v2 Quarter Single-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -322,8 +322,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 8th Flag Chord,-v2 Quarter Single
-        it('v1 8th Flag Chord,-v2 Quarter Single-Automatic Stem', async () =>
+        // v1 8th Flag Chord-v2 Quarter Single
+        it('v1 8th Flag Chord-v2 Quarter Single-Automatic Stem', async () =>
             await test(
                 `
             \\voice 
@@ -332,7 +332,7 @@ describe('MultiVoiceTests', () => {
             C5.4 D5 E5 F5 G5
             `
             ));
-        it('v1 8th Flag Chord,-v2 Quarter Single-Reversed Stem', async () =>
+        it('v1 8th Flag Chord-v2 Quarter Single-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -341,7 +341,7 @@ describe('MultiVoiceTests', () => {
             C5.4{beam up} D5{beam up} E5{beam up} F5{beam up} G5{beam up}
             `
             ));
-        it('v1 8th Flag Chord,-v2 Quarter Single-Same Stem', async () =>
+        it('v1 8th Flag Chord-v2 Quarter Single-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -351,8 +351,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 8th Flag Chord,-v2 Quarter Chord
-        it('v1 8th Flag Chord,-v2 Quarter Chord-Automatic Stem', async () =>
+        // v1 8th Flag Chord-v2 Quarter Chord
+        it('v1 8th Flag Chord-v2 Quarter Chord-Automatic Stem', async () =>
             await test(
                 `
             \\voice 
@@ -361,7 +361,7 @@ describe('MultiVoiceTests', () => {
             (C5 B4).4 (D5 C5) (E5 D5) (F5 E5) (G5 F5)
             `
             ));
-        it('v1 8th Flag Chord,-v2 Quarter Chord-Reversed Stem', async () =>
+        it('v1 8th Flag Chord-v2 Quarter Chord-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -370,7 +370,7 @@ describe('MultiVoiceTests', () => {
             (C5 B4).4{beam up} (D5 C5){beam up} (E5 D5){beam up} (F5 E5){beam up} (G5 F5){beam up}
             `
             ));
-        it('v1 8th Flag Chord,-v2 Quarter Chord-Same Stem', async () =>
+        it('v1 8th Flag Chord-v2 Quarter Chord-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -380,8 +380,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 8th Flag Single,-v2 Half Single
-        it('v1 8th Flag Single,-v2 Half Single-Automatic Stem', async () =>
+        // v1 8th Flag Single-v2 Half Single
+        it('v1 8th Flag Single-v2 Half Single-Automatic Stem', async () =>
             await test(
                 `
             \\ts (5 2)
@@ -391,7 +391,7 @@ describe('MultiVoiceTests', () => {
             C5.2 D5 E5 F5 G5
             `
             ));
-        it('v1 8th Flag Single,-v2 Half Single-Reversed Stem', async () =>
+        it('v1 8th Flag Single-v2 Half Single-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -400,7 +400,7 @@ describe('MultiVoiceTests', () => {
             C5.2{beam up} D5{beam up} E5{beam up} F5{beam up} G5 {beam up}
             `
             ));
-        it('v1 8th Flag Single,-v2 Half Single-Same Stem', async () =>
+        it('v1 8th Flag Single-v2 Half Single-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -410,8 +410,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 8th Flag Chord,-v2 Half Single
-        it('v1 8th Flag Chord,-v2 Half Single-Automatic Stem', async () =>
+        // v1 8th Flag Chord-v2 Half Single
+        it('v1 8th Flag Chord-v2 Half Single-Automatic Stem', async () =>
             await test(
                 `
             \\voice 
@@ -420,7 +420,7 @@ describe('MultiVoiceTests', () => {
             C5.2 D5 E5 F5 G5
             `
             ));
-        it('v1 8th Flag Chord,-v2 Half Single-Reversed Stem', async () =>
+        it('v1 8th Flag Chord-v2 Half Single-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -429,7 +429,7 @@ describe('MultiVoiceTests', () => {
             C5.2{beam up} D5{beam up} E5{beam up} F5{beam up} G5{beam up}
             `
             ));
-        it('v1 8th Flag Chord,-v2 Half Single-Same Stem', async () =>
+        it('v1 8th Flag Chord-v2 Half Single-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -439,8 +439,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 8th Flag Chord,-v2 Half Chord
-        it('v1 8th Flag Chord,-v2 Half Chord-Automatic Stem', async () =>
+        // v1 8th Flag Chord-v2 Half Chord
+        it('v1 8th Flag Chord-v2 Half Chord-Automatic Stem', async () =>
             await test(
                 `
             \\voice 
@@ -449,7 +449,7 @@ describe('MultiVoiceTests', () => {
             (C5 B4).2 (D5 C5) (E5 D5) (F5 E5) (G5 F5)
             `
             ));
-        it('v1 8th Flag Chord,-v2 Half Chord-Reversed Stem', async () =>
+        it('v1 8th Flag Chord-v2 Half Chord-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -458,7 +458,7 @@ describe('MultiVoiceTests', () => {
             (C5 B4).2{beam up} (D5 C5){beam up} (E5 D5){beam up} (F5 E5){beam up} (G5 F5){beam up}
             `
             ));
-        it('v1 8th Flag Chord,-v2 Half Chord-Same Stem', async () =>
+        it('v1 8th Flag Chord-v2 Half Chord-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -468,8 +468,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 Full Single,-v2 Full Single
-        it('v1 Full Single,-v2 Full Single-Automatic Stem', async () =>
+        // v1 Full Single-v2 Full Single
+        it('v1 Full Single-v2 Full Single-Automatic Stem', async () =>
             await test(
                 `
             \\ts (5 1)
@@ -479,7 +479,7 @@ describe('MultiVoiceTests', () => {
             C5.1 D5 E5 F5 G5
             `
             ));
-        it('v1 Full Single,-v2 Full Single-Reversed Stem', async () =>
+        it('v1 Full Single-v2 Full Single-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -488,7 +488,7 @@ describe('MultiVoiceTests', () => {
             C5.1{beam up} D5{beam up} E5{beam up} F5{beam up} G5{beam up}
             `
             ));
-        it('v1 Full Single,-v2 Full Single-Same Stem', async () =>
+        it('v1 Full Single-v2 Full Single-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -498,8 +498,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 Full Chord,-v2 Full Single
-        it('v1 Full Chord,-v2 Full Single-Automatic Stem', async () =>
+        // v1 Full Chord-v2 Full Single
+        it('v1 Full Chord-v2 Full Single-Automatic Stem', async () =>
             await test(
                 `
             \\voice 
@@ -508,7 +508,7 @@ describe('MultiVoiceTests', () => {
             C5.1 D5 E5 F5 G5
             `
             ));
-        it('v1 Full Chord,-v2 Full Single-Reversed Stem', async () =>
+        it('v1 Full Chord-v2 Full Single-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -517,7 +517,7 @@ describe('MultiVoiceTests', () => {
             C5.1{beam up} D5{beam up} E5{beam up} F5{beam up} G5{beam up}
             `
             ));
-        it('v1 Full Chord,-v2 Full Single-Same Stem', async () =>
+        it('v1 Full Chord-v2 Full Single-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -527,8 +527,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 Full Chord,-v2 Full Chord
-        it('v1 Full Chord,-v2 Full Chord-Automatic Stem', async () =>
+        // v1 Full Chord-v2 Full Chord
+        it('v1 Full Chord-v2 Full Chord-Automatic Stem', async () =>
             await test(
                 `
             \\voice 
@@ -537,7 +537,7 @@ describe('MultiVoiceTests', () => {
             (C5 B4).1 (D5 C5) (E5 D5) (F5 E5) (G5 F5)
             `
             ));
-        it('v1 Full Chord,-v2 Full Chord-Reversed Stem', async () =>
+        it('v1 Full Chord-v2 Full Chord-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -546,7 +546,7 @@ describe('MultiVoiceTests', () => {
             (C5 B4).1 {beam up} (D5 C5){beam up} (E5 D5){beam up} (F5 E5){beam up} (G5 F5){beam up}
             `
             ));
-        it('v1 Full Chord,-v2 Full Chord-Same Stem', async () =>
+        it('v1 Full Chord-v2 Full Chord-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -558,8 +558,8 @@ describe('MultiVoiceTests', () => {
 
         ////
 
-        // v1 Half Single,-v2 Full Single
-        it('v1 Half Single,-v2 Full Single-Automatic Stem', async () =>
+        // v1 Half Single-v2 Full Single
+        it('v1 Half Single-v2 Full Single-Automatic Stem', async () =>
             await test(
                 `
             \\ts (5 1)
@@ -569,7 +569,7 @@ describe('MultiVoiceTests', () => {
             C5.1 D5 E5 F5 G5
             `
             ));
-        it('v1 Half Single,-v2 Full Single-Reversed Stem', async () =>
+        it('v1 Half Single-v2 Full Single-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -578,7 +578,7 @@ describe('MultiVoiceTests', () => {
             C5.1{beam up} D5{beam up} E5{beam up} F5{beam up} G5{beam up}
             `
             ));
-        it('v1 Half Single,-v2 Full Single-Same Stem', async () =>
+        it('v1 Half Single-v2 Full Single-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -588,8 +588,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 Half Chord,-v2 Full Single
-        it('v1 Half Chord,-v2 Full Single-Automatic Stem', async () =>
+        // v1 Half Chord-v2 Full Single
+        it('v1 Half Chord-v2 Full Single-Automatic Stem', async () =>
             await test(
                 `
             \\voice 
@@ -598,7 +598,7 @@ describe('MultiVoiceTests', () => {
             C5.1 D5 E5 F5 G5
             `
             ));
-        it('v1 Half Chord,-v2 Full Single-Reversed Stem', async () =>
+        it('v1 Half Chord-v2 Full Single-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -607,7 +607,7 @@ describe('MultiVoiceTests', () => {
             C5.1{beam up} D5{beam up} E5{beam up} F5{beam up} G5{beam up}
             `
             ));
-        it('v1 Half Chord,-v2 Full Single-Same Stem', async () =>
+        it('v1 Half Chord-v2 Full Single-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -617,8 +617,8 @@ describe('MultiVoiceTests', () => {
             `
             ));
 
-        // v1 Half Chord,-v2 Full Chord
-        it('v1 Half Chord,-v2 Full Chord-Automatic Stem', async () =>
+        // v1 Half Chord-v2 Full Chord
+        it('v1 Half Chord-v2 Full Chord-Automatic Stem', async () =>
             await test(
                 `
             \\voice 
@@ -627,7 +627,7 @@ describe('MultiVoiceTests', () => {
             (C5 B4).1 (D5 C5) (E5 D5) (F5 E5) (G5 F5)
             `
             ));
-        it('v1 Half Chord,-v2 Full Chord-Reversed Stem', async () =>
+        it('v1 Half Chord-v2 Full Chord-Reversed Stem', async () =>
             await test(
                 `
             \\voice 
@@ -636,7 +636,7 @@ describe('MultiVoiceTests', () => {
             (C5 B4).1 {beam up} (D5 C5){beam up} (E5 D5){beam up} (F5 E5){beam up} (G5 F5){beam up}
             `
             ));
-        it('v1 Half Chord,-v2 Full Chord-Same Stem', async () =>
+        it('v1 Half Chord-v2 Full Chord-Same Stem', async () =>
             await test(
                 `
             \\voice 
@@ -645,6 +645,48 @@ describe('MultiVoiceTests', () => {
             (C5 B4).1 {beam up} (D5 C5){beam up} (E5 D5){beam up} (F5 E5){beam up} (G5 F5){beam up}
             `
             ));
+
+        it('v1 Eighth Single-v2 Eighth Single-Automatic-Stem', async () => await test(`
+            \\voice 
+            E5.8*10
+            \\voice 
+            C5*2 D5*2 E5*2 F5*2 G5*2
+        `));
+
+        it('v1 Eighth Chord-v2 Eighth Single-Automatic-Stem', async () => await test(`
+            \\voice 
+            (E5 F5).8*10
+            \\voice 
+            C5*2 D5*2 E5*2 F5*2 G5*2
+        `));
+
+        it('v1 Eighth Chord-v2 Eighth Chord-Automatic-Stem', async () => await test(`
+            \\voice 
+            (E5 F5).8*10
+            \\voice 
+            (C5 B4)*2 (D5 C5)*2 (E5 D5)*2 (F5 E5)*2 (G5 F5)*2
+        `));
+
+        it('v1 16th Single-v2 Eighth Single-Automatic-Stem', async () => await test(`
+            \\voice 
+            E5.16*20
+            \\voice 
+            C5.8*2 D5*2 E5*2 F5*2 G5*2
+        `));
+
+        it('v1 16th Chord-v2 Eighth Single-Automatic-Stem', async () => await test(`
+            \\voice 
+            (E5 F5).16*20
+            \\voice 
+            C5.8*2 D5*2 E5*2 F5*2 G5*2
+        `));
+
+        it('v1 16th Chord-v2 Eighth Chord-Automatic-Stem', async () => await test(`
+            \\voice 
+            (E5 F5).16*20
+            \\voice 
+            (C5 B4).8*2 (D5 C5)*2 (E5 D5)*2 (F5 E5)*2 (G5 F5)*2
+        `));
 
         // Known issues: (beat counts refer to the beats which "overlap", not the rests or filler beats)
 
