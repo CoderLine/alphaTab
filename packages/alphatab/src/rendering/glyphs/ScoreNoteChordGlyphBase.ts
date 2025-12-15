@@ -401,7 +401,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         } else {
             group = {
                 correctNotes: {
-                    notes: new Map(),
+                    notes: new Map<number, ScoreNoteGlyphInfo[]>(),
                     width: 0,
                     minX: Number.NaN
                 },
@@ -559,7 +559,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             let noteLookup: ScoreChordNoteHeadGroupSide;
             if (isGroupCollision) {
                 if (!noteGroup.displacedNotes) {
-                    noteGroup.displacedNotes = { notes: new Map(), width: 0, minX: 0 };
+                    noteGroup.displacedNotes = { notes: new Map<number, ScoreNoteGlyphInfo[]>(), width: 0, minX: 0 };
                 }
                 noteLookup = noteGroup.displacedNotes!;
             } else {

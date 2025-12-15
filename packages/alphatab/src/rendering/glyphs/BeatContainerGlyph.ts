@@ -17,6 +17,9 @@ import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingH
 import { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 
+/**
+ * @internal
+ */
 export abstract class BeatContainerGlyphBase extends Glyph {
     public abstract get absoluteDisplayStart(): number;
     public abstract get displayDuration(): number;
