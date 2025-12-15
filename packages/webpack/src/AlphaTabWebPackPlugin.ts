@@ -14,6 +14,7 @@ import type { webPackWithAlphaTab, webpackTypes } from './Utils';
 import { injectWebWorkerDependency } from './AlphaTabWebWorkerDependency';
 import { injectWorkletRuntimeModule } from './AlphaTabWorkletStartRuntimeModule';
 import { injectWorkletDependency } from './AlphaTabWorkletDependency';
+import { configureDetectionGlobal } from '@coderline/alphatab-webpack/DetectionGlobal';
 
 const WINDOWS_ABS_PATH_REGEXP = /^[a-zA-Z]:[\\/]/;
 const WINDOWS_PATH_SEPARATOR_REGEXP = /\\/g;
@@ -219,6 +220,7 @@ export class AlphaTabWebPackPlugin {
                 cachedContextify
             );
             this._configureAssetCopy(this._webPackWithAlphaTab, pluginName, compiler, compilation);
+            configureDetectionGlobal(pluginName, normalModuleFactory);
         });
     }
 

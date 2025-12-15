@@ -697,6 +697,15 @@ export class Environment {
         try {
             // @ts-expect-error
             if (typeof __webpack_require__ === 'function') {
+                // check if webpack plugin was used
+                // @ts-expect-error
+                if (typeof __ALPHATAB_WEBPACK__ !== 'boolean') {
+                    Logger.warning(
+                        'WebPack',
+                        `Detected bundling with WebPack but @coderline/alphatab-webpcak was not used! To ensure alphaTab works as expected use our bundler plugins. Learn more at https://www.alphatab.net/docs/getting-started/installation-webpack`
+                    );
+                }
+
                 return true;
             }
         } catch {
@@ -712,6 +721,15 @@ export class Environment {
         try {
             // @ts-expect-error
             if (typeof __BASE__ === 'string') {
+                // check if vite plugin was used
+                // @ts-expect-error
+                if (typeof __ALPHATAB_VITE__ !== 'boolean') {
+                    Logger.warning(
+                        'Vite',
+                        `Detected bundling with Vite but @coderline/alphatab-vite was not used! To ensure alphaTab works as expected use our bundler plugins. Learn more at https://www.alphatab.net/docs/getting-started/installation-vite`
+                    );
+                }
+
                 return true;
             }
         } catch {

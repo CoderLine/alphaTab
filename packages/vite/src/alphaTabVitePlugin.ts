@@ -1,3 +1,4 @@
+import { detectionGlobalPlugin } from '@coderline/alphatab-vite/detectionGlobalPlugin';
 import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
 import type { Plugin } from './bridge';
 import { copyAssetsPlugin } from './copyAssetsPlugin';
@@ -12,6 +13,7 @@ export function alphaTab(options?: AlphaTabVitePluginOptions) {
 
     options ??= {};
 
+    plugins.push(detectionGlobalPlugin());
     plugins.push(importMetaUrlPlugin(options));
     plugins.push(workerPlugin(options));
     plugins.push(copyAssetsPlugin(options));
