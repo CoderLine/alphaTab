@@ -641,7 +641,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
         const scale = this.scale;
         const lineExtension: number = this.renderer.smuflMetrics.legerLineExtension * scale;
-        const lineWidth: number = this.width + lineExtension * 2;
+        const lineWidth: number = this.width + lineExtension * 2 - this.noteStartX;
 
         const lineSpacing = scoreRenderer.getLineHeight(1);
         const firstTopLedgerY = scoreRenderer.getLineY(-1);
