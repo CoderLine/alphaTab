@@ -142,4 +142,10 @@ export class TestPlatform {
         const withConstructor = val as object;
         return (typeof withConstructor.constructor === 'function' && withConstructor.constructor.name) || 'Object';
     }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static currentTestName: string = '';
 }
