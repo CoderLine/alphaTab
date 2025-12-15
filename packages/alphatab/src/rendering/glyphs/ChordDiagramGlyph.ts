@@ -14,10 +14,12 @@ export class ChordDiagramGlyph extends EffectGlyph {
     private _textRow: number = 0;
     private _fretRow: number = 0;
     private _firstFretSpacing: number = 0;
+    private _center: boolean;
 
-    public constructor(x: number, y: number, chord: Chord) {
+    public constructor(x: number, y: number, chord: Chord, center: boolean = false) {
         super(x, y);
         this._chord = chord;
+        this._center = center;
     }
 
     public override doLayout(): void {
@@ -44,6 +46,10 @@ export class ChordDiagramGlyph extends EffectGlyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         cx += this.x + this.renderer.smuflMetrics.chordDiagramPaddingX + this._firstFretSpacing;
         cy += this.y;
+        if (this._center) {
+            cx -= this.width / 2;
+        }
+
         const stringSpacing: number = this.renderer.smuflMetrics.chordDiagramStringSpacing;
         const fretSpacing: number = this.renderer.smuflMetrics.chordDiagramFretSpacing;
         const res: RenderingResources = this.renderer.resources;
@@ -72,9 +78,9 @@ export class ChordDiagramGlyph extends EffectGlyph {
             const y: number = cy + this._fretRow / 2;
             let fret: number = this._chord.strings[this._chord.strings.length - i - 1];
             if (fret < 0) {
-                CanvasHelper.fillMusicFontSymbolSafe(canvas,x, y + xTopOffset, 1, MusicFontSymbol.FretboardX, true);
+                CanvasHelper.fillMusicFontSymbolSafe(canvas, x, y + xTopOffset, 1, MusicFontSymbol.FretboardX, true);
             } else if (fret === 0) {
-                CanvasHelper.fillMusicFontSymbolSafe(canvas,x, y + oTopOffset, 1, MusicFontSymbol.FretboardO, true);
+                CanvasHelper.fillMusicFontSymbolSafe(canvas, x, y + oTopOffset, 1, MusicFontSymbol.FretboardO, true);
             } else {
                 fret -= this._chord.firstFret - 1;
                 canvas.fillText(fret.toString(), x, y);
@@ -126,7 +132,8 @@ export class ChordDiagramGlyph extends EffectGlyph {
                 }
                 const y: number = cy + fret * fretSpacing + fretSpacing / 2 + 0.5;
                 const x: number = cx + (this._chord.strings.length - guitarString - 1) * stringSpacing + lineWidth / 2;
-                CanvasHelper.fillMusicFontSymbolSafe(canvas,
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
                     x,
                     y + circleTopOffset - circleHeight / 2,
                     1,

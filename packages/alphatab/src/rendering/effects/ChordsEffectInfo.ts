@@ -7,6 +7,7 @@ import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import { ChordDiagramGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramGlyph';
 
 /**
  * @internal
@@ -33,7 +34,10 @@ export class ChordsEffectInfo extends EffectInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new TextGlyph(0, 0, beat.chord!.name, renderer.resources.effectFont, TextAlign.Center);
+        const showDiagram = beat.voice.bar.staff.track.score.stylesheet.globalDisplayChordDiagramsInScore;
+        return showDiagram
+            ? new ChordDiagramGlyph(0, 0, beat.chord!, true)
+            : new TextGlyph(0, 0, beat.chord!.name, renderer.resources.effectFont, TextAlign.Center);
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

@@ -1362,6 +1362,15 @@ export class MusicXmlImporter extends ScoreImporter {
             chord.name += degreeParenthesis ? `(${degree})` : degree;
         }
 
+        if (element.getAttribute('print-frame', 'no') === 'yes') {
+            chord.showDiagram = true;
+            this._score.stylesheet.globalDisplayChordDiagramsInScore = true;
+        }
+
+        if (element.getAttribute('print-object', 'yes') === 'yes') {
+            chord.showDiagram = true;
+        }
+
         if (this._nextBeatChord === null) {
             this._nextBeatChord = chord;
         }
@@ -2703,8 +2712,10 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private static readonly _b4Value = 71;
-     private _estimateBeamDirection(note: Note): BeamDirection {
-        return note.calculateRealValue(false, false) < MusicXmlImporter._b4Value ? BeamDirection.Down : BeamDirection.Up;
+    private _estimateBeamDirection(note: Note): BeamDirection {
+        return note.calculateRealValue(false, false) < MusicXmlImporter._b4Value
+            ? BeamDirection.Down
+            : BeamDirection.Up;
     }
 
     private _parseNoteHead(element: XmlNode, note: Note, beatDuration: Duration, beamDirection: BeamDirection) {
@@ -3297,7 +3308,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-     private _parseArpeggiate(element: XmlNode, beat: Beat) {
+    private _parseArpeggiate(element: XmlNode, beat: Beat) {
         const direction = element.getAttribute('direction', 'down');
         switch (direction) {
             case 'down':
@@ -3607,7 +3618,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-     private _parseTied(element: XmlNode, note: Note, staff: Staff): void {
+    private _parseTied(element: XmlNode, note: Note, staff: Staff): void {
         const type = element.getAttribute('type');
         const number = element.getAttribute('number', '');
 

@@ -305,4 +305,18 @@ describe('EffectsAndAnnotationsTests', () => {
             'test-data/visual-tests/effects-and-annotations/legato.png'
         );
     });
+
+    it('inscore-chord-diagrams', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\chordDiagramsInScore true
+            \\chord ("E" 0 0 1 2 2 0)
+            \\chord ("C" 0 1 0 2 3 x)
+
+            (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"} r r r |
+            (0.1 1.2 0.3 2.4 3.5){ch "C"} r r r |
+            `,
+            'test-data/visual-tests/effects-and-annotations/inscore-chord-diagrams.png'
+        );
+    });
 });
