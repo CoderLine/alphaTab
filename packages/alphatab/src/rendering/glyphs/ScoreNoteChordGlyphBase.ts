@@ -88,6 +88,8 @@ export interface ScoreChordNoteHeadGroup {
      * The shift applied for the group to avoid overlaps.
      */
     multiVoiceShiftX: number;
+
+    hasFlag: boolean;
 }
 
 /**
@@ -159,11 +161,10 @@ export class ScoreChordNoteHeadInfo {
                 // handling note head
                 if (!ScoreChordNoteHeadInfo._canShareNoteHead(mainGroup, noteGroup)) {
                     // align stems back-to-back with additional spacing
-
                     if (mainGroup.direction === BeamDirection.Up) {
-                        noteGroup.multiVoiceShiftX = mainGroup.stemX;
+                        noteGroup.multiVoiceShiftX = mainGroup.stemX + noteGroup.correctNotes.width / 2;
                     } else {
-                        mainGroup.multiVoiceShiftX = noteGroup.stemX;
+                        mainGroup.multiVoiceShiftX = noteGroup.stemX + mainGroup.correctNotes.width / 2;
                     }
                 }
                 break;
@@ -188,6 +189,9 @@ export class ScoreChordNoteHeadInfo {
             case NoteHeadIntersectionKind.EndsTouchingInner:
                 if (mainGroup.direction === BeamDirection.Up) {
                     mainGroup.multiVoiceShiftX = mainGroup.stemX;
+                    if (noteGroup.hasFlag) {
+                        mainGroup.multiVoiceShiftX += mainGroup.correctNotes.width / 2;
+                    }
                 } else {
                     noteGroup.multiVoiceShiftX = noteGroup.stemX;
                 }
@@ -196,7 +200,12 @@ export class ScoreChordNoteHeadInfo {
                 // align note head center to stem
                 if (mainGroup.direction === BeamDirection.Up) {
                     const mainGroupWidth = mainGroup.correctNotes.width;
-                    mainGroup.multiVoiceShiftX = mainGroup.stemX - mainGroupWidth / 2;
+                    mainGroup.multiVoiceShiftX = mainGroup.stemX;
+                    if (noteGroup.hasFlag) {
+                        mainGroup.multiVoiceShiftX += mainGroupWidth / 2;
+                    } else {
+                        mainGroup.multiVoiceShiftX -= mainGroupWidth / 2;
+                    }
                 } else {
                     const noteGroupWidth = noteGroup.displacedNotes?.width ?? noteGroup.correctNotes.width;
                     noteGroup.multiVoiceShiftX = noteGroup.stemX - noteGroupWidth / 2;
@@ -306,6 +315,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     }
 
     public abstract get direction(): BeamDirection;
+    public abstract get hasFlag(): boolean;
     public abstract get scale(): number;
 
     public override getBoundingBoxTop(): number {
@@ -360,8 +370,12 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
         // obtain group we belong to
         let group: ScoreChordNoteHeadGroup;
+        const hasFlag = this.hasFlag;
         if (info.groups!.has(direction)) {
             group = info.groups!.get(direction)!;
+            if (hasFlag) {
+                group.hasFlag = hasFlag;
+            }
         } else {
             group = {
                 correctNotes: {
@@ -375,7 +389,8 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 minX: Number.NaN,
                 minStep: Number.NaN,
                 maxStep: Number.NaN,
-                multiVoiceShiftX: 0
+                multiVoiceShiftX: 0,
+                hasFlag
             };
             info.groups.set(direction, group);
         }

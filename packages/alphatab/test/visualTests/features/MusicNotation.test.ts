@@ -187,6 +187,7 @@ describe('MusicNotationTests', () => {
 
     describe('multi-voice-displace', async () => {
         // TODO: splitup test cases once implemented, for now its nicer to have one big file to implement and test things. 
+        // TODO: beamed notes test
 
         // currently working as desired (review round in [brackets]):
         // [1] Bar 1
@@ -199,16 +200,16 @@ describe('MusicNotationTests', () => {
         // [1] Bar 8
         // [1] Bar 9
 
-        // [ ] Bar 10        
-        // [ ] Bar 11
-        // [ ] Bar 12
-        // [ ] Bar 13
-        // [ ] Bar 14
-        // [ ] Bar 15
-        // [ ] Bar 16
-        // [ ] Bar 17
-        // [ ] Bar 18
-        // [ ] Bar 19
+        // [1] Bar 10        
+        // [1] Bar 11
+        // [1] Bar 12
+        // [1] Bar 13
+        // [1] Bar 14
+        // [1] Bar 15
+        // [1] Bar 16
+        // [1] Bar 17
+        // [1] Bar 18
+        // [1] Bar 19
 
         // [ ] Bar 20
         // [ ] Bar 21
@@ -326,25 +327,25 @@ describe('MusicNotationTests', () => {
             (E5 F5){beam up}*5  
             \\voice 
             (C5 B4){beam up} (D5 C5){beam up} (E5 D5){beam up} (F5 E5){beam up} (G5 F5){beam up}
-            |
+            | 
 
             // V1: Quarter Single V2: Half Single
             \\section ("10" "V1: Quarter Single V2: Half Single, Automatic Stem")
             \\ts (10 4)
             \\voice 
-            E5.4*10
+            E5.4 r E5.4 r E5.4 r E5.4 r E5.4 r 
             \\voice 
             C5.2 D5 E5 F5 G5
             |
             \\section ("11" "V1: Quarter Single V2: Half Single, Reversed Stem")
             \\voice 
-            E5.4{beam down}*10
+            E5.4 r E5.4 r E5.4 r E5.4 r E5.4 r 
             \\voice   
             C5.2{beam up} D5{beam up} E5{beam up} F5{beam up} G5 {beam up}
             |
             \\section ("12" "V1: Quarter Single V2: Half Single, Same Stem")
             \\voice 
-            E5.4{beam up}*10
+            E5.4 r E5.4 r E5.4 r E5.4 r E5.4 r 
             \\voice   
             C5.2{beam up} D5{beam up} E5{beam up} F5{beam up} G5 {beam up}
             |
@@ -352,19 +353,19 @@ describe('MusicNotationTests', () => {
             // V1: Quarter Chord, Half Single
             \\section ("13" "V1: Quarter Chord, Half Chord, Automatic Stem")
             \\voice 
-            (E5 F5).4*10
+            (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r
             \\voice 
             C5.2 D5 E5 F5 G5
             |
             \\section ("14" "V1: Quarter Chord, Half Chord, Reversed Stem")
             \\voice 
-            (E5 F5).4{beam down}*10  
+            (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r
             \\voice 
             C5.2{beam up} D5{beam up} E5{beam up} F5{beam up} G5{beam up}
             |
             \\section ("15" "V1: Quarter Chord, Half Chord, Same Stem")
             \\voice 
-            (E5 F5).4{beam up}*10  
+            (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r
             \\voice 
             C5.2{beam up} D5{beam up} E5{beam up} F5{beam up} G5{beam up}
             |
@@ -372,19 +373,19 @@ describe('MusicNotationTests', () => {
             // V1: Quarter Chord, V2: Half Chord
             \\section ("16" "V1: Quarter Chord, V2: Half Chord, Automatic Stem")
             \\voice 
-            (E5 F5).4*10  
+            (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r (E5 F5).4 r
             \\voice 
             (C5 B4).2 (D5 C5) (E5 D5) (F5 E5) (G5 F5)
             |
             \\section ("17" "V1: Quarter Chord, V2: Half Chord, Reversed Stem")
             \\voice 
-            (E5 F5).4{beam down}*10
+            (E5 F5).4{beam down} r (E5 F5).4{beam down} r (E5 F5).4{beam down} r (E5 F5).4{beam down} r (E5 F5).4{beam down} r
             \\voice 
             (C5 B4).2{beam up} (D5 C5){beam up} (E5 D5){beam up} (F5 E5){beam up} (G5 F5){beam up}
             |
             \\section ("18" "V1: Quarter Chord, V2: Half Chord, Same Stem")
             \\voice 
-            (E5 F5).4{beam up}*10  
+            (E5 F5).4{beam up} r (E5 F5).4{beam up} r (E5 F5).4{beam up} r (E5 F5).4{beam up} r (E5 F5).4 r{beam up}
             \\voice 
             (C5 B4).2{beam up} (D5 C5){beam up} (E5 D5){beam up} (F5 E5){beam up} (G5 F5){beam up}
             |
@@ -702,12 +703,20 @@ describe('MusicNotationTests', () => {
             settings
         );
 
-        // Known issues:
+        // Known issues: (beat counts refer to the beats which "overlap", not the rests or filler beats)
+
         // Bar 3 Beat 2: the note heads should be swapped (lowest goes to the 'correct' side'), stem is also not long enough due to displace
         // Bar 6 Beat 2: the note heads should be swapped (lowest goes to the 'correct' side'), stem is also not long enough due to displace
-        // Bar 9 Beat 3-5: Displace logic breaks heads. 
-        
+        // Bar 9 Beat 3-5: Displace logic breaks 
+        // Bar 12 beat 3: the note heads should be swapped (lowest goes to the 'correct' side'), stem is also not long enough due to displace
+        // Bar 13 beat 3: there is a slight overlap (shift further?)
+        // Bar 14 beat 4: there is a slight overlap (shift further?)
+        // Bar 15 Beat 2: the note heads should be swapped (lowest goes to the 'correct' side'), stem is also not long enough due to displace
+        // Bar 15 Beat 3: there is an overlap
+        // Bar 15 Beat 4: the half note is not visible (check for exact overlaps and try to go back to 'correct' side?)
+        // Bar 18 Beat 3: Displace logic breaks 
+        // Bar 18 Beat 4: Displace logic breaks 
+        // Bar 18 Beat 5: Displace logic breaks 
 
-        // TODO: beamed notes
     });
 });

@@ -38,6 +38,10 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         return this.renderer.getBeatDirection(this.beat);
     }
 
+    public override get hasFlag(): boolean {
+        return (this.renderer as ScoreBarRenderer).hasFlag(this.beat);
+    }
+
     public override get scale(): number {
         return this.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
     }
@@ -151,7 +155,6 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     public addEffectNoteGlyph(noteGlyph: NoteHeadGlyphBase, noteLine: number): void {
         super.add(noteGlyph, noteLine);
     }
-
 
     public override doLayout(): void {
         super.doLayout();
