@@ -188,76 +188,76 @@ describe('MusicNotationTests', () => {
     describe('multi-voice-displace', async () => {
         // TODO: splitup test cases once implemented, for now its nicer to have one big file to implement and test things. 
 
-        // currently working as desired:
-        // [ ] 1
-        // [ ] 2
-        // [ ] 3
-        // [ ] 4
-        // [ ] 5
-        // [ ] 6
-        // [ ] 7
-        // [ ] 8
-        // [ ] 9
+        // currently working as desired (review round in [brackets]):
+        // [1] Bar 1
+        // [1] Bar 2
+        // [1] Bar 3
+        // [1] Bar 4
+        // [1] Bar 5
+        // [1] Bar 6
+        // [1] Bar 7
+        // [1] Bar 8
+        // [1] Bar 9
 
-        // [ ] 10        
-        // [ ] 11
-        // [ ] 12
-        // [ ] 13
-        // [ ] 14
-        // [ ] 15
-        // [ ] 16
-        // [ ] 17
-        // [ ] 18
-        // [ ] 19
+        // [ ] Bar 10        
+        // [ ] Bar 11
+        // [ ] Bar 12
+        // [ ] Bar 13
+        // [ ] Bar 14
+        // [ ] Bar 15
+        // [ ] Bar 16
+        // [ ] Bar 17
+        // [ ] Bar 18
+        // [ ] Bar 19
 
-        // [ ] 20
-        // [ ] 21
-        // [ ] 22
-        // [ ] 23
-        // [ ] 24
-        // [ ] 25
-        // [ ] 26
-        // [ ] 27
-        // [ ] 28
-        // [ ] 29
+        // [ ] Bar 20
+        // [ ] Bar 21
+        // [ ] Bar 22
+        // [ ] Bar 23
+        // [ ] Bar 24
+        // [ ] Bar 25
+        // [ ] Bar 26
+        // [ ] Bar 27
+        // [ ] Bar 28
+        // [ ] Bar 29
 
-        // [ ] 30
-        // [ ] 31
-        // [ ] 32
-        // [ ] 33
-        // [ ] 34
-        // [ ] 35
-        // [ ] 36
-        // [ ] 37
-        // [ ] 38
-        // [ ] 39
+        // [ ] Bar 30
+        // [ ] Bar 31
+        // [ ] Bar 32
+        // [ ] Bar 33
+        // [ ] Bar 34
+        // [ ] Bar 35
+        // [ ] Bar 36
+        // [ ] Bar 37
+        // [ ] Bar 38
+        // [ ] Bar 39
 
-        // [ ] 40
-        // [ ] 41
-        // [ ] 42
-        // [ ] 43
-        // [ ] 44
-        // [ ] 45
-        // [ ] 46
-        // [ ] 47
-        // [ ] 48
-        // [ ] 49
+        // [ ] Bar 40
+        // [ ] Bar 41
+        // [ ] Bar 42
+        // [ ] Bar 43
+        // [ ] Bar 44
+        // [ ] Bar 45
+        // [ ] Bar 46
+        // [ ] Bar 47
+        // [ ] Bar 48
+        // [ ] Bar 49
 
-        // [ ] 50
-        // [ ] 51
-        // [ ] 52
-        // [ ] 53
-        // [ ] 54
-        // [ ] 55
-        // [ ] 56
-        // [ ] 57
-        // [ ] 58
-        // [ ] 59
+        // [ ] Bar 50
+        // [ ] Bar 51
+        // [ ] Bar 52
+        // [ ] Bar 53
+        // [ ] Bar 54
+        // [ ] Bar 55
+        // [ ] Bar 56
+        // [ ] Bar 57
+        // [ ] Bar 58
+        // [ ] Bar 59
 
-        // [ ] 60
-        // [ ] 61
-        // [ ] 62
-        // [ ] 63
+        // [ ] Bar 60
+        // [ ] Bar 61
+        // [ ] Bar 62
+        // [ ] Bar 63
 
         const settings = new Settings();
         settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
@@ -701,5 +701,13 @@ describe('MusicNotationTests', () => {
             'test-data/visual-tests/music-notation/multi-voice-displace.png',
             settings
         );
+
+        // Known issues:
+        // Bar 3 Beat 2: the note heads should be swapped (lowest goes to the 'correct' side'), stem is also not long enough due to displace
+        // Bar 6 Beat 2: the note heads should be swapped (lowest goes to the 'correct' side'), stem is also not long enough due to displace
+        // Bar 9 Beat 3-5: Displace logic breaks heads. 
+        
+
+        // TODO: beamed notes
     });
 });

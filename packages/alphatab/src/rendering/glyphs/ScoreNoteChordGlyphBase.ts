@@ -161,20 +161,27 @@ export class ScoreChordNoteHeadInfo {
                     // align stems back-to-back with additional spacing
 
                     if (mainGroup.direction === BeamDirection.Up) {
-                        noteGroup.multiVoiceShiftX = mainGroup.stemX ;
+                        noteGroup.multiVoiceShiftX = mainGroup.stemX;
                     } else {
                         mainGroup.multiVoiceShiftX = noteGroup.stemX;
                     }
                 }
                 break;
             case NoteHeadIntersectionKind.EndsTouchingOuter:
-                // align stems (but reversed)
                 if (mainGroup.direction === BeamDirection.Up) {
-                    const diff = mainGroup.stemX - noteGroup.stemX;
-                    noteGroup.multiVoiceShiftX = diff;
+                    if (mainGroup.displacedNotes) {
+                        noteGroup.multiVoiceShiftX = mainGroup.stemX;
+                    } else {
+                        const diff = mainGroup.stemX - noteGroup.stemX;
+                        noteGroup.multiVoiceShiftX = diff;
+                    }
                 } else {
-                    const diff = noteGroup.stemX - mainGroup.stemX;
-                    mainGroup.multiVoiceShiftX = diff;
+                    if (mainGroup.displacedNotes) {
+                        noteGroup.multiVoiceShiftX = -noteGroup.stemX;
+                    } else {
+                        const diff = noteGroup.stemX - mainGroup.stemX;
+                        mainGroup.multiVoiceShiftX = diff;
+                    }
                 }
 
                 break;
@@ -186,10 +193,13 @@ export class ScoreChordNoteHeadInfo {
                 }
                 break;
             case NoteHeadIntersectionKind.FullIntersection:
+                // align note head center to stem
                 if (mainGroup.direction === BeamDirection.Up) {
-                    mainGroup.multiVoiceShiftX = mainGroup.stemX;
+                    const mainGroupWidth = mainGroup.correctNotes.width;
+                    mainGroup.multiVoiceShiftX = mainGroup.stemX - mainGroupWidth / 2;
                 } else {
-                    noteGroup.multiVoiceShiftX = noteGroup.stemX;
+                    const noteGroupWidth = noteGroup.displacedNotes?.width ?? noteGroup.correctNotes.width;
+                    noteGroup.multiVoiceShiftX = noteGroup.stemX - noteGroupWidth / 2;
                 }
 
                 break;
@@ -396,11 +406,10 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         //      there is no shift and the same "spot" can be used
         //    * if there is a +/- 1 overlap a shift of the whole group is applied
 
-        // NOTE: 
+        // NOTE:
         // * This logic is close to what MuseScore does
         // * Dorico has own "note groups" for every voice, even if they are in the same stem-direction.
         //   Then they displace the groups similarly like with different stem-directions (never merging note heads)
-
 
         const info = this.getScoreChordNoteHeadInfo();
         const noteGroup = this._prepareForLayout(info);
