@@ -43,6 +43,7 @@ export class RenderStylesheetSerializer {
                 m.set(k.toString(), v);
             }
         }
+        o.set("globaldisplaychorddiagramsinscore", obj.globalDisplayChordDiagramsInScore);
         o.set("singletracktracknamepolicy", obj.singleTrackTrackNamePolicy as number);
         o.set("multitracktracknamepolicy", obj.multiTrackTrackNamePolicy as number);
         o.set("firstsystemtracknamemode", obj.firstSystemTrackNameMode as number);
@@ -88,6 +89,9 @@ export class RenderStylesheetSerializer {
                 JsonHelper.forEach(v, (v, k) => {
                     obj.perTrackChordDiagramsOnTop!.set(Number.parseInt(k), v as boolean);
                 });
+                return true;
+            case "globaldisplaychorddiagramsinscore":
+                obj.globalDisplayChordDiagramsInScore = v! as boolean;
                 return true;
             case "singletracktracknamepolicy":
                 obj.singleTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(v, TrackNamePolicy)!;

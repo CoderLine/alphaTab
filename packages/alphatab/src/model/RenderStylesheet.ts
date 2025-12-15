@@ -116,6 +116,11 @@ export class RenderStylesheet {
     public perTrackChordDiagramsOnTop: Map<number, boolean> | null = null;
 
     /**
+     * Whether to show the chord diagrams in score.
+     */
+    public globalDisplayChordDiagramsInScore: boolean = false;
+
+    /**
      * The policy where to show track names when a single track is rendered.
      */
     public singleTrackTrackNamePolicy: TrackNamePolicy = TrackNamePolicy.FirstSystem;

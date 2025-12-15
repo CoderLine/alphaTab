@@ -2529,4 +2529,27 @@ describe('AlphaTexImporterTest', () => {
             ).toMatchSnapshot();
         });
     });
+
+    it('inline-chord-diagrams', () =>{
+        let score = parseTex(`
+            \\chordDiagramsInScore
+            \\chord ("E" 0 0 1 2 2 0)
+            (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
+        `);
+        expect(score.stylesheet.globalDisplayChordDiagramsInScore).to.be.true;
+
+        score = parseTex(`
+            \\chordDiagramsInScore true
+            \\chord ("E" 0 0 1 2 2 0)
+            (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
+        `);
+        expect(score.stylesheet.globalDisplayChordDiagramsInScore).to.be.true;
+
+        score = parseTex(`
+            \\chordDiagramsInScore false
+            \\chord ("E" 0 0 1 2 2 0)
+            (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
+        `);
+        expect(score.stylesheet.globalDisplayChordDiagramsInScore).to.be.false;
+    })
 });

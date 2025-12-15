@@ -259,6 +259,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 }
                 score.stylesheet.otherSystemsTrackNameOrientation = otherSystemsTrackNameOrientation!;
                 return ApplyNodeResult.Applied;
+            case 'chorddiagramsinscore':
+                score.stylesheet.globalDisplayChordDiagramsInScore = metaData.arguments
+                    ? AlphaTex1LanguageHandler._booleanLikeValue(metaData.arguments!.arguments, 0)
+                    : true;
+                return ApplyNodeResult.Applied;
+
             default:
                 return ApplyNodeResult.NotAppliedUnrecognizedMarker;
         }
@@ -2486,6 +2492,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         if (stylesheet.extendBarLines) {
             nodes.push(Atnf.meta('extendBarLines'));
+        }
+
+        if (stylesheet.globalDisplayChordDiagramsInScore) {
+            nodes.push(Atnf.meta('chordDiagramsInScore'));
         }
 
         // Unsupported:

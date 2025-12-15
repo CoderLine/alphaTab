@@ -150,6 +150,9 @@ export class BinaryStylesheet {
                 case 'Global/DrawChords':
                     score.stylesheet.globalDisplayChordDiagramsOnTop = value as boolean;
                     break;
+                case 'System/drawChordInScore':
+                    score.stylesheet.globalDisplayChordDiagramsInScore = value as boolean;
+                    break;
                 case 'System/showTrackNameSingle':
                     if (!(value as boolean)) {
                         score.stylesheet.singleTrackTrackNamePolicy = TrackNamePolicy.Hidden;
@@ -458,6 +461,11 @@ export class BinaryStylesheet {
         binaryStylesheet.addValue(
             'Global/DrawChords',
             score.stylesheet.globalDisplayChordDiagramsOnTop,
+            DataType.Boolean
+        );
+        binaryStylesheet.addValue(
+            'System/drawChordInScore',
+            score.stylesheet.globalDisplayChordDiagramsInScore,
             DataType.Boolean
         );
 
