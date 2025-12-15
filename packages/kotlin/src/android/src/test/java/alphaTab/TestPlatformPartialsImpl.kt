@@ -12,6 +12,8 @@ import alphaTab.core.DoubleDoubleArrayTuple
 import alphaTab.core.IArrayTuple
 import alphaTab.core.IDoubleDoubleArrayTuple
 import alphaTab.core.IRecord
+import alphaTab.core.TestGlobals
+import alphaTab.core.TestName
 import alphaTab.core.ecmaScript.Record
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.core.toInvariantString
@@ -21,11 +23,13 @@ import com.beust.klaxon.JsonValue
 import com.beust.klaxon.Klaxon
 import com.beust.klaxon.KlaxonException
 import kotlinx.coroutines.CompletableDeferred
+import org.junit.Assert
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.OutputStreamWriter
+import java.lang.reflect.Method
 import java.nio.file.Paths
 import kotlin.contracts.ExperimentalContracts
 import kotlin.reflect.KClass
@@ -297,6 +301,29 @@ class TestPlatformPartials {
                 null -> ""
                 else -> o.javaClass.name
             }
+
+        public fun findTestMethod(): Method {
+            val walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
+            var testMethod: Method? = null
+            walker.forEach { frame ->
+                if (testMethod == null) {
+                    val method = frame.declaringClass.getDeclaredMethod(
+                        frame.methodName,
+                        *frame.methodType.parameterArray()
+                    )
+
+                    if (method.getAnnotation(org.junit.Test::class.java) != null) {
+                        testMethod = method
+                    }
+                }
+            }
+
+            if (testMethod == null) {
+                Assert.fail("No information about current test available, cannot find test snapshot");
+            }
+
+            return testMethod!!
+        }
 
         internal val currentTestName: String
             get() {

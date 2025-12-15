@@ -1,3 +1,4 @@
+import { Environment } from '@coderline/alphatab/Environment';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
@@ -259,7 +260,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
 
         // draw order is reversed so that the main voice overlaps secondary ones
         this.voiceDrawOrder = Array.from(this.beatGlyphs.keys());
-        this.voiceDrawOrder!.sort((a, b) => b - a);
+        Environment.sortDescending(this.voiceDrawOrder);
     }
 
     private _doMultiVoiceLayout() {

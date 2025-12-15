@@ -25,7 +25,7 @@ export abstract class BeatContainerGlyphBase extends Glyph {
     public abstract get displayDuration(): number;
     public abstract get onTimeX(): number;
     public abstract get graceType(): GraceType;
-    public abstract get graceIndex(): GraceType;
+    public abstract get graceIndex(): number;
     public abstract get graceGroup(): GraceGroup | null;
     public abstract get voiceIndex(): number;
     public abstract get isFirstOfTupletGroup(): boolean;
@@ -62,7 +62,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         return this.beat.displayDuration;
     }
 
-    public override get graceIndex(): GraceType {
+    public override get graceIndex(): number {
         return this.beat.graceIndex;
     }
 

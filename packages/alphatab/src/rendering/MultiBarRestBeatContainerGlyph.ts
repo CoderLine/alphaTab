@@ -29,7 +29,7 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
     public override get graceType(): GraceType {
         return GraceType.None;
     }
-    public override get graceIndex(): GraceType {
+    public override get graceIndex(): number {
         return 0;
     }
     public override get graceGroup(): GraceGroup | null {

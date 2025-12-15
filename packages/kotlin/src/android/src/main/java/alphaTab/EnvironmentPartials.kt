@@ -1,5 +1,6 @@
 package alphaTab
 
+import alphaTab.collections.DoubleList
 import alphaTab.platform.Json
 import alphaTab.platform.android.AndroidCanvas
 import alphaTab.platform.android.AndroidEnvironment
@@ -52,5 +53,10 @@ internal class EnvironmentPartials {
 
         @Suppress("NOTHING_TO_INLINE")
         internal inline fun quoteJsonString(string: String) = Json.quoteJsonString(string)
+
+        @Suppress("NOTHING_TO_INLINE")
+        internal inline fun sortDescending(list: DoubleList) = list.sortDescending()
+
+
     }
 }
