@@ -1,15 +1,15 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { Duration } from '@coderline/alphatab/model/Duration';
-import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 
 /**
  * @internal
  */
 export class FlagGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, duration: Duration, direction: BeamDirection, isGrace: boolean) {
-        super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, FlagGlyph.getSymbol(duration, direction, isGrace));
+        super(x, y, isGrace ? EngravingSettings.GraceScale : 1, FlagGlyph.getSymbol(duration, direction, isGrace));
     }
 
     public static getSymbol(duration: Duration, direction: BeamDirection, isGrace: boolean): MusicFontSymbol {

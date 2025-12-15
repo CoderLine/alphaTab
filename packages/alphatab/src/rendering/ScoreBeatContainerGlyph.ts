@@ -1,3 +1,4 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
@@ -8,7 +9,8 @@ import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { ScoreBeatGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatGlyph';
+import { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreBendGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBendGlyph';
 import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
 import { ScoreSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlideLineGlyph';
@@ -24,6 +26,33 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     private _effectSlur: ScoreSlurGlyph | null = null;
     private _effectEndSlur: ScoreSlurGlyph | null = null;
 
+    public constructor(beat: Beat) {
+        super(beat);
+        this.preNotes = new ScoreBeatPreNotesGlyph();
+        this.onNotes = new ScoreBeatGlyph();
+    }
+
+    public get prebendNoteHeadOffset() {
+        return (this.preNotes as ScoreBeatPreNotesGlyph).prebendNoteHeadOffset;
+    }
+
+    public get accidentalsWidth() {
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph;
+        if (preNotes && preNotes.accidentals) {
+            return preNotes.accidentals.width;
+        }
+        return 0;
+    }
+
+    public override doMultiVoiceLayout(): void {
+        this.preNotes.x = 0;
+        (this.preNotes as ScoreBeatPreNotesGlyph).doMultiVoiceLayout();
+        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        (this.onNotes as ScoreBeatGlyph).doMultiVoiceLayout();
+
+        this._bend?.doMultiVoiceLayout();
+    }
+
     public override doLayout(): void {
         this._effectSlur = null;
         this._effectEndSlur = null;
@@ -34,14 +63,14 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         const isGrace = beat.graceType !== GraceType.None;
         if (sr.hasFlag(beat)) {
             const direction = this.renderer.getBeatDirection(beat);
-            const scale = isGrace ? NoteHeadGlyph.GraceScale : 1;
+            const scale = isGrace ? EngravingSettings.GraceScale : 1;
             const symbol = FlagGlyph.getSymbol(beat.duration, direction, isGrace);
             const flagWidth = this.renderer.smuflMetrics.glyphWidths.get(symbol)! * scale;
             this._flagStretch = flagWidth;
         } else if (isGrace) {
             // always use flag size as spacing on grace notes
             const graceSpacing =
-                this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
+                this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * EngravingSettings.GraceScale;
             this._flagStretch = graceSpacing;
         }
 
@@ -128,7 +157,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         }
         if (n.hasBend) {
             if (!this._bend) {
-                const bend = new ScoreBendGlyph(n.beat);
+                const bend = new ScoreBendGlyph(this);
                 this._bend = bend;
                 bend.renderer = this.renderer;
                 this.addTie(bend);

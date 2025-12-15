@@ -1,27 +1,24 @@
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
-import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
-import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
-import { NumberedBeatGlyph, NumberedBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedBeatGlyph';
+import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
+import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
+import { NumberedKeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedKeySignatureGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
-import { NumberedKeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedKeySignatureGlyph';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
-import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
-import { Duration } from '@coderline/alphatab/model/Duration';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using (Jianpu) Numbered Music Notation
@@ -36,11 +33,14 @@ export class NumberedBarRenderer extends LineBarRenderer {
     public shortestDuration = Duration.QuadrupleWhole;
     public lowestOctave: number | null = null;
     public highestOctave: number | null = null;
+    public octaves = new Map<Beat, number>();
+
     get dotSpacing(): number {
         return this.smuflMetrics.glyphHeights.get(MusicFontSymbol.AugmentationDot)! * 2;
     }
 
-    public registerOctave(octave: number) {
+    public registerOctave(beat: Beat, octave: number) {
+        this.octaves.set(beat, octave);
         if (this.lowestOctave === null) {
             this.lowestOctave = octave;
             this.highestOctave = octave;
@@ -105,17 +105,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     public override doLayout(): void {
         super.doLayout();
-        let hasTuplets: boolean = false;
-        for (const voice of this.bar.voices) {
-            if (this.hasVoiceContainer(voice)) {
-                const c = this.getVoiceContainer(voice)!;
-                if (c.tupletGroups.length > 0) {
-                    hasTuplets = true;
-                    break;
-                }
-            }
-        }
-        if (hasTuplets) {
+        if (this.voiceContainer.tupletGroups.size > 0) {
             this.registerOverflowTop(this.tupletSize);
         }
 
@@ -203,8 +193,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 canvas.fillRect(cx + this.x + barStartX, barStartY, barEndX - barStartX, barSize);
             }
 
-            const onNotes = this.getBeatContainer(beat)!.onNotes;
-            let dotCount = onNotes instanceof NumberedBeatGlyph ? (onNotes as NumberedBeatGlyph).octaveDots : 0;
+            let dotCount = this.octaves.has(beat) ? this.octaves.get(beat)! : 0;
             const dotSpacing = this.dotSpacing;
             let dotsY = 0;
             let dotsOffset = 0;
@@ -342,12 +331,13 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
+        if (v.index > 0) {
+            return;
+        }
+
         super.createVoiceGlyphs(v);
         for (const b of v.beats) {
-            const container: NumberedBeatContainerGlyph = new NumberedBeatContainerGlyph(b, this.getVoiceContainer(v)!);
-            container.preNotes = v.index === 0 ? new NumberedBeatPreNotesGlyph() : new BeatGlyphBase();
-            container.onNotes = v.index === 0 ? new NumberedBeatGlyph() : new BeatOnNoteGlyphBase();
-            this.addBeatGlyph(container);
+            this.addBeatGlyph(new NumberedBeatContainerGlyph(b));
         }
     }
 

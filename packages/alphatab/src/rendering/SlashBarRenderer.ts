@@ -1,3 +1,4 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
@@ -7,15 +8,11 @@ import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { LineBarRenderer } from '@coderline/alphatab/rendering//LineBarRenderer';
 import type { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { SlashBeatContainerGlyph } from '@coderline/alphatab/rendering/SlashBeatContainerGlyph';
-import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
-import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
-import { SlashBeatGlyph } from '@coderline/alphatab/rendering/glyphs/SlashBeatGlyph';
 import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { SlashBeatContainerGlyph } from '@coderline/alphatab/rendering/SlashBeatContainerGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -83,17 +80,7 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     public override doLayout(): void {
         super.doLayout();
-        let hasTuplets: boolean = false;
-        for (const voice of this.bar.voices) {
-            if (this.hasVoiceContainer(voice)) {
-                const c = this.getVoiceContainer(voice)!;
-                if (c.tupletGroups.length > 0) {
-                    hasTuplets = true;
-                    break;
-                }
-            }
-        }
-        if (hasTuplets) {
+        if (this.voiceContainer.tupletGroups.size > 0) {
             this.registerOverflowTop(this.tupletSize);
         }
     }
@@ -105,7 +92,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     protected override getFlagTopY(beat: Beat, _direction: BeamDirection): number {
         let slashY = this.getLineY(0);
         const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
-        const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+        const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
 
         slashY -= this.smuflMetrics.stemUp.has(symbol) ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale : 0;
         if (!beat.isRest) {
@@ -118,7 +105,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     protected override getFlagBottomY(beat: Beat, _direction: BeamDirection): number {
         let slashY = this.getLineY(0);
         const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
-        const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+        const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
 
         slashY -= this.smuflMetrics.stemUp.has(symbol) ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale : 0;
 
@@ -192,12 +179,13 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
+        if (v.index > 0) {
+            return;
+        }
+
         super.createVoiceGlyphs(v);
         for (const b of v.beats) {
-            const container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b, this.getVoiceContainer(v)!);
-            container.preNotes = new BeatGlyphBase();
-            container.onNotes = v.index === 0 ? new SlashBeatGlyph() : new BeatOnNoteGlyphBase();
-            this.addBeatGlyph(container);
+            this.addBeatGlyph(new SlashBeatContainerGlyph(b));
         }
     }
 

@@ -22,9 +22,9 @@ export interface ITieGlyph {
 export abstract class TieGlyph extends Glyph implements ITieGlyph {
     public tieDirection: BeamDirection = BeamDirection.Up;
     public readonly slurEffectId: string;
-    protected isForEnd:boolean;
+    protected isForEnd: boolean;
 
-    public constructor(slurEffectId: string, forEnd:boolean) {
+    public constructor(slurEffectId: string, forEnd: boolean) {
         super(0, 0);
         this.slurEffectId = slurEffectId;
         this.isForEnd = forEnd;
@@ -118,12 +118,21 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 
         this._boundingBox = undefined;
         this.y = Math.min(this._startY, this._endY);
+        let tieBoundingBox: Bounds;
         if (this.shouldDrawBendSlur()) {
-            this._tieHeight = 0; // TODO: Bend slur height to be considered?
+            this._tieHeight = 0;
+            tieBoundingBox = TieGlyph.calculateBendSlurHeight(
+                this._startX,
+                this._startY,
+                this._endX,
+                this._endY,
+                this.tieDirection === BeamDirection.Down,
+                this.renderer.smuflMetrics.tieHeight
+            );
         } else {
             this._tieHeight = this.getTieHeight(this._startX, this._startY, this._endX, this._endY);
 
-            const tieBoundingBox = TieGlyph.calculateActualTieHeight(
+            tieBoundingBox = TieGlyph.calculateActualTieHeight(
                 1,
                 this._startX,
                 this._startY,
@@ -133,18 +142,19 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 this._tieHeight,
                 this.renderer.smuflMetrics.tieMidpointThickness
             );
-            this._boundingBox = tieBoundingBox;
+        }
 
-            this.height = tieBoundingBox.h;
+        this._boundingBox = tieBoundingBox;
 
-            if (this.tieDirection === BeamDirection.Up) {
-                // the tie might go above `this.y` due to its shape
-                // here we calculate how much this is so we can consider the
-                // respective overflow
-                const overlap = this.y - tieBoundingBox.y;
-                if (overlap > 0) {
-                    this.y -= overlap;
-                }
+        this.height = tieBoundingBox.h;
+
+        if (this.tieDirection === BeamDirection.Up) {
+            // the tie might go above `this.y` due to its shape
+            // here we calculate how much this is so we can consider the
+            // respective overflow
+            const overlap = this.y - tieBoundingBox.y;
+            if (overlap > 0) {
+                this.y -= overlap;
             }
         }
     }
@@ -162,7 +172,6 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 cx + this._endX,
                 cy + this._endY,
                 this.tieDirection === BeamDirection.Down,
-                1,
                 this.renderer.smuflMetrics.tieHeight
             );
         } else {
@@ -226,7 +235,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         size: number
     ): Bounds {
         const cp = TieGlyph._computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
-        if (cp.length === 0){
+        if (cp.length === 0) {
             return new Bounds(x1, y1, x2 - x1, y2 - y1);
         }
 
@@ -417,6 +426,39 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         return cp1Y;
     }
 
+    public static calculateBendSlurHeight(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        down: boolean,
+        bendSlurHeight: number
+    ): Bounds {
+        let normalVectorX: number = y2 - y1;
+        let normalVectorY: number = x2 - x1;
+        const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
+        if (down) {
+            normalVectorX *= -1;
+        } else {
+            normalVectorY *= -1;
+        }
+        // make to unit vector
+        normalVectorX /= length;
+        normalVectorY /= length;
+        // center of connection
+        const centerY: number = (y2 + y1) / 2;
+        let offset: number = bendSlurHeight;
+        if (x2 - x1 < 20) {
+            offset /= 2;
+        }
+        const cp1Y: number = centerY + offset * normalVectorY;
+
+        const minY = Math.min(y1, y2, cp1Y);
+        const maxY = Math.max(y1, y2, cp1Y);
+
+        return new Bounds(x1, Math.min(y1, y2, cp1Y), x2 - x1, maxY - minY);
+    }
+
     public static drawBendSlur(
         canvas: ICanvas,
         x1: number,
@@ -424,7 +466,6 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         x2: number,
         y2: number,
         down: boolean,
-        scale: number,
         bendSlurHeight: number,
         slurText?: string
     ): void {
@@ -440,10 +481,9 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         normalVectorX /= length;
         normalVectorY /= length;
         // center of connection
-        // TODO: should be 1/3
         const centerX: number = (x2 + x1) / 2;
         const centerY: number = (y2 + y1) / 2;
-        let offset: number = bendSlurHeight * scale;
+        let offset: number = bendSlurHeight;
         if (x2 - x1 < 20) {
             offset /= 2;
         }
@@ -472,7 +512,7 @@ export abstract class NoteTieGlyph extends TieGlyph {
     protected startNoteRenderer: BarRendererBase | null = null;
     protected endNoteRenderer: BarRendererBase | null = null;
 
-    public constructor(slurEffectId: string, startNote: Note, endNote: Note, forEnd:boolean) {
+    public constructor(slurEffectId: string, startNote: Note, endNote: Note, forEnd: boolean) {
         super(slurEffectId, forEnd);
         this.startNote = startNote;
         this.endNote = endNote;

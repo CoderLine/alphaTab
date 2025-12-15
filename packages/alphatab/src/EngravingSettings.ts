@@ -2,8 +2,7 @@ import { EngravingSettingsCloner } from '@coderline/alphatab/generated/Engraving
 import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
 import { Logger } from '@coderline/alphatab/Logger';
 import { Duration } from '@coderline/alphatab/model/Duration';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { MusicFontSymbol, MusicFontSymbolLookup } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { SmuflMetadata } from '@coderline/alphatab/SmuflMetadata';
 
 /**
@@ -52,6 +51,12 @@ export class EngravingStemInfo {
  */
 export class EngravingSettings {
     private static _bravuraDefaults?: EngravingSettings;
+
+    // NOTE: configurable in future?
+    /**
+     * @internal
+     */
+    public static readonly GraceScale: number = 0.75;
 
     /**
      * A {@link EngravingSettings} copy filled with the settings of the Bravura font used by default in alphaTab.
@@ -431,7 +436,7 @@ export class EngravingSettings {
             MusicFontSymbol.NoteheadNull
         ]);
 
-        for (const symbol of ModelUtils.getAllMusicFontSymbols()) {
+        for (const symbol of MusicFontSymbolLookup.getAllMusicFontSymbols()) {
             if (!handledSymbols.has(symbol)) {
                 if (!ignoredSymbols.has(symbol)) {
                     Logger.warning(
@@ -498,6 +503,7 @@ export class EngravingSettings {
         this.tripletFeelBracketPadding = 0.2 * this.oneStaffSpace;
         this.accidentalPadding = 0.1 * this.oneStaffSpace;
         this.preBeatGlyphSpacing = 0.5 * this.oneStaffSpace;
+        this.multiVoiceDisplacedNoteHeadSpacing = 0.2 * this.oneStaffSpace;
 
         this.tuningGlyphStringRowPadding = 0.2 * this.oneStaffSpace;
     }
@@ -554,20 +560,19 @@ export class EngravingSettings {
     public lineRangedGlyphDashSize = 0;
 
     /**
-     * The padding between effects and glyphs placed before the note heads, e.g. accidentals or brushes 
+     * The padding between effects and glyphs placed before the note heads, e.g. accidentals or brushes
      */
     public preNoteEffectPadding = 0;
 
     /**
-     * The padding between effects and glyphs placed after the note heads, e.g. slides or bends 
+     * The padding between effects and glyphs placed after the note heads, e.g. slides or bends
      */
     public postNoteEffectPadding = 0;
 
     /**
-     * The padding between effects and glyphs placed above/blow the note heads e.g. staccato 
+     * The padding between effects and glyphs placed above/blow the note heads e.g. staccato
      */
     public onNoteEffectPadding = 0;
-
 
     /**
      * The padding between the circles around string numbers.
@@ -600,7 +605,7 @@ export class EngravingSettings {
     public tieHeight = 0;
 
     /**
-     * The padding between the border and text of beat timers. 
+     * The padding between the border and text of beat timers.
      */
     public beatTimerPadding = 0;
 
@@ -630,7 +635,7 @@ export class EngravingSettings {
     public tabWhammyTextPadding = 0;
 
     /**
-     * The height applied per half-note whammy. 
+     * The height applied per half-note whammy.
      */
     public tabWhammyPerHalfHeight = 0;
 
@@ -658,15 +663,15 @@ export class EngravingSettings {
      * The size of the dashes on bends (e.g. on holds)
      */
     public tabBendDashSize = 0;
-    
+
     /**
      * The additional padding between the staff and the point
      * where bend values are calculated from.
      */
     public tabBendStaffPadding = 0;
-    
+
     /**
-     * The height applied per quarter-note. 
+     * The height applied per quarter-note.
      */
     public tabBendPerValueHeight = 0;
 
@@ -714,7 +719,7 @@ export class EngravingSettings {
     public chordDiagramLineWidth = 0;
 
     /**
-     * The padding between the bracket lines and numbers of tuplets 
+     * The padding between the bracket lines and numbers of tuplets
      */
     public tripletFeelBracketPadding = 0;
 
@@ -752,6 +757,12 @@ export class EngravingSettings {
      * The relative scale of any directions glyphs drawn like coda or segno.
      */
     public directionsScale = 0.6;
+
+    /**
+     * The spacing between displaced displaced note heads 
+     * in case of multi-voice note head overlaps. 
+     */
+    public multiVoiceDisplacedNoteHeadSpacing = 0;
 
     // Idea: maybe we can encode and pack this large metadata into a more compact format (e.g. BSON or a custom binary blob?)
     // This metadata below is updated automatically from the bravura_metadata.json via npm script

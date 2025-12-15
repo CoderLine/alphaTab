@@ -92,6 +92,7 @@ export class EngravingSettingsCloner {
         clone.tuningGlyphStringColumnScale = original.tuningGlyphStringColumnScale;
         clone.tuningGlyphStringRowPadding = original.tuningGlyphStringRowPadding;
         clone.directionsScale = original.directionsScale;
+        clone.multiVoiceDisplacedNoteHeadSpacing = original.multiVoiceDisplacedNoteHeadSpacing;
         return clone;
     }
 }

@@ -157,9 +157,18 @@ export class TabWhammyBarGlyph extends EffectGlyph {
             endX = cx + startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes, true);
         } else {
             startX = cx + startNoteRenderer.getBeatX(this._beat, BeatXPosition.MiddleNotes, true);
-            endX = !endNoteRenderer
-                ? cx + startNoteRenderer.postBeatGlyphsStart
-                : cx - startNoteRenderer.x + endNoteRenderer.x + endNoteRenderer.getBeatX(endBeat!, endXPositionType, true);
+            if (endNoteRenderer) {
+                endX =
+                    cx -
+                    startNoteRenderer.x +
+                    endNoteRenderer.x +
+                    endNoteRenderer.getBeatX(endBeat!, endXPositionType, true);
+            } else {
+                endX =
+                    cx +
+                    startNoteRenderer.getBeatX(this._beat!, BeatXPosition.EndBeat) -
+                    startNoteRenderer.smuflMetrics.postNoteEffectPadding;
+            }
         }
 
         const oldAlign = canvas.textAlign;
@@ -167,7 +176,6 @@ export class TabWhammyBarGlyph extends EffectGlyph {
         canvas.textAlign = TextAlign.Center;
         canvas.textBaseline = TextBaseline.Alphabetic;
         canvas.font = this.renderer.resources.tablatureFont;
-
 
         if (this._renderPoints.length >= 2) {
             const dx: number = (endX - startX) / BendPoint.MaxPosition;

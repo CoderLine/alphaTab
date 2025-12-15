@@ -9,9 +9,9 @@ import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
-import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import type { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 
 /**
  * @internal
@@ -22,7 +22,7 @@ export class ScoreSlideLineGlyph extends Glyph implements ITieGlyph {
     private _startNote: Note;
     private _parent: BeatContainerGlyph;
 
-     // the slide line cannot overflow anything and there are ties drawn in here
+    // the slide line cannot overflow anything and there are ties drawn in here
     public readonly checkForOverflow = false;
 
     public constructor(inType: SlideInType, outType: SlideOutType, startNote: Note, parent: BeatContainerGlyph) {
@@ -72,11 +72,8 @@ export class ScoreSlideLineGlyph extends Glyph implements ITieGlyph {
     }
 
     private _getAccidentalsWidth(renderer: ScoreBarRenderer, beat: Beat): number {
-        const preNotes: ScoreBeatPreNotesGlyph = renderer.getPreNotesGlyphForBeat(beat) as ScoreBeatPreNotesGlyph;
-        if (preNotes && preNotes.accidentals) {
-            return preNotes.accidentals.width;
-        }
-        return 0;
+        const container = renderer.getBeatContainer(beat) as ScoreBeatContainerGlyph;
+        return container.accidentalsWidth;
     }
 
     private _drawSlideOut(cx: number, cy: number, canvas: ICanvas): void {

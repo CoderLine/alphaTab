@@ -79,12 +79,12 @@ export class BeamingHelper {
 
     public hasStem(forceFlagOnSingleBeat: boolean, beat?: Beat): boolean {
         return (
-            (forceFlagOnSingleBeat && this._beatHasStem(beat!)) ||
-            (!forceFlagOnSingleBeat && this.beats.length === 1 && this._beatHasStem(beat!))
+            (forceFlagOnSingleBeat && BeamingHelper.beatHasStem(beat!)) ||
+            (!forceFlagOnSingleBeat && BeamingHelper.beatHasStem(beat!))
         );
     }
 
-    private _beatHasStem(beat: Beat): boolean {
+    public static beatHasStem(beat: Beat): boolean {
         return beat!.duration > Duration.Whole;
     }
 

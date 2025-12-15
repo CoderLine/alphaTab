@@ -1,7 +1,10 @@
+import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import { TabBeatGlyph } from '@coderline/alphatab/rendering/glyphs/TabBeatGlyph';
+import { TabBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/TabBeatPreNotesGlyph';
 import { TabBendGlyph } from '@coderline/alphatab/rendering/glyphs/TabBendGlyph';
 import { TabSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/TabSlideLineGlyph';
 import { TabSlurGlyph } from '@coderline/alphatab/rendering/glyphs/TabSlurGlyph';
@@ -15,6 +18,12 @@ import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingH
 export class TabBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: TabBendGlyph | null = null;
     private _effectSlurs: TabSlurGlyph[] = [];
+
+    public constructor(beat: Beat) {
+        super(beat);
+        this.preNotes = new TabBeatPreNotesGlyph();
+        this.onNotes = new TabBeatGlyph();
+    }
 
     protected override drawBeamHelperAsFlags(helper: BeamingHelper): boolean {
         return helper.hasFlag((this.renderer as TabBarRenderer).drawBeamHelperAsFlags(helper), this.beat);
@@ -78,7 +87,13 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
                 }
             }
             if (!expanded) {
-                const effectSlur: TabSlurGlyph = new TabSlurGlyph(`tab.slur.effect.${n.effectSlurOrigin.id}`, n.effectSlurOrigin, n, false, true);
+                const effectSlur: TabSlurGlyph = new TabSlurGlyph(
+                    `tab.slur.effect.${n.effectSlurOrigin.id}`,
+                    n.effectSlurOrigin,
+                    n,
+                    false,
+                    true
+                );
                 this._effectSlurs.push(effectSlur);
                 this.addTie(effectSlur);
             }

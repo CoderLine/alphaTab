@@ -1,23 +1,328 @@
+import type { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
+import { MusicFontSymbolLookup } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { ScoreNoteGlyphInfo } from '@coderline/alphatab/rendering/glyphs/ScoreNoteGlyphInfo';
+import type { NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+
+// TODO[perf]: the overall note head alignment creates quite a lot of objects which the GC
+// will have to cleanup again. we should be optimize this (e.g. via object pooling?, checking for multi-voice and avoid some objects)
+
+/**
+ * @internal
+ * @record
+ */
+export interface ScoreChordNoteHeadGroupSide {
+    /**
+     * A lookup for the notes located at particular steps.
+     * If we have more than 2 filled voices at the same spot, we might have the additional voices
+     * placed where the secondary voice already is.
+     */
+    notes: Map<number, ScoreNoteGlyphInfo[]>;
+    /**
+     * The width of this individual side.
+     */
+    width: number;
+
+    /**
+     * The smallest X-coordinate of all glyphs. Used later to calculate
+     * the overall shift needed to place notes within the bounds.
+     */
+    minX: number;
+}
+
+/**
+ * @internal
+ */
+enum NoteHeadIntersectionKind {
+    NoIntersection = 0,
+    EndsTouchingOuter = 1,
+    EndsTouchingInner = 2,
+    ExactMatch = 3,
+    FullIntersection = 4
+}
+
+/**
+ * @internal
+ * @record
+ */
+export interface ScoreChordNoteHeadGroup {
+    /**
+     * All notes on the "correct" side of the stem,
+     * that's left for upwards stems, and right for downward stems.
+     */
+    correctNotes: ScoreChordNoteHeadGroupSide;
+    /**
+     * All displaced notes (the other side of the stem compared to {@link correctNotes})
+     */
+    displacedNotes?: ScoreChordNoteHeadGroupSide;
+
+    /**
+     * The direction this group defines.
+     */
+    direction: BeamDirection;
+
+    minStep: number;
+    maxStep: number;
+
+    /**
+     * The offset of the stem for this group.
+     * Offset is relative to the group.
+     */
+    stemX: number;
+
+    /**
+     * Smallest X-coordinate in this group.
+     * Offset is relative to the group.
+     */
+    minX: number;
+    /**
+     * Largest X-coordinate in this group.
+     * Offset is relative to the group.
+     */
+    maxX: number;
+
+    /**
+     * The shift applied for the group to avoid overlaps.
+     */
+    multiVoiceShiftX: number;
+
+    hasFlag: boolean;
+    hasStem: boolean;
+}
+
+/**
+ * @internal
+ */
+export class ScoreChordNoteHeadInfo {
+    /**
+     * The direction of the main voice.
+     */
+    public mainVoiceDirection = BeamDirection.Up;
+
+    /**
+     * All groups respective to their direction.
+     */
+    public readonly groups = new Map<BeamDirection, ScoreChordNoteHeadGroup>();
+    public minX = 0;
+    public maxX = 0;
+
+    private _isFinished = false;
+
+    public constructor(mainVoiceDirection: BeamDirection) {
+        this.mainVoiceDirection = mainVoiceDirection;
+    }
+
+    public update() {
+        let minX = 0;
+        let maxX = 0;
+        for (const g of this.groups.values()) {
+            const gMinX = g.minX + g.multiVoiceShiftX;
+            const gMaxX = g.maxX + g.multiVoiceShiftX;
+            if (gMinX < minX) {
+                minX = gMinX;
+            }
+            if (maxX < gMaxX) {
+                maxX = gMaxX;
+            }
+        }
+        this.minX = minX;
+        this.maxX = maxX;
+    }
+
+    finish(smufl:EngravingSettings) {
+        if (this._isFinished) {
+            return;
+        }
+        this._isFinished = true;
+
+        for (const g of this.groups.values()) {
+            this._checkForGroupDisplacement(g, smufl);
+        }
+        this.update();
+    }
+
+    private _checkForGroupDisplacement(noteGroup: ScoreChordNoteHeadGroup, smufl:EngravingSettings) {
+        // no group displace if we're in the same direction
+        if (this.mainVoiceDirection === noteGroup.direction) {
+            return;
+        }
+
+        const mainGroup = this.groups.get(this.mainVoiceDirection)!;
+
+        // no intersection -> we can align the note heads directly.
+        const intersection = ScoreChordNoteHeadInfo._checkIntersection(mainGroup, noteGroup);
+
+        const spacing = smufl.multiVoiceDisplacedNoteHeadSpacing;
+
+        switch (intersection) {
+            case NoteHeadIntersectionKind.NoIntersection:
+                return;
+            case NoteHeadIntersectionKind.ExactMatch:
+                // handling note head
+                if (!ScoreChordNoteHeadInfo._canShareNoteHead(mainGroup, noteGroup)) {
+                    // align stems back-to-back with additional spacing
+                    if (mainGroup.direction === BeamDirection.Up) {
+                        if(noteGroup.displacedNotes) {
+                            noteGroup.multiVoiceShiftX = noteGroup.stemX + noteGroup.correctNotes.width + spacing;
+                        } else {
+                            noteGroup.multiVoiceShiftX = noteGroup.correctNotes.width + spacing;
+                        }
+                    } else {
+                        mainGroup.multiVoiceShiftX = noteGroup.stemX + spacing;
+                    }
+                }
+                break;
+            case NoteHeadIntersectionKind.EndsTouchingOuter:
+                if (mainGroup.direction === BeamDirection.Up) {
+                    if (mainGroup.displacedNotes) {
+                        noteGroup.multiVoiceShiftX = mainGroup.stemX;
+                    } else {
+                        const diff = mainGroup.stemX - noteGroup.stemX;
+                        noteGroup.multiVoiceShiftX = diff;
+                    }
+                } else {
+                    if (mainGroup.displacedNotes) {
+                        noteGroup.multiVoiceShiftX = -noteGroup.stemX;
+                    } else {
+                        const diff = noteGroup.stemX - mainGroup.stemX;
+                        mainGroup.multiVoiceShiftX = diff;
+                    }
+                }
+
+                break;
+            case NoteHeadIntersectionKind.EndsTouchingInner:
+                if (mainGroup.direction === BeamDirection.Up) {
+                    mainGroup.multiVoiceShiftX = mainGroup.stemX;
+                    if (noteGroup.hasFlag) {
+                        mainGroup.multiVoiceShiftX += spacing;
+                    }
+                } else {
+                    noteGroup.multiVoiceShiftX = noteGroup.stemX;
+                    if (mainGroup.hasFlag) {
+                        noteGroup.multiVoiceShiftX += spacing;
+                    }
+                }
+                break;
+            case NoteHeadIntersectionKind.FullIntersection:
+                // align note head center to stem
+                if(!mainGroup.hasStem && !noteGroup.hasStem) {
+                    // we can keep them aligned.
+                }
+                else if (mainGroup.direction === BeamDirection.Up) {
+                    mainGroup.multiVoiceShiftX = mainGroup.stemX;
+                    if (noteGroup.hasFlag) {
+                        mainGroup.multiVoiceShiftX += spacing;
+                    } else {
+                        mainGroup.multiVoiceShiftX -= spacing;
+                    }
+                } else {
+                    noteGroup.multiVoiceShiftX = noteGroup.stemX;
+                    if (mainGroup.hasFlag) {
+                        noteGroup.multiVoiceShiftX += spacing;
+                    } else {
+                        noteGroup.multiVoiceShiftX -= spacing;
+                    }
+                }
+
+                break;
+        }
+    }
+
+    private static _canShareNoteHead(mainGroup: ScoreChordNoteHeadGroup, thisGroup: ScoreChordNoteHeadGroup) {
+        // TODO: check actual note head
+        const mainGroupBottom = mainGroup.direction === BeamDirection.Up ? mainGroup.maxStep : mainGroup.minStep;
+        const thisGroupBottom = thisGroup.direction === BeamDirection.Up ? thisGroup.maxStep : thisGroup.minStep;
+
+        const mainGroupBottomNoteHead = mainGroup.correctNotes.notes.get(mainGroupBottom)!;
+        if (mainGroupBottomNoteHead.length > 1) {
+            return false;
+        }
+
+        const thisGroupBottomNoteHead = thisGroup.correctNotes.notes.get(thisGroupBottom)!;
+        if (thisGroupBottomNoteHead.length > 1) {
+            return false;
+        }
+
+        return ScoreChordNoteHeadInfo._canShareNoteHeadGlyph(
+            mainGroupBottomNoteHead[0].glyph,
+            thisGroupBottomNoteHead[0].glyph
+        );
+    }
+
+    private static _canShareNoteHeadGlyph(mainGlyph: NoteHeadGlyphBase, thisGlyph: NoteHeadGlyphBase) {
+        return (
+            mainGlyph.glyphScale === thisGlyph.glyphScale &&
+            mainGlyph.centerOnStem === thisGlyph.centerOnStem &&
+            MusicFontSymbolLookup.isBlackNoteHead(mainGlyph.symbol) &&
+            MusicFontSymbolLookup.isBlackNoteHead(thisGlyph.symbol)
+        );
+    }
+
+    private static _checkIntersection(
+        mainGroup: ScoreChordNoteHeadGroup,
+        thisGroup: ScoreChordNoteHeadGroup
+    ): NoteHeadIntersectionKind {
+        let bottomGap = 0;
+        if (mainGroup.direction === BeamDirection.Up) {
+            const mainGroupBottom = mainGroup.maxStep;
+            const thisGroupBottom = thisGroup.minStep;
+
+            bottomGap = thisGroupBottom - mainGroupBottom;
+        } else {
+            const mainGroupBottom = mainGroup.minStep;
+            const thisGroupBottom = thisGroup.maxStep;
+            bottomGap = mainGroupBottom - thisGroupBottom;
+        }
+
+        if (bottomGap === 0) {
+            return NoteHeadIntersectionKind.ExactMatch;
+        }
+        if (bottomGap === 1) {
+            return NoteHeadIntersectionKind.EndsTouchingOuter;
+        }
+        if (bottomGap === -1) {
+            return NoteHeadIntersectionKind.EndsTouchingInner;
+        }
+        if (bottomGap < 0) {
+            return NoteHeadIntersectionKind.FullIntersection;
+        }
+        return NoteHeadIntersectionKind.NoIntersection;
+    }
+}
+
+/**
+ * @internal
+ * @record
+ */
+interface ScoreNoteGlyphInfo {
+    glyph: NoteHeadGlyphBase;
+    steps: number;
+}
 
 /**
  * @internal
  */
 export abstract class ScoreNoteChordGlyphBase extends Glyph {
     private _infos: ScoreNoteGlyphInfo[] = [];
+    // TODO[perf]: keeping the whole group only for stemX prevents the GC to collect this
+    // maybe we can do some better "finalization" of the groups once all voices have been done
+    private _noteHeadInfo?: ScoreChordNoteHeadInfo;
+    protected noteGroup?: ScoreChordNoteHeadGroup;
 
     public minNote: ScoreNoteGlyphInfo | null = null;
     public maxNote: ScoreNoteGlyphInfo | null = null;
-    public upLineX: number = 0;
-    public downLineX: number = 0;
+    public get stemX(): number {
+        if (!this.noteGroup) {
+            return 0;
+        }
+
+        return this.noteGroup!.stemX + this.noteGroup!.multiVoiceShiftX;
+    }
+
     public noteStartX: number = 0;
 
     public onTimeX = 0;
@@ -27,6 +332,8 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     }
 
     public abstract get direction(): BeamDirection;
+    public abstract get hasFlag(): boolean;
+    public abstract get hasStem(): boolean;
     public abstract get scale(): number;
 
     public override getBoundingBoxTop(): number {
@@ -45,8 +352,8 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         return this.minNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.minNote.steps) : 0;
     }
 
-    protected add(noteGlyph: MusicFontGlyph, noteLine: number): void {
-        const info: ScoreNoteGlyphInfo = new ScoreNoteGlyphInfo(noteGlyph, noteLine);
+    protected add(noteGlyph: NoteHeadGlyphBase, noteSteps: number): void {
+        const info: ScoreNoteGlyphInfo = { glyph: noteGlyph, steps: noteSteps };
         this._infos.push(info);
         if (!this.minNote || this.minNote.steps > info.steps) {
             this.minNote = info;
@@ -56,135 +363,266 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         }
     }
 
-    public override doLayout(): void {
-        this._infos.sort((a, b) => {
-            return b.steps - a.steps;
-        });
-        let stemUpX: number = 0;
-        let stemDownX: number = 0;
-        let lastDisplaced: boolean = true;
-        let lastStep: number = 0;
-        let anyDisplaced = false;
+    protected abstract getScoreChordNoteHeadInfo(): ScoreChordNoteHeadInfo;
+
+    private _prepareForLayout(info: ScoreChordNoteHeadInfo): ScoreChordNoteHeadGroup {
         const direction: BeamDirection = this.direction;
 
-        // first get stem position on the right side (displacedX)
-        // to align all note heads accordingly (they might have different widths)
-        const smufl = this.renderer.smuflMetrics;
-        const scale = this.scale;
-        const displaced = new Map<number, boolean>();
-        for (let i: number = 0, j: number = this._infos.length; i < j; i++) {
-            const g = this._infos[i].glyph;
-            g.renderer = this.renderer;
-            g.doLayout();
-
-            if (i > 0 && Math.abs(lastStep - this._infos[i].steps) <= 1) {
-                if (!lastDisplaced) {
-                    anyDisplaced = true;
-                    lastDisplaced = true;
-                    displaced.set(i, true);
-                } else {
-                    lastDisplaced = false;
-                    displaced.set(i, false);
-                }
-            } else {
-                lastDisplaced = false;
-                displaced.set(i, false);
-            }
-
-            if (smufl.stemUp.has(g.symbol)) {
-                const stemInfo = smufl.stemUp.get(g.symbol)!;
-                const topX = stemInfo.x * scale;
-                if (topX > stemUpX) {
-                    stemUpX = topX;
-                }
-            } else {
-                const topX = smufl.glyphWidths.get(g.symbol)! * scale;
-                if (topX > stemUpX) {
-                    stemUpX = topX;
-                }
-            }
-
-            if (smufl.stemDown.has(g.symbol)) {
-                const stemInfo = smufl.stemDown.get(g.symbol)!;
-                const topX = stemInfo.x * scale;
-                if (topX > stemDownX) {
-                    const diff = topX - stemDownX;
-                    stemDownX = topX;
-                    stemUpX += diff; // shift right accordingly
-                }
-            }
-
-            lastStep = this._infos[i].steps;
+        // initialize empty info object
+        if (!info.groups) {
+            info.mainVoiceDirection = direction;
         }
 
-        // align all notes so that they align with the stem positions
-
-        const stemPosition = anyDisplaced || direction === BeamDirection.Up ? stemUpX : stemDownX;
-
-        let w: number = 0;
-        let displacedWidth = 0;
-        let nonDisplacedWidth = 0;
-        for (let i: number = 0, j: number = this._infos.length; i < j; i++) {
-            const g = this._infos[i].glyph;
-            const alignDisplaced: boolean = displaced.get(i)!;
-
-            if (alignDisplaced) {
-                // displaced: shift note to stem position
-                g.x = stemPosition;
-            } else {
-                // not displaced: align on left side (where down stem would be for notes)
-                g.x = stemDownX;
-                if (smufl.stemDown.has(g.symbol)) {
-                    g.x -= smufl.stemDown.get(g.symbol)!.x * scale;
-                }
-            }
-
-            g.x += this.noteStartX;
-            const gw = g.x + g.width;
-            w = Math.max(w, gw);
-            if (alignDisplaced) {
-                displacedWidth = Math.max(displacedWidth, gw);
-            } else {
-                nonDisplacedWidth = Math.max(nonDisplacedWidth, gw);
-            }
-
-            // after size calculation, re-align glyph to stem if needed
-            if (g instanceof NoteHeadGlyph && (g as NoteHeadGlyph).centerOnStem) {
-                g.x = stemPosition;
-            }
-        }
-
-        if (anyDisplaced) {
-            this.upLineX = stemPosition;
-            this.downLineX = stemPosition;
+        // sorting helps avoiding weird alignments
+        // if the stem is upwards we go bottom-up otherwise top-down
+        // this ensures we start placing notes on the primary side.
+        if (direction === BeamDirection.Up) {
+            this._infos.sort((a, b) => {
+                return b.steps - a.steps;
+            });
         } else {
-            this.upLineX = stemUpX;
-            this.downLineX = stemDownX;
+            this._infos.sort((a, b) => {
+                return a.steps - b.steps;
+            });
         }
+
+        // obtain group we belong to
+        let group: ScoreChordNoteHeadGroup;
+        const hasFlag = this.hasFlag;
+        const hasStem = this.hasStem;
+        if (info.groups!.has(direction)) {
+            group = info.groups!.get(direction)!;
+            if (hasFlag) {
+                group.hasFlag = hasFlag;
+            }
+            if (hasStem) {
+                group.hasStem = hasStem;
+            }
+        } else {
+            group = {
+                correctNotes: {
+                    notes: new Map<number, ScoreNoteGlyphInfo[]>(),
+                    width: 0,
+                    minX: Number.NaN
+                },
+                direction,
+                stemX: 0,
+                maxX: Number.NaN,
+                minX: Number.NaN,
+                minStep: Number.NaN,
+                maxStep: Number.NaN,
+                multiVoiceShiftX: 0,
+                hasFlag,
+                hasStem
+            };
+            info.groups.set(direction, group);
+        }
+        return group;
+    }
+
+    public override doLayout(): void {
+        // generally we try to follow the rules defined in "behind the bars"
+        // "Double-stemmed writing" but not all rules might be implemented
+
+        // The note head alignment has following base logic and rules:
+        // 1. we have two note groups:
+        //    * stem up
+        //    * stem down
+        // 2. we have 4 x-positions for note heads
+        //    * stem up non-displaced   (left from stem)
+        //    * stem up displaced       (right from stem)
+        //    * stem down non-displaced (right from stem)
+        //    * stem down displaced     (left from stem)
+        // 3. by default the non-displaced notes across note groups align vertically
+        // 4. every note head is registered on its "step" position of the current group
+        // 5. if the step of the note or +/- 1 step is reserved in the current group, the note head is displaced, otherwise it is non-displaced
+        // 6. the group of the first voice beat defines the "primary" stem-direction, all other voice beats are "secondary" stem-directions
+        // 7. if the current voice matches the primary stem direction and we have overlaps:
+        //    * no shifting of the group is needed
+        // 8. if the current voice does NOT match the primary stem and we have overlaps we might need shifting of the whole group:
+        //    * if the note heads are on the exact same position and have both the same "black" note head (grace, shape etc. are accounted)
+        //      there is no shift and the same "spot" can be used
+        //    * if there is a +/- 1 overlap a shift of the whole group is applied
+
+        // NOTE:
+        // * This logic is close to what MuseScore does
+        // * Dorico has own "note groups" for every voice, even if they are in the same stem-direction.
+        //   Then they displace the groups similarly like with different stem-directions (never merging note heads)
+
+        const info = this.getScoreChordNoteHeadInfo();
+        const noteGroup = this._prepareForLayout(info);
+        this.noteGroup = noteGroup;
+        this._noteHeadInfo = info;
+
+        this._collectNoteDisplacements(noteGroup);
+        this._alignNoteHeadsGroup(noteGroup);
+
+        info.update();
+
+        this._updateSizes();
+    }
+
+    private _updateSizes() {
+        const noteGroup = this.noteGroup!;
+
+        // NOTE: no noteGroup.multiVoiceShiftX for onTimeX. we don't shift the time position on displacement
+        // otherwise the alignment would automatically be corrected and we get no actual "shift"
 
         // the center of score notes, (used for aligning the beat to the right on-time position)
         // is always the center of the "correct note" position.
-        // * If the stem is upwards, the center is the middle of the left hand side note head
-        // * If the stem is downards, the center is the middle of the right-hand-side note head
-        if (anyDisplaced) {
-            if (direction === BeamDirection.Up) {
-                this.onTimeX = nonDisplacedWidth / 2;
-            } else {
-                const displacedRawWith = displacedWidth - stemPosition;
-                this.onTimeX = stemPosition + (displacedRawWith / 2);
+        this.onTimeX = noteGroup.correctNotes.minX + noteGroup.correctNotes.width / 2;
+
+        this.width = this.noteStartX + noteGroup.multiVoiceShiftX + noteGroup.maxX - noteGroup.minX;
+    }
+
+    public doMultiVoiceLayout() {
+        this._noteHeadInfo!.finish(this.renderer.smuflMetrics);
+        this._updateSizes();
+    }
+
+    private _alignNoteHeadsGroup(noteGroup: ScoreChordNoteHeadGroup) {
+        // align all notes so that they align with the stem positions
+        if (noteGroup.direction === BeamDirection.Up) {
+            this._alignNoteHeads(noteGroup, noteGroup.correctNotes, true);
+            if (noteGroup.displacedNotes) {
+                this._alignNoteHeads(noteGroup, noteGroup.displacedNotes!, false);
             }
         } else {
-            // for no displaced notes it is simply the center
-            this.onTimeX = w / 2;
+            this._alignNoteHeads(noteGroup, noteGroup.correctNotes, false);
+            if (noteGroup.displacedNotes) {
+                this._alignNoteHeads(noteGroup, noteGroup.displacedNotes!, true);
+            }
+        }
+    }
+    private _alignNoteHeads(
+        noteGroup: ScoreChordNoteHeadGroup,
+        side: ScoreChordNoteHeadGroupSide,
+        leftOfStem: boolean
+    ) {
+        const scale = this.scale;
+        const smufl = this.renderer.smuflMetrics;
+
+        for (const stepInfos of side.notes.values()) {
+            // NOTE: for now we do not displace "third" voices even further but they overlap
+            for (const info of stepInfos) {
+                // align directly
+                info.glyph.x = noteGroup.stemX;
+
+                //
+                if (info.glyph.centerOnStem) {
+                    // no offset
+                }
+                // shift left/right according to stem position or glyph size
+                else if (leftOfStem) {
+                    // stem-up is the offset on the right side of the notehead
+                    if (smufl.stemUp.has(info.glyph.symbol)) {
+                        info.glyph.x -= smufl.stemUp.get(info.glyph.symbol)!.x * scale;
+                    } else {
+                        info.glyph.x -= smufl.glyphWidths.get(info.glyph.symbol)! * scale;
+                    }
+                } else {
+                    // stem-down is the offset on the left side of the notehead
+                    if (smufl.stemDown.has(info.glyph.symbol)) {
+                        info.glyph.x += smufl.stemDown.get(info.glyph.symbol)!.x * scale;
+                    }
+                }
+
+                // update side
+                side.width = Math.max(side.width, info.glyph.width);
+                if (Number.isNaN(side.minX) || info.glyph.x < side.minX) {
+                    side.minX = info.glyph.x;
+                }
+
+                // update whole group
+                if (Number.isNaN(noteGroup.minX) || info.glyph.x < noteGroup.minX) {
+                    noteGroup.minX = info.glyph.x;
+                }
+                const maxX = info.glyph.x + info.glyph.width;
+                if (Number.isNaN(noteGroup.maxX) || maxX > noteGroup.maxX) {
+                    noteGroup.maxX = maxX;
+                }
+            }
+        }
+    }
+
+    private static _hasCollision(side: ScoreChordNoteHeadGroupSide, info: ScoreNoteGlyphInfo) {
+        return side.notes.has(info.steps) || side.notes.has(info.steps + 1) || side.notes.has(info.steps - 1);
+    }
+
+    private _collectNoteDisplacements(noteGroup: ScoreChordNoteHeadGroup) {
+        for (const info of this._infos) {
+            info.glyph.renderer = this.renderer;
+            info.glyph.doLayout();
+
+            const isGroupCollision = ScoreNoteChordGlyphBase._hasCollision(noteGroup.correctNotes, info);
+
+            let noteLookup: ScoreChordNoteHeadGroupSide;
+            if (isGroupCollision) {
+                if (!noteGroup.displacedNotes) {
+                    noteGroup.displacedNotes = { notes: new Map<number, ScoreNoteGlyphInfo[]>(), width: 0, minX: 0 };
+                }
+                noteLookup = noteGroup.displacedNotes!;
+            } else {
+                noteLookup = noteGroup.correctNotes!;
+            }
+
+            let stepInfos: ScoreNoteGlyphInfo[];
+            if (noteLookup.notes.has(info.steps)) {
+                stepInfos = noteLookup.notes.get(info.steps)!;
+            } else {
+                stepInfos = [];
+                noteLookup.notes.set(info.steps, stepInfos);
+            }
+            stepInfos.push(info);
+
+            if (Number.isNaN(noteGroup.minStep) || info.steps < noteGroup.minStep) {
+                noteGroup.minStep = info.steps;
+            }
+
+            if (Number.isNaN(noteGroup.maxStep) || info.steps > noteGroup.maxStep) {
+                noteGroup.maxStep = info.steps;
+            }
+
+            this._updateGroupStemXPosition(info, noteGroup);
+        }
+    }
+
+    private _updateGroupStemXPosition(info: ScoreNoteGlyphInfo, noteGroup: ScoreChordNoteHeadGroup) {
+        const smufl = this.renderer.smuflMetrics;
+        const scale = this.scale;
+        let stemX: number;
+
+        if (noteGroup.direction === BeamDirection.Up || noteGroup.displacedNotes) {
+            if (smufl.stemUp.has(info.glyph.symbol)) {
+                const stemInfo = smufl.stemUp.get(info.glyph.symbol)!;
+                stemX = stemInfo.x * scale;
+            } else {
+                stemX = smufl.glyphWidths.get(info.glyph.symbol)! * scale;
+            }
+        } else {
+            if (smufl.stemDown.has(info.glyph.symbol)) {
+                const stemInfo = smufl.stemDown.get(info.glyph.symbol)!;
+                stemX = stemInfo.x * scale;
+            } else {
+                stemX = 0;
+            }
         }
 
-        this.width = w;
+        stemX += this.noteStartX;
+
+        if (stemX > noteGroup.stemX) {
+            noteGroup.stemX = stemX;
+        }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         cx += this.x;
         cy += this.y;
+
         this._paintLedgerLines(cx, cy, canvas);
+        const noteGroup = this.noteGroup!;
+        cx += noteGroup.multiVoiceShiftX;
+
         const infos: ScoreNoteGlyphInfo[] = this._infos;
         for (const g of infos) {
             g.glyph.renderer = this.renderer;
@@ -203,7 +641,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
         const scale = this.scale;
         const lineExtension: number = this.renderer.smuflMetrics.legerLineExtension * scale;
-        const lineWidth: number = this.width - this.noteStartX + lineExtension * 2;
+        const lineWidth: number = this.width + lineExtension * 2 - this.noteStartX;
 
         const lineSpacing = scoreRenderer.getLineHeight(1);
         const firstTopLedgerY = scoreRenderer.getLineY(-1);

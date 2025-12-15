@@ -154,6 +154,7 @@ export class EngravingSettingsSerializer {
         o.set("tuningglyphstringcolumnscale", obj.tuningGlyphStringColumnScale);
         o.set("tuningglyphstringrowpadding", obj.tuningGlyphStringRowPadding);
         o.set("directionsscale", obj.directionsScale);
+        o.set("multivoicedisplacednoteheadspacing", obj.multiVoiceDisplacedNoteHeadSpacing);
         return o;
     }
     public static setProperty(obj: EngravingSettings, property: string, v: unknown): boolean {
@@ -431,6 +432,9 @@ export class EngravingSettingsSerializer {
                 return true;
             case "directionsscale":
                 obj.directionsScale = v! as number;
+                return true;
+            case "multivoicedisplacednoteheadspacing":
+                obj.multiVoiceDisplacedNoteHeadSpacing = v! as number;
                 return true;
         }
         return false;

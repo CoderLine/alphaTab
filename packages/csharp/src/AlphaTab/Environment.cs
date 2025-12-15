@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -56,5 +57,10 @@ partial class Environment
     public static string QuoteJsonString(string value)
     {
         return Json.QuoteJsonString(value);
+    }
+
+    internal static void SortDescending(System.Collections.Generic.IList<double> list)
+    {
+        list.Sort((a, b) => b - a);
     }
 }

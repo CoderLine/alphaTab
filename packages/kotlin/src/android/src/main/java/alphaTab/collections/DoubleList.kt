@@ -129,6 +129,10 @@ public class DoubleList : IDoubleIterable {
         _items.sort(0, _size)
     }
 
+    internal fun sortDescending() {
+        _items.sortDescending(0, _size)
+    }
+
     public fun shift(): Double {
         val d = _items[0]
         if (_items.size > 1) {

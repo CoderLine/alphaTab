@@ -192,33 +192,11 @@ class Expector<T>(private val actual: T) {
         }
     }
 
-    private fun findTestMethod(): Method {
-        val walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
-        var testMethod: Method? = null
-        walker.forEach { frame ->
-            if (testMethod == null) {
-                val method = frame.declaringClass.getDeclaredMethod(
-                    frame.methodName,
-                    *frame.methodType.parameterArray()
-                )
-
-                if (method.getAnnotation(org.junit.Test::class.java) != null) {
-                    testMethod = method
-                }
-            }
-        }
-
-        if (testMethod == null) {
-            Assert.fail("No information about current test available, cannot find test snapshot");
-        }
-
-        return testMethod!!
-    }
 
     @ExperimentalUnsignedTypes
     @ExperimentalContracts
     fun toMatchSnapshot(hint: String = "") {
-        val testMethodInfo = findTestMethod()
+        val testMethodInfo = TestPlatformPartials.findTestMethod()
         val file = testMethodInfo.getAnnotation(SnapshotFile::class.java)?.path
         if (file.isNullOrEmpty()) {
             Assert.fail("Missing SnapshotFile annotation with path to .snap file")

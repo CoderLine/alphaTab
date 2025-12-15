@@ -1,3 +1,4 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
@@ -7,8 +8,11 @@ import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarR
 import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { ScoreNoteChordGlyphBase } from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyphBase';
+import type { NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import {
+    ScoreChordNoteHeadInfo,
+    ScoreNoteChordGlyphBase
+} from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyphBase';
 import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
@@ -34,8 +38,33 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         return this.renderer.getBeatDirection(this.beat);
     }
 
+    public override get hasFlag(): boolean {
+        return (this.renderer as ScoreBarRenderer).hasFlag(this.beat);
+    }
+
+    public override get hasStem(): boolean {
+        return (this.renderer as ScoreBarRenderer).hasStem(this.beat);
+    }
+
     public override get scale(): number {
-        return this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+        return this.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
+    }
+
+    protected override getScoreChordNoteHeadInfo(): ScoreChordNoteHeadInfo {
+        // never share grace beats
+        if (this.beat.graceType !== GraceType.None) {
+            return new ScoreChordNoteHeadInfo(this.direction);
+        }
+
+        // TODO: do we need to share this spacing across all staves&tracks?
+        const staff = this.beat.voice.bar.staff;
+        const key = `score.noteheads.${staff.track.index}.${staff.index}.${this.beat.absoluteDisplayStart}`;
+        let existing = this.renderer.staff!.getSharedLayoutData<ScoreChordNoteHeadInfo | undefined>(key, undefined);
+        if (!existing) {
+            existing = new ScoreChordNoteHeadInfo(this.direction);
+            this.renderer.staff!.setSharedLayoutData(key, existing);
+        }
+        return existing;
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
@@ -69,7 +98,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _internalGetNoteY(n: MusicFontGlyph, requestedPosition: NoteYPosition): number {
         let pos = this.y + n.y;
 
-        const scale = this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+        const scale = this.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
         switch (requestedPosition) {
             case NoteYPosition.TopWithStem:
                 // stem start
@@ -121,19 +150,19 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         return pos;
     }
 
-    public addMainNoteGlyph(noteGlyph: MusicFontGlyph, note: Note, noteLine: number): void {
+    public addMainNoteGlyph(noteGlyph: NoteHeadGlyphBase, note: Note, noteLine: number): void {
         super.add(noteGlyph, noteLine);
         this._noteGlyphLookup.set(note.id, noteGlyph);
         this._notes.push(note);
     }
 
-    public addEffectNoteGlyph(noteGlyph: MusicFontGlyph, noteLine: number): void {
+    public addEffectNoteGlyph(noteGlyph: NoteHeadGlyphBase, noteLine: number): void {
         super.add(noteGlyph, noteLine);
     }
 
     public override doLayout(): void {
         super.doLayout();
-        const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const scoreRenderer = this.renderer as ScoreBarRenderer;
 
         if (this.beat.deadSlapped) {
             this._deadSlapped = new DeadSlappedBeatGlyph();
@@ -218,7 +247,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                 tremoloY = (topY + bottomY) / 2;
             }
 
-            let tremoloX: number = direction === BeamDirection.Up ? this.upLineX : this.downLineX;
+            let tremoloX: number = this.stemX;
             const speed: Duration = this.beat.tremoloSpeed!;
 
             if (this.beat.duration < Duration.Half) {

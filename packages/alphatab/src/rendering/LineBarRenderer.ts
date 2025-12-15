@@ -1,3 +1,4 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import type { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatBeamingMode, type BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
@@ -13,7 +14,6 @@ import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
 import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import { RepeatCountGlyph } from '@coderline/alphatab/rendering/glyphs/RepeatCountGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
@@ -189,10 +189,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
         beatElement: BeatSubElement,
         bracketsAsArcs: boolean = false
     ): void {
-        for (const voice of this.bar.voices) {
-            if (this.hasVoiceContainer(voice)) {
-                const container = this.getVoiceContainer(voice)!;
-                for (const tupletGroup of container.tupletGroups) {
+        for (const v of this.voiceContainer.voiceDrawOrder!) {
+            if (this.voiceContainer.tupletGroups.has(v)) {
+                const voice = this.voiceContainer.tupletGroups.get(v)!;
+                for (const tupletGroup of voice) {
                     this._paintTupletHelper(cx, cy, canvas, tupletGroup, beatElement, bracketsAsArcs);
                 }
             }
@@ -425,8 +425,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
         flagsElement: BeatSubElement,
         beamsElement: BeatSubElement
     ): void {
-        for (const v of this.helpers.beamHelpers) {
-            for (const h of v) {
+        for (const v of this.voiceContainer.voiceDrawOrder!) {
+            for (const h of this.helpers.beamHelpers[v]) {
                 this.paintBeamHelper(cx, cy, canvas, h, flagsElement, beamsElement);
             }
         }
@@ -440,13 +440,26 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (beat.isRest) {
             return false;
         }
-        
+
         const helper = this.helpers.getBeamingHelperForBeat(beat);
         if (helper) {
             return helper.hasFlag(this.drawBeamHelperAsFlags(helper), beat);
         }
 
         return BeamingHelper.beatHasFlag(beat);
+    }
+
+    public hasStem(beat: Beat) {
+        if (beat.isRest) {
+            return false;
+        }
+
+        const helper = this.helpers.getBeamingHelperForBeat(beat);
+        if (helper) {
+            return helper.hasStem(this.drawBeamHelperAsFlags(helper), beat);
+        }
+
+        return BeamingHelper.beatHasStem(beat);
     }
 
     protected paintBeamHelper(
@@ -551,7 +564,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                         cx + this.x + beatLineX + flagWidth / 2,
                         (topY + bottomY - this.smuflMetrics.glyphHeights.get(MusicFontSymbol.GraceNoteSlashStemDown)!) /
                             2,
-                        NoteHeadGlyph.GraceScale,
+                        EngravingSettings.GraceScale,
                         MusicFontSymbol.GraceNoteSlashStemDown,
                         true
                     );
@@ -561,7 +574,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                         cx + this.x + beatLineX + flagWidth / 2,
                         (topY + bottomY + this.smuflMetrics.glyphHeights.get(MusicFontSymbol.GraceNoteSlashStemUp)!) /
                             2,
-                        NoteHeadGlyph.GraceScale,
+                        EngravingSettings.GraceScale,
                         MusicFontSymbol.GraceNoteSlashStemUp,
                         true
                     );
@@ -640,7 +653,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, beamsElement: BeatSubElement): void {
         const direction: BeamDirection = this.getBeamDirection(h);
         const isGrace: boolean = h.graceType !== GraceType.None;
-        const scaleMod: number = isGrace ? NoteHeadGlyph.GraceScale : 1;
+        const scaleMod: number = isGrace ? EngravingSettings.GraceScale : 1;
         let barSpacing: number = (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
         let barSize: number = this.smuflMetrics.beamThickness * scaleMod;
         if (direction === BeamDirection.Down) {
@@ -769,7 +782,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
         if (h.graceType === GraceType.BeforeBeat) {
             const beatLineX: number = this.getBeatX(h.beats[0], BeatXPosition.Stem);
-            const flagWidth = this.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
+            const flagWidth =
+                this.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * EngravingSettings.GraceScale;
             let slashY: number = (cy + this.y + this.calculateBeamY(h, beatLineX)) | 0;
             slashY += barSize + barSpacing;
 
@@ -778,7 +792,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     canvas,
                     cx + this.x + beatLineX + flagWidth / 2,
                     slashY,
-                    NoteHeadGlyph.GraceScale,
+                    EngravingSettings.GraceScale,
                     MusicFontSymbol.GraceNoteSlashStemDown,
                     true
                 );
@@ -787,7 +801,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     canvas,
                     cx + this.x + beatLineX + flagWidth / 2,
                     slashY,
-                    NoteHeadGlyph.GraceScale,
+                    EngravingSettings.GraceScale,
                     MusicFontSymbol.GraceNoteSlashStemUp,
                     true
                 );
@@ -901,7 +915,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (h.drawingInfos.has(direction)) {
             return;
         }
-        const scale = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+        const scale = h.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
         const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
 
         const drawingInfo = new BeamingHelperDrawInfo();
@@ -1023,7 +1037,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             let barSpacing = 0;
             if (h.restBeats.length > 0) {
                 // space needed for the bars, rests need to be below them
-                const scaleMod: number = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+                const scaleMod: number = h.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
                 barSpacing = barCount * (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
             }
 

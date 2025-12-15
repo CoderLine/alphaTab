@@ -1,6 +1,7 @@
-import type { Color } from '@coderline/alphatab/model/Color';
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Color } from '@coderline/alphatab/model/Color';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
@@ -8,7 +9,10 @@ import { AccidentalGroupGlyph } from '@coderline/alphatab/rendering/glyphs/Accid
 import { GhostNoteContainerGlyph } from '@coderline/alphatab/rendering/glyphs/GhostNoteContainerGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { ScoreNoteChordGlyphBase } from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyphBase';
+import {
+    ScoreChordNoteHeadInfo,
+    ScoreNoteChordGlyphBase
+} from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyphBase';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
@@ -16,7 +20,6 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
  * @internal
  */
 export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
-
     private _beat: Beat;
     private _showParenthesis: boolean = false;
     private _noteValueLookup: Map<number, Glyph> = new Map();
@@ -24,25 +27,45 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
     private _preNoteParenthesis: GhostNoteContainerGlyph | null = null;
     private _postNoteParenthesis: GhostNoteContainerGlyph | null = null;
     public isEmpty: boolean = true;
+    private _groupId: string;
 
     public override get scale(): number {
-        return NoteHeadGlyph.GraceScale;
+        return EngravingSettings.GraceScale;
+    }
+
+    public override get hasFlag(): boolean {
+        return false;
+    }
+
+    public override get hasStem(): boolean {
+        return false;
     }
 
     public get direction(): BeamDirection {
         return BeamDirection.Up;
     }
 
-    public noteHeadOffset: number = 0;
-
-    public constructor(beat: Beat, showParenthesis: boolean = false) {
+    public constructor(groupId: string, beat: Beat, showParenthesis: boolean = false) {
         super();
         this._beat = beat;
+        this._groupId = groupId;
         this._showParenthesis = showParenthesis;
         if (showParenthesis) {
             this._preNoteParenthesis = new GhostNoteContainerGlyph(true);
             this._postNoteParenthesis = new GhostNoteContainerGlyph(false);
         }
+    }
+
+    protected override getScoreChordNoteHeadInfo(): ScoreChordNoteHeadInfo {
+        // TODO: do we need to share this spacing across all staves&tracks?
+        const staff = this._beat.voice.bar.staff;
+        const key = `score.noteheads.${this._groupId}.${staff.track.index}.${staff.index}.${this._beat.absoluteDisplayStart}`;
+        let existing = this.renderer.staff!.getSharedLayoutData<ScoreChordNoteHeadInfo | undefined>(key, undefined);
+        if (!existing) {
+            existing = new ScoreChordNoteHeadInfo(this.direction);
+            this.renderer.staff!.setSharedLayoutData(key, existing);
+        }
+        return new ScoreChordNoteHeadInfo(this.direction);
     }
 
     public containsNoteValue(noteValue: number): boolean {
@@ -74,7 +97,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
             this._postNoteParenthesis!.addParenthesisOnSteps(steps, true);
         }
         if (accidental !== AccidentalType.None) {
-            const g = new AccidentalGlyph(0, noteHeadGlyph.y, accidental, NoteHeadGlyph.GraceScale);
+            const g = new AccidentalGlyph(0, noteHeadGlyph.y, accidental, EngravingSettings.GraceScale);
             g.renderer = this.renderer;
             this._accidentals.renderer = this.renderer;
             this._accidentals.addGlyph(g);
@@ -101,7 +124,6 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         }
         this.noteStartX = x;
         super.doLayout();
-        this.noteHeadOffset = this.noteStartX + (this.width - this.noteStartX) / 2;
         if (this._showParenthesis) {
             this._postNoteParenthesis!.x = this.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
             this._postNoteParenthesis!.renderer = this.renderer;

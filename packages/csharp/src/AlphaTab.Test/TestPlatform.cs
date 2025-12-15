@@ -51,7 +51,7 @@ static partial class TestPlatform
         Converters = { new ArrayTupleConverterFactory() }
     };
 
-    private class ArrayTupleConverterFactory  :JsonConverterFactory
+    private class ArrayTupleConverterFactory : JsonConverterFactory
     {
         public override bool CanConvert(Type typeToConvert)
         {
@@ -80,7 +80,7 @@ static partial class TestPlatform
                 typeof(ArrayTupleConverter<,>).MakeGenericType(keyType, valueType),
                 BindingFlags.Instance | BindingFlags.Public,
                 binder: null,
-                args: new object[]{options},
+                args: new object[] { options },
                 culture: null)!;
 
             return converter;
@@ -261,5 +261,20 @@ static partial class TestPlatform
             IRecord => "Object",
             _ => val.GetType().Name
         };
+    }
+
+    public static string CurrentTestName
+    {
+        get
+        {
+            var testMethodInfo = TestMethodAccessor.CurrentTest;
+            if (testMethodInfo == null)
+            {
+                return "";
+            }
+            var testName = testMethodInfo.MethodInfo.GetCustomAttribute<TestMethodAttribute>()!
+                .DisplayName;
+            return testName ?? "";
+        }
     }
 }

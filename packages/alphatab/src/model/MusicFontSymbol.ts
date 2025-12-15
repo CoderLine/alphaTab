@@ -346,3 +346,38 @@ export enum MusicFontSymbol {
     FingeringALower = 0xed1b,
     FingeringCLower = 0xed1c
 }
+
+/**
+ * @internal
+ */
+export class MusicFontSymbolLookup {
+    private static _allMusicFontSymbols: MusicFontSymbol[] = [];
+    private static readonly _blackNoteHeadGlyphs = new Set<MusicFontSymbol>();
+
+    private static _initialize() {
+        const all = MusicFontSymbolLookup._allMusicFontSymbols;
+        if (all.length === 0) {
+            for (const v of Object.values(MusicFontSymbol).filter<any>((k: any) => typeof k === 'number')) {
+                const symbol = v as number as MusicFontSymbol;
+                all.push(symbol);
+                const name = MusicFontSymbol[symbol].toLowerCase();
+                if (name.endsWith('black')) {
+                    MusicFontSymbolLookup._blackNoteHeadGlyphs.add(symbol);
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets a list of all music font symbols used in alphaTab.
+     */
+    public static getAllMusicFontSymbols(): MusicFontSymbol[] {
+        MusicFontSymbolLookup._initialize();
+        return MusicFontSymbolLookup._allMusicFontSymbols;
+    }
+
+    public static isBlackNoteHead(glph: MusicFontSymbol): boolean {
+        MusicFontSymbolLookup._initialize();
+        return MusicFontSymbolLookup._blackNoteHeadGlyphs.has(glph);
+    }
+}

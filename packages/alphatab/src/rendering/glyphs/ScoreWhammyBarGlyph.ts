@@ -1,3 +1,4 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import type { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { BendStyle } from '@coderline/alphatab/model/BendStyle';
@@ -9,11 +10,10 @@ import type { ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import type { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreHelperNotesBaseGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreHelperNotesBaseGlyph';
 import { type ITieGlyph, TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import type { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
@@ -21,14 +21,16 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
  * @internal
  */
 export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements ITieGlyph {
+    private _container: ScoreBeatContainerGlyph;
     private _beat: Beat;
     private _endGlyph: BendNoteHeadGroupGlyph | null = null;
 
     public readonly checkForOverflow = false;
 
-    public constructor(beat: Beat) {
+    public constructor(container: ScoreBeatContainerGlyph) {
         super(0, 0);
-        this._beat = beat;
+        this._container = container;
+        this._beat = container.beat;
     }
 
     public get hasBoundingBox(): boolean {
@@ -53,6 +55,10 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
         return super.getBoundingBoxBottom();
     }
 
+    public doMultiVoiceLayout() {
+        this._endGlyph?.doMultiVoiceLayout();
+    }
+
     public override doLayout(): void {
         const sr = this.renderer as ScoreBarRenderer;
         const whammyMode: NotationMode = sr.settings.notation.notationMode;
@@ -64,7 +70,11 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
             case WhammyType.Dive:
             case WhammyType.PrediveDive:
                 {
-                    const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
+                    const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(
+                        'postwhammy',
+                        this._beat,
+                        false
+                    );
                     this._endGlyph = endGlyphs;
                     endGlyphs.renderer = sr;
                     const lastWhammyPoint: BendPoint =
@@ -88,7 +98,11 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         // handled separately
                         return;
                     } else {
-                        const middleGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
+                        const middleGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(
+                            'middlewhammy',
+                            this._beat,
+                            false
+                        );
                         middleGlyphs.renderer = sr;
                         if (sr.settings.notation.notationMode === NotationMode.GuitarPro) {
                             const middleBendPoint: BendPoint = this._beat.whammyBarPoints![1];
@@ -102,7 +116,11 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         }
                         middleGlyphs.doLayout();
                         this.addGlyph(middleGlyphs);
-                        const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
+                        const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(
+                            'postwhammy',
+                            this._beat,
+                            false
+                        );
                         endGlyphs.renderer = sr;
                         this._endGlyph = endGlyphs;
 
@@ -165,15 +183,12 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                 startY += startNoteRenderer.getNoteY(note, NoteYPosition.Top);
             }
 
-            let endX: number = cx + startNoteRenderer.x;
-            if (beat.isLastOfVoice) {
-                endX += startNoteRenderer.postBeatGlyphsStart;
-            } else {
-                endX += startNoteRenderer.getBeatX(beat, BeatXPosition.EndBeat);
-            }
+            let endX: number = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(beat, BeatXPosition.EndBeat);
+            endX -= this.renderer.smuflMetrics.postNoteEffectPadding;
 
             if (this._endGlyph) {
-                endX -= this._endGlyph.upLineX;
+                const postBeatSize = this._endGlyph.width - this._endGlyph.onTimeX;
+                endX -= postBeatSize;
             }
 
             const slurText: string = beat.whammyStyle === BendStyle.Gradual && i === 0 ? 'grad.' : '';
@@ -193,7 +208,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                 }
             }
 
-            let heightOffset: number = noteHeadHeight * NoteHeadGlyph.GraceScale * 0.5;
+            let heightOffset: number = noteHeadHeight * EngravingSettings.GraceScale * 0.5;
             if (direction === BeamDirection.Up) {
                 heightOffset = -heightOffset;
             }
@@ -246,7 +261,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                 case WhammyType.Dive:
                     if (i === 0) {
                         const g0 = this.glyphs![0] as BendNoteHeadGroupGlyph;
-                        g0.x = endX - g0.noteHeadOffset;
+                        g0.x = endX - g0.onTimeX;
                         const previousY = this.glyphs![0].y;
                         g0.y = cy + startNoteRenderer.y;
                         g0.paint(0, 0, canvas);
@@ -263,7 +278,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
                     } else if (note.isTieOrigin) {
@@ -298,7 +312,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                     } else {
                         const middleX: number = (startX + endX) / 2;
                         const g0 = this.glyphs![0] as BendNoteHeadGroupGlyph;
-                        g0.x = middleX - g0.noteHeadOffset;
+                        g0.x = middleX - g0.onTimeX;
                         g0.y = cy + startNoteRenderer.y;
                         g0.paint(0, 0, canvas);
                         const middleValue: number = this._getBendNoteValue(note, beat.whammyBarPoints![1]);
@@ -310,12 +324,11 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                             middleX,
                             middleY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
 
                         const g1 = this.glyphs![1] as BendNoteHeadGroupGlyph;
-                        g1.x = endX - g1.noteHeadOffset;
+                        g1.x = endX - g1.onTimeX;
                         g1.y = cy + startNoteRenderer.y;
                         g1.paint(0, 0, canvas);
                         endY = g1.getNoteValueY(endValue) + heightOffset;
@@ -326,7 +339,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
                     }
@@ -335,8 +347,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                 case WhammyType.Predive:
                     let preX: number =
                         cx + startNoteRenderer.x + startNoteRenderer.getBeatX(note.beat, BeatXPosition.PreNotes);
-                    preX += (startNoteRenderer.getPreNotesGlyphForBeat(note.beat) as ScoreBeatPreNotesGlyph)
-                        .prebendNoteHeadOffset;
+                    preX += this._container.prebendNoteHeadOffset;
                     const preY: number =
                         cy +
                         startNoteRenderer.y +
@@ -347,19 +358,10 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                             )
                         ) +
                         heightOffset;
-                    this.drawBendSlur(
-                        canvas,
-                        preX,
-                        preY,
-                        startX,
-                        startY,
-                        direction === BeamDirection.Down,
-                        1,
-                        slurText
-                    );
+                    this.drawBendSlur(canvas, preX, preY, startX, startY, direction === BeamDirection.Down, slurText);
                     if (this.glyphs) {
                         const g0 = this.glyphs![0] as BendNoteHeadGroupGlyph;
-                        g0.x = endX - g0.noteHeadOffset;
+                        g0.x = endX - g0.onTimeX;
                         g0.y = cy + startNoteRenderer.y;
                         g0.paint(0, 0, canvas);
                         this.drawBendSlur(
@@ -369,7 +371,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            1,
                             slurText
                         );
                     }

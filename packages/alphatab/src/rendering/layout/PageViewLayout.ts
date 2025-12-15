@@ -235,10 +235,16 @@ export class PageViewLayout extends ScoreLayout {
                 // if the current renderer still has space in the current system add it
                 // also force adding in case the system is empty
                 let renderers: MasterBarsRenderers | null = this._allMasterBarRenderers[currentIndex];
+
                 if (system.width + renderers!.width <= maxWidth || system.masterBarsRenderers.length === 0) {
                     system.addMasterBarRenderers(this.renderer.tracks!, renderers!);
-                    // move to next system
+                    // move to next bar
                     currentIndex++;
+
+                    if(this._needsLineBreak(currentIndex)){
+                        system.isFull = true;
+                    }
+
                 } else {
                     // if we cannot wrap on the current bar, we remove the last bar
                     // (this might even remove multiple ones until we reach a bar that can wrap);
@@ -248,6 +254,9 @@ export class PageViewLayout extends ScoreLayout {
                     }
                     // in case we do not have space, we create a new system
                     system.isFull = true;
+                }
+
+                if (system.isFull) {
                     system.isLast = this.lastBarIndex === system.lastBarIndex;
                     this._systems.push(system);
                     this._fitSystem(system);
@@ -401,18 +410,7 @@ export class PageViewLayout extends ScoreLayout {
                 this._barsFromPreviousSystem.reverse();
                 return system;
             }
-            // do we need a line break after this bar
-            let anyTrackNeedsLineBreak = false;
-            let allTracksNeedLineBreak = true;
-            for (const track of this.renderer.tracks!) {
-                if (track.lineBreaks && track.lineBreaks!.has(barIndex + 1)) {
-                    anyTrackNeedsLineBreak = true;
-                } else {
-                    allTracksNeedLineBreak = false;
-                }
-            }
-
-            if (anyTrackNeedsLineBreak && allTracksNeedLineBreak) {
+            if (this._needsLineBreak(barIndex)) {
                 system.isFull = true;
                 system.isLast = false;
                 return system;
@@ -422,6 +420,19 @@ export class PageViewLayout extends ScoreLayout {
         }
         system.isLast = endIndex === system.lastBarIndex;
         return system;
+    }
+
+    private _needsLineBreak(barIndex: number) {
+        let anyTrackNeedsLineBreak = false;
+        let allTracksNeedLineBreak = true;
+        for (const track of this.renderer.tracks!) {
+            if (track.lineBreaks && track.lineBreaks!.has(barIndex + 1)) {
+                anyTrackNeedsLineBreak = true;
+            } else {
+                allTracksNeedLineBreak = false;
+            }
+        }
+        return anyTrackNeedsLineBreak && allTracksNeedLineBreak;
     }
 
     private get _maxWidth(): number {

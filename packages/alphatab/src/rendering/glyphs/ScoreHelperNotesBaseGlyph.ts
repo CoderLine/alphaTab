@@ -16,10 +16,9 @@ export class ScoreHelperNotesBaseGlyph extends GlyphGroup {
         x2: number,
         y2: number,
         down: boolean,
-        scale: number,
         slurText?: string
     ): void {
-        TieGlyph.drawBendSlur(canvas, x1, y1, x2, y2, down, scale, this.renderer.smuflMetrics.tieHeight, slurText);
+        TieGlyph.drawBendSlur(canvas, x1, y1, x2, y2, down, this.renderer.smuflMetrics.tieHeight, slurText);
     }
 
     public override doLayout(): void {

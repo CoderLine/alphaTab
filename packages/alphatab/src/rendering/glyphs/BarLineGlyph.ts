@@ -312,8 +312,8 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
             top -= lineYOffset;
             bottom += lineRenderer.height;
         } else {
-            top += lineRenderer.getLineY(0);
-            bottom += lineRenderer.getLineY(lineRenderer.drawnLineCount - 1);
+            top += lineRenderer.getLineY(0) - lineYOffset / 2;
+            bottom += lineRenderer.getLineY(lineRenderer.drawnLineCount - 1) + lineYOffset / 2;
         }
 
         const h: number = bottom - top;

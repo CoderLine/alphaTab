@@ -395,4 +395,9 @@ export interface EngravingSettingsJson {
      * The relative scale of any directions glyphs drawn like coda or segno.
      */
     directionsScale?: number;
+    /**
+     * The spacing between displaced displaced note heads
+     * in case of multi-voice note head overlaps.
+     */
+    multiVoiceDisplacedNoteHeadSpacing?: number;
 }

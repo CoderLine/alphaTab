@@ -1,7 +1,7 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
+import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { TimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TimeSignatureGlyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { BarSubElement } from '@coderline/alphatab/model/Bar';
 
 /**
  * @internal
@@ -19,7 +19,7 @@ export class TabTimeSignatureGlyph extends TimeSignatureGlyph {
     protected get numberScale(): number {
         const renderer: TabBarRenderer = this.renderer as TabBarRenderer;
         if (renderer.bar.staff.tuning.length <= 4) {
-            return NoteHeadGlyph.GraceScale;
+            return EngravingSettings.GraceScale;
         }
         return 1;
     }

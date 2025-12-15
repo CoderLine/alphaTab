@@ -432,6 +432,13 @@ export class Score {
         for (let i: number = 0, j: number = this.tracks.length; i < j; i++) {
             this.tracks[i].finish(settings, sharedDataBag);
         }
+
+        // fixup masterbar starts to handle anacrusis lengths
+        for (const mb of this.masterBars) {
+            if (mb.index > 0) {
+                mb.start = mb.previousMasterBar!.start + mb.previousMasterBar!.calculateDuration();
+            }
+        }
     }
 
     /**

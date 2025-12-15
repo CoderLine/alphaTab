@@ -47,6 +47,19 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         AlphaTexNodeType.Number
     ]);
 
+    public hasMetaDataArguments(metaData: AlphaTexMetaDataTagNode): boolean {
+        const tag = metaData.tag.text.toLowerCase();
+        for (const lookup of AlphaTex1LanguageDefinitions.metaDataSignatures) {
+            if (lookup.has(tag)) {
+                const types = lookup.get(tag);
+                return types !== null;
+            }
+        }
+
+        // unknown meta -> assume args exist
+        return true;
+    }
+
     public readMetaDataArguments(
         parser: AlphaTexParser,
         metaData: AlphaTexMetaDataTagNode
@@ -83,7 +96,10 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         if (!AlphaTex1LanguageDefinitions.metaDataProperties.has(tag)) {
             return undefined;
         }
-        const props = AlphaTex1LanguageDefinitions.metaDataProperties.get(tag)!;
+        const props = AlphaTex1LanguageDefinitions.metaDataProperties.get(tag);
+        if (!props) {
+            return this._readPropertyArguments(parser, [], property);
+        }
         return this._readPropertyArguments(parser, [props], property);
     }
 

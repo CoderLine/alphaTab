@@ -278,7 +278,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         const types = lookup.get(tag);
         if (!types) {
-            if (args) {
+            if (args && args.arguments.length > 0) {
                 importer.addSemanticDiagnostic({
                     code: AlphaTexDiagnosticCode.AT300,
                     message: `Expected no arguments, but found some.`,

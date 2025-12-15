@@ -1,17 +1,16 @@
+import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
+import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
+import { Bar } from '@coderline/alphatab/model/Bar';
 import { Beat } from '@coderline/alphatab/model/Beat';
 import type { Duration } from '@coderline/alphatab/model/Duration';
-import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@coderline/alphatab/model/Score';
-import type { Settings } from '@coderline/alphatab/Settings';
-import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
-import { MasterBar } from '@coderline/alphatab/model/MasterBar';
-import type { Track } from '@coderline/alphatab/model/Track';
-import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
-import { Bar } from '@coderline/alphatab/model/Bar';
-import { Voice } from '@coderline/alphatab/model/Voice';
-import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
-import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
+import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@coderline/alphatab/model/Score';
+import type { Track } from '@coderline/alphatab/model/Track';
+import { Voice } from '@coderline/alphatab/model/Voice';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 
 /**
  * @internal
@@ -671,22 +670,6 @@ export class ModelUtils {
             masterBar.previousMasterBar!.nextMasterBar = null;
         }
     }
-
-    private static _allMusicFontSymbols: MusicFontSymbol[] = [];
-
-    /**
-     * Gets a list of all music font symbols used in alphaTab.
-     */
-    public static getAllMusicFontSymbols(): MusicFontSymbol[] {
-        if (ModelUtils._allMusicFontSymbols.length === 0) {
-            ModelUtils._allMusicFontSymbols = Object.values(MusicFontSymbol)
-                .filter<any>((k: any) => typeof k === 'number')
-                .map(v => v as number as MusicFontSymbol) as MusicFontSymbol[];
-        }
-
-        return ModelUtils._allMusicFontSymbols;
-    }
-
     /**
      * Lists the display transpositions for some known midi instruments.
      * It is a common practice to transpose the standard notation for instruments like guitars.

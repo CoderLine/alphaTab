@@ -161,6 +161,7 @@ describe('AlphaTexParserTest', () => {
 
     describe('ambiguous', () => {
         it('tempo and stringed note', () => parserTest('\\tempo 120 3.3 3.4'));
+        it('voice followed by note list', () => parserTest('\\voice (C4 C5)'));
     });
 
     describe('intermediate', () => {

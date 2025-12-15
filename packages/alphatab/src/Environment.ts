@@ -831,4 +831,17 @@ export class Environment {
     public static quoteJsonString(text: string) {
         return JSON.stringify(text);
     }
+
+    /**
+     * @internal
+     * @target web
+     * @partial
+     */
+    public static sortDescending(array: number[]) {
+        // java is a joke:
+        // no primitive sorting of arrays with custom comparer in 2025
+        // so we need to declare this specific helper function and implement it in Kotlin ourselves.
+        array.sort((a, b) => b - a);
+    }
+
 }

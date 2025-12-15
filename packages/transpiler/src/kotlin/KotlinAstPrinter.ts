@@ -627,7 +627,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeType(d.type);
 
         const needsInitializer =
-            isAutoProperty && d.type.isNullable && d.parent!.nodeType !== cs.SyntaxKind.InterfaceDeclaration;
+            isAutoProperty && d.type.isNullable && d.parent!.nodeType !== cs.SyntaxKind.InterfaceDeclaration &&
+            !d.isAbstract;
 
         let initializerWritten = false;
         if (d.initializer && !isLateInit) {

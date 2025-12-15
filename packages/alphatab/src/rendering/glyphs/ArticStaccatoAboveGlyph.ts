@@ -1,13 +1,13 @@
-import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 
 /**
  * @internal
  */
 export class ArticStaccatoAboveGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number) {
-        super(x, y, NoteHeadGlyph.GraceScale, MusicFontSymbol.ArticStaccatoAbove);
+        super(x, y, EngravingSettings.GraceScale, MusicFontSymbol.ArticStaccatoAbove);
         this.center = true;
     }
 

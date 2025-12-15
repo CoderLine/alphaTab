@@ -1,6 +1,8 @@
+import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { NumberedTieGlyph } from '@coderline/alphatab/rendering//glyphs/NumberedTieGlyph';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import { NumberedBeatGlyph, NumberedBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedBeatGlyph';
 import { NumberedSlurGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedSlurGlyph';
 import type { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 
@@ -10,6 +12,12 @@ import type { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
     private _slurs: Map<string, TieGlyph> = new Map<string, TieGlyph>();
     private _effectSlurs: NumberedSlurGlyph[] = [];
+
+    public constructor(beat: Beat) {
+        super(beat);
+        this.preNotes = new NumberedBeatPreNotesGlyph();
+        this.onNotes = new NumberedBeatGlyph();
+    }
 
     public override doLayout(): void {
         this._slurs.clear();
@@ -32,7 +40,11 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
             const tie = new NumberedTieGlyph(`numbered.tie.${n.tieOrigin!.beat.id}`, n.tieOrigin!, n, true);
             this.addTie(tie);
         }
-        if (n.isLeftHandTapped && !n.isHammerPullDestination && !this._slurs.has(`numbered.tie.leftHandTap.${n.beat.id}`)) {
+        if (
+            n.isLeftHandTapped &&
+            !n.isHammerPullDestination &&
+            !this._slurs.has(`numbered.tie.leftHandTap.${n.beat.id}`)
+        ) {
             const tapSlur = new NumberedTieGlyph(`numbered.tie.leftHandTap.${n.beat.id}`, n, n, false);
             this.addTie(tapSlur);
             this._slurs.set(tapSlur.slurEffectId, tapSlur);
@@ -72,13 +84,7 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
                 }
             }
             if (!expanded) {
-                const effectSlur = new NumberedSlurGlyph(
-                    `numbered.slur.effect`,
-                    n.effectSlurOrigin,
-                    n,
-                    false,
-                    true
-                );
+                const effectSlur = new NumberedSlurGlyph(`numbered.slur.effect`, n.effectSlurOrigin, n, false, true);
                 this._effectSlurs.push(effectSlur);
                 this.addTie(effectSlur);
                 this._slurs.set(effectSlur.slurEffectId, effectSlur);

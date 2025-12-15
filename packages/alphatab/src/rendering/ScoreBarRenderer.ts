@@ -1,3 +1,4 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
@@ -15,8 +16,6 @@ import { ClefGlyph } from '@coderline/alphatab/rendering/glyphs/ClefGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { KeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/KeySignatureGlyph';
 import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { ScoreBeatGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatGlyph';
-import { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
 import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
@@ -58,10 +57,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public override get staffLineBarSubElement(): BarSubElement {
         return BarSubElement.StandardNotationStaffLine;
-    }
-
-    public override get showMultiBarRest(): boolean {
-        return true;
     }
 
     public override get lineSpacing(): number {
@@ -125,7 +120,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (beat.slashed) {
             let slashY = this._getSlashFlagY();
             const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
-            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
 
             if (direction === BeamDirection.Down) {
                 slashY -= this.smuflMetrics.stemDown.has(symbol)
@@ -145,7 +140,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
         const minNote = this.accidentalHelper.getMinStepsNote(beat);
         if (minNote) {
-            return this.getBeatContainer(beat)!.onNotes.getNoteY(
+            return this.getNoteY(
                 minNote,
                 direction === BeamDirection.Up ? NoteYPosition.TopWithStem : NoteYPosition.StemDown
             );
@@ -154,7 +149,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         let y = this.getScoreY(this.accidentalHelper.getMinSteps(beat));
 
         if (direction === BeamDirection.Up && !beat.isRest) {
-            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
             y -= this.smuflMetrics.standardStemLength * scale;
         }
 
@@ -165,7 +160,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (beat.slashed) {
             let slashY = this._getSlashFlagY();
             const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
-            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
 
             if (direction === BeamDirection.Down) {
                 slashY -= this.smuflMetrics.stemDown.has(symbol)
@@ -183,7 +178,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
         const maxNote = this.accidentalHelper.getMaxStepsNote(beat);
         if (maxNote) {
-            return this.getBeatContainer(beat)!.onNotes.getNoteY(
+            return this.getNoteY(
                 maxNote,
                 direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.BottomWithStem
             );
@@ -191,7 +186,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
         let y = this.getScoreY(this.accidentalHelper.getMaxSteps(beat));
         if (direction === BeamDirection.Down) {
-            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
             y += this.smuflMetrics.standardStemLength * scale;
         }
         return y;
@@ -236,7 +231,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             // estimate on the position
             const steps = AccidentalHelper.computeStepsWithoutAccidentals(this.bar, note);
             y = this.getScoreY(steps);
-            const scale = note.beat.graceType === GraceType.None ? 1 : NoteHeadGlyph.GraceScale;
+            const scale = note.beat.graceType === GraceType.None ? 1 : EngravingSettings.GraceScale;
             const stemHeight = this.smuflMetrics.standardStemLength * scale;
             const noteHeadHeight =
                 this.smuflMetrics.glyphHeights.get(NoteHeadGlyph.getSymbol(note.beat.duration))! * scale;
@@ -302,14 +297,14 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (direction === BeamDirection.Up) {
             const maxNote = this.accidentalHelper.getMaxStepsNote(beat);
             if (maxNote) {
-                return this.getBeatContainer(beat)!.onNotes.getNoteY(maxNote, NoteYPosition.StemUp);
+                return this.getNoteY(maxNote, NoteYPosition.StemUp);
             }
             return this.getScoreY(this.accidentalHelper.getMaxSteps(beat));
         }
 
         const minNote = this.accidentalHelper.getMinStepsNote(beat);
         if (minNote) {
-            return this.getBeatContainer(beat)!.onNotes.getNoteY(minNote, NoteYPosition.StemDown);
+            return this.getNoteY(minNote, NoteYPosition.StemDown);
         }
         return this.getScoreY(this.accidentalHelper.getMinSteps(beat));
     }
@@ -479,10 +474,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     protected override createVoiceGlyphs(v: Voice): void {
         super.createVoiceGlyphs(v);
         for (const b of v.beats) {
-            const container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getVoiceContainer(v)!);
-            container.preNotes = new ScoreBeatPreNotesGlyph();
-            container.onNotes = new ScoreBeatGlyph();
-            this.addBeatGlyph(container);
+            this.addBeatGlyph(new ScoreBeatContainerGlyph(b));
         }
     }
 
