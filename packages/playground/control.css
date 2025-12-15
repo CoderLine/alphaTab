@@ -22,6 +22,8 @@
 
 @import url('bootstrap/dist/css/bootstrap.min.css');
 
+@import url('./select-handles.css');
+
 .at-cursor-bar {
     /* Defines the color of the bar background when a bar is played */
     background: rgba(255, 242, 0, 0.25);
@@ -520,5 +522,3 @@ input[type='range']::-moz-range-thumb {
     cursor: ew-resize !important;
 }
 
-
-@import url('./select-handles.css');
