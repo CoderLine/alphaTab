@@ -449,6 +449,19 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return BeamingHelper.beatHasFlag(beat);
     }
 
+    public hasStem(beat: Beat) {
+        if (beat.isRest) {
+            return false;
+        }
+
+        const helper = this.helpers.getBeamingHelperForBeat(beat);
+        if (helper) {
+            return helper.hasStem(this.drawBeamHelperAsFlags(helper), beat);
+        }
+
+        return BeamingHelper.beatHasStem(beat);
+    }
+
     protected paintBeamHelper(
         cx: number,
         cy: number,

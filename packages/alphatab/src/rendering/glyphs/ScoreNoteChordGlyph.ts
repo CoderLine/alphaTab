@@ -42,6 +42,10 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         return (this.renderer as ScoreBarRenderer).hasFlag(this.beat);
     }
 
+    public override get hasStem(): boolean {
+        return (this.renderer as ScoreBarRenderer).hasStem(this.beat);
+    }
+
     public override get scale(): number {
         return this.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
     }

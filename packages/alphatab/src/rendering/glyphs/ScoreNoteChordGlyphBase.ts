@@ -1,3 +1,4 @@
+import type { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { MusicFontSymbolLookup } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
@@ -90,6 +91,7 @@ export interface ScoreChordNoteHeadGroup {
     multiVoiceShiftX: number;
 
     hasFlag: boolean;
+    hasStem: boolean;
 }
 
 /**
@@ -131,19 +133,19 @@ export class ScoreChordNoteHeadInfo {
         this.maxX = maxX;
     }
 
-    finish() {
+    finish(smufl:EngravingSettings) {
         if (this._isFinished) {
             return;
         }
         this._isFinished = true;
 
         for (const g of this.groups.values()) {
-            this._checkForGroupDisplacement(g);
+            this._checkForGroupDisplacement(g, smufl);
         }
         this.update();
     }
 
-    private _checkForGroupDisplacement(noteGroup: ScoreChordNoteHeadGroup) {
+    private _checkForGroupDisplacement(noteGroup: ScoreChordNoteHeadGroup, smufl:EngravingSettings) {
         // no group displace if we're in the same direction
         if (this.mainVoiceDirection === noteGroup.direction) {
             return;
@@ -154,6 +156,8 @@ export class ScoreChordNoteHeadInfo {
         // no intersection -> we can align the note heads directly.
         const intersection = ScoreChordNoteHeadInfo._checkIntersection(mainGroup, noteGroup);
 
+        const spacing = smufl.multiVoiceDisplacedNoteHeadSpacing;
+
         switch (intersection) {
             case NoteHeadIntersectionKind.NoIntersection:
                 return;
@@ -162,9 +166,13 @@ export class ScoreChordNoteHeadInfo {
                 if (!ScoreChordNoteHeadInfo._canShareNoteHead(mainGroup, noteGroup)) {
                     // align stems back-to-back with additional spacing
                     if (mainGroup.direction === BeamDirection.Up) {
-                        noteGroup.multiVoiceShiftX = mainGroup.stemX + noteGroup.correctNotes.width / 2;
+                        if(noteGroup.displacedNotes) {
+                            noteGroup.multiVoiceShiftX = noteGroup.stemX + noteGroup.correctNotes.width + spacing;
+                        } else {
+                            noteGroup.multiVoiceShiftX = mainGroup.stemX + spacing;
+                        }
                     } else {
-                        mainGroup.multiVoiceShiftX = noteGroup.stemX + mainGroup.correctNotes.width / 2;
+                        mainGroup.multiVoiceShiftX = noteGroup.stemX + spacing;
                     }
                 }
                 break;
@@ -190,25 +198,34 @@ export class ScoreChordNoteHeadInfo {
                 if (mainGroup.direction === BeamDirection.Up) {
                     mainGroup.multiVoiceShiftX = mainGroup.stemX;
                     if (noteGroup.hasFlag) {
-                        mainGroup.multiVoiceShiftX += mainGroup.correctNotes.width / 2;
+                        mainGroup.multiVoiceShiftX += spacing;
                     }
                 } else {
                     noteGroup.multiVoiceShiftX = noteGroup.stemX;
+                    if (mainGroup.hasFlag) {
+                        noteGroup.multiVoiceShiftX += spacing;
+                    }
                 }
                 break;
             case NoteHeadIntersectionKind.FullIntersection:
                 // align note head center to stem
-                if (mainGroup.direction === BeamDirection.Up) {
-                    const mainGroupWidth = mainGroup.correctNotes.width;
+                if(!mainGroup.hasStem && !noteGroup.hasStem) {
+                    // we can keep them aligned.
+                }
+                else if (mainGroup.direction === BeamDirection.Up) {
                     mainGroup.multiVoiceShiftX = mainGroup.stemX;
                     if (noteGroup.hasFlag) {
-                        mainGroup.multiVoiceShiftX += mainGroupWidth / 2;
+                        mainGroup.multiVoiceShiftX += spacing;
                     } else {
-                        mainGroup.multiVoiceShiftX -= mainGroupWidth / 2;
+                        mainGroup.multiVoiceShiftX -= spacing;
                     }
                 } else {
-                    const noteGroupWidth = noteGroup.displacedNotes?.width ?? noteGroup.correctNotes.width;
-                    noteGroup.multiVoiceShiftX = noteGroup.stemX - noteGroupWidth / 2;
+                    noteGroup.multiVoiceShiftX = noteGroup.stemX;
+                    if (mainGroup.hasFlag) {
+                        noteGroup.multiVoiceShiftX += spacing;
+                    } else {
+                        noteGroup.multiVoiceShiftX -= spacing;
+                    }
                 }
 
                 break;
@@ -316,6 +333,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
     public abstract get direction(): BeamDirection;
     public abstract get hasFlag(): boolean;
+    public abstract get hasStem(): boolean;
     public abstract get scale(): number;
 
     public override getBoundingBoxTop(): number {
@@ -371,10 +389,14 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         // obtain group we belong to
         let group: ScoreChordNoteHeadGroup;
         const hasFlag = this.hasFlag;
+        const hasStem = this.hasStem;
         if (info.groups!.has(direction)) {
             group = info.groups!.get(direction)!;
             if (hasFlag) {
                 group.hasFlag = hasFlag;
+            }
+            if (hasStem) {
+                group.hasStem = hasStem;
             }
         } else {
             group = {
@@ -390,7 +412,8 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 minStep: Number.NaN,
                 maxStep: Number.NaN,
                 multiVoiceShiftX: 0,
-                hasFlag
+                hasFlag,
+                hasStem
             };
             info.groups.set(direction, group);
         }
@@ -453,7 +476,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     }
 
     public doMultiVoiceLayout() {
-        this._noteHeadInfo!.finish();
+        this._noteHeadInfo!.finish(this.renderer.smuflMetrics);
         this._updateSizes();
     }
 

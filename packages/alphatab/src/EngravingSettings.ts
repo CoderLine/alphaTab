@@ -503,6 +503,7 @@ export class EngravingSettings {
         this.tripletFeelBracketPadding = 0.2 * this.oneStaffSpace;
         this.accidentalPadding = 0.1 * this.oneStaffSpace;
         this.preBeatGlyphSpacing = 0.5 * this.oneStaffSpace;
+        this.multiVoiceDisplacedNoteHeadSpacing = 0.2 * this.oneStaffSpace;
 
         this.tuningGlyphStringRowPadding = 0.2 * this.oneStaffSpace;
     }
@@ -756,6 +757,12 @@ export class EngravingSettings {
      * The relative scale of any directions glyphs drawn like coda or segno.
      */
     public directionsScale = 0.6;
+
+    /**
+     * The spacing between displaced displaced note heads 
+     * in case of multi-voice note head overlaps. 
+     */
+    public multiVoiceDisplacedNoteHeadSpacing = 0;
 
     // Idea: maybe we can encode and pack this large metadata into a more compact format (e.g. BSON or a custom binary blob?)
     // This metadata below is updated automatically from the bravura_metadata.json via npm script

@@ -37,6 +37,10 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         return false;
     }
 
+    public override get hasStem(): boolean {
+        return false;
+    }
+
     public get direction(): BeamDirection {
         return BeamDirection.Up;
     }
