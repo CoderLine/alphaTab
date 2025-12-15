@@ -169,7 +169,7 @@ export class ScoreChordNoteHeadInfo {
                         if(noteGroup.displacedNotes) {
                             noteGroup.multiVoiceShiftX = noteGroup.stemX + noteGroup.correctNotes.width + spacing;
                         } else {
-                            noteGroup.multiVoiceShiftX = mainGroup.stemX + spacing;
+                            noteGroup.multiVoiceShiftX = noteGroup.correctNotes.width + spacing;
                         }
                     } else {
                         mainGroup.multiVoiceShiftX = noteGroup.stemX + spacing;
