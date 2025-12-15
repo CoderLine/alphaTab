@@ -193,7 +193,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 canvas.fillRect(cx + this.x + barStartX, barStartY, barEndX - barStartX, barSize);
             }
 
-            let dotCount = this.octaves.get(beat)!;
+            let dotCount = this.octaves.has(beat) ? this.octaves.get(beat)! : 0;
             const dotSpacing = this.dotSpacing;
             let dotsY = 0;
             let dotsOffset = 0;
