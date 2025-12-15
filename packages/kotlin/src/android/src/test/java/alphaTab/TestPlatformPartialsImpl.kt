@@ -297,5 +297,12 @@ class TestPlatformPartials {
                 null -> ""
                 else -> o.javaClass.name
             }
+
+        internal val currentTestName: String
+            get() {
+                val testMethodInfo = findTestMethod()
+                val testName = testMethodInfo.getAnnotation(TestName::class.java)!!.name
+                return testName
+            }
     }
 }
