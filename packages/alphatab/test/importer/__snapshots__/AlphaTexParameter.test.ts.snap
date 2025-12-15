@@ -1,28 +1,31 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`AlphaTexParameterTests handler-validation metadata empty signature empty 1`] = `
-Score (1,1) -> (1,9) {
+Score (1,1) -> (1,12) {
   bars: Array [
-    Bar (1,1) -> (1,9) {
+    Bar (1,1) -> (1,12) {
       metaData: Array [
-        Meta (1,1) -> (1,6) {
-          tag: Tag "ac" (1,1) -> (1,4) {
+        Meta (1,1) -> (1,9) {
+          tag: Tag "track" (1,1) -> (1,7) {
             prefix: Backslash (1,1) -> (1,2),
-            tag: Ident "ac" (1,2) -> (1,4),
+            tag: Ident "track" (1,2) -> (1,7),
           },
-          arguments: Arguments (1,4) -> (1,6) {
-            openParenthesis: LParen (1,4) -> (1,5),
+          arguments: Arguments (1,7) -> (1,9) {
+            openParenthesis: LParen (1,7) -> (1,8),
             arguments: Array [],
-            closeParenthesis: RParen (1,5) -> (1,6),
+            closeParenthesis: RParen (1,8) -> (1,9),
+            signatureCandidateIndices: Array [
+              0,
+            ],
           },
         },
       ],
       beats: Array [
-        Beat (1,7) -> (1,9) {
-          notes: NoteList (1,7) -> (1,9) {
+        Beat (1,10) -> (1,12) {
+          notes: NoteList (1,10) -> (1,12) {
             notes: Array [
-              Note (1,7) -> (1,9) {
-                noteValue: Ident "C4" (1,7) -> (1,9),
+              Note (1,10) -> (1,12) {
+                noteValue: Ident "C4" (1,10) -> (1,12),
               },
             ],
           },

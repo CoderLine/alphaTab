@@ -46,7 +46,7 @@ export class TestPlatform {
      * @partial
      */
     public static async listDirectory(path: string): Promise<string[]> {
-        return await fs.promises.readdir(path);
+        return (await fs.promises.readdir(path, { withFileTypes: true })).filter(t => t.isFile()).map(t => t.name);
     }
 
     /**
@@ -125,7 +125,7 @@ export class TestPlatform {
     public static mapAsUnknownIterable(map: unknown): Iterable<[unknown, unknown]> {
         return (map as Map<unknown, unknown>).entries();
     }
-    
+
     /**
      * @target web
      * @partial
