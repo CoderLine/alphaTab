@@ -80,7 +80,7 @@ export class BeamingHelper {
     public hasStem(forceFlagOnSingleBeat: boolean, beat?: Beat): boolean {
         return (
             (forceFlagOnSingleBeat && BeamingHelper.beatHasStem(beat!)) ||
-            (!forceFlagOnSingleBeat && this.beats.length === 1 && BeamingHelper.beatHasStem(beat!))
+            (!forceFlagOnSingleBeat && BeamingHelper.beatHasStem(beat!))
         );
     }
 
