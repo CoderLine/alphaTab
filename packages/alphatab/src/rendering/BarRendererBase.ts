@@ -5,7 +5,6 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import {
@@ -28,6 +27,7 @@ import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingH
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -677,13 +677,13 @@ export class BarRendererBase {
         return this.beatGlyphsStart + this.voiceContainer.getBeatX(beat, requestedPosition, useSharedSizes);
     }
 
-    public getRatioPositionX(ticks: number): number {
+    public getRatioPositionX(ratio: number): number {
         const firstOnNoteX = this.bar.isEmpty
             ? this.beatGlyphsStart
             : this.getBeatX(this.bar.voices[0].beats[0], BeatXPosition.MiddleNotes);
         const x = firstOnNoteX;
         const w = this.postBeatGlyphsStart - firstOnNoteX;
-        return x + w * ticks;
+        return x + w * ratio;
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {

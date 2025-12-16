@@ -23,6 +23,10 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
     public override get absoluteDisplayStart(): number {
         return this.renderer.bar.masterBar.start;
     }
+    public override get beatId(): number {
+        return -1;
+    }
+
     public override get onTimeX(): number {
         return 0;
     }
@@ -99,7 +103,6 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
                 case BeatXPosition.OnNotes:
                 case BeatXPosition.MiddleNotes:
                 case BeatXPosition.Stem:
-                    return g.x + g.width / 2;
                 case BeatXPosition.PostNotes:
                     return g.x + g.width;
                 case BeatXPosition.EndBeat:

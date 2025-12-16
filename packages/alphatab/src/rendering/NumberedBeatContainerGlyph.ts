@@ -1,8 +1,14 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { NumberedTieGlyph } from '@coderline/alphatab/rendering//glyphs/NumberedTieGlyph';
+import type { BarBounds } from '@coderline/alphatab/rendering/_barrel';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { NumberedBeatGlyph, NumberedBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedBeatGlyph';
+import {
+    type INumberedBeatDashGlyph,
+    type NumberedDashBeatContainerGlyph,
+    NumberedNoteBeatContainerGlyphBase
+} from '@coderline/alphatab/rendering/glyphs/NumberedDashBeatContainerGlyph';
 import { NumberedSlurGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedSlurGlyph';
 import type { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 
@@ -12,6 +18,20 @@ import type { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
     private _slurs: Map<string, TieGlyph> = new Map<string, TieGlyph>();
     private _effectSlurs: NumberedSlurGlyph[] = [];
+    private _dashes?: INumberedBeatDashGlyph[];
+
+    public hasAdditionalNumbers = false;
+    public *iterateAdditionalNumbers() {
+        const dashes = this._dashes;
+        if (!dashes) {
+            return;
+        }
+        for (const d of dashes) {
+            if (d instanceof NumberedNoteBeatContainerGlyphBase) {
+                yield d as NumberedNoteBeatContainerGlyphBase;
+            }
+        }
+    }
 
     public constructor(beat: Beat) {
         super(beat);
@@ -19,10 +39,44 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
         this.onNotes = new NumberedBeatGlyph();
     }
 
+    public addDash(dash: NumberedDashBeatContainerGlyph) {
+        let dashes = this._dashes;
+        if (!dashes) {
+            dashes = [];
+            this._dashes = dashes;
+        }
+        dashes.push(dash);
+    }
+
+    public addNotes(dash: NumberedNoteBeatContainerGlyphBase) {
+        let dashes = this._dashes;
+        if (!dashes) {
+            dashes = [];
+            this._dashes = dashes;
+        }
+        dashes.push(dash);
+        this.hasAdditionalNumbers = true;
+    }
+
     public override doLayout(): void {
         this._slurs.clear();
         this._effectSlurs = [];
         super.doLayout();
+    }
+
+    public override buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number) {
+        super.buildBoundingsLookup(barBounds, cx, cy);
+        // extend bounds to include dashes
+        const dashes = this._dashes;
+        if (dashes) {
+            const beatBounds = barBounds.beats[barBounds.beats.length - 1];
+            const lastDash = dashes[dashes.length - 1];
+            const visualEndX = lastDash.x + lastDash.contentWidth;
+            beatBounds.visualBounds.w = visualEndX - beatBounds.visualBounds.x;
+
+            const realEnd = lastDash.x + lastDash.width;
+            beatBounds.realBounds.w = realEnd - beatBounds.realBounds.x;
+        }
     }
 
     protected override createTies(n: Note): void {

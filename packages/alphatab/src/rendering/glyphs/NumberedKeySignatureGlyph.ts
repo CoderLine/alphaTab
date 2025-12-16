@@ -1,22 +1,23 @@
-import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
-import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
-import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
-import { KeySignature } from '@coderline/alphatab/model/KeySignature';
-import { CanvasHelper, type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
+import { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
+import { CanvasHelper, type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal
  */
-export class NumberedKeySignatureGlyph extends Glyph {
+export class NumberedKeySignatureGlyph extends EffectGlyph {
     private _keySignature: KeySignature;
     private _keySignatureType: KeySignatureType;
 
     private _text: string = '';
     private _accidental: AccidentalType = AccidentalType.None;
     private _accidentalOffset: number = 0;
+    private _padding: number = 0;
 
     public constructor(x: number, y: number, keySignature: KeySignature, keySignatureType: KeySignatureType) {
         super(x, y);
@@ -161,10 +162,15 @@ export class NumberedKeySignatureGlyph extends Glyph {
         this._text = text + text2;
         this._accidental = accidental;
         const c = this.renderer.scoreRenderer.canvas!;
-        const res = this.renderer.resources;
+        const settings = this.renderer.settings;
+        const res = settings.display.resources;
         c.font = res.numberedNotationFont;
         this._accidentalOffset = c.measureText(text).width;
-        this.width = c.measureText(text + text2).width;
+        const fullSize = c.measureText(text + text2);
+        this._padding =
+            this.renderer.index === 0 ? settings.display.firstStaffPaddingLeft : settings.display.staffPaddingLeft;
+        this.width = this._padding + fullSize.width;
+        this.height = fullSize.height;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -172,13 +178,14 @@ export class NumberedKeySignatureGlyph extends Glyph {
 
         const res = this.renderer.resources;
         canvas.font = res.numberedNotationFont;
-        canvas.textBaseline = TextBaseline.Middle;
-        canvas.fillText(this._text, cx + this.x, cy + this.y);
+        canvas.textBaseline = TextBaseline.Alphabetic;
+        canvas.fillText(this._text, cx + this.x + this._padding, cy + this.y + this.height);
 
         if (this._accidental !== AccidentalType.None) {
-            CanvasHelper.fillMusicFontSymbolSafe(canvas,
-                cx + this.x + this._accidentalOffset,
-                cy + this.y,
+            CanvasHelper.fillMusicFontSymbolSafe(
+                canvas,
+                cx + this.x + this._padding + this._accidentalOffset,
+                cy + this.y + this.height,
                 1,
                 AccidentalGlyph.getMusicSymbol(this._accidental),
                 false

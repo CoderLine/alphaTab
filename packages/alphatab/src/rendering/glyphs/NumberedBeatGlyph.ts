@@ -15,7 +15,6 @@ import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBas
 import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { NumberedDashGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedDashGlyph';
 import { NumberedNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedNoteHeadGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
@@ -32,11 +31,16 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
     public isNaturalizeAccidental = false;
     public accidental: AccidentalType = AccidentalType.None;
 
+    public skipLayout = false;
+
     protected override get effectElement() {
         return BeatSubElement.NumberedEffects;
     }
 
     public override doLayout(): void {
+        if (this.skipLayout) {
+            return;
+        }
         if (!this.container.beat.isRest && !this.container.beat.isEmpty) {
             const accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
             accidentals.renderer = this.renderer;
@@ -107,12 +111,9 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: NumberedNoteHeadGlyph | null = null;
     public deadSlapped: DeadSlappedBeatGlyph | null = null;
 
-    public octaveDots: number = 0;
-
     protected override get effectElement() {
         return BeatSubElement.NumberedEffects;
     }
-
     public override getNoteX(_note: Note, requestedPosition: NoteXPosition): number {
         let g: Glyph | null = null;
         if (this.noteHeads) {
@@ -226,6 +227,8 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             sr.shortestDuration = this.container.beat.duration;
         }
 
+        let octaveDots = 0;
+
         if (!this.container.beat.isEmpty) {
             const glyphY = sr.getLineY(0);
             let numberWithinOctave = '0';
@@ -248,13 +251,10 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
 
                     const index = noteValue < 0 ? ((noteValue % 12) + 12) % 12 : noteValue % 12;
 
-                    let dots = noteValue < 0 ? ((Math.abs(noteValue) + 12) / 12) | 0 : (noteValue / 12) | 0;
+                    octaveDots = noteValue < 0 ? ((Math.abs(noteValue) + 12) / 12) | 0 : (noteValue / 12) | 0;
                     if (noteValue < 0) {
-                        dots *= -1;
+                        octaveDots *= -1;
                     }
-                    this.octaveDots = dots;
-                    sr.registerOctave(this.container.beat, dots);
-
                     const stepList =
                         ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
                             ? AccidentalHelper.flatNoteSteps
@@ -291,7 +291,8 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                     glyphY,
                     numberWithinOctave,
                     isGrace,
-                    this.container.beat
+                    this.container.beat,
+                    octaveDots
                 );
                 this.noteHeads = noteHeadGlyph;
 
@@ -306,35 +307,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                     dot.renderer = this.renderer;
                     this.addEffect(dot);
                 }
-            }
-
-            //
-            // Dashes
-            let numberOfQuarterNotes = 0;
-            switch (this.container.beat.duration) {
-                case Duration.QuadrupleWhole:
-                    numberOfQuarterNotes = 16;
-                    break;
-                case Duration.DoubleWhole:
-                    numberOfQuarterNotes = 8;
-                    break;
-                case Duration.Whole:
-                    numberOfQuarterNotes = 4;
-                    break;
-                case Duration.Half:
-                    numberOfQuarterNotes = 2;
-                    break;
-            }
-
-            let numberOfAddedQuarters = numberOfQuarterNotes;
-            for (let i = 0; i < this.container.beat.dots; i++) {
-                numberOfAddedQuarters = (numberOfAddedQuarters / 2) | 0;
-                numberOfQuarterNotes += numberOfAddedQuarters;
-            }
-            for (let i = 0; i < numberOfQuarterNotes - 1; i++) {
-                const dash = new NumberedDashGlyph(0, glyphY, this.container.beat);
-                dash.renderer = this.renderer;
-                this.addNormal(dash);
             }
         }
 

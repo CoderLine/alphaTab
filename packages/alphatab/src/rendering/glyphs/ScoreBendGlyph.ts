@@ -35,6 +35,11 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         this._container = container;
     }
 
+    public override doLayout(): void {
+        super.doLayout();
+        this.width = 0;
+    }
+
     public override getBoundingBoxTop(): number {
         return super.getBoundingBoxTop() - this._calculateMaxSlurHeight(BeamDirection.Up);
     }

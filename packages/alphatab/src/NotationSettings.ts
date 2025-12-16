@@ -348,6 +348,11 @@ export enum NotationElement {
      */
     EffectWhammyBarLine = 50,
 
+    /**
+     * The key signature for numbered notation staff.
+     */
+    EffectNumberedNotationKeySignature = 51,
+
 }
 
 /**
