@@ -53,9 +53,11 @@ export class NumberedNoteHeadGlyph extends Glyph {
 
         const res = this.renderer.resources;
         canvas.font = this._isGrace ? res.numberedNotationGraceFont : res.numberedNotationFont;
+        const baseline = canvas.textBaseline;
         canvas.textBaseline = TextBaseline.Middle;
         canvas.textAlign = TextAlign.Left;
         canvas.fillText(this._number.toString(), cx + this.x, cy + this.y);
+        canvas.textBaseline = baseline;
 
         const dotCount = Math.abs(this._octaveDots);
         let dotsY = this._octaveDotsY + res.engravingSettings.glyphTop.get(MusicFontSymbol.AugmentationDot)!;
