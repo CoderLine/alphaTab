@@ -8,14 +8,12 @@ import type { Voice } from '@coderline/alphatab/model/Voice';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
+import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
+import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
-import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
-import { NumberedKeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedKeySignatureGlyph';
-import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -277,12 +275,6 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override createLinePreBeatGlyphs(): void {
-        // Key signature
-        if (!this.bar.previousBar || this.bar.keySignature !== this.bar.previousBar.keySignature) {
-            this.createStartSpacing();
-            this._createKeySignatureGlyphs();
-        }
-
         if (
             this._isOnlyNumbered &&
             (!this.bar.previousBar ||
@@ -300,15 +292,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
             this._createTimeSignatureGlyphs();
         }
     }
-    private _createKeySignatureGlyphs() {
-        this.addPreBeatGlyph(
-            new NumberedKeySignatureGlyph(0, this.getLineY(0), this.bar.keySignature, this.bar.keySignatureType)
-        );
-    }
-
+    
     private _createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
-
         const masterBar = this.bar.masterBar;
         const g = new ScoreTimeSignatureGlyph(
             0,
