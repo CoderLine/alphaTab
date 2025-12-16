@@ -163,13 +163,13 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 for (const additionalNumber of container.iterateAdditionalNumbers()) {
                     barCount = additionalNumber.barCount;
                     beatLineX =
-                        this.beatGlyphsStart + additionalNumber.x + additionalNumber.getBeatX(BeatXPosition.PreNotes);
+                        this.beatGlyphsStart + additionalNumber.x + additionalNumber.getBeatX(BeatXPosition.PreNotes, false);
                     for (let barIndex = 0; barIndex < barCount; barIndex++) {
                         const barY: number = barStart + barIndex * barSpacing;
                         const additionalBarEndX =
                             this.beatGlyphsStart +
                             additionalNumber.x +
-                            additionalNumber.getBeatX(BeatXPosition.PostNotes);
+                            additionalNumber.getBeatX(BeatXPosition.PostNotes, false);
                         LineBarRenderer.paintSingleBar(
                             canvas,
                             cx + this.x + beatLineX,

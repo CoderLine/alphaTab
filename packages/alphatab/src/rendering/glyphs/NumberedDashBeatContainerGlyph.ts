@@ -15,12 +15,18 @@ import type { NumberedBarRenderer } from '@coderline/alphatab/rendering/Numbered
 import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 
+/**
+ * @internal
+ */
 export interface INumberedBeatDashGlyph {
     readonly contentWidth: number;
     readonly x: number;
     readonly width: number;
 }
 
+/**
+ * @internal
+ */
 export class NumberedNoteBeatContainerGlyphBase extends NumberedBeatContainerGlyph implements INumberedBeatDashGlyph {
     private _absoluteDisplayStart: number;
     private _displayDuration: number;
@@ -92,6 +98,9 @@ export class NumberedNoteBeatContainerGlyphBase extends NumberedBeatContainerGly
     public override buildBoundingsLookup(_barBounds: BarBounds, _cx: number, _cy: number): void {}
 }
 
+/**
+ * @internal
+ */
 export class NumberedDashBeatContainerGlyph extends BeatContainerGlyphBase implements INumberedBeatDashGlyph {
     private _absoluteDisplayStart: number;
     private _voiceIndex: number;

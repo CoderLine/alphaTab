@@ -215,7 +215,7 @@ export interface EngravingSettingsJson {
      */
     numberedBarRendererBarSpacing?: number;
     /**
-     * The size of the dashed drawn in numbered notation to indicate the durations.
+     * The padding minimum between the duration dashes.
      */
     numberedDashGlyphPadding?: number;
     /**
