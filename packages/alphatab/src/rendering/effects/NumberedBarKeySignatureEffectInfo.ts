@@ -29,10 +29,10 @@ export class NumberedBarKeySignatureEffectInfo extends EffectInfo {
 
     public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         const bar = beat.voice.bar;
-        return beat.index === 0 && beat.voice.index === 0 && (
-            !bar.previousBar ||
-            bar.keySignature !== bar.previousBar.keySignature ||
-            (beat.index === 0 && beat.voice.index === 0)
+        return (
+            beat.index === 0 &&
+            beat.voice.index === 0 &&
+            (!bar.previousBar || bar.keySignature !== bar.previousBar.keySignature)
         );
     }
 
