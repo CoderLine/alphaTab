@@ -480,7 +480,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
     }
 
-    protected shouldPaintBeamingHelper(h:BeamingHelper){
+    protected shouldPaintBeamingHelper(h: BeamingHelper) {
         return !h.isRestBeamHelper;
     }
 
@@ -659,8 +659,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
         const direction: BeamDirection = this.getBeamDirection(h);
         const isGrace: boolean = h.graceType !== GraceType.None;
         const scaleMod: number = isGrace ? EngravingSettings.GraceScale : 1;
-        let barSpacing: number = (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
-        let barSize: number = this.smuflMetrics.beamThickness * scaleMod;
+        let barSpacing: number = (this.beamSpacing + this.beamThickness) * scaleMod;
+        let barSize: number = this.beamThickness * scaleMod;
         if (direction === BeamDirection.Down) {
             barSpacing = -barSpacing;
             barSize = -barSize;
@@ -901,7 +901,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
                             maxNoteY = topY;
                         }
 
-                        let bottomY: number = this.getBarLineStart(h.beatOfLowestNote, h.direction) + noteOverflowPadding;
+                        let bottomY: number =
+                            this.getBarLineStart(h.beatOfLowestNote, h.direction) + noteOverflowPadding;
                         if (h.hasTuplet && tupletDirection !== h.direction) {
                             bottomY += this.tupletSize + this.tupletOffset;
                         }
@@ -999,6 +1000,13 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return drawingInfo;
     }
 
+    protected get beamSpacing() {
+        return this.smuflMetrics.beamSpacing;
+    }
+    protected get beamThickness() {
+        return this.smuflMetrics.beamThickness;
+    }
+
     protected ensureBeamDrawingInfo(h: BeamingHelper, direction: BeamDirection): void {
         if (h.drawingInfos.has(direction)) {
             return;
@@ -1012,7 +1020,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
         const drawingInfo = this.initializeBeamDrawingInfo(h, direction);
         h.drawingInfos.set(direction, drawingInfo);
-      
+
         const isRest = h.isRestBeamHelper;
         const scale = h.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
         const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
@@ -1022,8 +1030,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // here we shift accordingly
         let barDrawingShift = 0;
         if (barCount > 2 && !isRest) {
-            const beamSpacing = this.smuflMetrics.beamSpacing * scale;
-            const beamThickness = this.smuflMetrics.beamThickness * scale;
+            const beamSpacing = this.beamSpacing * scale;
+            const beamThickness = this.beamThickness * scale;
             const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;
 
             if (direction === BeamDirection.Up) {
@@ -1075,7 +1083,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             if (h.restBeats.length > 0) {
                 // space needed for the bars, rests need to be below them
                 const scaleMod: number = h.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
-                barSpacing = barCount * (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
+                barSpacing = barCount * (this.beamSpacing + this.beamThickness) * scaleMod;
             }
 
             for (const b of h.restBeats) {

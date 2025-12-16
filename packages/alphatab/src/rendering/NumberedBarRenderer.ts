@@ -1,7 +1,9 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
@@ -117,28 +119,43 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
             using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
 
-            const barSpacing: number = this.smuflMetrics.numberedBarRendererBarSpacing;
-            const barSize: number = this.smuflMetrics.numberedBarRendererBarSize;
+            const direction: BeamDirection = this.getBeamDirection(h);
+            const isGrace: boolean = h.graceType !== GraceType.None;
+            const scaleMod: number = isGrace ? EngravingSettings.GraceScale : 1;
+
+            let barSpacing: number =
+                (this.beamSpacing + this.beamThickness) * scaleMod;
+            let barSize = this.beamThickness * scaleMod;
+            if (direction === BeamDirection.Down) {
+                barSpacing = -barSpacing;
+                barSize = -barSize;
+            }
 
             let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             let beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes);
 
-            const beamY = this.getFlagTopY(beat, BeamDirection.Down);
-            const barStart: number = cy + this.y + beamY + barSpacing;
+            let barStartX: number = 0;
+            let barEndX: number = 0;
+            if (i === h.beats.length - 1) {
+                barStartX = beatLineX;
+                barEndX = this.getBeatX(beat, BeatXPosition.PostNotes);
+            } else {
+                barStartX = beatLineX;
+                barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.PreNotes);
+            }
 
+            const barStart: number = cy + this.y + this.calculateBeamY(h, beatLineX);
             for (let barIndex: number = 0; barIndex < barCount; barIndex++) {
-                let barStartX: number = 0;
-                let barEndX: number = 0;
-                const barY: number = barStart + barIndex * (barSize + barSpacing);
-                if (i === h.beats.length - 1) {
-                    barStartX = beatLineX;
-                    barEndX = this.getBeatX(beat, BeatXPosition.PostNotes);
-                } else {
-                    barStartX = beatLineX;
-                    barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.PreNotes);
-                }
+                const barY: number = barStart + barIndex * barSpacing;
 
-                canvas.fillRect(cx + this.x + barStartX, barY, barEndX - barStartX, barSize);
+                LineBarRenderer.paintSingleBar(
+                    canvas,
+                    cx + this.x + barStartX,
+                    barY,
+                    cx + this.x + barEndX,
+                    barY,
+                    barSize
+                );
             }
 
             // dashes for additional numbers
@@ -149,12 +166,19 @@ export class NumberedBarRenderer extends LineBarRenderer {
                     beatLineX =
                         this.beatGlyphsStart + additionalNumber.x + additionalNumber.getBeatX(BeatXPosition.PreNotes);
                     for (let barIndex = 0; barIndex < barCount; barIndex++) {
-                        const barY: number = barStart + barIndex * (barSize + barSpacing);
-                        const barEndX =
+                        const barY: number = barStart + barIndex * barSpacing;
+                        const additionalBarEndX =
                             this.beatGlyphsStart +
                             additionalNumber.x +
                             additionalNumber.getBeatX(BeatXPosition.PostNotes);
-                        canvas.fillRect(cx + this.x + beatLineX, barY, barEndX - beatLineX, barSize);
+                        LineBarRenderer.paintSingleBar(
+                            canvas,
+                            cx + this.x + beatLineX,
+                            barY,
+                            cx + this.x + additionalBarEndX,
+                            barY,
+                            barSize
+                        );
                     }
                 }
             }
@@ -245,10 +269,13 @@ export class NumberedBarRenderer extends LineBarRenderer {
             return this.getLineY(0);
         }
 
+        this.ensureBeamDrawingInfo(h, direction);
+        const info = h.drawingInfos.get(direction)!;
         if (direction === BeamDirection.Up) {
-            return this.voiceContainer.getBoundingBoxTop();
+            return Math.min(info.startY, info.endY);
+        } else {
+            return Math.max(info.startY, info.endY);
         }
-        return this.voiceContainer.getBoundingBoxBottom();
     }
 
     protected override getBarLineStart(beat: Beat, _direction: BeamDirection): number {
@@ -336,7 +363,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
                         const dash = new NumberedDashBeatContainerGlyph(v.index, absoluteStart + dashTick);
                         this.addBeatGlyph(dash);
                         mainContainer.addDash(dash);
-                    } else {
+                    }
+                    // special case to create second note number, this logic doesn't play well with tuplets
+                    else if (b.duration === Duration.Half && b.dots > 1) {
                         const remainingTickNumber = new NumberedNoteBeatContainerGlyphBase(
                             b,
                             absoluteStart + dashTick,
@@ -361,6 +390,14 @@ export class NumberedBarRenderer extends LineBarRenderer {
         _canvas: ICanvas
     ): void {}
 
+    protected override get beamSpacing(): number {
+        return this.smuflMetrics.numberedBarRendererBarSpacing;
+    }
+
+    protected override get beamThickness(): number {
+        return this.smuflMetrics.numberedBarRendererBarSize;
+    }
+
     protected override paintBeamHelper(
         cx: number,
         cy: number,
@@ -372,16 +409,5 @@ export class NumberedBarRenderer extends LineBarRenderer {
         if (h.voice?.index === 0) {
             super.paintBeamHelper(cx, cy, canvas, h, flagsElement, beamsElement);
         }
-    }
-
-    protected override ensureBeamDrawingInfo(h: BeamingHelper, direction: BeamDirection): void {
-        if (h.drawingInfos.has(direction)) {
-            return;
-        }
-        const drawingInfo = this.initializeBeamDrawingInfo(h, direction);
-        h.drawingInfos.set(direction, drawingInfo);
-
-        // no shifting or collision prevention, just the basic offsets to calculate overflows and
-        // position things
     }
 }

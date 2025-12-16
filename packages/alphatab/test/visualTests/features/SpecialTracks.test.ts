@@ -1,5 +1,4 @@
 import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
-import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 
 describe('SpecialTracksTests', () => {
