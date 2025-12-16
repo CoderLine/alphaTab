@@ -111,7 +111,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
         h: BeamingHelper,
         flagsElement: BeatSubElement
     ): void {
-        if (h.beats.length === 0) {
+        if (h.beats.length === 0 || h.graceType !== GraceType.None) {
             return;
         }
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
@@ -123,8 +123,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
             const isGrace: boolean = h.graceType !== GraceType.None;
             const scaleMod: number = isGrace ? EngravingSettings.GraceScale : 1;
 
-            let barSpacing: number =
-                (this.beamSpacing + this.beamThickness) * scaleMod;
+            let barSpacing: number = (this.beamSpacing + this.beamThickness) * scaleMod;
             let barSize = this.beamThickness * scaleMod;
             if (direction === BeamDirection.Down) {
                 barSpacing = -barSpacing;
