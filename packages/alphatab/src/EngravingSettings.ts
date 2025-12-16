@@ -454,7 +454,7 @@ export class EngravingSettings {
         //
         // custom alphatab sizes
         this.numberedBarRendererBarSize = this.staffLineThickness * 2;
-        this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
+        this.numberedBarRendererBarSpacing = this.beamSpacing;
         this.preNoteEffectPadding = 0.4 * this.oneStaffSpace;
         this.postNoteEffectPadding = 0.2 * this.oneStaffSpace;
         this.lineRangedGlyphDashGap = 0.5 * this.oneStaffSpace;

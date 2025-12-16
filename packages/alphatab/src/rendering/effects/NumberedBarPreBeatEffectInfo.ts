@@ -33,7 +33,12 @@ export class NumberedBarKeySignatureEffectInfo extends EffectInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new NumberedKeySignatureGlyph(0, 0, renderer.bar.keySignature, renderer.bar.keySignatureType);
+        return new NumberedKeySignatureGlyph(
+            0,
+            0,
+            renderer.bar.keySignature,
+            renderer.bar.keySignatureType
+        );
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

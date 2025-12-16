@@ -107,8 +107,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: NumberedNoteHeadGlyph | null = null;
     public deadSlapped: DeadSlappedBeatGlyph | null = null;
 
-    public octaveDots: number = 0;
-
     protected override get effectElement() {
         return BeatSubElement.NumberedEffects;
     }
@@ -226,6 +224,8 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             sr.shortestDuration = this.container.beat.duration;
         }
 
+        let octaveDots = 0;
+
         if (!this.container.beat.isEmpty) {
             const glyphY = sr.getLineY(0);
             let numberWithinOctave = '0';
@@ -248,13 +248,10 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
 
                     const index = noteValue < 0 ? ((noteValue % 12) + 12) % 12 : noteValue % 12;
 
-                    let dots = noteValue < 0 ? ((Math.abs(noteValue) + 12) / 12) | 0 : (noteValue / 12) | 0;
+                    octaveDots = noteValue < 0 ? ((Math.abs(noteValue) + 12) / 12) | 0 : (noteValue / 12) | 0;
                     if (noteValue < 0) {
-                        dots *= -1;
+                        octaveDots *= -1;
                     }
-                    this.octaveDots = dots;
-                    sr.registerOctave(this.container.beat, dots);
-
                     const stepList =
                         ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
                             ? AccidentalHelper.flatNoteSteps
@@ -291,7 +288,8 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                     glyphY,
                     numberWithinOctave,
                     isGrace,
-                    this.container.beat
+                    this.container.beat,
+                    octaveDots
                 );
                 this.noteHeads = noteHeadGlyph;
 
