@@ -539,7 +539,7 @@ export class EngravingSettings {
     public numberedBarRendererBarSpacing = 0;
 
     /**
-     * The size of the dashed drawn in numbered notation to indicate the durations.
+     * The padding minimum between the duration dashes.
      */
     public numberedDashGlyphPadding = 0;
 

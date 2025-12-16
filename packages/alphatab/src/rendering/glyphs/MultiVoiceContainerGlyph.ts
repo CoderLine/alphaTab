@@ -24,6 +24,8 @@ export class MultiVoiceContainerGlyph extends Glyph {
 
     public voiceDrawOrder?: number[];
 
+    private readonly _beatGlyphLookup = new Map<number, BeatContainerGlyphBase>();
+
     public beatGlyphs = new Map<number, BeatContainerGlyphBase[]>();
     public tupletGroups = new Map<number, TupletGroup[]>();
 
@@ -58,7 +60,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
 
     private _scaleToForce(force: number): void {
         this.width = this.renderer.layoutingInfo.calculateVoiceWidth(force);
-        const positions: Map<number, number> = this.renderer.layoutingInfo.buildOnTimePositions(force);
+        const positions = this.renderer.layoutingInfo.buildOnTimePositions(force);
         for (const beatGlyphs of this.beatGlyphs.values()) {
             for (let i: number = 0, j: number = beatGlyphs.length; i < j; i++) {
                 const currentBeatGlyph = beatGlyphs[i];
@@ -170,6 +172,12 @@ export class MultiVoiceContainerGlyph extends Glyph {
             beatGlyphs.length === 0 ? 0 : beatGlyphs[beatGlyphs.length - 1].x + beatGlyphs[beatGlyphs.length - 1].width;
         bg.renderer = this.renderer;
         beatGlyphs.push(bg);
+
+        const id = bg.beatId;
+        if (id >= 0) {
+            this._beatGlyphLookup.set(id, bg);
+        }
+
         const newWidth = bg.x + bg.width;
         if (newWidth > this.width) {
             this.width = newWidth;
@@ -186,6 +194,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
             tupletGroups.push(bg.tupletGroup!);
         }
     }
+
     public getBeatX(
         beat: Beat,
         requestedPosition: BeatXPosition = BeatXPosition.PreNotes,
@@ -222,11 +231,10 @@ export class MultiVoiceContainerGlyph extends Glyph {
     }
 
     public getBeatContainer(beat: Beat): BeatContainerGlyphBase | undefined {
-        if (!this.beatGlyphs.has(beat.voice.index)) {
+        if (!this._beatGlyphLookup.has(beat.id)) {
             return undefined;
         }
-        const beats = this.beatGlyphs.get(beat.voice.index)!;
-        return beat.index < beats.length ? beats[beat.index] : undefined;
+        return this._beatGlyphLookup.get(beat.id);
     }
 
     public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number): void {

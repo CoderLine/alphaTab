@@ -69,6 +69,5 @@ export class SlashBeatContainerGlyph extends BeatContainerGlyph {
     protected override updateWidth(): void {
         super.updateWidth();
         this.width += this._flagStretch;
-        this.minWidth += this._flagStretch;
     }
 }

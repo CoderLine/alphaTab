@@ -677,13 +677,13 @@ export class BarRendererBase {
         return this.beatGlyphsStart + this.voiceContainer.getBeatX(beat, requestedPosition, useSharedSizes);
     }
 
-    public getRatioPositionX(ticks: number): number {
+    public getRatioPositionX(ratio: number): number {
         const firstOnNoteX = this.bar.isEmpty
             ? this.beatGlyphsStart
             : this.getBeatX(this.bar.voices[0].beats[0], BeatXPosition.MiddleNotes);
         const x = firstOnNoteX;
         const w = this.postBeatGlyphsStart - firstOnNoteX;
-        return x + w * ticks;
+        return x + w * ratio;
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {

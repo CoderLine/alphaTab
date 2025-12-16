@@ -41,7 +41,7 @@ import { LetRingEffectInfo } from '@coderline/alphatab/rendering/effects/LetRing
 import { LyricsEffectInfo } from '@coderline/alphatab/rendering/effects/LyricsEffectInfo';
 import { MarkerEffectInfo } from '@coderline/alphatab/rendering/effects/MarkerEffectInfo';
 import { NoteOrnamentEffectInfo } from '@coderline/alphatab/rendering/effects/NoteOrnamentEffectInfo';
-import { NumberedBarKeySignatureEffectInfo } from '@coderline/alphatab/rendering/effects/NumberedBarPreBeatEffectInfo';
+import { NumberedBarKeySignatureEffectInfo } from '@coderline/alphatab/rendering/effects/NumberedBarKeySignatureEffectInfo';
 import { OttaviaEffectInfo } from '@coderline/alphatab/rendering/effects/OttaviaEffectInfo';
 import { PalmMuteEffectInfo } from '@coderline/alphatab/rendering/effects/PalmMuteEffectInfo';
 import { PickSlideEffectInfo } from '@coderline/alphatab/rendering/effects/PickSlideEffectInfo';

@@ -471,13 +471,17 @@ export abstract class LineBarRenderer extends BarRendererBase {
         beamsElement: BeatSubElement
     ): void {
         canvas.color = h.voice!.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
-        if (!h.isRestBeamHelper) {
+        if (this.shouldPaintBeamingHelper(h)) {
             if (this.drawBeamHelperAsFlags(h)) {
                 this.paintFlag(cx, cy, canvas, h, flagsElement);
             } else {
                 this.paintBar(cx, cy, canvas, h, beamsElement);
             }
         }
+    }
+
+    protected shouldPaintBeamingHelper(h:BeamingHelper){
+        return !h.isRestBeamHelper;
     }
 
     protected abstract getFlagTopY(beat: Beat, direction: BeamDirection): number;
@@ -834,8 +838,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
         for (const v of this.helpers.beamHelpers) {
             for (const h of v) {
-                if (h.isRestBeamHelper) {
-                    // no stems or beams to consider
+                if (!this.shouldPaintBeamingHelper(h)) {
+                    // no visible helper
                 }
                 // notes with stems
                 else if (h.beats.length === 1 && h.beats[0].duration >= Duration.Half) {

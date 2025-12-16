@@ -20,7 +20,7 @@ export class NumberedBarKeySignatureEffectInfo extends EffectInfo {
     }
 
     public get canShareBand(): boolean {
-        return true;
+        return false;
     }
 
     public get sizingMode(): EffectBarGlyphSizing {
@@ -29,16 +29,15 @@ export class NumberedBarKeySignatureEffectInfo extends EffectInfo {
 
     public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         const bar = beat.voice.bar;
-        return !bar.previousBar || bar.keySignature !== bar.previousBar.keySignature;
+        return beat.index === 0 && beat.voice.index === 0 && (
+            !bar.previousBar ||
+            bar.keySignature !== bar.previousBar.keySignature ||
+            (beat.index === 0 && beat.voice.index === 0)
+        );
     }
 
     public createNewGlyph(renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new NumberedKeySignatureGlyph(
-            0,
-            0,
-            renderer.bar.keySignature,
-            renderer.bar.keySignatureType
-        );
+        return new NumberedKeySignatureGlyph(0, 0, renderer.bar.keySignature, renderer.bar.keySignatureType);
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

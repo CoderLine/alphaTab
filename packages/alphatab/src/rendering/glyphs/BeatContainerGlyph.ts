@@ -21,6 +21,7 @@ import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
  * @internal
  */
 export abstract class BeatContainerGlyphBase extends Glyph {
+    public abstract get beatId(): number;
     public abstract get absoluteDisplayStart(): number;
     public abstract get displayDuration(): number;
     public abstract get onTimeX(): number;
@@ -49,10 +50,14 @@ export abstract class BeatContainerGlyphBase extends Glyph {
  */
 export class BeatContainerGlyph extends BeatContainerGlyphBase {
     private _ties: ITieGlyph[] = [];
+    private _tieWidth = 0;
     public beat: Beat;
     public preNotes!: BeatGlyphBase;
     public onNotes!: BeatOnNoteGlyphBase;
-    public minWidth: number = 0;
+
+    public override get beatId(): number {
+        return this.beat.id;
+    }
 
     public override get isLastOfVoice(): boolean {
         return this.beat.isLastOfVoice;
@@ -132,7 +137,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     protected get postBeatStretch() {
-        return this.onNotes.computedWidth - this.onNotes.onTimeX;
+        return (this.onNotes.computedWidth + this._tieWidth) - this.onNotes.onTimeX;
     }
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
@@ -169,11 +174,15 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         this.onNotes.renderer = this.renderer;
         this.onNotes.container = this;
         this.onNotes.doLayout();
+        this.createBeatTies();
+        this.updateWidth();
+    }
+
+    protected createBeatTies() {
         let i: number = this.beat.notes.length - 1;
         while (i >= 0) {
             this.createTies(this.beat.notes[i--]);
         }
-        this.updateWidth();
     }
 
     public override doMultiVoiceLayout(): void {
@@ -181,7 +190,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     protected updateWidth(): void {
-        this.minWidth = this.preNotes.width + this.onNotes.width;
+        let width = this.preNotes.width + this.onNotes.width;
         let tieWidth: number = 0;
         for (const tie of this._ties) {
             const tg = tie as unknown as Glyph;
@@ -189,8 +198,9 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
                 tieWidth = tg.width;
             }
         }
-        this.minWidth += tieWidth;
-        this.width = this.minWidth;
+        this._tieWidth = tieWidth;
+        width += tieWidth;
+        this.width = width;
     }
 
     protected createTies(_n: Note): void {
