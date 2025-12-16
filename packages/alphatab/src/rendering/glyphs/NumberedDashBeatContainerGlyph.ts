@@ -51,7 +51,7 @@ export class NumberedNoteBeatContainerGlyphBase extends NumberedBeatContainerGly
         return 0;
     }
 
-    public readonly barCount:number;
+    public readonly barCount: number;
 
     public override get beatId(): number {
         return -1;
@@ -168,6 +168,6 @@ export class NumberedDashBeatContainerGlyph extends BeatContainerGlyphBase imple
         const dashWidth = renderer.smuflMetrics.numberedDashGlyphWidth;
         const dashHeight = renderer.smuflMetrics.numberedBarRendererBarSize;
         const dashY = Math.ceil(cy + renderer.getLineY(0) - dashHeight);
-        canvas.fillRect(cx + this.x + -dashWidth / 2, dashY, dashWidth, dashHeight);
+        canvas.fillRect(cx + this.x, dashY, dashWidth, dashHeight);
     }
 }
