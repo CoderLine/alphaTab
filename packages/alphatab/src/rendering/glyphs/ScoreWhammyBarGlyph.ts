@@ -145,6 +145,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
         }
 
         super.doLayout();
+        this.width = this.width / 2;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

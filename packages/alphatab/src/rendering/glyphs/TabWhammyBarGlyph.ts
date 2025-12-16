@@ -108,6 +108,7 @@ export class TabWhammyBarGlyph extends EffectGlyph {
         this.originalBottomOffset = bottomY;
 
         this.height = topY + bottomY;
+        this.width = 0;
     }
 
     private _getOffset(value: number): number {

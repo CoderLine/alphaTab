@@ -114,7 +114,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     protected override get effectElement() {
         return BeatSubElement.NumberedEffects;
     }
-
     public override getNoteX(_note: Note, requestedPosition: NoteXPosition): number {
         let g: Glyph | null = null;
         if (this.noteHeads) {
