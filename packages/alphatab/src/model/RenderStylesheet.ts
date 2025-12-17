@@ -164,4 +164,24 @@ export class RenderStylesheet {
      * Whether barlines should be drawn across staves within the same system.
      */
     public extendBarLines: boolean = false;
+
+    /**
+     * Whether to hide empty staves.
+     */
+    public hideEmptyStaves: boolean = false;   
+
+    /**
+     * Whether to also hide empty staves in the first system.
+     * @remarks
+     * Only has an effect when activating {@link hideEmptyStaves}.
+     */
+    public hideEmptyStavesInFirstSystem :boolean = false;
+
+    /**
+     * Whether to show brackets and braces across single staves.
+     * @remarks
+     * This allows a more consistent view for identifying staves when using
+     * {@link hideEmptyStaves}
+     */
+    public showSingleStaffBrackets: boolean = false;
 }

@@ -59,6 +59,9 @@ export class RenderStylesheetSerializer {
             }
         }
         o.set("extendbarlines", obj.extendBarLines);
+        o.set("hideemptystaves", obj.hideEmptyStaves);
+        o.set("hideemptystavesinfirstsystem", obj.hideEmptyStavesInFirstSystem);
+        o.set("showbracketsonsinglestaves", obj.showBracketsOnSingleStaves);
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
@@ -119,6 +122,15 @@ export class RenderStylesheetSerializer {
                 return true;
             case "extendbarlines":
                 obj.extendBarLines = v! as boolean;
+                return true;
+            case "hideemptystaves":
+                obj.hideEmptyStaves = v! as boolean;
+                return true;
+            case "hideemptystavesinfirstsystem":
+                obj.hideEmptyStavesInFirstSystem = v! as boolean;
+                return true;
+            case "showbracketsonsinglestaves":
+                obj.showBracketsOnSingleStaves = v! as boolean;
                 return true;
         }
         return false;

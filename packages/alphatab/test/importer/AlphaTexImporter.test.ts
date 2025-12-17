@@ -2514,7 +2514,6 @@ describe('AlphaTexImporterTest', () => {
             ).toMatchSnapshot();
         });
         it('barWise', () => {
-            
             expect(
                 parseTex(`
                     \\voiceMode barWise
@@ -2530,7 +2529,7 @@ describe('AlphaTexImporterTest', () => {
         });
     });
 
-    it('inline-chord-diagrams', () =>{
+    it('inline-chord-diagrams', () => {
         let score = parseTex(`
             \\chordDiagramsInScore
             \\chord ("E" 0 0 1 2 2 0)
@@ -2551,5 +2550,35 @@ describe('AlphaTexImporterTest', () => {
             (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
         `);
         expect(score.stylesheet.globalDisplayChordDiagramsInScore).to.be.false;
-    })
+    });
+
+    it('empty-staff-options', () => {
+        let score = parseTex(`
+            \\hideEmptyStaves
+            C4
+        `);
+        expect(score.stylesheet.hideEmptyStaves).to.be.true;
+        expect(score.stylesheet.hideEmptyStavesInFirstSystem).to.be.false;
+        expect(score.stylesheet.showSingleStaffBrackets).to.be.false;
+
+        score = parseTex(`
+            \\hideEmptyStaves
+            \\hideEmptyStavesInFirstSystem
+        `);
+        expect(score.stylesheet.hideEmptyStaves).to.be.true;
+        expect(score.stylesheet.hideEmptyStavesInFirstSystem).to.be.true;
+
+        score = parseTex(`
+            \\hideEmptyStavesInFirstSystem
+            C4
+        `);
+        expect(score.stylesheet.hideEmptyStaves).to.be.false;
+        expect(score.stylesheet.hideEmptyStavesInFirstSystem).to.be.true;
+
+        score = parseTex(`
+            \\showSingleStaffBrackets
+            C4
+        `);
+        expect(score.stylesheet.showSingleStaffBrackets).to.be.true;
+    });
 });
