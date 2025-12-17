@@ -12,6 +12,8 @@ export class StaffTrackGroup {
     public track: Track;
     public staffSystem: StaffSystem;
     public staves: RenderStaff[] = [];
+    public firstVisibleStaff?: RenderStaff;
+    public lastVisibleStaff?: RenderStaff;
     public bracket: SystemBracket | null = null;
 
     public constructor(staffSystem: StaffSystem, track: Track) {

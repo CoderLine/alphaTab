@@ -28,21 +28,42 @@ import { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSyst
  * @internal
  */
 export abstract class SystemBracket {
-    public firstStaffInBracket: RenderStaff | null = null;
-    public lastStaffInBracket: RenderStaff | null = null;
+    private _system: StaffSystem;
+    public firstStaffInBracket?: RenderStaff;
+    public lastStaffInBracket?: RenderStaff;
+    public firstVisibleStaffInBracket?: RenderStaff;
+    public lastVisibleStaffInBracket?: RenderStaff;
     public drawAsBrace: boolean = false;
     public braceScale: number = 1;
     public width: number = 0;
     public index: number = 0;
     public get canPaint(): boolean {
-        return this.firstStaffInBracket !== null && this.lastStaffInBracket !== null;
+        return this.firstVisibleStaffInBracket !== undefined && this.lastVisibleStaffInBracket !== undefined;
+    }
+
+    public constructor(system: StaffSystem) {
+        this._system = system;
     }
 
     public abstract includesStaff(s: RenderStaff): boolean;
 
     public finalizeBracket(smuflMetrics: EngravingSettings) {
+        let firstVisibleStaff: RenderStaff | undefined = undefined;
+        let lastVisibleStaff: RenderStaff | undefined = undefined;
+        for (let i = this.firstStaffInBracket!.index; i <= this.lastStaffInBracket!.index; i++) {
+            const staff = this._system.allStaves[i];
+            if (staff.isVisible) {
+                if (!firstVisibleStaff) {
+                    firstVisibleStaff = staff;
+                }
+                lastVisibleStaff = staff;
+            }
+        }
+        this.firstVisibleStaffInBracket = firstVisibleStaff;
+        this.lastVisibleStaffInBracket = lastVisibleStaff;
+
         // systems with just a single staff do not have a bracket
-        if (this.firstStaffInBracket === this.lastStaffInBracket) {
+        if (this.firstStaffInBracket === this.lastStaffInBracket || !firstVisibleStaff) {
             this.width = 0;
             return;
         }
@@ -77,8 +98,8 @@ export abstract class SystemBracket {
 class SingleTrackSystemBracket extends SystemBracket {
     protected track: Track;
 
-    public constructor(track: Track) {
-        super();
+    public constructor(system: StaffSystem, track: Track) {
+        super(system);
         this.track = track;
         this.drawAsBrace = SingleTrackSystemBracket.isTrackDrawAsBrace(track);
     }
@@ -118,7 +139,6 @@ class SimilarInstrumentSystemBracket extends SingleTrackSystemBracket {
  * @internal
  */
 export class StaffSystem {
-
     private _accoladeSpacingCalculated: boolean = false;
 
     private _brackets: SystemBracket[] = [];
@@ -158,6 +178,7 @@ export class StaffSystem {
     public topPadding: number;
     public bottomPadding: number;
     public allStaves: RenderStaff[] = [];
+    public firstVisibleStaff?:RenderStaff;
 
     public constructor(layout: ScoreLayout) {
         this.layout = layout;
@@ -426,12 +447,12 @@ export class StaffSystem {
                     break;
                 case BracketExtendMode.GroupStaves:
                     // when grouping staves, we create one bracket for the whole track across all staves
-                    bracket = new SingleTrackSystemBracket(track);
+                    bracket = new SingleTrackSystemBracket(this, track);
                     bracket.index = this._brackets.length;
                     this._brackets.push(bracket);
                     break;
                 case BracketExtendMode.GroupSimilarInstruments:
-                    bracket = new SimilarInstrumentSystemBracket(track);
+                    bracket = new SimilarInstrumentSystemBracket(this, track);
                     bracket.index = this._brackets.length;
                     this._brackets.push(bracket);
                     break;
@@ -500,9 +521,12 @@ export class StaffSystem {
     }
 
     public paintPartial(cx: number, cy: number, canvas: ICanvas, startIndex: number, count: number): void {
-        for (let i: number = 0, j: number = this.allStaves.length; i < j; i++) {
-            this.allStaves[i].paint(cx, cy, canvas, startIndex, count);
+        for (const s of this.allStaves) {
+            if (s.isVisible) {
+                s.paint(cx, cy, canvas, startIndex, count);
+            }
         }
+        
         const res: RenderingResources = this.layout.renderer.settings.display.resources;
 
         if (this.staves.length > 0 && startIndex === 0) {
@@ -551,9 +575,9 @@ export class StaffSystem {
                     const oldBaseLine = canvas.textBaseline;
                     const oldTextAlign = canvas.textAlign;
                     for (const g of this.staves) {
-                        if (g.staves.length > 0) {
-                            const firstStart: number = cy + g.staves[0].contentTop;
-                            const lastEnd: number = cy + g.staves[g.staves.length - 1].contentBottom;
+                        if (g.firstVisibleStaff) {
+                            const firstStart: number = cy + g.firstVisibleStaff.contentTop;
+                            const lastEnd: number = cy + g.lastVisibleStaff!.contentBottom;
 
                             let trackNameText = '';
                             switch (trackNameMode) {
@@ -617,6 +641,10 @@ export class StaffSystem {
             if (this.allStaves.length > 0 && needsSystemBarLine) {
                 let previousStaffInBracket: RenderStaff | null = null;
                 for (const s of this.allStaves) {
+                    if (!s.isVisible) {
+                        continue;
+                    }
+
                     if (previousStaffInBracket !== null) {
                         const previousBottom = previousStaffInBracket.contentBottom;
                         const thisTop = s.contentTop;
@@ -717,46 +745,100 @@ export class StaffSystem {
             this._hasSystemSeparator = true;
         }
 
+        const anyStaffVisible = this._finalizeTrackGroups();
+
+        // for now we always force one staff to be visible.
+        // making also whole systems invisible needs separate attention (also on player cursor handling)
+        if (!anyStaffVisible) {
+            const group = this.staves[0];
+            const firstStaff = group.staves[0];
+            firstStaff.isVisible = true;
+            this._finalizeTrackGroups(true);
+        }
+
+        for (const b of this._brackets!) {
+            b.finalizeBracket(settings.display.resources.engravingSettings);
+        }
+    }
+
+    private _finalizeTrackGroups(onlyFirstGroup: boolean = false) {
         let currentY: number = 0;
+        const settings = this.layout.renderer.settings;
         const smufl = settings.display.resources.engravingSettings;
         const topBracketSpikeHeight = smufl.glyphHeights.get(MusicFontSymbol.BracketTop)!;
         const bottomBracketSpikeHeight = smufl.glyphHeights.get(MusicFontSymbol.BracketBottom)!;
 
         let previousStaff: RenderStaff | undefined = undefined;
 
-        for (const staff of this.allStaves) {
-            // check if we need "in-between padding"
-            if (previousStaff !== undefined && previousStaff!.trackIndex !== staff.trackIndex) {
-                currentY += settings.display.trackStaffPaddingBetween;
-            }
-
-            const bracket = this._staffToBracket.has(staff) ? this._staffToBracket.get(staff) : undefined;
-            const hasBracket = bracket && !bracket.drawAsBrace && bracket.canPaint;
-            if (hasBracket && bracket!.firstStaffInBracket === staff) {
-                const spikeOverflow = topBracketSpikeHeight - staff.topOverflow;
-                if (spikeOverflow > 0) {
-                    currentY += spikeOverflow;
+        let endSpikeOverflow = 0;
+        let anyStaffVisible = false;
+        for (const group of this.staves) {
+            let firstVisibleStaffInGroup: RenderStaff | undefined = undefined;
+            let lastVisibleStaffInGroup: RenderStaff | undefined = undefined;
+            for (const staff of group.staves) {
+                // check if we need "in-between padding"
+                if (previousStaff !== undefined && previousStaff!.trackIndex !== staff.trackIndex) {
+                    currentY += settings.display.trackStaffPaddingBetween;
                 }
-            }
 
-            staff.x = this.accoladeWidth;
-            staff.y = currentY;
-            staff.finalizeStaff();
-            currentY += staff.height;
-
-            if (hasBracket && bracket!.lastStaffInBracket === staff) {
-                const spikeOverflow = bottomBracketSpikeHeight - staff.bottomOverflow;
-                if (spikeOverflow > 0) {
-                    currentY += spikeOverflow;
+                const bracket = this._staffToBracket.has(staff) ? this._staffToBracket.get(staff) : undefined;
+                const hasBracket = bracket && !bracket.drawAsBrace && bracket.canPaint;
+                if (hasBracket && bracket!.firstStaffInBracket === staff) {
+                    const spikeOverflow = topBracketSpikeHeight - staff.topOverflow;
+                    if (spikeOverflow > 0) {
+                        currentY += spikeOverflow;
+                    }
                 }
+
+                staff.x = this.accoladeWidth;
+                staff.y = currentY;
+                if(!onlyFirstGroup) {
+                    staff.finalizeStaff();
+                }
+                endSpikeOverflow = 0;
+
+                if (staff.isVisible) {
+                    anyStaffVisible = true;
+                    if (!firstVisibleStaffInGroup) {
+                        firstVisibleStaffInGroup = staff;
+                    }
+                    lastVisibleStaffInGroup = staff;
+                } else {
+                    continue;
+                }
+
+                currentY += staff.height;
+
+                if (hasBracket && bracket!.lastStaffInBracket === staff) {
+                    const spikeOverflow = bottomBracketSpikeHeight - staff.bottomOverflow;
+                    if (spikeOverflow > 0) {
+                        currentY += spikeOverflow;
+                        endSpikeOverflow = spikeOverflow;
+                    }
+                }
+                previousStaff = staff;
             }
-            previousStaff = staff;
+
+            group.firstVisibleStaff = firstVisibleStaffInGroup;
+            group.lastVisibleStaff = lastVisibleStaffInGroup;
+
+            if(!this.firstVisibleStaff) {
+                this.firstVisibleStaff = firstVisibleStaffInGroup;
+            }
+
+            if (onlyFirstGroup) {
+                break;
+            }
         }
+
+        // ensure we add overflow if last bracket is hidden
+        if (endSpikeOverflow) {
+            currentY += endSpikeOverflow;
+        }
+
         this._contentHeight = currentY;
 
-        for (const b of this._brackets!) {
-            b.finalizeBracket(smufl);
-        }
+        return anyStaffVisible;
     }
 
     public buildBoundingsLookup(cx: number, cy: number): void {
@@ -798,6 +880,9 @@ export class StaffSystem {
         const masterBarBoundsLookup: Map<number, MasterBarBounds> = new Map<number, MasterBarBounds>();
         for (let i: number = 0; i < this.staves.length; i++) {
             for (const staff of this.staves[i].staves) {
+                if (!staff.isVisible) {
+                    continue;
+                }
                 for (const renderer of staff.barRenderers) {
                     let masterBarBounds: MasterBarBounds;
                     if (!masterBarBoundsLookup.has(renderer.bar.masterBar.index)) {

@@ -30,8 +30,10 @@ export class RenderStaff {
     public index: number = 0;
     public staffIndex: number = 0;
 
+    public isVisible = false;
+
     public get isFirstInSystem() {
-        return this.index === 0;
+        return this.system.firstVisibleStaff === this;
     }
 
     public topEffectInfos: EffectBandInfo[] = [];
@@ -164,7 +166,7 @@ export class RenderStaff {
         this.bottomOverflow = 0;
         for (const r of this.barRenderers) {
             r.afterStaffBarReverted();
-        }       
+        }
         return lastBar;
     }
 
@@ -265,6 +267,8 @@ export class RenderStaff {
 
         this.height = 0;
 
+        let isEmpty = true;
+
         // 1st pass: let all renderers finalize themselves, this might cause
         // changes in the overflows
         let needsSecondPass = false;
@@ -275,6 +279,9 @@ export class RenderStaff {
                 needsSecondPass = true;
             }
             this.height = Math.max(this.height, renderer.height);
+            if (!renderer.bar.isEmpty && !renderer.bar.isRestOnly) {
+                isEmpty = false;
+            }
         }
 
         // 2nd pass: move renderers to correct position respecting the new overflows
@@ -296,6 +303,11 @@ export class RenderStaff {
         }
 
         this.height = Math.ceil(this.height);
+
+        const stylesheet = this.modelStaff.track.score.stylesheet;
+        const canHide = stylesheet.hideEmptyStaves && 
+            (!stylesheet.hideEmptyStavesInFirstSystem || this.system.index > 0);
+        this.isVisible = !canHide || !isEmpty;
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas, startIndex: number, count: number): void {
