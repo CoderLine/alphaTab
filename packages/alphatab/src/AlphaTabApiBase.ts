@@ -122,6 +122,9 @@ export interface PlaybackHighlightChangeEventArgs {
     highlightBlocks?: Bounds[];
 }
 
+/**
+ * @internal
+ */
 class BoundsLookupVisibilityChecker implements IBeatVisibilityChecker {
     public bounds: BoundsLookup | null = null;
 
