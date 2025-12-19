@@ -1,5 +1,5 @@
 import { Logger } from '@coderline/alphatab/Logger';
-import type { BeatTickLookup } from '@coderline/alphatab/midi/BeatTickLookup';
+import type { BeatTickLookup, IBeatVisibilityChecker } from '@coderline/alphatab/midi/BeatTickLookup';
 import { MasterBarTickLookup } from '@coderline/alphatab/midi/MasterBarTickLookup';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import type { Beat } from '@coderline/alphatab/model/Beat';
@@ -125,6 +125,19 @@ export class MidiTickLookupFindBeatResult {
 }
 
 /**
+ * @internal
+ */
+class TrackLookupBeatVisibilityChecker implements IBeatVisibilityChecker {
+    private _lookup: Set<number>;
+    public constructor(lookup: Set<number>) {
+        this._lookup = lookup;
+    }
+    public isVisible(beat: Beat): boolean {
+        return this._lookup.has(beat.voice.bar.staff.track.index);
+    }
+}
+
+/**
  * This class holds all information about when {@link MasterBar}s and {@link Beat}s are played.
  *
  * On top level it is organized into {@link MasterBarTickLookup} objects indicating the
@@ -192,20 +205,34 @@ export class MidiTickLookup {
         tick: number,
         currentBeatHint: MidiTickLookupFindBeatResult | null = null
     ): MidiTickLookupFindBeatResult | null {
+        return this.findBeatWithChecker(new TrackLookupBeatVisibilityChecker(trackLookup), tick, currentBeatHint);
+    }
+    /**
+     * Finds the currently played beat given a list of tracks and the current time.
+     * @param checker The checker to ask whether a beat is visible and should be considered for result.
+     * @param tick The current time in midi ticks.
+     * @param currentBeatHint Used for optimized lookup during playback. By passing in a previous result lookup of the next one can be optimized using heuristics. (optional).
+     * @returns The information about the current beat or null if no beat could be found.
+     */
+    public findBeatWithChecker(
+        checker: IBeatVisibilityChecker,
+        tick: number,
+        currentBeatHint: MidiTickLookupFindBeatResult | null = null
+    ): MidiTickLookupFindBeatResult | null {
         let result: MidiTickLookupFindBeatResult | null = null;
         if (currentBeatHint) {
-            result = this._findBeatFast(trackLookup, currentBeatHint, tick);
+            result = this._findBeatFast(checker, currentBeatHint, tick);
         }
 
         if (!result) {
-            result = this._findBeatSlow(trackLookup, currentBeatHint, tick, false);
+            result = this._findBeatSlow(checker, currentBeatHint, tick, false);
         }
 
         return result;
     }
 
     private _findBeatFast(
-        trackLookup: Set<number>,
+        checker: IBeatVisibilityChecker,
         currentBeatHint: MidiTickLookupFindBeatResult,
         tick: number
     ): MidiTickLookupFindBeatResult | null {
@@ -214,10 +241,15 @@ export class MidiTickLookup {
             return currentBeatHint;
         }
         // already on the next beat?
-        if (currentBeatHint.nextBeat && tick >= currentBeatHint.nextBeat.start && tick < currentBeatHint.nextBeat.end) {
+        if (
+            currentBeatHint.nextBeat &&
+            tick >= currentBeatHint.nextBeat.start &&
+            tick < currentBeatHint.nextBeat.end &&
+            (checker === undefined || checker.isVisible(currentBeatHint.nextBeat.beat))
+        ) {
             const next = currentBeatHint.nextBeat!;
             // fill next in chain
-            this._fillNextBeat(next, trackLookup);
+            this._fillNextBeat(next, checker);
             return next;
         }
 
@@ -225,7 +257,10 @@ export class MidiTickLookup {
         return null;
     }
 
-    private _fillNextBeatMultiBarRest(current: MidiTickLookupFindBeatResult, trackLookup: Set<number>) {
+    private _fillNextBeatMultiBarRest(
+        current: MidiTickLookupFindBeatResult,
+        checker: IBeatVisibilityChecker
+    ) {
         const group = this.multiBarRestInfo!.get(current.masterBar.masterBar.index)!;
 
         // this is a bit sensitive. we assume that the sequence of multi-rest bars and the
@@ -242,7 +277,7 @@ export class MidiTickLookup {
             // one more following -> use start of next
             if (endMasterBar.nextMasterBar) {
                 current.nextBeat = this._firstBeatInMasterBar(
-                    trackLookup,
+                    checker,
                     endMasterBar.nextMasterBar!,
                     endMasterBar.nextMasterBar!.start,
                     true
@@ -284,25 +319,31 @@ export class MidiTickLookup {
         current.calculateDuration();
     }
 
-    private _fillNextBeat(current: MidiTickLookupFindBeatResult, trackLookup: Set<number>) {
+    private _fillNextBeat(
+        current: MidiTickLookupFindBeatResult,
+        checker: IBeatVisibilityChecker
+    ) {
         // on multibar rests take the duration until the end.
         if (this._isMultiBarRestResult(current)) {
-            this._fillNextBeatMultiBarRest(current, trackLookup);
+            this._fillNextBeatMultiBarRest(current, checker);
         } else {
-            this._fillNextBeatDefault(current, trackLookup);
+            this._fillNextBeatDefault(current, checker);
         }
     }
-    private _fillNextBeatDefault(current: MidiTickLookupFindBeatResult, trackLookup: Set<number>) {
+    private _fillNextBeatDefault(
+        current: MidiTickLookupFindBeatResult,
+        checker: IBeatVisibilityChecker
+    ) {
         current.nextBeat = this._findBeatInMasterBar(
             current.masterBar,
             current.beatLookup.nextBeat,
             current.end,
-            trackLookup,
+            checker,
             true
         );
 
         if (current.nextBeat == null) {
-            current.nextBeat = this._findBeatSlow(trackLookup, current, current.end, true);
+            current.nextBeat = this._findBeatSlow(checker, current, current.end, true);
         }
 
         // if we have the next beat take the difference between the times as duration
@@ -344,7 +385,7 @@ export class MidiTickLookup {
     }
 
     private _findBeatSlow(
-        trackLookup: Set<number>,
+        checker: IBeatVisibilityChecker,
         currentBeatHint: MidiTickLookupFindBeatResult | null,
         tick: number,
         isNextSearch: boolean
@@ -376,11 +417,11 @@ export class MidiTickLookup {
             return null;
         }
 
-        return this._firstBeatInMasterBar(trackLookup, masterBar, tick, isNextSearch);
+        return this._firstBeatInMasterBar(checker, masterBar, tick, isNextSearch);
     }
 
     private _firstBeatInMasterBar(
-        trackLookup: Set<number>,
+        checker: IBeatVisibilityChecker,
         startMasterBar: MasterBarTickLookup,
         tick: number,
         isNextSearch: boolean
@@ -389,7 +430,13 @@ export class MidiTickLookup {
         // scan through beats and find first one which has a beat visible
         while (masterBar) {
             if (masterBar.firstBeat) {
-                const beat = this._findBeatInMasterBar(masterBar, masterBar.firstBeat, tick, trackLookup, isNextSearch);
+                const beat = this._findBeatInMasterBar(
+                    masterBar,
+                    masterBar.firstBeat,
+                    tick,
+                    checker,
+                    isNextSearch
+                );
 
                 if (beat) {
                     return beat;
@@ -414,7 +461,7 @@ export class MidiTickLookup {
         masterBar: MasterBarTickLookup,
         currentStartLookup: BeatTickLookup | null,
         tick: number,
-        visibleTracks: Set<number>,
+        checker: IBeatVisibilityChecker,
         isNextSearch: boolean
     ): MidiTickLookupFindBeatResult | null {
         if (!currentStartLookup) {
@@ -434,7 +481,7 @@ export class MidiTickLookup {
                 relativeTick < currentStartLookup.end
             ) {
                 startBeatLookup = currentStartLookup;
-                startBeat = currentStartLookup.getVisibleBeatAtStart(visibleTracks);
+                startBeat = currentStartLookup.getVisibleBeatAtStartWithChecker(checker);
 
                 // found the matching beat lookup but none of the beats are visible
                 // in this case scan further to the next lookup which has any visible beat
@@ -443,7 +490,7 @@ export class MidiTickLookup {
                         let currentMasterBar: MasterBarTickLookup | null = masterBar;
                         while (currentMasterBar != null && startBeat == null) {
                             while (currentStartLookup != null) {
-                                startBeat = currentStartLookup.getVisibleBeatAtStart(visibleTracks);
+                                startBeat = currentStartLookup.getVisibleBeatAtStartWithChecker(checker);
 
                                 if (startBeat) {
                                     startBeatLookup = currentStartLookup;
@@ -463,7 +510,7 @@ export class MidiTickLookup {
                         let currentMasterBar: MasterBarTickLookup | null = masterBar;
                         while (currentMasterBar != null && startBeat == null) {
                             while (currentStartLookup != null) {
-                                startBeat = currentStartLookup.getVisibleBeatAtStart(visibleTracks);
+                                startBeat = currentStartLookup.getVisibleBeatAtStartWithChecker(checker);
 
                                 if (startBeat) {
                                     startBeatLookup = currentStartLookup;
@@ -492,7 +539,7 @@ export class MidiTickLookup {
             return null;
         }
 
-        const result = this._createResult(masterBar, startBeatLookup!, startBeat, isNextSearch, visibleTracks);
+        const result = this._createResult(masterBar, startBeatLookup!, startBeat, isNextSearch, checker);
 
         return result;
     }
@@ -502,7 +549,7 @@ export class MidiTickLookup {
         beatLookup: BeatTickLookup,
         beat: Beat,
         isNextSearch: boolean,
-        visibleTracks: Set<number>
+        checker: IBeatVisibilityChecker
     ) {
         const result = new MidiTickLookupFindBeatResult(masterBar);
 
@@ -513,7 +560,7 @@ export class MidiTickLookup {
 
         if (!isNextSearch) {
             // the next beat filling will adjust this result with the respective durations
-            this._fillNextBeat(result, visibleTracks);
+            this._fillNextBeat(result, checker);
         }
         // if we do not search for the next beat, we need to still stretch multi-bar-rest
         // otherwise the fast path will not work correctly
