@@ -213,7 +213,7 @@ describe('LayoutTests', () => {
         await VisualTestHelper.runVisualTestTex(
             `
             \\hideEmptyStaves
-           \\\defaultSystemsLayout 3
+            \\defaultSystemsLayout 3
             \\multiTrackTrackNamePolicy allSystems
             \\track "T1"
             C4.4 *4 | r.1 | r.1 |
@@ -224,13 +224,104 @@ describe('LayoutTests', () => {
             
             \\track "T2"
             \\clef C3
-            C4.4 *4 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 | 
                 r.1 | r.1 | r.1 | 
                 r.1 | c4 | r.1 | 
                 r.1 | r.1 | r.1 | 
                 r.1 | C4 |
             `,
             'test-data/visual-tests/layout/hide-empty-staves.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+            }
+        );
+    });
+
+    it('hide-empty-staves-in-first', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\hideEmptyStavesInFirstSystem
+
+            \\defaultSystemsLayout 3
+            \\multiTrackTrackNamePolicy allSystems
+            \\track "T1"
+            C4.4 *4 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |  
+                r.1 | C4 |
+            
+            \\track "T2"
+            \\clef C3
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | c4 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | C4 |
+            `,
+            'test-data/visual-tests/layout/hide-empty-staves-in-first.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+            }
+        );
+    });
+
+    it('single-staff-brackets', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\showSingleStaffBrackets
+            \\defaultSystemsLayout 3
+            \\multiTrackTrackNamePolicy allSystems
+            \\track "T1"
+            \\staff {score}
+            C4.4 *4 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |  
+                r.1 | C4 |
+            \\staff {score}
+                \\clef C3
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | c4 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | C4 |
+            `,
+            'test-data/visual-tests/layout/single-staff-brackets-show.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+            }
+        );
+
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\defaultSystemsLayout 3
+            \\multiTrackTrackNamePolicy allSystems
+            \\track "T1"
+            \\staff {score}
+            C4.4 *4 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |  
+                r.1 | C4 |
+            \\staff {score}
+                \\clef C3
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | c4 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | C4 |
+            `,
+            'test-data/visual-tests/layout/single-staff-brackets-hide.png',
             undefined,
             o => {
                 o.tracks = o.score.tracks.map(t => t.index);
