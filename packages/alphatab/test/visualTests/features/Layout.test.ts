@@ -208,4 +208,34 @@ describe('LayoutTests', () => {
             }
         );
     });
+
+    it('hide-empty-staves', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+           \\\defaultSystemsLayout 3
+            \\multiTrackTrackNamePolicy allSystems
+            \\track "T1"
+            C4.4 *4 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |  
+                r.1 | C4 |
+            
+            \\track "T2"
+            \\clef C3
+            C4.4 *4 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | c4 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | C4 |
+            `,
+            'test-data/visual-tests/layout/hide-empty-staves.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+            }
+        );
+    });
 });
