@@ -37,9 +37,8 @@ export abstract class SystemBracket {
     public braceScale: number = 1;
     public width: number = 0;
     public index: number = 0;
-    public get canPaint(): boolean {
-        return this.firstVisibleStaffInBracket !== undefined && this.lastVisibleStaffInBracket !== undefined;
-    }
+
+    public canPaint = false;
 
     public constructor(system: StaffSystem) {
         this._system = system;
@@ -47,7 +46,7 @@ export abstract class SystemBracket {
 
     public abstract includesStaff(s: RenderStaff): boolean;
 
-    public finalizeBracket(smuflMetrics: EngravingSettings) {
+    public updateCanPaint() {
         let firstVisibleStaff: RenderStaff | undefined = undefined;
         let lastVisibleStaff: RenderStaff | undefined = undefined;
         for (let i = this.firstStaffInBracket!.index; i <= this.lastStaffInBracket!.index; i++) {
@@ -62,8 +61,23 @@ export abstract class SystemBracket {
         this.firstVisibleStaffInBracket = firstVisibleStaff;
         this.lastVisibleStaffInBracket = lastVisibleStaff;
 
-        // systems with just a single staff do not have a bracket
-        if (this.firstStaffInBracket === this.lastStaffInBracket || !firstVisibleStaff) {
+        if (!firstVisibleStaff || !lastVisibleStaff) {
+            this.canPaint = false;
+            return;
+        }
+
+        // single staff brackets?
+        const singleStaffBrackets = this._system.layout.renderer.score!.stylesheet.showSingleStaffBrackets;
+        if (!singleStaffBrackets && firstVisibleStaff === lastVisibleStaff) {
+            this.canPaint = false;
+            return;
+        }
+
+        this.canPaint = true;
+    }
+
+    public finalizeBracket(smuflMetrics: EngravingSettings) {
+        if (!this.canPaint) {
             this.width = 0;
             return;
         }
@@ -78,12 +92,13 @@ export abstract class SystemBracket {
         } else {
             this.width = smuflMetrics.bracketThickness;
         }
-        if (!this.drawAsBrace || !this.firstStaffInBracket || !this.lastStaffInBracket) {
+
+        if (!this.drawAsBrace) {
             return;
         }
 
-        const firstStart: number = this.firstStaffInBracket.contentTop;
-        const lastEnd: number = this.lastStaffInBracket.contentBottom;
+        const firstStart: number = this.firstVisibleStaffInBracket!.contentTop;
+        const lastEnd: number = this.lastVisibleStaffInBracket!.contentBottom;
 
         const requiredHeight = lastEnd - firstStart;
         const requiredScaleForBracket = requiredHeight / bravuraBraceHeightAtMusicFontSize;
@@ -178,7 +193,7 @@ export class StaffSystem {
     public topPadding: number;
     public bottomPadding: number;
     public allStaves: RenderStaff[] = [];
-    public firstVisibleStaff?:RenderStaff;
+    public firstVisibleStaff?: RenderStaff;
 
     public constructor(layout: ScoreLayout) {
         this.layout = layout;
@@ -201,14 +216,48 @@ export class StaffSystem {
         this.masterBarsRenderers.push(renderers);
         renderers.layoutingInfo.preBeatSize = 0;
         let src: number = 0;
-        for (let i: number = 0, j: number = this.staves.length; i < j; i++) {
-            const g: StaffTrackGroup = this.staves[i];
-            for (let k: number = 0, l: number = g.staves.length; k < l; k++) {
-                const s: RenderStaff = g.staves[k];
+
+        let firstVisibleStaff: RenderStaff | undefined = undefined;
+        let anyStaffVisible = false;
+
+        for (const g of this.staves) {
+            let firstVisibleStaffInGroup: RenderStaff | undefined = undefined;
+            let lastVisibleStaffInGroup: RenderStaff | undefined = undefined;
+
+            for (const s of g.staves) {
                 const renderer: BarRendererBase = renderers.renderers[src++];
                 s.addBarRenderer(renderer);
+
+                if (s.isVisible) {
+                    anyStaffVisible = true;
+                    if (!firstVisibleStaffInGroup) {
+                        firstVisibleStaffInGroup = s;
+                    }
+                    if (!firstVisibleStaff) {
+                        firstVisibleStaff = s;
+                    }
+
+                    lastVisibleStaffInGroup = s;
+                }
+            }
+
+            g.firstVisibleStaff = firstVisibleStaffInGroup;
+            g.lastVisibleStaff = lastVisibleStaffInGroup;
+            if (!firstVisibleStaff) {
+                firstVisibleStaff = firstVisibleStaffInGroup;
             }
         }
+
+        if (!anyStaffVisible) {
+            const group = this.staves[0];
+            const firstStaff = group.staves[0];
+            firstStaff.isVisible = true;
+            group.firstVisibleStaff = firstStaff;
+            group.lastVisibleStaff = firstStaff;
+            firstVisibleStaff = firstStaff;
+        }
+
+        this.firstVisibleStaff = firstVisibleStaff;
         this._calculateAccoladeSpacing(tracks);
 
         this._updateWidthFromLastBar();
@@ -226,9 +275,14 @@ export class StaffSystem {
         result.masterBar = tracks[0].score.masterBars[barIndex];
         this.masterBarsRenderers.push(result);
 
+        let firstVisibleStaff: RenderStaff | undefined = undefined;
+        let anyStaffVisible = false;
         // add renderers
         const barLayoutingInfo: BarLayoutingInfo = result.layoutingInfo;
         for (const g of this.staves) {
+            let firstVisibleStaffInGroup: RenderStaff | undefined = undefined;
+            let lastVisibleStaffInGroup: RenderStaff | undefined = undefined;
+
             for (const s of g.staves) {
                 const bar: Bar = g.track.staves[s.modelStaff.index].bars[barIndex];
 
@@ -238,6 +292,15 @@ export class StaffSystem {
                         : additionalMultiBarRestIndexes.map(b => g.track.staves[s.modelStaff.index].bars[b]);
 
                 s.addBar(bar, barLayoutingInfo, additionalMultiBarsRestBars);
+
+                if (s.isVisible) {
+                    anyStaffVisible = true;
+                    if (!firstVisibleStaffInGroup) {
+                        firstVisibleStaffInGroup = s;
+                    }
+                    lastVisibleStaffInGroup = s;
+                }
+
                 const renderer: BarRendererBase = s.barRenderers[s.barRenderers.length - 1];
                 result.renderers.push(renderer);
                 if (renderer.isLinkedToPrevious) {
@@ -247,7 +310,24 @@ export class StaffSystem {
                     result.canWrap = false;
                 }
             }
+            g.firstVisibleStaff = firstVisibleStaffInGroup;
+            g.lastVisibleStaff = lastVisibleStaffInGroup;
+            if (!firstVisibleStaff) {
+                firstVisibleStaff = firstVisibleStaffInGroup;
+            }
         }
+
+        if (!anyStaffVisible) {
+            const group = this.staves[0];
+            const firstStaff = group.staves[0];
+            firstStaff.isVisible = true;
+            group.firstVisibleStaff = firstStaff;
+            group.lastVisibleStaff = firstStaff;
+            firstVisibleStaff = firstStaff;
+        }
+
+        this.firstVisibleStaff = firstVisibleStaff;
+
         this._calculateAccoladeSpacing(tracks);
 
         barLayoutingInfo.finish();
@@ -263,19 +343,40 @@ export class StaffSystem {
             this.masterBarsRenderers.splice(this.masterBarsRenderers.length - 1, 1);
             let width: number = 0;
             let barDisplayScale: number = 0;
-            for (let i: number = 0, j: number = this.allStaves.length; i < j; i++) {
-                const s: RenderStaff = this.allStaves[i];
-                const lastBar: BarRendererBase = s.revertLastBar();
-                const computedWidth = lastBar.computedWidth;
-                if (computedWidth > width) {
-                    width = computedWidth;
+
+            let firstVisibleStaff: RenderStaff | undefined = undefined;
+            for (const g of this.staves) {
+                let firstVisibleStaffInGroup: RenderStaff | undefined = undefined;
+                let lastVisibleStaffInGroup: RenderStaff | undefined = undefined;
+
+                for (const s of g.staves) {
+                    const lastBar: BarRendererBase = s.revertLastBar();
+                    const computedWidth = lastBar.computedWidth;
+                    if (computedWidth > width) {
+                        width = computedWidth;
+                    }
+                    const newBarDisplayScale = lastBar.barDisplayScale;
+                    if (newBarDisplayScale > barDisplayScale) {
+                        barDisplayScale = newBarDisplayScale;
+                    }
+                    lastBar.afterReverted();
+
+                    if (s.isVisible) {
+                        if (!firstVisibleStaffInGroup) {
+                            firstVisibleStaffInGroup = s;
+                        }
+                        lastVisibleStaffInGroup = s;
+                    }
                 }
-                const newBarDisplayScale = lastBar.barDisplayScale;
-                if (newBarDisplayScale > barDisplayScale) {
-                    barDisplayScale = newBarDisplayScale;
+
+                g.firstVisibleStaff = firstVisibleStaffInGroup;
+                g.lastVisibleStaff = lastVisibleStaffInGroup;
+                if (!firstVisibleStaff) {
+                    firstVisibleStaff = firstVisibleStaffInGroup;
                 }
-                lastBar.afterReverted();
             }
+            this.firstVisibleStaff = firstVisibleStaff;
+
             this.width -= width;
             this.computedWidth -= width;
             this.totalBarDisplayScale -= barDisplayScale;
@@ -406,6 +507,7 @@ export class StaffSystem {
 
             let braceWidth = 0;
             for (const b of this._brackets) {
+                b.updateCanPaint();
                 b.finalizeBracket(settings.display.resources.engravingSettings);
                 braceWidth = Math.max(braceWidth, b.width);
             }
@@ -414,6 +516,11 @@ export class StaffSystem {
 
             this.width += this.accoladeWidth;
             this.computedWidth += this.accoladeWidth;
+        } else {
+            for (const b of this._brackets) {
+                b.updateCanPaint();
+                b.finalizeBracket(settings.display.resources.engravingSettings);
+            }
         }
     }
 
@@ -526,7 +633,7 @@ export class StaffSystem {
                 s.paint(cx, cy, canvas, startIndex, count);
             }
         }
-        
+
         const res: RenderingResources = this.layout.renderer.settings.display.resources;
 
         if (this.staves.length > 0 && startIndex === 0) {
@@ -677,11 +784,11 @@ export class StaffSystem {
 
         for (const bracket of this._brackets!) {
             if (bracket.canPaint) {
-                const barStartX: number = cx + bracket.firstStaffInBracket!.x;
+                const barStartX: number = cx + bracket.firstVisibleStaffInBracket!.x;
                 const barSize: number = bracket.width;
                 const barOffset: number = settings.display.accoladeBarPaddingRight;
-                const firstStart: number = cy + bracket.firstStaffInBracket!.contentTop;
-                const lastEnd: number = cy + bracket.lastStaffInBracket!.contentBottom;
+                const firstStart: number = cy + bracket.firstVisibleStaffInBracket!.contentTop;
+                const lastEnd: number = cy + bracket.lastVisibleStaffInBracket!.contentBottom;
                 let accoladeStart: number = firstStart;
                 let accoladeEnd: number = lastEnd;
 
@@ -693,7 +800,7 @@ export class StaffSystem {
                         bracket.braceScale,
                         MusicFontSymbol.Brace
                     );
-                } else if (bracket.firstStaffInBracket !== bracket.lastStaffInBracket) {
+                } else if (bracket.firstVisibleStaffInBracket !== bracket.lastVisibleStaffInBracket) {
                     // brackets typically overflow by 1/4 staff-space
                     const smuflMetrics = settings.display.resources.engravingSettings;
 
@@ -792,37 +899,39 @@ export class StaffSystem {
 
                 staff.x = this.accoladeWidth;
                 staff.y = currentY;
-                if(!onlyFirstGroup) {
+                if (!onlyFirstGroup) {
                     staff.finalizeStaff();
                 }
-                endSpikeOverflow = 0;
 
                 if (staff.isVisible) {
+                    currentY += staff.height;
+
                     anyStaffVisible = true;
+                    previousStaff = staff;
+
                     if (!firstVisibleStaffInGroup) {
                         firstVisibleStaffInGroup = staff;
                     }
                     lastVisibleStaffInGroup = staff;
-                } else {
-                    continue;
                 }
 
-                currentY += staff.height;
-
+                endSpikeOverflow = 0;
                 if (hasBracket && bracket!.lastStaffInBracket === staff) {
                     const spikeOverflow = bottomBracketSpikeHeight - staff.bottomOverflow;
                     if (spikeOverflow > 0) {
-                        currentY += spikeOverflow;
-                        endSpikeOverflow = spikeOverflow;
+                        if (staff.isVisible) {
+                            currentY += spikeOverflow;
+                        } else {
+                            endSpikeOverflow = spikeOverflow;
+                        }
                     }
                 }
-                previousStaff = staff;
             }
 
             group.firstVisibleStaff = firstVisibleStaffInGroup;
             group.lastVisibleStaff = lastVisibleStaffInGroup;
 
-            if(!this.firstVisibleStaff) {
+            if (!this.firstVisibleStaff) {
                 this.firstVisibleStaff = firstVisibleStaffInGroup;
             }
 

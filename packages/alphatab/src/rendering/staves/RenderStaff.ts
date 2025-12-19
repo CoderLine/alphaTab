@@ -31,6 +31,7 @@ export class RenderStaff {
     public staffIndex: number = 0;
 
     public isVisible = false;
+    private _emptyBarCount = 0;
 
     public get isFirstInSystem() {
         return this.system.firstVisibleStaff === this;
@@ -77,10 +78,11 @@ export class RenderStaff {
         return this.y + this.topPadding + this.topOverflow + this.staffBottom;
     }
 
-    public constructor(trackIndex: number, staff: Staff, factory: BarRendererFactory) {
+    public constructor(system: StaffSystem, trackIndex: number, staff: Staff, factory: BarRendererFactory) {
         this._factory = factory;
         this.trackIndex = trackIndex;
         this.modelStaff = staff;
+        this.system = system;
         for (const b of factory.effectBands) {
             if (b.shouldCreate && !b.shouldCreate!(staff)) {
                 continue;
@@ -98,6 +100,8 @@ export class RenderStaff {
                     break;
             }
         }
+
+        this._updateVisibility();
     }
 
     public getSharedLayoutData<T>(key: string, def: T): T {
@@ -129,6 +133,21 @@ export class RenderStaff {
         renderer.reLayout();
         this.barRenderers.push(renderer);
         this.system.layout.registerBarRenderer(this.staffId, renderer);
+        if (renderer.bar.isEmpty || renderer.bar.isRestOnly) {
+            this._emptyBarCount++;
+        }
+        this._updateVisibility();
+    }
+
+    private _updateVisibility() {
+        const stylesheet = this.modelStaff.track.score.stylesheet;
+        const canHideEmptyStaves =
+            stylesheet.hideEmptyStaves && (stylesheet.hideEmptyStavesInFirstSystem || this.system.index > 0);
+        if (canHideEmptyStaves) {
+            this.isVisible = this._emptyBarCount < this.barRenderers.length;
+        } else {
+            this.isVisible = true;
+        }
     }
 
     public addBar(bar: Bar, layoutingInfo: BarLayoutingInfo, additionalMultiBarsRestBars: Bar[] | null): void {
@@ -155,6 +174,10 @@ export class RenderStaff {
 
         this.barRenderers.push(renderer);
         this.system.layout.registerBarRenderer(this.staffId, renderer);
+        if (bar.isEmpty || bar.isRestOnly) {
+            this._emptyBarCount++;
+        }
+        this._updateVisibility();
     }
 
     public revertLastBar(): BarRendererBase {
@@ -167,6 +190,12 @@ export class RenderStaff {
         for (const r of this.barRenderers) {
             r.afterStaffBarReverted();
         }
+
+        if (lastBar.bar.isEmpty || lastBar.bar.isRestOnly) {
+            this._emptyBarCount--;
+        }
+        this._updateVisibility();
+
         return lastBar;
     }
 
@@ -267,8 +296,6 @@ export class RenderStaff {
 
         this.height = 0;
 
-        let isEmpty = true;
-
         // 1st pass: let all renderers finalize themselves, this might cause
         // changes in the overflows
         let needsSecondPass = false;
@@ -279,9 +306,6 @@ export class RenderStaff {
                 needsSecondPass = true;
             }
             this.height = Math.max(this.height, renderer.height);
-            if (!renderer.bar.isEmpty && !renderer.bar.isRestOnly) {
-                isEmpty = false;
-            }
         }
 
         // 2nd pass: move renderers to correct position respecting the new overflows
@@ -304,10 +328,7 @@ export class RenderStaff {
 
         this.height = Math.ceil(this.height);
 
-        const stylesheet = this.modelStaff.track.score.stylesheet;
-        const canHide = stylesheet.hideEmptyStaves && 
-            (!stylesheet.hideEmptyStavesInFirstSystem || this.system.index > 0);
-        this.isVisible = !canHide || !isEmpty;
+        this._updateVisibility();
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas, startIndex: number, count: number): void {
