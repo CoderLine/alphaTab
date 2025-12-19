@@ -1,10 +1,11 @@
-import { Clef } from '@coderline/alphatab/model/Clef';
-import { Ottavia } from '@coderline/alphatab/model/Ottavia';
-import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
+import { Clef } from '@coderline/alphatab/model/Clef';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal
@@ -12,6 +13,7 @@ import { BarSubElement } from '@coderline/alphatab/model/Bar';
 export class ClefGlyph extends MusicFontGlyph {
     private _clef: Clef;
     private _clefOttava: Ottavia;
+    private _ottavaGlyph?: MusicFontGlyph;
 
     public constructor(x: number, y: number, clef: Clef, clefOttava: Ottavia) {
         super(x, y, 1, ClefGlyph._getSymbol(clef, clefOttava));
@@ -19,11 +21,80 @@ export class ClefGlyph extends MusicFontGlyph {
         this._clefOttava = clefOttava;
     }
 
+    public override getBoundingBoxTop(): number {
+        let top = super.getBoundingBoxTop();
+
+        const ottava = this._ottavaGlyph;
+        if (ottava) {
+            const ottavaTop = this.y + ottava.getBoundingBoxTop();
+            top = ModelUtils.minBoundingBox(top, ottavaTop);
+        }
+
+        return top;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        let bottom = super.getBoundingBoxBottom();
+
+        const ottava = this._ottavaGlyph;
+        if (ottava) {
+            const ottavaBottom = this.y + ottava.getBoundingBoxBottom();
+            bottom = ModelUtils.maxBoundingBox(bottom, ottavaBottom);
+        }
+
+
+        return bottom;
+    }
+
     public override doLayout(): void {
         this.center = true;
         super.doLayout();
         this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.GClef)!;
         this.offsetX = this.width / 2;
+
+        this._ottavaGlyph = undefined;
+        switch (this._clef) {
+            case Clef.C3:
+            case Clef.C4:
+                switch (this._clefOttava) {
+                    case Ottavia._8vb:
+                        return;
+                }
+                break;
+            case Clef.F4:
+            case Clef.G2:
+                return;
+        }
+
+        let ottavaSymbol: MusicFontSymbol;
+        let top: boolean = false;
+        switch (this._clefOttava) {
+            case Ottavia._15ma:
+                ottavaSymbol = MusicFontSymbol.Clef15;
+                top = true;
+                break;
+            case Ottavia._8va:
+                ottavaSymbol = MusicFontSymbol.Clef8;
+                top = true;
+                break;
+            case Ottavia._8vb:
+                ottavaSymbol = MusicFontSymbol.Clef8;
+                break;
+            case Ottavia._15mb:
+                ottavaSymbol = MusicFontSymbol.Clef15;
+                break;
+            default:
+                return;
+        }
+        const ottavaX = this.width / 2;
+        const ottavaY = top
+            ? this.renderer.smuflMetrics.glyphTop.get(this.symbol)!
+            : this.renderer.smuflMetrics.glyphBottom.get(this.symbol)! -
+              this.renderer.smuflMetrics.glyphHeights.get(ottavaSymbol)!;
+        this._ottavaGlyph = new MusicFontGlyph(ottavaX, -ottavaY, 1, ottavaSymbol);
+        this._ottavaGlyph!.center = true;
+        this._ottavaGlyph!.renderer = this.renderer;
+        this._ottavaGlyph!.doLayout();
     }
 
     private static _getSymbol(clef: Clef, clefOttava: Ottavia): MusicFontSymbol {
@@ -74,46 +145,9 @@ export class ClefGlyph extends MusicFontGlyph {
 
         super.paint(cx, cy, canvas);
 
-        switch (this._clef) {
-            case Clef.C3:
-            case Clef.C4:
-                switch (this._clefOttava) {
-                    case Ottavia._8vb:
-                        return;
-                }
-                break;
-            case Clef.F4:
-            case Clef.G2:
-                return;
+        const ottava = this._ottavaGlyph;
+        if (ottava) {
+            ottava.paint(cx + this.x, cy + this.y, canvas);
         }
-
-        let ottavaGlyph: MusicFontSymbol;
-        let top: boolean = false;
-        switch (this._clefOttava) {
-            case Ottavia._15ma:
-                ottavaGlyph =  MusicFontSymbol.Clef15;
-                top = true;
-                break;
-            case Ottavia._8va:
-                ottavaGlyph = MusicFontSymbol.Clef8;
-                top = true;
-                break;
-            case Ottavia._8vb:
-                ottavaGlyph = MusicFontSymbol.Clef8;
-                break;
-            case Ottavia._15mb:
-                ottavaGlyph =  MusicFontSymbol.Clef15;
-                break;
-            default:
-                return;
-        }
-        const ottavaX: number = this.width / 2;
-        const ottavaY = top
-            ? this.renderer.smuflMetrics.glyphTop.get(this.symbol)!
-            : this.renderer.smuflMetrics.glyphBottom.get(this.symbol)! -
-              this.renderer.smuflMetrics.glyphHeights.get(ottavaGlyph)!;
-        CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x + ottavaX, cy + this.y - ottavaY, 1, ottavaGlyph, true)
-
-        
     }
 }
