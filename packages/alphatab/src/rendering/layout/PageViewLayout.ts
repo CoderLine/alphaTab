@@ -227,8 +227,7 @@ export class PageViewLayout extends ScoreLayout {
             this._systems = [];
             let currentIndex: number = 0;
             const maxWidth: number = this._maxWidth;
-            let system: StaffSystem = this.createEmptyStaffSystem();
-            system.index = this._systems.length;
+            let system: StaffSystem = this.createEmptyStaffSystem(this._systems.length);
             system.x = this.pagePadding![0];
             system.y = y;
             while (currentIndex < this._allMasterBarRenderers.length) {
@@ -262,8 +261,7 @@ export class PageViewLayout extends ScoreLayout {
                     this._fitSystem(system);
                     y += this._paintSystem(system, oldHeight);
                     // note: we do not increase currentIndex here to have it added to the next system
-                    system = this.createEmptyStaffSystem();
-                    system.index = this._systems.length;
+                    system = this.createEmptyStaffSystem(this._systems.length);
                     system.x = this.pagePadding![0];
                     system.y = y;
                 }
@@ -362,8 +360,7 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     private _createStaffSystem(currentBarIndex: number, endIndex: number): StaffSystem {
-        const system: StaffSystem = this.createEmptyStaffSystem();
-        system.index = this._systems.length;
+        const system: StaffSystem = this.createEmptyStaffSystem(this._systems.length);
         const barsPerRow: number = this._getBarsPerSystem(system.index);
         const maxWidth: number = this._maxWidth;
         const end: number = endIndex + 1;

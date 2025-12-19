@@ -374,8 +374,9 @@ export abstract class ScoreLayout {
 
     public lastBarIndex: number = 0;
 
-    protected createEmptyStaffSystem(): StaffSystem {
+    protected createEmptyStaffSystem(index:number): StaffSystem {
         const system: StaffSystem = new StaffSystem(this);
+        system.index = index;
         const allFactories = Environment.defaultRenderers;
 
         const renderStaves: RenderStaff[] = [];
@@ -392,7 +393,7 @@ export abstract class ScoreLayout {
 
                 for (const factory of allFactories) {
                     if (this.profile.has(factory.staffId) && factory.canCreate(track, staff)) {
-                        const renderStaff = new RenderStaff(trackIndex, staff, factory);
+                        const renderStaff = new RenderStaff(system, trackIndex, staff, factory);
                         // insert shared effect bands at front
                         renderStaff.topEffectInfos.splice(0, 0, ...sharedTopEffects);
                         renderStaff.bottomEffectInfos.push(...sharedBottomEffects);

@@ -150,6 +150,9 @@ import { db } from '@coderline/alphatab-alphatex/metadata/bar/db';
 import { voiceMode } from '@coderline/alphatab-alphatex/metadata/bar/voiceMode';
 import { chordDiagramsInScore } from '@coderline/alphatab-alphatex/metadata/score/chordDiagramsInScore';
 import { extendBarLines } from '@coderline/alphatab-alphatex/metadata/score/extendbarlines';
+import { hideEmptyStaves } from '@coderline/alphatab-alphatex/metadata/score/hideemptystaves';
+import { hideEmptyStavesInFirstSystem } from '@coderline/alphatab-alphatex/metadata/score/hideemptystavesinfirstsystem';
+import { showSingleStaffBrackets } from '@coderline/alphatab-alphatex/metadata/score/showsinglestaffbrackets';
 import { instrumentMeta } from '@coderline/alphatab-alphatex/metadata/staff/instrument';
 import type { AlphaTexExample, WithDescription, WithSignatures } from '@coderline/alphatab-alphatex/types';
 
@@ -181,7 +184,10 @@ export const scoreMetaData = metadata(
     firstSystemTrackNameOrientation,
     otherSystemsTrackNameOrientation,
     extendBarLines,
-    chordDiagramsInScore
+    chordDiagramsInScore,
+    hideEmptyStaves,
+    hideEmptyStavesInFirstSystem,
+    showSingleStaffBrackets
 );
 
 export const staffMetaData = metadata(

@@ -264,6 +264,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     ? AlphaTex1LanguageHandler._booleanLikeValue(metaData.arguments!.arguments, 0)
                     : true;
                 return ApplyNodeResult.Applied;
+            case 'hideemptystaves':
+                score.stylesheet.hideEmptyStaves = true;
+                return ApplyNodeResult.Applied;
+            case 'hideemptystavesinfirstsystem':
+                score.stylesheet.hideEmptyStavesInFirstSystem = true;
+                return ApplyNodeResult.Applied;
+            case 'showsinglestaffbrackets':
+                score.stylesheet.showSingleStaffBrackets = true;
+                return ApplyNodeResult.Applied;
 
             default:
                 return ApplyNodeResult.NotAppliedUnrecognizedMarker;
@@ -2496,6 +2505,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         if (stylesheet.globalDisplayChordDiagramsInScore) {
             nodes.push(Atnf.meta('chordDiagramsInScore'));
+        }
+        
+        if (stylesheet.hideEmptyStaves) {
+            nodes.push(Atnf.meta('hideEmptyStaves'));
+        }
+        
+        if (stylesheet.hideEmptyStavesInFirstSystem) {
+            nodes.push(Atnf.meta('hideEmptyStavesInFirstSystem'));
+        }
+        
+        if (stylesheet.showSingleStaffBrackets) {
+            nodes.push(Atnf.meta('showSingleStaffBrackets'));
         }
 
         // Unsupported:

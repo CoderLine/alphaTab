@@ -190,7 +190,10 @@ export class AlphaTex1LanguageDefinitions {
         ['firstsystemtracknameorientation', [[[[10, 17], 0, ['horizontal', 'vertical']]]]],
         ['othersystemstracknameorientation', [[[[10, 17], 0, ['horizontal', 'vertical']]]]],
         ['extendbarlines', null],
-        ['chorddiagramsinscore', [[[[10], 1, ['true', 'false']]]]]
+        ['chorddiagramsinscore', [[[[10], 1, ['true', 'false']]]]],
+        ['hideemptystaves', null],
+        ['hideemptystavesinfirstsystem', null],
+        ['showsinglestaffbrackets', null]
     ]);
     public static readonly staffMetaDataSignatures = AlphaTex1LanguageDefinitions._signatures([
         ['tuning', [[[[10, 17], 0, ['piano', 'none', 'voice']]], [[[10, 17], 5]]]],
@@ -530,6 +533,9 @@ export class AlphaTex1LanguageDefinitions {
         ['othersystemstracknameorientation', null],
         ['extendbarlines', null],
         ['chorddiagramsinscore', null],
+        ['hideemptystaves', null],
+        ['hideemptystavesinfirstsystem', null],
+        ['showsinglestaffbrackets', null],
         [
             'tuning',
             [

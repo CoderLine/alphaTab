@@ -67,7 +67,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         endBarIndex = startIndex + endBarIndex - 1; // map count to array index
 
         endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
-        this._system = this.createEmptyStaffSystem();
+        this._system = this.createEmptyStaffSystem(0);
         this._system.isLast = true;
         this._system.x = this.pagePadding![0];
         this._system.y = this.pagePadding![1];

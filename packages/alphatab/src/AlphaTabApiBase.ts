@@ -10,7 +10,7 @@ import {
 import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { Logger } from '@coderline/alphatab/Logger';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
-import type { BeatTickLookupItem } from '@coderline/alphatab/midi/BeatTickLookup';
+import type { BeatTickLookupItem, IBeatVisibilityChecker } from '@coderline/alphatab/midi/BeatTickLookup';
 import type {
     MetaDataEvent,
     MetaEvent,
@@ -123,6 +123,22 @@ export interface PlaybackHighlightChangeEventArgs {
 }
 
 /**
+ * @internal
+ */
+class BoundsLookupVisibilityChecker implements IBeatVisibilityChecker {
+    public bounds: BoundsLookup | null = null;
+
+    public isVisible(beat: Beat): boolean {
+        const bounds = this.bounds;
+        if (!bounds) {
+            return false;
+        }
+
+        return bounds.findBeat(beat) !== null;
+    }
+}
+
+/**
  * This class represents the public API of alphaTab and provides all logic to display
  * a music sheet in any UI using the given {@link IUiFacade}
  * @param <TSettings> The UI object holding the settings.
@@ -132,6 +148,7 @@ export class AlphaTabApiBase<TSettings> {
     private _startTime: number = 0;
     private _trackIndexes: number[] | null = null;
     private _trackIndexLookup: Set<number> | null = null;
+    private readonly _beatVisibilityChecker = new BoundsLookupVisibilityChecker();
     private _isDestroyed: boolean = false;
     private _score: Score | null = null;
     private _tracks: Track[] = [];
@@ -2049,18 +2066,19 @@ export class AlphaTabApiBase<TSettings> {
 
         const cache: MidiTickLookup | null = this._tickCache;
         if (cache) {
-            const tracks = this._trackIndexLookup;
-            if (tracks != null && tracks.size > 0) {
-                const beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick, this._currentBeat);
-                if (beat) {
-                    this._cursorUpdateBeat(
-                        beat,
-                        stop,
-                        shouldScroll,
-                        cursorSpeed,
-                        forceUpdate || this.playerState === PlayerState.Paused
-                    );
-                }
+            const beat: MidiTickLookupFindBeatResult | null = cache.findBeatWithChecker(
+                this._beatVisibilityChecker,
+                tick,
+                this._currentBeat
+            );
+            if (beat) {
+                this._cursorUpdateBeat(
+                    beat,
+                    stop,
+                    shouldScroll,
+                    cursorSpeed,
+                    forceUpdate || this.playerState === PlayerState.Paused
+                );
             }
         }
     }
@@ -3419,6 +3437,8 @@ export class AlphaTabApiBase<TSettings> {
         if (this._isDestroyed) {
             return;
         }
+
+        this._beatVisibilityChecker.bounds = this.boundsLookup;
 
         this._currentBeat = null;
         this._cursorUpdateTick(this._previousTick, false, 1, true, true);
