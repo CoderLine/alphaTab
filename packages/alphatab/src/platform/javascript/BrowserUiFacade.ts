@@ -252,6 +252,21 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         return new HtmlElementContainer(canvasElement);
     }
 
+    public setCanvasOverflow(canvasElement: IContainer, overflow: number, isVertical: boolean): void {
+        const html = (canvasElement as HtmlElementContainer).element;
+        if (overflow === 0) {
+            html.style.boxSizing = '';
+            html.style.paddingRight = '';
+            html.style.paddingBottom = '';
+        } else if (isVertical) {
+            html.style.boxSizing = 'content-box';
+            html.style.paddingBottom = `${overflow}px`;
+        } else {
+            html.style.boxSizing = 'content-box';
+            html.style.paddingRight = `${overflow}px`;
+        }
+    }
+
     public triggerEvent(
         container: IContainer,
         name: string,
@@ -914,6 +929,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
 
         if (scrollDuration === 0) {
+            console.log('scrollTo duration=0', currentAnimation);
             setValue(endScroll);
             return;
         }

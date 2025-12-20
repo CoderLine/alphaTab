@@ -193,6 +193,18 @@ export interface IUiFacade<TSettings> {
     loadSoundFont(data: unknown, append: boolean): boolean;
 
     /**
+     * Updates the overflows needed to ensure the smooth scrolling
+     * can reach the "end" at the desired position.
+     * @param canvasElement The canvas element.
+     * @param offset The offset we need
+     * @param isVertical Whether we have a vertical or horizontal overflow
+     * @remarks
+     * Without these overflows we might not have enough scroll space
+     * and we cannot reach a "sticky cursor" behavior.
+     */
+    setCanvasOverflow(canvasElement:IContainer, overflow: number, isVertical: boolean): void;
+
+    /**
      * This events is fired when the {@link canRender} property changes.
      */
     readonly canRenderChanged: IEventEmitter;

@@ -41,6 +41,7 @@ import {
     type MidiTickLookupFindBeatResult,
     MidiTickLookupFindBeatResultCursorMode
 } from '@coderline/alphatab/midi/MidiTickLookup';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
@@ -2027,25 +2028,74 @@ export class AlphaTabApiBase<TSettings> {
         this._selectionWrapper = null;
     }
 
+    private _scrollContainerResizeUnregister?: () => void;
+
+    private _createCursors() {
+        if (this._cursorWrapper) {
+            return;
+        }
+        const cursors = this.uiFacade.createCursors();
+        if (cursors) {
+            // store options and created elements for fast access
+            this._cursorWrapper = cursors.cursorWrapper;
+            this._barCursor = cursors.barCursor;
+            this._beatCursor = cursors.beatCursor;
+            this._selectionWrapper = cursors.selectionWrapper;
+            this._isInitialBeatCursorUpdate = true;
+        }
+        if (this._currentBeat !== null) {
+            this._cursorUpdateBeat(this._currentBeat!, false, this._previousTick > 10, 1, true);
+        }
+    }
+
+    private _updateSmoothScroll() {
+        // handle overflows for smooth scrolling
+        const settings = this.settings;
+        const resizeListenerUnregister = this._scrollContainerResizeUnregister;
+        if (settings.player.scrollMode !== ScrollMode.Smooth) {
+            this._destroySmoothScroll();
+        } else if (!resizeListenerUnregister) {
+            // we need a resize listener for the overflow calculation
+            this._scrollContainerResizeUnregister = this.uiFacade.getScrollContainer().resize.on(() => {
+                const isVertical = Environment.getLayoutEngineFactory(settings.display.layoutMode).vertical;
+                const scrollContainer = this.uiFacade.getScrollContainer();
+
+                let overflowNeeded: number;
+                let viewPortSize: number;
+                if (isVertical) {
+                    overflowNeeded = settings.player.scrollOffsetX;
+                    viewPortSize = scrollContainer.width;
+                } else {
+                    overflowNeeded = settings.player.scrollOffsetY;
+                    viewPortSize = scrollContainer.height;
+                }
+
+                // the content needs to shift out of screen (and back into screen with the offset)
+                // that's why we need the whole width as additional overflow
+                const overflowNeededAbsolute = viewPortSize + overflowNeeded;
+
+                this.uiFacade.setCanvasOverflow(this.canvasElement, overflowNeededAbsolute, isVertical);
+            });
+        }
+    }
+
+    private _destroySmoothScroll() {
+        const resizeListenerUnregister = this._scrollContainerResizeUnregister;
+        if (resizeListenerUnregister) {
+            resizeListenerUnregister();
+            this.uiFacade.setCanvasOverflow(this.canvasElement, 0, false /* doesn't matter */);
+        }
+        this._scrollContainerResizeUnregister = undefined;
+    }
+
     private _updateCursors() {
         const enable = this._hasCursor;
-        if (enable && !this._cursorWrapper) {
-            //
-            // Create cursors
-            const cursors = this.uiFacade.createCursors();
-            if (cursors) {
-                // store options and created elements for fast access
-                this._cursorWrapper = cursors.cursorWrapper;
-                this._barCursor = cursors.barCursor;
-                this._beatCursor = cursors.beatCursor;
-                this._selectionWrapper = cursors.selectionWrapper;
-                this._isInitialBeatCursorUpdate = true;
-            }
-            if (this._currentBeat !== null) {
-                this._cursorUpdateBeat(this._currentBeat!, false, this._previousTick > 10, 1, true);
-            }
+        if (enable) {
+            this._createCursors();
+            this._updateSmoothScroll();
         } else if (!enable && this._cursorWrapper) {
             this._destroyCursors();
+            this._destroySmoothScroll();
         }
     }
 
@@ -2188,57 +2238,55 @@ export class AlphaTabApiBase<TSettings> {
             // when scrolling on the y-axis, we preliminary check if the new beat/bar have
             // moved on the y-axis
             const y: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
-            if (y !== this._lastScroll) {
-                this._lastScroll = y;
-                switch (mode) {
-                    case ScrollMode.Continuous:
-                        const elementOffset: Bounds = this.uiFacade.getOffset(scrollElement, this.container);
-                        this.uiFacade.scrollToY(scrollElement, elementOffset.y + y, this.settings.player.scrollSpeed);
-                        break;
-                    case ScrollMode.OffScreen:
-                        const elementBottom: number =
-                            scrollElement.scrollTop + this.uiFacade.getOffset(null, scrollElement).h;
-                        if (
-                            barBoundings.visualBounds.y + barBoundings.visualBounds.h >= elementBottom ||
-                            barBoundings.visualBounds.y < scrollElement.scrollTop
-                        ) {
-                            const scrollTop: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
-                            this.uiFacade.scrollToY(scrollElement, scrollTop, this.settings.player.scrollSpeed);
-                        }
-                        break;
-                }
+            if (y === this._lastScroll && beatScrollDuration > 0) {
+                return;
+            }
+
+            this._lastScroll = y;
+            switch (mode) {
+                case ScrollMode.Continuous:
+                    const elementOffset: Bounds = this.uiFacade.getOffset(scrollElement, this.container);
+                    this.uiFacade.scrollToY(scrollElement, elementOffset.y + y, this.settings.player.scrollSpeed);
+                    break;
+                case ScrollMode.OffScreen:
+                    const elementBottom: number =
+                        scrollElement.scrollTop + this.uiFacade.getOffset(null, scrollElement).h;
+                    if (
+                        barBoundings.visualBounds.y + barBoundings.visualBounds.h >= elementBottom ||
+                        barBoundings.visualBounds.y < scrollElement.scrollTop
+                    ) {
+                        const scrollTop: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
+                        this.uiFacade.scrollToY(scrollElement, scrollTop, this.settings.player.scrollSpeed);
+                    }
+                    break;
             }
         } else {
             // when scrolling on the x-axis, we preliminary check if the new bar has
             // moved on the x-axis
             const x: number = barBoundings.visualBounds.x;
-            if (x !== this._lastScroll) {
-                this._lastScroll = x;
-                switch (mode) {
-                    case ScrollMode.Continuous:
-                        const scrollLeftContinuous: number =
+            if (x === this._lastScroll && beatScrollDuration > 0) {
+                return;
+            }
+            this._lastScroll = x;
+            switch (mode) {
+                case ScrollMode.Continuous:
+                    const scrollLeftContinuous: number = barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
+                    this._lastScroll = barBoundings.visualBounds.x;
+                    this.uiFacade.scrollToX(scrollElement, scrollLeftContinuous, this.settings.player.scrollSpeed);
+                    break;
+                case ScrollMode.OffScreen:
+                    const elementRight: number =
+                        scrollElement.scrollLeft + this.uiFacade.getOffset(null, scrollElement).w;
+                    if (
+                        barBoundings.visualBounds.x + barBoundings.visualBounds.w >= elementRight ||
+                        barBoundings.visualBounds.x < scrollElement.scrollLeft
+                    ) {
+                        const scrollLeftOffScreen: number =
                             barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
                         this._lastScroll = barBoundings.visualBounds.x;
-                        this.uiFacade.scrollToX(scrollElement, scrollLeftContinuous, this.settings.player.scrollSpeed);
-                        break;
-                    case ScrollMode.OffScreen:
-                        const elementRight: number =
-                            scrollElement.scrollLeft + this.uiFacade.getOffset(null, scrollElement).w;
-                        if (
-                            barBoundings.visualBounds.x + barBoundings.visualBounds.w >= elementRight ||
-                            barBoundings.visualBounds.x < scrollElement.scrollLeft
-                        ) {
-                            const scrollLeftOffScreen: number =
-                                barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
-                            this._lastScroll = barBoundings.visualBounds.x;
-                            this.uiFacade.scrollToX(
-                                scrollElement,
-                                scrollLeftOffScreen,
-                                this.settings.player.scrollSpeed
-                            );
-                        }
-                        break;
-                }
+                        this.uiFacade.scrollToX(scrollElement, scrollLeftOffScreen, this.settings.player.scrollSpeed);
+                    }
+                    break;
             }
         }
     }
@@ -2251,7 +2299,89 @@ export class AlphaTabApiBase<TSettings> {
         scrollElement: IContainer,
         isVertical: boolean
     ) {
+        if (isVertical) {
+            // vertical smooth scrolling aims to place the on-time position
+            // at scrollOffsetY **at the time when a system starts**
+            // this means when a system starts, it is at scrollOffsetY,
+            // then gradually scrolls down the system height reaching the bottom
+            // when the system completes.
+
+            const systemTop: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
+            if (systemTop === this._lastScroll && beatScrollDuration > 0) {
+                return;
+            }
+
+            // jump to start of new system
+            this.uiFacade.scrollToY(scrollElement, systemTop, 0);
+
+            // instant scroll
+            if (beatScrollDuration === 0) {
+                this._lastScroll = -1;
+                return;
+            }
+
+            // dynamic scrolling
+            this._lastScroll = systemTop;
+            // scroll to bottom over time
+            const systemBottom = systemTop + barBoundings.realBounds.h;
+
+            // NOTE: this calculation is a bit more expensive, but we only do it once per system
+            // so we should be good:
+            // * the more bars we have, the longer the system will play, hence the duration can take a bit longer
+            // * if we have less bars, we calculate more often, but the calculation will be faster because we sum up less bars.
+            const systemDuration = this._calculateSystemDuration(barBoundings);
+            this.uiFacade.scrollToY(scrollElement, systemBottom, systemDuration);
+        } else {
+            // horizontal smooth scrolling aims to place the on-time position
+            // at scrollOffsetX
+            // as the beat-cursor follows the on-time position too, we animate
+            // the scrolling along the beat cursor.
+            if (beatEndX === this._lastScroll && beatScrollDuration > 0) {
+                return;
+            }
+
+            this.uiFacade.scrollToX(scrollElement, beatStartX + this.settings.player.scrollOffsetX, 0);
+            // instant scroll
+            if (beatScrollDuration === 0) {
+                this._lastScroll = -1;
+                return;
+            }
+
+            this._lastScroll = beatEndX;
+            const scrollLeftContinuous = beatEndX + this.settings.player.scrollOffsetX;
+            this.uiFacade.scrollToX(scrollElement, scrollLeftContinuous, beatScrollDuration);
+        }
     }
+
+    private _calculateSystemDuration(barBoundings: MasterBarBounds) {
+        const systemBars = barBoundings.staffSystemBounds!.bars;
+        const tickCache = this._tickCache!;
+
+        let duration = 0;
+
+        const masterBars = this._score!.masterBars;
+        for (const bar of systemBars) {
+            const mb = masterBars[bar.index];
+
+            const mbInfo = tickCache.getMasterBar(mb);
+            const tempoChanges = tickCache.getMasterBar(mb).tempoChanges;
+
+            let tempo = tempoChanges[0].tempo;
+            let tick = tempoChanges[0].tick;
+            for (let i = 1; i < tempoChanges.length; i++) {
+                const diff = tempoChanges[i].tick - tick;
+                duration += MidiUtils.ticksToMillis(diff, tempo);
+                tempo = tempoChanges[i].tempo;
+                tick = tempoChanges[i].tick;
+            }
+
+            const toEnd = mbInfo.end - tick;
+            duration += MidiUtils.ticksToMillis(toEnd, tempo);
+        }
+
+        return duration;
+    }
+
     private _internalCursorUpdateBeat(
         beat: Beat,
         nextBeat: Beat | null,
