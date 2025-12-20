@@ -478,8 +478,8 @@ export class StaffSystem {
                         }
                     }
 
+                    this.accoladeWidth += settings.display.systemLabelPaddingLeft;
                     if (hasAnyTrackName) {
-                        this.accoladeWidth += settings.display.systemLabelPaddingLeft;
                         this.accoladeWidth += settings.display.systemLabelPaddingRight;
                     }
                 }
