@@ -22,6 +22,7 @@ const defaultSettings = {
     player: {
         playerMode: alphaTab.PlayerMode.EnabledAutomatic,
         scrollOffsetX: -10,
+        scrollOffsetY: -20,
         soundFont: '/font/sonivox/sonivox.sf2'
     }
 } satisfies alphaTab.json.SettingsJson;
@@ -598,15 +599,38 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
             switch ((e.target as HTMLAnchorElement).dataset.layout) {
                 case 'page':
                     settings.display.layoutMode = alphaTab.LayoutMode.Page;
-                    settings.player.scrollMode = alphaTab.ScrollMode.Continuous;
                     break;
-                case 'horizontal-bar':
+                case 'horizontal':
                     settings.display.layoutMode = alphaTab.LayoutMode.Horizontal;
-                    settings.player.scrollMode = alphaTab.ScrollMode.Continuous;
                     break;
-                case 'horizontal-screen':
-                    settings.display.layoutMode = alphaTab.LayoutMode.Horizontal;
+            }
+
+            at.updateSettings();
+            at.render();
+        };
+    }
+    for (const a of control.querySelectorAll<HTMLAnchorElement>('.at-scroll-options a')) {
+        a.onclick = e => {
+            e.preventDefault();
+            const settings = at.settings;
+            switch ((e.target as HTMLAnchorElement).dataset.scroll) {
+                case 'off':
+                    settings.player.scrollMode = alphaTab.ScrollMode.Off;
+                    break;
+                case 'continuous':
+                    settings.player.scrollMode = alphaTab.ScrollMode.Continuous;
+                    settings.player.scrollOffsetX = -10;
+                    settings.player.scrollOffsetY = -10;
+                    break;
+                case 'offscreen':
                     settings.player.scrollMode = alphaTab.ScrollMode.OffScreen;
+                    settings.player.scrollOffsetX = -10;
+                    settings.player.scrollOffsetY = -10;
+                    break;
+                case 'smooth':
+                    settings.player.scrollMode = alphaTab.ScrollMode.Smooth;
+                    settings.player.scrollOffsetX = -50;
+                    settings.player.scrollOffsetY = -100;
                     break;
             }
 
@@ -619,12 +643,10 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
         new bootstrap.Tooltip(t);
     }
 
-    at.playbackRangeChanged.on(e => {
-        if (e.playbackRange) {
-        }
-    });
-
     setupSelectionHandles(el, at);
+
+    // TEMP: for testing without sound
+    at.masterVolume = 0;
 
     // expose api for fiddling in developer tools
     (window as any).api = at;
