@@ -142,4 +142,13 @@ internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListene
             }
         }
     }
+
+    fun stopScrolling(){
+        _uiInvoke {
+            _scrollToY?.end()
+            _scrollToY = null
+            _scrollToX?.end()
+            _scrollToX = null
+        }
+    }
 }

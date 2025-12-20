@@ -383,18 +383,45 @@ namespace AlphaTab.Wpf
                 }
             }
         }
+
+        public override void StopScrolling(IContainer scrollElement)
+        {
+            if (((FrameworkElementContainer)scrollElement).Control is ScrollViewer s)
+            {
+                s.BeginAnimation(ScrollViewerExtension.ScrollXProperty, null);
+                s.BeginAnimation(ScrollViewerExtension.ScrollYProperty, null);
+            }
+        }
+
+        public override void SetCanvasOverflow(IContainer canvasElement, double overflow,
+            bool isVertical)
+        {
+            if (!(((FrameworkElementContainer)canvasElement).Control is Canvas c))
+            {
+                return;
+            }
+
+            c.Margin = isVertical
+                ? new Thickness(0, 0, 0, overflow)
+                : new Thickness(0, 0, overflow, 0);
+        }
     }
 
     internal class ScrollViewerExtension
     {
-        public static readonly DependencyProperty ScrollXProperty = DependencyProperty.RegisterAttached(
-            "ScrollX", typeof(double), typeof(ScrollViewerExtension), new PropertyMetadata(0.0, OnScrollXChanged));
+        public static readonly DependencyProperty ScrollXProperty =
+            DependencyProperty.RegisterAttached(
+                "ScrollX", typeof(double), typeof(ScrollViewerExtension),
+                new PropertyMetadata(0.0, OnScrollXChanged));
 
 
-        public static readonly DependencyProperty ScrollYProperty = DependencyProperty.RegisterAttached(
-            "ScrollY", typeof(double), typeof(ScrollViewerExtension), new PropertyMetadata(0.0, OnScrollYChanged));
+        public static readonly DependencyProperty ScrollYProperty =
+            DependencyProperty.RegisterAttached(
+                "ScrollY", typeof(double), typeof(ScrollViewerExtension),
+                new PropertyMetadata(0.0, OnScrollYChanged));
 
-        private static void OnScrollXChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnScrollXChanged(DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
         {
             if (d is ScrollViewer s)
             {
@@ -402,7 +429,8 @@ namespace AlphaTab.Wpf
             }
         }
 
-        private static void OnScrollYChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnScrollYChanged(DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
         {
             if (d is ScrollViewer s)
             {
@@ -411,4 +439,3 @@ namespace AlphaTab.Wpf
         }
     }
 }
-

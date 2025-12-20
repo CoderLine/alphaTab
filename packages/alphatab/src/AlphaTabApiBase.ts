@@ -2118,6 +2118,8 @@ export class AlphaTabApiBase<TSettings> {
         // destroy current handler in favor of new one
         if (currentHandler) {
             currentHandler[Symbol.dispose]();
+            const scroll = this.uiFacade.getScrollContainer();
+            this.uiFacade.stopScrolling(scroll);
         }
 
         switch (scrollMode) {
@@ -2126,24 +2128,24 @@ export class AlphaTabApiBase<TSettings> {
                 break;
             case ScrollMode.Continuous:
                 if (isVertical) {
-                    this._defaultScrollHandler = new VerticalContinuousScrollHandler(this);
+                    this._defaultScrollHandler = new VerticalContinuousScrollHandler<TSettings>(this);
                 } else {
-                    this._defaultScrollHandler = new HorizontalContinuousScrollHandler(this);
+                    this._defaultScrollHandler = new HorizontalContinuousScrollHandler<TSettings>(this);
                 }
                 break;
             case ScrollMode.OffScreen:
                 if (isVertical) {
-                    this._defaultScrollHandler = new VerticalOffScreenScrollHandler(this);
+                    this._defaultScrollHandler = new VerticalOffScreenScrollHandler<TSettings>(this);
                 } else {
-                    this._defaultScrollHandler = new HorizontalOffScreenScrollHandler(this);
+                    this._defaultScrollHandler = new HorizontalOffScreenScrollHandler<TSettings>(this);
                 }
                 break;
 
             case ScrollMode.Smooth:
                 if (isVertical) {
-                    this._defaultScrollHandler = new VerticalSmoothScrollHandler(this);
+                    this._defaultScrollHandler = new VerticalSmoothScrollHandler<TSettings>(this);
                 } else {
-                    this._defaultScrollHandler = new HorizontalSmoothScrollHandler(this);
+                    this._defaultScrollHandler = new HorizontalSmoothScrollHandler<TSettings>(this);
                 }
                 break;
         }

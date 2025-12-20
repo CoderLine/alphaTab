@@ -33,6 +33,10 @@ public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
         TotalResultCount = new ConcurrentQueue<Counter>();
     }
 
+    public abstract void StopScrolling(IContainer scrollElement);
+    public abstract void SetCanvasOverflow(IContainer canvasElement, double overflow,
+        bool isVertical);
+
     public IScoreRenderer CreateWorkerRenderer()
     {
         return new ManagedThreadScoreRenderer(Api.Settings, BeginInvoke);

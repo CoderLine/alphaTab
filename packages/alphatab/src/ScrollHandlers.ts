@@ -338,8 +338,8 @@ export class HorizontalSmoothScrollHandler<TSettings> implements IScrollHandler 
         this._scrollContainerResizeUnregister = api.uiFacade.getScrollContainer().resize.on(() => {
             const scrollContainer = api.uiFacade.getScrollContainer();
 
-            const overflowNeeded = api.settings.player.scrollOffsetY;
-            const viewPortSize = scrollContainer.height;
+            const overflowNeeded = api.settings.player.scrollOffsetX;
+            const viewPortSize = scrollContainer.width;
 
             // the content needs to shift out of screen (and back into screen with the offset)
             // that's why we need the whole width as additional overflow
