@@ -40,6 +40,7 @@ export type { IEventEmitter, IEventEmitterOfT } from '@coderline/alphatab/EventE
 
 export { AlphaTabApi } from '@coderline/alphatab/platform/javascript/AlphaTabApi';
 export { AlphaTabApiBase, type PlaybackHighlightChangeEventArgs } from '@coderline/alphatab/AlphaTabApiBase';
+export type { IScrollHandler } from '@coderline/alphatab/ScrollHandlers';
 export { WebPlatform } from '@coderline/alphatab/platform/javascript/WebPlatform';
 
 export { VersionInfo as meta } from '@coderline/alphatab/generated/VersionInfo';

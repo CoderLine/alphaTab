@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using AlphaTab.Platform;
 
@@ -45,14 +46,20 @@ namespace AlphaTab.WinForms
         public double Width
         {
             get => Control.ClientSize.Width - Control.Padding.Horizontal;
-            set => Control.Width = (int)value + Control.Padding.Horizontal;
+            set => Control.BeginInvoke(() =>
+            {
+                Control.Width = (int)value + Control.Padding.Horizontal;
+            });
         }
 
 
         public double Height
         {
             get => Control.ClientSize.Height - Control.Padding.Vertical;
-            set => Control.Height = (int)value + Control.Padding.Vertical;
+            set => Control.BeginInvoke(() =>
+            {
+                Control.Height = (int)value + Control.Padding.Vertical;
+            });
         }
 
         public bool IsVisible => Control.Visible && Control.Width > 0;
@@ -62,10 +69,14 @@ namespace AlphaTab.WinForms
             get => Control is ScrollableControl scroll ? scroll.AutoScrollPosition.X : 0;
             set
             {
-                if (Control is ScrollableControl scroll)
+                Control.BeginInvoke(() =>
                 {
-                    scroll.AutoScrollPosition = new Point((int)value, scroll.AutoScrollPosition.Y);
-                }
+                    if (Control is ScrollableControl scroll)
+                    {
+                        scroll.AutoScrollPosition =
+                            new Point((int)value, scroll.AutoScrollPosition.Y);
+                    }
+                });
             }
         }
 
@@ -74,42 +85,44 @@ namespace AlphaTab.WinForms
             get => Control is ScrollableControl scroll ? scroll.VerticalScroll.Value : 0;
             set
             {
-                if (Control is ScrollableControl scroll)
+                Control.BeginInvoke(() =>
                 {
-                    scroll.AutoScrollPosition = new Point(scroll.AutoScrollPosition.X, (int)value);
-                }
+                    if (Control is ScrollableControl scroll)
+                    {
+                        scroll.AutoScrollPosition =
+                            new Point(scroll.AutoScrollPosition.X, (int)value);
+                    }
+                });
             }
         }
         public void AppendChild(IContainer child)
         {
-            Control.Controls.Add(((ControlContainer)child).Control);
+            Control.BeginInvoke(() => { Control.Controls.Add(((ControlContainer)child).Control); });
         }
 
         public void StopAnimation()
         {
-            //Control.BeginAnimation(Canvas.LeftProperty, null);
         }
 
         public void TransitionToX(double duration, double x)
         {
-            // TODO: Animation
-            Control.Left = (int)x;
-
-            //Control.BeginAnimation(Canvas.LeftProperty,
-            //    new DoubleAnimation(x, new Duration(TimeSpan.FromMilliseconds(duration))));
+            Control.BeginInvoke(() => { Control.Left = (int)x; });
         }
 
         public void Clear()
         {
-            Control.Controls.Clear();
+            Control.BeginInvoke(() => { Control.Controls.Clear(); });
         }
 
         public void SetBounds(double x, double y, double w, double h)
         {
-            Control.Left = (int)x;
-            Control.Top = (int)y;
-            Control.Width = (int)w;
-            Control.Height = (int)h;
+            Control.BeginInvoke(() =>
+            {
+                Control.Left = (int)x;
+                Control.Top = (int)y;
+                Control.Width = (int)w;
+                Control.Height = (int)h;
+            });
         }
 
         public IEventEmitter Resize { get; set; }

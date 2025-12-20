@@ -47,10 +47,11 @@ import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { Track } from '@coderline/alphatab/model/Track';
+import { PlayerMode, ScrollMode } from '@coderline/alphatab/PlayerSettings';
 import type { IContainer } from '@coderline/alphatab/platform/IContainer';
 import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
 import type { IUiFacade } from '@coderline/alphatab/platform/IUiFacade';
-import { PlayerMode, ScrollMode } from '@coderline/alphatab/PlayerSettings';
+import { ResizeEventArgs } from '@coderline/alphatab/ResizeEventArgs';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
@@ -61,7 +62,15 @@ import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
 import type { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
-import { ResizeEventArgs } from '@coderline/alphatab/ResizeEventArgs';
+import {
+    HorizontalContinuousScrollHandler,
+    HorizontalOffScreenScrollHandler,
+    HorizontalSmoothScrollHandler,
+    type IScrollHandler,
+    VerticalContinuousScrollHandler,
+    VerticalOffScreenScrollHandler,
+    VerticalSmoothScrollHandler
+} from '@coderline/alphatab/ScrollHandlers';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { ActiveBeatsChangedEventArgs } from '@coderline/alphatab/synth/ActiveBeatsChangedEventArgs';
 import { AlphaSynthWrapper } from '@coderline/alphatab/synth/AlphaSynthWrapper';
@@ -155,6 +164,8 @@ export class AlphaTabApiBase<TSettings> {
     private _actualPlayerMode: PlayerMode = PlayerMode.Disabled;
     private _player!: AlphaSynthWrapper;
     private _renderer: ScoreRendererWrapper;
+
+    private _defaultScrollHandler?: IScrollHandler;
 
     /**
      * An indicator by how many midi-ticks the song contents are shifted.
@@ -975,6 +986,43 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private _tickCache: MidiTickLookup | null = null;
+
+    /**
+     * A custom scroll handler which will be used to handle scrolling operations during playback.
+     *
+     * @category Properties - Player
+     * @since 1.8.0
+     * @example
+     * JavaScript
+     * ```js
+     * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+     * api.customScrollHandler = {
+     *   forceScrollTo(currentBeatBounds) {
+     *     const scroll = api.uiFacade.getScrollElement();
+     *     api.uiFacade.scrollToY(scroll, currentBeatBounds.barBounds.masterBarBounds.realBounds.y, 0);
+     *   },
+     *   onBeatCursorUpdating(startBeat, endBeat, cursorMode, relativePosition, actualBeatCursorStartX, actualBeatCursorEndX, actualBeatCursorTransitionDuration) {
+     *     const scroll = api.uiFacade.getScrollElement();
+     *     api.uiFacade.scrollToY(scroll, startBeat.barBounds.masterBarBounds.realBounds.y, 0);
+     *   }
+     * }
+     * ```
+     *
+     * @example
+     * C#
+     * ```cs
+     * var api = new AlphaTabApi<MyControl>(...);
+     * api.CustomScrollHandler = new CustomScrollHandler();
+     * ```
+     *
+     * @example
+     * Android
+     * ```kotlin
+     * val api = AlphaTabApi<MyControl>(...)
+     * api.customScrollHandler = CustomScrollHandler();
+     * ```
+     */
+    public customScrollHandler?: IScrollHandler;
 
     /**
      * The tick cache allowing lookup of midi ticks to beats.
@@ -2014,7 +2062,6 @@ export class AlphaTabApiBase<TSettings> {
     private _isInitialBeatCursorUpdate = true;
     private _previousStateForCursor: PlayerState = PlayerState.Paused;
     private _previousCursorCache: BoundsLookup | null = null;
-    private _lastScroll: number = 0;
 
     private _destroyCursors(): void {
         if (!this._cursorWrapper) {
@@ -2027,25 +2074,80 @@ export class AlphaTabApiBase<TSettings> {
         this._selectionWrapper = null;
     }
 
+    private _createCursors() {
+        if (this._cursorWrapper) {
+            return;
+        }
+        const cursors = this.uiFacade.createCursors();
+        if (cursors) {
+            // store options and created elements for fast access
+            this._cursorWrapper = cursors.cursorWrapper;
+            this._barCursor = cursors.barCursor;
+            this._beatCursor = cursors.beatCursor;
+            this._selectionWrapper = cursors.selectionWrapper;
+            this._isInitialBeatCursorUpdate = true;
+        }
+        if (this._currentBeat !== null) {
+            this._cursorUpdateBeat(this._currentBeat!, false, this._previousTick > 10, 1, true);
+        }
+    }
+
     private _updateCursors() {
+        this._updateScrollHandler();
+
         const enable = this._hasCursor;
-        if (enable && !this._cursorWrapper) {
-            //
-            // Create cursors
-            const cursors = this.uiFacade.createCursors();
-            if (cursors) {
-                // store options and created elements for fast access
-                this._cursorWrapper = cursors.cursorWrapper;
-                this._barCursor = cursors.barCursor;
-                this._beatCursor = cursors.beatCursor;
-                this._selectionWrapper = cursors.selectionWrapper;
-                this._isInitialBeatCursorUpdate = true;
-            }
-            if (this._currentBeat !== null) {
-                this._cursorUpdateBeat(this._currentBeat!, false, this._previousTick > 10, 1, true);
-            }
+        if (enable) {
+            this._createCursors();
         } else if (!enable && this._cursorWrapper) {
             this._destroyCursors();
+        }
+    }
+
+    private _scrollHandlerMode = ScrollMode.Off;
+    private _scrollHandlerVertical = true;
+    private _updateScrollHandler() {
+        const currentHandler = this._defaultScrollHandler;
+        const scrollMode = this.settings.player.scrollMode;
+        const isVertical = Environment.getLayoutEngineFactory(this.settings.display.layoutMode).vertical;
+
+        // no change
+        if (this._scrollHandlerMode === scrollMode && this._scrollHandlerVertical === isVertical) {
+            return;
+        }
+
+        // destroy current handler in favor of new one
+        if (currentHandler) {
+            currentHandler[Symbol.dispose]();
+            const scroll = this.uiFacade.getScrollContainer();
+            this.uiFacade.stopScrolling(scroll);
+        }
+
+        switch (scrollMode) {
+            case ScrollMode.Off:
+                this._defaultScrollHandler = undefined;
+                break;
+            case ScrollMode.Continuous:
+                if (isVertical) {
+                    this._defaultScrollHandler = new VerticalContinuousScrollHandler<TSettings>(this);
+                } else {
+                    this._defaultScrollHandler = new HorizontalContinuousScrollHandler<TSettings>(this);
+                }
+                break;
+            case ScrollMode.OffScreen:
+                if (isVertical) {
+                    this._defaultScrollHandler = new VerticalOffScreenScrollHandler<TSettings>(this);
+                } else {
+                    this._defaultScrollHandler = new HorizontalOffScreenScrollHandler<TSettings>(this);
+                }
+                break;
+
+            case ScrollMode.Smooth:
+                if (isVertical) {
+                    this._defaultScrollHandler = new VerticalSmoothScrollHandler<TSettings>(this);
+                } else {
+                    this._defaultScrollHandler = new HorizontalSmoothScrollHandler<TSettings>(this);
+                }
+                break;
         }
     }
 
@@ -2153,69 +2255,9 @@ export class AlphaTabApiBase<TSettings> {
     public scrollToCursor() {
         const beatBounds = this._currentBeatBounds;
         if (beatBounds) {
-            this._internalScrollToCursor(beatBounds.barBounds.masterBarBounds);
-        }
-    }
-
-    private _internalScrollToCursor(barBoundings: MasterBarBounds) {
-        const scrollElement: IContainer = this.uiFacade.getScrollContainer();
-        const isVertical: boolean = Environment.getLayoutEngineFactory(this.settings.display.layoutMode).vertical;
-        const mode: ScrollMode = this.settings.player.scrollMode;
-        if (isVertical) {
-            // when scrolling on the y-axis, we preliminary check if the new beat/bar have
-            // moved on the y-axis
-            const y: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
-            if (y !== this._lastScroll) {
-                this._lastScroll = y;
-                switch (mode) {
-                    case ScrollMode.Continuous:
-                        const elementOffset: Bounds = this.uiFacade.getOffset(scrollElement, this.container);
-                        this.uiFacade.scrollToY(scrollElement, elementOffset.y + y, this.settings.player.scrollSpeed);
-                        break;
-                    case ScrollMode.OffScreen:
-                        const elementBottom: number =
-                            scrollElement.scrollTop + this.uiFacade.getOffset(null, scrollElement).h;
-                        if (
-                            barBoundings.visualBounds.y + barBoundings.visualBounds.h >= elementBottom ||
-                            barBoundings.visualBounds.y < scrollElement.scrollTop
-                        ) {
-                            const scrollTop: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
-                            this.uiFacade.scrollToY(scrollElement, scrollTop, this.settings.player.scrollSpeed);
-                        }
-                        break;
-                }
-            }
-        } else {
-            // when scrolling on the x-axis, we preliminary check if the new bar has
-            // moved on the x-axis
-            const x: number = barBoundings.visualBounds.x;
-            if (x !== this._lastScroll) {
-                this._lastScroll = x;
-                switch (mode) {
-                    case ScrollMode.Continuous:
-                        const scrollLeftContinuous: number =
-                            barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
-                        this._lastScroll = barBoundings.visualBounds.x;
-                        this.uiFacade.scrollToX(scrollElement, scrollLeftContinuous, this.settings.player.scrollSpeed);
-                        break;
-                    case ScrollMode.OffScreen:
-                        const elementRight: number =
-                            scrollElement.scrollLeft + this.uiFacade.getOffset(null, scrollElement).w;
-                        if (
-                            barBoundings.visualBounds.x + barBoundings.visualBounds.w >= elementRight ||
-                            barBoundings.visualBounds.x < scrollElement.scrollLeft
-                        ) {
-                            const scrollLeftOffScreen: number =
-                                barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
-                            this._lastScroll = barBoundings.visualBounds.x;
-                            this.uiFacade.scrollToX(
-                                scrollElement,
-                                scrollLeftOffScreen,
-                                this.settings.player.scrollSpeed
-                            );
-                        }
-                        break;
-                }
+            const handler = this.customScrollHandler ?? this._defaultScrollHandler;
+            if (handler) {
+                handler.forceScrollTo(beatBounds);
             }
         }
     }
@@ -2248,11 +2290,12 @@ export class AlphaTabApiBase<TSettings> {
         const isPlayingUpdate = this._player.state === PlayerState.Playing && !stop;
 
         let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
+        let nextBeatBoundings: BeatBounds | null = null;
         // get position of next beat on same system
         if (nextBeat && cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
             // if we are moving within the same bar or to the next bar
             // transition to the next beat, otherwise transition to the end of the bar.
-            const nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
+            nextBeatBoundings = cache.findBeat(nextBeat);
             if (
                 nextBeatBoundings &&
                 nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
@@ -2286,23 +2329,28 @@ export class AlphaTabApiBase<TSettings> {
                         beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
                     }
 
+                    // it can happen that the cursor reaches the target position slightly too early (especially on backing tracks)
+                    // to avoid the cursor stopping, causing a wierd look, we animate the cursor to the double position in double time.
+                    // beatCursor!.transitionToX((duration / cursorSpeed), nextBeatX);
+                    const factor = cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext ? 2 : 1;
+                    nextBeatX = startBeatX + (nextBeatX - startBeatX) * factor;
+                    duration = (duration / cursorSpeed) * factor;
+
                     // we need to put the transition to an own animation frame
                     // otherwise the stop animation above is not applied.
                     this.uiFacade.beginInvoke(() => {
-                        // it can happen that the cursor reaches the target position slightly too early (especially on backing tracks)
-                        // to avoid the cursor stopping, causing a wierd look, we animate the cursor to the double position in double time.
-                        // beatCursor!.transitionToX((duration / cursorSpeed), nextBeatX);
-                        const factor = cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext ? 2 : 1;
-                        const doubleEndBeatX = startBeatX + (nextBeatX - startBeatX) * factor;
-                        beatCursor!.transitionToX((duration / cursorSpeed) * factor, doubleEndBeatX);
+                        beatCursor!.transitionToX(duration, nextBeatX);
                     });
                 } else {
-                    beatCursor.transitionToX(0, startBeatX);
+                    duration = 0;
+                    beatCursor.transitionToX(duration, nextBeatX);
                     beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
                 }
             } else {
                 // ticking cursor
-                beatCursor.transitionToX(0, startBeatX);
+                duration = 0;
+                nextBeatX = startBeatX;
+                beatCursor.transitionToX(duration, nextBeatX);
                 beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
             }
 
@@ -2329,7 +2377,15 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         if (shouldScroll && !this._isBeatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {
-            this._internalScrollToCursor(barBoundings);
+            const handler = this.customScrollHandler ?? this._defaultScrollHandler;
+            if (handler) {
+                handler.onBeatCursorUpdating(beatBoundings, nextBeatBoundings === null ? undefined : nextBeatBoundings,
+                    cursorMode,
+                    startBeatX,
+                    nextBeatX,
+                    duration
+                );
+            }
         }
 
         // trigger an event for others to indicate which beat/bar is played
@@ -3809,6 +3865,7 @@ export class AlphaTabApiBase<TSettings> {
             const tickCache = this._tickCache;
             if (currentBeat && tickCache) {
                 this._player.tickPosition = tickCache.getBeatStart(currentBeat.beat);
+                this.scrollToCursor();
             }
         }
 

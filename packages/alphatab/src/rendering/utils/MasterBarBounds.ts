@@ -10,7 +10,7 @@ import type { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/Staf
  */
 export class MasterBarBounds {
     /**
-     * Gets or sets the index of this bounds relative within the parent lookup.
+     * The MasterBar index within the data model represented by these bounds.
      */
     public index: number = 0;
 

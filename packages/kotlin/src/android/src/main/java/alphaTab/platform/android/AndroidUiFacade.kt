@@ -186,7 +186,10 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
             synthToUse = this.createWorkerPlayer();
         }
 
-        return AndroidThreadAlphaSynthAudioExporter(synthToUse as AndroidThreadAlphaSynthWorkerPlayer, needNewWorker);
+        return AndroidThreadAlphaSynthAudioExporter(
+            synthToUse as AndroidThreadAlphaSynthWorkerPlayer,
+            needNewWorker
+        );
     }
 
 
@@ -382,12 +385,32 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
 
     override fun scrollToX(scrollElement: IContainer, offset: Double, speed: Double) {
         val view = (scrollElement as AndroidRootViewContainer)
-        view.scrollToX(offset)
+        view.scrollToX(offset, speed)
     }
 
     override fun scrollToY(scrollElement: IContainer, offset: Double, speed: Double) {
         val view = (scrollElement as AndroidRootViewContainer)
-        view.scrollToY(offset)
+        view.scrollToY(offset, speed)
+    }
+
+    override fun stopScrolling(scrollElement: IContainer) {
+        val view = (scrollElement as AndroidRootViewContainer)
+        view.stopScrolling()
+    }
+
+    override fun setCanvasOverflow(
+        canvasElement: IContainer,
+        overflow: Double,
+        isVertical: Boolean
+    ) {
+        val view = (canvasElement as AndroidViewContainer).view;
+        if (view is AlphaTabRenderSurface) {
+            if (isVertical) {
+                view.setPadding(0, 0, 0, overflow.toInt())
+            } else {
+                view.setPadding(0, 0, overflow.toInt(), 0)
+            }
+        }
     }
 
     override fun load(
