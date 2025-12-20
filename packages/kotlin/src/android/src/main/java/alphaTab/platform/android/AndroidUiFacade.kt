@@ -382,12 +382,12 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
 
     override fun scrollToX(scrollElement: IContainer, offset: Double, speed: Double) {
         val view = (scrollElement as AndroidRootViewContainer)
-        view.scrollToX(offset)
+        view.scrollToX(offset, speed)
     }
 
     override fun scrollToY(scrollElement: IContainer, offset: Double, speed: Double) {
         val view = (scrollElement as AndroidRootViewContainer)
-        view.scrollToY(offset)
+        view.scrollToY(offset, speed)
     }
 
     override fun load(
