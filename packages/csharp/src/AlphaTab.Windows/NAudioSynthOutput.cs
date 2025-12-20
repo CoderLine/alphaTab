@@ -96,7 +96,10 @@ namespace AlphaTab
         /// <inheritdoc />
         public void Pause()
         {
-            _context!.Pause();
+            if (_context!.PlaybackState == PlaybackState.Playing)
+            {
+                _context!.Pause();
+            }
         }
 
         /// <inheritdoc />
