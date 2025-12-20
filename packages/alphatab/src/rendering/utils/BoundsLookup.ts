@@ -31,6 +31,7 @@ export class BoundsLookup {
                 mb.visualBounds = this._boundsToJson(masterBar.visualBounds);
                 mb.realBounds = this._boundsToJson(masterBar.realBounds);
                 mb.index = masterBar.index;
+                mb.isFirstOfLine = masterBar.isFirstOfLine;
                 mb.bars = [];
                 for (const bar of masterBar.bars) {
                     const b: BarBounds = {} as any;
@@ -88,7 +89,7 @@ export class BoundsLookup {
                 mb.lineAlignedBounds = BoundsLookup._boundsFromJson(masterBar.lineAlignedBounds);
                 mb.visualBounds = BoundsLookup._boundsFromJson(masterBar.visualBounds);
                 mb.realBounds = BoundsLookup._boundsFromJson(masterBar.realBounds);
-                sg.addBar(mb);
+                lookup.addMasterBar(mb);
                 for (const bar of masterBar.bars) {
                     const b: BarBounds = new BarBounds();
                     b.visualBounds = BoundsLookup._boundsFromJson(bar.visualBounds);
