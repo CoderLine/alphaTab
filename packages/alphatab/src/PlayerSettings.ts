@@ -14,7 +14,13 @@ export enum ScrollMode {
     /**
      * Scrolling happens as soon the cursors exceed the displayed range.
      */
-    OffScreen = 2
+    OffScreen = 2,
+    /**
+     * Scrolling happens constantly in a smooth fashion.
+     * This will disable the use of any native scroll optimizations but
+     * manually scroll the scroll container in the required speed.
+     */
+    Smooth = 3
 }
 
 /**
@@ -219,25 +225,25 @@ export class PlayerSettings {
      * @category Player
      * @remarks
      * This setting configures whether the player feature is enabled or not. Depending on the platform enabling the player needs some additional actions of the developer.
-     * 
+     *
      * **Synthesizer**
-     * 
+     *
      * If the synthesizer is used (via {@link PlayerMode.EnabledAutomatic} or {@link PlayerMode.EnabledSynthesizer}) a sound font is needed so that the midi synthesizer can produce the audio samples.
-     * 
+     *
      * For the JavaScript version the [player.soundFont](/docs/reference/settings/player/soundfont) property must be set to the URL of the sound font that should be used or it must be loaded manually via API.
      * For .net manually the soundfont must be loaded.
-     * 
+     *
      * **Backing Track**
-     * 
-     * For a built-in backing track of the input file no additional data needs to be loaded (assuming everything is filled via the input file). 
+     *
+     * For a built-in backing track of the input file no additional data needs to be loaded (assuming everything is filled via the input file).
      * Otherwise the `score.backingTrack` needs to be filled before loading and the related sync points need to be configured.
-     * 
+     *
      * **External Media**
-     * 
+     *
      * For synchronizing alphaTab with an external media no data needs to be loaded into alphaTab. The configured sync points on the MasterBars are used
      * as reference to synchronize the external media with the internal time axis. Then the related APIs on the AlphaTabApi object need to be used
      * to update the playback state and exterrnal audio position during playback.
-     * 
+     *
      * **User Interface**
      *
      * AlphaTab does not ship a default UI for the player. The API must be hooked up to some UI controls to allow the user to interact with the player.

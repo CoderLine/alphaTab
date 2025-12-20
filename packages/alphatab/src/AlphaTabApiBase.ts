@@ -2153,14 +2153,37 @@ export class AlphaTabApiBase<TSettings> {
     public scrollToCursor() {
         const beatBounds = this._currentBeatBounds;
         if (beatBounds) {
-            this._internalScrollToCursor(beatBounds.barBounds.masterBarBounds);
+            this._internalScrollToCursor(
+                beatBounds.barBounds.masterBarBounds,
+                beatBounds.onNotesX,
+                beatBounds.onNotesX,
+                0
+            );
         }
     }
 
-    private _internalScrollToCursor(barBoundings: MasterBarBounds) {
+    private _internalScrollToCursor(
+        barBoundings: MasterBarBounds,
+        beatStartX: number,
+        beatEndX: number,
+        beatScrollDuration: number
+    ) {
         const scrollElement: IContainer = this.uiFacade.getScrollContainer();
         const isVertical: boolean = Environment.getLayoutEngineFactory(this.settings.display.layoutMode).vertical;
         const mode: ScrollMode = this.settings.player.scrollMode;
+
+        if (mode === ScrollMode.Smooth) {
+            this._internalScrollToCursorSmooth(
+                barBoundings,
+                beatStartX,
+                beatEndX,
+                beatScrollDuration,
+                scrollElement,
+                isVertical
+            );
+            return;
+        }
+
         if (isVertical) {
             // when scrolling on the y-axis, we preliminary check if the new beat/bar have
             // moved on the y-axis
@@ -2220,6 +2243,15 @@ export class AlphaTabApiBase<TSettings> {
         }
     }
 
+    private _internalScrollToCursorSmooth(
+        barBoundings: MasterBarBounds,
+        beatStartX: number,
+        beatEndX: number,
+        beatScrollDuration: number,
+        scrollElement: IContainer,
+        isVertical: boolean
+    ) {
+    }
     private _internalCursorUpdateBeat(
         beat: Beat,
         nextBeat: Beat | null,
@@ -2286,23 +2318,28 @@ export class AlphaTabApiBase<TSettings> {
                         beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
                     }
 
+                    // it can happen that the cursor reaches the target position slightly too early (especially on backing tracks)
+                    // to avoid the cursor stopping, causing a wierd look, we animate the cursor to the double position in double time.
+                    // beatCursor!.transitionToX((duration / cursorSpeed), nextBeatX);
+                    const factor = cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext ? 2 : 1;
+                    nextBeatX = startBeatX + (nextBeatX - startBeatX) * factor;
+                    duration = (duration / cursorSpeed) * factor;
+
                     // we need to put the transition to an own animation frame
                     // otherwise the stop animation above is not applied.
                     this.uiFacade.beginInvoke(() => {
-                        // it can happen that the cursor reaches the target position slightly too early (especially on backing tracks)
-                        // to avoid the cursor stopping, causing a wierd look, we animate the cursor to the double position in double time.
-                        // beatCursor!.transitionToX((duration / cursorSpeed), nextBeatX);
-                        const factor = cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext ? 2 : 1;
-                        const doubleEndBeatX = startBeatX + (nextBeatX - startBeatX) * factor;
-                        beatCursor!.transitionToX((duration / cursorSpeed) * factor, doubleEndBeatX);
+                        beatCursor!.transitionToX(duration, nextBeatX);
                     });
                 } else {
-                    beatCursor.transitionToX(0, startBeatX);
+                    duration = 0;
+                    beatCursor.transitionToX(duration, nextBeatX);
                     beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
                 }
             } else {
                 // ticking cursor
-                beatCursor.transitionToX(0, startBeatX);
+                duration = 0;
+                nextBeatX = startBeatX;
+                beatCursor.transitionToX(duration, nextBeatX);
                 beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
             }
 
@@ -2329,7 +2366,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         if (shouldScroll && !this._isBeatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {
-            this._internalScrollToCursor(barBoundings);
+            this._internalScrollToCursor(barBoundings, startBeatX, nextBeatX, duration);
         }
 
         // trigger an event for others to indicate which beat/bar is played

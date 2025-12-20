@@ -29,7 +29,7 @@ import { WebPlatform } from '@coderline/alphatab/platform/javascript/WebPlatform
 import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
 import { AlphaSynthAudioWorkletOutput } from '@coderline/alphatab/platform/javascript/AlphaSynthAudioWorkletOutput';
 import { ScalableHtmlElementContainer } from '@coderline/alphatab/platform/javascript/ScalableHtmlElementContainer';
-import { PlayerOutputMode } from '@coderline/alphatab/PlayerSettings';
+import { PlayerOutputMode, ScrollMode } from '@coderline/alphatab/PlayerSettings';
 import type { SettingsJson } from '@coderline/alphatab/generated/SettingsJson';
 import { AudioElementBackingTrackSynthOutput } from '@coderline/alphatab/platform/javascript/AudioElementBackingTrackSynthOutput';
 import { BackingTrackPlayer } from '@coderline/alphatab/synth/BackingTrackPlayer';
@@ -878,54 +878,84 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         this._internalScrollToX((element as HtmlElementContainer).element, scrollTargetY, speed);
     }
 
+    private get _nativeBrowserSmoothScroll() {
+        const settings = this._api.settings.player;
+        return settings.nativeBrowserSmoothScroll && settings.scrollMode !== ScrollMode.Smooth;
+    }
+
+    private _scrollAnimationId = 0;
+    private readonly _activeScrollAnimations = new Set<number>();
+    private readonly _scrollAnimationLookup = new Map<HTMLElement, number>();
+
     private _internalScrollToY(element: HTMLElement, scrollTargetY: number, speed: number): void {
-        if (this._api.settings.player.nativeBrowserSmoothScroll) {
+        if (this._nativeBrowserSmoothScroll) {
             element.scrollTo({
                 top: scrollTargetY,
                 behavior: 'smooth'
             });
         } else {
-            const startY: number = element.scrollTop;
-            const diff: number = scrollTargetY - startY;
-
-            let start: number = 0;
-            const step = (x: number) => {
-                if (start === 0) {
-                    start = x;
-                }
-                const time: number = x - start;
-                const percent: number = Math.min(time / speed, 1);
-                element.scrollTop = (startY + diff * percent) | 0;
-                if (time < speed) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
+            this._internalScrollTo(element, element.scrollTop, scrollTargetY, speed, scroll => {
+                element.scrollTop = scroll;
+            });
         }
     }
 
+    private _internalScrollTo(
+        element: HTMLElement,
+        startScroll: number,
+        endScroll: number,
+        scrollDuration: number,
+        setValue: (scroll: number) => void
+    ) {
+        // stop any current animation
+        const currentAnimation = this._scrollAnimationLookup.get(element);
+        if (currentAnimation !== undefined) {
+            this._activeScrollAnimations.delete(currentAnimation);
+        }
+
+        if (scrollDuration === 0) {
+            setValue(endScroll);
+            return;
+        }
+
+        // start new animation
+        const animationId = this._scrollAnimationId++;
+        this._scrollAnimationLookup.set(element, animationId);
+        this._activeScrollAnimations.add(animationId);
+
+        const diff: number = endScroll - startScroll;
+
+        let start: number = 0;
+        const step = (x: number) => {
+            if (!this._activeScrollAnimations.has(animationId)) {
+                return;
+            }
+
+            if (start === 0) {
+                start = x;
+            }
+            const time = x - start;
+            const percent = Math.min(time / scrollDuration, 1);
+            setValue((startScroll + diff * percent) | 0);
+            if (time < scrollDuration) {
+                window.requestAnimationFrame(step);
+            } else {
+                this._activeScrollAnimations.delete(animationId);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
     private _internalScrollToX(element: HTMLElement, scrollTargetX: number, speed: number): void {
-        if (this._api.settings.player.nativeBrowserSmoothScroll) {
+        if (this._nativeBrowserSmoothScroll) {
             element.scrollTo({
                 left: scrollTargetX,
                 behavior: 'smooth'
             });
         } else {
-            const startX: number = element.scrollLeft;
-            const diff: number = scrollTargetX - startX;
-            let start: number = 0;
-            const step = (t: number) => {
-                if (start === 0) {
-                    start = t;
-                }
-                const time: number = t - start;
-                const percent: number = Math.min(time / speed, 1);
-                element.scrollLeft = (startX + diff * percent) | 0;
-                if (time < speed) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
+            this._internalScrollTo(element, element.scrollLeft, scrollTargetX, speed, scroll => {
+                element.scrollLeft = scroll;
+            });
         }
     }
 
