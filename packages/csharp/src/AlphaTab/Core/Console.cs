@@ -7,24 +7,24 @@ internal class Console
     public virtual void Debug(string format, object?[]? details)
     {
         var message = details != null ? string.Format(format, details) : format;
-        Trace.Write(message, "AlphaTab Debug");
+        Trace.WriteLine(message, "AlphaTab Debug");
     }
 
     public virtual void Warn(string format, object?[]? details)
     {
         var message = details != null ? string.Format(format, details) : format;
-        Trace.Write(message, "AlphaTab Warn");
+        Trace.WriteLine(message, "AlphaTab Warn");
     }
 
     public virtual void Info(string format, object?[]? details)
     {
         var message = details != null ? string.Format(format, details) : format;
-        Trace.Write(message, "AlphaTab Info");
+        Trace.WriteLine(message, "AlphaTab Info");
     }
 
     public virtual void Error(string format, object?[]? details)
     {
         var message = details != null ? string.Format(format, details) : format;
-        Trace.Write(message, "AlphaTab Error");
+        Trace.WriteLine(message, "AlphaTab Error");
     }
 }
