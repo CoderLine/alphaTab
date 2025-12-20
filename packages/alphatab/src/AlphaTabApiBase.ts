@@ -3846,6 +3846,7 @@ export class AlphaTabApiBase<TSettings> {
             const tickCache = this._tickCache;
             if (currentBeat && tickCache) {
                 this._player.tickPosition = tickCache.getBeatStart(currentBeat.beat);
+                this.scrollToCursor();
             }
         }
 
