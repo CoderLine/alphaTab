@@ -90,7 +90,7 @@ export abstract class BasicScrollHandler<TSettings> implements IScrollHandler {
 
     public onBeatCursorUpdating(
         startBeat: BeatBounds,
-        _endBeat: BeatBounds,
+        _endBeat: BeatBounds|undefined,
         _cursorMode: MidiTickLookupFindBeatResultCursorMode,
         _actualBeatCursorStartX: number,
         _actualBeatCursorEndX: number,
@@ -199,7 +199,7 @@ export class VerticalSmoothScrollHandler<TSettings> implements IScrollHandler {
 
     public onBeatCursorUpdating(
         startBeat: BeatBounds,
-        _endBeat: BeatBounds,
+        _endBeat: BeatBounds | undefined,
         _cursorMode: MidiTickLookupFindBeatResultCursorMode,
         _actualBeatCursorStartX: number,
         _actualBeatCursorEndX: number,
@@ -367,7 +367,7 @@ export class HorizontalSmoothScrollHandler<TSettings> implements IScrollHandler 
 
     public onBeatCursorUpdating(
         _startBeat: BeatBounds,
-        _endBeat: BeatBounds,
+        _endBeat: BeatBounds | undefined,
         _cursorMode: MidiTickLookupFindBeatResultCursorMode,
         actualBeatCursorStartX: number,
         actualBeatCursorEndX: number,
