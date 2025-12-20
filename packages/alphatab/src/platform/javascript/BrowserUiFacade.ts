@@ -893,6 +893,14 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         this._internalScrollToX((element as HtmlElementContainer).element, scrollTargetY, speed);
     }
 
+    public stopScrolling(scrollElement: IContainer): void {
+        // stop any current animation
+        const currentAnimation = this._scrollAnimationLookup.get((scrollElement as HtmlElementContainer).element);
+        if (currentAnimation !== undefined) {
+            this._activeScrollAnimations.delete(currentAnimation);
+        }
+    }
+
     private get _nativeBrowserSmoothScroll() {
         const settings = this._api.settings.player;
         return settings.nativeBrowserSmoothScroll && settings.scrollMode !== ScrollMode.Smooth;
@@ -929,7 +937,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
 
         if (scrollDuration === 0) {
-            console.log('scrollTo duration=0', currentAnimation);
             setValue(endScroll);
             return;
         }

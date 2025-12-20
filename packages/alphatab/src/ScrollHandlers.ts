@@ -181,6 +181,7 @@ export class VerticalSmoothScrollHandler<TSettings> implements IScrollHandler {
     }
 
     [Symbol.dispose]() {
+        this._api.uiFacade.setCanvasOverflow(this._api.canvasElement, 0, true);
         this._scrollContainerResizeUnregister();
     }
 
@@ -350,6 +351,7 @@ export class HorizontalSmoothScrollHandler<TSettings> implements IScrollHandler 
 
     [Symbol.dispose]() {
         this._scrollContainerResizeUnregister();
+        this._api.uiFacade.setCanvasOverflow(this._api.canvasElement, 0, false);
     }
 
     public forceScrollTo(currentBeatBounds: BeatBounds): void {
