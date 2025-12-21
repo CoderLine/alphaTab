@@ -188,6 +188,18 @@ export class RenderStaff {
         return lastBar;
     }
 
+    public alignRenderers() {
+        this._sharedLayoutData = new Map<string, unknown>();
+        const topOverflow: number = this.topOverflow;
+        let x = 0;
+        for (const renderer of this.barRenderers) {
+            renderer.x = x;
+            renderer.y = this.topPadding + topOverflow;
+            x += renderer.width;
+        }
+        return x;
+    }
+
     public scaleToWidth(width: number): void {
         this._sharedLayoutData = new Map<string, unknown>();
         const topOverflow: number = this.topOverflow;

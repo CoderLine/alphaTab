@@ -14,6 +14,7 @@ export class HorizontalScreenLayoutPartialInfo {
     public x: number = 0;
     public width: number = 0;
     public masterBars: MasterBar[] = [];
+    public results: MasterBarsRenderers[] = [];
 }
 
 /**
@@ -65,7 +66,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
         const countPerPartial: number = this.renderer.settings.display.barCountPerPartial;
         const partials: HorizontalScreenLayoutPartialInfo[] = [];
         let currentPartial: HorizontalScreenLayoutPartialInfo = new HorizontalScreenLayoutPartialInfo();
-        let renderX = 0;
         while (currentBarIndex <= endBarIndex) {
             const multiBarRestInfo = this.multiBarRestInfo;
             const additionalMultiBarsRestBarIndices: number[] | null =
@@ -79,53 +79,27 @@ export class HorizontalScreenLayout extends ScoreLayout {
                 additionalMultiBarsRestBarIndices
             );
 
-            // if we detect that the new renderer is linked to the previous
-            // renderer, we need to put it into the previous partial
-            if (currentPartial.masterBars.length === 0 && result.isLinkedToPrevious && partials.length > 0) {
-                const previousPartial: HorizontalScreenLayoutPartialInfo = partials[partials.length - 1];
-                previousPartial.masterBars.push(score.masterBars[currentBarIndex]);
-                previousPartial.width += result.width;
-                renderX += result.width;
-                currentPartial.x += renderX;
-            } else {
-                currentPartial.masterBars.push(score.masterBars[currentBarIndex]);
-                currentPartial.width += result.width;
-                // no targetPartial here because previous partials already handled this code
-                if (currentPartial.masterBars.length >= countPerPartial) {
-                    if (partials.length === 0) {
-                        // respect accolade and on first partial
-                        currentPartial.width += this._system.accoladeWidth + this.pagePadding![0];
-                    }
-                    renderX += currentPartial.width;
-                    partials.push(currentPartial);
-                    Logger.debug(
-                        this.name,
-                        `Finished partial from bar ${currentPartial.masterBars[0].index} to ${currentPartial.masterBars[currentPartial.masterBars.length - 1].index}`,
-                        null
-                    );
-                    currentPartial = new HorizontalScreenLayoutPartialInfo();
-                    currentPartial.x = renderX;
-                }
+            // complete partial if its full and we are not linked
+            if (currentPartial.masterBars.length >= countPerPartial && !result.isLinkedToPrevious) {
+                currentPartial = this._completePartial(partials, currentPartial);
             }
 
+            this._scaleBars(result);
+
+            currentPartial.results.push(result);
+            currentPartial.masterBars.push(score.masterBars[currentBarIndex]);
+            currentPartial.width += result.width;
             currentBarIndex++;
         }
+
         // don't miss the last partial if not empty
         if (currentPartial.masterBars.length > 0) {
-            if (partials.length === 0) {
-                currentPartial.width += this._system.accoladeWidth + this.pagePadding![0];
-            }
-            partials.push(currentPartial);
-            Logger.debug(
-                this.name,
-                `Finished partial from bar ${currentPartial.masterBars[0].index} to ${currentPartial.masterBars[currentPartial.masterBars.length - 1].index}`,
-                null
-            );
+            this._completePartial(partials, currentPartial);
         }
         this._finalizeStaffSystem();
 
         this.height = Math.floor(this._system.y + this._system.height);
-        this.width = (this._system.x + this._system.width + this.pagePadding![2]);
+        this.width = this._system.x + this._system.width + this.pagePadding![2];
         currentBarIndex = 0;
 
         let x = 0;
@@ -181,8 +155,47 @@ export class HorizontalScreenLayout extends ScoreLayout {
         this.height *= this.renderer.settings.display.scale;
     }
 
+    private _scaleBars(result: MasterBarsRenderers) {
+        result.width = 0;
+        this._system!.width -= result.width;
+        for (const r of result.renderers) {
+            const barDisplayWidth =
+                r.staff!.system.staves.length > 1 ? r.bar.masterBar.displayWidth : r.bar.displayWidth;
+            if (barDisplayWidth > 0) {
+                r.scaleToWidth(barDisplayWidth);
+            }
+            const w = r.x + r.width;
+            if (w > result.width) {
+                result.width = w;
+            }
+        }
+        this._system!.width += result.width;
+    }
+
+    private _completePartial(
+        partials: HorizontalScreenLayoutPartialInfo[],
+        currentPartial: HorizontalScreenLayoutPartialInfo
+    ) {
+        if (partials.length === 0) {
+            // respect accolade and on first partial
+            currentPartial.width += this._system!.accoladeWidth + this.pagePadding![0];
+        }
+
+        partials.push(currentPartial);
+        Logger.debug(
+            this.name,
+            `Finished partial from bar ${currentPartial.masterBars[0].index} to ${currentPartial.masterBars[currentPartial.masterBars.length - 1].index}`,
+            null
+        );
+
+        // start new partial
+        const newPartial = new HorizontalScreenLayoutPartialInfo();
+        newPartial.x = currentPartial.x + currentPartial.width;
+        return newPartial;
+    }
+
     private _finalizeStaffSystem() {
-        this._system!.scaleToWidth(this._system!.width);
+        this._system!.alignRenderers();
         this._system!.finalizeSystem();
     }
 }

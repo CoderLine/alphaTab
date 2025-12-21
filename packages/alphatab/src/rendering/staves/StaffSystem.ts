@@ -588,6 +588,16 @@ export class StaffSystem {
         this.width = width;
     }
 
+    public alignRenderers(): void {
+        this.width = 0;
+        for (const s of this.allStaves) {
+            const w = s.alignRenderers();
+            if (w > this.width) {
+                this.width = w;
+            }
+        }
+    }
+
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         // const c = canvas.color;
         // canvas.color = Color.random(255);
