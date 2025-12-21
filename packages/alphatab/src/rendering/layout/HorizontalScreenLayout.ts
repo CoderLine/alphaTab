@@ -1,11 +1,11 @@
+import { Logger } from '@coderline/alphatab/Logger';
 import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
-import { InternalSystemsLayoutMode, ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
+import { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import type { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
-import { Logger } from '@coderline/alphatab/Logger';
-import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
 
 /**
  * @internal
@@ -44,15 +44,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
     }
 
     protected doLayoutAndRender(): void {
-        switch (this.renderer.settings.display.systemsLayoutMode) {
-            case SystemsLayoutMode.Automatic:
-                this.systemsLayoutMode = InternalSystemsLayoutMode.Automatic;
-                break;
-            case SystemsLayoutMode.UseModelLayout:
-                this.systemsLayoutMode = InternalSystemsLayoutMode.FromModelWithWidths;
-                break;
-        }
-
         const score: Score = this.renderer.score!;
 
         let startIndex: number = this.renderer.settings.display.startBar;

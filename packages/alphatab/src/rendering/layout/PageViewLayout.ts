@@ -1,13 +1,13 @@
+import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
+import { Logger } from '@coderline/alphatab/Logger';
+import { ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import type { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
-import { InternalSystemsLayoutMode, ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
+import { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
-import { Logger } from '@coderline/alphatab/Logger';
-import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
-import { ScoreSubElement } from '@coderline/alphatab/model/Score';
 
 /**
  * This layout arranges the bars into a fixed width and dynamic height region.
@@ -23,15 +23,6 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     protected doLayoutAndRender(): void {
-        switch (this.renderer.settings.display.systemsLayoutMode) {
-            case SystemsLayoutMode.Automatic:
-                this.systemsLayoutMode = InternalSystemsLayoutMode.Automatic;
-                break;
-            case SystemsLayoutMode.UseModelLayout:
-                this.systemsLayoutMode = InternalSystemsLayoutMode.FromModelWithScale;
-                break;
-        }
-
         let y: number = this.pagePadding![1];
         this.width = this.renderer.width;
         this._allMasterBarRenderers = [];
@@ -207,7 +198,7 @@ export class PageViewLayout extends ScoreLayout {
         // if we have a fixed number of bars per row, we only need to refit them.
         const barsPerRowActive =
             this.renderer.settings.display.barsPerRow > 0 ||
-            this.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithScale;
+            this.renderer.settings.display.systemsLayoutMode === SystemsLayoutMode.UseModelLayout;
 
         if (barsPerRowActive) {
             for (let i: number = 0; i < this._systems.length; i++) {
@@ -241,10 +232,9 @@ export class PageViewLayout extends ScoreLayout {
                     // move to next bar
                     currentIndex++;
 
-                    if(this._needsLineBreak(currentIndex)){
+                    if (this._needsLineBreak(currentIndex)) {
                         system.isFull = true;
                     }
-
                 } else {
                     // if we cannot wrap on the current bar, we remove the last bar
                     // (this might even remove multiple ones until we reach a bar that can wrap);
@@ -341,8 +331,7 @@ export class PageViewLayout extends ScoreLayout {
 
     private _getBarsPerSystem(rowIndex: number) {
         let barsPerRow: number = this.renderer.settings.display.barsPerRow;
-
-        if (this.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithScale) {
+        if (this.renderer.settings.display.systemsLayoutMode === SystemsLayoutMode.UseModelLayout) {
             let defaultSystemsLayout: number;
             let systemsLayout: number[];
             if (this.renderer.tracks!.length > 1) {
