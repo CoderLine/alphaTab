@@ -212,6 +212,7 @@ export class PageViewLayout extends ScoreLayout {
         if (barsPerRowActive) {
             for (let i: number = 0; i < this._systems.length; i++) {
                 const system: StaffSystem = this._systems[i];
+                system.width = system.computedWidth;
                 this._fitSystem(system);
                 y += this._paintSystem(system, oldHeight);
             }
