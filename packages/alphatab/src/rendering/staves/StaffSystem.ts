@@ -179,11 +179,34 @@ export class StaffSystem {
     public isFull: boolean = false;
 
     /**
-     * The width that the content bars actually need
+     * The current width of the system to which the content is scaled.
+     * Includes accolade (tracknames, brackets etc) and the content.
+     * 
+     * Used to determine the final size needed for rendering. 
      */
     public width: number = 0;
+
+    /**
+     * The minimum/default width to which the system was sized
+     * when performing the layout. This is the size of the system if no
+     * fitting/resizing is performed.  
+     * 
+     * Includes accolade (tracknames, brackets etc) and the content.
+     * 
+     * Used to perform a resizing/refitting of the system.
+     */
     public computedWidth: number = 0;
-    public totalBarDisplayScale: number = 0;
+
+    /**
+     * The minimum/default width to which the staves in this system were sized
+     * when performing the layout. This is the size of the system if no
+     * fitting/resizing is performed.  
+     * 
+     * Includes only the stave size without any other paddings or sizes like the accolade.
+     * 
+     * Used to perform a resizing/refitting of the staves in the system.
+     */
+    public computedStaffWidth: number = 0;
 
     public isLast: boolean = false;
     public masterBarsRenderers: MasterBarsRenderers[] = [];
@@ -260,7 +283,7 @@ export class StaffSystem {
         this.firstVisibleStaff = firstVisibleStaff;
         this._calculateAccoladeSpacing(tracks);
 
-        this._updateWidthFromLastBar();
+        this._applyLayoutAndUpdateWidth();
         return renderers;
     }
 
@@ -332,7 +355,7 @@ export class StaffSystem {
 
         barLayoutingInfo.finish();
         // ensure same widths of new renderer
-        result.width = this._updateWidthFromLastBar();
+        result.width = this._applyLayoutAndUpdateWidth();
 
         return result;
     }
@@ -342,7 +365,6 @@ export class StaffSystem {
             const toRemove: MasterBarsRenderers = this.masterBarsRenderers[this.masterBarsRenderers.length - 1];
             this.masterBarsRenderers.splice(this.masterBarsRenderers.length - 1, 1);
             let width: number = 0;
-            let barDisplayScale: number = 0;
 
             let firstVisibleStaff: RenderStaff | undefined = undefined;
             for (const g of this.staves) {
@@ -354,10 +376,6 @@ export class StaffSystem {
                     const computedWidth = lastBar.computedWidth;
                     if (computedWidth > width) {
                         width = computedWidth;
-                    }
-                    const newBarDisplayScale = lastBar.barDisplayScale;
-                    if (newBarDisplayScale > barDisplayScale) {
-                        barDisplayScale = newBarDisplayScale;
                     }
                     lastBar.afterReverted();
 
@@ -379,32 +397,24 @@ export class StaffSystem {
 
             this.width -= width;
             this.computedWidth -= width;
-            this.totalBarDisplayScale -= barDisplayScale;
+            this.computedStaffWidth -= width;
             return toRemove;
         }
         return null;
     }
 
-    private _updateWidthFromLastBar(): number {
+    private _applyLayoutAndUpdateWidth(): number {
         let realWidth: number = 0;
-        let barDisplayScale: number = 0;
-        for (let i: number = 0, j: number = this.allStaves.length; i < j; i++) {
-            const s: RenderStaff = this.allStaves[i];
-
+        for (const s of this.allStaves) {
             const last = s.barRenderers[s.barRenderers.length - 1];
             last.applyLayoutingInfo();
             if (last.computedWidth > realWidth) {
                 realWidth = last.computedWidth;
             }
-
-            const newBarDisplayScale = last.barDisplayScale;
-            if (newBarDisplayScale > barDisplayScale) {
-                barDisplayScale = newBarDisplayScale;
-            }
         }
         this.width += realWidth;
         this.computedWidth += realWidth;
-        this.totalBarDisplayScale += barDisplayScale;
+        this.computedStaffWidth += realWidth;
 
         return realWidth;
     }
@@ -582,8 +592,8 @@ export class StaffSystem {
     }
 
     public scaleToWidth(width: number): void {
-        for (let i: number = 0, j: number = this.allStaves.length; i < j; i++) {
-            this.allStaves[i].scaleToWidth(width);
+        for (const s of this.allStaves) {
+            s.scaleToWidth(width - this.accoladeWidth);
         }
         this.width = width;
     }

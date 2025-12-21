@@ -944,4 +944,19 @@ export class ModelUtils {
         }
         return a > b ? a : b;
     }
+
+    public static getSystemLayout(score: Score, systemIndex: number, displayedTracks: Track[]) {
+        let defaultSystemsLayout: number;
+        let systemsLayout: number[];
+        if (displayedTracks.length === 1) {
+            defaultSystemsLayout = displayedTracks[0].defaultSystemsLayout;
+            systemsLayout = displayedTracks[0].systemsLayout;
+        } else {
+            // multi track applies
+            defaultSystemsLayout = score.defaultSystemsLayout;
+            systemsLayout = score.systemsLayout;
+        }
+
+        return systemIndex < systemsLayout.length ? systemsLayout[systemIndex] : defaultSystemsLayout;
+    }
 }

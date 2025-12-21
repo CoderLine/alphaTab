@@ -603,6 +603,9 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
                 case 'horizontal':
                     settings.display.layoutMode = alphaTab.LayoutMode.Horizontal;
                     break;
+                case 'parchment':
+                    settings.display.layoutMode = alphaTab.LayoutMode.Parchment;
+                    break;
             }
 
             at.updateSettings();

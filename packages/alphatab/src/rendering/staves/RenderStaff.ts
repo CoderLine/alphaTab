@@ -206,12 +206,12 @@ export class RenderStaff {
         let x = 0;
 
         // scale the bars by keeping their respective ratio size
-        const scaleRatio = width / this.system.computedWidth;
+        const scale = width / this.system.computedStaffWidth;
         for (const renderer of this.barRenderers) {
             renderer.x = x;
             renderer.y = this.topPadding + topOverflow;
 
-            const actualBarWidth = renderer.computedWidth * scaleRatio;
+            const actualBarWidth = renderer.computedWidth * scale;
             renderer.scaleToWidth(actualBarWidth);
             x += renderer.width;
         }

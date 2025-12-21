@@ -245,14 +245,6 @@ export class BarRendererBase {
         return this.scoreRenderer.settings;
     }
 
-    /**
-     * Gets the scale with which the bar should be displayed in case the model
-     * scale should be respected.
-     */
-    public get barDisplayScale(): number {
-        return this.staff!.system.staves.length > 1 ? this.bar.masterBar.displayScale : this.bar.displayScale;
-    }
-
     protected wasFirstOfStaff: boolean = false;
 
     public get isFirstOfStaff(): boolean {
