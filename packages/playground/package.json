@@ -13,7 +13,7 @@
         "@types/serve-static": "^2.2.0",
         "bootstrap": "^5.3.8",
         "handlebars": "^4.7.8",
-        "monaco-editor": "^0.54.0",
+        "monaco-editor": "^0.55.1",
         "serve-static": "^2.2.1"
     },
     "scripts": {
