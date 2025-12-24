@@ -314,6 +314,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
      * Realignes the bars in this line according to the available space
      */
     private _fitSystem(system: StaffSystem): void {
+        // TODO lift scaleToWidth of system and staves to this level and apply bar scale factors
         if (system.isFull || system.width > this._maxWidth || this.renderer.settings.display.justifyLastSystem) {
             system.scaleToWidth(this._maxWidth);
         } else {

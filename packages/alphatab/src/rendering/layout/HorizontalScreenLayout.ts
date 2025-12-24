@@ -195,6 +195,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
     }
 
     private _finalizeStaffSystem() {
+        // TODO: lift alignrenderers to this level
         this._system!.alignRenderers();
         this._system!.finalizeSystem();
     }
