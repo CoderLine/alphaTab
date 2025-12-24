@@ -1806,7 +1806,7 @@ export class GpifWriter {
             const elements = instrumentSet.addElement('Elements');
             const element = elements.addElement('Element');
 
-            element.addElement('Pitched').innerText = 'Pitched';
+            element.addElement('Name').innerText = 'Pitched';
             element.addElement('Type').innerText = 'pitched';
             element.addElement('SoundbankName').innerText = '';
 
