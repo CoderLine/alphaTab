@@ -159,7 +159,7 @@ namespace AlphaTab.Wpf
                     ImageSource? source = null;
                     if (body is string)
                     {
-                        // TODO: svg support
+                        // NOTE: no svg support
                         return;
                     }
 

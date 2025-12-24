@@ -370,7 +370,6 @@ export class BeamingHelper {
     }
 
     public static isFullBarJoin(a: Beat, b: Beat, barIndex: number): boolean {
-        // TODO: this getindex call seems expensive since we call this method very often.
         return ModelUtils.getIndex(a.duration) - 2 - barIndex > 0 && ModelUtils.getIndex(b.duration) - 2 - barIndex > 0;
     }
 

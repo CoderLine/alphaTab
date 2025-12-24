@@ -148,7 +148,7 @@ namespace AlphaTab.WinForms
                 switch (body)
                 {
                     case string _:
-                        // TODO: svg support
+                        // NOTE: no svg support
                         return;
                     case AlphaSkiaImage skiaImage:
                         using (skiaImage)

@@ -2,7 +2,7 @@ import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
 import { Bar } from '@coderline/alphatab/model/Bar';
 import { Beat } from '@coderline/alphatab/model/Beat';
-import type { Duration } from '@coderline/alphatab/model/Duration';
+import { Duration } from '@coderline/alphatab/model/Duration';
 import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
@@ -43,13 +43,18 @@ export class TuningParseResultTone {
  * @internal
  */
 export class ModelUtils {
+    private static readonly _durationIndices = ModelUtils._buildDurationIndices();
+
+    private static _buildDurationIndices() {
+        return new Map<Duration, number>(
+            Object.values(Duration)
+                .filter<any>((k: any) => typeof k === 'number')
+                .map(d => [d as number as Duration, (d as number) < 0 ? 0 : Math.log2(d as number) | 0])
+        );
+    }
+
     public static getIndex(duration: Duration): number {
-        const index: number = 0;
-        const value: number = duration;
-        if (value < 0) {
-            return index;
-        }
-        return Math.log2(duration) | 0;
+        return ModelUtils._durationIndices.get(duration)!;
     }
 
     public static keySignatureIsFlat(ks: number): boolean {

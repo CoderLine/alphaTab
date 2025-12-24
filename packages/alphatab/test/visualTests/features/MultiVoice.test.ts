@@ -6,8 +6,6 @@ import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 
 describe('MultiVoiceTests', () => {
     describe('displace', async () => {
-        // TODO: beamed notes test
-
         async function test(tex: string) {
             const settings = new Settings();
             settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
