@@ -170,7 +170,7 @@ export class RenderStaff {
     }
 
     public revertLastBar(): BarRendererBase {
-        this._sharedLayoutData = new Map<string, unknown>();
+        this.resetSharedLayoutData();
 
         const lastBar: BarRendererBase = this.barRenderers[this.barRenderers.length - 1];
         this.barRenderers.splice(this.barRenderers.length - 1, 1);
@@ -188,33 +188,8 @@ export class RenderStaff {
         return lastBar;
     }
 
-    public alignRenderers() {
-        this._sharedLayoutData = new Map<string, unknown>();
-        const topOverflow: number = this.topOverflow;
-        let x = 0;
-        for (const renderer of this.barRenderers) {
-            renderer.x = x;
-            renderer.y = this.topPadding + topOverflow;
-            x += renderer.width;
-        }
-        return x;
-    }
-
-    public scaleToWidth(width: number): void {
-        this._sharedLayoutData = new Map<string, unknown>();
-        const topOverflow: number = this.topOverflow;
-        let x = 0;
-
-        // scale the bars by keeping their respective ratio size
-        const scale = width / this.system.computedStaffWidth;
-        for (const renderer of this.barRenderers) {
-            renderer.x = x;
-            renderer.y = this.topPadding + topOverflow;
-
-            const actualBarWidth = renderer.computedWidth * scale;
-            renderer.scaleToWidth(actualBarWidth);
-            x += renderer.width;
-        }
+    public resetSharedLayoutData() {
+        this._sharedLayoutData.clear();
     }
 
     public topOverflow = 0;

@@ -195,8 +195,25 @@ export class HorizontalScreenLayout extends ScoreLayout {
     }
 
     private _finalizeStaffSystem() {
-        // TODO: lift alignrenderers to this level
-        this._system!.alignRenderers();
+        this._alignRenderers();
         this._system!.finalizeSystem();
+    }
+
+    private _alignRenderers(): void {
+        this.width = 0;
+        for (const s of this._system!.allStaves) {
+            s.resetSharedLayoutData();
+
+            let w = 0;
+            for (const renderer of s.barRenderers) {
+                renderer.x = w;
+                renderer.y = s.topPadding + s.topOverflow;
+                w += renderer.width;
+            }
+
+            if (w > this.width) {
+                this.width = w;
+            }
+        }
     }
 }

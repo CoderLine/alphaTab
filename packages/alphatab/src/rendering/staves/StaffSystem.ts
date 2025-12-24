@@ -591,23 +591,6 @@ export class StaffSystem {
         return Math.ceil(this._contentHeight + this.topPadding + this.bottomPadding);
     }
 
-    public scaleToWidth(width: number): void {
-        for (const s of this.allStaves) {
-            s.scaleToWidth(width - this.accoladeWidth);
-        }
-        this.width = width;
-    }
-
-    public alignRenderers(): void {
-        this.width = 0;
-        for (const s of this.allStaves) {
-            const w = s.alignRenderers();
-            if (w > this.width) {
-                this.width = w;
-            }
-        }
-    }
-
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         // const c = canvas.color;
         // canvas.color = Color.random(255);

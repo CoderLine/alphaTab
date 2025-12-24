@@ -314,13 +314,33 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
      * Realignes the bars in this line according to the available space
      */
     private _fitSystem(system: StaffSystem): void {
-        // TODO lift scaleToWidth of system and staves to this level and apply bar scale factors
         if (system.isFull || system.width > this._maxWidth || this.renderer.settings.display.justifyLastSystem) {
-            system.scaleToWidth(this._maxWidth);
+            this._scaleToWidth(system, this._maxWidth);
         } else {
-            system.scaleToWidth(system.width);
+            this._scaleToWidth(system, system.width);
         }
         system.finalizeSystem();
+    }
+
+    private _scaleToWidth(system: StaffSystem, width: number): void {
+        const staffWidth = width - system.accoladeWidth;
+        const scale = staffWidth / system.computedStaffWidth;
+
+        for (const s of system.allStaves) {
+            s.resetSharedLayoutData();
+
+            // scale the bars by keeping their respective ratio size
+            let w = 0;
+            for (const renderer of s.barRenderers) {
+                renderer.x = w;
+                renderer.y = s.topPadding + s.topOverflow;
+
+                const actualBarWidth = renderer.computedWidth * scale;
+                renderer.scaleToWidth(actualBarWidth);
+                w += renderer.width;
+            }
+        }
+        system.width = width;
     }
 
     protected abstract getBarsPerSystem(systemIndex: number): number;
