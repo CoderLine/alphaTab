@@ -14,4 +14,8 @@ export class ParchmentLayout extends VerticalLayoutBase {
     protected override getBarsPerSystem(systemIndex: number) {
         return ModelUtils.getSystemLayout(this.renderer.score!, systemIndex, this.renderer.tracks!);
     }
+
+    protected override get shouldApplyBarScale(): boolean {
+        return true;
+    }
 }

@@ -322,9 +322,14 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         system.finalizeSystem();
     }
 
+    protected abstract get shouldApplyBarScale(): boolean;
+
     private _scaleToWidth(system: StaffSystem, width: number): void {
         const staffWidth = width - system.accoladeWidth;
         const scale = staffWidth / system.computedStaffWidth;
+        const shouldApplyBarScale = this.shouldApplyBarScale;
+
+        const totalScale = system.totalBarDisplayScale;
 
         for (const s of system.allStaves) {
             s.resetSharedLayoutData();
@@ -335,7 +340,14 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
                 renderer.x = w;
                 renderer.y = s.topPadding + s.topOverflow;
 
-                const actualBarWidth = renderer.computedWidth * scale;
+                let actualBarWidth: number;
+                if (shouldApplyBarScale) {
+                    const barDisplayScale = system.getBarDisplayScale(renderer);
+                    actualBarWidth = (barDisplayScale * staffWidth) / totalScale;
+                } else {
+                    actualBarWidth = renderer.computedWidth * scale;
+                }
+
                 renderer.scaleToWidth(actualBarWidth);
                 w += renderer.width;
             }

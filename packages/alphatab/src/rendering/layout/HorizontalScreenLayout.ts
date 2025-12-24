@@ -201,7 +201,8 @@ export class HorizontalScreenLayout extends ScoreLayout {
 
     private _alignRenderers(): void {
         this.width = 0;
-        for (const s of this._system!.allStaves) {
+        const system = this._system!;
+        for (const s of system.allStaves) {
             s.resetSharedLayoutData();
 
             let w = 0;
@@ -212,8 +213,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
             }
 
             if (w > this.width) {
-                this.width = w;
+                system.width = w;
             }
         }
+        system.width += system.accoladeWidth;
     }
 }

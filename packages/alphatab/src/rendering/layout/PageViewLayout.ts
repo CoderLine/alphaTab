@@ -20,4 +20,8 @@ export class PageViewLayout extends VerticalLayoutBase {
 
         return barsPerRow;
     }
+
+    protected override get shouldApplyBarScale(): boolean {
+        return this.renderer.settings.display.systemsLayoutMode === SystemsLayoutMode.UseModelLayout;
+    }
 }
