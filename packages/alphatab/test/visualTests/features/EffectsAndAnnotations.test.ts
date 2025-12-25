@@ -1,10 +1,10 @@
-import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { BeatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@coderline/alphatab/Settings';
+import { expect } from 'chai';
 import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
-import { expect } from 'chai';
 
 describe('EffectsAndAnnotationsTests', () => {
     it('markers', async () => {
@@ -250,7 +250,7 @@ describe('EffectsAndAnnotationsTests', () => {
 
     it('rasgueado', async () => {
         const settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('effects-and-annotations/rasgueado.gp', settings);
     });
 

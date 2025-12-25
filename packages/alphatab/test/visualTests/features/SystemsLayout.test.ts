@@ -21,7 +21,7 @@ describe('SystemsLayoutTests', () => {
 
     it('bars-adjusted-model', async () => {
         const settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
 
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file(
@@ -34,7 +34,7 @@ describe('SystemsLayoutTests', () => {
 
     it('multi-track-single-track', async () => {
         const settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
 
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file(
@@ -47,7 +47,7 @@ describe('SystemsLayoutTests', () => {
 
     it('multi-track-two-tracks', async () => {
         const settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
 
         const options = await VisualTestOptions.file(
             'systems-layout/multi-track-different.gp',
@@ -60,7 +60,7 @@ describe('SystemsLayoutTests', () => {
 
     it('resized', async () => {
         const settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
 
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file(
@@ -74,7 +74,6 @@ describe('SystemsLayoutTests', () => {
     it('horizontal-fixed-sizes-single-track', async () => {
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
 
         const score = ScoreLoader.loadScoreFromBytes(
             await TestPlatform.loadFile('test-data/visual-tests/systems-layout/multi-track-different.gp')
@@ -101,7 +100,6 @@ describe('SystemsLayoutTests', () => {
     it('horizontal-fixed-sizes-two-tracks', async () => {
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
         const score = ScoreLoader.loadScoreFromBytes(
             await TestPlatform.loadFile('test-data/visual-tests/systems-layout/multi-track-different.gp')
         );
