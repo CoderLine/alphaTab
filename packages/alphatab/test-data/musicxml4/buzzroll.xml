@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<score-partwise version="4.0">
+  <work>
+    <work-title>Title</work-title>
+  </work>
+  <movement-number></movement-number>
+  <movement-title></movement-title>
+  <identification>
+    <creator type="lyricist">Words</creator>
+    <creator type="arranger">Music</creator>
+    <creator>Artist</creator>
+    <rights>Copyright</rights>
+    <encoding>
+      <encoder>Tab</encoder>
+      <encoding-description>Notices</encoding-description>
+    </encoding>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>Track 1</part-name>
+      <part-abbreviation>T1</part-abbreviation>
+      <midi-device port="1" />
+      <score-instrument id="I1">
+        <instrument-name>I1</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I1">
+        <midi-channel>1</midi-channel>
+        <midi-program>1</midi-program>
+        <midi-bank>1</midi-bank>
+        <volume>0.5</volume>
+        <pan>0.25</pan>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+					<beats>4</beats>
+					<beat-type>4</beat-type>
+				</time>
+				<clef>
+					<sign>G</sign>
+					<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<pitch>
+					<step>C</step>
+					<octave>4</octave>
+				</pitch>
+				<duration>960</duration>
+				<voice>1</voice>
+				<type>quarter</type>
+				<notations>
+					<ornaments>
+						<tremolo type='unmeasured'>0</tremolo>
+					</ornaments>
+				</notations>
+			</note>
+			<note>
+				<pitch>
+					<step>C</step>
+					<octave>4</octave>
+				</pitch>
+				<duration>960</duration>
+				<voice>1</voice>
+				<type>quarter</type>
+				<notations>
+					<ornaments>
+						<tremolo type='unmeasured'>1</tremolo>
+					</ornaments>
+				</notations>
+			</note>
+			<note>
+				<pitch>
+					<step>C</step>
+					<octave>4</octave>
+				</pitch>
+				<duration>960</duration>
+				<voice>1</voice>
+				<type>quarter</type>
+				<notations>
+					<ornaments>
+						<tremolo smufl="buzzRoll">0</tremolo>
+					</ornaments>
+				</notations>
+			</note>
+			<note>
+				<pitch>
+					<step>C</step>
+					<octave>4</octave>
+				</pitch>
+				<duration>960</duration>
+				<voice>1</voice>
+				<type>quarter</type>
+				<notations>
+					<ornaments>
+						<tremolo smufl="buzzRoll">1</tremolo>
+					</ornaments>
+				</notations>
+			</note>
+    </measure>
+  </part>
+</score-partwise>

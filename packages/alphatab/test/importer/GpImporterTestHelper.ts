@@ -279,13 +279,13 @@ export class GpImporterTestHelper {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillSpeed).to.equal(Duration.Sixteenth);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].isTremolo).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].tremoloSpeed).to.equal(Duration.ThirtySecond);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].tremoloPicking!.marks).to.equal(3);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].isTremolo).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tremoloSpeed).to.equal(Duration.Sixteenth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tremoloPicking!.marks).to.equal(2);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].isTremolo).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].tremoloSpeed).to.equal(Duration.Eighth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].tremoloPicking!.marks).to.equal(1);
     }
 
     public static checkOtherEffects(score: Score, skipInstrumentCheck: boolean = false): void {
