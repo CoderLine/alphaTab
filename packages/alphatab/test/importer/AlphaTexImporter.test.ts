@@ -52,6 +52,7 @@ import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 import { assert, expect } from 'chai';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { TremoloPickingEffectSerializer } from '@coderline/alphatab/generated/model/TremoloPickingEffectSerializer';
 
 describe('AlphaTexImporterTest', () => {
     /**
@@ -236,7 +237,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(3);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isTremolo).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].tremoloSpeed).to.equal(Duration.Sixteenth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].tremoloPicking!.marks).to.equal(2);
     });
 
     it('brushes-arpeggio', () => {
@@ -2580,5 +2581,41 @@ describe('AlphaTexImporterTest', () => {
             C4
         `);
         expect(score.stylesheet.showSingleStaffBrackets).to.be.true;
+    });
+
+    describe('tremolos', () => {
+        function test(tex: string) {
+            const score = parseTex(tex);
+            const beat = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+            const serialized = TremoloPickingEffectSerializer.toJson(beat.tremoloPicking!);
+            expect(serialized).toMatchSnapshot();
+            testExportRoundtrip(score);
+        }
+
+        // simple
+        it('tremolo1', () => test(`C4 {tp 1}`));
+        it('tremolo2', () => test(`C4 {tp 2}`));
+        it('tremolo3', () => test(`C4 {tp 3}`));
+        it('tremolo4', () => test(`C4 {tp 4}`));
+        it('tremolo5', () => test(`C4 {tp 5}`));
+
+        // backwards compatibility
+        it('tremolo8', () => test(`C4 {tp 8}`));
+        it('tremolo16', () => test(`C4 {tp 16}`));
+        it('tremolo32', () => test(`C4 {tp 32}`));
+
+        // with default style
+        it('tremolo-default1', () => test(`C4 {tp (1 default)}`));
+        it('tremolo-default2', () => test(`C4 {tp (2 default)}`));
+        it('tremolo-default3', () => test(`C4 {tp (3 default)}`));
+        it('tremolo-default4', () => test(`C4 {tp (4 default)}`));
+        it('tremolo-default5', () => test(`C4 {tp (5 default)}`));
+
+        // buzzroll
+        it('buzzroll-default1', () => test(`C4 {tp (1 buzzRoll)}`));
+        it('buzzroll-default2', () => test(`C4 {tp (2 buzzRoll)}`));
+        it('buzzroll-default3', () => test(`C4 {tp (3 buzzRoll)}`));
+        it('buzzroll-default4', () => test(`C4 {tp (4 buzzRoll)}`));
+        it('buzzroll-default5', () => test(`C4 {tp (5 buzzRoll)}`));
     });
 });

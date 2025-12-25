@@ -3585,8 +3585,8 @@ export class MusicXmlImporter extends ScoreImporter {
                     tremolo.marks = Number.parseInt(c.innerText, 10);
 
                     if (
-                        (element.getAttribute('type', '') === 'unmeasured' && tremolo.marks === 0) ||
-                        element.getAttribute('smufl', '') === 'buzzRoll'
+                        (c.getAttribute('type', '') === 'unmeasured' && tremolo.marks === 0) ||
+                        c.getAttribute('smufl', '') === 'buzzRoll'
                     ) {
                         tremolo.style = TremoloPickingStyle.BuzzRoll;
                     }

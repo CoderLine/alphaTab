@@ -268,4 +268,9 @@ describe('MusicXmlImporterTests', () => {
         expect(score.tracks[1].playbackInfo.program).to.equal(1);
         expect(score.tracks[1].playbackInfo.bank).to.equal(77);
     });
+
+    it('buzzroll', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/buzzroll.xml');
+        expect(score).toMatchSnapshot();
+    });
 });
