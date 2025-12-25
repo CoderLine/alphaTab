@@ -55,6 +55,7 @@ import { Direction } from '@coderline/alphatab/model/Direction';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
 
 /**
  * This structure represents a duration within a gpif
@@ -1693,15 +1694,17 @@ export class GpifParser {
                     }
                     break;
                 case 'Tremolo':
+                    const tremolo = new TremoloPickingEffect();
+                    beat.tremoloPicking = tremolo;
                     switch (c.innerText) {
                         case '1/2':
-                            beat.tremoloSpeed = Duration.Eighth;
+                            tremolo.marks = 1;
                             break;
                         case '1/4':
-                            beat.tremoloSpeed = Duration.Sixteenth;
+                            tremolo.marks = 2;
                             break;
                         case '1/8':
-                            beat.tremoloSpeed = Duration.ThirtySecond;
+                            tremolo.marks = 3;
                             break;
                     }
                     break;

@@ -792,16 +792,17 @@ export class GpifWriter {
             beatNode.addElement('Fadding').innerText = FadeType[beat.fade];
         }
         if (beat.isTremolo) {
-            switch (beat.tremoloSpeed) {
-                case Duration.Eighth:
+            switch (beat.tremoloPicking!.marks) {
+                case 1:
                     beatNode.addElement('Tremolo').innerText = '1/2';
                     break;
-                case Duration.Sixteenth:
+                case 2:
                     beatNode.addElement('Tremolo').innerText = '1/4';
                     break;
-                case Duration.ThirtySecond:
+                case 3:
                     beatNode.addElement('Tremolo').innerText = '1/8';
                     break;
+                // NOTE: guitar pro does not support other tremolos
             }
         }
         if (beat.hasChord) {
