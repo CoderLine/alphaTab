@@ -122,8 +122,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             //
             // Tremolo Picking
             if (this.container.beat.isTremolo && !beatEffects.has('tremolo')) {
-                const speed = this.container.beat.tremoloSpeed!;
-                const glyph = new TremoloPickingGlyph(0, 0, speed);
+                const glyph = new TremoloPickingGlyph(0, 0, this.container.beat.tremoloPicking!);
                 glyph.offsetY = this.renderer.smuflMetrics.glyphTop.get(glyph.symbol)!;
                 beatEffects.set('tremolo', glyph);
                 centeredEffectGlyphs.push(glyph);

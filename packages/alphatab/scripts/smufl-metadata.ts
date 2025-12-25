@@ -12,8 +12,8 @@ const metadata: SmuflMetadata = JSON.parse(await fs.promises.readFile(input, 'ut
 
 const outputMetadata:SmuflMetadata = {
     engravingDefaults: metadata.engravingDefaults,
-    glyphBBoxes: {},
-    glyphsWithAnchors: {}
+    glyphBBoxes: {} as SmuflMetadata['glyphBBoxes'],
+    glyphsWithAnchors: {} as SmuflMetadata['glyphsWithAnchors']
 };
 
 const alphaTabUsedGlyphs = new Set<string>();

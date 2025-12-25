@@ -928,6 +928,10 @@ export class EngravingSettings {
                     bBoxNE: [1.876, 1.18],
                     bBoxSW: [0, 0]
                 },
+                buzzRoll: {
+                    bBoxNE: [0.624, 0.464],
+                    bBoxSW: [-0.62, -0.464]
+                },
                 cClef: {
                     bBoxNE: [2.796, 2.024],
                     bBoxSW: [0, -2.024]
@@ -1883,6 +1887,14 @@ export class EngravingSettings {
                 tremolo3: {
                     bBoxNE: [0.6, 1.112],
                     bBoxSW: [-0.6, -1.12]
+                },
+                tremolo4: {
+                    bBoxNE: [0.6, 1.496],
+                    bBoxSW: [-0.6, -1.48]
+                },
+                tremolo5: {
+                    bBoxNE: [0.6, 1.88],
+                    bBoxSW: [-0.604, -1.84]
                 },
                 tuplet0: {
                     bBoxNE: [1.2731041262817027, 1.5],
