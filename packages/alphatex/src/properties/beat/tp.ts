@@ -33,7 +33,14 @@ export const tp: PropertyDefinition = {
             ]
         }
     ],
-    examples: `
-        3.3{tp 8} 3.3{tp 16} 3.3{tp 32}
+    examples: [
         `
+        3.3{tp 1} 3.3{tp 2} 3.3{tp 3} 
+        `,
+        `
+        \\title "Buzz Rolls"
+        3.3{tp (0 buzzRoll)} // no audio 
+        3.3{tp (1 buzzRoll)} // 8th notes tremolo shown as buzzroll
+        `
+    ]
 };
