@@ -94,6 +94,7 @@
         "${configDir}/*.ts",
         "${configDir}/src",
         "${configDir}/test",
+        "${configDir}/scripts",
     ],
     "exclude": [
         // monorepo root

@@ -2,7 +2,6 @@ import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
@@ -110,32 +109,34 @@ export class TabBarRenderer extends LineBarRenderer {
         }
     }
 
-    protected override adjustSizes(): void {
-        if (this.rhythmMode !== TabRhythmMode.Hidden) {
-            let shortestTremolo = Duration.Whole;
-            for (const b of this.helpers.beamHelpers) {
-                for (const h of b) {
-                    if (h.tremoloDuration && (!shortestTremolo || shortestTremolo < h.tremoloDuration!)) {
-                        shortestTremolo = h.tremoloDuration!;
-                    }
-                }
-            }
+    // protected override adjustSizes(): void {
+    //     if (this.rhythmMode !== TabRhythmMode.Hidden) {
+    //         let maxTremoloMarks = Number.NaN;
+    //         for (const b of this.helpers.beamHelpers) {
+    //             for (const h of b) {
 
-            switch (shortestTremolo) {
-                case Duration.Eighth:
-                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo1)!;
-                    break;
-                case Duration.Sixteenth:
-                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo2)!;
-                    break;
-                case Duration.ThirtySecond:
-                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo3)!;
-                    break;
-            }
+    //                 if (!Number.isNaN(h.maxTremoloMarks)
+    //                      && (Number.isNaN(maxTremoloMarks) || maxTremoloMarks > h.maxTremoloMarks!)) {
+    //                     maxTremoloMarks = h.maxTremoloMarks!;
+    //                 }
+    //             }
+    //         }
 
-            this.registerOverflowBottom(this.settings.notation.rhythmHeight);
-        }
-    }
+    //         switch (maxTremoloMarks) {
+    //             case Duration.Eighth:
+    //                 this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo1)!;
+    //                 break;
+    //             case Duration.Sixteenth:
+    //                 this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo2)!;
+    //                 break;
+    //             case Duration.ThirtySecond:
+    //                 this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo3)!;
+    //                 break;
+    //         }
+
+    //         this.registerOverflowBottom(this.settings.notation.rhythmHeight);
+    //     }
+    // }
 
     public override doLayout(): void {
         const hasStandardNotation =
@@ -266,6 +267,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
+        // TODO: respect tremolo height
         return this.getFlagAndBarPos();
     }
 

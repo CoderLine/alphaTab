@@ -247,13 +247,12 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             }
 
             let tremoloX: number = this.stemX;
-            const speed: Duration = this.beat.tremoloSpeed!;
 
             if (this.beat.duration < Duration.Half) {
                 tremoloX = this.width / 2;
             }
 
-            this._tremoloPicking = new TremoloPickingGlyph(tremoloX, tremoloY, speed);
+            this._tremoloPicking = new TremoloPickingGlyph(tremoloX, tremoloY, this.beat.tremoloPicking!);
             this._tremoloPicking.renderer = this.renderer;
             this._tremoloPicking.doLayout();
         }
