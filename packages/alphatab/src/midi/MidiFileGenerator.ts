@@ -137,7 +137,6 @@ export class MidiFileGenerator {
         this._calculatedBeatTimers.clear();
         this._currentTime = 0;
 
-
         // initialize tracks
         for (const track of this._score.tracks) {
             this._generateTrack(track);
@@ -145,7 +144,6 @@ export class MidiFileGenerator {
 
         // tickshift is added after initial track channel details
         this._detectTickShift();
-
 
         Logger.debug('Midi', 'Begin midi generation');
 
@@ -1992,9 +1990,16 @@ export class MidiFileGenerator {
         channel: number
     ): void {
         const track: Track = note.beat.voice.bar.staff.track;
-        let tpLength: number = MidiUtils.toTicks(note.beat.tremoloSpeed!);
+        const marks = note.beat.tremoloPicking!.marks;
+        if (marks === 0) {
+            return;
+        }
+        
+        // the marks represent the duration
+        let tpLength = MidiUtils.toTicks(note.beat.tremoloPicking!.duration);
         let tick: number = noteStart;
         const end: number = noteStart + noteDuration.untilTieOrSlideEnd;
+
         while (tick + 10 < end) {
             // only the rest on last trill play
             if (tick + tpLength >= end) {
