@@ -354,6 +354,7 @@ export interface DisplaySettingsJson {
      *
      * * Comparing files against each other (top/bottom comparison)
      * * Aligning the playback of multiple files on one screen assuming the same tempo (e.g. one file per track).
+     * @deprecated Use the {@link LayoutMode.Parchment} to display a music sheet respecting the systems layout.
      */
     systemsLayoutMode?: SystemsLayoutMode | keyof typeof SystemsLayoutMode | Lowercase<keyof typeof SystemsLayoutMode>;
 }

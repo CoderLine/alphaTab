@@ -8,6 +8,7 @@ import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { NoteSerializer } from "@coderline/alphatab/generated/model/NoteSerializer";
 import { AutomationSerializer } from "@coderline/alphatab/generated/model/AutomationSerializer";
 import { BendPointSerializer } from "@coderline/alphatab/generated/model/BendPointSerializer";
+import { TremoloPickingEffectSerializer } from "@coderline/alphatab/generated/model/TremoloPickingEffectSerializer";
 import { BeatStyleSerializer } from "@coderline/alphatab/generated/model/BeatStyleSerializer";
 import { Note } from "@coderline/alphatab/model/Note";
 import { BendStyle } from "@coderline/alphatab/model/BendStyle";
@@ -21,6 +22,7 @@ import { BendPoint } from "@coderline/alphatab/model/BendPoint";
 import { VibratoType } from "@coderline/alphatab/model/VibratoType";
 import { GraceType } from "@coderline/alphatab/model/GraceType";
 import { PickStroke } from "@coderline/alphatab/model/PickStroke";
+import { TremoloPickingEffect } from "@coderline/alphatab/model/TremoloPickingEffect";
 import { CrescendoType } from "@coderline/alphatab/model/CrescendoType";
 import { GolpeType } from "@coderline/alphatab/model/GolpeType";
 import { DynamicValue } from "@coderline/alphatab/model/DynamicValue";
@@ -75,7 +77,9 @@ export class BeatSerializer {
         o.set("chordid", obj.chordId);
         o.set("gracetype", obj.graceType as number);
         o.set("pickstroke", obj.pickStroke as number);
-        o.set("tremolospeed", obj.tremoloSpeed as number | null);
+        if (obj.tremoloPicking) {
+            o.set("tremolopicking", TremoloPickingEffectSerializer.toJson(obj.tremoloPicking));
+        }
         o.set("crescendo", obj.crescendo as number);
         o.set("displaystart", obj.displayStart);
         o.set("playbackstart", obj.playbackStart);
@@ -201,8 +205,14 @@ export class BeatSerializer {
             case "pickstroke":
                 obj.pickStroke = JsonHelper.parseEnum<PickStroke>(v, PickStroke)!;
                 return true;
-            case "tremolospeed":
-                obj.tremoloSpeed = JsonHelper.parseEnum<Duration>(v, Duration) ?? null;
+            case "tremolopicking":
+                if (v) {
+                    obj.tremoloPicking = new TremoloPickingEffect();
+                    TremoloPickingEffectSerializer.fromJson(obj.tremoloPicking, v);
+                }
+                else {
+                    obj.tremoloPicking = undefined;
+                }
                 return true;
             case "crescendo":
                 obj.crescendo = JsonHelper.parseEnum<CrescendoType>(v, CrescendoType)!;
