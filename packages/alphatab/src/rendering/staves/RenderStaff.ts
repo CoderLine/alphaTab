@@ -7,7 +7,6 @@ import {
     type EffectBandInfo,
     EffectBandMode
 } from '@coderline/alphatab/rendering/BarRendererFactory';
-import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
@@ -162,16 +161,6 @@ export class RenderStaff {
         renderer.layoutingInfo = layoutingInfo;
         renderer.doLayout();
 
-        // For cases like in the horizontal layout we need to set the fixed width early
-        // to have correct partials splitting
-        const barDisplayWidth = renderer.barDisplayWidth;
-        if (
-            barDisplayWidth > 0 &&
-            this.system.layout.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithWidths
-        ) {
-            renderer.width = barDisplayWidth;
-        }
-
         this.barRenderers.push(renderer);
         this.system.layout.registerBarRenderer(this.staffId, renderer);
         if (bar.isEmpty || bar.isRestOnly) {
@@ -181,7 +170,7 @@ export class RenderStaff {
     }
 
     public revertLastBar(): BarRendererBase {
-        this._sharedLayoutData = new Map<string, unknown>();
+        this.resetSharedLayoutData();
 
         const lastBar: BarRendererBase = this.barRenderers[this.barRenderers.length - 1];
         this.barRenderers.splice(this.barRenderers.length - 1, 1);
@@ -199,59 +188,8 @@ export class RenderStaff {
         return lastBar;
     }
 
-    public scaleToWidth(width: number): void {
-        this._sharedLayoutData = new Map<string, unknown>();
-        const topOverflow: number = this.topOverflow;
-        let x = 0;
-
-        switch (this.system.layout.systemsLayoutMode) {
-            case InternalSystemsLayoutMode.Automatic:
-                // Note: here we could do some "intelligent" distribution of
-                // the space over the bar renderers, for now we evenly apply the space to all bars
-                const difference: number = width - this.system.computedWidth;
-                const spacePerBar: number = difference / this.barRenderers.length;
-                for (const renderer of this.barRenderers) {
-                    renderer.x = x;
-                    renderer.y = this.topPadding + topOverflow;
-
-                    const actualBarWidth = renderer.computedWidth + spacePerBar;
-                    renderer.scaleToWidth(actualBarWidth);
-                    x += renderer.width;
-                }
-                break;
-            case InternalSystemsLayoutMode.FromModelWithScale:
-                // each bar holds a percentual size where the sum of all scales make the width.
-                // hence we can calculate the width accordingly by calculating how big each column needs to be percentual.
-
-                width -= this.system.accoladeWidth;
-                const totalScale = this.system.totalBarDisplayScale;
-
-                for (const renderer of this.barRenderers) {
-                    renderer.x = x;
-                    renderer.y = this.topPadding + topOverflow;
-
-                    const actualBarWidth = (renderer.barDisplayScale * width) / totalScale;
-                    renderer.scaleToWidth(actualBarWidth);
-
-                    x += renderer.width;
-                }
-
-                break;
-            case InternalSystemsLayoutMode.FromModelWithWidths:
-                for (const renderer of this.barRenderers) {
-                    renderer.x = x;
-                    renderer.y = this.topPadding + topOverflow;
-                    const displayWidth = renderer.barDisplayWidth;
-                    if (displayWidth > 0) {
-                        renderer.scaleToWidth(displayWidth);
-                    } else {
-                        renderer.scaleToWidth(renderer.computedWidth);
-                    }
-
-                    x += renderer.width;
-                }
-                break;
-        }
+    public resetSharedLayoutData() {
+        this._sharedLayoutData.clear();
     }
 
     public topOverflow = 0;

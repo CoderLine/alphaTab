@@ -120,8 +120,6 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             const tie: ScoreTieGlyph = new ScoreTieGlyph(`score.tie.${n.tieOrigin!.id}`, n.tieOrigin!, n, true);
             this.addTie(tie);
         }
-        // TODO: depending on the type we have other positioning
-        // we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
         if (n.slideInType !== SlideInType.None || n.slideOutType !== SlideOutType.None) {
             const l: ScoreSlideLineGlyph = new ScoreSlideLineGlyph(n.slideInType, n.slideOutType, n, this);
             this.addTie(l);

@@ -56,7 +56,6 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             return new ScoreChordNoteHeadInfo(this.direction);
         }
 
-        // TODO: do we need to share this spacing across all staves&tracks?
         const staff = this.beat.voice.bar.staff;
         const key = `score.noteheads.${staff.track.index}.${staff.index}.${this.beat.absoluteDisplayStart}`;
         let existing = this.renderer.staff!.getSharedLayoutData<ScoreChordNoteHeadInfo | undefined>(key, undefined);

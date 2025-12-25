@@ -5,6 +5,7 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import {
@@ -15,7 +16,6 @@ import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
 import { MultiVoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/MultiVoiceContainerGlyph';
 import { ContinuationTieGlyph, type ITieGlyph, type TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
-import { InternalSystemsLayoutMode } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
@@ -27,7 +27,6 @@ import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingH
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -246,22 +245,6 @@ export class BarRendererBase {
         return this.scoreRenderer.settings;
     }
 
-    /**
-     * Gets the scale with which the bar should be displayed in case the model
-     * scale should be respected.
-     */
-    public get barDisplayScale(): number {
-        return this.staff!.system.staves.length > 1 ? this.bar.masterBar.displayScale : this.bar.displayScale;
-    }
-
-    /**
-     * Gets the absolute width in which the bar should be displayed in case the model
-     * scale should be respected.
-     */
-    public get barDisplayWidth(): number {
-        return this.staff!.system.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
-    }
-
     protected wasFirstOfStaff: boolean = false;
 
     public get isFirstOfStaff(): boolean {
@@ -328,18 +311,6 @@ export class BarRendererBase {
         this._postBeatGlyphs.width = this.layoutingInfo.postBeatSize;
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
         this.computedWidth = this.width;
-
-        // For cases like in the horizontal layout we need to set the fixed width early
-        // to have correct partials splitting. the proper alignment to this scale will happen
-        // later in the workflow.
-        const fixedBarWidth = this.barDisplayWidth;
-        if (
-            fixedBarWidth > 0 &&
-            this.scoreRenderer.layout!.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithWidths
-        ) {
-            this.width = fixedBarWidth;
-            this.computedWidth = fixedBarWidth;
-        }
 
         this.topEffects.sizeAndAlignEffectBands();
         this.bottomEffects.sizeAndAlignEffectBands();

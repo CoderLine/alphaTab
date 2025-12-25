@@ -1,4 +1,3 @@
-import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestPlatform } from 'test/TestPlatform';
@@ -6,13 +5,10 @@ import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 
 describe('MultiVoiceTests', () => {
     describe('displace', async () => {
-        // TODO: beamed notes test
-
         async function test(tex: string) {
             const settings = new Settings();
-            settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
             settings.display.justifyLastSystem = true;
-            settings.display.layoutMode = LayoutMode.Page;
+            settings.display.layoutMode = LayoutMode.Parchment;
 
             const fileName = TestPlatform.currentTestName.replaceAll(':', '_').replaceAll(',', '').replaceAll(' ', '_');
             await VisualTestHelper.runVisualTestTex(

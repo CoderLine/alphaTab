@@ -63,6 +63,7 @@ import { WideBeatVibratoEffectInfo } from '@coderline/alphatab/rendering/effects
 import { WideNoteVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/WideNoteVibratoEffectInfo';
 import { HorizontalScreenLayout } from '@coderline/alphatab/rendering/layout/HorizontalScreenLayout';
 import { PageViewLayout } from '@coderline/alphatab/rendering/layout/PageViewLayout';
+import { ParchmentLayout } from '@coderline/alphatab/rendering/layout/ParchmentLayout';
 import type { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
 import { NumberedBarRendererFactory } from '@coderline/alphatab/rendering/NumberedBarRendererFactory';
@@ -621,6 +622,12 @@ export class Environment {
             LayoutMode.Horizontal,
             new LayoutEngineFactory(false, r => {
                 return new HorizontalScreenLayout(r);
+            })
+        );
+        engines.set(
+            LayoutMode.Parchment,
+            new LayoutEngineFactory(true, r => {
+                return new ParchmentLayout(r);
             })
         );
         return engines;

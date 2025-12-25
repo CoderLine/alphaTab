@@ -1,4 +1,3 @@
-import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { Settings } from '@coderline/alphatab/Settings';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
@@ -62,7 +61,7 @@ describe('LayoutTests', () => {
 
     it('brackets-braces-none', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/brackets-braces-none.gp', settings, o => {
             o.tracks = [0, 1, 2, 3, 4, 5, 6, 7, 8];
         });
@@ -70,7 +69,7 @@ describe('LayoutTests', () => {
 
     it('brackets-braces-similar', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/brackets-braces-similar.gp', settings, o => {
             o.tracks = [0, 1, 2, 3, 4, 5, 6, 7, 8];
         });
@@ -78,7 +77,7 @@ describe('LayoutTests', () => {
 
     it('brackets-braces-staves', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/brackets-braces-staves.gp', settings, o => {
             o.tracks = [0, 1, 2, 3, 4, 5, 6, 7, 8];
         });
@@ -86,7 +85,7 @@ describe('LayoutTests', () => {
 
     it('brackets-braces-system-divider', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/system-divider.gp', settings, o => {
             o.tracks = [0, 1];
         });
@@ -94,31 +93,31 @@ describe('LayoutTests', () => {
 
     it('track-names-full-name-all', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/track-names-full-name-all.gp', settings);
     });
 
     it('track-names-full-name-short-name', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/track-names-full-name-short-name.gp', settings);
     });
 
     it('track-names-full-name-horizontal', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/track-names-full-name-horizontal.gp', settings);
     });
 
     it('track-names-first-system', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/track-names-first-system.gp', settings);
     });
 
     it('track-names-all-systems-multi', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/track-names-all-systems-multi.gp', settings, o => {
             o.tracks = [0, 1];
         });
@@ -126,7 +125,7 @@ describe('LayoutTests', () => {
 
     it('system-layout-tex', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTestTex(
             `
             \\track { defaultSystemsLayout 3 }
@@ -234,7 +233,7 @@ describe('LayoutTests', () => {
             undefined,
             o => {
                 o.tracks = o.score.tracks.map(t => t.index);
-                o.settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+                o.settings.display.layoutMode = LayoutMode.Parchment;
             }
         );
     });
@@ -266,7 +265,7 @@ describe('LayoutTests', () => {
             undefined,
             o => {
                 o.tracks = o.score.tracks.map(t => t.index);
-                o.settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+                o.settings.display.layoutMode = LayoutMode.Parchment;
             }
         );
     });
@@ -297,7 +296,7 @@ describe('LayoutTests', () => {
             undefined,
             o => {
                 o.tracks = o.score.tracks.map(t => t.index);
-                o.settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+                o.settings.display.layoutMode = LayoutMode.Parchment;
             }
         );
 
@@ -325,7 +324,7 @@ describe('LayoutTests', () => {
             undefined,
             o => {
                 o.tracks = o.score.tracks.map(t => t.index);
-                o.settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+                o.settings.display.layoutMode = LayoutMode.Parchment;
             }
         );
     });

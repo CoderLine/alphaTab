@@ -8,9 +8,6 @@ import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRen
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
-// TODO[perf]: the overall note head alignment creates quite a lot of objects which the GC
-// will have to cleanup again. we should be optimize this (e.g. via object pooling?, checking for multi-voice and avoid some objects)
-
 /**
  * @internal
  * @record
@@ -233,7 +230,6 @@ export class ScoreChordNoteHeadInfo {
     }
 
     private static _canShareNoteHead(mainGroup: ScoreChordNoteHeadGroup, thisGroup: ScoreChordNoteHeadGroup) {
-        // TODO: check actual note head
         const mainGroupBottom = mainGroup.direction === BeamDirection.Up ? mainGroup.maxStep : mainGroup.minStep;
         const thisGroupBottom = thisGroup.direction === BeamDirection.Up ? thisGroup.maxStep : thisGroup.minStep;
 
@@ -308,8 +304,6 @@ interface ScoreNoteGlyphInfo {
  */
 export abstract class ScoreNoteChordGlyphBase extends Glyph {
     private _infos: ScoreNoteGlyphInfo[] = [];
-    // TODO[perf]: keeping the whole group only for stemX prevents the GC to collect this
-    // maybe we can do some better "finalization" of the groups once all voices have been done
     private _noteHeadInfo?: ScoreChordNoteHeadInfo;
     protected noteGroup?: ScoreChordNoteHeadGroup;
 

@@ -1,4 +1,4 @@
-import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 
 describe('SpecialTracksTests', () => {
@@ -116,7 +116,7 @@ describe('SpecialTracksTests', () => {
             'test-data/visual-tests/special-tracks/numbered-durations.png',
             undefined,
             o => {
-                o.settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+                o.settings.display.layoutMode = LayoutMode.Parchment;
                 o.tracks = o.score.tracks.map(t => t.index);
             }
         );
