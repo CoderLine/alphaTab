@@ -47,6 +47,7 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
+import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
 
 /**
  * @internal
@@ -63,7 +64,10 @@ export class Gp3To5Importer extends ScoreImporter {
     private _playbackInfos: PlaybackInformation[] = [];
     private _doubleBars: Set<number> = new Set<number>();
     private _clefsPerTrack: Map<number, Clef> = new Map<number, Clef>();
-    private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<number, [KeySignature, KeySignatureType]>();
+    private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<
+        number,
+        [KeySignature, KeySignatureType]
+    >();
     private _beatTextChunksByTrack: Map<number, string[]> = new Map<number, string[]>();
 
     private _directionLookup: Map<number, Direction[]> = new Map<number, Direction[]>();
@@ -1356,18 +1360,9 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readTremoloPicking(beat: Beat): void {
-        const speed: number = this.data.readByte();
-        switch (speed) {
-            case 1:
-                beat.tremoloSpeed = Duration.Eighth;
-                break;
-            case 2:
-                beat.tremoloSpeed = Duration.Sixteenth;
-                break;
-            case 3:
-                beat.tremoloSpeed = Duration.ThirtySecond;
-                break;
-        }
+        const effect = new TremoloPickingEffect();
+        beat.tremoloPicking = effect;
+        effect.marks = this.data.readByte();
     }
 
     public readSlide(note: Note): void {

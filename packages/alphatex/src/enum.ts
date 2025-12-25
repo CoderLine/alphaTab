@@ -27,7 +27,8 @@ export const alphaTexMappedEnumLookup = {
     TripletFeel: alphaTab.model.TripletFeel,
     BarLineStyle: alphaTab.model.BarLineStyle,
     SimileMark: alphaTab.model.SimileMark,
-    Direction: alphaTab.model.Direction
+    Direction: alphaTab.model.Direction,
+    TremoloPickingStyle: alphaTab.model.TremoloPickingStyle
 };
 export type AlphaTexMappedEnumName = keyof typeof alphaTexMappedEnumLookup;
 
@@ -448,6 +449,10 @@ export const alphaTexMappedEnumMapping: {
         JumpDalSegnoSegnoAlFine: { snippet: 'dalSegnoSegnoAlFine', shortDescription: 'DalSegnoSegnoAlFine (Jump)' },
         JumpDaCoda: { snippet: 'daCoda', shortDescription: 'DaCoda (Jump)' },
         JumpDaDoubleCoda: { snippet: 'daDoubleCoda', shortDescription: 'DaDoubleCoda (Jump)' }
+    },
+    TremoloPickingStyle: {
+        Default: { snippet: 'default', shortDescription: 'Default tremolo' },
+        BuzzRoll: { snippet: 'buzzRoll', shortDescription: 'Buzz roll tremolo' }
     }
 };
 

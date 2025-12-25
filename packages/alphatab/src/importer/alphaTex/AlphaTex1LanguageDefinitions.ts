@@ -759,7 +759,15 @@ export class AlphaTex1LanguageDefinitions {
         ],
         ['volume', [[[[16], 0]]]],
         ['balance', [[[[16], 0]]]],
-        ['tp', [[[[16], 0, ['8', '16', '32']]]]],
+        [
+            'tp',
+            [
+                [
+                    [[16], 0],
+                    [[10, 17], 1, ['default', 'buzzroll']]
+                ]
+            ]
+        ],
         [
             'barre',
             [
