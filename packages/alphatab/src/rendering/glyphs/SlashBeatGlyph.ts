@@ -1,7 +1,10 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
 import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
@@ -9,6 +12,7 @@ import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadS
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
 import { SlashRestGlyph } from '@coderline/alphatab/rendering/glyphs/SlashRestGlyph';
+import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 import type { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRenderer';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
@@ -18,6 +22,8 @@ import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
  * @internal
  */
 export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
+    private _tremoloPicking?: TremoloPickingGlyph;
+
     public noteHeads: SlashNoteHeadGlyph | null = null;
     public deadSlapped: DeadSlappedBeatGlyph | null = null;
     public restGlyph: SlashRestGlyph | null = null;
@@ -92,30 +98,62 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         return 0;
     }
 
-    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+    public override getNoteY(_note: Note, requestedPosition: NoteYPosition): number {
+        return this._internalGetNoteY(requestedPosition);
+    }
+
+    public _internalGetNoteY(requestedPosition: NoteYPosition): number {
         let g: Glyph | null = null;
         let symbol: MusicFontSymbol = MusicFontSymbol.None;
+        let hasStem = false;
         if (this.noteHeads) {
             g = this.noteHeads;
-            symbol = SlashNoteHeadGlyph.getSymbol(note.beat.duration);
+            symbol = SlashNoteHeadGlyph.getSymbol(this.container.beat.duration);
+            hasStem = true;
         } else if (this.deadSlapped) {
             g = this.deadSlapped;
         }
 
         if (g) {
             let pos = this.y + g.y;
+            const scale = this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
 
             switch (requestedPosition) {
-                case NoteYPosition.Top:
                 case NoteYPosition.TopWithStem:
+                    if (hasStem) {
+                        // stem start
+                        pos -=
+                            (this.renderer.smuflMetrics.stemUp.has(symbol)
+                                ? this.renderer.smuflMetrics.stemUp.get(symbol)!.bottomY
+                                : 0) * scale;
+
+                        // stem size according to duration
+                        pos -= this.renderer.smuflMetrics.standardStemLength * scale;
+                    } else {
+                        pos -= g.height / 2;
+                    }
+                    return pos;
+                case NoteYPosition.Top:
                     pos -= g.height / 2;
                     break;
                 case NoteYPosition.Center:
                     break;
                 case NoteYPosition.Bottom:
-                case NoteYPosition.BottomWithStem:
                     pos += g.height / 2;
                     break;
+                case NoteYPosition.BottomWithStem:
+                    if (hasStem) {
+                        pos -=
+                            (this.renderer.smuflMetrics.stemDown.has(symbol)
+                                ? this.renderer.smuflMetrics.stemDown.get(symbol)!.topY
+                                : -this.renderer.smuflMetrics.glyphHeights.get(symbol)! / 2) * scale;
+
+                        // stem size according to duration
+                        pos += this.renderer.smuflMetrics.standardStemLength * scale;
+                    } else {
+                        pos += g.height / 2;
+                    }
+                    return pos;
 
                 case NoteYPosition.StemUp:
                     pos -= this.renderer.smuflMetrics.stemUp.has(symbol)
@@ -158,6 +196,17 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 this.noteHeads = noteHeadGlyph;
                 noteHeadGlyph.beat = this.container.beat;
                 this.addNormal(noteHeadGlyph);
+
+                if (this.container.beat.isTremolo) {
+                    let tremoloY = 0;
+                    const topY = this._internalGetNoteY(NoteYPosition.TopWithStem);
+                    const bottomY = this._internalGetNoteY(NoteYPosition.StemUp);
+                    tremoloY = (topY + bottomY) / 2;
+
+                    this._tremoloPicking = new TremoloPickingGlyph(0, tremoloY, this.container.beat.duration!);
+                    this._tremoloPicking.renderer = this.renderer;
+                    this._tremoloPicking.doLayout();
+                }
             } else {
                 const restGlyph = new SlashRestGlyph(0, glyphY, this.container.beat.duration);
                 this.restGlyph = restGlyph;
@@ -191,5 +240,18 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
             this.stemX = this.onTimeX;
         }
         this.middleX = this.onTimeX;
+
+        const tremolo = this._tremoloPicking;
+        if (tremolo) {
+            tremolo.x = this.container.beat.duration < Duration.Half ? this.width / 2 : this.stemX;
+        }
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        super.paint(cx, cy, canvas);
+        const tremolo = this._tremoloPicking;
+        if (tremolo) {
+            tremolo.paint(cx + this.x, cy + this.y, canvas);
+        }
     }
 }
