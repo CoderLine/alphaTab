@@ -209,6 +209,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
             for (const renderer of s.barRenderers) {
                 renderer.x = w;
                 renderer.y = s.topPadding + s.topOverflow;
+                // note: this will ensure aspects like beaming helpers
+                // and overflows are prepared for finalization
+                renderer.scaleToWidth(renderer.width);
                 w += renderer.width;
             }
 

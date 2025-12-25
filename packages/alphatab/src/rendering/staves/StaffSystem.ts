@@ -198,17 +198,6 @@ export class StaffSystem {
     public computedWidth: number = 0;
 
     /**
-     * The minimum/default width to which the staves in this system were sized
-     * when performing the layout. This is the size of the system if no
-     * fitting/resizing is performed.
-     *
-     * Includes only the stave size without any other paddings or sizes like the accolade.
-     *
-     * Used to perform a resizing/refitting of the staves in the system.
-     */
-    public computedStaffWidth: number = 0;
-
-    /**
      * This is the simple sum of all display scales of the bars in this system.
      * This value is mainly used in the parchment style layout for correct scaling of the bars.
      */
@@ -366,8 +355,8 @@ export class StaffSystem {
         return result;
     }
 
-    public getBarDisplayScale(renderer:BarRendererBase){
-        return this.staves.length > 1 ? renderer.bar.masterBar.displayScale : renderer.bar.displayScale; 
+    public getBarDisplayScale(renderer: BarRendererBase) {
+        return this.staves.length > 1 ? renderer.bar.masterBar.displayScale : renderer.bar.displayScale;
     }
 
     public revertLastBar(): MasterBarsRenderers | null {
@@ -410,7 +399,6 @@ export class StaffSystem {
 
             this.width -= width;
             this.computedWidth -= width;
-            this.computedStaffWidth -= width;
             this.totalBarDisplayScale -= barDisplayScale;
             return toRemove;
         }
@@ -435,7 +423,6 @@ export class StaffSystem {
         this.totalBarDisplayScale += barDisplayScale;
         this.width += realWidth;
         this.computedWidth += realWidth;
-        this.computedStaffWidth += realWidth;
 
         return realWidth;
     }

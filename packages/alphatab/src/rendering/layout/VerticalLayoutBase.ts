@@ -326,10 +326,19 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
 
     private _scaleToWidth(system: StaffSystem, width: number): void {
         const staffWidth = width - system.accoladeWidth;
-        const scale = staffWidth / system.computedStaffWidth;
         const shouldApplyBarScale = this.shouldApplyBarScale;
 
         const totalScale = system.totalBarDisplayScale;
+
+        // NOTE: it currently delivers best results if we evenly distribute the available space across bars
+        // scaling bars relatively to their computed width, rather causes distortions whenever bars have
+        // pre-beat glyphs. 
+
+        // most precise scaling would come if we use the contents (voiceContainerGlyph) width as a calculation
+        // factor. but this would make the calculation additionally complex with not much gain. 
+        
+        const difference: number = width - system.computedWidth; 
+        const spacePerBar: number = difference / system.masterBarsRenderers.length; 
 
         for (const s of system.allStaves) {
             s.resetSharedLayoutData();
@@ -345,7 +354,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
                     const barDisplayScale = system.getBarDisplayScale(renderer);
                     actualBarWidth = (barDisplayScale * staffWidth) / totalScale;
                 } else {
-                    actualBarWidth = renderer.computedWidth * scale;
+                    actualBarWidth = renderer.computedWidth + spacePerBar; 
                 }
 
                 renderer.scaleToWidth(actualBarWidth);
