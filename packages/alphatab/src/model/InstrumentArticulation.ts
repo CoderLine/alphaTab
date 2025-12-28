@@ -72,6 +72,31 @@ export class InstrumentArticulation {
      */
     public outputMidiNumber: number;
 
+    /**
+     * Gets or sets the input MIDI number for this articulation.
+     */
+    public inputMidiNumber: number;
+
+    /**
+     * Gets or sets the RSE sound path for playback (e.g., 'stick.hit.hit').
+     */
+    public outputRSESound: string;
+
+    /**
+     * Gets or sets the soundbank name for the element (e.g., 'Master-Snare').
+     */
+    public soundbankName: string;
+
+    /**
+     * Gets or sets the display name for this articulation (e.g., 'Snare (hit)').
+     */
+    public articulationName: string;
+
+    /**
+     * Gets or sets the display name for the element (e.g., 'Snare').
+     */
+    public elementName: string;
+
     public constructor(
         elementType: string = '',
         staffLine: number = 0,
@@ -80,7 +105,12 @@ export class InstrumentArticulation {
         noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
         techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
-        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside
+        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside,
+        inputMidiNumber: number = 0,
+        outputRSESound: string = '',
+        soundbankName: string = '',
+        articulationName: string = '',
+        elementName: string = ''
     ) {
         this.elementType = elementType;
         this.outputMidiNumber = outputMidiNumber;
@@ -90,6 +120,11 @@ export class InstrumentArticulation {
         this.noteHeadWhole = noteHeadWhole !== MusicFontSymbol.None ? noteHeadWhole : noteHeadDefault;
         this.techniqueSymbol = techniqueSymbol;
         this.techniqueSymbolPlacement = techniqueSymbolPlacement;
+        this.inputMidiNumber = inputMidiNumber;
+        this.outputRSESound = outputRSESound;
+        this.soundbankName = soundbankName;
+        this.articulationName = articulationName;
+        this.elementName = elementName;
     }
 
     public getSymbol(duration: Duration): MusicFontSymbol {

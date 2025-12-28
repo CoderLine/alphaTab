@@ -30,6 +30,11 @@ export class InstrumentArticulationSerializer {
         o.set("techniquesymbol", obj.techniqueSymbol as number);
         o.set("techniquesymbolplacement", obj.techniqueSymbolPlacement as number);
         o.set("outputmidinumber", obj.outputMidiNumber);
+        o.set("inputmidinumber", obj.inputMidiNumber);
+        o.set("outputrsesound", obj.outputRSESound);
+        o.set("soundbankname", obj.soundbankName);
+        o.set("articulationname", obj.articulationName);
+        o.set("elementname", obj.elementName);
         return o;
     }
     public static setProperty(obj: InstrumentArticulation, property: string, v: unknown): boolean {
@@ -57,6 +62,21 @@ export class InstrumentArticulationSerializer {
                 return true;
             case "outputmidinumber":
                 obj.outputMidiNumber = v! as number;
+                return true;
+            case "inputmidinumber":
+                obj.inputMidiNumber = v! as number;
+                return true;
+            case "outputrsesound":
+                obj.outputRSESound = v! as string;
+                return true;
+            case "soundbankname":
+                obj.soundbankName = v! as string;
+                return true;
+            case "articulationname":
+                obj.articulationName = v! as string;
+                return true;
+            case "elementname":
+                obj.elementName = v! as string;
                 return true;
         }
         return false;
