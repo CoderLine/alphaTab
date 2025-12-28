@@ -128,8 +128,13 @@ class TrackInfo {
 
     private static _defaultNoteArticulation: InstrumentArticulation = new InstrumentArticulation(
         'Default',
+        'Default',
+        'Default',
         0,
         0,
+        0,
+        '',
+        '',
         MusicFontSymbol.NoteheadBlack,
         MusicFontSymbol.NoteheadHalf,
         MusicFontSymbol.NoteheadWhole
@@ -169,9 +174,14 @@ class TrackInfo {
         const staffLine = musicXmlStaffSteps - stepDifference;
 
         const newArticulation = new InstrumentArticulation(
+            articulation.elementName,
             articulation.elementType,
+            articulation.articulationName,
             staffLine,
+            articulation.inputMidiNumber,
             articulation.outputMidiNumber,
+            articulation.outputRSESound,
+            articulation.soundbankName,
             articulation.noteHeadDefault,
             articulation.noteHeadHalf,
             articulation.noteHeadWhole,
