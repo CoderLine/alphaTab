@@ -98,33 +98,33 @@ export class InstrumentArticulation {
     public elementName: string;
 
     public constructor(
+        elementName: string = '',
         elementType: string = '',
+        articulationName: string = '',
         staffLine: number = 0,
+        inputMidiNumber: number = 0,
         outputMidiNumber: number = 0,
+        outputRSESound: string = '',
+        soundbankName: string = '',
         noteHeadDefault: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
         techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
-        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside,
-        inputMidiNumber: number = 0,
-        outputRSESound: string = '',
-        soundbankName: string = '',
-        articulationName: string = '',
-        elementName: string = ''
+        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Outside,
     ) {
+        this.elementName = elementName;
         this.elementType = elementType;
-        this.outputMidiNumber = outputMidiNumber;
+        this.articulationName = articulationName;
         this.staffLine = staffLine;
+        this.inputMidiNumber = inputMidiNumber;
+        this.outputMidiNumber = outputMidiNumber;
+        this.outputRSESound = outputRSESound;
+        this.soundbankName = soundbankName;
         this.noteHeadDefault = noteHeadDefault;
         this.noteHeadHalf = noteHeadHalf !== MusicFontSymbol.None ? noteHeadHalf : noteHeadDefault;
         this.noteHeadWhole = noteHeadWhole !== MusicFontSymbol.None ? noteHeadWhole : noteHeadDefault;
         this.techniqueSymbol = techniqueSymbol;
         this.techniqueSymbolPlacement = techniqueSymbolPlacement;
-        this.inputMidiNumber = inputMidiNumber;
-        this.outputRSESound = outputRSESound;
-        this.soundbankName = soundbankName;
-        this.articulationName = articulationName;
-        this.elementName = elementName;
     }
 
     public getSymbol(duration: Duration): MusicFontSymbol {
