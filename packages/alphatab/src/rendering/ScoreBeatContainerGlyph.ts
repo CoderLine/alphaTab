@@ -16,6 +16,7 @@ import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLega
 import { ScoreSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlideLineGlyph';
 import { ScoreSlurGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlurGlyph';
 import { ScoreTieGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTieGlyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 
 /**
@@ -62,15 +63,15 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         const beat = this.beat;
         const isGrace = beat.graceType !== GraceType.None;
         if (sr.hasFlag(beat)) {
-            const direction = this.renderer.getBeatDirection(beat);
+            const direction = sr.getBeatDirection(beat);
             const scale = isGrace ? EngravingSettings.GraceScale : 1;
             const symbol = FlagGlyph.getSymbol(beat.duration, direction, isGrace);
-            const flagWidth = this.renderer.smuflMetrics.glyphWidths.get(symbol)! * scale;
+            const flagWidth = sr.smuflMetrics.glyphWidths.get(symbol)! * scale;
             this._flagStretch = flagWidth;
         } else if (isGrace) {
             // always use flag size as spacing on grace notes
             const graceSpacing =
-                this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * EngravingSettings.GraceScale;
+                sr.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * EngravingSettings.GraceScale;
             this._flagStretch = graceSpacing;
         }
 
@@ -140,7 +141,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         }
         // end effect slur on last beat
         if (!this._effectEndSlur && n.beat.isEffectSlurDestination && n.beat.effectSlurOrigin) {
-            const direction = this.renderer.getBeatDirection(n.beat);
+            const direction = (this.renderer as LineBarRenderer).getBeatDirection(n.beat);
             const startNote =
                 direction === BeamDirection.Up ? n.beat.effectSlurOrigin.minNote! : n.beat.effectSlurOrigin.maxNote!;
             const endNote = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;

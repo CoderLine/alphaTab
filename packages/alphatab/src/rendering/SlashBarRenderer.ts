@@ -1,15 +1,11 @@
-import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
-import { GraceType } from '@coderline/alphatab/model/GraceType';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { LineBarRenderer } from '@coderline/alphatab/rendering//LineBarRenderer';
-import type { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
-import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { SlashBeatContainerGlyph } from '@coderline/alphatab/rendering/SlashBeatContainerGlyph';
@@ -89,27 +85,23 @@ export class SlashBarRenderer extends LineBarRenderer {
         return 0;
     }
 
-    protected override getFlagTopY(beat: Beat, _direction: BeamDirection): number {
-        let slashY = this.getLineY(0);
-        const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
-        const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
-
-        slashY -= this.smuflMetrics.stemUp.has(symbol) ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale : 0;
-        if (!beat.isRest) {
-            slashY -= this.smuflMetrics.standardStemLength + scale;
+    protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
+        const position = direction === BeamDirection.Up ? NoteYPosition.TopWithStem : NoteYPosition.StemDown;
+        if (beat.notes.length > 0) {
+            return this.getNoteY(beat.notes[0], position);
+        } else {
+            return this.getRestY(beat, position);
         }
-
-        return slashY;
     }
 
-    protected override getFlagBottomY(beat: Beat, _direction: BeamDirection): number {
-        let slashY = this.getLineY(0);
-        const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
-        const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
+    protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
+        const position = direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.BottomWithStem;
 
-        slashY -= this.smuflMetrics.stemUp.has(symbol) ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale : 0;
-
-        return slashY;
+        if (beat.notes.length > 0) {
+            return this.getNoteY(beat.notes[0], position);
+        } else {
+            return this.getRestY(beat, position);
+        }
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -122,22 +114,6 @@ export class SlashBarRenderer extends LineBarRenderer {
             y = this.getLineY(0);
         }
         return y;
-    }
-
-    protected override calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
-        if (h.beats.length === 0) {
-            return direction === BeamDirection.Up
-                ? this.getFlagTopY(h.beats[0], direction)
-                : this.getFlagBottomY(h.beats[0], direction);
-        }
-
-        this.ensureBeamDrawingInfo(h, direction);
-        return h.drawingInfos.get(direction)!.calcY(x);
-    }
-
-    protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
-        return this.getLineY(0) - noteHeadHeight / 2;
     }
 
     protected override createLinePreBeatGlyphs(): void {

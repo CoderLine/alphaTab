@@ -79,6 +79,14 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
         return this.getRestY(requestedPosition);
     }
 
+    public override getHighestNoteY(position: NoteYPosition): number {
+        return this.getRestY(position);
+    }
+
+    public override getLowestNoteY(position: NoteYPosition): number {
+        return this.getRestY(position);
+    }
+
     public override getNoteX(_note: Note, requestedPosition: NoteXPosition): number {
         const g = this._glyph;
         if (g) {

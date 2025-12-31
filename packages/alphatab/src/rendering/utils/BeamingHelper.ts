@@ -1,6 +1,6 @@
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import type { Bar } from '@coderline/alphatab/model/Bar';
-import { BeatBeamingMode, type Beat } from '@coderline/alphatab/model/Beat';
+import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
@@ -8,10 +8,10 @@ import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Voice } from '@coderline/alphatab/model/Voice';
-import { NoteYPosition, type BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 
 /**
@@ -115,47 +115,10 @@ export class BeamingHelper {
         }
     }
 
-    public direction: BeamDirection = BeamDirection.Up;
     public finish(): void {
-        this.direction = this._calculateDirection();
         this._renderer.completeBeamingHelper(this);
     }
 
-    private _calculateDirection(): BeamDirection {
-        // no proper voice (should not happen usually)
-        if (!this.voice) {
-            return BeamDirection.Up;
-        }
-        // we have a preferred direction
-        if (this.preferredBeamDirection !== null) {
-            return this.preferredBeamDirection!;
-        }
-        // on multi-voice setups secondary voices are always down
-        if (this.voice.index > 0) {
-            return this._invert(BeamDirection.Down);
-        }
-        // on multi-voice setups primary voices are always up
-        if (this.voice.bar.isMultiVoice) {
-            return this._invert(BeamDirection.Up);
-        }
-        // grace notes are always up
-        if (this.beats[0].graceType !== GraceType.None) {
-            return this._invert(BeamDirection.Up);
-        }
-
-        // the average line is used for determination
-        //      key lowerequal than middle line -> up
-        //      key higher than middle line -> down
-        if (this.highestNoteInHelper && this.lowestNoteInHelper) {
-            const highestNotePosition = this._renderer.getNoteY(this.highestNoteInHelper, NoteYPosition.Center);
-            const lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper, NoteYPosition.Center);
-
-            const avg = (highestNotePosition + lowestNotePosition) / 2;
-            return this._invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
-        }
-
-        return this._invert(BeamDirection.Up);
-    }
 
     public static computeLineHeightsForRest(duration: Duration): number[] {
         switch (duration) {
@@ -183,19 +146,6 @@ export class BeamingHelper {
                 return [6, 8];
         }
         return [0, 0];
-    }
-
-    private _invert(direction: BeamDirection): BeamDirection {
-        if (!this.invertBeamDirection) {
-            return direction;
-        }
-        switch (direction) {
-            case BeamDirection.Down:
-                return BeamDirection.Up;
-            // case BeamDirection.Up:
-            default:
-                return BeamDirection.Down;
-        }
     }
 
     public checkBeat(beat: Beat): boolean {

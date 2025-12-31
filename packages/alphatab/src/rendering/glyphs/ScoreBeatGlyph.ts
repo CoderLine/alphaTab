@@ -52,10 +52,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         return BeatSubElement.StandardNotationEffects;
     }
 
-    public override getNoteX(note: Note, requestedPosition: NoteXPosition): number {
-        return this.noteHeads ? this.noteHeads.getNoteX(note, requestedPosition) : 0;
-    }
-
     public override buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
         if (this.noteHeads) {
             this.noteHeads.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
@@ -90,16 +86,30 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         return y;
     }
 
-    public override getLowestNoteY(): number {
-        return this.noteHeads ? this.noteHeads.getLowestNoteY() : 0;
+    public override getLowestNoteY(requestedPosition: NoteYPosition): number {
+        // NOTE: slash handled automatically
+        return this.noteHeads ? this.noteHeads.getLowestNoteY(requestedPosition) : 0;
     }
 
-    public override getHighestNoteY(): number {
-        return this.noteHeads ? this.noteHeads.getHighestNoteY() : 0;
+    public override getHighestNoteY(requestedPosition: NoteYPosition): number {
+        // NOTE: slash handled automatically
+        return this.noteHeads ? this.noteHeads.getHighestNoteY(requestedPosition) : 0;
     }
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+        // for slashed beats always lookup first note
+        if (note.beat.slashed) {
+            note = note.beat.notes[0];
+        }
         return this.noteHeads ? this.noteHeads.getNoteY(note, requestedPosition) : 0;
+    }
+
+    public override getNoteX(note: Note, requestedPosition: NoteXPosition): number {
+        // for slashed beats always lookup first note
+        if (note.beat.slashed) {
+            note = note.beat.notes[0];
+        }
+        return this.noteHeads ? this.noteHeads.getNoteX(note, requestedPosition) : 0;
     }
 
     public override getRestY(requestedPosition: NoteYPosition): number {
@@ -213,10 +223,21 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         const ghost = new GhostNoteContainerGlyph(false);
         ghost.renderer = this.renderer;
 
-        for (const note of this.container.beat.notes) {
-            if (note.isVisible && (!note.beat.slashed || note.index === 0)) {
-                this._createNoteGlyph(note);
-                ghost.addParenthesis(note);
+        if (this.container.beat.slashed) {
+            const steps = sr.heightLineCount - 1;
+            const slash = new SlashNoteHeadGlyph(0, sr.getScoreY(steps), this.container.beat);
+            slash.colorOverride = ElementStyleHelper.noteColor(
+                sr.resources,
+                NoteSubElement.StandardNotationNoteHead,
+                this.container.beat.notes[0]
+            );
+            this.noteHeads!.addMainNoteGlyph(slash, this.container.beat.notes[0], steps);
+        } else {
+            for (const note of this.container.beat.notes) {
+                if (note.isVisible) {
+                    this._createNoteGlyph(note);
+                    ghost.addParenthesis(note);
+                }
             }
         }
 
@@ -330,10 +351,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             Logger.warning('Rendering', `No articulation found for percussion instrument ${n.percussionArticulation}`);
         }
 
-        if (n.beat.slashed) {
-            return new SlashNoteHeadGlyph(0, 0, n.beat.duration, isGrace, n.beat);
-        }
-
         if (n.isDead) {
             return new DeadNoteHeadGlyph(0, 0, isGrace);
         }
@@ -360,12 +377,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         );
 
         // calculate y position
-        let steps: number;
-        if (n.beat.slashed) {
-            steps = sr.heightLineCount - 1;
-        } else {
-            steps = sr.getNoteSteps(n);
-        }
+        let steps = sr.getNoteSteps(n);
 
         noteHeadGlyph.y = sr.getScoreY(steps);
         this.noteHeads!.addMainNoteGlyph(noteHeadGlyph, n, steps);
@@ -388,7 +400,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         const belowBeatEffects = this.noteHeads!.belowBeatEffects;
         const aboveBeatEffects = this.noteHeads!.aboveBeatEffects;
         const outsideBeatEffects: Map<string, EffectGlyph> =
-            this.renderer.getBeatDirection(this.container.beat) === BeamDirection.Up
+            sr.getBeatDirection(this.container.beat) === BeamDirection.Up
                 ? this.noteHeads!.belowBeatEffects
                 : this.noteHeads!.aboveBeatEffects;
 

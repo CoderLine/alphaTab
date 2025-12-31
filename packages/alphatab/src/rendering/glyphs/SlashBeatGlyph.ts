@@ -71,12 +71,12 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    public override getLowestNoteY(): number {
-        return this.noteHeads ? this.noteHeads.y : 0;
+    public override getLowestNoteY(requestedPosition: NoteYPosition): number {
+        return this._internalGetNoteY(requestedPosition);
     }
 
-    public override getHighestNoteY(): number {
-        return this.noteHeads ? this.noteHeads.y : 0;
+    public override getHighestNoteY(requestedPosition: NoteYPosition): number {
+        return this._internalGetNoteY(requestedPosition);
     }
 
     public override getRestY(requestedPosition: NoteYPosition): number {
@@ -185,14 +185,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
             this.addEffect(deadSlapped);
         } else if (!this.container.beat.isEmpty) {
             if (!this.container.beat.isRest) {
-                const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
-                const noteHeadGlyph = new SlashNoteHeadGlyph(
-                    0,
-                    glyphY,
-                    this.container.beat.duration,
-                    isGrace,
-                    this.container.beat
-                );
+                const noteHeadGlyph = new SlashNoteHeadGlyph(0, glyphY, this.container.beat);
                 this.noteHeads = noteHeadGlyph;
                 noteHeadGlyph.beat = this.container.beat;
                 this.addNormal(noteHeadGlyph);

@@ -35,7 +35,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     public beat!: Beat;
 
     public get direction(): BeamDirection {
-        return this.renderer.getBeatDirection(this.beat);
+        return (this.renderer as ScoreBarRenderer).getBeatDirection(this.beat);
     }
 
     public override get hasFlag(): boolean {
@@ -92,6 +92,14 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             return this._internalGetNoteY(n, requestedPosition);
         }
         return 0;
+    }
+
+    public getLowestNoteY(requestedPosition: NoteYPosition): number {
+        return this.maxStepsNote ? this._internalGetNoteY(this.maxStepsNote.glyph, requestedPosition) : 0;
+    }
+
+    public getHighestNoteY(requestedPosition: NoteYPosition): number {
+        return this.minStepsNote ? this._internalGetNoteY(this.minStepsNote.glyph, requestedPosition) : 0;
     }
 
     private _internalGetNoteY(n: MusicFontGlyph, requestedPosition: NoteYPosition): number {
@@ -180,13 +188,13 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             aboveBeatEffectsY = scoreRenderer.getScoreY(scoreRenderer.heightLineCount);
         } else {
             if (this.direction === BeamDirection.Up) {
-                belowBeatEffectsY = this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.Bottom) + effectSpacing;
+                belowBeatEffectsY = this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.Bottom) + effectSpacing;
                 aboveBeatEffectsY =
-                    this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.TopWithStem) - effectSpacing;
+                    this._internalGetNoteY(this.minStepsNote!.glyph, NoteYPosition.TopWithStem) - effectSpacing;
             } else {
                 belowBeatEffectsY =
-                    this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.BottomWithStem) + effectSpacing;
-                aboveBeatEffectsY = this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.Top) - effectSpacing;
+                    this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.BottomWithStem) + effectSpacing;
+                aboveBeatEffectsY = this._internalGetNoteY(this.minStepsNote!.glyph, NoteYPosition.Top) - effectSpacing;
             }
         }
 
@@ -235,13 +243,13 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
             let tremoloY = 0;
             if (direction === BeamDirection.Up) {
-                const topY = this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.TopWithStem);
-                const bottomY = this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.StemUp);
+                const topY = this._internalGetNoteY(this.minStepsNote!.glyph, NoteYPosition.TopWithStem);
+                const bottomY = this._internalGetNoteY(this.minStepsNote!.glyph, NoteYPosition.StemUp);
 
                 tremoloY = (topY + bottomY) / 2;
             } else {
-                const topY = this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.StemDown);
-                const bottomY = this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.BottomWithStem);
+                const topY = this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.StemDown);
+                const bottomY = this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.BottomWithStem);
 
                 tremoloY = (topY + bottomY) / 2;
             }

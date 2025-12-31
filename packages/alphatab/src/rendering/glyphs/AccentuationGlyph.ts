@@ -1,8 +1,9 @@
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { Note } from '@coderline/alphatab/model/Note';
+import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
@@ -36,7 +37,7 @@ export class AccentuationGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const dir = this.renderer.getBeatDirection(this._note.beat);
+        const dir = (this.renderer as LineBarRenderer).getBeatDirection(this._note.beat);
         const symbol = AccentuationGlyph._getSymbol(this._note.accentuated, dir === BeamDirection.Down);
 
         const y = dir === BeamDirection.Up ? cy + this.y : cy + this.y + this.height;

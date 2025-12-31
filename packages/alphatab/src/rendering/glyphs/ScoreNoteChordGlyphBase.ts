@@ -130,7 +130,7 @@ export class ScoreChordNoteHeadInfo {
         this.maxX = maxX;
     }
 
-    finish(smufl:EngravingSettings) {
+    finish(smufl: EngravingSettings) {
         if (this._isFinished) {
             return;
         }
@@ -142,7 +142,7 @@ export class ScoreChordNoteHeadInfo {
         this.update();
     }
 
-    private _checkForGroupDisplacement(noteGroup: ScoreChordNoteHeadGroup, smufl:EngravingSettings) {
+    private _checkForGroupDisplacement(noteGroup: ScoreChordNoteHeadGroup, smufl: EngravingSettings) {
         // no group displace if we're in the same direction
         if (this.mainVoiceDirection === noteGroup.direction) {
             return;
@@ -163,7 +163,7 @@ export class ScoreChordNoteHeadInfo {
                 if (!ScoreChordNoteHeadInfo._canShareNoteHead(mainGroup, noteGroup)) {
                     // align stems back-to-back with additional spacing
                     if (mainGroup.direction === BeamDirection.Up) {
-                        if(noteGroup.displacedNotes) {
+                        if (noteGroup.displacedNotes) {
                             noteGroup.multiVoiceShiftX = noteGroup.stemX + noteGroup.correctNotes.width + spacing;
                         } else {
                             noteGroup.multiVoiceShiftX = noteGroup.correctNotes.width + spacing;
@@ -206,10 +206,9 @@ export class ScoreChordNoteHeadInfo {
                 break;
             case NoteHeadIntersectionKind.FullIntersection:
                 // align note head center to stem
-                if(!mainGroup.hasStem && !noteGroup.hasStem) {
+                if (!mainGroup.hasStem && !noteGroup.hasStem) {
                     // we can keep them aligned.
-                }
-                else if (mainGroup.direction === BeamDirection.Up) {
+                } else if (mainGroup.direction === BeamDirection.Up) {
                     mainGroup.multiVoiceShiftX = mainGroup.stemX;
                     if (noteGroup.hasFlag) {
                         mainGroup.multiVoiceShiftX += spacing;
@@ -307,8 +306,8 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     private _noteHeadInfo?: ScoreChordNoteHeadInfo;
     protected noteGroup?: ScoreChordNoteHeadGroup;
 
-    public minNote: ScoreNoteGlyphInfo | null = null;
-    public maxNote: ScoreNoteGlyphInfo | null = null;
+    public minStepsNote: ScoreNoteGlyphInfo | null = null;
+    public maxStepsNote: ScoreNoteGlyphInfo | null = null;
     public get stemX(): number {
         if (!this.noteGroup) {
             return 0;
@@ -331,29 +330,21 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     public abstract get scale(): number;
 
     public override getBoundingBoxTop(): number {
-        return this.minNote ? this.minNote.glyph.getBoundingBoxTop() : this.y;
+        return this.minStepsNote ? this.minStepsNote.glyph.getBoundingBoxTop() : this.y;
     }
 
     public override getBoundingBoxBottom(): number {
-        return this.maxNote ? this.maxNote.glyph.getBoundingBoxBottom() : this.y + this.height;
-    }
-
-    public getLowestNoteY(): number {
-        return this.maxNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.maxNote.steps) : 0;
-    }
-
-    public getHighestNoteY(): number {
-        return this.minNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.minNote.steps) : 0;
+        return this.maxStepsNote ? this.maxStepsNote.glyph.getBoundingBoxBottom() : this.y + this.height;
     }
 
     protected add(noteGlyph: NoteHeadGlyphBase, noteSteps: number): void {
         const info: ScoreNoteGlyphInfo = { glyph: noteGlyph, steps: noteSteps };
         this._infos.push(info);
-        if (!this.minNote || this.minNote.steps > info.steps) {
-            this.minNote = info;
+        if (!this.minStepsNote || this.minStepsNote.steps > info.steps) {
+            this.minStepsNote = info;
         }
-        if (!this.maxNote || this.maxNote.steps < info.steps) {
-            this.maxNote = info;
+        if (!this.maxStepsNote || this.maxStepsNote.steps < info.steps) {
+            this.maxStepsNote = info;
         }
     }
 
@@ -625,7 +616,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     }
 
     private _paintLedgerLines(cx: number, cy: number, canvas: ICanvas) {
-        if (!this.minNote) {
+        if (!this.minStepsNote) {
             return;
         }
 
@@ -640,8 +631,8 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         const lineSpacing = scoreRenderer.getLineHeight(1);
         const firstTopLedgerY = scoreRenderer.getLineY(-1);
         const firstBottomLedgerY = scoreRenderer.getLineY(scoreRenderer.drawnLineCount);
-        const minNoteLineY = scoreRenderer.getLineY(this.minNote!.steps / 2);
-        const maxNoteLineY = scoreRenderer.getLineY(this.maxNote!.steps / 2);
+        const minNoteLineY = scoreRenderer.getLineY(this.minStepsNote!.steps / 2);
+        const maxNoteLineY = scoreRenderer.getLineY(this.maxStepsNote!.steps / 2);
 
         const lineYOffset = (this.renderer.smuflMetrics.legerLineThickness * scale) / 2;
 

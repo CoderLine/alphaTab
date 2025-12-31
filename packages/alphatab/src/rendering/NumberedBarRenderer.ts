@@ -242,11 +242,6 @@ export class NumberedBarRenderer extends LineBarRenderer {
         return this.getLineY(0);
     }
 
-    public override completeBeamingHelper(helper: BeamingHelper): void {
-        super.completeBeamingHelper(helper);
-        helper.direction = BeamDirection.Down;
-    }
-
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
         return BeamDirection.Down;
     }
@@ -261,30 +256,6 @@ export class NumberedBarRenderer extends LineBarRenderer {
             y = this.getLineY(0);
         }
         return y;
-    }
-
-    protected override calculateBeamYWithDirection(h: BeamingHelper, _x: number, direction: BeamDirection): number {
-        if (h.beats.length === 0) {
-            return this.getLineY(0);
-        }
-
-        this.ensureBeamDrawingInfo(h, direction);
-        const info = h.drawingInfos.get(direction)!;
-        if (direction === BeamDirection.Up) {
-            return Math.min(info.startY, info.endY);
-        } else {
-            return Math.max(info.startY, info.endY);
-        }
-    }
-
-    protected override getBarLineStart(beat: Beat, _direction: BeamDirection): number {
-        // NOTE: this is only for the overflow calculation, this renderer has a custom bar drawing logic
-        const container = this.voiceContainer.getBeatContainer(beat);
-        if (!container) {
-            return this.voiceContainer.getBoundingBoxTop();
-        }
-
-        return container.getBoundingBoxTop();
     }
 
     protected override createPreBeatGlyphs(): void {

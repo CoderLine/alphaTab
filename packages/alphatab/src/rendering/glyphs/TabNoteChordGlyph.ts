@@ -55,12 +55,12 @@ export class TabNoteChordGlyph extends Glyph {
         return 0;
     }
 
-    public getLowestNoteY(): number {
-        return this.maxStringNote ? this.getNoteY(this.maxStringNote, NoteYPosition.Center) : 0;
+    public getLowestNoteY(requestedPosition: NoteYPosition): number {
+        return this.maxStringNote ? this.getNoteY(this.maxStringNote, requestedPosition) : 0;
     }
 
-    public getHighestNoteY(): number {
-        return this.minStringNote ? this.getNoteY(this.minStringNote, NoteYPosition.Center) : 0;
+    public getHighestNoteY(requestedPosition: NoteYPosition): number {
+        return this.minStringNote ? this.getNoteY(this.minStringNote, requestedPosition) : 0;
     }
 
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
@@ -136,7 +136,7 @@ export class TabNoteChordGlyph extends Glyph {
                 }
             }
 
-            if(!Number.isNaN(minEffectY)){
+            if (!Number.isNaN(minEffectY)) {
                 this.renderer.registerBeatEffectOverflows(minEffectY, maxEffectY);
             }
         }

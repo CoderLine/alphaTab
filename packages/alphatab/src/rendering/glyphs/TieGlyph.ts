@@ -2,6 +2,7 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 
@@ -509,8 +510,8 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 export abstract class NoteTieGlyph extends TieGlyph {
     protected startNote: Note;
     protected endNote: Note;
-    protected startNoteRenderer: BarRendererBase | null = null;
-    protected endNoteRenderer: BarRendererBase | null = null;
+    protected startNoteRenderer: LineBarRenderer | null = null;
+    protected endNoteRenderer: LineBarRenderer | null = null;
 
     public constructor(slurEffectId: string, startNote: Note, endNote: Note, forEnd: boolean) {
         super(slurEffectId, forEnd);
@@ -598,22 +599,22 @@ export abstract class NoteTieGlyph extends TieGlyph {
         }
     }
 
-    protected override lookupEndBeatRenderer(): BarRendererBase | null {
+    protected override lookupEndBeatRenderer(): LineBarRenderer | null {
         if (!this.endNoteRenderer) {
             this.endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                 this.renderer.staff!.staffId,
                 this.endNote.beat.voice.bar
-            );
+            ) as LineBarRenderer | null;
         }
         return this.endNoteRenderer;
     }
 
-    protected override lookupStartBeatRenderer(): BarRendererBase {
+    protected override lookupStartBeatRenderer(): LineBarRenderer {
         if (!this.startNoteRenderer) {
             this.startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                 this.renderer.staff!.staffId,
                 this.startNote.beat.voice.bar
-            )!;
+            )! as LineBarRenderer;
         }
         return this.startNoteRenderer;
     }

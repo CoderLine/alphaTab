@@ -1,11 +1,13 @@
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { NoteSubElement } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -15,13 +17,11 @@ export class SlashNoteHeadGlyph extends NoteHeadGlyphBase {
     public beatEffects: Map<string, Glyph> = new Map();
     public noteHeadElement: NoteSubElement = NoteSubElement.SlashNoteHead;
     public effectElement: BeatSubElement = BeatSubElement.SlashEffects;
-    private _symbol: MusicFontSymbol;
 
     public stemX: number = 0;
 
-    public constructor(x: number, y: number, duration: Duration, isGrace: boolean, beat: Beat) {
-        super(x, y, isGrace, SlashNoteHeadGlyph.getSymbol(duration));
-        this._symbol = SlashNoteHeadGlyph.getSymbol(duration);
+    public constructor(x: number, y: number, beat: Beat) {
+        super(x, y, beat.graceType !== GraceType.None, SlashNoteHeadGlyph.getSymbol(beat.duration));
         this.beat = beat;
     }
 
@@ -43,8 +43,9 @@ export class SlashNoteHeadGlyph extends NoteHeadGlyphBase {
     public override doLayout(): void {
         super.doLayout();
 
-        const effectSpacing: number = this.renderer.smuflMetrics.onNoteEffectPadding;
-        let effectY = this.renderer.smuflMetrics.glyphHeights.get(this._symbol)!;
+        const lr = this.renderer as LineBarRenderer;
+        const effectSpacing: number = lr.smuflMetrics.onNoteEffectPadding;
+        let effectY = lr.smuflMetrics.glyphHeights.get(this.symbol)!;
 
         let minEffectY = Number.NaN;
         let maxEffectY = Number.NaN;
@@ -52,7 +53,7 @@ export class SlashNoteHeadGlyph extends NoteHeadGlyphBase {
         for (const g of this.beatEffects.values()) {
             g.y += effectY;
             g.x += this.width / 2;
-            g.renderer = this.renderer;
+            g.renderer = lr;
             effectY += g.height + effectSpacing;
             g.doLayout();
 
@@ -65,20 +66,16 @@ export class SlashNoteHeadGlyph extends NoteHeadGlyphBase {
         }
 
         if (!Number.isNaN(minEffectY)) {
-            this.renderer.registerBeatEffectOverflows(minEffectY, maxEffectY);
+            lr.registerBeatEffectOverflows(minEffectY, maxEffectY);
         }
 
-        const direction = this.renderer.getBeatDirection(this.beat!);
-        const symbol = this._symbol;
+        const direction = lr.getBeatDirection(this.beat!);
+        const symbol = this.symbol;
         if (direction === BeamDirection.Up) {
-            const stemInfoUp = this.renderer.smuflMetrics.stemUp.has(symbol)
-                ? this.renderer.smuflMetrics.stemUp.get(symbol)!.x
-                : 0;
+            const stemInfoUp = lr.smuflMetrics.stemUp.has(symbol) ? lr.smuflMetrics.stemUp.get(symbol)!.x : 0;
             this.stemX = stemInfoUp;
         } else {
-            const stemInfoDown = this.renderer.smuflMetrics.stemDown.has(symbol)
-                ? this.renderer.smuflMetrics.stemDown.get(symbol)!.x
-                : 0;
+            const stemInfoDown = lr.smuflMetrics.stemDown.has(symbol) ? lr.smuflMetrics.stemDown.get(symbol)!.x : 0;
             this.stemX = stemInfoDown;
         }
     }

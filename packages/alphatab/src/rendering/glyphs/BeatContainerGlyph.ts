@@ -37,6 +37,8 @@ export abstract class BeatContainerGlyphBase extends Glyph {
     public abstract getRestY(requestedPosition: NoteYPosition): number;
     public abstract getNoteX(note: Note, requestedPosition: NoteXPosition): number;
     public abstract getBeatX(requestedPosition: BeatXPosition, useSharedSizes: boolean): number;
+    public abstract getLowestNoteY(requestedPosition: NoteYPosition): number;
+    public abstract getHighestNoteY(requestedPosition: NoteYPosition): number;
     public abstract registerLayoutingInfo(layoutings: BarLayoutingInfo): void;
     public abstract applyLayoutingInfo(info: BarLayoutingInfo): void;
     public abstract buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number): void;
@@ -54,6 +56,14 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     public beat: Beat;
     public preNotes!: BeatGlyphBase;
     public onNotes!: BeatOnNoteGlyphBase;
+
+    public override getLowestNoteY(requestedPosition: NoteYPosition): number {
+        return this.onNotes.getLowestNoteY(requestedPosition);
+    }
+
+    public override getHighestNoteY(requestedPosition: NoteYPosition): number {
+        return this.onNotes.getHighestNoteY(requestedPosition);
+    }
 
     public override get beatId(): number {
         return this.beat.id;
@@ -137,7 +147,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     protected get postBeatStretch() {
-        return (this.onNotes.computedWidth + this._tieWidth) - this.onNotes.onTimeX;
+        return this.onNotes.computedWidth + this._tieWidth - this.onNotes.onTimeX;
     }
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {

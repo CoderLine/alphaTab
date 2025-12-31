@@ -9,7 +9,7 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
 import { NotationMode } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
-import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
 import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
@@ -199,12 +199,21 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
     }
 
-    protected abstract getBeamDirection(helper: BeamingHelper): BeamDirection;
+    protected abstract getBeamDirection(_helper: BeamingHelper): BeamDirection;
+
+    public getBeatDirection(beat: Beat): BeamDirection {
+        const helper = this.helpers.getBeamingHelperForBeat(beat);
+        return helper ? this.getBeamDirection(helper) : BeamDirection.Up;
+    }
+
     protected getTupletBeamDirection(helper: BeamingHelper): BeamDirection {
         return this.getBeamDirection(helper);
     }
 
-    protected abstract calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number;
+    private _calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
+        this.ensureBeamDrawingInfo(h, direction);
+        return h.drawingInfos.get(direction)!.calcY(x);
+    }
 
     private _paintTupletHelper(
         cx: number,
@@ -286,7 +295,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 const direction: BeamDirection = this.getTupletBeamDirection(beamingHelper);
 
                 const tupletX: number = this.getBeatX(beat, BeatXPosition.Stem);
-                let tupletY: number = this.calculateBeamYWithDirection(beamingHelper, tupletX, direction);
+                let tupletY: number = this._calculateBeamYWithDirection(beamingHelper, tupletX, direction);
 
                 if (direction === BeamDirection.Down) {
                     tupletY += shift;
@@ -335,8 +344,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
             const firstNonRestBeamingHelper = this.helpers.getBeamingHelperForBeat(firstNonRestBeat)!;
             const lastNonRestBeamingHelper = this.helpers.getBeamingHelperForBeat(lastNonRestBeat)!;
             const direction = this.getTupletBeamDirection(firstNonRestBeamingHelper);
-            let startY: number = this.calculateBeamYWithDirection(firstNonRestBeamingHelper, startX, direction);
-            let endY: number = this.calculateBeamYWithDirection(lastNonRestBeamingHelper, endX, direction);
+            let startY: number = this._calculateBeamYWithDirection(firstNonRestBeamingHelper, startX, direction);
+            let endY: number = this._calculateBeamYWithDirection(lastNonRestBeamingHelper, endX, direction);
             if (isRestOnly) {
                 startY = Math.max(startY, endY);
                 endY = startY;
@@ -624,10 +633,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
         super.recreatePreBeatGlyphs();
     }
 
-    protected abstract getBarLineStart(beat: Beat, direction: BeamDirection): number;
-
     public calculateBeamY(h: BeamingHelper, x: number): number {
-        return this.calculateBeamYWithDirection(h, x, this.getBeamDirection(h));
+        return this._calculateBeamYWithDirection(h, x, this.getBeamDirection(h));
     }
 
     protected override createPreBeatGlyphs(): void {
@@ -673,7 +680,12 @@ export abstract class LineBarRenderer extends BarRendererBase {
             }
 
             const beatLineX: number = this.getBeatX(beat, BeatXPosition.Stem);
-            const y1: number = cy + this.y + this.getBarLineStart(beat, direction);
+            let y1: number = cy + this.y;
+            if (direction === BeamDirection.Up) {
+                y1 += this.getFlagBottomY(beat, direction);
+            } else {
+                y1 += this.getFlagTopY(beat, direction);
+            }
 
             // ensure we are pixel aligned on the end of the stem to avoid anti-aliasing artifacts
             // when combining stems and beams on sub-pixel level
@@ -834,7 +846,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected calculateBeamingOverflows(rendererTop: number, rendererBottom: number) {
         let maxNoteY = 0;
         let minNoteY = 0;
-        const noteOverflowPadding = this.getLineHeight(0.5);
 
         for (const v of this.helpers.beamHelpers) {
             for (const h of v) {
@@ -844,16 +855,17 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 // notes with stems
                 else if (h.beats.length === 1 && h.beats[0].duration >= Duration.Half) {
                     const tupletDirection = this.getTupletBeamDirection(h);
-                    if (h.direction === BeamDirection.Up) {
-                        let topY = this.getFlagTopY(h.beats[0], h.direction);
-                        if (h.hasTuplet && tupletDirection === h.direction) {
+                    const direction = this.getBeamDirection(h);
+                    if (direction === BeamDirection.Up) {
+                        let topY = this.getFlagTopY(h.beats[0], direction);
+                        if (h.hasTuplet && tupletDirection === direction) {
                             topY -= this.tupletSize + this.tupletOffset;
                         }
                         if (topY < maxNoteY) {
                             maxNoteY = topY;
                         }
 
-                        if (h.hasTuplet && tupletDirection !== h.direction) {
+                        if (h.hasTuplet && tupletDirection !== direction) {
                             let bottomY = this.getFlagBottomY(h.beats[0], tupletDirection);
                             bottomY += this.tupletSize + this.tupletOffset;
 
@@ -864,15 +876,15 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
                         // bottom handled via beat container bBox
                     } else {
-                        let bottomY = this.getFlagBottomY(h.beats[0], h.direction);
-                        if (h.hasTuplet && tupletDirection === h.direction) {
+                        let bottomY = this.getFlagBottomY(h.beats[0], direction);
+                        if (h.hasTuplet && tupletDirection === direction) {
                             bottomY += this.tupletSize + this.tupletOffset;
                         }
                         if (bottomY > minNoteY) {
                             minNoteY = bottomY;
                         }
 
-                        if (h.hasTuplet && tupletDirection !== h.direction) {
+                        if (h.hasTuplet && tupletDirection !== direction) {
                             let topY = this.getFlagTopY(h.beats[0], tupletDirection);
                             topY -= this.tupletSize + this.tupletOffset;
 
@@ -887,13 +899,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 // beamed notes and notes without stems
                 // (see paintTuplets in case of doubts how we handle tuplets on non beamed notes)
                 else {
-                    this.ensureBeamDrawingInfo(h, h.direction);
-                    const drawingInfo = h.drawingInfos.get(h.direction)!;
+                    const direction = this.getBeamDirection(h);
+                    this.ensureBeamDrawingInfo(h, direction);
+                    const drawingInfo = h.drawingInfos.get(direction)!;
                     const tupletDirection = this.getTupletBeamDirection(h);
 
-                    if (h.direction === BeamDirection.Up) {
+                    if (direction === BeamDirection.Up) {
                         let topY = Math.min(drawingInfo.startY, drawingInfo.endY);
-                        if (h.hasTuplet && tupletDirection === h.direction) {
+                        if (h.hasTuplet && tupletDirection === direction) {
                             topY -= this.tupletSize + this.tupletOffset;
                         }
 
@@ -901,9 +914,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
                             maxNoteY = topY;
                         }
 
-                        let bottomY: number =
-                            this.getBarLineStart(h.beatOfLowestNote, h.direction) + noteOverflowPadding;
-                        if (h.hasTuplet && tupletDirection !== h.direction) {
+                        let bottomY: number = this.voiceContainer.getLowestNoteY(h.beatOfLowestNote, NoteYPosition.Bottom);
+                        if (h.hasTuplet && tupletDirection !== direction) {
                             bottomY += this.tupletSize + this.tupletOffset;
                         }
 
@@ -913,7 +925,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     } else {
                         let bottomY = Math.max(drawingInfo.startY, drawingInfo.endY);
 
-                        if (h.hasTuplet && tupletDirection === h.direction) {
+                        if (h.hasTuplet && tupletDirection === direction) {
                             bottomY += this.tupletSize + this.tupletOffset;
                         }
 
@@ -921,8 +933,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
                             minNoteY = bottomY;
                         }
 
-                        let topY: number = this.getBarLineStart(h.beatOfHighestNote, h.direction) - noteOverflowPadding;
-                        if (h.hasTuplet && tupletDirection !== h.direction) {
+                        let topY: number = this.voiceContainer.getHighestNoteY(h.beatOfHighestNote, NoteYPosition.Top);
+                        if (h.hasTuplet && tupletDirection !== direction) {
                             topY -= this.tupletSize + this.tupletOffset;
                         }
 
@@ -1116,9 +1128,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 for (const b of h.slashBeats) {
                     const yGivenByCurrentValues = drawingInfo.calcY(this.getBeatX(b, BeatXPosition.Stem));
                     const yNeededForSlash =
-                        h.direction === BeamDirection.Up
-                            ? this.getFlagTopY(b, h.direction)
-                            : this.getFlagBottomY(b, h.direction);
+                        direction === BeamDirection.Up
+                            ? this.getFlagTopY(b, direction)
+                            : this.getFlagBottomY(b, direction);
 
                     const diff = yNeededForSlash - yGivenByCurrentValues;
                     if (diff > 0) {

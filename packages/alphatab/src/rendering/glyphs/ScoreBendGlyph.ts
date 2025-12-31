@@ -86,16 +86,16 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
             switch (note.bendType) {
                 case BendType.Bend:
                 case BendType.PrebendBend:
-                    endY = this._endNoteGlyph!.minNote!.glyph.getBoundingBoxTop();
+                    endY = this._endNoteGlyph!.minStepsNote!.glyph.getBoundingBoxTop();
                     endX = width;
                     break;
                 case BendType.BendRelease:
-                    endY = this._middleNoteGlyph!.minNote!.glyph.getBoundingBoxTop();
+                    endY = this._middleNoteGlyph!.minStepsNote!.glyph.getBoundingBoxTop();
                     endX = width / 2;
                     break;
                 case BendType.Release:
                 case BendType.PrebendRelease:
-                    endY = this._endNoteGlyph!.maxNote!.glyph.getBoundingBoxTop();
+                    endY = this._endNoteGlyph!.maxStepsNote!.glyph.getBoundingBoxTop();
                     endX = width;
                     break;
             }

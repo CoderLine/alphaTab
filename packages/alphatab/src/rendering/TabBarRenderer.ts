@@ -1,8 +1,6 @@
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
-import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
@@ -107,33 +105,6 @@ export class TabBarRenderer extends LineBarRenderer {
                     }
                 }
             }
-        }
-    }
-
-    protected override adjustSizes(): void {
-        if (this.rhythmMode !== TabRhythmMode.Hidden) {
-            let shortestTremolo = Duration.Whole;
-            for (const b of this.helpers.beamHelpers) {
-                for (const h of b) {
-                    if (h.tremoloDuration && (!shortestTremolo || shortestTremolo < h.tremoloDuration!)) {
-                        shortestTremolo = h.tremoloDuration!;
-                    }
-                }
-            }
-
-            switch (shortestTremolo) {
-                case Duration.Eighth:
-                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo1)!;
-                    break;
-                case Duration.Sixteenth:
-                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo2)!;
-                    break;
-                case Duration.ThirtySecond:
-                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo3)!;
-                    break;
-            }
-
-            this.registerOverflowBottom(this.settings.notation.rhythmHeight);
         }
     }
 
@@ -257,37 +228,29 @@ export class TabBarRenderer extends LineBarRenderer {
         return super.drawBeamHelperAsFlags(h) || this.rhythmMode === TabRhythmMode.ShowWithBeams;
     }
 
-    protected override getFlagTopY(beat: Beat, _direction: BeamDirection): number {
-        const container = this.getBeatContainer(beat);
-        if (!container || !beat.minStringNote || beat.duration === Duration.Half) {
-            return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
+    protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
+        const minNote = beat.minStringNote;
+        const position = direction === BeamDirection.Up ? NoteYPosition.TopWithStem : NoteYPosition.StemDown;
+        if (minNote) {
+            return this.getNoteY(minNote, position);
+        } else {
+            return this.getRestY(beat, position);
         }
-        return container.getNoteY(beat.minStringNote, NoteYPosition.Bottom) + this.smuflMetrics.staffLineThickness;
     }
 
-    protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getFlagAndBarPos();
-    }
+    protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
+        const maxNote = beat.maxStringNote;
+        const position = direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.BottomWithStem;
 
-    protected override getFlagStemSize(_duration: Duration, _forceMinStem: boolean = false): number {
-        return 0; // fixed size via getFlagBottomY
-    }
-
-    protected override getBarLineStart(beat: Beat, direction: BeamDirection): number {
-        return this.getFlagTopY(beat, direction);
+        if (maxNote) {
+            return this.getNoteY(maxNote, position);
+        } else {
+            return this.getRestY(beat, position);
+        }
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
         return BeamDirection.Down;
-    }
-
-    public getFlagAndBarPos(): number {
-        return this.height + this.settings.notation.rhythmHeight - (this._hasTuplets ? this.tupletSize / 2 : 0);
-    }
-
-    protected override calculateBeamYWithDirection(_h: BeamingHelper, _x: number, _direction: BeamDirection): number {
-        // currently only used for duplets
-        return this.getFlagAndBarPos();
     }
 
     protected override shouldPaintFlag(beat: Beat): boolean {

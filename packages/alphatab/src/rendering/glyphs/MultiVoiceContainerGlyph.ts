@@ -206,6 +206,23 @@ export class MultiVoiceContainerGlyph extends Glyph {
         }
         return 0;
     }
+
+    public getLowestNoteY(beat: Beat, position: NoteYPosition): number {
+        const container = this.getBeatContainer(beat);
+        if (container) {
+            return container.y + container.getLowestNoteY(position);
+        }
+        return 0;
+    }
+
+    public getHighestNoteY(beat: Beat, position: NoteYPosition): number {
+        const container = this.getBeatContainer(beat);
+        if (container) {
+            return container.x + container.getHighestNoteY(position);
+        }
+        return 0;
+    }
+
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         const container = this.getBeatContainer(note.beat);
         if (container) {
