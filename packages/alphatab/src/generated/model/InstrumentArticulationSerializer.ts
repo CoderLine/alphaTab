@@ -29,6 +29,7 @@ export class InstrumentArticulationSerializer {
         o.set("noteheadwhole", obj.noteHeadWhole as number);
         o.set("techniquesymbol", obj.techniqueSymbol as number);
         o.set("techniquesymbolplacement", obj.techniqueSymbolPlacement as number);
+        o.set("inputmidinumber", obj.inputMidiNumber);
         o.set("outputmidinumber", obj.outputMidiNumber);
         return o;
     }
@@ -54,6 +55,9 @@ export class InstrumentArticulationSerializer {
                 return true;
             case "techniquesymbolplacement":
                 obj.techniqueSymbolPlacement = JsonHelper.parseEnum<TechniqueSymbolPlacement>(v, TechniqueSymbolPlacement)!;
+                return true;
+            case "inputmidinumber":
+                obj.inputMidiNumber = v! as number;
                 return true;
             case "outputmidinumber":
                 obj.outputMidiNumber = v! as number;

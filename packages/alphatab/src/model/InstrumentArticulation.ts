@@ -70,11 +70,16 @@ export class InstrumentArticulation {
     /**
      * Gets or sets which midi key to use when playing the note.
      */
+    public inputMidiNumber: number;
+    /**
+     * Gets or sets which midi key to use when playing the note.
+     */
     public outputMidiNumber: number;
 
     public constructor(
         elementType: string = '',
         staffLine: number = 0,
+        inputMidiNumber: number = 0,
         outputMidiNumber: number = 0,
         noteHeadDefault: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
@@ -83,6 +88,7 @@ export class InstrumentArticulation {
         techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside
     ) {
         this.elementType = elementType;
+        this.inputMidiNumber = inputMidiNumber;
         this.outputMidiNumber = outputMidiNumber;
         this.staffLine = staffLine;
         this.noteHeadDefault = noteHeadDefault;
