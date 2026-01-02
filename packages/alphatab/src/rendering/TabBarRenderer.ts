@@ -229,17 +229,17 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
-        const minNote = beat.minStringNote;
+        const maxNote = beat.maxStringNote;
         const position = direction === BeamDirection.Up ? NoteYPosition.TopWithStem : NoteYPosition.StemDown;
-        if (minNote) {
-            return this.getNoteY(minNote, position);
+        if (maxNote) {
+            return this.getNoteY(maxNote, position);
         } else {
             return this.getRestY(beat, position);
         }
     }
 
     protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
-        const maxNote = beat.maxStringNote;
+        const maxNote = beat.minStringNote;
         const position = direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.BottomWithStem;
 
         if (maxNote) {
@@ -287,18 +287,27 @@ export class TabBarRenderer extends LineBarRenderer {
             holes.sort((a, b) => a.topY - b.topY);
         }
 
-        let y = bottomY;
-        while (y > topY) {
-            let lineY = topY;
-            // draw until next hole (if hole reaches into line)
-            if (holes.length > 0 && holes[holes.length - 1].bottomY > lineY) {
-                const bottomHole = holes.pop()!;
-                lineY = cy + bottomHole.bottomY;
-                canvas.fillRect(x, lineY, this.smuflMetrics.stemThickness, y - lineY);
-                y = cy + bottomHole.topY;
-            } else {
-                canvas.fillRect(x, lineY, this.smuflMetrics.stemThickness, y - lineY);
-                break;
+        // fast path -> single note == full line
+        if (holes.length === 1) {
+            canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
+            return;
+        }
+
+        const bottomYRelative = bottomY - cy;
+        // slow path -> multiple notes == lines between notes
+        const bottomHole = holes[holes.length - 1];
+        canvas.fillRect(
+            x,
+            cy + bottomHole.bottomY,
+            this.smuflMetrics.stemThickness,
+            bottomYRelative - bottomHole.bottomY
+        );
+
+        for (let i = holes.length - 1; i > 0; i--) {
+            const bottomHoleY = holes[i].topY;
+            const topHoleY = holes[i - 1].bottomY;
+            if (topHoleY < bottomHoleY) {
+                canvas.fillRect(x, cy + topHoleY, this.smuflMetrics.stemThickness, bottomHoleY - topHoleY);
             }
         }
     }

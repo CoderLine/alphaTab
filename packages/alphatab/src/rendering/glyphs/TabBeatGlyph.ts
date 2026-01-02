@@ -1,6 +1,7 @@
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
 import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
@@ -52,6 +53,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         if (g) {
             switch (requestedPosition) {
                 case NoteYPosition.TopWithStem:
+                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.standardStemLength;
                 case NoteYPosition.Top:
                     return g.getBoundingBoxTop();
                 case NoteYPosition.Center:
@@ -59,8 +61,9 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 case NoteYPosition.StemDown:
                     return g.getBoundingBoxTop() + g.height / 2;
                 case NoteYPosition.Bottom:
+                    return g.getBoundingBoxTop();
                 case NoteYPosition.BottomWithStem:
-                    return g.getBoundingBoxBottom();
+                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.standardStemLength;
             }
         }
         return 0;
@@ -79,10 +82,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             this.noteNumbers.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
         }
     }
-
-    // public getFlagAndBarPos(): number {
-    //     return this.height + this.settings.notation.rhythmHeight - (this._hasTuplets ? this.tupletSize / 2 : 0);
-    // }
 
     public override doLayout(): void {
         const tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
@@ -132,14 +131,13 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             //
             // Note dots
             //
-            // TOOD: render in TabBarRenderer.paintBeamingStem
-            // if (this.container.beat.dots > 0 && tabRenderer.rhythmMode !== TabRhythmMode.Hidden) {
-            //     const y: number = tabRenderer.getFlagAndBarPos();
+            if (this.container.beat.dots > 0 && tabRenderer.rhythmMode !== TabRhythmMode.Hidden) {
+                const y: number = this.getNoteY(this.container.beat.maxNote!, NoteYPosition.BottomWithStem);
 
-            //     for (let i: number = 0; i < this.container.beat.dots; i++) {
-            //         this.addEffect(new AugmentationDotGlyph(0, y));
-            //     }
-            // }
+                for (let i: number = 0; i < this.container.beat.dots; i++) {
+                    this.addEffect(new AugmentationDotGlyph(0, y));
+                }
+            }
         } else {
             const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
             const y: number = tabRenderer.getLineY(line);
@@ -195,8 +193,9 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         noteNumberGlyph.renderer = this.renderer;
         noteNumberGlyph.doLayout();
         this.noteNumbers!.addNoteGlyph(noteNumberGlyph, n);
-        const topY = noteNumberGlyph.y - noteNumberGlyph.height / 2;
-        const bottomY = topY + noteNumberGlyph.height;
+        const topY = noteNumberGlyph.getBoundingBoxTop();
+        const bottomY = noteNumberGlyph.getBoundingBoxBottom();
+
         this.renderer.collisionHelper.reserveBeatSlot(this.container.beat, topY, bottomY);
 
         const minString = tr.minString;
