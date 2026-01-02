@@ -121,16 +121,23 @@ export class EffectBandContainer {
         }
 
         let y: number = 0;
+        // TODO. activate padding
+        // const paddingTop = this._isTopContainer ? 0 : this._renderer.settings.display.effectBandPaddingBottom;
+        // const paddingBottom = this._isTopContainer ? this._renderer.settings.display.effectBandPaddingBottom : 0;
+        const paddingTop = 0;
+        const paddingBottom = this._renderer.settings.display.effectBandPaddingBottom;
+
         for (const slot of this._effectBandSizingInfo.slots) {
             slot.shared.y = y;
             for (const band of slot.bands) {
+                y += paddingTop;
                 band.y = y;
                 if (finalize) {
                     band.finalizeBand();
                 }
                 band.height = slot.shared.height;
             }
-            y += slot.shared.height + this._renderer.settings.display.effectBandPaddingBottom;
+            y += slot.shared.height + paddingBottom;
         }
         y = Math.ceil(y);
 
