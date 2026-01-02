@@ -130,6 +130,7 @@ class TrackInfo {
         'Default',
         0,
         0,
+        0,
         MusicFontSymbol.NoteheadBlack,
         MusicFontSymbol.NoteheadHalf,
         MusicFontSymbol.NoteheadWhole
@@ -171,6 +172,7 @@ class TrackInfo {
         const newArticulation = new InstrumentArticulation(
             articulation.elementType,
             staffLine,
+            articulation.inputMidiNumber,
             articulation.outputMidiNumber,
             articulation.noteHeadDefault,
             articulation.noteHeadHalf,

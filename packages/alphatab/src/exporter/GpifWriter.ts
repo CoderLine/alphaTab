@@ -106,6 +106,32 @@ class GpifMidiProgramInfo {
 }
 
 /**
+ * @internal
+ */
+class GpifArticulationInfo  {
+    public inputMidiNumber: number
+    public elementName: string
+    public articulationName: string
+    public outputRSESound: string
+    public soundbankName: string
+
+    constructor(inputMidiNumber: number, elementName: string, outputRSESound: string, soundbankName: string) {
+        this.inputMidiNumber = inputMidiNumber;
+        this.elementName = elementName;
+        this.outputRSESound = outputRSESound;
+        this.soundbankName = soundbankName;
+
+        let articulationName = this.elementName
+        for (const [name, inputMidi] of PercussionMapper.instrumentArticulationNames) {
+            if (inputMidiNumber === inputMidi) {
+                articulationName = name;
+            }
+        }
+        this.articulationName = articulationName
+    }
+}
+
+/**
  * This class can write a score.gpif XML from a given score model.
  * @internal
  */
@@ -246,6 +272,102 @@ export class GpifWriter {
         [126, new GpifMidiProgramInfo(GpifIconIds.Fx, 'Recorder')],
         [127, new GpifMidiProgramInfo(GpifIconIds.Fx, 'Timpani')]
     ]);
+    private static _articulationExtraInfoLookup: Map<number, GpifArticulationInfo> = new Map([
+        new GpifArticulationInfo(38, "Snare", "stick.hit.hit", "Master-Snare"),
+        new GpifArticulationInfo(37, "Snare", "stick.hit.sidestick", "Master-Snare"),
+        new GpifArticulationInfo(91, "Snare", "stick.hit.rimshot", "Master-Snare"),
+        new GpifArticulationInfo(42, "Charley", "stick.hit.closed", "Master-Hihat"),
+        new GpifArticulationInfo(92, "Charley", "stick.hit.half", "Master-Hihat"),
+        new GpifArticulationInfo(46, "Charley", "stick.hit.open", "Master-Hihat"),
+        new GpifArticulationInfo(44, "Charley", "pedal.hit.pedal", "Master-Hihat"),
+        new GpifArticulationInfo(35, "Acoustic Kick Drum", "pedal.hit.hit", "AcousticKick-Percu"),
+        new GpifArticulationInfo(36, "Kick Drum", "pedal.hit.hit", "Master-Kick"),
+        new GpifArticulationInfo(50, "Tom Very High", "stick.hit.hit", "Master-Tom05"),
+        new GpifArticulationInfo(48, "Tom High", "stick.hit.hit", "Master-Tom04"),
+        new GpifArticulationInfo(47, "Tom Medium", "stick.hit.hit", "Master-Tom03"),
+        new GpifArticulationInfo(45, "Tom Low", "stick.hit.hit", "Master-Tom02"),
+        new GpifArticulationInfo(43, "Tom Very Low", "stick.hit.hit", "Master-Tom01"),
+        new GpifArticulationInfo(93, "Ride", "stick.hit.edge", "Master-Ride"),
+        new GpifArticulationInfo(51, "Ride", "stick.hit.mid", "Master-Ride"),
+        new GpifArticulationInfo(53, "Ride", "stick.hit.bell", "Master-Ride"),
+        new GpifArticulationInfo(94, "Ride", "stick.hit.choke", "Master-Ride"),
+        new GpifArticulationInfo(55, "Splash", "stick.hit.hit", "Master-Splash"),
+        new GpifArticulationInfo(95, "Splash", "stick.hit.choke", "Master-Splash"),
+        new GpifArticulationInfo(52, "China", "stick.hit.hit", "Master-China"),
+        new GpifArticulationInfo(96, "China", "stick.hit.choke", "Master-China"),
+        new GpifArticulationInfo(49, "Crash High", "stick.hit.hit", "Master-Crash02"),
+        new GpifArticulationInfo(97, "Crash High", "stick.hit.choke", "Master-Crash02"),
+        new GpifArticulationInfo(57, "Crash Medium", "stick.hit.hit", "Master-Crash01"),
+        new GpifArticulationInfo(98, "Crash Medium", "stick.hit.choke", "Master-Crash01"),
+        new GpifArticulationInfo(99, "Cowbell Low", "stick.hit.hit", "CowbellBig-Percu"),
+        new GpifArticulationInfo(100, "Cowbell Low", "stick.hit.tip", "CowbellBig-Percu"),
+        new GpifArticulationInfo(56, "Cowbell Medium", "stick.hit.hit", "CowbellMid-Percu"),
+        new GpifArticulationInfo(101, "Cowbell Medium", "stick.hit.tip", "CowbellMid-Percu"),
+        new GpifArticulationInfo(102, "Cowbell High", "stick.hit.hit", "CowbellSmall-Percu"),
+        new GpifArticulationInfo(103, "Cowbell High", "stick.hit.tip", "CowbellSmall-Percu"),
+        new GpifArticulationInfo(77, "Woodblock Low", "stick.hit.hit", "WoodblockLow-Percu"),
+        new GpifArticulationInfo(76, "Woodblock High", "stick.hit.hit", "WoodblockHigh-Percu"),
+        new GpifArticulationInfo(60, "Bongo High", "hand.hit.hit", "BongoHigh-Percu"),
+        new GpifArticulationInfo(104, "Bongo High", "hand.hit.mute", "BongoHigh-Percu"),
+        new GpifArticulationInfo(105, "Bongo High", "hand.hit.slap", "BongoHigh-Percu"),
+        new GpifArticulationInfo(61, "Bongo Low", "hand.hit.hit", "BongoLow-Percu"),
+        new GpifArticulationInfo(106, "Bongo Low", "hand.hit.mute", "BongoLow-Percu"),
+        new GpifArticulationInfo(107, "Bongo Low", "hand.hit.slap", "BongoLow-Percu"),
+        new GpifArticulationInfo(66, "Timbale Low", "stick.hit.hit", "TimbaleLow-Percu"),
+        new GpifArticulationInfo(65, "Timbale High", "stick.hit.hit", "TimbaleHigh-Percu"),
+        new GpifArticulationInfo(68, "Agogo Low", "stick.hit.hit", "AgogoLow-Percu"),
+        new GpifArticulationInfo(67, "Agogo High", "stick.hit.hit", "AgogoHigh-Percu"),
+        new GpifArticulationInfo(64, "Conga Low", "hand.hit.hit", "CongaLow-Percu"),
+        new GpifArticulationInfo(108, "Conga Low", "hand.hit.slap", "CongaLow-Percu"),
+        new GpifArticulationInfo(109, "Conga Low", "hand.hit.mute", "CongaLow-Percu"),
+        new GpifArticulationInfo(63, "Conga High", "hand.hit.hit", "CongaHigh-Percu"),
+        new GpifArticulationInfo(110, "Conga High", "hand.hit.slap", "CongaHigh-Percu"),
+        new GpifArticulationInfo(62, "Conga High", "hand.hit.mute", "CongaHigh-Percu"),
+        new GpifArticulationInfo(72, "Whistle Low", "blow.hit.hit", "WhistleLow-Percu"),
+        new GpifArticulationInfo(71, "Whistle High", "blow.hit.hit", "WhistleHigh-Percu"),
+        new GpifArticulationInfo(73, "Guiro", "stick.hit.hit", "Guiro-Percu"),
+        new GpifArticulationInfo(74, "Guiro", "stick.scrape.return", "Guiro-Percu"),
+        new GpifArticulationInfo(86, "Surdo", "brush.hit.hit", "Surdo-Percu"),
+        new GpifArticulationInfo(87, "Surdo", "brush.hit.mute", "Surdo-Percu"),
+        new GpifArticulationInfo(54, "Tambourine", "hand.hit.hit", "Tambourine-Percu"),
+        new GpifArticulationInfo(111, "Tambourine", "hand.hit.return", "Tambourine-Percu"),
+        new GpifArticulationInfo(112, "Tambourine", "hand.hit.roll", "Tambourine-Percu"),
+        new GpifArticulationInfo(113, "Tambourine", "hand.hit.handhit", "Tambourine-Percu"),
+        new GpifArticulationInfo(79, "Cuica", "hand.hit.hit", "Cuica-Percu"),
+        new GpifArticulationInfo(78, "Cuica", "hand.hit.mute", "Cuica-Percu"),
+        new GpifArticulationInfo(58, "Vibraslap", "hand.hit.hit", "Vibraslap-Percu"),
+        new GpifArticulationInfo(81, "Triangle", "stick.hit.hit", "Triangle-Percu"),
+        new GpifArticulationInfo(80, "Triangle", "stick.hit.mute", "Triangle-Percu"),
+        new GpifArticulationInfo(114, "Grancassa", "mallet.hit.hit", "Grancassa-Percu"),
+        new GpifArticulationInfo(115, "Piatti", "hand.hit.hit", "Piatti-Percu"),
+        new GpifArticulationInfo(116, "Piatti", "hand.hit.hit", "Piatti-Percu"),
+        new GpifArticulationInfo(69, "Cabasa", "hand.hit.hit", "Cabasa-Percu"),
+        new GpifArticulationInfo(117, "Cabasa", "hand.hit.return", "Cabasa-Percu"),
+        new GpifArticulationInfo(85, "Castanets", "hand.hit.hit", "Castanets-Percu"),
+        new GpifArticulationInfo(75, "Claves", "stick.hit.hit", "Claves-Percu"),
+        new GpifArticulationInfo(70, "Left Maraca", "hand.hit.hit", "Maracas-Percu"),
+        new GpifArticulationInfo(118, "Left Maraca", "hand.hit.return", "Maracas-Percu"),
+        new GpifArticulationInfo(119, "Right Maraca", "hand.hit.hit", "Maracas-Percu"),
+        new GpifArticulationInfo(120, "Right Maraca", "hand.hit.return", "Maracas-Percu"),
+        new GpifArticulationInfo(82, "Shaker", "hand.hit.hit", "ShakerStudio-Percu"),
+        new GpifArticulationInfo(122, "Shaker", "hand.hit.return", "ShakerStudio-Percu"),
+        new GpifArticulationInfo(84, "Bell Tree", "stick.hit.hit", "BellTree-Percu"),
+        new GpifArticulationInfo(123, "Bell Tree", "stick.hit.return", "BellTree-Percu"),
+        new GpifArticulationInfo(83, "Jingle Bell", "stick.hit.hit", "JingleBell-Percu"),
+        new GpifArticulationInfo(124, "Golpe", "thumb.hit.body", "Golpe-Percu"),
+        new GpifArticulationInfo(125, "Golpe", "finger4.hit.body", "Golpe-Percu"),
+        new GpifArticulationInfo(39, "Hand Clap", "hand.hit.hit", "GroupHandClap-Percu"),
+        new GpifArticulationInfo(40, "Electric Snare", "stick.hit.hit", "ElectricSnare-Percu"),
+        new GpifArticulationInfo(31, "Sticks", "stick.hit.sidestick", "Stick-Percu"),
+        new GpifArticulationInfo(41, "Very Low Floor Tom", "stick.hit.hit", "LowFloorTom-Percu"),
+        new GpifArticulationInfo(59, "Ride Cymbal 2", "stick.hit.edge", "Ride-Percu"),
+        new GpifArticulationInfo(126, "Ride Cymbal 2", "stick.hit.mid", "Ride-Percu"),
+        new GpifArticulationInfo(127, "Ride Cymbal 2", "stick.hit.bell", "Ride-Percu"),
+        new GpifArticulationInfo(29, "Ride Cymbal 2", "stick.hit.choke", "Ride-Percu"),
+        new GpifArticulationInfo(30, "Reverse Cymbal", "stick.hit.hit", "Reverse-Cymbal"),
+        new GpifArticulationInfo(33, "Metronome", "stick.hit.sidestick", "Metronome-Percu"),
+        new GpifArticulationInfo(34, "Metronome", "stick.hit.hit", "Metronome-Percu"),
+    ].map(info=> [info.inputMidiNumber, info]))
 
     private static _drumKitProgramInfo: GpifMidiProgramInfo = new GpifMidiProgramInfo(
         GpifIconIds.PercussionKit,
@@ -1739,34 +1861,33 @@ export class GpifWriter {
 
             instrumentSet.addElement('Name').innerText = GpifWriter._drumKitProgramInfo.instrumentSetName;
             instrumentSet.addElement('Type').innerText = GpifWriter._drumKitProgramInfo.instrumentSetType;
-            const currentElementType: string = '';
             let currentElementName: string = '';
+            let currentElement: XmlNode | null = null;
             let currentArticulations: XmlNode = new XmlNode();
-            const counterPerType = new Map<string, number>();
             const elements = instrumentSet.addElement('Elements');
             for (const articulation of articulations) {
-                if (!currentElementType || currentElementType !== articulation.elementType) {
-                    const currentElement = elements.addElement('Element');
+                const extraArticulationInfo = GpifWriter._articulationExtraInfoLookup.get(articulation.inputMidiNumber);
 
-                    let name = articulation.elementType;
-                    if (counterPerType.has(name)) {
-                        const counter = counterPerType.get(name)!;
-                        name += ` ${counter}`;
-                        counterPerType.set(name, counter + 1);
-                    } else {
-                        counterPerType.set(name, 1);
-                    }
-
-                    currentElementName = name;
-                    currentElement.addElement('Name').innerText = name;
+                // Group by elementName (e.g., 'Snare', 'Charley', 'Kick Drum')
+                // If elementName is not set, fall back to elementType
+                const elementNameToUse = extraArticulationInfo?.elementName 
+                    || articulation.elementType;
+                
+                if (!currentElementName || currentElementName !== elementNameToUse) {
+                    currentElement = elements.addElement('Element');
+                    currentElementName = elementNameToUse;
+                    
+                    currentElement.addElement('Name').innerText = elementNameToUse;
                     currentElement.addElement('Type').innerText = articulation.elementType;
+                    currentElement.addElement('SoundbankName').innerText = extraArticulationInfo?.soundbankName || '';
 
                     currentArticulations = currentElement.addElement('Articulations');
                 }
 
                 const articulationNode = currentArticulations.addElement('Articulation');
-                articulationNode.addElement('Name').innerText =
-                    `${currentElementName} ${currentArticulations.childNodes.length}`;
+                // Use articulationName if available, otherwise generate a name
+
+                articulationNode.addElement('Name').innerText = extraArticulationInfo?.articulationName || '';
                 articulationNode.addElement('StaffLine').innerText = articulation.staffLine.toString();
                 articulationNode.addElement('Noteheads').innerText = [
                     this._mapMusicSymbol(articulation.noteHeadDefault),
@@ -1791,10 +1912,14 @@ export class GpifWriter {
                 articulationNode.addElement('TechniqueSymbol').innerText = this._mapMusicSymbol(
                     articulation.techniqueSymbol
                 );
-                articulationNode.addElement('InputMidiNumbers').innerText = '';
+                // Write InputMidiNumbers using the inputMidiNumber field
+                articulationNode.addElement('InputMidiNumbers').innerText = 
+                    articulation.inputMidiNumber > 0 ? articulation.inputMidiNumber.toString() : '';
+                // Write OutputRSESound
+                articulationNode.addElement('OutputRSESound').innerText = extraArticulationInfo?.outputRSESound || '';
                 articulationNode.addElement('OutputMidiNumber').innerText = articulation.outputMidiNumber.toString();
             }
-        } else {
+        }  else {
             const programInfo = GpifWriter._midiProgramInfoLookup.has(track.playbackInfo.program)
                 ? GpifWriter._midiProgramInfoLookup.get(track.playbackInfo.program)!
                 : GpifWriter._midiProgramInfoLookup.get(0)!;
