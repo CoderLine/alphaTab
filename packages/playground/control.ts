@@ -256,7 +256,7 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
     document.ondragover = e => {
         e.stopPropagation();
         e.preventDefault();
-        e.dataTransfer!.dropEffect = 'link';
+        e.dataTransfer!.dropEffect = 'copy';
     };
 
     document.ondrop = e => {
