@@ -1739,31 +1739,34 @@ export class GpifWriter {
 
             instrumentSet.addElement('Name').innerText = GpifWriter._drumKitProgramInfo.instrumentSetName;
             instrumentSet.addElement('Type').innerText = GpifWriter._drumKitProgramInfo.instrumentSetType;
+            const currentElementType: string = '';
             let currentElementName: string = '';
-            let currentElement: XmlNode | null = null;
             let currentArticulations: XmlNode = new XmlNode();
+            const counterPerType = new Map<string, number>();
             const elements = instrumentSet.addElement('Elements');
             for (const articulation of articulations) {
-                // Group by elementName (e.g., 'Snare', 'Charley', 'Kick Drum')
-                // If elementName is not set, fall back to elementType
-                const elementNameToUse = articulation.elementName || articulation.elementType;
-                
-                if (!currentElementName || currentElementName !== elementNameToUse) {
-                    currentElement = elements.addElement('Element');
-                    currentElementName = elementNameToUse;
-                    
-                    currentElement.addElement('Name').innerText = elementNameToUse;
+                if (!currentElementType || currentElementType !== articulation.elementType) {
+                    const currentElement = elements.addElement('Element');
+
+                    let name = articulation.elementType;
+                    if (counterPerType.has(name)) {
+                        const counter = counterPerType.get(name)!;
+                        name += ` ${counter}`;
+                        counterPerType.set(name, counter + 1);
+                    } else {
+                        counterPerType.set(name, 1);
+                    }
+
+                    currentElementName = name;
+                    currentElement.addElement('Name').innerText = name;
                     currentElement.addElement('Type').innerText = articulation.elementType;
-                    currentElement.addElement('SoundbankName').innerText = articulation.soundbankName || '';
 
                     currentArticulations = currentElement.addElement('Articulations');
                 }
 
                 const articulationNode = currentArticulations.addElement('Articulation');
-                // Use articulationName if available, otherwise generate a name
-                const articulationNameToUse = articulation.articulationName || 
+                articulationNode.addElement('Name').innerText =
                     `${currentElementName} ${currentArticulations.childNodes.length}`;
-                articulationNode.addElement('Name').innerText = articulationNameToUse;
                 articulationNode.addElement('StaffLine').innerText = articulation.staffLine.toString();
                 articulationNode.addElement('Noteheads').innerText = [
                     this._mapMusicSymbol(articulation.noteHeadDefault),
@@ -1788,11 +1791,7 @@ export class GpifWriter {
                 articulationNode.addElement('TechniqueSymbol').innerText = this._mapMusicSymbol(
                     articulation.techniqueSymbol
                 );
-                // Write InputMidiNumbers using the inputMidiNumber field
-                articulationNode.addElement('InputMidiNumbers').innerText = 
-                    articulation.inputMidiNumber > 0 ? articulation.inputMidiNumber.toString() : '';
-                // Write OutputRSESound
-                articulationNode.addElement('OutputRSESound').innerText = articulation.outputRSESound || '';
+                articulationNode.addElement('InputMidiNumbers').innerText = '';
                 articulationNode.addElement('OutputMidiNumber').innerText = articulation.outputMidiNumber.toString();
             }
         } else {

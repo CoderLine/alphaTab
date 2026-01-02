@@ -72,54 +72,19 @@ export class InstrumentArticulation {
      */
     public outputMidiNumber: number;
 
-    /**
-     * Gets or sets the input MIDI number for this articulation.
-     */
-    public inputMidiNumber: number;
-
-    /**
-     * Gets or sets the RSE sound path for playback (e.g., 'stick.hit.hit').
-     */
-    public outputRSESound: string;
-
-    /**
-     * Gets or sets the soundbank name for the element (e.g., 'Master-Snare').
-     */
-    public soundbankName: string;
-
-    /**
-     * Gets or sets the display name for this articulation (e.g., 'Snare (hit)').
-     */
-    public articulationName: string;
-
-    /**
-     * Gets or sets the display name for the element (e.g., 'Snare').
-     */
-    public elementName: string;
-
     public constructor(
-        elementName: string = '',
         elementType: string = '',
-        articulationName: string = '',
         staffLine: number = 0,
-        inputMidiNumber: number = 0,
         outputMidiNumber: number = 0,
-        outputRSESound: string = '',
-        soundbankName: string = '',
         noteHeadDefault: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
         techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
-        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Outside,
+        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside
     ) {
-        this.elementName = elementName;
         this.elementType = elementType;
-        this.articulationName = articulationName;
-        this.staffLine = staffLine;
-        this.inputMidiNumber = inputMidiNumber;
         this.outputMidiNumber = outputMidiNumber;
-        this.outputRSESound = outputRSESound;
-        this.soundbankName = soundbankName;
+        this.staffLine = staffLine;
         this.noteHeadDefault = noteHeadDefault;
         this.noteHeadHalf = noteHeadHalf !== MusicFontSymbol.None ? noteHeadHalf : noteHeadDefault;
         this.noteHeadWhole = noteHeadWhole !== MusicFontSymbol.None ? noteHeadWhole : noteHeadDefault;
