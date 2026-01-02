@@ -210,7 +210,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return this.getBeamDirection(helper);
     }
 
-    private _calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
+    protected calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
         this.ensureBeamDrawingInfo(h, direction);
         return h.drawingInfos.get(direction)!.calcY(x);
     }
@@ -295,7 +295,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 const direction: BeamDirection = this.getTupletBeamDirection(beamingHelper);
 
                 const tupletX: number = this.getBeatX(beat, BeatXPosition.Stem);
-                let tupletY: number = this._calculateBeamYWithDirection(beamingHelper, tupletX, direction);
+                let tupletY: number = this.calculateBeamYWithDirection(beamingHelper, tupletX, direction);
 
                 if (direction === BeamDirection.Down) {
                     tupletY += shift;
@@ -344,8 +344,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
             const firstNonRestBeamingHelper = this.helpers.getBeamingHelperForBeat(firstNonRestBeat)!;
             const lastNonRestBeamingHelper = this.helpers.getBeamingHelperForBeat(lastNonRestBeat)!;
             const direction = this.getTupletBeamDirection(firstNonRestBeamingHelper);
-            let startY: number = this._calculateBeamYWithDirection(firstNonRestBeamingHelper, startX, direction);
-            let endY: number = this._calculateBeamYWithDirection(lastNonRestBeamingHelper, endX, direction);
+            let startY: number = this.calculateBeamYWithDirection(firstNonRestBeamingHelper, startX, direction);
+            let endY: number = this.calculateBeamYWithDirection(lastNonRestBeamingHelper, endX, direction);
             if (isRestOnly) {
                 startY = Math.max(startY, endY);
                 endY = startY;
@@ -634,7 +634,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     }
 
     public calculateBeamY(h: BeamingHelper, x: number): number {
-        return this._calculateBeamYWithDirection(h, x, this.getBeamDirection(h));
+        return this.calculateBeamYWithDirection(h, x, this.getBeamDirection(h));
     }
 
     protected override createPreBeatGlyphs(): void {
@@ -1036,39 +1036,12 @@ export abstract class LineBarRenderer extends BarRendererBase {
         const drawingInfo = this.initializeBeamDrawingInfo(h, direction);
         h.drawingInfos.set(direction, drawingInfo);
 
-        const isRest = h.isRestBeamHelper;
-        const scale = h.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
         const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
 
         // 3. adjust beam drawing order
         // we can only draw up to 2 beams towards the noteheads, then we have to grow to the other side
         // here we shift accordingly
-        let barDrawingShift = 0;
-        if (barCount > 2 && !isRest) {
-            const beamSpacing = this.beamSpacing * scale;
-            const beamThickness = this.beamThickness * scale;
-            const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;
-
-            if (direction === BeamDirection.Up) {
-                const bottomBarY = drawingInfo.startY + 2 * beamThickness + beamSpacing;
-                const barTopY = bottomBarY - totalBarsHeight;
-                const diff = drawingInfo.startY - barTopY;
-                if (diff > 0) {
-                    barDrawingShift = diff * -1;
-                    drawingInfo.startY -= diff;
-                    drawingInfo.endY -= diff;
-                }
-            } else {
-                const topBarY = drawingInfo.startY - 2 * beamThickness + beamSpacing;
-                const barBottomY = topBarY + totalBarsHeight;
-                const diff = barBottomY - drawingInfo.startY;
-                if (diff > 0) {
-                    barDrawingShift = diff;
-                    drawingInfo.startY += diff;
-                    drawingInfo.endY += diff;
-                }
-            }
-        }
+        const barDrawingShift = this.applyBarShift(h, direction, drawingInfo, barCount);
 
         // 4. let middle elements shift up/down
         if (h.beats.length > 1) {
@@ -1143,6 +1116,43 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 }
             }
         }
+    }
+    protected applyBarShift(
+        h: BeamingHelper,
+        direction: BeamDirection,
+        drawingInfo: BeamingHelperDrawInfo,
+        barCount: number
+    ) {
+        let barDrawingShift = 0;
+        const isRest = h.isRestBeamHelper;
+        const scale = h.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
+
+        if (barCount > 2 && !isRest) {
+            const beamSpacing = this.beamSpacing * scale;
+            const beamThickness = this.beamThickness * scale;
+            const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;
+
+            if (direction === BeamDirection.Up) {
+                const bottomBarY = drawingInfo.startY + 2 * beamThickness + beamSpacing;
+                const barTopY = bottomBarY - totalBarsHeight;
+                const diff = drawingInfo.startY - barTopY;
+                if (diff > 0) {
+                    barDrawingShift = diff * -1;
+                    drawingInfo.startY -= diff;
+                    drawingInfo.endY -= diff;
+                }
+            } else {
+                const topBarY = drawingInfo.startY - 2 * beamThickness + beamSpacing;
+                const barBottomY = topBarY + totalBarsHeight;
+                const diff = barBottomY - drawingInfo.startY;
+                if (diff > 0) {
+                    barDrawingShift = diff;
+                    drawingInfo.startY += diff;
+                    drawingInfo.endY += diff;
+                }
+            }
+        }
+        return barDrawingShift;
     }
 
     protected getMinLineOfBeat(_beat: Beat): number {

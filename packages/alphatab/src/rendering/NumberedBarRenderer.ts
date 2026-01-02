@@ -22,7 +22,7 @@ import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import type { BeamingHelper, BeamingHelperDrawInfo } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -163,7 +163,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 for (const additionalNumber of container.iterateAdditionalNumbers()) {
                     barCount = additionalNumber.barCount;
                     beatLineX =
-                        this.beatGlyphsStart + additionalNumber.x + additionalNumber.getBeatX(BeatXPosition.PreNotes, false);
+                        this.beatGlyphsStart +
+                        additionalNumber.x +
+                        additionalNumber.getBeatX(BeatXPosition.PreNotes, false);
                     for (let barIndex = 0; barIndex < barCount; barIndex++) {
                         const barY: number = barStart + barIndex * barSpacing;
                         const additionalBarEndX =
@@ -378,6 +380,25 @@ export class NumberedBarRenderer extends LineBarRenderer {
     ): void {
         if (h.voice?.index === 0) {
             super.paintBeamHelper(cx, cy, canvas, h, flagsElement, beamsElement);
+        }
+    }
+
+    protected override applyBarShift(
+        _h: BeamingHelper,
+        _direction: BeamDirection,
+        _drawingInfo: BeamingHelperDrawInfo,
+        _barCount: number
+    ): number {
+        return 0;
+    }
+
+    protected override calculateBeamYWithDirection(h: BeamingHelper, _x: number, direction: BeamDirection): number {
+        this.ensureBeamDrawingInfo(h, direction);
+        const info = h.drawingInfos.get(direction)!;
+        if (direction === BeamDirection.Up) {
+            return Math.min(info.startY, info.endY);
+        } else {
+            return Math.max(info.startY, info.endY);
         }
     }
 }
