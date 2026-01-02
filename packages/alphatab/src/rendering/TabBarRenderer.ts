@@ -302,4 +302,14 @@ export class TabBarRenderer extends LineBarRenderer {
             }
         }
     }
+
+    protected override calculateOverflows(rendererTop: number, rendererBottom: number): void {
+        super.calculateOverflows(rendererTop, rendererBottom);
+        if (this.bar.isEmpty) {
+            return;
+        }
+        if (this.rhythmMode !== TabRhythmMode.Hidden) {
+            this.calculateBeamingOverflows(rendererTop, rendererBottom);
+        }
+    }
 }

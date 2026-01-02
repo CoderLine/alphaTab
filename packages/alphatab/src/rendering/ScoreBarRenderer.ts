@@ -397,8 +397,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
             }
 
             // TODO: pre-register all note heads and calculate lines to have them available here
-            // this way we can avoid asking for the y-position but check the "steps" 
-            // also we should be up/down based on the note furthest away from the center line. 
+            // this way we can avoid asking for the y-position but check the "steps"
+            // also we should be up/down based on the note furthest away from the center line.
             if (direction === BeamDirection.Up) {
                 highestNotePosition = this.getNoteY(helper.highestNoteInHelper, NoteYPosition.TopWithStem) - offset;
                 lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper, NoteYPosition.Bottom);
@@ -433,6 +433,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
         // grace notes are always up
         if (helper.beats[0].graceType !== GraceType.None) {
             return this._invertBeamDirection(helper, BeamDirection.Up);
+        }
+
+        if (helper.beats.length === 1 && helper.beats[0].slashed) {
+            return this._invertBeamDirection(helper, BeamDirection.Down);
         }
 
         // the average line is used for determination

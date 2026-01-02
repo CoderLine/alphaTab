@@ -70,18 +70,21 @@ export class TabNoteChordGlyph extends Glyph {
 
             switch (requestedPosition) {
                 case NoteYPosition.Top:
-                case NoteYPosition.TopWithStem:
+                case NoteYPosition.StemUp:
                     pos -= n.height / 2;
                     break;
                 case NoteYPosition.Center:
                     break;
                 case NoteYPosition.Bottom:
-                case NoteYPosition.BottomWithStem:
+                case NoteYPosition.StemDown:
                     pos += n.height / 2;
                     break;
+                case NoteYPosition.TopWithStem:
+                    pos = -this.renderer.settings.notation.rhythmHeight;
+                    break;
 
-                case NoteYPosition.StemUp:
-                case NoteYPosition.StemDown:
+                case NoteYPosition.BottomWithStem:
+                    pos = this.renderer.height + this.renderer.settings.notation.rhythmHeight;
                     break;
             }
 

@@ -914,7 +914,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
                             maxNoteY = topY;
                         }
 
-                        let bottomY: number = this.voiceContainer.getLowestNoteY(h.beatOfLowestNote, NoteYPosition.Bottom);
+                        let bottomY: number = this.voiceContainer.getLowestNoteY(
+                            h.beatOfLowestNote,
+                            NoteYPosition.Bottom
+                        );
                         if (h.hasTuplet && tupletDirection !== direction) {
                             bottomY += this.tupletSize + this.tupletOffset;
                         }

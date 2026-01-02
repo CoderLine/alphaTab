@@ -218,7 +218,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
     public getHighestNoteY(beat: Beat, position: NoteYPosition): number {
         const container = this.getBeatContainer(beat);
         if (container) {
-            return container.x + container.getHighestNoteY(position);
+            return container.y + container.getHighestNoteY(position);
         }
         return 0;
     }
