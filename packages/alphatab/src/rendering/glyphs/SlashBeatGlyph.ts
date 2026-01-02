@@ -198,7 +198,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                     const bottomY = this._internalGetNoteY(NoteYPosition.StemUp);
                     tremoloY = (topY + bottomY) / 2;
 
-                    this._tremoloPicking = new TremoloPickingGlyph(0, tremoloY, this.container.beat.duration!);
+                    this._tremoloPicking = new TremoloPickingGlyph(0, tremoloY, this.container.beat.tremoloSpeed!);
                     this._tremoloPicking.renderer = this.renderer;
                     this._tremoloPicking.doLayout();
                 }
