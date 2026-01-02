@@ -60,16 +60,18 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
         const g = this._glyph;
         if (g) {
             switch (requestedPosition) {
-                case NoteYPosition.TopWithStem:
                 case NoteYPosition.Top:
                     return g.y;
+                case NoteYPosition.TopWithStem:
+                    return g.y - this.renderer.smuflMetrics.standardStemLength;
                 case NoteYPosition.Center:
                 case NoteYPosition.StemUp:
                 case NoteYPosition.StemDown:
                     return g.y + g.height / 2;
                 case NoteYPosition.Bottom:
-                case NoteYPosition.BottomWithStem:
                     return g.y + g.height;
+                case NoteYPosition.BottomWithStem:
+                    return g.y + g.height + this.renderer.smuflMetrics.standardStemLength;
             }
         }
         return 0;

@@ -84,6 +84,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         if (g) {
             switch (requestedPosition) {
                 case NoteYPosition.TopWithStem:
+                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.standardStemLength;
                 case NoteYPosition.Top:
                     return g.getBoundingBoxTop();
                 case NoteYPosition.Center:
@@ -91,8 +92,9 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 case NoteYPosition.StemDown:
                     return g.getBoundingBoxTop() + g.height / 2;
                 case NoteYPosition.Bottom:
-                case NoteYPosition.BottomWithStem:
                     return g.getBoundingBoxBottom();
+                case NoteYPosition.BottomWithStem:
+                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.standardStemLength;
             }
         }
         return 0;
