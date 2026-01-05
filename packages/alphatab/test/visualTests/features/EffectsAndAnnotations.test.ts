@@ -407,9 +407,7 @@ describe('EffectsAndAnnotationsTests', () => {
                 }
             );
         });
-    });
 
-    describe('tremolo-picking-extended', () => {
         async function test(tex: string, referenceFileName: string, configure?: (o: VisualTestOptions) => void) {
             await VisualTestHelper.runVisualTestTex(
                 tex,
@@ -430,7 +428,7 @@ describe('EffectsAndAnnotationsTests', () => {
                     C4.8 {tp 4} | C4.32 {tp 4} | 
                     C4.8 {tp 5} | C4.32 {tp 5} 
                 `,
-                    'standard-default-flags'
+                    'tremolo-standard-default-flags'
                 ));
 
             it('default-beams', async () =>
@@ -443,7 +441,7 @@ describe('EffectsAndAnnotationsTests', () => {
                     C4.8 {tp 4} C4.8 {tp 4} | C4.32 {tp 4} C4.32 {tp 4} | 
                     C4.8 {tp 5} C4.8 {tp 5} | C4.32 {tp 5} C4.32 {tp 5} 
                 `,
-                    'standard-default-beams'
+                    'tremolo-standard-default-beams'
                 ));
 
             it('buzzroll-flags', async () =>
@@ -456,7 +454,7 @@ describe('EffectsAndAnnotationsTests', () => {
                     C4.8 {tp (4 buzzRoll)} | C4.32 {tp (4 buzzRoll)} | 
                     C4.8 {tp (5 buzzRoll)} | C4.32 {tp (5 buzzRoll)} 
                 `,
-                    'standard-buzzroll-flags'
+                    'tremolo-standard-buzzroll-flags'
                 ));
 
             it('buzzroll-beams', async () =>
@@ -469,7 +467,7 @@ describe('EffectsAndAnnotationsTests', () => {
                     C4.8 {tp (4 buzzRoll)} C4.8 {tp (4 buzzRoll)} | C4.32 {tp (4 buzzRoll)} C4.32 {tp (4 buzzRoll)} | 
                     C4.8 {tp (5 buzzRoll)} C4.8 {tp (5 buzzRoll)} | C4.32 {tp (5 buzzRoll)} C4.32 {tp (5 buzzRoll)} 
                 `,
-                    'standard-buzzroll-beams'
+                    'tremolo-standard-buzzroll-beams'
                 ));
         });
         describe('tabs', () => {
@@ -483,7 +481,7 @@ describe('EffectsAndAnnotationsTests', () => {
                     3.6.8 {tp 4} | 3.6.32 {tp 4} |
                     3.6.8 {tp 5} | 3.6.32 {tp 5} 
                 `,
-                    'tabs-default-flags'
+                    'tremolo-tabs-default-flags'
                 ));
 
             it('default-beams', async () =>
@@ -496,7 +494,7 @@ describe('EffectsAndAnnotationsTests', () => {
                     3.6.8 {tp 4} 3.6.8 {tp 4} | 3.6.32 {tp 4} 3.6.32 {tp 4} | 
                     3.6.8 {tp 5} 3.6.8 {tp 5} | 3.6.32 {tp 5} 3.6.32 {tp 5} 
                 `,
-                    'tabs-default-beams'
+                    'tremolo-tabs-default-beams'
                 ));
 
             it('buzzroll-flags', async () =>
@@ -509,7 +507,7 @@ describe('EffectsAndAnnotationsTests', () => {
                     3.6.8 {tp (4 buzzRoll)} | 3.6.32 {tp (4 buzzRoll)} | 
                     3.6.8 {tp (5 buzzRoll)} | 3.6.32 {tp (5 buzzRoll)} 
                 `,
-                    'tabs-buzzroll-flags'
+                    'tremolo-tabs-buzzroll-flags'
                 ));
 
             it('buzzroll-beams', async () =>
@@ -522,7 +520,7 @@ describe('EffectsAndAnnotationsTests', () => {
                     3.6.8 {tp (4 buzzRoll)} 3.6.8 {tp (4 buzzRoll)} | 3.6.32 {tp (4 buzzRoll)} 3.6.32 {tp (4 buzzRoll)} | 
                     3.6.8 {tp (5 buzzRoll)} 3.6.8 {tp (5 buzzRoll)} | 3.6.32 {tp (5 buzzRoll)} 3.6.32 {tp (5 buzzRoll)} 
                 `,
-                    'tabs-buzzroll-beams'
+                    'tremolo-tabs-buzzroll-beams'
                 ));
         });
     });

@@ -1,7 +1,7 @@
-import { Duration } from '@coderline/alphatab/model/Duration';
+import type { Duration } from '@coderline/alphatab/model/Duration';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { type TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
+import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 
@@ -13,7 +13,7 @@ export class TremoloPickingGlyph extends MusicFontGlyph {
         super(x, y, 1, TremoloPickingGlyph._getSymbol(effect));
     }
 
-    private static _getSymbol(effect: TremoloPickingEffect): MusicFontSymbol {
+    public static _getSymbol(effect: TremoloPickingEffect): MusicFontSymbol {
         if (effect.style === TremoloPickingStyle.BuzzRoll) {
             return MusicFontSymbol.BuzzRoll;
         } else {
