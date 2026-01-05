@@ -198,8 +198,8 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 
     protected abstract calculateTieDirection(): BeamDirection;
 
-    protected abstract lookupStartBeatRenderer(): BarRendererBase;
-    protected abstract lookupEndBeatRenderer(): BarRendererBase | null;
+    protected abstract lookupStartBeatRenderer(): LineBarRenderer;
+    protected abstract lookupEndBeatRenderer(): LineBarRenderer | null;
 
     protected abstract calculateStartY(): number;
 
@@ -599,7 +599,7 @@ export abstract class NoteTieGlyph extends TieGlyph {
         }
     }
 
-    protected override lookupEndBeatRenderer(): LineBarRenderer | null {
+    protected override lookupEndBeatRenderer() {
         if (!this.endNoteRenderer) {
             this.endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                 this.renderer.staff!.staffId,
@@ -609,7 +609,7 @@ export abstract class NoteTieGlyph extends TieGlyph {
         return this.endNoteRenderer;
     }
 
-    protected override lookupStartBeatRenderer(): LineBarRenderer {
+    protected override lookupStartBeatRenderer() {
         if (!this.startNoteRenderer) {
             this.startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                 this.renderer.staff!.staffId,
@@ -636,12 +636,12 @@ export class ContinuationTieGlyph extends TieGlyph {
         this._startTie = startTie;
     }
 
-    protected override lookupStartBeatRenderer(): BarRendererBase {
-        return this.renderer;
+    protected override lookupStartBeatRenderer() {
+        return this.renderer as LineBarRenderer;
     }
 
-    protected override lookupEndBeatRenderer(): BarRendererBase {
-        return this.renderer;
+    protected override lookupEndBeatRenderer() {
+        return this.renderer as LineBarRenderer;
     }
 
     protected override shouldDrawBendSlur(): boolean {
