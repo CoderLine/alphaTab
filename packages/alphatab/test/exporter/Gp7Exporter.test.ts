@@ -313,29 +313,23 @@ describe('Gp7ExporterTest', () => {
                     continue;
                 }
 
-                const articulation = new GpifInstrumentArticulation();
-
-                articulation.name = articulationNode.findChildElement('Name')!.innerText;
-                articulation.staffLine = Number.parseInt(articulationNode.findChildElement('StaffLine')!.innerText, 10);
-                const noteHeads = articulationNode
-                    .findChildElement('Noteheads')!
-                    .innerText.split(' ')
-                    .map(t => GpifParser.parseNoteHead(t));
-                articulation.noteHeads = [noteHeads[0], noteHeads[1], noteHeads[2]];
-                articulation.techniqueSymbolPlacement = GpifParser.parseTechniqueSymbolPlacement(
-                    articulationNode.findChildElement('TechniquePlacement')!.innerText
-                );
-                articulation.techniqueSymbol = GpifParser.parseTechniqueSymbol(
-                    articulationNode.findChildElement('TechniqueSymbol')!.innerText
-                );
-                articulation.inputMidiNumbers = articulationNode
-                    .findChildElement('InputMidiNumbers')!
-                    .innerText.split(' ')
-                    .map(t => Number.parseInt(t, 10));
-                articulation.outputRSESound = articulationNode.findChildElement('OutputRSESound')!.innerText;
-                articulation.outputMidiNumber = Number.parseInt(
-                    articulationNode.findChildElement('OutputMidiNumber')!.innerText,
-                    10
+                const articulation = new GpifInstrumentArticulation(
+                    articulationNode.findChildElement('Name')!.innerText,
+                    Number.parseInt(articulationNode.findChildElement('StaffLine')!.innerText, 10),
+                    articulationNode
+                        .findChildElement('Noteheads')!
+                        .innerText.split(' ')
+                        .map(t => GpifParser.parseNoteHead(t)),
+                    GpifParser.parseTechniqueSymbol(articulationNode.findChildElement('TechniqueSymbol')!.innerText),
+                    GpifParser.parseTechniqueSymbolPlacement(
+                        articulationNode.findChildElement('TechniquePlacement')!.innerText
+                    ),
+                    articulationNode
+                        .findChildElement('InputMidiNumbers')!
+                        .innerText.split(' ')
+                        .map(t => Number.parseInt(t, 10)),
+                    Number.parseInt(articulationNode.findChildElement('OutputMidiNumber')!.innerText, 10),
+                    articulationNode.findChildElement('OutputRSESound')!.innerText
                 );
 
                 element.articulations.push(articulation);

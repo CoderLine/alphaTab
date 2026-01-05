@@ -110,25 +110,46 @@ export class GpifInstrumentElement {
  * @internal
  */
 export class GpifInstrumentArticulation {
-    public name: string = '';
-    public staffLine: number = 0;
-    public noteHeads: [MusicFontSymbol, MusicFontSymbol, MusicFontSymbol] = [
-        MusicFontSymbol.None,
-        MusicFontSymbol.None,
-        MusicFontSymbol.None
-    ];
-    public techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None;
-    public techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Outside;
-    public inputMidiNumbers: number[] = [];
-    public outputMidiNumber: number = 0;
-    public outputRSESound: string = '';
+    public name: string;
+    public staffLine: number;
+    public noteHeads: MusicFontSymbol[];
+    public techniqueSymbol: MusicFontSymbol;
+    public techniqueSymbolPlacement: TechniqueSymbolPlacement;
+    public inputMidiNumbers: number[];
+    public outputMidiNumber: number;
+    public outputRSESound: string;
+
+    public constructor(
+        name: string,
+        staffLine: number,
+        noteHeads: MusicFontSymbol[],
+        techniqueSymbol: MusicFontSymbol,
+        techniqueSymbolPlacement: TechniqueSymbolPlacement,
+        inputMidiNumbers: number[],
+        outputMidiNumber: number,
+        outputRSESound: string
+    ) {
+        this.name = name;
+        this.staffLine = staffLine;
+        this.noteHeads = noteHeads;
+        this.techniqueSymbol = techniqueSymbol;
+        this.techniqueSymbolPlacement = techniqueSymbolPlacement;
+        this.inputMidiNumbers = inputMidiNumbers;
+        this.outputMidiNumber = outputMidiNumber;
+        this.outputRSESound = outputRSESound;
+    }
 
     public static template(name: string, inputMidiNumbers: number[], outputRSESound: string) {
-        const a = new GpifInstrumentArticulation();
-        a.name = name;
-        a.inputMidiNumbers = inputMidiNumbers;
-        a.outputRSESound = outputRSESound;
-        return a;
+        return new GpifInstrumentArticulation(
+            name,
+            0,
+            [],
+            MusicFontSymbol.None,
+            TechniqueSymbolPlacement.Outside,
+            inputMidiNumbers,
+            0,
+            outputRSESound
+        );
     }
 }
 
@@ -479,31 +500,26 @@ export class GpifSoundMapper {
     ]);
     // END generated
 
-    private static _elementByArticulation: Map<number, GpifInstrumentElement> = (() => {
-        const set = GpifSoundMapper._drumInstrumentSet;
-        const lookup = new Map<number, GpifInstrumentElement>();
-        for (const element of set.elements.values()) {
-            for (const articulation of element.articulations) {
-                for (const id of articulation.inputMidiNumbers) {
-                    lookup.set(id, element);
-                }
-            }
-        }
-        return lookup;
-    })();
+    private static _elementByArticulation: Map<number, GpifInstrumentElement> | undefined = undefined;
+    private static _articulationsById: Map<number, GpifInstrumentArticulation> | undefined = undefined;
 
-    private static _articulationsById: Map<number, GpifInstrumentArticulation> = (() => {
+    private static _initLookups() {
         const set = GpifSoundMapper._drumInstrumentSet;
-        const lookup = new Map<number, GpifInstrumentArticulation>();
+        const elementByArticulation = new Map<number, GpifInstrumentElement>();
+        const articulationsById = new Map<number, GpifInstrumentArticulation>();
         for (const element of set.elements.values()) {
             for (const articulation of element.articulations) {
                 for (const id of articulation.inputMidiNumbers) {
-                    lookup.set(id, articulation);
+                    elementByArticulation.set(id, element);
+                    articulationsById.set(id, articulation);
                 }
             }
         }
-        return lookup;
-    })();
+
+        GpifSoundMapper._elementByArticulation = elementByArticulation;
+        GpifSoundMapper._articulationsById = articulationsById;
+        return elementByArticulation;
+    }
 
     public static getIconId(playbackInfo: PlaybackInformation): number {
         if (playbackInfo.primaryChannel === 9) {
@@ -523,23 +539,18 @@ export class GpifSoundMapper {
         }
     }
 
-    private static readonly _pitchedElement: GpifInstrumentElement = {
-        name: 'Pitched',
-        type: 'pitched',
-        soundbankName: '',
-        articulations: [
-            {
-                name: '',
-                staffLine: 0,
-                noteHeads: [MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole],
-                outputMidiNumber: 0,
-                outputRSESound: '',
-                techniqueSymbol: MusicFontSymbol.None,
-                techniqueSymbolPlacement: TechniqueSymbolPlacement.Outside,
-                inputMidiNumbers: []
-            }
-        ]
-    };
+    private static readonly _pitchedElement = new GpifInstrumentElement('Pitched', 'pitched', '', [
+        new GpifInstrumentArticulation(
+            '',
+            0,
+            [MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole],
+            MusicFontSymbol.None,
+            TechniqueSymbolPlacement.Outside,
+            [],
+            0,
+            ''
+        )
+    ]);
 
     private static _buildPitchedInstrumentSet(track: Track): GpifInstrumentSet {
         const instrumentSet = new GpifInstrumentSet();
@@ -557,6 +568,10 @@ export class GpifSoundMapper {
     }
 
     private static _buildPercussionInstrumentSet(track: Track): GpifInstrumentSet {
+        if (!GpifSoundMapper._elementByArticulation) {
+            GpifSoundMapper._initLookups();
+        }
+
         const instrumentSet = new GpifInstrumentSet();
         instrumentSet.lineCount = track.staves[0].standardNotationLineCount;
         instrumentSet.name = 'Drums';
@@ -570,37 +585,31 @@ export class GpifSoundMapper {
         for (const articulation of articulations) {
             let element: GpifInstrumentElement;
 
-            const gpifArticulation = new GpifInstrumentArticulation();
             // main info from own articulation
-            gpifArticulation.noteHeads = [
-                articulation.noteHeadDefault,
-                articulation.noteHeadHalf,
-                articulation.noteHeadWhole
-            ];
-            gpifArticulation.outputMidiNumber = articulation.outputMidiNumber;
-            gpifArticulation.staffLine = articulation.staffLine;
-            gpifArticulation.techniqueSymbol = articulation.techniqueSymbol;
-            gpifArticulation.techniqueSymbolPlacement = articulation.techniqueSymbolPlacement;
+            const gpifArticulation = new GpifInstrumentArticulation(
+                articulation.elementType,
+                articulation.staffLine,
+                [articulation.noteHeadDefault, articulation.noteHeadHalf, articulation.noteHeadWhole],
+                articulation.techniqueSymbol,
+                articulation.techniqueSymbolPlacement,
+                [articulation.id],
+                articulation.outputMidiNumber,
+                ''
+            );
 
             // additional details we try to lookup from the known templates
-            if (GpifSoundMapper._elementByArticulation.has(articulation.id)) {
-                const knownElement = GpifSoundMapper._elementByArticulation.get(articulation.id)!;
-                const knownArticulation = GpifSoundMapper._articulationsById.get(articulation.id)!;
+            if (GpifSoundMapper._elementByArticulation!.has(articulation.id)) {
+                const knownElement = GpifSoundMapper._elementByArticulation!.get(articulation.id)!;
+                const knownArticulation = GpifSoundMapper._articulationsById!.get(articulation.id)!;
                 element = instrumentSet.getOrCreateElement(knownElement);
 
                 gpifArticulation.inputMidiNumbers = knownArticulation.inputMidiNumbers;
                 gpifArticulation.name = knownArticulation.name;
                 gpifArticulation.outputRSESound = knownArticulation.outputRSESound;
             } else {
-                element = instrumentSet.getOrCreateElement({
-                    name: articulation.elementType,
-                    type: articulation.elementType,
-                    soundbankName: '',
-                    articulations: []
-                });
-                gpifArticulation.inputMidiNumbers = [articulation.id];
-                gpifArticulation.name = articulation.elementType;
-                gpifArticulation.outputRSESound = '';
+                element = instrumentSet.getOrCreateElement(
+                    new GpifInstrumentElement(articulation.elementType, articulation.elementType, '', [])
+                );
             }
 
             element.articulations.push(gpifArticulation);

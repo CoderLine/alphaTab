@@ -132,6 +132,7 @@ class TrackInfo {
         0,
         'Default',
         0,
+        0,
         MusicFontSymbol.NoteheadBlack,
         MusicFontSymbol.NoteheadHalf,
         MusicFontSymbol.NoteheadWhole
