@@ -619,6 +619,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
         super.createPreBeatGlyphs();
         this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         this.createLinePreBeatGlyphs();
+        if (this.index === 0) {
+            this.createStartSpacing();
+        }
         this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
     }
 
@@ -830,12 +833,13 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 if (!this.shouldPaintBeamingHelper(h)) {
                     // no visible helper
                 }
-                // notes with stems
+                // notes with stems (and potential flags)
                 else if (h.beats.length === 1 && h.beats[0].duration >= Duration.Half) {
                     const tupletDirection = this.getTupletBeamDirection(h);
                     const direction = this.getBeamDirection(h);
+                    const flagOverflow = this.smuflMetrics.stemFlagOffsets.get(h.beats[0].duration)!;
                     if (direction === BeamDirection.Up) {
-                        let topY = this.getFlagTopY(h.beats[0], direction);
+                        let topY = this.getFlagTopY(h.beats[0], direction) - flagOverflow;
                         if (h.hasTuplet && tupletDirection === direction) {
                             topY -= this.tupletSize + this.tupletOffset;
                         }
@@ -854,7 +858,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
                         // bottom handled via beat container bBox
                     } else {
-                        let bottomY = this.getFlagBottomY(h.beats[0], direction);
+                        let bottomY = this.getFlagBottomY(h.beats[0], direction) + flagOverflow;
                         if (h.hasTuplet && tupletDirection === direction) {
                             bottomY += this.tupletSize + this.tupletOffset;
                         }

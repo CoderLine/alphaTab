@@ -64,7 +64,7 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
                 case NoteYPosition.Top:
                     return g.y;
                 case NoteYPosition.TopWithStem:
-                    return g.y - this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
+                    return g.y - this.renderer.smuflMetrics.getStemLength(Duration.Quarter, true);
                 case NoteYPosition.Center:
                 case NoteYPosition.StemUp:
                 case NoteYPosition.StemDown:
@@ -72,7 +72,7 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
                 case NoteYPosition.Bottom:
                     return g.y + g.height;
                 case NoteYPosition.BottomWithStem:
-                    return g.y + g.height + this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
+                    return g.y + g.height + this.renderer.smuflMetrics.getStemLength(Duration.Quarter, true);
             }
         }
         return 0;

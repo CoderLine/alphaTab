@@ -86,7 +86,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         if (g) {
             switch (requestedPosition) {
                 case NoteYPosition.TopWithStem:
-                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
+                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.getStemLength(Duration.Quarter, true);
                 case NoteYPosition.Top:
                     return g.getBoundingBoxTop();
                 case NoteYPosition.Center:
@@ -96,7 +96,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 case NoteYPosition.Bottom:
                     return g.getBoundingBoxBottom();
                 case NoteYPosition.BottomWithStem:
-                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
+                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.getStemLength(Duration.Quarter, true);
             }
         }
         return 0;
@@ -120,19 +120,20 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
 
         if (g) {
             let pos = this.y + g.y;
-            const scale = this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
+            const sr = this.renderer as SlashBarRenderer;
+            const beat = this.container.beat;
+            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
 
             switch (requestedPosition) {
                 case NoteYPosition.TopWithStem:
                     if (hasStem) {
                         // stem start
                         pos -=
-                            (this.renderer.smuflMetrics.stemUp.has(symbol)
-                                ? this.renderer.smuflMetrics.stemUp.get(symbol)!.bottomY
-                                : 0) * scale;
+                            (sr.smuflMetrics.stemUp.has(symbol) ? sr.smuflMetrics.stemUp.get(symbol)!.bottomY : 0) *
+                            scale;
 
                         // stem size according to duration
-                        pos -= this.renderer.smuflMetrics.getStemLength(this.container.beat.duration) * scale;
+                        pos -= sr.smuflMetrics.getStemLength(beat.duration, sr.hasFlag(beat)) * scale;
                         pos -= this._stemLengthExtension;
                     } else {
                         pos -= g.height / 2;
@@ -149,12 +150,12 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 case NoteYPosition.BottomWithStem:
                     if (hasStem) {
                         pos -=
-                            (this.renderer.smuflMetrics.stemDown.has(symbol)
-                                ? this.renderer.smuflMetrics.stemDown.get(symbol)!.topY
-                                : -this.renderer.smuflMetrics.glyphHeights.get(symbol)! / 2) * scale;
+                            (sr.smuflMetrics.stemDown.has(symbol)
+                                ? sr.smuflMetrics.stemDown.get(symbol)!.topY
+                                : -sr.smuflMetrics.glyphHeights.get(symbol)! / 2) * scale;
 
                         // stem size according to duration
-                        pos += this.renderer.smuflMetrics.getStemLength(this.container.beat.duration) * scale;
+                        pos += sr.smuflMetrics.getStemLength(beat.duration, sr.hasFlag(beat)) * scale;
                         pos += this._stemLengthExtension;
                     } else {
                         pos += g.height / 2;
@@ -251,6 +252,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
             this._internalGetNoteY(NoteYPosition.Center),
             this.container.beat.duration
         );
+        this._stemLengthExtension = g.stemExtensionHeight;
 
         let tremoloX: number = this.stemX;
         if (this.container.beat.duration < Duration.Half) {

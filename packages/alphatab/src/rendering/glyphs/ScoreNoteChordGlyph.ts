@@ -58,7 +58,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
 
         const staff = this.beat.voice.bar.staff;
-        const key = `score.noteheads.${staff.track.index}.${staff.index}.${this.beat.absoluteDisplayStart}`;
+        const key = `score.noteheads.${staff.track.index}.${staff.index}.${this.beat.voice.bar.index}.${this.beat.absoluteDisplayStart}`;
         let existing = this.renderer.staff!.getSharedLayoutData<ScoreChordNoteHeadInfo | undefined>(key, undefined);
         if (!existing) {
             existing = new ScoreChordNoteHeadInfo(this.direction);
@@ -106,20 +106,19 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _internalGetNoteY(n: MusicFontGlyph, requestedPosition: NoteYPosition): number {
         let pos = this.y + n.y;
 
+        const sr = this.renderer as ScoreBarRenderer;
         const scale = this.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
         switch (requestedPosition) {
             case NoteYPosition.TopWithStem:
                 // stem start
                 pos -=
-                    (this.renderer.smuflMetrics.stemUp.has(n.symbol)
-                        ? this.renderer.smuflMetrics.stemUp.get(n.symbol)!.bottomY
-                        : 0) * scale;
+                    (sr.smuflMetrics.stemUp.has(n.symbol) ? sr.smuflMetrics.stemUp.get(n.symbol)!.bottomY : 0) * scale;
 
                 // stem size according to duration
-                pos -= this.renderer.smuflMetrics.getStemLength(this.beat.duration) * scale;
+                pos -= sr.smuflMetrics.getStemLength(this.beat.duration, sr.hasFlag(this.beat)) * scale;
                 pos -= this._stemLengthExtension;
 
-                let topCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.direction);
+                let topCenterY = sr.centerStaffStemY(this.direction);
                 topCenterY -= this._stemLengthExtension;
 
                 return Math.min(topCenterY, pos);
@@ -139,25 +138,23 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                         : -this.renderer.smuflMetrics.glyphHeights.get(n.symbol)! / 2) * scale;
 
                 // stem size according to duration
-                pos += this.renderer.smuflMetrics.getStemLength(this.beat.duration) * scale;
+                pos += sr.smuflMetrics.getStemLength(this.beat.duration, sr.hasFlag(this.beat)) * scale;
                 pos += this._stemLengthExtension;
 
-                let bottomCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.direction);
+                let bottomCenterY = sr.centerStaffStemY(this.direction);
                 bottomCenterY += this._stemLengthExtension;
 
                 return Math.max(bottomCenterY, pos);
 
             case NoteYPosition.StemUp:
                 pos -=
-                    (this.renderer.smuflMetrics.stemUp.has(n.symbol)
-                        ? this.renderer.smuflMetrics.stemUp.get(n.symbol)!.bottomY
-                        : 0) * scale;
+                    (sr.smuflMetrics.stemUp.has(n.symbol) ? sr.smuflMetrics.stemUp.get(n.symbol)!.bottomY : 0) * scale;
                 break;
             case NoteYPosition.StemDown:
                 pos -=
-                    (this.renderer.smuflMetrics.stemDown.has(n.symbol)
-                        ? this.renderer.smuflMetrics.stemDown.get(n.symbol)!.topY
-                        : -this.renderer.smuflMetrics.glyphHeights.get(n.symbol)! / 2) * scale;
+                    (sr.smuflMetrics.stemDown.has(n.symbol)
+                        ? sr.smuflMetrics.stemDown.get(n.symbol)!.topY
+                        : -sr.smuflMetrics.glyphHeights.get(n.symbol)! / 2) * scale;
                 break;
         }
 
