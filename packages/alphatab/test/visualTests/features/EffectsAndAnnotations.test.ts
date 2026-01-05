@@ -319,4 +319,93 @@ describe('EffectsAndAnnotationsTests', () => {
             'test-data/visual-tests/effects-and-annotations/inscore-chord-diagrams.png'
         );
     });
+
+    describe('tremolo-extended', async () => {
+        function flagsTex(noteString: number) {
+            return ['8', '16', '32']
+                .map(
+                    tp =>
+                        `
+                    // 1 bar
+                    3.${noteString}.32 {beam split tp ${tp}} 
+                    3.${noteString}.16 {beam split  tp ${tp}} 
+                    3.${noteString}.8 {beam split  tp ${tp}} |
+
+                    5.${noteString}.32 {beam split tp ${tp}} 
+                    5.${noteString}.16 {beam split  tp ${tp}} 
+                    5.${noteString}.8 {beam split  tp ${tp}} |
+
+                    -21.${noteString}.32 {beam split tp ${tp}} 
+                    -21.${noteString}.16 {beam split  tp ${tp}} 
+                    -21.${noteString}.8 {beam split  tp ${tp}} |
+
+                    -19.${noteString}.32 {beam split tp ${tp}} 
+                    -19.${noteString}.16 {beam split  tp ${tp}} 
+                    -19.${noteString}.8 {beam split  tp ${tp}} |
+
+                    15.${noteString}.32 {beam split tp ${tp}} 
+                    15.${noteString}.16 {beam split  tp ${tp}} 
+                    15.${noteString}.8 {beam split  tp ${tp}} |
+
+                    17.${noteString}.32 {beam split tp ${tp}} 
+                    17.${noteString}.16 {beam split  tp ${tp}} 
+                    17.${noteString}.8 {beam split  tp ${tp}} |
+                    
+                    39.${noteString}.32 {beam split tp ${tp}} 
+                    39.${noteString}.16 {beam split  tp ${tp}} 
+                    39.${noteString}.8 {beam split  tp ${tp}} |
+
+                    41.${noteString}.32 {beam split tp ${tp}} 
+                    41.${noteString}.16 {beam split  tp ${tp}} 
+                    41.${noteString}.8 {beam split  tp ${tp}} |
+                `
+                )
+                .join('\n');
+        }
+
+        it('flags-mixed', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                    \\track {defaultsystemslayout 8}
+                    \\staff {score tabs numbered slash}
+                    ${flagsTex(4)}
+                `,
+                'test-data/visual-tests/effects-and-annotations/tremolo-flags-mixed.png',
+                undefined,
+                o => {
+                    o.settings.display.layoutMode = LayoutMode.Parchment;
+                }
+            );
+        });
+
+        it('flags-tab', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                    \\track {defaultsystemslayout 8}
+                    \\staff {tabs}
+                    ${flagsTex(4)}
+                `,
+                'test-data/visual-tests/effects-and-annotations/tremolo-flags.png',
+                undefined,
+                o => {
+                    o.settings.display.layoutMode = LayoutMode.Parchment;
+                }
+            );
+        });
+
+        it('flags-tab-bottom', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                    \\track {defaultsystemslayout 8}
+                    \\staff {tabs}
+                    ${flagsTex(6)}
+                `,
+                'test-data/visual-tests/effects-and-annotations/tremolo-flags-bottom.png',
+                undefined,
+                o => {
+                    o.settings.display.layoutMode = LayoutMode.Parchment;
+                }
+            );
+        });
+    });
 });

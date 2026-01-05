@@ -206,6 +206,23 @@ export class MultiVoiceContainerGlyph extends Glyph {
         }
         return 0;
     }
+
+    public getLowestNoteY(beat: Beat, position: NoteYPosition): number {
+        const container = this.getBeatContainer(beat);
+        if (container) {
+            return container.y + container.getLowestNoteY(position);
+        }
+        return 0;
+    }
+
+    public getHighestNoteY(beat: Beat, position: NoteYPosition): number {
+        const container = this.getBeatContainer(beat);
+        if (container) {
+            return container.y + container.getHighestNoteY(position);
+        }
+        return 0;
+    }
+
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         const container = this.getBeatContainer(note.beat);
         if (container) {
@@ -219,7 +236,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
         if (beat) {
             return beat.y + beat.getNoteY(note, requestedPosition);
         }
-        return Number.NaN;
+        return 0;
     }
 
     public getRestY(beat: Beat, requestedPosition: NoteYPosition): number {
@@ -227,7 +244,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
         if (container) {
             return container.y + container.getRestY(requestedPosition);
         }
-        return Number.NaN;
+        return 0;
     }
 
     public getBeatContainer(beat: Beat): BeatContainerGlyphBase | undefined {

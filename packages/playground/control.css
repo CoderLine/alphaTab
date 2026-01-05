@@ -23,6 +23,7 @@
 @import url('bootstrap/dist/css/bootstrap.min.css');
 
 @import url('./select-handles.css');
+@import url('./crosshair.css');
 
 .at-cursor-bar {
     /* Defines the color of the bar background when a bar is played */

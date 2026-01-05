@@ -1,9 +1,10 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
-import { type BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
@@ -12,8 +13,8 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
 export class ScoreLegatoGlyph extends TieGlyph {
     protected startBeat: Beat;
     protected endBeat: Beat;
-    protected startBeatRenderer: BarRendererBase | null = null;
-    protected endBeatRenderer: BarRendererBase | null = null;
+    protected startBeatRenderer: LineBarRenderer | null = null;
+    protected endBeatRenderer: LineBarRenderer | null = null;
 
     public constructor(slurEffectId: string, startBeat: Beat, endBeat: Beat, forEnd: boolean) {
         super(slurEffectId, forEnd);
@@ -25,22 +26,22 @@ export class ScoreLegatoGlyph extends TieGlyph {
         super.doLayout();
     }
 
-    protected override lookupStartBeatRenderer(): BarRendererBase {
+    protected override lookupStartBeatRenderer(): LineBarRenderer {
         if (!this.startBeatRenderer) {
             this.startBeatRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                 this.renderer.staff!.staffId,
                 this.startBeat.voice.bar
-            )!;
+            )! as LineBarRenderer;
         }
         return this.startBeatRenderer;
     }
 
-    protected override lookupEndBeatRenderer(): BarRendererBase | null {
+    protected override lookupEndBeatRenderer(): LineBarRenderer | null {
         if (!this.endBeatRenderer) {
             this.endBeatRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                 this.renderer.staff!.staffId,
                 this.endBeat.voice.bar
-            );
+            ) as LineBarRenderer | null;
         }
         return this.endBeatRenderer;
     }

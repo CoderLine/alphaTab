@@ -12,9 +12,9 @@ export abstract class BeatOnNoteGlyphBase extends BeatGlyphBase {
     public stemX: number = 0;
 
     public abstract buildBoundingsLookup(_beatBounds: BeatBounds, _cx: number, _cy: number): void;
-    public abstract getNoteX(_note: Note, _requestedPosition: NoteXPosition): number;
-    public abstract getNoteY(_note: Note, _requestedPosition: NoteYPosition): number;
-    public abstract getRestY(_requestedPosition: NoteYPosition): number;
-    public abstract getHighestNoteY(): number;
-    public abstract getLowestNoteY(): number;
+    public abstract getNoteX(note: Note, requestedPosition: NoteXPosition): number;
+    public abstract getNoteY(note: Note, requestedPosition: NoteYPosition): number;
+    public abstract getRestY(requestedPosition: NoteYPosition): number;
+    public abstract getHighestNoteY(requestedPosition: NoteYPosition): number;
+    public abstract getLowestNoteY(requestedPosition: NoteYPosition): number;
 }

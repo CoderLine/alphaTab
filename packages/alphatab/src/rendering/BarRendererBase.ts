@@ -5,7 +5,6 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import {
@@ -22,11 +21,11 @@ import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarL
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import { BarHelpers } from '@coderline/alphatab/rendering/utils/BarHelpers';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -729,9 +728,5 @@ export class BarRendererBase {
 
     public completeBeamingHelper(_helper: BeamingHelper) {
         // nothing by default
-    }
-
-    public getBeatDirection(beat: Beat): BeamDirection {
-        return this.helpers.getBeamingHelperForBeat(beat)?.direction ?? BeamDirection.Up;
     }
 }

@@ -152,6 +152,14 @@ export class NumberedDashBeatContainerGlyph extends BeatContainerGlyphBase imple
         return false;
     }
 
+    public override getLowestNoteY(_requestedPosition: NoteYPosition): number {
+        return 0;
+    }
+
+    public override getHighestNoteY(_requestedPosition: NoteYPosition): number {
+        return 0;
+    }
+
     public override getNoteY(_note: Note, _requestedPosition: NoteYPosition): number {
         return 0;
     }

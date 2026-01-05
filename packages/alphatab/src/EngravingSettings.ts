@@ -357,6 +357,22 @@ export class EngravingSettings {
         this.stemFlagOffsets.set(Duration.OneHundredTwentyEighth, 0);
         this.stemFlagOffsets.set(Duration.TwoHundredFiftySixth, 0);
 
+        // Workaround for: https://github.com/w3c/smufl/issues/203
+        // There is no clear anchor for the height of flags on the stem side yet.
+        // These aproximations are tested with bravura
+
+        this.stemFlagHeight.set(Duration.QuadrupleWhole, 0);
+        this.stemFlagHeight.set(Duration.DoubleWhole, 0);
+        this.stemFlagHeight.set(Duration.Whole, 0);
+        this.stemFlagHeight.set(Duration.Half, 0);
+        this.stemFlagHeight.set(Duration.Quarter, 0);
+        this.stemFlagHeight.set(Duration.Eighth, 1 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.Sixteenth, 1.5 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.ThirtySecond, 2 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.SixtyFourth, 3 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.OneHundredTwentyEighth, 3.5 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.TwoHundredFiftySixth, 4.2 * this.oneStaffSpace);
+
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
             const symbol = EngravingSettings._smuflNameToMusicFontSymbol(g);
             if (symbol) {
@@ -759,10 +775,25 @@ export class EngravingSettings {
     public directionsScale = 0.6;
 
     /**
-     * The spacing between displaced displaced note heads 
-     * in case of multi-voice note head overlaps. 
+     * The spacing between displaced displaced note heads
+     * in case of multi-voice note head overlaps.
      */
     public multiVoiceDisplacedNoteHeadSpacing = 0;
+
+    /**
+     * Calculates the stem height for a note of the given duration.
+     * @param duration The duration to calculate the height respecting flag sizes.
+     * @param hasFlag True if we need to respect flags, false if we have beams.
+     * @returns The total stem height
+     */
+    public getStemLength(duration: Duration, hasFlag: boolean) {
+        return this.standardStemLength + (hasFlag ? this.stemFlagOffsets.get(duration)! : 0);
+    }
+
+    /**
+     * The space needed by flags on the stem-side from top to bottom to place.
+     */
+    public stemFlagHeight: Map<Duration, number> = new Map<Duration, number>();
 
     // Idea: maybe we can encode and pack this large metadata into a more compact format (e.g. BSON or a custom binary blob?)
     // This metadata below is updated automatically from the bravura_metadata.json via npm script

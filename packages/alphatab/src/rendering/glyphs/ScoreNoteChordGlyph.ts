@@ -29,13 +29,14 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _notes: Note[] = [];
     private _deadSlapped: DeadSlappedBeatGlyph | null = null;
     private _tremoloPicking: TremoloPickingGlyph | null = null;
+    private _stemLengthExtension = 0;
 
     public aboveBeatEffects: Map<string, EffectGlyph> = new Map();
     public belowBeatEffects: Map<string, EffectGlyph> = new Map();
     public beat!: Beat;
 
     public get direction(): BeamDirection {
-        return this.renderer.getBeatDirection(this.beat);
+        return (this.renderer as ScoreBarRenderer).getBeatDirection(this.beat);
     }
 
     public override get hasFlag(): boolean {
@@ -57,7 +58,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
 
         const staff = this.beat.voice.bar.staff;
-        const key = `score.noteheads.${staff.track.index}.${staff.index}.${this.beat.absoluteDisplayStart}`;
+        const key = `score.noteheads.${staff.track.index}.${staff.index}.${this.beat.voice.bar.index}.${this.beat.absoluteDisplayStart}`;
         let existing = this.renderer.staff!.getSharedLayoutData<ScoreChordNoteHeadInfo | undefined>(key, undefined);
         if (!existing) {
             existing = new ScoreChordNoteHeadInfo(this.direction);
@@ -94,22 +95,32 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         return 0;
     }
 
+    public getLowestNoteY(requestedPosition: NoteYPosition): number {
+        return this.maxStepsNote ? this._internalGetNoteY(this.maxStepsNote.glyph, requestedPosition) : 0;
+    }
+
+    public getHighestNoteY(requestedPosition: NoteYPosition): number {
+        return this.minStepsNote ? this._internalGetNoteY(this.minStepsNote.glyph, requestedPosition) : 0;
+    }
+
     private _internalGetNoteY(n: MusicFontGlyph, requestedPosition: NoteYPosition): number {
         let pos = this.y + n.y;
 
+        const sr = this.renderer as ScoreBarRenderer;
         const scale = this.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
         switch (requestedPosition) {
             case NoteYPosition.TopWithStem:
                 // stem start
                 pos -=
-                    (this.renderer.smuflMetrics.stemUp.has(n.symbol)
-                        ? this.renderer.smuflMetrics.stemUp.get(n.symbol)!.bottomY
-                        : 0) * scale;
+                    (sr.smuflMetrics.stemUp.has(n.symbol) ? sr.smuflMetrics.stemUp.get(n.symbol)!.bottomY : 0) * scale;
 
                 // stem size according to duration
-                pos -= this.renderer.smuflMetrics.standardStemLength * scale;
+                pos -= sr.smuflMetrics.getStemLength(this.beat.duration, sr.hasFlag(this.beat)) * scale;
+                pos -= this._stemLengthExtension;
 
-                const topCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.direction);
+                let topCenterY = sr.centerStaffStemY(this.direction);
+                topCenterY -= this._stemLengthExtension;
+
                 return Math.min(topCenterY, pos);
 
             case NoteYPosition.Top:
@@ -127,22 +138,23 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                         : -this.renderer.smuflMetrics.glyphHeights.get(n.symbol)! / 2) * scale;
 
                 // stem size according to duration
-                pos += this.renderer.smuflMetrics.standardStemLength * scale;
+                pos += sr.smuflMetrics.getStemLength(this.beat.duration, sr.hasFlag(this.beat)) * scale;
+                pos += this._stemLengthExtension;
 
-                const bottomCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.direction);
+                let bottomCenterY = sr.centerStaffStemY(this.direction);
+                bottomCenterY += this._stemLengthExtension;
+
                 return Math.max(bottomCenterY, pos);
 
             case NoteYPosition.StemUp:
                 pos -=
-                    (this.renderer.smuflMetrics.stemUp.has(n.symbol)
-                        ? this.renderer.smuflMetrics.stemUp.get(n.symbol)!.bottomY
-                        : 0) * scale;
+                    (sr.smuflMetrics.stemUp.has(n.symbol) ? sr.smuflMetrics.stemUp.get(n.symbol)!.bottomY : 0) * scale;
                 break;
             case NoteYPosition.StemDown:
                 pos -=
-                    (this.renderer.smuflMetrics.stemDown.has(n.symbol)
-                        ? this.renderer.smuflMetrics.stemDown.get(n.symbol)!.topY
-                        : -this.renderer.smuflMetrics.glyphHeights.get(n.symbol)! / 2) * scale;
+                    (sr.smuflMetrics.stemDown.has(n.symbol)
+                        ? sr.smuflMetrics.stemDown.get(n.symbol)!.topY
+                        : -sr.smuflMetrics.glyphHeights.get(n.symbol)! / 2) * scale;
                 break;
         }
 
@@ -180,13 +192,14 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             aboveBeatEffectsY = scoreRenderer.getScoreY(scoreRenderer.heightLineCount);
         } else {
             if (this.direction === BeamDirection.Up) {
-                belowBeatEffectsY = this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.Bottom) + effectSpacing;
+                belowBeatEffectsY =
+                    this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.Bottom) + effectSpacing;
                 aboveBeatEffectsY =
-                    this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.TopWithStem) - effectSpacing;
+                    this._internalGetNoteY(this.minStepsNote!.glyph, NoteYPosition.TopWithStem) - effectSpacing;
             } else {
                 belowBeatEffectsY =
-                    this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.BottomWithStem) + effectSpacing;
-                aboveBeatEffectsY = this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.Top) - effectSpacing;
+                    this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.BottomWithStem) + effectSpacing;
+                aboveBeatEffectsY = this._internalGetNoteY(this.minStepsNote!.glyph, NoteYPosition.Top) - effectSpacing;
             }
         }
 
@@ -231,32 +244,40 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
 
         if (this.beat.isTremolo && !this.beat.deadSlapped) {
-            const direction = this.direction;
-
-            let tremoloY = 0;
-            if (direction === BeamDirection.Up) {
-                const topY = this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.TopWithStem);
-                const bottomY = this._internalGetNoteY(this.minNote!.glyph, NoteYPosition.StemUp);
-
-                tremoloY = (topY + bottomY) / 2;
-            } else {
-                const topY = this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.StemDown);
-                const bottomY = this._internalGetNoteY(this.maxNote!.glyph, NoteYPosition.BottomWithStem);
-
-                tremoloY = (topY + bottomY) / 2;
-            }
-
-            let tremoloX: number = this.stemX;
-            const speed: Duration = this.beat.tremoloSpeed!;
-
-            if (this.beat.duration < Duration.Half) {
-                tremoloX = this.width / 2;
-            }
-
-            this._tremoloPicking = new TremoloPickingGlyph(tremoloX, tremoloY, speed);
+            this._tremoloPicking = new TremoloPickingGlyph(0, 0, this.beat.tremoloSpeed!);
             this._tremoloPicking.renderer = this.renderer;
             this._tremoloPicking.doLayout();
+
+            this._alignTremoloPickingGlyph();
         }
+    }
+
+    private _alignTremoloPickingGlyph() {
+        const g = this._tremoloPicking!;
+        const direction = this.direction;
+        if (direction === BeamDirection.Up) {
+            g.alignTremoloPickingGlyph(
+                direction,
+                this.getHighestNoteY(NoteYPosition.TopWithStem),
+                this.getHighestNoteY(NoteYPosition.Center),
+                this.beat.duration
+            );
+        } else {
+            g.alignTremoloPickingGlyph(
+                direction,
+                this.getLowestNoteY(NoteYPosition.BottomWithStem),
+                this.getLowestNoteY(NoteYPosition.Center),
+                this.beat.duration
+            );
+        }
+        this._stemLengthExtension = g.stemExtensionHeight;
+
+        let tremoloX: number = this.stemX;
+        if (this.beat.duration < Duration.Half) {
+            tremoloX = this.width / 2;
+        }
+
+        g.x = tremoloX;
     }
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {

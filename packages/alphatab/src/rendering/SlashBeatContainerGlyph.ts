@@ -28,15 +28,15 @@ export class SlashBeatContainerGlyph extends BeatContainerGlyph {
         const beat = this.beat;
         const isGrace = beat.graceType !== GraceType.None;
         if (sr.hasFlag(beat)) {
-            const direction = this.renderer.getBeatDirection(beat);
+            const direction = sr.getBeatDirection(beat);
             const scale = isGrace ? EngravingSettings.GraceScale : 1;
             const symbol = FlagGlyph.getSymbol(beat.duration, direction, isGrace);
-            const flagWidth = this.renderer.smuflMetrics.glyphWidths.get(symbol)! * scale;
+            const flagWidth = sr.smuflMetrics.glyphWidths.get(symbol)! * scale;
             this._flagStretch = flagWidth;
         } else if (isGrace) {
             // always use flag size as spacing on grace notes
             const graceSpacing =
-                this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * EngravingSettings.GraceScale;
+                sr.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * EngravingSettings.GraceScale;
             this._flagStretch = graceSpacing;
         }
 

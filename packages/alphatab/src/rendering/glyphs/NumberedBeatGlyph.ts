@@ -152,12 +152,12 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    public override getLowestNoteY(): number {
-        return this._internalGetNoteY(NoteYPosition.Center);
+    public override getLowestNoteY(requestedPosition: NoteYPosition): number {
+        return this._internalGetNoteY(requestedPosition);
     }
 
-    public override getHighestNoteY(): number {
-        return this._internalGetNoteY(NoteYPosition.Center);
+    public override getHighestNoteY(requestedPosition: NoteYPosition): number {
+        return this._internalGetNoteY(requestedPosition);
     }
 
     public override getNoteY(_note: Note, requestedPosition: NoteYPosition): number {

@@ -9,7 +9,7 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
 import { NotationMode } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
-import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
 import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
@@ -31,7 +31,7 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 export abstract class LineBarRenderer extends BarRendererBase {
     protected firstLineY: number = 0;
     private _startSpacing = false;
-    protected tupletSize: number = 0;
+    public tupletSize: number = 0;
 
     public get lineOffset(): number {
         return this.lineSpacing;
@@ -199,12 +199,21 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
     }
 
-    protected abstract getBeamDirection(helper: BeamingHelper): BeamDirection;
+    protected abstract getBeamDirection(_helper: BeamingHelper): BeamDirection;
+
+    public getBeatDirection(beat: Beat): BeamDirection {
+        const helper = this.helpers.getBeamingHelperForBeat(beat);
+        return helper ? this.getBeamDirection(helper) : BeamDirection.Up;
+    }
+
     protected getTupletBeamDirection(helper: BeamingHelper): BeamDirection {
         return this.getBeamDirection(helper);
     }
 
-    protected abstract calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number;
+    protected calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
+        this.ensureBeamDrawingInfo(h, direction);
+        return h.drawingInfos.get(direction)!.calcY(x);
+    }
 
     private _paintTupletHelper(
         cx: number,
@@ -597,34 +606,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
         canvas: ICanvas
     ): void;
 
-    protected getFlagStemSize(duration: Duration, forceMinStem: boolean = false): number {
-        let size: number = 0;
-
-        switch (duration) {
-            case Duration.QuadrupleWhole:
-            case Duration.Half:
-            case Duration.Quarter:
-            case Duration.Eighth:
-            case Duration.Sixteenth:
-            case Duration.ThirtySecond:
-            case Duration.SixtyFourth:
-            case Duration.OneHundredTwentyEighth:
-            case Duration.TwoHundredFiftySixth:
-                size = this.smuflMetrics.standardStemLength + this.smuflMetrics.stemFlagOffsets.get(duration)!;
-                break;
-            default:
-                size = forceMinStem ? this.smuflMetrics.standardStemLength : 0;
-                break;
-        }
-        return size;
-    }
-
     protected override recreatePreBeatGlyphs(): void {
         this._startSpacing = false;
         super.recreatePreBeatGlyphs();
     }
-
-    protected abstract getBarLineStart(beat: Beat, direction: BeamDirection): number;
 
     public calculateBeamY(h: BeamingHelper, x: number): number {
         return this.calculateBeamYWithDirection(h, x, this.getBeamDirection(h));
@@ -634,6 +619,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
         super.createPreBeatGlyphs();
         this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         this.createLinePreBeatGlyphs();
+        if (this.index === 0) {
+            this.createStartSpacing();
+        }
         this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
     }
 
@@ -673,7 +661,12 @@ export abstract class LineBarRenderer extends BarRendererBase {
             }
 
             const beatLineX: number = this.getBeatX(beat, BeatXPosition.Stem);
-            const y1: number = cy + this.y + this.getBarLineStart(beat, direction);
+            let y1: number = cy + this.y;
+            if (direction === BeamDirection.Up) {
+                y1 += this.getFlagBottomY(beat, direction);
+            } else {
+                y1 += this.getFlagTopY(beat, direction);
+            }
 
             // ensure we are pixel aligned on the end of the stem to avoid anti-aliasing artifacts
             // when combining stems and beams on sub-pixel level
@@ -834,26 +827,27 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected calculateBeamingOverflows(rendererTop: number, rendererBottom: number) {
         let maxNoteY = 0;
         let minNoteY = 0;
-        const noteOverflowPadding = this.getLineHeight(0.5);
 
         for (const v of this.helpers.beamHelpers) {
             for (const h of v) {
                 if (!this.shouldPaintBeamingHelper(h)) {
                     // no visible helper
                 }
-                // notes with stems
+                // notes with stems (and potential flags)
                 else if (h.beats.length === 1 && h.beats[0].duration >= Duration.Half) {
                     const tupletDirection = this.getTupletBeamDirection(h);
-                    if (h.direction === BeamDirection.Up) {
-                        let topY = this.getFlagTopY(h.beats[0], h.direction);
-                        if (h.hasTuplet && tupletDirection === h.direction) {
+                    const direction = this.getBeamDirection(h);
+                    const flagOverflow = this.smuflMetrics.stemFlagOffsets.get(h.beats[0].duration)!;
+                    if (direction === BeamDirection.Up) {
+                        let topY = this.getFlagTopY(h.beats[0], direction) - flagOverflow;
+                        if (h.hasTuplet && tupletDirection === direction) {
                             topY -= this.tupletSize + this.tupletOffset;
                         }
                         if (topY < maxNoteY) {
                             maxNoteY = topY;
                         }
 
-                        if (h.hasTuplet && tupletDirection !== h.direction) {
+                        if (h.hasTuplet && tupletDirection !== direction) {
                             let bottomY = this.getFlagBottomY(h.beats[0], tupletDirection);
                             bottomY += this.tupletSize + this.tupletOffset;
 
@@ -864,15 +858,15 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
                         // bottom handled via beat container bBox
                     } else {
-                        let bottomY = this.getFlagBottomY(h.beats[0], h.direction);
-                        if (h.hasTuplet && tupletDirection === h.direction) {
+                        let bottomY = this.getFlagBottomY(h.beats[0], direction) + flagOverflow;
+                        if (h.hasTuplet && tupletDirection === direction) {
                             bottomY += this.tupletSize + this.tupletOffset;
                         }
                         if (bottomY > minNoteY) {
                             minNoteY = bottomY;
                         }
 
-                        if (h.hasTuplet && tupletDirection !== h.direction) {
+                        if (h.hasTuplet && tupletDirection !== direction) {
                             let topY = this.getFlagTopY(h.beats[0], tupletDirection);
                             topY -= this.tupletSize + this.tupletOffset;
 
@@ -887,13 +881,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 // beamed notes and notes without stems
                 // (see paintTuplets in case of doubts how we handle tuplets on non beamed notes)
                 else {
-                    this.ensureBeamDrawingInfo(h, h.direction);
-                    const drawingInfo = h.drawingInfos.get(h.direction)!;
+                    const direction = this.getBeamDirection(h);
+                    this.ensureBeamDrawingInfo(h, direction);
+                    const drawingInfo = h.drawingInfos.get(direction)!;
                     const tupletDirection = this.getTupletBeamDirection(h);
 
-                    if (h.direction === BeamDirection.Up) {
+                    if (direction === BeamDirection.Up) {
                         let topY = Math.min(drawingInfo.startY, drawingInfo.endY);
-                        if (h.hasTuplet && tupletDirection === h.direction) {
+                        if (h.hasTuplet && tupletDirection === direction) {
                             topY -= this.tupletSize + this.tupletOffset;
                         }
 
@@ -901,9 +896,11 @@ export abstract class LineBarRenderer extends BarRendererBase {
                             maxNoteY = topY;
                         }
 
-                        let bottomY: number =
-                            this.getBarLineStart(h.beatOfLowestNote, h.direction) + noteOverflowPadding;
-                        if (h.hasTuplet && tupletDirection !== h.direction) {
+                        let bottomY: number = this.voiceContainer.getLowestNoteY(
+                            h.beatOfLowestNote,
+                            NoteYPosition.Bottom
+                        );
+                        if (h.hasTuplet && tupletDirection !== direction) {
                             bottomY += this.tupletSize + this.tupletOffset;
                         }
 
@@ -913,7 +910,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     } else {
                         let bottomY = Math.max(drawingInfo.startY, drawingInfo.endY);
 
-                        if (h.hasTuplet && tupletDirection === h.direction) {
+                        if (h.hasTuplet && tupletDirection === direction) {
                             bottomY += this.tupletSize + this.tupletOffset;
                         }
 
@@ -921,8 +918,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
                             minNoteY = bottomY;
                         }
 
-                        let topY: number = this.getBarLineStart(h.beatOfHighestNote, h.direction) - noteOverflowPadding;
-                        if (h.hasTuplet && tupletDirection !== h.direction) {
+                        let topY: number = this.voiceContainer.getHighestNoteY(h.beatOfHighestNote, NoteYPosition.Top);
+                        if (h.hasTuplet && tupletDirection !== direction) {
                             topY -= this.tupletSize + this.tupletOffset;
                         }
 
@@ -1021,39 +1018,12 @@ export abstract class LineBarRenderer extends BarRendererBase {
         const drawingInfo = this.initializeBeamDrawingInfo(h, direction);
         h.drawingInfos.set(direction, drawingInfo);
 
-        const isRest = h.isRestBeamHelper;
-        const scale = h.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
         const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
 
         // 3. adjust beam drawing order
         // we can only draw up to 2 beams towards the noteheads, then we have to grow to the other side
         // here we shift accordingly
-        let barDrawingShift = 0;
-        if (barCount > 2 && !isRest) {
-            const beamSpacing = this.beamSpacing * scale;
-            const beamThickness = this.beamThickness * scale;
-            const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;
-
-            if (direction === BeamDirection.Up) {
-                const bottomBarY = drawingInfo.startY + 2 * beamThickness + beamSpacing;
-                const barTopY = bottomBarY - totalBarsHeight;
-                const diff = drawingInfo.startY - barTopY;
-                if (diff > 0) {
-                    barDrawingShift = diff * -1;
-                    drawingInfo.startY -= diff;
-                    drawingInfo.endY -= diff;
-                }
-            } else {
-                const topBarY = drawingInfo.startY - 2 * beamThickness + beamSpacing;
-                const barBottomY = topBarY + totalBarsHeight;
-                const diff = barBottomY - drawingInfo.startY;
-                if (diff > 0) {
-                    barDrawingShift = diff;
-                    drawingInfo.startY += diff;
-                    drawingInfo.endY += diff;
-                }
-            }
-        }
+        const barDrawingShift = this.applyBarShift(h, direction, drawingInfo, barCount);
 
         // 4. let middle elements shift up/down
         if (h.beats.length > 1) {
@@ -1116,9 +1086,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 for (const b of h.slashBeats) {
                     const yGivenByCurrentValues = drawingInfo.calcY(this.getBeatX(b, BeatXPosition.Stem));
                     const yNeededForSlash =
-                        h.direction === BeamDirection.Up
-                            ? this.getFlagTopY(b, h.direction)
-                            : this.getFlagBottomY(b, h.direction);
+                        direction === BeamDirection.Up
+                            ? this.getFlagTopY(b, direction)
+                            : this.getFlagBottomY(b, direction);
 
                     const diff = yNeededForSlash - yGivenByCurrentValues;
                     if (diff > 0) {
@@ -1128,6 +1098,43 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 }
             }
         }
+    }
+    protected applyBarShift(
+        h: BeamingHelper,
+        direction: BeamDirection,
+        drawingInfo: BeamingHelperDrawInfo,
+        barCount: number
+    ) {
+        let barDrawingShift = 0;
+        const isRest = h.isRestBeamHelper;
+        const scale = h.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
+
+        if (barCount > 2 && !isRest) {
+            const beamSpacing = this.beamSpacing * scale;
+            const beamThickness = this.beamThickness * scale;
+            const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;
+
+            if (direction === BeamDirection.Up) {
+                const bottomBarY = drawingInfo.startY + 2 * beamThickness + beamSpacing;
+                const barTopY = bottomBarY - totalBarsHeight;
+                const diff = drawingInfo.startY - barTopY;
+                if (diff > 0) {
+                    barDrawingShift = diff * -1;
+                    drawingInfo.startY -= diff;
+                    drawingInfo.endY -= diff;
+                }
+            } else {
+                const topBarY = drawingInfo.startY - 2 * beamThickness + beamSpacing;
+                const barBottomY = topBarY + totalBarsHeight;
+                const diff = barBottomY - drawingInfo.startY;
+                if (diff > 0) {
+                    barDrawingShift = diff;
+                    drawingInfo.startY += diff;
+                    drawingInfo.endY += diff;
+                }
+            }
+        }
+        return barDrawingShift;
     }
 
     protected getMinLineOfBeat(_beat: Beat): number {

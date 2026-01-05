@@ -1,4 +1,3 @@
-import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
@@ -15,9 +14,7 @@ import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/Accidental
 import { ClefGlyph } from '@coderline/alphatab/rendering/glyphs/ClefGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { KeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/KeySignatureGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
-import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNoteHeadGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
@@ -110,90 +107,27 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return BeatSubElement.StandardNotationTuplet;
     }
 
-    private _getSlashFlagY() {
-        const line = (this.heightLineCount - 1) / 2;
-        const slashY = this.getLineY(line);
-        return slashY;
-    }
-
     protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
-        if (beat.slashed) {
-            let slashY = this._getSlashFlagY();
-            const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
-            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
-
-            if (direction === BeamDirection.Down) {
-                slashY -= this.smuflMetrics.stemDown.has(symbol)
-                    ? this.smuflMetrics.stemDown.get(symbol)!.topY * scale
-                    : 0;
-            } else {
-                slashY -= this.smuflMetrics.stemUp.has(symbol)
-                    ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale
-                    : 0;
-                if (!beat.isRest) {
-                    slashY -= this.smuflMetrics.standardStemLength + scale;
-                }
-            }
-
-            return slashY;
+        const position = direction === BeamDirection.Up ? NoteYPosition.TopWithStem : NoteYPosition.StemDown;
+        if (beat.isRest) {
+            return this.getRestY(beat, position);
+        } else {
+            return this.voiceContainer.getHighestNoteY(beat, position);
         }
-
-        const minNote = this.accidentalHelper.getMinStepsNote(beat);
-        if (minNote) {
-            return this.getNoteY(
-                minNote,
-                direction === BeamDirection.Up ? NoteYPosition.TopWithStem : NoteYPosition.StemDown
-            );
-        }
-
-        let y = this.getScoreY(this.accidentalHelper.getMinSteps(beat));
-
-        if (direction === BeamDirection.Up && !beat.isRest) {
-            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
-            y -= this.smuflMetrics.standardStemLength * scale;
-        }
-
-        return y;
     }
 
     protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
-        if (beat.slashed) {
-            let slashY = this._getSlashFlagY();
-            const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
-            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
+        const position = direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.BottomWithStem;
 
-            if (direction === BeamDirection.Down) {
-                slashY -= this.smuflMetrics.stemDown.has(symbol)
-                    ? this.smuflMetrics.stemDown.get(symbol)!.topY * scale
-                    : 0;
-                slashY += this.smuflMetrics.standardStemLength + scale;
-            } else {
-                slashY -= this.smuflMetrics.stemUp.has(symbol)
-                    ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale
-                    : 0;
-            }
-
-            return slashY;
+        if (beat.isRest) {
+            return this.getRestY(beat, position);
+        } else {
+            return this.voiceContainer.getLowestNoteY(beat, position);
         }
-
-        const maxNote = this.accidentalHelper.getMaxStepsNote(beat);
-        if (maxNote) {
-            return this.getNoteY(
-                maxNote,
-                direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.BottomWithStem
-            );
-        }
-
-        let y = this.getScoreY(this.accidentalHelper.getMaxSteps(beat));
-        if (direction === BeamDirection.Down) {
-            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
-            y += this.smuflMetrics.standardStemLength * scale;
-        }
-        return y;
     }
 
     protected override getBeamDirection(helper: BeamingHelper): BeamDirection {
-        return helper.direction;
+        return this._beamDirections.has(helper) ? this._beamDirections.get(helper)! : BeamDirection.Up;
     }
 
     public centerStaffStemY(direction: BeamDirection) {
@@ -210,53 +144,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return this.getScoreY(0);
     }
 
-    public getStemBottomY(_beamingHelper: BeamingHelper): number {
-        throw new Error('Method not implemented.');
-    }
-
     public override get middleYPosition(): number {
         return this.getScoreY(this.bar.staff.standardNotationLineCount - 1);
-    }
-
-    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        if (note.beat.slashed) {
-            const line = (this.heightLineCount - 1) / 2;
-            return this.getLineY(line);
-        }
-
-        let y = super.getNoteY(note, requestedPosition);
-        if (Number.isNaN(y)) {
-            // NOTE: some might request the note position before the glyphs have been created
-            // e.g. the beaming helper, for these we just need a rough
-            // estimate on the position
-            const steps = AccidentalHelper.computeStepsWithoutAccidentals(this.bar, note);
-            y = this.getScoreY(steps);
-            const scale = note.beat.graceType === GraceType.None ? 1 : EngravingSettings.GraceScale;
-            const stemHeight = this.smuflMetrics.standardStemLength * scale;
-            const noteHeadHeight =
-                this.smuflMetrics.glyphHeights.get(NoteHeadGlyph.getSymbol(note.beat.duration))! * scale;
-            switch (requestedPosition) {
-                case NoteYPosition.TopWithStem:
-                    y -= stemHeight;
-                    break;
-                case NoteYPosition.Top:
-                    y -= noteHeadHeight / 2;
-                    break;
-                case NoteYPosition.Center:
-                    break;
-                case NoteYPosition.Bottom:
-                    y += noteHeadHeight / 2;
-                    break;
-                case NoteYPosition.BottomWithStem:
-                    y += stemHeight;
-                    break;
-                case NoteYPosition.StemUp:
-                    break;
-                case NoteYPosition.StemDown:
-                    break;
-            }
-        }
-        return y;
     }
 
     public override applyLayoutingInfo(): boolean {
@@ -274,39 +163,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
             }
         }
         return result;
-    }
-
-    protected override calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
-        if (h.beats.length === 0) {
-            return direction === BeamDirection.Up
-                ? this.getFlagTopY(h.beats[0], direction)
-                : this.getFlagBottomY(h.beats[0], direction);
-        }
-
-        this.ensureBeamDrawingInfo(h, direction);
-        return h.drawingInfos.get(direction)!.calcY(x);
-    }
-
-    protected override getBarLineStart(beat: Beat, direction: BeamDirection): number {
-        if (beat.slashed) {
-            return direction === BeamDirection.Down
-                ? this.getFlagTopY(beat, direction)
-                : this.getFlagBottomY(beat, direction);
-        }
-
-        if (direction === BeamDirection.Up) {
-            const maxNote = this.accidentalHelper.getMaxStepsNote(beat);
-            if (maxNote) {
-                return this.getNoteY(maxNote, NoteYPosition.StemUp);
-            }
-            return this.getScoreY(this.accidentalHelper.getMaxSteps(beat));
-        }
-
-        const minNote = this.accidentalHelper.getMinStepsNote(beat);
-        if (minNote) {
-            return this.getNoteY(minNote, NoteYPosition.StemDown);
-        }
-        return this.getScoreY(this.accidentalHelper.getMinSteps(beat));
     }
 
     protected override getMinLineOfBeat(beat: Beat): number {
@@ -486,32 +342,75 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return this.accidentalHelper.getNoteSteps(n);
     }
 
+    private readonly _beamDirections = new Map<BeamingHelper, BeamDirection>();
+
     public override completeBeamingHelper(helper: BeamingHelper) {
-        // for multi-voice bars we need to register the positions
-        // for multi-voice rest displacement to avoid collisions
-        if (this.bar.isMultiVoice && helper.highestNoteInHelper && helper.lowestNoteInHelper) {
-            let highestNotePosition = 0;
-            let lowestNotePosition = 0;
-
-            let offset = 0;
-            if (helper.hasTuplet) {
-                offset += this.resources.effectFont.size * 2;
-            }
-
-            if (helper.direction === BeamDirection.Up) {
-                highestNotePosition = this.getNoteY(helper.highestNoteInHelper, NoteYPosition.TopWithStem) - offset;
-                lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper, NoteYPosition.Bottom);
-            } else {
-                highestNotePosition = this.getNoteY(helper.highestNoteInHelper, NoteYPosition.Top);
-                lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper, NoteYPosition.BottomWithStem) + offset;
-            }
-
-            for (const beat of helper.beats) {
-                this.helpers.collisionHelper.reserveBeatSlot(beat, highestNotePosition, lowestNotePosition);
-            }
-        }
+        const direction = this._calculateBeamDirection(helper);
+        this._beamDirections.set(helper, direction);
     }
 
+    private _calculateBeamDirection(helper: BeamingHelper): BeamDirection {
+        // no proper voice (should not happen usually)
+        if (!helper.voice) {
+            return BeamDirection.Up;
+        }
+        // we have a preferred direction
+        if (helper.preferredBeamDirection !== null) {
+            return helper.preferredBeamDirection!;
+        }
+        // on multi-voice setups secondary voices are always down
+        if (helper.voice.index > 0) {
+            return this._invertBeamDirection(helper, BeamDirection.Down);
+        }
+        // on multi-voice setups primary voices are always up
+        if (helper.voice.bar.isMultiVoice) {
+            return this._invertBeamDirection(helper, BeamDirection.Up);
+        }
+        // grace notes are always up
+        if (helper.beats[0].graceType !== GraceType.None) {
+            return this._invertBeamDirection(helper, BeamDirection.Up);
+        }
+
+        if (helper.beats.length === 1 && helper.beats[0].slashed) {
+            return this._invertBeamDirection(helper, BeamDirection.Down);
+        }
+
+        // the average line is used for determination
+        //      key lowerequal than middle line -> up
+        //      key higher than middle line -> down
+        if (helper.highestNoteInHelper && helper.lowestNoteInHelper) {
+            // NOTE: This is the only place where we need the locations before we have positioned the notes
+            // TODO: we should first register all note-heads and calculate the accidentals+steps
+            const highestNotePosition = this._getNoteCenterYBeforeLayouting(helper.highestNoteInHelper);
+            const lowestNotePosition = this._getNoteCenterYBeforeLayouting(helper.lowestNoteInHelper);
+
+            const avg = (highestNotePosition + lowestNotePosition) / 2;
+            return this._invertBeamDirection(
+                helper,
+                this.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down
+            );
+        }
+
+        return this._invertBeamDirection(helper, BeamDirection.Up);
+    }
+
+    private _getNoteCenterYBeforeLayouting(note: Note): number {
+        const steps = AccidentalHelper.computeStepsWithoutAccidentals(this.bar, note);
+        return this.getScoreY(steps);
+    }
+
+    private _invertBeamDirection(helper: BeamingHelper, direction: BeamDirection): BeamDirection {
+        if (!helper.invertBeamDirection) {
+            return direction;
+        }
+        switch (direction) {
+            case BeamDirection.Down:
+                return BeamDirection.Up;
+            // case BeamDirection.Up:
+            default:
+                return BeamDirection.Down;
+        }
+    }
     protected override paintBeamingStem(
         beat: Beat,
         _cy: number,

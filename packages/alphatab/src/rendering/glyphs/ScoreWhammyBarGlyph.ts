@@ -38,19 +38,19 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
         if (!endGlyph) {
             return false;
         }
-        return !!endGlyph.minNote && !!endGlyph.maxNote;
+        return !!endGlyph.minStepsNote && !!endGlyph.maxStepsNote;
     }
 
     public override getBoundingBoxTop(): number {
-        if (this._endGlyph?.minNote) {
-            return this._endGlyph.minNote.glyph.getBoundingBoxTop();
+        if (this._endGlyph?.minStepsNote) {
+            return this._endGlyph.minStepsNote.glyph.getBoundingBoxTop();
         }
         return super.getBoundingBoxTop();
     }
 
     public override getBoundingBoxBottom(): number {
-        if (this._endGlyph?.maxNote) {
-            return this._endGlyph.maxNote.glyph.getBoundingBoxBottom();
+        if (this._endGlyph?.maxStepsNote) {
+            return this._endGlyph.maxStepsNote.glyph.getBoundingBoxBottom();
         }
         return super.getBoundingBoxBottom();
     }

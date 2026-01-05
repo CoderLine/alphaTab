@@ -270,10 +270,6 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         // as long we have some nodes, we can already start semantically
         // validating and using them
 
-        if (scoreNode.bars.length === 0) {
-            throw new UnsupportedFormatError('No alphaTex data found');
-        }
-
         this._bars(scoreNode);
 
         if (this.semanticDiagnostics.hasErrors) {

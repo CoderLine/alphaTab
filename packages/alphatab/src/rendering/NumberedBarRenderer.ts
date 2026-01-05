@@ -9,7 +9,6 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
 import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
@@ -22,7 +21,7 @@ import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import type { BeamingHelper, BeamingHelperDrawInfo } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -163,7 +162,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 for (const additionalNumber of container.iterateAdditionalNumbers()) {
                     barCount = additionalNumber.barCount;
                     beatLineX =
-                        this.beatGlyphsStart + additionalNumber.x + additionalNumber.getBeatX(BeatXPosition.PreNotes, false);
+                        this.beatGlyphsStart +
+                        additionalNumber.x +
+                        additionalNumber.getBeatX(BeatXPosition.PreNotes, false);
                     for (let barIndex = 0; barIndex < barCount; barIndex++) {
                         const barY: number = barStart + barIndex * barSpacing;
                         const additionalBarEndX =
@@ -242,49 +243,12 @@ export class NumberedBarRenderer extends LineBarRenderer {
         return this.getLineY(0);
     }
 
-    public override completeBeamingHelper(helper: BeamingHelper): void {
-        super.completeBeamingHelper(helper);
-        helper.direction = BeamDirection.Down;
-    }
-
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
         return BeamDirection.Down;
     }
 
     protected override getTupletBeamDirection(_helper: BeamingHelper): BeamDirection {
         return BeamDirection.Up;
-    }
-
-    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        let y = super.getNoteY(note, requestedPosition);
-        if (Number.isNaN(y)) {
-            y = this.getLineY(0);
-        }
-        return y;
-    }
-
-    protected override calculateBeamYWithDirection(h: BeamingHelper, _x: number, direction: BeamDirection): number {
-        if (h.beats.length === 0) {
-            return this.getLineY(0);
-        }
-
-        this.ensureBeamDrawingInfo(h, direction);
-        const info = h.drawingInfos.get(direction)!;
-        if (direction === BeamDirection.Up) {
-            return Math.min(info.startY, info.endY);
-        } else {
-            return Math.max(info.startY, info.endY);
-        }
-    }
-
-    protected override getBarLineStart(beat: Beat, _direction: BeamDirection): number {
-        // NOTE: this is only for the overflow calculation, this renderer has a custom bar drawing logic
-        const container = this.voiceContainer.getBeatContainer(beat);
-        if (!container) {
-            return this.voiceContainer.getBoundingBoxTop();
-        }
-
-        return container.getBoundingBoxTop();
     }
 
     protected override createPreBeatGlyphs(): void {
@@ -407,6 +371,25 @@ export class NumberedBarRenderer extends LineBarRenderer {
     ): void {
         if (h.voice?.index === 0) {
             super.paintBeamHelper(cx, cy, canvas, h, flagsElement, beamsElement);
+        }
+    }
+
+    protected override applyBarShift(
+        _h: BeamingHelper,
+        _direction: BeamDirection,
+        _drawingInfo: BeamingHelperDrawInfo,
+        _barCount: number
+    ): number {
+        return 0;
+    }
+
+    protected override calculateBeamYWithDirection(h: BeamingHelper, _x: number, direction: BeamDirection): number {
+        this.ensureBeamDrawingInfo(h, direction);
+        const info = h.drawingInfos.get(direction)!;
+        if (direction === BeamDirection.Up) {
+            return Math.min(info.startY, info.endY);
+        } else {
+            return Math.max(info.startY, info.endY);
         }
     }
 }

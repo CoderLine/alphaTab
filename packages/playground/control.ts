@@ -16,6 +16,7 @@ const params = new URL(window.location.href).searchParams;
 const defaultSettings = {
     core: {
         logLevel: (params.get('loglevel') ?? 'info') as alphaTab.json.CoreSettingsJson['logLevel'],
+        engine: params.get('engine') ?? 'default',
         file: '/test-data/audio/full-song.gp5',
         fontDirectory: '/font/bravura/'
     },
@@ -256,7 +257,7 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
     document.ondragover = e => {
         e.stopPropagation();
         e.preventDefault();
-        e.dataTransfer!.dropEffect = 'link';
+        e.dataTransfer!.dropEffect = 'copy';
     };
 
     document.ondrop = e => {
@@ -677,3 +678,5 @@ function updateProgress(el: HTMLElement, value: number) {
     }
     el.querySelector<HTMLElement>('.progress-value-number')!.innerText = String(value | 0);
 }
+
+import './crosshair';
