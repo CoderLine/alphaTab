@@ -6,634 +6,308 @@ import type { Note } from '@coderline/alphatab/model/Note';
  * @internal
  */
 export class PercussionMapper {
-    private static _gp6ElementAndVariationToArticulation: number[][] = [
-        // known GP6 elements and variations, analyzed from a GPX test file
-        // with all instruments inside manually aligned with the same names of articulations in GP7
-        // [{articulation index}]   // [{element number}] => {element name} ({variation[0]}, {variation[1]}, {variation[2]})
-        [35, 35, 35], // [0] => Kick (hit, unused, unused)
-        [38, 91, 37], // [1] => Snare (hit, rim shot, side stick)
-        [99, 100, 99], // [2] => Cowbell low (hit, tip, unused)
-        [56, 100, 56], // [3] => Cowbell medium (hit, tip, unused)
-        [102, 103, 102], // [4] => Cowbell high (hit, tip, unused)
-        [43, 43, 43], // [5] => Tom very low (hit, unused, unused)
-        [45, 45, 45], // [6] => Tom low (hit, unused, unused)
-        [47, 47, 47], // [7] => Tom medium (hit, unused, unused)
-        [48, 48, 48], // [8] => Tom high (hit, unused, unused)
-        [50, 50, 50], // [9] => Tom very high (hit, unused, unused)
-        [42, 92, 46], // [10] => Hihat (closed, half, open)
-        [44, 44, 44], // [11] => Pedal hihat (hit, unused, unused)
-        [57, 98, 57], // [12] => Crash medium (hit, choke, unused)
-        [49, 97, 49], // [13] => Crash high (hit, choke, unused)
-        [55, 95, 55], // [14] => Splash (hit, choke, unused)
-        [51, 93, 127], // [15] => Ride (middle, edge, bell)
-        [52, 96, 52] // [16] => China (hit, choke, unused)
-    ];
+    //
+    // To update the following generated code, use the GpExporterTest.percussion-articulations unit test
+    // which will generate the new code to copy for here.
+    // We could also use an NPM script for that but for now this is enough.
 
-    public static articulationFromElementVariation(element: number, variation: number): number {
-        if (element < PercussionMapper._gp6ElementAndVariationToArticulation.length) {
-            if (variation >= PercussionMapper._gp6ElementAndVariationToArticulation.length) {
-                variation = 0;
-            }
-            return PercussionMapper._gp6ElementAndVariationToArticulation[element][variation];
-        }
-        // unknown combination, should not happen, fallback to some default value (Snare hit)
-        return 38;
-    }
-
-    /*
-     * This map was generated using the following steps:
-     * 1. Make a new GP7 file with a drumkit track
-     * 2. Add one note for each midi value using the instrument panel
-     * 3. Load the file in alphaTab and set a breakpoint in the GP7 importer.
-     * 4. Use the following snipped in the console to generate the map initializer (fix enums manually):
-     * parser = new DOMParser();
-     * xmlDoc = parser.parseFromString(xml, 'text/xml');
-     * articulations = xmlDoc.getElementsByTagName('Articulation');
-     * existingArticulations = new Map();
-     * s = '';
-     * for(let i = 0; i < articulations.length; i++) {
-     *     const articulation = articulations[i];
-     *     let midi = articulation.getElementsByTagName('InputMidiNumbers');
-     * 	if(midi.length === 1) {
-     * 		midi = midi[0].textContent;
-     *      const elementType = articulation.parentElement.parentElement.getElementsByTagName('Type')[0].textContent;
-     *      const outputMidiNumber = articulation.getElementsByTagName('OutputMidiNumber')[0].textContent;
-     * 		const staffLine = articulation.getElementsByTagName('StaffLine')[0].textContent;
-     * 		const techniqueSymbol = articulation.getElementsByTagName('TechniqueSymbol')[0].textContent;
-     * 		const techniquePlacement = articulation.getElementsByTagName('TechniquePlacement')[0].textContent;
-     * 		const noteHeads = articulation.getElementsByTagName('Noteheads')[0].textContent.split(' ').map(n=>n = 'MusicFontSymbol.' + n);
-     * 		if(!existingArticulations.has(midi)) {
-     *        if(techniqueSymbol) {
-     * 		    s += `['${elementType}', ${midi}, new InstrumentArticulation(${staffLine}, ${outputMidiNumber}, ${noteHeads[0]}, ${noteHeads[1]}, ${noteHeads[2]}, ${techniqueSymbol}, ${techniquePlacement})],\r\n`;
-     *        }
-     *        else {
-     * 		    s += `['${elementType}', ${midi}, new InstrumentArticulation(${staffLine}, ${outputMidiNumber}, ${noteHeads[0]}, ${noteHeads[1]}, ${noteHeads[2]})],\r\n`;
-     *        }
-     * 		  existingArticulations.set(midi, true);
-     * 		}
-     * 	}
-     * }
-     * copy(s)
-     */
-    public static instrumentArticulations: Map<number, InstrumentArticulation> = new Map([
+    // BEGIN generated articulations
+    public static instrumentArticulations: Map<number, InstrumentArticulation> = new Map(
         [
-            38,
-            new InstrumentArticulation(
+            InstrumentArticulation.create(
+                29,
+                'ride',
+                2,
+                59,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.ArticStaccatoAbove,
+                TechniqueSymbolPlacement.Outside
+            ),
+            InstrumentArticulation.create(
+                30,
+                'crash',
+                -3,
+                49,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack
+            ),
+            InstrumentArticulation.create(
+                31,
                 'snare',
                 3,
-                38,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            37,
-            new InstrumentArticulation(
+                40,
+                MusicFontSymbol.NoteheadSlashedBlack2,
+                MusicFontSymbol.NoteheadSlashedBlack2,
+                MusicFontSymbol.NoteheadSlashedBlack2
+            ),
+            InstrumentArticulation.create(
+                33,
                 'snare',
                 3,
                 37,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            91,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                34,
                 'snare',
                 3,
                 38,
-                MusicFontSymbol.NoteheadDiamondWhite,
-                MusicFontSymbol.NoteheadDiamondWhite,
-                MusicFontSymbol.NoteheadDiamondWhite
-            )
-        ],
-        [
-            42,
-            new InstrumentArticulation(
-                'hiHat',
-                -1,
-                42,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            92,
-            new InstrumentArticulation(
-                'hiHat',
-                -1,
-                46,
-                MusicFontSymbol.NoteheadCircleSlash,
-                MusicFontSymbol.NoteheadCircleSlash,
-                MusicFontSymbol.NoteheadCircleSlash
-            )
-        ],
-        [
-            46,
-            new InstrumentArticulation(
-                'hiHat',
-                -1,
-                46,
-                MusicFontSymbol.NoteheadCircleX,
-                MusicFontSymbol.NoteheadCircleX,
-                MusicFontSymbol.NoteheadCircleX
-            )
-        ],
-        [
-            44,
-            new InstrumentArticulation(
-                'hiHat',
-                9,
-                44,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            35,
-            new InstrumentArticulation(
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadBlack
+            ),
+            InstrumentArticulation.create(
+                35,
                 'kickDrum',
                 8,
                 35,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            36,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                36,
                 'kickDrum',
                 7,
                 36,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            50,
-            new InstrumentArticulation(
-                'tom',
-                1,
-                50,
+            ),
+            InstrumentArticulation.create(
+                37,
+                'snare',
+                3,
+                37,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack
+            ),
+            InstrumentArticulation.create(
+                38,
+                'snare',
+                3,
+                38,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            48,
-            new InstrumentArticulation(
-                'tom',
-                2,
-                48,
+            ),
+            InstrumentArticulation.create(
+                39,
+                'handClap',
+                3,
+                39,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            47,
-            new InstrumentArticulation(
-                'tom',
-                4,
-                47,
+            ),
+            InstrumentArticulation.create(
+                40,
+                'snare',
+                3,
+                40,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            45,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                41,
                 'tom',
                 5,
-                45,
+                41,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            43,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                42,
+                'hiHat',
+                -1,
+                42,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack
+            ),
+            InstrumentArticulation.create(
+                43,
                 'tom',
                 6,
                 43,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            93,
-            new InstrumentArticulation(
-                'ride',
-                0,
+            ),
+            InstrumentArticulation.create(
+                44,
+                'hiHat',
+                9,
+                44,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack
+            ),
+            InstrumentArticulation.create(
+                45,
+                'tom',
+                5,
+                45,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                46,
+                'hiHat',
+                -1,
+                46,
+                MusicFontSymbol.NoteheadCircleX,
+                MusicFontSymbol.NoteheadCircleX,
+                MusicFontSymbol.NoteheadCircleX
+            ),
+            InstrumentArticulation.create(
+                47,
+                'tom',
+                4,
+                47,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                48,
+                'tom',
+                2,
+                48,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                49,
+                'crash',
+                -2,
+                49,
+                MusicFontSymbol.NoteheadHeavyX,
+                MusicFontSymbol.NoteheadHeavyX,
+                MusicFontSymbol.NoteheadHeavyX
+            ),
+            InstrumentArticulation.create(
+                50,
+                'tom',
+                1,
+                50,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
                 51,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.PictEdgeOfCymbal,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            51,
-            new InstrumentArticulation(
                 'ride',
                 0,
                 51,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            53,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                52,
+                'china',
+                -3,
+                52,
+                MusicFontSymbol.NoteheadHeavyXHat,
+                MusicFontSymbol.NoteheadHeavyXHat,
+                MusicFontSymbol.NoteheadHeavyXHat
+            ),
+            InstrumentArticulation.create(
+                53,
                 'ride',
                 0,
                 53,
                 MusicFontSymbol.NoteheadDiamondWhite,
                 MusicFontSymbol.NoteheadDiamondWhite,
                 MusicFontSymbol.NoteheadDiamondWhite
-            )
-        ],
-        [
-            94,
-            new InstrumentArticulation(
-                'ride',
-                0,
-                51,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.ArticStaccatoAbove,
-                TechniqueSymbolPlacement.Above
-            )
-        ],
-        [
-            55,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                54,
+                'tambourine',
+                3,
+                54,
+                MusicFontSymbol.NoteheadTriangleUpBlack,
+                MusicFontSymbol.NoteheadTriangleUpBlack,
+                MusicFontSymbol.NoteheadTriangleUpBlack
+            ),
+            InstrumentArticulation.create(
+                55,
                 'splash',
                 -2,
                 55,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            95,
-            new InstrumentArticulation(
-                'splash',
-                -2,
-                55,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.ArticStaccatoAbove,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            52,
-            new InstrumentArticulation(
-                'china',
-                -3,
-                52,
-                MusicFontSymbol.NoteheadHeavyXHat,
-                MusicFontSymbol.NoteheadHeavyXHat,
-                MusicFontSymbol.NoteheadHeavyXHat
-            )
-        ],
-        [
-            96,
-            new InstrumentArticulation(
-                'china',
-                -3,
-                52,
-                MusicFontSymbol.NoteheadHeavyXHat,
-                MusicFontSymbol.NoteheadHeavyXHat,
-                MusicFontSymbol.NoteheadHeavyXHat
-            )
-        ],
-        [
-            49,
-            new InstrumentArticulation(
-                'crash',
-                -2,
-                49,
-                MusicFontSymbol.NoteheadHeavyX,
-                MusicFontSymbol.NoteheadHeavyX,
-                MusicFontSymbol.NoteheadHeavyX
-            )
-        ],
-        [
-            97,
-            new InstrumentArticulation(
-                'crash',
-                -2,
-                49,
-                MusicFontSymbol.NoteheadHeavyX,
-                MusicFontSymbol.NoteheadHeavyX,
-                MusicFontSymbol.NoteheadHeavyX,
-                MusicFontSymbol.ArticStaccatoAbove,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            57,
-            new InstrumentArticulation(
-                'crash',
-                -1,
-                57,
-                MusicFontSymbol.NoteheadHeavyX,
-                MusicFontSymbol.NoteheadHeavyX,
-                MusicFontSymbol.NoteheadHeavyX
-            )
-        ],
-        [
-            98,
-            new InstrumentArticulation(
-                'crash',
-                -1,
-                57,
-                MusicFontSymbol.NoteheadHeavyX,
-                MusicFontSymbol.NoteheadHeavyX,
-                MusicFontSymbol.NoteheadHeavyX,
-                MusicFontSymbol.ArticStaccatoAbove,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            99,
-            new InstrumentArticulation(
-                'cowbell',
-                1,
+            ),
+            InstrumentArticulation.create(
                 56,
-                MusicFontSymbol.NoteheadTriangleUpBlack,
-                MusicFontSymbol.NoteheadTriangleUpHalf,
-                MusicFontSymbol.NoteheadTriangleUpWhole
-            )
-        ],
-        [
-            100,
-            new InstrumentArticulation(
-                'cowbell',
-                1,
-                56,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXHalf,
-                MusicFontSymbol.NoteheadXWhole
-            )
-        ],
-        [
-            56,
-            new InstrumentArticulation(
                 'cowbell',
                 0,
                 56,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
                 MusicFontSymbol.NoteheadTriangleUpHalf,
                 MusicFontSymbol.NoteheadTriangleUpWhole
-            )
-        ],
-        [
-            101,
-            new InstrumentArticulation(
-                'cowbell',
+            ),
+            InstrumentArticulation.create(
+                57,
+                'crash',
+                -1,
+                57,
+                MusicFontSymbol.NoteheadHeavyX,
+                MusicFontSymbol.NoteheadHeavyX,
+                MusicFontSymbol.NoteheadHeavyX
+            ),
+            InstrumentArticulation.create(
+                58,
+                'vibraslap',
+                28,
+                58,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                59,
+                'ride',
                 0,
-                56,
+                59,
                 MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXHalf,
-                MusicFontSymbol.NoteheadXWhole
-            )
-        ],
-        [
-            102,
-            new InstrumentArticulation(
-                'cowbell',
-                -1,
-                56,
-                MusicFontSymbol.NoteheadTriangleUpBlack,
-                MusicFontSymbol.NoteheadTriangleUpHalf,
-                MusicFontSymbol.NoteheadTriangleUpWhole
-            )
-        ],
-        [
-            103,
-            new InstrumentArticulation(
-                'cowbell',
-                -1,
-                56,
                 MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXHalf,
-                MusicFontSymbol.NoteheadXWhole
-            )
-        ],
-        [
-            77,
-            new InstrumentArticulation(
-                'woodblock',
-                -9,
-                77,
-                MusicFontSymbol.NoteheadTriangleUpBlack,
-                MusicFontSymbol.NoteheadTriangleUpBlack,
-                MusicFontSymbol.NoteheadTriangleUpBlack
-            )
-        ],
-        [
-            76,
-            new InstrumentArticulation(
-                'woodblock',
-                -10,
-                76,
-                MusicFontSymbol.NoteheadTriangleUpBlack,
-                MusicFontSymbol.NoteheadTriangleUpBlack,
-                MusicFontSymbol.NoteheadTriangleUpBlack
-            )
-        ],
-        [
-            60,
-            new InstrumentArticulation(
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.PictEdgeOfCymbal,
+                TechniqueSymbolPlacement.Above
+            ),
+            InstrumentArticulation.create(
+                60,
                 'bongo',
                 -4,
                 60,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            104,
-            new InstrumentArticulation(
-                'bongo',
-                -5,
-                60,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole,
-                MusicFontSymbol.NoteheadParenthesis,
-                TechniqueSymbolPlacement.Inside
-            )
-        ],
-        [
-            105,
-            new InstrumentArticulation(
-                'bongo',
-                -6,
-                60,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            61,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                61,
                 'bongo',
                 -7,
                 61,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            106,
-            new InstrumentArticulation(
-                'bongo',
-                -8,
-                61,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole,
-                MusicFontSymbol.NoteheadParenthesis,
-                TechniqueSymbolPlacement.Inside
-            )
-        ],
-        [
-            107,
-            new InstrumentArticulation(
-                'bongo',
-                -16,
-                61,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            66,
-            new InstrumentArticulation(
-                'timbale',
-                10,
-                66,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            65,
-            new InstrumentArticulation(
-                'timbale',
-                9,
-                65,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            68,
-            new InstrumentArticulation(
-                'agogo',
-                12,
-                68,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            67,
-            new InstrumentArticulation(
-                'agogo',
-                11,
-                67,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            64,
-            new InstrumentArticulation(
-                'conga',
-                17,
-                64,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            108,
-            new InstrumentArticulation(
-                'conga',
-                16,
-                64,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            109,
-            new InstrumentArticulation(
-                'conga',
-                15,
-                64,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole,
-                MusicFontSymbol.NoteheadParenthesis,
-                TechniqueSymbolPlacement.Inside
-            )
-        ],
-        [
-            63,
-            new InstrumentArticulation(
-                'conga',
-                14,
-                63,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            110,
-            new InstrumentArticulation(
-                'conga',
-                13,
-                63,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            62,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                62,
                 'conga',
                 19,
                 62,
@@ -642,171 +316,162 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.NoteheadParenthesis,
                 TechniqueSymbolPlacement.Inside
-            )
-        ],
-        [
-            72,
-            new InstrumentArticulation(
-                'whistle',
-                -11,
-                72,
+            ),
+            InstrumentArticulation.create(
+                63,
+                'conga',
+                14,
+                63,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            71,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                64,
+                'conga',
+                17,
+                64,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                65,
+                'timbale',
+                9,
+                65,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                66,
+                'timbale',
+                10,
+                66,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                67,
+                'agogo',
+                11,
+                67,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                68,
+                'agogo',
+                12,
+                68,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                69,
+                'cabasa',
+                23,
+                69,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                70,
+                'maraca',
+                -12,
+                70,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                71,
                 'whistle',
                 -17,
                 71,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            73,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                72,
+                'whistle',
+                -11,
+                72,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                73,
                 'guiro',
                 38,
                 73,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            74,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                74,
                 'guiro',
                 37,
                 74,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            86,
-            new InstrumentArticulation(
-                'surdo',
-                36,
-                86,
+            ),
+            InstrumentArticulation.create(
+                75,
+                'claves',
+                20,
+                75,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            87,
-            new InstrumentArticulation(
-                'surdo',
-                35,
-                87,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadParenthesis,
-                TechniqueSymbolPlacement.Inside
-            )
-        ],
-        [
-            54,
-            new InstrumentArticulation(
-                'tambourine',
-                3,
-                54,
+            ),
+            InstrumentArticulation.create(
+                76,
+                'woodblock',
+                -10,
+                76,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
                 MusicFontSymbol.NoteheadTriangleUpBlack
-            )
-        ],
-        [
-            111,
-            new InstrumentArticulation(
-                'tambourine',
-                2,
-                54,
+            ),
+            InstrumentArticulation.create(
+                77,
+                'woodblock',
+                -9,
+                77,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
-                MusicFontSymbol.NoteheadTriangleUpBlack,
-                MusicFontSymbol.StringsUpBow,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            112,
-            new InstrumentArticulation(
-                'tambourine',
-                1,
-                54,
-                MusicFontSymbol.NoteheadTriangleUpBlack,
-                MusicFontSymbol.NoteheadTriangleUpBlack,
-                MusicFontSymbol.NoteheadTriangleUpBlack,
-                MusicFontSymbol.StringsDownBow,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            113,
-            new InstrumentArticulation(
-                'tambourine',
-                -7,
-                54,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            79,
-            new InstrumentArticulation(
-                'cuica',
-                30,
-                79,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            78,
-            new InstrumentArticulation(
+                MusicFontSymbol.NoteheadTriangleUpBlack
+            ),
+            InstrumentArticulation.create(
+                78,
                 'cuica',
                 29,
                 78,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            58,
-            new InstrumentArticulation(
-                'vibraslap',
-                28,
-                58,
+            ),
+            InstrumentArticulation.create(
+                79,
+                'cuica',
+                30,
+                79,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            81,
-            new InstrumentArticulation(
-                'triangle',
-                27,
-                81,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            80,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                80,
                 'triangle',
                 26,
                 80,
@@ -815,55 +480,328 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadParenthesis,
                 TechniqueSymbolPlacement.Inside
-            )
-        ],
-        [
-            114,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                81,
+                'triangle',
+                27,
+                81,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                82,
+                'shaker',
+                -23,
+                82,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                83,
+                'jingleBell',
+                -20,
+                53,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                84,
+                'bellTree',
+                -18,
+                53,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                85,
+                'castanets',
+                21,
+                85,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                86,
+                'surdo',
+                36,
+                86,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole
+            ),
+            InstrumentArticulation.create(
+                87,
+                'surdo',
+                35,
+                87,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadParenthesis,
+                TechniqueSymbolPlacement.Inside
+            ),
+            InstrumentArticulation.create(
+                91,
+                'snare',
+                3,
+                38,
+                MusicFontSymbol.NoteheadDiamondWhite,
+                MusicFontSymbol.NoteheadDiamondWhite,
+                MusicFontSymbol.NoteheadDiamondWhite
+            ),
+            InstrumentArticulation.create(
+                92,
+                'hiHat',
+                -1,
+                46,
+                MusicFontSymbol.NoteheadCircleSlash,
+                MusicFontSymbol.NoteheadCircleSlash,
+                MusicFontSymbol.NoteheadCircleSlash
+            ),
+            InstrumentArticulation.create(
+                93,
+                'ride',
+                0,
+                51,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.PictEdgeOfCymbal,
+                TechniqueSymbolPlacement.Above
+            ),
+            InstrumentArticulation.create(
+                94,
+                'ride',
+                0,
+                51,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.ArticStaccatoAbove,
+                TechniqueSymbolPlacement.Outside
+            ),
+            InstrumentArticulation.create(
+                95,
+                'splash',
+                -2,
+                55,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.ArticStaccatoAbove,
+                TechniqueSymbolPlacement.Outside
+            ),
+            InstrumentArticulation.create(
+                96,
+                'china',
+                -3,
+                52,
+                MusicFontSymbol.NoteheadHeavyXHat,
+                MusicFontSymbol.NoteheadHeavyXHat,
+                MusicFontSymbol.NoteheadHeavyXHat
+            ),
+            InstrumentArticulation.create(
+                97,
+                'crash',
+                -2,
+                49,
+                MusicFontSymbol.NoteheadHeavyX,
+                MusicFontSymbol.NoteheadHeavyX,
+                MusicFontSymbol.NoteheadHeavyX,
+                MusicFontSymbol.ArticStaccatoAbove,
+                TechniqueSymbolPlacement.Outside
+            ),
+            InstrumentArticulation.create(
+                98,
+                'crash',
+                -1,
+                57,
+                MusicFontSymbol.NoteheadHeavyX,
+                MusicFontSymbol.NoteheadHeavyX,
+                MusicFontSymbol.NoteheadHeavyX,
+                MusicFontSymbol.ArticStaccatoAbove,
+                TechniqueSymbolPlacement.Outside
+            ),
+            InstrumentArticulation.create(
+                99,
+                'cowbell',
+                1,
+                56,
+                MusicFontSymbol.NoteheadTriangleUpBlack,
+                MusicFontSymbol.NoteheadTriangleUpHalf,
+                MusicFontSymbol.NoteheadTriangleUpWhole
+            ),
+            InstrumentArticulation.create(
+                100,
+                'cowbell',
+                1,
+                56,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXHalf,
+                MusicFontSymbol.NoteheadXWhole
+            ),
+            InstrumentArticulation.create(
+                101,
+                'cowbell',
+                0,
+                56,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXHalf,
+                MusicFontSymbol.NoteheadXWhole
+            ),
+            InstrumentArticulation.create(
+                102,
+                'cowbell',
+                -1,
+                56,
+                MusicFontSymbol.NoteheadTriangleUpBlack,
+                MusicFontSymbol.NoteheadTriangleUpHalf,
+                MusicFontSymbol.NoteheadTriangleUpWhole
+            ),
+            InstrumentArticulation.create(
+                103,
+                'cowbell',
+                -1,
+                56,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXHalf,
+                MusicFontSymbol.NoteheadXWhole
+            ),
+            InstrumentArticulation.create(
+                104,
+                'bongo',
+                -5,
+                60,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole,
+                MusicFontSymbol.NoteheadParenthesis,
+                TechniqueSymbolPlacement.Inside
+            ),
+            InstrumentArticulation.create(
+                105,
+                'bongo',
+                -6,
+                60,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack
+            ),
+            InstrumentArticulation.create(
+                106,
+                'bongo',
+                -8,
+                61,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole,
+                MusicFontSymbol.NoteheadParenthesis,
+                TechniqueSymbolPlacement.Inside
+            ),
+            InstrumentArticulation.create(
+                107,
+                'bongo',
+                -16,
+                61,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack
+            ),
+            InstrumentArticulation.create(
+                108,
+                'conga',
+                16,
+                64,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack
+            ),
+            InstrumentArticulation.create(
+                109,
+                'conga',
+                15,
+                64,
+                MusicFontSymbol.NoteheadBlack,
+                MusicFontSymbol.NoteheadHalf,
+                MusicFontSymbol.NoteheadWhole,
+                MusicFontSymbol.NoteheadParenthesis,
+                TechniqueSymbolPlacement.Inside
+            ),
+            InstrumentArticulation.create(
+                110,
+                'conga',
+                13,
+                63,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack
+            ),
+            InstrumentArticulation.create(
+                111,
+                'tambourine',
+                2,
+                54,
+                MusicFontSymbol.NoteheadTriangleUpBlack,
+                MusicFontSymbol.NoteheadTriangleUpBlack,
+                MusicFontSymbol.NoteheadTriangleUpBlack,
+                MusicFontSymbol.StringsUpBow,
+                TechniqueSymbolPlacement.Above
+            ),
+            InstrumentArticulation.create(
+                112,
+                'tambourine',
+                1,
+                54,
+                MusicFontSymbol.NoteheadTriangleUpBlack,
+                MusicFontSymbol.NoteheadTriangleUpBlack,
+                MusicFontSymbol.NoteheadTriangleUpBlack,
+                MusicFontSymbol.StringsDownBow,
+                TechniqueSymbolPlacement.Above
+            ),
+            InstrumentArticulation.create(
+                113,
+                'tambourine',
+                -7,
+                54,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack,
+                MusicFontSymbol.NoteheadXBlack
+            ),
+            InstrumentArticulation.create(
+                114,
                 'grancassa',
                 25,
                 43,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            115,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                115,
                 'piatti',
                 18,
                 49,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            116,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                116,
                 'piatti',
                 24,
                 49,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            69,
-            new InstrumentArticulation(
-                'cabasa',
-                23,
-                69,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            117,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                117,
                 'cabasa',
                 22,
                 69,
@@ -871,45 +809,10 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.StringsUpBow,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            85,
-            new InstrumentArticulation(
-                'castanets',
-                21,
-                85,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            75,
-            new InstrumentArticulation(
-                'claves',
-                20,
-                75,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            70,
-            new InstrumentArticulation(
-                'maraca',
-                -12,
-                70,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            118,
-            new InstrumentArticulation(
+                TechniqueSymbolPlacement.Outside
+            ),
+            InstrumentArticulation.create(
+                118,
                 'maraca',
                 -13,
                 70,
@@ -917,23 +820,19 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.StringsUpBow,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            119,
-            new InstrumentArticulation(
+                TechniqueSymbolPlacement.Outside
+            ),
+            InstrumentArticulation.create(
+                119,
                 'maraca',
                 -14,
                 70,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            120,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                120,
                 'maraca',
                 -15,
                 70,
@@ -941,47 +840,21 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.StringsUpBow,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            82,
-            new InstrumentArticulation(
-                'shaker',
-                -23,
-                54,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            122,
-            new InstrumentArticulation(
+                TechniqueSymbolPlacement.Outside
+            ),
+            InstrumentArticulation.create(
+                122,
                 'shaker',
                 -24,
-                54,
+                82,
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.StringsUpBow,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            84,
-            new InstrumentArticulation(
-                'bellTree',
-                -18,
-                53,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            123,
-            new InstrumentArticulation(
+                TechniqueSymbolPlacement.Outside
+            ),
+            InstrumentArticulation.create(
+                123,
                 'bellTree',
                 -19,
                 53,
@@ -989,23 +862,10 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.StringsUpBow,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            83,
-            new InstrumentArticulation(
-                'jingleBell',
-                -20,
-                53,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            124,
-            new InstrumentArticulation(
+                TechniqueSymbolPlacement.Outside
+            ),
+            InstrumentArticulation.create(
+                124,
                 'unpitched',
                 -21,
                 62,
@@ -1013,12 +873,10 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadNull,
                 MusicFontSymbol.NoteheadNull,
                 MusicFontSymbol.GuitarGolpe,
-                TechniqueSymbolPlacement.Above
-            )
-        ],
-        [
-            125,
-            new InstrumentArticulation(
+                TechniqueSymbolPlacement.Below
+            ),
+            InstrumentArticulation.create(
+                125,
                 'unpitched',
                 -22,
                 62,
@@ -1026,140 +884,30 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadNull,
                 MusicFontSymbol.NoteheadNull,
                 MusicFontSymbol.GuitarGolpe,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            39,
-            new InstrumentArticulation(
-                'handClap',
-                3,
-                39,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            40,
-            new InstrumentArticulation(
-                'snare',
-                3,
-                40,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            31,
-            new InstrumentArticulation(
-                'snare',
-                3,
-                40,
-                MusicFontSymbol.NoteheadSlashedBlack2,
-                MusicFontSymbol.NoteheadSlashedBlack2,
-                MusicFontSymbol.NoteheadSlashedBlack2
-            )
-        ],
-        [
-            41,
-            new InstrumentArticulation(
-                'tom',
-                5,
-                41,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadHalf,
-                MusicFontSymbol.NoteheadWhole
-            )
-        ],
-        [
-            59,
-            new InstrumentArticulation(
+                TechniqueSymbolPlacement.Above
+            ),
+            InstrumentArticulation.create(
+                126,
                 'ride',
-                2,
-                59,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.PictEdgeOfCymbal,
-                TechniqueSymbolPlacement.Below
-            )
-        ],
-        [
-            126,
-            new InstrumentArticulation(
-                'ride',
-                2,
+                0,
                 59,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            127,
-            new InstrumentArticulation(
+            ),
+            InstrumentArticulation.create(
+                127,
                 'ride',
-                2,
+                0,
                 59,
                 MusicFontSymbol.NoteheadDiamondWhite,
                 MusicFontSymbol.NoteheadDiamondWhite,
                 MusicFontSymbol.NoteheadDiamondWhite
             )
-        ],
-        [
-            29,
-            new InstrumentArticulation(
-                'ride',
-                2,
-                59,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.ArticStaccatoAbove,
-                TechniqueSymbolPlacement.Above
-            )
-        ],
-        [
-            30,
-            new InstrumentArticulation(
-                'crash',
-                -3,
-                49,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            33,
-            new InstrumentArticulation(
-                'snare',
-                3,
-                37,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack,
-                MusicFontSymbol.NoteheadXBlack
-            )
-        ],
-        [
-            34,
-            new InstrumentArticulation(
-                'snare',
-                3,
-                38,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadBlack,
-                MusicFontSymbol.NoteheadBlack
-            )
-        ]
-    ]);
+        ].map(articulation => [articulation.id, articulation])
+    );
 
-    // these are manually defined names/identifiers for the articulation list above.
-    // they are currently only used in the AlphaTex importer when using default articulations
-    // but they are kept here close to the source of the default aritculation list to maintain them together.
-    public static instrumentArticulationNames = new Map<string, number>([
+    private static _instrumentArticulationNames = new Map<string, number>([
         ['Ride (choke)', 29],
         ['Cymbal (hit)', 30],
         ['Snare (side stick)', 31],
@@ -1190,10 +938,8 @@ export class PercussionMapper {
         ['Crash medium (hit)', 57],
         ['Vibraslap (hit)', 58],
         ['Ride (edge)', 59],
-        ['Hand (hit)', 60],
-        ['Hand (hit)', 61],
         ['Bongo high (hit)', 60],
-        ['Bongo low (hit)', 61],
+        ['Hand (hit)', 61],
         ['Conga high (mute)', 62],
         ['Conga high (hit)', 63],
         ['Conga low (hit)', 64],
@@ -1216,7 +962,6 @@ export class PercussionMapper {
         ['Triangle (hit)', 81],
         ['Shaker (hit)', 82],
         ['Tinkle Bell (hat)', 83],
-        ['Jingle Bell (hit)', 83],
         ['Bell Tree (hit)', 84],
         ['Castanets (hit)', 85],
         ['Surdo (hit)', 86],
@@ -1258,6 +1003,41 @@ export class PercussionMapper {
         ['Ride (middle) 2', 126],
         ['Ride (bell) 2', 127]
     ]);
+    // END generated articulations
+
+    private static _gp6ElementAndVariationToArticulation: number[][] = [
+        // known GP6 elements and variations, analyzed from a GPX test file
+        // with all instruments inside manually aligned with the same names of articulations in GP7
+        // [{articulation index}]   // [{element number}] => {element name} ({variation[0]}, {variation[1]}, {variation[2]})
+        [35, 35, 35], // [0] => Kick (hit, unused, unused)
+        [38, 91, 37], // [1] => Snare (hit, rim shot, side stick)
+        [99, 100, 99], // [2] => Cowbell low (hit, tip, unused)
+        [56, 100, 56], // [3] => Cowbell medium (hit, tip, unused)
+        [102, 103, 102], // [4] => Cowbell high (hit, tip, unused)
+        [43, 43, 43], // [5] => Tom very low (hit, unused, unused)
+        [45, 45, 45], // [6] => Tom low (hit, unused, unused)
+        [47, 47, 47], // [7] => Tom medium (hit, unused, unused)
+        [48, 48, 48], // [8] => Tom high (hit, unused, unused)
+        [50, 50, 50], // [9] => Tom very high (hit, unused, unused)
+        [42, 92, 46], // [10] => Hihat (closed, half, open)
+        [44, 44, 44], // [11] => Pedal hihat (hit, unused, unused)
+        [57, 98, 57], // [12] => Crash medium (hit, choke, unused)
+        [49, 97, 49], // [13] => Crash high (hit, choke, unused)
+        [55, 95, 55], // [14] => Splash (hit, choke, unused)
+        [51, 93, 127], // [15] => Ride (middle, edge, bell)
+        [52, 96, 52] // [16] => China (hit, choke, unused)
+    ];
+
+    public static articulationFromElementVariation(element: number, variation: number): number {
+        if (element < PercussionMapper._gp6ElementAndVariationToArticulation.length) {
+            if (variation >= PercussionMapper._gp6ElementAndVariationToArticulation.length) {
+                variation = 0;
+            }
+            return PercussionMapper._gp6ElementAndVariationToArticulation[element][variation];
+        }
+        // unknown combination, should not happen, fallback to some default value (Snare hit)
+        return 38;
+    }
 
     public static getArticulationName(n: Note): string {
         const articulation = PercussionMapper.getArticulation(n);
@@ -1287,7 +1067,7 @@ export class PercussionMapper {
             return trackArticulations[articulationIndex];
         }
 
-        return PercussionMapper.getArticulationByInputMidiNumber(articulationIndex);
+        return PercussionMapper.getArticulationById(articulationIndex);
     }
 
     public static getElementAndVariation(n: Note): number[] {
@@ -1300,7 +1080,7 @@ export class PercussionMapper {
         for (let element = 0; element < PercussionMapper._gp6ElementAndVariationToArticulation.length; element++) {
             const variations = PercussionMapper._gp6ElementAndVariationToArticulation[element];
             for (let variation = 0; variation < variations.length; variation++) {
-                const gp6Articulation = PercussionMapper.getArticulationByInputMidiNumber(variations[variation]);
+                const gp6Articulation = PercussionMapper.getArticulationById(variations[variation]);
                 if (gp6Articulation?.outputMidiNumber === articulation.outputMidiNumber) {
                     return [element, variation];
                 }
@@ -1310,10 +1090,48 @@ export class PercussionMapper {
         return [-1, -1];
     }
 
-    public static getArticulationByInputMidiNumber(inputMidiNumber: number): InstrumentArticulation | null {
+    public static getArticulationById(inputMidiNumber: number): InstrumentArticulation | null {
         if (PercussionMapper.instrumentArticulations.has(inputMidiNumber)) {
             return PercussionMapper.instrumentArticulations.get(inputMidiNumber)!;
         }
         return null;
+    }
+
+    public static readonly instrumentArticulationNames = PercussionMapper._mergeNames([
+        PercussionMapper._instrumentArticulationNames,
+        new Map<string, number>([
+            ['Hand (hit)', 60],
+            ['Hand (hit)', 61],
+            ['Tinkle Bell (hat)', 83]
+        ])
+    ]);
+
+    private static _mergeNames(maps: Map<string, number>[]) {
+        const merged = new Map<string, number>(maps[0]);
+        for (let i = 1; i < maps.length; i++) {
+            for (const [k, v] of maps[i]) {
+                merged.set(k, v);
+            }
+        }
+        return merged;
+    }
+
+    private static _articulationsByOutputNumber: Map<number, InstrumentArticulation> | undefined;
+    public static tryMatchKnownArticulation(articulation: InstrumentArticulation): number {
+        let articulationsByOutputNumber = PercussionMapper._articulationsByOutputNumber;
+        if (!articulationsByOutputNumber) {
+            articulationsByOutputNumber = new Map<number, InstrumentArticulation>();
+            for (const a of PercussionMapper.instrumentArticulations.values()) {
+                // first one wins
+                if (!articulationsByOutputNumber.has(a.outputMidiNumber)) {
+                    articulationsByOutputNumber.set(a.outputMidiNumber, a);
+                }
+            }
+            PercussionMapper._articulationsByOutputNumber = articulationsByOutputNumber;
+        }
+
+        return articulationsByOutputNumber.has(articulation.outputMidiNumber)
+            ? articulationsByOutputNumber.get(articulation.outputMidiNumber)!.id
+            : -1;
     }
 }

@@ -685,7 +685,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         articulationIndex = this._state.articulationValueToIndex.get(numericValue)!;
                     } else {
                         articulationIndex = this._state.currentTrack!.percussionArticulations.length;
-                        const articulation = PercussionMapper.getArticulationByInputMidiNumber(numericValue);
+                        const articulation = PercussionMapper.getArticulationById(numericValue);
                         if (articulation === null) {
                             this.addSemanticDiagnostic({
                                 code: AlphaTexDiagnosticCode.AT209,

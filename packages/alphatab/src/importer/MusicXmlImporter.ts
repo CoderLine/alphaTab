@@ -29,6 +29,7 @@ import { Note, NoteStyle } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { Score } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
@@ -127,9 +128,9 @@ class TrackInfo {
         return line;
     }
 
-    private static _defaultNoteArticulation: InstrumentArticulation = new InstrumentArticulation(
-        'Default',
+    private static _defaultNoteArticulation: InstrumentArticulation = InstrumentArticulation.create(
         0,
+        'Default',
         0,
         MusicFontSymbol.NoteheadBlack,
         MusicFontSymbol.NoteheadHalf,
@@ -169,7 +170,8 @@ class TrackInfo {
 
         const staffLine = musicXmlStaffSteps - stepDifference;
 
-        const newArticulation = new InstrumentArticulation(
+        const newArticulation = InstrumentArticulation.create(
+            articulation.id,
             articulation.elementType,
             staffLine,
             articulation.outputMidiNumber,
@@ -693,6 +695,11 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'elevation': Ignored
             }
+        }
+
+        articulation.id = PercussionMapper.tryMatchKnownArticulation(articulation);
+        if (articulation.id < 0) {
+            articulation.id = 0;
         }
     }
 

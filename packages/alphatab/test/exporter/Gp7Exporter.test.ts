@@ -1,13 +1,22 @@
 import { Gp7Exporter } from '@coderline/alphatab/exporter/Gp7Exporter';
 import { Gp7To8Importer } from '@coderline/alphatab/importer/Gp7To8Importer';
+import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import {
+    type InstrumentArticulation,
+    TechniqueSymbolPlacement
+} from '@coderline/alphatab/model/InstrumentArticulation';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
+import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
+import { assert, expect } from 'chai';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { TestPlatform } from 'test/TestPlatform';
-import { expect } from 'chai';
 
 describe('Gp7ExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
@@ -171,9 +180,93 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('gp8', async () => {
-        await testRoundTripFolderEqual('guitarpro8', undefined, [
-            'bendpoints',
-            'bendtype',
-        ]);
+        await testRoundTripFolderEqual('guitarpro8', undefined, ['bendpoints', 'bendtype']);
+    });
+
+    /**
+     * This test generates the articulations code needed for the PercussionMapper.
+     * To update the code there, run this test and copy the source code from the written file.
+     * The test will fail and write a ".new" file if the code changed.
+     */
+    it('percussion-articulations', async () => {
+        const settings = new Settings();
+        const zip = new ZipReader(
+            ByteBuffer.fromBuffer(await TestPlatform.loadFile('test-data/exporter/articulations.gp'))
+        ).read();
+        const gpifData = zip.find(e => e.fileName === 'score.gpif')!.data;
+        const parser = new GpifParser();
+        parser.parseXml(IOHelper.toString(gpifData, settings.importer.encoding), settings);
+        const score = parser.score;
+
+        let instrumentArticulationsLookup =
+            'public static instrumentArticulations: Map<number, InstrumentArticulation> = new Map(\n';
+        instrumentArticulationsLookup += '  [\n';
+
+        let instrumentArticulationNames = 'private static _instrumentArticulationNames = new Map<string, number>([\n';
+
+        const existingNameMappings = new Set<string>(['']);
+        const existingCustomNames = new Map<number, string>();
+        for (const [name, id] of PercussionMapper.instrumentArticulationNames) {
+            existingCustomNames.set(id, name);
+        }
+
+        const deduplicateArticulations = new Map<number, InstrumentArticulation>();
+        for (const a of score.tracks[0].percussionArticulations) {
+            deduplicateArticulations.set(a.id, a);
+        }
+
+        const sorted = Array.from(deduplicateArticulations.values());
+        sorted.sort((a, b) => a.id - b.id);
+
+        for (const a of sorted) {
+            instrumentArticulationsLookup += `    InstrumentArticulation.create(`;
+            instrumentArticulationsLookup += `${a.id}, `;
+            instrumentArticulationsLookup += `${JSON.stringify(a.elementType)}, `;
+            instrumentArticulationsLookup += `${a.staffLine}, `;
+            instrumentArticulationsLookup += `${a.outputMidiNumber}, `;
+            instrumentArticulationsLookup += `MusicFontSymbol.${MusicFontSymbol[a.noteHeadDefault]}, `;
+            instrumentArticulationsLookup += `MusicFontSymbol.${MusicFontSymbol[a.noteHeadHalf]}, `;
+            instrumentArticulationsLookup += `MusicFontSymbol.${MusicFontSymbol[a.noteHeadWhole]}`;
+            if (a.techniqueSymbol !== MusicFontSymbol.None) {
+                instrumentArticulationsLookup += `, MusicFontSymbol.${MusicFontSymbol[a.techniqueSymbol]}, `;
+                instrumentArticulationsLookup += `TechniqueSymbolPlacement.${TechniqueSymbolPlacement[a.techniqueSymbolPlacement]}`;
+            }
+            instrumentArticulationsLookup += `),\n`;
+
+            let name: string;
+            if (existingCustomNames.has(a.id)) {
+                name = existingCustomNames.get(a.id)!;
+            } else if (parser.articulationNamesById.has(a.id)) {
+                name = parser.articulationNamesById.get(a.id)!;
+            } else {
+                name = '';
+            }
+
+            if (!existingNameMappings.has(name)) {
+                instrumentArticulationNames += `  [${JSON.stringify(name)}, ${a.id}],\n`;
+                existingNameMappings.add(name);
+            } else {
+                // primarily duplicates
+                instrumentArticulationNames += `  [TODO /*TODO define a name for ${a.elementType} */, ${a.id}],\n`;
+            }
+        }
+
+        instrumentArticulationsLookup += '  ].map(articulation => [articulation.id, articulation])';
+        instrumentArticulationsLookup += ');';
+        instrumentArticulationNames += ']);';
+
+        const sourceCode = [
+            '// BEGIN generated articulations',
+            instrumentArticulationsLookup,
+            '',
+            instrumentArticulationNames,
+            '// END generated articulations'
+        ].join('\n');
+
+        const expected = await TestPlatform.loadFileAsString('test-data/exporter/articulations.source');
+        if (expected !== sourceCode) {
+            await TestPlatform.saveFileAsString('test-data/exporter/articulations.source.new', sourceCode);
+            assert.fail('Articulations have changed, update the PercussionMapper and update the snapshot file');
+        }
     });
 });

@@ -98,6 +98,34 @@ export class InstrumentArticulation {
         this.techniqueSymbolPlacement = techniqueSymbolPlacement;
     }
 
+    // avoiding breaking change
+    /**
+     * @internal
+     */
+    public static create(
+        id: number = 0,
+        elementType: string = '',
+        staffLine: number = 0,
+        outputMidiNumber: number = 0,
+        noteHeadDefault: MusicFontSymbol = MusicFontSymbol.None,
+        noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
+        noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
+        techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
+        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside
+    ) {
+        return new InstrumentArticulation(
+            elementType,
+            staffLine,
+            outputMidiNumber,
+            noteHeadDefault,
+            noteHeadHalf,
+            noteHeadWhole,
+            techniqueSymbol,
+            techniqueSymbolPlacement,
+            id
+        );
+    }
+
     public getSymbol(duration: Duration): MusicFontSymbol {
         switch (duration) {
             case Duration.Whole:
