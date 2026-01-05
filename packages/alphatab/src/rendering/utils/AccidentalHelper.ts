@@ -15,9 +15,9 @@ import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRen
  */
 class BeatSteps {
     public maxSteps: number = -1000;
-    public maxStepsNote: Note|null=null;
+    public maxStepsNote: Note | null = null;
     public minSteps: number = -1000;
-    public minStepsNote: Note|null=null;
+    public minStepsNote: Note | null = null;
 }
 
 /**
@@ -28,7 +28,6 @@ class BeatSteps {
 export class AccidentalHelper {
     private _bar: Bar;
     private _barRenderer: LineBarRenderer;
-
 
     /**
      * We always have 7 steps per octave.
@@ -88,7 +87,7 @@ export class AccidentalHelper {
         if (noteValue < bar.staff.track.percussionArticulations.length) {
             return bar.staff.track.percussionArticulations[noteValue]!.staffLine;
         }
-        return PercussionMapper.getArticulationByInputMidiNumber(noteValue)?.staffLine ?? 0;
+        return PercussionMapper.getArticulationById(noteValue)?.staffLine ?? 0;
     }
 
     public static getNoteValue(note: Note) {
@@ -158,7 +157,6 @@ export class AccidentalHelper {
         }
         return steps;
     }
-
 
     private _getAccidental(
         noteValue: number,
@@ -250,7 +248,7 @@ export class AccidentalHelper {
         return accidentalToSet;
     }
 
-    private _registerSteps(relatedBeat: Beat, steps: number, note:Note|null) {
+    private _registerSteps(relatedBeat: Beat, steps: number, note: Note | null) {
         let beatSteps: BeatSteps;
         if (this._beatSteps.has(relatedBeat.id)) {
             beatSteps = this._beatSteps.get(relatedBeat.id)!;
@@ -272,15 +270,15 @@ export class AccidentalHelper {
         return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.maxSteps : 0;
     }
 
-    public getMaxStepsNote(b: Beat): Note|null {
+    public getMaxStepsNote(b: Beat): Note | null {
         return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.maxStepsNote : null;
     }
 
     public getMinSteps(b: Beat): number {
         return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.minSteps : 0;
     }
-    
-    public getMinStepsNote(b: Beat): Note|null {
+
+    public getMinStepsNote(b: Beat): Note | null {
         return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.minStepsNote : null;
     }
 
