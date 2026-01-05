@@ -528,5 +528,7 @@ describe('Gp7ExporterTest', () => {
         }
 
         expect(actualInstrumentSet.elements.size).to.equal(expectedInstrumentSet.elements.size);
+
+        // await TestPlatform.saveFile('test-data/exporter/articulations.exported.gp', exported);
     });
 });
