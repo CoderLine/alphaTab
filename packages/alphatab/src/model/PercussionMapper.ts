@@ -15,7 +15,7 @@ export class PercussionMapper {
         [
             InstrumentArticulation.create(
                 29,
-                'ride',
+                'Ride Cymbal 2',
                 2,
                 59,
                 MusicFontSymbol.NoteheadXBlack,
@@ -26,7 +26,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 30,
-                'crash',
+                'Reverse Cymbal',
                 -3,
                 49,
                 MusicFontSymbol.NoteheadXBlack,
@@ -35,7 +35,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 31,
-                'snare',
+                'Sticks',
                 3,
                 40,
                 MusicFontSymbol.NoteheadSlashedBlack2,
@@ -44,7 +44,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 33,
-                'snare',
+                'Metronome',
                 3,
                 37,
                 MusicFontSymbol.NoteheadXBlack,
@@ -53,7 +53,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 34,
-                'snare',
+                'Metronome',
                 3,
                 38,
                 MusicFontSymbol.NoteheadBlack,
@@ -62,7 +62,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 35,
-                'kickDrum',
+                'Acoustic Kick Drum',
                 8,
                 35,
                 MusicFontSymbol.NoteheadBlack,
@@ -71,7 +71,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 36,
-                'kickDrum',
+                'Kick Drum',
                 7,
                 36,
                 MusicFontSymbol.NoteheadBlack,
@@ -80,7 +80,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 37,
-                'snare',
+                'Snare',
                 3,
                 37,
                 MusicFontSymbol.NoteheadXBlack,
@@ -89,7 +89,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 38,
-                'snare',
+                'Snare',
                 3,
                 38,
                 MusicFontSymbol.NoteheadBlack,
@@ -98,7 +98,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 39,
-                'handClap',
+                'Hand Clap',
                 3,
                 39,
                 MusicFontSymbol.NoteheadBlack,
@@ -107,7 +107,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 40,
-                'snare',
+                'Electric Snare',
                 3,
                 40,
                 MusicFontSymbol.NoteheadBlack,
@@ -116,7 +116,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 41,
-                'tom',
+                'Very Low Floor Tom',
                 5,
                 41,
                 MusicFontSymbol.NoteheadBlack,
@@ -125,7 +125,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 42,
-                'hiHat',
+                'Charley',
                 -1,
                 42,
                 MusicFontSymbol.NoteheadXBlack,
@@ -134,7 +134,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 43,
-                'tom',
+                'Tom Very Low',
                 6,
                 43,
                 MusicFontSymbol.NoteheadBlack,
@@ -143,7 +143,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 44,
-                'hiHat',
+                'Charley',
                 9,
                 44,
                 MusicFontSymbol.NoteheadXBlack,
@@ -152,7 +152,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 45,
-                'tom',
+                'Tom Low',
                 5,
                 45,
                 MusicFontSymbol.NoteheadBlack,
@@ -161,7 +161,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 46,
-                'hiHat',
+                'Charley',
                 -1,
                 46,
                 MusicFontSymbol.NoteheadCircleX,
@@ -170,7 +170,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 47,
-                'tom',
+                'Tom Medium',
                 4,
                 47,
                 MusicFontSymbol.NoteheadBlack,
@@ -179,7 +179,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 48,
-                'tom',
+                'Tom High',
                 2,
                 48,
                 MusicFontSymbol.NoteheadBlack,
@@ -188,7 +188,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 49,
-                'crash',
+                'Crash High',
                 -2,
                 49,
                 MusicFontSymbol.NoteheadHeavyX,
@@ -197,7 +197,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 50,
-                'tom',
+                'Tom Very High',
                 1,
                 50,
                 MusicFontSymbol.NoteheadBlack,
@@ -206,7 +206,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 51,
-                'ride',
+                'Ride',
                 0,
                 51,
                 MusicFontSymbol.NoteheadXBlack,
@@ -215,7 +215,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 52,
-                'china',
+                'China',
                 -3,
                 52,
                 MusicFontSymbol.NoteheadHeavyXHat,
@@ -224,7 +224,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 53,
-                'ride',
+                'Ride',
                 0,
                 53,
                 MusicFontSymbol.NoteheadDiamondWhite,
@@ -233,7 +233,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 54,
-                'tambourine',
+                'Tambourine',
                 3,
                 54,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
@@ -242,7 +242,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 55,
-                'splash',
+                'Splash',
                 -2,
                 55,
                 MusicFontSymbol.NoteheadXBlack,
@@ -251,7 +251,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 56,
-                'cowbell',
+                'Cowbell Medium',
                 0,
                 56,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
@@ -260,7 +260,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 57,
-                'crash',
+                'Crash Medium',
                 -1,
                 57,
                 MusicFontSymbol.NoteheadHeavyX,
@@ -269,7 +269,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 58,
-                'vibraslap',
+                'Vibraslap',
                 28,
                 58,
                 MusicFontSymbol.NoteheadBlack,
@@ -278,8 +278,8 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 59,
-                'ride',
-                0,
+                'Ride Cymbal 2',
+                2,
                 59,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
@@ -289,7 +289,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 60,
-                'bongo',
+                'Bongo High',
                 -4,
                 60,
                 MusicFontSymbol.NoteheadBlack,
@@ -298,7 +298,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 61,
-                'bongo',
+                'Bongo Low',
                 -7,
                 61,
                 MusicFontSymbol.NoteheadBlack,
@@ -307,7 +307,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 62,
-                'conga',
+                'Conga High',
                 19,
                 62,
                 MusicFontSymbol.NoteheadBlack,
@@ -318,7 +318,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 63,
-                'conga',
+                'Conga High',
                 14,
                 63,
                 MusicFontSymbol.NoteheadBlack,
@@ -327,7 +327,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 64,
-                'conga',
+                'Conga Low',
                 17,
                 64,
                 MusicFontSymbol.NoteheadBlack,
@@ -336,7 +336,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 65,
-                'timbale',
+                'Timbale High',
                 9,
                 65,
                 MusicFontSymbol.NoteheadBlack,
@@ -345,7 +345,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 66,
-                'timbale',
+                'Timbale Low',
                 10,
                 66,
                 MusicFontSymbol.NoteheadBlack,
@@ -354,7 +354,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 67,
-                'agogo',
+                'Agogo High',
                 11,
                 67,
                 MusicFontSymbol.NoteheadBlack,
@@ -363,7 +363,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 68,
-                'agogo',
+                'Agogo Low',
                 12,
                 68,
                 MusicFontSymbol.NoteheadBlack,
@@ -372,7 +372,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 69,
-                'cabasa',
+                'Cabasa',
                 23,
                 69,
                 MusicFontSymbol.NoteheadBlack,
@@ -381,7 +381,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 70,
-                'maraca',
+                'Left Maraca',
                 -12,
                 70,
                 MusicFontSymbol.NoteheadBlack,
@@ -390,7 +390,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 71,
-                'whistle',
+                'Whistle High',
                 -17,
                 71,
                 MusicFontSymbol.NoteheadBlack,
@@ -399,7 +399,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 72,
-                'whistle',
+                'Whistle Low',
                 -11,
                 72,
                 MusicFontSymbol.NoteheadBlack,
@@ -408,7 +408,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 73,
-                'guiro',
+                'Guiro',
                 38,
                 73,
                 MusicFontSymbol.NoteheadBlack,
@@ -417,7 +417,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 74,
-                'guiro',
+                'Guiro',
                 37,
                 74,
                 MusicFontSymbol.NoteheadBlack,
@@ -426,7 +426,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 75,
-                'claves',
+                'Claves',
                 20,
                 75,
                 MusicFontSymbol.NoteheadBlack,
@@ -435,7 +435,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 76,
-                'woodblock',
+                'Woodblock High',
                 -10,
                 76,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
@@ -444,7 +444,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 77,
-                'woodblock',
+                'Woodblock Low',
                 -9,
                 77,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
@@ -453,7 +453,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 78,
-                'cuica',
+                'Cuica',
                 29,
                 78,
                 MusicFontSymbol.NoteheadXBlack,
@@ -462,7 +462,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 79,
-                'cuica',
+                'Cuica',
                 30,
                 79,
                 MusicFontSymbol.NoteheadBlack,
@@ -471,7 +471,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 80,
-                'triangle',
+                'Triangle',
                 26,
                 80,
                 MusicFontSymbol.NoteheadXBlack,
@@ -482,7 +482,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 81,
-                'triangle',
+                'Triangle',
                 27,
                 81,
                 MusicFontSymbol.NoteheadBlack,
@@ -491,7 +491,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 82,
-                'shaker',
+                'Shaker',
                 -23,
                 82,
                 MusicFontSymbol.NoteheadBlack,
@@ -500,7 +500,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 83,
-                'jingleBell',
+                'Tinkle Bell',
                 -20,
                 53,
                 MusicFontSymbol.NoteheadBlack,
@@ -509,7 +509,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 84,
-                'bellTree',
+                'Bell Tree',
                 -18,
                 53,
                 MusicFontSymbol.NoteheadBlack,
@@ -518,7 +518,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 85,
-                'castanets',
+                'Castanets',
                 21,
                 85,
                 MusicFontSymbol.NoteheadBlack,
@@ -527,7 +527,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 86,
-                'surdo',
+                'Surdo',
                 36,
                 86,
                 MusicFontSymbol.NoteheadBlack,
@@ -536,7 +536,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 87,
-                'surdo',
+                'Surdo',
                 35,
                 87,
                 MusicFontSymbol.NoteheadXBlack,
@@ -547,7 +547,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 91,
-                'snare',
+                'Snare',
                 3,
                 38,
                 MusicFontSymbol.NoteheadDiamondWhite,
@@ -556,7 +556,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 92,
-                'hiHat',
+                'Charley',
                 -1,
                 46,
                 MusicFontSymbol.NoteheadCircleSlash,
@@ -565,7 +565,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 93,
-                'ride',
+                'Ride',
                 0,
                 51,
                 MusicFontSymbol.NoteheadXBlack,
@@ -576,7 +576,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 94,
-                'ride',
+                'Ride',
                 0,
                 51,
                 MusicFontSymbol.NoteheadXBlack,
@@ -587,7 +587,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 95,
-                'splash',
+                'Splash',
                 -2,
                 55,
                 MusicFontSymbol.NoteheadXBlack,
@@ -598,7 +598,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 96,
-                'china',
+                'China',
                 -3,
                 52,
                 MusicFontSymbol.NoteheadHeavyXHat,
@@ -607,7 +607,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 97,
-                'crash',
+                'Crash High',
                 -2,
                 49,
                 MusicFontSymbol.NoteheadHeavyX,
@@ -618,7 +618,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 98,
-                'crash',
+                'Crash Medium',
                 -1,
                 57,
                 MusicFontSymbol.NoteheadHeavyX,
@@ -629,7 +629,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 99,
-                'cowbell',
+                'Cowbell Low',
                 1,
                 56,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
@@ -638,7 +638,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 100,
-                'cowbell',
+                'Cowbell Low',
                 1,
                 56,
                 MusicFontSymbol.NoteheadXBlack,
@@ -647,7 +647,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 101,
-                'cowbell',
+                'Cowbell Medium',
                 0,
                 56,
                 MusicFontSymbol.NoteheadXBlack,
@@ -656,7 +656,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 102,
-                'cowbell',
+                'Cowbell High',
                 -1,
                 56,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
@@ -665,7 +665,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 103,
-                'cowbell',
+                'Cowbell High',
                 -1,
                 56,
                 MusicFontSymbol.NoteheadXBlack,
@@ -674,7 +674,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 104,
-                'bongo',
+                'Bongo High',
                 -5,
                 60,
                 MusicFontSymbol.NoteheadBlack,
@@ -685,7 +685,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 105,
-                'bongo',
+                'Bongo High',
                 -6,
                 60,
                 MusicFontSymbol.NoteheadXBlack,
@@ -694,7 +694,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 106,
-                'bongo',
+                'Bongo Low',
                 -8,
                 61,
                 MusicFontSymbol.NoteheadBlack,
@@ -705,7 +705,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 107,
-                'bongo',
+                'Bongo Low',
                 -16,
                 61,
                 MusicFontSymbol.NoteheadXBlack,
@@ -714,7 +714,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 108,
-                'conga',
+                'Conga Low',
                 16,
                 64,
                 MusicFontSymbol.NoteheadXBlack,
@@ -723,7 +723,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 109,
-                'conga',
+                'Conga Low',
                 15,
                 64,
                 MusicFontSymbol.NoteheadBlack,
@@ -734,7 +734,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 110,
-                'conga',
+                'Conga High',
                 13,
                 63,
                 MusicFontSymbol.NoteheadXBlack,
@@ -743,7 +743,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 111,
-                'tambourine',
+                'Tambourine',
                 2,
                 54,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
@@ -754,7 +754,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 112,
-                'tambourine',
+                'Tambourine',
                 1,
                 54,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
@@ -765,7 +765,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 113,
-                'tambourine',
+                'Tambourine',
                 -7,
                 54,
                 MusicFontSymbol.NoteheadXBlack,
@@ -774,7 +774,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 114,
-                'grancassa',
+                'Grancassa',
                 25,
                 43,
                 MusicFontSymbol.NoteheadBlack,
@@ -783,7 +783,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 115,
-                'piatti',
+                'Piatti',
                 18,
                 49,
                 MusicFontSymbol.NoteheadBlack,
@@ -792,7 +792,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 116,
-                'piatti',
+                'Piatti',
                 24,
                 49,
                 MusicFontSymbol.NoteheadXBlack,
@@ -801,7 +801,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 117,
-                'cabasa',
+                'Cabasa',
                 22,
                 69,
                 MusicFontSymbol.NoteheadBlack,
@@ -812,7 +812,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 118,
-                'maraca',
+                'Left Maraca',
                 -13,
                 70,
                 MusicFontSymbol.NoteheadBlack,
@@ -823,7 +823,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 119,
-                'maraca',
+                'Right Maraca',
                 -14,
                 70,
                 MusicFontSymbol.NoteheadBlack,
@@ -832,7 +832,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 120,
-                'maraca',
+                'Right Maraca',
                 -15,
                 70,
                 MusicFontSymbol.NoteheadBlack,
@@ -843,7 +843,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 122,
-                'shaker',
+                'Shaker',
                 -24,
                 82,
                 MusicFontSymbol.NoteheadBlack,
@@ -854,7 +854,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 123,
-                'bellTree',
+                'Bell Tree',
                 -19,
                 53,
                 MusicFontSymbol.NoteheadBlack,
@@ -865,7 +865,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 124,
-                'unpitched',
+                'Golpe',
                 -21,
                 62,
                 MusicFontSymbol.NoteheadNull,
@@ -876,7 +876,7 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 125,
-                'unpitched',
+                'Golpe',
                 -22,
                 62,
                 MusicFontSymbol.NoteheadNull,
@@ -887,8 +887,8 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 126,
-                'ride',
-                0,
+                'Ride Cymbal 2',
+                2,
                 59,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
@@ -896,8 +896,8 @@ export class PercussionMapper {
             ),
             InstrumentArticulation.create(
                 127,
-                'ride',
-                0,
+                'Ride Cymbal 2',
+                2,
                 59,
                 MusicFontSymbol.NoteheadDiamondWhite,
                 MusicFontSymbol.NoteheadDiamondWhite,

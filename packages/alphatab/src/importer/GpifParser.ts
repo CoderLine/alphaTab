@@ -750,6 +750,13 @@ export class GpifParser {
 
     private _parseElement(track: Track, node: XmlNode, isInstrumentSet: boolean) {
         const name = node.findChildElement('Name')?.innerText ?? '';
+
+        // HACK: Guitar Pro has two element for the same item "Jingle Bell" and "Tinkle Bell"
+        // this can lead to wierd behaviors, we filter out one.
+        if (name === 'Jingle Bell') {
+            return;
+        }
+
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Name':

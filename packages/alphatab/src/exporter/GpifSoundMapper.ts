@@ -444,9 +444,6 @@ export class GpifSoundMapper {
             GpifInstrumentArticulation.template('Bell Tree (hit)', [84], 'stick.hit.hit'),
             GpifInstrumentArticulation.template('Bell Tree (return)', [123], 'stick.hit.return')
         ]),
-        new GpifInstrumentElement('Jingle Bell', 'jingleBell', 'JingleBell-Percu', [
-            GpifInstrumentArticulation.template('Jingle Bell (hit)', [83], 'stick.hit.hit')
-        ]),
         new GpifInstrumentElement('Tinkle Bell', 'jingleBell', 'JingleBell-Percu', [
             GpifInstrumentArticulation.template('Tinkle Bell (hit)', [83], 'stick.hit.hit')
         ]),

@@ -302,8 +302,8 @@ describe('Gp7ExporterTest', () => {
                 []
             );
 
-            // NOTE: GP8 has both a "Jingle Bell" and "Tingle Bell" element mapping down to the same
-            // articulations. due to ordering we have "Tingle Bell" but not "Jingle Bell"
+            // NOTE: GP8 has both a "Jingle Bell" and "Tinkle Bell" element mapping down to the same
+            // articulations. due to ordering we have "Tinkle Bell" but not "Jingle Bell"
             if (element.name === 'Jingle Bell') {
                 continue;
             }
