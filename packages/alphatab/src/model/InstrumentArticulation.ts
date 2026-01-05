@@ -1,7 +1,5 @@
-
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-
 
 /**
  * This public enum lists all base line modes
@@ -34,9 +32,15 @@ export enum TechniqueSymbolPlacement {
  */
 export class InstrumentArticulation {
     /**
+     * The ID used to address this articulation.
+     */
+    public id: number = 0;
+
+    /**
      * Gets or sets the type of the element for which this articulation is for.
      */
     public elementType: string;
+
     /**
      * The line the note head should be shown for standard notation.
      *
@@ -80,8 +84,10 @@ export class InstrumentArticulation {
         noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
         techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
-        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside
+        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside,
+        id: number = 0
     ) {
+        this.id = id;
         this.elementType = elementType;
         this.outputMidiNumber = outputMidiNumber;
         this.staffLine = staffLine;
