@@ -2351,7 +2351,7 @@ describe('AlphaTexImporterTest', () => {
             it('articulation', () => importErrorTest('\\articulation "Test" 0'));
             it('duration tuplet', () => importErrorTest('. :4 {tu 0}'));
             it('beat tuplet', () => importErrorTest('. C4 {tu 0}'));
-            it('tremolo speed', () => importErrorTest('. C4 {tp 0}'));
+            it('tremolo speed', () => importErrorTest('. C4 {tp 10}'));
             it('trill', () => importErrorTest('. 3.3 {tr 4 0}'));
             it('textalign', () => importErrorTest('\\title "Test" "" invalid'));
         });

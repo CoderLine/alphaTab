@@ -5625,11 +5625,11 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected tremolo speed value '0, expected: 8, 16 or 32",
+    "message" => "Unexpected tremolo marks value '10, expected: 0-5, or legacy: 8, 16 or 32",
     "start" => Map {
-      "col" => 11,
+      "col" => 12,
       "line" => 1,
-      "offset" => 10,
+      "offset" => 11,
     },
   },
 ]
