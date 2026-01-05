@@ -1,3 +1,4 @@
+import { Duration } from '@coderline/alphatab/model/Duration';
 import type { GraceGroup } from '@coderline/alphatab/model/GraceGroup';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import type { Note } from '@coderline/alphatab/model/Note';
@@ -63,7 +64,7 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
                 case NoteYPosition.Top:
                     return g.y;
                 case NoteYPosition.TopWithStem:
-                    return g.y - this.renderer.smuflMetrics.standardStemLength;
+                    return g.y - this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
                 case NoteYPosition.Center:
                 case NoteYPosition.StemUp:
                 case NoteYPosition.StemDown:
@@ -71,7 +72,7 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
                 case NoteYPosition.Bottom:
                     return g.y + g.height;
                 case NoteYPosition.BottomWithStem:
-                    return g.y + g.height + this.renderer.smuflMetrics.standardStemLength;
+                    return g.y + g.height + this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
             }
         }
         return 0;

@@ -1,6 +1,7 @@
 import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
@@ -10,6 +11,12 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
 export class FlagGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, duration: Duration, direction: BeamDirection, isGrace: boolean) {
         super(x, y, isGrace ? EngravingSettings.GraceScale : 1, FlagGlyph.getSymbol(duration, direction, isGrace));
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        const c = canvas.color;
+        super.paint(cx, cy, canvas);
+        canvas.color = c;
     }
 
     public static getSymbol(duration: Duration, direction: BeamDirection, isGrace: boolean): MusicFontSymbol {

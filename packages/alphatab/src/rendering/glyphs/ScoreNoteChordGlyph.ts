@@ -29,6 +29,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _notes: Note[] = [];
     private _deadSlapped: DeadSlappedBeatGlyph | null = null;
     private _tremoloPicking: TremoloPickingGlyph | null = null;
+    private _stemLengthExtension = 0;
 
     public aboveBeatEffects: Map<string, EffectGlyph> = new Map();
     public belowBeatEffects: Map<string, EffectGlyph> = new Map();
@@ -115,9 +116,12 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                         : 0) * scale;
 
                 // stem size according to duration
-                pos -= this.renderer.smuflMetrics.standardStemLength * scale;
+                pos -= this.renderer.smuflMetrics.getStemLength(this.beat.duration) * scale;
+                pos -= this._stemLengthExtension;
 
-                const topCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.direction);
+                let topCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.direction);
+                topCenterY -= this._stemLengthExtension;
+
                 return Math.min(topCenterY, pos);
 
             case NoteYPosition.Top:
@@ -135,9 +139,12 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                         : -this.renderer.smuflMetrics.glyphHeights.get(n.symbol)! / 2) * scale;
 
                 // stem size according to duration
-                pos += this.renderer.smuflMetrics.standardStemLength * scale;
+                pos += this.renderer.smuflMetrics.getStemLength(this.beat.duration) * scale;
+                pos += this._stemLengthExtension;
 
-                const bottomCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.direction);
+                let bottomCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.direction);
+                bottomCenterY += this._stemLengthExtension;
+
                 return Math.max(bottomCenterY, pos);
 
             case NoteYPosition.StemUp:
@@ -188,7 +195,8 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             aboveBeatEffectsY = scoreRenderer.getScoreY(scoreRenderer.heightLineCount);
         } else {
             if (this.direction === BeamDirection.Up) {
-                belowBeatEffectsY = this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.Bottom) + effectSpacing;
+                belowBeatEffectsY =
+                    this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.Bottom) + effectSpacing;
                 aboveBeatEffectsY =
                     this._internalGetNoteY(this.minStepsNote!.glyph, NoteYPosition.TopWithStem) - effectSpacing;
             } else {
@@ -239,32 +247,40 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
 
         if (this.beat.isTremolo && !this.beat.deadSlapped) {
-            const direction = this.direction;
-
-            let tremoloY = 0;
-            if (direction === BeamDirection.Up) {
-                const topY = this._internalGetNoteY(this.minStepsNote!.glyph, NoteYPosition.TopWithStem);
-                const bottomY = this._internalGetNoteY(this.minStepsNote!.glyph, NoteYPosition.StemUp);
-
-                tremoloY = (topY + bottomY) / 2;
-            } else {
-                const topY = this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.StemDown);
-                const bottomY = this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.BottomWithStem);
-
-                tremoloY = (topY + bottomY) / 2;
-            }
-
-            let tremoloX: number = this.stemX;
-            const speed: Duration = this.beat.tremoloSpeed!;
-
-            if (this.beat.duration < Duration.Half) {
-                tremoloX = this.width / 2;
-            }
-
-            this._tremoloPicking = new TremoloPickingGlyph(tremoloX, tremoloY, speed);
+            this._tremoloPicking = new TremoloPickingGlyph(0, 0, this.beat.tremoloSpeed!);
             this._tremoloPicking.renderer = this.renderer;
             this._tremoloPicking.doLayout();
+
+            this._alignTremoloPickingGlyph();
         }
+    }
+
+    private _alignTremoloPickingGlyph() {
+        const g = this._tremoloPicking!;
+        const direction = this.direction;
+        if (direction === BeamDirection.Up) {
+            g.alignTremoloPickingGlyph(
+                direction,
+                this.getHighestNoteY(NoteYPosition.TopWithStem),
+                this.getHighestNoteY(NoteYPosition.Center),
+                this.beat.duration
+            );
+        } else {
+            g.alignTremoloPickingGlyph(
+                direction,
+                this.getLowestNoteY(NoteYPosition.BottomWithStem),
+                this.getLowestNoteY(NoteYPosition.Center),
+                this.beat.duration
+            );
+        }
+        this._stemLengthExtension = g.stemExtensionHeight;
+
+        let tremoloX: number = this.stemX;
+        if (this.beat.duration < Duration.Half) {
+            tremoloX = this.width / 2;
+        }
+
+        g.x = tremoloX;
     }
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {

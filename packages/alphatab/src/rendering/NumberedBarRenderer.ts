@@ -9,7 +9,6 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
 import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
@@ -250,14 +249,6 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     protected override getTupletBeamDirection(_helper: BeamingHelper): BeamDirection {
         return BeamDirection.Up;
-    }
-
-    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        let y = super.getNoteY(note, requestedPosition);
-        if (Number.isNaN(y)) {
-            y = this.getLineY(0);
-        }
-        return y;
     }
 
     protected override createPreBeatGlyphs(): void {

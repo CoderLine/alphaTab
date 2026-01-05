@@ -236,7 +236,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
         if (beat) {
             return beat.y + beat.getNoteY(note, requestedPosition);
         }
-        return Number.NaN;
+        return 0;
     }
 
     public getRestY(beat: Beat, requestedPosition: NoteYPosition): number {
@@ -244,7 +244,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
         if (container) {
             return container.y + container.getRestY(requestedPosition);
         }
-        return Number.NaN;
+        return 0;
     }
 
     public getBeatContainer(beat: Beat): BeatContainerGlyphBase | undefined {

@@ -108,14 +108,6 @@ export class SlashBarRenderer extends LineBarRenderer {
         return BeamDirection.Up;
     }
 
-    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        let y = super.getNoteY(note, requestedPosition);
-        if (Number.isNaN(y)) {
-            y = this.getLineY(0);
-        }
-        return y;
-    }
-
     protected override createLinePreBeatGlyphs(): void {
         // Key signature
         if (
@@ -171,6 +163,10 @@ export class SlashBarRenderer extends LineBarRenderer {
             return;
         }
         this.calculateBeamingOverflows(rendererTop, rendererBottom);
+    }
+
+    protected override shouldPaintBeamingHelper(h: BeamingHelper): boolean {
+        return super.shouldPaintBeamingHelper(h) && h.voice!.index === 0;
     }
 
     protected override paintBeamingStem(

@@ -400,4 +400,8 @@ export interface EngravingSettingsJson {
      * in case of multi-voice note head overlaps.
      */
     multiVoiceDisplacedNoteHeadSpacing?: number;
+    /**
+     * The space needed by flags on the stem-side from top to bottom to place.
+     */
+    stemFlagHeight?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
 }

@@ -117,7 +117,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (g) {
             switch (requestedPosition) {
                 case NoteYPosition.TopWithStem:
-                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.standardStemLength;
+                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
                 case NoteYPosition.Top:
                     return g.getBoundingBoxTop();
                 case NoteYPosition.Center:
@@ -127,7 +127,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 case NoteYPosition.Bottom:
                     return g.getBoundingBoxBottom();
                 case NoteYPosition.BottomWithStem:
-                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.standardStemLength;
+                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
             }
         }
         return 0;
@@ -273,6 +273,27 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 }
                 this.addEffect(group);
             }
+        }
+
+        if (this.renderer.bar.isMultiVoice) {
+            let highestNotePosition = 0;
+            let lowestNotePosition = 0;
+            const direction = sr.getBeatDirection(this.container.beat);
+
+            let offset = 0;
+            if (this.container.beat.hasTuplet) {
+                offset += sr.tupletOffset + sr.tupletSize;
+            }
+
+            if (direction === BeamDirection.Up) {
+                highestNotePosition = this.getHighestNoteY(NoteYPosition.TopWithStem) - offset;
+                lowestNotePosition = this.getLowestNoteY(NoteYPosition.Bottom);
+            } else {
+                highestNotePosition = this.getHighestNoteY(NoteYPosition.Top);
+                lowestNotePosition = this.getLowestNoteY(NoteYPosition.BottomWithStem) + offset;
+            }
+
+            this.renderer.collisionHelper.reserveBeatSlot(this.container.beat, highestNotePosition, lowestNotePosition);
         }
     }
 

@@ -31,7 +31,7 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 export abstract class LineBarRenderer extends BarRendererBase {
     protected firstLineY: number = 0;
     private _startSpacing = false;
-    protected tupletSize: number = 0;
+    public tupletSize: number = 0;
 
     public get lineOffset(): number {
         return this.lineSpacing;
@@ -605,28 +605,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
         bottomY: number,
         canvas: ICanvas
     ): void;
-
-    protected getFlagStemSize(duration: Duration, forceMinStem: boolean = false): number {
-        let size: number = 0;
-
-        switch (duration) {
-            case Duration.QuadrupleWhole:
-            case Duration.Half:
-            case Duration.Quarter:
-            case Duration.Eighth:
-            case Duration.Sixteenth:
-            case Duration.ThirtySecond:
-            case Duration.SixtyFourth:
-            case Duration.OneHundredTwentyEighth:
-            case Duration.TwoHundredFiftySixth:
-                size = this.smuflMetrics.standardStemLength + this.smuflMetrics.stemFlagOffsets.get(duration)!;
-                break;
-            default:
-                size = forceMinStem ? this.smuflMetrics.standardStemLength : 0;
-                break;
-        }
-        return size;
-    }
 
     protected override recreatePreBeatGlyphs(): void {
         this._startSpacing = false;

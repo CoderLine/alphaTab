@@ -1,4 +1,5 @@
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
@@ -53,7 +54,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         if (g) {
             switch (requestedPosition) {
                 case NoteYPosition.TopWithStem:
-                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.standardStemLength;
+                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
                 case NoteYPosition.Top:
                     return g.getBoundingBoxTop();
                 case NoteYPosition.Center:
@@ -63,7 +64,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 case NoteYPosition.Bottom:
                     return g.getBoundingBoxTop();
                 case NoteYPosition.BottomWithStem:
-                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.standardStemLength;
+                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
             }
         }
         return 0;

@@ -1,4 +1,3 @@
-import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
@@ -15,7 +14,6 @@ import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/Accidental
 import { ClefGlyph } from '@coderline/alphatab/rendering/glyphs/ClefGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { KeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/KeySignatureGlyph';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
@@ -148,42 +146,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public override get middleYPosition(): number {
         return this.getScoreY(this.bar.staff.standardNotationLineCount - 1);
-    }
-
-    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        let y = super.getNoteY(note, requestedPosition);
-        if (Number.isNaN(y)) {
-            // NOTE: some might request the note position before the glyphs have been created
-            // e.g. the beaming helper, for these we just need a rough
-            // estimate on the position
-            const steps = AccidentalHelper.computeStepsWithoutAccidentals(this.bar, note);
-            y = this.getScoreY(steps);
-            const scale = note.beat.graceType === GraceType.None ? 1 : EngravingSettings.GraceScale;
-            const stemHeight = this.smuflMetrics.standardStemLength * scale;
-            const noteHeadHeight =
-                this.smuflMetrics.glyphHeights.get(NoteHeadGlyph.getSymbol(note.beat.duration))! * scale;
-            switch (requestedPosition) {
-                case NoteYPosition.TopWithStem:
-                    y -= stemHeight;
-                    break;
-                case NoteYPosition.Top:
-                    y -= noteHeadHeight / 2;
-                    break;
-                case NoteYPosition.Center:
-                    break;
-                case NoteYPosition.Bottom:
-                    y += noteHeadHeight / 2;
-                    break;
-                case NoteYPosition.BottomWithStem:
-                    y += stemHeight;
-                    break;
-                case NoteYPosition.StemUp:
-                    break;
-                case NoteYPosition.StemDown:
-                    break;
-            }
-        }
-        return y;
     }
 
     public override applyLayoutingInfo(): boolean {
@@ -385,32 +347,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
     public override completeBeamingHelper(helper: BeamingHelper) {
         const direction = this._calculateBeamDirection(helper);
         this._beamDirections.set(helper, direction);
-        // for multi-voice bars we need to register the positions
-        // for multi-voice rest displacement to avoid collisions
-        if (this.bar.isMultiVoice && helper.highestNoteInHelper && helper.lowestNoteInHelper) {
-            let highestNotePosition = 0;
-            let lowestNotePosition = 0;
-
-            let offset = 0;
-            if (helper.hasTuplet) {
-                offset += this.resources.effectFont.size * 2;
-            }
-
-            // TODO: pre-register all note heads and calculate lines to have them available here
-            // this way we can avoid asking for the y-position but check the "steps"
-            // also we should be up/down based on the note furthest away from the center line.
-            if (direction === BeamDirection.Up) {
-                highestNotePosition = this.getNoteY(helper.highestNoteInHelper, NoteYPosition.TopWithStem) - offset;
-                lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper, NoteYPosition.Bottom);
-            } else {
-                highestNotePosition = this.getNoteY(helper.highestNoteInHelper, NoteYPosition.Top);
-                lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper, NoteYPosition.BottomWithStem) + offset;
-            }
-
-            for (const beat of helper.beats) {
-                this.helpers.collisionHelper.reserveBeatSlot(beat, highestNotePosition, lowestNotePosition);
-            }
-        }
     }
 
     private _calculateBeamDirection(helper: BeamingHelper): BeamDirection {
@@ -443,8 +379,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
         if (helper.highestNoteInHelper && helper.lowestNoteInHelper) {
-            const highestNotePosition = this.getNoteY(helper.highestNoteInHelper, NoteYPosition.Center);
-            const lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper, NoteYPosition.Center);
+            // NOTE: This is the only place where we need the locations before we have positioned the notes
+            // TODO: we should first register all note-heads and calculate the accidentals+steps
+            const highestNotePosition = this._getNoteCenterYBeforeLayouting(helper.highestNoteInHelper);
+            const lowestNotePosition = this._getNoteCenterYBeforeLayouting(helper.lowestNoteInHelper);
 
             const avg = (highestNotePosition + lowestNotePosition) / 2;
             return this._invertBeamDirection(
@@ -454,6 +392,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         return this._invertBeamDirection(helper, BeamDirection.Up);
+    }
+
+    private _getNoteCenterYBeforeLayouting(note: Note): number {
+        const steps = AccidentalHelper.computeStepsWithoutAccidentals(this.bar, note);
+        return this.getScoreY(steps);
     }
 
     private _invertBeamDirection(helper: BeamingHelper, direction: BeamDirection): BeamDirection {

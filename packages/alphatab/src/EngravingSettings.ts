@@ -357,6 +357,22 @@ export class EngravingSettings {
         this.stemFlagOffsets.set(Duration.OneHundredTwentyEighth, 0);
         this.stemFlagOffsets.set(Duration.TwoHundredFiftySixth, 0);
 
+        // Workaround for: https://github.com/w3c/smufl/issues/203
+        // There is no clear anchor for the height of flags on the stem side yet.
+        // These aproximations are tested with bravura
+
+        this.stemFlagHeight.set(Duration.QuadrupleWhole, 0);
+        this.stemFlagHeight.set(Duration.DoubleWhole, 0);
+        this.stemFlagHeight.set(Duration.Whole, 0);
+        this.stemFlagHeight.set(Duration.Half, 0);
+        this.stemFlagHeight.set(Duration.Quarter, 0);
+        this.stemFlagHeight.set(Duration.Eighth, 1 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.Sixteenth, 1.5 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.ThirtySecond, 2 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.SixtyFourth, 3 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.OneHundredTwentyEighth, 3.5 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.TwoHundredFiftySixth, 4.2 * this.oneStaffSpace);
+
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
             const symbol = EngravingSettings._smuflNameToMusicFontSymbol(g);
             if (symbol) {
@@ -759,10 +775,24 @@ export class EngravingSettings {
     public directionsScale = 0.6;
 
     /**
-     * The spacing between displaced displaced note heads 
-     * in case of multi-voice note head overlaps. 
+     * The spacing between displaced displaced note heads
+     * in case of multi-voice note head overlaps.
      */
     public multiVoiceDisplacedNoteHeadSpacing = 0;
+
+    /**
+     * Calculates the stem height for a note of the given duration.
+     * @param duration The duration to calculate the height respecting flag sizes.
+     * @returns The total stem height
+     */
+    public getStemLength(duration: Duration) {
+        return this.standardStemLength + this.stemFlagOffsets.get(duration)!;
+    }
+
+    /**
+     * The space needed by flags on the stem-side from top to bottom to place.
+     */
+    public stemFlagHeight: Map<Duration, number> = new Map<Duration, number>();
 
     // Idea: maybe we can encode and pack this large metadata into a more compact format (e.g. BSON or a custom binary blob?)
     // This metadata below is updated automatically from the bravura_metadata.json via npm script
@@ -770,1587 +800,3852 @@ export class EngravingSettings {
     public static readonly bravuraMetadata: SmuflMetadata =
         // begin bravura_alphatab_metadata
         {
-            engravingDefaults: {
-                arrowShaftThickness: 0.16,
-                barlineSeparation: 0.4,
-                beamSpacing: 0.25,
-                beamThickness: 0.5,
-                bracketThickness: 0.5,
-                dashedBarlineDashLength: 0.5,
-                dashedBarlineGapLength: 0.25,
-                dashedBarlineThickness: 0.16,
-                hairpinThickness: 0.16,
-                legerLineExtension: 0.4,
-                legerLineThickness: 0.16,
-                lyricLineThickness: 0.16,
-                octaveLineThickness: 0.16,
-                pedalLineThickness: 0.16,
-                repeatBarlineDotSeparation: 0.16,
-                repeatEndingLineThickness: 0.16,
-                slurEndpointThickness: 0.1,
-                slurMidpointThickness: 0.22,
-                staffLineThickness: 0.13,
-                stemThickness: 0.12,
-                subBracketThickness: 0.16,
-                textEnclosureThickness: 0.16,
-                thickBarlineThickness: 0.5,
-                thinBarlineThickness: 0.16,
-                tieEndpointThickness: 0.1,
-                tieMidpointThickness: 0.22,
-                thinThickBarlineSeparation: 0.4,
-                tupletBracketThickness: 0.16
-            },
-            glyphBBoxes: {
-                FourStringTabClef: {
-                    bBoxNE: [1.088, 2.016],
-                    bBoxSW: [-0.012, -2.032]
-                },
-                SixStringTabClef: {
-                    bBoxNE: [1.632, 3.056],
-                    bBoxSW: [-0.012, -2.992]
-                },
-                accidentalDoubleFlat: {
-                    bBoxNE: [1.644, 1.748],
-                    bBoxSW: [0, -0.7]
-                },
-                accidentalDoubleSharp: {
-                    bBoxNE: [0.988, 0.508],
-                    bBoxSW: [0, -0.5]
-                },
-                accidentalFlat: {
-                    bBoxNE: [0.904, 1.756],
-                    bBoxSW: [0, -0.7]
-                },
-                accidentalNatural: {
-                    bBoxNE: [0.672, 1.364],
-                    bBoxSW: [0, -1.34]
-                },
-                accidentalQuarterToneFlatArrowUp: {
-                    bBoxNE: [0.992, 2.316],
-                    bBoxSW: [-0.168, -0.708]
-                },
-                accidentalQuarterToneSharpNaturalArrowUp: {
-                    bBoxNE: [0.848, 2.188],
-                    bBoxSW: [-0.104, -1.36]
-                },
-                accidentalSharp: {
-                    bBoxNE: [0.996, 1.4],
-                    bBoxSW: [0, -1.392]
-                },
-                accidentalThreeQuarterTonesSharpArrowUp: {
-                    bBoxNE: [1.1, 2.12],
-                    bBoxSW: [0, -1.388]
-                },
-                arrowheadBlackDown: {
-                    bBoxNE: [0.912, 1.196],
-                    bBoxSW: [0, 0]
-                },
-                arrowheadBlackUp: {
-                    bBoxNE: [0.912, 1.196],
-                    bBoxSW: [0, 0]
-                },
-                articAccentAbove: {
-                    bBoxNE: [1.356, 0.98],
-                    bBoxSW: [0, 0.004]
-                },
-                articAccentBelow: {
-                    bBoxNE: [1.356, 0],
-                    bBoxSW: [0, -0.976]
-                },
-                articMarcatoAbove: {
-                    bBoxNE: [0.94, 1.012],
-                    bBoxSW: [-0.004, -0.004]
-                },
-                articMarcatoBelow: {
-                    bBoxNE: [0.94, 0],
-                    bBoxSW: [-0.004, -1.016]
-                },
-                articStaccatoAbove: {
-                    bBoxNE: [0.336, 0.336],
-                    bBoxSW: [0, 0]
-                },
-                articStaccatoBelow: {
-                    bBoxNE: [0.336, 0],
-                    bBoxSW: [0, -0.336]
-                },
-                articTenutoAbove: {
-                    bBoxNE: [1.352, 0.192],
-                    bBoxSW: [-0.004, 0]
-                },
-                articTenutoBelow: {
-                    bBoxNE: [1.352, 0],
-                    bBoxSW: [-0.004, -0.192]
-                },
-                augmentationDot: {
-                    bBoxNE: [0.4, 0.2],
-                    bBoxSW: [0, -0.2]
-                },
-                brace: {
-                    bBoxNE: [0.328, 3.988],
-                    bBoxSW: [0.008, 0]
-                },
-                bracketBottom: {
-                    bBoxNE: [1.876, 0],
-                    bBoxSW: [0, -1.18]
-                },
-                bracketTop: {
-                    bBoxNE: [1.876, 1.18],
-                    bBoxSW: [0, 0]
-                },
-                cClef: {
-                    bBoxNE: [2.796, 2.024],
-                    bBoxSW: [0, -2.024]
-                },
-                cClef8vb: {
-                    bBoxNE: [2.796, 2.024],
-                    bBoxSW: [0, -2.964]
-                },
-                clef15: {
-                    bBoxNE: [1.436, 1.02],
-                    bBoxSW: [0, -0.012]
-                },
-                clef8: {
-                    bBoxNE: [0.82, 0.988],
-                    bBoxSW: [0, 0]
-                },
-                coda: {
-                    bBoxNE: [3.82, 3.592],
-                    bBoxSW: [-0.016, -0.632]
-                },
-                dynamicCrescendoHairpin: {
-                    bBoxNE: [2.944, 1.424],
-                    bBoxSW: [0.016, 0.372]
-                },
-                dynamicFF: {
-                    bBoxNE: [2.44, 1.776],
-                    bBoxSW: [-0.54, -0.608]
-                },
-                dynamicFFF: {
-                    bBoxNE: [3.32, 1.776],
-                    bBoxSW: [-0.62, -0.608]
-                },
-                dynamicFFFF: {
-                    bBoxNE: [4.28, 1.776],
-                    bBoxSW: [-0.62, -0.608]
-                },
-                dynamicFFFFF: {
-                    bBoxNE: [5.24, 1.776],
-                    bBoxSW: [-0.62, -0.608]
-                },
-                dynamicFFFFFF: {
-                    bBoxNE: [6.2, 1.776],
-                    bBoxSW: [-0.62, -0.608]
-                },
-                dynamicForte: {
-                    bBoxNE: [1.456, 1.776],
-                    bBoxSW: [-0.564, -0.608]
-                },
-                dynamicFortePiano: {
-                    bBoxNE: [2.476, 1.776],
-                    bBoxSW: [-0.564, -0.608]
-                },
-                dynamicForzando: {
-                    bBoxNE: [1.988, 1.776],
-                    bBoxSW: [-0.564, -0.608]
-                },
-                dynamicMF: {
-                    bBoxNE: [3.272, 1.724],
-                    bBoxSW: [-0.08, -0.66]
-                },
-                dynamicMP: {
-                    bBoxNE: [3.3, 1.096],
-                    bBoxSW: [-0.08, -0.568]
-                },
-                dynamicNiente: {
-                    bBoxNE: [1.232, 1.096],
-                    bBoxSW: [-0.092, -0.04]
-                },
-                dynamicPF: {
-                    bBoxNE: [3.08, 1.776],
-                    bBoxSW: [-0.288, -0.608]
-                },
-                dynamicPP: {
-                    bBoxNE: [2.912, 1.096],
-                    bBoxSW: [-0.328, -0.568]
-                },
-                dynamicPPP: {
-                    bBoxNE: [4.292, 1.096],
-                    bBoxSW: [-0.368, -0.568]
-                },
-                dynamicPPPP: {
-                    bBoxNE: [5.672, 1.096],
-                    bBoxSW: [-0.408, -0.568]
-                },
-                dynamicPPPPP: {
-                    bBoxNE: [7.092, 1.096],
-                    bBoxSW: [-0.408, -0.568]
-                },
-                dynamicPPPPPP: {
-                    bBoxNE: [8.512, 1.096],
-                    bBoxSW: [-0.408, -0.568]
-                },
-                dynamicPiano: {
-                    bBoxNE: [1.464, 1.096],
-                    bBoxSW: [-0.356, -0.568]
-                },
-                dynamicRinforzando1: {
-                    bBoxNE: [2.5, 1.776],
-                    bBoxSW: [-0.08, -0.608]
-                },
-                dynamicRinforzando2: {
-                    bBoxNE: [2.976, 1.776],
-                    bBoxSW: [-0.08, -0.608]
-                },
-                dynamicSforzando1: {
-                    bBoxNE: [2.416, 1.776],
-                    bBoxSW: [0, -0.608]
-                },
-                dynamicSforzandoPianissimo: {
-                    bBoxNE: [4.796, 1.776],
-                    bBoxSW: [0, -0.608]
-                },
-                dynamicSforzandoPiano: {
-                    bBoxNE: [3.38, 1.776],
-                    bBoxSW: [0, -0.608]
-                },
-                dynamicSforzato: {
-                    bBoxNE: [2.932, 1.776],
-                    bBoxSW: [0, -0.608]
-                },
-                dynamicSforzatoFF: {
-                    bBoxNE: [3.856, 1.776],
-                    bBoxSW: [0, -0.608]
-                },
-                dynamicSforzatoPiano: {
-                    bBoxNE: [4.304, 1.776],
-                    bBoxSW: [0, -0.608]
-                },
-                fClef: {
-                    bBoxNE: [2.736, 1.048],
-                    bBoxSW: [-0.02, -2.54]
-                },
-                fClef15ma: {
-                    bBoxNE: [2.736, 1.984],
-                    bBoxSW: [-0.02, -2.54]
-                },
-                fClef15mb: {
-                    bBoxNE: [2.736, 1.048],
-                    bBoxSW: [-0.02, -2.968]
-                },
-                fClef8va: {
-                    bBoxNE: [2.736, 1.98],
-                    bBoxSW: [-0.02, -2.54]
-                },
-                fClef8vb: {
-                    bBoxNE: [2.736, 1.048],
-                    bBoxSW: [-0.02, -2.976]
-                },
-                fermataAbove: {
-                    bBoxNE: [2.42, 1.316],
-                    bBoxSW: [0.012, -0.012]
-                },
-                fermataLongAbove: {
-                    bBoxNE: [2.412, 1.332],
-                    bBoxSW: [0, -0.004]
-                },
-                fermataShortAbove: {
-                    bBoxNE: [2.416, 1.364],
-                    bBoxSW: [0, 0]
-                },
-                fingering0: {
-                    bBoxNE: [0.94, 1.004],
-                    bBoxSW: [0.08, -0.004]
-                },
-                fingering1: {
-                    bBoxNE: [0.548, 1.016],
-                    bBoxSW: [0.08, 0]
-                },
-                fingering2: {
-                    bBoxNE: [0.888, 1.012],
-                    bBoxSW: [0.08, -0.012]
-                },
-                fingering3: {
-                    bBoxNE: [0.82, 1.008],
-                    bBoxSW: [0.08, 0]
-                },
-                fingering4: {
-                    bBoxNE: [0.864, 1.012],
-                    bBoxSW: [0.08, 0.004]
-                },
-                fingering5: {
-                    bBoxNE: [0.82, 1.032],
-                    bBoxSW: [0.08, 0]
-                },
-                fingeringALower: {
-                    bBoxNE: [1.068, 1.032],
-                    bBoxSW: [0, -0.02]
-                },
-                fingeringCLower: {
-                    bBoxNE: [0.888, 1.044],
-                    bBoxSW: [0, -0.028]
-                },
-                fingeringILower: {
-                    bBoxNE: [0.656, 1.54],
-                    bBoxSW: [-0.052, -0.028]
-                },
-                fingeringMLower: {
-                    bBoxNE: [1.66, 1.028],
-                    bBoxSW: [-0.032, -0.016]
-                },
-                fingeringPLower: {
-                    bBoxNE: [1.088, 1.028],
-                    bBoxSW: [-0.216, -0.612]
-                },
-                fingeringTLower: {
-                    bBoxNE: [0.604, 1.484],
-                    bBoxSW: [0, -0.028]
-                },
-                flag128thDown: {
-                    bBoxNE: [1.092, 3.248],
-                    bBoxSW: [0, -2.32]
-                },
-                flag128thUp: {
-                    bBoxNE: [1.044, 2.132],
-                    bBoxSW: [0, -3.248]
-                },
-                flag16thDown: {
-                    bBoxNE: [1.1635806326044895, 3.2480256],
-                    bBoxSW: [0, -0.036]
-                },
-                flag16thUp: {
-                    bBoxNE: [1.116, 0.008],
-                    bBoxSW: [0, -3.252]
-                },
-                flag256thDown: {
-                    bBoxNE: [1.196, 3.252],
-                    bBoxSW: [0, -3.004]
-                },
-                flag256thUp: {
-                    bBoxNE: [1.056, 2.816],
-                    bBoxSW: [0, -3.248]
-                },
-                flag32ndDown: {
-                    bBoxNE: [1.092, 3.248],
-                    bBoxSW: [0, -0.688]
-                },
-                flag32ndUp: {
-                    bBoxNE: [1.044, 0.596],
-                    bBoxSW: [0, -3.248]
-                },
-                flag64thDown: {
-                    bBoxNE: [1.092, 3.248],
-                    bBoxSW: [0, -1.504]
-                },
-                flag64thUp: {
-                    bBoxNE: [1.044, 1.388],
-                    bBoxSW: [0, -3.248]
-                },
-                flag8thDown: {
-                    bBoxNE: [1.224, 3.232896633157715],
-                    bBoxSW: [0, -0.056]
-                },
-                flag8thUp: {
-                    bBoxNE: [1.056, 0.036],
-                    bBoxSW: [0, -3.240768470618394]
-                },
-                fretboardFilledCircle: {
-                    bBoxNE: [0.564, 0.564],
-                    bBoxSW: [0, 0]
-                },
-                fretboardO: {
-                    bBoxNE: [0.564, 0.564],
-                    bBoxSW: [0, 0]
-                },
-                fretboardX: {
-                    bBoxNE: [0.596, 0.596],
-                    bBoxSW: [0, 0]
-                },
-                gClef: {
-                    bBoxNE: [2.684, 4.392],
-                    bBoxSW: [0, -2.632]
-                },
-                gClef15ma: {
-                    bBoxNE: [2.684, 5.276],
-                    bBoxSW: [0, -2.632]
-                },
-                gClef15mb: {
-                    bBoxNE: [2.684, 4.392],
-                    bBoxSW: [0, -3.524]
-                },
-                gClef8va: {
-                    bBoxNE: [2.684, 5.28],
-                    bBoxSW: [0, -2.632]
-                },
-                gClef8vb: {
-                    bBoxNE: [2.684, 4.392],
-                    bBoxSW: [0, -3.512]
-                },
-                graceNoteSlashStemDown: {
-                    bBoxNE: [2.02, 0],
-                    bBoxSW: [0, -1.604]
-                },
-                graceNoteSlashStemUp: {
-                    bBoxNE: [2.02, 1.604],
-                    bBoxSW: [0, 0]
-                },
-                guitarClosePedal: {
-                    bBoxNE: [1.144, 1.14],
-                    bBoxSW: [0, -0.004]
-                },
-                guitarFadeIn: {
-                    bBoxNE: [1.448, 1.46],
-                    bBoxSW: [0, 0]
-                },
-                guitarFadeOut: {
-                    bBoxNE: [1.448, 1.46],
-                    bBoxSW: [0, 0]
-                },
-                guitarGolpe: {
-                    bBoxNE: [1.08, 1.128],
-                    bBoxSW: [0.004, 0]
-                },
-                guitarLeftHandTapping: {
-                    bBoxNE: [1.588, 1.364],
-                    bBoxSW: [0, -0.224]
-                },
-                guitarOpenPedal: {
-                    bBoxNE: [1.144, 1.144],
-                    bBoxSW: [0, 0]
-                },
-                guitarString0: {
-                    bBoxNE: [2.164, 2.156],
-                    bBoxSW: [0.004, 0]
-                },
-                guitarString1: {
-                    bBoxNE: [2.16, 2.156],
-                    bBoxSW: [0, 0]
-                },
-                guitarString2: {
-                    bBoxNE: [2.16, 2.156],
-                    bBoxSW: [0, 0]
-                },
-                guitarString3: {
-                    bBoxNE: [2.16, 2.156],
-                    bBoxSW: [0, 0]
-                },
-                guitarString4: {
-                    bBoxNE: [2.164, 2.156],
-                    bBoxSW: [0.004, 0]
-                },
-                guitarString5: {
-                    bBoxNE: [2.16, 2.156],
-                    bBoxSW: [0, 0]
-                },
-                guitarString6: {
-                    bBoxNE: [2.16, 2.156],
-                    bBoxSW: [0, 0]
-                },
-                guitarString7: {
-                    bBoxNE: [2.16, 2.156],
-                    bBoxSW: [0, 0]
-                },
-                guitarString8: {
-                    bBoxNE: [2.16, 2.156],
-                    bBoxSW: [0, 0]
-                },
-                guitarString9: {
-                    bBoxNE: [2.16, 2.156],
-                    bBoxSW: [0, 0]
-                },
-                guitarVibratoStroke: {
-                    bBoxNE: [0.668, 0.476],
-                    bBoxSW: [-0.056, 0]
-                },
-                guitarVolumeSwell: {
-                    bBoxNE: [2.896, 1.46],
-                    bBoxSW: [0, 0]
-                },
-                guitarWideVibratoStroke: {
-                    bBoxNE: [0.908, 0.896],
-                    bBoxSW: [-0.096, 0]
-                },
-                keyboardPedalPed: {
-                    bBoxNE: [4.076, 2.22],
-                    bBoxSW: [0, -0.032]
-                },
-                keyboardPedalUp: {
-                    bBoxNE: [1.8, 1.8],
-                    bBoxSW: [0, 0]
-                },
-                metAugmentationDot: {
-                    bBoxNE: [0.4, 0.2],
-                    bBoxSW: [0, -0.2]
-                },
-                metNote8thUp: {
-                    bBoxNE: [2.132, 2.784],
-                    bBoxSW: [0, -0.564]
-                },
-                metNoteQuarterUp: {
-                    bBoxNE: [1.328, 2.752],
-                    bBoxSW: [0, -0.564]
-                },
-                note8thUp: {
-                    bBoxNE: [2.264, 3.492],
-                    bBoxSW: [0, -0.552]
-                },
-                noteQuarterUp: {
-                    bBoxNE: [1.328, 3.5],
-                    bBoxSW: [0, -0.564]
-                },
-                noteShapeDiamondBlack: {
-                    bBoxNE: [1.444, 0.548],
-                    bBoxSW: [0, -0.552]
-                },
-                noteShapeDiamondWhite: {
-                    bBoxNE: [1.444, 0.544],
-                    bBoxSW: [0, -0.556]
-                },
-                noteShapeMoonBlack: {
-                    bBoxNE: [1.444, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteShapeMoonWhite: {
-                    bBoxNE: [1.444, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteShapeRoundBlack: {
-                    bBoxNE: [1.456, 0.552],
-                    bBoxSW: [0, -0.552]
-                },
-                noteShapeRoundWhite: {
-                    bBoxNE: [1.464, 0.548],
-                    bBoxSW: [0, -0.548]
-                },
-                noteShapeSquareBlack: {
-                    bBoxNE: [1.44, 0.46],
-                    bBoxSW: [0, -0.46]
-                },
-                noteShapeSquareWhite: {
-                    bBoxNE: [1.44, 0.46],
-                    bBoxSW: [0, -0.46]
-                },
-                noteShapeTriangleLeftBlack: {
-                    bBoxNE: [1.44, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteShapeTriangleLeftWhite: {
-                    bBoxNE: [1.44, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteShapeTriangleRightBlack: {
-                    bBoxNE: [1.44, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteShapeTriangleRightWhite: {
-                    bBoxNE: [1.44, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteShapeTriangleRoundBlack: {
-                    bBoxNE: [1.424, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteShapeTriangleRoundWhite: {
-                    bBoxNE: [1.424, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteShapeTriangleUpBlack: {
-                    bBoxNE: [1.424, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteShapeTriangleUpWhite: {
-                    bBoxNE: [1.424, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadBlack: {
-                    bBoxNE: [1.18, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadCircleSlash: {
-                    bBoxNE: [1, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadCircleX: {
-                    bBoxNE: [0.996, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadCircleXDoubleWhole: {
-                    bBoxNE: [1.688, 0.62],
-                    bBoxSW: [0, -0.62]
-                },
-                noteheadCircleXHalf: {
-                    bBoxNE: [1, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadCircleXWhole: {
-                    bBoxNE: [0.996, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadCircledBlack: {
-                    bBoxNE: [1.284, 0.668],
-                    bBoxSW: [-0.084, -0.684]
-                },
-                noteheadCircledDoubleWhole: {
-                    bBoxNE: [2.412, 0.852],
-                    bBoxSW: [0, -0.872]
-                },
-                noteheadCircledHalf: {
-                    bBoxNE: [1.244, 0.668],
-                    bBoxSW: [-0.072, -0.648]
-                },
-                noteheadCircledWhole: {
-                    bBoxNE: [1.748, 0.844],
-                    bBoxSW: [0, -0.9]
-                },
-                noteheadClusterDoubleWhole3rd: {
-                    bBoxNE: [2.428, 1.62],
-                    bBoxSW: [0, -0.62]
-                },
-                noteheadClusterHalf3rd: {
-                    bBoxNE: [1.264, 1.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadClusterQuarter3rd: {
-                    bBoxNE: [1.44, 1.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadClusterWhole3rd: {
-                    bBoxNE: [1.7, 1.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadDiamondBlack: {
-                    bBoxNE: [1, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadDiamondBlackWide: {
-                    bBoxNE: [1.4, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadDiamondDoubleWhole: {
-                    bBoxNE: [1.728, 0.62],
-                    bBoxSW: [0, -0.62]
-                },
-                noteheadDiamondHalf: {
-                    bBoxNE: [1.004, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadDiamondWhite: {
-                    bBoxNE: [1, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadDiamondWhiteWide: {
-                    bBoxNE: [1.4, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadDiamondWhole: {
-                    bBoxNE: [1.08, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadDoubleWhole: {
-                    bBoxNE: [2.396, 0.62],
-                    bBoxSW: [0, -0.62]
-                },
-                noteheadDoubleWholeSquare: {
-                    bBoxNE: [1.664, 0.792],
-                    bBoxSW: [0, -0.76]
-                },
-                noteheadHalf: {
-                    bBoxNE: [1.18, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadHeavyX: {
-                    bBoxNE: [1.54, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadHeavyXHat: {
-                    bBoxNE: [1.828, 1.04],
-                    bBoxSW: [-0.292, -0.5]
-                },
-                noteheadParenthesis: {
-                    bBoxNE: [1.472, 0.728],
-                    bBoxSW: [-0.292, -0.72]
-                },
-                noteheadPlusBlack: {
-                    bBoxNE: [0.996, 0.5],
-                    bBoxSW: [-0.004, -0.5]
-                },
-                noteheadPlusDoubleWhole: {
-                    bBoxNE: [1.892, 0.62],
-                    bBoxSW: [0, -0.62]
-                },
-                noteheadPlusHalf: {
-                    bBoxNE: [1.044, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadPlusWhole: {
-                    bBoxNE: [1.14, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadRoundWhiteWithDot: {
-                    bBoxNE: [1.004, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadSlashHorizontalEnds: {
-                    bBoxNE: [2.12, 1],
-                    bBoxSW: [0, -1]
-                },
-                noteheadSlashWhiteHalf: {
-                    bBoxNE: [3.12, 1],
-                    bBoxSW: [0, -1]
-                },
-                noteheadSlashWhiteWhole: {
-                    bBoxNE: [3.92, 1],
-                    bBoxSW: [0, -1]
-                },
-                noteheadSlashedBlack1: {
-                    bBoxNE: [1.5, 0.668],
-                    bBoxSW: [-0.32, -0.66]
-                },
-                noteheadSlashedBlack2: {
-                    bBoxNE: [1.504, 0.672],
-                    bBoxSW: [-0.316, -0.656]
-                },
-                noteheadSlashedDoubleWhole1: {
-                    bBoxNE: [2.384, 0.672],
-                    bBoxSW: [0, -0.716]
-                },
-                noteheadSlashedDoubleWhole2: {
-                    bBoxNE: [2.384, 0.676],
-                    bBoxSW: [0, -0.712]
-                },
-                noteheadSlashedHalf1: {
-                    bBoxNE: [1.544, 0.64],
-                    bBoxSW: [-0.268, -0.568]
-                },
-                noteheadSlashedHalf2: {
-                    bBoxNE: [1.52, 0.672],
-                    bBoxSW: [-0.292, -0.536]
-                },
-                noteheadSlashedWhole1: {
-                    bBoxNE: [1.732, 0.592],
-                    bBoxSW: [-0.088, -0.628]
-                },
-                noteheadSlashedWhole2: {
-                    bBoxNE: [1.744, 0.604],
-                    bBoxSW: [-0.072, -0.616]
-                },
-                noteheadSquareBlack: {
-                    bBoxNE: [1.252, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadSquareBlackLarge: {
-                    bBoxNE: [2, 1],
-                    bBoxSW: [0, -1]
-                },
-                noteheadSquareBlackWhite: {
-                    bBoxNE: [2, 1],
-                    bBoxSW: [0, -1]
-                },
-                noteheadSquareWhite: {
-                    bBoxNE: [1.252, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadTriangleDownBlack: {
-                    bBoxNE: [1.168, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadTriangleDownDoubleWhole: {
-                    bBoxNE: [1.932, 0.62],
-                    bBoxSW: [0, -0.62]
-                },
-                noteheadTriangleDownHalf: {
-                    bBoxNE: [1.14, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadTriangleDownWhole: {
-                    bBoxNE: [1.276, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadTriangleRightBlack: {
-                    bBoxNE: [1.356, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadTriangleRightWhite: {
-                    bBoxNE: [1.356, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadTriangleUpBlack: {
-                    bBoxNE: [1.172, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadTriangleUpDoubleWhole: {
-                    bBoxNE: [1.932, 0.62],
-                    bBoxSW: [0, -0.62]
-                },
-                noteheadTriangleUpHalf: {
-                    bBoxNE: [1.14, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadTriangleUpWhole: {
-                    bBoxNE: [1.276, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadWhole: {
-                    bBoxNE: [1.688, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadXBlack: {
-                    bBoxNE: [1.16, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadXDoubleWhole: {
-                    bBoxNE: [2.184, 0.62],
-                    bBoxSW: [0, -0.62]
-                },
-                noteheadXHalf: {
-                    bBoxNE: [1.336, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                noteheadXOrnate: {
-                    bBoxNE: [0.988, 0.504],
-                    bBoxSW: [0, -0.504]
-                },
-                noteheadXWhole: {
-                    bBoxNE: [1.508, 0.5],
-                    bBoxSW: [0, -0.5]
-                },
-                octaveBaselineB: {
-                    bBoxNE: [0.796, 1.352],
-                    bBoxSW: [0, -0.04]
-                },
-                octaveBaselineM: {
-                    bBoxNE: [1.524, 0.928],
-                    bBoxSW: [0, -0.02]
-                },
-                ornamentMordent: {
-                    bBoxNE: [2.916, 1.276],
-                    bBoxSW: [0.004, -0.292]
-                },
-                ornamentShortTrill: {
-                    bBoxNE: [2.9, 0.98],
-                    bBoxSW: [0, 0]
-                },
-                ornamentTrill: {
-                    bBoxNE: [2.084, 1.56],
-                    bBoxSW: [0, -0.04]
-                },
-                ornamentTurn: {
-                    bBoxNE: [1.84, 0.872],
-                    bBoxSW: [0, 0]
-                },
-                ornamentTurnInverted: {
-                    bBoxNE: [1.828, 0.872],
-                    bBoxSW: [-0.012, 0]
-                },
-                ottava: {
-                    bBoxNE: [1.544, 1.852],
-                    bBoxSW: [0, -0.04]
-                },
-                ottavaAlta: {
-                    bBoxNE: [3.54, 1.852],
-                    bBoxSW: [0, -0.04]
-                },
-                ottavaBassaVb: {
-                    bBoxNE: [3.184, 1.852],
-                    bBoxSW: [0, -0.04]
-                },
-                pictEdgeOfCymbal: {
-                    bBoxNE: [4.828, 2.14],
-                    bBoxSW: [0.004, 0]
-                },
-                quindicesima: {
-                    bBoxNE: [2.668, 1.844],
-                    bBoxSW: [0, -0.04]
-                },
-                quindicesimaAlta: {
-                    bBoxNE: [5.26, 1.844],
-                    bBoxSW: [0, -0.04]
-                },
-                repeat1Bar: {
-                    bBoxNE: [2.128, 1.116],
-                    bBoxSW: [0, -1]
-                },
-                repeat2Bars: {
-                    bBoxNE: [3.048, 1.116],
-                    bBoxSW: [0, -1]
-                },
-                repeatDot: {
-                    bBoxNE: [0.4, 0.2],
-                    bBoxSW: [0, -0.2]
-                },
-                rest128th: {
-                    bBoxNE: [1.94, 2.756],
-                    bBoxSW: [0, -3]
-                },
-                rest16th: {
-                    bBoxNE: [1.28, 0.716],
-                    bBoxSW: [0, -2]
-                },
-                rest256th: {
-                    bBoxNE: [2.164, 2.784],
-                    bBoxSW: [0, -4]
-                },
-                rest32nd: {
-                    bBoxNE: [1.452, 1.704],
-                    bBoxSW: [0, -2]
-                },
-                rest64th: {
-                    bBoxNE: [1.692, 1.72],
-                    bBoxSW: [0, -3.012]
-                },
-                rest8th: {
-                    bBoxNE: [0.988, 0.696],
-                    bBoxSW: [0, -1.004]
-                },
-                restDoubleWhole: {
-                    bBoxNE: [0.5, 1],
-                    bBoxSW: [0, 0]
-                },
-                restHBarLeft: {
-                    bBoxNE: [1.5, 1.048],
-                    bBoxSW: [0, -1.08]
-                },
-                restHBarMiddle: {
-                    bBoxNE: [1.42, 0.384],
-                    bBoxSW: [-0.108, -0.416]
-                },
-                restHBarRight: {
-                    bBoxNE: [1.5, 1.048],
-                    bBoxSW: [0, -1.08]
-                },
-                restHalf: {
-                    bBoxNE: [1.128, 0.568],
-                    bBoxSW: [0, -0.008]
-                },
-                restLonga: {
-                    bBoxNE: [0.5, 1],
-                    bBoxSW: [0, -0.996]
-                },
-                restQuarter: {
-                    bBoxNE: [1.08, 1.492],
-                    bBoxSW: [0.004, -1.5]
-                },
-                restWhole: {
-                    bBoxNE: [1.128, 0.036],
-                    bBoxSW: [0, -0.54]
-                },
-                segno: {
-                    bBoxNE: [2.2, 3.036],
-                    bBoxSW: [0.016, -0.108]
-                },
-                stringsDownBow: {
-                    bBoxNE: [1.248, 1.272],
-                    bBoxSW: [0, 0]
-                },
-                stringsUpBow: {
-                    bBoxNE: [0.996, 1.98],
-                    bBoxSW: [0.004, 0.004]
-                },
-                systemDivider: {
-                    bBoxNE: [4.232, 4.24],
-                    bBoxSW: [0, -0.272]
-                },
-                textAugmentationDot: {
-                    bBoxNE: [0.4, 0.256],
-                    bBoxSW: [0, -0.144]
-                },
-                textBlackNoteFrac16thLongStem: {
-                    bBoxNE: [1.368, 3.512],
-                    bBoxSW: [0, -0.56]
-                },
-                textBlackNoteFrac32ndLongStem: {
-                    bBoxNE: [1.368, 3.512],
-                    bBoxSW: [0, -0.56]
-                },
-                textBlackNoteFrac8thLongStem: {
-                    bBoxNE: [1.368, 3.512],
-                    bBoxSW: [0, -0.56]
-                },
-                textBlackNoteLongStem: {
-                    bBoxNE: [1.328, 3.512],
-                    bBoxSW: [0, -0.564]
-                },
-                textCont16thBeamLongStem: {
-                    bBoxNE: [1.368, 3.512],
-                    bBoxSW: [0, 2.264]
-                },
-                textCont32ndBeamLongStem: {
-                    bBoxNE: [1.368, 3.512],
-                    bBoxSW: [0, 1.504]
-                },
-                textCont8thBeamLongStem: {
-                    bBoxNE: [1.368, 3.512],
-                    bBoxSW: [0, 3.012]
-                },
-                textTuplet3LongStem: {
-                    bBoxNE: [0.94, 5.3],
-                    bBoxSW: [0, 4.2]
-                },
-                textTupletBracketEndLongStem: {
-                    bBoxNE: [1.272, 4.764],
-                    bBoxSW: [0, 3.94]
-                },
-                textTupletBracketStartLongStem: {
-                    bBoxNE: [1.272, 4.764],
-                    bBoxSW: [0, 3.94]
-                },
-                timeSig0: {
-                    bBoxNE: [1.8, 1.004],
-                    bBoxSW: [0.08, -1]
-                },
-                timeSig1: {
-                    bBoxNE: [1.256, 1.004],
-                    bBoxSW: [0.08, -1]
-                },
-                timeSig2: {
-                    bBoxNE: [1.704, 1.016],
-                    bBoxSW: [0.08, -1.028]
-                },
-                timeSig3: {
-                    bBoxNE: [1.604, 0.996],
-                    bBoxSW: [0.08, -1.004]
-                },
-                timeSig4: {
-                    bBoxNE: [1.8, 1.004],
-                    bBoxSW: [0.08, -1]
-                },
-                timeSig5: {
-                    bBoxNE: [1.532, 0.984],
-                    bBoxSW: [0.08, -1.004]
-                },
-                timeSig6: {
-                    bBoxNE: [1.656, 1.004],
-                    bBoxSW: [0.08, -0.996]
-                },
-                timeSig7: {
-                    bBoxNE: [1.684, 0.996],
-                    bBoxSW: [0.08, -1]
-                },
-                timeSig8: {
-                    bBoxNE: [1.664, 1.036],
-                    bBoxSW: [0.08, -1.036]
-                },
-                timeSig9: {
-                    bBoxNE: [1.656, 1.004],
-                    bBoxSW: [0.08, -0.996]
-                },
-                timeSigCommon: {
-                    bBoxNE: [1.696, 1.004],
-                    bBoxSW: [0.02, -0.996]
-                },
-                timeSigCutCommon: {
-                    bBoxNE: [1.672, 1.444],
-                    bBoxSW: [0, -1.436]
-                },
-                tremolo1: {
-                    bBoxNE: [0.6, 0.376],
-                    bBoxSW: [-0.6, -0.372]
-                },
-                tremolo2: {
-                    bBoxNE: [0.596, 0.748],
-                    bBoxSW: [-0.604, -0.748]
-                },
-                tremolo3: {
-                    bBoxNE: [0.6, 1.112],
-                    bBoxSW: [-0.6, -1.12]
-                },
-                tuplet0: {
-                    bBoxNE: [1.2731041262817027, 1.5],
-                    bBoxSW: [-0.001204330173715796, -0.032]
-                },
-                tuplet1: {
-                    bBoxNE: [1.024, 1.488],
-                    bBoxSW: [0.04, 0]
-                },
-                tuplet2: {
-                    bBoxNE: [1.316, 1.5],
-                    bBoxSW: [0.04, -0.024]
-                },
-                tuplet3: {
-                    bBoxNE: [1.224, 1.5],
-                    bBoxSW: [0.04, -0.032]
-                },
-                tuplet4: {
-                    bBoxNE: [1.252, 1.488],
-                    bBoxSW: [0.04, 0]
-                },
-                tuplet5: {
-                    bBoxNE: [1.308, 1.492],
-                    bBoxSW: [0.04, -0.032]
-                },
-                tuplet6: {
-                    bBoxNE: [1.256, 1.5],
-                    bBoxSW: [0.04105974105482295, -0.032]
-                },
-                tuplet7: {
-                    bBoxNE: [1.332, 1.488],
-                    bBoxSW: [0.12, -0.016]
-                },
-                tuplet8: {
-                    bBoxNE: [1.292, 1.5],
-                    bBoxSW: [0.04, -0.032]
-                },
-                tuplet9: {
-                    bBoxNE: [1.254940258945177, 1.5],
-                    bBoxSW: [0.04, -0.032]
-                },
-                tupletColon: {
-                    bBoxNE: [0.484, 1.072],
-                    bBoxSW: [0.04, 0.232]
-                },
-                unpitchedPercussionClef1: {
-                    bBoxNE: [1.528, 1],
-                    bBoxSW: [0, -1]
-                },
-                wiggleSawtooth: {
-                    bBoxNE: [3.06, 1.06],
-                    bBoxSW: [-0.068, -1.068]
-                },
-                wiggleSawtoothNarrow: {
-                    bBoxNE: [2.06, 1.064],
-                    bBoxSW: [-0.072, -1.064]
-                },
-                wiggleTrill: {
-                    bBoxNE: [1.08, 0.836],
-                    bBoxSW: [-0.144, 0.392]
-                },
-                wiggleVibratoMediumFast: {
-                    bBoxNE: [1.292, 0.8],
-                    bBoxSW: [-0.104, -0.164]
-                }
-            },
-            glyphsWithAnchors: {
-                accidentalDoubleFlat: {
-                    cutOutNE: [0.988, 0.644],
-                    cutOutSE: [1.336, -0.396]
-                },
-                accidentalFlat: {
-                    cutOutNE: [0.252, 0.656],
-                    cutOutSE: [0.504, -0.476]
-                },
-                accidentalNatural: {
-                    cutOutNE: [0.192, 0.776],
-                    cutOutSW: [0.476, -0.828]
-                },
-                accidentalQuarterToneFlatArrowUp: {
-                    cutOutNE: [0.604, 0.664],
-                    cutOutSE: [0.62, -0.452]
-                },
-                accidentalQuarterToneSharpNaturalArrowUp: {
-                    cutOutSW: [0.616, -0.868]
-                },
-                accidentalSharp: {
-                    cutOutNE: [0.84, 0.896],
-                    cutOutNW: [0.144, 0.568],
-                    cutOutSE: [0.84, -0.596],
-                    cutOutSW: [0.144, -0.896]
-                },
-                accidentalThreeQuarterTonesSharpArrowUp: {
-                    cutOutNW: [0.272, 1.304],
-                    cutOutSE: [0.86, -0.584],
-                    cutOutSW: [0.132, -0.888]
-                },
-                dynamicFF: {
-                    opticalCenter: [1.852, 0]
-                },
-                dynamicFFF: {
-                    opticalCenter: [2.472, 0]
-                },
-                dynamicFFFF: {
-                    opticalCenter: [2.824, 0]
-                },
-                dynamicFFFFF: {
-                    opticalCenter: [2.976, 0]
-                },
-                dynamicFFFFFF: {
-                    opticalCenter: [3.504, 0]
-                },
-                dynamicForte: {
-                    opticalCenter: [1.256, 0]
-                },
-                dynamicFortePiano: {
-                    opticalCenter: [1.5, 0]
-                },
-                dynamicForzando: {
-                    opticalCenter: [1.352, 0]
-                },
-                dynamicMF: {
-                    opticalCenter: [1.796, 0]
-                },
-                dynamicMP: {
-                    opticalCenter: [1.848, 0]
-                },
-                dynamicNiente: {
-                    opticalCenter: [0.616, 0]
-                },
-                dynamicPF: {
-                    opticalCenter: [1.68, 0]
-                },
-                dynamicPP: {
-                    opticalCenter: [1.708, 0]
-                },
-                dynamicPPP: {
-                    opticalCenter: [2.368, 0]
-                },
-                dynamicPPPP: {
-                    opticalCenter: [3.004, 0]
-                },
-                dynamicPPPPP: {
-                    opticalCenter: [3.552, 0]
-                },
-                dynamicPPPPPP: {
-                    opticalCenter: [4.248, 0]
-                },
-                dynamicPiano: {
-                    opticalCenter: [1.22, 0]
-                },
-                dynamicRinforzando1: {
-                    opticalCenter: [1.564, 0]
-                },
-                dynamicRinforzando2: {
-                    opticalCenter: [2.084, 0]
-                },
-                dynamicSforzando1: {
-                    opticalCenter: [1.3, 0]
-                },
-                dynamicSforzandoPianissimo: {
-                    opticalCenter: [1.972, 0]
-                },
-                dynamicSforzandoPiano: {
-                    opticalCenter: [1.904, 0]
-                },
-                dynamicSforzato: {
-                    opticalCenter: [1.76, 0]
-                },
-                dynamicSforzatoFF: {
-                    opticalCenter: [2.276, 0]
-                },
-                dynamicSforzatoPiano: {
-                    opticalCenter: [1.848, 0]
-                },
-                flag128thDown: {
-                    stemDownSW: [0, -2.076]
-                },
-                flag128thUp: {
-                    stemUpNW: [0, 1.9]
-                },
-                flag16thDown: {
-                    stemDownSW: [0, 0.128]
-                },
-                flag16thUp: {
-                    stemUpNW: [0, -0.088]
-                },
-                flag256thDown: {
-                    stemDownSW: [0, -2.812]
-                },
-                flag256thUp: {
-                    stemUpNW: [0, 2.592]
-                },
-                flag32ndDown: {
-                    stemDownSW: [0, -0.448]
-                },
-                flag32ndUp: {
-                    stemUpNW: [0, 0.376]
-                },
-                flag64thDown: {
-                    stemDownSW: [0, -1.244]
-                },
-                flag64thUp: {
-                    stemUpNW: [0, 1.172]
-                },
-                flag8thDown: {
-                    graceNoteSlashNW: [-0.596, 2.168],
-                    graceNoteSlashSE: [1.328, 0.628],
-                    stemDownSW: [0, 0.132]
-                },
-                flag8thUp: {
-                    graceNoteSlashNE: [1.284, -0.796],
-                    graceNoteSlashSW: [-0.644, -2.456],
-                    stemUpNW: [0, -0.04]
-                },
-                guitarVibratoStroke: {
-                    repeatOffset: [0.608, 0]
-                },
-                guitarWideVibratoStroke: {
-                    repeatOffset: [0.82, 0]
-                },
-                noteShapeDiamondBlack: {
-                    stemDownNW: [0, 0],
-                    stemUpSE: [1.444, 0]
-                },
-                noteShapeDiamondWhite: {
-                    stemDownNW: [0, 0],
-                    stemUpSE: [1.436, 0]
-                },
-                noteShapeMoonBlack: {
-                    stemDownNW: [0, 0.068],
-                    stemUpSE: [1.44, 0.068]
-                },
-                noteShapeMoonWhite: {
-                    stemDownNW: [0, 0.072],
-                    stemUpSE: [1.444, 0.068]
-                },
-                noteShapeRoundBlack: {
-                    stemDownNW: [0, -0.168],
-                    stemUpSE: [1.444, 0.184]
-                },
-                noteShapeRoundWhite: {
-                    stemDownNW: [0, -0.168],
-                    stemUpSE: [1.456, 0.192]
-                },
-                noteShapeSquareBlack: {
-                    stemDownNW: [0, 0.46],
-                    stemUpSE: [1.44, -0.46]
-                },
-                noteShapeSquareWhite: {
-                    stemDownNW: [0, 0.46],
-                    stemUpSE: [1.44, -0.46]
-                },
-                noteShapeTriangleLeftBlack: {
-                    stemDownNW: [0, 0.5],
-                    stemUpSE: [1.436, -0.5]
-                },
-                noteShapeTriangleLeftWhite: {
-                    stemDownNW: [0, 0.5],
-                    stemUpSE: [1.436, -0.5]
-                },
-                noteShapeTriangleRightBlack: {
-                    stemDownNW: [0, 0.476],
-                    stemUpSE: [1.44, -0.5]
-                },
-                noteShapeTriangleRightWhite: {
-                    stemDownNW: [0, 0.476],
-                    stemUpSE: [1.44, -0.5]
-                },
-                noteShapeTriangleRoundBlack: {
-                    stemDownNW: [0, 0.172],
-                    stemUpSE: [1.424, 0.172]
-                },
-                noteShapeTriangleRoundWhite: {
-                    stemDownNW: [0, 0.172],
-                    stemUpSE: [1.424, 0.172]
-                },
-                noteShapeTriangleUpBlack: {
-                    stemDownNW: [0, -0.5],
-                    stemUpSE: [1.424, -0.5]
-                },
-                noteShapeTriangleUpWhite: {
-                    stemDownNW: [0, -0.5],
-                    stemUpSE: [1.424, -0.5]
-                },
-                noteheadBlack: {
-                    cutOutNW: [0.208, 0.3],
-                    cutOutSE: [0.94, -0.296],
-                    splitStemDownNE: [0.968, -0.248],
-                    splitStemDownNW: [0.12, -0.416],
-                    splitStemUpSE: [1.092, 0.392],
-                    splitStemUpSW: [0.312, 0.356],
-                    stemDownNW: [0, -0.168],
-                    stemUpSE: [1.18, 0.168]
-                },
-                noteheadCircleSlash: {
-                    stemDownNW: [0.004, 0],
-                    stemUpSE: [1, 0]
-                },
-                noteheadCircleX: {
-                    stemDownNW: [0, 0],
-                    stemUpSE: [0.996, 0]
-                },
-                noteheadCircleXDoubleWhole: {
-                    noteheadOrigin: [0.352, 0]
-                },
-                noteheadCircleXHalf: {
-                    stemDownNW: [0, 0],
-                    stemUpSE: [1, 0]
-                },
-                noteheadCircledBlack: {
-                    stemDownNW: [0, -0.164],
-                    stemUpSE: [1.18, 0.168]
-                },
-                noteheadCircledDoubleWhole: {
-                    noteheadOrigin: [0.356, 0]
-                },
-                noteheadCircledHalf: {
-                    stemDownNW: [0, -0.144],
-                    stemUpSE: [1.172, 0.156]
-                },
-                noteheadClusterDoubleWhole3rd: {
-                    noteheadOrigin: [0.364, 0]
-                },
-                noteheadClusterHalf3rd: {
-                    stemDownNW: [0, -0.164],
-                    stemUpSE: [1.264, 1.144]
-                },
-                noteheadClusterQuarter3rd: {
-                    stemDownNW: [0, 0.26],
-                    stemUpSE: [1.44, 0.744]
-                },
-                noteheadDiamondBlack: {
-                    stemDownNW: [0, 0],
-                    stemUpSE: [1, 0]
-                },
-                noteheadDiamondBlackWide: {
-                    stemDownNW: [0, 0],
-                    stemUpSE: [1.4, 0]
-                },
-                noteheadDiamondDoubleWhole: {
-                    noteheadOrigin: [0.324, 0]
-                },
-                noteheadDiamondHalf: {
-                    stemDownNW: [0, 0],
-                    stemUpSE: [1.004, 0]
-                },
-                noteheadDiamondWhite: {
-                    stemDownNW: [0, 0],
-                    stemUpSE: [1, 0]
-                },
-                noteheadDiamondWhiteWide: {
-                    stemDownNW: [0, 0.004],
-                    stemUpSE: [1.4, 0]
-                },
-                noteheadDoubleWhole: {
-                    noteheadOrigin: [0.36, 0]
-                },
-                noteheadHalf: {
-                    cutOutNW: [0.204, 0.296],
-                    cutOutSE: [0.98, -0.3],
-                    splitStemDownNE: [0.956, -0.3],
-                    splitStemDownNW: [0.128, -0.428],
-                    splitStemUpSE: [1.108, 0.372],
-                    splitStemUpSW: [0.328, 0.38],
-                    stemDownNW: [0, -0.168],
-                    stemUpSE: [1.18, 0.168]
-                },
-                noteheadHeavyX: {
-                    stemDownNW: [0, -0.436],
-                    stemUpSE: [1.54, 0.44]
-                },
-                noteheadHeavyXHat: {
-                    stemDownNW: [0, -0.436],
-                    stemUpSE: [1.54, 0.456]
-                },
-                noteheadPlusBlack: {
-                    stemDownNW: [-0.004, 0],
-                    stemUpSE: [0.996, 0]
-                },
-                noteheadPlusDoubleWhole: {
-                    noteheadOrigin: [0.372, 0]
-                },
-                noteheadPlusHalf: {
-                    stemDownNW: [0, -0.112],
-                    stemUpSE: [1.044, 0.088]
-                },
-                noteheadRoundWhiteWithDot: {
-                    stemDownNW: [0, 0],
-                    stemUpSE: [1.004, 0]
-                },
-                noteheadSlashHorizontalEnds: {
-                    stemDownNW: [0, -1],
-                    stemUpSE: [2.12, 1]
-                },
-                noteheadSlashWhiteHalf: {
-                    stemDownNW: [0, -1],
-                    stemUpSE: [3.12, 1]
-                },
-                noteheadSlashedBlack1: {
-                    stemDownNW: [0, -0.172],
-                    stemUpSE: [1.18, 0.164]
-                },
-                noteheadSlashedBlack2: {
-                    stemDownNW: [0, -0.172],
-                    stemUpSE: [1.18, 0.164]
-                },
-                noteheadSlashedDoubleWhole1: {
-                    noteheadOrigin: [0.356, 0]
-                },
-                noteheadSlashedDoubleWhole2: {
-                    noteheadOrigin: [0.356, 0]
-                },
-                noteheadSlashedHalf1: {
-                    stemDownNW: [0, -0.168],
-                    stemUpSE: [1.168, 0.164]
-                },
-                noteheadSlashedHalf2: {
-                    stemDownNW: [0, -0.164],
-                    stemUpSE: [1.172, 0.168]
-                },
-                noteheadSquareBlack: {
-                    stemDownNW: [0, -0.5],
-                    stemUpSE: [1.252, 0.5]
-                },
-                noteheadSquareBlackLarge: {
-                    stemDownNW: [0, 0],
-                    stemUpSE: [2, 0]
-                },
-                noteheadSquareBlackWhite: {
-                    stemDownNW: [0, -1],
-                    stemUpSE: [2, 1]
-                },
-                noteheadSquareWhite: {
-                    stemDownNW: [0, -0.5],
-                    stemUpSE: [1.252, 0.5]
-                },
-                noteheadTriangleDownBlack: {
-                    stemDownNW: [0, 0.5],
-                    stemUpSE: [1.168, 0.5]
-                },
-                noteheadTriangleDownDoubleWhole: {
-                    noteheadOrigin: [0.384, 0]
-                },
-                noteheadTriangleDownHalf: {
-                    stemDownNW: [0, 0.464],
-                    stemUpSE: [1.14, 0.464]
-                },
-                noteheadTriangleRightBlack: {
-                    stemDownNW: [0, -0.5],
-                    stemUpSE: [1.356, 0.5]
-                },
-                noteheadTriangleRightWhite: {
-                    stemDownNW: [0, -0.5],
-                    stemUpSE: [1.356, 0.5]
-                },
-                noteheadTriangleUpBlack: {
-                    stemDownNW: [0, -0.5],
-                    stemUpSE: [1.172, -0.5]
-                },
-                noteheadTriangleUpDoubleWhole: {
-                    noteheadOrigin: [0.34, 0]
-                },
-                noteheadTriangleUpHalf: {
-                    stemDownNW: [0, -0.46],
-                    stemUpSE: [1.14, -0.46]
-                },
-                noteheadWhole: {
-                    cutOutNW: [0.172, 0.332],
-                    cutOutSE: [1.532, -0.364]
-                },
-                noteheadXBlack: {
-                    stemDownNW: [0, -0.44],
-                    stemUpSE: [1.16, 0.444]
-                },
-                noteheadXDoubleWhole: {
-                    noteheadOrigin: [0.348, 0]
-                },
-                noteheadXHalf: {
-                    stemDownNW: [0, -0.412],
-                    stemUpSE: [1.336, 0.412]
-                },
-                noteheadXOrnate: {
-                    stemDownNW: [0, -0.312],
-                    stemUpSE: [0.988, 0.316]
-                },
-                wiggleSawtooth: {
-                    repeatOffset: [2.992, 0]
-                },
-                wiggleSawtoothNarrow: {
-                    repeatOffset: [1.996, 0]
-                },
-                wiggleTrill: {
-                    repeatOffset: [0.948, 0]
-                },
-                wiggleVibratoMediumFast: {
-                    repeatOffset: [1.18, 0]
-                }
-            }
-        };
-    // end bravura_alphatab_metadata.json
+    engravingDefaults: {
+        arrowShaftThickness: 0.16,
+        barlineSeparation: 0.4,
+        beamSpacing: 0.25,
+        beamThickness: 0.5,
+        bracketThickness: 0.5,
+        dashedBarlineDashLength: 0.5,
+        dashedBarlineGapLength: 0.25,
+        dashedBarlineThickness: 0.16,
+        hairpinThickness: 0.16,
+        legerLineExtension: 0.4,
+        legerLineThickness: 0.16,
+        lyricLineThickness: 0.16,
+        octaveLineThickness: 0.16,
+        pedalLineThickness: 0.16,
+        repeatBarlineDotSeparation: 0.16,
+        repeatEndingLineThickness: 0.16,
+        slurEndpointThickness: 0.1,
+        slurMidpointThickness: 0.22,
+        staffLineThickness: 0.13,
+        stemThickness: 0.12,
+        subBracketThickness: 0.16,
+        textEnclosureThickness: 0.16,
+        thickBarlineThickness: 0.5,
+        thinBarlineThickness: 0.16,
+        tieEndpointThickness: 0.1,
+        tieMidpointThickness: 0.22,
+        thinThickBarlineSeparation: 0.4,
+        tupletBracketThickness: 0.16
+    },
+    glyphBBoxes: {
+        FourStringTabClef: {
+            bBoxNE: [
+                1.088,
+                2.016
+            ],
+            bBoxSW: [
+                -0.012,
+                -2.032
+            ]
+        },
+        SixStringTabClef: {
+            bBoxNE: [
+                1.632,
+                3.056
+            ],
+            bBoxSW: [
+                -0.012,
+                -2.992
+            ]
+        },
+        accidentalDoubleFlat: {
+            bBoxNE: [
+                1.644,
+                1.748
+            ],
+            bBoxSW: [
+                0,
+                -0.7
+            ]
+        },
+        accidentalDoubleSharp: {
+            bBoxNE: [
+                0.988,
+                0.508
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        accidentalFlat: {
+            bBoxNE: [
+                0.904,
+                1.756
+            ],
+            bBoxSW: [
+                0,
+                -0.7
+            ]
+        },
+        accidentalNatural: {
+            bBoxNE: [
+                0.672,
+                1.364
+            ],
+            bBoxSW: [
+                0,
+                -1.34
+            ]
+        },
+        accidentalQuarterToneFlatArrowUp: {
+            bBoxNE: [
+                0.992,
+                2.316
+            ],
+            bBoxSW: [
+                -0.168,
+                -0.708
+            ]
+        },
+        accidentalQuarterToneSharpNaturalArrowUp: {
+            bBoxNE: [
+                0.848,
+                2.188
+            ],
+            bBoxSW: [
+                -0.104,
+                -1.36
+            ]
+        },
+        accidentalSharp: {
+            bBoxNE: [
+                0.996,
+                1.4
+            ],
+            bBoxSW: [
+                0,
+                -1.392
+            ]
+        },
+        accidentalThreeQuarterTonesSharpArrowUp: {
+            bBoxNE: [
+                1.1,
+                2.12
+            ],
+            bBoxSW: [
+                0,
+                -1.388
+            ]
+        },
+        arrowheadBlackDown: {
+            bBoxNE: [
+                0.912,
+                1.196
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        arrowheadBlackUp: {
+            bBoxNE: [
+                0.912,
+                1.196
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        articAccentAbove: {
+            bBoxNE: [
+                1.356,
+                0.98
+            ],
+            bBoxSW: [
+                0,
+                0.004
+            ]
+        },
+        articAccentBelow: {
+            bBoxNE: [
+                1.356,
+                0
+            ],
+            bBoxSW: [
+                0,
+                -0.976
+            ]
+        },
+        articMarcatoAbove: {
+            bBoxNE: [
+                0.94,
+                1.012
+            ],
+            bBoxSW: [
+                -0.004,
+                -0.004
+            ]
+        },
+        articMarcatoBelow: {
+            bBoxNE: [
+                0.94,
+                0
+            ],
+            bBoxSW: [
+                -0.004,
+                -1.016
+            ]
+        },
+        articStaccatoAbove: {
+            bBoxNE: [
+                0.336,
+                0.336
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        articStaccatoBelow: {
+            bBoxNE: [
+                0.336,
+                0
+            ],
+            bBoxSW: [
+                0,
+                -0.336
+            ]
+        },
+        articTenutoAbove: {
+            bBoxNE: [
+                1.352,
+                0.192
+            ],
+            bBoxSW: [
+                -0.004,
+                0
+            ]
+        },
+        articTenutoBelow: {
+            bBoxNE: [
+                1.352,
+                0
+            ],
+            bBoxSW: [
+                -0.004,
+                -0.192
+            ]
+        },
+        augmentationDot: {
+            bBoxNE: [
+                0.4,
+                0.2
+            ],
+            bBoxSW: [
+                0,
+                -0.2
+            ]
+        },
+        brace: {
+            bBoxNE: [
+                0.328,
+                3.988
+            ],
+            bBoxSW: [
+                0.008,
+                0
+            ]
+        },
+        bracketBottom: {
+            bBoxNE: [
+                1.876,
+                0
+            ],
+            bBoxSW: [
+                0,
+                -1.18
+            ]
+        },
+        bracketTop: {
+            bBoxNE: [
+                1.876,
+                1.18
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        cClef: {
+            bBoxNE: [
+                2.796,
+                2.024
+            ],
+            bBoxSW: [
+                0,
+                -2.024
+            ]
+        },
+        cClef8vb: {
+            bBoxNE: [
+                2.796,
+                2.024
+            ],
+            bBoxSW: [
+                0,
+                -2.964
+            ]
+        },
+        clef15: {
+            bBoxNE: [
+                1.436,
+                1.02
+            ],
+            bBoxSW: [
+                0,
+                -0.012
+            ]
+        },
+        clef8: {
+            bBoxNE: [
+                0.82,
+                0.988
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        coda: {
+            bBoxNE: [
+                3.82,
+                3.592
+            ],
+            bBoxSW: [
+                -0.016,
+                -0.632
+            ]
+        },
+        dynamicCrescendoHairpin: {
+            bBoxNE: [
+                2.944,
+                1.424
+            ],
+            bBoxSW: [
+                0.016,
+                0.372
+            ]
+        },
+        dynamicFF: {
+            bBoxNE: [
+                2.44,
+                1.776
+            ],
+            bBoxSW: [
+                -0.54,
+                -0.608
+            ]
+        },
+        dynamicFFF: {
+            bBoxNE: [
+                3.32,
+                1.776
+            ],
+            bBoxSW: [
+                -0.62,
+                -0.608
+            ]
+        },
+        dynamicFFFF: {
+            bBoxNE: [
+                4.28,
+                1.776
+            ],
+            bBoxSW: [
+                -0.62,
+                -0.608
+            ]
+        },
+        dynamicFFFFF: {
+            bBoxNE: [
+                5.24,
+                1.776
+            ],
+            bBoxSW: [
+                -0.62,
+                -0.608
+            ]
+        },
+        dynamicFFFFFF: {
+            bBoxNE: [
+                6.2,
+                1.776
+            ],
+            bBoxSW: [
+                -0.62,
+                -0.608
+            ]
+        },
+        dynamicForte: {
+            bBoxNE: [
+                1.456,
+                1.776
+            ],
+            bBoxSW: [
+                -0.564,
+                -0.608
+            ]
+        },
+        dynamicFortePiano: {
+            bBoxNE: [
+                2.476,
+                1.776
+            ],
+            bBoxSW: [
+                -0.564,
+                -0.608
+            ]
+        },
+        dynamicForzando: {
+            bBoxNE: [
+                1.988,
+                1.776
+            ],
+            bBoxSW: [
+                -0.564,
+                -0.608
+            ]
+        },
+        dynamicMF: {
+            bBoxNE: [
+                3.272,
+                1.724
+            ],
+            bBoxSW: [
+                -0.08,
+                -0.66
+            ]
+        },
+        dynamicMP: {
+            bBoxNE: [
+                3.3,
+                1.096
+            ],
+            bBoxSW: [
+                -0.08,
+                -0.568
+            ]
+        },
+        dynamicNiente: {
+            bBoxNE: [
+                1.232,
+                1.096
+            ],
+            bBoxSW: [
+                -0.092,
+                -0.04
+            ]
+        },
+        dynamicPF: {
+            bBoxNE: [
+                3.08,
+                1.776
+            ],
+            bBoxSW: [
+                -0.288,
+                -0.608
+            ]
+        },
+        dynamicPP: {
+            bBoxNE: [
+                2.912,
+                1.096
+            ],
+            bBoxSW: [
+                -0.328,
+                -0.568
+            ]
+        },
+        dynamicPPP: {
+            bBoxNE: [
+                4.292,
+                1.096
+            ],
+            bBoxSW: [
+                -0.368,
+                -0.568
+            ]
+        },
+        dynamicPPPP: {
+            bBoxNE: [
+                5.672,
+                1.096
+            ],
+            bBoxSW: [
+                -0.408,
+                -0.568
+            ]
+        },
+        dynamicPPPPP: {
+            bBoxNE: [
+                7.092,
+                1.096
+            ],
+            bBoxSW: [
+                -0.408,
+                -0.568
+            ]
+        },
+        dynamicPPPPPP: {
+            bBoxNE: [
+                8.512,
+                1.096
+            ],
+            bBoxSW: [
+                -0.408,
+                -0.568
+            ]
+        },
+        dynamicPiano: {
+            bBoxNE: [
+                1.464,
+                1.096
+            ],
+            bBoxSW: [
+                -0.356,
+                -0.568
+            ]
+        },
+        dynamicRinforzando1: {
+            bBoxNE: [
+                2.5,
+                1.776
+            ],
+            bBoxSW: [
+                -0.08,
+                -0.608
+            ]
+        },
+        dynamicRinforzando2: {
+            bBoxNE: [
+                2.976,
+                1.776
+            ],
+            bBoxSW: [
+                -0.08,
+                -0.608
+            ]
+        },
+        dynamicSforzando1: {
+            bBoxNE: [
+                2.416,
+                1.776
+            ],
+            bBoxSW: [
+                0,
+                -0.608
+            ]
+        },
+        dynamicSforzandoPianissimo: {
+            bBoxNE: [
+                4.796,
+                1.776
+            ],
+            bBoxSW: [
+                0,
+                -0.608
+            ]
+        },
+        dynamicSforzandoPiano: {
+            bBoxNE: [
+                3.38,
+                1.776
+            ],
+            bBoxSW: [
+                0,
+                -0.608
+            ]
+        },
+        dynamicSforzato: {
+            bBoxNE: [
+                2.932,
+                1.776
+            ],
+            bBoxSW: [
+                0,
+                -0.608
+            ]
+        },
+        dynamicSforzatoFF: {
+            bBoxNE: [
+                3.856,
+                1.776
+            ],
+            bBoxSW: [
+                0,
+                -0.608
+            ]
+        },
+        dynamicSforzatoPiano: {
+            bBoxNE: [
+                4.304,
+                1.776
+            ],
+            bBoxSW: [
+                0,
+                -0.608
+            ]
+        },
+        fClef: {
+            bBoxNE: [
+                2.736,
+                1.048
+            ],
+            bBoxSW: [
+                -0.02,
+                -2.54
+            ]
+        },
+        fClef15ma: {
+            bBoxNE: [
+                2.736,
+                1.984
+            ],
+            bBoxSW: [
+                -0.02,
+                -2.54
+            ]
+        },
+        fClef15mb: {
+            bBoxNE: [
+                2.736,
+                1.048
+            ],
+            bBoxSW: [
+                -0.02,
+                -2.968
+            ]
+        },
+        fClef8va: {
+            bBoxNE: [
+                2.736,
+                1.98
+            ],
+            bBoxSW: [
+                -0.02,
+                -2.54
+            ]
+        },
+        fClef8vb: {
+            bBoxNE: [
+                2.736,
+                1.048
+            ],
+            bBoxSW: [
+                -0.02,
+                -2.976
+            ]
+        },
+        fermataAbove: {
+            bBoxNE: [
+                2.42,
+                1.316
+            ],
+            bBoxSW: [
+                0.012,
+                -0.012
+            ]
+        },
+        fermataLongAbove: {
+            bBoxNE: [
+                2.412,
+                1.332
+            ],
+            bBoxSW: [
+                0,
+                -0.004
+            ]
+        },
+        fermataShortAbove: {
+            bBoxNE: [
+                2.416,
+                1.364
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        fingering0: {
+            bBoxNE: [
+                0.94,
+                1.004
+            ],
+            bBoxSW: [
+                0.08,
+                -0.004
+            ]
+        },
+        fingering1: {
+            bBoxNE: [
+                0.548,
+                1.016
+            ],
+            bBoxSW: [
+                0.08,
+                0
+            ]
+        },
+        fingering2: {
+            bBoxNE: [
+                0.888,
+                1.012
+            ],
+            bBoxSW: [
+                0.08,
+                -0.012
+            ]
+        },
+        fingering3: {
+            bBoxNE: [
+                0.82,
+                1.008
+            ],
+            bBoxSW: [
+                0.08,
+                0
+            ]
+        },
+        fingering4: {
+            bBoxNE: [
+                0.864,
+                1.012
+            ],
+            bBoxSW: [
+                0.08,
+                0.004
+            ]
+        },
+        fingering5: {
+            bBoxNE: [
+                0.82,
+                1.032
+            ],
+            bBoxSW: [
+                0.08,
+                0
+            ]
+        },
+        fingeringALower: {
+            bBoxNE: [
+                1.068,
+                1.032
+            ],
+            bBoxSW: [
+                0,
+                -0.02
+            ]
+        },
+        fingeringCLower: {
+            bBoxNE: [
+                0.888,
+                1.044
+            ],
+            bBoxSW: [
+                0,
+                -0.028
+            ]
+        },
+        fingeringILower: {
+            bBoxNE: [
+                0.656,
+                1.54
+            ],
+            bBoxSW: [
+                -0.052,
+                -0.028
+            ]
+        },
+        fingeringMLower: {
+            bBoxNE: [
+                1.66,
+                1.028
+            ],
+            bBoxSW: [
+                -0.032,
+                -0.016
+            ]
+        },
+        fingeringPLower: {
+            bBoxNE: [
+                1.088,
+                1.028
+            ],
+            bBoxSW: [
+                -0.216,
+                -0.612
+            ]
+        },
+        fingeringTLower: {
+            bBoxNE: [
+                0.604,
+                1.484
+            ],
+            bBoxSW: [
+                0,
+                -0.028
+            ]
+        },
+        flag128thDown: {
+            bBoxNE: [
+                1.092,
+                3.248
+            ],
+            bBoxSW: [
+                0,
+                -2.32
+            ]
+        },
+        flag128thUp: {
+            bBoxNE: [
+                1.044,
+                2.132
+            ],
+            bBoxSW: [
+                0,
+                -3.248
+            ]
+        },
+        flag16thDown: {
+            bBoxNE: [
+                1.1635806326044895,
+                3.2480256
+            ],
+            bBoxSW: [
+                0,
+                -0.036
+            ]
+        },
+        flag16thUp: {
+            bBoxNE: [
+                1.116,
+                0.008
+            ],
+            bBoxSW: [
+                0,
+                -3.252
+            ]
+        },
+        flag256thDown: {
+            bBoxNE: [
+                1.196,
+                3.252
+            ],
+            bBoxSW: [
+                0,
+                -3.004
+            ]
+        },
+        flag256thUp: {
+            bBoxNE: [
+                1.056,
+                2.816
+            ],
+            bBoxSW: [
+                0,
+                -3.248
+            ]
+        },
+        flag32ndDown: {
+            bBoxNE: [
+                1.092,
+                3.248
+            ],
+            bBoxSW: [
+                0,
+                -0.688
+            ]
+        },
+        flag32ndUp: {
+            bBoxNE: [
+                1.044,
+                0.596
+            ],
+            bBoxSW: [
+                0,
+                -3.248
+            ]
+        },
+        flag64thDown: {
+            bBoxNE: [
+                1.092,
+                3.248
+            ],
+            bBoxSW: [
+                0,
+                -1.504
+            ]
+        },
+        flag64thUp: {
+            bBoxNE: [
+                1.044,
+                1.388
+            ],
+            bBoxSW: [
+                0,
+                -3.248
+            ]
+        },
+        flag8thDown: {
+            bBoxNE: [
+                1.224,
+                3.232896633157715
+            ],
+            bBoxSW: [
+                0,
+                -0.056
+            ]
+        },
+        flag8thUp: {
+            bBoxNE: [
+                1.056,
+                0.036
+            ],
+            bBoxSW: [
+                0,
+                -3.240768470618394
+            ]
+        },
+        fretboardFilledCircle: {
+            bBoxNE: [
+                0.564,
+                0.564
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        fretboardO: {
+            bBoxNE: [
+                0.564,
+                0.564
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        fretboardX: {
+            bBoxNE: [
+                0.596,
+                0.596
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        gClef: {
+            bBoxNE: [
+                2.684,
+                4.392
+            ],
+            bBoxSW: [
+                0,
+                -2.632
+            ]
+        },
+        gClef15ma: {
+            bBoxNE: [
+                2.684,
+                5.276
+            ],
+            bBoxSW: [
+                0,
+                -2.632
+            ]
+        },
+        gClef15mb: {
+            bBoxNE: [
+                2.684,
+                4.392
+            ],
+            bBoxSW: [
+                0,
+                -3.524
+            ]
+        },
+        gClef8va: {
+            bBoxNE: [
+                2.684,
+                5.28
+            ],
+            bBoxSW: [
+                0,
+                -2.632
+            ]
+        },
+        gClef8vb: {
+            bBoxNE: [
+                2.684,
+                4.392
+            ],
+            bBoxSW: [
+                0,
+                -3.512
+            ]
+        },
+        graceNoteSlashStemDown: {
+            bBoxNE: [
+                2.02,
+                0
+            ],
+            bBoxSW: [
+                0,
+                -1.604
+            ]
+        },
+        graceNoteSlashStemUp: {
+            bBoxNE: [
+                2.02,
+                1.604
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarClosePedal: {
+            bBoxNE: [
+                1.144,
+                1.14
+            ],
+            bBoxSW: [
+                0,
+                -0.004
+            ]
+        },
+        guitarFadeIn: {
+            bBoxNE: [
+                1.448,
+                1.46
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarFadeOut: {
+            bBoxNE: [
+                1.448,
+                1.46
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarGolpe: {
+            bBoxNE: [
+                1.08,
+                1.128
+            ],
+            bBoxSW: [
+                0.004,
+                0
+            ]
+        },
+        guitarLeftHandTapping: {
+            bBoxNE: [
+                1.588,
+                1.364
+            ],
+            bBoxSW: [
+                0,
+                -0.224
+            ]
+        },
+        guitarOpenPedal: {
+            bBoxNE: [
+                1.144,
+                1.144
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarString0: {
+            bBoxNE: [
+                2.164,
+                2.156
+            ],
+            bBoxSW: [
+                0.004,
+                0
+            ]
+        },
+        guitarString1: {
+            bBoxNE: [
+                2.16,
+                2.156
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarString2: {
+            bBoxNE: [
+                2.16,
+                2.156
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarString3: {
+            bBoxNE: [
+                2.16,
+                2.156
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarString4: {
+            bBoxNE: [
+                2.164,
+                2.156
+            ],
+            bBoxSW: [
+                0.004,
+                0
+            ]
+        },
+        guitarString5: {
+            bBoxNE: [
+                2.16,
+                2.156
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarString6: {
+            bBoxNE: [
+                2.16,
+                2.156
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarString7: {
+            bBoxNE: [
+                2.16,
+                2.156
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarString8: {
+            bBoxNE: [
+                2.16,
+                2.156
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarString9: {
+            bBoxNE: [
+                2.16,
+                2.156
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarVibratoStroke: {
+            bBoxNE: [
+                0.668,
+                0.476
+            ],
+            bBoxSW: [
+                -0.056,
+                0
+            ]
+        },
+        guitarVolumeSwell: {
+            bBoxNE: [
+                2.896,
+                1.46
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        guitarWideVibratoStroke: {
+            bBoxNE: [
+                0.908,
+                0.896
+            ],
+            bBoxSW: [
+                -0.096,
+                0
+            ]
+        },
+        keyboardPedalPed: {
+            bBoxNE: [
+                4.076,
+                2.22
+            ],
+            bBoxSW: [
+                0,
+                -0.032
+            ]
+        },
+        keyboardPedalUp: {
+            bBoxNE: [
+                1.8,
+                1.8
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        metAugmentationDot: {
+            bBoxNE: [
+                0.4,
+                0.2
+            ],
+            bBoxSW: [
+                0,
+                -0.2
+            ]
+        },
+        metNote8thUp: {
+            bBoxNE: [
+                2.132,
+                2.784
+            ],
+            bBoxSW: [
+                0,
+                -0.564
+            ]
+        },
+        metNoteQuarterUp: {
+            bBoxNE: [
+                1.328,
+                2.752
+            ],
+            bBoxSW: [
+                0,
+                -0.564
+            ]
+        },
+        note8thUp: {
+            bBoxNE: [
+                2.264,
+                3.492
+            ],
+            bBoxSW: [
+                0,
+                -0.552
+            ]
+        },
+        noteQuarterUp: {
+            bBoxNE: [
+                1.328,
+                3.5
+            ],
+            bBoxSW: [
+                0,
+                -0.564
+            ]
+        },
+        noteShapeDiamondBlack: {
+            bBoxNE: [
+                1.444,
+                0.548
+            ],
+            bBoxSW: [
+                0,
+                -0.552
+            ]
+        },
+        noteShapeDiamondWhite: {
+            bBoxNE: [
+                1.444,
+                0.544
+            ],
+            bBoxSW: [
+                0,
+                -0.556
+            ]
+        },
+        noteShapeMoonBlack: {
+            bBoxNE: [
+                1.444,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteShapeMoonWhite: {
+            bBoxNE: [
+                1.444,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteShapeRoundBlack: {
+            bBoxNE: [
+                1.456,
+                0.552
+            ],
+            bBoxSW: [
+                0,
+                -0.552
+            ]
+        },
+        noteShapeRoundWhite: {
+            bBoxNE: [
+                1.464,
+                0.548
+            ],
+            bBoxSW: [
+                0,
+                -0.548
+            ]
+        },
+        noteShapeSquareBlack: {
+            bBoxNE: [
+                1.44,
+                0.46
+            ],
+            bBoxSW: [
+                0,
+                -0.46
+            ]
+        },
+        noteShapeSquareWhite: {
+            bBoxNE: [
+                1.44,
+                0.46
+            ],
+            bBoxSW: [
+                0,
+                -0.46
+            ]
+        },
+        noteShapeTriangleLeftBlack: {
+            bBoxNE: [
+                1.44,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteShapeTriangleLeftWhite: {
+            bBoxNE: [
+                1.44,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteShapeTriangleRightBlack: {
+            bBoxNE: [
+                1.44,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteShapeTriangleRightWhite: {
+            bBoxNE: [
+                1.44,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteShapeTriangleRoundBlack: {
+            bBoxNE: [
+                1.424,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteShapeTriangleRoundWhite: {
+            bBoxNE: [
+                1.424,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteShapeTriangleUpBlack: {
+            bBoxNE: [
+                1.424,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteShapeTriangleUpWhite: {
+            bBoxNE: [
+                1.424,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadBlack: {
+            bBoxNE: [
+                1.18,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadCircleSlash: {
+            bBoxNE: [
+                1,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadCircleX: {
+            bBoxNE: [
+                0.996,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadCircleXDoubleWhole: {
+            bBoxNE: [
+                1.688,
+                0.62
+            ],
+            bBoxSW: [
+                0,
+                -0.62
+            ]
+        },
+        noteheadCircleXHalf: {
+            bBoxNE: [
+                1,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadCircleXWhole: {
+            bBoxNE: [
+                0.996,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadCircledBlack: {
+            bBoxNE: [
+                1.284,
+                0.668
+            ],
+            bBoxSW: [
+                -0.084,
+                -0.684
+            ]
+        },
+        noteheadCircledDoubleWhole: {
+            bBoxNE: [
+                2.412,
+                0.852
+            ],
+            bBoxSW: [
+                0,
+                -0.872
+            ]
+        },
+        noteheadCircledHalf: {
+            bBoxNE: [
+                1.244,
+                0.668
+            ],
+            bBoxSW: [
+                -0.072,
+                -0.648
+            ]
+        },
+        noteheadCircledWhole: {
+            bBoxNE: [
+                1.748,
+                0.844
+            ],
+            bBoxSW: [
+                0,
+                -0.9
+            ]
+        },
+        noteheadClusterDoubleWhole3rd: {
+            bBoxNE: [
+                2.428,
+                1.62
+            ],
+            bBoxSW: [
+                0,
+                -0.62
+            ]
+        },
+        noteheadClusterHalf3rd: {
+            bBoxNE: [
+                1.264,
+                1.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadClusterQuarter3rd: {
+            bBoxNE: [
+                1.44,
+                1.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadClusterWhole3rd: {
+            bBoxNE: [
+                1.7,
+                1.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadDiamondBlack: {
+            bBoxNE: [
+                1,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadDiamondBlackWide: {
+            bBoxNE: [
+                1.4,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadDiamondDoubleWhole: {
+            bBoxNE: [
+                1.728,
+                0.62
+            ],
+            bBoxSW: [
+                0,
+                -0.62
+            ]
+        },
+        noteheadDiamondHalf: {
+            bBoxNE: [
+                1.004,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadDiamondWhite: {
+            bBoxNE: [
+                1,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadDiamondWhiteWide: {
+            bBoxNE: [
+                1.4,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadDiamondWhole: {
+            bBoxNE: [
+                1.08,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadDoubleWhole: {
+            bBoxNE: [
+                2.396,
+                0.62
+            ],
+            bBoxSW: [
+                0,
+                -0.62
+            ]
+        },
+        noteheadDoubleWholeSquare: {
+            bBoxNE: [
+                1.664,
+                0.792
+            ],
+            bBoxSW: [
+                0,
+                -0.76
+            ]
+        },
+        noteheadHalf: {
+            bBoxNE: [
+                1.18,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadHeavyX: {
+            bBoxNE: [
+                1.54,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadHeavyXHat: {
+            bBoxNE: [
+                1.828,
+                1.04
+            ],
+            bBoxSW: [
+                -0.292,
+                -0.5
+            ]
+        },
+        noteheadParenthesis: {
+            bBoxNE: [
+                1.472,
+                0.728
+            ],
+            bBoxSW: [
+                -0.292,
+                -0.72
+            ]
+        },
+        noteheadPlusBlack: {
+            bBoxNE: [
+                0.996,
+                0.5
+            ],
+            bBoxSW: [
+                -0.004,
+                -0.5
+            ]
+        },
+        noteheadPlusDoubleWhole: {
+            bBoxNE: [
+                1.892,
+                0.62
+            ],
+            bBoxSW: [
+                0,
+                -0.62
+            ]
+        },
+        noteheadPlusHalf: {
+            bBoxNE: [
+                1.044,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadPlusWhole: {
+            bBoxNE: [
+                1.14,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadRoundWhiteWithDot: {
+            bBoxNE: [
+                1.004,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadSlashHorizontalEnds: {
+            bBoxNE: [
+                2.12,
+                1
+            ],
+            bBoxSW: [
+                0,
+                -1
+            ]
+        },
+        noteheadSlashWhiteHalf: {
+            bBoxNE: [
+                3.12,
+                1
+            ],
+            bBoxSW: [
+                0,
+                -1
+            ]
+        },
+        noteheadSlashWhiteWhole: {
+            bBoxNE: [
+                3.92,
+                1
+            ],
+            bBoxSW: [
+                0,
+                -1
+            ]
+        },
+        noteheadSlashedBlack1: {
+            bBoxNE: [
+                1.5,
+                0.668
+            ],
+            bBoxSW: [
+                -0.32,
+                -0.66
+            ]
+        },
+        noteheadSlashedBlack2: {
+            bBoxNE: [
+                1.504,
+                0.672
+            ],
+            bBoxSW: [
+                -0.316,
+                -0.656
+            ]
+        },
+        noteheadSlashedDoubleWhole1: {
+            bBoxNE: [
+                2.384,
+                0.672
+            ],
+            bBoxSW: [
+                0,
+                -0.716
+            ]
+        },
+        noteheadSlashedDoubleWhole2: {
+            bBoxNE: [
+                2.384,
+                0.676
+            ],
+            bBoxSW: [
+                0,
+                -0.712
+            ]
+        },
+        noteheadSlashedHalf1: {
+            bBoxNE: [
+                1.544,
+                0.64
+            ],
+            bBoxSW: [
+                -0.268,
+                -0.568
+            ]
+        },
+        noteheadSlashedHalf2: {
+            bBoxNE: [
+                1.52,
+                0.672
+            ],
+            bBoxSW: [
+                -0.292,
+                -0.536
+            ]
+        },
+        noteheadSlashedWhole1: {
+            bBoxNE: [
+                1.732,
+                0.592
+            ],
+            bBoxSW: [
+                -0.088,
+                -0.628
+            ]
+        },
+        noteheadSlashedWhole2: {
+            bBoxNE: [
+                1.744,
+                0.604
+            ],
+            bBoxSW: [
+                -0.072,
+                -0.616
+            ]
+        },
+        noteheadSquareBlack: {
+            bBoxNE: [
+                1.252,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadSquareBlackLarge: {
+            bBoxNE: [
+                2,
+                1
+            ],
+            bBoxSW: [
+                0,
+                -1
+            ]
+        },
+        noteheadSquareBlackWhite: {
+            bBoxNE: [
+                2,
+                1
+            ],
+            bBoxSW: [
+                0,
+                -1
+            ]
+        },
+        noteheadSquareWhite: {
+            bBoxNE: [
+                1.252,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadTriangleDownBlack: {
+            bBoxNE: [
+                1.168,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadTriangleDownDoubleWhole: {
+            bBoxNE: [
+                1.932,
+                0.62
+            ],
+            bBoxSW: [
+                0,
+                -0.62
+            ]
+        },
+        noteheadTriangleDownHalf: {
+            bBoxNE: [
+                1.14,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadTriangleDownWhole: {
+            bBoxNE: [
+                1.276,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadTriangleRightBlack: {
+            bBoxNE: [
+                1.356,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadTriangleRightWhite: {
+            bBoxNE: [
+                1.356,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadTriangleUpBlack: {
+            bBoxNE: [
+                1.172,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadTriangleUpDoubleWhole: {
+            bBoxNE: [
+                1.932,
+                0.62
+            ],
+            bBoxSW: [
+                0,
+                -0.62
+            ]
+        },
+        noteheadTriangleUpHalf: {
+            bBoxNE: [
+                1.14,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadTriangleUpWhole: {
+            bBoxNE: [
+                1.276,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadWhole: {
+            bBoxNE: [
+                1.688,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadXBlack: {
+            bBoxNE: [
+                1.16,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadXDoubleWhole: {
+            bBoxNE: [
+                2.184,
+                0.62
+            ],
+            bBoxSW: [
+                0,
+                -0.62
+            ]
+        },
+        noteheadXHalf: {
+            bBoxNE: [
+                1.336,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        noteheadXOrnate: {
+            bBoxNE: [
+                0.988,
+                0.504
+            ],
+            bBoxSW: [
+                0,
+                -0.504
+            ]
+        },
+        noteheadXWhole: {
+            bBoxNE: [
+                1.508,
+                0.5
+            ],
+            bBoxSW: [
+                0,
+                -0.5
+            ]
+        },
+        octaveBaselineB: {
+            bBoxNE: [
+                0.796,
+                1.352
+            ],
+            bBoxSW: [
+                0,
+                -0.04
+            ]
+        },
+        octaveBaselineM: {
+            bBoxNE: [
+                1.524,
+                0.928
+            ],
+            bBoxSW: [
+                0,
+                -0.02
+            ]
+        },
+        ornamentMordent: {
+            bBoxNE: [
+                2.916,
+                1.276
+            ],
+            bBoxSW: [
+                0.004,
+                -0.292
+            ]
+        },
+        ornamentShortTrill: {
+            bBoxNE: [
+                2.9,
+                0.98
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        ornamentTrill: {
+            bBoxNE: [
+                2.084,
+                1.56
+            ],
+            bBoxSW: [
+                0,
+                -0.04
+            ]
+        },
+        ornamentTurn: {
+            bBoxNE: [
+                1.84,
+                0.872
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        ornamentTurnInverted: {
+            bBoxNE: [
+                1.828,
+                0.872
+            ],
+            bBoxSW: [
+                -0.012,
+                0
+            ]
+        },
+        ottava: {
+            bBoxNE: [
+                1.544,
+                1.852
+            ],
+            bBoxSW: [
+                0,
+                -0.04
+            ]
+        },
+        ottavaAlta: {
+            bBoxNE: [
+                3.54,
+                1.852
+            ],
+            bBoxSW: [
+                0,
+                -0.04
+            ]
+        },
+        ottavaBassaVb: {
+            bBoxNE: [
+                3.184,
+                1.852
+            ],
+            bBoxSW: [
+                0,
+                -0.04
+            ]
+        },
+        pictEdgeOfCymbal: {
+            bBoxNE: [
+                4.828,
+                2.14
+            ],
+            bBoxSW: [
+                0.004,
+                0
+            ]
+        },
+        quindicesima: {
+            bBoxNE: [
+                2.668,
+                1.844
+            ],
+            bBoxSW: [
+                0,
+                -0.04
+            ]
+        },
+        quindicesimaAlta: {
+            bBoxNE: [
+                5.26,
+                1.844
+            ],
+            bBoxSW: [
+                0,
+                -0.04
+            ]
+        },
+        repeat1Bar: {
+            bBoxNE: [
+                2.128,
+                1.116
+            ],
+            bBoxSW: [
+                0,
+                -1
+            ]
+        },
+        repeat2Bars: {
+            bBoxNE: [
+                3.048,
+                1.116
+            ],
+            bBoxSW: [
+                0,
+                -1
+            ]
+        },
+        repeatDot: {
+            bBoxNE: [
+                0.4,
+                0.2
+            ],
+            bBoxSW: [
+                0,
+                -0.2
+            ]
+        },
+        rest128th: {
+            bBoxNE: [
+                1.94,
+                2.756
+            ],
+            bBoxSW: [
+                0,
+                -3
+            ]
+        },
+        rest16th: {
+            bBoxNE: [
+                1.28,
+                0.716
+            ],
+            bBoxSW: [
+                0,
+                -2
+            ]
+        },
+        rest256th: {
+            bBoxNE: [
+                2.164,
+                2.784
+            ],
+            bBoxSW: [
+                0,
+                -4
+            ]
+        },
+        rest32nd: {
+            bBoxNE: [
+                1.452,
+                1.704
+            ],
+            bBoxSW: [
+                0,
+                -2
+            ]
+        },
+        rest64th: {
+            bBoxNE: [
+                1.692,
+                1.72
+            ],
+            bBoxSW: [
+                0,
+                -3.012
+            ]
+        },
+        rest8th: {
+            bBoxNE: [
+                0.988,
+                0.696
+            ],
+            bBoxSW: [
+                0,
+                -1.004
+            ]
+        },
+        restDoubleWhole: {
+            bBoxNE: [
+                0.5,
+                1
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        restHBarLeft: {
+            bBoxNE: [
+                1.5,
+                1.048
+            ],
+            bBoxSW: [
+                0,
+                -1.08
+            ]
+        },
+        restHBarMiddle: {
+            bBoxNE: [
+                1.42,
+                0.384
+            ],
+            bBoxSW: [
+                -0.108,
+                -0.416
+            ]
+        },
+        restHBarRight: {
+            bBoxNE: [
+                1.5,
+                1.048
+            ],
+            bBoxSW: [
+                0,
+                -1.08
+            ]
+        },
+        restHalf: {
+            bBoxNE: [
+                1.128,
+                0.568
+            ],
+            bBoxSW: [
+                0,
+                -0.008
+            ]
+        },
+        restLonga: {
+            bBoxNE: [
+                0.5,
+                1
+            ],
+            bBoxSW: [
+                0,
+                -0.996
+            ]
+        },
+        restQuarter: {
+            bBoxNE: [
+                1.08,
+                1.492
+            ],
+            bBoxSW: [
+                0.004,
+                -1.5
+            ]
+        },
+        restWhole: {
+            bBoxNE: [
+                1.128,
+                0.036
+            ],
+            bBoxSW: [
+                0,
+                -0.54
+            ]
+        },
+        segno: {
+            bBoxNE: [
+                2.2,
+                3.036
+            ],
+            bBoxSW: [
+                0.016,
+                -0.108
+            ]
+        },
+        stringsDownBow: {
+            bBoxNE: [
+                1.248,
+                1.272
+            ],
+            bBoxSW: [
+                0,
+                0
+            ]
+        },
+        stringsUpBow: {
+            bBoxNE: [
+                0.996,
+                1.98
+            ],
+            bBoxSW: [
+                0.004,
+                0.004
+            ]
+        },
+        systemDivider: {
+            bBoxNE: [
+                4.232,
+                4.24
+            ],
+            bBoxSW: [
+                0,
+                -0.272
+            ]
+        },
+        textAugmentationDot: {
+            bBoxNE: [
+                0.4,
+                0.256
+            ],
+            bBoxSW: [
+                0,
+                -0.144
+            ]
+        },
+        textBlackNoteFrac16thLongStem: {
+            bBoxNE: [
+                1.368,
+                3.512
+            ],
+            bBoxSW: [
+                0,
+                -0.56
+            ]
+        },
+        textBlackNoteFrac32ndLongStem: {
+            bBoxNE: [
+                1.368,
+                3.512
+            ],
+            bBoxSW: [
+                0,
+                -0.56
+            ]
+        },
+        textBlackNoteFrac8thLongStem: {
+            bBoxNE: [
+                1.368,
+                3.512
+            ],
+            bBoxSW: [
+                0,
+                -0.56
+            ]
+        },
+        textBlackNoteLongStem: {
+            bBoxNE: [
+                1.328,
+                3.512
+            ],
+            bBoxSW: [
+                0,
+                -0.564
+            ]
+        },
+        textCont16thBeamLongStem: {
+            bBoxNE: [
+                1.368,
+                3.512
+            ],
+            bBoxSW: [
+                0,
+                2.264
+            ]
+        },
+        textCont32ndBeamLongStem: {
+            bBoxNE: [
+                1.368,
+                3.512
+            ],
+            bBoxSW: [
+                0,
+                1.504
+            ]
+        },
+        textCont8thBeamLongStem: {
+            bBoxNE: [
+                1.368,
+                3.512
+            ],
+            bBoxSW: [
+                0,
+                3.012
+            ]
+        },
+        textTuplet3LongStem: {
+            bBoxNE: [
+                0.94,
+                5.3
+            ],
+            bBoxSW: [
+                0,
+                4.2
+            ]
+        },
+        textTupletBracketEndLongStem: {
+            bBoxNE: [
+                1.272,
+                4.764
+            ],
+            bBoxSW: [
+                0,
+                3.94
+            ]
+        },
+        textTupletBracketStartLongStem: {
+            bBoxNE: [
+                1.272,
+                4.764
+            ],
+            bBoxSW: [
+                0,
+                3.94
+            ]
+        },
+        timeSig0: {
+            bBoxNE: [
+                1.8,
+                1.004
+            ],
+            bBoxSW: [
+                0.08,
+                -1
+            ]
+        },
+        timeSig1: {
+            bBoxNE: [
+                1.256,
+                1.004
+            ],
+            bBoxSW: [
+                0.08,
+                -1
+            ]
+        },
+        timeSig2: {
+            bBoxNE: [
+                1.704,
+                1.016
+            ],
+            bBoxSW: [
+                0.08,
+                -1.028
+            ]
+        },
+        timeSig3: {
+            bBoxNE: [
+                1.604,
+                0.996
+            ],
+            bBoxSW: [
+                0.08,
+                -1.004
+            ]
+        },
+        timeSig4: {
+            bBoxNE: [
+                1.8,
+                1.004
+            ],
+            bBoxSW: [
+                0.08,
+                -1
+            ]
+        },
+        timeSig5: {
+            bBoxNE: [
+                1.532,
+                0.984
+            ],
+            bBoxSW: [
+                0.08,
+                -1.004
+            ]
+        },
+        timeSig6: {
+            bBoxNE: [
+                1.656,
+                1.004
+            ],
+            bBoxSW: [
+                0.08,
+                -0.996
+            ]
+        },
+        timeSig7: {
+            bBoxNE: [
+                1.684,
+                0.996
+            ],
+            bBoxSW: [
+                0.08,
+                -1
+            ]
+        },
+        timeSig8: {
+            bBoxNE: [
+                1.664,
+                1.036
+            ],
+            bBoxSW: [
+                0.08,
+                -1.036
+            ]
+        },
+        timeSig9: {
+            bBoxNE: [
+                1.656,
+                1.004
+            ],
+            bBoxSW: [
+                0.08,
+                -0.996
+            ]
+        },
+        timeSigCommon: {
+            bBoxNE: [
+                1.696,
+                1.004
+            ],
+            bBoxSW: [
+                0.02,
+                -0.996
+            ]
+        },
+        timeSigCutCommon: {
+            bBoxNE: [
+                1.672,
+                1.444
+            ],
+            bBoxSW: [
+                0,
+                -1.436
+            ]
+        },
+        tremolo1: {
+            bBoxNE: [
+                0.6,
+                0.376
+            ],
+            bBoxSW: [
+                -0.6,
+                -0.372
+            ]
+        },
+        tremolo2: {
+            bBoxNE: [
+                0.596,
+                0.748
+            ],
+            bBoxSW: [
+                -0.604,
+                -0.748
+            ]
+        },
+        tremolo3: {
+            bBoxNE: [
+                0.6,
+                1.112
+            ],
+            bBoxSW: [
+                -0.6,
+                -1.12
+            ]
+        },
+        tuplet0: {
+            bBoxNE: [
+                1.2731041262817027,
+                1.5
+            ],
+            bBoxSW: [
+                -0.001204330173715796,
+                -0.032
+            ]
+        },
+        tuplet1: {
+            bBoxNE: [
+                1.024,
+                1.488
+            ],
+            bBoxSW: [
+                0.04,
+                0
+            ]
+        },
+        tuplet2: {
+            bBoxNE: [
+                1.316,
+                1.5
+            ],
+            bBoxSW: [
+                0.04,
+                -0.024
+            ]
+        },
+        tuplet3: {
+            bBoxNE: [
+                1.224,
+                1.5
+            ],
+            bBoxSW: [
+                0.04,
+                -0.032
+            ]
+        },
+        tuplet4: {
+            bBoxNE: [
+                1.252,
+                1.488
+            ],
+            bBoxSW: [
+                0.04,
+                0
+            ]
+        },
+        tuplet5: {
+            bBoxNE: [
+                1.308,
+                1.492
+            ],
+            bBoxSW: [
+                0.04,
+                -0.032
+            ]
+        },
+        tuplet6: {
+            bBoxNE: [
+                1.256,
+                1.5
+            ],
+            bBoxSW: [
+                0.04105974105482295,
+                -0.032
+            ]
+        },
+        tuplet7: {
+            bBoxNE: [
+                1.332,
+                1.488
+            ],
+            bBoxSW: [
+                0.12,
+                -0.016
+            ]
+        },
+        tuplet8: {
+            bBoxNE: [
+                1.292,
+                1.5
+            ],
+            bBoxSW: [
+                0.04,
+                -0.032
+            ]
+        },
+        tuplet9: {
+            bBoxNE: [
+                1.254940258945177,
+                1.5
+            ],
+            bBoxSW: [
+                0.04,
+                -0.032
+            ]
+        },
+        tupletColon: {
+            bBoxNE: [
+                0.484,
+                1.072
+            ],
+            bBoxSW: [
+                0.04,
+                0.232
+            ]
+        },
+        unpitchedPercussionClef1: {
+            bBoxNE: [
+                1.528,
+                1
+            ],
+            bBoxSW: [
+                0,
+                -1
+            ]
+        },
+        wiggleSawtooth: {
+            bBoxNE: [
+                3.06,
+                1.06
+            ],
+            bBoxSW: [
+                -0.068,
+                -1.068
+            ]
+        },
+        wiggleSawtoothNarrow: {
+            bBoxNE: [
+                2.06,
+                1.064
+            ],
+            bBoxSW: [
+                -0.072,
+                -1.064
+            ]
+        },
+        wiggleTrill: {
+            bBoxNE: [
+                1.08,
+                0.836
+            ],
+            bBoxSW: [
+                -0.144,
+                0.392
+            ]
+        },
+        wiggleVibratoMediumFast: {
+            bBoxNE: [
+                1.292,
+                0.8
+            ],
+            bBoxSW: [
+                -0.104,
+                -0.164
+            ]
+        }
+    },
+    glyphsWithAnchors: {
+        accidentalDoubleFlat: {
+            cutOutNE: [
+                0.988,
+                0.644
+            ],
+            cutOutSE: [
+                1.336,
+                -0.396
+            ]
+        },
+        accidentalFlat: {
+            cutOutNE: [
+                0.252,
+                0.656
+            ],
+            cutOutSE: [
+                0.504,
+                -0.476
+            ]
+        },
+        accidentalNatural: {
+            cutOutNE: [
+                0.192,
+                0.776
+            ],
+            cutOutSW: [
+                0.476,
+                -0.828
+            ]
+        },
+        accidentalQuarterToneFlatArrowUp: {
+            cutOutNE: [
+                0.604,
+                0.664
+            ],
+            cutOutSE: [
+                0.62,
+                -0.452
+            ]
+        },
+        accidentalQuarterToneSharpNaturalArrowUp: {
+            cutOutSW: [
+                0.616,
+                -0.868
+            ]
+        },
+        accidentalSharp: {
+            cutOutNE: [
+                0.84,
+                0.896
+            ],
+            cutOutNW: [
+                0.144,
+                0.568
+            ],
+            cutOutSE: [
+                0.84,
+                -0.596
+            ],
+            cutOutSW: [
+                0.144,
+                -0.896
+            ]
+        },
+        accidentalThreeQuarterTonesSharpArrowUp: {
+            cutOutNW: [
+                0.272,
+                1.304
+            ],
+            cutOutSE: [
+                0.86,
+                -0.584
+            ],
+            cutOutSW: [
+                0.132,
+                -0.888
+            ]
+        },
+        dynamicFF: {
+            opticalCenter: [
+                1.852,
+                0
+            ]
+        },
+        dynamicFFF: {
+            opticalCenter: [
+                2.472,
+                0
+            ]
+        },
+        dynamicFFFF: {
+            opticalCenter: [
+                2.824,
+                0
+            ]
+        },
+        dynamicFFFFF: {
+            opticalCenter: [
+                2.976,
+                0
+            ]
+        },
+        dynamicFFFFFF: {
+            opticalCenter: [
+                3.504,
+                0
+            ]
+        },
+        dynamicForte: {
+            opticalCenter: [
+                1.256,
+                0
+            ]
+        },
+        dynamicFortePiano: {
+            opticalCenter: [
+                1.5,
+                0
+            ]
+        },
+        dynamicForzando: {
+            opticalCenter: [
+                1.352,
+                0
+            ]
+        },
+        dynamicMF: {
+            opticalCenter: [
+                1.796,
+                0
+            ]
+        },
+        dynamicMP: {
+            opticalCenter: [
+                1.848,
+                0
+            ]
+        },
+        dynamicNiente: {
+            opticalCenter: [
+                0.616,
+                0
+            ]
+        },
+        dynamicPF: {
+            opticalCenter: [
+                1.68,
+                0
+            ]
+        },
+        dynamicPP: {
+            opticalCenter: [
+                1.708,
+                0
+            ]
+        },
+        dynamicPPP: {
+            opticalCenter: [
+                2.368,
+                0
+            ]
+        },
+        dynamicPPPP: {
+            opticalCenter: [
+                3.004,
+                0
+            ]
+        },
+        dynamicPPPPP: {
+            opticalCenter: [
+                3.552,
+                0
+            ]
+        },
+        dynamicPPPPPP: {
+            opticalCenter: [
+                4.248,
+                0
+            ]
+        },
+        dynamicPiano: {
+            opticalCenter: [
+                1.22,
+                0
+            ]
+        },
+        dynamicRinforzando1: {
+            opticalCenter: [
+                1.564,
+                0
+            ]
+        },
+        dynamicRinforzando2: {
+            opticalCenter: [
+                2.084,
+                0
+            ]
+        },
+        dynamicSforzando1: {
+            opticalCenter: [
+                1.3,
+                0
+            ]
+        },
+        dynamicSforzandoPianissimo: {
+            opticalCenter: [
+                1.972,
+                0
+            ]
+        },
+        dynamicSforzandoPiano: {
+            opticalCenter: [
+                1.904,
+                0
+            ]
+        },
+        dynamicSforzato: {
+            opticalCenter: [
+                1.76,
+                0
+            ]
+        },
+        dynamicSforzatoFF: {
+            opticalCenter: [
+                2.276,
+                0
+            ]
+        },
+        dynamicSforzatoPiano: {
+            opticalCenter: [
+                1.848,
+                0
+            ]
+        },
+        flag128thDown: {
+            stemDownSW: [
+                0,
+                -2.076
+            ]
+        },
+        flag128thUp: {
+            stemUpNW: [
+                0,
+                1.9
+            ]
+        },
+        flag16thDown: {
+            stemDownSW: [
+                0,
+                0.128
+            ]
+        },
+        flag16thUp: {
+            stemUpNW: [
+                0,
+                -0.088
+            ]
+        },
+        flag256thDown: {
+            stemDownSW: [
+                0,
+                -2.812
+            ]
+        },
+        flag256thUp: {
+            stemUpNW: [
+                0,
+                2.592
+            ]
+        },
+        flag32ndDown: {
+            stemDownSW: [
+                0,
+                -0.448
+            ]
+        },
+        flag32ndUp: {
+            stemUpNW: [
+                0,
+                0.376
+            ]
+        },
+        flag64thDown: {
+            stemDownSW: [
+                0,
+                -1.244
+            ]
+        },
+        flag64thUp: {
+            stemUpNW: [
+                0,
+                1.172
+            ]
+        },
+        flag8thDown: {
+            graceNoteSlashNW: [
+                -0.596,
+                2.168
+            ],
+            graceNoteSlashSE: [
+                1.328,
+                0.628
+            ],
+            stemDownSW: [
+                0,
+                0.132
+            ]
+        },
+        flag8thUp: {
+            graceNoteSlashNE: [
+                1.284,
+                -0.796
+            ],
+            graceNoteSlashSW: [
+                -0.644,
+                -2.456
+            ],
+            stemUpNW: [
+                0,
+                -0.04
+            ]
+        },
+        guitarVibratoStroke: {
+            repeatOffset: [
+                0.608,
+                0
+            ]
+        },
+        guitarWideVibratoStroke: {
+            repeatOffset: [
+                0.82,
+                0
+            ]
+        },
+        noteShapeDiamondBlack: {
+            stemDownNW: [
+                0,
+                0
+            ],
+            stemUpSE: [
+                1.444,
+                0
+            ]
+        },
+        noteShapeDiamondWhite: {
+            stemDownNW: [
+                0,
+                0
+            ],
+            stemUpSE: [
+                1.436,
+                0
+            ]
+        },
+        noteShapeMoonBlack: {
+            stemDownNW: [
+                0,
+                0.068
+            ],
+            stemUpSE: [
+                1.44,
+                0.068
+            ]
+        },
+        noteShapeMoonWhite: {
+            stemDownNW: [
+                0,
+                0.072
+            ],
+            stemUpSE: [
+                1.444,
+                0.068
+            ]
+        },
+        noteShapeRoundBlack: {
+            stemDownNW: [
+                0,
+                -0.168
+            ],
+            stemUpSE: [
+                1.444,
+                0.184
+            ]
+        },
+        noteShapeRoundWhite: {
+            stemDownNW: [
+                0,
+                -0.168
+            ],
+            stemUpSE: [
+                1.456,
+                0.192
+            ]
+        },
+        noteShapeSquareBlack: {
+            stemDownNW: [
+                0,
+                0.46
+            ],
+            stemUpSE: [
+                1.44,
+                -0.46
+            ]
+        },
+        noteShapeSquareWhite: {
+            stemDownNW: [
+                0,
+                0.46
+            ],
+            stemUpSE: [
+                1.44,
+                -0.46
+            ]
+        },
+        noteShapeTriangleLeftBlack: {
+            stemDownNW: [
+                0,
+                0.5
+            ],
+            stemUpSE: [
+                1.436,
+                -0.5
+            ]
+        },
+        noteShapeTriangleLeftWhite: {
+            stemDownNW: [
+                0,
+                0.5
+            ],
+            stemUpSE: [
+                1.436,
+                -0.5
+            ]
+        },
+        noteShapeTriangleRightBlack: {
+            stemDownNW: [
+                0,
+                0.476
+            ],
+            stemUpSE: [
+                1.44,
+                -0.5
+            ]
+        },
+        noteShapeTriangleRightWhite: {
+            stemDownNW: [
+                0,
+                0.476
+            ],
+            stemUpSE: [
+                1.44,
+                -0.5
+            ]
+        },
+        noteShapeTriangleRoundBlack: {
+            stemDownNW: [
+                0,
+                0.172
+            ],
+            stemUpSE: [
+                1.424,
+                0.172
+            ]
+        },
+        noteShapeTriangleRoundWhite: {
+            stemDownNW: [
+                0,
+                0.172
+            ],
+            stemUpSE: [
+                1.424,
+                0.172
+            ]
+        },
+        noteShapeTriangleUpBlack: {
+            stemDownNW: [
+                0,
+                -0.5
+            ],
+            stemUpSE: [
+                1.424,
+                -0.5
+            ]
+        },
+        noteShapeTriangleUpWhite: {
+            stemDownNW: [
+                0,
+                -0.5
+            ],
+            stemUpSE: [
+                1.424,
+                -0.5
+            ]
+        },
+        noteheadBlack: {
+            cutOutNW: [
+                0.208,
+                0.3
+            ],
+            cutOutSE: [
+                0.94,
+                -0.296
+            ],
+            splitStemDownNE: [
+                0.968,
+                -0.248
+            ],
+            splitStemDownNW: [
+                0.12,
+                -0.416
+            ],
+            splitStemUpSE: [
+                1.092,
+                0.392
+            ],
+            splitStemUpSW: [
+                0.312,
+                0.356
+            ],
+            stemDownNW: [
+                0,
+                -0.168
+            ],
+            stemUpSE: [
+                1.18,
+                0.168
+            ]
+        },
+        noteheadCircleSlash: {
+            stemDownNW: [
+                0.004,
+                0
+            ],
+            stemUpSE: [
+                1,
+                0
+            ]
+        },
+        noteheadCircleX: {
+            stemDownNW: [
+                0,
+                0
+            ],
+            stemUpSE: [
+                0.996,
+                0
+            ]
+        },
+        noteheadCircleXDoubleWhole: {
+            noteheadOrigin: [
+                0.352,
+                0
+            ]
+        },
+        noteheadCircleXHalf: {
+            stemDownNW: [
+                0,
+                0
+            ],
+            stemUpSE: [
+                1,
+                0
+            ]
+        },
+        noteheadCircledBlack: {
+            stemDownNW: [
+                0,
+                -0.164
+            ],
+            stemUpSE: [
+                1.18,
+                0.168
+            ]
+        },
+        noteheadCircledDoubleWhole: {
+            noteheadOrigin: [
+                0.356,
+                0
+            ]
+        },
+        noteheadCircledHalf: {
+            stemDownNW: [
+                0,
+                -0.144
+            ],
+            stemUpSE: [
+                1.172,
+                0.156
+            ]
+        },
+        noteheadClusterDoubleWhole3rd: {
+            noteheadOrigin: [
+                0.364,
+                0
+            ]
+        },
+        noteheadClusterHalf3rd: {
+            stemDownNW: [
+                0,
+                -0.164
+            ],
+            stemUpSE: [
+                1.264,
+                1.144
+            ]
+        },
+        noteheadClusterQuarter3rd: {
+            stemDownNW: [
+                0,
+                0.26
+            ],
+            stemUpSE: [
+                1.44,
+                0.744
+            ]
+        },
+        noteheadDiamondBlack: {
+            stemDownNW: [
+                0,
+                0
+            ],
+            stemUpSE: [
+                1,
+                0
+            ]
+        },
+        noteheadDiamondBlackWide: {
+            stemDownNW: [
+                0,
+                0
+            ],
+            stemUpSE: [
+                1.4,
+                0
+            ]
+        },
+        noteheadDiamondDoubleWhole: {
+            noteheadOrigin: [
+                0.324,
+                0
+            ]
+        },
+        noteheadDiamondHalf: {
+            stemDownNW: [
+                0,
+                0
+            ],
+            stemUpSE: [
+                1.004,
+                0
+            ]
+        },
+        noteheadDiamondWhite: {
+            stemDownNW: [
+                0,
+                0
+            ],
+            stemUpSE: [
+                1,
+                0
+            ]
+        },
+        noteheadDiamondWhiteWide: {
+            stemDownNW: [
+                0,
+                0.004
+            ],
+            stemUpSE: [
+                1.4,
+                0
+            ]
+        },
+        noteheadDoubleWhole: {
+            noteheadOrigin: [
+                0.36,
+                0
+            ]
+        },
+        noteheadHalf: {
+            cutOutNW: [
+                0.204,
+                0.296
+            ],
+            cutOutSE: [
+                0.98,
+                -0.3
+            ],
+            splitStemDownNE: [
+                0.956,
+                -0.3
+            ],
+            splitStemDownNW: [
+                0.128,
+                -0.428
+            ],
+            splitStemUpSE: [
+                1.108,
+                0.372
+            ],
+            splitStemUpSW: [
+                0.328,
+                0.38
+            ],
+            stemDownNW: [
+                0,
+                -0.168
+            ],
+            stemUpSE: [
+                1.18,
+                0.168
+            ]
+        },
+        noteheadHeavyX: {
+            stemDownNW: [
+                0,
+                -0.436
+            ],
+            stemUpSE: [
+                1.54,
+                0.44
+            ]
+        },
+        noteheadHeavyXHat: {
+            stemDownNW: [
+                0,
+                -0.436
+            ],
+            stemUpSE: [
+                1.54,
+                0.456
+            ]
+        },
+        noteheadPlusBlack: {
+            stemDownNW: [
+                -0.004,
+                0
+            ],
+            stemUpSE: [
+                0.996,
+                0
+            ]
+        },
+        noteheadPlusDoubleWhole: {
+            noteheadOrigin: [
+                0.372,
+                0
+            ]
+        },
+        noteheadPlusHalf: {
+            stemDownNW: [
+                0,
+                -0.112
+            ],
+            stemUpSE: [
+                1.044,
+                0.088
+            ]
+        },
+        noteheadRoundWhiteWithDot: {
+            stemDownNW: [
+                0,
+                0
+            ],
+            stemUpSE: [
+                1.004,
+                0
+            ]
+        },
+        noteheadSlashHorizontalEnds: {
+            stemDownNW: [
+                0,
+                -1
+            ],
+            stemUpSE: [
+                2.12,
+                1
+            ]
+        },
+        noteheadSlashWhiteHalf: {
+            stemDownNW: [
+                0,
+                -1
+            ],
+            stemUpSE: [
+                3.12,
+                1
+            ]
+        },
+        noteheadSlashedBlack1: {
+            stemDownNW: [
+                0,
+                -0.172
+            ],
+            stemUpSE: [
+                1.18,
+                0.164
+            ]
+        },
+        noteheadSlashedBlack2: {
+            stemDownNW: [
+                0,
+                -0.172
+            ],
+            stemUpSE: [
+                1.18,
+                0.164
+            ]
+        },
+        noteheadSlashedDoubleWhole1: {
+            noteheadOrigin: [
+                0.356,
+                0
+            ]
+        },
+        noteheadSlashedDoubleWhole2: {
+            noteheadOrigin: [
+                0.356,
+                0
+            ]
+        },
+        noteheadSlashedHalf1: {
+            stemDownNW: [
+                0,
+                -0.168
+            ],
+            stemUpSE: [
+                1.168,
+                0.164
+            ]
+        },
+        noteheadSlashedHalf2: {
+            stemDownNW: [
+                0,
+                -0.164
+            ],
+            stemUpSE: [
+                1.172,
+                0.168
+            ]
+        },
+        noteheadSquareBlack: {
+            stemDownNW: [
+                0,
+                -0.5
+            ],
+            stemUpSE: [
+                1.252,
+                0.5
+            ]
+        },
+        noteheadSquareBlackLarge: {
+            stemDownNW: [
+                0,
+                0
+            ],
+            stemUpSE: [
+                2,
+                0
+            ]
+        },
+        noteheadSquareBlackWhite: {
+            stemDownNW: [
+                0,
+                -1
+            ],
+            stemUpSE: [
+                2,
+                1
+            ]
+        },
+        noteheadSquareWhite: {
+            stemDownNW: [
+                0,
+                -0.5
+            ],
+            stemUpSE: [
+                1.252,
+                0.5
+            ]
+        },
+        noteheadTriangleDownBlack: {
+            stemDownNW: [
+                0,
+                0.5
+            ],
+            stemUpSE: [
+                1.168,
+                0.5
+            ]
+        },
+        noteheadTriangleDownDoubleWhole: {
+            noteheadOrigin: [
+                0.384,
+                0
+            ]
+        },
+        noteheadTriangleDownHalf: {
+            stemDownNW: [
+                0,
+                0.464
+            ],
+            stemUpSE: [
+                1.14,
+                0.464
+            ]
+        },
+        noteheadTriangleRightBlack: {
+            stemDownNW: [
+                0,
+                -0.5
+            ],
+            stemUpSE: [
+                1.356,
+                0.5
+            ]
+        },
+        noteheadTriangleRightWhite: {
+            stemDownNW: [
+                0,
+                -0.5
+            ],
+            stemUpSE: [
+                1.356,
+                0.5
+            ]
+        },
+        noteheadTriangleUpBlack: {
+            stemDownNW: [
+                0,
+                -0.5
+            ],
+            stemUpSE: [
+                1.172,
+                -0.5
+            ]
+        },
+        noteheadTriangleUpDoubleWhole: {
+            noteheadOrigin: [
+                0.34,
+                0
+            ]
+        },
+        noteheadTriangleUpHalf: {
+            stemDownNW: [
+                0,
+                -0.46
+            ],
+            stemUpSE: [
+                1.14,
+                -0.46
+            ]
+        },
+        noteheadWhole: {
+            cutOutNW: [
+                0.172,
+                0.332
+            ],
+            cutOutSE: [
+                1.532,
+                -0.364
+            ]
+        },
+        noteheadXBlack: {
+            stemDownNW: [
+                0,
+                -0.44
+            ],
+            stemUpSE: [
+                1.16,
+                0.444
+            ]
+        },
+        noteheadXDoubleWhole: {
+            noteheadOrigin: [
+                0.348,
+                0
+            ]
+        },
+        noteheadXHalf: {
+            stemDownNW: [
+                0,
+                -0.412
+            ],
+            stemUpSE: [
+                1.336,
+                0.412
+            ]
+        },
+        noteheadXOrnate: {
+            stemDownNW: [
+                0,
+                -0.312
+            ],
+            stemUpSE: [
+                0.988,
+                0.316
+            ]
+        },
+        wiggleSawtooth: {
+            repeatOffset: [
+                2.992,
+                0
+            ]
+        },
+        wiggleSawtoothNarrow: {
+            repeatOffset: [
+                1.996,
+                0
+            ]
+        },
+        wiggleTrill: {
+            repeatOffset: [
+                0.948,
+                0
+            ]
+        },
+        wiggleVibratoMediumFast: {
+            repeatOffset: [
+                1.18,
+                0
+            ]
+        }
+    }
+}
+        // end bravura_alphatab_metadata.json
 }

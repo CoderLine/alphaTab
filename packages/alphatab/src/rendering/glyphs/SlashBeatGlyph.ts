@@ -5,6 +5,7 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
 import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
@@ -23,6 +24,7 @@ import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
  */
 export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
     private _tremoloPicking?: TremoloPickingGlyph;
+    private _stemLengthExtension = 0;
 
     public noteHeads: SlashNoteHeadGlyph | null = null;
     public deadSlapped: DeadSlappedBeatGlyph | null = null;
@@ -84,7 +86,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         if (g) {
             switch (requestedPosition) {
                 case NoteYPosition.TopWithStem:
-                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.standardStemLength;
+                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
                 case NoteYPosition.Top:
                     return g.getBoundingBoxTop();
                 case NoteYPosition.Center:
@@ -94,7 +96,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 case NoteYPosition.Bottom:
                     return g.getBoundingBoxBottom();
                 case NoteYPosition.BottomWithStem:
-                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.standardStemLength;
+                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.getStemLength(Duration.Quarter);
             }
         }
         return 0;
@@ -130,7 +132,8 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                                 : 0) * scale;
 
                         // stem size according to duration
-                        pos -= this.renderer.smuflMetrics.standardStemLength * scale;
+                        pos -= this.renderer.smuflMetrics.getStemLength(this.container.beat.duration) * scale;
+                        pos -= this._stemLengthExtension;
                     } else {
                         pos -= g.height / 2;
                     }
@@ -151,7 +154,8 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                                 : -this.renderer.smuflMetrics.glyphHeights.get(symbol)! / 2) * scale;
 
                         // stem size according to duration
-                        pos += this.renderer.smuflMetrics.standardStemLength * scale;
+                        pos += this.renderer.smuflMetrics.getStemLength(this.container.beat.duration) * scale;
+                        pos += this._stemLengthExtension;
                     } else {
                         pos += g.height / 2;
                     }
@@ -193,14 +197,11 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 this.addNormal(noteHeadGlyph);
 
                 if (this.container.beat.isTremolo) {
-                    let tremoloY = 0;
-                    const topY = this._internalGetNoteY(NoteYPosition.TopWithStem);
-                    const bottomY = this._internalGetNoteY(NoteYPosition.StemUp);
-                    tremoloY = (topY + bottomY) / 2;
-
-                    this._tremoloPicking = new TremoloPickingGlyph(0, tremoloY, this.container.beat.tremoloSpeed!);
+                    this._tremoloPicking = new TremoloPickingGlyph(0, 0, this.container.beat.tremoloSpeed!);
                     this._tremoloPicking.renderer = this.renderer;
                     this._tremoloPicking.doLayout();
+
+                    this._alignTremoloPickingGlyph();
                 }
             } else {
                 const restGlyph = new SlashRestGlyph(0, glyphY, this.container.beat.duration);
@@ -240,6 +241,23 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         if (tremolo) {
             tremolo.x = this.container.beat.duration < Duration.Half ? this.width / 2 : this.stemX;
         }
+    }
+
+    private _alignTremoloPickingGlyph() {
+        const g = this._tremoloPicking!;
+        g.alignTremoloPickingGlyph(
+            BeamDirection.Up,
+            this._internalGetNoteY(NoteYPosition.TopWithStem),
+            this._internalGetNoteY(NoteYPosition.Center),
+            this.container.beat.duration
+        );
+
+        let tremoloX: number = this.stemX;
+        if (this.container.beat.duration < Duration.Half) {
+            tremoloX = this.width / 2;
+        }
+
+        g.x = tremoloX;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
