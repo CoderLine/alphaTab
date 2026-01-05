@@ -7,6 +7,7 @@ import { Beat } from "@coderline/alphatab/model/Beat";
 import { NoteCloner } from "@coderline/alphatab/generated/model/NoteCloner";
 import { AutomationCloner } from "@coderline/alphatab/generated/model/AutomationCloner";
 import { BendPointCloner } from "@coderline/alphatab/generated/model/BendPointCloner";
+import { TremoloPickingEffectCloner } from "@coderline/alphatab/generated/model/TremoloPickingEffectCloner";
 /**
  * @internal
  */
@@ -54,7 +55,7 @@ export class BeatCloner {
         clone.chordId = original.chordId;
         clone.graceType = original.graceType;
         clone.pickStroke = original.pickStroke;
-        clone.tremoloSpeed = original.tremoloSpeed;
+        clone.tremoloPicking = original.tremoloPicking ? TremoloPickingEffectCloner.clone(original.tremoloPicking) : undefined;
         clone.crescendo = original.crescendo;
         clone.displayStart = original.displayStart;
         clone.playbackStart = original.playbackStart;

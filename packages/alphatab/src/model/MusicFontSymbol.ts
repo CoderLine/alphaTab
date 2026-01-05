@@ -171,9 +171,13 @@ export enum MusicFontSymbol {
     TextTuplet3LongStem = 0xe202,
     TextTupletBracketEndLongStem = 0xe203,
 
-    Tremolo3 = 0xe222,
-    Tremolo2 = 0xe221,
     Tremolo1 = 0xe220,
+    Tremolo2 = 0xe221,
+    Tremolo3 = 0xe222,
+    Tremolo4 = 0xe223,
+    Tremolo5 = 0xe224,
+
+    BuzzRoll = 0xe22A,
 
     Flag8thUp = 0xe240,
     Flag8thDown = 0xe241,

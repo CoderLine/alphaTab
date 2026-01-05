@@ -20,6 +20,7 @@ import type {
     TrackNamePolicy
 } from '@coderline/alphatab/model/RenderStylesheet';
 import type { SimileMark } from '@coderline/alphatab/model/SimileMark';
+import type { TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 import type { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import type { WhammyType } from '@coderline/alphatab/model/WhammyType';
 import type { TextAlign } from '@coderline/alphatab/platform/ICanvas';
@@ -397,6 +398,13 @@ export class AlphaTex1EnumMappings {
         ['dadoublecoda', 18]
     ]);
     public static readonly directionReversed = AlphaTex1EnumMappings._reverse(AlphaTex1EnumMappings.direction);
+    public static readonly tremoloPickingStyle = new Map<string, TremoloPickingStyle>([
+        ['default', 0],
+        ['buzzroll', 1]
+    ]);
+    public static readonly tremoloPickingStyleReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.tremoloPickingStyle
+    );
     public static readonly keySignaturesMinorReversed = new Map<KeySignature, string>([
         [-7, 'abminor'],
         [-6, 'ebminor'],

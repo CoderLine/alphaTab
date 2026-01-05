@@ -53,7 +53,6 @@ export class BeamingHelper {
     public voice: Voice | null = null;
     public beats: Beat[] = [];
     public shortestDuration: Duration = Duration.QuadrupleWhole;
-    public tremoloDuration?: Duration;
 
     /**
      * an indicator whether any beat has a tuplet on it.
@@ -182,12 +181,6 @@ export class BeamingHelper {
 
             if (beat.hasTuplet) {
                 this.hasTuplet = true;
-            }
-
-            if (beat.isTremolo) {
-                if (!this.tremoloDuration || this.tremoloDuration < beat.tremoloSpeed!) {
-                    this.tremoloDuration = beat.tremoloSpeed!;
-                }
             }
 
             if (beat.graceType !== GraceType.None) {

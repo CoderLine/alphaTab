@@ -562,6 +562,160 @@ Map {
 }
 `;
 
+exports[`MusicXmlImporterTests buzzroll 1`] = `
+Map {
+  "__kind" => "Score",
+  "artist" => "Artist",
+  "copyright" => "Copyright",
+  "music" => "Music",
+  "notices" => "Notices",
+  "title" => "Title",
+  "words" => "Words",
+  "tab" => "Tab",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                          "isvisible" => true,
+                        },
+                      ],
+                      "tremolopicking" => Map {
+                        "marks" => 0,
+                        "style" => 1,
+                      },
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "tremolopicking" => Map {
+                        "marks" => 1,
+                        "style" => 0,
+                      },
+                      "displaystart" => 960,
+                      "playbackstart" => 960,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 2,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "tremolopicking" => Map {
+                        "marks" => 0,
+                        "style" => 1,
+                      },
+                      "displaystart" => 1920,
+                      "playbackstart" => 1920,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 3,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "tremolopicking" => Map {
+                        "marks" => 1,
+                        "style" => 1,
+                      },
+                      "displaystart" => 2880,
+                      "playbackstart" => 2880,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "showtablature" => false,
+        },
+      ],
+      "playbackinfo" => Map {
+        "volume" => 0,
+        "secondarychannel" => 1,
+      },
+      "name" => "Track 1",
+      "shortname" => "T1",
+    },
+  ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
+}
+`;
+
 exports[`MusicXmlImporterTests partwise-anacrusis 1`] = `
 Map {
   "__kind" => "Score",

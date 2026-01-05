@@ -407,5 +407,121 @@ describe('EffectsAndAnnotationsTests', () => {
                 }
             );
         });
+
+        async function test(tex: string, referenceFileName: string, configure?: (o: VisualTestOptions) => void) {
+            await VisualTestHelper.runVisualTestTex(
+                tex,
+                `test-data/visual-tests/effects-and-annotations/${referenceFileName}.png`,
+                undefined,
+                configure
+            );
+        }
+
+        describe('standard', () => {
+            it('default-flags', async () =>
+                await test(
+                    `
+                    \\staff {score slash}
+                    C4.8 {tp 1} | C4.32 {tp 1} | 
+                    C4.8 {tp 2} | C4.32 {tp 2} | 
+                    C4.8 {tp 3} | C4.32 {tp 3} | 
+                    C4.8 {tp 4} | C4.32 {tp 4} | 
+                    C4.8 {tp 5} | C4.32 {tp 5} 
+                `,
+                    'tremolo-standard-default-flags'
+                ));
+
+            it('default-beams', async () =>
+                await test(
+                    `
+                    \\staff {score slash}
+                    C4.8 {tp 1} C4.8 {tp 1} | C4.32 {tp 1} C4.32 {tp 1} | 
+                    C4.8 {tp 2} C4.8 {tp 2} | C4.32 {tp 2} C4.32 {tp 2} | 
+                    C4.8 {tp 3} C4.8 {tp 3} | C4.32 {tp 3} C4.32 {tp 3} | 
+                    C4.8 {tp 4} C4.8 {tp 4} | C4.32 {tp 4} C4.32 {tp 4} | 
+                    C4.8 {tp 5} C4.8 {tp 5} | C4.32 {tp 5} C4.32 {tp 5} 
+                `,
+                    'tremolo-standard-default-beams'
+                ));
+
+            it('buzzroll-flags', async () =>
+                await test(
+                    `
+                    \\staff {score slash}
+                    C4.8 {tp (1 buzzRoll)} | C4.32 {tp (1 buzzRoll)} | 
+                    C4.8 {tp (2 buzzRoll)} | C4.32 {tp (2 buzzRoll)} | 
+                    C4.8 {tp (3 buzzRoll)} | C4.32 {tp (3 buzzRoll)} | 
+                    C4.8 {tp (4 buzzRoll)} | C4.32 {tp (4 buzzRoll)} | 
+                    C4.8 {tp (5 buzzRoll)} | C4.32 {tp (5 buzzRoll)} 
+                `,
+                    'tremolo-standard-buzzroll-flags'
+                ));
+
+            it('buzzroll-beams', async () =>
+                await test(
+                    `
+                    \\staff {score slash}
+                    C4.8 {tp (1 buzzRoll)} C4.8 {tp (1 buzzRoll)} | C4.32 {tp (1 buzzRoll)} C4.32 {tp (1 buzzRoll)} | 
+                    C4.8 {tp (2 buzzRoll)} C4.8 {tp (2 buzzRoll)} | C4.32 {tp (2 buzzRoll)} C4.32 {tp (2 buzzRoll)} | 
+                    C4.8 {tp (3 buzzRoll)} C4.8 {tp (3 buzzRoll)} | C4.32 {tp (3 buzzRoll)} C4.32 {tp (3 buzzRoll)} | 
+                    C4.8 {tp (4 buzzRoll)} C4.8 {tp (4 buzzRoll)} | C4.32 {tp (4 buzzRoll)} C4.32 {tp (4 buzzRoll)} | 
+                    C4.8 {tp (5 buzzRoll)} C4.8 {tp (5 buzzRoll)} | C4.32 {tp (5 buzzRoll)} C4.32 {tp (5 buzzRoll)} 
+                `,
+                    'tremolo-standard-buzzroll-beams'
+                ));
+        });
+        describe('tabs', () => {
+            it('default-flags', async () =>
+                await test(
+                    `
+                    \\staff {tabs}
+                    3.6.8 {tp 1} | 3.6.32 {tp 1} | 
+                    3.6.8 {tp 2} | 3.6.32 {tp 2} | 
+                    3.6.8 {tp 3} | 3.6.32 {tp 3} | 
+                    3.6.8 {tp 4} | 3.6.32 {tp 4} |
+                    3.6.8 {tp 5} | 3.6.32 {tp 5} 
+                `,
+                    'tremolo-tabs-default-flags'
+                ));
+
+            it('default-beams', async () =>
+                await test(
+                    `
+                    \\staff {tabs}
+                    3.6.8 {tp 1} 3.6.8 {tp 1} | 3.6.32 {tp 1} 3.6.32 {tp 1} | 
+                    3.6.8 {tp 2} 3.6.8 {tp 2} | 3.6.32 {tp 2} 3.6.32 {tp 2} | 
+                    3.6.8 {tp 3} 3.6.8 {tp 3} | 3.6.32 {tp 3} 3.6.32 {tp 3} | 
+                    3.6.8 {tp 4} 3.6.8 {tp 4} | 3.6.32 {tp 4} 3.6.32 {tp 4} | 
+                    3.6.8 {tp 5} 3.6.8 {tp 5} | 3.6.32 {tp 5} 3.6.32 {tp 5} 
+                `,
+                    'tremolo-tabs-default-beams'
+                ));
+
+            it('buzzroll-flags', async () =>
+                await test(
+                    `
+                    \\staff {tabs}
+                    3.6.8 {tp (1 buzzRoll)} | 3.6.32 {tp (1 buzzRoll)} | 
+                    3.6.8 {tp (2 buzzRoll)} | 3.6.32 {tp (2 buzzRoll)} | 
+                    3.6.8 {tp (3 buzzRoll)} | 3.6.32 {tp (3 buzzRoll)} | 
+                    3.6.8 {tp (4 buzzRoll)} | 3.6.32 {tp (4 buzzRoll)} | 
+                    3.6.8 {tp (5 buzzRoll)} | 3.6.32 {tp (5 buzzRoll)} 
+                `,
+                    'tremolo-tabs-buzzroll-flags'
+                ));
+
+            it('buzzroll-beams', async () =>
+                await test(
+                    `
+                    \\staff {tabs}
+                    3.6.8 {tp (1 buzzRoll)} 3.6.8 {tp (1 buzzRoll)} | 3.6.32 {tp (1 buzzRoll)} 3.6.32 {tp (1 buzzRoll)} | 
+                    3.6.8 {tp (2 buzzRoll)} 3.6.8 {tp (2 buzzRoll)} | 3.6.32 {tp (2 buzzRoll)} 3.6.32 {tp (2 buzzRoll)} | 
+                    3.6.8 {tp (3 buzzRoll)} 3.6.8 {tp (3 buzzRoll)} | 3.6.32 {tp (3 buzzRoll)} 3.6.32 {tp (3 buzzRoll)} | 
+                    3.6.8 {tp (4 buzzRoll)} 3.6.8 {tp (4 buzzRoll)} | 3.6.32 {tp (4 buzzRoll)} 3.6.32 {tp (4 buzzRoll)} | 
+                    3.6.8 {tp (5 buzzRoll)} 3.6.8 {tp (5 buzzRoll)} | 3.6.32 {tp (5 buzzRoll)} 3.6.32 {tp (5 buzzRoll)} 
+                `,
+                    'tremolo-tabs-buzzroll-beams'
+                ));
+        });
     });
 });

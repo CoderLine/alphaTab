@@ -198,7 +198,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 this.addNormal(noteHeadGlyph);
 
                 if (this.container.beat.isTremolo) {
-                    this._tremoloPicking = new TremoloPickingGlyph(0, 0, this.container.beat.tremoloSpeed!);
+                    this._tremoloPicking = new TremoloPickingGlyph(0, 0, this.container.beat.tremoloPicking!);
                     this._tremoloPicking.renderer = this.renderer;
                     this._tremoloPicking.doLayout();
 

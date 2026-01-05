@@ -109,7 +109,7 @@ export class TabNoteChordGlyph extends Glyph {
         if (beat.duration <= Duration.Quarter) {
             return 0;
         }
-        const symbol = TremoloPickingGlyph._getSymbol(beat.tremoloSpeed!);
+        const symbol = TremoloPickingGlyph._getSymbol(beat.tremoloPicking!);
         const smufl = this.renderer.smuflMetrics;
         return smufl.glyphHeights.has(symbol) ? smufl.glyphHeights.get(symbol)! : 0;
     }

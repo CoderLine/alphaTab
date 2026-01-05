@@ -244,7 +244,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
 
         if (this.beat.isTremolo && !this.beat.deadSlapped) {
-            this._tremoloPicking = new TremoloPickingGlyph(0, 0, this.beat.tremoloSpeed!);
+            this._tremoloPicking = new TremoloPickingGlyph(0, 0, this.beat.tremoloPicking!);
             this._tremoloPicking.renderer = this.renderer;
             this._tremoloPicking.doLayout();
 

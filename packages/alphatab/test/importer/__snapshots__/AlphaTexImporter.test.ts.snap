@@ -5625,11 +5625,11 @@ Array [
   Map {
     "code" => 209,
     "severity" => 2,
-    "message" => "Unexpected tremolo speed value '0, expected: 8, 16 or 32",
+    "message" => "Unexpected tremolo marks value '10, expected: 0-5, or legacy: 8, 16 or 32",
     "start" => Map {
-      "col" => 11,
+      "col" => 12,
       "line" => 1,
-      "offset" => 10,
+      "offset" => 11,
     },
   },
 ]
@@ -6489,6 +6489,132 @@ Map {
       "start" => 8640,
     },
   ],
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos buzzroll-default1 1`] = `
+Map {
+  "marks" => 1,
+  "style" => 1,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos buzzroll-default2 1`] = `
+Map {
+  "marks" => 2,
+  "style" => 1,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos buzzroll-default3 1`] = `
+Map {
+  "marks" => 3,
+  "style" => 1,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos buzzroll-default4 1`] = `
+Map {
+  "marks" => 4,
+  "style" => 1,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos buzzroll-default5 1`] = `
+Map {
+  "marks" => 5,
+  "style" => 1,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo-default1 1`] = `
+Map {
+  "marks" => 1,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo-default2 1`] = `
+Map {
+  "marks" => 2,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo-default3 1`] = `
+Map {
+  "marks" => 3,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo-default4 1`] = `
+Map {
+  "marks" => 4,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo-default5 1`] = `
+Map {
+  "marks" => 5,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo1 1`] = `
+Map {
+  "marks" => 1,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo2 1`] = `
+Map {
+  "marks" => 2,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo3 1`] = `
+Map {
+  "marks" => 3,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo4 1`] = `
+Map {
+  "marks" => 4,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo5 1`] = `
+Map {
+  "marks" => 5,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo8 1`] = `
+Map {
+  "marks" => 1,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo16 1`] = `
+Map {
+  "marks" => 2,
+  "style" => 0,
+}
+`;
+
+exports[`AlphaTexImporterTest tremolos tremolo32 1`] = `
+Map {
+  "marks" => 3,
+  "style" => 0,
 }
 `;
 

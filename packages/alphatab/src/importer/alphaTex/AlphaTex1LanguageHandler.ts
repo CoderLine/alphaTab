@@ -78,6 +78,7 @@ import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
+import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
@@ -1734,28 +1735,52 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 beat.automations.push(balanceAutomation);
                 return ApplyNodeResult.Applied;
             case 'tp':
-                beat.tremoloSpeed = Duration.Eighth;
+                const tremolo = new TremoloPickingEffect();
+                beat.tremoloPicking = tremolo;
                 if (p.arguments && p.arguments.arguments.length > 0) {
-                    const tremoloSpeedValue = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
-                    switch (tremoloSpeedValue) {
-                        case 8:
-                            beat.tremoloSpeed = Duration.Eighth;
-                            break;
-                        case 16:
-                            beat.tremoloSpeed = Duration.Sixteenth;
-                            break;
-                        case 32:
-                            beat.tremoloSpeed = Duration.ThirtySecond;
-                            break;
-                        default:
-                            importer.addSemanticDiagnostic({
-                                code: AlphaTexDiagnosticCode.AT209,
-                                message: `Unexpected tremolo speed value '${tremoloSpeedValue}, expected: 8, 16 or 32`,
-                                severity: AlphaTexDiagnosticsSeverity.Error,
-                                start: p.arguments!.arguments[0].start,
-                                end: p.arguments!.arguments[0].end
-                            });
+                    if (p.arguments.arguments.length > 0) {
+                        const tremoloMarks = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
+                        if (
+                            tremoloMarks >= TremoloPickingEffect.minMarks &&
+                            tremoloMarks <= TremoloPickingEffect.maxMarks
+                        ) {
+                            tremolo.marks = tremoloMarks;
+                        } else {
+                            switch (tremoloMarks) {
+                                // backwards compatibility
+                                case 8:
+                                    tremolo.marks = 1;
+                                    break;
+                                case 16:
+                                    tremolo.marks = 2;
+                                    break;
+                                case 32:
+                                    tremolo.marks = 3;
+                                    break;
+                                default:
+                                    importer.addSemanticDiagnostic({
+                                        code: AlphaTexDiagnosticCode.AT209,
+                                        message: `Unexpected tremolo marks value '${tremoloMarks}, expected: ${TremoloPickingEffect.minMarks}-${TremoloPickingEffect.maxMarks}, or legacy: 8, 16 or 32`,
+                                        severity: AlphaTexDiagnosticsSeverity.Error,
+                                        start: p.arguments!.arguments[0].start,
+                                        end: p.arguments!.arguments[0].end
+                                    });
+                                    return ApplyNodeResult.NotAppliedSemanticError;
+                            }
+                        }
+                    }
+                    if (p.arguments.arguments.length > 1) {
+                        const tremoloStyle = AlphaTex1LanguageHandler._parseEnumValue(
+                            importer,
+                            p.arguments!,
+                            'tremolo picking style',
+                            AlphaTex1EnumMappings.tremoloPickingStyle,
+                            1
+                        );
+                        if (tremoloStyle === undefined) {
                             return ApplyNodeResult.NotAppliedSemanticError;
+                        }
+                        tremolo.style = tremoloStyle;
                     }
                 }
                 return ApplyNodeResult.Applied;
@@ -2506,15 +2531,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (stylesheet.globalDisplayChordDiagramsInScore) {
             nodes.push(Atnf.meta('chordDiagramsInScore'));
         }
-        
+
         if (stylesheet.hideEmptyStaves) {
             nodes.push(Atnf.meta('hideEmptyStaves'));
         }
-        
+
         if (stylesheet.hideEmptyStavesInFirstSystem) {
             nodes.push(Atnf.meta('hideEmptyStavesInFirstSystem'));
         }
-        
+
         if (stylesheet.showSingleStaffBrackets) {
             nodes.push(Atnf.meta('showSingleStaffBrackets'));
         }
@@ -3323,7 +3348,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (beat.isTremolo) {
-            Atnf.prop(properties, 'tp', Atnf.numberValue(beat.tremoloSpeed! as number));
+            const values: IAlphaTexArgumentValue[] = [Atnf.number(beat.tremoloPicking!.marks)];
+            if (beat.tremoloPicking!.style !== TremoloPickingStyle.Default) {
+                values.push(Atnf.ident(TremoloPickingStyle[beat.tremoloPicking!.style]));
+            }
+
+            Atnf.prop(properties, 'tp', Atnf.args(values));
         }
 
         switch (beat.crescendo) {

@@ -4,6 +4,7 @@ export { AutomationType, Automation, SyncPointData, type FlatSyncPoint } from '@
 export { Bar, SustainPedalMarkerType, SustainPedalMarker, BarSubElement, BarStyle, BarLineStyle } from '@coderline/alphatab/model/Bar';
 export { BarreShape } from '@coderline/alphatab/model/BarreShape';
 export { Beat, BeatBeamingMode, BeatSubElement, BeatStyle } from '@coderline/alphatab/model/Beat';
+export { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 export { BendPoint } from '@coderline/alphatab/model/BendPoint';
 export { BendStyle } from '@coderline/alphatab/model/BendStyle';
 export { BendType } from '@coderline/alphatab/model/BendType';

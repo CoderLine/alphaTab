@@ -36,6 +36,7 @@ import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
+import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Voice } from '@coderline/alphatab/model/Voice';
@@ -3579,17 +3580,17 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'schleifer': Not supported
                 case 'tremolo':
-                    switch (c.innerText) {
-                        case '1':
-                            note.beat.tremoloSpeed = Duration.Eighth;
-                            break;
-                        case '2':
-                            note.beat.tremoloSpeed = Duration.Sixteenth;
-                            break;
-                        case '3':
-                            note.beat.tremoloSpeed = Duration.ThirtySecond;
-                            break;
+                    const tremolo = new TremoloPickingEffect();
+                    note.beat.tremoloPicking = tremolo;
+                    tremolo.marks = Number.parseInt(c.innerText, 10);
+
+                    if (
+                        (c.getAttribute('type', '') === 'unmeasured' && tremolo.marks === 0) ||
+                        c.getAttribute('smufl', '') === 'buzzRoll'
+                    ) {
+                        tremolo.style = TremoloPickingStyle.BuzzRoll;
                     }
+
                     break;
                 // case 'haydn': Not supported
                 // case 'other-element': Not supported

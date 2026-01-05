@@ -370,9 +370,9 @@
         7.5{pm}.8{beam Up}
       |
         // Bar 58 / Voice 1 contents
-        7.5.4{tp 32 beam Up}
-        8.5.4{tp 32 beam Up}
-        9.5{acc #}.2{tp 32 beam Up}
+        7.5.4{tp 3 beam Up}
+        8.5.4{tp 3 beam Up}
+        9.5{acc #}.2{tp 3 beam Up}
       |
         // Bar 59 / Voice 1 contents
         7.3{tr (9 16)}.1{beam Down}
