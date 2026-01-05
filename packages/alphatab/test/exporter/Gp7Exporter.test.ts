@@ -13,6 +13,7 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
+import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
 import { assert, expect } from 'chai';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
@@ -267,6 +268,70 @@ describe('Gp7ExporterTest', () => {
         if (expected !== sourceCode) {
             await TestPlatform.saveFileAsString('test-data/exporter/articulations.source.new', sourceCode);
             assert.fail('Articulations have changed, update the PercussionMapper and update the snapshot file');
+        }
+    });
+
+    /**
+     * This test generates the RSE mapping information for the exporter.
+     * To update the code there, run this test and copy the source code from the written file.
+     * The test will fail and write a ".new" file if the code changed.
+     */
+    it('sound-mapper', async () => {
+        const settings = new Settings();
+        const zip = new ZipReader(
+            ByteBuffer.fromBuffer(await TestPlatform.loadFile('test-data/exporter/articulations.gp'))
+        ).read();
+        const gpifData = zip.find(e => e.fileName === 'score.gpif')!.data;
+
+        const xml = new XmlDocument();
+        xml.parse(IOHelper.toString(gpifData, settings.importer.encoding));
+
+        let instrumentSetCode = 'private static _drumInstrumentSet = GpifInstrumentSet.create(';
+
+        const instrumentSet = xml
+            .findChildElement('GPIF')!
+            .findChildElement('Tracks')!
+            .findChildElement('Track')!
+            .findChildElement('InstrumentSet')!;
+
+        instrumentSetCode += `${JSON.stringify(instrumentSet.findChildElement('Name')!.innerText)}, `;
+        instrumentSetCode += `${JSON.stringify(instrumentSet.findChildElement('Type')!.innerText)}, `;
+        instrumentSetCode += `${instrumentSet.findChildElement('LineCount')!.innerText}, [\n`;
+
+        for (const element of instrumentSet.findChildElement('Elements')!.childElements()) {
+            if (element.localName !== 'Element') {
+                continue;
+            }
+
+            instrumentSetCode += `  new GpifInstrumentElement(`;
+            instrumentSetCode += `${JSON.stringify(element.findChildElement('Name')!.innerText)}, `;
+            instrumentSetCode += `${JSON.stringify(element.findChildElement('Type')!.innerText)}, `;
+            instrumentSetCode += `${JSON.stringify(element.findChildElement('SoundbankName')!.innerText)}, `;
+            instrumentSetCode += `[\n`;
+
+            for (const articulation of element.findChildElement('Articulations')!.childElements()) {
+                if (articulation.localName !== 'Articulation') {
+                    continue;
+                }
+
+                instrumentSetCode += '    GpifInstrumentArticulation.template(';
+                instrumentSetCode += `${JSON.stringify(articulation.findChildElement('Name')!.innerText)}, `;
+                instrumentSetCode += `[${articulation.findChildElement('InputMidiNumbers')!.innerText.split(' ').join(', ')}], `;
+                instrumentSetCode += `${JSON.stringify(articulation.findChildElement('OutputRSESound')!.innerText)}`;
+                instrumentSetCode += '),\n';
+            }
+
+            instrumentSetCode += `  ]),\n`;
+        }
+
+        instrumentSetCode += `]);`;
+
+        const sourceCode = ['// BEGIN generated', instrumentSetCode, '// END generated'].join('\n');
+
+        const expected = await TestPlatform.loadFileAsString('test-data/exporter/soundmapper.source');
+        if (expected !== sourceCode) {
+            await TestPlatform.saveFileAsString('test-data/exporter/soundmapper.source.new', sourceCode);
+            assert.fail('RSE instrument set has, update the GpifSoundMapper and update the snapshot file');
         }
     });
 });

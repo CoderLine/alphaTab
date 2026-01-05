@@ -6,7 +6,6 @@ import type { Note } from '@coderline/alphatab/model/Note';
  * @internal
  */
 export class PercussionMapper {
-    //
     // To update the following generated code, use the GpExporterTest.percussion-articulations unit test
     // which will generate the new code to copy for here.
     // We could also use an NPM script for that but for now this is enough.
