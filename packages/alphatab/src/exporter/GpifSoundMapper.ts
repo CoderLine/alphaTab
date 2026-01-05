@@ -563,7 +563,7 @@ export class GpifSoundMapper {
         const instrumentSet = new GpifInstrumentSet();
         instrumentSet.lineCount = track.staves[0].standardNotationLineCount;
         instrumentSet.name = 'Drums';
-        instrumentSet.type = 'drumKid';
+        instrumentSet.type = 'drumKit';
 
         const articulations =
             track.percussionArticulations.length > 0

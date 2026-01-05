@@ -1097,12 +1097,12 @@ export class PercussionMapper {
     }
 
     public static readonly instrumentArticulationNames = PercussionMapper._mergeNames([
-        PercussionMapper._instrumentArticulationNames,
         new Map<string, number>([
             ['Hand (hit)', 60],
             ['Hand (hit)', 61],
             ['Tinkle Bell (hat)', 83]
-        ])
+        ]),
+        PercussionMapper._instrumentArticulationNames
     ]);
 
     private static _mergeNames(maps: Map<string, number>[]) {

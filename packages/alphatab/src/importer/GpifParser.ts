@@ -710,7 +710,7 @@ export class GpifParser {
                     }
                     break;
                 case 'Elements':
-                    this._parseElements(track, c);
+                    this._parseElements(track, c, false);
                     break;
             }
         }
@@ -727,7 +727,7 @@ export class GpifParser {
                     }
                     break;
                 case 'Elements':
-                    this._parseElements(track, c);
+                    this._parseElements(track, c, true);
                     break;
                 case 'LineCount':
                     const lineCount = GpifParser._parseIntSafe(c.innerText, 5);
@@ -738,41 +738,44 @@ export class GpifParser {
             }
         }
     }
-    private _parseElements(track: Track, node: XmlNode) {
+    private _parseElements(track: Track, node: XmlNode, isInstrumentSet: boolean) {
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Element':
-                    this._parseElement(track, c);
+                    this._parseElement(track, c, isInstrumentSet);
                     break;
             }
         }
     }
 
-    private _parseElement(track: Track, node: XmlNode) {
-        const type = node.findChildElement('Type')?.innerText ?? '';
+    private _parseElement(track: Track, node: XmlNode, isInstrumentSet: boolean) {
+        const name = node.findChildElement('Name')?.innerText ?? '';
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Name':
                 case 'Articulations':
-                    this._parseArticulations(track, c, type);
+                    this._parseArticulations(track, c, isInstrumentSet, name);
                     break;
             }
         }
     }
-    private _parseArticulations(track: Track, node: XmlNode, elementType: string) {
+    private _parseArticulations(track: Track, node: XmlNode, isInstrumentSet: boolean, elementName: string) {
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Articulation':
-                    this._parseArticulation(track, c, elementType);
+                    this._parseArticulation(track, c, isInstrumentSet, elementName);
                     break;
             }
         }
     }
 
-    private _parseArticulation(track: Track, node: XmlNode, elementType: string) {
+    private _parseArticulation(track: Track, node: XmlNode, isInstrumentSet: boolean, elementName: string) {
         const articulation = new InstrumentArticulation();
         articulation.outputMidiNumber = -1;
-        articulation.elementType = elementType;
+        // NOTE: in the past we used the type here, but it is not unique enough. e.g. there are multiple kinds of "ride" ('Ride' vs 'Ride Cymbal 2')
+        // we have to use the name as element identifier
+        // using a wrong type leads to wrong "NotationPatch" updates
+        articulation.elementType = elementName;
         let name = '';
         for (const c of node.childElements()) {
             const txt = c.innerText;
@@ -790,20 +793,7 @@ export class GpifParser {
                     articulation.techniqueSymbol = GpifParser.parseTechniqueSymbol(txt);
                     break;
                 case 'TechniquePlacement':
-                    switch (txt) {
-                        case 'outside':
-                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Outside;
-                            break;
-                        case 'inside':
-                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Inside;
-                            break;
-                        case 'above':
-                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Above;
-                            break;
-                        case 'below':
-                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Below;
-                            break;
-                    }
+                    articulation.techniqueSymbolPlacement = GpifParser.parseTechniqueSymbolPlacement(txt);
                     break;
                 case 'Noteheads':
                     const noteHeadsTxt = GpifParser._splitSafe(txt);
@@ -832,16 +822,14 @@ export class GpifParser {
             }
         }
 
-        if (articulation.outputMidiNumber !== -1) {
-            console.log('Articulation', articulation.id, name);
+        const fullName = `${elementName}.${name}`;
+        if (isInstrumentSet) {
             track.percussionArticulations.push(articulation);
             this.articulationNamesById.set(articulation.id, name);
-            if (name.length > 0) {
-                this._articulationByName.set(name, articulation);
-            }
-        } else if (name.length > 0 && this._articulationByName.has(name)) {
+            this._articulationByName.set(fullName, articulation);
+        } else if (this._articulationByName.has(fullName)) {
             // notation patch
-            this._articulationByName.get(name)!.staffLine = articulation.staffLine;
+            this._articulationByName.get(fullName)!.staffLine = articulation.staffLine;
         }
     }
 
@@ -864,6 +852,24 @@ export class GpifParser {
                 return MusicFontSymbol.GuitarGolpe;
             default:
                 return MusicFontSymbol.None;
+        }
+    }
+
+    /**
+     * @internal
+     */
+    public static parseTechniqueSymbolPlacement(txt: string): TechniqueSymbolPlacement {
+        switch (txt) {
+            case 'outside':
+                return TechniqueSymbolPlacement.Outside;
+            case 'inside':
+                return TechniqueSymbolPlacement.Inside;
+            case 'above':
+                return TechniqueSymbolPlacement.Above;
+            case 'below':
+                return TechniqueSymbolPlacement.Below;
+            default:
+                return TechniqueSymbolPlacement.Outside;
         }
     }
 
