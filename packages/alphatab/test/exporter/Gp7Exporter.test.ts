@@ -1,4 +1,9 @@
 import { Gp7Exporter } from '@coderline/alphatab/exporter/Gp7Exporter';
+import {
+    GpifInstrumentArticulation,
+    GpifInstrumentElement,
+    GpifInstrumentSet
+} from '@coderline/alphatab/exporter/GpifSoundMapper';
 import { Gp7To8Importer } from '@coderline/alphatab/importer/Gp7To8Importer';
 import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
@@ -271,6 +276,122 @@ describe('Gp7ExporterTest', () => {
         }
     });
 
+    // NOTE: this function could be useful in future if we want to use a real .gp file as "template"
+    function readFullInstrumentSet(xml: XmlDocument) {
+        const instrumentSetNode = xml
+            .findChildElement('GPIF')!
+            .findChildElement('Tracks')!
+            .findChildElement('Track')!
+            .findChildElement('InstrumentSet')!;
+
+        const instrumentSet = new GpifInstrumentSet();
+
+        instrumentSet.name = instrumentSetNode.findChildElement('Name')!.innerText;
+        instrumentSet.type = instrumentSetNode.findChildElement('Type')!.innerText;
+        instrumentSet.lineCount = Number.parseInt(instrumentSetNode.findChildElement('LineCount')!.innerText, 10);
+
+        for (const elementNode of instrumentSetNode.findChildElement('Elements')!.childElements()) {
+            if (elementNode.localName !== 'Element') {
+                continue;
+            }
+
+            const element = new GpifInstrumentElement(
+                elementNode.findChildElement('Name')!.innerText,
+                elementNode.findChildElement('Type')!.innerText,
+                elementNode.findChildElement('SoundbankName')!.innerText,
+                []
+            );
+
+            // NOTE: GP8 has both a "Jingle Bell" and "Tingle Bell" element mapping down to the same
+            // articulations. due to ordering we have "Tingle Bell" but not "Jingle Bell"
+            if (element.name === 'Jingle Bell') {
+                continue;
+            }
+
+            for (const articulationNode of elementNode.findChildElement('Articulations')!.childElements()) {
+                if (articulationNode.localName !== 'Articulation') {
+                    continue;
+                }
+
+                const articulation = new GpifInstrumentArticulation();
+
+                articulation.name = articulationNode.findChildElement('Name')!.innerText;
+                articulation.staffLine = Number.parseInt(articulationNode.findChildElement('StaffLine')!.innerText, 10);
+                const noteHeads = articulationNode
+                    .findChildElement('Noteheads')!
+                    .innerText.split(' ')
+                    .map(t => GpifParser.parseNoteHead(t));
+                articulation.noteHeads = [noteHeads[0], noteHeads[1], noteHeads[2]];
+                articulation.techniqueSymbolPlacement = GpifParser.parseTechniqueSymbolPlacement(
+                    articulationNode.findChildElement('TechniquePlacement')!.innerText
+                );
+                articulation.techniqueSymbol = GpifParser.parseTechniqueSymbol(
+                    articulationNode.findChildElement('TechniqueSymbol')!.innerText
+                );
+                articulation.inputMidiNumbers = articulationNode
+                    .findChildElement('InputMidiNumbers')!
+                    .innerText.split(' ')
+                    .map(t => Number.parseInt(t, 10));
+                articulation.outputRSESound = articulationNode.findChildElement('OutputRSESound')!.innerText;
+                articulation.outputMidiNumber = Number.parseInt(
+                    articulationNode.findChildElement('OutputMidiNumber')!.innerText,
+                    10
+                );
+
+                element.articulations.push(articulation);
+            }
+
+            instrumentSet.elements.set(element.name, element);
+        }
+
+        // we also have to apply the instrument patches
+        // this is a bit duplicate from what we already do in the GpifParser but test-focused
+        const notationPatchNode = xml
+            .findChildElement('GPIF')!
+            .findChildElement('Tracks')!
+            .findChildElement('Track')!
+            .findChildElement('NotationPatch');
+
+        if (notationPatchNode) {
+            for (const c of notationPatchNode.childElements()) {
+                switch (c.localName) {
+                    case 'LineCount':
+                        instrumentSet.lineCount = Number.parseInt(c.innerText, 10);
+                        break;
+                    case 'Elements':
+                        for (const e of c.childElements()) {
+                            switch (e.localName) {
+                                case 'Element':
+                                    const elementToPatch = instrumentSet.elements.get(
+                                        e.findChildElement('Name')!.innerText
+                                    );
+
+                                    for (const a of e.findChildElement('Articulations')!.childElements()) {
+                                        const name = a.findChildElement('Name')!.innerText;
+                                        const articulationToPatch = elementToPatch!.articulations.find(
+                                            p => p.name === name
+                                        )!;
+
+                                        for (const ac of a.childElements()) {
+                                            switch (ac.localName) {
+                                                case 'StaffLine':
+                                                    articulationToPatch.staffLine = Number.parseInt(ac.innerText, 10);
+                                                    break;
+                                            }
+                                        }
+                                    }
+
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+
+        return instrumentSet;
+    }
+
     /**
      * This test generates the RSE mapping information for the exporter.
      * To update the code there, run this test and copy the source code from the written file.
@@ -288,36 +409,24 @@ describe('Gp7ExporterTest', () => {
 
         let instrumentSetCode = 'private static _drumInstrumentSet = GpifInstrumentSet.create(';
 
-        const instrumentSet = xml
-            .findChildElement('GPIF')!
-            .findChildElement('Tracks')!
-            .findChildElement('Track')!
-            .findChildElement('InstrumentSet')!;
+        const instrumentSet = readFullInstrumentSet(xml);
 
-        instrumentSetCode += `${JSON.stringify(instrumentSet.findChildElement('Name')!.innerText)}, `;
-        instrumentSetCode += `${JSON.stringify(instrumentSet.findChildElement('Type')!.innerText)}, `;
-        instrumentSetCode += `${instrumentSet.findChildElement('LineCount')!.innerText}, [\n`;
+        instrumentSetCode += `${JSON.stringify(instrumentSet.name)}, `;
+        instrumentSetCode += `${JSON.stringify(instrumentSet.type)}, `;
+        instrumentSetCode += `${instrumentSet.lineCount.toString()}, [\n`;
 
-        for (const element of instrumentSet.findChildElement('Elements')!.childElements()) {
-            if (element.localName !== 'Element') {
-                continue;
-            }
-
+        for (const element of instrumentSet.elements.values()) {
             instrumentSetCode += `  new GpifInstrumentElement(`;
-            instrumentSetCode += `${JSON.stringify(element.findChildElement('Name')!.innerText)}, `;
-            instrumentSetCode += `${JSON.stringify(element.findChildElement('Type')!.innerText)}, `;
-            instrumentSetCode += `${JSON.stringify(element.findChildElement('SoundbankName')!.innerText)}, `;
+            instrumentSetCode += `${JSON.stringify(element.name)}, `;
+            instrumentSetCode += `${JSON.stringify(element.type)}, `;
+            instrumentSetCode += `${JSON.stringify(element.soundbankName)}, `;
             instrumentSetCode += `[\n`;
 
-            for (const articulation of element.findChildElement('Articulations')!.childElements()) {
-                if (articulation.localName !== 'Articulation') {
-                    continue;
-                }
-
+            for (const articulation of element.articulations) {
                 instrumentSetCode += '    GpifInstrumentArticulation.template(';
-                instrumentSetCode += `${JSON.stringify(articulation.findChildElement('Name')!.innerText)}, `;
-                instrumentSetCode += `[${articulation.findChildElement('InputMidiNumbers')!.innerText.split(' ').join(', ')}], `;
-                instrumentSetCode += `${JSON.stringify(articulation.findChildElement('OutputRSESound')!.innerText)}`;
+                instrumentSetCode += `${JSON.stringify(articulation.name)}, `;
+                instrumentSetCode += `[${articulation.inputMidiNumbers.map(n => n.toString()).join(', ')}], `;
+                instrumentSetCode += `${JSON.stringify(articulation.outputRSESound)}`;
                 instrumentSetCode += '),\n';
             }
 
@@ -333,5 +442,91 @@ describe('Gp7ExporterTest', () => {
             await TestPlatform.saveFileAsString('test-data/exporter/soundmapper.source.new', sourceCode);
             assert.fail('RSE instrument set has, update the GpifSoundMapper and update the snapshot file');
         }
+    });
+
+    it('drumkit-roundtrip', async () => {
+        const inputData = await TestPlatform.loadFile('test-data/exporter/articulations.gp');
+        const loaded = ScoreLoader.loadScoreFromBytes(inputData);
+
+        function getInstrumentSet(gp: Uint8Array) {
+            const zip = new ZipReader(ByteBuffer.fromBuffer(gp));
+            const gpifData = zip.read().find(e => e.fileName === 'score.gpif')!.data;
+            const xml = new XmlDocument();
+            xml.parse(IOHelper.toString(gpifData, ''));
+            return readFullInstrumentSet(xml);
+        }
+
+        const exported = new Gp7Exporter().export(loaded);
+
+        const expectedInstrumentSet = getInstrumentSet(inputData);
+        const actualInstrumentSet = getInstrumentSet(exported);
+
+        // order is not important but equality based on unique identifiers of the nodes
+        expect(actualInstrumentSet.name).to.equal(expectedInstrumentSet.name);
+        expect(actualInstrumentSet.type).to.equal(expectedInstrumentSet.type);
+        expect(actualInstrumentSet.lineCount).to.equal(expectedInstrumentSet.lineCount);
+
+        for (const [k, expectedElement] of expectedInstrumentSet.elements) {
+            expect(actualInstrumentSet.elements.has(k), `Element ${k} missing in actual file`).to.be.true;
+            const actualElement = actualInstrumentSet.elements.get(k)!;
+
+            expect(actualElement.name).to.equal(expectedElement.name);
+            expect(actualElement.type).to.equal(expectedElement.type);
+            expect(actualElement.soundbankName).to.equal(expectedElement.soundbankName);
+
+            const expectedArticulations = new Map<number, GpifInstrumentArticulation>();
+            for (const a of expectedElement.articulations) {
+                for (const i of a.inputMidiNumbers) {
+                    expectedArticulations.set(i, a);
+                }
+            }
+
+            const actualArticulations = new Map<number, GpifInstrumentArticulation>();
+            for (const a of actualElement.articulations) {
+                for (const i of a.inputMidiNumbers) {
+                    actualArticulations.set(i, a);
+                }
+            }
+
+            for (const [i, expectedArticulation] of expectedArticulations) {
+                expect(actualArticulations.has(i), `Articulation ${i} missing in actual file`).to.be.true;
+
+                const actualArticulation = actualArticulations.get(i)!;
+
+                expect(actualArticulation.name).to.equal(expectedArticulation.name);
+                expect(actualArticulation.staffLine).to.equal(
+                    expectedArticulation.staffLine,
+                    `Wrong staffline for articulation ${actualArticulation.name}`
+                );
+                expect(actualArticulation.noteHeads.map(s => MusicFontSymbol[s]).join(' ')).to.equal(
+                    expectedArticulation.noteHeads.map(s => MusicFontSymbol[s]).join(' '),
+                    `Wrong noteHeads for articulation ${actualArticulation.name}`
+                );
+                expect(MusicFontSymbol[actualArticulation.techniqueSymbol]).to.equal(
+                    MusicFontSymbol[expectedArticulation.techniqueSymbol],
+                    `Wrong techniqueSymbol for articulation ${actualArticulation.name}`
+                );
+                expect(TechniqueSymbolPlacement[actualArticulation.techniqueSymbolPlacement]).to.equal(
+                    TechniqueSymbolPlacement[expectedArticulation.techniqueSymbolPlacement],
+                    `Wrong techniqueSymbolPlacement for articulation ${actualArticulation.name}`
+                );
+                expect(actualArticulation.inputMidiNumbers.map(i => i.toString()).join(',')).to.equal(
+                    expectedArticulation.inputMidiNumbers.map(i => i.toString()).join(','),
+                    `Wrong inputMidiNumbers for articulation ${actualArticulation.name}`
+                );
+                expect(actualArticulation.outputMidiNumber).to.equal(
+                    expectedArticulation.outputMidiNumber,
+                    `Wrong outputMidiNumber for articulation ${actualArticulation.name}`
+                );
+                expect(actualArticulation.outputRSESound).to.equal(
+                    expectedArticulation.outputRSESound,
+                    `Wrong outputRSESound for articulation ${actualArticulation.name}`
+                );
+            }
+
+            expect(actualArticulations.size).to.equal(expectedArticulations.size);
+        }
+
+        expect(actualInstrumentSet.elements.size).to.equal(expectedInstrumentSet.elements.size);
     });
 });
