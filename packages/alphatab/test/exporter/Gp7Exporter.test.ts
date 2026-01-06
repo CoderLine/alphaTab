@@ -214,7 +214,7 @@ describe('Gp7ExporterTest', () => {
             for (const a of element.articulations) {
                 instrumentArticulationsLookup += `    InstrumentArticulation.create(`;
                 instrumentArticulationsLookup += `${a.inputMidiNumbers[0]}, `;
-                instrumentArticulationsLookup += `${JSON.stringify(element.type)}, `;
+                instrumentArticulationsLookup += `${JSON.stringify(element.name)}, `;
                 instrumentArticulationsLookup += `${a.staffLine}, `;
                 instrumentArticulationsLookup += `${a.outputMidiNumber}, `;
                 instrumentArticulationsLookup += `MusicFontSymbol.${MusicFontSymbol[a.noteHeads[0]]}, `;
@@ -235,7 +235,7 @@ describe('Gp7ExporterTest', () => {
                     nameCounter.set(name, 1);
                 }
 
-                const uniqueId = `${element.type}.${a.inputMidiNumbers[0]}`;
+                const uniqueId = `${element.name}.${a.inputMidiNumbers[0]}`;
                 instrumentArticulationNames += `  [${JSON.stringify(name)}, ${`${JSON.stringify(uniqueId)}`}],\n`;
             }
         }
