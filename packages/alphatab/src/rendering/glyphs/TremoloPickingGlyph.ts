@@ -1,9 +1,9 @@
 import type { Duration } from '@coderline/alphatab/model/Duration';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { type TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal

@@ -83,7 +83,7 @@ import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 
 /**
@@ -461,11 +461,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
                 if (metaData.arguments!.arguments.length === 2) {
                     const number = (metaData.arguments!.arguments[1] as AlphaTexNumberLiteral).value;
-                    if (PercussionMapper.instrumentArticulations.has(number)) {
-                        percussionArticulationNames.set(articulationName.toLowerCase(), number);
+                    const articulation = PercussionMapper.getArticulationById(number);
+                    if (articulation) {
+                        percussionArticulationNames.set(articulationName.toLowerCase(), articulation.uniqueId);
                         return ApplyNodeResult.Applied;
                     } else {
-                        const articulations = Array.from(PercussionMapper.instrumentArticulations.keys())
+                        const articulations = Array.from(PercussionMapper.instrumentArticulationIds())
                             .map(n => `${n}`)
                             .join(',');
                         importer.addSemanticDiagnostic({

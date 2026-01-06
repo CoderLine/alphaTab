@@ -35,27 +35,27 @@ import { Voice } from '@coderline/alphatab/model/Voice';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 
-import { type XmlNode, XmlNodeType } from '@coderline/alphatab/xml/XmlNode';
-import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
-import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
-import { InstrumentArticulation, TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { BeatCloner } from '@coderline/alphatab/generated/model/BeatCloner';
 import { NoteCloner } from '@coderline/alphatab/generated/model/NoteCloner';
 import { Logger } from '@coderline/alphatab/Logger';
-import { GolpeType } from '@coderline/alphatab/model/GolpeType';
-import { FadeType } from '@coderline/alphatab/model/FadeType';
-import { WahPedal } from '@coderline/alphatab/model/WahPedal';
-import { BarreShape } from '@coderline/alphatab/model/BarreShape';
-import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
-import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
-import { Direction } from '@coderline/alphatab/model/Direction';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
+import { BarreShape } from '@coderline/alphatab/model/BarreShape';
+import { Direction } from '@coderline/alphatab/model/Direction';
+import { FadeType } from '@coderline/alphatab/model/FadeType';
+import { GolpeType } from '@coderline/alphatab/model/GolpeType';
+import { InstrumentArticulation, TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
+import { WahPedal } from '@coderline/alphatab/model/WahPedal';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { type XmlNode, XmlNodeType } from '@coderline/alphatab/xml/XmlNode';
 
 /**
  * This structure represents a duration within a gpif
@@ -705,7 +705,7 @@ export class GpifParser {
                     }
                     break;
                 case 'Elements':
-                    this._parseElements(track, c);
+                    this._parseElements(track, c, false);
                     break;
             }
         }
@@ -722,7 +722,7 @@ export class GpifParser {
                     }
                     break;
                 case 'Elements':
-                    this._parseElements(track, c);
+                    this._parseElements(track, c, true);
                     break;
                 case 'LineCount':
                     const lineCount = GpifParser._parseIntSafe(c.innerText, 5);
@@ -733,41 +733,45 @@ export class GpifParser {
             }
         }
     }
-    private _parseElements(track: Track, node: XmlNode) {
+    private _parseElements(track: Track, node: XmlNode, isInstrumentSet: boolean) {
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Element':
-                    this._parseElement(track, c);
+                    this._parseElement(track, c, isInstrumentSet);
                     break;
             }
         }
     }
 
-    private _parseElement(track: Track, node: XmlNode) {
-        const type = node.findChildElement('Type')?.innerText ?? '';
+    private _parseElement(track: Track, node: XmlNode, isInstrumentSet: boolean) {
+        const name = node.findChildElement('Name')?.innerText ?? '';
+
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Name':
                 case 'Articulations':
-                    this._parseArticulations(track, c, type);
+                    this._parseArticulations(track, c, isInstrumentSet, name);
                     break;
             }
         }
     }
-    private _parseArticulations(track: Track, node: XmlNode, elementType: string) {
+    private _parseArticulations(track: Track, node: XmlNode, isInstrumentSet: boolean, elementName: string) {
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Articulation':
-                    this._parseArticulation(track, c, elementType);
+                    this._parseArticulation(track, c, isInstrumentSet, elementName);
                     break;
             }
         }
     }
 
-    private _parseArticulation(track: Track, node: XmlNode, elementType: string) {
+    private _parseArticulation(track: Track, node: XmlNode, isInstrumentSet: boolean, elementName: string) {
         const articulation = new InstrumentArticulation();
         articulation.outputMidiNumber = -1;
-        articulation.elementType = elementType;
+        // NOTE: in the past we used the type here, but it is not unique enough. e.g. there are multiple kinds of "ride" ('Ride' vs 'Ride Cymbal 2')
+        // we have to use the name as element identifier
+        // using a wrong type leads to wrong "NotationPatch" updates
+        articulation.elementType = elementName;
         let name = '';
         for (const c of node.childElements()) {
             const txt = c.innerText;
@@ -775,38 +779,28 @@ export class GpifParser {
                 case 'Name':
                     name = c.innerText;
                     break;
+                case 'InputMidiNumbers':
+                    articulation.id = GpifParser._parseIntSafe(txt.split(' ')[0], 0);
+                    break;
                 case 'OutputMidiNumber':
                     articulation.outputMidiNumber = GpifParser._parseIntSafe(txt, 0);
                     break;
                 case 'TechniqueSymbol':
-                    articulation.techniqueSymbol = this._parseTechniqueSymbol(txt);
+                    articulation.techniqueSymbol = GpifParser.parseTechniqueSymbol(txt);
                     break;
                 case 'TechniquePlacement':
-                    switch (txt) {
-                        case 'outside':
-                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Outside;
-                            break;
-                        case 'inside':
-                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Inside;
-                            break;
-                        case 'above':
-                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Above;
-                            break;
-                        case 'below':
-                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Below;
-                            break;
-                    }
+                    articulation.techniqueSymbolPlacement = GpifParser.parseTechniqueSymbolPlacement(txt);
                     break;
                 case 'Noteheads':
                     const noteHeadsTxt = GpifParser._splitSafe(txt);
                     if (noteHeadsTxt.length >= 1) {
-                        articulation.noteHeadDefault = this._parseNoteHead(noteHeadsTxt[0]);
+                        articulation.noteHeadDefault = GpifParser.parseNoteHead(noteHeadsTxt[0]);
                     }
                     if (noteHeadsTxt.length >= 2) {
-                        articulation.noteHeadHalf = this._parseNoteHead(noteHeadsTxt[1]);
+                        articulation.noteHeadHalf = GpifParser.parseNoteHead(noteHeadsTxt[1]);
                     }
                     if (noteHeadsTxt.length >= 3) {
-                        articulation.noteHeadWhole = this._parseNoteHead(noteHeadsTxt[2]);
+                        articulation.noteHeadWhole = GpifParser.parseNoteHead(noteHeadsTxt[2]);
                     }
 
                     if (articulation.noteHeadHalf === MusicFontSymbol.None) {
@@ -824,17 +818,20 @@ export class GpifParser {
             }
         }
 
-        if (articulation.outputMidiNumber !== -1) {
+        const fullName = `${elementName}.${name}`;
+        if (isInstrumentSet) {
             track.percussionArticulations.push(articulation);
-            if (name.length > 0) {
-                this._articulationByName.set(name, articulation);
-            }
-        } else if (name.length > 0 && this._articulationByName.has(name)) {
-            this._articulationByName.get(name)!.staffLine = articulation.staffLine;
+            this._articulationByName.set(fullName, articulation);
+        } else if (this._articulationByName.has(fullName)) {
+            // notation patch
+            this._articulationByName.get(fullName)!.staffLine = articulation.staffLine;
         }
     }
 
-    private _parseTechniqueSymbol(txt: string): MusicFontSymbol {
+    /**
+     * @internal
+     */
+    public static parseTechniqueSymbol(txt: string): MusicFontSymbol {
         switch (txt) {
             case 'pictEdgeOfCymbal':
                 return MusicFontSymbol.PictEdgeOfCymbal;
@@ -853,7 +850,28 @@ export class GpifParser {
         }
     }
 
-    private _parseNoteHead(txt: string): MusicFontSymbol {
+    /**
+     * @internal
+     */
+    public static parseTechniqueSymbolPlacement(txt: string): TechniqueSymbolPlacement {
+        switch (txt) {
+            case 'outside':
+                return TechniqueSymbolPlacement.Outside;
+            case 'inside':
+                return TechniqueSymbolPlacement.Inside;
+            case 'above':
+                return TechniqueSymbolPlacement.Above;
+            case 'below':
+                return TechniqueSymbolPlacement.Below;
+            default:
+                return TechniqueSymbolPlacement.Outside;
+        }
+    }
+
+    /**
+     * @internal
+     */
+    public static parseNoteHead(txt: string): MusicFontSymbol {
         switch (txt) {
             case 'noteheadDoubleWholeSquare':
                 return MusicFontSymbol.NoteheadDoubleWholeSquare;

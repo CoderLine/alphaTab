@@ -43,7 +43,6 @@ import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { WhammyType } from '@coderline/alphatab/model/WhammyType';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { HarmonicsEffectInfo } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { Settings } from '@coderline/alphatab/Settings';
@@ -53,6 +52,7 @@ import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 import { assert, expect } from 'chai';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { TremoloPickingEffectSerializer } from '@coderline/alphatab/generated/model/TremoloPickingEffectSerializer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 describe('AlphaTexImporterTest', () => {
     /**
@@ -1391,9 +1391,9 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
         expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).to.equal(49);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(40);
+        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(37);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(2);
-        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
+        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(40);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
         expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
         testExportRoundtrip(score);
@@ -1411,9 +1411,9 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
         expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).to.equal(49);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(40);
+        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(37);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(2);
-        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
+        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(40);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
         expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
         testExportRoundtrip(score);

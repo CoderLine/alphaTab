@@ -1,0 +1,207 @@
+// BEGIN generated
+private static _drumInstrumentSet = GpifInstrumentSet.create("Drums", "drumKit", 5, [
+  new GpifInstrumentElement("Snare", "snare", "Master-Snare", [
+    GpifInstrumentArticulation.template("Snare (hit)", [38], "stick.hit.hit"),
+    GpifInstrumentArticulation.template("Snare (side stick)", [37], "stick.hit.sidestick"),
+    GpifInstrumentArticulation.template("Snare (rim shot)", [91], "stick.hit.rimshot"),
+  ]),
+  new GpifInstrumentElement("Charley", "hiHat", "Master-Hihat", [
+    GpifInstrumentArticulation.template("Hi-Hat (closed)", [42], "stick.hit.closed"),
+    GpifInstrumentArticulation.template("Hi-Hat (half)", [92], "stick.hit.half"),
+    GpifInstrumentArticulation.template("Hi-Hat (open)", [46], "stick.hit.open"),
+    GpifInstrumentArticulation.template("Pedal Hi-Hat (hit)", [44], "pedal.hit.pedal"),
+  ]),
+  new GpifInstrumentElement("Acoustic Kick Drum", "kickDrum", "AcousticKick-Percu", [
+    GpifInstrumentArticulation.template("Kick (hit)", [35], "pedal.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Kick Drum", "kickDrum", "Master-Kick", [
+    GpifInstrumentArticulation.template("Kick (hit)", [36], "pedal.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Tom Very High", "tom", "Master-Tom05", [
+    GpifInstrumentArticulation.template("High Floor Tom (hit)", [50], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Tom High", "tom", "Master-Tom04", [
+    GpifInstrumentArticulation.template("High Tom (hit)", [48], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Tom Medium", "tom", "Master-Tom03", [
+    GpifInstrumentArticulation.template("Mid Tom (hit)", [47], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Tom Low", "tom", "Master-Tom02", [
+    GpifInstrumentArticulation.template("Low Tom (hit)", [45], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Tom Very Low", "tom", "Master-Tom01", [
+    GpifInstrumentArticulation.template("Very Low Tom (hit)", [43], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Ride", "ride", "Master-Ride", [
+    GpifInstrumentArticulation.template("Ride (edge)", [93], "stick.hit.edge"),
+    GpifInstrumentArticulation.template("Ride (middle)", [51], "stick.hit.mid"),
+    GpifInstrumentArticulation.template("Ride (bell)", [53], "stick.hit.bell"),
+    GpifInstrumentArticulation.template("Ride (choke)", [94], "stick.hit.choke"),
+  ]),
+  new GpifInstrumentElement("Splash", "splash", "Master-Splash", [
+    GpifInstrumentArticulation.template("Splash (hit)", [55], "stick.hit.hit"),
+    GpifInstrumentArticulation.template("Splash (choke)", [95], "stick.hit.choke"),
+  ]),
+  new GpifInstrumentElement("China", "china", "Master-China", [
+    GpifInstrumentArticulation.template("China (hit)", [52], "stick.hit.hit"),
+    GpifInstrumentArticulation.template("China (choke)", [96], "stick.hit.choke"),
+  ]),
+  new GpifInstrumentElement("Crash High", "crash", "Master-Crash02", [
+    GpifInstrumentArticulation.template("Crash high (hit)", [49], "stick.hit.hit"),
+    GpifInstrumentArticulation.template("Crash high (choke)", [97], "stick.hit.choke"),
+  ]),
+  new GpifInstrumentElement("Crash Medium", "crash", "Master-Crash01", [
+    GpifInstrumentArticulation.template("Crash medium (hit)", [57], "stick.hit.hit"),
+    GpifInstrumentArticulation.template("Crash medium (choke)", [98], "stick.hit.choke"),
+  ]),
+  new GpifInstrumentElement("Cowbell Low", "cowbell", "CowbellBig-Percu", [
+    GpifInstrumentArticulation.template("Cowbell low (hit)", [99], "stick.hit.hit"),
+    GpifInstrumentArticulation.template("Cowbell low (tip)", [100], "stick.hit.tip"),
+  ]),
+  new GpifInstrumentElement("Cowbell Medium", "cowbell", "CowbellMid-Percu", [
+    GpifInstrumentArticulation.template("Cowbell medium (hit)", [56], "stick.hit.hit"),
+    GpifInstrumentArticulation.template("Cowbell medium (tip)", [101], "stick.hit.tip"),
+  ]),
+  new GpifInstrumentElement("Cowbell High", "cowbell", "CowbellSmall-Percu", [
+    GpifInstrumentArticulation.template("Cowbell high (hit)", [102], "stick.hit.hit"),
+    GpifInstrumentArticulation.template("Cowbell high (tip)", [103], "stick.hit.tip"),
+  ]),
+  new GpifInstrumentElement("Woodblock Low", "woodblock", "WoodblockLow-Percu", [
+    GpifInstrumentArticulation.template("Woodblock low (hit)", [77], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Woodblock High", "woodblock", "WoodblockHigh-Percu", [
+    GpifInstrumentArticulation.template("Woodblock high (hit)", [76], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Bongo High", "bongo", "BongoHigh-Percu", [
+    GpifInstrumentArticulation.template("Bongo High (hit)", [60], "hand.hit.hit"),
+    GpifInstrumentArticulation.template("Bongo High (mute)", [104], "hand.hit.mute"),
+    GpifInstrumentArticulation.template("Bongo High (slap)", [105], "hand.hit.slap"),
+  ]),
+  new GpifInstrumentElement("Bongo Low", "bongo", "BongoLow-Percu", [
+    GpifInstrumentArticulation.template("Bongo Low (hit)", [61], "hand.hit.hit"),
+    GpifInstrumentArticulation.template("Bongo Low (mute)", [106], "hand.hit.mute"),
+    GpifInstrumentArticulation.template("Bongo Low (slap)", [107], "hand.hit.slap"),
+  ]),
+  new GpifInstrumentElement("Timbale Low", "timbale", "TimbaleLow-Percu", [
+    GpifInstrumentArticulation.template("Timbale low (hit)", [66], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Timbale High", "timbale", "TimbaleHigh-Percu", [
+    GpifInstrumentArticulation.template("Timbale high (hit)", [65], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Agogo Low", "agogo", "AgogoLow-Percu", [
+    GpifInstrumentArticulation.template("Agogo low (hit)", [68], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Agogo High", "agogo", "AgogoHigh-Percu", [
+    GpifInstrumentArticulation.template("Agogo high (hit)", [67], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Conga Low", "conga", "CongaLow-Percu", [
+    GpifInstrumentArticulation.template("Conga low (hit)", [64], "hand.hit.hit"),
+    GpifInstrumentArticulation.template("Conga low (slap)", [108], "hand.hit.slap"),
+    GpifInstrumentArticulation.template("Conga low (mute)", [109], "hand.hit.mute"),
+  ]),
+  new GpifInstrumentElement("Conga High", "conga", "CongaHigh-Percu", [
+    GpifInstrumentArticulation.template("Conga high (hit)", [63], "hand.hit.hit"),
+    GpifInstrumentArticulation.template("Conga high (slap)", [110], "hand.hit.slap"),
+    GpifInstrumentArticulation.template("Conga high (mute)", [62], "hand.hit.mute"),
+  ]),
+  new GpifInstrumentElement("Whistle Low", "whistle", "WhistleLow-Percu", [
+    GpifInstrumentArticulation.template("Whistle low (hit)", [72], "blow.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Whistle High", "whistle", "WhistleHigh-Percu", [
+    GpifInstrumentArticulation.template("Whistle high (hit)", [71], "blow.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Guiro", "guiro", "Guiro-Percu", [
+    GpifInstrumentArticulation.template("Guiro (hit)", [73], "stick.hit.hit"),
+    GpifInstrumentArticulation.template("Guiro (scrap-return)", [74], "stick.scrape.return"),
+  ]),
+  new GpifInstrumentElement("Surdo", "surdo", "Surdo-Percu", [
+    GpifInstrumentArticulation.template("Surdo (hit)", [86], "brush.hit.hit"),
+    GpifInstrumentArticulation.template("Surdo (mute)", [87], "brush.hit.mute"),
+  ]),
+  new GpifInstrumentElement("Tambourine", "tambourine", "Tambourine-Percu", [
+    GpifInstrumentArticulation.template("Tambourine (hit)", [54], "hand.hit.hit"),
+    GpifInstrumentArticulation.template("Tambourine (return)", [111], "hand.hit.return"),
+    GpifInstrumentArticulation.template("Tambourine (roll)", [112], "hand.hit.roll"),
+    GpifInstrumentArticulation.template("Tambourine (hand)", [113], "hand.hit.handhit"),
+  ]),
+  new GpifInstrumentElement("Cuica", "cuica", "Cuica-Percu", [
+    GpifInstrumentArticulation.template("Cuica (open)", [79], "hand.hit.hit"),
+    GpifInstrumentArticulation.template("Cuica (mute)", [78], "hand.hit.mute"),
+  ]),
+  new GpifInstrumentElement("Vibraslap", "vibraslap", "Vibraslap-Percu", [
+    GpifInstrumentArticulation.template("Vibraslap (hit)", [58], "hand.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Triangle", "triangle", "Triangle-Percu", [
+    GpifInstrumentArticulation.template("Triangle (hit)", [81], "stick.hit.hit"),
+    GpifInstrumentArticulation.template("Triangle (mute)", [80], "stick.hit.mute"),
+  ]),
+  new GpifInstrumentElement("Grancassa", "grancassa", "Grancassa-Percu", [
+    GpifInstrumentArticulation.template("Grancassa (hit)", [114], "mallet.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Piatti", "piatti", "Piatti-Percu", [
+    GpifInstrumentArticulation.template("Piatti (hit)", [115], "hand.hit.hit"),
+    GpifInstrumentArticulation.template("Piatti (hand)", [116], "hand.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Cabasa", "cabasa", "Cabasa-Percu", [
+    GpifInstrumentArticulation.template("Cabasa (hit)", [69], "hand.hit.hit"),
+    GpifInstrumentArticulation.template("Cabasa (return)", [117], "hand.hit.return"),
+  ]),
+  new GpifInstrumentElement("Castanets", "castanets", "Castanets-Percu", [
+    GpifInstrumentArticulation.template("Castanets (hit)", [85], "hand.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Claves", "claves", "Claves-Percu", [
+    GpifInstrumentArticulation.template("Claves (hit)", [75], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Left Maraca", "maraca", "Maracas-Percu", [
+    GpifInstrumentArticulation.template("Left Maraca (hit)", [70], "hand.hit.hit"),
+    GpifInstrumentArticulation.template("Left Maraca (return)", [118], "hand.hit.return"),
+  ]),
+  new GpifInstrumentElement("Right Maraca", "maraca", "Maracas-Percu", [
+    GpifInstrumentArticulation.template("Right Maraca (hit)", [119], "hand.hit.hit"),
+    GpifInstrumentArticulation.template("Right Maraca (return)", [120], "hand.hit.return"),
+  ]),
+  new GpifInstrumentElement("Shaker", "shaker", "ShakerStudio-Percu", [
+    GpifInstrumentArticulation.template("Shaker (hit)", [82], "hand.hit.hit"),
+    GpifInstrumentArticulation.template("Shaker (return)", [122], "hand.hit.return"),
+  ]),
+  new GpifInstrumentElement("Bell Tree", "bellTree", "BellTree-Percu", [
+    GpifInstrumentArticulation.template("Bell Tree (hit)", [84], "stick.hit.hit"),
+    GpifInstrumentArticulation.template("Bell Tree (return)", [123], "stick.hit.return"),
+  ]),
+  new GpifInstrumentElement("Jingle Bell", "jingleBell", "JingleBell-Percu", [
+    GpifInstrumentArticulation.template("Jingle Bell (hit)", [83], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Tinkle Bell", "jingleBell", "JingleBell-Percu", [
+    GpifInstrumentArticulation.template("Tinkle Bell (hit)", [83], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Golpe", "unpitched", "Golpe-Percu", [
+    GpifInstrumentArticulation.template("Golpe (thumb)", [124], "thumb.hit.body"),
+    GpifInstrumentArticulation.template("Golpe (finger)", [125], "finger4.hit.body"),
+  ]),
+  new GpifInstrumentElement("Hand Clap", "handClap", "GroupHandClap-Percu", [
+    GpifInstrumentArticulation.template("Hand Clap (hit)", [39], "hand.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Electric Snare", "snare", "ElectricSnare-Percu", [
+    GpifInstrumentArticulation.template("Electric Snare (hit)", [40], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Sticks", "snare", "Stick-Percu", [
+    GpifInstrumentArticulation.template("Snare (side stick)", [31], "stick.hit.sidestick"),
+  ]),
+  new GpifInstrumentElement("Very Low Floor Tom", "tom", "LowFloorTom-Percu", [
+    GpifInstrumentArticulation.template("Low Floor Tom (hit)", [41], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Ride Cymbal 2", "ride", "Ride-Percu", [
+    GpifInstrumentArticulation.template("Ride (edge)", [59], "stick.hit.edge"),
+    GpifInstrumentArticulation.template("Ride (middle)", [126], "stick.hit.mid"),
+    GpifInstrumentArticulation.template("Ride (bell)", [127], "stick.hit.bell"),
+    GpifInstrumentArticulation.template("Ride (choke)", [29], "stick.hit.choke"),
+  ]),
+  new GpifInstrumentElement("Reverse Cymbal", "crash", "Reverse-Cymbal", [
+    GpifInstrumentArticulation.template("Reverse Cymbal (hit)", [30], "stick.hit.hit"),
+  ]),
+  new GpifInstrumentElement("Metronome", "snare", "Metronome-Percu", [
+    GpifInstrumentArticulation.template("Metronome (hit)", [33], "stick.hit.sidestick"),
+    GpifInstrumentArticulation.template("Metronome (bell)", [34], "stick.hit.hit"),
+  ]),
+]);
+// END generated

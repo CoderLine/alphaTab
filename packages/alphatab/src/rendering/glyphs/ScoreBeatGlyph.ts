@@ -10,7 +10,6 @@ import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { type NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { AccentuationGlyph } from '@coderline/alphatab/rendering/glyphs/AccentuationGlyph';
 import { ArticStaccatoAboveGlyph } from '@coderline/alphatab/rendering/glyphs/ArticStaccatoAboveGlyph';
@@ -33,6 +32,7 @@ import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNo
 import { StringNumberContainerGlyph } from '@coderline/alphatab/rendering/glyphs/StringNumberContainerGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import type { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';

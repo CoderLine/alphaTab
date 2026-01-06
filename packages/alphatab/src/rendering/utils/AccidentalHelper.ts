@@ -15,9 +15,9 @@ import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRen
  */
 class BeatSteps {
     public maxSteps: number = -1000;
-    public maxStepsNote: Note|null=null;
+    public maxStepsNote: Note | null = null;
     public minSteps: number = -1000;
-    public minStepsNote: Note|null=null;
+    public minStepsNote: Note | null = null;
 }
 
 /**
@@ -28,7 +28,6 @@ class BeatSteps {
 export class AccidentalHelper {
     private _bar: Bar;
     private _barRenderer: LineBarRenderer;
-
 
     /**
      * We always have 7 steps per octave.
@@ -84,18 +83,11 @@ export class AccidentalHelper {
         this._bar = barRenderer.bar;
     }
 
-    public static getPercussionSteps(bar: Bar, noteValue: number): number {
-        if (noteValue < bar.staff.track.percussionArticulations.length) {
-            return bar.staff.track.percussionArticulations[noteValue]!.staffLine;
-        }
-        return PercussionMapper.getArticulationByInputMidiNumber(noteValue)?.staffLine ?? 0;
+    public static getPercussionSteps(note: Note): number {
+        return PercussionMapper.getArticulation(note)?.staffLine ?? 0;
     }
 
     public static getNoteValue(note: Note) {
-        if (note.isPercussion) {
-            return note.percussionArticulation;
-        }
-
         let noteValue: number = note.displayValue;
 
         // adjust note height according to accidentals enforced
@@ -152,13 +144,12 @@ export class AccidentalHelper {
         const noteValue = AccidentalHelper.getNoteValue(note);
 
         if (note.isPercussion) {
-            steps = AccidentalHelper.getPercussionSteps(bar, noteValue);
+            steps = AccidentalHelper.getPercussionSteps(note);
         } else {
             steps = AccidentalHelper.calculateNoteSteps(bar.keySignature, bar.clef, noteValue);
         }
         return steps;
     }
-
 
     private _getAccidental(
         noteValue: number,
@@ -171,9 +162,9 @@ export class AccidentalHelper {
 
         let accidentalToSet = AccidentalType.None;
 
-        const isPercussion = note != null ? note.isPercussion : this._bar.staff.isPercussion;
+        const isPercussion = note != null ? note.isPercussion : false;
         if (isPercussion) {
-            steps = AccidentalHelper.getPercussionSteps(this._bar, noteValue);
+            steps = AccidentalHelper.getPercussionSteps(note!);
         } else {
             const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
             steps = AccidentalHelper.calculateNoteSteps(this._bar.keySignature, this._bar.clef, noteValue);
@@ -250,7 +241,7 @@ export class AccidentalHelper {
         return accidentalToSet;
     }
 
-    private _registerSteps(relatedBeat: Beat, steps: number, note:Note|null) {
+    private _registerSteps(relatedBeat: Beat, steps: number, note: Note | null) {
         let beatSteps: BeatSteps;
         if (this._beatSteps.has(relatedBeat.id)) {
             beatSteps = this._beatSteps.get(relatedBeat.id)!;
@@ -272,15 +263,15 @@ export class AccidentalHelper {
         return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.maxSteps : 0;
     }
 
-    public getMaxStepsNote(b: Beat): Note|null {
+    public getMaxStepsNote(b: Beat): Note | null {
         return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.maxStepsNote : null;
     }
 
     public getMinSteps(b: Beat): number {
         return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.minSteps : 0;
     }
-    
-    public getMinStepsNote(b: Beat): Note|null {
+
+    public getMinStepsNote(b: Beat): Note | null {
         return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.minStepsNote : null;
     }
 

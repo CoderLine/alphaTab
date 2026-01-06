@@ -13,7 +13,6 @@ import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
-
 /**
  * @internal
  */
@@ -118,7 +117,6 @@ export class BeamingHelper {
         this._renderer.completeBeamingHelper(this);
     }
 
-
     public static computeLineHeightsForRest(duration: Duration): number[] {
         switch (duration) {
             case Duration.QuadrupleWhole:
@@ -222,10 +220,7 @@ export class BeamingHelper {
         // For percussion we use the line as value to compare whether it is
         // higher or lower.
         if (this.voice && note.isPercussion) {
-            lowestValueForNote = -AccidentalHelper.getPercussionSteps(
-                this.voice.bar,
-                AccidentalHelper.getNoteValue(note)
-            );
+            lowestValueForNote = -AccidentalHelper.getPercussionSteps(note);
             highestValueForNote = lowestValueForNote;
         } else {
             lowestValueForNote = AccidentalHelper.getNoteValue(note);
