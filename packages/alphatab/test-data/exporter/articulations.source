@@ -1,5 +1,5 @@
 // BEGIN generated articulations
-public static instrumentArticulations: Map<number, InstrumentArticulation> = new Map(
+public static instrumentArticulations: Map<string, InstrumentArticulation> = new Map(
   [
     InstrumentArticulation.create(38, "Snare", 3, 38, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole),
     InstrumentArticulation.create(37, "Snare", 3, 37, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack),
@@ -96,7 +96,7 @@ public static instrumentArticulations: Map<number, InstrumentArticulation> = new
     InstrumentArticulation.create(30, "Reverse Cymbal", -3, 49, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack),
     InstrumentArticulation.create(33, "Metronome", 3, 37, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack),
     InstrumentArticulation.create(34, "Metronome", 3, 38, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadBlack),
-  ].map(articulation => [articulation.id, articulation]));
+  ].map(articulation => [articulation.uniqueId, articulation]));
 
 private static _instrumentArticulationNames = new Map<string, string>([
   ["Snare (hit)", "Snare.38"],

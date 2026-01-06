@@ -203,7 +203,7 @@ describe('Gp7ExporterTest', () => {
         const instrumentSet = readFullInstrumentSet(xml);
 
         let instrumentArticulationsLookup =
-            'public static instrumentArticulations: Map<number, InstrumentArticulation> = new Map(\n';
+            'public static instrumentArticulations: Map<string, InstrumentArticulation> = new Map(\n';
         instrumentArticulationsLookup += '  [\n';
 
         let instrumentArticulationNames = 'private static _instrumentArticulationNames = new Map<string, string>([\n';
@@ -240,7 +240,7 @@ describe('Gp7ExporterTest', () => {
             }
         }
 
-        instrumentArticulationsLookup += '  ].map(articulation => [articulation.id, articulation])';
+        instrumentArticulationsLookup += '  ].map(articulation => [articulation.uniqueId, articulation])';
         instrumentArticulationsLookup += ');';
         instrumentArticulationNames += ']);';
 
@@ -415,17 +415,17 @@ describe('Gp7ExporterTest', () => {
         }
     });
 
+    function getInstrumentSet(gp: Uint8Array) {
+        const zip = new ZipReader(ByteBuffer.fromBuffer(gp));
+        const gpifData = zip.read().find(e => e.fileName === 'score.gpif')!.data;
+        const xml = new XmlDocument();
+        xml.parse(IOHelper.toString(gpifData, ''));
+        return readFullInstrumentSet(xml);
+    }
+
     it('drumkit-roundtrip', async () => {
         const inputData = await TestPlatform.loadFile('test-data/exporter/articulations.gp');
         const loaded = ScoreLoader.loadScoreFromBytes(inputData);
-
-        function getInstrumentSet(gp: Uint8Array) {
-            const zip = new ZipReader(ByteBuffer.fromBuffer(gp));
-            const gpifData = zip.read().find(e => e.fileName === 'score.gpif')!.data;
-            const xml = new XmlDocument();
-            xml.parse(IOHelper.toString(gpifData, ''));
-            return readFullInstrumentSet(xml);
-        }
 
         const exported = new Gp7Exporter().export(loaded);
 

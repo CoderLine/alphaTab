@@ -11,7 +11,7 @@ export class PercussionMapper {
     // We could also use an NPM script for that but for now this is enough.
 
     // BEGIN generated articulations
-    public static instrumentArticulations: Map<number, InstrumentArticulation> = new Map(
+    public static instrumentArticulations: Map<string, InstrumentArticulation> = new Map(
         [
             InstrumentArticulation.create(
                 38,
@@ -912,7 +912,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadBlack,
                 MusicFontSymbol.NoteheadBlack
             )
-        ].map(articulation => [articulation.id, articulation])
+        ].map(articulation => [articulation.uniqueId, articulation])
     );
 
     private static _instrumentArticulationNames = new Map<string, string>([
@@ -1085,11 +1085,29 @@ export class PercussionMapper {
         return PercussionMapper.getArticulationById(articulationIndex);
     }
 
-    public static getArticulationById(inputMidiNumber: number): InstrumentArticulation | null {
-        if (PercussionMapper.instrumentArticulations.has(inputMidiNumber)) {
-            return PercussionMapper.instrumentArticulations.get(inputMidiNumber)!;
+    private static _instrumentArticulationsById: Map<number, InstrumentArticulation> | undefined;
+
+    private static _initArticulationsById(): Map<number, InstrumentArticulation> {
+        let lookup = PercussionMapper._instrumentArticulationsById;
+        if (!lookup) {
+            lookup = new Map<number, InstrumentArticulation>();
+            for (const articulation of PercussionMapper.instrumentArticulations.values()) {
+                lookup.set(articulation.id, articulation);
+            }
+            PercussionMapper._instrumentArticulationsById = lookup;
         }
-        return null;
+
+        return lookup;
+    }
+
+    public static instrumentArticulationIds(): Iterable<number> {
+        const lookup = PercussionMapper._initArticulationsById();
+        return lookup.keys();
+    }
+
+    public static getArticulationById(id: number): InstrumentArticulation | null {
+        const lookup = PercussionMapper._initArticulationsById();
+        return lookup.has(id) ? lookup.get(id)! : null;
     }
 
     public static getElementAndVariation(n: Note): number[] {

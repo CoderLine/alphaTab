@@ -126,8 +126,8 @@ internal class Expector<T>
     {
         if (_actual is int i)
         {
-            Assert.IsTrue(i.CompareTo(expected) > 0,
-                _message ?? message ?? 
+            Assert.IsTrue(i > expected,
+                _message ?? message ??
                 $"Expected {expected} to be greater than {_actual}");
         }
 
