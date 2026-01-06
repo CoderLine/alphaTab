@@ -2,7 +2,8 @@ import type { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
 import type { MidiTickLookupFindBeatResultCursorMode } from '@coderline/alphatab/midi/MidiTickLookup';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { ScrollMode } from '@coderline/alphatab/PlayerSettings';
-import type { BeatBounds, MasterBarBounds } from '@coderline/alphatab/rendering/_barrel';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
 
 /**
  * Classes implementing this interface can handle the scroll logic
@@ -90,7 +91,7 @@ export abstract class BasicScrollHandler<TSettings> implements IScrollHandler {
 
     public onBeatCursorUpdating(
         startBeat: BeatBounds,
-        _endBeat: BeatBounds|undefined,
+        _endBeat: BeatBounds | undefined,
         _cursorMode: MidiTickLookupFindBeatResultCursorMode,
         _actualBeatCursorStartX: number,
         _actualBeatCursorEndX: number,

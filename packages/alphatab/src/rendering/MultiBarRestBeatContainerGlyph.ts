@@ -4,12 +4,12 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { BarBounds } from '@coderline/alphatab/rendering/_barrel';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { MultiBarRestGlyph } from '@coderline/alphatab/rendering/glyphs/MultiBarRestGlyph';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 
 /**
  * @internal

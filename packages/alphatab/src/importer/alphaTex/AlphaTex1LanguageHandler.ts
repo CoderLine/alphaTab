@@ -83,7 +83,7 @@ import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 
 /**

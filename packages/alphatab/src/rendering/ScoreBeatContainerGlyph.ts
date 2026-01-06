@@ -6,7 +6,6 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { ScoreBeatGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatGlyph';
@@ -18,6 +17,7 @@ import { ScoreSlurGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlurGl
 import { ScoreTieGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTieGlyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal

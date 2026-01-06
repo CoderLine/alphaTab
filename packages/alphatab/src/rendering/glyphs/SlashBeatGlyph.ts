@@ -5,7 +5,6 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
 import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
@@ -15,6 +14,7 @@ import { SlashNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/SlashNo
 import { SlashRestGlyph } from '@coderline/alphatab/rendering/glyphs/SlashRestGlyph';
 import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 import type { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';

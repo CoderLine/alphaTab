@@ -2,8 +2,13 @@ import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabEr
 import { Environment } from '@coderline/alphatab/Environment';
 import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
-import type { AlphaSynthWebWorkerApi, BackingTrackSyncPoint } from '@coderline/alphatab/synth/_barrel';
-import type { AudioExportChunk, AudioExportOptions, IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExporter';
+import type { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/javascript/AlphaSynthWebWorkerApi';
+import type { BackingTrackSyncPoint } from '@coderline/alphatab/synth/IAlphaSynth';
+import type {
+    AudioExportChunk,
+    AudioExportOptions,
+    IAudioExporterWorker
+} from '@coderline/alphatab/synth/IAudioExporter';
 
 /**
  * @target web

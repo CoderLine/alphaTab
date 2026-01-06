@@ -43,7 +43,6 @@ import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { WhammyType } from '@coderline/alphatab/model/WhammyType';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { HarmonicsEffectInfo } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { Settings } from '@coderline/alphatab/Settings';
@@ -53,6 +52,7 @@ import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 import { assert, expect } from 'chai';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { TremoloPickingEffectSerializer } from '@coderline/alphatab/generated/model/TremoloPickingEffectSerializer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 describe('AlphaTexImporterTest', () => {
     /**

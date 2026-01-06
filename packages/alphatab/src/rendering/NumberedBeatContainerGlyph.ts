@@ -1,7 +1,6 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { NumberedTieGlyph } from '@coderline/alphatab/rendering//glyphs/NumberedTieGlyph';
-import type { BarBounds } from '@coderline/alphatab/rendering/_barrel';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { NumberedBeatGlyph, NumberedBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedBeatGlyph';
 import {
@@ -11,6 +10,7 @@ import {
 } from '@coderline/alphatab/rendering/glyphs/NumberedDashBeatContainerGlyph';
 import { NumberedSlurGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedSlurGlyph';
 import type { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 
 /**
  * @internal
