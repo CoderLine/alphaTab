@@ -98,10 +98,10 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
     }
 
 
-    fun greaterThan(expected: Double) {
+    fun greaterThan(expected: Double, message: String? = null) {
         if (actual is Number) {
             Assert.assertTrue(
-                this.message ?: "Expected $actual to be greater than $expected",
+                this.message ?: (message ?: "Expected $actual to be greater than $expected"),
                 actual.toDouble() > expected
             )
         } else {

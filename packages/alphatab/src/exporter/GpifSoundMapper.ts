@@ -497,7 +497,7 @@ export class GpifSoundMapper {
         const set = GpifSoundMapper._drumInstrumentSet;
         const elementByArticulation = new Map<string, GpifInstrumentElement>();
         const articulationsById = new Map<string, GpifInstrumentArticulation>();
-        for (const element of set.elements.values()) {
+        for (const element of set.elements) {
             for (const articulation of element.articulations) {
                 for (const midi of articulation.inputMidiNumbers) {
                     const gpId = `${element.name}.${midi}`;

@@ -122,19 +122,19 @@ internal class Expector<T>
         }
     }
 
-    public void GreaterThan(double expected)
+    public void GreaterThan(double expected, string? message = null)
     {
         if (_actual is int i)
         {
             Assert.IsTrue(i.CompareTo(expected) > 0,
-                _message ??
+                _message ?? message ?? 
                 $"Expected {expected} to be greater than {_actual}");
         }
 
         if (_actual is double d)
         {
             Assert.IsTrue(d.CompareTo(expected) > 0,
-                _message ??
+                _message ?? message ??
                 $"Expected {expected} to be greater than {_actual}");
         }
     }

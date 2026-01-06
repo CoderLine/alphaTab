@@ -386,7 +386,7 @@ describe('Gp7ExporterTest', () => {
         instrumentSetCode += `${JSON.stringify(instrumentSet.type)}, `;
         instrumentSetCode += `${instrumentSet.lineCount.toString()}, [\n`;
 
-        for (const element of instrumentSet.elements.values()) {
+        for (const element of instrumentSet.elements) {
             instrumentSetCode += `  new GpifInstrumentElement(`;
             instrumentSetCode += `${JSON.stringify(element.name)}, `;
             instrumentSetCode += `${JSON.stringify(element.type)}, `;

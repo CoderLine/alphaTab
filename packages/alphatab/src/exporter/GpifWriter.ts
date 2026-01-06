@@ -1534,7 +1534,7 @@ export class GpifWriter {
         instrumentSetNode.addElement('LineCount').innerText = instrumentSet.lineCount.toString();
 
         const elementsNode = instrumentSetNode.addElement('Elements');
-        for (const element of instrumentSet.elements.values()) {
+        for (const element of instrumentSet.elements) {
             const elementNode = elementsNode.addElement('Element');
             elementNode.addElement('Name').innerText = element.name;
             elementNode.addElement('Type').innerText = element.type;
