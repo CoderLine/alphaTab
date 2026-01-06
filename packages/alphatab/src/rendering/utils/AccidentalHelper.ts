@@ -83,18 +83,11 @@ export class AccidentalHelper {
         this._bar = barRenderer.bar;
     }
 
-    public static getPercussionSteps(bar: Bar, noteValue: number): number {
-        if (noteValue < bar.staff.track.percussionArticulations.length) {
-            return bar.staff.track.percussionArticulations[noteValue]!.staffLine;
-        }
-        return PercussionMapper.getArticulationById(noteValue)?.staffLine ?? 0;
+    public static getPercussionSteps(note: Note): number {
+        return PercussionMapper.getArticulation(note)?.staffLine ?? 0;
     }
 
     public static getNoteValue(note: Note) {
-        if (note.isPercussion) {
-            return note.percussionArticulation;
-        }
-
         let noteValue: number = note.displayValue;
 
         // adjust note height according to accidentals enforced
@@ -151,7 +144,7 @@ export class AccidentalHelper {
         const noteValue = AccidentalHelper.getNoteValue(note);
 
         if (note.isPercussion) {
-            steps = AccidentalHelper.getPercussionSteps(bar, noteValue);
+            steps = AccidentalHelper.getPercussionSteps(note);
         } else {
             steps = AccidentalHelper.calculateNoteSteps(bar.keySignature, bar.clef, noteValue);
         }
@@ -169,9 +162,9 @@ export class AccidentalHelper {
 
         let accidentalToSet = AccidentalType.None;
 
-        const isPercussion = note != null ? note.isPercussion : this._bar.staff.isPercussion;
+        const isPercussion = note != null ? note.isPercussion : false;
         if (isPercussion) {
-            steps = AccidentalHelper.getPercussionSteps(this._bar, noteValue);
+            steps = AccidentalHelper.getPercussionSteps(note!);
         } else {
             const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
             steps = AccidentalHelper.calculateNoteSteps(this._bar.keySignature, this._bar.clef, noteValue);

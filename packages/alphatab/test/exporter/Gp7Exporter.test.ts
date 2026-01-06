@@ -206,7 +206,9 @@ describe('Gp7ExporterTest', () => {
             'public static instrumentArticulations: Map<number, InstrumentArticulation> = new Map(\n';
         instrumentArticulationsLookup += '  [\n';
 
-        let instrumentArticulationNames = 'private static _instrumentArticulationNames = new Map<string, number>([\n';
+        let instrumentArticulationNames = 'private static _instrumentArticulationNames = new Map<string, string>([\n';
+
+        const nameCounter = new Map<string, number>();
 
         for (const element of instrumentSet.elements) {
             for (const a of element.articulations) {
@@ -224,8 +226,17 @@ describe('Gp7ExporterTest', () => {
                 }
                 instrumentArticulationsLookup += `),\n`;
 
-                const name = a.name;
-                instrumentArticulationNames += `  [${JSON.stringify(name)}, ${a.inputMidiNumbers[0]}],\n`;
+                let name = a.name;
+                if (nameCounter.has(name)) {
+                    const newCount = nameCounter.get(name)! + 1;
+                    name += ` ${newCount}`;
+                    nameCounter.set(name, newCount);
+                } else {
+                    nameCounter.set(name, 1);
+                }
+
+                const uniqueId = `${element.type}.${a.inputMidiNumbers[0]}`;
+                instrumentArticulationNames += `  [${JSON.stringify(name)}, ${`${JSON.stringify(uniqueId)}`}],\n`;
             }
         }
 

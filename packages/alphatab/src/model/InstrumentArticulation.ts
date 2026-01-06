@@ -39,6 +39,13 @@ export class InstrumentArticulation {
     public id: number = 0;
 
     /**
+     * A unique id for this articulation.
+     */
+    public get uniqueId() {
+        return `${this.elementType}.${this.id}`;
+    }
+
+    /**
      * Gets or sets the type of the element for which this articulation is for.
      */
     public elementType: string;

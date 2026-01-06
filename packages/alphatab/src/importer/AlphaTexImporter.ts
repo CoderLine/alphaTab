@@ -148,11 +148,11 @@ class AlphaTexImportState implements IAlphaTexImporterState {
     public ignoredInitialStaff = false;
     public ignoredInitialTrack = false;
     public currentDuration = Duration.Quarter;
-    public articulationValueToIndex = new Map<number, number>();
+    public articulationUniqueIdToIndex = new Map<string, number>();
 
     public hasAnyProperData = false;
 
-    public readonly percussionArticulationNames = new Map<string, number>();
+    public readonly percussionArticulationNames = new Map<string, string>();
 
     public readonly slurs = new Map<string, Note>();
     public readonly lyrics = new Map<number, Lyrics[]>();
@@ -321,7 +321,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         const staff = this._state.currentTrack.staves[0];
         staff.displayTranspositionPitch = 0;
         staff.stringTuning = Tuning.getDefaultTuningFor(6)!;
-        this._state.articulationValueToIndex.clear();
+        this._state.articulationUniqueIdToIndex.clear();
 
         this._beginStaff(staff);
 
@@ -543,6 +543,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         let isDead: boolean = false;
         let isTie: boolean = false;
         let numericValue: number = -1;
+        let articulationValue: string = '';
         let octave: number = -1;
         let tone: number = -1;
         let accidentalMode = NoteAccidentalMode.Default;
@@ -590,13 +591,19 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         const percussionArticulationNames = this._state.percussionArticulationNames;
                         if (staffNoteKind === undefined && percussionArticulationNames.size === 0) {
                             for (const [defaultName, defaultValue] of PercussionMapper.instrumentArticulationNames) {
-                                percussionArticulationNames.set(defaultName.toLowerCase(), defaultValue);
-                                percussionArticulationNames.set(ModelUtils.toArticulationId(defaultName), defaultValue);
+                                const articulation = PercussionMapper.getInstrumentArticulationByUniqueId(defaultValue);
+                                if (articulation) {
+                                    percussionArticulationNames.set(defaultName.toLowerCase(), defaultValue);
+                                    percussionArticulationNames.set(
+                                        ModelUtils.toArticulationId(defaultName),
+                                        defaultValue
+                                    );
+                                }
                             }
                         }
 
                         if (percussionArticulationNames.has(articulationName)) {
-                            numericValue = percussionArticulationNames.get(articulationName)!;
+                            articulationValue = percussionArticulationNames.get(articulationName)!;
                         } else {
                             this.addSemanticDiagnostic({
                                 code: AlphaTexDiagnosticCode.AT209,
@@ -606,7 +613,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                                 end: noteValue.end
                             });
                             // avoid double error
-                            numericValue = Array.from(PercussionMapper.instrumentArticulationNames.values())[0];
+                            articulationValue = Array.from(PercussionMapper.instrumentArticulationNames.values())[0];
                             return;
                         }
                     }
@@ -681,11 +688,19 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                     break;
                 case AlphaTexStaffNoteKind.Articulation:
                     let articulationIndex: number = 0;
-                    if (this._state.articulationValueToIndex.has(numericValue)) {
-                        articulationIndex = this._state.articulationValueToIndex.get(numericValue)!;
+
+                    if (articulationValue.length === 0 && numericValue > 0) {
+                        const byId = PercussionMapper.getArticulationById(numericValue);
+                        if (byId) {
+                            articulationValue = byId.uniqueId;
+                        }
+                    }
+
+                    if (this._state.articulationUniqueIdToIndex.has(articulationValue)) {
+                        articulationIndex = this._state.articulationUniqueIdToIndex.get(articulationValue)!;
                     } else {
                         articulationIndex = this._state.currentTrack!.percussionArticulations.length;
-                        const articulation = PercussionMapper.getArticulationById(numericValue);
+                        const articulation = PercussionMapper.getInstrumentArticulationByUniqueId(articulationValue);
                         if (articulation === null) {
                             this.addSemanticDiagnostic({
                                 code: AlphaTexDiagnosticCode.AT209,
@@ -698,7 +713,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         }
 
                         this._state.currentTrack!.percussionArticulations.push(articulation!);
-                        this._state.articulationValueToIndex.set(numericValue, articulationIndex);
+                        this._state.articulationUniqueIdToIndex.set(articulationValue, articulationIndex);
                     }
                     note.percussionArticulation = articulationIndex;
                     break;

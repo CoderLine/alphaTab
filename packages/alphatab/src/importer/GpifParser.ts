@@ -745,33 +745,43 @@ export class GpifParser {
 
     private _parseElement(track: Track, node: XmlNode, isInstrumentSet: boolean) {
         const name = node.findChildElement('Name')?.innerText ?? '';
+        const type = node.findChildElement('Type')?.innerText ?? '';
 
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Name':
                 case 'Articulations':
-                    this._parseArticulations(track, c, isInstrumentSet, name);
+                    this._parseArticulations(track, c, isInstrumentSet, name, type);
                     break;
             }
         }
     }
-    private _parseArticulations(track: Track, node: XmlNode, isInstrumentSet: boolean, elementName: string) {
+    private _parseArticulations(
+        track: Track,
+        node: XmlNode,
+        isInstrumentSet: boolean,
+        elementName: string,
+        elementType: string
+    ) {
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Articulation':
-                    this._parseArticulation(track, c, isInstrumentSet, elementName);
+                    this._parseArticulation(track, c, isInstrumentSet, elementName, elementType);
                     break;
             }
         }
     }
 
-    private _parseArticulation(track: Track, node: XmlNode, isInstrumentSet: boolean, elementName: string) {
+    private _parseArticulation(
+        track: Track,
+        node: XmlNode,
+        isInstrumentSet: boolean,
+        elementName: string,
+        elementType: string
+    ) {
         const articulation = new InstrumentArticulation();
         articulation.outputMidiNumber = -1;
-        // NOTE: in the past we used the type here, but it is not unique enough. e.g. there are multiple kinds of "ride" ('Ride' vs 'Ride Cymbal 2')
-        // we have to use the name as element identifier
-        // using a wrong type leads to wrong "NotationPatch" updates
-        articulation.elementType = elementName;
+        articulation.elementType = elementType;
         let name = '';
         for (const c of node.childElements()) {
             const txt = c.innerText;

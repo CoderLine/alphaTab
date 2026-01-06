@@ -1391,9 +1391,9 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
         expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).to.equal(49);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(40);
+        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(37);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(2);
-        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
+        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(40);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
         expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
         testExportRoundtrip(score);
@@ -1411,9 +1411,9 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
         expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).to.equal(49);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(40);
+        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(37);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(2);
-        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
+        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(40);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
         expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
         testExportRoundtrip(score);

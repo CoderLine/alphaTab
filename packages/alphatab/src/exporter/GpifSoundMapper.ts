@@ -595,7 +595,7 @@ export class GpifSoundMapper {
             );
 
             // additional details we try to lookup from the known templates
-            const gpId = `${articulation.elementType}.${articulation.id}`;
+            const gpId = articulation.uniqueId;
             if (GpifSoundMapper._articulationsById!.has(gpId)) {
                 const knownArticulation = GpifSoundMapper._articulationsById!.get(gpId)!;
                 gpifArticulation.inputMidiNumbers = knownArticulation.inputMidiNumbers;

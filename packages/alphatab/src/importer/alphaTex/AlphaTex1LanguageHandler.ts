@@ -462,7 +462,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 if (metaData.arguments!.arguments.length === 2) {
                     const number = (metaData.arguments!.arguments[1] as AlphaTexNumberLiteral).value;
                     if (PercussionMapper.instrumentArticulations.has(number)) {
-                        percussionArticulationNames.set(articulationName.toLowerCase(), number);
+                        percussionArticulationNames.set(
+                            articulationName.toLowerCase(),
+                            PercussionMapper.instrumentArticulations.get(number)!.uniqueId
+                        );
                         return ApplyNodeResult.Applied;
                     } else {
                         const articulations = Array.from(PercussionMapper.instrumentArticulations.keys())

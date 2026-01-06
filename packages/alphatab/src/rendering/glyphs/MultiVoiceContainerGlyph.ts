@@ -11,7 +11,7 @@ import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
-import { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
+import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**

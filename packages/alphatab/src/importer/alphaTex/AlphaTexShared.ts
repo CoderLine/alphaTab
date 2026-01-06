@@ -293,7 +293,7 @@ export interface IAlphaTexImporterState {
     currentTupletDenominator: number;
     readonly syncPoints: FlatSyncPoint[];
     readonly slurs: Map<string, Note>;
-    readonly percussionArticulationNames: Map<string, number>;
+    readonly percussionArticulationNames: Map<string, string>;
     readonly lyrics: Map<number, Lyrics[]>;
     readonly staffHasExplicitDisplayTransposition: Set<Staff>;
     readonly staffHasExplicitTuning: Set<Staff>;
