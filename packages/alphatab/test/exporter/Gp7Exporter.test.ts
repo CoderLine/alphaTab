@@ -9,13 +9,9 @@ import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
-import {
-    type InstrumentArticulation,
-    TechniqueSymbolPlacement
-} from '@coderline/alphatab/model/InstrumentArticulation';
+import { TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
@@ -200,9 +196,11 @@ describe('Gp7ExporterTest', () => {
             ByteBuffer.fromBuffer(await TestPlatform.loadFile('test-data/exporter/articulations.gp'))
         ).read();
         const gpifData = zip.find(e => e.fileName === 'score.gpif')!.data;
-        const parser = new GpifParser();
-        parser.parseXml(IOHelper.toString(gpifData, settings.importer.encoding), settings);
-        const score = parser.score;
+
+        const xml = new XmlDocument();
+        xml.parse(IOHelper.toString(gpifData, settings.importer.encoding));
+
+        const instrumentSet = readFullInstrumentSet(xml);
 
         let instrumentArticulationsLookup =
             'public static instrumentArticulations: Map<number, InstrumentArticulation> = new Map(\n';
@@ -210,50 +208,24 @@ describe('Gp7ExporterTest', () => {
 
         let instrumentArticulationNames = 'private static _instrumentArticulationNames = new Map<string, number>([\n';
 
-        const existingNameMappings = new Set<string>(['']);
-        const existingCustomNames = new Map<number, string>();
-        for (const [name, id] of PercussionMapper.instrumentArticulationNames) {
-            existingCustomNames.set(id, name);
-        }
+        for (const element of instrumentSet.elements) {
+            for (const a of element.articulations) {
+                instrumentArticulationsLookup += `    InstrumentArticulation.create(`;
+                instrumentArticulationsLookup += `${a.inputMidiNumbers[0]}, `;
+                instrumentArticulationsLookup += `${JSON.stringify(element.type)}, `;
+                instrumentArticulationsLookup += `${a.staffLine}, `;
+                instrumentArticulationsLookup += `${a.outputMidiNumber}, `;
+                instrumentArticulationsLookup += `MusicFontSymbol.${MusicFontSymbol[a.noteHeads[0]]}, `;
+                instrumentArticulationsLookup += `MusicFontSymbol.${MusicFontSymbol[a.noteHeads[1]]}, `;
+                instrumentArticulationsLookup += `MusicFontSymbol.${MusicFontSymbol[a.noteHeads[2]]}`;
+                if (a.techniqueSymbol !== MusicFontSymbol.None) {
+                    instrumentArticulationsLookup += `, MusicFontSymbol.${MusicFontSymbol[a.techniqueSymbol]}, `;
+                    instrumentArticulationsLookup += `TechniqueSymbolPlacement.${TechniqueSymbolPlacement[a.techniqueSymbolPlacement]}`;
+                }
+                instrumentArticulationsLookup += `),\n`;
 
-        const deduplicateArticulations = new Map<number, InstrumentArticulation>();
-        for (const a of score.tracks[0].percussionArticulations) {
-            deduplicateArticulations.set(a.id, a);
-        }
-
-        const sorted = Array.from(deduplicateArticulations.values());
-        sorted.sort((a, b) => a.id - b.id);
-
-        for (const a of sorted) {
-            instrumentArticulationsLookup += `    InstrumentArticulation.create(`;
-            instrumentArticulationsLookup += `${a.id}, `;
-            instrumentArticulationsLookup += `${JSON.stringify(a.elementType)}, `;
-            instrumentArticulationsLookup += `${a.staffLine}, `;
-            instrumentArticulationsLookup += `${a.outputMidiNumber}, `;
-            instrumentArticulationsLookup += `MusicFontSymbol.${MusicFontSymbol[a.noteHeadDefault]}, `;
-            instrumentArticulationsLookup += `MusicFontSymbol.${MusicFontSymbol[a.noteHeadHalf]}, `;
-            instrumentArticulationsLookup += `MusicFontSymbol.${MusicFontSymbol[a.noteHeadWhole]}`;
-            if (a.techniqueSymbol !== MusicFontSymbol.None) {
-                instrumentArticulationsLookup += `, MusicFontSymbol.${MusicFontSymbol[a.techniqueSymbol]}, `;
-                instrumentArticulationsLookup += `TechniqueSymbolPlacement.${TechniqueSymbolPlacement[a.techniqueSymbolPlacement]}`;
-            }
-            instrumentArticulationsLookup += `),\n`;
-
-            let name: string;
-            if (existingCustomNames.has(a.id)) {
-                name = existingCustomNames.get(a.id)!;
-            } else if (parser.articulationNamesById.has(a.id)) {
-                name = parser.articulationNamesById.get(a.id)!;
-            } else {
-                name = '';
-            }
-
-            if (!existingNameMappings.has(name)) {
-                instrumentArticulationNames += `  [${JSON.stringify(name)}, ${a.id}],\n`;
-                existingNameMappings.add(name);
-            } else {
-                // primarily duplicates
-                instrumentArticulationNames += `  [TODO /*TODO define a name for ${a.elementType} */, ${a.id}],\n`;
+                const name = a.name;
+                instrumentArticulationNames += `  [${JSON.stringify(name)}, ${a.inputMidiNumbers[0]}],\n`;
             }
         }
 
@@ -302,12 +274,6 @@ describe('Gp7ExporterTest', () => {
                 []
             );
 
-            // NOTE: GP8 has both a "Jingle Bell" and "Tinkle Bell" element mapping down to the same
-            // articulations. due to ordering we have "Tinkle Bell" but not "Jingle Bell"
-            if (element.name === 'Jingle Bell') {
-                continue;
-            }
-
             for (const articulationNode of elementNode.findChildElement('Articulations')!.childElements()) {
                 if (articulationNode.localName !== 'Articulation') {
                     continue;
@@ -335,7 +301,7 @@ describe('Gp7ExporterTest', () => {
                 element.articulations.push(articulation);
             }
 
-            instrumentSet.elements.set(element.name, element);
+            instrumentSet.elements.push(element);
         }
 
         // we also have to apply the instrument patches
@@ -356,8 +322,8 @@ describe('Gp7ExporterTest', () => {
                         for (const e of c.childElements()) {
                             switch (e.localName) {
                                 case 'Element':
-                                    const elementToPatch = instrumentSet.elements.get(
-                                        e.findChildElement('Name')!.innerText
+                                    const elementToPatch = instrumentSet.elements.find(
+                                        x => x.name === e.findChildElement('Name')!.innerText
                                     );
 
                                     for (const a of e.findChildElement('Articulations')!.childElements()) {
@@ -455,37 +421,34 @@ describe('Gp7ExporterTest', () => {
         const expectedInstrumentSet = getInstrumentSet(inputData);
         const actualInstrumentSet = getInstrumentSet(exported);
 
-        // order is not important but equality based on unique identifiers of the nodes
+        // order IS important for the elements and articulations. the InstrumentArticulation is index based.
         expect(actualInstrumentSet.name).to.equal(expectedInstrumentSet.name);
         expect(actualInstrumentSet.type).to.equal(expectedInstrumentSet.type);
         expect(actualInstrumentSet.lineCount).to.equal(expectedInstrumentSet.lineCount);
 
-        for (const [k, expectedElement] of expectedInstrumentSet.elements) {
-            expect(actualInstrumentSet.elements.has(k), `Element ${k} missing in actual file`).to.be.true;
-            const actualElement = actualInstrumentSet.elements.get(k)!;
+        const expectedElements = Array.from(expectedInstrumentSet.elements);
+        const actualElements = Array.from(actualInstrumentSet.elements);
+
+        for (let i = 0; i < expectedElements.length; i++) {
+            const expectedElement = expectedElements[i];
+            expect(actualElements.length).to.be.greaterThan(
+                i,
+                `Element ${i} (${expectedElement.name}) missing in actual file`
+            );
+            const actualElement = actualElements[i];
 
             expect(actualElement.name).to.equal(expectedElement.name);
             expect(actualElement.type).to.equal(expectedElement.type);
             expect(actualElement.soundbankName).to.equal(expectedElement.soundbankName);
 
-            const expectedArticulations = new Map<number, GpifInstrumentArticulation>();
-            for (const a of expectedElement.articulations) {
-                for (const i of a.inputMidiNumbers) {
-                    expectedArticulations.set(i, a);
-                }
-            }
+            for (let j = 0; j < expectedElement.articulations.length; j++) {
+                const expectedArticulation = expectedElement.articulations[j];
+                expect(actualElement.articulations.length).to.be.greaterThan(
+                    j,
+                    `Articulation ${i} missing in actual file`
+                );
 
-            const actualArticulations = new Map<number, GpifInstrumentArticulation>();
-            for (const a of actualElement.articulations) {
-                for (const i of a.inputMidiNumbers) {
-                    actualArticulations.set(i, a);
-                }
-            }
-
-            for (const [i, expectedArticulation] of expectedArticulations) {
-                expect(actualArticulations.has(i), `Articulation ${i} missing in actual file`).to.be.true;
-
-                const actualArticulation = actualArticulations.get(i)!;
+                const actualArticulation = actualElement.articulations[j];
 
                 expect(actualArticulation.name).to.equal(expectedArticulation.name);
                 expect(actualArticulation.staffLine).to.equal(
@@ -518,10 +481,13 @@ describe('Gp7ExporterTest', () => {
                 );
             }
 
-            expect(actualArticulations.size).to.equal(expectedArticulations.size);
+            expect(actualElement.articulations.length).to.equal(
+                expectedElement.articulations.length,
+                `articulation length mismatch on element ${expectedElement.name}`
+            );
         }
 
-        expect(actualInstrumentSet.elements.size).to.equal(expectedInstrumentSet.elements.size);
+        expect(actualInstrumentSet.elements.length).to.equal(expectedInstrumentSet.elements.length);
 
         // await TestPlatform.saveFile('test-data/exporter/articulations.exported.gp', exported);
     });

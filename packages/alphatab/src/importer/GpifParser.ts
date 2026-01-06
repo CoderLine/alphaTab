@@ -132,10 +132,6 @@ export class GpifParser {
     private _soundsByTrack!: Map<string, Map<string, GpifSound>>;
     private _hasAnacrusis: boolean = false;
     private _articulationByName!: Map<string, InstrumentArticulation>;
-    /**
-     * @internal
-     */
-    public articulationNamesById!: Map<number, string>;
     private _skipApplyLyrics: boolean = false;
     private _backingTrackPadding: number = 0;
 
@@ -607,7 +603,6 @@ export class GpifParser {
 
     private _parseTrack(node: XmlNode): void {
         this._articulationByName = new Map<string, InstrumentArticulation>();
-        this.articulationNamesById = new Map<number, string>();
 
         const track: Track = new Track();
         track.ensureStaveCount(1);
@@ -751,12 +746,6 @@ export class GpifParser {
     private _parseElement(track: Track, node: XmlNode, isInstrumentSet: boolean) {
         const name = node.findChildElement('Name')?.innerText ?? '';
 
-        // HACK: Guitar Pro has two element for the same item "Jingle Bell" and "Tinkle Bell"
-        // this can lead to wierd behaviors, we filter out one.
-        if (name === 'Jingle Bell') {
-            return;
-        }
-
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Name':
@@ -791,7 +780,7 @@ export class GpifParser {
                     name = c.innerText;
                     break;
                 case 'InputMidiNumbers':
-                    articulation.id = GpifParser._parseIntSafe(txt, 0);
+                    articulation.id = GpifParser._parseIntSafe(txt.split(' ')[0], 0);
                     break;
                 case 'OutputMidiNumber':
                     articulation.outputMidiNumber = GpifParser._parseIntSafe(txt, 0);
@@ -832,7 +821,6 @@ export class GpifParser {
         const fullName = `${elementName}.${name}`;
         if (isInstrumentSet) {
             track.percussionArticulations.push(articulation);
-            this.articulationNamesById.set(articulation.id, name);
             this._articulationByName.set(fullName, articulation);
         } else if (this._articulationByName.has(fullName)) {
             // notation patch

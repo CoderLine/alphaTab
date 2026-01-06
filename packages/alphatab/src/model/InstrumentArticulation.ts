@@ -32,7 +32,9 @@ export enum TechniqueSymbolPlacement {
  */
 export class InstrumentArticulation {
     /**
-     * The ID used to address this articulation.
+     * An internal ID to identify this articulation for purposes like
+     * mapping during exports.The exact meaning of the ID is not defined and dependes on the
+     * importer source.
      */
     public id: number = 0;
 

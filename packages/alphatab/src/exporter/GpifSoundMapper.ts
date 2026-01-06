@@ -64,27 +64,14 @@ export class GpifInstrumentSet {
     public lineCount: number = 0;
     public name: string = '';
     public type: string = '';
-    public readonly elements = new Map<string, GpifInstrumentElement>();
-
-    public getOrCreateElement(template: GpifInstrumentElement) {
-        let element: GpifInstrumentElement;
-        if (this.elements.has(template.name)) {
-            element = this.elements.get(template.name)!;
-        } else {
-            element = new GpifInstrumentElement(template.name, template.type, template.soundbankName, []);
-            this.elements.set(template.name, element);
-        }
-        return element;
-    }
+    public elements: GpifInstrumentElement[] = [];
 
     public static create(name: string, type: string, lineCount: number, elements: GpifInstrumentElement[]) {
         const insturmentSet = new GpifInstrumentSet();
         insturmentSet.name = name;
         insturmentSet.type = type;
         insturmentSet.lineCount = lineCount;
-        for (const e of elements) {
-            insturmentSet.elements.set(e.name, e);
-        }
+        insturmentSet.elements = elements;
         return insturmentSet;
     }
 }
@@ -465,6 +452,9 @@ export class GpifSoundMapper {
             GpifInstrumentArticulation.template('Bell Tree (hit)', [84], 'stick.hit.hit'),
             GpifInstrumentArticulation.template('Bell Tree (return)', [123], 'stick.hit.return')
         ]),
+        new GpifInstrumentElement('Jingle Bell', 'jingleBell', 'JingleBell-Percu', [
+            GpifInstrumentArticulation.template('Jingle Bell (hit)', [83], 'stick.hit.hit')
+        ]),
         new GpifInstrumentElement('Tinkle Bell', 'jingleBell', 'JingleBell-Percu', [
             GpifInstrumentArticulation.template('Tinkle Bell (hit)', [83], 'stick.hit.hit')
         ]),
@@ -500,18 +490,19 @@ export class GpifSoundMapper {
     ]);
     // END generated
 
-    private static _elementByArticulation: Map<number, GpifInstrumentElement> | undefined = undefined;
-    private static _articulationsById: Map<number, GpifInstrumentArticulation> | undefined = undefined;
+    private static _elementByArticulation: Map<string, GpifInstrumentElement> | undefined = undefined;
+    private static _articulationsById: Map<string, GpifInstrumentArticulation> | undefined = undefined;
 
     private static _initLookups() {
         const set = GpifSoundMapper._drumInstrumentSet;
-        const elementByArticulation = new Map<number, GpifInstrumentElement>();
-        const articulationsById = new Map<number, GpifInstrumentArticulation>();
+        const elementByArticulation = new Map<string, GpifInstrumentElement>();
+        const articulationsById = new Map<string, GpifInstrumentArticulation>();
         for (const element of set.elements.values()) {
             for (const articulation of element.articulations) {
-                for (const id of articulation.inputMidiNumbers) {
-                    elementByArticulation.set(id, element);
-                    articulationsById.set(id, articulation);
+                for (const midi of articulation.inputMidiNumbers) {
+                    const gpId = `${element.name}.${midi}`;
+                    elementByArticulation.set(gpId, element);
+                    articulationsById.set(gpId, articulation);
                 }
             }
         }
@@ -562,8 +553,13 @@ export class GpifSoundMapper {
 
         instrumentSet.name = programInfo.instrumentSetName;
         instrumentSet.type = programInfo.instrumentSetType;
-        const element = instrumentSet.getOrCreateElement(GpifSoundMapper._pitchedElement);
-        element.articulations.push(GpifSoundMapper._pitchedElement.articulations[0]);
+        const element = new GpifInstrumentElement(
+            GpifSoundMapper._pitchedElement.name,
+            GpifSoundMapper._pitchedElement.type,
+            GpifSoundMapper._pitchedElement.soundbankName,
+            [GpifSoundMapper._pitchedElement.articulations[0]]
+        );
+        instrumentSet.elements.push(element);
         return instrumentSet;
     }
 
@@ -582,9 +578,10 @@ export class GpifSoundMapper {
                 ? track.percussionArticulations
                 : Array.from(PercussionMapper.instrumentArticulations.values());
 
+        // NOTE: GP files are very sensitive in terms of articulation and element order.
+        // notes reference articulations index based within the overall file.
+        let element: GpifInstrumentElement | undefined = undefined;
         for (const articulation of articulations) {
-            let element: GpifInstrumentElement;
-
             // main info from own articulation
             const gpifArticulation = new GpifInstrumentArticulation(
                 articulation.elementType,
@@ -598,18 +595,31 @@ export class GpifSoundMapper {
             );
 
             // additional details we try to lookup from the known templates
-            if (GpifSoundMapper._elementByArticulation!.has(articulation.id)) {
-                const knownElement = GpifSoundMapper._elementByArticulation!.get(articulation.id)!;
-                const knownArticulation = GpifSoundMapper._articulationsById!.get(articulation.id)!;
-                element = instrumentSet.getOrCreateElement(knownElement);
-
+            const gpId = `${articulation.elementType}.${articulation.id}`;
+            if (GpifSoundMapper._articulationsById!.has(gpId)) {
+                const knownArticulation = GpifSoundMapper._articulationsById!.get(gpId)!;
                 gpifArticulation.inputMidiNumbers = knownArticulation.inputMidiNumbers;
                 gpifArticulation.name = knownArticulation.name;
                 gpifArticulation.outputRSESound = knownArticulation.outputRSESound;
+            }
+
+            // check for element change
+            if (GpifSoundMapper._elementByArticulation!.has(gpId)) {
+                const knownElement = GpifSoundMapper._elementByArticulation!.get(gpId)!;
+                if (!element || element.name !== articulation.elementType) {
+                    element = new GpifInstrumentElement(
+                        knownElement.name,
+                        knownElement.type,
+                        knownElement.soundbankName,
+                        []
+                    );
+                    instrumentSet.elements.push(element);
+                }
             } else {
-                element = instrumentSet.getOrCreateElement(
-                    new GpifInstrumentElement(articulation.elementType, articulation.elementType, '', [])
-                );
+                if (!element || element.name !== articulation.elementType) {
+                    element = new GpifInstrumentElement(articulation.elementType, articulation.elementType, '', []);
+                    instrumentSet.elements.push(element);
+                }
             }
 
             element.articulations.push(gpifArticulation);
