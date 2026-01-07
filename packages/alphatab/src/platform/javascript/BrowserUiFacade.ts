@@ -65,8 +65,14 @@ interface ResultPlaceholder extends HTMLElement {
  */
 interface RegisteredWebFont {
     hash: number;
-    element: HTMLStyleElement;
-    usages: number;
+    cssSource: string;
+    elements: Map<
+        HTMLDocument,
+        {
+            element: HTMLStyleElement;
+            usages: number;
+        }
+    >;
     fontSuffix: string;
     checker: FontLoadingChecker;
 }
@@ -233,11 +239,20 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public destroy(): void {
-        (this.rootContainer as HtmlElementContainer).element.innerHTML = '';
+        const element = (this.rootContainer as HtmlElementContainer).element;
+        element.innerHTML = '';
         const webFont = this._webFont;
-        webFont.usages--;
-        if (webFont.usages <= 0) {
-            webFont.element.remove();
+
+        const styleElement = webFont.elements.get(element.ownerDocument);
+        if (styleElement) {
+            styleElement.usages--;
+            if (styleElement.usages <= 0) {
+                styleElement.element.remove();
+                webFont.elements.delete(element.ownerDocument);
+            }
+        }
+
+        if (webFont.elements.size === 0) {
             BrowserUiFacade._registeredWebFonts.delete(webFont.hash);
         }
     }
@@ -390,8 +405,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         const registeredWebFonts = BrowserUiFacade._registeredWebFonts;
         if (registeredWebFonts.has(hash)) {
             const webFont = registeredWebFonts.get(hash)!;
-            webFont.usages++;
             webFont.checker.fontLoaded.on(this._onFontLoaded.bind(this));
+            this._createStyleElement(webFont, root);
             this._webFont = webFont;
             return;
         }
@@ -426,10 +441,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 overflow: visible !important;
             }`;
 
-        const styleElement = root.createElement('style');
-        styleElement.id = `alphaTabStyle${fontSuffix}`;
-        styleElement.innerHTML = css;
-        root.getElementsByTagName('head').item(0)!.appendChild(styleElement);
         const checker = new FontLoadingChecker([familyName]);
         checker.fontLoaded.on(this._onFontLoaded.bind(this));
         this._fontCheckers.set(familyName, checker);
@@ -439,14 +450,31 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
         const webFont: RegisteredWebFont = {
             hash,
-            element: styleElement,
+            elements: new Map(),
             fontSuffix,
-            usages: 1,
-            checker
+            checker,
+            cssSource: css
         };
+
+        this._createStyleElement(webFont, root);
 
         registeredWebFonts.set(hash, webFont);
         this._webFont = webFont;
+    }
+    private _createStyleElement(webFont: RegisteredWebFont, root: Document) {
+        if (webFont.elements.has(root)) {
+            webFont.elements.get(root)!.usages++;
+            return;
+        }
+
+        const styleElement = root.createElement('style');
+        styleElement.id = `alphaTabStyle${webFont.fontSuffix}`;
+        styleElement.innerHTML = webFont.cssSource;
+        root.getElementsByTagName('head').item(0)!.appendChild(styleElement);
+        webFont.elements.set(root, {
+            element: styleElement,
+            usages: 1
+        });
     }
 
     private static _cssFormat(format: FontFileFormat) {
