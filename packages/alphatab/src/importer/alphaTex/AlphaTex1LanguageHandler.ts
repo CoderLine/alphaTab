@@ -62,7 +62,7 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
-import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { BeamingRules, type MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
@@ -653,6 +653,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         break;
                 }
                 return ApplyNodeResult.Applied;
+            case 'beaming':
+                return this._parseBeamingRule(importer, metaData, bar.masterBar);
             case 'ks':
                 const keySignature = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
@@ -911,6 +913,43 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             default:
                 return ApplyNodeResult.NotAppliedUnrecognizedMarker;
         }
+    }
+
+    private _parseBeamingRule(importer: IAlphaTexImporter, metaData: AlphaTexMetaDataNode, masterBar: MasterBar) {
+        let duration = Duration.Eighth;
+        const groupSizes: number[] = [];
+
+        const durationValue = (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
+        switch (durationValue) {
+            case 8:
+                duration = Duration.Eighth;
+                break;
+            case 16:
+                duration = Duration.Sixteenth;
+                break;
+            case 32:
+                duration = Duration.ThirtySecond;
+                break;
+            default:
+                importer.addSemanticDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT209,
+                    message: `Value is out of valid range. Allowed range: 8,16 or 32, Actual Value: ${durationValue}`,
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: metaData.arguments!.arguments[0].start,
+                    end: metaData.arguments!.arguments[0].end
+                });
+                return ApplyNodeResult.NotAppliedSemanticError;
+        }
+
+        for (let i = 1; i < metaData.arguments!.arguments.length; i++) {
+            groupSizes.push((metaData.arguments!.arguments[i] as AlphaTexNumberLiteral).value);
+        }
+
+        if (!masterBar.beamingRules) {
+            masterBar.beamingRules = new BeamingRules();
+        }
+        masterBar.beamingRules!.groups.set(duration, groupSizes);
+        return ApplyNodeResult.Applied;
     }
 
     private static _handleAccidentalMode(importer: IAlphaTexImporter, args: AlphaTexArgumentList): ApplyNodeResult {
@@ -2914,6 +2953,17 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         ])
                     )
                 );
+            }
+        }
+
+        if (masterBar.beamingRules) {
+            for (const [k, v] of masterBar.beamingRules.groups) {
+                const args = Atnf.args([Atnf.number(k)], true);
+                for (const i of v) {
+                    args!.arguments.push(Atnf.number(i));
+                }
+
+                nodes.push(Atnf.meta('beaming', args));
             }
         }
 

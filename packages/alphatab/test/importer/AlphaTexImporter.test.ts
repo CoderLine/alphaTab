@@ -2653,4 +2653,19 @@ describe('AlphaTexImporterTest', () => {
         it('hide', () =>
             test('\\defaultBarNumberDisplay allBars C4 | \\barNumberDisplay hide C4 ', BarNumberDisplay.Hide));
     });
+
+    it('custom-beaming', () => {
+        const score = parseTex(`
+            \\ts (4 4)
+            \\beaming (8 2 2 2 2)
+                C4.8 * 8 |
+                C4.8 * 8 |
+            \\ts (4 4)
+            \\beaming (8 4 4)
+                C4.8 * 8
+                C4.8 * 8            
+        `);
+        expect(score).toMatchSnapshot();
+        testExportRoundtrip(score);
+    });
 });
