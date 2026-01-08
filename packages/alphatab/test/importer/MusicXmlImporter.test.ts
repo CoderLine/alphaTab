@@ -1,9 +1,9 @@
-import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
-import type { Score } from '@coderline/alphatab/model/Score';
 import { BendType } from '@coderline/alphatab/model/BendType';
-import { expect } from 'chai';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { expect } from 'chai';
+import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
 
 describe('MusicXmlImporterTests', () => {
     it('track-volume', async () => {

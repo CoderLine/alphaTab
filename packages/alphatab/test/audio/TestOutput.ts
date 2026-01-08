@@ -1,5 +1,10 @@
 import type { ISynthOutput, ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
-import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import {
+    EventEmitter,
+    type IEventEmitter,
+    type IEventEmitterOfT,
+    EventEmitterOfT
+} from '@coderline/alphatab/EventEmitter';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 
 /**
@@ -8,9 +13,14 @@ import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 export class TestOutput implements ISynthOutput {
     public samples: Float32Array[] = [];
     public sampleCount: number = 0;
+    private _storeSamples: boolean;
 
     public get sampleRate(): number {
         return 44100;
+    }
+
+    public constructor(storeSamples: boolean = true) {
+        this._storeSamples = storeSamples;
     }
 
     public open(_bufferTimeInMilliseconds: number): void {
@@ -35,7 +45,9 @@ export class TestOutput implements ISynthOutput {
     }
 
     public addSamples(f: Float32Array): void {
-        this.samples.push(f);
+        if (this._storeSamples) {
+            this.samples.push(f);
+        }
         this.sampleCount += f.length;
         (this.samplesPlayed as EventEmitterOfT<number>).trigger(f.length / SynthConstants.AudioChannels);
     }
