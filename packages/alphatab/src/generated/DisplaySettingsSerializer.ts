@@ -52,6 +52,7 @@ export class DisplaySettingsSerializer {
         o.set("staffpaddingleft", obj.staffPaddingLeft);
         o.set("effectbandpaddingbottom", obj.effectBandPaddingBottom);
         o.set("trackstaffpaddingbetween", obj.trackStaffPaddingBetween);
+        o.set("lyriclinespaddingbetween", obj.lyricLinesPaddingBetween);
         o.set("systemslayoutmode", obj.systemsLayoutMode as number);
         return o;
     }
@@ -137,6 +138,9 @@ export class DisplaySettingsSerializer {
                 return true;
             case "trackstaffpaddingbetween":
                 obj.trackStaffPaddingBetween = v! as number;
+                return true;
+            case "lyriclinespaddingbetween":
+                obj.lyricLinesPaddingBetween = v! as number;
                 return true;
             case "systemslayoutmode":
                 obj.systemsLayoutMode = JsonHelper.parseEnum<SystemsLayoutMode>(v, SystemsLayoutMode)!;

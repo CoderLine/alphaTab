@@ -501,7 +501,11 @@ export abstract class ScoreLayout {
         const msg: string = 'rendered by alphaTab';
         const resources: RenderingResources = this.renderer.settings.display.resources;
         const size: number = 12;
-        const font = Font.withFamilyList(resources.copyrightFont.families, size, FontStyle.Plain, FontWeight.Bold);
+        const fontFamilies = resources.elementFonts.has(NotationElement.ScoreCopyright)
+            ? resources.elementFonts.get(NotationElement.ScoreCopyright)!.families
+            : resources.tablatureFont.families;
+
+        const font = Font.withFamilyList(fontFamilies, size, FontStyle.Plain, FontWeight.Bold);
 
         const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);
         const glyph = new TextGlyph(0, 0, msg, font, TextAlign.Center, undefined, resources.mainGlyphColor);

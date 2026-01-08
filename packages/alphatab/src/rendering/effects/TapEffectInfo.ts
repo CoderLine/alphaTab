@@ -36,12 +36,12 @@ export class TapEffectInfo extends EffectInfo {
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
         const res: RenderingResources = renderer.resources;
         if (beat.slap) {
-            return new TextGlyph(0, 0, 'S', res.effectFont, TextAlign.Center);
+            return new TextGlyph(0, 0, 'S', res.elementFonts.get(NotationElement.EffectTap)!, TextAlign.Center);
         }
         if (beat.pop) {
-            return new TextGlyph(0, 0, 'P', res.effectFont, TextAlign.Center);
+            return new TextGlyph(0, 0, 'P', res.elementFonts.get(NotationElement.EffectTap)!, TextAlign.Center);
         }
-        return new TextGlyph(0, 0, 'T', res.effectFont, TextAlign.Center);
+        return new TextGlyph(0, 0, 'T', res.elementFonts.get(NotationElement.EffectTap)!, TextAlign.Center);
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

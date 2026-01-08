@@ -37,7 +37,7 @@ export class CapoEffectInfo extends EffectInfo {
             0,
             0,
             `Capo. fret ${beat.voice.bar.staff.capo}`,
-            renderer.resources.effectFont,
+            renderer.resources.elementFonts.get(NotationElement.EffectCapo)!,
             TextAlign.Left
         );
     }

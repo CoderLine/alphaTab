@@ -2,6 +2,7 @@ import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { CanvasHelper, TextAlign, TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -86,7 +87,7 @@ export class TripletFeelGlyph extends EffectGlyph {
 
         const b = canvas.textBaseline;
         canvas.textBaseline = TextBaseline.Bottom;
-        canvas.font = this.renderer.resources.effectFont;
+        canvas.font = this.renderer.resources.elementFonts.get(NotationElement.EffectTripletFeel)!;
 
         canvas.fillText('(', cx, textY);
         cx += canvas.measureText('( ').width;

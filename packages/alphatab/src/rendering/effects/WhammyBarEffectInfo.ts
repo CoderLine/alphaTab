@@ -32,7 +32,7 @@ export class WhammyBarEffectInfo extends EffectInfo {
     }
 
     public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new LineRangedGlyph('w/bar');
+        return new LineRangedGlyph('w/bar', NotationElement.EffectWhammyBar);
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

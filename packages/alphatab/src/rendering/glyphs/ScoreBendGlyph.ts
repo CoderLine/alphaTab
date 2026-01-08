@@ -6,6 +6,7 @@ import { BendType } from '@coderline/alphatab/model/BendType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
@@ -115,7 +116,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
             if (note.bendStyle === BendStyle.Gradual) {
                 const res = this.renderer.resources;
                 const c = this.renderer.scoreRenderer.canvas!;
-                c.font = res.barNumberFont; // see note in paint()
+                c.font = res.elementFonts.get(NotationElement.ScoreBendSlur)!;
                 slurHeight += c.measureText('grad.').height;
             }
 
@@ -245,14 +246,27 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         this._notes.sort((a, b) => {
             return b.displayValue - a.displayValue;
         });
+
+        // draw slurs
+        if (this.renderer.settings.notation.isNotationElementVisible(NotationElement.ScoreBendSlur)) {
+            this._paintSlurs(cx, cy, canvas, startNoteRenderer, startX, middleX, endBeatX);
+        }
+    }
+
+    private _paintSlurs(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        startNoteRenderer: ScoreBarRenderer,
+        startX: number,
+        middleX: number,
+        endBeatX: number
+    ) {
         const directionBeat: Beat = this._beat.graceType === GraceType.BendGrace ? this._beat.nextBeat! : this._beat;
         let direction: BeamDirection =
             this._notes.length === 1 ? this.getTieDirection(directionBeat, startNoteRenderer) : BeamDirection.Up;
-
         const noteHeadHeight = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
-
-        // draw slurs
-        canvas.font = this.renderer.resources.barNumberFont; // we have never have set it explicitly, that's the current state
+        canvas.font = this.renderer.resources.elementFonts.get(NotationElement.ScoreBendSlur)!;
         for (let i: number = 0; i < this._notes.length; i++) {
             const note: Note = this._notes[i];
             using _ = ElementStyleHelper.note(canvas, NoteSubElement.StandardNotationEffects, note);

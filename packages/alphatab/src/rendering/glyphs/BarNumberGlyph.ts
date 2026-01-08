@@ -3,6 +3,7 @@ import type { RenderingResources } from '@coderline/alphatab/RenderingResources'
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -23,7 +24,7 @@ export class BarNumberGlyph extends Glyph {
         //     return;
         // }
 
-        this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.barNumberFont;
+        this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.elementFonts.get(NotationElement.BarNumber)!;
         const size = this.renderer.scoreRenderer.canvas!.measureText(this._number);
         this.width = size.width;
         this.height = size.height;
@@ -44,7 +45,7 @@ export class BarNumberGlyph extends Glyph {
 
         const res: RenderingResources = this.renderer.resources;
         const baseline = canvas.textBaseline;
-        canvas.font = res.barNumberFont;
+        canvas.font = res.elementFonts.get(NotationElement.BarNumber)!;
         canvas.textBaseline = TextBaseline.Top;
         canvas.fillText(this._number, cx + this.x, cy + this.y);
         canvas.textBaseline = baseline;

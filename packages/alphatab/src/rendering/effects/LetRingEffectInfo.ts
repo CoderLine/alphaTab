@@ -32,7 +32,7 @@ export class LetRingEffectInfo extends EffectInfo {
     }
 
     public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new LineRangedGlyph('LetRing');
+        return new LineRangedGlyph('LetRing', NotationElement.EffectLetRing);
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

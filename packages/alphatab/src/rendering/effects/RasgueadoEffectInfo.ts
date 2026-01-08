@@ -32,7 +32,7 @@ export class RasgueadoEffectInfo extends EffectInfo {
     }
 
     public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new LineRangedGlyph('rasg.');
+        return new LineRangedGlyph('rasg.', NotationElement.EffectRasgueado);
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

@@ -3,6 +3,7 @@ import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -17,7 +18,9 @@ export class RepeatCountGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.barNumberFont;
+        this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.elementFonts.get(
+            NotationElement.RepeatCount
+        )!;
         const size = this.renderer.scoreRenderer.canvas!.measureText(`x${this._count}`);
         this.width = 0; // do not account width
         this.height = size.height;
@@ -33,7 +36,7 @@ export class RepeatCountGlyph extends Glyph {
 
         const res: RenderingResources = this.renderer.resources;
         const oldAlign: TextAlign = canvas.textAlign;
-        canvas.font = res.barNumberFont;
+        canvas.font = res.elementFonts.get(NotationElement.RepeatCount)!;
         canvas.textAlign = TextAlign.Right;
         const s: string = `x${this._count}`;
         const w: number = canvas.measureText(s).width / 1.5;

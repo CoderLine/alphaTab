@@ -8,6 +8,7 @@ import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Voice } from '@coderline/alphatab/model/Voice';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
@@ -258,7 +259,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
         }
         this.createLinePreBeatGlyphs();
         this.createStartSpacing();
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
+        if (this.settings.notation.isNotationElementVisible(NotationElement.BarNumber)) {
+            this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
+        }
     }
 
     protected override createLinePreBeatGlyphs(): void {

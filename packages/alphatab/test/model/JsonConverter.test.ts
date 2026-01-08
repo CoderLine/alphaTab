@@ -1,17 +1,16 @@
-import { LayoutMode } from '@coderline/alphatab/LayoutMode';
-import { LogLevel } from '@coderline/alphatab/LogLevel';
-import { StaveProfile } from '@coderline/alphatab/StaveProfile';
-import { Settings } from '@coderline/alphatab/Settings';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { LogLevel } from '@coderline/alphatab/LogLevel';
 import { Color } from '@coderline/alphatab/model/Color';
 import { Font, FontStyle } from '@coderline/alphatab/model/Font';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
-import { NotationElement, TabRhythmMode, NotationMode, FingeringMode } from '@coderline/alphatab/NotationSettings';
+import { FingeringMode, NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
+import { Settings } from '@coderline/alphatab/Settings';
+import { assert, expect } from 'chai';
 import { TestPlatform } from 'test/TestPlatform';
 import { ComparisonHelpers } from './ComparisonHelpers';
-import { assert, expect } from 'chai';
 
 describe('JsonConverterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
@@ -110,9 +109,11 @@ describe('JsonConverterTest', () => {
 
         expected.display.scale = 10;
         expected.display.stretchForce = 2;
-        expected.display.staveProfile = StaveProfile.ScoreTab;
         expected.display.barCountPerPartial = 14;
-        expected.display.resources.copyrightFont = new Font('copy', 15, FontStyle.Plain);
+        expected.display.resources.elementFonts.set(
+            NotationElement.ScoreCopyright,
+            new Font('copy', 15, FontStyle.Plain)
+        );
         expected.display.resources.staffLineColor = new Color(255, 0, 0, 100);
         expected.display.padding = [1, 2, 3, 4];
 
@@ -165,7 +166,7 @@ describe('JsonConverterTest', () => {
         raw.set('notationRhythmMode', 'sHoWWITHbArs');
 
         // immutable
-        raw.set('displayResourcesCopyrightFont', 'italic 18px Roboto');
+        raw.set('displayResourcesMainGlyphColor', '#FF0000');
 
         SettingsSerializer.fromJson(settings, raw);
 
@@ -174,9 +175,9 @@ describe('JsonConverterTest', () => {
         expect(settings.display.layoutMode).to.equal(LayoutMode.Horizontal);
         expect(settings.display.scale).to.equal(5);
         expect(settings.notation.rhythmMode).to.equal(TabRhythmMode.ShowWithBars);
-        expect(settings.display.resources.copyrightFont.families[0]).to.equal('Roboto');
-        expect(settings.display.resources.copyrightFont.size).to.equal(18);
-        expect(settings.display.resources.copyrightFont.style).to.equal(FontStyle.Italic);
+        expect(settings.display.resources.mainGlyphColor.r).to.equal(255);
+        expect(settings.display.resources.mainGlyphColor.g).to.equal(0);
+        expect(settings.display.resources.mainGlyphColor.b).to.equal(0);
     });
 
     /*@target web*/
@@ -196,7 +197,7 @@ describe('JsonConverterTest', () => {
             // json_partial_names
             notationRhythmMode: 'sHoWWITHbArs',
             // immutable
-            displayResourcesCopyrightFont: 'italic 18px Roboto'
+            displayResourcesMainGlyphColor: '#FF0000'
         };
 
         SettingsSerializer.fromJson(settings, raw);
@@ -206,8 +207,8 @@ describe('JsonConverterTest', () => {
         expect(settings.display.layoutMode).to.equal(LayoutMode.Horizontal);
         expect(settings.display.scale).to.equal(5);
         expect(settings.notation.rhythmMode).to.equal(TabRhythmMode.ShowWithBars);
-        expect(settings.display.resources.copyrightFont.families[0]).to.equal('Roboto');
-        expect(settings.display.resources.copyrightFont.size).to.equal(18);
-        expect(settings.display.resources.copyrightFont.style).to.equal(FontStyle.Italic);
+        expect(settings.display.resources.mainGlyphColor.r).to.equal(255);
+        expect(settings.display.resources.mainGlyphColor.g).to.equal(0);
+        expect(settings.display.resources.mainGlyphColor.b).to.equal(0);
     });
 });

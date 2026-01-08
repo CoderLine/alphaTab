@@ -170,6 +170,10 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
                     `${mapValueTypeInfo.typeAsString}.fromJson(v)`,
                     ts.SyntaxKind.CallExpression
                 );
+
+                if(!mapValueTypeInfo.isOptional && !mapValueTypeInfo.isNullable) {
+                    mapValue = ts.factory.createNonNullExpression(mapValue);
+                }
             } else {
                 itemSerializer = `${mapValueTypeInfo.typeAsString}Serializer`;
                 importer(itemSerializer, findSerializerModule(mapValueTypeInfo));
@@ -181,15 +185,17 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
                 .filter(t => t.tagName.text === 'json_add')
                 .map(t => t.comment ?? '')[0] as string;
 
-            caseStatements.push(
-                assignField(
-                    ts.factory.createNewExpression(
-                        ts.factory.createIdentifier('Map'),
-                        prop.type.typeArguments!.map(t => t.createTypeNode()),
-                        []
+            if(!prop.isReadOnly) {
+                caseStatements.push(
+                    assignField(
+                        ts.factory.createNewExpression(
+                            ts.factory.createIdentifier('Map'),
+                            prop.type.typeArguments!.map(t => t.createTypeNode()),
+                            []
+                        )
                     )
-                )
-            );
+                );
+            }
 
             caseStatements.push(
                 ts.factory.createExpressionStatement(

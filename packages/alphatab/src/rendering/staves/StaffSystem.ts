@@ -469,7 +469,7 @@ export class StaffSystem {
                 let hasAnyTrackName = false;
                 if (shouldRender) {
                     const canvas: ICanvas = this.layout.renderer.canvas!;
-                    const res: Font = settings.display.resources.effectFont;
+                    const res: Font = settings.display.resources.elementFonts.get(NotationElement.TrackNames)!;
                     canvas.font = res;
                     for (const t of tracks) {
                         let trackNameText = '';
@@ -659,7 +659,7 @@ export class StaffSystem {
             const hasTrackName = this.layout.renderer.settings.notation.isNotationElementVisible(
                 NotationElement.TrackNames
             );
-            canvas.font = res.effectFont;
+            canvas.font = res.elementFonts.get(NotationElement.TrackNames)!;
             if (hasTrackName) {
                 const stylesheet = this.layout.renderer.score!.stylesheet;
 

@@ -524,4 +524,42 @@ describe('EffectsAndAnnotationsTests', () => {
                 ));
         });
     });
+
+    describe('lyrics', () => {
+        it('single-line', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                \\lyrics "Do Re Mi Fa"
+                C4 C4 C4 C4
+                `,
+                `test-data/visual-tests/effects-and-annotations/lyrics-single-line.png`
+            );
+        });
+
+        it('multi-line', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                \\lyrics "Do Re Mi Fa"
+                \\lyrics "Do  Mi "
+                C4 C4 C4 C4
+                `,
+                `test-data/visual-tests/effects-and-annotations/lyrics-multi-line.png`
+            );
+        });
+
+        it('multi-line-spacing', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                \\lyrics "Do Re Mi Fa"
+                \\lyrics "Do  Mi "
+                C4 C4 C4 C4
+                `,
+                `test-data/visual-tests/effects-and-annotations/lyrics-multi-line-spacing.png`,
+                undefined,
+                o => {
+                    o.settings.display.lyricLinesPaddingBetween = 20;
+                }
+            );
+        });
+    });
 });

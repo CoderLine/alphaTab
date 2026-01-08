@@ -353,6 +353,26 @@ export enum NotationElement {
      */
     EffectNumberedNotationKeySignature = 51,
 
+    /**
+     * The fretboard numbers shown in chord diagrams.
+     */
+    ChordDiagramFretboardNumbers = 52,
+
+    /**
+     * The bar numbers.
+     */
+    BarNumber = 53,
+
+    /**
+     * The repeat count indicator shown above the thick bar line to describe
+     * how many repeats should be played.
+     */
+    RepeatCount = 54,
+
+    /**
+     * The slurs shown on bend effects within the score staff.
+     */
+    ScoreBendSlur = 55
 }
 
 /**
