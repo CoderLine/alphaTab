@@ -1,3 +1,4 @@
+import type { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@coderline/alphatab/rendering/glyphs/GroupedEffectGlyph';
@@ -10,11 +11,13 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
     private _label: string;
     private _dashed: boolean;
     private _labelWidth = 0;
+    private _fontElement: NotationElement;
 
-    public constructor(label: string, dashed: boolean = true) {
+    public constructor(label: string, fontElement: NotationElement, dashed: boolean = true) {
         super(BeatXPosition.OnNotes);
         this._label = label;
         this._dashed = dashed;
+        this._fontElement = fontElement;
     }
 
     public override doLayout(): void {
@@ -23,7 +26,7 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
             this.forceGroupedRendering = true;
         }
         super.doLayout();
-        this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.effectFont;
+        this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.elementFonts.get(this._fontElement)!;
         const size = this.renderer.scoreRenderer.canvas!.measureText(this._label);
         this.height = size.height;
         this._labelWidth = size.width;
@@ -31,7 +34,7 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
 
     protected override paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {
         const res: RenderingResources = this.renderer.resources;
-        canvas.font = res.effectFont;
+        canvas.font = res.elementFonts.get(this._fontElement)!;
 
         const b = canvas.textBaseline;
         canvas.textBaseline = TextBaseline.Middle;

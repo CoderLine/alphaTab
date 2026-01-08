@@ -45,7 +45,7 @@ export class BeatBarreEffectInfo extends EffectInfo {
 
         barre += `B ${BeatBarreEffectInfo.toRoman(beat.barreFret)}`;
 
-        return new LineRangedGlyph(barre, false);
+        return new LineRangedGlyph(barre, NotationElement.EffectBeatBarre, false);
     }
 
     private static readonly _romanLetters = new Map<string, number>([

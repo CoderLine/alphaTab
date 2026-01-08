@@ -25,6 +25,6 @@ export class PickSlideEffectInfo extends NoteEffectInfoBase {
     }
 
     public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new LineRangedGlyph('P.S.');
+        return new LineRangedGlyph('P.S.', NotationElement.EffectPickSlide);
     }
 }

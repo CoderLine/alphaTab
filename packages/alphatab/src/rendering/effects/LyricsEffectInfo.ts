@@ -33,7 +33,13 @@ export class LyricsEffectInfo extends EffectInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new LyricsGlyph(0, 0, beat.lyrics!, renderer.resources.effectFont, TextAlign.Center);
+        return new LyricsGlyph(
+            0,
+            0,
+            beat.lyrics!,
+            renderer.resources.elementFonts.get(NotationElement.EffectLyrics)!,
+            TextAlign.Center
+        );
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

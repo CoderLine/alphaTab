@@ -70,7 +70,10 @@ export class HarmonicsEffectInfo extends NoteEffectInfoBase {
     }
 
     public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new LineRangedGlyph(HarmonicsEffectInfo.harmonicToString(this._harmonicType));
+        return new LineRangedGlyph(
+            HarmonicsEffectInfo.harmonicToString(this._harmonicType),
+            NotationElement.EffectHarmonics
+        );
     }
 
     public static harmonicToString(type: HarmonicType): string {

@@ -1,18 +1,18 @@
-import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
-import type { Score } from '@coderline/alphatab/model/Score';
-import { Settings } from '@coderline/alphatab/Settings';
-import { TestPlatform } from 'test/TestPlatform';
-import { Environment } from '@coderline/alphatab/Environment';
-import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
-import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
-import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
-import { PixelMatch, PixelMatchOptions } from 'test/visualTests/PixelMatch';
-import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
-import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
-import { TestUiFacade } from './TestUiFacade';
 import * as alphaSkiaModule from '@coderline/alphaskia';
 import { AlphaSkiaCanvas, AlphaSkiaImage } from '@coderline/alphaskia';
+import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
 import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { Environment } from '@coderline/alphatab/Environment';
+import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import { Settings } from '@coderline/alphatab/Settings';
+import { TestPlatform } from 'test/TestPlatform';
+import { PixelMatch, PixelMatchOptions } from 'test/visualTests/PixelMatch';
+import { TestUiFacade } from './TestUiFacade';
 
 /**
  * @internal
@@ -251,20 +251,18 @@ export class VisualTestHelper {
         Environment.highDpiFactor = 1; // test data is in scale 1
         settings.core.enableLazyLoading = false;
 
-        settings.display.resources.copyrightFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.titleFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.subTitleFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.wordsFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.effectFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.timerFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.fretboardNumberFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.tablatureFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.graceFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.barNumberFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.markerFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.directionsFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.numberedNotationFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.numberedNotationGraceFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+
+        for (const f of settings.display.resources.elementFonts.values()) {
+            if (f.families.includes('sans-serif')) {
+                f.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+            } else {
+                f.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+            }
+        }
     }
 
     public static async compareVisualResult(

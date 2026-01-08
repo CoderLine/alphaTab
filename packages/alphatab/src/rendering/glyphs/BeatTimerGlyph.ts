@@ -1,3 +1,4 @@
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextBaseline, TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 
@@ -20,7 +21,7 @@ export class BeatTimerGlyph extends EffectGlyph {
         this._text = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
         const c = this.renderer.scoreRenderer.canvas!;
-        c.font = this.renderer.resources.timerFont;
+        c.font = this.renderer.resources.elementFonts.get(NotationElement.EffectBeatTimer)!;
 
         const size = c.measureText(this._text);
 
@@ -41,7 +42,7 @@ export class BeatTimerGlyph extends EffectGlyph {
         const f = canvas.font;
         const b = canvas.textBaseline;
         const a = canvas.textAlign;
-        canvas.font = this.renderer.resources.timerFont;
+        canvas.font = this.renderer.resources.elementFonts.get(NotationElement.EffectBeatTimer)!;
         canvas.textBaseline = TextBaseline.Middle;
         canvas.textAlign = TextAlign.Center;
         canvas.fillText(this._text, cx + this.x, cy + this.y + this.height / 2);

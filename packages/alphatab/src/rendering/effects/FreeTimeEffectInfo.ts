@@ -39,7 +39,13 @@ export class FreeTimeEffectInfo extends EffectInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new TextGlyph(0, 0, 'Free time', renderer.resources.effectFont, TextAlign.Left);
+        return new TextGlyph(
+            0,
+            0,
+            'Free time',
+            renderer.resources.elementFonts.get(NotationElement.EffectFreeTime)!,
+            TextAlign.Left
+        );
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

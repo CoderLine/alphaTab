@@ -36,8 +36,14 @@ export class ChordsEffectInfo extends EffectInfo {
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
         const showDiagram = beat.voice.bar.staff.track.score.stylesheet.globalDisplayChordDiagramsInScore;
         return showDiagram
-            ? new ChordDiagramGlyph(0, 0, beat.chord!, true)
-            : new TextGlyph(0, 0, beat.chord!.name, renderer.resources.effectFont, TextAlign.Center);
+            ? new ChordDiagramGlyph(0, 0, beat.chord!, NotationElement.EffectChordNames, true)
+            : new TextGlyph(
+                  0,
+                  0,
+                  beat.chord!.name,
+                  renderer.resources.elementFonts.get(NotationElement.EffectChordNames)!,
+                  TextAlign.Center
+              );
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

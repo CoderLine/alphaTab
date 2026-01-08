@@ -44,7 +44,7 @@ export class MarkerEffectInfo extends EffectInfo {
             !beat.voice.bar.masterBar.section!.marker
                 ? beat.voice.bar.masterBar.section!.text
                 : `[${beat.voice.bar.masterBar.section!.marker}] ${beat.voice.bar.masterBar.section!.text}`,
-            renderer.resources.markerFont,
+            renderer.resources.elementFonts.get(NotationElement.EffectMarker)!,
             TextAlign.Left
         );
     }

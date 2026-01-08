@@ -7,7 +7,7 @@ import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
-import { NotationMode } from '@coderline/alphatab/NotationSettings';
+import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
@@ -622,7 +622,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (this.index === 0) {
             this.createStartSpacing();
         }
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
+        if (this.settings.notation.isNotationElementVisible(NotationElement.BarNumber)) {
+            this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
+        }
     }
 
     protected abstract createLinePreBeatGlyphs(): void;
@@ -633,7 +635,11 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
         this.addPostBeatGlyph(new BarLineGlyph(true, this.bar.staff.track.score.stylesheet.extendBarLines));
 
-        if (lastBar.masterBar.isRepeatEnd && lastBar.masterBar.repeatCount > 2) {
+        if (
+            lastBar.masterBar.isRepeatEnd &&
+            lastBar.masterBar.repeatCount > 2 &&
+            this.settings.notation.isNotationElementVisible(NotationElement.RepeatCount)
+        ) {
             this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getLineHeight(-0.5), this.bar.masterBar.repeatCount));
         }
     }

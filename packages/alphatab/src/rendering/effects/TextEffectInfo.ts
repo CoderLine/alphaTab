@@ -33,7 +33,13 @@ export class TextEffectInfo extends EffectInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new TextGlyph(0, 0, beat.text!, renderer.resources.effectFont, TextAlign.Left);
+        return new TextGlyph(
+            0,
+            0,
+            beat.text!,
+            renderer.resources.elementFonts.get(NotationElement.EffectText)!,
+            TextAlign.Left
+        );
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

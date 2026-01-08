@@ -1,5 +1,6 @@
 import type { Automation } from '@coderline/alphatab/model/Automation';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 
@@ -29,7 +30,7 @@ export class BarTempoGlyph extends EffectGlyph {
             let x = cx + this.renderer.getRatioPositionX(automation.ratioPosition);
 
             const res = this.renderer.resources;
-            canvas.font = res.markerFont;
+            canvas.font = res.elementFonts.get(NotationElement.EffectMarker)!;
 
             const notePosY =
                 cy +
@@ -45,12 +46,17 @@ export class BarTempoGlyph extends EffectGlyph {
                 const size = canvas.measureText(text);
                 canvas.fillText(text, x, notePosY);
                 x += size.width;
-            }
-            else {
+            } else {
                 x -= res.engravingSettings.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! / 2;
             }
 
-            CanvasHelper.fillMusicFontSymbolSafe(canvas,x, notePosY, res.engravingSettings.tempoNoteScale, MusicFontSymbol.MetNoteQuarterUp);
+            CanvasHelper.fillMusicFontSymbolSafe(
+                canvas,
+                x,
+                notePosY,
+                res.engravingSettings.tempoNoteScale,
+                MusicFontSymbol.MetNoteQuarterUp
+            );
             x +=
                 this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! *
                 res.engravingSettings.tempoNoteScale;

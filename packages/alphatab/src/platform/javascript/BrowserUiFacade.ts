@@ -217,16 +217,14 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private _setupFontCheckers(settings: Settings): void {
-        this._registerFontChecker(settings.display.resources.copyrightFont);
-        this._registerFontChecker(settings.display.resources.effectFont);
+        for (const font of settings.display.resources.elementFonts.values()) {
+            this._registerFontChecker(font);
+        }
+
         this._registerFontChecker(settings.display.resources.graceFont);
-        this._registerFontChecker(settings.display.resources.markerFont);
         this._registerFontChecker(settings.display.resources.tablatureFont);
-        this._registerFontChecker(settings.display.resources.titleFont);
-        this._registerFontChecker(settings.display.resources.wordsFont);
-        this._registerFontChecker(settings.display.resources.barNumberFont);
-        this._registerFontChecker(settings.display.resources.fretboardNumberFont);
-        this._registerFontChecker(settings.display.resources.subTitleFont);
+        this._registerFontChecker(settings.display.resources.numberedNotationFont);
+        this._registerFontChecker(settings.display.resources.numberedNotationGraceFont);
     }
 
     private _registerFontChecker(font: Font): void {
