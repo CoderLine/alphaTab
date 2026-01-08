@@ -361,7 +361,7 @@ export class Score {
             bar.previousMasterBar.nextMasterBar = bar;
             // NOTE: this will not work on anacrusis. Correct anacrusis durations are only working
             // when there are beats with playback positions already computed which requires full finish
-            // chicken-egg problem here. temporarily forcing anacrusis length here to 0, 
+            // chicken-egg problem here. temporarily forcing anacrusis length here to 0,
             // .finish() will correct these times
             bar.start =
                 bar.previousMasterBar.start +
@@ -436,9 +436,7 @@ export class Score {
 
         // fixup masterbar starts to handle anacrusis lengths
         for (const mb of this.masterBars) {
-            if (mb.index > 0) {
-                mb.start = mb.previousMasterBar!.start + mb.previousMasterBar!.calculateDuration();
-            }
+            mb.finish(sharedDataBag);
         }
     }
 
