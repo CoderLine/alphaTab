@@ -74,6 +74,7 @@ export enum TrackNameOrientation {
 
 /**
  * How bar numbers are displayed
+ * @public
  */
 export enum BarNumberDisplay {
     /**
