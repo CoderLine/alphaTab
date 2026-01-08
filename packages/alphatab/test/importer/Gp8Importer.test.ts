@@ -3,15 +3,21 @@ import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { Direction } from '@coderline/alphatab/model/Direction';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@coderline/alphatab/model/RenderStylesheet';
+import {
+    BarNumberDisplay,
+    BracketExtendMode,
+    TrackNameMode,
+    TrackNameOrientation,
+    TrackNamePolicy
+} from '@coderline/alphatab/model/RenderStylesheet';
 import { ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { Settings } from '@coderline/alphatab/Settings';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import { expect } from 'chai';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { TestPlatform } from 'test/TestPlatform';
-import { expect } from 'chai';
 
 describe('Gp8ImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {
@@ -425,17 +431,38 @@ describe('Gp8ImporterTest', () => {
         expect(score.tracks[0].playbackInfo.bank).to.equal(0);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].automations.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getAutomation(AutomationType.Instrument)?.value).to.equal(25);
+        expect(
+            score.tracks[0].staves[0].bars[0].voices[0].beats[0].getAutomation(AutomationType.Instrument)?.value
+        ).to.equal(25);
         // expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getAutomation(AutomationType.Bank)?.value).to.equal(0); skipped
 
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].automations.length).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Instrument)?.value).to.equal(25);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Bank)?.value).to.equal(256);
+        expect(
+            score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Instrument)?.value
+        ).to.equal(25);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Bank)?.value).to.equal(
+            256
+        );
     });
 
     it('extend-bar-lines', async () => {
         const score = (await prepareImporterWithFile('guitarpro8/extended-barlines.gp')).readScore();
 
         expect(score.stylesheet.extendBarLines).to.be.true;
+    });
+
+    describe('barnumbers', () => {
+        it('all', async () => {
+            const score = (await prepareImporterWithFile('guitarpro8/barnumbers-all.gp')).readScore();
+            expect(score.stylesheet.barNumberDisplay).to.equal(BarNumberDisplay.AllBars);
+        });
+        it('hide', async () => {
+            const score = (await prepareImporterWithFile('guitarpro8/barnumbers-hide.gp')).readScore();
+            expect(score.stylesheet.barNumberDisplay).to.equal(BarNumberDisplay.Hide);
+        });
+        it('first', async () => {
+            const score = (await prepareImporterWithFile('guitarpro8/barnumbers-first.gp')).readScore();
+            expect(score.stylesheet.barNumberDisplay).to.equal(BarNumberDisplay.FirstOfSystem);
+        });
     });
 });

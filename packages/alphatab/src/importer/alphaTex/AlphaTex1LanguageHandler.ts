@@ -70,7 +70,7 @@ import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
-import type { RenderStylesheet } from '@coderline/alphatab/model/RenderStylesheet';
+import { BarNumberDisplay, type RenderStylesheet } from '@coderline/alphatab/model/RenderStylesheet';
 import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
@@ -273,6 +273,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'showsinglestaffbrackets':
                 score.stylesheet.showSingleStaffBrackets = true;
+                return ApplyNodeResult.Applied;
+            case 'defaultbarnumberdisplay':
+                const barNumberDisplay = AlphaTex1LanguageHandler._parseEnumValue(
+                    importer,
+                    metaData.arguments!,
+                    'bar number display',
+                    AlphaTex1EnumMappings.barNumberDisplay
+                );
+                if (barNumberDisplay === undefined) {
+                    return ApplyNodeResult.NotAppliedSemanticError;
+                }
+                score.stylesheet.barNumberDisplay = barNumberDisplay!;
                 return ApplyNodeResult.Applied;
 
             default:
@@ -854,6 +866,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'db':
                 bar.masterBar.isDoubleBar = true;
                 bar.barLineRight = BarLineStyle.LightLight;
+                return ApplyNodeResult.Applied;
+            case 'barnumberdisplay':
+                const barNumberDisplay = AlphaTex1LanguageHandler._parseEnumValue(
+                    importer,
+                    metaData.arguments!,
+                    'bar number display',
+                    AlphaTex1EnumMappings.barNumberDisplay
+                );
+                if (barNumberDisplay === undefined) {
+                    return ApplyNodeResult.NotAppliedSemanticError;
+                }
+                bar.barNumberDisplay = barNumberDisplay!;
                 return ApplyNodeResult.Applied;
             default:
                 return ApplyNodeResult.NotAppliedUnrecognizedMarker;
@@ -2545,6 +2569,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(Atnf.meta('showSingleStaffBrackets'));
         }
 
+        if (stylesheet.barNumberDisplay !== BarNumberDisplay.AllBars) {
+            nodes.push(Atnf.identMeta('defaultBarNumberDisplay', BarNumberDisplay[stylesheet.barNumberDisplay]));
+        }
+
         // Unsupported:
         // 'globaldisplaychorddiagramsontop',
         // 'pertrackchorddiagramsontop',
@@ -2722,6 +2750,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     text: `Bar ${bar.index + 1} Metadata`
                 }
             ];
+        }
+
+        if (bar.barNumberDisplay !== undefined) {
+            nodes.push(Atnf.identMeta('barNumberDisplay', BarNumberDisplay[bar.barNumberDisplay]));
         }
 
         return nodes;

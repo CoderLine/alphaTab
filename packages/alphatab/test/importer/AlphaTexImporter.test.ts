@@ -27,6 +27,7 @@ import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import {
+    BarNumberDisplay,
     BracketExtendMode,
     TrackNameMode,
     TrackNameOrientation,
@@ -2617,5 +2618,39 @@ describe('AlphaTexImporterTest', () => {
         it('buzzroll-default3', () => test(`C4 {tp (3 buzzRoll)}`));
         it('buzzroll-default4', () => test(`C4 {tp (4 buzzRoll)}`));
         it('buzzroll-default5', () => test(`C4 {tp (5 buzzRoll)}`));
+    });
+
+    describe('defaultBarNumberDisplay', () => {
+        function test(tex: string, mode: BarNumberDisplay) {
+            const score = parseTex(tex);
+            expect(score.stylesheet.barNumberDisplay).to.equal(mode);
+
+            testExportRoundtrip(score);
+        }
+
+        it('all', () => test('\\defaultBarNumberDisplay allBars C4', BarNumberDisplay.AllBars));
+        it('first', () => test('\\defaultBarNumberDisplay firstOfSystem C4', BarNumberDisplay.FirstOfSystem));
+        it('hide', () => test('\\defaultBarNumberDisplay hide C4', BarNumberDisplay.Hide));
+    });
+
+    describe('barNumberDisplay', () => {
+        function test(tex: string, mode: BarNumberDisplay | undefined) {
+            const score = parseTex(tex);
+            expect(score.tracks[0].staves[0].bars[0].barNumberDisplay).to.be.undefined;
+            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).to.equal(mode);
+
+            testExportRoundtrip(score);
+        }
+
+        it('unsert', () => test('\\defaultBarNumberDisplay hide C4 | C4 ', undefined));
+        it('all', () =>
+            test('\\defaultBarNumberDisplay hide C4 | \\barNumberDisplay allBars C4 ', BarNumberDisplay.AllBars));
+        it('first', () =>
+            test(
+                '\\defaultBarNumberDisplay hide C4 | \\barNumberDisplay firstOfSystem C4 ',
+                BarNumberDisplay.FirstOfSystem
+            ));
+        it('hide', () =>
+            test('\\defaultBarNumberDisplay allBars C4 | \\barNumberDisplay hide C4 ', BarNumberDisplay.Hide));
     });
 });

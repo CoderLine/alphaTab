@@ -14,6 +14,7 @@ import type { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidenta
 import type { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import type { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import type {
+    BarNumberDisplay,
     BracketExtendMode,
     TrackNameMode,
     TrackNameOrientation,
@@ -404,6 +405,14 @@ export class AlphaTex1EnumMappings {
     ]);
     public static readonly tremoloPickingStyleReversed = AlphaTex1EnumMappings._reverse(
         AlphaTex1EnumMappings.tremoloPickingStyle
+    );
+    public static readonly barNumberDisplay = new Map<string, BarNumberDisplay>([
+        ['allbars', 0],
+        ['firstofsystem', 1],
+        ['hide', 2]
+    ]);
+    public static readonly barNumberDisplayReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.barNumberDisplay
     );
     public static readonly keySignaturesMinorReversed = new Map<KeySignature, string>([
         [-7, 'abminor'],
