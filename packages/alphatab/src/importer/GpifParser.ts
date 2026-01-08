@@ -18,7 +18,7 @@ import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
-import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { BeamingRules, MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { Note } from '@coderline/alphatab/model/Note';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
@@ -1983,6 +1983,9 @@ export class GpifParser {
     }
 
     private _parseMasterBarXProperties(masterBar: MasterBar, node: XmlNode) {
+        let beamingRuleDuration: number = Number.NaN;
+        let beamingRuleGroups: number[] | undefined = undefined;
+
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'XProperty':
@@ -1994,9 +1997,39 @@ export class GpifParser {
                                 1
                             );
                             break;
+                        case '1124139010':
+                            beamingRuleDuration = GpifParser._parseIntSafe(
+                                c.findChildElement('Int')?.innerText,
+                                Number.NaN
+                            );
+                            break;
+                        default:
+                            const idNumeric = GpifParser._parseIntSafe(id, 0);
+                            if (idNumeric >= 1124139264 && idNumeric <= 1124139295) {
+                                const groupIndex = idNumeric - 1124139264;
+                                const groupSize = GpifParser._parseIntSafe(
+                                    c.findChildElement('Int')?.innerText,
+                                    Number.NaN
+                                );
+
+                                if (beamingRuleGroups === undefined) {
+                                    beamingRuleGroups = [];
+                                }
+                                while (beamingRuleGroups.length < groupIndex + 1) {
+                                    beamingRuleGroups.push(0);
+                                }
+                                beamingRuleGroups[groupIndex] = groupSize;
+                            }
+                            break;
                     }
                     break;
             }
+        }
+
+        if (!Number.isNaN(beamingRuleDuration) && beamingRuleGroups) {
+            const rules = new BeamingRules();
+            rules.groups.set(beamingRuleDuration as Duration, beamingRuleGroups);
+            masterBar.beamingRules = rules;
         }
     }
 
