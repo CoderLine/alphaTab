@@ -17,8 +17,7 @@ import {
     type AlphaTexMappedEnumName
 } from '@coderline/alphatab-alphatex/enum';
 
-import * as alphaTab from '@coderline/alphatab'
-
+import * as alphaTab from '@coderline/alphatab';
 
 type LanguageDefinitionsVisitorContext = {
     foundDefinitions: boolean;
@@ -397,7 +396,7 @@ function enumMappingsVisitor<TNode extends ts.Node>(
 
         members.push(
             generateKeySignaturesReversed('keySignaturesMinorReversed', (entry: AlphaTexMappedEnumMappingEntry) => {
-                return entry?.aliases!.find(a => a.endsWith('minor'))!;
+                return entry!.aliases!.find(a => a.endsWith('minor'))!;
             })
         );
         members.push(

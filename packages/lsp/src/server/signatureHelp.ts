@@ -59,7 +59,7 @@ function createMetaDataSignatureHelp(
         return null;
     }
 
-    const endOfValues = metaData.arguments?.end!.offset ?? metaData.properties?.start!.offset ?? metaData.end!.offset;
+    const endOfValues = metaData.arguments?.end?.offset ?? metaData.properties?.start?.offset ?? metaData.end!.offset;
     if (metaData.start!.offset <= offset && offset < endOfValues) {
         return createArgumentsSignatureHelp(`\\${metaData.tag.tag.text}`, metaDataDocs, metaData.arguments, offset);
     }

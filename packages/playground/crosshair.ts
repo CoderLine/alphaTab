@@ -1,6 +1,6 @@
 let showCrossHair = false;
 document.addEventListener('keydown', e => {
-    let shouldShowCrossHair = e.getModifierState('CapsLock');
+    const shouldShowCrossHair = e.getModifierState('CapsLock');
     if (showCrossHair !== shouldShowCrossHair) {
         showCrossHair = shouldShowCrossHair;
         if (e.getModifierState('CapsLock')) {

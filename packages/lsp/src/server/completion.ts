@@ -64,12 +64,12 @@ export function setupCompletion(connection: Connection, documents: TextDocuments
         }
 
         const endOfBar =
-            bar.pipe?.start!.offset ??
+            bar.pipe?.start?.offset ??
             (barIndex === document.ast.bars.length - 1
                 ? Number.MAX_SAFE_INTEGER
                 : document.ast.bars[barIndex + 1].start!.offset);
 
-        const endOfBarMetaData = bar.beats[0]?.start!.offset ?? endOfBar;
+        const endOfBarMetaData = bar.beats[0]?.start?.offset ?? endOfBar;
         const metaData = bar ? binaryNodeSearch(bar.metaData, offset, endOfBarMetaData) : undefined;
         if (metaData) {
             const metaDataIndex = bar.metaData.indexOf(metaData);
@@ -150,16 +150,16 @@ function createBeatCompletions(
         beat.durationChange.start!.offset < offset &&
         offset <= beat.durationChange!.end!.offset
     ) {
-        const endOfDurationChange = beat.notes?.start!.offset ?? endOfBeat;
+        const endOfDurationChange = beat.notes?.start?.offset ?? endOfBeat;
         return createDurationChangeCompletions(beat.durationChange, offset, endOfDurationChange);
     }
 
     if (beat.notes && beat.notes.start!.offset < offset && offset <= beat.notes.end!.offset) {
         const endOfNotes =
-            beat.notes?.closeParenthesis?.start!.offset ??
-            beat.durationDot?.start!.offset ??
-            beat.beatEffects?.start!.offset ??
-            beat.beatMultiplier?.start!.offset ??
+            beat.notes?.closeParenthesis?.start?.offset ??
+            beat.durationDot?.start?.offset ??
+            beat.beatEffects?.start?.offset ??
+            beat.beatMultiplier?.start?.offset ??
             endOfBeat;
         const note = binaryNodeSearch(beat.notes.notes, offset, endOfNotes);
         if (note) {
@@ -201,7 +201,7 @@ function createBeatCompletions(
 
     if (beat.beatEffects && beat.beatEffects.start!.offset < offset && beat.beatEffects.end!.offset) {
         const endOfProperties =
-            beat.beatEffects?.closeBrace?.start!.offset ?? beat.beatMultiplier?.start!.offset ?? endOfBeat;
+            beat.beatEffects?.closeBrace?.start?.offset ?? beat.beatMultiplier?.start?.offset ?? endOfBeat;
         completions.splice(
             0,
             0,
@@ -247,7 +247,7 @@ function createDurationChangeCompletions(
         durationChange.properties.start!.offset < offset &&
         durationChange.properties.end!.offset
     ) {
-        const endOfProperties = durationChange.properties?.closeBrace?.start!.offset ?? endOfDurationChange;
+        const endOfProperties = durationChange.properties?.closeBrace?.start?.offset ?? endOfDurationChange;
         completions.push(
             ...createPropertiesCompletions(durationChange.properties, offset, durationChangeProperties, endOfProperties)
         );
@@ -264,7 +264,7 @@ function createNoteCompletions(
 ): CompletionItem[] {
     const completions: CompletionItem[] = [];
     if (note.noteEffects && note.noteEffects.start!.offset < offset && note.noteEffects.end!.offset) {
-        const endOfProperties = note.noteEffects.closeBrace?.start!.offset ?? endOfNote;
+        const endOfProperties = note.noteEffects.closeBrace?.start?.offset ?? endOfNote;
 
         if (beat.notes!.notes.length === 1) {
             completions.splice(
@@ -404,9 +404,9 @@ function createMetaDataCompletions(
     }
 
     const endOfArguments =
-        metaData.arguments?.closeParenthesis?.start!.offset ??
-        metaData.arguments?.end!.offset ??
-        metaData.properties?.start!.offset ??
+        metaData.arguments?.closeParenthesis?.start?.offset ??
+        metaData.arguments?.end?.offset ??
+        metaData.properties?.start?.offset ??
         endOfMetaData;
     completions.splice(
         0,
@@ -415,7 +415,7 @@ function createMetaDataCompletions(
     );
 
     if (metaDataDocs?.properties) {
-        const endOfProperties = metaData.properties?.closeBrace?.start!.offset ?? endOfMetaData;
+        const endOfProperties = metaData.properties?.closeBrace?.start?.offset ?? endOfMetaData;
         completions.splice(
             0,
             0,
@@ -435,12 +435,12 @@ function createArgumentCompletions(
     if (actualValues) {
         const value = binaryNodeSearch(actualValues.arguments, offset, trailingEnd);
         if (value?.parameterIndices) {
-            const isNextParameter =  offset > value.end!.offset;
+            const isNextParameter = offset > value.end!.offset;
 
             const signatureCandidates = resolveSignature(signatures, actualValues);
             for (const [k, v] of signatureCandidates) {
                 let parameterIndex = value.parameterIndices.get(k);
-                if(parameterIndex !== undefined  && isNextParameter && parameterIndex < v.parameters.length - 1) {
+                if (parameterIndex !== undefined && isNextParameter && parameterIndex < v.parameters.length - 1) {
                     parameterIndex++;
                 }
 
