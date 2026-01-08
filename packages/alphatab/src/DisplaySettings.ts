@@ -215,7 +215,7 @@ export class DisplaySettings {
      * @category Display
      * @defaultValue `10`
      */
-    public systemPaddingBottom: number = 10
+    public systemPaddingBottom: number = 10;
     /**
      * The bottom padding applied to the last system.
      * @since 1.4.0
@@ -333,6 +333,14 @@ export class DisplaySettings {
      * @defaultValue `5`
      */
     public trackStaffPaddingBetween = 5;
+
+    /**
+     * The additional padding to apply between multiple lyric lines.
+     * @since 1.8.0
+     * @category Display
+     * @defaultValue `5`
+     */
+    public lyricLinesPaddingBetween = 5;
 
     /**
      * The mode used to arrange staves and systems.

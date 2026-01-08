@@ -293,6 +293,13 @@ export interface DisplaySettingsJson {
      */
     trackStaffPaddingBetween?: number;
     /**
+     * The additional padding to apply between multiple lyric lines.
+     * @since 1.8.0
+     * @category Display
+     * @defaultValue `5`
+     */
+    lyricLinesPaddingBetween?: number;
+    /**
      * The mode used to arrange staves and systems.
      * @since 1.3.0
      * @category Display
