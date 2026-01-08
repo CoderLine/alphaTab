@@ -92,6 +92,8 @@ import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler {
     public static readonly instance = new AlphaTex1LanguageHandler();
 
+    private static readonly _timeSignatureDenominators = new Set<number>([1, 2, 4, 8, 16, 32, 64, 128]);
+
     public applyScoreMetaData(
         importer: IAlphaTexImporter,
         score: Score,
@@ -597,12 +599,39 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'ts':
                 switch (metaData.arguments!.arguments[0].nodeType) {
                     case AlphaTexNodeType.Number:
-                        bar.masterBar.timeSignatureNumerator = (
-                            metaData.arguments!.arguments[0] as AlphaTexNumberLiteral
-                        ).value;
-                        bar.masterBar.timeSignatureDenominator = (
-                            metaData.arguments!.arguments[1] as AlphaTexNumberLiteral
-                        ).value;
+                        bar.masterBar.timeSignatureNumerator =
+                            (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value | 0;
+
+                        if (bar.masterBar.timeSignatureNumerator < 1 || bar.masterBar.timeSignatureNumerator > 32) {
+                            importer.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT211,
+                                message: `Value is out of valid range. Allowed range: 1-32, Actual Value: ${bar.masterBar.timeSignatureNumerator}`,
+                                start: metaData.arguments!.arguments[0].start,
+                                end: metaData.arguments!.arguments[0].end,
+                                severity: AlphaTexDiagnosticsSeverity.Error
+                            });
+                        }
+
+                        bar.masterBar.timeSignatureDenominator =
+                            (metaData.arguments!.arguments[1] as AlphaTexNumberLiteral).value | 0;
+
+                        if (
+                            !AlphaTex1LanguageHandler._timeSignatureDenominators.has(
+                                bar.masterBar.timeSignatureDenominator
+                            )
+                        ) {
+                            const valueList = Array.from(AlphaTex1LanguageHandler._timeSignatureDenominators).join(
+                                ', '
+                            );
+                            importer.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT211,
+                                message: `Value is out of valid range. Allowed range: ${valueList}, Actual Value: ${bar.masterBar.timeSignatureDenominator}`,
+                                start: metaData.arguments!.arguments[0].start,
+                                end: metaData.arguments!.arguments[0].end,
+                                severity: AlphaTexDiagnosticsSeverity.Error
+                            });
+                        }
+
                         break;
                     case AlphaTexNodeType.Ident:
                     case AlphaTexNodeType.String:
