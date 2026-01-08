@@ -199,7 +199,8 @@ export class MusicXmlImporter extends ScoreImporter {
     private _indexToTrackInfo: Map<number, TrackInfo> = new Map<number, TrackInfo>();
     private _staffToContext: Map<Staff, StaffContext> = new Map<Staff, StaffContext>();
 
-    private _currentBarNumberDisplay?: BarNumberDisplay;
+    private _currentBarNumberDisplayPart?: BarNumberDisplay;
+    private _currentBarNumberDisplayBar?: BarNumberDisplay;
 
     private _divisionsPerQuarterNote: number = 1;
     private _currentDynamics = DynamicValue.F;
@@ -872,13 +873,14 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        this._currentBarNumberDisplay = undefined;
+        this._currentBarNumberDisplayPart = undefined;
     }
 
     private _parsePartwiseMeasure(element: XmlNode, track: Track, index: number) {
         const masterBar = this._getOrCreateMasterBar(element, index);
         const implicit = element.attributes.get('implicit') === 'yes';
-        this._parsePartMeasure(element, masterBar, track, implicit);
+        this._parsePartMeasure(element, masterBar, track, implicit, true);
+        this._currentBarNumberDisplayBar = undefined;
     }
 
     private _parseTimewiseMeasure(element: XmlNode, index: number) {
@@ -889,14 +891,15 @@ export class MusicXmlImporter extends ScoreImporter {
             switch (c.localName) {
                 case 'part':
                     this._parseTimewisePart(c, masterBar, implicit);
+                    this._currentBarNumberDisplayPart = undefined;
                     break;
                 case 'print':
-                    this._parsePrint(c, masterBar, undefined);
+                    this._parsePrint(c, masterBar, undefined, true);
                     break;
             }
         }
 
-        this._currentBarNumberDisplay = undefined;
+        this._currentBarNumberDisplayBar = undefined;
     }
 
     private _getOrCreateMasterBar(element: XmlNode, index: number) {
@@ -925,7 +928,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         const track = this._idToTrackInfo.get(id)!.track;
-        this._parsePartMeasure(element, masterBar, track, implicit);
+        this._parsePartMeasure(element, masterBar, track, implicit, false);
     }
 
     // current measure state
@@ -941,7 +944,13 @@ export class MusicXmlImporter extends ScoreImporter {
      */
     private _lastBeat: Beat | null = null;
 
-    private _parsePartMeasure(element: XmlNode, masterBar: MasterBar, track: Track, implicit: boolean) {
+    private _parsePartMeasure(
+        element: XmlNode,
+        masterBar: MasterBar,
+        track: Track,
+        implicit: boolean,
+        isPartwise: boolean
+    ) {
         this._musicalPosition = 0;
         this._lastBeat = null;
 
@@ -971,7 +980,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'figured-bass': Not supported
                 case 'print':
-                    this._parsePrint(c, masterBar, track);
+                    this._parsePrint(c, masterBar, track, true);
                     break;
                 case 'sound':
                     this._parseSound(c, masterBar, track);
@@ -999,15 +1008,17 @@ export class MusicXmlImporter extends ScoreImporter {
 
         if (implicit) {
             bar.barNumberDisplay = BarNumberDisplay.Hide;
-        } else if (this._currentBarNumberDisplay !== undefined) {
-            bar.barNumberDisplay = this._currentBarNumberDisplay;
+        } else if (isPartwise) {
+            bar.barNumberDisplay = this._currentBarNumberDisplayBar ?? this._currentBarNumberDisplayPart;
+        } else {
+            bar.barNumberDisplay = this._currentBarNumberDisplayPart ?? this._currentBarNumberDisplayBar;
         }
 
         // clear measure attribute
         this._keyAllStaves = null;
     }
 
-    private _parsePrint(element: XmlNode, masterBar: MasterBar, track: Track | undefined) {
+    private _parsePrint(element: XmlNode, masterBar: MasterBar, track: Track | undefined, isMeasurePrint: boolean) {
         if (track !== undefined) {
             if (element.getAttribute('new-system', 'no') === 'yes') {
                 track.addLineBreaks(masterBar.index);
@@ -1016,23 +1027,29 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        this._currentBarNumberDisplay = undefined;
+        let newDisplay: BarNumberDisplay | undefined = undefined;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'measure-numbering':
                     switch (c.innerText) {
                         case 'none':
-                            this._currentBarNumberDisplay = BarNumberDisplay.Hide;
+                            newDisplay = BarNumberDisplay.Hide;
                             break;
                         case 'measure':
-                            this._currentBarNumberDisplay = BarNumberDisplay.AllBars;
+                            newDisplay = BarNumberDisplay.AllBars;
                             break;
                         case 'system':
-                            this._currentBarNumberDisplay = BarNumberDisplay.FirstOfSystem;
+                            newDisplay = BarNumberDisplay.FirstOfSystem;
                             break;
                     }
                     break;
             }
+        }
+
+        if (isMeasurePrint) {
+            this._currentBarNumberDisplayBar = newDisplay;
+        } else {
+            this._currentBarNumberDisplayPart = newDisplay;
         }
     }
 
