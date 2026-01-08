@@ -268,7 +268,7 @@ export class MidiFileSequencer {
 
             if (mEvent.type === MidiEventType.TempoChange) {
                 const meta: TempoChangeEvent = mEvent as TempoChangeEvent;
-                bpm = meta.beatsPerMinute;
+                bpm = MidiFileSequencer._sanitizeBpm(meta.beatsPerMinute);
                 state.tempoChanges.push(new MidiFileSequencerTempoChange(bpm, absTick, absTime));
                 metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division));
             } else if (mEvent.type === MidiEventType.TimeSignature) {
@@ -405,7 +405,7 @@ export class MidiFileSequencer {
                     previousTick = 0;
                 } else {
                     const previousSyncPoint = syncPoints[i - 1];
-                    previousModifiedTempo = previousSyncPoint.syncBpm;
+                    previousModifiedTempo = MidiFileSequencer._sanitizeBpm(previousSyncPoint.syncBpm);
                     previousMillisecondOffset = previousSyncPoint.syncTime;
                     previousTick = previousSyncPoint.synthTick;
                 }
@@ -436,7 +436,7 @@ export class MidiFileSequencer {
                         syncPoint.syncBpm = previousModifiedTempo;
                     }
 
-                    bpm = state.tempoChanges[tempoChangeIndex].bpm;
+                    bpm = MidiFileSequencer._sanitizeBpm(state.tempoChanges[tempoChangeIndex].bpm);
                     tempoChangeIndex++;
                 }
 
@@ -462,9 +462,14 @@ export class MidiFileSequencer {
         this._updateCurrentTempo(state, timePosition);
         const lastTempoChange = state.tempoChanges[state.tempoChangeIndex];
         const timeDiff = timePosition - lastTempoChange.time;
-        const ticks = (timeDiff / (60000.0 / (lastTempoChange.bpm * state.division))) | 0;
+        const ticks =
+            (timeDiff / (60000.0 / (MidiFileSequencer._sanitizeBpm(lastTempoChange.bpm) * state.division))) | 0;
         // we add 1 for possible rounding errors.(floating point issuses)
         return lastTempoChange.ticks + ticks + 1;
+    }
+
+    private static _sanitizeBpm(bpm: number) {
+        return Math.max(bpm, 1); // prevent <0 bpms. Doesn't make sense and can cause endless loops
     }
 
     public currentUpdateCurrentTempo(timePosition: number) {

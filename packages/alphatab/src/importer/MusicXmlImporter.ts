@@ -2232,7 +2232,7 @@ export class MusicXmlImporter extends ScoreImporter {
         if (unit !== null && perMinute > 0) {
             const tempoAutomation: Automation = new Automation();
             tempoAutomation.type = AutomationType.Tempo;
-            tempoAutomation.value = (perMinute * (unit / 4)) | 0;
+            tempoAutomation.value = perMinute * (unit / 4);
             tempoAutomation.ratioPosition = ratioPosition;
 
             if (!this._hasSameTempo(masterBar, tempoAutomation)) {
