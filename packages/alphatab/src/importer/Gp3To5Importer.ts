@@ -37,17 +37,17 @@ import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Voice } from '@coderline/alphatab/model/Voice';
 
-import { Logger } from '@coderline/alphatab/Logger';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
-import { FadeType } from '@coderline/alphatab/model/FadeType';
-import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
-import { Direction } from '@coderline/alphatab/model/Direction';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import { Ottavia } from '@coderline/alphatab/model/Ottavia';
-import { WahPedal } from '@coderline/alphatab/model/WahPedal';
+import { Logger } from '@coderline/alphatab/Logger';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
+import { Direction } from '@coderline/alphatab/model/Direction';
+import { FadeType } from '@coderline/alphatab/model/FadeType';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
+import { WahPedal } from '@coderline/alphatab/model/WahPedal';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal
@@ -434,6 +434,11 @@ export class Gp3To5Importer extends ScoreImporter {
         }
     }
 
+    /**
+     * Guitar Pro 3-6 changes to a bass clef if any string tuning is below B2;
+     */
+    private static readonly _bassClefTuningThreshold = ModelUtils.parseTuning('B2')!.realValue;
+
     public readTrack(): void {
         const newTrack: Track = new Track();
         newTrack.ensureStaveCount(1);
@@ -527,10 +532,10 @@ export class Gp3To5Importer extends ScoreImporter {
 
             // `12` for all tunings which have bass clefs
             const clefMode = IOHelper.readInt32LE(this.data);
-            if (clefMode === 12) {
-                this._clefsPerTrack.set(index, Clef.F4);
+            if (clefMode === 12 || tuning[tuning.length - 1] < Gp3To5Importer._bassClefTuningThreshold) {
+                this._clefsPerTrack.set(newTrack.index, Clef.F4);
             } else {
-                this._clefsPerTrack.set(index, Clef.G2);
+                this._clefsPerTrack.set(newTrack.index, Clef.G2);
             }
 
             // Unknown, no UI setting seem to affect this
@@ -570,10 +575,10 @@ export class Gp3To5Importer extends ScoreImporter {
                 GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
             }
         } else {
-            if (GeneralMidi.isBass(newTrack.playbackInfo.program)) {
-                this._clefsPerTrack.set(index, Clef.F4);
+            if (tuning[tuning.length - 1] < Gp3To5Importer._bassClefTuningThreshold) {
+                this._clefsPerTrack.set(newTrack.index, Clef.F4);
             } else {
-                this._clefsPerTrack.set(index, Clef.G2);
+                this._clefsPerTrack.set(newTrack.index, Clef.G2);
             }
         }
     }

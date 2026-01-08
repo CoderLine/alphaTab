@@ -8,6 +8,7 @@ import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { expect } from 'chai';
+import { Clef } from '@coderline/alphatab/model/Clef';
 
 describe('Gp5ImporterTest', () => {
     it('score-info', async () => {
@@ -543,5 +544,13 @@ describe('Gp5ImporterTest', () => {
 
         expect(score.tracks[1].playbackInfo.program).to.equal(25);
         expect(score.tracks[1].playbackInfo.bank).to.equal(77);
+    });
+
+    it('tuning-bass-clef', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/bass-tuning.gp5')).readScore();
+        expect(score.tracks[0].staves[0].bars[0].clef).to.equal(Clef.F4);
+        expect(score.tracks[1].staves[0].bars[0].clef).to.equal(Clef.F4);
+        expect(score.tracks[2].staves[0].bars[0].clef).to.equal(Clef.F4);
+        expect(score.tracks[3].staves[0].bars[0].clef).to.equal(Clef.F4);
     });
 });
