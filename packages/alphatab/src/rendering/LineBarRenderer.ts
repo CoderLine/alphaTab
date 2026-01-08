@@ -6,6 +6,7 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
+import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
 import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
@@ -172,14 +173,15 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // override in subclasses
     }
 
-    protected createStartSpacing(): void {
+    protected createStartSpacing(): boolean {
         if (this._startSpacing) {
-            return;
+            return false;
         }
         const padding =
             this.index === 0 ? this.settings.display.firstStaffPaddingLeft : this.settings.display.staffPaddingLeft;
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, padding));
         this._startSpacing = true;
+        return true;
     }
 
     protected paintTuplets(
@@ -619,12 +621,37 @@ export abstract class LineBarRenderer extends BarRendererBase {
         super.createPreBeatGlyphs();
         this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         this.createLinePreBeatGlyphs();
+        let hasSpaceAfterStartGlyphs = false;
         if (this.index === 0) {
-            this.createStartSpacing();
+            hasSpaceAfterStartGlyphs = this.createStartSpacing();
         }
-        if (this.settings.notation.isNotationElementVisible(NotationElement.BarNumber)) {
+
+        if (this.shouldCreateBarNumber()) {
             this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
+        } else if (!hasSpaceAfterStartGlyphs) {
+            this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
         }
+    }
+
+    public shouldCreateBarNumber(): boolean {
+        let display = BarNumberDisplay.AllBars;
+        if (!this.settings.notation.isNotationElementVisible(NotationElement.BarNumber)) {
+            display = BarNumberDisplay.Hide;
+        } else if (this.bar.barNumberDisplay !== undefined) {
+            display = this.bar.barNumberDisplay!;
+        } else {
+            display = this.bar.staff.track.score.stylesheet.barNumberDisplay;
+        }
+
+        switch (display) {
+            case BarNumberDisplay.AllBars:
+                return true;
+            case BarNumberDisplay.FirstOfSystem:
+                return this.isFirstOfStaff;
+            case BarNumberDisplay.Hide:
+                return false;
+        }
+        return true;
     }
 
     protected abstract createLinePreBeatGlyphs(): void;

@@ -11,7 +11,7 @@ import { setupControl } from './control';
 async function setupLspAlphaTexLanguageSupport(editor: monaco.editor.IStandaloneCodeEditor) {
     await basicEditorLspIntegration(
         editor,
-        new Worker(new URL('./alphaTexLanguageServerWrap', import.meta.url), { type: 'module' }),
+        new Worker(new URL('./alphatexLanguageServerWrap', import.meta.url), { type: 'module' }),
         {
             logger: {
                 error(message) {

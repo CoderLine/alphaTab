@@ -55,11 +55,11 @@ internal static class TestGlobals
 
 internal class NotExpector<T>
 {
-    private readonly T _actual;
+    private readonly T? _actual;
     public NotExpector<T> Be => this;
     private readonly string? _message;
 
-    public NotExpector(T actual, string? message = null)
+    public NotExpector(T? actual, string? message = null)
     {
         _actual = actual;
         _message = message;
@@ -76,14 +76,19 @@ internal class NotExpector<T>
             Assert.AreEqual(default!, _actual, _message);
         }
     }
+
+    public void Undefined()
+    {
+        Assert.IsNotNull(_actual, _message);
+    }
 }
 
 internal class Expector<T>
 {
-    private readonly T _actual;
+    private readonly T? _actual;
     private readonly string? _message;
 
-    public Expector(T actual, string? message = null)
+    public Expector(T? actual, string? message = null)
     {
         _actual = actual;
         _message = message;
@@ -165,6 +170,11 @@ internal class Expector<T>
     public void Ok()
     {
         Assert.AreNotEqual(default!, _actual, _message);
+    }
+
+    public void Undefined()
+    {
+        Assert.IsNull(_actual, _message);
     }
 
     public void Length(int length)

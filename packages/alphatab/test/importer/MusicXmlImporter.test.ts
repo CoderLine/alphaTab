@@ -3,6 +3,7 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { BendType } from '@coderline/alphatab/model/BendType';
 import { expect } from 'chai';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 
 describe('MusicXmlImporterTests', () => {
     it('track-volume', async () => {
@@ -272,5 +273,51 @@ describe('MusicXmlImporterTests', () => {
     it('buzzroll', async () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/buzzroll.xml');
         expect(score).toMatchSnapshot();
+    });
+
+    describe('barnumberdisplay', async () => {
+        async function testPartwise(filename: string, display: BarNumberDisplay) {
+            const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/${filename}`);
+            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).to.equal(display);
+            expect(score.tracks[1].staves[0].bars[2].barNumberDisplay).to.equal(display);
+        }
+
+        async function testTimewise(filename: string, display: BarNumberDisplay) {
+            const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/${filename}`);
+            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).to.equal(display);
+            expect(score.tracks[1].staves[0].bars[1].barNumberDisplay).to.equal(display);
+        }
+
+        it('partwise-none', async () =>
+            await testPartwise('partwise-measure-numbering-none.xml', BarNumberDisplay.Hide));
+        it('partwise-measure', async () =>
+            await testPartwise('partwise-measure-numbering-measure.xml', BarNumberDisplay.AllBars));
+        it('partwise-system', async () =>
+            await testPartwise('partwise-measure-numbering-system.xml', BarNumberDisplay.FirstOfSystem));
+        it('partwise-implicit', async () => {
+            const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/partwise-anacrusis.xml');
+            expect(score.tracks[0].staves[0].bars[0].barNumberDisplay).to.equal(BarNumberDisplay.Hide);
+            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).to.be.undefined;
+            expect(score.tracks[0].staves[0].bars[3].barNumberDisplay).to.equal(BarNumberDisplay.Hide);
+            expect(score.tracks[1].staves[0].bars[0].barNumberDisplay).to.equal(BarNumberDisplay.Hide);
+            expect(score.tracks[1].staves[0].bars[1].barNumberDisplay).to.be.undefined;
+            expect(score.tracks[1].staves[0].bars[3].barNumberDisplay).to.equal(BarNumberDisplay.Hide);
+        });
+
+        it('timewise-none', async () =>
+            await testTimewise('timewise-measure-numbering-none.xml', BarNumberDisplay.Hide));
+        it('timewise-measure', async () =>
+            await testTimewise('timewise-measure-numbering-measure.xml', BarNumberDisplay.AllBars));
+        it('timewise-system', async () =>
+            await testTimewise('timewise-measure-numbering-system.xml', BarNumberDisplay.FirstOfSystem));
+        it('timewise-implicit', async () => {
+            const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/timewise-anacrusis.xml');
+            expect(score.tracks[0].staves[0].bars[0].barNumberDisplay).to.equal(BarNumberDisplay.Hide);
+            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).to.be.undefined;
+            expect(score.tracks[0].staves[0].bars[3].barNumberDisplay).to.equal(BarNumberDisplay.Hide);
+            expect(score.tracks[1].staves[0].bars[0].barNumberDisplay).to.equal(BarNumberDisplay.Hide);
+            expect(score.tracks[1].staves[0].bars[1].barNumberDisplay).to.be.undefined;
+            expect(score.tracks[1].staves[0].bars[3].barNumberDisplay).to.equal(BarNumberDisplay.Hide);
+        });
     });
 });

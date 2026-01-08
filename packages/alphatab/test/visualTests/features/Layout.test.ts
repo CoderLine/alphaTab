@@ -328,4 +328,90 @@ describe('LayoutTests', () => {
             }
         );
     });
+
+    describe('barnumberdisplay', () => {
+        describe('stylesheet', () => {
+            it('all', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay allBars
+                    C4.1 | C4.1 | C4.1 |
+                    C4.1 | C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-stylesheet-all.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
+            it('first', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay firstOfSystem
+                    C4.1 | C4.1 | C4.1 |
+                    C4.1 | C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-stylesheet-first.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
+            it('hide', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay hide
+                    C4.1 | C4.1 | C4.1 |
+                    C4.1 | C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-stylesheet-hide.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
+        });
+
+        describe('bar-override', () => {
+            it('all', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay allBars
+                    C4.1 | \\barNumberDisplay hide C4.1 | C4.1 |
+                    C4.1 | C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-bar-override-all.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
+            it('first', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay firstOfSystem
+                    C4.1 | \\barNumberDisplay allBars C4.1 | C4.1 |
+                    \\barNumberDisplay hide C4.1 | C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-bar-override-first.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
+            it('hide', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay hide
+                    C4.1 | \\barNumberDisplay allBars C4.1 | C4.1 |
+                    \\barNumberDisplay firstOfSystem C4.1 | \\barNumberDisplay firstOfSystem C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-bar-override-hide.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
+        });
+    });
 });

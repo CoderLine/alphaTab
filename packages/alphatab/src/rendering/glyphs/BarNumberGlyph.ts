@@ -17,13 +17,6 @@ export class BarNumberGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        // TODO: activate this and update paddings accordingly.
-        // if (!this.renderer.staff!.isFirstInSystem) {
-        //     this.width = 0;
-        //     this.height = 0;
-        //     return;
-        // }
-
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.elementFonts.get(NotationElement.BarNumber)!;
         const size = this.renderer.scoreRenderer.canvas!.measureText(this._number);
         this.width = size.width;

@@ -6,6 +6,7 @@ import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { Color } from '@coderline/alphatab/model/Color';
 import {
+    BarNumberDisplay,
     type BracketExtendMode,
     TrackNameMode,
     TrackNameOrientation,
@@ -347,6 +348,20 @@ export class BinaryStylesheet {
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).isVisible =
                         value as boolean;
                     break;
+
+                case 'System/barIndexDrawType':
+                    switch (value as number) {
+                        case 0:
+                            score.stylesheet.barNumberDisplay = BarNumberDisplay.AllBars;
+                            break;
+                        case 1:
+                            score.stylesheet.barNumberDisplay = BarNumberDisplay.FirstOfSystem;
+                            break;
+                        case 2:
+                            score.stylesheet.barNumberDisplay = BarNumberDisplay.Hide;
+                            break;
+                    }
+                    break;
             }
         }
     }
@@ -567,6 +582,18 @@ export class BinaryStylesheet {
                         break;
                 }
             }
+        }
+
+        switch (score.stylesheet.barNumberDisplay) {
+            case BarNumberDisplay.AllBars:
+                binaryStylesheet.addValue('System/barIndexDrawType', 0, DataType.Integer);
+                break;
+            case BarNumberDisplay.FirstOfSystem:
+                binaryStylesheet.addValue('System/barIndexDrawType', 1, DataType.Integer);
+                break;
+            case BarNumberDisplay.Hide:
+                binaryStylesheet.addValue('System/barIndexDrawType', 2, DataType.Integer);
+                break;
         }
 
         const writer = ByteBuffer.withCapacity(128);

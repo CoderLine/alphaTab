@@ -193,7 +193,8 @@ export class AlphaTex1LanguageDefinitions {
         ['chorddiagramsinscore', [[[[10], 1, ['true', 'false']]]]],
         ['hideemptystaves', null],
         ['hideemptystavesinfirstsystem', null],
-        ['showsinglestaffbrackets', null]
+        ['showsinglestaffbrackets', null],
+        ['defaultbarnumberdisplay', [[[[10, 17], 0, ['allbars', 'firstofsystem', 'hide']]]]]
     ]);
     public static readonly staffMetaDataSignatures = AlphaTex1LanguageDefinitions._signatures([
         ['tuning', [[[[10, 17], 0, ['piano', 'none', 'voice']]], [[[10, 17], 5]]]],
@@ -478,7 +479,8 @@ export class AlphaTex1LanguageDefinitions {
         ['sph', [[[[16], 2]]]],
         ['spu', [[[[16], 2]]]],
         ['db', null],
-        ['voicemode', [[[[10, 17], 0, ['staffwise', 'barwise']]]]]
+        ['voicemode', [[[[10, 17], 0, ['staffwise', 'barwise']]]]],
+        ['barnumberdisplay', [[[[10, 17], 0, ['allbars', 'firstofsystem', 'hide']]]]]
     ]);
     public static readonly metaDataProperties = AlphaTex1LanguageDefinitions._metaProps([
         [
@@ -536,6 +538,7 @@ export class AlphaTex1LanguageDefinitions {
         ['hideemptystaves', null],
         ['hideemptystavesinfirstsystem', null],
         ['showsinglestaffbrackets', null],
+        ['defaultbarnumberdisplay', null],
         [
             'tuning',
             [
@@ -592,7 +595,8 @@ export class AlphaTex1LanguageDefinitions {
         ['sph', null],
         ['spu', null],
         ['db', null],
-        ['voicemode', null]
+        ['voicemode', null],
+        ['barnumberdisplay', null]
     ]);
     public static readonly metaDataSignatures = [
         AlphaTex1LanguageDefinitions.scoreMetaDataSignatures,

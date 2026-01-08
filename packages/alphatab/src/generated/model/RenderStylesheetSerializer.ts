@@ -9,6 +9,7 @@ import { BracketExtendMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNamePolicy } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameOrientation } from "@coderline/alphatab/model/RenderStylesheet";
+import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
 /**
  * @internal
  */
@@ -62,6 +63,7 @@ export class RenderStylesheetSerializer {
         o.set("hideemptystaves", obj.hideEmptyStaves);
         o.set("hideemptystavesinfirstsystem", obj.hideEmptyStavesInFirstSystem);
         o.set("showsinglestaffbrackets", obj.showSingleStaffBrackets);
+        o.set("barnumberdisplay", obj.barNumberDisplay as number);
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
@@ -131,6 +133,9 @@ export class RenderStylesheetSerializer {
                 return true;
             case "showsinglestaffbrackets":
                 obj.showSingleStaffBrackets = v! as boolean;
+                return true;
+            case "barnumberdisplay":
+                obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(v, BarNumberDisplay)!;
                 return true;
         }
         return false;

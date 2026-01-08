@@ -31,6 +31,7 @@ import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
+import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import { Score } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
@@ -197,6 +198,9 @@ export class MusicXmlImporter extends ScoreImporter {
     private _idToTrackInfo: Map<string, TrackInfo> = new Map<string, TrackInfo>();
     private _indexToTrackInfo: Map<number, TrackInfo> = new Map<number, TrackInfo>();
     private _staffToContext: Map<Staff, StaffContext> = new Map<Staff, StaffContext>();
+
+    private _currentBarNumberDisplayPart?: BarNumberDisplay;
+    private _currentBarNumberDisplayBar?: BarNumberDisplay;
 
     private _divisionsPerQuarterNote: number = 1;
     private _currentDynamics = DynamicValue.F;
@@ -868,23 +872,34 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
             }
         }
+
+        this._currentBarNumberDisplayPart = undefined;
     }
 
     private _parsePartwiseMeasure(element: XmlNode, track: Track, index: number) {
         const masterBar = this._getOrCreateMasterBar(element, index);
-        this._parsePartMeasure(element, masterBar, track);
+        const implicit = element.attributes.get('implicit') === 'yes';
+        this._parsePartMeasure(element, masterBar, track, implicit, true);
+        this._currentBarNumberDisplayBar = undefined;
     }
 
     private _parseTimewiseMeasure(element: XmlNode, index: number) {
         const masterBar = this._getOrCreateMasterBar(element, index);
+        const implicit = element.attributes.get('implicit') === 'yes';
 
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'part':
-                    this._parseTimewisePart(c, masterBar);
+                    this._parseTimewisePart(c, masterBar, implicit);
+                    this._currentBarNumberDisplayPart = undefined;
+                    break;
+                case 'print':
+                    this._parsePrint(c, masterBar, undefined, true);
                     break;
             }
         }
+
+        this._currentBarNumberDisplayBar = undefined;
     }
 
     private _getOrCreateMasterBar(element: XmlNode, index: number) {
@@ -906,14 +921,14 @@ export class MusicXmlImporter extends ScoreImporter {
         return masterBar;
     }
 
-    private _parseTimewisePart(element: XmlNode, masterBar: MasterBar) {
+    private _parseTimewisePart(element: XmlNode, masterBar: MasterBar, implicit: boolean) {
         const id = element.attributes.get('id');
         if (!id || !this._idToTrackInfo.has(id)) {
             return;
         }
 
         const track = this._idToTrackInfo.get(id)!.track;
-        this._parsePartMeasure(element, masterBar, track);
+        this._parsePartMeasure(element, masterBar, track, implicit, false);
     }
 
     // current measure state
@@ -929,7 +944,13 @@ export class MusicXmlImporter extends ScoreImporter {
      */
     private _lastBeat: Beat | null = null;
 
-    private _parsePartMeasure(element: XmlNode, masterBar: MasterBar, track: Track) {
+    private _parsePartMeasure(
+        element: XmlNode,
+        masterBar: MasterBar,
+        track: Track,
+        implicit: boolean,
+        isPartwise: boolean
+    ) {
         this._musicalPosition = 0;
         this._lastBeat = null;
 
@@ -959,7 +980,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'figured-bass': Not supported
                 case 'print':
-                    this._parsePrint(c, masterBar, track);
+                    this._parsePrint(c, masterBar, track, true);
                     break;
                 case 'sound':
                     this._parseSound(c, masterBar, track);
@@ -983,17 +1004,52 @@ export class MusicXmlImporter extends ScoreImporter {
 
         // initial empty staff and voice (if no other elements created something already)
         const staff = this._getOrCreateStaff(track, 0);
-        this._getOrCreateBar(staff, masterBar);
+        const bar = this._getOrCreateBar(staff, masterBar);
+
+        if (implicit) {
+            bar.barNumberDisplay = BarNumberDisplay.Hide;
+        } else if (isPartwise) {
+            bar.barNumberDisplay = this._currentBarNumberDisplayBar ?? this._currentBarNumberDisplayPart;
+        } else {
+            bar.barNumberDisplay = this._currentBarNumberDisplayPart ?? this._currentBarNumberDisplayBar;
+        }
 
         // clear measure attribute
         this._keyAllStaves = null;
     }
 
-    private _parsePrint(element: XmlNode, masterBar: MasterBar, track: Track) {
-        if (element.getAttribute('new-system', 'no') === 'yes') {
-            track.addLineBreaks(masterBar.index);
-        } else if (element.getAttribute('new-page', 'no') === 'yes') {
-            track.addLineBreaks(masterBar.index);
+    private _parsePrint(element: XmlNode, masterBar: MasterBar, track: Track | undefined, isMeasurePrint: boolean) {
+        if (track !== undefined) {
+            if (element.getAttribute('new-system', 'no') === 'yes') {
+                track.addLineBreaks(masterBar.index);
+            } else if (element.getAttribute('new-page', 'no') === 'yes') {
+                track.addLineBreaks(masterBar.index);
+            }
+        }
+
+        let newDisplay: BarNumberDisplay | undefined = undefined;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'measure-numbering':
+                    switch (c.innerText) {
+                        case 'none':
+                            newDisplay = BarNumberDisplay.Hide;
+                            break;
+                        case 'measure':
+                            newDisplay = BarNumberDisplay.AllBars;
+                            break;
+                        case 'system':
+                            newDisplay = BarNumberDisplay.FirstOfSystem;
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        if (isMeasurePrint) {
+            this._currentBarNumberDisplayBar = newDisplay;
+        } else {
+            this._currentBarNumberDisplayPart = newDisplay;
         }
     }
 

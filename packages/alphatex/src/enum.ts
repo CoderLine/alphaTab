@@ -28,7 +28,8 @@ export const alphaTexMappedEnumLookup = {
     BarLineStyle: alphaTab.model.BarLineStyle,
     SimileMark: alphaTab.model.SimileMark,
     Direction: alphaTab.model.Direction,
-    TremoloPickingStyle: alphaTab.model.TremoloPickingStyle
+    TremoloPickingStyle: alphaTab.model.TremoloPickingStyle,
+    BarNumberDisplay: alphaTab.model.BarNumberDisplay
 };
 export type AlphaTexMappedEnumName = keyof typeof alphaTexMappedEnumLookup;
 
@@ -453,6 +454,11 @@ export const alphaTexMappedEnumMapping: {
     TremoloPickingStyle: {
         Default: { snippet: 'default', shortDescription: 'Default tremolo' },
         BuzzRoll: { snippet: 'buzzRoll', shortDescription: 'Buzz roll tremolo' }
+    },
+    BarNumberDisplay: {
+        AllBars: { snippet: 'allBars', shortDescription: 'All bars' },
+        FirstOfSystem: { snippet: 'firstOfSystem', shortDescription: 'First bar of every system' },
+        Hide: { snippet: 'hide', shortDescription: 'Hide' }
     }
 };
 

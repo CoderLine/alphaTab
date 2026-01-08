@@ -793,6 +793,7 @@ Map {
                   ],
                 },
               ],
+              "barnumberdisplay" => 2,
             },
             Map {
               "__kind" => "Bar",
@@ -850,6 +851,7 @@ Map {
                   ],
                 },
               ],
+              "barnumberdisplay" => 2,
             },
             Map {
               "__kind" => "Bar",
@@ -915,6 +917,7 @@ Map {
                   ],
                 },
               ],
+              "barnumberdisplay" => 2,
             },
             Map {
               "__kind" => "Bar",
@@ -972,6 +975,7 @@ Map {
                   ],
                 },
               ],
+              "barnumberdisplay" => 2,
             },
             Map {
               "__kind" => "Bar",
@@ -3031,6 +3035,7 @@ Map {
                   ],
                 },
               ],
+              "barnumberdisplay" => 2,
             },
             Map {
               "__kind" => "Bar",
@@ -3088,6 +3093,7 @@ Map {
                   ],
                 },
               ],
+              "barnumberdisplay" => 2,
             },
             Map {
               "__kind" => "Bar",
@@ -3153,6 +3159,7 @@ Map {
                   ],
                 },
               ],
+              "barnumberdisplay" => 2,
             },
             Map {
               "__kind" => "Bar",
@@ -3210,6 +3217,7 @@ Map {
                   ],
                 },
               ],
+              "barnumberdisplay" => 2,
             },
             Map {
               "__kind" => "Bar",

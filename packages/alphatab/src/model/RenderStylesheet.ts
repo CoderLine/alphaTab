@@ -73,6 +73,25 @@ export enum TrackNameOrientation {
 }
 
 /**
+ * How bar numbers are displayed
+ * @public
+ */
+export enum BarNumberDisplay {
+    /**
+     * Show bar numbers on all bars.
+     */
+    AllBars = 0,
+    /**
+     * Show bar numbers on the first bar of every system.
+     */
+    FirstOfSystem = 1,
+    /**
+     * Hide all bar numbers
+     */
+    Hide = 2
+}
+
+/**
  * This class represents the rendering stylesheet.
  * It contains settings which control the display of the score when rendered.
  * @json
@@ -168,14 +187,14 @@ export class RenderStylesheet {
     /**
      * Whether to hide empty staves.
      */
-    public hideEmptyStaves: boolean = false;   
+    public hideEmptyStaves: boolean = false;
 
     /**
      * Whether to also hide empty staves in the first system.
      * @remarks
      * Only has an effect when activating {@link hideEmptyStaves}.
      */
-    public hideEmptyStavesInFirstSystem :boolean = false;
+    public hideEmptyStavesInFirstSystem: boolean = false;
 
     /**
      * Whether to show brackets and braces across single staves.
@@ -184,4 +203,9 @@ export class RenderStylesheet {
      * {@link hideEmptyStaves}
      */
     public showSingleStaffBrackets: boolean = false;
+
+    /**
+     * How bar numbers should be displayed.
+     */
+    public barNumberDisplay: BarNumberDisplay = BarNumberDisplay.AllBars;
 }
