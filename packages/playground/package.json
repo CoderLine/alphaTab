@@ -7,7 +7,7 @@
     "dependencies": {
         "@coderline/alphatab": "*",
         "@fontsource/noto-sans": "^5.2.10",
-        "@fontsource/noto-serif": "^5.2.8",
+        "@fontsource/noto-serif": "^5.2.9",
         "@fortawesome/fontawesome-free": "^7.1.0",
         "@popperjs/core": "^2.11.8",
         "@types/serve-static": "^2.2.0",
