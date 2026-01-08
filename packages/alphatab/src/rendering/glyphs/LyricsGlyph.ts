@@ -28,11 +28,9 @@ export class LyricsGlyph extends EffectGlyph {
         canvas.font = this.font;
         let y = 0;
         for (const line of this._lines) {
-            if (line) {
-                this._linePositions.push(y);
-                const size = canvas.measureText(line);
-                y += size.height + lineSpacing;
-            }
+            this._linePositions.push(y);
+            const size = canvas.measureText(line.length > 0 ? line : ' ');
+            y += size.height + lineSpacing;
         }
         y -= lineSpacing;
 
