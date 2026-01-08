@@ -5,6 +5,7 @@
 // </auto-generated>
 import { EngravingSettingsJson } from "@coderline/alphatab/generated/EngravingSettingsJson";
 import { FontJson } from "@coderline/alphatab/model/Font";
+import { NotationElement } from "@coderline/alphatab/NotationSettings";
 import { ColorJson } from "@coderline/alphatab/model/Color";
 /**
  * This public class contains central definitions for controlling the visual appearance.
@@ -37,53 +38,35 @@ export interface RenderingResourcesJson {
      */
     engravingSettings?: EngravingSettingsJson;
     /**
-     * The font to use for displaying the songs copyright information in the header of the music sheet.
-     * @defaultValue `bold 12px Arial, sans-serif`
+     * Unused, see deprecation note.
+     * @defaultValue `14px Georgia, serif`
      * @since 0.9.6
+     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
+     * @json_ignore
      */
-    copyrightFont?: FontJson;
+    fingeringFont?: FontJson;
     /**
-     * The font to use for displaying the songs title in the header of the music sheet.
-     * @defaultValue `32px Georgia, serif`
-     * @since 0.9.6
+     * Unused, see deprecation note.
+     * @defaultValue `12px Georgia, serif`
+     * @since 1.4.0
+     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
+     * @json_ignore
      */
-    titleFont?: FontJson;
+    inlineFingeringFont?: FontJson;
     /**
-     * The font to use for displaying the songs subtitle in the header of the music sheet.
-     * @defaultValue `20px Georgia, serif`
-     * @since 0.9.6
-     */
-    subTitleFont?: FontJson;
-    /**
-     * The font to use for displaying the lyrics information in the header of the music sheet.
-     * @defaultValue `15px Arial, sans-serif`
-     * @since 0.9.6
-     */
-    wordsFont?: FontJson;
-    /**
-     * The font to use for displaying certain effect related elements in the music sheet.
+     * Ununsed, see deprecation note.
      * @defaultValue `italic 12px Georgia, serif`
      * @since 0.9.6
+     * @deprecated use {@link elementFonts} with the respective
+     * @json_ignore
      */
     effectFont?: FontJson;
     /**
-     * The font to use for displaying beat time information in the music sheet.
-     * @defaultValue `12px Georgia, serif`
-     * @since 1.4.0
+     * The fonts used by individual elements. Check {@link defaultFonts} for the elements which have custom fonts.
+     * Removing fonts from this map can lead to unexpected side effects and errors. Only update it with new values.
+     * @json_immutable
      */
-    timerFont?: FontJson;
-    /**
-     * The font to use for displaying the directions texts.
-     * @defaultValue `14px Georgia, serif`
-     * @since 1.4.0
-     */
-    directionsFont?: FontJson;
-    /**
-     * The font to use for displaying the fretboard numbers in chord diagrams.
-     * @defaultValue `11px Arial, sans-serif`
-     * @since 0.9.6
-     */
-    fretboardNumberFont?: FontJson;
+    elementFonts?: Map<NotationElement | keyof typeof NotationElement | Lowercase<keyof typeof NotationElement>, FontJson>;
     /**
      * The font to use for displaying the numbered music notation in the music sheet.
      * @defaultValue `14px Arial, sans-serif`
@@ -121,37 +104,11 @@ export interface RenderingResourcesJson {
      */
     barSeparatorColor?: ColorJson;
     /**
-     * The font to use for displaying the bar numbers above the music sheet.
-     * @defaultValue `11px Arial, sans-serif`
-     * @since 0.9.6
-     */
-    barNumberFont?: FontJson;
-    /**
      * The color to use for displaying the bar numbers above the music sheet.
      * @defaultValue `rgb(200, 0, 0)`
      * @since 0.9.6
      */
     barNumberColor?: ColorJson;
-    /**
-     * The font to use for displaying finger information in the music sheet.
-     * @defaultValue `14px Georgia, serif`
-     * @since 0.9.6
-     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
-     */
-    fingeringFont?: FontJson;
-    /**
-     * The font to use for displaying finger information when inline into the music sheet.
-     * @defaultValue `12px Georgia, serif`
-     * @since 1.4.0
-     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
-     */
-    inlineFingeringFont?: FontJson;
-    /**
-     * The font to use for section marker labels shown above the music sheet.
-     * @defaultValue `bold 14px Georgia, serif`
-     * @since 0.9.6
-     */
-    markerFont?: FontJson;
     /**
      * The color to use for music notation elements of the primary voice.
      * @defaultValue `rgb(0, 0, 0)`

@@ -8,6 +8,7 @@ import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { EngravingSettingsSerializer } from "@coderline/alphatab/generated/EngravingSettingsSerializer";
 import { Font } from "@coderline/alphatab/model/Font";
 import { Color } from "@coderline/alphatab/model/Color";
+import { NotationElement } from "@coderline/alphatab/NotationSettings";
 /**
  * @internal
  */
@@ -25,25 +26,20 @@ export class RenderingResourcesSerializer {
         const o = new Map<string, unknown>();
         o.set("smuflfontfamilyname", obj.smuflFontFamilyName);
         o.set("engravingsettings", EngravingSettingsSerializer.toJson(obj.engravingSettings));
-        o.set("copyrightfont", Font.toJson(obj.copyrightFont)!);
-        o.set("titlefont", Font.toJson(obj.titleFont)!);
-        o.set("subtitlefont", Font.toJson(obj.subTitleFont)!);
-        o.set("wordsfont", Font.toJson(obj.wordsFont)!);
-        o.set("effectfont", Font.toJson(obj.effectFont)!);
-        o.set("timerfont", Font.toJson(obj.timerFont)!);
-        o.set("directionsfont", Font.toJson(obj.directionsFont)!);
-        o.set("fretboardnumberfont", Font.toJson(obj.fretboardNumberFont)!);
+        {
+            const m = new Map<string, unknown>();
+            o.set("elementfonts", m);
+            for (const [k, v] of obj.elementFonts!) {
+                m.set(k.toString(), Font.toJson(v)!);
+            }
+        }
         o.set("numberednotationfont", Font.toJson(obj.numberedNotationFont)!);
         o.set("numberednotationgracefont", Font.toJson(obj.numberedNotationGraceFont)!);
         o.set("tablaturefont", Font.toJson(obj.tablatureFont)!);
         o.set("gracefont", Font.toJson(obj.graceFont)!);
         o.set("stafflinecolor", Color.toJson(obj.staffLineColor)!);
         o.set("barseparatorcolor", Color.toJson(obj.barSeparatorColor)!);
-        o.set("barnumberfont", Font.toJson(obj.barNumberFont)!);
         o.set("barnumbercolor", Color.toJson(obj.barNumberColor)!);
-        o.set("fingeringfont", Font.toJson(obj.fingeringFont)!);
-        o.set("inlinefingeringfont", Font.toJson(obj.inlineFingeringFont)!);
-        o.set("markerfont", Font.toJson(obj.markerFont)!);
         o.set("mainglyphcolor", Color.toJson(obj.mainGlyphColor)!);
         o.set("secondaryglyphcolor", Color.toJson(obj.secondaryGlyphColor)!);
         o.set("scoreinfocolor", Color.toJson(obj.scoreInfoColor)!);
@@ -54,29 +50,10 @@ export class RenderingResourcesSerializer {
             case "smuflfontfamilyname":
                 obj.smuflFontFamilyName = v as string | undefined;
                 return true;
-            case "copyrightfont":
-                obj.copyrightFont = Font.fromJson(v)!;
-                return true;
-            case "titlefont":
-                obj.titleFont = Font.fromJson(v)!;
-                return true;
-            case "subtitlefont":
-                obj.subTitleFont = Font.fromJson(v)!;
-                return true;
-            case "wordsfont":
-                obj.wordsFont = Font.fromJson(v)!;
-                return true;
-            case "effectfont":
-                obj.effectFont = Font.fromJson(v)!;
-                return true;
-            case "timerfont":
-                obj.timerFont = Font.fromJson(v)!;
-                return true;
-            case "directionsfont":
-                obj.directionsFont = Font.fromJson(v)!;
-                return true;
-            case "fretboardnumberfont":
-                obj.fretboardNumberFont = Font.fromJson(v)!;
+            case "elementfonts":
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.elementFonts.set(JsonHelper.parseEnum<NotationElement>(k, NotationElement)!, Font.fromJson(v)!);
+                });
                 return true;
             case "numberednotationfont":
                 obj.numberedNotationFont = Font.fromJson(v)!;
@@ -96,20 +73,8 @@ export class RenderingResourcesSerializer {
             case "barseparatorcolor":
                 obj.barSeparatorColor = Color.fromJson(v)!;
                 return true;
-            case "barnumberfont":
-                obj.barNumberFont = Font.fromJson(v)!;
-                return true;
             case "barnumbercolor":
                 obj.barNumberColor = Color.fromJson(v)!;
-                return true;
-            case "fingeringfont":
-                obj.fingeringFont = Font.fromJson(v)!;
-                return true;
-            case "inlinefingeringfont":
-                obj.inlineFingeringFont = Font.fromJson(v)!;
-                return true;
-            case "markerfont":
-                obj.markerFont = Font.fromJson(v)!;
                 return true;
             case "mainglyphcolor":
                 obj.mainGlyphColor = Color.fromJson(v)!;

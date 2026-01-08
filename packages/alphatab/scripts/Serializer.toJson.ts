@@ -30,7 +30,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
         const fieldName = prop.name;
         const jsonName = prop.jsonNames.filter(n => n !== '')[0];
 
-        if (!jsonName || prop.isReadOnly) {
+        if (!jsonName || prop.isJsonReadOnly) {
             continue;
         }
 
