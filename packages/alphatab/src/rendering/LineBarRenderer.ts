@@ -638,7 +638,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (!this.settings.notation.isNotationElementVisible(NotationElement.BarNumber)) {
             display = BarNumberDisplay.Hide;
         } else if (this.bar.barNumberDisplay !== undefined) {
-            display = this.bar.barNumberDisplay;
+            display = this.bar.barNumberDisplay!;
         } else {
             display = this.bar.staff.track.score.stylesheet.barNumberDisplay;
         }

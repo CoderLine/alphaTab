@@ -47,6 +47,12 @@ class NotExpector<T>(private val actual: T, private val message: String? = null)
             }
         }
     }
+
+
+    fun undefined() {
+        Assert.assertNotNull(message, actual)
+    }
+
 }
 
 class Expector<T>(private val actual: T, private val message: String? = null) {
@@ -155,6 +161,10 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
                 Assert.assertNotEquals(message, "", actual)
             }
         }
+    }
+
+    fun undefined() {
+        Assert.assertNull(message, actual)
     }
 
     fun `true`() {
