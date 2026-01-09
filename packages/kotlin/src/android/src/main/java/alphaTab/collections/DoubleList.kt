@@ -152,6 +152,19 @@ public class DoubleList : IDoubleIterable {
         return Iterator(this)
     }
 
+    public fun splice(start: Double, deleteCount: Double) {
+        val firstAfterDelete = (start + deleteCount).toInt()
+        val itemsAfterDelete = this.length.toInt() - firstAfterDelete;
+        if(itemsAfterDelete > 0) {
+            _items.copyInto(
+                _items,
+                start.toInt(),
+                firstAfterDelete,
+                itemsAfterDelete
+            )
+        }
+        this._size -= deleteCount.toInt()
+    }
     private class Iterator(private val list: DoubleList) : DoubleIterator() {
         private var _index = 0
         override fun hasNext(): Boolean {
