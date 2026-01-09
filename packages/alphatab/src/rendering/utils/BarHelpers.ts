@@ -95,9 +95,52 @@ export class BarHelpers {
     private static _findOrBuildDefaultBeamingRules(masterBar: MasterBar): BeamingRules {
         let defaultBeamingRules = BarHelpers._defaultBeamingRules;
         if (!defaultBeamingRules) {
-            defaultBeamingRules = new Map<string, BeamingRules>();
+            defaultBeamingRules = new Map<string, BeamingRules>(
+                [
+                    BeamingRules.createSimple(2, 16, Duration.Sixteenth, [1, 1]),
+                    BeamingRules.createSimple(1, 8, Duration.Eighth, [1]),
+                    BeamingRules.createSimple(1, 4, Duration.Quarter, [1]),
 
-            // TODO: more default definitions
+                    BeamingRules.createSimple(3, 16, Duration.Sixteenth, [3]),
+
+                    BeamingRules.createSimple(4, 16, Duration.Sixteenth, [2, 2]),
+                    BeamingRules.createSimple(2, 8, Duration.Eighth, [1, 1]),
+
+                    BeamingRules.createSimple(5, 16, Duration.Sixteenth, [3, 2]),
+
+                    BeamingRules.createSimple(6, 16, Duration.Sixteenth, [3, 3]),
+                    BeamingRules.createSimple(3, 8, Duration.Eighth, [3]),
+
+                    BeamingRules.createSimple(4, 8, Duration.Eighth, [2, 2]),
+                    BeamingRules.createSimple(2, 4, Duration.Quarter, [1, 1]),
+
+                    BeamingRules.createSimple(9, 16, Duration.Sixteenth, [3, 3, 3]),
+
+                    BeamingRules.createSimple(5, 8, Duration.Eighth, [3, 2]),
+
+                    BeamingRules.createSimple(12, 16, Duration.Sixteenth, [3, 3, 3, 3]),
+                    BeamingRules.createSimple(6, 8, Duration.Eighth, [3, 3, 3]),
+                    BeamingRules.createSimple(3, 4, Duration.Quarter, [1, 1, 1]),
+
+                    BeamingRules.createSimple(7, 8, Duration.Eighth, [4, 3]),
+
+                    BeamingRules.createSimple(8, 8, Duration.Eighth, [3, 3, 2]),
+                    BeamingRules.createSimple(4, 4, Duration.Quarter, [1, 1, 1, 1]),
+
+                    BeamingRules.createSimple(9, 8, Duration.Eighth, [3, 3, 3]),
+
+                    BeamingRules.createSimple(10, 8, Duration.Eighth, [4, 3, 3]),
+                    BeamingRules.createSimple(5, 4, Duration.Quarter, [1, 1, 1, 1, 1]),
+
+                    BeamingRules.createSimple(12, 8, Duration.Eighth, [3, 3, 3, 3]),
+                    BeamingRules.createSimple(6, 4, Duration.Quarter, [1, 1, 1, 1, 1, 1]),
+
+                    BeamingRules.createSimple(15, 8, Duration.Eighth, [3, 3, 3, 3, 3, 3]),
+
+                    BeamingRules.createSimple(8, 4, Duration.Quarter, [1, 1, 1, 1, 1, 1, 1, 1]),
+                    BeamingRules.createSimple(18, 8, Duration.Eighth, [3, 3, 3, 3, 3, 3])
+                ].map(r => [`${r.timeSignatureNumerator}_${r.timeSignatureDenominator}`, r] as [string, BeamingRules])
+            );
 
             BarHelpers._defaultBeamingRules = defaultBeamingRules;
         }

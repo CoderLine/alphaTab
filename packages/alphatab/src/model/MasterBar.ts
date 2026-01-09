@@ -28,6 +28,8 @@ import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
  * If beats start within the same "group" they are beamed together.
  */
 export class BeamingRules {
+    private _singleGroupKey?: Duration;
+
     /**
      * The the group for a given "longest duration" within the bar.
      * @remarks
@@ -56,16 +58,34 @@ export class BeamingRules {
     /**
      * @internal
      */
-    public findRule(shortestDuration: Duration): [Duration, number[]] {
-        // beaming rules start at 8th notes
-        if (shortestDuration < Duration.Eighth) {
-            return [shortestDuration, []];
-        }
+    public static createSimple(
+        timeSignatureNumerator: number,
+        timeSignatureDenominator: number,
+        duration: Duration,
+        groups: number[]
+    ) {
+        const r = new BeamingRules();
+        r.timeSignatureNumerator = timeSignatureNumerator;
+        r.timeSignatureDenominator = timeSignatureDenominator;
+        r.groups.set(duration, groups);
+        r.finish();
+        return r;
+    }
 
     /**
      * @internal
      */
     public findRule(shortestDuration: Duration): [Duration, number[]] {
+        // fast path: one rule -> take it
+        const singleGroupKey = this._singleGroupKey;
+        if (singleGroupKey) {
+            return [singleGroupKey, this.groups.get(singleGroupKey)!];
+        }
+
+        if (shortestDuration < Duration.Quarter) {
+            return [shortestDuration, []];
+        }
+
         // first search shorter
         let durationValue = shortestDuration as number;
         do {
@@ -84,7 +104,7 @@ export class BeamingRules {
                 return [duration, this.groups.get(duration)!];
             }
             durationValue = durationValue / 2;
-        } while (durationValue > (Duration.Quarter as number));
+        } while (durationValue > (Duration.Half as number));
 
         return [shortestDuration, []];
     }
@@ -113,6 +133,10 @@ export class BeamingRules {
             }
 
             uniqueId += `_${v.join('_')}`;
+
+            if (this.groups.size === 1) {
+                this._singleGroupKey = k;
+            }
         }
         this.uniqueId = uniqueId;
     }
