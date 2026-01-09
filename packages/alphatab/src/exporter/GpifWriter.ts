@@ -1614,6 +1614,10 @@ export class GpifWriter {
         masterBarNode.addElement('Time').innerText =
             `${masterBar.timeSignatureNumerator}/${masterBar.timeSignatureDenominator}`;
 
+        if (masterBar.actualBeamingRules) {
+            this._writeBarXProperties(masterBarNode, masterBar);
+        }
+
         if (masterBar.isFreeTime) {
             masterBarNode.addElement('FreeTime');
         }
@@ -1737,6 +1741,39 @@ export class GpifWriter {
         }
 
         this._writeFermatas(masterBarNode, masterBar);
+    }
+
+    private _writeBarXProperties(masterBarNode: XmlNode, masterBar: MasterBar) {
+        const properties = masterBarNode.addElement('XProperties');
+
+        const beamingRules = masterBar.actualBeamingRules;
+        if (beamingRules) {
+            // prefer 8th note rule (that's what GP mostly has)
+            const rule = beamingRules!.findRule(Duration.Eighth);
+
+            // NOTE: it's not clear if guitar pro supports quarter rules
+            // for that case we better convert this to an "8th" note rule.
+            let durationProp = rule[0] as number;
+            let groupSizeFactor = 1;
+            if (rule[0] === Duration.Quarter) {
+                durationProp = 8;
+                groupSizeFactor = 2;
+            }
+
+            this._writeSimpleXPropertyNode(properties, '1124139010', 'Int', durationProp.toString());
+
+            const startGroupid = 1124139264;
+            let i = 0;
+            while (startGroupid < 1124139295 && i < rule[1].length) {
+                this._writeSimpleXPropertyNode(
+                    properties,
+                    (startGroupid + i).toString(),
+                    'Int',
+                    (rule[1][i] * groupSizeFactor).toString()
+                );
+                i++;
+            }
+        }
     }
 
     private _writeFermatas(parent: XmlNode, masterBar: MasterBar) {
