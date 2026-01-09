@@ -3,6 +3,7 @@ import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { Direction } from '@coderline/alphatab/model/Direction';
+import { Duration } from '@coderline/alphatab/model/Duration';
 import {
     BarNumberDisplay,
     BracketExtendMode,
@@ -464,5 +465,43 @@ describe('Gp8ImporterTest', () => {
             const score = (await prepareImporterWithFile('guitarpro8/barnumbers-first.gp')).readScore();
             expect(score.stylesheet.barNumberDisplay).to.equal(BarNumberDisplay.FirstOfSystem);
         });
+    });
+
+    it('custom-beaming', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/custom-beaming.gp')).readScore();
+
+        // NOTE: no need to verify all details, we'll have a visual test for that.
+
+        expect(score.masterBars[0].beamingRules).to.be.ok;
+        expect(score.masterBars[0].beamingRules!.groups.has(Duration.Eighth)).to.be.true;
+        expect(score.masterBars[0].beamingRules!.groups.get(Duration.Eighth)!.join(',')).to.be.equal('2,2,2,2');
+        // equal to previous
+        expect(score.masterBars[1].beamingRules === undefined, 'expected beamingRules of bar 1 to be undefined').to.be
+            .true;
+        expect(
+            score.masterBars[1].actualBeamingRules === score.masterBars[0].beamingRules,
+            'actualBeamingRules of bar 1 incorrect'
+        ).to.be.true;
+        expect(score.masterBars[2].beamingRules === undefined, 'expected beamingRules of bar 2 to be undefined').to.be
+            .true;
+        expect(
+            score.masterBars[2].actualBeamingRules === score.masterBars[0].beamingRules,
+            'actualBeamingRules of bar 1 incorrect'
+        ).to.be.true;
+        expect(score.masterBars[3].beamingRules === undefined, 'expected beamingRules of bar 3 to be undefined').to.be
+            .true;
+        expect(
+            score.masterBars[3].actualBeamingRules === score.masterBars[0].beamingRules,
+            'actualBeamingRules of bar 1 incorrect'
+        ).to.be.true;
+        expect(score.masterBars[4].beamingRules === undefined, 'expected beamingRules of bar 4 to be undefined').to.be
+            .true;
+        expect(
+            score.masterBars[4].actualBeamingRules === score.masterBars[0].beamingRules,
+            'actualBeamingRules of bar 1 incorrect'
+        ).to.be.true;
+
+        expect(score.masterBars[5].beamingRules!.groups.has(Duration.Eighth)).to.be.true;
+        expect(score.masterBars[5].beamingRules!.groups.get(Duration.Eighth)!.join(',')).to.be.equal('4,4');
     });
 });

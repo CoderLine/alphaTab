@@ -5,9 +5,11 @@
 // </auto-generated>
 import { MasterBar } from "@coderline/alphatab/model/MasterBar";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { BeamingRulesSerializer } from "@coderline/alphatab/generated/model/BeamingRulesSerializer";
 import { SectionSerializer } from "@coderline/alphatab/generated/model/SectionSerializer";
 import { AutomationSerializer } from "@coderline/alphatab/generated/model/AutomationSerializer";
 import { FermataSerializer } from "@coderline/alphatab/generated/model/FermataSerializer";
+import { BeamingRules } from "@coderline/alphatab/model/MasterBar";
 import { TripletFeel } from "@coderline/alphatab/model/TripletFeel";
 import { Section } from "@coderline/alphatab/model/Section";
 import { Automation } from "@coderline/alphatab/model/Automation";
@@ -35,6 +37,9 @@ export class MasterBarSerializer {
         o.set("timesignaturenumerator", obj.timeSignatureNumerator);
         o.set("timesignaturedenominator", obj.timeSignatureDenominator);
         o.set("timesignaturecommon", obj.timeSignatureCommon);
+        if (obj.beamingRules) {
+            o.set("beamingrules", BeamingRulesSerializer.toJson(obj.beamingRules));
+        }
         o.set("isfreetime", obj.isFreeTime);
         o.set("tripletfeel", obj.tripletFeel as number);
         if (obj.section) {
@@ -86,6 +91,15 @@ export class MasterBarSerializer {
                 return true;
             case "timesignaturecommon":
                 obj.timeSignatureCommon = v! as boolean;
+                return true;
+            case "beamingrules":
+                if (v) {
+                    obj.beamingRules = new BeamingRules();
+                    BeamingRulesSerializer.fromJson(obj.beamingRules, v);
+                }
+                else {
+                    obj.beamingRules = undefined;
+                }
                 return true;
             case "isfreetime":
                 obj.isFreeTime = v! as boolean;

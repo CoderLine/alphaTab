@@ -62,7 +62,7 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
-import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { BeamingRules, type MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
@@ -91,6 +91,8 @@ import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
  */
 export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler {
     public static readonly instance = new AlphaTex1LanguageHandler();
+
+    private static readonly _timeSignatureDenominators = new Set<number>([1, 2, 4, 8, 16, 32, 64, 128]);
 
     public applyScoreMetaData(
         importer: IAlphaTexImporter,
@@ -597,12 +599,39 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'ts':
                 switch (metaData.arguments!.arguments[0].nodeType) {
                     case AlphaTexNodeType.Number:
-                        bar.masterBar.timeSignatureNumerator = (
-                            metaData.arguments!.arguments[0] as AlphaTexNumberLiteral
-                        ).value;
-                        bar.masterBar.timeSignatureDenominator = (
-                            metaData.arguments!.arguments[1] as AlphaTexNumberLiteral
-                        ).value;
+                        bar.masterBar.timeSignatureNumerator =
+                            (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value | 0;
+
+                        if (bar.masterBar.timeSignatureNumerator < 1 || bar.masterBar.timeSignatureNumerator > 32) {
+                            importer.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT211,
+                                message: `Value is out of valid range. Allowed range: 1-32, Actual Value: ${bar.masterBar.timeSignatureNumerator}`,
+                                start: metaData.arguments!.arguments[0].start,
+                                end: metaData.arguments!.arguments[0].end,
+                                severity: AlphaTexDiagnosticsSeverity.Error
+                            });
+                        }
+
+                        bar.masterBar.timeSignatureDenominator =
+                            (metaData.arguments!.arguments[1] as AlphaTexNumberLiteral).value | 0;
+
+                        if (
+                            !AlphaTex1LanguageHandler._timeSignatureDenominators.has(
+                                bar.masterBar.timeSignatureDenominator
+                            )
+                        ) {
+                            const valueList = Array.from(AlphaTex1LanguageHandler._timeSignatureDenominators).join(
+                                ', '
+                            );
+                            importer.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT211,
+                                message: `Value is out of valid range. Allowed range: ${valueList}, Actual Value: ${bar.masterBar.timeSignatureDenominator}`,
+                                start: metaData.arguments!.arguments[0].start,
+                                end: metaData.arguments!.arguments[0].end,
+                                severity: AlphaTexDiagnosticsSeverity.Error
+                            });
+                        }
+
                         break;
                     case AlphaTexNodeType.Ident:
                     case AlphaTexNodeType.String:
@@ -624,6 +653,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         break;
                 }
                 return ApplyNodeResult.Applied;
+            case 'beaming':
+                return this._parseBeamingRule(importer, metaData, bar.masterBar);
             case 'ks':
                 const keySignature = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
@@ -882,6 +913,57 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             default:
                 return ApplyNodeResult.NotAppliedUnrecognizedMarker;
         }
+    }
+
+    private _parseBeamingRule(importer: IAlphaTexImporter, metaData: AlphaTexMetaDataNode, masterBar: MasterBar) {
+        let duration = Duration.Eighth;
+        const groupSizes: number[] = [];
+
+        const durationValue = (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
+        switch (durationValue) {
+            case 4:
+                duration = Duration.QuadrupleWhole;
+                break;
+            case 8:
+                duration = Duration.Eighth;
+                break;
+            case 16:
+                duration = Duration.Sixteenth;
+                break;
+            case 32:
+                duration = Duration.ThirtySecond;
+                break;
+            default:
+                importer.addSemanticDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT209,
+                    message: `Value is out of valid range. Allowed range: 4,8,16 or 32, Actual Value: ${durationValue}`,
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: metaData.arguments!.arguments[0].start,
+                    end: metaData.arguments!.arguments[0].end
+                });
+                return ApplyNodeResult.NotAppliedSemanticError;
+        }
+
+        for (let i = 1; i < metaData.arguments!.arguments.length; i++) {
+            const groupSize = (metaData.arguments!.arguments[i] as AlphaTexNumberLiteral).value;
+            if (groupSize < 1) {
+                importer.addSemanticDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT209,
+                    message: `Value is out of valid range. Allowed range: >0, Actual Value: ${durationValue}`,
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: metaData.arguments!.arguments[i].start,
+                    end: metaData.arguments!.arguments[i].end
+                });
+                return ApplyNodeResult.NotAppliedSemanticError;
+            }
+            groupSizes.push((metaData.arguments!.arguments[i] as AlphaTexNumberLiteral).value);
+        }
+
+        if (!masterBar.beamingRules) {
+            masterBar.beamingRules = new BeamingRules();
+        }
+        masterBar.beamingRules!.groups.set(duration, groupSizes);
+        return ApplyNodeResult.Applied;
     }
 
     private static _handleAccidentalMode(importer: IAlphaTexImporter, args: AlphaTexArgumentList): ApplyNodeResult {
@@ -2885,6 +2967,17 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         ])
                     )
                 );
+            }
+        }
+
+        if (masterBar.beamingRules) {
+            for (const [k, v] of masterBar.beamingRules.groups) {
+                const args = Atnf.args([Atnf.number(k)], true);
+                for (const i of v) {
+                    args!.arguments.push(Atnf.number(i));
+                }
+
+                nodes.push(Atnf.meta('beaming', args));
             }
         }
 

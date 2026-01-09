@@ -157,6 +157,7 @@ import { showSingleStaffBrackets } from '@coderline/alphatab-alphatex/metadata/s
 import { instrumentMeta } from '@coderline/alphatab-alphatex/metadata/staff/instrument';
 import type { AlphaTexExample, WithDescription, WithSignatures } from '@coderline/alphatab-alphatex/types';
 import { barNumberDisplay } from '@coderline/alphatab-alphatex/metadata/bar/barnumberdisplay';
+import { beaming } from '@coderline/alphatab-alphatex/metadata/bar/beamingRule';
 
 export const structuralMetaData = metadata(track, staff, voice);
 export const scoreMetaData = metadata(
@@ -230,7 +231,8 @@ export const barMetaData = metadata(
     spu,
     db,
     voiceMode,
-    barNumberDisplay
+    barNumberDisplay,
+    beaming
 );
 
 export const allMetadata = new Map([

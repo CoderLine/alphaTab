@@ -480,7 +480,16 @@ export class AlphaTex1LanguageDefinitions {
         ['spu', [[[[16], 2]]]],
         ['db', null],
         ['voicemode', [[[[10, 17], 0, ['staffwise', 'barwise']]]]],
-        ['barnumberdisplay', [[[[10, 17], 0, ['allbars', 'firstofsystem', 'hide']]]]]
+        ['barnumberdisplay', [[[[10, 17], 0, ['allbars', 'firstofsystem', 'hide']]]]],
+        [
+            'beaming',
+            [
+                [
+                    [[16], 0],
+                    [[16], 5]
+                ]
+            ]
+        ]
     ]);
     public static readonly metaDataProperties = AlphaTex1LanguageDefinitions._metaProps([
         [
@@ -596,7 +605,8 @@ export class AlphaTex1LanguageDefinitions {
         ['spu', null],
         ['db', null],
         ['voicemode', null],
-        ['barnumberdisplay', null]
+        ['barnumberdisplay', null],
+        ['beaming', null]
     ]);
     public static readonly metaDataSignatures = [
         AlphaTex1LanguageDefinitions.scoreMetaDataSignatures,
