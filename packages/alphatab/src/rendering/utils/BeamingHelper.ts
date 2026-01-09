@@ -1,4 +1,3 @@
-import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
@@ -12,6 +11,7 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
 
 /**
  * @internal
@@ -48,7 +48,7 @@ export class BeamingHelperDrawInfo {
 export class BeamingHelper {
     private _staff: Staff;
     private _renderer: BarRendererBase;
-
+    private _beamingRuleLookup: BeamingRuleLookup;
     public voice: Voice | null = null;
     public beats: Beat[] = [];
     public shortestDuration: Duration = Duration.QuadrupleWhole;
@@ -99,10 +99,11 @@ export class BeamingHelper {
         );
     }
 
-    public constructor(staff: Staff, renderer: BarRendererBase) {
+    public constructor(staff: Staff, renderer: BarRendererBase, beamingRuleLookup: BeamingRuleLookup) {
         this._staff = staff;
         this._renderer = renderer;
         this.beats = [];
+        this._beamingRuleLookup = beamingRuleLookup;
     }
 
     public alignWithBeats() {
@@ -161,7 +162,7 @@ export class BeamingHelper {
             switch (this.beats[this.beats.length - 1].beamingMode) {
                 case BeatBeamingMode.Auto:
                 case BeatBeamingMode.ForceSplitOnSecondaryToNext:
-                    add = BeamingHelper._canJoin(this.beats[this.beats.length - 1], beat);
+                    add = this._canJoin(this.beats[this.beats.length - 1], beat);
                     break;
                 case BeatBeamingMode.ForceSplitToNext:
                     add = false;
@@ -240,8 +241,7 @@ export class BeamingHelper {
         }
     }
 
-    // TODO: Check if this beaming is really correct, I'm not sure if we are connecting beats correctly
-    private static _canJoin(b1: Beat, b2: Beat): boolean {
+    private _canJoin(b1: Beat, b2: Beat): boolean {
         // is this a voice we can join with?
         if (
             !b1 ||
@@ -263,6 +263,7 @@ export class BeamingHelper {
         if (m1 !== m2) {
             return false;
         }
+
         // get times of those voices and check if the times
         // are in the same division
         const start1: number = b1.playbackStart;
@@ -281,19 +282,11 @@ export class BeamingHelper {
                 return true;
             }
         }
-        // TODO: create more rules for automatic beaming
-        let divisionLength: number = MidiUtils.QuarterTime;
-        switch (m1.masterBar.timeSignatureDenominator) {
-            case 8:
-                if (m1.masterBar.timeSignatureNumerator % 3 === 0) {
-                    divisionLength += (MidiUtils.QuarterTime / 2) | 0;
-                }
-                break;
-        }
-        // check if they are on the same division
-        const division1: number = ((divisionLength + start1) / divisionLength) | 0 | 0;
-        const division2: number = ((divisionLength + start2) / divisionLength) | 0 | 0;
-        return division1 === division2;
+
+        // check if they are on the same group as per rule definitions
+        const groupId1 = this._beamingRuleLookup.calculateGroupIndex(start1);
+        const groupId2 = this._beamingRuleLookup.calculateGroupIndex(start2);
+        return groupId1 === groupId2;
     }
 
     private static _canJoinDuration(d: Duration): boolean {

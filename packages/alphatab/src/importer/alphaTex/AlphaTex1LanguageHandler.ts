@@ -921,6 +921,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         const durationValue = (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
         switch (durationValue) {
+            case 4:
+                duration = Duration.QuadrupleWhole;
+                break;
             case 8:
                 duration = Duration.Eighth;
                 break;
@@ -933,7 +936,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             default:
                 importer.addSemanticDiagnostic({
                     code: AlphaTexDiagnosticCode.AT209,
-                    message: `Value is out of valid range. Allowed range: 8,16 or 32, Actual Value: ${durationValue}`,
+                    message: `Value is out of valid range. Allowed range: 4,8,16 or 32, Actual Value: ${durationValue}`,
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: metaData.arguments!.arguments[0].start,
                     end: metaData.arguments!.arguments[0].end
@@ -942,6 +945,17 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         for (let i = 1; i < metaData.arguments!.arguments.length; i++) {
+            const groupSize = (metaData.arguments!.arguments[i] as AlphaTexNumberLiteral).value;
+            if (groupSize < 1) {
+                importer.addSemanticDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT209,
+                    message: `Value is out of valid range. Allowed range: >0, Actual Value: ${durationValue}`,
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: metaData.arguments!.arguments[i].start,
+                    end: metaData.arguments!.arguments[i].end
+                });
+                return ApplyNodeResult.NotAppliedSemanticError;
+            }
             groupSizes.push((metaData.arguments!.arguments[i] as AlphaTexNumberLiteral).value);
         }
 

@@ -20,6 +20,7 @@ import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFin
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
+import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -73,6 +74,7 @@ export abstract class ScoreLayout {
     public abstract get supportsResize(): boolean;
 
     public slurRegistry = new SlurRegistry();
+    public beamingRuleLookups = new Map<string, BeamingRuleLookup>();
 
     public resize(): void {
         this._lazyPartials.clear();
@@ -84,6 +86,7 @@ export abstract class ScoreLayout {
     public layoutAndRender(): void {
         this._lazyPartials.clear();
         this.slurRegistry.clear();
+        this.beamingRuleLookups.clear();
         this._barRendererLookup.clear();
 
         this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;

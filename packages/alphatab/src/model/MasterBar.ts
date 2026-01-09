@@ -3,7 +3,7 @@ import type { Automation } from '@coderline/alphatab/model/Automation';
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Direction } from '@coderline/alphatab/model/Direction';
-import type { Duration } from '@coderline/alphatab/model/Duration';
+import { Duration } from '@coderline/alphatab/model/Duration';
 import type { Fermata } from '@coderline/alphatab/model/Fermata';
 import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import type { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
@@ -46,19 +46,57 @@ export class BeamingRules {
      * @internal
      * @json_ignore
      */
-    public masterBar: MasterBar | undefined;
+    public timeSignatureNumerator: number = 0;
+    /**
+     * @internal
+     * @json_ignore
+     */
+    public timeSignatureDenominator: number = 0;
 
     /**
      * @internal
      */
-    public finish(masterBar: MasterBar) {
-        this.masterBar = masterBar;
-        let uniqueId = '';
-        for (const [k, v] of this.groups) {
-            if (uniqueId.length > 0) {
-                uniqueId += '__';
+    public findRule(shortestDuration: Duration): [Duration, number[]] {
+        // beaming rules start at 8th notes
+        if (shortestDuration < Duration.Eighth) {
+            return [shortestDuration, []];
+        }
+
+    /**
+     * @internal
+     */
+    public findRule(shortestDuration: Duration): [Duration, number[]] {
+        // first search shorter
+        let durationValue = shortestDuration as number;
+        do {
+            const duration = durationValue as Duration;
+            if (this.groups.has(duration)) {
+                return [duration, this.groups.get(duration)!];
             }
-            uniqueId += k;
+            durationValue = durationValue * 2;
+        } while (durationValue <= (Duration.TwoHundredFiftySixth as number));
+
+        // then longer
+        durationValue = (shortestDuration as number) / 2;
+        do {
+            const duration = durationValue as Duration;
+            if (this.groups.has(duration)) {
+                return [duration, this.groups.get(duration)!];
+            }
+            durationValue = durationValue / 2;
+        } while (durationValue > (Duration.Quarter as number));
+
+        return [shortestDuration, []];
+    }
+
+    /**
+     * @internal
+     */
+    public finish() {
+        let uniqueId = `${this.timeSignatureNumerator}_${this.timeSignatureDenominator}`;
+
+        for (const [k, v] of this.groups) {
+            uniqueId += `__${k}`;
 
             // trim of 0s at the end of the group
             let lastZero = v.length;
@@ -384,9 +422,12 @@ export class MasterBar {
     }
 
     public finish(sharedDataBag: Map<string, unknown>) {
-        this.beamingRules?.finish(this);
-
-        let actualBeamingRules = this.beamingRules;
+        let beamingRules = this.beamingRules;
+        if (beamingRules) {
+            beamingRules.timeSignatureNumerator = this.timeSignatureNumerator;
+            beamingRules.timeSignatureDenominator = this.timeSignatureDenominator;
+            beamingRules.finish();
+        }
 
         if (this.index > 0) {
             this.start = this.previousMasterBar!.start + this.previousMasterBar!.calculateDuration();
@@ -396,15 +437,17 @@ export class MasterBar {
                 ? (sharedDataBag.get('beamingRules')! as BeamingRules)
                 : undefined;
 
-            if (previousRules && previousRules.uniqueId === this.beamingRules?.uniqueId) {
+            if (previousRules && previousRules.uniqueId === beamingRules?.uniqueId) {
                 this.beamingRules = undefined;
-                actualBeamingRules = previousRules;
+                beamingRules = previousRules;
+            } else if (!beamingRules) {
+                beamingRules = previousRules;
             }
         }
-        this.actualBeamingRules = actualBeamingRules;
+        this.actualBeamingRules = beamingRules;
 
         if (this.beamingRules) {
-            sharedDataBag.set('beamingRules', this.beamingRules);
+            sharedDataBag.set('beamingRules', beamingRules);
         }
     }
 }
