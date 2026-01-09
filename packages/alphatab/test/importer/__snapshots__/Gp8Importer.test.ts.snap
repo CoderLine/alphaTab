@@ -9,6 +9,16 @@ Map {
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",
+      "beamingrules" => Map {
+        "groups" => Map {
+          "8" => Array [
+            2,
+            2,
+            2,
+            2,
+          ],
+        },
+      },
       "tempoautomations" => Array [
         Map {
           "islinear" => false,
@@ -695,6 +705,14 @@ Map {
     Map {
       "__kind" => "MasterBar",
       "timesignaturenumerator" => 6,
+      "beamingrules" => Map {
+        "groups" => Map {
+          "8" => Array [
+            6,
+            6,
+          ],
+        },
+      },
       "tempoautomations" => Array [
         Map {
           "islinear" => false,
@@ -723,6 +741,16 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
+      "beamingrules" => Map {
+        "groups" => Map {
+          "8" => Array [
+            2,
+            2,
+            2,
+            2,
+          ],
+        },
+      },
       "tempoautomations" => Array [
         Map {
           "islinear" => false,
@@ -1044,10 +1072,28 @@ Map {
     Map {
       "__kind" => "MasterBar",
       "timesignaturenumerator" => 6,
+      "beamingrules" => Map {
+        "groups" => Map {
+          "8" => Array [
+            6,
+            6,
+          ],
+        },
+      },
       "start" => 689280,
     },
     Map {
       "__kind" => "MasterBar",
+      "beamingrules" => Map {
+        "groups" => Map {
+          "8" => Array [
+            2,
+            2,
+            2,
+            2,
+          ],
+        },
+      },
       "start" => 695040,
     },
     Map {
