@@ -693,7 +693,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 continue;
             }
 
-            const beatLineX: number = this.getBeatX(beat, BeatXPosition.Stem);
+            const stemX: number = this.getBeatX(beat, BeatXPosition.Stem);
             let y1: number = cy + this.y;
             if (direction === BeamDirection.Up) {
                 y1 += this.getFlagBottomY(beat, direction);
@@ -701,14 +701,23 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 y1 += this.getFlagTopY(beat, direction);
             }
 
-            // ensure we are pixel aligned on the end of the stem to avoid anti-aliasing artifacts
-            // when combining stems and beams on sub-pixel level
-            const y2: number = (cy + this.y + this.calculateBeamY(h, beatLineX)) | 0;
+            const y2: number = cy + this.y + this.calculateBeamY(h, stemX);
+
+            // improve subpixel related artifacts on stem/beam overlaps
+            let stemY1: number;
+            let stemY2: number;
+            if (y1 < y2) {
+                stemY1 = y1;
+                stemY2 = y2;
+            } else {
+                stemY1 = y2;
+                stemY2 = y1;
+            }
 
             if (y1 < y2) {
-                this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, y1, y2, canvas);
+                this.paintBeamingStem(beat, cy + this.y, cx + this.x + stemX, stemY1, stemY2, canvas);
             } else {
-                this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, y2, y1, canvas);
+                this.paintBeamingStem(beat, cy + this.y, cx + this.x + stemX, stemY2, stemY1, canvas);
             }
 
             using _ = ElementStyleHelper.beat(canvas, beamsElement, beat);
@@ -716,9 +725,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
             const brokenBarOffset: number = this.smuflMetrics.brokenBeamWidth * scaleMod;
             const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             const barStart: number = cy + this.y;
+            const stemThickness = this.smuflMetrics.stemThickness;
 
             for (let barIndex: number = 0; barIndex < barCount; barIndex++) {
-                let barStartX: number = 0;
+                let barStartX: number = Math.floor(stemX + stemThickness);
                 let barEndX: number = 0;
                 let barStartY: number = 0;
                 let barEndY: number = 0;
@@ -737,8 +747,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                         beat.beamingMode === BeatBeamingMode.ForceSplitOnSecondaryToNext
                     ) {
                         // start part
-                        barStartX = beatLineX;
-                        barEndX = barStartX + brokenBarOffset;
+                        barEndX = Math.ceil(barStartX + brokenBarOffset);
                         barStartY = barY + this.calculateBeamY(h, barStartX);
                         barEndY = barY + this.calculateBeamY(h, barEndX);
                         LineBarRenderer.paintSingleBar(
@@ -751,8 +760,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
                         );
 
                         // end part
-                        barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.Stem);
-                        barStartX = barEndX - brokenBarOffset;
+                        barEndX = Math.floor(this.getBeatX(h.beats[i + 1], BeatXPosition.Stem));
+                        barStartX = Math.floor(barEndX - brokenBarOffset);
                         barStartY = barY + this.calculateBeamY(h, barStartX);
                         barEndY = barY + this.calculateBeamY(h, barEndX);
                         LineBarRenderer.paintSingleBar(
@@ -766,23 +775,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     } else {
                         if (isFullBarJoin) {
                             // full bar?
-                            barStartX = beatLineX;
-                            barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.Stem);
+                            barEndX = Math.ceil(this.getBeatX(h.beats[i + 1], BeatXPosition.Stem));
                         } else if (i === 0 || !BeamingHelper.isFullBarJoin(h.beats[i - 1], beat, barIndex)) {
-                            barStartX = beatLineX;
-                            barEndX = barStartX + brokenBarOffset;
+                            barEndX = Math.ceil(barStartX + brokenBarOffset);
                         } else {
                             continue;
                         }
                         barStartY = barY + this.calculateBeamY(h, barStartX);
                         barEndY = barY + this.calculateBeamY(h, barEndX);
-
-                        // ensure we are pixel aligned on the end of the stem to avoid anti-aliasing artifacts
-                        // when combining stems and beams on sub-pixel level
-                        if (barIndex === 0) {
-                            barStartY = barStartY | 0;
-                            barEndY = barEndY | 0;
-                        }
 
                         LineBarRenderer.paintSingleBar(
                             canvas,
@@ -794,9 +794,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
                         );
                     }
                 } else if (i > 0 && !BeamingHelper.isFullBarJoin(beat, h.beats[i - 1], barIndex)) {
-                    barStartX = beatLineX - brokenBarOffset;
-                    barEndX = beatLineX;
-                    barEndX = beatLineX;
+                    barEndX = Math.ceil(stemX);
+                    barStartX = Math.floor(stemX - brokenBarOffset);
                     barStartY = barY + this.calculateBeamY(h, barStartX);
                     barEndY = barY + this.calculateBeamY(h, barEndX);
                     LineBarRenderer.paintSingleBar(
@@ -810,6 +809,19 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 }
             }
         }
+
+        // const firstStartX = this.getBeatX(h.beats[0], BeatXPosition.Stem);
+        // const firstStartY = this.calculateBeamY(h, firstStartX);
+        // const lastEndX = this.getBeatX(h.beats[h.beats.length - 1], BeatXPosition.Stem);
+        // const lastEndY = this.calculateBeamY(h, lastEndX);
+        // canvas.lineWidth = 0.5;
+        // const c = canvas.color;
+        // canvas.color = new Color(255, 0, 0);
+        // canvas.moveTo(cx + this.x + firstStartX, cy + this.y + firstStartY);
+        // canvas.lineTo(cx + this.x + lastEndX, cy + this.y + lastEndY);
+        // canvas.stroke();
+        // canvas.lineWidth = 1;
+        // canvas.color = c;
 
         if (h.graceType === GraceType.BeforeBeat) {
             const beatLineX: number = this.getBeatX(h.beats[0], BeatXPosition.Stem);
@@ -1130,6 +1142,15 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     }
                 }
             }
+        }
+
+        // avoid subpixel induced problems by rounding
+        if (direction === BeamDirection.Up) {
+            drawingInfo.startY = Math.round(drawingInfo.startY);
+            drawingInfo.endY = Math.round(drawingInfo.endY);
+        } else {
+            drawingInfo.startY = Math.round(drawingInfo.startY);
+            drawingInfo.endY = Math.round(drawingInfo.endY);
         }
     }
     protected applyBarShift(
