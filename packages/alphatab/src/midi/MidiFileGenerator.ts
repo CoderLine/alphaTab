@@ -2013,8 +2013,7 @@ export class MidiFileGenerator {
 
         // the marks represent the duration
         let tpLength =
-            MidiUtils.toTicks(note.beat.tremoloPicking!.getDuration(note.beat.duration)) *
-            noteDuration.beatDurationFactor;
+            note.beat.tremoloPicking!.getDurationAsTicks(note.beat.duration) * noteDuration.beatDurationFactor;
 
         let tick: number = noteStart;
         const end: number = noteStart + noteDuration.untilTieOrSlideEnd;

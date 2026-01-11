@@ -1,4 +1,5 @@
-import type { Duration } from '@coderline/alphatab/model/Duration';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import { Duration } from '@coderline/alphatab/model/Duration';
 
 /**
  * The style of tremolo affecting mainly the display of the effect.
@@ -45,8 +46,8 @@ export class TremoloPickingEffect {
     public style: TremoloPickingStyle = TremoloPickingStyle.Default;
 
     /**
-     * The number of marks define the note value of the note repetition.
-     * e.g. a single mark is an 8th note.
+     * @internal
+     * @deprecated use {@link getDurationAsTicks} to handle tremolo durations shorter than typical durations.
      */
     public getDuration(beatDuration: Duration): Duration {
         let marks = this.marks;
@@ -55,6 +56,24 @@ export class TremoloPickingEffect {
         }
         const baseDuration = beatDuration as number;
         const actualDuration = baseDuration * Math.pow(2, marks);
-        return actualDuration as Duration;
+        if (actualDuration <= Duration.TwoHundredFiftySixth) {
+            return actualDuration as Duration;
+        } else {
+            return Duration.TwoHundredFiftySixth;
+        }
+    }
+
+    /**
+     * Gets the duration of a single tremolo note played in a beat of the given duration
+     * based on the configured marks.
+     */
+    public getDurationAsTicks(beatDuration: Duration): number {
+        let marks = this.marks;
+        if (marks < 1) {
+            marks = 1;
+        }
+        const baseDuration = beatDuration as number;
+        const actualDuration = baseDuration * Math.pow(2, marks);
+        return MidiUtils.valueToTicks(actualDuration);
     }
 }
