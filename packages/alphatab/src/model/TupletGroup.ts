@@ -82,11 +82,12 @@ export class TupletGroup {
         //    by checking all potential note durations.
         // this logic is very likely not 100% correct but for most cases the tuplets
         // appeared correct.
-        if (beat.playbackDuration !== this.beats[0].playbackDuration) {
+
+        if (beat.displayDuration !== this.beats[0].displayDuration) {
             this._isEqualLengthTuplet = false;
         }
         this.beats.push(beat);
-        this.totalDuration += beat.playbackDuration;
+        this.totalDuration += beat.displayDuration;
         if (this._isEqualLengthTuplet) {
             if (this.beats.length === this.beats[0].tupletNumerator) {
                 this.isFull = true;
