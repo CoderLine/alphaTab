@@ -649,9 +649,6 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
 
     setupSelectionHandles(el, at);
 
-    // TEMP: for testing without sound
-    at.masterVolume = 0;
-
     // expose api for fiddling in developer tools
     (window as any).api = at;
     (window as any).alphaTab = alphaTab;

@@ -23,6 +23,8 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
 import type { Score } from '@coderline/alphatab/model/Score';
+import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Settings } from '@coderline/alphatab/Settings';
 import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
@@ -32,7 +34,7 @@ import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/Positio
 import { expect } from 'chai';
 import {
     FlatControlChangeEvent,
-    type FlatMidiEvent,
+    FlatMidiEvent,
     FlatMidiEventGenerator,
     FlatNoteBendEvent,
     FlatNoteEvent,
@@ -1933,5 +1935,159 @@ describe('MidiFileGeneratorTest', () => {
         wrapper.tickPosition = 0;
         expect(lastArgs!.currentTick).to.equal(tickImprecision);
         expect(synth.tickPosition).to.equal(handler.tickShift + tickImprecision);
+    });
+
+    describe('effect-note-durations', () => {
+        function test(tex: string, applyEffect: (beat: Beat) => void) {
+            const score = ScoreLoader.loadAlphaTex(tex);
+            let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+            while (beat) {
+                applyEffect(beat);
+                beat = beat.nextBeat;
+            }
+
+            const settings = new Settings();
+            settings.player.playTripletFeel = true;
+
+            score.finish(settings);
+
+            const flat = new FlatMidiEventGenerator();
+            const generator: MidiFileGenerator = new MidiFileGenerator(score, settings, flat);
+            generator.generate();
+
+            const noteEvents = flat.midiEvents
+                .filter<FlatMidiEvent>(e => e instanceof FlatNoteEvent)
+                .map(
+                    e =>
+                        `Note: ${Tuning.getTextForTuning((e as FlatNoteEvent).key, true)} ${(e as FlatNoteEvent).length}`
+                );
+
+            expect(noteEvents).toMatchSnapshot();
+        }
+
+        function addTrill(b: Beat) {
+            if (b.graceType !== GraceType.None) {
+                return;
+            }
+            b.notes[0].trillValue = b.notes[0].realValue + 12;
+            b.notes[0].trillSpeed = Duration.ThirtySecond;
+        }
+
+        function addTremolo(b: Beat, marks: number) {
+            if (b.graceType !== GraceType.None) {
+                return;
+            }
+            b.tremoloPicking = new TremoloPickingEffect();
+            b.tremoloPicking.marks = marks;
+            b.tremoloPicking.style = TremoloPickingStyle.Default;
+        }
+
+        // as reference to check snapshots
+        describe('plain', () => {
+            const tex = `
+                :8
+                5.3
+                7.3
+                9.3
+                10.3
+            `;
+
+            it('tripletfeel', () => test(`\\tf triplet8th ${tex}`, _b => {}));
+            it('tuplet', () =>
+                test(tex, b => {
+                    b.tupletNumerator = 3;
+                    b.tupletDenominator = 2;
+                }));
+            it('dot', () =>
+                test(tex, b => {
+                    b.dots = 1;
+                }));
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        describe('tuplet', () => {
+            const tex = `
+                :8
+                5.3 {tu 3}
+                7.3 {tu 3}
+                9.3 {tu 3}
+            `;
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        describe('dots', () => {
+            const tex = `
+                :8
+                5.3 {d}
+                7.3 {d}
+                9.3 {d}
+            `;
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        describe('triplet-feel', () => {
+            const tex = `
+                \\tf triplet8th 
+                :8
+                5.3
+                7.3
+                9.3
+                10.3
+            `;
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        describe('grace-notes-on-beat', () => {
+            const tex = `
+                :8
+                3.5 {gr ob}
+                5.3
+                5.5 {gr ob}
+                7.3
+                7.5 {gr ob}
+                9.3
+                9.5 {gr ob}
+                10.3
+            `;
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        describe('grace-notes-before-beat', () => {
+            const tex = `
+                :8            
+                5.3 {gr bb}
+                5.3
+                7.3 {gr bb}
+                7.3
+                9.3 {gr bb}
+                9.3
+                10.3 {gr bb}
+                10.3
+            `;
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        // NOTE: there might be more affected effects which we assume are "good enough" with the
+        // current behavior. combining these effects are rather unlikely like:
+        // * brush-strokes combined with trills or tremolos
+        // * rasgueados combined with trills or tremolos
     });
 });

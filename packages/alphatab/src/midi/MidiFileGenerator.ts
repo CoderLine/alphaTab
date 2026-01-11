@@ -49,6 +49,13 @@ class MidiNoteDuration {
     public noteOnly: number = 0;
     public untilTieOrSlideEnd: number = 0;
     public letRingEnd: number = 0;
+    /**
+     * A factor indicating how much longer/shorter the beat is in its playback respecting
+     * effects like tuplets, triplet feels, dots, grace beats stealing parts etc.
+     *
+     * This factor can be used to relatively adjust durations in effects like trills or tremolos.
+     */
+    public beatDurationFactor: number = 1;
 }
 
 /**
@@ -142,9 +149,6 @@ export class MidiFileGenerator {
             this._generateTrack(track);
         }
 
-        // tickshift is added after initial track channel details
-        this._detectTickShift();
-
         Logger.debug('Midi', 'Begin midi generation');
 
         this.syncPoints = [];
@@ -154,6 +158,10 @@ export class MidiFileGenerator {
             false,
             (bar, previousMasterBar, currentTick, currentTempo, occurence) => {
                 this._generateMasterBar(bar, previousMasterBar, currentTick, currentTempo, occurence);
+                if (bar.index === 0 && occurence === 0) {
+                    // tickshift is added after initial track channel details
+                    this._detectTickShift();
+                }
             },
             (index, currentTick, currentTempo) => {
                 for (const track of this._score.tracks) {
@@ -1158,15 +1166,19 @@ export class MidiFileGenerator {
         this._handler.addNote(track.index, noteStart, remaining, noteKey, velocity, channel);
     }
 
-    private _getNoteDuration(note: Note, duration: number, tempoOnBeatStart: number): MidiNoteDuration {
+    private _getNoteDuration(note: Note, beatPlayDuration: number, tempoOnBeatStart: number): MidiNoteDuration {
         const durationWithEffects: MidiNoteDuration = new MidiNoteDuration();
-        durationWithEffects.noteOnly = duration;
-        durationWithEffects.untilTieOrSlideEnd = duration;
-        durationWithEffects.letRingEnd = duration;
+
+        const defaultBeatDuration = MidiUtils.toTicks(note.beat.duration);
+        durationWithEffects.beatDurationFactor = beatPlayDuration / defaultBeatDuration;
+
+        durationWithEffects.noteOnly = beatPlayDuration;
+        durationWithEffects.untilTieOrSlideEnd = beatPlayDuration;
+        durationWithEffects.letRingEnd = beatPlayDuration;
         if (note.isDead) {
             durationWithEffects.noteOnly = this._applyStaticDuration(
                 MidiFileGenerator._defaultDurationDead,
-                duration,
+                beatPlayDuration,
                 tempoOnBeatStart
             );
             durationWithEffects.untilTieOrSlideEnd = durationWithEffects.noteOnly;
@@ -1176,7 +1188,7 @@ export class MidiFileGenerator {
         if (note.isPalmMute) {
             durationWithEffects.noteOnly = this._applyStaticDuration(
                 MidiFileGenerator._defaultDurationPalmMute,
-                duration,
+                beatPlayDuration,
                 tempoOnBeatStart
             );
             durationWithEffects.untilTieOrSlideEnd = durationWithEffects.noteOnly;
@@ -1184,7 +1196,7 @@ export class MidiFileGenerator {
             return durationWithEffects;
         }
         if (note.isStaccato) {
-            durationWithEffects.noteOnly = (duration / 2) | 0;
+            durationWithEffects.noteOnly = (beatPlayDuration / 2) | 0;
             durationWithEffects.untilTieOrSlideEnd = durationWithEffects.noteOnly;
             durationWithEffects.letRingEnd = durationWithEffects.noteOnly;
             return durationWithEffects;
@@ -1211,7 +1223,8 @@ export class MidiFileGenerator {
                         endNote.beat.playbackDuration,
                         tempoOnBeatStart
                     );
-                    durationWithEffects.untilTieOrSlideEnd = duration + tieDestinationDuration.untilTieOrSlideEnd;
+                    durationWithEffects.untilTieOrSlideEnd =
+                        beatPlayDuration + tieDestinationDuration.untilTieOrSlideEnd;
                 }
             }
         } else if (note.slideOutType === SlideOutType.Legato) {
@@ -1254,7 +1267,7 @@ export class MidiFileGenerator {
                 }
             }
             if (lastLetRingBeat === note.beat) {
-                durationWithEffects.letRingEnd = duration;
+                durationWithEffects.letRingEnd = beatPlayDuration;
             } else {
                 durationWithEffects.letRingEnd = letRingEnd;
             }
@@ -1966,7 +1979,10 @@ export class MidiFileGenerator {
     ): void {
         const track: Track = note.beat.voice.bar.staff.track;
         const trillKey: number = note.stringTuning + note.trillFret;
+        // NOTE: no noteDuration.beatDurationFactor, the trill speed is absolute and not dependent on the
+        // beat effects
         let trillLength: number = MidiUtils.toTicks(note.trillSpeed);
+
         let realKey: boolean = true;
         let tick: number = noteStart;
         const end: number = noteStart + noteDuration.untilTieOrSlideEnd;
@@ -1975,7 +1991,7 @@ export class MidiFileGenerator {
             if (tick + trillLength >= end) {
                 trillLength = end - tick;
             }
-            this._handler.addNote(track.index, tick, trillLength, realKey ? trillKey : noteKey, dynamicValue, channel);
+            this._handler.addNote(track.index, tick, trillLength, realKey ? noteKey : trillKey, dynamicValue, channel);
             realKey = !realKey;
             tick += trillLength;
         }
@@ -1994,9 +2010,11 @@ export class MidiFileGenerator {
         if (marks === 0) {
             return;
         }
-        
+
         // the marks represent the duration
-        let tpLength = MidiUtils.toTicks(note.beat.tremoloPicking!.duration);
+        let tpLength =
+            note.beat.tremoloPicking!.getDurationAsTicks(note.beat.duration) * noteDuration.beatDurationFactor;
+
         let tick: number = noteStart;
         const end: number = noteStart + noteDuration.untilTieOrSlideEnd;
 
