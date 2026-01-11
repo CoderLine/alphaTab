@@ -36,7 +36,7 @@ export { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 export { KeySignature } from '@coderline/alphatab/model/KeySignature';
 export { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 export { Lyrics } from '@coderline/alphatab/model/Lyrics';
-export { MasterBar } from '@coderline/alphatab/model/MasterBar';
+export { MasterBar, BeamingRules } from '@coderline/alphatab/model/MasterBar';
 export { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 export { Note, NoteSubElement, NoteStyle } from '@coderline/alphatab/model/Note';
 export { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
