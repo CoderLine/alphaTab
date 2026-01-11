@@ -1,4 +1,4 @@
-import { Duration } from '@coderline/alphatab/model/Duration';
+import type { Duration } from '@coderline/alphatab/model/Duration';
 
 /**
  * The style of tremolo affecting mainly the display of the effect.
@@ -48,13 +48,13 @@ export class TremoloPickingEffect {
      * The number of marks define the note value of the note repetition.
      * e.g. a single mark is an 8th note.
      */
-    public get duration(): Duration {
+    public getDuration(beatDuration: Duration): Duration {
         let marks = this.marks;
         if (marks < 1) {
             marks = 1;
         }
-        const baseDuration = Duration.Eighth as number;
-        const actualDuration = baseDuration * Math.pow(2, marks - 1);
+        const baseDuration = beatDuration as number;
+        const actualDuration = baseDuration * Math.pow(2, marks);
         return actualDuration as Duration;
     }
 }

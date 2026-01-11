@@ -554,7 +554,7 @@ export class Beat {
     public get tremoloSpeed(): Duration | null {
         const tremolo = this.tremoloPicking;
         if (tremolo) {
-            return tremolo.duration;
+            return tremolo.getDuration(this.duration);
         }
         return null;
     }
