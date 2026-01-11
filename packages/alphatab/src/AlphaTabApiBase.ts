@@ -53,7 +53,7 @@ import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventAr
 import type { IUiFacade } from '@coderline/alphatab/platform/IUiFacade';
 import { ResizeEventArgs } from '@coderline/alphatab/ResizeEventArgs';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
-import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { ScoreRendererWrapper } from '@coderline/alphatab/rendering/ScoreRendererWrapper';
@@ -631,6 +631,7 @@ export class AlphaTabApiBase<TSettings> {
      * @param score The score containing the tracks to be rendered.
      * @param trackIndexes The indexes of the tracks from the song that should be rendered. If not provided, the first track of the
      * song will be shown.
+     * @param renderHints Additional hints to respect during layouting and rendering.
      *
      * @category Methods - Core
      * @since 0.9.4
@@ -655,7 +656,7 @@ export class AlphaTabApiBase<TSettings> {
      * api.renderScore(generateScore(), alphaTab.collections.DoubleList(2, 3));
      * ```
      */
-    public renderScore(score: Score, trackIndexes?: number[]): void {
+    public renderScore(score: Score, trackIndexes?: number[], renderHints?: RenderHints): void {
         const tracks: Track[] = [];
         if (!trackIndexes) {
             if (score.tracks.length > 0) {
@@ -678,12 +679,13 @@ export class AlphaTabApiBase<TSettings> {
                 }
             }
         }
-        this._internalRenderTracks(score, tracks);
+        this._internalRenderTracks(score, tracks, renderHints);
     }
 
     /**
      * Renders the given list of tracks.
      * @param tracks The tracks to render. They must all belong to the same score.
+     * @param renderHints Additional hints to respect during layouting and rendering.
      *
      * @category Methods - Core
      * @since 0.9.4
@@ -714,7 +716,7 @@ export class AlphaTabApiBase<TSettings> {
      * }
      * ```
      */
-    public renderTracks(tracks: Track[]): void {
+    public renderTracks(tracks: Track[], renderHints?: RenderHints): void {
         if (tracks.length > 0) {
             const score: Score = tracks[0].score;
             for (const track of tracks) {
@@ -728,11 +730,11 @@ export class AlphaTabApiBase<TSettings> {
                     return;
                 }
             }
-            this._internalRenderTracks(score, tracks);
+            this._internalRenderTracks(score, tracks, renderHints);
         }
     }
 
-    private _internalRenderTracks(score: Score, tracks: Track[]): void {
+    private _internalRenderTracks(score: Score, tracks: Track[], renderHints: RenderHints | undefined): void {
         ModelUtils.applyPitchOffsets(this.settings, score);
         if (score !== this.score) {
             this._score = score;
@@ -745,7 +747,7 @@ export class AlphaTabApiBase<TSettings> {
             this._trackIndexLookup = new Set<number>(this._trackIndexes);
             this._onScoreLoaded(score);
             this.loadMidiForScore();
-            this.render();
+            this.render(renderHints);
         } else {
             this._tracks = tracks;
 
@@ -761,7 +763,7 @@ export class AlphaTabApiBase<TSettings> {
             }
             this._trackIndexLookup = new Set<number>(this._trackIndexes);
 
-            this.render();
+            this.render(renderHints);
         }
     }
 
@@ -949,6 +951,7 @@ export class AlphaTabApiBase<TSettings> {
 
     /**
      * Initiates a re-rendering of the current setup.
+     * @param renderHints Additional hints to respect during layouting and rendering.
      * @remarks
      * If rendering is not yet possible, it will be deferred until the UI changes to be ready for rendering.
      *
@@ -975,13 +978,13 @@ export class AlphaTabApiBase<TSettings> {
      * api.render()
      * ```
      */
-    public render(): void {
+    public render(renderHints?: RenderHints): void {
         if (this.uiFacade.canRender) {
             // when font is finally loaded, start rendering
             this._renderer.width = this.container.width;
-            this._renderer.renderScore(this.score, this._trackIndexes);
+            this._renderer.renderScore(this.score, this._trackIndexes, renderHints);
         } else {
-            this.uiFacade.canRenderChanged.on(() => this.render());
+            this.uiFacade.canRenderChanged.on(() => this.render(renderHints));
         }
     }
 
@@ -2379,7 +2382,9 @@ export class AlphaTabApiBase<TSettings> {
         if (shouldScroll && !this._isBeatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {
             const handler = this.customScrollHandler ?? this._defaultScrollHandler;
             if (handler) {
-                handler.onBeatCursorUpdating(beatBoundings, nextBeatBoundings === null ? undefined : nextBeatBoundings,
+                handler.onBeatCursorUpdating(
+                    beatBoundings,
+                    nextBeatBoundings === null ? undefined : nextBeatBoundings,
                     cursorMode,
                     startBeatX,
                     nextBeatX,

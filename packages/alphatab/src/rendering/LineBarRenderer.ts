@@ -714,11 +714,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 stemY2 = y1;
             }
 
-            if (y1 < y2) {
-                this.paintBeamingStem(beat, cy + this.y, cx + this.x + stemX, stemY1, stemY2, canvas);
-            } else {
-                this.paintBeamingStem(beat, cy + this.y, cx + this.x + stemX, stemY2, stemY1, canvas);
-            }
+            this.paintBeamingStem(beat, cy + this.y, cx + this.x + stemX, stemY1, stemY2, canvas);
 
             using _ = ElementStyleHelper.beat(canvas, beamsElement, beat);
 

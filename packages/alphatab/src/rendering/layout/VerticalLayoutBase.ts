@@ -1,12 +1,13 @@
 import { Logger } from '@coderline/alphatab/Logger';
 import { ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
+import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 
 /**
  * Base layout for page and parchment style layouts where we have an endless
@@ -18,10 +19,14 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
     private _barsFromPreviousSystem: MasterBarsRenderers[] = [];
 
-    protected doLayoutAndRender(): void {
+    private _reuseViewPort: boolean = false;
+
+    protected doLayoutAndRender(renderHints: RenderHints | undefined): void {
         let y: number = this.pagePadding![1];
         this.width = this.renderer.width;
         this._allMasterBarRenderers = [];
+        this._reuseViewPort = renderHints?.reuseViewport ?? false;
+
         //
         // 1. Score Info
         y = this._layoutAndRenderScoreInfo(y, -1);
@@ -42,6 +47,11 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         this.height = (y + this.pagePadding![3]) * this.renderer.settings.display.scale;
     }
 
+    protected override registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void): void {
+        args.reuseViewport = this._reuseViewPort;
+        super.registerPartial(args, callback);
+    }
+
     public get supportsResize(): boolean {
         return true;
     }
@@ -58,6 +68,8 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         let y: number = this.pagePadding![1];
         this.width = this.renderer.width;
         const oldHeight: number = this.height;
+        this._reuseViewPort = true;
+
         //
         // 1. Score Info
         y = this._layoutAndRenderScoreInfo(y, oldHeight);
@@ -332,13 +344,13 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
 
         // NOTE: it currently delivers best results if we evenly distribute the available space across bars
         // scaling bars relatively to their computed width, rather causes distortions whenever bars have
-        // pre-beat glyphs. 
+        // pre-beat glyphs.
 
         // most precise scaling would come if we use the contents (voiceContainerGlyph) width as a calculation
-        // factor. but this would make the calculation additionally complex with not much gain. 
-        
-        const difference: number = width - system.computedWidth; 
-        const spacePerBar: number = difference / system.masterBarsRenderers.length; 
+        // factor. but this would make the calculation additionally complex with not much gain.
+
+        const difference: number = width - system.computedWidth;
+        const spacePerBar: number = difference / system.masterBarsRenderers.length;
 
         for (const s of system.allStaves) {
             s.resetSharedLayoutData();
@@ -354,7 +366,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
                     const barDisplayScale = system.getBarDisplayScale(renderer);
                     actualBarWidth = (barDisplayScale * staffWidth) / totalScale;
                 } else {
-                    actualBarWidth = renderer.computedWidth + spacePerBar; 
+                    actualBarWidth = renderer.computedWidth + spacePerBar;
                 }
 
                 renderer.scaleToWidth(actualBarWidth);

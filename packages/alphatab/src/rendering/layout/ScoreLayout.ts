@@ -9,12 +9,14 @@ import type { Staff } from '@coderline/alphatab/model/Staff';
 import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { ChordDiagramContainerGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import { TuningContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TuningContainerGlyph';
 import { TuningGlyph } from '@coderline/alphatab/rendering/glyphs/TuningGlyph';
+import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { SlurRegistry } from '@coderline/alphatab/rendering/layout/SlurRegistry';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
@@ -22,7 +24,6 @@ import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { Lazy } from '@coderline/alphatab/util/Lazy';
 
@@ -83,7 +84,7 @@ export abstract class ScoreLayout {
     }
     public abstract doResize(): void;
 
-    public layoutAndRender(): void {
+    public layoutAndRender(renderHints?: RenderHints): void {
         this._lazyPartials.clear();
         this.slurRegistry.clear();
         this.beamingRuleLookups.clear();
@@ -112,7 +113,7 @@ export abstract class ScoreLayout {
         }
 
         this._createScoreInfoGlyphs();
-        this.doLayoutAndRender();
+        this.doLayoutAndRender(renderHints);
     }
 
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
@@ -156,7 +157,7 @@ export abstract class ScoreLayout {
         }
     }
 
-    protected abstract doLayoutAndRender(): void;
+    protected abstract doLayoutAndRender(renderHints: RenderHints | undefined): void;
 
     protected static readonly headerElements: Lazy<Map<ScoreSubElement, NotationElement | undefined>> = new Lazy(
         () =>

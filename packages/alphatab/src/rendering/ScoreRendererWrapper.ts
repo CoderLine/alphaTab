@@ -1,6 +1,11 @@
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import {
+    EventEmitter,
+    EventEmitterOfT,
+    type IEventEmitter,
+    type IEventEmitterOfT
+} from '@coderline/alphatab/EventEmitter';
 import type { Score } from '@coderline/alphatab/model/Score';
-import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -85,18 +90,18 @@ export class ScoreRendererWrapper implements IScoreRenderer {
         }
     }
 
-    public render(): void {
-        this._instance?.render();
+    public render(renderHints?: RenderHints): void {
+        this._instance?.render(renderHints);
     }
 
     public resizeRender(): void {
         this._instance?.resizeRender();
     }
 
-    public renderScore(score: Score | null, trackIndexes: number[] | null): void {
+    public renderScore(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
         this._score = score;
         this._trackIndexes = trackIndexes;
-        this._instance?.renderScore(score, trackIndexes);
+        this._instance?.renderScore(score, trackIndexes, renderHints);
     }
 
     public renderResult(resultId: string): void {

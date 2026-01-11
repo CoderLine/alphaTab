@@ -118,7 +118,9 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
 
         sessionStorage.setItem('alphatex-editor.code', tex);
         fromTex = true;
-        api.renderTracks(score.tracks);
+        api.renderTracks(score.tracks, {
+            reuseViewport: true
+        });
         fromTex = false;
     }
 
