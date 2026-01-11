@@ -678,6 +678,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             placeholder.renderedResultId = undefined;
             placeholder.renderedResult = undefined;
 
+            if (!renderResult.reuseViewport) {
+                placeholder.textContent = '';
+            }
             this._resultIdToElementLookup.set(renderResult.id, placeholder);
 
             // remember which bar is contained in which node for faster lookup

@@ -1,9 +1,14 @@
 import type { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
-import { EventEmitter, type IEventEmitterOfT, type IEventEmitter, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import {
+    EventEmitter,
+    type IEventEmitterOfT,
+    type IEventEmitter,
+    EventEmitterOfT
+} from '@coderline/alphatab/EventEmitter';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
-import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -55,9 +60,10 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         return jsObject;
     }
 
-    public render(): void {
+    public render(renderHints?: RenderHints): void {
         this._worker.postMessage({
-            cmd: 'alphaTab.render'
+            cmd: 'alphaTab.render',
+            renderHints: renderHints
         });
     }
 
@@ -113,13 +119,15 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         }
     }
 
-    public renderScore(score: Score | null, trackIndexes: number[] | null): void {
-        const jsObject: unknown = score == null ? null : JsonConverter.scoreToJsObject(Environment.prepareForPostMessage(score));
+    public renderScore(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
+        const jsObject: unknown =
+            score == null ? null : JsonConverter.scoreToJsObject(Environment.prepareForPostMessage(score));
         this._worker.postMessage({
             cmd: 'alphaTab.renderScore',
             score: jsObject,
             trackIndexes: Environment.prepareForPostMessage(trackIndexes),
-            fontSizes: FontSizes.fontSizeLookupTables
+            fontSizes: FontSizes.fontSizeLookupTables,
+            renderHints
         });
     }
 
@@ -128,7 +136,8 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         new EventEmitterOfT<RenderFinishedEventArgs>();
     public readonly partialLayoutFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
         new EventEmitterOfT<RenderFinishedEventArgs>();
-    public readonly renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    public readonly renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
+        new EventEmitterOfT<RenderFinishedEventArgs>();
     public readonly postRenderFinished: IEventEmitter = new EventEmitter();
     public readonly error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
 }

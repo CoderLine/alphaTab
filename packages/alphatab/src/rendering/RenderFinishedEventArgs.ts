@@ -10,6 +10,20 @@ export class RenderFinishedEventArgs {
      * Gets or sets the unique id of this event args.
      */
     public id: string = ModelUtils.newGuid();
+
+    /**
+     * A value indicating whether the currently rendered viewport can be reused.
+     * @remarks
+     * If set to true, the viewport does NOT need to be cleared as a similar
+     * content will be rendered.
+     * If set to false, the viewport and any visual partials should be cleared
+     * as it could lead to UI disturbances otherwise.
+     *
+     * The viewport can be typically used on resize renders or if the user supplied
+     * a rendering hint that the new score is "similar" to the old one (e.g. in case of live-editing).
+     */
+    public reuseViewport: boolean = true;
+
     /**
      * Gets or sets the x position of the current rendering result.
      */

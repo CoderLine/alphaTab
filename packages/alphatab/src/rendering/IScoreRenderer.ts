@@ -6,6 +6,22 @@ import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLoo
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
+ * Additional hints which should be respected during layout and rendering of the score.
+ * @public
+ */
+export interface RenderHints {
+    /**
+     * A value indicating whether the currently rendered viewport can be reused when rendering the score.
+     * @remarks
+     * Set this property to true in cases of live-editing where the rendered score changes from an object perspective,
+     * but remains the similar from a content perspective. This way the visual update will appear more smooth than a full clearing.
+     *
+     * internally it might still be decided to clear the viewport.
+     */
+    reuseViewport?: boolean;
+}
+
+/**
  * Represents the public interface of the component that can render scores.
  * @public
  */
@@ -31,9 +47,10 @@ export interface IScoreRenderer {
 
     /**
      * Initiates a re-rendering of the current setup.
+     * @param renderHints Additional hints to respect during layouting and rendering.
      * @since 0.9.6
      */
-    render(): void;
+    render(renderHints?: RenderHints): void;
 
     /**
      * Initiates a resize-optimized re-rendering of the score using the current settings.
@@ -53,9 +70,10 @@ export interface IScoreRenderer {
      * Initiates the rendering of the specified tracks of the given score.
      * @param score The score defining the tracks.
      * @param trackIndexes The indexes of the tracks to draw.
+     * @param renderHints Additional hints to respect during layouting and rendering.
      * @since 0.9.6
      */
-    renderScore(score: Score | null, trackIndexes: number[] | null): void;
+    renderScore(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void;
 
     /**
      * Requests the rendering of a chunk which was layed out before.

@@ -2,6 +2,7 @@ import { Logger } from '@coderline/alphatab/Logger';
 import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
@@ -44,7 +45,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         // not supported
     }
 
-    protected doLayoutAndRender(): void {
+    protected doLayoutAndRender(renderHints: RenderHints | undefined): void {
         const score: Score = this.renderer.score!;
 
         let startIndex: number = this.renderer.settings.display.startBar;
@@ -107,6 +108,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
             const partial: HorizontalScreenLayoutPartialInfo = partials[i];
 
             const e = new RenderFinishedEventArgs();
+            e.reuseViewport = renderHints?.reuseViewport ?? false;
             e.x = x;
             e.y = 0;
             e.totalWidth = this.width;
