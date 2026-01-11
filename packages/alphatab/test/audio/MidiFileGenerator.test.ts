@@ -34,7 +34,7 @@ import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/Positio
 import { expect } from 'chai';
 import {
     FlatControlChangeEvent,
-    type FlatMidiEvent,
+    FlatMidiEvent,
     FlatMidiEventGenerator,
     FlatNoteBendEvent,
     FlatNoteEvent,
@@ -1956,8 +1956,11 @@ describe('MidiFileGeneratorTest', () => {
             generator.generate();
 
             const noteEvents = flat.midiEvents
-                .filter(e => e instanceof FlatNoteEvent)
-                .map(e => `Note: ${Tuning.getTextForTuning(e.key, true)} ${e.length}`);
+                .filter<FlatMidiEvent>(e => e instanceof FlatNoteEvent)
+                .map(
+                    e =>
+                        `Note: ${Tuning.getTextForTuning((e as FlatNoteEvent).key, true)} ${(e as FlatNoteEvent).length}`
+                );
 
             expect(noteEvents).toMatchSnapshot();
         }
