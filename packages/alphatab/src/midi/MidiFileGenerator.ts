@@ -149,9 +149,6 @@ export class MidiFileGenerator {
             this._generateTrack(track);
         }
 
-        // tickshift is added after initial track channel details
-        this._detectTickShift();
-
         Logger.debug('Midi', 'Begin midi generation');
 
         this.syncPoints = [];
@@ -161,6 +158,10 @@ export class MidiFileGenerator {
             false,
             (bar, previousMasterBar, currentTick, currentTempo, occurence) => {
                 this._generateMasterBar(bar, previousMasterBar, currentTick, currentTempo, occurence);
+                if (bar.index === 0 && occurence === 0) {
+                    // tickshift is added after initial track channel details
+                    this._detectTickShift();
+                }
             },
             (index, currentTick, currentTempo) => {
                 for (const track of this._score.tracks) {
