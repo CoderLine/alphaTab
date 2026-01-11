@@ -9,9 +9,7 @@ sidebar_custom_props:
 import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="0.9.4" />
-
-### Description
-This event is fired whenever a new song is loaded. This event is fired whenever a new song is loaded or changing due to <Signature style="inline" js={[["identifier","renderScore","/docs/reference/types/alphatabapibase/renderscore"]]} /> or <Signature style="inline" js={[["identifier","renderTracks","/docs/reference/types/alphatabapibase/rendertracks"]]} /> calls.
+This event is fired whenever a new song is loaded. This event is fired whenever a new song is loaded or changing due to <Signature style="inline" js={[["identifier","renderScore","/docs/reference/types/alphatabapibase#renderscore"]]}>renderScore</Signature>  or <Signature style="inline" js={[["identifier","renderTracks","/docs/reference/types/alphatabapibase#rendertracks"]]}>renderTracks</Signature>  calls.
 It is fired after the transposition midi pitches from the settings were applied, but before any midi is generated or rendering is started.
 This allows any modification of the score before further processing.
 

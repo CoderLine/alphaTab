@@ -9,11 +9,9 @@ sidebar_custom_props:
 import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="0.9.4" />
-
-### Description
-Applies any changes that were done to the settings object. It also informs the <Signature style="inline" js={[["identifier","renderer","/docs/reference/types/alphatabapibase/renderer"]]} /> about any new values to consider.
+Applies any changes that were done to the settings object. It also informs the <Signature style="inline" js={[["identifier","renderer","/docs/reference/types/alphatabapibase#renderer"]]}>renderer</Signature>  about any new values to consider.
 By default alphaTab will not trigger any re-rendering or settings update just if the settings object itself was changed. This method must be called
-to trigger an update of the settings in all components. Then a re-rendering can be initiated using the <Signature style="inline" js={[["identifier","render","/docs/reference/types/alphatabapibase/render"]]} /> method.
+to trigger an update of the settings in all components. Then a re-rendering can be initiated using the <Signature style="inline" js={[["identifier","render","/docs/reference/types/alphatabapibase#render"]]}>render</Signature>  method.
 
 <Signature style="block"
            js={[["identifier","updateSettings"],["token","("],["token",")"],["token",":"],["whitespace"," "],["identifier","void"]]}

@@ -9,11 +9,9 @@ sidebar_custom_props:
 import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="1.2.3" />
-
-### Description
 This event is fired whenever the user moves the mouse over a note after the user already pressed the button on a note. This event is fired whenever the user moves the mouse over a note after the user already pressed the button on a note.
-It is only fired if <Signature style="inline" js={[["identifier","CoreSettings.includeNoteBounds","/docs/reference/settings/core/includenotebounds"]]} /> was set to `true` because
-only then this hit detection can be done. A click on a note is considered if the note head or the note number on tabs are clicked as documented in <Signature style="inline" js={[["identifier","boundsLookup","/docs/reference/types/alphatabapibase/boundslookup"]]} />
+It is only fired if <Signature style="inline" js={[["identifier","CoreSettings.includeNoteBounds","/docs/reference/settings/core/includenotebounds"]]}>CoreSettings.includeNoteBounds</Signature>  was set to `true` because
+only then this hit detection can be done. A click on a note is considered if the note head or the note number on tabs are clicked as documented in <Signature style="inline" js={[["identifier","boundsLookup","/docs/reference/types/alphatabapibase#boundslookup"]]}>boundsLookup</Signature>
 
 <Signature style="block"
            js={[["keyword","readonly"],["whitespace"," "],["identifier","noteMouseMove"],["token",":"],["whitespace"," "],["identifier","IEventEmitterOfT","/docs/reference/types/ieventemitteroft"],["token","<"],["identifier","Note","/docs/reference/types/model/note"],["token",">"],["token",";"]]}

@@ -62,7 +62,7 @@ const sidebars: SidebarsConfig = {
           id: "reference/settings",
         },
         className: "reference-item",
-        collapsible: false,
+        collapsible: true,
         collapsed: true,
         items: [
           {
@@ -79,7 +79,7 @@ const sidebars: SidebarsConfig = {
           id: "reference/api",
         },
         className: "reference-item",
-        collapsible: false,
+        collapsible: true,
         collapsed: true,
         items: [
           {
@@ -144,15 +144,15 @@ const sidebars: SidebarsConfig = {
     alphaTex: [
       {
         type: 'doc',
-        id:  "alphatex/introduction"
+        id: "alphatex/introduction"
       },
       {
         type: 'doc',
-        id:  "alphatex/syntax"
+        id: "alphatex/syntax"
       },
       {
         type: 'doc',
-        id:  "alphatex/document-structure"
+        id: "alphatex/document-structure"
       },
       {
         type: 'category',
@@ -167,18 +167,18 @@ const sidebars: SidebarsConfig = {
           "alphatex/beat-properties",
           "alphatex/note-properties",
         ]
-      }, 
-      {
-        type: 'doc',
-        id:  "alphatex/importer"
       },
       {
         type: 'doc',
-        id:  "alphatex/lsp"
+        id: "alphatex/importer"
       },
       {
         type: 'doc',
-        id:  "alphatex/monaco"
+        id: "alphatex/lsp"
+      },
+      {
+        type: 'doc',
+        id: "alphatex/monaco"
       }
     ],
   },

@@ -34,8 +34,8 @@ The audio exporter follows an asynchronous pull pattern:
 To export the audio you follow tree main steps: 
 
 1. You start a new exporter with [`await api.exportAudio(...)`](/docs/reference/api/exportaudio.mdx). 
-2. You call [`exporter.render(<milliseconds>)`](/docs/reference/types/synth/iaudioexporter/render.mdx) to produce a chunk of audio which you can then process further. (repeated until end is reached).
-3. You cleanup the exporter via [`exporter.destroy()`](/docs/reference/types/synth/iaudioexporter/destroy.mdx). The exporter also implements `Disposable` (`IDisposable` for C#, `AutoCloseable` for `Kotlin`) which allows easy cleanup via language features if supported.
+2. You call [`exporter.render(<milliseconds>)`](/docs/reference/types/synth/iaudioexporter#render) to produce a chunk of audio which you can then process further. (repeated until end is reached).
+3. You cleanup the exporter via [`exporter.destroy()`](/docs/reference/types/synth/iaudioexporter#destroy). The exporter also implements `Disposable` (`IDisposable` for C#, `AutoCloseable` for `Kotlin`) which allows easy cleanup via language features if supported.
 
 > [!WARNING]
 > The raw audio samples for a whole song can consume quite a huge amount of memory: A calculation example:
@@ -52,14 +52,14 @@ To export the audio you follow tree main steps:
 
 The [`AudioExportOptions`](/docs/reference/types/synth/audioexportoptions/index.mdx) allow customizing various aspects of the audio exported: 
 
-* [`soundFonts`](/docs/reference/types/synth/audioexportoptions/soundfonts.mdx) can be used to customize the soundfonts used during export. 
-* [`sampleRate`](/docs/reference/types/synth/audioexportoptions/samplerate.mdx) can be used to customize the sample rate of the exported audio. 
-* [`useSyncPoints`](/docs/reference/types/synth/audioexportoptions/usesyncpoints.mdx) controls whether the sync points of the currently loaded song are appled during audio generation. 
-* [`masterVolume`](/docs/reference/types/synth/audioexportoptions/mastervolume.mdx) controls the master volume of the generated audio. 
-* [`metronomeVolume`](/docs/reference/types/synth/audioexportoptions/metronomevolume.mdx) controls the volume of the metronome ticks. (keep in mind that the use of `useSyncPoints` changes the audio duration, the metronome is aligned with the music notes, not with the synthesized audio)
-* [`playbackRange`](/docs/reference/types/synth/audioexportoptions/playbackrange.mdx) controls the audio range which is exported. 
-* [`trackVolume`](/docs/reference/types/synth/audioexportoptions/trackvolume.mdx) controls the volume of every track (percentage-wise to the already configured absolute volume)
-* [`trackTranspositionPitches`](/docs/reference/types/synth/audioexportoptions/tracktranspositionpitches.mdx) controls an additional transposition pitch for the tracks. 
+* [`soundFonts`](/docs/reference/types/synth/audioexportoptions#soundfonts) can be used to customize the soundfonts used during export. 
+* [`sampleRate`](/docs/reference/types/synth/audioexportoptions#samplerate) can be used to customize the sample rate of the exported audio. 
+* [`useSyncPoints`](/docs/reference/types/synth/audioexportoptions#usesyncpoints) controls whether the sync points of the currently loaded song are appled during audio generation. 
+* [`masterVolume`](/docs/reference/types/synth/audioexportoptions#mastervolume) controls the master volume of the generated audio. 
+* [`metronomeVolume`](/docs/reference/types/synth/audioexportoptions#metronomevolume) controls the volume of the metronome ticks. (keep in mind that the use of `useSyncPoints` changes the audio duration, the metronome is aligned with the music notes, not with the synthesized audio)
+* [`playbackRange`](/docs/reference/types/synth/audioexportoptions#playbackrange) controls the audio range which is exported. 
+* [`trackVolume`](/docs/reference/types/synth/audioexportoptions#trackvolume) controls the volume of every track (percentage-wise to the already configured absolute volume)
+* [`trackTranspositionPitches`](/docs/reference/types/synth/audioexportoptions#tracktranspositionpitches) controls an additional transposition pitch for the tracks. 
 
 ## Example
 

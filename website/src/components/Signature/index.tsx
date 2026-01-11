@@ -2,6 +2,7 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import { FC } from "react";
 import Link from "@docusaurus/Link";
+import { useDoc } from "@docusaurus/plugin-content-docs/lib/client/doc.js";
 
 export type SignatureToken =
     [string, string] | [string, string, string];
@@ -83,14 +84,16 @@ export const Signature: FC<SignatureProps> = ({ style, js, csharp, kotlin }) => 
         return (<SignatureItem style={style} tokens={items[0]!.tokens as SignatureToken[]} />);
     }
     else {
-        return <Tabs defaultValue="js"
-            values={items.map(i => ({ label: i.label, value: i.value }))}>
-            {items.map(i => (
-                <TabItem key={i.value} value={i.value}>
-                    <SignatureItem style={style} tokens={i.tokens!} />
-                </TabItem>
-            ))}
-        </Tabs>
+        return <div className="signature-tabs">
+            <Tabs defaultValue="js"
+                values={items.map(i => ({ label: i.label, value: i.value }))}>
+                {items.map(i => (
+                    <TabItem key={i.value} value={i.value}>
+                        <SignatureItem style={style} tokens={i.tokens!} />
+                    </TabItem>
+                ))}
+            </Tabs>
+        </div>
     }
 
 };

@@ -10,8 +10,6 @@ import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, Prop
 
 <SinceBadge since="0.9.6" />
 <PropertyDescription showJson={true} />
-
-### Description
 Enables lazy loading of the rendered music sheet chunks. AlphaTab renders the music sheet in smaller sub-chunks to have fast UI feedback. Not all of those sub-chunks are immediately
 appended to the DOM due to performance reasons. AlphaTab tries to detect which elements are visible on the screen, and only
 appends those elements to the DOM. This reduces the load of the browser heavily but is not working for all layouts and use cases.

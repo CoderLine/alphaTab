@@ -10,13 +10,11 @@ import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, Prop
 
 <SinceBadge since="1.5.0" />
 <PropertyDescription />
-
-### Description
-The tick cache allowing lookup of midi ticks to beats. In older versions of alphaTab you can access the `boundsLookup` via <Signature style="inline" js={[["identifier","boundsLookup","/docs/reference/types/rendering/iscorerenderer/boundslookup"]]} /> on <Signature style="inline" js={[["identifier","renderer","/docs/reference/types/alphatabapibase/renderer"]]} />.
+The tick cache allowing lookup of midi ticks to beats. In older versions of alphaTab you can access the `boundsLookup` via <Signature style="inline" js={[["identifier","boundsLookup","/docs/reference/types/rendering/iscorerenderer#boundslookup"]]}>boundsLookup</Signature>  on <Signature style="inline" js={[["identifier","renderer","/docs/reference/types/alphatabapibase#renderer"]]}>renderer</Signature> .
 
 After the rendering completed alphaTab exposes via this lookup the location of the individual
 notation elements. The lookup provides fast access to the bars and beats at a given location.
-If the <Signature style="inline" js={[["identifier","CoreSettings.includeNoteBounds","/docs/reference/settings/core/includenotebounds"]]} /> option was activated also the location of the individual notes can be obtained.
+If the <Signature style="inline" js={[["identifier","CoreSettings.includeNoteBounds","/docs/reference/settings/core/includenotebounds"]]}>CoreSettings.includeNoteBounds</Signature>  option was activated also the location of the individual notes can be obtained.
 
 The property contains a `BoundsLookup` instance which follows a hierarchical structure that represents
 the tree of rendered elements.

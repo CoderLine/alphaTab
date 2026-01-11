@@ -109,7 +109,7 @@ export async function generateSettings(context: GenerateContext) {
 
             await fileStream.write(`<PropertyDescription showJson={true} />\n`);
 
-            await writePropertyDetails(context, fileStream, member);
+            await writePropertyDetails(context, fileStream, subSettingType, member);
           }
         }
       }

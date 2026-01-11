@@ -87,10 +87,6 @@ img.thumbnail {
   position: relative;
 }
 
-li.reference-item ul {
-  display: none !important;
-}
-
 li.types-item .menu__list-item-collapsible {
   flex-wrap: no-wrap;
 }
@@ -272,9 +268,32 @@ body.playground {
         }
       }
     }
-
-
   }
-
 }
 
+.signature-tabs {
+  margin-top: calc(var(--ifm-leading) * -1);
+
+  &>.tabs-container {
+    margin-bottom: 0;
+
+    &>.margin-top--md {
+      margin-top: 0 !important;
+    }
+  }
+
+  .tabs {
+    justify-content: flex-end;
+  }
+
+  .tabs__item {
+    padding: 0.1rem 0.2rem;
+    border-radius: 0;
+    font-weight: normal;
+    font-size: 80%;
+  }
+
+  .codeBlockContainer .codeBlockLines {
+    padding: 0.25rem;
+  }
+}

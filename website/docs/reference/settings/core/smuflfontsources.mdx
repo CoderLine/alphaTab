@@ -11,8 +11,6 @@ import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, Prop
 
 <SinceBadge since="1.6.0" />
 <PropertyDescription showJson={true} />
-
-### Description
 Defines the URLs from which to load the SMuFL compliant font files. These sources will be used to load and register the webfonts on the page so
 they are available for rendering the music sheet. The sources can be set to any
 CSS compatible URL which can be passed into `url()`.
@@ -20,9 +18,9 @@ See https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/src#url
 
 If you customize the SmuFL font used in alphaTab, you will also need to provide
 the respective SMuFL Metadata information to alphaTab.
-Set the metadata via <Signature style="inline" js={[["identifier","fillFromSmufl","/docs/reference/types/engravingsettings/fillfromsmufl"]]} /> on the rendering resources.
+Set the metadata via <Signature style="inline" js={[["identifier","fillFromSmufl","/docs/reference/types/engravingsettings#fillfromsmufl"]]}>fillFromSmufl</Signature>  on the rendering resources.
 
 <Signature style="block"
-           js={[["identifier","smuflFontSources"],["token",":"],["whitespace"," "],["identifier","Map","/docs/reference/types/fontfileformat"],["token","<"],["identifier","FontFileFormat","/docs/reference/types/fontfileformat"],["token",","],["whitespace"," "],["identifier","string"],["token",">"],["whitespace"," "],["token","|"],["whitespace"," "],["keyword","null"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","Bravura files located at <Signature style=\"inline\" js={[[\"identifier\",\"fontDirectory\",\"/docs/reference/settings/core/fontdirectory\"]]} /> ."],["token",";"]]}
+           js={[["identifier","smuflFontSources"],["token",":"],["whitespace"," "],["identifier","Map","/docs/reference/types/fontfileformat"],["token","<"],["identifier","FontFileFormat","/docs/reference/types/fontfileformat"],["token",","],["whitespace"," "],["identifier","string"],["token",">"],["whitespace"," "],["token","|"],["whitespace"," "],["keyword","null"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","Bravura files located at <Signature style=\"inline\" js={[[\"identifier\",\"fontDirectory\",\"/docs/reference/settings/core/fontdirectory\"]]}>fontDirectory</Signature>  ."],["token",";"]]}
 />
 
