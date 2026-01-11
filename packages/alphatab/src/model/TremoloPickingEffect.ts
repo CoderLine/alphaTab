@@ -54,7 +54,7 @@ export class TremoloPickingEffect {
             marks = 1;
         }
         const baseDuration = Duration.Eighth as number;
-        const actualDuration = baseDuration * Math.pow(2, marks);
+        const actualDuration = baseDuration * Math.pow(2, marks - 1);
         return actualDuration as Duration;
     }
 }
