@@ -11,6 +11,7 @@ import type { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGly
 import type { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
@@ -135,11 +136,22 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     public override getBoundingBoxTop(): number {
-        return ModelUtils.minBoundingBox(this.preNotes.getBoundingBoxTop(), this.onNotes.getBoundingBoxTop());
+        let top = ModelUtils.minBoundingBox(this.preNotes.getBoundingBoxTop(), this.onNotes.getBoundingBoxTop());
+        if (Number.isNaN(top)) {
+            top = (this.renderer as LineBarRenderer).middleYPosition;
+        }
+        return top;
     }
 
     public override getBoundingBoxBottom(): number {
-        return ModelUtils.maxBoundingBox(this.preNotes.getBoundingBoxBottom(), this.onNotes.getBoundingBoxBottom());
+        let bottom = ModelUtils.maxBoundingBox(
+            this.preNotes.getBoundingBoxBottom(),
+            this.onNotes.getBoundingBoxBottom()
+        );
+        if (Number.isNaN(bottom)) {
+            bottom = (this.renderer as LineBarRenderer).middleYPosition;
+        }
+        return bottom;
     }
 
     protected drawBeamHelperAsFlags(helper: BeamingHelper): boolean {
