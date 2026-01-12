@@ -19,23 +19,26 @@ import {
 import ts from "typescript";
 import { FileStream, openFileStream } from "./util.mjs";
 
+type Member<TMember> = {
+  parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
+  member: TMember
+}
+
 export async function generateApiDocs(context: GenerateContext) {
   const basePath = path.join(repositoryRoot, "docs", "reference", "api");
   await fs.promises.mkdir(basePath, { recursive: true });
 
-  const properties: (
-    | ts.PropertyDeclaration
+  const properties: Member<ts.PropertyDeclaration
     | ts.PropertySignature
     | ts.GetAccessorDeclaration
-  )[] = [];
+  >[] = [];
 
-  const events: (
-    | ts.PropertyDeclaration
+  const events: Member<ts.PropertyDeclaration
     | ts.PropertySignature
     | ts.GetAccessorDeclaration
-  )[] = [];
+  >[] = [];
 
-  const methods: (ts.MethodDeclaration | ts.MethodSignature)[] = [];
+  const methods: Member<ts.MethodDeclaration | ts.MethodSignature>[] = [];
 
   const members: Map<string, ts.ClassElement | ts.TypeElement> = new Map();
   collectMembers(context, members, context.flatExports.get(
@@ -47,18 +50,26 @@ export async function generateApiDocs(context: GenerateContext) {
 
   const categories = new ReferenceTableData();
 
-
   for (const m of Array.from(members.values())) {
     if (isEvent(context, m)) {
-      events.push(m as (typeof events)[0]);
+      events.push({
+        parent: m.parent as ts.ClassDeclaration | ts.InterfaceDeclaration,
+        member: m as ts.PropertyDeclaration
+      });
     } else if (
       ts.isPropertyDeclaration(m) ||
       ts.isPropertySignature(m) ||
       ts.isGetAccessorDeclaration(m)
     ) {
-      properties.push(m);
+      properties.push({
+        parent: m.parent as ts.ClassDeclaration | ts.InterfaceDeclaration,
+        member: m as ts.PropertyDeclaration
+      });
     } else if (ts.isMethodDeclaration(m) || ts.isMethodSignature(m)) {
-      methods.push(m);
+      methods.push({
+        parent: m.parent as ts.ClassDeclaration | ts.InterfaceDeclaration,
+        member: m as ts.MethodDeclaration
+      });
     }
   }
 
@@ -80,41 +91,40 @@ export async function generateApiDocs(context: GenerateContext) {
 async function writeProperties(
   context: GenerateContext,
   basePath: string,
-  properties: (
-    | ts.PropertyDeclaration
+  properties: Member<ts.PropertyDeclaration
     | ts.PropertySignature
     | ts.GetAccessorDeclaration
-  )[],
+  >[],
   referenceTable: ReferenceTableData
 ) {
   for (const member of properties) {
-    await writePropertyPage(context, basePath, member, referenceTable);
+    await writePropertyPage(context, basePath, member.parent, member.member, referenceTable);
   }
 }
 
 async function writeMethods(
   context: GenerateContext,
   basePath: string,
-  methods: (ts.MethodDeclaration | ts.MethodSignature)[],
+  methods: Member<ts.MethodDeclaration | ts.MethodSignature>[],
   referenceTable: ReferenceTableData
 ) {
   for (const member of methods) {
-    await writeMethodPage(context, basePath, member, referenceTable);
+    await writeMethodPage(context, basePath, member.parent, member.member, referenceTable);
   }
 }
 
 async function writeEvents(
   context: GenerateContext,
   basePath: string,
-  events: (
-    | ts.PropertyDeclaration
+  events: Member<
+    ts.PropertyDeclaration
     | ts.PropertySignature
     | ts.GetAccessorDeclaration
-  )[],
+  >[],
   referenceTable: ReferenceTableData
 ) {
   for (const member of events) {
-    await writeEventPage(context, basePath, member, referenceTable);
+    await writeEventPage(context, basePath, member.parent, member.member, referenceTable);
   }
 }
 
@@ -171,6 +181,7 @@ async function writeFrontMatter(
 async function writePropertyPage(
   context: GenerateContext,
   basePath: string,
+  parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
   member:
     | ts.PropertyDeclaration
     | ts.PropertySignature
@@ -194,12 +205,13 @@ async function writePropertyPage(
 
   await fileStream.write("<PropertyDescription />\n");
 
-  await writePropertyDetails(context, fileStream, member);
+  await writePropertyDetails(context, fileStream, parent, member);
 }
 
 async function writeEventPage(
   context: GenerateContext,
   basePath: string,
+  parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
   member:
     | ts.PropertyDeclaration
     | ts.PropertySignature
@@ -212,12 +224,13 @@ async function writeEventPage(
   await using fileStream = await openFileStream(filePath);
 
   await writeFrontMatter(context, fileStream, memberName, member, "event", referenceTable);
-  await writeEventDetails(context, fileStream, member);
+  await writeEventDetails(context, fileStream, parent, member);
 }
 
 async function writeMethodPage(
   context: GenerateContext,
   basePath: string,
+  parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
   member: ts.MethodDeclaration | ts.MethodSignature,
   referenceTable: ReferenceTableData
 ) {
@@ -228,5 +241,5 @@ async function writeMethodPage(
 
   await writeFrontMatter(context, fileStream, memberName, member, "method", referenceTable);
 
-  await writeMethodDetails(context, fileStream, member);
+  await writeMethodDetails(context, fileStream, parent, member);
 }

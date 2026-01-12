@@ -9,14 +9,12 @@ sidebar_custom_props:
 import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="0.9.4" />
-
-### Description
 Renders the given list of tracks.
 
 <Signature style="block"
-           js={[["identifier","renderTracks"],["token","("],["identifier","tracks"],["token",":"],["whitespace"," "],["identifier","Track","/docs/reference/types/model/track"],["token","[]"],["token",")"],["token",":"],["whitespace"," "],["identifier","void"]]}
-           csharp={[["keyword","void"],["whitespace"," "],["identifier","RenderTracks"],["token","("],["identifier","IList","https://learn.microsoft.com/en-us/dotnet/api/system.collections.ilist"],["token","<"],["identifier","Track","/docs/reference/types/model/track"],["token",">"],["whitespace"," "],["identifier","tracks"],["token",")"]]}
-           kotlin={[["identifier","fun"],["whitespace"," "],["identifier","renderTracks"],["token","("],["identifier","tracks"],["token",":"],["whitespace"," "],["identifier","alphaTab.collections.List"],["token","<"],["identifier","Track","/docs/reference/types/model/track"],["token",">"],["token",")"],["token",":"],["whitespace"," "],["identifier","Unit"]]}
+           js={[["identifier","renderTracks"],["token","("],["identifier","tracks"],["token",":"],["whitespace"," "],["identifier","Track","/docs/reference/types/model/track"],["token","[]"],["token",","],["whitespace"," "],["identifier","renderHints"],["token","?"],["token",":"],["whitespace"," "],["identifier","RenderHints","/docs/reference/types/rendering/renderhints"],["token",")"],["token",":"],["whitespace"," "],["identifier","void"]]}
+           csharp={[["keyword","void"],["whitespace"," "],["identifier","RenderTracks"],["token","("],["identifier","IList","https://learn.microsoft.com/en-us/dotnet/api/system.collections.ilist"],["token","<"],["identifier","Track","/docs/reference/types/model/track"],["token",">"],["whitespace"," "],["identifier","tracks"],["token",","],["whitespace"," "],["identifier","RenderHints","/docs/reference/types/rendering/renderhints"],["token","?"],["whitespace"," "],["identifier","renderHints"],["token",")"]]}
+           kotlin={[["identifier","fun"],["whitespace"," "],["identifier","renderTracks"],["token","("],["identifier","tracks"],["token",":"],["whitespace"," "],["identifier","alphaTab.collections.List"],["token","<"],["identifier","Track","/docs/reference/types/model/track"],["token",">"],["token",","],["whitespace"," "],["identifier","renderHints"],["token",":"],["whitespace"," "],["identifier","RenderHints","/docs/reference/types/rendering/renderhints"],["token","?"],["token",")"],["token",":"],["whitespace"," "],["identifier","Unit"]]}
 />
 
 <table className="table table-striped table-condensed type-table">
@@ -33,6 +31,14 @@ Renders the given list of tracks.
   </td>
   <td>
     The tracks to render. They must all belong to the same score.
+  </td>
+</tr>
+<tr>
+  <td>
+    <CodeBadge type="all" name="renderHints" />
+  </td>
+  <td>
+    Additional hints to respect during layouting and rendering.
   </td>
 </tr>
   </tbody>

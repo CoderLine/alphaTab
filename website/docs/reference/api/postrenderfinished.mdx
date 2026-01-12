@@ -9,13 +9,11 @@ sidebar_custom_props:
 import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="0.9.4" />
-
-### Description
-This event is fired when the rendering of the whole music sheet is finished, and all handlers of `renderFinished` ran. If <Signature style="inline" js={[["identifier","CoreSettings.enableLazyLoading","/docs/reference/settings/core/enablelazyloading"]]} /> is enabled not all partial images of the music sheet might be rendered.
+This event is fired when the rendering of the whole music sheet is finished, and all handlers of `renderFinished` ran. If <Signature style="inline" js={[["identifier","CoreSettings.enableLazyLoading","/docs/reference/settings/core/enablelazyloading"]]}>CoreSettings.enableLazyLoading</Signature>  is enabled not all partial images of the music sheet might be rendered.
 In this case the `renderFinished` event rather represents that the whole music sheet has been layouted and arranged
 and every partial image can be requested for rendering. If you neeed more fine-grained access
-to the actual layouting and rendering progress, you need to look at the low-level apis <Signature style="inline" js={[["identifier","partialLayoutFinished","/docs/reference/types/rendering/iscorerenderer/partiallayoutfinished"]]} /> and
-<Signature style="inline" js={[["identifier","partialRenderFinished","/docs/reference/types/rendering/iscorerenderer/partialrenderfinished"]]} /> accessible via <Signature style="inline" js={[["identifier","renderer","/docs/reference/types/alphatabapibase/renderer"]]} />.
+to the actual layouting and rendering progress, you need to look at the low-level apis <Signature style="inline" js={[["identifier","partialLayoutFinished","/docs/reference/types/rendering/iscorerenderer/#partiallayoutfinished"]]}>partialLayoutFinished</Signature>  and
+<Signature style="inline" js={[["identifier","partialRenderFinished","/docs/reference/types/rendering/iscorerenderer/#partialrenderfinished"]]}>partialRenderFinished</Signature>  accessible via <Signature style="inline" js={[["identifier","renderer","/docs/reference/types/alphatabapibase/#renderer"]]}>renderer</Signature> .
 
 <Signature style="block"
            js={[["keyword","readonly"],["whitespace"," "],["identifier","postRenderFinished"],["token",":"],["whitespace"," "],["identifier","IEventEmitter","/docs/reference/types/ieventemitter"],["token",";"]]}

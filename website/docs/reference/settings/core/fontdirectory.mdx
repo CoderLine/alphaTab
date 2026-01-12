@@ -1,5 +1,6 @@
 ---
 title: core.fontDirectory
+sidebar_label: fontDirectory
 sidebar_custom_props:
   javaScriptOnly: true
   jsOnParent: true
@@ -11,14 +12,12 @@ import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, Prop
 
 <SinceBadge since="0.9.6" />
 <PropertyDescription showJson={true} />
-
-### Description
 The full URL to the alphaTab font directory. AlphaTab will generate some dynamic CSS that is needed for displaying the music symbols correctly. For this it needs to know
 where the Web Font files of [Bravura](https://github.com/steinbergmedia/bravura) are. Normally alphaTab expects
 them to be in a `font` subfolder beside the script file. If this is not the case, this setting must be used to configure the path.
 Alternatively also a global variable `ALPHATAB_FONT` can be set on the page before initializing alphaTab.
 
-Use <Signature style="inline" js={[["identifier","smuflFontSources","/docs/reference/settings/core/smuflfontsources"]]} /> for more flexible font configuration.
+Use <Signature style="inline" js={[["identifier","smuflFontSources","/docs/reference/settings/core/smuflfontsources"]]}>smuflFontSources</Signature>  for more flexible font configuration.
 
 <Signature style="block"
            js={[["identifier","fontDirectory"],["token",":"],["whitespace"," "],["identifier","string"],["whitespace"," "],["token","|"],["whitespace"," "],["keyword","null"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","\"${AlphaTabScriptFolder}/font/\""],["token",";"]]}

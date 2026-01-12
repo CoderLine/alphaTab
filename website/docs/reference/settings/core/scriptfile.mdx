@@ -1,5 +1,6 @@
 ---
 title: core.scriptFile
+sidebar_label: scriptFile
 sidebar_custom_props:
   javaScriptOnly: true
   jsOnParent: true
@@ -11,8 +12,6 @@ import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, Prop
 
 <SinceBadge since="0.9.6" />
 <PropertyDescription showJson={true} />
-
-### Description
 The full URL to the alphaTab JavaScript file. AlphaTab needs to know the full URL to the script file it is contained in to launch the web workers. AlphaTab will do its best to auto-detect
 this path but in case it fails, this setting can be used to explicitly define it. Altenatively also a global variable `ALPHATAB_ROOT` can
 be defined before initializing. Please be aware that bundling alphaTab together with other scripts might cause errors

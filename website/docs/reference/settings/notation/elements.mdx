@@ -1,5 +1,6 @@
 ---
 title: notation.elements
+sidebar_label: elements
 sidebar_custom_props:
   category: Notation
   since: 0.9.8
@@ -9,8 +10,6 @@ import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, Prop
 
 <SinceBadge since="0.9.8" />
 <PropertyDescription showJson={true} />
-
-### Description
 Whether music notation elements are visible or not. AlphaTab has quite a set of notation elements that are usually shown by default or only shown when using
 the `SongBook` notation mode. This setting allows showing/hiding individual notation elements like the
 song information or the track names.
@@ -36,7 +35,7 @@ the key is the element to configure and the value is a boolean value whether it 
     ]}
 >
 <TabItem value="javascript">
-Internally the setting is a [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) where the key must be a <Signature style="inline" js={[["identifier","NotationElement","/docs/reference/types/notationelement"]]} /> enumeration value.
+Internally the setting is a [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) where the key must be a <Signature style="inline" js={[["identifier","NotationElement","/docs/reference/types/notationelement"]]}>NotationElement</Signature>  enumeration value.
 For JSON input the usual enumeration serialization applies where also the names can be used. The names
 are case insensitive.
 

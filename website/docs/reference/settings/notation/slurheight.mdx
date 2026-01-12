@@ -1,5 +1,6 @@
 ---
 title: notation.slurHeight
+sidebar_label: slurHeight
 sidebar_custom_props:
   category: Notation
   since: 0.9.6
@@ -9,8 +10,6 @@ import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, Prop
 
 <SinceBadge since="0.9.6" />
 <PropertyDescription showJson={true} />
-
-### Description
 The height scale factor for slurs Slurs and ties currently calculate their height based on the distance they have from start to end note. Most music notation software do some complex collision detection to avoid a slur to overlap with other elements, alphaTab
 only has a simplified version of the slur positioning as of today. This setting allows adjusting the slur height to avoid collisions. The factor defined by this setting, is multiplied with the logarithmic distance between start and end.
 | Slur Height Default                                                    | Slur Height 14                                               |

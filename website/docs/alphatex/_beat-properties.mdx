@@ -889,7 +889,7 @@ C4 {balance 0} D4 E4 {balance 16} F4
 ## `tp`
 
 ```plain title="Syntax"
-tp speed
+tp (marks style)
 ```
 
 **Description:** Add a tremolo picking to the beat.
@@ -898,7 +898,8 @@ tp speed
 
 | Name | Description | Type | Required |
 |------|-------------|------|----------|
-|  `speed` | The tremolo picking speed | `8\|16\|32` | yes  |
+|  `marks` | The number of tremolo marks | `Number` | yes  |
+|  `style` | The tremolo style | `default\|buzzRoll` | no  |
 
 **Parameter Values:**
 
@@ -906,12 +907,19 @@ Following parameters have value limitations
 
 | Name | Values |
 |------|--------|
-| `speed` | <ParameterValuesTable values={[["8","8th Notes"],["16","16th Notes"],["32","32nd Notes"]]} /> |
+| `marks` | <ParameterValuesTable values={[["1","1 tremolo mark (8th notes)"],["2","2 tremolo mark (16th notes)"],["3","3 tremolo mark (32nd notes)"],["4","4 tremolo mark (64th notes)"],["5","5 tremolo mark (128th notes)"]]} /> |
+| `style` | <ParameterValuesTable values={[["default","Default tremolo"],["buzzRoll","Buzz roll tremolo"]]} /> |
 
 **Example:**
 
 <AlphaTexSample tracks="all" player={true} >{`
-3.3{tp 8} 3.3{tp 16} 3.3{tp 32}
+3.3{tp 1} 3.3{tp 2} 3.3{tp 3} 
+
+`}</AlphaTexSample>
+<AlphaTexSample tracks="all" player={true} >{`
+\\title "Buzz Rolls"
+3.3{tp (0 buzzRoll)} // no audio 
+3.3{tp (1 buzzRoll)} // 8th notes tremolo shown as buzzroll
 
 `}</AlphaTexSample>
 

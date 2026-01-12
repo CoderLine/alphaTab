@@ -585,14 +585,11 @@ function getDeclarationReferenceUrl(
     case ts.SyntaxKind.PropertyDeclaration:
     case ts.SyntaxKind.PropertySignature:
       let page = (element as ts.ClassElement).name!.getText().toLowerCase();
-      if (page === "index") {
-        page = "index_";
-      }
       return (
         getDeclarationReferenceUrl(
           context,
           element.parent as ts.ClassDeclaration | ts.InterfaceDeclaration,
-        ) + '/' + page
+        ) + '/#' + page
       );
     case ts.SyntaxKind.EnumMember:
       return (
@@ -600,7 +597,7 @@ function getDeclarationReferenceUrl(
           context,
           element.parent as ts.EnumDeclaration
         ) +
-        "#" +
+        "/#" +
         (element as ts.EnumMember).name!.getText().toLowerCase()
       );
     case ts.SyntaxKind.TypeParameter:
@@ -745,18 +742,22 @@ function isInternal(context: GenerateContext, node: ts.Node) {
 export async function writeEventDetails(
   context: GenerateContext,
   fileStream: FileStream,
+  parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
   member:
     | ts.PropertySignature
     | ts.PropertyDeclaration
-    | ts.GetAccessorDeclaration
+    | ts.GetAccessorDeclaration,
+  referenceDoc: boolean = false
 ) {
-  await writeCommonDescription(context, fileStream, member);
+  await writeCommonDescription(context, fileStream, parent, member, referenceDoc);
 
   await writeEventSignatures(context, fileStream, member);
 
-  await writeManualDocs(fileStream, member);
+  if (!referenceDoc) {
+    await writeManualDocs(fileStream, member);
 
-  await writeExamples(fileStream, context, member);
+    await writeExamples(fileStream, context, member);
+  }
 }
 
 export async function writeEventSignatures(
@@ -773,27 +774,32 @@ export async function writeEventSignatures(
 export async function writeMethodDetails(
   context: GenerateContext,
   fileStream: FileStream,
-  member: ts.MethodDeclaration | ts.MethodSignature
+  parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
+  member: ts.MethodDeclaration | ts.MethodSignature,
+  referenceDoc: boolean = false
 ) {
-  await writeCommonDescription(context, fileStream, member);
+  await writeCommonDescription(context, fileStream, parent, member, referenceDoc);
 
   await writeMethodSignatures(context, fileStream, member);
   await writeMethodParameters(context, fileStream, member);
-  await writeMethodReturn(context, fileStream, member);
+  await writeMethodReturn(context, fileStream, member, referenceDoc ? 4 : 3);
 
-  await writeManualDocs(fileStream, member);
+  if (!referenceDoc) {
+    await writeManualDocs(fileStream, member);
 
-  await writeExamples(fileStream, context, member);
+    await writeExamples(fileStream, context, member);
+  }
 }
 
-export async function writeMethodReturn(
+async function writeMethodReturn(
   context: GenerateContext,
   fileStream: FileStream,
-  m: ts.MethodDeclaration | ts.MethodSignature
+  m: ts.MethodDeclaration | ts.MethodSignature,
+  level: number
 ) {
   const returnsDoc = getJsDocTagText(context, m, "returns");
   if (returnsDoc) {
-    await fileStream.write(`### Returns \n`);
+    await fileStream.write(`${'#'.repeat(level)} Returns \n`);
     await fileStream.write(`${returnsDoc} \n\n`);
   }
 }
@@ -1030,13 +1036,46 @@ export async function writeCommonImports(fileStream: FileStream, additionals: st
   await fileStream.writeLine();
 }
 
+function getInheritenceInfo(
+  context: GenerateContext,
+  parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
+  member: ts.ClassElement | ts.TypeElement
+) {
+  let info = "";
+  // inheritence info
+  if (member.parent !== parent) {
+    info += " (Inherited from ";
+    const builder = new TypeReferencedCodeBuilder(context);
+    builder.declaration(
+      member.parent as ts.ClassDeclaration | ts.InterfaceDeclaration
+    );
+
+    let name = (member.parent as ts.NamedDeclaration).name!.getText();
+    if (context.nameToExportName.has(name)) {
+      name = context.nameToExportName.get(name)!;
+    }
+
+    info += builder.toMdx("js", "inline");
+
+    info += ")";
+  }
+  return info;
+}
+
+
 async function writeCommonDescription(
   context: GenerateContext,
   fileStream: FileStream,
-  member: ts.TypeElement | ts.ClassElement
+  parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
+  member: ts.TypeElement | ts.ClassElement,
+  referenceDoc: boolean
 ) {
-  await fileStream.write(`\n### Description\n`);
-  await fileStream.write(`${getFullDescription(context, member)}\n\n`);
+  await fileStream.write(`${getFullDescription(context, member)}`);
+  if (referenceDoc) {
+    await fileStream.write(`${getInheritenceInfo(context, parent, member)}`);
+  }
+
+  await fileStream.write(`\n\n`);
 }
 
 export async function writeManualDocs(
@@ -1065,18 +1104,21 @@ export async function writeManualDocs(
 export async function writePropertyDetails(
   context: GenerateContext,
   fileStream: FileStream,
+  parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
   member:
     | ts.PropertySignature
     | ts.PropertyDeclaration
-    | ts.GetAccessorDeclaration
+    | ts.GetAccessorDeclaration,
+  referenceDoc: boolean = false
 ) {
-  await writeCommonDescription(context, fileStream, member);
+  await writeCommonDescription(context, fileStream, parent, member, referenceDoc);
 
   await writePropertySignatures(context, fileStream, member);
 
-  await writeManualDocs(fileStream, member);
-
-  await writeExamples(fileStream, context, member);
+  if (!referenceDoc) {
+    await writeManualDocs(fileStream, member);
+    await writeExamples(fileStream, context, member);
+  }
 }
 
 export const cconsole = {
@@ -1362,6 +1404,7 @@ type TypeReferencedCodeLanguage = "js" | "c#" | "kotlin";
 
 export class TypeReferencedCodeBuilder {
   private chunks: TypeReferencedCodeToken[] = [];
+  public links = true;
 
   public constructor(private context: GenerateContext) { }
 
@@ -1387,6 +1430,10 @@ export class TypeReferencedCodeBuilder {
 
   public declaration(t: ts.NamedDeclaration, linkText?: string) {
     linkText ??= t.name?.getText() ?? "UnknownReference";
+
+    if (!this.links) {
+      return this.identifier(linkText);
+    }
 
     const referenceUrl = getDeclarationReferenceUrl(this.context, t as any);
     if (referenceUrl) {
@@ -1440,6 +1487,32 @@ export class TypeReferencedCodeBuilder {
     this.chunks = [];
   }
 
+  public toPlain(language: TypeReferencedCodeLanguage) {
+    let plain = '';
+
+    const translated = this.translateChunks(this.chunks, language);
+    for (const chunk of translated) {
+      switch (chunk.kind) {
+        case "identifier":
+        case "token":
+        case "keyword":
+        case "whitespace":
+          plain += escapeHtmlEntities(chunk.content.toString());
+          break;
+
+        // case "type": // rewritten during translateChunks
+        //   break;
+        case "link":
+          const link = chunk.content as TypeReferencedCodeLink;
+          plain += escapeHtmlEntities(link.linkText);
+          break;
+      }
+    }
+
+
+    return plain;
+  }
+
   public toJSON(language: TypeReferencedCodeLanguage) {
     const translated = this.translateChunks(this.chunks, language);
 
@@ -1468,10 +1541,11 @@ export class TypeReferencedCodeBuilder {
 
   public toMdx(
     language: TypeReferencedCodeLanguage,
-    style: "block" | "inline"
+    style: "block" | "inline",
+    basicName: string = ''
   ) {
     let code = `<Signature style=${JSON.stringify(style)} `;
-    switch(language){
+    switch (language) {
       case "js":
         code += 'js';
         break;
@@ -1482,7 +1556,7 @@ export class TypeReferencedCodeBuilder {
         code += 'kotlin';
         break;
     }
-    code += '={' + this.toJSON(language) + '} />';
+    code += '={' + this.toJSON(language) + '}>' + this.toPlain(language) + '</Signature> ';
     return code;
   }
 

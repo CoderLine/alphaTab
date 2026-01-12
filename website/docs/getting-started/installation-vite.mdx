@@ -12,7 +12,7 @@ import { SinceBadge } from '@site/src/components/SinceBadge';
 **TL;DR:** AlphaTab comes with a Vite plugin which should be added to your Vite config to guarantee compatibility. 
 ```js
 import { defineConfig } from "vite";
-import { alphaTab } from "@coderline/alphatab/vite";
+import { alphaTab } from "@coderline/alphatab-vite";
 
 export default defineConfig({
   plugins: [alphaTab()]
@@ -49,9 +49,9 @@ Unless there is something special to your project setup, adding the plugin to th
 
 ```js
 // CommonJS
-const alphaTab = require('@coderline/alphatab/vite');
+const alphaTab = require('@coderline/alphatab-vite');
 // JavaScript modules
-import { alphaTab } from '@coderline/alphatab/vite';
+import { alphaTab } from '@coderline/alphatab-vite';
 
 // Add the plugin to your config
 export default defineConfig({

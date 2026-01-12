@@ -11,7 +11,7 @@ import { SinceBadge } from '@site/src/components/SinceBadge';
 :::info
 **TL;DR:**  AlphaTab comes with a WebPack 5 plugin which should be added to your WebPack config to guarantee compatibility. 
 ```js
-import { AlphaTabWebPackPlugin } from '@coderline/alphatab/webpack';
+import { AlphaTabWebPackPlugin } from '@coderline/alphatab-webpack';
 
 const webpackConfig =  {
     plugins: [
@@ -53,9 +53,9 @@ Unless there is something special to your project setup, adding the plugin to th
 
 ```js
 // CommonJS
-const AlphaTabWebPackPlugin = require('@coderline/alphatab/webpack');
+const AlphaTabWebPackPlugin = require('@coderline/alphatab-webpack');
 // JavaScript modules
-import { AlphaTabWebPackPlugin } from '@coderline/alphatab/webpack';
+import { AlphaTabWebPackPlugin } from '@coderline/alphatab-webpack';
 
 // Add the plugin to your config
 const config = {
@@ -193,7 +193,7 @@ In our [Angular sample](https://github.com/CoderLine/alphaTabSamplesWeb/tree/mai
 ```
 4. Add a `custom-webpack.config.js` and add the alphaTab Plugin
 ```js
-const { AlphaTabWebPackPlugin } = require('@coderline/alphatab/webpack');
+const { AlphaTabWebPackPlugin } = require('@coderline/alphatab-webpack');
 
 module.exports = {
     plugins: [

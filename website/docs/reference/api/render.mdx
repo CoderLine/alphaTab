@@ -9,16 +9,32 @@ sidebar_custom_props:
 import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="0.9.4" />
-
-### Description
 Initiates a re-rendering of the current setup. If rendering is not yet possible, it will be deferred until the UI changes to be ready for rendering.
 
 <Signature style="block"
-           js={[["identifier","render"],["token","("],["token",")"],["token",":"],["whitespace"," "],["identifier","void"]]}
-           csharp={[["keyword","void"],["whitespace"," "],["identifier","Render"],["token","("],["token",")"]]}
-           kotlin={[["identifier","fun"],["whitespace"," "],["identifier","render"],["token","("],["token",")"],["token",":"],["whitespace"," "],["identifier","Unit"]]}
+           js={[["identifier","render"],["token","("],["identifier","renderHints"],["token","?"],["token",":"],["whitespace"," "],["identifier","RenderHints","/docs/reference/types/rendering/renderhints"],["token",")"],["token",":"],["whitespace"," "],["identifier","void"]]}
+           csharp={[["keyword","void"],["whitespace"," "],["identifier","Render"],["token","("],["identifier","RenderHints","/docs/reference/types/rendering/renderhints"],["token","?"],["whitespace"," "],["identifier","renderHints"],["token",")"]]}
+           kotlin={[["identifier","fun"],["whitespace"," "],["identifier","render"],["token","("],["identifier","renderHints"],["token",":"],["whitespace"," "],["identifier","RenderHints","/docs/reference/types/rendering/renderhints"],["token","?"],["token",")"],["token",":"],["whitespace"," "],["identifier","Unit"]]}
 />
 
+<table className="table table-striped table-condensed type-table">
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr>
+  <td>
+    <CodeBadge type="all" name="renderHints" />
+  </td>
+  <td>
+    Additional hints to respect during layouting and rendering.
+  </td>
+</tr>
+  </tbody>
+</table>
 
 ## Examples
 

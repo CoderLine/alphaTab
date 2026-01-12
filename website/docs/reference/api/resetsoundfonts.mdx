@@ -9,8 +9,6 @@ sidebar_custom_props:
 import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
 
 <SinceBadge since="0.9.4" />
-
-### Description
 Unloads all presets from previously loaded SoundFonts. This function resets the player internally to not have any SoundFont loaded anymore. This allows you to reduce the memory usage of the page
 if multiple partial SoundFonts are loaded via `loadSoundFont(..., true)`. Depending on the workflow you might also just want to use `loadSoundFont(..., false)` once
 instead of unloading the previous SoundFonts.

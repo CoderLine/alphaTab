@@ -1,0 +1,59 @@
+---
+title: customScrollHandler
+sidebar_custom_props:
+  kind: property
+  category: Properties - Player
+  since: 1.8.0
+---
+
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, PropertyDescription } from '@site/src/reference-commons'
+
+<SinceBadge since="1.8.0" />
+<PropertyDescription />
+A custom scroll handler which will be used to handle scrolling operations during playback.
+
+<Signature style="block"
+           js={[["identifier","customScrollHandler"],["token","?"],["token",":"],["whitespace"," "],["identifier","IScrollHandler","/docs/reference/types/iscrollhandler"],["token",";"]]}
+           csharp={[["identifier","IScrollHandler","/docs/reference/types/iscrollhandler"],["whitespace"," "],["identifier","CustomScrollHandler"],["whitespace"," "],["token","{"],["whitespace"," "],["keyword","get"],["token",";"],["whitespace"," "],["keyword","set"],["token",";"],["whitespace"," "],["token","}"]]}
+           kotlin={[["keyword","var"],["whitespace"," "],["identifier","customScrollHandler"],["token",":"],["whitespace"," "],["identifier","IScrollHandler","/docs/reference/types/iscrollhandler"]]}
+/>
+
+
+## Examples
+
+<Tabs
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.customScrollHandler = {
+  forceScrollTo(currentBeatBounds) {
+    const scroll = api.uiFacade.getScrollElement();
+    api.uiFacade.scrollToY(scroll, currentBeatBounds.barBounds.masterBarBounds.realBounds.y, 0);
+  },
+  onBeatCursorUpdating(startBeat, endBeat, cursorMode, relativePosition, actualBeatCursorStartX, actualBeatCursorEndX, actualBeatCursorTransitionDuration) {
+    const scroll = api.uiFacade.getScrollElement();
+    api.uiFacade.scrollToY(scroll, startBeat.barBounds.masterBarBounds.realBounds.y, 0);
+  }
+}
+```
+</TabItem>
+<TabItem value="csharp">
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.CustomScrollHandler = new CustomScrollHandler();
+```
+</TabItem>
+<TabItem value="android">
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.customScrollHandler = CustomScrollHandler();
+```
+</TabItem>
+</Tabs>

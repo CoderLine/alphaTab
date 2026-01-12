@@ -1,5 +1,6 @@
 ---
 title: player.scrollSpeed
+sidebar_label: scrollSpeed
 sidebar_custom_props:
   category: Player
   since: 0.9.6
@@ -9,11 +10,9 @@ import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, Prop
 
 <SinceBadge since="0.9.6" />
 <PropertyDescription showJson={true} />
-
-### Description
 How fast the scrolling to the new position should happen. If possible from the platform, alphaTab will try to do a smooth scrolling to the played bar.
 This setting defines the speed of scrolling in milliseconds.
-Note that <Signature style="inline" js={[["identifier","nativeBrowserSmoothScroll","/docs/reference/settings/player/nativebrowsersmoothscroll"]]} /> must be set to `false` for this to have an effect.
+Note that <Signature style="inline" js={[["identifier","nativeBrowserSmoothScroll","/docs/reference/settings/player/nativebrowsersmoothscroll"]]}>nativeBrowserSmoothScroll</Signature>  must be set to `false` for this to have an effect.
 
 <Signature style="block"
            js={[["identifier","scrollSpeed"],["token",":"],["whitespace"," "],["identifier","number"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","300"],["token",";"]]}

@@ -10,13 +10,11 @@ import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, Prop
 
 <SinceBadge since="1.2.3" />
 <PropertyDescription />
-
-### Description
 The tick cache allowing lookup of midi ticks to beats. Gets the tick cache allowing lookup of midi ticks to beats. If the player is enabled, a midi file will be generated
-for the loaded <Signature style="inline" js={[["identifier","Score","/docs/reference/types/model/score"]]} /> for later playback. During this generation this tick cache is filled with the
+for the loaded <Signature style="inline" js={[["identifier","Score","/docs/reference/types/model/score"]]}>Score</Signature>  for later playback. During this generation this tick cache is filled with the
 exact midi ticks when beats are played.
 
-The <Signature style="inline" js={[["identifier","findBeat","/docs/reference/types/midi/miditicklookup/findbeat"]]} /> method allows a lookup of the beat related to a given input midi tick.
+The <Signature style="inline" js={[["identifier","findBeat","/docs/reference/types/midi/miditicklookup/#findbeat"]]}>findBeat</Signature>  method allows a lookup of the beat related to a given input midi tick.
 
 <Signature style="block"
            js={[["keyword","readonly"],["whitespace"," "],["identifier","tickCache"],["token",":"],["whitespace"," "],["identifier","MidiTickLookup","/docs/reference/types/midi/miditicklookup"],["whitespace"," "],["token","|"],["whitespace"," "],["keyword","null"],["token",";"]]}

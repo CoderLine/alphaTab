@@ -17,7 +17,7 @@
     "generate-alphatabdoc-empty": "tsx scripts/generate-alphatabdoc.mts --empty"
   },
   "dependencies": {
-    "@coderline/alphatab": "^1.7.1",
+    "@coderline/alphatab": "^1.8.0-alpha.1671",
     "@docusaurus/core": "^3.9.2",
     "@docusaurus/preset-classic": "^3.9.2",
     "@docusaurus/theme-mermaid": "^3.9.2",

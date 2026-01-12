@@ -1,23 +1,22 @@
-import path from "path";
 import fs from "fs";
+import path from "path";
+import ts from "typescript";
+import {
+  collectMembers,
+  getFullDescription,
+  getJsDocTagText,
+  isEvent,
+  TypeReferencedCodeBuilder,
+  writeCommonImports,
+  writeEventDetails,
+  writeMethodDetails,
+  writePropertyDetails
+} from "./generate-common.mjs";
 import {
   GenerateContext,
   getTypeWithNullableInfo,
   repositoryRoot,
 } from "./typeschema.mjs";
-import {
-  collectMembers,
-  getFullDescription,
-  getJsDocTagText,
-  getSummary,
-  isEvent,
-  writeCommonImports,
-  writeEventDetails,
-  writeMethodDetails,
-  writePropertyDetails,
-  TypeReferencedCodeBuilder,
-} from "./generate-common.mjs";
-import ts from "typescript";
 import { FileStream, openFileStream } from "./util.mjs";
 
 export async function generateTypeDocs(context: GenerateContext) {
@@ -48,9 +47,6 @@ export async function generateTypeDocs(context: GenerateContext) {
     fileStream.suspend = context.emptyFiles;
     await writeCommonImports(fileStream);
 
-    await fileStream.write(
-      `\n<DynHeading as="h3" inlined={props.inlined}>Description</DynHeading>\n\n`
-    );
     await fileStream.write(`${getFullDescription(context, exportedType)}\n\n`);
 
     if (
@@ -170,18 +166,16 @@ export async function generateTypeDocs(context: GenerateContext) {
         await writeProperties(
           context,
           fileStream,
-          basePath,
           exportedType,
           properties
         );
         await writeMethods(
           context,
           fileStream,
-          basePath,
           exportedType,
           methods
         );
-        await writeEvents(context, fileStream, basePath, exportedType, events);
+        await writeEvents(context, fileStream, exportedType, events);
       }
     } else if (ts.isEnumDeclaration(exportedType)) {
       await writeEnumMembers(context, fileStream, exportedType);
@@ -192,7 +186,6 @@ export async function generateTypeDocs(context: GenerateContext) {
 async function writeProperties(
   context: GenerateContext,
   fileStream: FileStream,
-  basePath: string,
   parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
   properties: (
     | ts.PropertyDeclaration
@@ -205,70 +198,25 @@ async function writeProperties(
   }
 
   await fileStream.write(
-    `\n<DynHeading as="h3" inlined={props.inlined}>Properties</DynHeading>\n\n`
+    `\n## Properties\n\n`
   );
-
-  await fileStream.write(
-    `<table className="table table-striped table-condensed type-table">\n`
-  );
-  await fileStream.write(`  <tbody>\n`);
 
   for (const member of properties) {
-    await fileStream.write(`    <tr>\n`);
-
     const referenceBuilder = new TypeReferencedCodeBuilder(context);
+    referenceBuilder.links = false;
     referenceBuilder.declaration(member);
+
     await fileStream.write(
-      `      <td>${referenceBuilder.toMdx("js", "inline")}</td>\n`
+      `\n### ${referenceBuilder.toMdx("js", "inline")}\n\n`
     );
 
-    referenceBuilder.reset();
-    referenceBuilder.type(
-      getTypeWithNullableInfo(
-        context,
-        member.type,
-        true,
-        !!member.questionToken
-      )
-    );
-
-    await fileStream.writeLine(
-      `      {props.detailed && (<td>${referenceBuilder.toMdx("js", "inline")}</td>)}`
-    );
-
-    let defaultValue = getJsDocTagText(context, member, "defaultValue");
-    if (!defaultValue) {
-      defaultValue = "(no default)";
-    }
-    await fileStream.writeLine(
-      `      {props.detailed && <td><code>{${JSON.stringify(defaultValue)}}</code></td>}`
-    );
-
-    let description =
-      getSummary(context, member, true, true) +
-      getInheritenceInfo(context, parent, member);
-
-    await fileStream.write(`      <td>\n`);
-    await fileStream.write(
-      `${description
-        .split("\n")
-        .map((l) => `        ${l}`)
-        .join("\n")}\n`
-    );
-    await fileStream.write(`      </td>\n`);
-
-    await fileStream.write(`    </tr>\n`);
-
-    await writePropertyPage(context, basePath, member);
+    await writePropertyDetails(context, fileStream, parent, member, true);
   }
-  await fileStream.write(`  </tbody>\n`);
-  await fileStream.write(`</table>\n`);
 }
 
 async function writeMethods(
   context: GenerateContext,
   fileStream: FileStream,
-  basePath: string,
   parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
   methods: (ts.MethodDeclaration | ts.MethodSignature)[]
 ) {
@@ -277,50 +225,25 @@ async function writeMethods(
   }
 
   await fileStream.write(
-    `\n<DynHeading as="h3" inlined={props.inlined}>Methods</DynHeading>\n\n`
+    `\n## Methods \n\n`
   );
-
-  await fileStream.write(
-    `<table className="table table-striped table-condensed type-table">\n`
-  );
-  await fileStream.write(`  <tbody>\n`);
 
   for (const member of methods) {
-    await fileStream.write(`    <tr>\n`);
 
-    const parameters = member.parameters
-      .map((p) => p.type!.getText())
-      .join(", ");
+    const referenceBuilder = new TypeReferencedCodeBuilder(context);
+    referenceBuilder.declaration(member);
+
     await fileStream.write(
-      `      <td>[\`${member.name.getText()}(${parameters})\`](./${member.name
-        .getText()
-        .toLowerCase()}.mdx)</td>\n`
+      `\n### ${referenceBuilder.toMdx("js", "inline")}\n\n`
     );
 
-    let description =
-      getSummary(context, member, true, true) +
-      getInheritenceInfo(context, parent, member);
-    await fileStream.write(`      <td>\n`);
-    await fileStream.write(
-      `${description
-        .split("\n")
-        .map((l) => `        ${l}`)
-        .join("\n")}\n`
-    );
-    await fileStream.write(`      </td>\n`);
-
-    await fileStream.write(`    </tr>\n`);
-
-    await writeMethodPage(context, basePath, member);
+    await writeMethodDetails(context, fileStream, parent, member, true);
   }
-  await fileStream.write(`  </tbody>\n`);
-  await fileStream.write(`</table>\n`);
 }
 
 async function writeEvents(
   context: GenerateContext,
   fileStream: FileStream,
-  basePath: string,
   parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
   events: (
     | ts.PropertyDeclaration
@@ -333,41 +256,21 @@ async function writeEvents(
   }
 
   await fileStream.write(
-    `\n<DynHeading as="h3" inlined={props.inlined}>Events</DynHeading>\n\n`
+    `\n## Events\n\n`
   );
-
-  await fileStream.write(
-    `<table className="table table-striped table-condensed type-table">\n`
-  );
-  await fileStream.write(`  <tbody>\n`);
 
   for (const member of events) {
-    await fileStream.write(`    <tr>\n`);
+
+    const referenceBuilder = new TypeReferencedCodeBuilder(context);
+    referenceBuilder.declaration(member);
 
     await fileStream.write(
-      `      <td>[\`${member.name.getText()}\`](./${member.name
-        .getText()
-        .toLowerCase()}.mdx)</td>\n`
+      `\n### ${referenceBuilder.toMdx("js", "inline")}\n\n`
     );
+    await fileStream.write(`${getFullDescription(context, member)}\n\n`);
 
-    let description =
-      getSummary(context, member, true, true) +
-      getInheritenceInfo(context, parent, member);
-    await fileStream.write(`      <td>\n`);
-    await fileStream.write(
-      `${description
-        .split("\n")
-        .map((l) => `        ${l}`)
-        .join("\n")}\n`
-    );
-    await fileStream.write(`      </td>\n`);
-
-    await fileStream.write(`    </tr>\n`);
-
-    await writeEventPage(context, basePath, member);
+    await writeEventDetails(context, fileStream, parent, member, true);
   }
-  await fileStream.write(`  </tbody>\n`);
-  await fileStream.write(`</table>\n`);
 }
 
 async function writeEnumMembers(
@@ -376,7 +279,7 @@ async function writeEnumMembers(
   exportedType: ts.EnumDeclaration
 ) {
   await fileStream.write(
-    `\n<DynHeading as="h3" inlined={props.inlined}>Enum Members</DynHeading>\n\n`
+    `\n### Enum Members\n\n`
   );
 
   await fileStream.write(
@@ -443,83 +346,4 @@ async function writeFrontMatter(
   if (since) {
     await fileStream.write(`<SinceBadge since=${JSON.stringify(since)} />\n`);
   }
-}
-
-async function writePropertyPage(
-  context: GenerateContext,
-  basePath: string,
-  member:
-    | ts.PropertyDeclaration
-    | ts.PropertySignature
-    | ts.GetAccessorDeclaration
-) {
-  let memberName = member.name!.getText();
-  let fileName = memberName.toLowerCase();
-  if (memberName === "index") {
-    fileName = "index_";
-  }
-
-  const filePath = path.join(basePath, fileName + ".mdx");
-
-  await using fileStream = await openFileStream(filePath);
-
-  await writeFrontMatter(context, fileStream, memberName, member, "property");
-  await writePropertyDetails(context, fileStream, member);
-}
-
-async function writeEventPage(
-  context: GenerateContext,
-  basePath: string,
-  member:
-    | ts.PropertyDeclaration
-    | ts.PropertySignature
-    | ts.GetAccessorDeclaration
-) {
-  const memberName = member.name!.getText();
-  const filePath = path.join(basePath, memberName.toLocaleLowerCase() + ".mdx");
-
-  await using fileStream = await openFileStream(filePath);
-
-  await writeFrontMatter(context, fileStream, memberName, member, "event");
-  await writeEventDetails(context, fileStream, member);
-}
-
-async function writeMethodPage(
-  context: GenerateContext,
-  basePath: string,
-  member: ts.MethodDeclaration | ts.MethodSignature
-) {
-  const memberName = member.name!.getText();
-  const filePath = path.join(basePath, memberName.toLocaleLowerCase() + ".mdx");
-
-  await using fileStream = await openFileStream(filePath);
-
-  await writeFrontMatter(context, fileStream, memberName, member, "method");
-  await writeMethodDetails(context, fileStream, member);
-}
-
-function getInheritenceInfo(
-  context: GenerateContext,
-  parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
-  member: ts.ClassElement | ts.TypeElement
-) {
-  let info = "";
-  // inheritence info
-  if (member.parent !== parent) {
-    info += " (Inherited from ";
-    const builder = new TypeReferencedCodeBuilder(context);
-    builder.declaration(
-      member.parent as ts.ClassDeclaration | ts.InterfaceDeclaration
-    );
-
-    let name = (member.parent as ts.NamedDeclaration).name!.getText();
-    if (context.nameToExportName.has(name)) {
-      name = context.nameToExportName.get(name)!;
-    }
-
-    info += builder.toMdx("js", "inline");
-
-    info += ")";
-  }
-  return info;
 }

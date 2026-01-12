@@ -81,6 +81,7 @@ export async function generateSettings(context: GenerateContext) {
               `title: ${page.title}\n`
             );
 
+            await fileStream.write(`sidebar_label: ${member.name.getText()}\n`);
             await fileStream.write(`sidebar_custom_props:\n`);
 
             if (page.javaScriptOnly) {
@@ -109,7 +110,7 @@ export async function generateSettings(context: GenerateContext) {
 
             await fileStream.write(`<PropertyDescription showJson={true} />\n`);
 
-            await writePropertyDetails(context, fileStream, member);
+            await writePropertyDetails(context, fileStream, subSettingType, member);
           }
         }
       }
