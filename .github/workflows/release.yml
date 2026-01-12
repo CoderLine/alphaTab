@@ -20,7 +20,7 @@ on:
 
 jobs:
   web:
-    uses: ./.github/workflows/~publish_web.yml@feature/publish-pipeline
+    uses: ./.github/workflows/~publish_web.yml
     secrets: inherit
     if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_web == 'true')
     with: 
@@ -29,7 +29,7 @@ jobs:
       force: true
 
   dotnet:
-    uses: ./.github/workflows/~publish_dotnet.yml@feature/publish-pipeline
+    uses: ./.github/workflows/~publish_dotnet.yml
     secrets: inherit
     if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_csharp == 'true')
     with: 
@@ -37,7 +37,7 @@ jobs:
       force: true
 
   kotlin:
-    uses: ./.github/workflows/~publish_kotlin.yml@feature/publish-pipeline
+    uses: ./.github/workflows/~publish_kotlin.yml
     secrets: inherit
     if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_kotlin_android == 'true')
     with: 
