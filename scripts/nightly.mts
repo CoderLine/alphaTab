@@ -1,8 +1,8 @@
-import { execSync, ExecSyncOptionsWithBufferEncoding } from 'node:child_process';
+import { type ExecSyncOptionsWithBufferEncoding, execSync } from 'node:child_process';
 import { appendFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { exit } from 'node:process';
-import { parseArgs, type ParseArgsOptionsConfig } from 'node:util';
+import { type ParseArgsOptionsConfig, parseArgs } from 'node:util';
 
 const options: ParseArgsOptionsConfig = {
     platform: {
