@@ -15,6 +15,8 @@ jobs:
       has_changes: ${{ steps.check.outputs.has_changes }}
     steps:
       - uses: actions/checkout@v6
+        with: 
+          fetch-depth: 100
       - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
@@ -24,10 +26,12 @@ jobs:
 
   build:
     needs: check
-    if: needs.check.outputs.has-changes == 'true'
+    if: needs.check.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with: 
+          fetch-depth: 100      
       - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
