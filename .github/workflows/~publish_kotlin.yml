@@ -1,0 +1,51 @@
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+      force:
+        type: boolean
+        default: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.check.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - run: npm run nightly-check -- --platform kotlin --force ${{ inputs.force }}
+        id: check    
+
+  build:
+    needs: check
+    if: needs.check.outputs.has-changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - uses: actions/setup-java@v5
+        with:
+          java-version: "19"
+          distribution: "temurin"
+
+      - run: npm run update-version -- ${{inputs.version}
+      - run: npm ci
+      - run: npm run build-kotlin
+
+      - run: npm run nightly-pack -- --platform kotlin --force ${{ inputs.force }}
+      - run: npm run nightly-publish -- --platform kotlin --force ${{ inputs.force }}
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{secrets.OSSRH_USERTOKEN_USERNAME}}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{secrets.OSSRH_USERTOKEN_PASSWORD}}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{secrets.SONATYPE_SIGNING_KEY_ID}}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{secrets.SONATYPE_SIGNING_KEY}}

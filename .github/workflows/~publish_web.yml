@@ -1,0 +1,50 @@
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+      force:
+        type: boolean
+        default: false
+      npm_tag:
+        type: string
+        required: true
+
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.check.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - run: npm run nightly-check -- --platform web --force ${{ inputs.force }}
+        id: check    
+
+  build:
+    needs: check
+    if: needs.check.outputs.has-changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          registry-url: https://registry.npmjs.org/
+
+      - run: npm run update-version -- ${{inputs.version}
+      - run: npm ci
+      - run: npm run build-web
+      - run: npm run build-language-server
+      - run: npm run build-monaco
+
+      - run: npm run nightly-pack -- --platform web --force ${{ inputs.force }}
+      - run: npm run nightly-publish -- --platform web --force ${{ inputs.force }} --tag ${{ inputs.npm_tag }} 
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_AUTH_TOKEN }}
