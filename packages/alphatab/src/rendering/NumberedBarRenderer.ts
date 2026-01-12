@@ -397,4 +397,14 @@ export class NumberedBarRenderer extends LineBarRenderer {
             return Math.max(info.startY, info.endY);
         }
     }
+
+    protected override paintTuplets(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        beatElement: BeatSubElement,
+        _bracketsAsArcs?: boolean
+    ): void {
+        super.paintTuplets(cx, cy, canvas, beatElement, true);
+    }
 }
