@@ -17,7 +17,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>music,notation,engraver,renderer</PackageTags>
     <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>	
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 </Project>
