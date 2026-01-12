@@ -36,7 +36,7 @@
         "monaco-editor": "^0.55.1",
         "vscode-languageserver-types": "^3.17.5",
         "vscode-oniguruma": "^2.0.1",
-        "vscode-textmate": "^9.3.0"
+        "vscode-textmate": "^9.3.1"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.3.11",
