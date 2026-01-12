@@ -1,0 +1,50 @@
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+      force:
+        type: boolean
+        default: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.check.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v6
+        with: 
+          fetch-depth: 100
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - run: npm run nightly-check -- --platform dotnet --force ${{ inputs.force }}
+        id: check    
+
+  build:
+    needs: check
+    if: needs.check.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with: 
+          fetch-depth: 100      
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8"
+
+      - run: npm run update-version -- ${{inputs.version}}
+      - run: npm ci
+      - run: npm run build-csharp
+
+      - run: npm run nightly-pack -- --platform dotnet --force ${{ inputs.force }}
+      - run: npm run nightly-publish -- --platform dotnet --force ${{ inputs.force }}
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}

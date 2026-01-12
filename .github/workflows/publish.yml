@@ -6,139 +6,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  check_sha:
-    name: check_sha
-    runs-on: ubuntu-latest
-    outputs:
-      hit: ${{ steps.cache.outputs.cache-hit == 'true' }}
-    steps:
-      - run: touch dummy.txt
+  web:
+    uses: ./.github/workflows/~publish_web.yml
+    secrets: inherit
+    with: 
+      version: alpha ${{github.run_number}}
+      npm_tag: alpha
 
-      - uses: actions/cache@v5
-        id: cache
-        with:
-          path: dummy.txt
-          key: check-sha-${{ github.sha }}
+  dotnet:
+    uses: ./.github/workflows/~publish_dotnet.yml
+    secrets: inherit
+    with: 
+      version: alpha ${{github.run_number}}
 
-  nighty_web:
-    name: Web
-    needs: check_sha
-    if: needs.check_sha.outputs.hit == 'false'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          lfs: true
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
-
-      - run: npm run update-version -- alpha ${{github.run_number}}
-      - run: npm ci
-      - run: npm run build-web
-      - run: npm run build-language-server
-      - run: npm run build-monaco      
-      - run: npm pack
-        working-directory: ./packages/alphatab/
-      - run: npm pack
-        working-directory: ./packages/vite/
-      - run: npm pack
-        working-directory: ./packages/webpack/
-      - run: npm pack
-        working-directory: ./packages/lsp/
-      - run: npm pack
-        working-directory: ./packages/monaco/
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 'lts/*'
-          registry-url: https://registry.npmjs.org/
-
-      - run: npm publish --access public --tag alpha
-        working-directory: ./packages/alphatab/
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-
-      - run: npm publish --access public --tag alpha
-        working-directory: ./packages/vite/
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-
-      - run: npm publish --access public --tag alpha
-        working-directory: ./packages/webpack/
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-
-      - run: npm publish --access public --tag alpha
-        working-directory: ./packages/lsp/
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-
-      - run: npm publish --access public --tag alpha
-        working-directory: ./packages/monaco/
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-
-  nightly_csharp:
-    name: C#
-    needs: check_sha
-    if: needs.check_sha.outputs.hit == 'false'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          lfs: true
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
-
-      - uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: "8"
-
-      - run: npm run update-version -- alpha ${{github.run_number}}
-      - run: npm ci
-      - run: npm run build-csharp
-
-      - run: dotnet nuget push AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
-        working-directory: ./packages/csharp/src/
-      - run: dotnet nuget push AlphaTab.Windows/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
-        working-directory: ./packages/csharp/src/
-
-  nightly_kotlin_android:
-    name: Kotlin (Android)
-    needs: check_sha
-    if: needs.check_sha.outputs.hit == 'false'
-    runs-on: ubuntu-latest
-    env:
-      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{secrets.OSSRH_USERTOKEN_USERNAME}}
-      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{secrets.OSSRH_USERTOKEN_PASSWORD}}
-      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{secrets.SONATYPE_SIGNING_KEY_ID}}
-      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
-      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{secrets.SONATYPE_SIGNING_KEY}}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          lfs: true
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
-
-      - uses: actions/setup-java@v5
-        with:
-          java-version: "19"
-          distribution: "temurin"
-
-      - run: npm run update-version -- alpha ${{github.run_number}}
-      - run: npm ci
-      - run: npm run build-kotlin
-
-      - run: ./gradlew publishToMavenCentral
-        working-directory: ./packages/kotlin/src/
-
-      - run: ./gradlew --stop
-        working-directory: ./packages/kotlin/src/
-
+  kotlin:
+    uses: ./.github/workflows/~publish_kotlin.yml
+    secrets: inherit
+    with: 
+      version: alpha ${{github.run_number}}

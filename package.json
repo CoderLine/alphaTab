@@ -40,7 +40,11 @@
         "build-webpack": "npm run build --workspace=packages/webpack",
         "test-webpack": "npm run test --workspace=packages/webpack",
 
-        "build-monaco": "npm run build --workspace=packages/monaco"
+        "build-monaco": "npm run build --workspace=packages/monaco",
+
+        "nightly-check": "node ./scripts/nightly.mts --mode check",
+        "nightly-pack": "node ./scripts/nightly.mts --mode pack",
+        "nightly-publish": "node ./scripts/nightly.mts --mode publish"
     },
     "devDependencies": {
         "concurrently": "^9.2.1"

@@ -19,116 +19,27 @@ on:
         default: true                
 
 jobs:
-  release_web:
-    name: Web
-    runs-on: ubuntu-latest
+  web:
+    uses: ./.github/workflows/~publish_web.yml
+    secrets: inherit
     if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_web == 'true')
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          lfs: true
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 'lts/*'
+    with: 
+      version: ${{github.run_number}}
+      npm_tag: latest
+      force: true
 
-      - run: npm run update-version -- ${{github.run_number}}
-      - run: npm ci
-      - run: npm run build-web
-      - run: npm run build-language-server
-      - run: npm run build-monaco      
-      - run: npm pack
-        working-directory: ./packages/alphatab/
-      - run: npm pack
-        working-directory: ./packages/vite/
-      - run: npm pack
-        working-directory: ./packages/webpack/
-      - run: npm pack
-        working-directory: ./packages/lsp/
-      - run: npm pack
-        working-directory: ./packages/monaco/
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 'lts/*'
-          registry-url: https://registry.npmjs.org/
-      - name: Publish to NPM (alphaTab release)
-        run: npm publish --access public
-        working-directory: ./packages/alphatab/
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-      - name: Publish to NPM (Vite Plugin release)
-        run: npm publish --access public
-        working-directory: ./packages/vite/
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-      - name: Publish to NPM (Webpack release)
-        run: npm publish --access public
-        working-directory: ./packages/webpack/
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-      - name: Publish to NPM (Language Server release)
-        run: npm publish --access public
-        working-directory: ./packages/lsp/
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-      - name: Publish to NPM (Monaco release)
-        run: npm publish --access public
-        working-directory: ./packages/monaco/
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-
-  release_csharp:
-    name: C#
-    runs-on: ubuntu-latest
+  dotnet:
+    uses: ./.github/workflows/~publish_dotnet.yml
+    secrets: inherit
     if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_csharp == 'true')
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          lfs: true
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 'lts/*'
-      - uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '8'
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
-      - run: npm run update-version -- ${{github.run_number}}
-      - run: npm ci
-      - run: npm run build-csharp
-      - run: dotnet nuget push AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
-        working-directory: ./packages/csharp/src/
-      - run: dotnet nuget push AlphaTab.Windows/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
-        working-directory: ./packages/csharp/src/
+    with: 
+      version: ${{github.run_number}}
+      force: true
 
-  release_kotlin_android:
-    name: Kotlin (Android)
-    runs-on: windows-latest
+  kotlin:
+    uses: ./.github/workflows/~publish_kotlin.yml
+    secrets: inherit
     if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_kotlin_android == 'true')
-    env:
-      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{secrets.OSSRH_USERTOKEN_USERNAME}}
-      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{secrets.OSSRH_USERTOKEN_PASSWORD}}
-      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{secrets.SONATYPE_SIGNING_KEY_ID}}
-      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
-      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{secrets.SONATYPE_SIGNING_KEY}}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          lfs: true      
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 'lts/*'
-
-      - uses: actions/setup-java@v5
-        with:
-          java-version: "19"
-          distribution: "temurin"
-
-      - run: npm run update-version -- ${{github.run_number}}
-      - run: npm ci
-      - run: npm run build-kotlin
-      - run: ./gradlew publishToMavenCentral
-        working-directory: ./packages/kotlin/src/
-
-      - run: ./gradlew --stop
-        working-directory: ./packages/kotlin/src/
-
+    with: 
+      version: ${{github.run_number}}
+      force: true
