@@ -712,7 +712,7 @@ export class Environment {
                 if (typeof __ALPHATAB_WEBPACK__ !== 'boolean') {
                     Logger.warning(
                         'WebPack',
-                        `Detected bundling with WebPack but @coderline/alphatab-webpcak was not used! To ensure alphaTab works as expected use our bundler plugins. Learn more at https://www.alphatab.net/docs/getting-started/installation-webpack`
+                        `Detected bundling with WebPack but @coderline/alphatab-webpack was not used! To ensure alphaTab works as expected use our bundler plugins. Learn more at https://www.alphatab.net/docs/getting-started/installation-webpack`
                     );
                 }
 
