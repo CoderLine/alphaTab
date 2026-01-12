@@ -1,0 +1,84 @@
+---
+title: highlightPlaybackRange
+sidebar_custom_props:
+  kind: method
+  category: Methods - Player
+  since: 1.8.0
+---
+
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
+
+<SinceBadge since="1.8.0" />
+Places the highlight markers at the specified start and end-beat range. Unlike actually setting <Signature style="inline" js={[["identifier","playbackRange","/docs/reference/types/alphatabapibase/#playbackrange"]]}>playbackRange</Signature>  this method only places the selection markers without actually
+changing the playback range. This method can be used when building custom selection systems (e.g. having draggable handles).
+
+<Signature style="block"
+           js={[["identifier","highlightPlaybackRange"],["token","("],["identifier","startBeat"],["token",":"],["whitespace"," "],["identifier","Beat","/docs/reference/types/model/beat"],["token",","],["whitespace"," "],["identifier","endBeat"],["token",":"],["whitespace"," "],["identifier","Beat","/docs/reference/types/model/beat"],["token",")"],["token",":"],["whitespace"," "],["identifier","void"]]}
+           csharp={[["keyword","void"],["whitespace"," "],["identifier","HighlightPlaybackRange"],["token","("],["identifier","Beat","/docs/reference/types/model/beat"],["whitespace"," "],["identifier","startBeat"],["token",","],["whitespace"," "],["identifier","Beat","/docs/reference/types/model/beat"],["whitespace"," "],["identifier","endBeat"],["token",")"]]}
+           kotlin={[["identifier","fun"],["whitespace"," "],["identifier","highlightPlaybackRange"],["token","("],["identifier","startBeat"],["token",":"],["whitespace"," "],["identifier","Beat","/docs/reference/types/model/beat"],["token",","],["whitespace"," "],["identifier","endBeat"],["token",":"],["whitespace"," "],["identifier","Beat","/docs/reference/types/model/beat"],["token",")"],["token",":"],["whitespace"," "],["identifier","Unit"]]}
+/>
+
+<table className="table table-striped table-condensed type-table">
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr>
+  <td>
+    <CodeBadge type="all" name="startBeat" />
+  </td>
+  <td>
+    The start beat where the selection should start
+  </td>
+</tr>
+<tr>
+  <td>
+    <CodeBadge type="all" name="endBeat" />
+  </td>
+  <td>
+    The end beat where the selection should end.
+  </td>
+</tr>
+  </tbody>
+</table>
+
+## Examples
+
+<Tabs
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const startBeat = api.score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+const endBeat = api.score.tracks[0].staves[0].bars[3].voices[0].beats[0];
+api.highlightPlaybackRange(startBeat, endBeat);
+```
+</TabItem>
+<TabItem value="csharp">
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.ChangeTrackVolume(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, 1.5);
+api.ChangeTrackVolume(new Track[] { api.Score.Tracks[2] }, 0.5);
+var startBeat = api.Score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0];
+var endBeat = api.Score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0];
+api.HighlightPlaybackRange(startBeat, endBeat);
+```
+</TabItem>
+<TabItem value="android">
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+val startBeat = api.score.tracks[0].staves[0].bars[0].voices[0].beats[0]
+val endBeat = api.score.tracks[0].staves[0].bars[3].voices[0].beats[0]
+api.highlightPlaybackRange(startBeat, endBeat)
+```
+</TabItem>
+</Tabs>

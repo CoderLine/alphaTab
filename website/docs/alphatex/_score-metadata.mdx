@@ -762,3 +762,189 @@ Following parameters have value limitations
 
 `}</AlphaTexSample>
 
+## `\extendBarLines`
+
+```plain title="Syntax"
+\extendBarLines ()
+```
+
+**Description:** Extend the bar lines across staves in the same system.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\extendBarLines
+\\track "Piano1"
+  \\staff {score}
+\\instrument piano
+  C4 D4 E4 F4
+  \\staff {score}
+  \\clef f4 C3 D3 E3 F3
+\\track "Piano2"
+  \\staff {score}
+\\instrument piano
+  C4 D4 E4 F4
+\\track "Flute 1"
+  \\staff { score }
+\\instrument flute
+  C4 D4 E4 F4
+\\track "Flute 2"
+  \\staff { score }
+\\instrument flute
+  \\clef f4 C3 D3 E3 F3
+\\track "Guitar 1"
+  \\staff { score tabs }
+  0.3.4 2.3.4 5.3.4 7.3.4
+
+`}</AlphaTexSample>
+
+## `\chordDiagramsInScore`
+
+```plain title="Syntax"
+\chordDiagramsInScore visibility
+```
+
+**Description:** Configures whether chord diagrams are shown inline in the score..
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `visibility` | The visibility of the diagrams | `true\|false` | no `true` |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `visibility` | <ParameterValuesTable values={[["true","Show the diagrams"],["false","Hide the diagrams"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\chordDiagramsInScore
+\\chord ("E" 0 0 1 2 2 0)
+(0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
+
+`}</AlphaTexSample>
+
+## `\hideEmptyStaves`
+
+```plain title="Syntax"
+\hideEmptyStaves ()
+```
+
+**Description:** Hide empty staves.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\hideEmptyStaves
+\\defaultSystemsLayout 3
+\\track "Track 1"
+    C4 * 4 | C4 * 4 | C4 * 4 | 
+    C4 * 4 | C4 * 4 | C4 * 4 | 
+\\track "Track 2"
+    r | r | r |
+    r | C4.1 | r |
+
+`}</AlphaTexSample>
+
+## `\hideEmptyStavesInFirstSystem`
+
+```plain title="Syntax"
+\hideEmptyStavesInFirstSystem ()
+```
+
+**Description:** Hide empty staves in first system.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\hideEmptyStaves
+\\hideEmptyStavesInFirstSystem
+\\defaultSystemsLayout 3
+\\track "Track 1"
+    C4 * 4 | C4 * 4 | C4 * 4 | 
+    r | r | r | 
+\\track "Track 2"
+    r | r | r |
+    r | C4.1 | r |
+
+`}</AlphaTexSample>
+
+## `\showSingleStaffBrackets`
+
+```plain title="Syntax"
+\showSingleStaffBrackets ()
+```
+
+**Description:** Show brackets and braces on single staves.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\hideEmptyStaves
+\\hideEmptyStavesInFirstSystem
+\\showSingleStaffBrackets
+\\defaultSystemsLayout 3
+\\track "Track 1"
+    \\staff { score }
+    C4 * 4 | C4 * 4 | C4 * 4 |
+    C4 * 4 | C4 * 4 | C4 * 4 |
+    \\staff { score }
+    r | r | r | 
+    r | C4.1 | r | 
+
+`}</AlphaTexSample>
+
+## `\defaultBarNumberDisplay`
+
+```plain title="Syntax"
+\defaultBarNumberDisplay mode
+```
+
+**Description:** Sets the display mode for bar numbers on all bars.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `allBars\|firstOfSystem\|hide` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["allBars","All bars"],["firstOfSystem","First bar of every system"],["hide","Hide"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultBarNumberDisplay allBars
+\\title "All Bars"
+    \\track { defaultsystemslayout 3 }
+    C4.1 | C4.1 | C4.1 |
+    C4.1 | C4.1 | C4.1 
+
+`}</AlphaTexSample>
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultBarNumberDisplay firstOfSystem
+\\title "First of System"
+    \\track { defaultsystemslayout 3 }
+    C4.1 | C4.1 | C4.1 |
+    C4.1 | C4.1 | C4.1 
+
+`}</AlphaTexSample>
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultBarNumberDisplay hide
+\\title "Hide"
+    \\track { defaultsystemslayout 3 }
+    C4.1 | C4.1 | C4.1 |
+    C4.1 | C4.1 | C4.1 
+
+`}</AlphaTexSample>
+
