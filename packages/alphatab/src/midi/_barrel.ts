@@ -1,6 +1,9 @@
 export { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
-export { BeatTickLookup, BeatTickLookupItem, ,
-    type IBeatVisibilityChecker } from '@coderline/alphatab/midi/BeatTickLookup';
+export {
+    BeatTickLookup,
+    BeatTickLookupItem,
+    type IBeatVisibilityChecker
+} from '@coderline/alphatab/midi/BeatTickLookup';
 export { ControllerType } from '@coderline/alphatab/midi/ControllerType';
 export {
     AlphaTabSystemExclusiveEvents,
