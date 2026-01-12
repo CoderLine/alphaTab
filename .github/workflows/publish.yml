@@ -7,20 +7,20 @@ on:
 
 jobs:
   web:
-    uses: ./github/workflows/~publish_web.yml@feature/publish-pipeline
+    uses: ./.github/workflows/~publish_web.yml@feature/publish-pipeline
     secrets: inherit
     with: 
       version: alpha ${{github.run_number}}
       npm_tag: alpha
 
   dotnet:
-    uses: ./github/workflows/~publish_dotnet.yml@feature/publish-pipeline
+    uses: ./.github/workflows/~publish_dotnet.yml@feature/publish-pipeline
     secrets: inherit
     with: 
       version: alpha ${{github.run_number}}
 
   kotlin:
-    uses: ./github/workflows/~publish_kotlin.yml@feature/publish-pipeline
+    uses: ./.github/workflows/~publish_kotlin.yml@feature/publish-pipeline
     secrets: inherit
     with: 
       version: alpha ${{github.run_number}}

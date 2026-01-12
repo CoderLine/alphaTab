@@ -38,7 +38,7 @@ jobs:
           cache: 'npm'
           registry-url: https://registry.npmjs.org/
 
-      - run: npm run update-version -- ${{inputs.version}
+      - run: npm run update-version -- ${{inputs.version}}
       - run: npm ci
       - run: npm run build-web
       - run: npm run build-language-server

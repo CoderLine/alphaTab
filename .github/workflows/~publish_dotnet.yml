@@ -36,7 +36,7 @@ jobs:
         with:
           dotnet-version: "8"
 
-      - run: npm run update-version -- ${{inputs.version}
+      - run: npm run update-version -- ${{inputs.version}}
       - run: npm ci
       - run: npm run build-csharp
 

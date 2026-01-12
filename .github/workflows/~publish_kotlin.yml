@@ -37,7 +37,7 @@ jobs:
           java-version: "19"
           distribution: "temurin"
 
-      - run: npm run update-version -- ${{inputs.version}
+      - run: npm run update-version -- ${{inputs.version}}
       - run: npm ci
       - run: npm run build-kotlin
 
