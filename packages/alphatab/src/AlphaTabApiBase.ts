@@ -3235,12 +3235,16 @@ export class AlphaTabApiBase<TSettings> {
         } else {
             // if the beats are on the same staff, we simply highlight from the startbeat to endbeat
             const selection: IContainer = this.uiFacade.createSelectionElement()!;
-            selection.setBounds(
+            const selectionBounds = new Bounds(
                 startX,
                 startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,
                 endX - startX,
                 startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
             );
+
+            selection.setBounds(selectionBounds.x, selectionBounds.y, selectionBounds.w, selectionBounds.h);
+            eventArgs.highlightBlocks!.push(selectionBounds);
+
             selectionWrapper.appendChild(selection);
         }
 
