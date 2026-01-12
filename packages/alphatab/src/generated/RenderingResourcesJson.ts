@@ -62,7 +62,7 @@ export interface RenderingResourcesJson {
      */
     effectFont?: FontJson;
     /**
-     * The fonts used by individual elements. Check {@link defaultFonts} for the elements which have custom fonts.
+     * The fonts used by individual elements. Check `defaultFonts` for the elements which have custom fonts.
      * Removing fonts from this map can lead to unexpected side effects and errors. Only update it with new values.
      * @json_immutable
      */
