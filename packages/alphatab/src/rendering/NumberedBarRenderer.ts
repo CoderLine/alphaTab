@@ -403,7 +403,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
         cy: number,
         canvas: ICanvas,
         beatElement: BeatSubElement,
-        _bracketsAsArcs?: boolean
+        _bracketsAsArcs: boolean = false
     ): void {
         super.paintTuplets(cx, cy, canvas, beatElement, true);
     }
