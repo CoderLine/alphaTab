@@ -1,5 +1,5 @@
 import { TestPlatform } from 'test/TestPlatform';
-import { VisualTestHelper } from '../VisualTestHelper';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '../VisualTestHelper';
 import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { expect } from 'chai';
@@ -10,6 +10,41 @@ import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 describe('BrokenRendersTests', () => {
     it('let-ring-empty-voice', async () => {
         await VisualTestHelper.runVisualTest('issues/let-ring-empty-voice.gp');
+    });
+
+    it('bottom-effect-band', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\lyrics "Do Re Mi Fa So"
+            C4 {tr 16} C4 C4 C4 | C4 c4`,
+            'test-data/visual-tests/issues/bottom-effect-band.png'
+        );
+    });
+
+    it('whammy-resize-wrap', async () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            \\staff {tabs}
+                7.3.4
+                8.3
+                10.3.4
+                12.3.4{tbe (dip default 0 0 15 -4 30 0) beam Down} 
+            |  
+                5.3{nh}.4{tbe (dive default 0 0 30.599999999999998 8) beam Down}  
+                5.3
+                5.3`);
+        await VisualTestHelper.runVisualTestFull(
+            new VisualTestOptions(
+                score,
+                [
+                    new VisualTestRun(600, 'test-data/visual-tests/issues/whammy-resize-wrap-600.png'),
+                    new VisualTestRun(400, 'test-data/visual-tests/issues/whammy-resize-wrap-400.png'),
+                    // 431
+                    new VisualTestRun(380, 'test-data/visual-tests/issues/whammy-resize-wrap-380.png'),
+                    new VisualTestRun(500, 'test-data/visual-tests/issues/whammy-resize-wrap-500.png')
+                ],
+                new Settings()
+            )
+        );
     });
 
     it('valid-svg', async () => {
@@ -52,5 +87,45 @@ describe('BrokenRendersTests', () => {
                 expect(xml.firstElement!.localName).to.equal('svg');
             }
         }
+    });
+
+    describe('no-label-padding-left', () => {
+        it('no-padding', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                \\track "T1"
+                C4 * 4
+                `,
+                'test-data/visual-tests/issues/no-label-padding-left-no-padding.png'
+            );
+        });
+
+        it('with-label', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                \\track "T1"
+                C4 * 4
+                `,
+                'test-data/visual-tests/issues/no-label-padding-left-with-label.png',
+                undefined,
+                o => {
+                    o.settings.display.systemLabelPaddingLeft = 100;
+                }
+            );
+        });
+
+        it('without-label', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                \\track
+                C4 * 4
+                `,
+                'test-data/visual-tests/issues/no-label-padding-left-without-label.png',
+                undefined,
+                o => {
+                    o.settings.display.systemLabelPaddingLeft = 100;
+                }
+            );
+        });
     });
 });

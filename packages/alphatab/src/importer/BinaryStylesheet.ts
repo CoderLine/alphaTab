@@ -6,6 +6,7 @@ import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { Color } from '@coderline/alphatab/model/Color';
 import {
+    BarNumberDisplay,
     type BracketExtendMode,
     TrackNameMode,
     TrackNameOrientation,
@@ -150,6 +151,9 @@ export class BinaryStylesheet {
                 case 'Global/DrawChords':
                     score.stylesheet.globalDisplayChordDiagramsOnTop = value as boolean;
                     break;
+                case 'System/drawChordInScore':
+                    score.stylesheet.globalDisplayChordDiagramsInScore = value as boolean;
+                    break;
                 case 'System/showTrackNameSingle':
                     if (!(value as boolean)) {
                         score.stylesheet.singleTrackTrackNamePolicy = TrackNamePolicy.Hidden;
@@ -218,6 +222,10 @@ export class BinaryStylesheet {
                         score.stylesheet.otherSystemsTrackNameOrientation = TrackNameOrientation.Vertical;
                     }
                     break;
+                case 'System/ExtendedBarLines':
+                    score.stylesheet.extendBarLines = value as boolean;
+                    break;
+
                 case 'Header/Title':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).template = value as string;
                     break;
@@ -340,6 +348,20 @@ export class BinaryStylesheet {
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).isVisible =
                         value as boolean;
                     break;
+
+                case 'System/barIndexDrawType':
+                    switch (value as number) {
+                        case 0:
+                            score.stylesheet.barNumberDisplay = BarNumberDisplay.AllBars;
+                            break;
+                        case 1:
+                            score.stylesheet.barNumberDisplay = BarNumberDisplay.FirstOfSystem;
+                            break;
+                        case 2:
+                            score.stylesheet.barNumberDisplay = BarNumberDisplay.Hide;
+                            break;
+                    }
+                    break;
             }
         }
     }
@@ -456,6 +478,11 @@ export class BinaryStylesheet {
             score.stylesheet.globalDisplayChordDiagramsOnTop,
             DataType.Boolean
         );
+        binaryStylesheet.addValue(
+            'System/drawChordInScore',
+            score.stylesheet.globalDisplayChordDiagramsInScore,
+            DataType.Boolean
+        );
 
         switch (score.stylesheet.singleTrackTrackNamePolicy) {
             case TrackNamePolicy.Hidden:
@@ -517,6 +544,8 @@ export class BinaryStylesheet {
                 break;
         }
 
+        binaryStylesheet.addValue('System/ExtendedBarLines', score.stylesheet.extendBarLines, DataType.Boolean);
+
         const scoreStyle = score.style;
         if (scoreStyle) {
             for (const [k, v] of scoreStyle.headerAndFooter) {
@@ -553,6 +582,18 @@ export class BinaryStylesheet {
                         break;
                 }
             }
+        }
+
+        switch (score.stylesheet.barNumberDisplay) {
+            case BarNumberDisplay.AllBars:
+                binaryStylesheet.addValue('System/barIndexDrawType', 0, DataType.Integer);
+                break;
+            case BarNumberDisplay.FirstOfSystem:
+                binaryStylesheet.addValue('System/barIndexDrawType', 1, DataType.Integer);
+                break;
+            case BarNumberDisplay.Hide:
+                binaryStylesheet.addValue('System/barIndexDrawType', 2, DataType.Integer);
+                break;
         }
 
         const writer = ByteBuffer.withCapacity(128);

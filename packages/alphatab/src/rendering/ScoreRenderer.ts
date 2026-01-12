@@ -1,10 +1,15 @@
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { Environment } from '@coderline/alphatab/Environment';
-import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import {
+    EventEmitter,
+    type IEventEmitter,
+    type IEventEmitterOfT,
+    EventEmitterOfT
+} from '@coderline/alphatab/EventEmitter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { Track } from '@coderline/alphatab/model/Track';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
@@ -70,7 +75,7 @@ export class ScoreRenderer implements IScoreRenderer {
         return false;
     }
 
-    public renderScore(score: Score | null, trackIndexes: number[] | null): void {
+    public renderScore(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
         try {
             this.score = score;
             let tracks: Track[] | null = null;
@@ -92,7 +97,7 @@ export class ScoreRenderer implements IScoreRenderer {
             }
 
             this.tracks = tracks;
-            this.render();
+            this.render(renderHints);
         } catch (e) {
             (this.error as EventEmitterOfT<Error>).trigger(e as Error);
         }
@@ -130,7 +135,7 @@ export class ScoreRenderer implements IScoreRenderer {
         }
     }
 
-    public render(): void {
+    public render(renderHints?: RenderHints): void {
         if (this.width === 0) {
             Logger.warning('Rendering', 'AlphaTab skipped rendering because of width=0 (element invisible)', null);
             return;
@@ -155,7 +160,7 @@ export class ScoreRenderer implements IScoreRenderer {
             }
             (this.preRender as EventEmitterOfT<boolean>).trigger(false);
             this._recreateLayout();
-            this._layoutAndRender();
+            this._layoutAndRender(renderHints);
             Logger.debug('Rendering', 'Rendering finished');
         }
     }
@@ -178,13 +183,13 @@ export class ScoreRenderer implements IScoreRenderer {
         Logger.debug('Rendering', 'Resize finished');
     }
 
-    private _layoutAndRender(): void {
+    private _layoutAndRender(renderHints?: RenderHints): void {
         Logger.debug(
             'Rendering',
             `Rendering at scale ${this.settings.display.scale} with layout ${this.layout!.name}`,
             null
         );
-        this.layout!.layoutAndRender();
+        this.layout!.layoutAndRender(renderHints);
         this._renderedTracks = this.tracks;
         this._onRenderFinished();
         (this.postRenderFinished as EventEmitter).trigger();

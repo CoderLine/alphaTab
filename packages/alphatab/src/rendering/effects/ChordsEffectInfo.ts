@@ -4,14 +4,15 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import { ChordDiagramGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramGlyph';
 
 /**
  * @internal
  */
-export class ChordsEffectInfo extends EffectBarRendererInfo {
+export class ChordsEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectChordNames;
     }
@@ -33,7 +34,16 @@ export class ChordsEffectInfo extends EffectBarRendererInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new TextGlyph(0, 0, beat.chord!.name, renderer.resources.effectFont, TextAlign.Center);
+        const showDiagram = beat.voice.bar.staff.track.score.stylesheet.globalDisplayChordDiagramsInScore;
+        return showDiagram
+            ? new ChordDiagramGlyph(0, 0, beat.chord!, NotationElement.EffectChordNames, true)
+            : new TextGlyph(
+                  0,
+                  0,
+                  beat.chord!.name,
+                  renderer.resources.elementFonts.get(NotationElement.EffectChordNames)!,
+                  TextAlign.Center
+              );
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

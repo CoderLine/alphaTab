@@ -24,36 +24,42 @@ class assert {
     }
 }
 
-class NotExpector<T>(private val actual: T) {
+class NotExpector<T>(private val actual: T, private val message: String? = null) {
     val be
         get() = this
 
     fun ok() {
         when (actual) {
             is Int -> {
-                Assert.assertEquals(0, actual)
+                Assert.assertEquals(message, 0, actual)
             }
 
             is Double -> {
-                Assert.assertEquals(0.0, actual, 0.0)
+                Assert.assertEquals(message, 0.0, actual, 0.0)
             }
 
             is String -> {
-                Assert.assertEquals("", actual)
+                Assert.assertEquals(message, "", actual)
             }
 
             else -> {
-                Assert.assertNull(actual)
+                Assert.assertNull(message, actual)
             }
         }
     }
+
+
+    fun undefined() {
+        Assert.assertNotNull(message, actual)
+    }
+
 }
 
-class Expector<T>(private val actual: T) {
+class Expector<T>(private val actual: T, private val message: String? = null) {
     val to
         get() = this
 
-    fun not() = NotExpector(actual)
+    fun not() = NotExpector(actual, message)
 
     val be
         get() = this
@@ -82,14 +88,14 @@ class Expector<T>(private val actual: T) {
             }
         }
 
-        Assert.assertEquals(message, expectedTyped, actualToCheck as Any?)
+        Assert.assertEquals(this.message ?: message, expectedTyped, actualToCheck as Any?)
     }
 
 
     fun lessThan(expected: Double) {
         if (actual is Number) {
             Assert.assertTrue(
-                "Expected $actual to be less than $expected",
+                this.message ?: "Expected $actual to be less than $expected",
                 actual.toDouble() < expected
             )
         } else {
@@ -98,10 +104,10 @@ class Expector<T>(private val actual: T) {
     }
 
 
-    fun greaterThan(expected: Double) {
+    fun greaterThan(expected: Double, message: String? = null) {
         if (actual is Number) {
             Assert.assertTrue(
-                "Expected $actual to be greater than $expected",
+                this.message ?: (message ?: "Expected $actual to be greater than $expected"),
                 actual.toDouble() > expected
             )
         } else {
@@ -111,7 +117,7 @@ class Expector<T>(private val actual: T) {
 
     fun closeTo(expected: Double, delta: Double, message: String? = null) {
         if (actual is Number) {
-            Assert.assertEquals(message, expected, actual.toDouble(), delta)
+            Assert.assertEquals(this.message ?: message, expected, actual.toDouble(), delta)
         } else {
             Assert.fail("toBeCloseTo can only be used with numeric operands");
         }
@@ -119,11 +125,11 @@ class Expector<T>(private val actual: T) {
 
     fun length(expected: Double) {
         if (actual is alphaTab.collections.List<*>) {
-            Assert.assertEquals(expected.toInt(), actual.length.toInt())
+            Assert.assertEquals(message, expected.toInt(), actual.length.toInt())
         } else if (actual is alphaTab.collections.DoubleList) {
-            Assert.assertEquals(expected.toInt(), actual.length.toInt())
+            Assert.assertEquals(message, expected.toInt(), actual.length.toInt())
         } else if (actual is alphaTab.collections.BooleanList) {
-            Assert.assertEquals(expected.toInt(), actual.length.toInt())
+            Assert.assertEquals(message, expected.toInt(), actual.length.toInt())
         } else {
             Assert.fail("length can only be used with collection operands");
         }
@@ -132,7 +138,7 @@ class Expector<T>(private val actual: T) {
     fun contain(value: Any) {
         if (actual is Iterable<*>) {
             Assert.assertTrue(
-                "Expected collection ${actual.joinToString(",")} to contain $value",
+                message ?: "Expected collection ${actual.joinToString(",")} to contain $value",
                 actual.contains(value)
             )
         } else {
@@ -144,22 +150,26 @@ class Expector<T>(private val actual: T) {
         Assert.assertNotNull(actual)
         when (actual) {
             is Int -> {
-                Assert.assertNotEquals(0, actual)
+                Assert.assertNotEquals(message, 0, actual)
             }
 
             is Double -> {
-                Assert.assertNotEquals(0.0, actual)
+                Assert.assertNotEquals(message, 0.0, actual)
             }
 
             is String -> {
-                Assert.assertNotEquals("", actual)
+                Assert.assertNotEquals(message, "", actual)
             }
         }
     }
 
+    fun undefined() {
+        Assert.assertNull(message, actual)
+    }
+
     fun `true`() {
         if (actual is Boolean) {
-            Assert.assertTrue(actual);
+            Assert.assertTrue(message, actual);
         } else {
             Assert.fail("toBeTrue can only be used on booleans:");
         }
@@ -167,7 +177,7 @@ class Expector<T>(private val actual: T) {
 
     fun `false`() {
         if (actual is Boolean) {
-            Assert.assertFalse(actual);
+            Assert.assertFalse(message, actual);
         } else {
             Assert.fail("toBeFalse can only be used on booleans:");
         }
@@ -179,46 +189,24 @@ class Expector<T>(private val actual: T) {
         if (actual is Function0<*>) {
             try {
                 actual()
-                Assert.fail("Did not throw error " + expected.qualifiedName);
+                Assert.fail(message ?: ("Did not throw error " + expected.qualifiedName));
             } catch (e: Throwable) {
                 if (expected::class.isInstance(e::class)) {
                     return;
                 }
             }
 
-            Assert.fail("Exception type didn't match");
+            Assert.fail(message ?: "Exception type didn't match");
         } else {
             Assert.fail("ToThrowError can only be used with an exception");
         }
     }
 
-    private fun findTestMethod(): Method {
-        val walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
-        var testMethod: Method? = null
-        walker.forEach { frame ->
-            if (testMethod == null) {
-                val method = frame.declaringClass.getDeclaredMethod(
-                    frame.methodName,
-                    *frame.methodType.parameterArray()
-                )
-
-                if (method.getAnnotation(org.junit.Test::class.java) != null) {
-                    testMethod = method
-                }
-            }
-        }
-
-        if (testMethod == null) {
-            Assert.fail("No information about current test available, cannot find test snapshot");
-        }
-
-        return testMethod!!
-    }
 
     @ExperimentalUnsignedTypes
     @ExperimentalContracts
     fun toMatchSnapshot(hint: String = "") {
-        val testMethodInfo = findTestMethod()
+        val testMethodInfo = TestPlatformPartials.findTestMethod()
         val file = testMethodInfo.getAnnotation(SnapshotFile::class.java)?.path
         if (file.isNullOrEmpty()) {
             Assert.fail("Missing SnapshotFile annotation with path to .snap file")
@@ -240,11 +228,6 @@ class Expector<T>(private val actual: T) {
         parts.push(testName)
 
         val snapshotName = TestGlobals.useSnapshotValue(parts.joinToString(" "), hint);
-
-
-
-
-
 
         val error = snapshotFile.match(snapshotName, actual)
         if (!error.isNullOrEmpty()) {
@@ -281,8 +264,8 @@ class TestGlobals {
             return "$fullName ${value.toInt()}";
         }
 
-        fun <T> expect(actual: T): Expector<T> {
-            return Expector(actual);
+        fun <T> expect(actual: T, message:String? = null): Expector<T> {
+            return Expector(actual, message);
         }
 
         fun expect(actual: () -> Unit): Expector<() -> Unit> {

@@ -1,15 +1,16 @@
 import { BendType } from '@coderline/alphatab/model/BendType';
 import type { Font } from '@coderline/alphatab/model/Font';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
-import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
+import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
 
 /**
  * @internal
@@ -26,6 +27,18 @@ export class NoteNumberGlyph extends Glyph {
     public constructor(x: number, y: number, note: Note) {
         super(x, y);
         this._note = note;
+    }
+
+    private get _padding() {
+        return (this.renderer as TabBarRenderer).lineSpacing * 0.25;
+    }
+
+    public override getBoundingBoxTop(): number {
+        return this.y - this.height / 2 - this._padding;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        return this.y + this.height / 2;
     }
 
     public override doLayout(): void {
@@ -102,22 +115,22 @@ export class NoteNumberGlyph extends Glyph {
             return;
         }
         const textWidth: number = this.noteStringWidth + this._trillNoteStringWidth;
-        const x: number = (cx + this.x + (this.width - textWidth) / 2);
+        const x: number = cx + this.x + (this.width - textWidth) / 2;
+        const y = cy + this.y;
 
-        this.paintTrill(x, cy, canvas);
+        this.paintTrill(x, y, canvas);
 
         using _ = ElementStyleHelper.note(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
-        canvas.fillText(this._noteString!, x, cy + this.y);
+        canvas.fillText(this._noteString!, x, y);
+
+        // canvas.color = Color.random();
+        // canvas.fillRect(cx + this.x, cy + this.y - this.height / 2, this.width, this.height);
     }
     paintTrill(x: number, cy: number, canvas: ICanvas) {
         using _ = ElementStyleHelper.note(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
         const prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
-        canvas.fillText(
-            this._trillNoteString!,
-            x + this.noteStringWidth,
-            cy + this.y
-        );
+        canvas.fillText(this._trillNoteString!, x + this.noteStringWidth, cy);
         this.renderer.scoreRenderer.canvas!.font = prevFont;
     }
 

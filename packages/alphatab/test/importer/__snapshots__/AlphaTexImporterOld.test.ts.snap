@@ -82,6 +82,7 @@ Map {
               "barlineright" => 4,
             },
           ],
+          "showtablature" => false,
         },
         Map {
           "__kind" => "Staff",
@@ -129,6 +130,7 @@ Map {
               "barlineright" => 1,
             },
           ],
+          "showtablature" => false,
         },
       ],
       "playbackinfo" => Map {

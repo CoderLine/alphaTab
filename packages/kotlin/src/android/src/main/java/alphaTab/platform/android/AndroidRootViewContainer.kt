@@ -3,6 +3,7 @@ package alphaTab.platform.android
 import alphaTab.*
 import alphaTab.platform.IContainer
 import alphaTab.platform.IMouseEventArgs
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.view.View
 import android.widget.HorizontalScrollView
@@ -15,14 +16,14 @@ import kotlin.contracts.ExperimentalContracts
 internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener {
     private val _outerScroll: HorizontalScrollView
     private val _innerScroll: ScrollView
-    private val _uiInvoke: ( action: (() -> Unit) ) -> Unit
+    private val _uiInvoke: (action: (() -> Unit)) -> Unit
     internal val renderSurface: AlphaTabRenderSurface
 
     constructor(
         outerScroll: HorizontalScrollView,
         innerScroll: ScrollView,
         renderSurface: AlphaTabRenderSurface,
-        uiInvoke: ( action: (() -> Unit) ) -> Unit
+        uiInvoke: (action: (() -> Unit)) -> Unit
     ) {
         _uiInvoke = uiInvoke
         _innerScroll = innerScroll
@@ -101,21 +102,53 @@ internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListene
         }
     }
 
-    fun scrollToX(offset: Double) {
+    private var _scrollToX: ObjectAnimator? = null
+    private var _scrollToY: ObjectAnimator? = null
+
+    fun scrollToX(offset: Double, speed: Double) {
         _uiInvoke {
-            _outerScroll.smoothScrollTo(
-                (offset * Environment.highDpiFactor).toInt(),
-                _outerScroll.scrollY
-            )
+            _scrollToX?.end()
+            val scrollX = (offset * Environment.highDpiFactor).toInt()
+            if (speed < 10) {
+                _outerScroll.scrollX = scrollX
+            } else {
+
+                val animation = ObjectAnimator.ofInt(
+                    _outerScroll,
+                    "scrollX",
+                    scrollX
+                ).setDuration(speed.toLong())
+                animation.start()
+                _scrollToX = animation
+            }
         }
     }
 
-    fun scrollToY(offset: Double) {
+    fun scrollToY(offset: Double, speed: Double) {
         _uiInvoke {
-            _innerScroll.smoothScrollTo(
-                _innerScroll.scrollX,
-                (offset * Environment.highDpiFactor).toInt()
-            )
+            _scrollToY?.end()
+            val scrollY = (offset * Environment.highDpiFactor).toInt()
+            if (speed < 10) {
+                _innerScroll.scrollY = scrollY
+            } else {
+
+                val animation = ObjectAnimator.ofInt(
+                    _innerScroll,
+                    "scrollY",
+                    scrollY
+                ).setDuration(speed.toLong())
+                animation.start()
+                _scrollToY = animation
+            }
+        }
+    }
+
+    fun stopScrolling(){
+        _uiInvoke {
+            _scrollToY?.end()
+            _scrollToY = null
+            _scrollToX?.end()
+            _scrollToX = null
         }
     }
 }

@@ -9,6 +9,7 @@ export const alphaTexMappedEnumLookup = {
     GraceType: alphaTab.model.GraceType,
     FermataType: alphaTab.model.FermataType,
     AlphaTexAccidentalMode: alphaTab.importer.alphaTex.AlphaTexAccidentalMode,
+    AlphaTexVoiceMode: alphaTab.importer.alphaTex.AlphaTexVoiceMode,
     NoteAccidentalMode: alphaTab.model.NoteAccidentalMode,
     BarreShape: alphaTab.model.BarreShape,
     Ottavia: alphaTab.model.Ottavia,
@@ -26,7 +27,9 @@ export const alphaTexMappedEnumLookup = {
     TripletFeel: alphaTab.model.TripletFeel,
     BarLineStyle: alphaTab.model.BarLineStyle,
     SimileMark: alphaTab.model.SimileMark,
-    Direction: alphaTab.model.Direction
+    Direction: alphaTab.model.Direction,
+    TremoloPickingStyle: alphaTab.model.TremoloPickingStyle,
+    BarNumberDisplay: alphaTab.model.BarNumberDisplay
 };
 export type AlphaTexMappedEnumName = keyof typeof alphaTexMappedEnumLookup;
 
@@ -105,6 +108,18 @@ export const alphaTexMappedEnumMapping: {
     AlphaTexAccidentalMode: {
         Auto: { snippet: 'auto', shortDescription: 'Automatic (Based on Pitch)' },
         Explicit: { snippet: 'explicit', shortDescription: 'Explicit (as Written)' }
+    },
+    AlphaTexVoiceMode: {
+        StaffWise: {
+            snippet: 'staffWise',
+            shortDescription: 'Staff-Wise voices',
+            longDescription: 'A new voice resets to bar 1 from where the notation of a new voice can be added.'
+        },
+        BarWise: {
+            snippet: 'barWise',
+            shortDescription: 'Bar-Wise voices',
+            longDescription: 'A new voice adds a new voice to the current bar only.'
+        }
     },
     NoteAccidentalMode: {
         Default: { snippet: 'default', shortDescription: 'Auto-detect the accidentals', aliases: ['d'] },
@@ -435,6 +450,15 @@ export const alphaTexMappedEnumMapping: {
         JumpDalSegnoSegnoAlFine: { snippet: 'dalSegnoSegnoAlFine', shortDescription: 'DalSegnoSegnoAlFine (Jump)' },
         JumpDaCoda: { snippet: 'daCoda', shortDescription: 'DaCoda (Jump)' },
         JumpDaDoubleCoda: { snippet: 'daDoubleCoda', shortDescription: 'DaDoubleCoda (Jump)' }
+    },
+    TremoloPickingStyle: {
+        Default: { snippet: 'default', shortDescription: 'Default tremolo' },
+        BuzzRoll: { snippet: 'buzzRoll', shortDescription: 'Buzz roll tremolo' }
+    },
+    BarNumberDisplay: {
+        AllBars: { snippet: 'allBars', shortDescription: 'All bars' },
+        FirstOfSystem: { snippet: 'firstOfSystem', shortDescription: 'First bar of every system' },
+        Hide: { snippet: 'hide', shortDescription: 'Hide' }
     }
 };
 

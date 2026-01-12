@@ -1,6 +1,7 @@
 /** @target web */
 import * as chai from 'chai';
 import { afterAll, beforeEachTest, initializeJestSnapshot } from './mocha.jest-snapshot';
+import { TestPlatform } from 'test/TestPlatform';
 
 export const mochaHooks = {
     async beforeAll() {
@@ -10,6 +11,7 @@ export const mochaHooks = {
 
     beforeEach: function (done) {
         beforeEachTest(this.currentTest!);
+        TestPlatform.currentTestName = this.currentTest!.title;
         done();
     },
 

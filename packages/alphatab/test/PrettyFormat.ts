@@ -1038,9 +1038,10 @@ export class SnapshotFile {
 
                 const name = lines[i].substring(9, endOfName);
 
-                if (lines[i].endsWith('`;')) {
+                if (lines[i].trimEnd().endsWith('`;')) {
                     const startOfValue = lines[i].indexOf('`', endOfName + 2) + 1;
-                    this.snapshots.set(name, lines[i].substring(startOfValue, lines[i].length - 2));
+                    const endOfValue = lines[i].indexOf('`;', startOfValue + 1);
+                    this.snapshots.set(name, lines[i].substring(startOfValue, endOfValue));
                     i++;
                     continue;
                 }

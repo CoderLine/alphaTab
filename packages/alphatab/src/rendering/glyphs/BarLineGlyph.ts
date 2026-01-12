@@ -13,6 +13,12 @@ abstract class BarLineGlyphBase extends Glyph {
     public override doLayout(): void {
         this.width = this.renderer.smuflMetrics.thinBarlineThickness;
     }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        this.paintExtended(cx, cy, canvas, this.height);
+    }
+
+    public abstract paintExtended(cx: number, cy: number, canvas: ICanvas, newHeight: number): void;
 }
 
 /**
@@ -31,8 +37,8 @@ class BarLineLightGlyph extends BarLineGlyphBase {
             : this.renderer.smuflMetrics.thinBarlineThickness;
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        canvas.fillRect(cx + this.x, cy + this.y, this.renderer.smuflMetrics.thinBarlineThickness, this.height);
+    public override paintExtended(cx: number, cy: number, canvas: ICanvas, newHeight: number): void {
+        canvas.fillRect(cx + this.x, cy + this.y, this.renderer.smuflMetrics.thinBarlineThickness, newHeight);
     }
 }
 
@@ -40,14 +46,14 @@ class BarLineLightGlyph extends BarLineGlyphBase {
  * @internal
  */
 class BarLineDottedGlyph extends BarLineGlyphBase {
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paintExtended(cx: number, cy: number, canvas: ICanvas, newHeight: number): void {
         const circleRadius: number = this.renderer.smuflMetrics.thinBarlineThickness / 2;
 
         const lineHeight = (this.renderer as LineBarRenderer).getLineHeight(1);
 
         let circleY = cy + this.y + lineHeight * 0.5 + circleRadius;
 
-        const bottom = cy + this.y + this.height;
+        const bottom = cy + this.y + newHeight;
         while (circleY < bottom) {
             canvas.fillCircle(cx + this.x, circleY, circleRadius);
             circleY += lineHeight;
@@ -59,11 +65,11 @@ class BarLineDottedGlyph extends BarLineGlyphBase {
  * @internal
  */
 class BarLineDashedGlyph extends BarLineGlyphBase {
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paintExtended(cx: number, cy: number, canvas: ICanvas, newHeight: number): void {
         const dashSize: number = this.renderer.smuflMetrics.dashedBarlineDashLength;
         const x = cx + this.x - this.width / 2;
-        const dashes: number = Math.ceil(this.height / 2 / dashSize);
-        const bottom = cy + this.y + this.height;
+        const dashes: number = Math.ceil(newHeight / 2 / dashSize);
+        const bottom = cy + this.y + newHeight;
         const dashGapLength = this.renderer.smuflMetrics.dashedBarlineGapLength;
 
         const lw = canvas.lineWidth;
@@ -94,8 +100,8 @@ class BarLineHeavyGlyph extends BarLineGlyphBase {
         this.width = this.renderer.smuflMetrics.thickBarlineThickness;
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
+    public override paintExtended(cx: number, cy: number, canvas: ICanvas, newHeight: number): void {
+        canvas.fillRect(cx + this.x, cy + this.y, this.width, newHeight);
     }
 }
 
@@ -107,7 +113,7 @@ class BarLineRepeatDotsGlyph extends BarLineGlyphBase {
         this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.RepeatDot)!;
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paintExtended(cx: number, cy: number, canvas: ICanvas, _newHeight: number): void {
         const renderer = this.renderer as LineBarRenderer;
 
         const lineOffset = renderer.heightLineCount % 2 === 0 ? 1 : 0.5;
@@ -122,8 +128,20 @@ class BarLineRepeatDotsGlyph extends BarLineGlyphBase {
 
         const dotOffset = dotTop - dotHeight / 2;
 
-        CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x, exactCenter + dotOffset - lineHeight, 1, MusicFontSymbol.RepeatDot);
-        CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x, exactCenter + dotOffset + lineHeight, 1, MusicFontSymbol.RepeatDot);
+        CanvasHelper.fillMusicFontSymbolSafe(
+            canvas,
+            cx + this.x,
+            exactCenter + dotOffset - lineHeight,
+            1,
+            MusicFontSymbol.RepeatDot
+        );
+        CanvasHelper.fillMusicFontSymbolSafe(
+            canvas,
+            cx + this.x,
+            exactCenter + dotOffset + lineHeight,
+            1,
+            MusicFontSymbol.RepeatDot
+        );
     }
 }
 
@@ -131,7 +149,7 @@ class BarLineRepeatDotsGlyph extends BarLineGlyphBase {
  * @internal
  */
 class BarLineShortGlyph extends BarLineGlyphBase {
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paintExtended(cx: number, cy: number, canvas: ICanvas, _newHeight: number): void {
         const renderer = this.renderer as LineBarRenderer;
         const lines = renderer.drawnLineCount;
         const gaps = lines - 1;
@@ -152,7 +170,7 @@ class BarLineShortGlyph extends BarLineGlyphBase {
  * @internal
  */
 class BarLineTickGlyph extends BarLineGlyphBase {
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paintExtended(cx: number, cy: number, canvas: ICanvas, _newHeight: number): void {
         const renderer = this.renderer as LineBarRenderer;
 
         const lineHeight = renderer.getLineHeight(1);
@@ -167,10 +185,12 @@ class BarLineTickGlyph extends BarLineGlyphBase {
  */
 export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
     private _isRight: boolean;
+    private _extendToNextStaff: boolean;
 
-    public constructor(isRight: boolean) {
+    public constructor(isRight: boolean, extendToNextStaff: boolean) {
         super();
         this._isRight = isRight;
+        this._extendToNextStaff = extendToNextStaff;
     }
 
     public override doLayout(): void {
@@ -281,20 +301,68 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
 
         const lineRenderer = this.renderer as LineBarRenderer;
 
-        const lineYOffset = lineRenderer.smuflMetrics.staffLineThickness ;
-        const top: number = this.y + lineRenderer.topPadding - lineYOffset;
-        const bottom: number = this.y + this.renderer.height - this.renderer.bottomPadding;
-        const h: number = (bottom - top);
+        const lineYOffset = lineRenderer.smuflMetrics.staffLineThickness;
+        let top: number = this.y;
+        let bottom: number = this.y;
+        if (
+            lineRenderer.drawnLineCount < 2 ||
+            (!this._isRight && lineRenderer.isFirstOfStaff) ||
+            (this._isRight && lineRenderer.isLastOfStaff)
+        ) {
+            top -= lineYOffset;
+            bottom += lineRenderer.height;
+        } else {
+            top += lineRenderer.getLineY(0) - lineYOffset / 2;
+            bottom += lineRenderer.getLineY(lineRenderer.drawnLineCount - 1) + lineYOffset / 2;
+        }
+
+        const h: number = bottom - top;
+
+        // round up to have pixel-aligned bar lines, x-shift will be used during rendering
+        // to avoid shifting again all glyphs
+        let xShift = 0;
+        if (this._extendToNextStaff && this._isRight) {
+            const fullWidth = Math.ceil(this.width);
+            xShift = fullWidth - this.width;
+            this.width = fullWidth;
+        }
 
         for (const g of this.glyphs!) {
             g.y = top;
+            g.x += xShift;
             g.height = h;
         }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        const lines = this.glyphs;
+        if (!lines) {
+            return;
+        }
+
         const renderer = this.renderer as LineBarRenderer;
         using _ = ElementStyleHelper.bar(canvas, renderer.barLineBarSubElement, this.renderer.bar, true);
-        super.paint(cx, cy, canvas);
+
+        // extending across systems needs some more dynamic lookup, we do that during drawing
+        // as during layout things are still moving
+        let actualLineHeight = this.height;
+        const thisStaff = renderer.staff!;
+        const allStaves = thisStaff.system.allStaves;
+        let isExtended = false;
+        if (this._extendToNextStaff && thisStaff.index < allStaves.length - 1) {
+            const nextStaff = allStaves[thisStaff.index + 1];
+            const lineTop = thisStaff.y + renderer.y;
+            const lineBottom = nextStaff.y + nextStaff.topOverflow + renderer.smuflMetrics.staffLineThickness;
+            actualLineHeight = lineBottom - lineTop;
+            isExtended = true;
+        }
+
+        for (const line of lines) {
+            if (isExtended) {
+                (line as BarLineGlyphBase).paintExtended(cx, cy, canvas, actualLineHeight);
+            } else {
+                (line as BarLineGlyphBase).paint(cx, cy, canvas);
+            }
+        }
     }
 }

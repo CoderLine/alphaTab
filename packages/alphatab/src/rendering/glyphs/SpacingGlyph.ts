@@ -9,4 +9,12 @@ export class SpacingGlyph extends Glyph {
         super(x, y);
         this.width = width;
     }
+
+    public override getBoundingBoxTop(): number {
+        return Number.NaN;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        return Number.NaN;
+    }
 }

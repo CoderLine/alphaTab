@@ -12,7 +12,7 @@ internal abstract class AlphaSynthWorkerApiBase : IAlphaSynth
     private LogLevel _logLevel;
     private readonly double _bufferTimeInMilliseconds;
 
-    public AlphaSynth Player { get; private set; }
+    public AlphaSynth? Player { get; private set; }
 
     protected AlphaSynthWorkerApiBase(ISynthOutput output, LogLevel logLevel, double bufferTimeInMilliseconds)
     {
@@ -45,10 +45,10 @@ internal abstract class AlphaSynthWorkerApiBase : IAlphaSynth
         DispatchOnUiThread(OnReady);
     }
 
-    public bool IsReady => Player.IsReady;
-    public bool IsReadyForPlayback => Player.IsReadyForPlayback;
+    public bool IsReady => Player?.IsReady ?? false;
+    public bool IsReadyForPlayback => Player?.IsReadyForPlayback ?? false;
 
-    public PlayerState State => Player == null ? PlayerState.Paused : Player.State;
+    public PlayerState State => Player?.State ?? PlayerState.Paused;
 
     public LogLevel LogLevel
     {

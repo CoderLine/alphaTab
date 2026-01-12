@@ -1,5 +1,10 @@
 import type { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import {
+    EventEmitter,
+    EventEmitterOfT,
+    type IEventEmitter,
+    type IEventEmitterOfT
+} from '@coderline/alphatab/EventEmitter';
 import { Settings } from '@coderline/alphatab/Settings';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { Score } from '@coderline/alphatab/model/Score';
@@ -127,6 +132,10 @@ export class TestUiFacade implements IUiFacade<unknown> {
         this.canRender = true;
         this.resizeThrottle = 10;
     }
+
+    public stopScrolling(_scrollElement: IContainer): void {}
+
+    public setCanvasOverflow(_canvasElement: IContainer, _overflow: number, _isVertical: boolean): void {}
 
     public initialize(api: AlphaTabApiBase<unknown>, raw: unknown): void {
         this._api = api;

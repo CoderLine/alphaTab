@@ -43,7 +43,7 @@ jobs:
       - run: npm run build-language-server
       - run: npm run build-monaco
         id: test
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
         with: 
           name: test-results-web
@@ -69,7 +69,7 @@ jobs:
       - run: npm run build-csharp
       - run: npm run test-csharp
         id: test
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
         with: 
           name: test-results-csharp
@@ -108,7 +108,7 @@ jobs:
       - run: npm run build-kotlin
       - run: npm run test-kotlin
         id: test
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
         with: 
           name: test-results-kotlin

@@ -1,6 +1,6 @@
 {
     "name": "@coderline/alphatab-webpack",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "description": "A plugin for WebPack to bundle alphaTab into your webapps.",
     "keywords": [
         "guitar",
@@ -42,23 +42,23 @@
         "test": "mocha"
     },
     "dependencies": {
-        "webpack": "^5.101.3"
+        "webpack": "^5.104.1"
     },
     "engines": {
         "node": ">=20.19.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.2.6",
+        "@biomejs/biome": "^2.3.11",
         "@types/chai": "^5.2.3",
         "@types/mocha": "^10.0.10",
-        "@types/node": "^24.10.0",
+        "@types/node": "^25.0.6",
         "assert": "^2.1.0",
-        "chai": "^6.2.1",
+        "chai": "^6.2.2",
         "html-webpack-plugin": "^5.6.5",
         "mocha": "^11.7.5",
-        "rimraf": "^6.1.0",
+        "rimraf": "^6.1.2",
         "tslib": "^2.8.1",
-        "tsx": "^4.20.6",
+        "tsx": "^4.21.0",
         "typescript": "^5.9.3",
         "webpack-cli": "^6.0.1"
     },

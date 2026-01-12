@@ -176,6 +176,12 @@ export interface IUiFacade<TSettings> {
     scrollToX(scrollElement: IContainer, offset: number, speed: number): void;
 
     /**
+     * Stops any ongoing scrolling of the given element. 
+     * @param scrollElement The element which might be scrolling dynamically.
+     */
+    stopScrolling(scrollElement: IContainer): void;
+
+    /**
      * Attempts a load of the score represented by the given data object.
      * @param data The data object to decode
      * @param success The action to call if the score was loaded
@@ -191,6 +197,18 @@ export interface IUiFacade<TSettings> {
      * @returns true if the data object is supported and a load was initiated, otherwise false
      */
     loadSoundFont(data: unknown, append: boolean): boolean;
+
+    /**
+     * Updates the overflows needed to ensure the smooth scrolling
+     * can reach the "end" at the desired position.
+     * @param canvasElement The canvas element.
+     * @param offset The offset we need
+     * @param isVertical Whether we have a vertical or horizontal overflow
+     * @remarks
+     * Without these overflows we might not have enough scroll space
+     * and we cannot reach a "sticky cursor" behavior.
+     */
+    setCanvasOverflow(canvasElement:IContainer, overflow: number, isVertical: boolean): void;
 
     /**
      * This events is fired when the {@link canRender} property changes.

@@ -1,7 +1,7 @@
 import type {
+    AlphaTexArgumentList, 
     AlphaTexMetaDataTagNode,
-    AlphaTexPropertyNode,
-    AlphaTexArgumentList
+    AlphaTexPropertyNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 
@@ -9,6 +9,7 @@ import type { AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/Alpha
  * @internal
  */
 export interface IAlphaTexMetaDataReader {
+    hasMetaDataArguments(metaData: AlphaTexMetaDataTagNode): boolean;
     readMetaDataArguments(parser: AlphaTexParser, metaData: AlphaTexMetaDataTagNode): AlphaTexArgumentList | undefined;
 
     readMetaDataPropertyArguments(

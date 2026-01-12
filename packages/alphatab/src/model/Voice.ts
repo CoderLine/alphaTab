@@ -1,9 +1,10 @@
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
+import { GraceGroup } from '@coderline/alphatab/model/GraceGroup';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import type { Settings } from '@coderline/alphatab/Settings';
-import { GraceGroup } from '@coderline/alphatab/model/GraceGroup';
-import { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
 
 /**
  * Lists all graphical sub elements within a {@link Voice} which can be styled via {@link Voice.style}
@@ -93,6 +94,13 @@ export class Voice {
     public get isRestOnly() {
         return this._isRestOnly;
     }
+
+    /**
+     * The shortest duration contained across beats in this bar.
+     * @internal
+     * @json_ignore
+     */
+    public shortestDuration = Duration.DoubleWhole;
 
     public insertBeat(after: Beat, newBeat: Beat): void {
         newBeat.nextBeat = after.nextBeat;
@@ -191,6 +199,7 @@ export class Voice {
 
         let currentDisplayTick: number = 0;
         let currentPlaybackTick: number = 0;
+        this.shortestDuration = Duration.DoubleWhole;
         for (let i: number = 0; i < this.beats.length; i++) {
             const beat: Beat = this.beats[i];
             beat.index = i;
@@ -200,6 +209,10 @@ export class Voice {
             // we need to first steal the duration from the right beat
             // and place the grace beats correctly
             if (beat.graceType === GraceType.None) {
+                if (beat.duration > this.shortestDuration) {
+                    this.shortestDuration = beat.duration;
+                }
+
                 if (beat.graceGroup) {
                     const firstGraceBeat = beat.graceGroup!.beats[0];
                     const lastGraceBeat = beat.graceGroup!.beats[beat.graceGroup!.beats.length - 1];

@@ -8,11 +8,10 @@ import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import Split from 'split.js';
 import { setupControl } from './control';
 
-
 async function setupLspAlphaTexLanguageSupport(editor: monaco.editor.IStandaloneCodeEditor) {
     await basicEditorLspIntegration(
         editor,
-        new Worker(new URL('./alphaTexLanguageServerWrap', import.meta.url), { type: 'module' }),
+        new Worker(new URL('./alphatexLanguageServerWrap', import.meta.url), { type: 'module' }),
         {
             logger: {
                 error(message) {
@@ -83,8 +82,8 @@ async function load<T>(url: URL, type: XMLHttpRequest['responseType']): Promise<
 async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
     Split(['#editor-wrap', '#alphatab-wrap']);
 
-    const initialCode = sessionStorage.getItem('alphatex-editor.code') ?? trimCode(element.innerHTML);
-    element.innerHTML = '';
+    const initialCode = sessionStorage.getItem('alphatex-editor.code') || trimCode(element.textContent);
+    element.innerText = '';
 
     await setupMonaco();
 
@@ -94,18 +93,35 @@ async function setupEditor(api: alphaTab.AlphaTabApi, element: HTMLElement) {
         automaticLayout: true
     });
 
+    let fromTex = true;
+    api.settings.exporter.comments = true;
+    api.settings.exporter.indent = 2;
+    api.scoreLoaded.on(score => {
+        if (!fromTex) {
+            const exporter = new alphaTab.exporter.AlphaTexExporter();
+            const tex = exporter.exportToString(score, api.settings);
+            editor.getModel()!.setValue(tex);
+        }
+    });
+
     function loadTex(tex: string) {
         const importer = new alphaTab.importer.AlphaTexImporter();
         importer.initFromString(tex, api.settings);
+        importer.logErrors = true;
         let score: alphaTab.model.Score;
         try {
             score = importer.readScore();
+            api.updateSettings();
         } catch {
             return;
         }
 
         sessionStorage.setItem('alphatex-editor.code', tex);
-        api.renderTracks(score.tracks);
+        fromTex = true;
+        api.renderTracks(score.tracks, {
+            reuseViewport: true
+        });
+        fromTex = false;
     }
 
     editor.onDidChangeModelContent(() => {

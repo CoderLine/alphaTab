@@ -6,7 +6,10 @@ type TestResult = {
     originalFile: string;
     newFile: string | Uint8Array;
     diffFile: string | Uint8Array;
+    accepted?: true;
 };
+
+let currentResults:TestResult[] = [];
 
 function setupComparer(card: HTMLElement, el: HTMLElement, result: TestResult) {
     const ex = el.querySelector<HTMLElement>('.expected')!;
@@ -64,6 +67,8 @@ function setupComparer(card: HTMLElement, el: HTMLElement, result: TestResult) {
                 acceptButton.innerText = 'Accepted';
             }
             card.classList.add('accepted');
+            result.accepted = true;
+            updateRemaining();
         };
         xhr.onerror = () => {
             alert('error accepting test result');
@@ -171,6 +176,7 @@ async function createResultViewer(result: TestResult) {
 async function displayResults(results: TestResult[]) {
     const wrapper = document.querySelector<HTMLElement>('#results-wrapper')!;
     wrapper.innerHTML = '';
+    currentResults = results;
 
     for (const result of results) {
         wrapper.appendChild(await createResultViewer(result));
@@ -179,6 +185,15 @@ async function displayResults(results: TestResult[]) {
     if (results.length === 0) {
         wrapper.innerHTML = '<div class="alert alert-success" role="alert">No reported errors on visual tests.</div>';
     }
+    updateRemaining();
+}
+
+function updateRemaining() {
+    if (currentResults.length === 0) {
+        return;
+    }
+    document.querySelector<HTMLSpanElement>('#remaining')!.innerText =
+        `(${currentResults.filter(r => !r.accepted).length}/${currentResults.length})`;
 }
 
 function loadResults() {

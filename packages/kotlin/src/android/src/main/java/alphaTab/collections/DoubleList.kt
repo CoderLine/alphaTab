@@ -129,6 +129,10 @@ public class DoubleList : IDoubleIterable {
         _items.sort(0, _size)
     }
 
+    internal fun sortDescending() {
+        _items.sortDescending(0, _size)
+    }
+
     public fun shift(): Double {
         val d = _items[0]
         if (_items.size > 1) {
@@ -148,6 +152,19 @@ public class DoubleList : IDoubleIterable {
         return Iterator(this)
     }
 
+    public fun splice(start: Double, deleteCount: Double) {
+        val firstAfterDelete = (start + deleteCount).toInt()
+        val itemsAfterDelete = this.length.toInt() - firstAfterDelete;
+        if(itemsAfterDelete > 0) {
+            _items.copyInto(
+                _items,
+                start.toInt(),
+                firstAfterDelete,
+                itemsAfterDelete
+            )
+        }
+        this._size -= deleteCount.toInt()
+    }
     private class Iterator(private val list: DoubleList) : DoubleIterator() {
         private var _index = 0
         override fun hasNext(): Boolean {

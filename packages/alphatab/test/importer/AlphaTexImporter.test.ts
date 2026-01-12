@@ -27,6 +27,7 @@ import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import {
+    BarNumberDisplay,
     BracketExtendMode,
     TrackNameMode,
     TrackNameOrientation,
@@ -43,7 +44,6 @@ import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { WhammyType } from '@coderline/alphatab/model/WhammyType';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
 import { HarmonicsEffectInfo } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { Settings } from '@coderline/alphatab/Settings';
@@ -51,6 +51,9 @@ import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 import { assert, expect } from 'chai';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { TremoloPickingEffectSerializer } from '@coderline/alphatab/generated/model/TremoloPickingEffectSerializer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 describe('AlphaTexImporterTest', () => {
     /**
@@ -235,7 +238,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(3);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isTremolo).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].tremoloSpeed).to.equal(Duration.Sixteenth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].tremoloPicking!.marks).to.equal(2);
     });
 
     it('brushes-arpeggio', () => {
@@ -1389,9 +1392,9 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
         expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).to.equal(49);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(40);
+        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(37);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(2);
-        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
+        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(40);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
         expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
         testExportRoundtrip(score);
@@ -1409,9 +1412,9 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
         expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).to.equal(49);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(40);
+        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(37);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(2);
-        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
+        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(40);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
         expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
         testExportRoundtrip(score);
@@ -1421,7 +1424,7 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             . \\tempo 120 1.1.4 1.1 1.1{tempo 60} 1.1 | 1.1.4{tempo 100} 1.1 1.1{tempo 120} 1.1
         `);
-        expect(score.masterBars[0].tempoAutomations).to.have.length(2);
+        expect(score.masterBars[0].tempoAutomations.length).to.equal(2);
         expect(score.masterBars[0].tempoAutomations[0].value).to.equal(120);
         expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.equal(0);
         expect(score.masterBars[0].tempoAutomations[1].value).to.equal(60);
@@ -1572,7 +1575,7 @@ describe('AlphaTexImporterTest', () => {
                         c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
-        expect(score.masterBars).to.have.length(2);
+        expect(score.masterBars.length).to.equal(2);
 
         expect(score.tracks[0].staves[0].bars.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
@@ -1588,11 +1591,11 @@ describe('AlphaTexImporterTest', () => {
                 c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
-        expect(score.masterBars).to.have.length(2);
+        expect(score.masterBars.length).to.equal(2);
 
-        expect(score.tracks[0].staves[0].bars).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[1].voices.length).to.equal(2);
         testExportRoundtrip(score);
     });
 
@@ -1603,11 +1606,11 @@ describe('AlphaTexImporterTest', () => {
             c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
-        expect(score.masterBars).to.have.length(2);
+        expect(score.masterBars.length).to.equal(2);
 
-        expect(score.tracks[0].staves[0].bars).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[1].voices.length).to.equal(2);
         testExportRoundtrip(score);
     });
 
@@ -1676,13 +1679,13 @@ describe('AlphaTexImporterTest', () => {
             3.3.4{ tb dive gradual (0 -12.5) } |
         `);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarType).to.equal(WhammyType.Dive);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12.5);
 
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarType).to.equal(WhammyType.Dive);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyStyle).to.equal(BendStyle.Gradual);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12.5);
         testExportRoundtrip(score);
@@ -1721,7 +1724,7 @@ describe('AlphaTexImporterTest', () => {
             G4 G4 G4 { instrument brightacousticpiano }
         `);
         expect(score.tracks[0].playbackInfo.program).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(
             AutomationType.Instrument
         );
@@ -1745,7 +1748,7 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendType).to.equal(BendType.Bend);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendStyle).to.equal(BendStyle.Gradual);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(2);
         testExportRoundtrip(score);
     });
 
@@ -1833,7 +1836,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tempo).to.equal(100);
         expect(score.tempoLabel).to.equal('T1');
 
-        expect(score.masterBars[1].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[1].tempoAutomations.length).to.equal(1);
         expect(score.masterBars[1].tempoAutomations[0].value).to.equal(80);
         expect(score.masterBars[1].tempoAutomations[0].text).to.equal('T2');
         testExportRoundtrip(score);
@@ -1863,7 +1866,7 @@ describe('AlphaTexImporterTest', () => {
         `);
 
         expect(score.defaultSystemsLayout).to.equal(5);
-        expect(score.systemsLayout).to.have.length(3);
+        expect(score.systemsLayout.length).to.equal(3);
         expect(score.systemsLayout[0]).to.equal(3);
         expect(score.systemsLayout[1]).to.equal(2);
         expect(score.systemsLayout[2]).to.equal(3);
@@ -1904,7 +1907,7 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].color.rgba).to.equal('#FF0000');
         expect(score.tracks[0].defaultSystemsLayout).to.equal(6);
-        expect(score.tracks[0].systemsLayout).to.have.length(3);
+        expect(score.tracks[0].systemsLayout.length).to.equal(3);
         expect(score.tracks[0].systemsLayout[0]).to.equal(3);
         expect(score.tracks[0].systemsLayout[1]).to.equal(2);
         expect(score.tracks[0].systemsLayout[0]).to.equal(3);
@@ -2217,13 +2220,13 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].playbackInfo.volume).to.equal(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].type).to.equal(
             AutomationType.Volume
         );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].value).to.equal(8);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(
             AutomationType.Volume
         );
@@ -2241,13 +2244,13 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].playbackInfo.balance).to.equal(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].type).to.equal(
             AutomationType.Balance
         );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].value).to.equal(8);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(
             AutomationType.Balance
         );
@@ -2271,7 +2274,7 @@ describe('AlphaTexImporterTest', () => {
         `);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].deadSlapped).to.be.true;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes).to.have.length(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).to.equal(0);
         testExportRoundtrip(score);
     });
 
@@ -2349,7 +2352,7 @@ describe('AlphaTexImporterTest', () => {
             it('articulation', () => importErrorTest('\\articulation "Test" 0'));
             it('duration tuplet', () => importErrorTest('. :4 {tu 0}'));
             it('beat tuplet', () => importErrorTest('. C4 {tu 0}'));
-            it('tremolo speed', () => importErrorTest('. C4 {tp 0}'));
+            it('tremolo speed', () => importErrorTest('. C4 {tp 10}'));
             it('trill', () => importErrorTest('. 3.3 {tr 4 0}'));
             it('textalign', () => importErrorTest('\\title "Test" "" invalid'));
         });
@@ -2457,5 +2460,212 @@ describe('AlphaTexImporterTest', () => {
         });
 
         // - with instrument already specified
+    });
+
+    it('extend-bar-lines', () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            \\extendBarLines
+            \\track "Piano1"
+              \\staff {score}
+            \\instrument piano
+              C4 D4 E4 F4
+              \\staff {score}
+              \\clef f4 C3 D3 E3 F3
+            \\track "Piano2"
+              \\staff {score}
+            \\instrument piano
+              C4 D4 E4 F4
+            \\track "Flute 1"
+              \\staff { score }
+            \\instrument flute
+              C4 D4 E4 F4
+            \\track "Flute 2"
+              \\staff { score }
+            \\instrument flute
+              \\clef f4 C3 D3 E3 F3
+            \\track "Guitar 1"
+              \\staff { score tabs }
+              0.3.4 2.3.4 5.3.4 7.3.4
+        `);
+
+        expect(score.stylesheet.extendBarLines).to.be.true;
+
+        testExportRoundtrip(score);
+    });
+
+    describe('voice-mode', () => {
+        it('default', () => {
+            expect(
+                parseTex(`
+                    \\voice
+                        C4 | C5
+                    \\voice
+                        C3 | C4
+                `)
+            ).toMatchSnapshot();
+        });
+        it('staffWise', () => {
+            expect(
+                parseTex(`
+                    \\voiceMode staffWise
+                    \\voice
+                        C4 | C5
+                    \\voice
+                        C3 | C4
+                `)
+            ).toMatchSnapshot();
+        });
+        it('barWise', () => {
+            expect(
+                parseTex(`
+                    \\voiceMode barWise
+                    // Bar 1
+                        \\voice C4 
+                        \\voice C3
+                    |
+                    // Bar 2
+                        \\voice C5 
+                        \\voice C4
+                `)
+            ).toMatchSnapshot();
+        });
+    });
+
+    it('inline-chord-diagrams', () => {
+        let score = parseTex(`
+            \\chordDiagramsInScore
+            \\chord ("E" 0 0 1 2 2 0)
+            (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
+        `);
+        expect(score.stylesheet.globalDisplayChordDiagramsInScore).to.be.true;
+
+        score = parseTex(`
+            \\chordDiagramsInScore true
+            \\chord ("E" 0 0 1 2 2 0)
+            (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
+        `);
+        expect(score.stylesheet.globalDisplayChordDiagramsInScore).to.be.true;
+
+        score = parseTex(`
+            \\chordDiagramsInScore false
+            \\chord ("E" 0 0 1 2 2 0)
+            (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
+        `);
+        expect(score.stylesheet.globalDisplayChordDiagramsInScore).to.be.false;
+    });
+
+    it('empty-staff-options', () => {
+        let score = parseTex(`
+            \\hideEmptyStaves
+            C4
+        `);
+        expect(score.stylesheet.hideEmptyStaves).to.be.true;
+        expect(score.stylesheet.hideEmptyStavesInFirstSystem).to.be.false;
+        expect(score.stylesheet.showSingleStaffBrackets).to.be.false;
+
+        score = parseTex(`
+            \\hideEmptyStaves
+            \\hideEmptyStavesInFirstSystem
+        `);
+        expect(score.stylesheet.hideEmptyStaves).to.be.true;
+        expect(score.stylesheet.hideEmptyStavesInFirstSystem).to.be.true;
+
+        score = parseTex(`
+            \\hideEmptyStavesInFirstSystem
+            C4
+        `);
+        expect(score.stylesheet.hideEmptyStaves).to.be.false;
+        expect(score.stylesheet.hideEmptyStavesInFirstSystem).to.be.true;
+
+        score = parseTex(`
+            \\showSingleStaffBrackets
+            C4
+        `);
+        expect(score.stylesheet.showSingleStaffBrackets).to.be.true;
+    });
+
+    describe('tremolos', () => {
+        function test(tex: string) {
+            const score = parseTex(tex);
+            const beat = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+            const serialized = TremoloPickingEffectSerializer.toJson(beat.tremoloPicking!);
+            expect(serialized).toMatchSnapshot();
+            testExportRoundtrip(score);
+        }
+
+        // simple
+        it('tremolo1', () => test(`C4 {tp 1}`));
+        it('tremolo2', () => test(`C4 {tp 2}`));
+        it('tremolo3', () => test(`C4 {tp 3}`));
+        it('tremolo4', () => test(`C4 {tp 4}`));
+        it('tremolo5', () => test(`C4 {tp 5}`));
+
+        // backwards compatibility
+        it('tremolo8', () => test(`C4 {tp 8}`));
+        it('tremolo16', () => test(`C4 {tp 16}`));
+        it('tremolo32', () => test(`C4 {tp 32}`));
+
+        // with default style
+        it('tremolo-default1', () => test(`C4 {tp (1 default)}`));
+        it('tremolo-default2', () => test(`C4 {tp (2 default)}`));
+        it('tremolo-default3', () => test(`C4 {tp (3 default)}`));
+        it('tremolo-default4', () => test(`C4 {tp (4 default)}`));
+        it('tremolo-default5', () => test(`C4 {tp (5 default)}`));
+
+        // buzzroll
+        it('buzzroll-default1', () => test(`C4 {tp (1 buzzRoll)}`));
+        it('buzzroll-default2', () => test(`C4 {tp (2 buzzRoll)}`));
+        it('buzzroll-default3', () => test(`C4 {tp (3 buzzRoll)}`));
+        it('buzzroll-default4', () => test(`C4 {tp (4 buzzRoll)}`));
+        it('buzzroll-default5', () => test(`C4 {tp (5 buzzRoll)}`));
+    });
+
+    describe('defaultBarNumberDisplay', () => {
+        function test(tex: string, mode: BarNumberDisplay) {
+            const score = parseTex(tex);
+            expect(score.stylesheet.barNumberDisplay).to.equal(mode);
+
+            testExportRoundtrip(score);
+        }
+
+        it('all', () => test('\\defaultBarNumberDisplay allBars C4', BarNumberDisplay.AllBars));
+        it('first', () => test('\\defaultBarNumberDisplay firstOfSystem C4', BarNumberDisplay.FirstOfSystem));
+        it('hide', () => test('\\defaultBarNumberDisplay hide C4', BarNumberDisplay.Hide));
+    });
+
+    describe('barNumberDisplay', () => {
+        function test(tex: string, mode: BarNumberDisplay | undefined) {
+            const score = parseTex(tex);
+            expect(score.tracks[0].staves[0].bars[0].barNumberDisplay).to.be.undefined;
+            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).to.equal(mode);
+
+            testExportRoundtrip(score);
+        }
+
+        it('unsert', () => test('\\defaultBarNumberDisplay hide C4 | C4 ', undefined));
+        it('all', () =>
+            test('\\defaultBarNumberDisplay hide C4 | \\barNumberDisplay allBars C4 ', BarNumberDisplay.AllBars));
+        it('first', () =>
+            test(
+                '\\defaultBarNumberDisplay hide C4 | \\barNumberDisplay firstOfSystem C4 ',
+                BarNumberDisplay.FirstOfSystem
+            ));
+        it('hide', () =>
+            test('\\defaultBarNumberDisplay allBars C4 | \\barNumberDisplay hide C4 ', BarNumberDisplay.Hide));
+    });
+
+    it('custom-beaming', () => {
+        const score = parseTex(`
+            \\ts (4 4)
+            \\beaming (8 2 2 2 2)
+                C4.8 * 8 |
+                C4.8 * 8 |
+            \\ts (4 4)
+            \\beaming (8 4 4)
+                C4.8 * 8
+                C4.8 * 8            
+        `);
+        expect(score).toMatchSnapshot();
+        testExportRoundtrip(score);
     });
 });

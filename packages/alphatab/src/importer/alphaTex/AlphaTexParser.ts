@@ -67,7 +67,7 @@ export class AlphaTexParser {
     /**
      * The parsing mode.
      */
-    public mode:AlphaTexParseMode = AlphaTexParseMode.ForModelImport;
+    public mode: AlphaTexParseMode = AlphaTexParseMode.ForModelImport;
 
     public get lexerDiagnostics(): AlphaTexDiagnosticBag {
         return this.lexer.lexerDiagnostics;
@@ -507,6 +507,8 @@ export class AlphaTexParser {
         return note;
     }
 
+    private static readonly _allowValuesAfterProperties = new Set<string>(['chord']);
+
     private _metaData(metaDataList: AlphaTexMetaDataNode[]) {
         const tag = this.lexer.peekToken();
         if (!tag || tag.nodeType !== AlphaTexNodeType.Tag) {
@@ -524,10 +526,11 @@ export class AlphaTexParser {
         metaDataList.push(metaData);
 
         try {
+            const allowValuesAfterProperties = AlphaTexParser._allowValuesAfterProperties.has(metaData.tag.tag.text);
             // properties can be before or after the arguments, this is a again a historical
             // inconsistency on chords
             const braceCandidate = this.lexer.peekToken();
-            if (braceCandidate?.nodeType === AlphaTexNodeType.LBrace) {
+            if (allowValuesAfterProperties && braceCandidate?.nodeType === AlphaTexNodeType.LBrace) {
                 metaData.propertiesBeforeArguments = true;
                 metaData.properties = this._properties(property =>
                     this._metaDataReader.readMetaDataPropertyArguments(this, metaData.tag, property)
@@ -554,17 +557,19 @@ export class AlphaTexParser {
                     }
                 }
             } else {
-                metaData.arguments = this.argumentList();
-                if (!metaData.arguments) {
-                    metaData.arguments = this._metaDataReader.readMetaDataArguments(this, metaData.tag);
-                    if (metaData.arguments && metaData.arguments.arguments.length > 1) {
-                        this.addParserDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT301,
-                            message: `Metadata arguments should be wrapped into parenthesis.`,
-                            severity: AlphaTexDiagnosticsSeverity.Warning,
-                            start: metaData.arguments?.start ?? metaData.start,
-                            end: metaData.arguments?.end ?? metaData.end
-                        });
+                if (this._metaDataReader.hasMetaDataArguments(metaData.tag)) {
+                    metaData.arguments = this.argumentList();
+                    if (!metaData.arguments) {
+                        metaData.arguments = this._metaDataReader.readMetaDataArguments(this, metaData.tag);
+                        if (metaData.arguments && metaData.arguments.arguments.length > 1) {
+                            this.addParserDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT301,
+                                message: `Metadata arguments should be wrapped into parenthesis.`,
+                                severity: AlphaTexDiagnosticsSeverity.Warning,
+                                start: metaData.arguments?.start ?? metaData.start,
+                                end: metaData.arguments?.end ?? metaData.end
+                            });
+                        }
                     }
                 }
 

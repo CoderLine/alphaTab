@@ -39,7 +39,8 @@ export { Environment, RenderEngineFactory } from '@coderline/alphatab/Environmen
 export type { IEventEmitter, IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
 
 export { AlphaTabApi } from '@coderline/alphatab/platform/javascript/AlphaTabApi';
-export { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
+export { AlphaTabApiBase, type PlaybackHighlightChangeEventArgs } from '@coderline/alphatab/AlphaTabApiBase';
+export type { IScrollHandler } from '@coderline/alphatab/ScrollHandlers';
 export { WebPlatform } from '@coderline/alphatab/platform/javascript/WebPlatform';
 
 export { VersionInfo as meta } from '@coderline/alphatab/generated/VersionInfo';

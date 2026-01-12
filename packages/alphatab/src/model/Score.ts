@@ -359,9 +359,10 @@ export class Score {
         if (this.masterBars.length !== 0) {
             bar.previousMasterBar = this.masterBars[this.masterBars.length - 1];
             bar.previousMasterBar.nextMasterBar = bar;
-            // TODO: this will not work on anacrusis. Correct anacrusis durations are only working
+            // NOTE: this will not work on anacrusis. Correct anacrusis durations are only working
             // when there are beats with playback positions already computed which requires full finish
-            // chicken-egg problem here. temporarily forcing anacrusis length here to 0
+            // chicken-egg problem here. temporarily forcing anacrusis length here to 0,
+            // .finish() will correct these times
             bar.start =
                 bar.previousMasterBar.start +
                 (bar.previousMasterBar.isAnacrusis ? 0 : bar.previousMasterBar.calculateDuration());
@@ -431,6 +432,11 @@ export class Score {
         const sharedDataBag = new Map<string, unknown>();
         for (let i: number = 0, j: number = this.tracks.length; i < j; i++) {
             this.tracks[i].finish(settings, sharedDataBag);
+        }
+
+        // fixup masterbar starts to handle anacrusis lengths
+        for (const mb of this.masterBars) {
+            mb.finish(sharedDataBag);
         }
     }
 

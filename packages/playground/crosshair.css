@@ -1,0 +1,27 @@
+#crosshair {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 20000;
+}
+
+.crosshair-x,.crosshair-y {
+    pointer-events: none;
+    position: absolute;
+}
+
+.crosshair-y {
+    width: 100vw;
+    border-bottom: 1px dotted #000;
+    height: 1px;
+    left: 0;
+}
+
+.crosshair-x {
+    height: 100vw;
+    border-left: 1px dotted #000;
+    width: 1px;
+    top: 0;
+}
+

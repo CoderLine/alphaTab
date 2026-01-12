@@ -341,7 +341,38 @@ export enum NotationElement {
     /**
      * The absolute playback time of beats.
      */
-    EffectBeatTimer = 49
+    EffectBeatTimer = 49,
+
+    /**
+     * The whammy bar line effect shown above the tab staff
+     */
+    EffectWhammyBarLine = 50,
+
+    /**
+     * The key signature for numbered notation staff.
+     */
+    EffectNumberedNotationKeySignature = 51,
+
+    /**
+     * The fretboard numbers shown in chord diagrams.
+     */
+    ChordDiagramFretboardNumbers = 52,
+
+    /**
+     * The bar numbers.
+     */
+    BarNumber = 53,
+
+    /**
+     * The repeat count indicator shown above the thick bar line to describe
+     * how many repeats should be played.
+     */
+    RepeatCount = 54,
+
+    /**
+     * The slurs shown on bend effects within the score staff.
+     */
+    ScoreBendSlur = 55
 }
 
 /**
@@ -479,11 +510,11 @@ export class NotationSettings {
      * Controls how high the ryhthm notation is rendered below the tab staff
      * @since 0.9.6
      * @category Notation
-     * @defaultValue `15`
+     * @defaultValue `25`
      * @remarks
      * This setting can be used in combination with the {@link rhythmMode} setting to control how high the rhythm notation should be rendered below the tab staff.
      */
-    public rhythmHeight: number = 15;
+    public rhythmHeight: number = 25;
 
     /**
      * The transposition pitch offsets for the individual tracks used for rendering and playback.

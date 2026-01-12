@@ -1,27 +1,29 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Voice } from '@coderline/alphatab/model/Voice';
-import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
-import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
-import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
-import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
-import { NumberedBeatGlyph, NumberedBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedBeatGlyph';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
+import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
+import {
+    NumberedDashBeatContainerGlyph,
+    NumberedNoteBeatContainerGlyphBase
+} from '@coderline/alphatab/rendering/glyphs/NumberedDashBeatContainerGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
-import { NumberedKeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedKeySignatureGlyph';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
-import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
+import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
+import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import type { BeamingHelper, BeamingHelperDrawInfo } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
-import { Duration } from '@coderline/alphatab/model/Duration';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using (Jianpu) Numbered Music Notation
@@ -34,24 +36,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     private _isOnlyNumbered: boolean;
     public shortestDuration = Duration.QuadrupleWhole;
-    public lowestOctave: number | null = null;
-    public highestOctave: number | null = null;
+
     get dotSpacing(): number {
         return this.smuflMetrics.glyphHeights.get(MusicFontSymbol.AugmentationDot)! * 2;
-    }
-
-    public registerOctave(octave: number) {
-        if (this.lowestOctave === null) {
-            this.lowestOctave = octave;
-            this.highestOctave = octave;
-        } else {
-            if (octave < this.lowestOctave!) {
-                this.lowestOctave = octave;
-            }
-            if (octave > this.highestOctave!) {
-                this.highestOctave = octave;
-            }
-        }
     }
 
     public override get repeatsBarSubElement(): BarSubElement {
@@ -91,55 +78,20 @@ export class NumberedBarRenderer extends LineBarRenderer {
         return 0;
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas, BeatSubElement.NumberedDuration, BeatSubElement.NumberedDuration);
-        this.paintTuplets(cx, cy, canvas, BeatSubElement.NumberedTuplet, true);
+    protected override get flagsSubElement(): BeatSubElement {
+        return BeatSubElement.NumberedDuration;
     }
 
-    public override doLayout(): void {
-        super.doLayout();
-        let hasTuplets: boolean = false;
-        for (const voice of this.bar.voices) {
-            if (this.hasVoiceContainer(voice)) {
-                const c = this.getVoiceContainer(voice)!;
-                if (c.tupletGroups.length > 0) {
-                    hasTuplets = true;
-                    break;
-                }
-            }
-        }
-        if (hasTuplets) {
-            this.registerOverflowTop(this.tupletSize);
-        }
+    protected override get beamsSubElement(): BeatSubElement {
+        return BeatSubElement.NumberedDuration;
+    }
 
-        if (!this.bar.isEmpty) {
-            const barCount: number = ModelUtils.getIndex(this.shortestDuration) - 2;
-            const dotSpacing = this.dotSpacing;
-            if (barCount > 0) {
-                const barSpacing: number = this.smuflMetrics.numberedBarRendererBarSpacing;
-                const barSize: number = this.smuflMetrics.numberedBarRendererBarSize;
-                const barOverflow = (barCount - 1) * barSpacing + barSize;
+    protected override get tupletSubElement(): BeatSubElement {
+        return BeatSubElement.NumberedTuplet;
+    }
 
-                let dotOverflow = 0;
-                const lowestOctave = this.lowestOctave;
-                if (lowestOctave !== null) {
-                    dotOverflow =
-                        Math.abs(lowestOctave) * dotSpacing +
-                        this.smuflMetrics.glyphHeights.get(MusicFontSymbol.AugmentationDot)!;
-                }
-
-                this.registerOverflowBottom(barOverflow + dotOverflow);
-            }
-
-            const highestOctave = this.highestOctave;
-            if (highestOctave !== null) {
-                const dotOverflow =
-                    Math.abs(highestOctave) * dotSpacing +
-                    this.smuflMetrics.glyphHeights.get(MusicFontSymbol.AugmentationDot)!;
-                this.registerOverflowTop(dotOverflow);
-            }
-        }
+    protected override shouldPaintBeamingHelper(_h: BeamingHelper): boolean {
+        return true;
     }
 
     protected override paintFlag(
@@ -159,84 +111,137 @@ export class NumberedBarRenderer extends LineBarRenderer {
         h: BeamingHelper,
         flagsElement: BeatSubElement
     ): void {
-        if (h.beats.length === 0) {
+        if (h.beats.length === 0 || h.graceType !== GraceType.None) {
             return;
         }
-        const res = this.resources;
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             const beat: Beat = h.beats[i];
 
             using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
 
-            //
-            // draw line
-            //
-            const barSpacing: number = this.smuflMetrics.numberedBarRendererBarSpacing;
-            const barSize: number = this.smuflMetrics.numberedBarRendererBarSize;
-            const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
-            const barStart: number = cy + this.y;
+            const direction: BeamDirection = this.getBeamDirection(h);
+            const isGrace: boolean = h.graceType !== GraceType.None;
+            const scaleMod: number = isGrace ? EngravingSettings.GraceScale : 1;
 
-            const beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes) - this.beatGlyphsStart;
+            let barSpacing: number = (this.beamSpacing + this.beamThickness) * scaleMod;
+            let barSize = this.beamThickness * scaleMod;
+            if (direction === BeamDirection.Down) {
+                barSpacing = -barSpacing;
+                barSize = -barSize;
+            }
 
-            const beamY = this.calculateBeamY(h, beatLineX);
+            let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
+            let beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes);
 
+            let barStartX: number = 0;
+            let barEndX: number = 0;
+            if (i === h.beats.length - 1) {
+                barStartX = beatLineX;
+                barEndX = this.getBeatX(beat, BeatXPosition.PostNotes);
+            } else {
+                barStartX = beatLineX;
+                barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.PreNotes);
+            }
+
+            const barStart: number = cy + this.y + this.calculateBeamY(h, beatLineX);
             for (let barIndex: number = 0; barIndex < barCount; barIndex++) {
-                let barStartX: number = 0;
-                let barEndX: number = 0;
-                let barStartY: number = 0;
                 const barY: number = barStart + barIndex * barSpacing;
-                if (i === h.beats.length - 1) {
-                    barStartX = beatLineX;
-                    barEndX = this.getBeatX(beat, BeatXPosition.PostNotes) - this.beatGlyphsStart;
-                } else {
-                    barStartX = beatLineX;
-                    barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.PreNotes) - this.beatGlyphsStart;
+
+                LineBarRenderer.paintSingleBar(
+                    canvas,
+                    cx + this.x + barStartX,
+                    barY,
+                    cx + this.x + barEndX,
+                    barY,
+                    barSize
+                );
+            }
+
+            // dashes for additional numbers
+            const container = this.voiceContainer.getBeatContainer(beat) as NumberedBeatContainerGlyph | undefined;
+            if (container && container.hasAdditionalNumbers) {
+                for (const additionalNumber of container.iterateAdditionalNumbers()) {
+                    barCount = additionalNumber.barCount;
+                    beatLineX =
+                        this.beatGlyphsStart +
+                        additionalNumber.x +
+                        additionalNumber.getBeatX(BeatXPosition.PreNotes, false);
+                    for (let barIndex = 0; barIndex < barCount; barIndex++) {
+                        const barY: number = barStart + barIndex * barSpacing;
+                        const additionalBarEndX =
+                            this.beatGlyphsStart +
+                            additionalNumber.x +
+                            additionalNumber.getBeatX(BeatXPosition.PostNotes, false);
+                        LineBarRenderer.paintSingleBar(
+                            canvas,
+                            cx + this.x + beatLineX,
+                            barY,
+                            cx + this.x + additionalBarEndX,
+                            barY,
+                            barSize
+                        );
+                    }
                 }
-
-                barStartY = barY + beamY;
-                canvas.fillRect(cx + this.x + barStartX, barStartY, barEndX - barStartX, barSize);
-            }
-
-            const onNotes = this.getBeatContainer(beat)!.onNotes;
-            let dotCount = onNotes instanceof NumberedBeatGlyph ? (onNotes as NumberedBeatGlyph).octaveDots : 0;
-            const dotSpacing = this.dotSpacing;
-            let dotsY = 0;
-            let dotsOffset = 0;
-            if (dotCount > 0) {
-                dotsY = barStart + this.getLineY(0) - res.numberedNotationFont.size;
-                dotsOffset = dotSpacing * -1;
-            } else if (dotCount < 0) {
-                dotsY = barStart + beamY + barCount * (barSpacing + barSize);
-                dotsOffset = dotSpacing;
-            }
-            const dotX: number = this.getBeatX(beat, BeatXPosition.MiddleNotes) - this.beatGlyphsStart;
-
-            dotCount = Math.abs(dotCount);
-
-            for (let d = 0; d < dotCount; d++) {
-                CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x + dotX, dotsY, 1, MusicFontSymbol.AugmentationDot, true);
-                dotsY += dotsOffset;
             }
         }
     }
 
-    public getNoteLine() {
+    protected override calculateOverflows(rendererTop: number, rendererBottom: number): void {
+        super.calculateOverflows(rendererTop, rendererBottom);
+        if (this.bar.isEmpty) {
+            return;
+        }
+        this.calculateBeamingOverflows(rendererTop, rendererBottom);
+    }
+
+    public getNoteLine(_note: Note) {
         return 0;
     }
 
-    public override get tupletOffset(): number {
-        // Shift tuplet above the number by: 
-        // * 1 to get back to the center (calculateBeamYWithDirection places the beam below the number)
-        // * 1.5 to get back to the top of the number
-        return super.tupletOffset + this.resources.numberedNotationFont.size * 1.5;
+    private _calculateBarHeight(beat: Beat) {
+        const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
+        let barHeight = 0;
+        if (barCount > 0) {
+            const smufl = this.smuflMetrics;
+            barHeight =
+                smufl.numberedBarRendererBarSpacing +
+                barCount * (smufl.numberedBarRendererBarSpacing + smufl.numberedBarRendererBarSize);
+        }
+
+        return barHeight;
     }
 
-    protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - this.resources.numberedNotationFont.size;
+    protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
+        const barHeight: number = this._calculateBarHeight(beat);
+        const container = this.voiceContainer.getBeatContainer(beat);
+        if (!container) {
+            if (direction === BeamDirection.Up) {
+                return this.voiceContainer.getBoundingBoxTop() - barHeight;
+            }
+            return this.voiceContainer.getBoundingBoxBottom();
+        }
+
+        if (direction === BeamDirection.Up) {
+            return container.getBoundingBoxTop() - barHeight;
+        }
+        return container.getBoundingBoxBottom();
     }
 
-    protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - this.resources.numberedNotationFont.size;
+    protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
+        const barHeight: number = this._calculateBarHeight(beat);
+
+        const container = this.voiceContainer.getBeatContainer(beat);
+        if (!container) {
+            if (direction === BeamDirection.Down) {
+                return this.voiceContainer.getBoundingBoxBottom() + barHeight;
+            }
+            return this.getLineY(0);
+        }
+
+        if (direction === BeamDirection.Down) {
+            return container.getBoundingBoxBottom() + barHeight;
+        }
+        return this.getLineY(0);
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -247,40 +252,21 @@ export class NumberedBarRenderer extends LineBarRenderer {
         return BeamDirection.Up;
     }
 
-    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        let y = super.getNoteY(note, requestedPosition);
-        if (Number.isNaN(y)) {
-            y = this.getLineY(0);
-        }
-        return y;
-    }
-
-    protected override calculateBeamYWithDirection(_h: BeamingHelper, _x: number, _direction: BeamDirection): number {
-        const res = this.resources.numberedNotationFont;
-        return this.getLineY(0) + res.size;
-    }
-
-    protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
-        return this.getLineY(0) - noteHeadHeight / 2;
-    }
-
     protected override createPreBeatGlyphs(): void {
-        this.wasFirstOfLine = this.isFirstOfLine;
+        this.wasFirstOfStaff = this.isFirstOfStaff;
         if (this.index === 0 || (this.bar.masterBar.isRepeatStart && this._isOnlyNumbered)) {
-            this.addPreBeatGlyph(new BarLineGlyph(false));
+            this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         }
         this.createLinePreBeatGlyphs();
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.25), this.bar.index + 1));
+        const hasSpaceAfterStartGlyphs = this.createStartSpacing();
+        if (this.shouldCreateBarNumber()) {
+            this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
+        } else if (!hasSpaceAfterStartGlyphs) {
+            this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
+        }
     }
 
     protected override createLinePreBeatGlyphs(): void {
-        // Key signature
-        if (!this.bar.previousBar || this.bar.keySignature !== this.bar.previousBar.keySignature) {
-            this.createStartSpacing();
-            this._createKeySignatureGlyphs();
-        }
-
         if (
             this._isOnlyNumbered &&
             (!this.bar.previousBar ||
@@ -298,15 +284,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
             this._createTimeSignatureGlyphs();
         }
     }
-    private _createKeySignatureGlyphs() {
-        this.addPreBeatGlyph(
-            new NumberedKeySignatureGlyph(0, this.getLineY(0), this.bar.keySignature, this.bar.keySignatureType)
-        );
-    }
 
     private _createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
-
         const masterBar = this.bar.masterBar;
         const g = new ScoreTimeSignatureGlyph(
             0,
@@ -329,11 +308,44 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
+        if (v.index > 0) {
+            return;
+        }
+
+        super.createVoiceGlyphs(v);
+
+        const absoluteStart = this.bar.masterBar.start;
         for (const b of v.beats) {
-            const container: NumberedBeatContainerGlyph = new NumberedBeatContainerGlyph(b, this.getVoiceContainer(v)!);
-            container.preNotes = v.index === 0 ? new NumberedBeatPreNotesGlyph() : new BeatGlyphBase();
-            container.onNotes = v.index === 0 ? new NumberedBeatGlyph() : new BeatOnNoteGlyphBase();
-            this.addBeatGlyph(container);
+            const mainContainer = new NumberedBeatContainerGlyph(b);
+            this.addBeatGlyph(mainContainer);
+
+            // create dashes and filler glyphs
+            // we want a glyph on every quarter tick
+
+            if (b.duration < Duration.Quarter) {
+                const endTick = b.displayStart + b.displayDuration;
+                let dashTick = b.displayStart + MidiUtils.QuarterTime;
+                while (dashTick < endTick) {
+                    const isFullTick = endTick - dashTick >= MidiUtils.QuarterTime;
+                    if (isFullTick) {
+                        const dash = new NumberedDashBeatContainerGlyph(v.index, absoluteStart + dashTick);
+                        this.addBeatGlyph(dash);
+                        mainContainer.addDash(dash);
+                    }
+                    // special case to create second note number, this logic doesn't play well with tuplets
+                    else if (b.duration === Duration.Half && b.dots > 1) {
+                        const remainingTickNumber = new NumberedNoteBeatContainerGlyphBase(
+                            b,
+                            absoluteStart + dashTick,
+                            endTick - dashTick
+                        );
+                        this.addBeatGlyph(remainingTickNumber);
+                        mainContainer.addNotes(remainingTickNumber);
+                    }
+
+                    dashTick += MidiUtils.QuarterTime;
+                }
+            }
         }
     }
 
@@ -345,4 +357,54 @@ export class NumberedBarRenderer extends LineBarRenderer {
         _bottomY: number,
         _canvas: ICanvas
     ): void {}
+
+    protected override get beamSpacing(): number {
+        return this.smuflMetrics.numberedBarRendererBarSpacing;
+    }
+
+    protected override get beamThickness(): number {
+        return this.smuflMetrics.numberedBarRendererBarSize;
+    }
+
+    protected override paintBeamHelper(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        h: BeamingHelper,
+        flagsElement: BeatSubElement,
+        beamsElement: BeatSubElement
+    ): void {
+        if (h.voice?.index === 0) {
+            super.paintBeamHelper(cx, cy, canvas, h, flagsElement, beamsElement);
+        }
+    }
+
+    protected override applyBarShift(
+        _h: BeamingHelper,
+        _direction: BeamDirection,
+        _drawingInfo: BeamingHelperDrawInfo,
+        _barCount: number
+    ): number {
+        return 0;
+    }
+
+    protected override calculateBeamYWithDirection(h: BeamingHelper, _x: number, direction: BeamDirection): number {
+        this.ensureBeamDrawingInfo(h, direction);
+        const info = h.drawingInfos.get(direction)!;
+        if (direction === BeamDirection.Up) {
+            return Math.min(info.startY, info.endY);
+        } else {
+            return Math.max(info.startY, info.endY);
+        }
+    }
+
+    protected override paintTuplets(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        beatElement: BeatSubElement,
+        _bracketsAsArcs: boolean = false
+    ): void {
+        super.paintTuplets(cx, cy, canvas, beatElement, true);
+    }
 }

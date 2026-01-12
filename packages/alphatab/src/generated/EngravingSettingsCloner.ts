@@ -72,6 +72,7 @@ export class EngravingSettingsCloner {
         clone.deadSlappedLineWidth = original.deadSlappedLineWidth;
         clone.leftHandTabTieWidth = original.leftHandTabTieWidth;
         clone.tabBendDashSize = original.tabBendDashSize;
+        clone.tabBendStaffPadding = original.tabBendStaffPadding;
         clone.tabBendPerValueHeight = original.tabBendPerValueHeight;
         clone.tabBendLabelPadding = original.tabBendLabelPadding;
         clone.simpleSlideWidth = original.simpleSlideWidth;
@@ -91,6 +92,8 @@ export class EngravingSettingsCloner {
         clone.tuningGlyphStringColumnScale = original.tuningGlyphStringColumnScale;
         clone.tuningGlyphStringRowPadding = original.tuningGlyphStringRowPadding;
         clone.directionsScale = original.directionsScale;
+        clone.multiVoiceDisplacedNoteHeadSpacing = original.multiVoiceDisplacedNoteHeadSpacing;
+        clone.stemFlagHeight = new Map(original.stemFlagHeight);
         return clone;
     }
 }

@@ -16,6 +16,7 @@ import { SustainPedalMarker } from "@coderline/alphatab/model/Bar";
 import { BarLineStyle } from "@coderline/alphatab/model/Bar";
 import { KeySignature } from "@coderline/alphatab/model/KeySignature";
 import { KeySignatureType } from "@coderline/alphatab/model/KeySignatureType";
+import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
 import { BarStyle } from "@coderline/alphatab/model/Bar";
 /**
  * @internal
@@ -44,6 +45,7 @@ export class BarSerializer {
         o.set("barlineright", obj.barLineRight as number);
         o.set("keysignature", obj.keySignature as number);
         o.set("keysignaturetype", obj.keySignatureType as number);
+        o.set("barnumberdisplay", obj.barNumberDisplay as number | undefined);
         if (obj.style) {
             o.set("style", BarStyleSerializer.toJson(obj.style));
         }
@@ -96,6 +98,9 @@ export class BarSerializer {
                 return true;
             case "keysignaturetype":
                 obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(v, KeySignatureType)!;
+                return true;
+            case "barnumberdisplay":
+                obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(v, BarNumberDisplay);
                 return true;
             case "style":
                 if (v) {

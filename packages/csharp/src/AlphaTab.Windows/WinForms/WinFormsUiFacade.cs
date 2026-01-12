@@ -136,7 +136,6 @@ namespace AlphaTab.WinForms
         {
             SettingsContainer.BeginInvoke((Action<RenderFinishedEventArgs?>)(renderResult =>
             {
-
                 if (renderResult == null ||
                     !_resultIdToElementLookup.TryGetValue(renderResult.Id, out var placeholder))
                 {
@@ -149,7 +148,7 @@ namespace AlphaTab.WinForms
                 switch (body)
                 {
                     case string _:
-                        // TODO: svg support
+                        // NOTE: no svg support
                         return;
                     case AlphaSkiaImage skiaImage:
                         using (skiaImage)
@@ -303,6 +302,25 @@ namespace AlphaTab.WinForms
         {
             var c = ((ControlContainer)scrollElement).Control;
             c.AutoScrollOffset = new Point((int)offset, c.AutoScrollOffset.Y);
+        }
+
+        public override void StopScrolling(IContainer scrollElement)
+        {
+            // no scrolling animations, hence nothing to do
+        }
+
+        public override void SetCanvasOverflow(IContainer canvasElement, double overflow,
+            bool isVertical)
+        {
+            var c = ((ControlContainer)canvasElement).Control;
+            if (!(c is AlphaTabLayoutPanel p))
+            {
+                return;
+            }
+
+            p.Padding = isVertical
+                ? new Padding(0, 0, 0, (int)overflow)
+                : new Padding(0, 0, (int)overflow, 0);
         }
     }
 }

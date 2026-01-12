@@ -62,7 +62,8 @@ export function buildTypeSchema(program: ts.Program, input: ts.ClassDeclaration)
                         asRaw,
                         partialNames: !!jsDoc.find(t => t.tagName.text === 'json_partial_names'),
                         target: jsDoc.find(t => t.tagName.text === 'target')?.comment as string,
-                        isReadOnly: !!jsDoc.find(t => t.tagName.text === 'json_read_only'),
+                        isJsonReadOnly: isReadonly,
+                        isReadOnly: propertyDeclaration.modifiers!.some(m => m.kind == ts.SyntaxKind.ReadonlyKeyword),
                         name: (member.name as ts.Identifier).text,
                         jsDocTags: jsDoc,
                         type: getTypeWithNullableInfo(
@@ -379,6 +380,7 @@ export interface TypeProperty {
     jsonNames: string[];
     asRaw: boolean;
     target?: string;
+    isJsonReadOnly: boolean;
     isReadOnly: boolean;
 }
 

@@ -1,14 +1,22 @@
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
+import { ScoreBeatGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatGlyph';
+import { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreBendGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBendGlyph';
 import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
 import { ScoreSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlideLineGlyph';
 import { ScoreSlurGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlurGlyph';
 import { ScoreTieGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTieGlyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
@@ -19,14 +27,75 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     private _effectSlur: ScoreSlurGlyph | null = null;
     private _effectEndSlur: ScoreSlurGlyph | null = null;
 
+    public constructor(beat: Beat) {
+        super(beat);
+        this.preNotes = new ScoreBeatPreNotesGlyph();
+        this.onNotes = new ScoreBeatGlyph();
+    }
+
+    public get prebendNoteHeadOffset() {
+        return (this.preNotes as ScoreBeatPreNotesGlyph).prebendNoteHeadOffset;
+    }
+
+    public get accidentalsWidth() {
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph;
+        if (preNotes && preNotes.accidentals) {
+            return preNotes.accidentals.width;
+        }
+        return 0;
+    }
+
+    public override doMultiVoiceLayout(): void {
+        this.preNotes.x = 0;
+        (this.preNotes as ScoreBeatPreNotesGlyph).doMultiVoiceLayout();
+        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        (this.onNotes as ScoreBeatGlyph).doMultiVoiceLayout();
+
+        this._bend?.doMultiVoiceLayout();
+    }
+
     public override doLayout(): void {
         this._effectSlur = null;
         this._effectEndSlur = null;
+
+        // make space for flag
+        const sr = this.renderer as ScoreBarRenderer;
+        const beat = this.beat;
+        const isGrace = beat.graceType !== GraceType.None;
+        if (sr.hasFlag(beat)) {
+            const direction = sr.getBeatDirection(beat);
+            const scale = isGrace ? EngravingSettings.GraceScale : 1;
+            const symbol = FlagGlyph.getSymbol(beat.duration, direction, isGrace);
+            const flagWidth = sr.smuflMetrics.glyphWidths.get(symbol)! * scale;
+            this._flagStretch = flagWidth;
+        } else if (isGrace) {
+            // always use flag size as spacing on grace notes
+            const graceSpacing =
+                sr.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * EngravingSettings.GraceScale;
+            this._flagStretch = graceSpacing;
+        }
+
         super.doLayout();
         if (this._bend) {
             this._bend.renderer = this.renderer;
             this._bend.doLayout();
             this.updateWidth();
+        }
+    }
+
+    public override getBoundingBoxTop(): number {
+        if (this._bend !== null) {
+            return ModelUtils.minBoundingBox(this._bend.getBoundingBoxTop(), super.getBoundingBoxTop());
+        } else {
+            return super.getBoundingBoxTop();
+        }
+    }
+
+    public override getBoundingBoxBottom(): number {
+        if (this._bend !== null) {
+            return ModelUtils.maxBoundingBox(this._bend.getBoundingBoxBottom(), super.getBoundingBoxTop());
+        } else {
+            return super.getBoundingBoxBottom();
         }
     }
 
@@ -45,48 +114,49 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             n.tieDestination &&
             n.tieDestination.isVisible
         ) {
-            // tslint:disable-next-line: no-unnecessary-type-assertion
-            const tie: ScoreTieGlyph = new ScoreTieGlyph(n, n.tieDestination!, false);
+            const tie: ScoreTieGlyph = new ScoreTieGlyph(`score.tie.${n.id}`, n, n.tieDestination!, false);
             this.addTie(tie);
         }
         if (n.isTieDestination && !n.tieOrigin!.hasBend && !n.beat.hasWhammyBar) {
-            const tie: ScoreTieGlyph = new ScoreTieGlyph(n.tieOrigin!, n, true);
+            const tie: ScoreTieGlyph = new ScoreTieGlyph(`score.tie.${n.tieOrigin!.id}`, n.tieOrigin!, n, true);
             this.addTie(tie);
         }
-        // TODO: depending on the type we have other positioning
-        // we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
         if (n.slideInType !== SlideInType.None || n.slideOutType !== SlideOutType.None) {
             const l: ScoreSlideLineGlyph = new ScoreSlideLineGlyph(n.slideInType, n.slideOutType, n, this);
             this.addTie(l);
         }
         if (n.isSlurOrigin && n.slurDestination && n.slurDestination.isVisible) {
-            // tslint:disable-next-line: no-unnecessary-type-assertion
-            const tie: ScoreSlurGlyph = new ScoreSlurGlyph(n, n.slurDestination!, false);
+            const tie: ScoreSlurGlyph = new ScoreSlurGlyph(`score.slur.${n.id}`, n, n.slurDestination!, false);
             this.addTie(tie);
         }
         if (n.isSlurDestination) {
-            const tie: ScoreSlurGlyph = new ScoreSlurGlyph(n.slurOrigin!, n, true);
+            const tie: ScoreSlurGlyph = new ScoreSlurGlyph(`score.slur.${n.slurOrigin!.id}`, n.slurOrigin!, n, true);
             this.addTie(tie);
         }
         // start effect slur on first beat
         if (!this._effectSlur && n.isEffectSlurOrigin && n.effectSlurDestination) {
-            const effectSlur = new ScoreSlurGlyph(n, n.effectSlurDestination, false);
+            const effectSlur = new ScoreSlurGlyph(`score.slur.effect.${n.beat.id}`, n, n.effectSlurDestination, false);
             this._effectSlur = effectSlur;
             this.addTie(effectSlur);
         }
         // end effect slur on last beat
         if (!this._effectEndSlur && n.beat.isEffectSlurDestination && n.beat.effectSlurOrigin) {
-            const direction: BeamDirection = this.onNotes.beamingHelper.direction;
-            const startNote: Note =
+            const direction = (this.renderer as LineBarRenderer).getBeatDirection(n.beat);
+            const startNote =
                 direction === BeamDirection.Up ? n.beat.effectSlurOrigin.minNote! : n.beat.effectSlurOrigin.maxNote!;
-            const endNote: Note = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
-            const effectEndSlur = new ScoreSlurGlyph(startNote, endNote, true);
+            const endNote = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
+            const effectEndSlur = new ScoreSlurGlyph(
+                `score.slur.effect.${startNote.beat.id}`,
+                startNote,
+                endNote,
+                true
+            );
             this._effectEndSlur = effectEndSlur;
             this.addTie(effectEndSlur);
         }
         if (n.hasBend) {
             if (!this._bend) {
-                const bend = new ScoreBendGlyph(n.beat);
+                const bend = new ScoreBendGlyph(this);
                 this._bend = bend;
                 bend.renderer = this.renderer;
                 this.addTie(bend);
@@ -103,7 +173,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
                 while (destination.nextBeat && destination.nextBeat.isLegatoDestination) {
                     destination = destination.nextBeat;
                 }
-                this.addTie(new ScoreLegatoGlyph(this.beat, destination, false));
+                this.addTie(new ScoreLegatoGlyph(`score.legato.${this.beat.id}`, this.beat, destination, false));
             }
         } else if (this.beat.isLegatoDestination) {
             // only create slur for last destination of "group"
@@ -112,8 +182,19 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
                 while (origin.previousBeat && origin.previousBeat.isLegatoOrigin) {
                     origin = origin.previousBeat;
                 }
-                this.addTie(new ScoreLegatoGlyph(origin, this.beat, true));
+                this.addTie(new ScoreLegatoGlyph(`score.legato.${origin.id}`, origin, this.beat, true));
             }
         }
+    }
+
+    private _flagStretch = 0;
+
+    protected override get postBeatStretch(): number {
+        return super.postBeatStretch + this._flagStretch;
+    }
+
+    protected override updateWidth(): void {
+        super.updateWidth();
+        this.width += this._flagStretch;
     }
 }

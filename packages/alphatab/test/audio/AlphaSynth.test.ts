@@ -2,7 +2,12 @@ import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
 import { ControllerType } from '@coderline/alphatab/midi/ControllerType';
-import { type ControlChangeEvent, MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
+import {
+    type ControlChangeEvent,
+    type MidiEvent,
+    MidiEventType,
+    TempoChangeEvent
+} from '@coderline/alphatab/midi/MidiEvent';
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -12,9 +17,9 @@ import { AudioExportOptions } from '@coderline/alphatab/synth/IAudioExporter';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 import { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
 import { VorbisFile } from '@coderline/alphatab/synth/vorbis/VorbisFile';
+import { assert, expect } from 'chai';
 import { TestOutput } from 'test/audio/TestOutput';
 import { TestPlatform } from 'test/TestPlatform';
-import { expect } from 'chai';
 
 describe('AlphaSynthTests', () => {
     it('pcm-generation', async () => {
@@ -331,5 +336,63 @@ describe('AlphaSynthTests', () => {
         expect(synth.channelGetPresetBank(1)).to.equal(1000);
         expect(synth.channelGetPresetBank(2)).to.equal(4000);
         expect(synth.channelGetPresetBank(3)).to.equal(4000);
+    });
+
+    async function testPlaythrough(midi: MidiFile) {
+        const testOutput = new TestOutput(false);
+        const synth = new AlphaSynth(testOutput, 500);
+        const soundFont = await TestPlatform.loadFile('test-data/audio/default.sf2');
+        synth.loadSoundFont(soundFont, false);
+        synth.loadMidiFile(midi);
+        synth.play();
+        let finished = false;
+        synth.finished.on(() => {
+            finished = true;
+        });
+
+        const start = Date.now();
+
+        while (!finished) {
+            const now = Date.now();
+            if (now - start > 2000) {
+                assert.fail(`play did not complete after ${2000}ms`);
+            }
+            testOutput.next();
+        }
+    }
+
+    it('small-tempos', async () => {
+        const score = ScoreLoader.loadScoreFromBytes(await TestPlatform.loadFile('test-data/audio/small-tempo.xml'));
+
+        expect(score.masterBars[0].tempoAutomations[0].value).to.equal(0.111);
+
+        const midi = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(midi);
+        const generator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        const tempoChange: MidiEvent[] = midi.events.filter(e => e instanceof TempoChangeEvent);
+        expect(tempoChange.length).to.equal(1);
+        expect((tempoChange[0] as TempoChangeEvent).beatsPerMinute).to.equal(0.111);
+
+        await testPlaythrough(midi);
+    });
+
+    it('zero-tempo', async () => {
+        const score = ScoreLoader.loadScoreFromBytes(await TestPlatform.loadFile('test-data/audio/small-tempo.xml'));
+
+        expect(score.masterBars[0].tempoAutomations[0].value).to.equal(0.111);
+        score.masterBars[0].tempoAutomations[0].value = 0;
+
+        const midi = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(midi);
+        const generator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        const tempoChange: MidiEvent[] = midi.events.filter(e => e instanceof TempoChangeEvent);
+        expect(tempoChange.length).to.equal(1);
+        expect((tempoChange[0] as TempoChangeEvent).beatsPerMinute).to.equal(0);
+
+        await testPlaythrough(midi);
     });
 });

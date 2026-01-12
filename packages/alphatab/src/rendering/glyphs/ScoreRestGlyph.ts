@@ -1,17 +1,14 @@
-import { Duration } from '@coderline/alphatab/model/Duration';
-import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal
  */
 export class ScoreRestGlyph extends MusicFontGlyph {
-    public beamingHelper!: BeamingHelper;
-
     public constructor(x: number, y: number, duration: Duration) {
         super(x, y, 1, ScoreRestGlyph.getSymbol(duration));
     }
@@ -42,17 +39,6 @@ export class ScoreRestGlyph extends MusicFontGlyph {
                 return MusicFontSymbol.Rest256th;
             default:
                 return MusicFontSymbol.None;
-        }
-    }
-
-    public updateBeamingHelper(cx: number): void {
-        if (this.beamingHelper) {
-            this.beamingHelper.registerBeatLineX(
-                'score',
-                this.beat!,
-                cx + this.x + this.width / 2,
-                cx + this.x + this.width / 2
-            );
         }
     }
 

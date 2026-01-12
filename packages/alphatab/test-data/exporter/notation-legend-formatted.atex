@@ -242,6 +242,8 @@
         12.2{x}.16{sd gr onbeat beam Up}
         12.1.1{sd beam Down}
       |
+      // Masterbar 37 Metadata
+      \beaming (8 2 2 2 2)
         // Bar 37 / Voice 1 contents
         5.1{x}.16{sd gr onbeat beam Up}
         5.2{x}.16{sd gr onbeat beam Up}
@@ -269,6 +271,7 @@
       |
       // Masterbar 41 Metadata
       \ts (1 4)
+      \beaming (8 2 2 2 2)
         // Bar 41 / Voice 1 contents
         5.3{sl}.8{beam Down}
         7.3.8{beam Down}
@@ -299,6 +302,7 @@
       |
       // Masterbar 49 Metadata
       \ts (4 4)
+      \beaming (8 2 2 2 2)
         // Bar 49 / Voice 1 contents
         5.4{h}.2{beam Up}
         7.4.2{beam Up}
@@ -370,9 +374,9 @@
         7.5{pm}.8{beam Up}
       |
         // Bar 58 / Voice 1 contents
-        7.5.4{tp 32 beam Up}
-        8.5.4{tp 32 beam Up}
-        9.5{acc #}.2{tp 32 beam Up}
+        7.5.4{tp 3 beam Up}
+        8.5.4{tp 3 beam Up}
+        9.5{acc #}.2{tp 3 beam Up}
       |
         // Bar 59 / Voice 1 contents
         7.3{tr (9 16)}.1{beam Down}
@@ -527,6 +531,7 @@
       |
       // Masterbar 83 Metadata
       \ts (5 8)
+      \beaming (8 2 2 2 2)
         // Bar 83 / Voice 1 contents
         7.5.8{beam Up}
         7.5.8{beam Up}
@@ -535,6 +540,7 @@
       |
       // Masterbar 84 Metadata
       \ts (4 4)
+      \beaming (8 2 2 2 2)
       \tempo 60
         // Bar 84 / Voice 1 contents
         7.5.8{beam Up}
@@ -795,6 +801,7 @@
       |
       // Masterbar 117 Metadata
       \ts (6 8)
+      \beaming (8 3 3)
         // Bar 117 / Voice 1 contents
         0.6{lr}.8{beam Up}
         (0.3{lr} 0.6{lr t}).8{beam Up}
@@ -839,6 +846,7 @@
       |
       // Masterbar 124 Metadata
       \ts (4 4)
+      \beaming (8 2 2 2 2)
         // Bar 124 / Voice 1 contents
         12.3{lf 2}.4{sd beam Down}
         14.3{lf 4}.8{sd beam Down}

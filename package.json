@@ -1,6 +1,6 @@
 {
     "name": "@coderline/alphatab-monorepo",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "description": "Monorepo for alphaTab and its related packages",
     "private": true,
     "type": "module",
@@ -41,7 +41,6 @@
         "test-webpack": "npm run test --workspace=packages/webpack",
 
         "build-monaco": "npm run build --workspace=packages/monaco"
-
     },
     "devDependencies": {
         "concurrently": "^9.2.1"

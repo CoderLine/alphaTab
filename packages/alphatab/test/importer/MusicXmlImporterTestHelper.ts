@@ -1,8 +1,10 @@
 import { MusicXmlImporter } from '@coderline/alphatab/importer/MusicXmlImporter';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { Bar } from '@coderline/alphatab/model/Bar';
 import { Beat } from '@coderline/alphatab/model/Beat';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { Note } from '@coderline/alphatab/model/Note';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -10,12 +12,10 @@ import { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
 import { Voice } from '@coderline/alphatab/model/Voice';
 import { Settings } from '@coderline/alphatab/Settings';
-import { TestPlatform } from 'test/TestPlatform';
-import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
-import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { assert } from 'chai';
+import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
+import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
-import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
 
 /**
  * @internal
@@ -68,7 +68,7 @@ export class MusicXmlImporterTestHelper {
         if (render) {
             settings.display.justifyLastSystem = score.masterBars.length > 4;
             if (score.tracks.some(t => t.systemsLayout.length > 0)) {
-                settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+                settings.display.layoutMode = LayoutMode.Parchment;
             }
 
             prepare?.(settings);

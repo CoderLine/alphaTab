@@ -141,7 +141,7 @@ describe('AlphaTexParameterTests', () => {
 
         describe('metadata', () => {
             describe('empty signature', () => {
-                it('empty', () => importTest(`\\ac() C4`));
+                it('empty', () => importTest(`\\track() C4`));
             });
 
             describe('single overload', () => {

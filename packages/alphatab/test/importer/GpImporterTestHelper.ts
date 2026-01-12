@@ -167,16 +167,13 @@ export class GpImporterTestHelper {
     }
 
     public static checkBend(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(2);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).to.equal(0);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).to.equal(15);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).to.equal(60);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].value).to.equal(4);
-
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![2].offset).to.equal(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![2].value).to.equal(4);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints!.length).to.equal(7);
 
@@ -282,13 +279,13 @@ export class GpImporterTestHelper {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillSpeed).to.equal(Duration.Sixteenth);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].isTremolo).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].tremoloSpeed).to.equal(Duration.ThirtySecond);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].tremoloPicking!.marks).to.equal(3);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].isTremolo).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tremoloSpeed).to.equal(Duration.Sixteenth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tremoloPicking!.marks).to.equal(2);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].isTremolo).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].tremoloSpeed).to.equal(Duration.Eighth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].tremoloPicking!.marks).to.equal(1);
     }
 
     public static checkOtherEffects(score: Score, skipInstrumentCheck: boolean = false): void {
@@ -305,7 +302,7 @@ export class GpImporterTestHelper {
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].text).to.equal('Text');
 
         expect(score.masterBars[4].isDoubleBar).to.be.equal(true);
-        expect(score.masterBars[4].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[4].tempoAutomations.length).to.equal(1);
         expect(score.masterBars[4].tempoAutomations[0]!.value).to.equal(120.0);
         if (!skipInstrumentCheck) {
             expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)).to.be

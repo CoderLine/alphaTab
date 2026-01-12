@@ -44,12 +44,33 @@ export class EffectBandSlot {
     }
 
     public canBeUsed(band: EffectBand): boolean {
-        return (
-            ((!this.shared.uniqueEffectId && band.info.canShareBand) ||
-                band.info.effectId === this.shared.uniqueEffectId) &&
-            (!this.shared.firstBeat ||
-                this.shared.lastBeat!.isBefore(band.firstBeat!) ||
-                this.shared.lastBeat!.isBefore(this.shared.firstBeat))
-        );
+        const canShareBand =
+            (!this.shared.uniqueEffectId && band.info.canShareBand) ||
+            band.info.effectId === this.shared.uniqueEffectId;
+        if (!canShareBand) {
+            return false;
+        }
+
+        // first beat in slot
+        if (!this.shared.firstBeat) {
+            return true;
+        }
+
+        // beat is already added and this is an "extended" band connecting to the previous bar
+        if(this.shared.lastBeat === band.firstBeat){
+            return true;
+        }
+
+        // newly added band is after current beat
+        if (this.shared.lastBeat!.isBefore(band.firstBeat!)) {
+            return true;
+        }
+
+        // historical case, doesn't make much sense, but let's keep it for now
+        if (this.shared.lastBeat!.isBefore(this.shared.firstBeat)) {
+            return true;
+        }
+
+        return false;
     }
 }

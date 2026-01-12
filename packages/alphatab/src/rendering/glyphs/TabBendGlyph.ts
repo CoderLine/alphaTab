@@ -1,24 +1,25 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { BendStyle } from '@coderline/alphatab/model/BendStyle';
 import { BendType } from '@coderline/alphatab/model/BendType';
 import type { Color } from '@coderline/alphatab/model/Color';
+import type { Font } from '@coderline/alphatab/model/Font';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
-import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { type BarRendererBase, NoteYPosition, NoteXPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import { TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { TabBendRenderPoint } from '@coderline/alphatab/rendering/glyphs/TabBendRenderPoint';
-import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
-import { BendPoint } from '@coderline/alphatab/model/BendPoint';
-import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { TabBendRenderPoint } from '@coderline/alphatab/rendering/glyphs/TabBendRenderPoint';
+import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 
 /**
  * @internal
  */
-export class TabBendGlyph extends Glyph {
+export class TabBendGlyph extends Glyph implements ITieGlyph {
     private _notes: Note[] = [];
     private _renderPoints: Map<number, TabBendRenderPoint[]> = new Map();
     private _preBendMinValue: number = -1;
@@ -28,6 +29,8 @@ export class TabBendGlyph extends Glyph {
     private _releaseMinValue: number = -1;
     private _releaseContinuedMinValue: number = -1;
     private _maxBendValue: number = -1;
+
+    public readonly checkForOverflow = false;
 
     public constructor() {
         super(0, 0);
@@ -126,8 +129,9 @@ export class TabBendGlyph extends Glyph {
 
     public override doLayout(): void {
         super.doLayout();
-        const bendHeight: number = this._maxBendValue * this.renderer.smuflMetrics.tabBendPerValueHeight;
-        this.renderer.registerOverflowTop(bendHeight);
+
+        this._calculateAndRegisterOverflow();
+
         let value: number = 0;
         for (const note of this._notes) {
             const renderPoints: TabBendRenderPoint[] = this._renderPoints.get(note.id)!;
@@ -177,6 +181,22 @@ export class TabBendGlyph extends Glyph {
         });
     }
 
+    private _calculateAndRegisterOverflow() {
+        const res = this.renderer.resources;
+        const smufl = this.renderer.smuflMetrics;
+        let bendHeight: number = this._maxBendValue * smufl.tabBendPerValueHeight;
+
+        bendHeight += smufl.tabBendStaffPadding;
+
+        // account for space
+        const canvas = this.renderer.scoreRenderer.canvas!;
+        canvas.font = res.tablatureFont;
+        const size = canvas.measureText('full');
+        bendHeight += size.height + res.engravingSettings.tabBendLabelPadding;
+
+        this.renderer.registerOverflowTop(bendHeight);
+    }
+
     private _createRenderingPoints(note: Note): TabBendRenderPoint[] {
         const renderingPoints: TabBendRenderPoint[] = [];
         // Guitar Pro Rendering Note:
@@ -214,18 +234,16 @@ export class TabBendGlyph extends Glyph {
             canvas.color = this.renderer.resources.secondaryGlyphColor;
         }
         for (const note of this._notes) {
-            const renderPoints: TabBendRenderPoint[] = this._renderPoints.get(note.id)!;
-            const startNoteRenderer: BarRendererBase = this.renderer;
-            let endNote: Note = note;
-            let isMultiBeatBend: boolean = false;
+            const startNoteRenderer = this.renderer as TabBarRenderer;
+            let endNote = note;
+            let isMultiBeatBend = false;
             let endNoteRenderer: BarRendererBase | null = null;
-            let endNoteHasBend: boolean = false;
-            const slurText: string = note.bendStyle === BendStyle.Gradual ? 'grad.' : '';
+            let endNoteHasBend = false;
             let endBeat: Beat | null = null;
             while (endNote.isTieOrigin) {
-                const nextNote: Note = endNote.tieDestination!;
+                const nextNote = endNote.tieDestination!;
                 endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                    this.renderer.staff.staffId,
+                    this.renderer.staff!.staffId,
                     nextNote.beat.voice.bar
                 );
                 if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
@@ -245,7 +263,7 @@ export class TabBendGlyph extends Glyph {
 
             endBeat = endNote.beat;
             endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                this.renderer.staff.staffId,
+                this.renderer.staff!.staffId,
                 endBeat.voice.bar
             ) as TabBarRenderer;
             if (
@@ -255,133 +273,123 @@ export class TabBendGlyph extends Glyph {
             ) {
                 endBeat = null;
             }
-            let startX: number = 0;
-            let endX: number = 0;
-            const topY: number = cy + startNoteRenderer.y;
-            const tabBendArrowSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
-            startX = cx + startNoteRenderer.x;
+
+            const smufl = startNoteRenderer.smuflMetrics;
+            const tabBendArrowSize = smufl.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
+
+            const topY: number = cy + startNoteRenderer.y - smufl.tabBendStaffPadding;
+
+            let startX = cx + startNoteRenderer.x;
+            const renderPoints = this._renderPoints.get(note.id)!;
             if (renderPoints[0].value > 0 || note.isContinuedBend) {
                 startX += startNoteRenderer.getBeatX(note.beat, BeatXPosition.MiddleNotes);
             } else {
                 startX += startNoteRenderer.getNoteX(note, NoteXPosition.Right);
             }
+
+            let endX: number = 0;
             if (!endBeat || (endBeat.isLastOfVoice && !endNoteHasBend)) {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.postBeatGlyphsStart;
+                endX -= this.renderer.smuflMetrics.postNoteEffectPadding;
             } else if (endNoteHasBend || !endBeat.nextBeat) {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat, BeatXPosition.MiddleNotes);
             } else if (note.bendType === BendType.Hold) {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat.nextBeat, BeatXPosition.OnNotes);
             } else {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat.nextBeat, BeatXPosition.PreNotes);
+                endX -= this.renderer.smuflMetrics.postNoteEffectPadding;
             }
-            if (!isMultiBeatBend) {
-                endX -= tabBendArrowSize;
-            }
+
             // we need some pixels for the arrow. otherwise we might draw into the next
-            // note
-            const width: number = endX - startX;
-            // calculate offsets per step
-            const dX: number = width / BendPoint.MaxPosition;
-            canvas.beginPath();
-            for (let i: number = 0, j: number = renderPoints.length - 1; i < j; i++) {
-                const firstPt: TabBendRenderPoint = renderPoints[i];
-                let secondPt: TabBendRenderPoint = renderPoints[i + 1];
-                // draw pre-bend if previous
-                if (i === 0 && firstPt.value !== 0 && !note.isTieDestination) {
-                    this._paintBend(note, new TabBendRenderPoint(0, 0), firstPt, startX, topY, dX, slurText, canvas);
-                }
-                if (note.bendType !== BendType.Prebend) {
-                    if (i === 0) {
-                        startX += this.renderer.smuflMetrics.postNoteEffectPadding;
-                    }
-                    this._paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
-                } else if (note.isTieOrigin && note.tieDestination!.hasBend) {
-                    secondPt = new TabBendRenderPoint(BendPoint.MaxPosition, firstPt.value);
-                    secondPt.lineValue = firstPt.lineValue;
-
-                    this._paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
-                }
+            if (!isMultiBeatBend) {
+                endX -= tabBendArrowSize / 2;
             }
 
-            if (endNote.vibrato !== VibratoType.None) {
-                const vibratoStartX = endX - cx + tabBendArrowSize - endNoteRenderer.x;
-                const vibratoStartY: number =
-                    topY -
-                    cy -
-                    this.renderer.smuflMetrics.tabBendPerValueHeight * renderPoints[renderPoints.length - 1].lineValue;
-
-                const vibrato = new NoteVibratoGlyph(vibratoStartX, vibratoStartY, endNote.vibrato);
-                vibrato.beat = endNote.beat;
-                vibrato.renderer = endNoteRenderer;
-                vibrato.doLayout();
-                vibrato.paint(cx + endNoteRenderer.x, cy, canvas);
-            }
+            this._paintBendLines(canvas, startX, topY, endX, startNoteRenderer, note, renderPoints);
+            this._paintBendVibrato(
+                canvas,
+                cx,
+                endX + tabBendArrowSize / 2,
+                topY - smufl.tabBendPerValueHeight * renderPoints[renderPoints.length - 1].lineValue,
+                endNoteRenderer,
+                endNote
+            );
 
             canvas.color = color;
         }
     }
 
-    private _paintBend(
-        note: Note,
-        firstPt: TabBendRenderPoint,
-        secondPt: TabBendRenderPoint,
+    private _paintBendVibrato(
+        canvas: ICanvas,
+        cx: number,
+        vibratoX: number,
+        topY: number,
+        endNoteRenderer: BarRendererBase,
+        endNote: Note
+    ) {
+        if (endNote.isTieDestination && endNote.vibrato !== VibratoType.None && !endNote.hasBend) {
+            const vibratoEndX = cx + endNoteRenderer.x;
+            const vibratoStartX = vibratoX - vibratoEndX;
+            const vibrato = new NoteVibratoGlyph(vibratoStartX, 0, endNote.vibrato);
+
+            vibrato.beat = endNote.beat;
+            vibrato.renderer = endNoteRenderer;
+            vibrato.doLayout();
+            vibrato.paint(vibratoEndX, topY, canvas);
+        }
+    }
+
+    private _paintBendLines(
+        canvas: ICanvas,
         cx: number,
         cy: number,
-        dX: number,
-        slurText: string,
-        canvas: ICanvas
-    ): void {
-        const r: TabBarRenderer = this.renderer as TabBarRenderer;
-        const res: RenderingResources = this.renderer.resources;
-        const overflowOffset: number = r.lineOffset / 2;
-        const x1: number = cx + dX * firstPt.offset;
-        const bendValueHeight: number = this.renderer.smuflMetrics.tabBendPerValueHeight;
-        let y1: number = cy - bendValueHeight * firstPt.lineValue;
-        if (firstPt.value === 0) {
-            if (secondPt.offset === firstPt.offset) {
-                y1 += r.getNoteY(note.beat.maxStringNote!, NoteYPosition.Top) - overflowOffset / 2;
-            } else {
-                y1 += r.getNoteY(note, NoteYPosition.Center);
-            }
-        } else {
-            y1 += overflowOffset;
-        }
-        const x2: number = cx + dX * secondPt.offset;
-        let y2: number = cy - bendValueHeight * secondPt.lineValue;
-        if (secondPt.lineValue === 0) {
-            y2 += r.getNoteY(note, NoteYPosition.Center);
-        } else {
-            y2 += overflowOffset;
-        }
-        // what type of arrow? (up/down)
-        let arrowOffset: number = 0;
-        const arrowSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
-        if (secondPt.value > firstPt.value) {
-            if (y2 + arrowSize > y1) {
-                y2 = y1 - arrowSize;
-            }
-            canvas.beginPath();
-            canvas.moveTo(x2, y2);
-            canvas.lineTo(x2 - arrowSize * 0.5, y2 + arrowSize);
-            canvas.lineTo(x2 + arrowSize * 0.5, y2 + arrowSize);
-            canvas.closePath();
-            canvas.fill();
-            arrowOffset = arrowSize;
-        } else if (secondPt.value !== firstPt.value) {
-            if (y2 < y1) {
-                y2 = y1 + arrowSize;
-            }
-            canvas.beginPath();
-            canvas.moveTo(x2, y2);
-            canvas.lineTo(x2 - arrowSize * 0.5, y2 - arrowSize);
-            canvas.lineTo(x2 + arrowSize * 0.5, y2 - arrowSize);
-            canvas.closePath();
-            canvas.fill();
-            arrowOffset = -arrowSize;
-        }
+        endX: number,
+        noteRenderer: TabBarRenderer,
+        note: Note,
+        renderPoints: TabBendRenderPoint[]
+    ) {
         const l = canvas.lineWidth;
-        canvas.lineWidth = this.renderer.smuflMetrics.arrowShaftThickness;
-        canvas.beginPath();
+        const res = this.renderer.resources;
+        const bl = canvas.textBaseline;
+        canvas.textBaseline = TextBaseline.Alphabetic;
+        canvas.lineWidth = res.engravingSettings.arrowShaftThickness;
+
+        // calculate offsets per step
+        const width: number = endX - cx;
+        const dX: number = width / BendPoint.MaxPosition;
+        for (let i: number = 0, j: number = renderPoints.length - 1; i < j; i++) {
+            const firstPt: TabBendRenderPoint = renderPoints[i];
+            let secondPt: TabBendRenderPoint = renderPoints[i + 1];
+            // draw pre-bend if previous
+            if (i === 0 && firstPt.value !== 0 && !note.isTieDestination) {
+                this._paintBend(canvas, cx, cy, dX, noteRenderer, note, new TabBendRenderPoint(0, 0), firstPt);
+            }
+            if (note.bendType !== BendType.Prebend) {
+                if (i === 0) {
+                    cx += this.renderer.smuflMetrics.postNoteEffectPadding;
+                }
+                this._paintBend(canvas, cx, cy, dX, noteRenderer, note, firstPt, secondPt);
+            } else if (note.isTieOrigin && note.tieDestination!.hasBend) {
+                secondPt = new TabBendRenderPoint(BendPoint.MaxPosition, firstPt.value);
+                secondPt.lineValue = firstPt.lineValue;
+
+                this._paintBend(canvas, cx, cy, dX, noteRenderer, note, firstPt, secondPt);
+            }
+        }
+
+        canvas.lineWidth = l;
+        canvas.textBaseline = bl;
+    }
+
+    private _paintBendLine(
+        canvas: ICanvas,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        firstPt: TabBendRenderPoint,
+        secondPt: TabBendRenderPoint
+    ) {
         if (firstPt.value === secondPt.value) {
             // draw horizontal dashed line
             // to really have the line ending at the right position
@@ -405,6 +413,10 @@ export class TabBendGlyph extends Glyph {
             }
         } else {
             if (x2 > x1) {
+                const isUp = secondPt.value > firstPt.value;
+                // small offset to have line inside arrow head and not showing in tip
+                const arrowOffset = isUp ? 3 : -3;
+
                 // draw bezier line from first to second point
                 canvas.moveTo(x1, y1);
                 canvas.bezierCurveTo((x1 + x2) / 2, y1, x2, y1, x2, y2 + arrowOffset);
@@ -415,9 +427,77 @@ export class TabBendGlyph extends Glyph {
                 canvas.stroke();
             }
         }
-        if (slurText && firstPt.offset < secondPt.offset) {
-            canvas.font = res.graceFont;
+    }
+
+    private _paintBend(
+        canvas: ICanvas,
+        cx: number,
+        cy: number,
+        dX: number,
+        noteRenderer: TabBarRenderer,
+        note: Note,
+        firstPt: TabBendRenderPoint,
+        secondPt: TabBendRenderPoint
+    ): void {
+        const noteNumberAndLinePaddingY = noteRenderer.lineOffset / 2;
+        const res = noteRenderer.resources;
+        const smufl = res.engravingSettings;
+
+        const x1 = cx + dX * firstPt.offset;
+        let y1: number;
+        if (firstPt.value === 0) {
+            y1 = cy + smufl.tabBendStaffPadding;
+            if (secondPt.offset === firstPt.offset) {
+                y1 += noteRenderer.getNoteY(note.beat.maxStringNote!, NoteYPosition.Top) - noteNumberAndLinePaddingY;
+            } else {
+                y1 += noteRenderer.getNoteY(note, NoteYPosition.Center);
+            }
+        } else {
+            y1 = cy - smufl.tabBendPerValueHeight * firstPt.lineValue;
+        }
+
+        const x2 = cx + dX * secondPt.offset;
+        let y2: number;
+        if (secondPt.lineValue === 0) {
+            y2 = cy + smufl.tabBendStaffPadding + noteRenderer.getNoteY(note.beat.maxStringNote!, NoteYPosition.Center);
+        } else {
+            y2 = cy - smufl.tabBendPerValueHeight * secondPt.lineValue;
+        }
+
+        this._paintBendLine(canvas, x1, y1, x2, y2, firstPt, secondPt);
+
+        const arrowSize = smufl.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
+        if (firstPt.value !== secondPt.value) {
+            const up = secondPt.value > firstPt.value;
+            this._paintBendLineArrow(canvas, x2, y2, y1, arrowSize, up);
+
+            this._paintBendLineSlurText(canvas, x1, y1, x2, y2, note, res.graceFont);
+            this._paintBendLineValueText(
+                canvas,
+                y1,
+                x2,
+                y2 - smufl.tabBendLabelPadding,
+                firstPt,
+                secondPt,
+                res.tablatureFont
+            );
+        }
+    }
+
+    private _paintBendLineSlurText(
+        canvas: ICanvas,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        note: Note,
+        font: Font
+    ) {
+        if (note.bendStyle === BendStyle.Gradual) {
+            const slurText = 'grad.';
             const size = canvas.measureText(slurText);
+            canvas.font = font;
+
             let y: number = 0;
             let x: number = 0;
             if (y1 > y2) {
@@ -430,41 +510,71 @@ export class TabBendGlyph extends Glyph {
             }
             canvas.fillText(slurText, x, y);
         }
-        if (secondPt.value !== 0 && firstPt.value !== secondPt.value) {
-            let dV: number = secondPt.value;
-            const up: boolean = secondPt.value > firstPt.value;
-            dV = Math.abs(dV);
+    }
+
+    private _paintBendLineValueText(
+        canvas: ICanvas,
+        y1: number,
+        x2: number,
+        y2: number,
+        firstPt: TabBendRenderPoint,
+        secondPt: TabBendRenderPoint,
+        font: Font
+    ) {
+        if (secondPt.value !== 0) {
+            const up = secondPt.value > firstPt.value;
+
+            //
             // calculate label
-            let s: string = '';
+
+            let bendValue = secondPt.value;
+            let bendValueText = '';
             // Full Steps
-            if (dV === 4) {
-                s = 'full';
-                dV -= 4;
-            } else if (dV >= 4 || dV <= -4) {
-                const steps: number = (dV / 4) | 0;
-                s += steps;
+            if (bendValue === 4) {
+                bendValueText = 'full';
+                bendValue -= 4;
+            } else if (bendValue >= 4 || bendValue <= -4) {
+                const steps = (bendValue / 4) | 0;
+                bendValueText += steps;
                 // Quaters
-                dV -= steps * 4;
+                bendValue -= steps * 4;
             }
-            if (dV > 0) {
-                s += TabBendGlyph.getFractionSign(dV);
+            if (bendValue > 0) {
+                bendValueText += TabBendGlyph.getFractionSign(bendValue);
             }
-            if (s !== '') {
-                y2 = cy - bendValueHeight * secondPt.value;
-                let startY: number = y2;
-                if (!up) {
-                    startY = y1 + (Math.abs(y2 - y1) * 1) / 3;
-                }
-                // draw label
-                canvas.font = res.tablatureFont;
-                const size = canvas.measureText(s);
-                const y: number = startY - size.height / 1.5;
-                const x: number = x2 - size.width / 2;
-                canvas.fillText(s, x, y - res.engravingSettings.tabBendLabelPadding);
+
+            if (bendValueText !== '') {
+                const textY = up ? y2 : y1 + (Math.abs(y2 - y1) * 1) / 3;
+                canvas.font = font;
+                const size = canvas.measureText(bendValueText);
+                const textX = x2 - size.width / 2;
+                canvas.fillText(bendValueText, textX, textY);
             }
         }
-
-        canvas.lineWidth = l;
+    }
+    private _paintBendLineArrow(canvas: ICanvas, x2: number, y2: number, y1: number, arrowSize: number, up: boolean) {
+        if (up) {
+            // shift arrow up in narrow cases
+            if (y2 + arrowSize > y1) {
+                y2 = y1 - arrowSize;
+            }
+            canvas.beginPath();
+            canvas.moveTo(x2, y2);
+            canvas.lineTo(x2 - arrowSize * 0.5, y2 + arrowSize);
+            canvas.lineTo(x2 + arrowSize * 0.5, y2 + arrowSize);
+            canvas.closePath();
+            canvas.fill();
+        } else {
+            if (y2 < y1) {
+                y2 = y1 + arrowSize;
+            }
+            canvas.beginPath();
+            canvas.moveTo(x2, y2);
+            canvas.lineTo(x2 - arrowSize * 0.5, y2 - arrowSize);
+            canvas.lineTo(x2 + arrowSize * 0.5, y2 - arrowSize);
+            canvas.closePath();
+            canvas.fill();
+        }
     }
 
     public static getFractionSign(steps: number): string {

@@ -171,9 +171,13 @@ export enum MusicFontSymbol {
     TextTuplet3LongStem = 0xe202,
     TextTupletBracketEndLongStem = 0xe203,
 
-    Tremolo3 = 0xe222,
-    Tremolo2 = 0xe221,
     Tremolo1 = 0xe220,
+    Tremolo2 = 0xe221,
+    Tremolo3 = 0xe222,
+    Tremolo4 = 0xe223,
+    Tremolo5 = 0xe224,
+
+    BuzzRoll = 0xe22A,
 
     Flag8thUp = 0xe240,
     Flag8thDown = 0xe241,
@@ -345,4 +349,39 @@ export enum MusicFontSymbol {
     FingeringMLower = 0xed1a,
     FingeringALower = 0xed1b,
     FingeringCLower = 0xed1c
+}
+
+/**
+ * @internal
+ */
+export class MusicFontSymbolLookup {
+    private static _allMusicFontSymbols: MusicFontSymbol[] = [];
+    private static readonly _blackNoteHeadGlyphs = new Set<MusicFontSymbol>();
+
+    private static _initialize() {
+        const all = MusicFontSymbolLookup._allMusicFontSymbols;
+        if (all.length === 0) {
+            for (const v of Object.values(MusicFontSymbol).filter<any>((k: any) => typeof k === 'number')) {
+                const symbol = v as number as MusicFontSymbol;
+                all.push(symbol);
+                const name = MusicFontSymbol[symbol].toLowerCase();
+                if (name.endsWith('black')) {
+                    MusicFontSymbolLookup._blackNoteHeadGlyphs.add(symbol);
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets a list of all music font symbols used in alphaTab.
+     */
+    public static getAllMusicFontSymbols(): MusicFontSymbol[] {
+        MusicFontSymbolLookup._initialize();
+        return MusicFontSymbolLookup._allMusicFontSymbols;
+    }
+
+    public static isBlackNoteHead(glph: MusicFontSymbol): boolean {
+        MusicFontSymbolLookup._initialize();
+        return MusicFontSymbolLookup._blackNoteHeadGlyphs.has(glph);
+    }
 }

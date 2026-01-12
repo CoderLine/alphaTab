@@ -1,9 +1,17 @@
 export { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 export { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 export { AutomationType, Automation, SyncPointData, type FlatSyncPoint } from '@coderline/alphatab/model/Automation';
-export { Bar, SustainPedalMarkerType, SustainPedalMarker, BarSubElement, BarStyle, BarLineStyle } from '@coderline/alphatab/model/Bar';
+export {
+    Bar,
+    SustainPedalMarkerType,
+    SustainPedalMarker,
+    BarSubElement,
+    BarStyle,
+    BarLineStyle
+} from '@coderline/alphatab/model/Bar';
 export { BarreShape } from '@coderline/alphatab/model/BarreShape';
 export { Beat, BeatBeamingMode, BeatSubElement, BeatStyle } from '@coderline/alphatab/model/Beat';
+export { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 export { BendPoint } from '@coderline/alphatab/model/BendPoint';
 export { BendStyle } from '@coderline/alphatab/model/BendStyle';
 export { BendType } from '@coderline/alphatab/model/BendType';
@@ -28,7 +36,7 @@ export { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 export { KeySignature } from '@coderline/alphatab/model/KeySignature';
 export { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 export { Lyrics } from '@coderline/alphatab/model/Lyrics';
-export { MasterBar } from '@coderline/alphatab/model/MasterBar';
+export { MasterBar, BeamingRules } from '@coderline/alphatab/model/MasterBar';
 export { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 export { Note, NoteSubElement, NoteStyle } from '@coderline/alphatab/model/Note';
 export { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
@@ -42,7 +50,8 @@ export {
     BracketExtendMode,
     TrackNamePolicy,
     TrackNameMode,
-    TrackNameOrientation
+    TrackNameOrientation,
+    BarNumberDisplay
 } from '@coderline/alphatab/model/RenderStylesheet';
 export { RepeatGroup } from '@coderline/alphatab/model/RepeatGroup';
 export { Score, ScoreSubElement, ScoreStyle, HeaderFooterStyle } from '@coderline/alphatab/model/Score';

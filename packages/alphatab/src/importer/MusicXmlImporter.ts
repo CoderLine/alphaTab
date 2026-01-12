@@ -29,13 +29,16 @@ import { Note, NoteStyle } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
+import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import { Score } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
+import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Voice } from '@coderline/alphatab/model/Voice';
@@ -126,7 +129,8 @@ class TrackInfo {
         return line;
     }
 
-    private static _defaultNoteArticulation: InstrumentArticulation = new InstrumentArticulation(
+    private static _defaultNoteArticulation: InstrumentArticulation = InstrumentArticulation.create(
+        0,
         'Default',
         0,
         0,
@@ -168,7 +172,8 @@ class TrackInfo {
 
         const staffLine = musicXmlStaffSteps - stepDifference;
 
-        const newArticulation = new InstrumentArticulation(
+        const newArticulation = InstrumentArticulation.create(
+            articulation.id,
             articulation.elementType,
             staffLine,
             articulation.outputMidiNumber,
@@ -193,6 +198,9 @@ export class MusicXmlImporter extends ScoreImporter {
     private _idToTrackInfo: Map<string, TrackInfo> = new Map<string, TrackInfo>();
     private _indexToTrackInfo: Map<number, TrackInfo> = new Map<number, TrackInfo>();
     private _staffToContext: Map<Staff, StaffContext> = new Map<Staff, StaffContext>();
+
+    private _currentBarNumberDisplayPart?: BarNumberDisplay;
+    private _currentBarNumberDisplayBar?: BarNumberDisplay;
 
     private _divisionsPerQuarterNote: number = 1;
     private _currentDynamics = DynamicValue.F;
@@ -693,6 +701,11 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'elevation': Ignored
             }
         }
+
+        articulation.id = PercussionMapper.tryMatchKnownArticulation(articulation);
+        if (articulation.id < 0) {
+            articulation.id = 0;
+        }
     }
 
     private static _interpolatePercent(value: number) {
@@ -859,23 +872,34 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
             }
         }
+
+        this._currentBarNumberDisplayPart = undefined;
     }
 
     private _parsePartwiseMeasure(element: XmlNode, track: Track, index: number) {
         const masterBar = this._getOrCreateMasterBar(element, index);
-        this._parsePartMeasure(element, masterBar, track);
+        const implicit = element.attributes.get('implicit') === 'yes';
+        this._parsePartMeasure(element, masterBar, track, implicit, true);
+        this._currentBarNumberDisplayBar = undefined;
     }
 
     private _parseTimewiseMeasure(element: XmlNode, index: number) {
         const masterBar = this._getOrCreateMasterBar(element, index);
+        const implicit = element.attributes.get('implicit') === 'yes';
 
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'part':
-                    this._parseTimewisePart(c, masterBar);
+                    this._parseTimewisePart(c, masterBar, implicit);
+                    this._currentBarNumberDisplayPart = undefined;
+                    break;
+                case 'print':
+                    this._parsePrint(c, masterBar, undefined, true);
                     break;
             }
         }
+
+        this._currentBarNumberDisplayBar = undefined;
     }
 
     private _getOrCreateMasterBar(element: XmlNode, index: number) {
@@ -897,14 +921,14 @@ export class MusicXmlImporter extends ScoreImporter {
         return masterBar;
     }
 
-    private _parseTimewisePart(element: XmlNode, masterBar: MasterBar) {
+    private _parseTimewisePart(element: XmlNode, masterBar: MasterBar, implicit: boolean) {
         const id = element.attributes.get('id');
         if (!id || !this._idToTrackInfo.has(id)) {
             return;
         }
 
         const track = this._idToTrackInfo.get(id)!.track;
-        this._parsePartMeasure(element, masterBar, track);
+        this._parsePartMeasure(element, masterBar, track, implicit, false);
     }
 
     // current measure state
@@ -920,7 +944,13 @@ export class MusicXmlImporter extends ScoreImporter {
      */
     private _lastBeat: Beat | null = null;
 
-    private _parsePartMeasure(element: XmlNode, masterBar: MasterBar, track: Track) {
+    private _parsePartMeasure(
+        element: XmlNode,
+        masterBar: MasterBar,
+        track: Track,
+        implicit: boolean,
+        isPartwise: boolean
+    ) {
         this._musicalPosition = 0;
         this._lastBeat = null;
 
@@ -950,7 +980,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'figured-bass': Not supported
                 case 'print':
-                    this._parsePrint(c, masterBar, track);
+                    this._parsePrint(c, masterBar, track, true);
                     break;
                 case 'sound':
                     this._parseSound(c, masterBar, track);
@@ -974,17 +1004,52 @@ export class MusicXmlImporter extends ScoreImporter {
 
         // initial empty staff and voice (if no other elements created something already)
         const staff = this._getOrCreateStaff(track, 0);
-        this._getOrCreateBar(staff, masterBar);
+        const bar = this._getOrCreateBar(staff, masterBar);
+
+        if (implicit) {
+            bar.barNumberDisplay = BarNumberDisplay.Hide;
+        } else if (isPartwise) {
+            bar.barNumberDisplay = this._currentBarNumberDisplayBar ?? this._currentBarNumberDisplayPart;
+        } else {
+            bar.barNumberDisplay = this._currentBarNumberDisplayPart ?? this._currentBarNumberDisplayBar;
+        }
 
         // clear measure attribute
         this._keyAllStaves = null;
     }
 
-    private _parsePrint(element: XmlNode, masterBar: MasterBar, track: Track) {
-        if (element.getAttribute('new-system', 'no') === 'yes') {
-            track.addLineBreaks(masterBar.index);
-        } else if (element.getAttribute('new-page', 'no') === 'yes') {
-            track.addLineBreaks(masterBar.index);
+    private _parsePrint(element: XmlNode, masterBar: MasterBar, track: Track | undefined, isMeasurePrint: boolean) {
+        if (track !== undefined) {
+            if (element.getAttribute('new-system', 'no') === 'yes') {
+                track.addLineBreaks(masterBar.index);
+            } else if (element.getAttribute('new-page', 'no') === 'yes') {
+                track.addLineBreaks(masterBar.index);
+            }
+        }
+
+        let newDisplay: BarNumberDisplay | undefined = undefined;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'measure-numbering':
+                    switch (c.innerText) {
+                        case 'none':
+                            newDisplay = BarNumberDisplay.Hide;
+                            break;
+                        case 'measure':
+                            newDisplay = BarNumberDisplay.AllBars;
+                            break;
+                        case 'system':
+                            newDisplay = BarNumberDisplay.FirstOfSystem;
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        if (isMeasurePrint) {
+            this._currentBarNumberDisplayBar = newDisplay;
+        } else {
+            this._currentBarNumberDisplayPart = newDisplay;
         }
     }
 
@@ -1360,6 +1425,15 @@ export class MusicXmlImporter extends ScoreImporter {
 
         if (degree) {
             chord.name += degreeParenthesis ? `(${degree})` : degree;
+        }
+
+        if (element.getAttribute('print-frame', 'no') === 'yes') {
+            chord.showDiagram = true;
+            this._score.stylesheet.globalDisplayChordDiagramsInScore = true;
+        }
+
+        if (element.getAttribute('print-object', 'yes') === 'yes') {
+            chord.showDiagram = true;
         }
 
         if (this._nextBeatChord === null) {
@@ -2158,7 +2232,7 @@ export class MusicXmlImporter extends ScoreImporter {
         if (unit !== null && perMinute > 0) {
             const tempoAutomation: Automation = new Automation();
             tempoAutomation.type = AutomationType.Tempo;
-            tempoAutomation.value = (perMinute * (unit / 4)) | 0;
+            tempoAutomation.value = perMinute * (unit / 4);
             tempoAutomation.ratioPosition = ratioPosition;
 
             if (!this._hasSameTempo(masterBar, tempoAutomation)) {
@@ -2703,8 +2777,10 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private static readonly _b4Value = 71;
-     private _estimateBeamDirection(note: Note): BeamDirection {
-        return note.calculateRealValue(false, false) < MusicXmlImporter._b4Value ? BeamDirection.Down : BeamDirection.Up;
+    private _estimateBeamDirection(note: Note): BeamDirection {
+        return note.calculateRealValue(false, false) < MusicXmlImporter._b4Value
+            ? BeamDirection.Down
+            : BeamDirection.Up;
     }
 
     private _parseNoteHead(element: XmlNode, note: Note, beatDuration: Duration, beamDirection: BeamDirection) {
@@ -3297,7 +3373,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-     private _parseArpeggiate(element: XmlNode, beat: Beat) {
+    private _parseArpeggiate(element: XmlNode, beat: Beat) {
         const direction = element.getAttribute('direction', 'down');
         switch (direction) {
             case 'down':
@@ -3568,17 +3644,17 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'schleifer': Not supported
                 case 'tremolo':
-                    switch (c.innerText) {
-                        case '1':
-                            note.beat.tremoloSpeed = Duration.Eighth;
-                            break;
-                        case '2':
-                            note.beat.tremoloSpeed = Duration.Sixteenth;
-                            break;
-                        case '3':
-                            note.beat.tremoloSpeed = Duration.ThirtySecond;
-                            break;
+                    const tremolo = new TremoloPickingEffect();
+                    note.beat.tremoloPicking = tremolo;
+                    tremolo.marks = Number.parseInt(c.innerText, 10);
+
+                    if (
+                        (c.getAttribute('type', '') === 'unmeasured' && tremolo.marks === 0) ||
+                        c.getAttribute('smufl', '') === 'buzzRoll'
+                    ) {
+                        tremolo.style = TremoloPickingStyle.BuzzRoll;
                     }
+
                     break;
                 // case 'haydn': Not supported
                 // case 'other-element': Not supported
@@ -3607,7 +3683,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-     private _parseTied(element: XmlNode, note: Note, staff: Staff): void {
+    private _parseTied(element: XmlNode, note: Note, staff: Staff): void {
         const type = element.getAttribute('type');
         const number = element.getAttribute('number', '');
 

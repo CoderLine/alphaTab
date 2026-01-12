@@ -130,7 +130,7 @@ export interface NotationSettingsJson {
      * Controls how high the ryhthm notation is rendered below the tab staff
      * @since 0.9.6
      * @category Notation
-     * @defaultValue `15`
+     * @defaultValue `25`
      * @remarks
      * This setting can be used in combination with the {@link rhythmMode} setting to control how high the rhythm notation should be rendered below the tab staff.
      */

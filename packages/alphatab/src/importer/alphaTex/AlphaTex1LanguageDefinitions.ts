@@ -188,7 +188,13 @@ export class AlphaTex1LanguageDefinitions {
         ['firstsystemtracknamemode', [[[[10, 17], 0, ['fullname', 'shortname']]]]],
         ['othersystemstracknamemode', [[[[10, 17], 0, ['fullname', 'shortname']]]]],
         ['firstsystemtracknameorientation', [[[[10, 17], 0, ['horizontal', 'vertical']]]]],
-        ['othersystemstracknameorientation', [[[[10, 17], 0, ['horizontal', 'vertical']]]]]
+        ['othersystemstracknameorientation', [[[[10, 17], 0, ['horizontal', 'vertical']]]]],
+        ['extendbarlines', null],
+        ['chorddiagramsinscore', [[[[10], 1, ['true', 'false']]]]],
+        ['hideemptystaves', null],
+        ['hideemptystavesinfirstsystem', null],
+        ['showsinglestaffbrackets', null],
+        ['defaultbarnumberdisplay', [[[[10, 17], 0, ['allbars', 'firstofsystem', 'hide']]]]]
     ]);
     public static readonly staffMetaDataSignatures = AlphaTex1LanguageDefinitions._signatures([
         ['tuning', [[[[10, 17], 0, ['piano', 'none', 'voice']]], [[[10, 17], 5]]]],
@@ -472,7 +478,18 @@ export class AlphaTex1LanguageDefinitions {
         ['spd', [[[[16], 2]]]],
         ['sph', [[[[16], 2]]]],
         ['spu', [[[[16], 2]]]],
-        ['db', null]
+        ['db', null],
+        ['voicemode', [[[[10, 17], 0, ['staffwise', 'barwise']]]]],
+        ['barnumberdisplay', [[[[10, 17], 0, ['allbars', 'firstofsystem', 'hide']]]]],
+        [
+            'beaming',
+            [
+                [
+                    [[16], 0],
+                    [[16], 5]
+                ]
+            ]
+        ]
     ]);
     public static readonly metaDataProperties = AlphaTex1LanguageDefinitions._metaProps([
         [
@@ -525,6 +542,12 @@ export class AlphaTex1LanguageDefinitions {
         ['othersystemstracknamemode', null],
         ['firstsystemtracknameorientation', null],
         ['othersystemstracknameorientation', null],
+        ['extendbarlines', null],
+        ['chorddiagramsinscore', null],
+        ['hideemptystaves', null],
+        ['hideemptystavesinfirstsystem', null],
+        ['showsinglestaffbrackets', null],
+        ['defaultbarnumberdisplay', null],
         [
             'tuning',
             [
@@ -580,7 +603,10 @@ export class AlphaTex1LanguageDefinitions {
         ['spd', null],
         ['sph', null],
         ['spu', null],
-        ['db', null]
+        ['db', null],
+        ['voicemode', null],
+        ['barnumberdisplay', null],
+        ['beaming', null]
     ]);
     public static readonly metaDataSignatures = [
         AlphaTex1LanguageDefinitions.scoreMetaDataSignatures,
@@ -747,7 +773,15 @@ export class AlphaTex1LanguageDefinitions {
         ],
         ['volume', [[[[16], 0]]]],
         ['balance', [[[[16], 0]]]],
-        ['tp', [[[[16], 0, ['8', '16', '32']]]]],
+        [
+            'tp',
+            [
+                [
+                    [[16], 0],
+                    [[10, 17], 1, ['default', 'buzzroll']]
+                ]
+            ]
+        ],
         [
             'barre',
             [

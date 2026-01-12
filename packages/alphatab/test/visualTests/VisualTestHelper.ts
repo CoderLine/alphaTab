@@ -1,18 +1,18 @@
-import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
-import type { Score } from '@coderline/alphatab/model/Score';
-import { Settings } from '@coderline/alphatab/Settings';
-import { TestPlatform } from 'test/TestPlatform';
-import { Environment } from '@coderline/alphatab/Environment';
-import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
-import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
-import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
-import { PixelMatch, PixelMatchOptions } from 'test/visualTests/PixelMatch';
-import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
-import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
-import { TestUiFacade } from './TestUiFacade';
 import * as alphaSkiaModule from '@coderline/alphaskia';
 import { AlphaSkiaCanvas, AlphaSkiaImage } from '@coderline/alphaskia';
+import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
 import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { Environment } from '@coderline/alphatab/Environment';
+import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import { Settings } from '@coderline/alphatab/Settings';
+import { TestPlatform } from 'test/TestPlatform';
+import { PixelMatch, PixelMatchOptions } from 'test/visualTests/PixelMatch';
+import { TestUiFacade } from './TestUiFacade';
 
 /**
  * @internal
@@ -32,22 +32,18 @@ export class VisualTestRun {
 export class VisualTestOptions {
     public score: Score;
     public runs: VisualTestRun[];
-    public settings?: Settings;
+    public settings: Settings;
     public tracks?: number[];
     public tolerancePercent?: number;
     public prepareFullImage?: (run: VisualTestRun, api: AlphaTabApiBase<unknown>, fullImage: AlphaSkiaCanvas) => void;
 
-    public constructor(score: Score, runs: VisualTestRun[], settings?: Settings) {
+    public constructor(score: Score, runs: VisualTestRun[], settings: Settings | undefined) {
         this.score = score;
         this.runs = runs;
-        this.settings = settings;
+        this.settings = settings ?? new Settings();
     }
 
     public static async file(inputFile: string, runs: VisualTestRun[], settings?: Settings) {
-        if (!settings) {
-            settings = new Settings();
-        }
-
         const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
         const score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
@@ -91,8 +87,17 @@ export class VisualTestHelper {
         await VisualTestHelper.runVisualTestFull(o);
     }
 
-    public static runVisualTestTex(tex: string, referenceFileName: string, settings?: Settings): Promise<void> {
-        return VisualTestHelper.runVisualTestFull(VisualTestOptions.tex(tex, referenceFileName, settings));
+    public static runVisualTestTex(
+        tex: string,
+        referenceFileName: string,
+        settings?: Settings,
+        configure?: (o: VisualTestOptions) => void
+    ): Promise<void> {
+        const o = VisualTestOptions.tex(tex, referenceFileName, settings);
+        if (configure) {
+            configure(o);
+        }
+        return VisualTestHelper.runVisualTestFull(o);
     }
 
     public static async runVisualTestFull(options: VisualTestOptions): Promise<void> {
@@ -246,20 +251,18 @@ export class VisualTestHelper {
         Environment.highDpiFactor = 1; // test data is in scale 1
         settings.core.enableLazyLoading = false;
 
-        settings.display.resources.copyrightFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.titleFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.subTitleFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.wordsFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.effectFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.timerFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.fretboardNumberFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.tablatureFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.graceFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.barNumberFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.markerFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.directionsFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.numberedNotationFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.numberedNotationGraceFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+
+        for (const f of settings.display.resources.elementFonts.values()) {
+            if (f.families.includes('sans-serif')) {
+                f.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+            } else {
+                f.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+            }
+        }
     }
 
     public static async compareVisualResult(
@@ -320,7 +323,7 @@ export class VisualTestHelper {
         let errorMessage = '';
         const oldActual = actual;
 
-        const tolerancePercent = options.tolerancePercent ?? 1;
+        const tolerancePercent = options.tolerancePercent ?? 0;
 
         if (expected) {
             const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;

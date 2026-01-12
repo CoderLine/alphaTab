@@ -12,7 +12,7 @@ export enum BeatXPosition {
      */
     OnNotes = 1,
     /**
-     * Gets the middle-notes position which is located after in the middle the note heads.
+     * Gets the middle-notes position which is located after in the exact center of the note heads.
      */
     MiddleNotes = 2,
     /**

@@ -1,12 +1,13 @@
+import { Environment } from '@coderline/alphatab/Environment';
+import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
+import { Logger } from '@coderline/alphatab/Logger';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { IWorkerScope } from '@coderline/alphatab/platform/javascript/IWorkerScope';
 import { type FontSizeDefinition, FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
+import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { Settings } from '@coderline/alphatab/Settings';
-import { Logger } from '@coderline/alphatab/Logger';
-import { Environment } from '@coderline/alphatab/Environment';
-import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 
 /**
  * @target web
@@ -67,8 +68,8 @@ export class AlphaTabWebWorker {
                 });
                 this._renderer.error.on(this._error.bind(this));
                 break;
-            case 'alphaTab.invalidate':
-                this._renderer.render();
+            case 'alphaTab.render':
+                this._renderer.render(data.renderHints);
                 break;
             case 'alphaTab.resizeRender':
                 this._renderer.resizeRender();
@@ -111,9 +112,9 @@ export class AlphaTabWebWorker {
         SettingsSerializer.fromJson(this._renderer.settings, json);
     }
 
-    private _renderMultiple(score: Score | null, trackIndexes: number[] | null): void {
+    private _renderMultiple(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
         try {
-            this._renderer.renderScore(score, trackIndexes);
+            this._renderer.renderScore(score, trackIndexes, renderHints);
         } catch (e) {
             this._error(e as Error);
         }

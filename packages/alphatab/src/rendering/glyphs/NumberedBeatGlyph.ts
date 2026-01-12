@@ -1,29 +1,28 @@
-import { GraceType } from '@coderline/alphatab/model/GraceType';
-import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
-import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
-import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
-import { NumberedNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedNoteHeadGlyph';
-import type { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
-import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
-import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
-import { AccidentalGroupGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGroupGlyph';
-import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { NoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
-import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
-import { NumberedDashGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedDashGlyph';
-import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
-import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
+import { AccidentalGroupGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGroupGlyph';
+import { AugmentationDotGlyph } from '@coderline/alphatab/rendering/glyphs/AugmentationDotGlyph';
+import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
+import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOnNoteGlyphBase';
+import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { NumberedNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedNoteHeadGlyph';
+import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import type { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
+import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
+import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
 
 /**
  * @internal
@@ -32,11 +31,16 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
     public isNaturalizeAccidental = false;
     public accidental: AccidentalType = AccidentalType.None;
 
+    public skipLayout = false;
+
     protected override get effectElement() {
         return BeatSubElement.NumberedEffects;
     }
 
     public override doLayout(): void {
+        if (this.skipLayout) {
+            return;
+        }
         if (!this.container.beat.isRest && !this.container.beat.isEmpty) {
             const accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
             accidentals.renderer = this.renderer;
@@ -85,8 +89,8 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                         sr.getLineY(0),
                         accidentalToSet,
                         note.beat.graceType !== GraceType.None
-                            ? NoteHeadGlyph.GraceScale * NoteHeadGlyph.GraceScale
-                            : NoteHeadGlyph.GraceScale
+                            ? EngravingSettings.GraceScale * EngravingSettings.GraceScale
+                            : EngravingSettings.GraceScale
                     );
                     g.colorOverride = color;
                     g.renderer = this.renderer;
@@ -107,12 +111,9 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: NumberedNoteHeadGlyph | null = null;
     public deadSlapped: DeadSlappedBeatGlyph | null = null;
 
-    public octaveDots: number = 0;
-
     protected override get effectElement() {
         return BeatSubElement.NumberedEffects;
     }
-
     public override getNoteX(_note: Note, requestedPosition: NoteXPosition): number {
         let g: Glyph | null = null;
         if (this.noteHeads) {
@@ -151,15 +152,19 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    public override getLowestNoteY(): number {
-        return this._internalGetNoteY(NoteYPosition.Center);
+    public override getLowestNoteY(requestedPosition: NoteYPosition): number {
+        return this._internalGetNoteY(requestedPosition);
     }
 
-    public override getHighestNoteY(): number {
-        return this._internalGetNoteY(NoteYPosition.Center);
+    public override getHighestNoteY(requestedPosition: NoteYPosition): number {
+        return this._internalGetNoteY(requestedPosition);
     }
 
     public override getNoteY(_note: Note, requestedPosition: NoteYPosition): number {
+        return this._internalGetNoteY(requestedPosition);
+    }
+
+    public override getRestY(requestedPosition: NoteYPosition): number {
         return this._internalGetNoteY(requestedPosition);
     }
 
@@ -196,26 +201,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         return 0;
     }
 
-    public override updateBeamingHelper(): void {
-        if (this.beamingHelper) {
-            let g: Glyph | null = null;
-            if (this.noteHeads) {
-                g = this.noteHeads;
-            } else if (this.deadSlapped) {
-                g = this.deadSlapped;
-            }
-
-            if (g) {
-                this.beamingHelper.registerBeatLineX(
-                    'numbered',
-                    this.container.beat,
-                    this.container.x + this.x + g.x,
-                    this.container.x + this.x + g.x + g.width
-                );
-            }
-        }
-    }
-
     public static readonly majorKeySignatureOneValues: Array<number> = [
         // Flats
         59, 66, 61, 68, 63, 58, 65,
@@ -242,11 +227,13 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             sr.shortestDuration = this.container.beat.duration;
         }
 
-        const glyphY = sr.getLineY(sr.getNoteLine());
+        let octaveDots = 0;
 
         if (!this.container.beat.isEmpty) {
+            const glyphY = sr.getLineY(0);
             let numberWithinOctave = '0';
             if (this.container.beat.notes.length > 0) {
+                const note = this.container.beat.notes[0];
                 const kst = this.renderer.bar.keySignatureType;
                 const ks = this.renderer.bar.keySignature as number;
                 const ksi = ks + 7;
@@ -257,8 +244,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                         : NumberedBeatGlyph.majorKeySignatureOneValues;
                 const oneNoteValue = oneNoteValues[ksi];
 
-                const note = this.container.beat.notes[0];
-
                 if (note.isDead) {
                     numberWithinOctave = 'X';
                 } else {
@@ -266,13 +251,10 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
 
                     const index = noteValue < 0 ? ((noteValue % 12) + 12) % 12 : noteValue % 12;
 
-                    let dots = noteValue < 0 ? ((Math.abs(noteValue) + 12) / 12) | 0 : (noteValue / 12) | 0;
+                    octaveDots = noteValue < 0 ? ((Math.abs(noteValue) + 12) / 12) | 0 : (noteValue / 12) | 0;
                     if (noteValue < 0) {
-                        dots *= -1;
+                        octaveDots *= -1;
                     }
-                    this.octaveDots = dots;
-                    sr.registerOctave(dots);
-
                     const stepList =
                         ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
                             ? AccidentalHelper.flatNoteSteps
@@ -309,7 +291,8 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                     glyphY,
                     numberWithinOctave,
                     isGrace,
-                    this.container.beat
+                    this.container.beat,
+                    octaveDots
                 );
                 this.noteHeads = noteHeadGlyph;
 
@@ -320,50 +303,23 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             // Note dots
             if (this.container.beat.dots > 0 && this.container.beat.duration >= Duration.Quarter) {
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
-                    const dot = new AugmentationDotGlyph(0, sr.getLineY(0));
+                    const dot = new AugmentationDotGlyph(0, glyphY);
                     dot.renderer = this.renderer;
                     this.addEffect(dot);
                 }
-            }
-
-            //
-            // Dashes
-            let numberOfQuarterNotes = 0;
-            switch (this.container.beat.duration) {
-                case Duration.QuadrupleWhole:
-                    numberOfQuarterNotes = 16;
-                    break;
-                case Duration.DoubleWhole:
-                    numberOfQuarterNotes = 8;
-                    break;
-                case Duration.Whole:
-                    numberOfQuarterNotes = 4;
-                    break;
-                case Duration.Half:
-                    numberOfQuarterNotes = 2;
-                    break;
-            }
-
-            let numberOfAddedQuarters = numberOfQuarterNotes;
-            for (let i = 0; i < this.container.beat.dots; i++) {
-                numberOfAddedQuarters = (numberOfAddedQuarters / 2) | 0;
-                numberOfQuarterNotes += numberOfAddedQuarters;
-            }
-            for (let i = 0; i < numberOfQuarterNotes - 1; i++) {
-                const dash = new NumberedDashGlyph(0, sr.getLineY(0), this.container.beat);
-                dash.renderer = this.renderer;
-                this.addNormal(dash);
             }
         }
 
         super.doLayout();
 
         if (this.container.beat.isEmpty) {
-            this.centerX = this.width / 2;
+            this.onTimeX = this.width / 2;
         } else if (this.noteHeads) {
-            this.centerX = this.noteHeads.x + this.noteHeads.width / 2;
+            this.onTimeX = this.noteHeads.x + this.noteHeads.width / 2;
         } else if (this.deadSlapped) {
-            this.centerX = this.deadSlapped.x + this.deadSlapped.width / 2;
+            this.onTimeX = this.deadSlapped.x + this.deadSlapped.width / 2;
         }
+        this.middleX = this.onTimeX;
+        this.stemX = this.middleX;
     }
 }

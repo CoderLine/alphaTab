@@ -6,6 +6,7 @@ import alphaTab.core.ecmaScript.Error
 import alphaTab.model.Score
 import alphaTab.rendering.IScoreRenderer
 import alphaTab.rendering.RenderFinishedEventArgs
+import alphaTab.rendering.RenderHints
 import alphaTab.rendering.ScoreRenderer
 import alphaTab.rendering.utils.BoundsLookup
 import java.util.concurrent.BlockingQueue
@@ -95,11 +96,11 @@ internal class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
             }
         }
 
-    override fun render() {
+    override fun render(renderHints: RenderHints?) {
         if (checkAccess()) {
-            renderer.render()
+            renderer.render(renderHints)
         } else {
-            _workerQueue.add { render() }
+            _workerQueue.add { render(renderHints) }
         }
     }
 
@@ -119,14 +120,15 @@ internal class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
         }
     }
 
-    override fun renderScore(score: Score?, trackIndexes: DoubleList?) {
+    override fun renderScore(score: Score?, trackIndexes: DoubleList?, renderHints: RenderHints?) {
         if (checkAccess()) {
-            renderer.renderScore(score, trackIndexes)
+            renderer.renderScore(score, trackIndexes, renderHints)
         } else {
             _workerQueue.add {
                 renderScore(
                     score,
-                    trackIndexes
+                    trackIndexes,
+                    renderHints
                 )
             }
         }

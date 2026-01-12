@@ -62,6 +62,8 @@ describe('Vite', () => {
                     expect(text).to.include('assets/alphaTab.worklet-');
                     // without custom chunking the app will bundle alphatab directly
                     expect(text).to.include(".at-surface");
+                    // ensure __ALPHATAB_VITE__ got replaced
+                    expect(text).to.not.include("__ALPHATAB_VITE__");
                     appValidated = true;
                 } else if (file.name.startsWith('alphaTab.worker-')) {
                     expect(text).to.include('initializeWorker()');

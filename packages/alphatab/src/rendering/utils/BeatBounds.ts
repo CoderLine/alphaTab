@@ -63,7 +63,7 @@ export class BeatBounds {
         if (!notes) {
             return null;
         }
-        // TODO: can be likely optimized
+        // perf: can be likely optimized
         // a beat is mostly vertically aligned, we could sort the note bounds by Y
         // and then do a binary search on the Y-axis.
         for (const note of notes) {

@@ -11,7 +11,9 @@
                     <ScrollViewer x:Name="PART_ScrollView"
                               SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                               Margin="{TemplateBinding Margin}"
-                              Padding="{TemplateBinding Padding}">
+                              Padding="{TemplateBinding Padding}"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Auto">
                         <Grid Background="{TemplateBinding Background}" HorizontalAlignment="Center" />
                     </ScrollViewer>
                 </ControlTemplate>

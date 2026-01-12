@@ -215,7 +215,7 @@ export interface EngravingSettingsJson {
      */
     numberedBarRendererBarSpacing?: number;
     /**
-     * The size of the dashed drawn in numbered notation to indicate the durations.
+     * The padding minimum between the duration dashes.
      */
     numberedDashGlyphPadding?: number;
     /**
@@ -315,6 +315,11 @@ export interface EngravingSettingsJson {
      */
     tabBendDashSize?: number;
     /**
+     * The additional padding between the staff and the point
+     * where bend values are calculated from.
+     */
+    tabBendStaffPadding?: number;
+    /**
      * The height applied per quarter-note.
      */
     tabBendPerValueHeight?: number;
@@ -390,4 +395,13 @@ export interface EngravingSettingsJson {
      * The relative scale of any directions glyphs drawn like coda or segno.
      */
     directionsScale?: number;
+    /**
+     * The spacing between displaced displaced note heads
+     * in case of multi-voice note head overlaps.
+     */
+    multiVoiceDisplacedNoteHeadSpacing?: number;
+    /**
+     * The space needed by flags on the stem-side from top to bottom to place.
+     */
+    stemFlagHeight?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
 }

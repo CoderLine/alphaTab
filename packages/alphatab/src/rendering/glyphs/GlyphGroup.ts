@@ -1,3 +1,4 @@
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 
@@ -14,17 +15,25 @@ export class GlyphGroup extends Glyph {
     }
 
     public override getBoundingBoxTop(): number {
-        let top = 0;
+        let top = Number.NaN;
         const glyphs = this.glyphs;
         if (glyphs) {
             for (const g of glyphs) {
-                const gTop = g.getBoundingBoxTop();
-                if (gTop < top) {
-                    top = gTop;
-                }
+                top = ModelUtils.minBoundingBox(top, g.getBoundingBoxTop());
             }
         }
         return top;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        let bottom = Number.NaN;
+        const glyphs = this.glyphs;
+        if (glyphs) {
+            for (const g of glyphs) {
+                bottom = ModelUtils.maxBoundingBox(bottom, g.getBoundingBoxBottom());
+            }
+        }
+        return bottom;
     }
 
     public override doLayout(): void {

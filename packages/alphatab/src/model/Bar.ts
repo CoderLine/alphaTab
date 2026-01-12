@@ -8,6 +8,8 @@ import type { Settings } from '@coderline/alphatab/Settings';
 import { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
 import { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
+import type { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
+import { Duration } from '@coderline/alphatab/model/Duration';
 
 /**
  * The different pedal marker types.
@@ -397,6 +399,19 @@ export class Bar {
     public keySignatureType: KeySignatureType = KeySignatureType.Major;
 
     /**
+     * How bar numbers should be displayed.
+     * If specified, overrides the value from the stylesheet on score level.
+     */
+    public barNumberDisplay?: BarNumberDisplay;
+
+    /**
+     * The shortest duration contained across beats in this bar.
+     * @internal
+     * @json_ignore
+     */
+    public shortestDuration: Duration = Duration.DoubleWhole;
+
+    /**
      * The bar line to draw on the left side of the bar with an "automatic" type resolved to the actual one.
      * @param isFirstOfSystem  Whether the bar is the first one in the system.
      */
@@ -469,12 +484,16 @@ export class Bar {
         this._filledVoices.add(0);
         this._isEmpty = true;
         this._isRestOnly = true;
+        this.shortestDuration = Duration.DoubleWhole;
         for (let i: number = 0, j: number = this.voices.length; i < j; i++) {
             const voice: Voice = this.voices[i];
             voice.finish(settings, sharedDataBag);
             if (!voice.isEmpty) {
                 this._isEmpty = false;
                 this._filledVoices.add(i);
+                if (voice.shortestDuration > this.shortestDuration) {
+                    this.shortestDuration = voice.shortestDuration;
+                }
             }
 
             if (!voice.isRestOnly) {
@@ -490,7 +509,7 @@ export class Bar {
 
             if (this.previousBar && this.previousBar.sustainPedals.length > 0) {
                 previousMarker = this.previousBar.sustainPedals[this.previousBar.sustainPedals.length - 1];
-                if(previousMarker.pedalType === SustainPedalMarkerType.Up) {
+                if (previousMarker.pedalType === SustainPedalMarkerType.Up) {
                     previousMarker = null;
                 }
             }

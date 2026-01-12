@@ -12,6 +12,4 @@ export class ElementStyle<TSubElements extends number> {
      * even if some "higher level" element changes colors.
      */
     public colors: Map<TSubElements, Color | null> = new Map<TSubElements, Color | null>();
-
-    // TODO: replace NotationSettings.elements by adding a visibility here?
 }

@@ -62,7 +62,7 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
-import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { BeamingRules, type MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
@@ -70,7 +70,7 @@ import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
-import type { RenderStylesheet } from '@coderline/alphatab/model/RenderStylesheet';
+import { BarNumberDisplay, type RenderStylesheet } from '@coderline/alphatab/model/RenderStylesheet';
 import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
@@ -78,11 +78,12 @@ import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
+import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
-import { BeamDirection } from '@coderline/alphatab/rendering/_barrel';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 
 /**
@@ -90,6 +91,8 @@ import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
  */
 export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler {
     public static readonly instance = new AlphaTex1LanguageHandler();
+
+    private static readonly _timeSignatureDenominators = new Set<number>([1, 2, 4, 8, 16, 32, 64, 128]);
 
     public applyScoreMetaData(
         importer: IAlphaTexImporter,
@@ -165,6 +168,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'showdynamics':
                 score.stylesheet.hideDynamics = false;
+                return ApplyNodeResult.Applied;
+            case 'extendbarlines':
+                score.stylesheet.extendBarLines = true;
                 return ApplyNodeResult.Applied;
             case 'bracketextendmode':
                 const bracketExtendMode = AlphaTex1LanguageHandler._parseEnumValue(
@@ -256,6 +262,33 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 }
                 score.stylesheet.otherSystemsTrackNameOrientation = otherSystemsTrackNameOrientation!;
                 return ApplyNodeResult.Applied;
+            case 'chorddiagramsinscore':
+                score.stylesheet.globalDisplayChordDiagramsInScore = metaData.arguments
+                    ? AlphaTex1LanguageHandler._booleanLikeValue(metaData.arguments!.arguments, 0)
+                    : true;
+                return ApplyNodeResult.Applied;
+            case 'hideemptystaves':
+                score.stylesheet.hideEmptyStaves = true;
+                return ApplyNodeResult.Applied;
+            case 'hideemptystavesinfirstsystem':
+                score.stylesheet.hideEmptyStavesInFirstSystem = true;
+                return ApplyNodeResult.Applied;
+            case 'showsinglestaffbrackets':
+                score.stylesheet.showSingleStaffBrackets = true;
+                return ApplyNodeResult.Applied;
+            case 'defaultbarnumberdisplay':
+                const barNumberDisplay = AlphaTex1LanguageHandler._parseEnumValue(
+                    importer,
+                    metaData.arguments!,
+                    'bar number display',
+                    AlphaTex1EnumMappings.barNumberDisplay
+                );
+                if (barNumberDisplay === undefined) {
+                    return ApplyNodeResult.NotAppliedSemanticError;
+                }
+                score.stylesheet.barNumberDisplay = barNumberDisplay!;
+                return ApplyNodeResult.Applied;
+
             default:
                 return ApplyNodeResult.NotAppliedUnrecognizedMarker;
         }
@@ -275,7 +308,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         const types = lookup.get(tag);
         if (!types) {
-            if (args) {
+            if (args && args.arguments.length > 0) {
                 importer.addSemanticDiagnostic({
                     code: AlphaTexDiagnosticCode.AT300,
                     message: `Expected no arguments, but found some.`,
@@ -442,11 +475,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
                 if (metaData.arguments!.arguments.length === 2) {
                     const number = (metaData.arguments!.arguments[1] as AlphaTexNumberLiteral).value;
-                    if (PercussionMapper.instrumentArticulations.has(number)) {
-                        percussionArticulationNames.set(articulationName.toLowerCase(), number);
+                    const articulation = PercussionMapper.getArticulationById(number);
+                    if (articulation) {
+                        percussionArticulationNames.set(articulationName.toLowerCase(), articulation.uniqueId);
                         return ApplyNodeResult.Applied;
                     } else {
-                        const articulations = Array.from(PercussionMapper.instrumentArticulations.keys())
+                        const articulations = Array.from(PercussionMapper.instrumentArticulationIds())
                             .map(n => `${n}`)
                             .join(',');
                         importer.addSemanticDiagnostic({
@@ -565,12 +599,39 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'ts':
                 switch (metaData.arguments!.arguments[0].nodeType) {
                     case AlphaTexNodeType.Number:
-                        bar.masterBar.timeSignatureNumerator = (
-                            metaData.arguments!.arguments[0] as AlphaTexNumberLiteral
-                        ).value;
-                        bar.masterBar.timeSignatureDenominator = (
-                            metaData.arguments!.arguments[1] as AlphaTexNumberLiteral
-                        ).value;
+                        bar.masterBar.timeSignatureNumerator =
+                            (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value | 0;
+
+                        if (bar.masterBar.timeSignatureNumerator < 1 || bar.masterBar.timeSignatureNumerator > 32) {
+                            importer.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT211,
+                                message: `Value is out of valid range. Allowed range: 1-32, Actual Value: ${bar.masterBar.timeSignatureNumerator}`,
+                                start: metaData.arguments!.arguments[0].start,
+                                end: metaData.arguments!.arguments[0].end,
+                                severity: AlphaTexDiagnosticsSeverity.Error
+                            });
+                        }
+
+                        bar.masterBar.timeSignatureDenominator =
+                            (metaData.arguments!.arguments[1] as AlphaTexNumberLiteral).value | 0;
+
+                        if (
+                            !AlphaTex1LanguageHandler._timeSignatureDenominators.has(
+                                bar.masterBar.timeSignatureDenominator
+                            )
+                        ) {
+                            const valueList = Array.from(AlphaTex1LanguageHandler._timeSignatureDenominators).join(
+                                ', '
+                            );
+                            importer.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT211,
+                                message: `Value is out of valid range. Allowed range: ${valueList}, Actual Value: ${bar.masterBar.timeSignatureDenominator}`,
+                                start: metaData.arguments!.arguments[0].start,
+                                end: metaData.arguments!.arguments[0].end,
+                                severity: AlphaTexDiagnosticsSeverity.Error
+                            });
+                        }
+
                         break;
                     case AlphaTexNodeType.Ident:
                     case AlphaTexNodeType.String:
@@ -592,6 +653,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         break;
                 }
                 return ApplyNodeResult.Applied;
+            case 'beaming':
+                return this._parseBeamingRule(importer, metaData, bar.masterBar);
             case 'ks':
                 const keySignature = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
@@ -758,6 +821,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'accidentals':
                 return AlphaTex1LanguageHandler._handleAccidentalMode(importer, metaData.arguments!);
+            case 'voicemode':
+                return AlphaTex1LanguageHandler._handleVoiceMode(importer, metaData.arguments!);
             case 'jump':
                 const direction = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
@@ -833,9 +898,72 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 bar.masterBar.isDoubleBar = true;
                 bar.barLineRight = BarLineStyle.LightLight;
                 return ApplyNodeResult.Applied;
+            case 'barnumberdisplay':
+                const barNumberDisplay = AlphaTex1LanguageHandler._parseEnumValue(
+                    importer,
+                    metaData.arguments!,
+                    'bar number display',
+                    AlphaTex1EnumMappings.barNumberDisplay
+                );
+                if (barNumberDisplay === undefined) {
+                    return ApplyNodeResult.NotAppliedSemanticError;
+                }
+                bar.barNumberDisplay = barNumberDisplay!;
+                return ApplyNodeResult.Applied;
             default:
                 return ApplyNodeResult.NotAppliedUnrecognizedMarker;
         }
+    }
+
+    private _parseBeamingRule(importer: IAlphaTexImporter, metaData: AlphaTexMetaDataNode, masterBar: MasterBar) {
+        let duration = Duration.Eighth;
+        const groupSizes: number[] = [];
+
+        const durationValue = (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
+        switch (durationValue) {
+            case 4:
+                duration = Duration.QuadrupleWhole;
+                break;
+            case 8:
+                duration = Duration.Eighth;
+                break;
+            case 16:
+                duration = Duration.Sixteenth;
+                break;
+            case 32:
+                duration = Duration.ThirtySecond;
+                break;
+            default:
+                importer.addSemanticDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT209,
+                    message: `Value is out of valid range. Allowed range: 4,8,16 or 32, Actual Value: ${durationValue}`,
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: metaData.arguments!.arguments[0].start,
+                    end: metaData.arguments!.arguments[0].end
+                });
+                return ApplyNodeResult.NotAppliedSemanticError;
+        }
+
+        for (let i = 1; i < metaData.arguments!.arguments.length; i++) {
+            const groupSize = (metaData.arguments!.arguments[i] as AlphaTexNumberLiteral).value;
+            if (groupSize < 1) {
+                importer.addSemanticDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT209,
+                    message: `Value is out of valid range. Allowed range: >0, Actual Value: ${durationValue}`,
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: metaData.arguments!.arguments[i].start,
+                    end: metaData.arguments!.arguments[i].end
+                });
+                return ApplyNodeResult.NotAppliedSemanticError;
+            }
+            groupSizes.push((metaData.arguments!.arguments[i] as AlphaTexNumberLiteral).value);
+        }
+
+        if (!masterBar.beamingRules) {
+            masterBar.beamingRules = new BeamingRules();
+        }
+        masterBar.beamingRules!.groups.set(duration, groupSizes);
+        return ApplyNodeResult.Applied;
     }
 
     private static _handleAccidentalMode(importer: IAlphaTexImporter, args: AlphaTexArgumentList): ApplyNodeResult {
@@ -849,6 +977,20 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return ApplyNodeResult.NotAppliedSemanticError;
         }
         importer.state.accidentalMode = accidentalMode!;
+        return ApplyNodeResult.Applied;
+    }
+
+    private static _handleVoiceMode(importer: IAlphaTexImporter, args: AlphaTexArgumentList): ApplyNodeResult {
+        const voiceMode = AlphaTex1LanguageHandler._parseEnumValue(
+            importer,
+            args,
+            'voice mode',
+            AlphaTex1EnumMappings.alphaTexVoiceMode
+        );
+        if (voiceMode === undefined) {
+            return ApplyNodeResult.NotAppliedSemanticError;
+        }
+        importer.state.voiceMode = voiceMode!;
         return ApplyNodeResult.Applied;
     }
 
@@ -1700,28 +1842,52 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 beat.automations.push(balanceAutomation);
                 return ApplyNodeResult.Applied;
             case 'tp':
-                beat.tremoloSpeed = Duration.Eighth;
+                const tremolo = new TremoloPickingEffect();
+                beat.tremoloPicking = tremolo;
                 if (p.arguments && p.arguments.arguments.length > 0) {
-                    const tremoloSpeedValue = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
-                    switch (tremoloSpeedValue) {
-                        case 8:
-                            beat.tremoloSpeed = Duration.Eighth;
-                            break;
-                        case 16:
-                            beat.tremoloSpeed = Duration.Sixteenth;
-                            break;
-                        case 32:
-                            beat.tremoloSpeed = Duration.ThirtySecond;
-                            break;
-                        default:
-                            importer.addSemanticDiagnostic({
-                                code: AlphaTexDiagnosticCode.AT209,
-                                message: `Unexpected tremolo speed value '${tremoloSpeedValue}, expected: 8, 16 or 32`,
-                                severity: AlphaTexDiagnosticsSeverity.Error,
-                                start: p.arguments!.arguments[0].start,
-                                end: p.arguments!.arguments[0].end
-                            });
+                    if (p.arguments.arguments.length > 0) {
+                        const tremoloMarks = (p.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
+                        if (
+                            tremoloMarks >= TremoloPickingEffect.minMarks &&
+                            tremoloMarks <= TremoloPickingEffect.maxMarks
+                        ) {
+                            tremolo.marks = tremoloMarks;
+                        } else {
+                            switch (tremoloMarks) {
+                                // backwards compatibility
+                                case 8:
+                                    tremolo.marks = 1;
+                                    break;
+                                case 16:
+                                    tremolo.marks = 2;
+                                    break;
+                                case 32:
+                                    tremolo.marks = 3;
+                                    break;
+                                default:
+                                    importer.addSemanticDiagnostic({
+                                        code: AlphaTexDiagnosticCode.AT209,
+                                        message: `Unexpected tremolo marks value '${tremoloMarks}, expected: ${TremoloPickingEffect.minMarks}-${TremoloPickingEffect.maxMarks}, or legacy: 8, 16 or 32`,
+                                        severity: AlphaTexDiagnosticsSeverity.Error,
+                                        start: p.arguments!.arguments[0].start,
+                                        end: p.arguments!.arguments[0].end
+                                    });
+                                    return ApplyNodeResult.NotAppliedSemanticError;
+                            }
+                        }
+                    }
+                    if (p.arguments.arguments.length > 1) {
+                        const tremoloStyle = AlphaTex1LanguageHandler._parseEnumValue(
+                            importer,
+                            p.arguments!,
+                            'tremolo picking style',
+                            AlphaTex1EnumMappings.tremoloPickingStyle,
+                            1
+                        );
+                        if (tremoloStyle === undefined) {
                             return ApplyNodeResult.NotAppliedSemanticError;
+                        }
+                        tremolo.style = tremoloStyle;
                     }
                 }
                 return ApplyNodeResult.Applied;
@@ -2465,6 +2631,30 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             );
         }
 
+        if (stylesheet.extendBarLines) {
+            nodes.push(Atnf.meta('extendBarLines'));
+        }
+
+        if (stylesheet.globalDisplayChordDiagramsInScore) {
+            nodes.push(Atnf.meta('chordDiagramsInScore'));
+        }
+
+        if (stylesheet.hideEmptyStaves) {
+            nodes.push(Atnf.meta('hideEmptyStaves'));
+        }
+
+        if (stylesheet.hideEmptyStavesInFirstSystem) {
+            nodes.push(Atnf.meta('hideEmptyStavesInFirstSystem'));
+        }
+
+        if (stylesheet.showSingleStaffBrackets) {
+            nodes.push(Atnf.meta('showSingleStaffBrackets'));
+        }
+
+        if (stylesheet.barNumberDisplay !== BarNumberDisplay.AllBars) {
+            nodes.push(Atnf.identMeta('defaultBarNumberDisplay', BarNumberDisplay[stylesheet.barNumberDisplay]));
+        }
+
         // Unsupported:
         // 'globaldisplaychorddiagramsontop',
         // 'pertrackchorddiagramsontop',
@@ -2644,6 +2834,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             ];
         }
 
+        if (bar.barNumberDisplay !== undefined) {
+            nodes.push(Atnf.identMeta('barNumberDisplay', BarNumberDisplay[bar.barNumberDisplay]));
+        }
+
         return nodes;
     }
     private static _buildStaffMetaDataNodes(nodes: AlphaTexMetaDataNode[], staff: Staff) {
@@ -2773,6 +2967,17 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         ])
                     )
                 );
+            }
+        }
+
+        if (masterBar.beamingRules) {
+            for (const [k, v] of masterBar.beamingRules.groups) {
+                const args = Atnf.args([Atnf.number(k)], true);
+                for (const i of v) {
+                    args!.arguments.push(Atnf.number(i));
+                }
+
+                nodes.push(Atnf.meta('beaming', args));
             }
         }
 
@@ -3269,7 +3474,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (beat.isTremolo) {
-            Atnf.prop(properties, 'tp', Atnf.numberValue(beat.tremoloSpeed! as number));
+            const values: IAlphaTexArgumentValue[] = [Atnf.number(beat.tremoloPicking!.marks)];
+            if (beat.tremoloPicking!.style !== TremoloPickingStyle.Default) {
+                values.push(Atnf.ident(TremoloPickingStyle[beat.tremoloPicking!.style]));
+            }
+
+            Atnf.prop(properties, 'tp', Atnf.args(values));
         }
 
         switch (beat.crescendo) {

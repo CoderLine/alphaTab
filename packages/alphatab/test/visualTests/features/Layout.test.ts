@@ -1,4 +1,3 @@
-import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { Settings } from '@coderline/alphatab/Settings';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
@@ -62,7 +61,7 @@ describe('LayoutTests', () => {
 
     it('brackets-braces-none', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/brackets-braces-none.gp', settings, o => {
             o.tracks = [0, 1, 2, 3, 4, 5, 6, 7, 8];
         });
@@ -70,7 +69,7 @@ describe('LayoutTests', () => {
 
     it('brackets-braces-similar', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/brackets-braces-similar.gp', settings, o => {
             o.tracks = [0, 1, 2, 3, 4, 5, 6, 7, 8];
         });
@@ -78,7 +77,7 @@ describe('LayoutTests', () => {
 
     it('brackets-braces-staves', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/brackets-braces-staves.gp', settings, o => {
             o.tracks = [0, 1, 2, 3, 4, 5, 6, 7, 8];
         });
@@ -86,7 +85,7 @@ describe('LayoutTests', () => {
 
     it('brackets-braces-system-divider', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/system-divider.gp', settings, o => {
             o.tracks = [0, 1];
         });
@@ -94,31 +93,31 @@ describe('LayoutTests', () => {
 
     it('track-names-full-name-all', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/track-names-full-name-all.gp', settings);
     });
 
     it('track-names-full-name-short-name', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/track-names-full-name-short-name.gp', settings);
     });
 
     it('track-names-full-name-horizontal', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/track-names-full-name-horizontal.gp', settings);
     });
 
     it('track-names-first-system', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/track-names-first-system.gp', settings);
     });
 
     it('track-names-all-systems-multi', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('layout/track-names-all-systems-multi.gp', settings, o => {
             o.tracks = [0, 1];
         });
@@ -126,7 +125,7 @@ describe('LayoutTests', () => {
 
     it('system-layout-tex', async () => {
         const settings: Settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTestTex(
             `
             \\track { defaultSystemsLayout 3 }
@@ -157,6 +156,262 @@ describe('LayoutTests', () => {
         await VisualTestHelper.runVisualTest('layout/multibar-rest.gp', undefined, o => {
             o.tracks = [0, 1, 2];
             o.runs[0].referenceFileName = 'test-data/visual-tests/layout/multibar-rest-all-tracks.png';
+        });
+    });
+
+    it('extended-barlines', async () => {
+        await VisualTestHelper.runVisualTest('layout/extended-barlines.xml', undefined, o => {
+            o.score.stylesheet.extendBarLines = true;
+            o.tracks = [0, 1];
+        });
+    });
+
+    it('multi-system-slur-scale-down', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            C4 {slur S1} 
+            | r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r
+            A4 {slur S1} 
+            `,
+            '',
+            undefined,
+            o => {
+                o.score.stylesheet.extendBarLines = true;
+                o.runs = [
+                    new VisualTestRun(1300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-0-1300.png'),
+                    new VisualTestRun(600, 'test-data/visual-tests/layout/multi-system-slur-scale-down-1-600.png'),
+                    new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-2-300.png'),
+                    new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-3-700.png')
+                ];
+            }
+        );
+    });
+
+    it('multi-system-slur-scale-up', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            C4 {slur S1} 
+            | r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r
+            A4 {slur S1} 
+            `,
+            '',
+            undefined,
+            o => {
+                o.score.stylesheet.extendBarLines = true;
+                o.runs = [
+                    new VisualTestRun(600, 'test-data/visual-tests/layout/multi-system-slur-scale-up-0-600.png'),
+                    new VisualTestRun(1300, 'test-data/visual-tests/layout/multi-system-slur-scale-up-1-1300.png'),
+                    new VisualTestRun(700, 'test-data/visual-tests/layout/multi-system-slur-scale-up-2-700.png'),
+                    new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-up-3-300.png')
+                ];
+            }
+        );
+    });
+
+    it('hide-empty-staves', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\defaultSystemsLayout 3
+            \\multiTrackTrackNamePolicy allSystems
+            \\track "T1"
+            C4.4 *4 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |  
+                r.1 | C4 |
+            
+            \\track "T2"
+            \\clef C3
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | c4 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | C4 |
+            `,
+            'test-data/visual-tests/layout/hide-empty-staves.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.layoutMode = LayoutMode.Parchment;
+            }
+        );
+    });
+
+    it('hide-empty-staves-in-first', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\hideEmptyStavesInFirstSystem
+
+            \\defaultSystemsLayout 3
+            \\multiTrackTrackNamePolicy allSystems
+            \\track "T1"
+            C4.4 *4 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |  
+                r.1 | C4 |
+            
+            \\track "T2"
+            \\clef C3
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | c4 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | C4 |
+            `,
+            'test-data/visual-tests/layout/hide-empty-staves-in-first.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.layoutMode = LayoutMode.Parchment;
+            }
+        );
+    });
+
+    it('single-staff-brackets', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\showSingleStaffBrackets
+            \\defaultSystemsLayout 3
+            \\multiTrackTrackNamePolicy allSystems
+            \\track "T1"
+            \\staff {score}
+            C4.4 *4 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |  
+                r.1 | C4 |
+            \\staff {score}
+                \\clef C3
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | c4 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | C4 |
+            `,
+            'test-data/visual-tests/layout/single-staff-brackets-show.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.layoutMode = LayoutMode.Parchment;
+            }
+        );
+
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\defaultSystemsLayout 3
+            \\multiTrackTrackNamePolicy allSystems
+            \\track "T1"
+            \\staff {score}
+            C4.4 *4 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |  
+                r.1 | C4 |
+            \\staff {score}
+                \\clef C3
+                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | c4 | r.1 | 
+                r.1 | r.1 | r.1 | 
+                r.1 | C4 |
+            `,
+            'test-data/visual-tests/layout/single-staff-brackets-hide.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.layoutMode = LayoutMode.Parchment;
+            }
+        );
+    });
+
+    describe('barnumberdisplay', () => {
+        describe('stylesheet', () => {
+            it('all', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay allBars
+                    C4.1 | C4.1 | C4.1 |
+                    C4.1 | C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-stylesheet-all.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
+            it('first', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay firstOfSystem
+                    C4.1 | C4.1 | C4.1 |
+                    C4.1 | C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-stylesheet-first.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
+            it('hide', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay hide
+                    C4.1 | C4.1 | C4.1 |
+                    C4.1 | C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-stylesheet-hide.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
+        });
+
+        describe('bar-override', () => {
+            it('all', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay allBars
+                    C4.1 | \\barNumberDisplay hide C4.1 | C4.1 |
+                    C4.1 | C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-bar-override-all.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
+            it('first', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay firstOfSystem
+                    C4.1 | \\barNumberDisplay allBars C4.1 | C4.1 |
+                    \\barNumberDisplay hide C4.1 | C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-bar-override-first.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
+            it('hide', async () =>
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\defaultBarNumberDisplay hide
+                    C4.1 | \\barNumberDisplay allBars C4.1 | C4.1 |
+                    \\barNumberDisplay firstOfSystem C4.1 | \\barNumberDisplay firstOfSystem C4.1 | C4.1 
+                    `,
+                    'test-data/visual-tests/layout/barnumberdisplay-bar-override-hide.png',
+                    undefined,
+                    o => {
+                        o.settings.display.layoutMode = LayoutMode.Parchment;
+                    }
+                ));
         });
     });
 });

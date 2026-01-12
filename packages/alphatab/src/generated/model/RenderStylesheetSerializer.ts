@@ -9,6 +9,7 @@ import { BracketExtendMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNamePolicy } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameOrientation } from "@coderline/alphatab/model/RenderStylesheet";
+import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
 /**
  * @internal
  */
@@ -43,6 +44,7 @@ export class RenderStylesheetSerializer {
                 m.set(k.toString(), v);
             }
         }
+        o.set("globaldisplaychorddiagramsinscore", obj.globalDisplayChordDiagramsInScore);
         o.set("singletracktracknamepolicy", obj.singleTrackTrackNamePolicy as number);
         o.set("multitracktracknamepolicy", obj.multiTrackTrackNamePolicy as number);
         o.set("firstsystemtracknamemode", obj.firstSystemTrackNameMode as number);
@@ -57,6 +59,11 @@ export class RenderStylesheetSerializer {
                 a.push(v);
             }
         }
+        o.set("extendbarlines", obj.extendBarLines);
+        o.set("hideemptystaves", obj.hideEmptyStaves);
+        o.set("hideemptystavesinfirstsystem", obj.hideEmptyStavesInFirstSystem);
+        o.set("showsinglestaffbrackets", obj.showSingleStaffBrackets);
+        o.set("barnumberdisplay", obj.barNumberDisplay as number);
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
@@ -88,6 +95,9 @@ export class RenderStylesheetSerializer {
                     obj.perTrackChordDiagramsOnTop!.set(Number.parseInt(k), v as boolean);
                 });
                 return true;
+            case "globaldisplaychorddiagramsinscore":
+                obj.globalDisplayChordDiagramsInScore = v! as boolean;
+                return true;
             case "singletracktracknamepolicy":
                 obj.singleTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(v, TrackNamePolicy)!;
                 return true;
@@ -111,6 +121,21 @@ export class RenderStylesheetSerializer {
                 return true;
             case "pertrackmultibarrest":
                 obj.perTrackMultiBarRest = new Set<number>(v as number[]);
+                return true;
+            case "extendbarlines":
+                obj.extendBarLines = v! as boolean;
+                return true;
+            case "hideemptystaves":
+                obj.hideEmptyStaves = v! as boolean;
+                return true;
+            case "hideemptystavesinfirstsystem":
+                obj.hideEmptyStavesInFirstSystem = v! as boolean;
+                return true;
+            case "showsinglestaffbrackets":
+                obj.showSingleStaffBrackets = v! as boolean;
+                return true;
+            case "barnumberdisplay":
+                obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(v, BarNumberDisplay)!;
                 return true;
         }
         return false;

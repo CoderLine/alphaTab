@@ -1,17 +1,16 @@
-import { Beat } from '@coderline/alphatab/model/Beat';
-import type { Duration } from '@coderline/alphatab/model/Duration';
-import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@coderline/alphatab/model/Score';
-import type { Settings } from '@coderline/alphatab/Settings';
-import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
-import { MasterBar } from '@coderline/alphatab/model/MasterBar';
-import type { Track } from '@coderline/alphatab/model/Track';
-import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
-import { Bar } from '@coderline/alphatab/model/Bar';
-import { Voice } from '@coderline/alphatab/model/Voice';
-import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
+import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
+import { Bar } from '@coderline/alphatab/model/Bar';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@coderline/alphatab/model/Score';
+import type { Track } from '@coderline/alphatab/model/Track';
+import { Voice } from '@coderline/alphatab/model/Voice';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 
 /**
  * @internal
@@ -25,7 +24,6 @@ export class TuningParseResult {
         return this.octave * 12 + this.tone.noteValue;
     }
 }
-
 
 /**
  * @internal
@@ -45,13 +43,18 @@ export class TuningParseResultTone {
  * @internal
  */
 export class ModelUtils {
+    private static readonly _durationIndices = ModelUtils._buildDurationIndices();
+
+    private static _buildDurationIndices() {
+        return new Map<Duration, number>(
+            Object.values(Duration)
+                .filter<any>((k: any) => typeof k === 'number')
+                .map(d => [d as number as Duration, (d as number) < 0 ? 0 : Math.log2(d as number) | 0])
+        );
+    }
+
     public static getIndex(duration: Duration): number {
-        const index: number = 0;
-        const value: number = duration;
-        if (value < 0) {
-            return index;
-        }
-        return Math.log2(duration) | 0;
+        return ModelUtils._durationIndices.get(duration)!;
     }
 
     public static keySignatureIsFlat(ks: number): boolean {
@@ -672,22 +675,6 @@ export class ModelUtils {
             masterBar.previousMasterBar!.nextMasterBar = null;
         }
     }
-
-    private static _allMusicFontSymbols: MusicFontSymbol[] = [];
-
-    /**
-     * Gets a list of all music font symbols used in alphaTab.
-     */
-    public static getAllMusicFontSymbols(): MusicFontSymbol[] {
-        if (ModelUtils._allMusicFontSymbols.length === 0) {
-            ModelUtils._allMusicFontSymbols = Object.values(MusicFontSymbol)
-                .filter<any>((k: any) => typeof k === 'number')
-                .map(v => v as number as MusicFontSymbol) as MusicFontSymbol[];
-        }
-
-        return ModelUtils._allMusicFontSymbols;
-    }
-
     /**
      * Lists the display transpositions for some known midi instruments.
      * It is a common practice to transpose the standard notation for instruments like guitars.
@@ -938,7 +925,6 @@ export class ModelUtils {
         return accidentalToSet;
     }
 
-    
     /**
      * @internal
      */
@@ -946,5 +932,36 @@ export class ModelUtils {
         return plain.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     }
 
-}
+    public static minBoundingBox(a: number, b: number) {
+        if (Number.isNaN(a)) {
+            return b;
+        } else if (Number.isNaN(b)) {
+            return a;
+        }
+        return a < b ? a : b;
+    }
 
+    public static maxBoundingBox(a: number, b: number) {
+        if (Number.isNaN(a)) {
+            return b;
+        } else if (Number.isNaN(b)) {
+            return a;
+        }
+        return a > b ? a : b;
+    }
+
+    public static getSystemLayout(score: Score, systemIndex: number, displayedTracks: Track[]) {
+        let defaultSystemsLayout: number;
+        let systemsLayout: number[];
+        if (displayedTracks.length === 1) {
+            defaultSystemsLayout = displayedTracks[0].defaultSystemsLayout;
+            systemsLayout = displayedTracks[0].systemsLayout;
+        } else {
+            // multi track applies
+            defaultSystemsLayout = score.defaultSystemsLayout;
+            systemsLayout = score.systemsLayout;
+        }
+
+        return systemIndex < systemsLayout.length ? systemsLayout[systemIndex] : defaultSystemsLayout;
+    }
+}

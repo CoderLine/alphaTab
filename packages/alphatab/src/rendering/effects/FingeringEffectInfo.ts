@@ -5,7 +5,7 @@ import { FingeringMode, NotationElement } from '@coderline/alphatab/NotationSett
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { FingeringGroupGlyph } from '@coderline/alphatab/rendering/glyphs/FingeringGroupGlyph';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
@@ -13,7 +13,7 @@ import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGl
 /**
  * @internal
  */
-export class FingeringEffectInfo extends EffectBarRendererInfo {
+export class FingeringEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectFingering;
     }

@@ -99,8 +99,8 @@ export function injectWorkletDependency(webPackWithAlphaTab: webPackWithAlphaTab
             runtimeRequirements.add(webPackWithAlphaTab.alphaTab.RuntimeGlobalWorkletGetStartupChunks);
 
             source.replace(
-                dep.range[0],
-                dep.range[1] - 1,
+                dep.range![0],
+                dep.range![1] - 1,
                 webPackWithAlphaTab.webpack.Template.asString([
                     '(/* worklet bootstrap */ async function(__webpack_worklet__) {',
                     webPackWithAlphaTab.webpack.Template.indent([

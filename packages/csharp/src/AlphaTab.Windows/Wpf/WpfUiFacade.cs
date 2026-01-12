@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using AlphaTab.Synth;
 using AlphaTab.Platform;
@@ -158,7 +159,7 @@ namespace AlphaTab.Wpf
                     ImageSource? source = null;
                     if (body is string)
                     {
-                        // TODO: svg support
+                        // NOTE: no svg support
                         return;
                     }
 
@@ -260,20 +261,22 @@ namespace AlphaTab.Wpf
                 IsHitTestVisible = false
             };
 
-            barCursor.SetBinding(Shape.FillProperty, new Binding(nameof(SettingsContainer.BarCursorFill))
-            {
-                Source = SettingsContainer
-            });
+            barCursor.SetBinding(Shape.FillProperty,
+                new Binding(nameof(SettingsContainer.BarCursorFill))
+                {
+                    Source = SettingsContainer
+                });
 
             var beatCursor = new Rectangle
             {
                 IsHitTestVisible = false,
                 Width = 3
             };
-            beatCursor.SetBinding(Shape.FillProperty, new Binding(nameof(SettingsContainer.BeatCursorFill))
-            {
-                Source = SettingsContainer
-            });
+            beatCursor.SetBinding(Shape.FillProperty,
+                new Binding(nameof(SettingsContainer.BeatCursorFill))
+                {
+                    Source = SettingsContainer
+                });
 
             cursorWrapper.Children.Add(selectionWrapper);
             cursorWrapper.Children.Add(barCursor);
@@ -351,23 +354,88 @@ namespace AlphaTab.Wpf
         {
             if (((FrameworkElementContainer)scrollElement).Control is ScrollViewer s)
             {
-                s.ScrollToVerticalOffset(offset);
+                if (speed < 10)
+                {
+                    s.ScrollToVerticalOffset(offset);
+                }
+                else
+                {
+                    s.BeginAnimation(ScrollViewerExtension.ScrollYProperty,
+                        new DoubleAnimation(offset,
+                            new Duration(TimeSpan.FromMilliseconds(speed))));
+                }
             }
-
-            //scrollElementWpf.BeginAnimation(ScrollViewer.VerticalOffsetProperty,
-            //    new DoubleAnimation(offset, new System.Windows.Duration(TimeSpan.FromMilliseconds(speed))));
         }
 
         public override void ScrollToX(IContainer scrollElement, double offset, double speed)
         {
             if (((FrameworkElementContainer)scrollElement).Control is ScrollViewer s)
             {
-                s.ScrollToHorizontalOffset(offset);
+                if (speed < 10)
+                {
+                    s.ScrollToHorizontalOffset(offset);
+                }
+                else
+                {
+                    s.BeginAnimation(ScrollViewerExtension.ScrollXProperty,
+                        new DoubleAnimation(offset,
+                            new Duration(TimeSpan.FromMilliseconds(speed))));
+                }
+            }
+        }
+
+        public override void StopScrolling(IContainer scrollElement)
+        {
+            if (((FrameworkElementContainer)scrollElement).Control is ScrollViewer s)
+            {
+                s.BeginAnimation(ScrollViewerExtension.ScrollXProperty, null);
+                s.BeginAnimation(ScrollViewerExtension.ScrollYProperty, null);
+            }
+        }
+
+        public override void SetCanvasOverflow(IContainer canvasElement, double overflow,
+            bool isVertical)
+        {
+            if (!(((FrameworkElementContainer)canvasElement).Control is Canvas c))
+            {
+                return;
             }
 
-            //var scrollElementWpf = ((FrameworkElementContainer)scrollElement).Control;
-            //scrollElementWpf.BeginAnimation(ScrollViewer.HorizontalOffsetProperty,
-            //    new DoubleAnimation(offset, new System.Windows.Duration(TimeSpan.FromMilliseconds(speed))));
+            c.Margin = isVertical
+                ? new Thickness(0, 0, 0, overflow)
+                : new Thickness(0, 0, overflow, 0);
+        }
+    }
+
+    internal class ScrollViewerExtension
+    {
+        public static readonly DependencyProperty ScrollXProperty =
+            DependencyProperty.RegisterAttached(
+                "ScrollX", typeof(double), typeof(ScrollViewerExtension),
+                new PropertyMetadata(0.0, OnScrollXChanged));
+
+
+        public static readonly DependencyProperty ScrollYProperty =
+            DependencyProperty.RegisterAttached(
+                "ScrollY", typeof(double), typeof(ScrollViewerExtension),
+                new PropertyMetadata(0.0, OnScrollYChanged));
+
+        private static void OnScrollXChanged(DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ScrollViewer s)
+            {
+                s.ScrollToHorizontalOffset((double)e.NewValue);
+            }
+        }
+
+        private static void OnScrollYChanged(DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ScrollViewer s)
+            {
+                s.ScrollToVerticalOffset((double)e.NewValue);
+            }
         }
     }
 }

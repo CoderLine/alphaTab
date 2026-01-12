@@ -25,6 +25,13 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     private _smf1Mode: boolean;
 
     /**
+     * An indicator by how many midi-ticks the song contents are shifted.
+     * Grace beats at start might require a shift for the first beat to start at 0.
+     * This information can be used to translate back the player time axis to the music notation.
+     */
+    public tickShift: number = 0;
+
+    /**
      * Initializes a new instance of the {@link AlphaSynthMidiFileHandler} class.
      * @param midiFile The midi file.
      * @param smf1Mode Whether to generate a SMF1 compatible midi file. This might break multi note bends.
@@ -34,7 +41,14 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         this._smf1Mode = smf1Mode;
     }
 
+    public addTickShift(tickShift: number) {
+        this._midiFile.tickShift = tickShift;
+        this.tickShift = tickShift;
+    }
+
     public addTimeSignature(tick: number, timeSignatureNumerator: number, timeSignatureDenominator: number): void {
+        tick += this.tickShift;
+
         let denominatorIndex: number = 0;
         let denominator = timeSignatureDenominator;
         while (true) {
@@ -50,12 +64,14 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     }
 
     public addRest(track: number, tick: number, channel: number): void {
+        tick += this.tickShift;
         if (!this._smf1Mode) {
             this._midiFile.addEvent(new AlphaTabRestEvent(track, tick, channel));
         }
     }
 
     public addNote(track: number, start: number, length: number, key: number, velocity: number, channel: number): void {
+        start += this.tickShift;
         this._midiFile.addEvent(
             new NoteOnEvent(
                 track,
@@ -94,16 +110,19 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         controller: ControllerType,
         value: number
     ): void {
+        tick += this.tickShift;
         this._midiFile.addEvent(
             new ControlChangeEvent(track, tick, channel, controller, AlphaSynthMidiFileHandler._fixValue(value))
         );
     }
 
     public addProgramChange(track: number, tick: number, channel: number, program: number): void {
+        tick += this.tickShift;
         this._midiFile.addEvent(new ProgramChangeEvent(track, tick, channel, program));
     }
 
     public addTempo(tick: number, tempo: number): void {
+        tick += this.tickShift;
         // bpm -> microsecond per quarter note
         const tempoEvent = new TempoChangeEvent(tick, 0);
         tempoEvent.beatsPerMinute = tempo;
@@ -111,6 +130,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     }
 
     public addBend(track: number, tick: number, channel: number, value: number): void {
+        tick += this.tickShift;
         if (value >= SynthConstants.MaxPitchWheel) {
             value = SynthConstants.MaxPitchWheel;
         } else {
@@ -120,6 +140,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     }
 
     public addNoteBend(track: number, tick: number, channel: number, key: number, value: number): void {
+        tick += this.tickShift;
         if (this._smf1Mode) {
             this.addBend(track, tick, channel, value);
         } else {
@@ -132,6 +153,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     }
 
     public finishTrack(track: number, tick: number): void {
+        tick += this.tickShift;
         if (this._midiFile.format === MidiFileFormat.MultiTrack || track === 0) {
             this._midiFile.addEvent(new EndOfTrackEvent(track, tick));
         }

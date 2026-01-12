@@ -73,6 +73,25 @@ export enum TrackNameOrientation {
 }
 
 /**
+ * How bar numbers are displayed
+ * @public
+ */
+export enum BarNumberDisplay {
+    /**
+     * Show bar numbers on all bars.
+     */
+    AllBars = 0,
+    /**
+     * Show bar numbers on the first bar of every system.
+     */
+    FirstOfSystem = 1,
+    /**
+     * Hide all bar numbers
+     */
+    Hide = 2
+}
+
+/**
  * This class represents the rendering stylesheet.
  * It contains settings which control the display of the score when rendered.
  * @json
@@ -116,6 +135,11 @@ export class RenderStylesheet {
     public perTrackChordDiagramsOnTop: Map<number, boolean> | null = null;
 
     /**
+     * Whether to show the chord diagrams in score.
+     */
+    public globalDisplayChordDiagramsInScore: boolean = false;
+
+    /**
      * The policy where to show track names when a single track is rendered.
      */
     public singleTrackTrackNamePolicy: TrackNamePolicy = TrackNamePolicy.FirstSystem;
@@ -154,4 +178,34 @@ export class RenderStylesheet {
      * If single track: Whether to render multiple subsequent empty (or rest-only) bars together as multi-bar rest.
      */
     public perTrackMultiBarRest: Set<number> | null = null;
+
+    /**
+     * Whether barlines should be drawn across staves within the same system.
+     */
+    public extendBarLines: boolean = false;
+
+    /**
+     * Whether to hide empty staves.
+     */
+    public hideEmptyStaves: boolean = false;
+
+    /**
+     * Whether to also hide empty staves in the first system.
+     * @remarks
+     * Only has an effect when activating {@link hideEmptyStaves}.
+     */
+    public hideEmptyStavesInFirstSystem: boolean = false;
+
+    /**
+     * Whether to show brackets and braces across single staves.
+     * @remarks
+     * This allows a more consistent view for identifying staves when using
+     * {@link hideEmptyStaves}
+     */
+    public showSingleStaffBrackets: boolean = false;
+
+    /**
+     * How bar numbers should be displayed.
+     */
+    public barNumberDisplay: BarNumberDisplay = BarNumberDisplay.AllBars;
 }

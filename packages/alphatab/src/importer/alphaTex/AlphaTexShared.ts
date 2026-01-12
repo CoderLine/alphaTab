@@ -1,5 +1,5 @@
 ﻿import type { AlphaTexAstNodeLocation } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
-import { AlphaTexParseMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
+import type { AlphaTexParseMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import type { FlatSyncPoint } from '@coderline/alphatab/model/Automation';
 import type { SustainPedalMarker } from '@coderline/alphatab/model/Bar';
 import type { Beat } from '@coderline/alphatab/model/Beat';
@@ -276,15 +276,24 @@ export enum AlphaTexAccidentalMode {
 /**
  * @public
  */
+export enum AlphaTexVoiceMode {
+    StaffWise = 0,
+    BarWise = 1
+}
+
+/**
+ * @public
+ */
 export interface IAlphaTexImporterState {
     score: Score;
     accidentalMode: AlphaTexAccidentalMode;
+    voiceMode: AlphaTexVoiceMode;
     currentDynamics: DynamicValue;
     currentTupletNumerator: number;
     currentTupletDenominator: number;
     readonly syncPoints: FlatSyncPoint[];
     readonly slurs: Map<string, Note>;
-    readonly percussionArticulationNames: Map<string, number>;
+    readonly percussionArticulationNames: Map<string, string>;
     readonly lyrics: Map<number, Lyrics[]>;
     readonly staffHasExplicitDisplayTransposition: Set<Staff>;
     readonly staffHasExplicitTuning: Set<Staff>;

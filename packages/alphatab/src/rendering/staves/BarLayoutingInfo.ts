@@ -1,10 +1,20 @@
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
-import { Spring } from '@coderline/alphatab/rendering/staves/Spring';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { GraceType } from '@coderline/alphatab/model/GraceType';
+import type { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import { Spring } from '@coderline/alphatab/rendering/staves/Spring';
+
+/**
+ * @internal
+ * @record
+ */
+interface BarLayoutingInfoBeatSizes {
+    preBeatSize: number;
+    onBeatSize: number;
+}
 
 /**
  * This public class stores size information about a stave.
@@ -21,6 +31,7 @@ export class BarLayoutingInfo {
     private _onTimePositionsForce: number = 0;
     private _onTimePositions: Map<number, number> = new Map();
     private _incompleteGraceRodsWidth: number = 0;
+    private _beatSizes: Map<number, BarLayoutingInfoBeatSizes> = new Map();
 
     // the smallest duration we have between two springs to ensure we have positive spring constants
     private _minDuration: number = BarLayoutingInfo._defaultMinDuration;
@@ -38,6 +49,30 @@ export class BarLayoutingInfo {
     private _updateMinStretchForce(force: number): void {
         if (this.minStretchForce < force) {
             this.minStretchForce = force;
+        }
+    }
+
+    public getBeatSizes(beat: Beat) {
+        const key = beat.absoluteDisplayStart;
+        if (this._beatSizes.has(key)) {
+            return this._beatSizes.get(key);
+        }
+        return undefined;
+    }
+    
+    public setBeatSizes(beat: BeatContainerGlyphBase, sizes: BarLayoutingInfoBeatSizes) {
+        const key = beat.absoluteDisplayStart;
+        if (this._beatSizes.has(key)) {
+            const current = this._beatSizes.get(key)!;
+            if (current.onBeatSize < sizes.onBeatSize) {
+                current.onBeatSize = sizes.onBeatSize;
+            }
+
+            if (current.preBeatSize < sizes.preBeatSize) {
+                current.preBeatSize = sizes.preBeatSize;
+            }
+        } else {
+            this._beatSizes.set(key, sizes);
         }
     }
 
@@ -138,7 +173,7 @@ export class BarLayoutingInfo {
         return spring;
     }
 
-    public addBeatSpring(beat: Beat, preBeatSize: number, postBeatSize: number): void {
+    public addBeatSpring(beat: BeatContainerGlyphBase, preBeatSize: number, postBeatSize: number): void {
         const start: number = beat.absoluteDisplayStart;
         if (beat.graceType !== GraceType.None) {
             // For grace beats we just remember the the sizes required for them

@@ -3,6 +3,7 @@ import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { type ICanvas, TextBaseline, TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -47,7 +48,7 @@ class JumpDirectionGlyph extends Glyph {
 
     public override doLayout(): void {
         const c = this.renderer.scoreRenderer.canvas!;
-        c.font = this.renderer.resources.directionsFont;
+        c.font = this.renderer.resources.elementFonts.get(NotationElement.EffectDirections)!;
         this.height = c.measureText(this._text).height;
     }
 
@@ -56,7 +57,7 @@ class JumpDirectionGlyph extends Glyph {
         const baseline = canvas.textBaseline;
         const align = canvas.textAlign;
 
-        canvas.font = this.renderer.resources.directionsFont;
+        canvas.font = this.renderer.resources.elementFonts.get(NotationElement.EffectDirections)!;
         canvas.textBaseline = TextBaseline.Middle;
         canvas.textAlign = TextAlign.Right;
 

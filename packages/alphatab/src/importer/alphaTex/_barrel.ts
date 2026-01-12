@@ -43,6 +43,7 @@ export {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
     AlphaTexStaffNoteKind,
+    AlphaTexVoiceMode,
     ArgumentListParseTypesMode,
     type IAlphaTexImporter,
     type IAlphaTexImporterState

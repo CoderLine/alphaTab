@@ -87,6 +87,13 @@ export class MidiFile {
      * Gets or sets the division per quarter notes.
      */
     public division: number = MidiUtils.QuarterTime;
+    
+    /**
+     * An indicator by how many midi-ticks the song contents are shifted. 
+     * Grace beats at start might require a shift for the first beat to start at 0.
+     * This information can be used to translate back the player time axis to the music notation.
+     */
+    public tickShift: number = 0;
 
     /**
      * Gets a list of midi events sorted by time.

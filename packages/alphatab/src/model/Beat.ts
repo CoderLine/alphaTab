@@ -28,6 +28,7 @@ import { WahPedal } from '@coderline/alphatab/model/WahPedal';
 import { BarreShape } from '@coderline/alphatab/model/BarreShape';
 import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
+import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
 
 /**
  * Lists the different modes on how beaming for a beat should be done.
@@ -534,14 +535,64 @@ export class Beat {
      */
     public pickStroke: PickStroke = PickStroke.None;
 
+    /**
+     * Whether this beat has a tremolo picking effect.
+     */
     public get isTremolo(): boolean {
-        return !!this.tremoloSpeed;
+        return this.tremoloPicking !== undefined;
     }
 
     /**
-     * Gets or sets the speed of the tremolo effect.
+     * The tremolo picking effect.
      */
-    public tremoloSpeed: Duration | null = null;
+    public tremoloPicking?: TremoloPickingEffect;
+
+    /**
+     * The speed of the tremolo.
+     * @deprecated Set {@link tremoloPicking} instead.
+     */
+    public get tremoloSpeed(): Duration | null {
+        const tremolo = this.tremoloPicking;
+        if (tremolo) {
+            return tremolo.getDuration(this.duration);
+        }
+        return null;
+    }
+
+    /**
+     * The speed of the tremolo.
+     * @deprecated Set {@link tremoloPicking} instead.
+     */
+    public set tremoloSpeed(value: Duration | null) {
+        if (value === null) {
+            this.tremoloPicking = undefined;
+            return;
+        }
+
+        let effect = this.tremoloPicking;
+        if (effect === undefined) {
+            effect = new TremoloPickingEffect();
+            this.tremoloPicking = effect;
+        }
+
+        switch (value) {
+            case Duration.Eighth:
+                effect.marks = 1;
+                break;
+            case Duration.Sixteenth:
+                effect.marks = 2;
+                break;
+            case Duration.ThirtySecond:
+                effect.marks = 3;
+                break;
+            case Duration.SixtyFourth:
+                effect.marks = 4;
+                break;
+            case Duration.OneHundredTwentyEighth:
+                effect.marks = 5;
+                break;
+        }
+    }
 
     /**
      * Gets or sets whether a crescendo/decrescendo is applied on this beat.
@@ -882,6 +933,13 @@ export class Beat {
             this.brushDuration = 0;
         }
 
+        const tremolo = this.tremoloPicking;
+        if (tremolo !== undefined) {
+            if (tremolo.marks < TremoloPickingEffect.minMarks || tremolo.marks > TremoloPickingEffect.maxMarks) {
+                this.tremoloPicking = undefined;
+            }
+        }
+
         const displayMode: NotationMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
         let isGradual: boolean = this.text === 'grad' || this.text === 'grad.';
         if (isGradual && displayMode === NotationMode.SongBook) {
@@ -1037,6 +1095,34 @@ export class Beat {
                         points.splice(1, 1);
                     }
                 }
+            } else if (points!.length === 3) {
+                const origin: BendPoint = points[0];
+                const middle: BendPoint = points[1];
+                const destination: BendPoint = points[2];
+                // constant decrease or increase
+                if (
+                    (origin.value < middle.value && middle.value < destination.value) ||
+                    (origin.value > middle.value && middle.value > destination.value)
+                ) {
+                    if (origin.value !== 0 && !this.isContinuedWhammy) {
+                        this.whammyBarType = WhammyType.PrediveDive;
+                    } else {
+                        this.whammyBarType = WhammyType.Dive;
+                    }
+                    points.splice(1, 1);
+                } else if (
+                    (origin.value > middle.value && middle.value < destination.value) ||
+                    (origin.value < middle.value && middle.value > destination.value)
+                ) {
+                    this.whammyBarType = WhammyType.Dip;
+                } else if (origin.value === middle.value && middle.value === destination.value) {
+                    if (origin.value !== 0 && !this.isContinuedWhammy) {
+                        this.whammyBarType = WhammyType.Predive;
+                    } else {
+                        this.whammyBarType = WhammyType.Hold;
+                    }
+                    points.splice(1, 1);
+                }
             } else if (points!.length === 2) {
                 const origin: BendPoint = points[0];
                 const destination: BendPoint = points[1];
@@ -1145,7 +1231,6 @@ export class Beat {
         return this.noteStringLookup.has(noteString);
     }
 
-    // TODO: can be likely eliminated
     public getNoteWithRealValue(noteRealValue: number): Note | null {
         if (this.noteValueLookup.has(noteRealValue)) {
             return this.noteValueLookup.get(noteRealValue)!;

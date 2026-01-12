@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Threading;
-using AlphaTab.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test;
@@ -24,6 +22,11 @@ internal static class TestGlobals
     public static Expector<T> Expect<T>(T actual)
     {
         return new Expector<T>(actual);
+    }
+
+    public static Expector<T> Expect<T>(T actual, string message)
+    {
+        return new Expector<T>(actual, message);
     }
 
     public static Expector<Action> Expect(Action actual)
@@ -52,41 +55,50 @@ internal static class TestGlobals
 
 internal class NotExpector<T>
 {
-    private readonly T _actual;
+    private readonly T? _actual;
     public NotExpector<T> Be => this;
+    private readonly string? _message;
 
-    public NotExpector(T actual)
+    public NotExpector(T? actual, string? message = null)
     {
         _actual = actual;
+        _message = message;
     }
 
     public void Ok()
     {
         if (_actual is string s)
         {
-            Assert.IsTrue(string.IsNullOrEmpty(s));
+            Assert.IsTrue(string.IsNullOrEmpty(s), _message);
         }
         else
         {
-            Assert.AreEqual(default!, _actual);
+            Assert.AreEqual(default!, _actual, _message);
         }
+    }
+
+    public void Undefined()
+    {
+        Assert.IsNotNull(_actual, _message);
     }
 }
 
 internal class Expector<T>
 {
-    private readonly T _actual;
+    private readonly T? _actual;
+    private readonly string? _message;
 
-    public Expector(T actual)
+    public Expector(T? actual, string? message = null)
     {
         _actual = actual;
+        _message = message;
     }
 
     public Expector<T> To => this;
 
     public NotExpector<T> Not()
     {
-        return new NotExpector<T>(_actual);
+        return new NotExpector<T>(_actual, _message);
     }
 
     public Expector<T> Be => this;
@@ -104,28 +116,30 @@ internal class Expector<T>
             expected = (int)d;
         }
 
-        Assert.AreEqual(expected, _actual, message);
+        Assert.AreEqual(expected, _actual, message ?? _message);
     }
 
     public void LessThan(double expected)
     {
         if (_actual is IComparable d)
         {
-            Assert.IsTrue(d.CompareTo(expected) < 0, $"Expected Expected[{d}] < Actual[{_actual}]");
+            Assert.IsTrue(d.CompareTo(expected) < 0, _message ?? $"Expected Expected[{d}] < Actual[{_actual}]");
         }
     }
 
-    public void GreaterThan(double expected)
+    public void GreaterThan(double expected, string? message = null)
     {
         if (_actual is int i)
         {
-            Assert.IsTrue(i.CompareTo(expected) > 0,
+            Assert.IsTrue(i > expected,
+                _message ?? message ??
                 $"Expected {expected} to be greater than {_actual}");
         }
 
         if (_actual is double d)
         {
             Assert.IsTrue(d.CompareTo(expected) > 0,
+                _message ?? message ??
                 $"Expected {expected} to be greater than {_actual}");
         }
     }
@@ -135,7 +149,7 @@ internal class Expector<T>
         if (_actual is IConvertible c)
         {
             Assert.AreEqual(expected,
-                c.ToDouble(System.Globalization.CultureInfo.InvariantCulture), delta, message);
+                c.ToDouble(System.Globalization.CultureInfo.InvariantCulture), delta, message ?? _message);
         }
         else
         {
@@ -150,19 +164,24 @@ internal class Expector<T>
             expected = (double)i;
         }
 
-        Assert.AreEqual(expected, _actual);
+        Assert.AreEqual(expected, _actual, _message);
     }
 
     public void Ok()
     {
-        Assert.AreNotEqual(default!, _actual);
+        Assert.AreNotEqual(default!, _actual, _message);
+    }
+
+    public void Undefined()
+    {
+        Assert.IsNull(_actual, _message);
     }
 
     public void Length(int length)
     {
         if (_actual is ICollection collection)
         {
-            Assert.AreEqual(length, collection.Count);
+            Assert.AreEqual(length, collection.Count, _message);
         }
         else
         {
@@ -174,7 +193,7 @@ internal class Expector<T>
     {
         if (_actual is ICollection collection)
         {
-            CollectionAssert.Contains(collection, element);
+            CollectionAssert.Contains(collection, element, _message);
         }
         else
         {
@@ -186,7 +205,7 @@ internal class Expector<T>
     {
         if (_actual is bool b)
         {
-            Assert.IsTrue(b);
+            Assert.IsTrue(b, _message);
         }
         else
         {
@@ -198,7 +217,7 @@ internal class Expector<T>
     {
         if (_actual is bool b)
         {
-            Assert.IsFalse(b);
+            Assert.IsFalse(b, _message);
         }
         else
         {
@@ -214,7 +233,7 @@ internal class Expector<T>
             try
             {
                 d();
-                Assert.Fail("Did not throw error");
+                Assert.Fail(_message ?? "Did not throw error");
             }
             catch (Exception e)
             {
@@ -224,7 +243,7 @@ internal class Expector<T>
                 }
             }
 
-            Assert.Fail("Exception type didn't match");
+            Assert.Fail(_message ?? "Exception type didn't match");
         }
         else
         {
@@ -266,7 +285,7 @@ internal class Expector<T>
         var error = snapshotFile.Match(snapshotName, _actual);
         if (!string.IsNullOrEmpty(error))
         {
-            Assert.Fail(error);
+            Assert.Fail((_message ?? "") + error);
         }
     }
 

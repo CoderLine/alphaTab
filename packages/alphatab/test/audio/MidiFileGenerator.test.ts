@@ -5,7 +5,12 @@ import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { Logger } from '@coderline/alphatab/Logger';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
 import { ControllerType } from '@coderline/alphatab/midi/ControllerType';
-import { type MidiEvent, MidiEventType, NoteOnEvent, type TimeSignatureEvent } from '@coderline/alphatab/midi/MidiEvent';
+import {
+    type MidiEvent,
+    MidiEventType,
+    NoteOnEvent,
+    type TimeSignatureEvent
+} from '@coderline/alphatab/midi/MidiEvent';
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import type { MidiTickLookup } from '@coderline/alphatab/midi/MidiTickLookup';
@@ -18,11 +23,18 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
 import type { Score } from '@coderline/alphatab/model/Score';
+import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Settings } from '@coderline/alphatab/Settings';
+import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
+import { AlphaSynthWrapper } from '@coderline/alphatab/synth/AlphaSynthWrapper';
+import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
+import { expect } from 'chai';
 import {
     FlatControlChangeEvent,
-    type FlatMidiEvent,
+    FlatMidiEvent,
     FlatMidiEventGenerator,
     FlatNoteBendEvent,
     FlatNoteEvent,
@@ -32,8 +44,8 @@ import {
     FlatTimeSignatureEvent,
     FlatTrackEndEvent
 } from 'test/audio/FlatMidiEventGenerator';
+import { TestOutput } from 'test/audio/TestOutput';
 import { TestPlatform } from 'test/TestPlatform';
-import { expect } from 'chai';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
@@ -339,6 +351,7 @@ describe('MidiFileGeneratorTest', () => {
             new FlatNoteBendEvent(9 * 40, 0, info.secondaryChannel, note.realValue, 8960),
             new FlatNoteBendEvent(10 * 40, 0, info.secondaryChannel, note.realValue, 9045),
             new FlatNoteBendEvent(11 * 40, 0, info.secondaryChannel, note.realValue, 9131),
+            new FlatNoteBendEvent(12 * 40, 0, info.secondaryChannel, note.realValue, 9216), // full bend
             new FlatNoteBendEvent(12 * 40, 0, info.secondaryChannel, note.realValue, 9216), // full bend
             new FlatNoteBendEvent(12 * 40, 0, info.secondaryChannel, note.realValue, 9216), // full bend
             new FlatNoteBendEvent(13 * 40, 0, info.secondaryChannel, note.realValue, 9131),
@@ -1241,7 +1254,7 @@ describe('MidiFileGeneratorTest', () => {
         const score: Score = parseTex(tex);
 
         expect(score.tempo).to.be.equal(60);
-        expect(score.masterBars[0].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[0].tempoAutomations.length).to.equal(1);
         expect(score.masterBars[0].tempoAutomations[0]!.value).to.be.equal(60);
 
         const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
@@ -1840,5 +1853,241 @@ describe('MidiFileGeneratorTest', () => {
 
         expect(generator.transpositionPitches.has(5)).to.be.true;
         expect(generator.transpositionPitches.get(5)!).to.equal(12);
+    });
+
+    it('tickshift-flat', () => {
+        const score = parseTex(`
+            C4 {gr bb} C4 C4 C4 C4  
+        `);
+
+        const handler = new FlatMidiEventGenerator();
+        const generator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        expect(handler.tickShift).to.equal(120);
+        const firstNote = handler.midiEvents.find(e => e instanceof FlatNoteEvent) as FlatNoteEvent;
+        expect(firstNote.tick).to.equal(-120);
+    });
+
+    it('tickshift-synth', () => {
+        const score = parseTex(`
+            C4 {gr bb} C4 C4 C4 C4  
+        `);
+
+        const file = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(file);
+        const generator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        expect(handler.tickShift).to.equal(120);
+        const firstNote = file.events.find(e => e instanceof NoteOnEvent) as NoteOnEvent;
+        expect(firstNote.tick).to.equal(0);
+    });
+
+    it('synthwrapper-mapping', () => {
+        const wrapper = new AlphaSynthWrapper();
+        const output = new TestOutput();
+        const synth = new AlphaSynth(output, 100);
+        wrapper.instance = synth;
+
+        const score = parseTex(`
+            C4 {gr bb} C4 C4 C4 C4  
+        `);
+
+        const file = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(file);
+        const generator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        wrapper.midiTickShift = handler.tickShift;
+        wrapper.loadMidiFile(file);
+
+        // the synth is always a bit off internally to handle
+        // some inclusive/exclusive ranges easier
+        const tickImprecision = 1;
+
+        // check API -> Player mappings
+        wrapper.tickPosition = -120;
+        expect(synth.tickPosition).to.equal(tickImprecision);
+
+        wrapper.tickPosition = 0;
+        expect(synth.tickPosition).to.equal(120 + tickImprecision);
+
+        const range = new PlaybackRange();
+        range.startTick = 960;
+        range.endTick = 1920;
+        wrapper.playbackRange = range;
+        expect(synth.playbackRange!.startTick).to.equal(range.startTick + handler.tickShift);
+        expect(synth.playbackRange!.endTick).to.equal(range.endTick + handler.tickShift);
+
+        // check API <- Player mappings
+        wrapper.stop();
+        expect(wrapper.tickPosition).to.equal(range.startTick + tickImprecision);
+        expect(wrapper.loadedMidiInfo!.endTick).to.equal(3840);
+        expect(wrapper.playbackRange!.startTick).to.equal(range.startTick);
+        expect(wrapper.playbackRange!.endTick).to.equal(range.endTick);
+
+        wrapper.playbackRange = null;
+        let lastArgs: PositionChangedEventArgs | null = null;
+        wrapper.positionChanged.on(e => {
+            lastArgs = e;
+        });
+        wrapper.tickPosition = 0;
+        expect(lastArgs!.currentTick).to.equal(tickImprecision);
+        expect(synth.tickPosition).to.equal(handler.tickShift + tickImprecision);
+    });
+
+    describe('effect-note-durations', () => {
+        function test(tex: string, applyEffect: (beat: Beat) => void) {
+            const score = ScoreLoader.loadAlphaTex(tex);
+            let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+            while (beat) {
+                applyEffect(beat);
+                beat = beat.nextBeat;
+            }
+
+            const settings = new Settings();
+            settings.player.playTripletFeel = true;
+
+            score.finish(settings);
+
+            const flat = new FlatMidiEventGenerator();
+            const generator: MidiFileGenerator = new MidiFileGenerator(score, settings, flat);
+            generator.generate();
+
+            const noteEvents = flat.midiEvents
+                .filter<FlatMidiEvent>(e => e instanceof FlatNoteEvent)
+                .map(
+                    e =>
+                        `Note: ${Tuning.getTextForTuning((e as FlatNoteEvent).key, true)} ${(e as FlatNoteEvent).length}`
+                );
+
+            expect(noteEvents).toMatchSnapshot();
+        }
+
+        function addTrill(b: Beat) {
+            if (b.graceType !== GraceType.None) {
+                return;
+            }
+            b.notes[0].trillValue = b.notes[0].realValue + 12;
+            b.notes[0].trillSpeed = Duration.ThirtySecond;
+        }
+
+        function addTremolo(b: Beat, marks: number) {
+            if (b.graceType !== GraceType.None) {
+                return;
+            }
+            b.tremoloPicking = new TremoloPickingEffect();
+            b.tremoloPicking.marks = marks;
+            b.tremoloPicking.style = TremoloPickingStyle.Default;
+        }
+
+        // as reference to check snapshots
+        describe('plain', () => {
+            const tex = `
+                :8
+                5.3
+                7.3
+                9.3
+                10.3
+            `;
+
+            it('tripletfeel', () => test(`\\tf triplet8th ${tex}`, _b => {}));
+            it('tuplet', () =>
+                test(tex, b => {
+                    b.tupletNumerator = 3;
+                    b.tupletDenominator = 2;
+                }));
+            it('dot', () =>
+                test(tex, b => {
+                    b.dots = 1;
+                }));
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        describe('tuplet', () => {
+            const tex = `
+                :8
+                5.3 {tu 3}
+                7.3 {tu 3}
+                9.3 {tu 3}
+            `;
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        describe('dots', () => {
+            const tex = `
+                :8
+                5.3 {d}
+                7.3 {d}
+                9.3 {d}
+            `;
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        describe('triplet-feel', () => {
+            const tex = `
+                \\tf triplet8th 
+                :8
+                5.3
+                7.3
+                9.3
+                10.3
+            `;
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        describe('grace-notes-on-beat', () => {
+            const tex = `
+                :8
+                3.5 {gr ob}
+                5.3
+                5.5 {gr ob}
+                7.3
+                7.5 {gr ob}
+                9.3
+                9.5 {gr ob}
+                10.3
+            `;
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        describe('grace-notes-before-beat', () => {
+            const tex = `
+                :8            
+                5.3 {gr bb}
+                5.3
+                7.3 {gr bb}
+                7.3
+                9.3 {gr bb}
+                9.3
+                10.3 {gr bb}
+                10.3
+            `;
+
+            it('trill', () => test(tex, b => addTrill(b)));
+            it('tremolo-2', () => test(tex, b => addTremolo(b, 2)));
+            it('tremolo-3', () => test(tex, b => addTremolo(b, 3)));
+        });
+
+        // NOTE: there might be more affected effects which we assume are "good enough" with the
+        // current behavior. combining these effects are rather unlikely like:
+        // * brush-strokes combined with trills or tremolos
+        // * rasgueados combined with trills or tremolos
     });
 });

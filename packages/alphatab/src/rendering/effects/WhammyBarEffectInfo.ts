@@ -3,14 +3,14 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@coderline/alphatab/rendering/glyphs/LineRangedGlyph';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
  */
-export class WhammyBarEffectInfo extends EffectBarRendererInfo {
+export class WhammyBarEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectWhammyBar;
     }
@@ -32,7 +32,7 @@ export class WhammyBarEffectInfo extends EffectBarRendererInfo {
     }
 
     public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new LineRangedGlyph('w/bar');
+        return new LineRangedGlyph('w/bar', NotationElement.EffectWhammyBar);
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

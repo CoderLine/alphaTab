@@ -134,6 +134,7 @@ export class EngravingSettingsSerializer {
         o.set("deadslappedlinewidth", obj.deadSlappedLineWidth);
         o.set("lefthandtabtiewidth", obj.leftHandTabTieWidth);
         o.set("tabbenddashsize", obj.tabBendDashSize);
+        o.set("tabbendstaffpadding", obj.tabBendStaffPadding);
         o.set("tabbendpervalueheight", obj.tabBendPerValueHeight);
         o.set("tabbendlabelpadding", obj.tabBendLabelPadding);
         o.set("simpleslidewidth", obj.simpleSlideWidth);
@@ -153,6 +154,14 @@ export class EngravingSettingsSerializer {
         o.set("tuningglyphstringcolumnscale", obj.tuningGlyphStringColumnScale);
         o.set("tuningglyphstringrowpadding", obj.tuningGlyphStringRowPadding);
         o.set("directionsscale", obj.directionsScale);
+        o.set("multivoicedisplacednoteheadspacing", obj.multiVoiceDisplacedNoteHeadSpacing);
+        {
+            const m = new Map<string, unknown>();
+            o.set("stemflagheight", m);
+            for (const [k, v] of obj.stemFlagHeight!) {
+                m.set(k.toString(), v);
+            }
+        }
         return o;
     }
     public static setProperty(obj: EngravingSettings, property: string, v: unknown): boolean {
@@ -371,6 +380,9 @@ export class EngravingSettingsSerializer {
             case "tabbenddashsize":
                 obj.tabBendDashSize = v! as number;
                 return true;
+            case "tabbendstaffpadding":
+                obj.tabBendStaffPadding = v! as number;
+                return true;
             case "tabbendpervalueheight":
                 obj.tabBendPerValueHeight = v! as number;
                 return true;
@@ -427,6 +439,15 @@ export class EngravingSettingsSerializer {
                 return true;
             case "directionsscale":
                 obj.directionsScale = v! as number;
+                return true;
+            case "multivoicedisplacednoteheadspacing":
+                obj.multiVoiceDisplacedNoteHeadSpacing = v! as number;
+                return true;
+            case "stemflagheight":
+                obj.stemFlagHeight = new Map<Duration, number>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.stemFlagHeight.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number);
+                });
                 return true;
         }
         return false;

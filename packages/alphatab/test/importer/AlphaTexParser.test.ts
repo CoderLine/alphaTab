@@ -22,7 +22,8 @@ describe('AlphaTexParserTest', () => {
         it('known semantic', () => parserTest('\\title "Title" "Template" left . '));
         it('known multiple', () => parserTest('\\title "Title" \\subtitle "Sub" . '));
         it('known property', () => parserTest('\\track "Name" {color "red"} . '));
-        it('known property before value', () => parserTest('\\track {color "red"} "Name" . '));
+        it('known property before value', () => parserTest('\\chord {showFingering} "Name" . '));
+        it('notelist after props', () => parserTest('\\staff { tabs } (3.3 3.3).2'));
         it('unknown valuelist', () => parserTest('\\notExisting ("Value") . '));
         it('unknown multiple', () => parserTest('\\notExisting ("Value") \\notExisting ("") . '));
         it('valuelist propertylist empty', () => parserTest('\\notExisting ("Value") {} . '));
@@ -160,6 +161,7 @@ describe('AlphaTexParserTest', () => {
 
     describe('ambiguous', () => {
         it('tempo and stringed note', () => parserTest('\\tempo 120 3.3 3.4'));
+        it('voice followed by note list', () => parserTest('\\voice (C4 C5)'));
     });
 
     describe('intermediate', () => {

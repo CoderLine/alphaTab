@@ -3,15 +3,22 @@ import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { Direction } from '@coderline/alphatab/model/Direction';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@coderline/alphatab/model/RenderStylesheet';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import {
+    BarNumberDisplay,
+    BracketExtendMode,
+    TrackNameMode,
+    TrackNameOrientation,
+    TrackNamePolicy
+} from '@coderline/alphatab/model/RenderStylesheet';
 import { ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { Settings } from '@coderline/alphatab/Settings';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import { expect } from 'chai';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { TestPlatform } from 'test/TestPlatform';
-import { expect } from 'chai';
 
 describe('Gp8ImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {
@@ -46,13 +53,13 @@ describe('Gp8ImporterTest', () => {
     it('beat-tempo-change', async () => {
         const score = (await prepareImporterWithFile('guitarpro8/beat-tempo-change.gp')).readScore();
 
-        expect(score.masterBars[0].tempoAutomations).to.have.length(2);
+        expect(score.masterBars[0].tempoAutomations.length).to.equal(2);
         expect(score.masterBars[0].tempoAutomations[0].value).to.have.equal(120);
         expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.equal(0);
         expect(score.masterBars[0].tempoAutomations[1].value).to.equal(60);
         expect(score.masterBars[0].tempoAutomations[1].ratioPosition).to.equal(0.5);
 
-        expect(score.masterBars[1].tempoAutomations).to.have.length(2);
+        expect(score.masterBars[1].tempoAutomations.length).to.equal(2);
         expect(score.masterBars[1].tempoAutomations[0].value).to.equal(100);
         expect(score.masterBars[1].tempoAutomations[0].ratioPosition).to.equal(0);
         expect(score.masterBars[1].tempoAutomations[1].value).to.equal(120);
@@ -130,6 +137,14 @@ describe('Gp8ImporterTest', () => {
 
         const show = (await prepareImporterWithFile('guitarpro8/directions.gp')).readScore();
         expect(show.stylesheet.globalDisplayChordDiagramsOnTop).to.be.true;
+    });
+
+    it('show-chord-diagrams-in-score', async () => {
+        const hide = (await prepareImporterWithFile('guitarpro8/show-diagrams-in-score.gp')).readScore();
+        expect(hide.stylesheet.globalDisplayChordDiagramsInScore).to.be.true;
+
+        const show = (await prepareImporterWithFile('guitarpro8/directions.gp')).readScore();
+        expect(show.stylesheet.globalDisplayChordDiagramsInScore).to.be.false;
     });
 
     it('beaming-mode', async () => {
@@ -417,11 +432,76 @@ describe('Gp8ImporterTest', () => {
         expect(score.tracks[0].playbackInfo.bank).to.equal(0);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].automations.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getAutomation(AutomationType.Instrument)?.value).to.equal(25);
+        expect(
+            score.tracks[0].staves[0].bars[0].voices[0].beats[0].getAutomation(AutomationType.Instrument)?.value
+        ).to.equal(25);
         // expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getAutomation(AutomationType.Bank)?.value).to.equal(0); skipped
 
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].automations.length).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Instrument)?.value).to.equal(25);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Bank)?.value).to.equal(256);
+        expect(
+            score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Instrument)?.value
+        ).to.equal(25);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Bank)?.value).to.equal(
+            256
+        );
+    });
+
+    it('extend-bar-lines', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/extended-barlines.gp')).readScore();
+
+        expect(score.stylesheet.extendBarLines).to.be.true;
+    });
+
+    describe('barnumbers', () => {
+        it('all', async () => {
+            const score = (await prepareImporterWithFile('guitarpro8/barnumbers-all.gp')).readScore();
+            expect(score.stylesheet.barNumberDisplay).to.equal(BarNumberDisplay.AllBars);
+        });
+        it('hide', async () => {
+            const score = (await prepareImporterWithFile('guitarpro8/barnumbers-hide.gp')).readScore();
+            expect(score.stylesheet.barNumberDisplay).to.equal(BarNumberDisplay.Hide);
+        });
+        it('first', async () => {
+            const score = (await prepareImporterWithFile('guitarpro8/barnumbers-first.gp')).readScore();
+            expect(score.stylesheet.barNumberDisplay).to.equal(BarNumberDisplay.FirstOfSystem);
+        });
+    });
+
+    it('custom-beaming', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/custom-beaming.gp')).readScore();
+
+        // NOTE: no need to verify all details, we'll have a visual test for that.
+
+        expect(score.masterBars[0].beamingRules).to.be.ok;
+        expect(score.masterBars[0].beamingRules!.groups.has(Duration.Eighth)).to.be.true;
+        expect(score.masterBars[0].beamingRules!.groups.get(Duration.Eighth)!.join(',')).to.be.equal('2,2,2,2');
+        // equal to previous
+        expect(score.masterBars[1].beamingRules === undefined, 'expected beamingRules of bar 1 to be undefined').to.be
+            .true;
+        expect(
+            score.masterBars[1].actualBeamingRules === score.masterBars[0].beamingRules,
+            'actualBeamingRules of bar 1 incorrect'
+        ).to.be.true;
+        expect(score.masterBars[2].beamingRules === undefined, 'expected beamingRules of bar 2 to be undefined').to.be
+            .true;
+        expect(
+            score.masterBars[2].actualBeamingRules === score.masterBars[0].beamingRules,
+            'actualBeamingRules of bar 1 incorrect'
+        ).to.be.true;
+        expect(score.masterBars[3].beamingRules === undefined, 'expected beamingRules of bar 3 to be undefined').to.be
+            .true;
+        expect(
+            score.masterBars[3].actualBeamingRules === score.masterBars[0].beamingRules,
+            'actualBeamingRules of bar 1 incorrect'
+        ).to.be.true;
+        expect(score.masterBars[4].beamingRules === undefined, 'expected beamingRules of bar 4 to be undefined').to.be
+            .true;
+        expect(
+            score.masterBars[4].actualBeamingRules === score.masterBars[0].beamingRules,
+            'actualBeamingRules of bar 1 incorrect'
+        ).to.be.true;
+
+        expect(score.masterBars[5].beamingRules!.groups.has(Duration.Eighth)).to.be.true;
+        expect(score.masterBars[5].beamingRules!.groups.get(Duration.Eighth)!.join(',')).to.be.equal('4,4');
     });
 });

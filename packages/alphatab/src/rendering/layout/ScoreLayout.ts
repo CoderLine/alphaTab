@@ -1,26 +1,29 @@
 import { Environment } from '@coderline/alphatab/Environment';
+import type { EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { Logger } from '@coderline/alphatab/Logger';
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
+import { type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { ChordDiagramContainerGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
+import { TuningContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TuningContainerGlyph';
+import { TuningGlyph } from '@coderline/alphatab/rendering/glyphs/TuningGlyph';
+import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
+import { SlurRegistry } from '@coderline/alphatab/rendering/layout/SlurRegistry';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
-import { Logger } from '@coderline/alphatab/Logger';
-import type { EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
-import { TuningContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TuningContainerGlyph';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { TuningGlyph } from '@coderline/alphatab/rendering/glyphs/TuningGlyph';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { Lazy } from '@coderline/alphatab/util/Lazy';
 
@@ -37,27 +40,6 @@ class LazyPartial {
 }
 
 /**
- * Lists the different modes in which the staves and systems are arranged.
- * @internal
- */
-export enum InternalSystemsLayoutMode {
-    /**
-     * Use the automatic alignment system provided by alphaTab (default)
-     */
-    Automatic = 0,
-
-    /**
-     * Use the relative scaling information stored in the score model.
-     */
-    FromModelWithScale = 1,
-
-    /**
-     * Use the absolute size information stored in the score model.
-     */
-    FromModelWithWidths = 2
-}
-
-/**
  * This is the base class for creating new layouting engines for the score renderer.
  * @internal
  */
@@ -65,6 +47,8 @@ export abstract class ScoreLayout {
     private _barRendererLookup: Map<string, Map<number, BarRendererBase>> = new Map();
 
     protected pagePadding: number[] | null = null;
+
+    public profile: Set<string> = new Set<string>();
 
     public abstract get name(): string;
 
@@ -83,8 +67,6 @@ export abstract class ScoreLayout {
     protected chordDiagrams: ChordDiagramContainerGlyph | null = null;
     protected tuningGlyph: TuningContainerGlyph | null = null;
 
-    public systemsLayoutMode: InternalSystemsLayoutMode = InternalSystemsLayoutMode.Automatic;
-
     public constructor(renderer: ScoreRenderer) {
         this.renderer = renderer;
     }
@@ -92,14 +74,23 @@ export abstract class ScoreLayout {
     public abstract get firstBarX(): number;
     public abstract get supportsResize(): boolean;
 
+    public slurRegistry = new SlurRegistry();
+    public beamingRuleLookups = new Map<string, BeamingRuleLookup>();
+
     public resize(): void {
         this._lazyPartials.clear();
+        this.slurRegistry.clear();
         this.doResize();
     }
     public abstract doResize(): void;
 
-    public layoutAndRender(): void {
+    public layoutAndRender(renderHints?: RenderHints): void {
         this._lazyPartials.clear();
+        this.slurRegistry.clear();
+        this.beamingRuleLookups.clear();
+        this._barRendererLookup.clear();
+
+        this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
 
         const score: Score = this.renderer.score!;
 
@@ -122,7 +113,7 @@ export abstract class ScoreLayout {
         }
 
         this._createScoreInfoGlyphs();
-        this.doLayoutAndRender();
+        this.doLayoutAndRender(renderHints);
     }
 
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
@@ -166,7 +157,7 @@ export abstract class ScoreLayout {
         }
     }
 
-    protected abstract doLayoutAndRender(): void;
+    protected abstract doLayoutAndRender(renderHints: RenderHints | undefined): void;
 
     protected static readonly headerElements: Lazy<Map<ScoreSubElement, NotationElement | undefined>> = new Lazy(
         () =>
@@ -352,10 +343,9 @@ export abstract class ScoreLayout {
                 }
             }
 
-            if(this.chordDiagrams.isEmpty) {
+            if (this.chordDiagrams.isEmpty) {
                 this.chordDiagrams = null;
             }
-
         } else {
             this.chordDiagrams = null;
         }
@@ -365,22 +355,64 @@ export abstract class ScoreLayout {
 
     public lastBarIndex: number = 0;
 
-    protected createEmptyStaffSystem(): StaffSystem {
+    protected createEmptyStaffSystem(index: number): StaffSystem {
         const system: StaffSystem = new StaffSystem(this);
+        system.index = index;
+        const allFactories = Environment.defaultRenderers;
+
+        const renderStaves: RenderStaff[] = [];
         for (let trackIndex: number = 0; trackIndex < this.renderer.tracks!.length; trackIndex++) {
             const track: Track = this.renderer.tracks![trackIndex];
+
             for (let staffIndex: number = 0; staffIndex < track.staves.length; staffIndex++) {
-                const staff: Staff = track.staves[staffIndex];
-                const profile: BarRendererFactory[] = Environment.staveProfiles.get(
-                    this.renderer.settings.display.staveProfile
-                )!;
-                for (const factory of profile) {
-                    if (factory.canCreate(track, staff)) {
-                        system.addStaff(track, new RenderStaff(trackIndex, staff, factory));
+                const staff = track.staves[staffIndex];
+
+                let sharedTopEffects: EffectBandInfo[] = [];
+                let sharedBottomEffects: EffectBandInfo[] = [];
+
+                let previousStaff: RenderStaff | undefined = undefined;
+
+                for (const factory of allFactories) {
+                    if (this.profile.has(factory.staffId) && factory.canCreate(track, staff)) {
+                        const renderStaff = new RenderStaff(system, trackIndex, staff, factory);
+                        // insert shared effect bands at front
+                        renderStaff.topEffectInfos.splice(0, 0, ...sharedTopEffects);
+                        renderStaff.bottomEffectInfos.push(...sharedBottomEffects);
+                        previousStaff = renderStaff;
+                        // just remember staff, adding to system comes later when we have all effects collected
+                        renderStaves.push(renderStaff);
+                        sharedTopEffects = [];
+                        sharedBottomEffects = [];
+                    } else {
+                        for (const e of factory.effectBands) {
+                            switch (e.mode) {
+                                case EffectBandMode.SharedTop:
+                                    sharedTopEffects.push(e);
+                                    break;
+                                case EffectBandMode.SharedBottom:
+                                    sharedBottomEffects.push(e);
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                // don't forget any left-over shared effects.
+                if (previousStaff) {
+                    if (sharedTopEffects.length > 0) {
+                        previousStaff.bottomEffectInfos.push(...sharedTopEffects);
+                    }
+                    if (sharedBottomEffects.length > 0) {
+                        previousStaff.bottomEffectInfos.push(...sharedBottomEffects);
                     }
                 }
             }
         }
+
+        for (const staff of renderStaves) {
+            system.addStaff(staff);
+        }
+
         return system;
     }
 
@@ -392,18 +424,6 @@ export abstract class ScoreLayout {
         if (renderer.additionalMultiRestBars) {
             for (const b of renderer.additionalMultiRestBars) {
                 this._barRendererLookup.get(key)!.set(b.id, renderer);
-            }
-        }
-    }
-
-    public unregisterBarRenderer(key: string, renderer: BarRendererBase): void {
-        if (this._barRendererLookup.has(key)) {
-            const lookup: Map<number, BarRendererBase> = this._barRendererLookup.get(key)!;
-            lookup.delete(renderer.bar.id);
-            if (renderer.additionalMultiRestBars) {
-                for (const b of renderer.additionalMultiRestBars) {
-                    lookup.delete(b.id);
-                }
             }
         }
     }
@@ -485,7 +505,11 @@ export abstract class ScoreLayout {
         const msg: string = 'rendered by alphaTab';
         const resources: RenderingResources = this.renderer.settings.display.resources;
         const size: number = 12;
-        const font = Font.withFamilyList(resources.copyrightFont.families, size, FontStyle.Plain, FontWeight.Bold);
+        const fontFamilies = resources.elementFonts.has(NotationElement.ScoreCopyright)
+            ? resources.elementFonts.get(NotationElement.ScoreCopyright)!.families
+            : resources.tablatureFont.families;
+
+        const font = Font.withFamilyList(fontFamilies, size, FontStyle.Plain, FontWeight.Bold);
 
         const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);
         const glyph = new TextGlyph(0, 0, msg, font, TextAlign.Center, undefined, resources.mainGlyphColor);

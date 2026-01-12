@@ -98,7 +98,6 @@ describe('Gp3ImporterTest', () => {
     });
 
     it('vibrato', async () => {
-        // TODO: Check why this vibrato is not recognized
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/vibrato.gp3');
         const score: Score = reader.readScore();
         GpImporterTestHelper.checkVibrato(score, false);

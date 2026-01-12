@@ -1,7 +1,5 @@
-
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-
 
 /**
  * This public enum lists all base line modes
@@ -34,9 +32,24 @@ export enum TechniqueSymbolPlacement {
  */
 export class InstrumentArticulation {
     /**
+     * An internal ID to identify this articulation for purposes like
+     * mapping during exports.The exact meaning of the ID is not defined and dependes on the
+     * importer source.
+     */
+    public id: number = 0;
+
+    /**
+     * A unique id for this articulation.
+     */
+    public get uniqueId() {
+        return `${this.elementType}.${this.id}`;
+    }
+
+    /**
      * Gets or sets the type of the element for which this articulation is for.
      */
     public elementType: string;
+
     /**
      * The line the note head should be shown for standard notation.
      *
@@ -80,8 +93,10 @@ export class InstrumentArticulation {
         noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
         techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
-        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside
+        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside,
+        id: number = 0
     ) {
+        this.id = id;
         this.elementType = elementType;
         this.outputMidiNumber = outputMidiNumber;
         this.staffLine = staffLine;
@@ -90,6 +105,34 @@ export class InstrumentArticulation {
         this.noteHeadWhole = noteHeadWhole !== MusicFontSymbol.None ? noteHeadWhole : noteHeadDefault;
         this.techniqueSymbol = techniqueSymbol;
         this.techniqueSymbolPlacement = techniqueSymbolPlacement;
+    }
+
+    // avoiding breaking change
+    /**
+     * @internal
+     */
+    public static create(
+        id: number = 0,
+        elementType: string = '',
+        staffLine: number = 0,
+        outputMidiNumber: number = 0,
+        noteHeadDefault: MusicFontSymbol = MusicFontSymbol.None,
+        noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
+        noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
+        techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
+        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside
+    ) {
+        return new InstrumentArticulation(
+            elementType,
+            staffLine,
+            outputMidiNumber,
+            noteHeadDefault,
+            noteHeadHalf,
+            noteHeadWhole,
+            techniqueSymbol,
+            techniqueSymbolPlacement,
+            id
+        );
     }
 
     public getSymbol(duration: Duration): MusicFontSymbol {

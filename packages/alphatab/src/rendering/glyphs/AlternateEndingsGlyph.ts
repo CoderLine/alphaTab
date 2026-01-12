@@ -3,6 +3,7 @@ import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { BarLineStyle } from '@coderline/alphatab/model/Bar';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -31,7 +32,9 @@ export class AlternateEndingsGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.resources.wordsFont.size + this.renderer.smuflMetrics.alternateEndingsPadding * 2;
+        this.height =
+            this.renderer.resources.elementFonts.get(NotationElement.EffectAlternateEndings)!.size +
+            this.renderer.smuflMetrics.alternateEndingsPadding * 2;
         let endingsStrings: string = '';
         for (let i: number = 0, j: number = this._endings.length; i < j; i++) {
             endingsStrings += this._endings[i] + 1;
@@ -44,7 +47,7 @@ export class AlternateEndingsGlyph extends EffectGlyph {
         let width = this._closeLine ? this.width - canvas.lineWidth : this.width;
 
         const lineBarRight = this.renderer.bar.getActualBarLineRight();
-        if(lineBarRight === BarLineStyle.LightHeavy) {
+        if (lineBarRight === BarLineStyle.LightHeavy) {
             width -= this.renderer.smuflMetrics.thickBarlineThickness + this.renderer.smuflMetrics.barlineSeparation;
         }
 
@@ -75,7 +78,7 @@ export class AlternateEndingsGlyph extends EffectGlyph {
             const baseline: TextBaseline = canvas.textBaseline;
             canvas.textBaseline = TextBaseline.Top;
             const res: RenderingResources = this.renderer.resources;
-            canvas.font = res.wordsFont;
+            canvas.font = res.elementFonts.get(NotationElement.EffectAlternateEndings)!;
             canvas.fillText(
                 this._endingsString,
                 cx + this.x + this.renderer.smuflMetrics.alternateEndingsPadding,

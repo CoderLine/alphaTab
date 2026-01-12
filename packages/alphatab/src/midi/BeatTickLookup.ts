@@ -22,6 +22,15 @@ export class BeatTickLookupItem {
 }
 
 /**
+ * Classes implementing this interface can help in checking whether beats are currently being
+ * displayed so that they can be considered for a tick-search.
+ * @public
+ */
+export interface IBeatVisibilityChecker {
+    isVisible(beat: Beat): boolean;
+}
+
+/**
  * Represents the time period, for which one or multiple {@link Beat}s are played
  * @public
  */
@@ -91,6 +100,20 @@ export class BeatTickLookup {
     public getVisibleBeatAtStart(visibleTracks: Set<number>): Beat | null {
         for (const b of this.highlightedBeats) {
             if (b.playbackStart === this.start && visibleTracks.has(b.beat.voice.bar.staff.track.index)) {
+                return b.beat;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Looks for the first visible beat which starts at this lookup so it can be used for cursor placement.
+     * @param checker The custom checker to see if a beat is visible.
+     * @returns The first beat which is visible according to the given tracks or null.
+     */
+    getVisibleBeatAtStartWithChecker(checker: IBeatVisibilityChecker): Beat | null {
+        for (const b of this.highlightedBeats) {
+            if (b.playbackStart === this.start && checker.isVisible(b.beat)) {
                 return b.beat;
             }
         }

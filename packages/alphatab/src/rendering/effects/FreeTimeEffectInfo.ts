@@ -4,14 +4,14 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
  */
-export class FreeTimeEffectInfo extends EffectBarRendererInfo {
+export class FreeTimeEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectText;
     }
@@ -39,7 +39,13 @@ export class FreeTimeEffectInfo extends EffectBarRendererInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new TextGlyph(0, 0, 'Free time', renderer.resources.effectFont, TextAlign.Left);
+        return new TextGlyph(
+            0,
+            0,
+            'Free time',
+            renderer.resources.elementFonts.get(NotationElement.EffectFreeTime)!,
+            TextAlign.Left
+        );
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

@@ -4,14 +4,14 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
  */
-export class TextEffectInfo extends EffectBarRendererInfo {
+export class TextEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectText;
     }
@@ -33,7 +33,13 @@ export class TextEffectInfo extends EffectBarRendererInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new TextGlyph(0, 0, beat.text!, renderer.resources.effectFont, TextAlign.Left);
+        return new TextGlyph(
+            0,
+            0,
+            beat.text!,
+            renderer.resources.elementFonts.get(NotationElement.EffectText)!,
+            TextAlign.Left
+        );
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {

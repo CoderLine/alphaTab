@@ -1,23 +1,23 @@
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Beat } from '@coderline/alphatab/model/Beat';
-import type { Note } from '@coderline/alphatab/model/Note';
-import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
-import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
-import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { Clef } from '@coderline/alphatab/model/Clef';
 import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { Note } from '@coderline/alphatab/model/Note';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 
 /**
  * @internal
  */
-class BeatLines {
-    public maxLine: number = -1000;
-    public maxLineNote: Note|null=null;
-    public minLine: number = -1000;
-    public minLineNote: Note|null=null;
+class BeatSteps {
+    public maxSteps: number = -1000;
+    public maxStepsNote: Note | null = null;
+    public minSteps: number = -1000;
+    public minStepsNote: Note | null = null;
 }
 
 /**
@@ -28,7 +28,6 @@ class BeatLines {
 export class AccidentalHelper {
     private _bar: Bar;
     private _barRenderer: LineBarRenderer;
-
 
     /**
      * We always have 7 steps per octave.
@@ -55,47 +54,40 @@ export class AccidentalHelper {
     public static readonly flatNoteSteps: number[] = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6];
 
     private _registeredAccidentals: Map<number, AccidentalType> = new Map();
-    private _appliedScoreLines: Map<number, number> = new Map();
-    private _appliedScoreLinesByValue: Map<number, number> = new Map();
+    private _appliedScoreSteps: Map<number, number> = new Map();
+    private _appliedScoreStepsByValue: Map<number, number> = new Map();
     private _notesByValue: Map<number, Note> = new Map();
-    private _beatLines: Map<number, BeatLines> = new Map();
+    private _beatSteps: Map<number, BeatSteps> = new Map();
 
     /**
      * The beat on which the highest note of this helper was added.
      * Used together with beaming helper to calculate overflow.
      */
-    public maxLineBeat: Beat | null = null;
+    public maxStepsBeat: Beat | null = null;
     /**
      * The beat on which the lowest note of this helper was added.
      * Used together with beaming helper to calculate overflow.
      */
-    public minLineBeat: Beat | null = null;
+    public minStepsBeat: Beat | null = null;
     /**
-     * The line of the highest note added to this helper.
+     * The steps of the highest note added to this helper.
      */
-    public maxLine: number = -1000;
+    public maxSteps: number = -1000;
     /**
-     * The line of the lowest note added to this helper.
+     * The steps of the lowest note added to this helper.
      */
-    public minLine: number = -1000;
+    public minSteps: number = -1000;
 
     public constructor(barRenderer: LineBarRenderer) {
         this._barRenderer = barRenderer;
         this._bar = barRenderer.bar;
     }
 
-    public static getPercussionLine(bar: Bar, noteValue: number): number {
-        if (noteValue < bar.staff.track.percussionArticulations.length) {
-            return bar.staff.track.percussionArticulations[noteValue]!.staffLine;
-        }
-        return PercussionMapper.getArticulationByInputMidiNumber(noteValue)?.staffLine ?? 0;
+    public static getPercussionSteps(note: Note): number {
+        return PercussionMapper.getArticulation(note)?.staffLine ?? 0;
     }
 
     public static getNoteValue(note: Note) {
-        if (note.isPercussion) {
-            return note.percussionArticulation;
-        }
-
         let noteValue: number = note.displayValue;
 
         // adjust note height according to accidentals enforced
@@ -147,18 +139,17 @@ export class AccidentalHelper {
         return this._getAccidental(noteValue, quarterBend, relatedBeat, isHelperNote, null);
     }
 
-    public static computeLineWithoutAccidentals(bar: Bar, note: Note) {
-        let line: number = 0;
+    public static computeStepsWithoutAccidentals(bar: Bar, note: Note) {
+        let steps = 0;
         const noteValue = AccidentalHelper.getNoteValue(note);
 
         if (note.isPercussion) {
-            line = AccidentalHelper.getPercussionLine(bar, noteValue);
+            steps = AccidentalHelper.getPercussionSteps(note);
         } else {
-            line = AccidentalHelper.calculateNoteSteps(bar.keySignature, bar.clef, noteValue);
+            steps = AccidentalHelper.calculateNoteSteps(bar.keySignature, bar.clef, noteValue);
         }
-        return line;
+        return steps;
     }
-
 
     private _getAccidental(
         noteValue: number,
@@ -171,9 +162,9 @@ export class AccidentalHelper {
 
         let accidentalToSet = AccidentalType.None;
 
-        const isPercussion = note != null ? note.isPercussion : this._bar.staff.isPercussion;
+        const isPercussion = note != null ? note.isPercussion : false;
         if (isPercussion) {
-            steps = AccidentalHelper.getPercussionLine(this._bar, noteValue);
+            steps = AccidentalHelper.getPercussionSteps(note!);
         } else {
             const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
             steps = AccidentalHelper.calculateNoteSteps(this._bar.keySignature, this._bar.clef, noteValue);
@@ -195,21 +186,21 @@ export class AccidentalHelper {
                 case AccidentalType.NaturalQuarterNoteUp:
                 case AccidentalType.SharpQuarterNoteUp:
                 case AccidentalType.FlatQuarterNoteUp:
-                    // quarter notes are always set and not compared with lines
+                    // quarter notes are always set and not compared with steps
                     break;
                 default:
                     // Issue #472: Tied notes across bars do not show the accidentals but also
                     // do not register them.
                     // https://ultimatemusictheory.com/tied-notes-with-accidentals/
                     if (note && note.isTieDestination && note.beat.index === 0) {
-                        // candidate for skip, check further if start note is on the same line
+                        // candidate for skip, check further if start note is on the same steps
                         const tieOriginBarRenderer = this._barRenderer.scoreRenderer.layout?.getRendererForBar(
-                            this._barRenderer.staff.staffId,
+                            this._barRenderer.staff!.staffId,
                             note.tieOrigin!.beat.voice.bar
                         ) as ScoreBarRenderer | null;
                         if (tieOriginBarRenderer && tieOriginBarRenderer.staff === this._barRenderer.staff) {
-                            const tieOriginLine = tieOriginBarRenderer.accidentalHelper.getNoteLine(note.tieOrigin!);
-                            if (tieOriginLine === steps) {
+                            const tieOriginSteps = tieOriginBarRenderer.accidentalHelper.getNoteSteps(note.tieOrigin!);
+                            if (tieOriginSteps === steps) {
                                 skipAccidental = true;
                             }
                         }
@@ -228,60 +219,60 @@ export class AccidentalHelper {
         }
 
         if (note) {
-            this._appliedScoreLines.set(note.id, steps);
+            this._appliedScoreSteps.set(note.id, steps);
             this._notesByValue.set(noteValue, note);
         } else {
-            this._appliedScoreLinesByValue.set(noteValue, steps);
+            this._appliedScoreStepsByValue.set(noteValue, steps);
         }
 
-        if (this.minLine === -1000 || this.minLine < steps) {
-            this.minLine = steps;
-            this.minLineBeat = relatedBeat;
+        if (this.minSteps === -1000 || this.minSteps < steps) {
+            this.minSteps = steps;
+            this.minStepsBeat = relatedBeat;
         }
-        if (this.maxLine === -1000 || this.maxLine > steps) {
-            this.maxLine = steps;
-            this.maxLineBeat = relatedBeat;
+        if (this.maxSteps === -1000 || this.maxSteps > steps) {
+            this.maxSteps = steps;
+            this.maxStepsBeat = relatedBeat;
         }
 
         if (!isHelperNote) {
-            this._registerLine(relatedBeat, steps, note);
+            this._registerSteps(relatedBeat, steps, note);
         }
 
         return accidentalToSet;
     }
 
-    private _registerLine(relatedBeat: Beat, line: number, note:Note|null) {
-        let lines: BeatLines;
-        if (this._beatLines.has(relatedBeat.id)) {
-            lines = this._beatLines.get(relatedBeat.id)!;
+    private _registerSteps(relatedBeat: Beat, steps: number, note: Note | null) {
+        let beatSteps: BeatSteps;
+        if (this._beatSteps.has(relatedBeat.id)) {
+            beatSteps = this._beatSteps.get(relatedBeat.id)!;
         } else {
-            lines = new BeatLines();
-            this._beatLines.set(relatedBeat.id, lines);
+            beatSteps = new BeatSteps();
+            this._beatSteps.set(relatedBeat.id, beatSteps);
         }
-        if (lines.minLine === -1000 || line < lines.minLine) {
-            lines.minLine = line;
-            lines.minLineNote = note;
+        if (beatSteps.minSteps === -1000 || steps < beatSteps.minSteps) {
+            beatSteps.minSteps = steps;
+            beatSteps.minStepsNote = note;
         }
-        if (lines.minLine === -1000 || line > lines.maxLine) {
-            lines.maxLine = line;
-            lines.maxLineNote = note;
+        if (beatSteps.minSteps === -1000 || steps > beatSteps.maxSteps) {
+            beatSteps.maxSteps = steps;
+            beatSteps.maxStepsNote = note;
         }
     }
 
-    public getMaxLine(b: Beat): number {
-        return this._beatLines.has(b.id) ? this._beatLines.get(b.id)!.maxLine : 0;
+    public getMaxSteps(b: Beat): number {
+        return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.maxSteps : 0;
     }
 
-    public getMaxLineNote(b: Beat): Note|null {
-        return this._beatLines.has(b.id) ? this._beatLines.get(b.id)!.maxLineNote : null;
+    public getMaxStepsNote(b: Beat): Note | null {
+        return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.maxStepsNote : null;
     }
 
-    public getMinLine(b: Beat): number {
-        return this._beatLines.has(b.id) ? this._beatLines.get(b.id)!.minLine : 0;
+    public getMinSteps(b: Beat): number {
+        return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.minSteps : 0;
     }
-    
-    public getMinLineNote(b: Beat): Note|null {
-        return this._beatLines.has(b.id) ? this._beatLines.get(b.id)!.minLineNote : null;
+
+    public getMinStepsNote(b: Beat): Note | null {
+        return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.minStepsNote : null;
     }
 
     public static calculateNoteSteps(keySignature: KeySignature, clef: Clef, noteValue: number): number {
@@ -306,16 +297,16 @@ export class AccidentalHelper {
         return steps;
     }
 
-    public getNoteLine(n: Note): number {
-        return this._appliedScoreLines.get(n.id)!;
+    public getNoteSteps(n: Note): number {
+        return this._appliedScoreSteps.get(n.id)!;
     }
 
-    public getNoteLineForValue(rawValue: number, searchForNote: boolean = false): number {
-        if (this._appliedScoreLinesByValue.has(rawValue)) {
-            return this._appliedScoreLinesByValue.get(rawValue)!;
+    public getNoteStepsForValue(rawValue: number, searchForNote: boolean = false): number {
+        if (this._appliedScoreStepsByValue.has(rawValue)) {
+            return this._appliedScoreStepsByValue.get(rawValue)!;
         }
         if (searchForNote && this._notesByValue.has(rawValue)) {
-            return this.getNoteLine(this._notesByValue.get(rawValue)!);
+            return this.getNoteSteps(this._notesByValue.get(rawValue)!);
         }
         return 0;
     }

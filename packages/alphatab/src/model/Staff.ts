@@ -1,8 +1,8 @@
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Chord } from '@coderline/alphatab/model/Chord';
 import type { Track } from '@coderline/alphatab/model/Track';
-import type { Settings } from '@coderline/alphatab/Settings';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * This class describes a single staff within a track. There are instruments like pianos
@@ -128,6 +128,10 @@ export class Staff {
             this.displayTranspositionPitch = 0;
         }
         this.stringTuning.finish();
+        if(this.stringTuning.tunings.length === 0){
+            this.showTablature = false;
+        }
+
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {
             this.bars[i].finish(settings, sharedDataBag);
             for(const v of this.bars[i].filledVoices) {

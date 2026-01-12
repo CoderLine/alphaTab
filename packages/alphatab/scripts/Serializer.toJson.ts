@@ -1,5 +1,5 @@
-import * as ts from 'typescript';
 import { createNodeFromSource, setMethodBody } from '@coderline/alphatab-transpiler/src/BuilderHelpers';
+import * as ts from 'typescript';
 import { findSerializerModule } from './Serializer.common';
 import type { TypeSchema } from './TypeSchema';
 
@@ -30,7 +30,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
         const fieldName = prop.name;
         const jsonName = prop.jsonNames.filter(n => n !== '')[0];
 
-        if (!jsonName || prop.isReadOnly) {
+        if (!jsonName || prop.isJsonReadOnly) {
             continue;
         }
 
@@ -151,6 +151,17 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                         m.set(k.toString(), ${prop.type.typeArguments![1].typeAsString}.toJson(v)${notNull});
                     }
                 }`,
+                    ts.SyntaxKind.Block
+                );
+            } else if(prop.type.typeArguments![1].isArray && prop.type.typeArguments![1].arrayItemType!.isPrimitiveType) {
+                serializeBlock = createNodeFromSource<ts.Block>(
+                    `{
+                        const m = new Map<string, unknown>();
+                        o.set(${JSON.stringify(jsonName)}, m);
+                        for(const [k, v] of obj.${fieldName}!) {
+                            m.set(k.toString(), v);
+                        }
+                    }`,
                     ts.SyntaxKind.Block
                 );
             } else {

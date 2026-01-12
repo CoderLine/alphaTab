@@ -1,4 +1,4 @@
-import type { AlphaTexAccidentalMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import type { AlphaTexAccidentalMode, AlphaTexVoiceMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import type { BarLineStyle } from '@coderline/alphatab/model/Bar';
 import type { BarreShape } from '@coderline/alphatab/model/BarreShape';
 import type { BendStyle } from '@coderline/alphatab/model/BendStyle';
@@ -14,12 +14,14 @@ import type { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidenta
 import type { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import type { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import type {
+    BarNumberDisplay,
     BracketExtendMode,
     TrackNameMode,
     TrackNameOrientation,
     TrackNamePolicy
 } from '@coderline/alphatab/model/RenderStylesheet';
 import type { SimileMark } from '@coderline/alphatab/model/SimileMark';
+import type { TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 import type { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import type { WhammyType } from '@coderline/alphatab/model/WhammyType';
 import type { TextAlign } from '@coderline/alphatab/platform/ICanvas';
@@ -73,6 +75,13 @@ export class AlphaTex1EnumMappings {
     ]);
     public static readonly alphaTexAccidentalModeReversed = AlphaTex1EnumMappings._reverse(
         AlphaTex1EnumMappings.alphaTexAccidentalMode
+    );
+    public static readonly alphaTexVoiceMode = new Map<string, AlphaTexVoiceMode>([
+        ['staffwise', 0],
+        ['barwise', 1]
+    ]);
+    public static readonly alphaTexVoiceModeReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.alphaTexVoiceMode
     );
     public static readonly noteAccidentalMode = new Map<string, NoteAccidentalMode>([
         ['default', 0],
@@ -390,6 +399,21 @@ export class AlphaTex1EnumMappings {
         ['dadoublecoda', 18]
     ]);
     public static readonly directionReversed = AlphaTex1EnumMappings._reverse(AlphaTex1EnumMappings.direction);
+    public static readonly tremoloPickingStyle = new Map<string, TremoloPickingStyle>([
+        ['default', 0],
+        ['buzzroll', 1]
+    ]);
+    public static readonly tremoloPickingStyleReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.tremoloPickingStyle
+    );
+    public static readonly barNumberDisplay = new Map<string, BarNumberDisplay>([
+        ['allbars', 0],
+        ['firstofsystem', 1],
+        ['hide', 2]
+    ]);
+    public static readonly barNumberDisplayReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.barNumberDisplay
+    );
     public static readonly keySignaturesMinorReversed = new Map<KeySignature, string>([
         [-7, 'abminor'],
         [-6, 'ebminor'],

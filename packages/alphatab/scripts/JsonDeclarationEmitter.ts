@@ -7,7 +7,7 @@ import * as ts from 'typescript';
 import createEmitter, { generateFile } from './EmitterBase';
 import { getTypeWithNullableInfo, type TypeWithNullableInfo } from './TypeSchema';
 
-function createDefaultJsonTypeNode(checker: ts.TypeChecker, type: TypeWithNullableInfo, isNullable: boolean) {
+function createDefaultJsonTypeNode(checker: ts.TypeChecker, type: TypeWithNullableInfo, isNullable: boolean): ts.TypeNode {
     if (isNullable) {
         const notNullable = createDefaultJsonTypeNode(checker, type, false);
         return ts.factory.createUnionTypeNode([notNullable, ts.factory.createLiteralTypeNode(ts.factory.createNull())]);

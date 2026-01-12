@@ -101,15 +101,15 @@ internal class ManagedThreadScoreRenderer : IScoreRenderer
         return Thread.CurrentThread == _workerThread;
     }
 
-    public void Render()
+    public void Render(RenderHints? renderHints = null)
     {
         if (CheckAccess())
         {
-            _renderer.Render();
+            _renderer.Render(renderHints);
         }
         else
         {
-            _workerQueue.Add(Render);
+            _workerQueue.Add(() => Render(renderHints));
         }
     }
 
@@ -154,17 +154,17 @@ internal class ManagedThreadScoreRenderer : IScoreRenderer
         }
     }
 
-    public void RenderScore(Score? score, IList<double>? trackIndexes)
+    public void RenderScore(Score? score, IList<double>? trackIndexes, RenderHints? renderHints = null)
     {
         if (CheckAccess())
         {
-            _renderer.RenderScore(score, trackIndexes);
+            _renderer.RenderScore(score, trackIndexes, renderHints);
         }
         else
         {
             _workerQueue.Add(() =>
                 RenderScore(score,
-                    trackIndexes));
+                    trackIndexes, renderHints));
         }
     }
 

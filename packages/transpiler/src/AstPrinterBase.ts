@@ -152,9 +152,40 @@ export default abstract class AstPrinterBase {
             d.isStatic &&
             !d.setAccessor &&
             cs.isPrimitiveTypeNode(d.type) &&
-            !!d.initializer &&
+            this._isConstantExpression(d.initializer) &&
             (!d.getAccessor || !d.getAccessor.body)
         );
+    }
+    private _isConstantExpression(expression: cs.Expression | undefined): boolean {
+        if (expression === undefined) {
+            return false;
+        }
+
+        switch (expression.nodeType) {
+            case cs.SyntaxKind.PrefixUnaryExpression:
+                return this._isConstantExpression((expression as cs.PrefixUnaryExpression).operand);
+            case cs.SyntaxKind.PostfixUnaryExpression:
+                return this._isConstantExpression((expression as cs.PostfixUnaryExpression).operand);
+            case cs.SyntaxKind.NullLiteral:
+            case cs.SyntaxKind.TrueLiteral:
+            case cs.SyntaxKind.FalseLiteral:
+            case cs.SyntaxKind.StringLiteral:
+            case cs.SyntaxKind.NumericLiteral:
+            case cs.SyntaxKind.DefaultExpression:
+                return true;
+            case cs.SyntaxKind.BinaryExpression:
+                return (
+                    this._isConstantExpression((expression as cs.BinaryExpression).left) &&
+                    this._isConstantExpression((expression as cs.BinaryExpression).right)
+                );
+            case cs.SyntaxKind.ParenthesizedExpression:
+                return this._isConstantExpression((expression as cs.ParenthesizedExpression).expression);
+            // case cs.SyntaxKind.MemberAccessExpression:
+            // case cs.SyntaxKind.Identifier:
+            // maybe detect enums and other constant declarations?
+        }
+
+        return false;
     }
 
     protected writePropertyAsField(d: cs.PropertyDeclaration) {

@@ -4,14 +4,14 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
-import { EffectBarRendererInfo } from '@coderline/alphatab/rendering/EffectBarRendererInfo';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
  */
-export class CapoEffectInfo extends EffectBarRendererInfo {
+export class CapoEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectCapo;
     }
@@ -37,7 +37,7 @@ export class CapoEffectInfo extends EffectBarRendererInfo {
             0,
             0,
             `Capo. fret ${beat.voice.bar.staff.capo}`,
-            renderer.resources.effectFont,
+            renderer.resources.elementFonts.get(NotationElement.EffectCapo)!,
             TextAlign.Left
         );
     }

@@ -2,8 +2,7 @@ import { EngravingSettingsCloner } from '@coderline/alphatab/generated/Engraving
 import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
 import { Logger } from '@coderline/alphatab/Logger';
 import { Duration } from '@coderline/alphatab/model/Duration';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { MusicFontSymbol, MusicFontSymbolLookup } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { SmuflMetadata } from '@coderline/alphatab/SmuflMetadata';
 
 /**
@@ -52,6 +51,12 @@ export class EngravingStemInfo {
  */
 export class EngravingSettings {
     private static _bravuraDefaults?: EngravingSettings;
+
+    // NOTE: configurable in future?
+    /**
+     * @internal
+     */
+    public static readonly GraceScale: number = 0.75;
 
     /**
      * A {@link EngravingSettings} copy filled with the settings of the Bravura font used by default in alphaTab.
@@ -352,6 +357,22 @@ export class EngravingSettings {
         this.stemFlagOffsets.set(Duration.OneHundredTwentyEighth, 0);
         this.stemFlagOffsets.set(Duration.TwoHundredFiftySixth, 0);
 
+        // Workaround for: https://github.com/w3c/smufl/issues/203
+        // There is no clear anchor for the height of flags on the stem side yet.
+        // These aproximations are tested with bravura
+
+        this.stemFlagHeight.set(Duration.QuadrupleWhole, 0);
+        this.stemFlagHeight.set(Duration.DoubleWhole, 0);
+        this.stemFlagHeight.set(Duration.Whole, 0);
+        this.stemFlagHeight.set(Duration.Half, 0);
+        this.stemFlagHeight.set(Duration.Quarter, 0);
+        this.stemFlagHeight.set(Duration.Eighth, 1 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.Sixteenth, 1.5 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.ThirtySecond, 2 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.SixtyFourth, 3 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.OneHundredTwentyEighth, 3.5 * this.oneStaffSpace);
+        this.stemFlagHeight.set(Duration.TwoHundredFiftySixth, 4.2 * this.oneStaffSpace);
+
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
             const symbol = EngravingSettings._smuflNameToMusicFontSymbol(g);
             if (symbol) {
@@ -431,7 +452,7 @@ export class EngravingSettings {
             MusicFontSymbol.NoteheadNull
         ]);
 
-        for (const symbol of ModelUtils.getAllMusicFontSymbols()) {
+        for (const symbol of MusicFontSymbolLookup.getAllMusicFontSymbols()) {
             if (!handledSymbols.has(symbol)) {
                 if (!ignoredSymbols.has(symbol)) {
                     Logger.warning(
@@ -449,7 +470,7 @@ export class EngravingSettings {
         //
         // custom alphatab sizes
         this.numberedBarRendererBarSize = this.staffLineThickness * 2;
-        this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
+        this.numberedBarRendererBarSpacing = this.beamSpacing;
         this.preNoteEffectPadding = 0.4 * this.oneStaffSpace;
         this.postNoteEffectPadding = 0.2 * this.oneStaffSpace;
         this.lineRangedGlyphDashGap = 0.5 * this.oneStaffSpace;
@@ -476,6 +497,7 @@ export class EngravingSettings {
 
         this.songBookWhammyDipHeight = 0.6 * this.oneStaffSpace;
         this.tabWhammyPerHalfHeight = 0.6 * this.oneStaffSpace;
+        this.tabBendStaffPadding = 0.5 * this.oneStaffSpace;
         this.tabBendPerValueHeight = 0.6 * this.oneStaffSpace;
         this.tabBendLabelPadding = 0.3 * this.oneStaffSpace;
 
@@ -497,6 +519,7 @@ export class EngravingSettings {
         this.tripletFeelBracketPadding = 0.2 * this.oneStaffSpace;
         this.accidentalPadding = 0.1 * this.oneStaffSpace;
         this.preBeatGlyphSpacing = 0.5 * this.oneStaffSpace;
+        this.multiVoiceDisplacedNoteHeadSpacing = 0.2 * this.oneStaffSpace;
 
         this.tuningGlyphStringRowPadding = 0.2 * this.oneStaffSpace;
     }
@@ -532,7 +555,7 @@ export class EngravingSettings {
     public numberedBarRendererBarSpacing = 0;
 
     /**
-     * The size of the dashed drawn in numbered notation to indicate the durations.
+     * The padding minimum between the duration dashes.
      */
     public numberedDashGlyphPadding = 0;
 
@@ -553,20 +576,19 @@ export class EngravingSettings {
     public lineRangedGlyphDashSize = 0;
 
     /**
-     * The padding between effects and glyphs placed before the note heads, e.g. accidentals or brushes 
+     * The padding between effects and glyphs placed before the note heads, e.g. accidentals or brushes
      */
     public preNoteEffectPadding = 0;
 
     /**
-     * The padding between effects and glyphs placed after the note heads, e.g. slides or bends 
+     * The padding between effects and glyphs placed after the note heads, e.g. slides or bends
      */
     public postNoteEffectPadding = 0;
 
     /**
-     * The padding between effects and glyphs placed above/blow the note heads e.g. staccato 
+     * The padding between effects and glyphs placed above/blow the note heads e.g. staccato
      */
     public onNoteEffectPadding = 0;
-
 
     /**
      * The padding between the circles around string numbers.
@@ -599,7 +621,7 @@ export class EngravingSettings {
     public tieHeight = 0;
 
     /**
-     * The padding between the border and text of beat timers. 
+     * The padding between the border and text of beat timers.
      */
     public beatTimerPadding = 0;
 
@@ -629,7 +651,7 @@ export class EngravingSettings {
     public tabWhammyTextPadding = 0;
 
     /**
-     * The height applied per half-note whammy. 
+     * The height applied per half-note whammy.
      */
     public tabWhammyPerHalfHeight = 0;
 
@@ -657,9 +679,15 @@ export class EngravingSettings {
      * The size of the dashes on bends (e.g. on holds)
      */
     public tabBendDashSize = 0;
-    
+
     /**
-     * The height applied per quarter-note. 
+     * The additional padding between the staff and the point
+     * where bend values are calculated from.
+     */
+    public tabBendStaffPadding = 0;
+
+    /**
+     * The height applied per quarter-note.
      */
     public tabBendPerValueHeight = 0;
 
@@ -707,7 +735,7 @@ export class EngravingSettings {
     public chordDiagramLineWidth = 0;
 
     /**
-     * The padding between the bracket lines and numbers of tuplets 
+     * The padding between the bracket lines and numbers of tuplets
      */
     public tripletFeelBracketPadding = 0;
 
@@ -745,6 +773,27 @@ export class EngravingSettings {
      * The relative scale of any directions glyphs drawn like coda or segno.
      */
     public directionsScale = 0.6;
+
+    /**
+     * The spacing between displaced displaced note heads
+     * in case of multi-voice note head overlaps.
+     */
+    public multiVoiceDisplacedNoteHeadSpacing = 0;
+
+    /**
+     * Calculates the stem height for a note of the given duration.
+     * @param duration The duration to calculate the height respecting flag sizes.
+     * @param hasFlag True if we need to respect flags, false if we have beams.
+     * @returns The total stem height
+     */
+    public getStemLength(duration: Duration, hasFlag: boolean) {
+        return this.standardStemLength + (hasFlag ? this.stemFlagOffsets.get(duration)! : 0);
+    }
+
+    /**
+     * The space needed by flags on the stem-side from top to bottom to place.
+     */
+    public stemFlagHeight: Map<Duration, number> = new Map<Duration, number>();
 
     // Idea: maybe we can encode and pack this large metadata into a more compact format (e.g. BSON or a custom binary blob?)
     // This metadata below is updated automatically from the bravura_metadata.json via npm script
@@ -878,6 +927,10 @@ export class EngravingSettings {
                 bracketTop: {
                     bBoxNE: [1.876, 1.18],
                     bBoxSW: [0, 0]
+                },
+                buzzRoll: {
+                    bBoxNE: [0.624, 0.464],
+                    bBoxSW: [-0.62, -0.464]
                 },
                 cClef: {
                     bBoxNE: [2.796, 2.024],
@@ -1834,6 +1887,14 @@ export class EngravingSettings {
                 tremolo3: {
                     bBoxNE: [0.6, 1.112],
                     bBoxSW: [-0.6, -1.12]
+                },
+                tremolo4: {
+                    bBoxNE: [0.6, 1.496],
+                    bBoxSW: [-0.6, -1.48]
+                },
+                tremolo5: {
+                    bBoxNE: [0.6, 1.88],
+                    bBoxSW: [-0.604, -1.84]
                 },
                 tuplet0: {
                     bBoxNE: [1.2731041262817027, 1.5],

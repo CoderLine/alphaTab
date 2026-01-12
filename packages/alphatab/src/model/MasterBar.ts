@@ -1,15 +1,146 @@
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import type { Automation } from '@coderline/alphatab/model/Automation';
-import type { Beat } from '@coderline/alphatab/model/Beat';
-import type { Fermata } from '@coderline/alphatab/model/Fermata';
 import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Beat } from '@coderline/alphatab/model/Beat';
+import type { Direction } from '@coderline/alphatab/model/Direction';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import type { Fermata } from '@coderline/alphatab/model/Fermata';
 import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import type { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import type { RepeatGroup } from '@coderline/alphatab/model/RepeatGroup';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { Section } from '@coderline/alphatab/model/Section';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
-import type { Direction } from '@coderline/alphatab/model/Direction';
+
+/**
+ * Defines the custom beaming rules which define how beats are beamed together or split apart
+ * during the automatic beaming when displayed.
+ * @json
+ * @json_strict
+ * @public
+ *
+ * @remarks
+ * The beaming logic works like this:
+ *
+ * The time axis of the bar is sliced into even chunks. The chunk-size is defined by the respective group definition.
+ * Within these chunks groups can then be placed spanning 1 or more chunks.
+ *
+ * If beats start within the same "group" they are beamed together.
+ */
+export class BeamingRules {
+    private _singleGroupKey?: Duration;
+
+    /**
+     * The the group for a given "longest duration" within the bar.
+     * @remarks
+     * The map key is the duration to which the bar will be sliced into.
+     * The map value defines the "groups" placed within the sliced.
+     */
+    public groups = new Map<Duration, number[]>();
+
+    /**
+     * @internal
+     * @json_ignore
+     */
+    public uniqueId: string = '';
+
+    /**
+     * @internal
+     * @json_ignore
+     */
+    public timeSignatureNumerator: number = 0;
+    /**
+     * @internal
+     * @json_ignore
+     */
+    public timeSignatureDenominator: number = 0;
+
+    /**
+     * @internal
+     */
+    public static createSimple(
+        timeSignatureNumerator: number,
+        timeSignatureDenominator: number,
+        duration: Duration,
+        groups: number[]
+    ) {
+        const r = new BeamingRules();
+        r.timeSignatureNumerator = timeSignatureNumerator;
+        r.timeSignatureDenominator = timeSignatureDenominator;
+        r.groups.set(duration, groups);
+        r.finish();
+        return r;
+    }
+
+    /**
+     * @internal
+     */
+    public findRule(shortestDuration: Duration): [Duration, number[]] {
+        // fast path: one rule -> take it
+        const singleGroupKey = this._singleGroupKey;
+        if (singleGroupKey) {
+            return [singleGroupKey, this.groups.get(singleGroupKey)!];
+        }
+
+        if (shortestDuration < Duration.Quarter) {
+            return [shortestDuration, []];
+        }
+
+        // first search shorter
+        let durationValue = shortestDuration as number;
+        do {
+            const duration = durationValue as Duration;
+            if (this.groups.has(duration)) {
+                return [duration, this.groups.get(duration)!];
+            }
+            durationValue = durationValue * 2;
+        } while (durationValue <= (Duration.TwoHundredFiftySixth as number));
+
+        // then longer
+        durationValue = (shortestDuration as number) / 2;
+        do {
+            const duration = durationValue as Duration;
+            if (this.groups.has(duration)) {
+                return [duration, this.groups.get(duration)!];
+            }
+            durationValue = durationValue / 2;
+        } while (durationValue > (Duration.Half as number));
+
+        return [shortestDuration, []];
+    }
+
+    /**
+     * @internal
+     */
+    public finish() {
+        let uniqueId = `${this.timeSignatureNumerator}_${this.timeSignatureDenominator}`;
+
+        for (const [k, v] of this.groups) {
+            uniqueId += `__${k}`;
+
+            // trim of 0s at the end of the group
+            let lastZero = v.length;
+            for (let i = v.length - 1; i >= 0; i--) {
+                if (v[i] === 0) {
+                    lastZero = i;
+                } else {
+                    break;
+                }
+            }
+
+            if (lastZero < v.length) {
+                v.splice(lastZero, v.length - lastZero);
+            }
+
+            uniqueId += `_${v.join('_')}`;
+
+            if (this.groups.size === 1) {
+                this._singleGroupKey = k;
+            }
+        }
+        this.uniqueId = uniqueId;
+    }
+}
 
 /**
  * The MasterBar stores information about a bar which affects
@@ -151,6 +282,18 @@ export class MasterBar {
     public timeSignatureCommon: boolean = false;
 
     /**
+     * Defines the custom beaming rules which should be applied to this bar and all bars following.
+     */
+    public beamingRules?: BeamingRules;
+
+    /**
+     * The actual (custom) beaming rules to use for this bar if any were specified.
+     * @json_ignore
+     * @internal
+     */
+    public actualBeamingRules?: BeamingRules;
+
+    /**
      * Gets or sets whether the bar indicates a free time playing.
      */
     public isFreeTime: boolean = false;
@@ -180,7 +323,7 @@ export class MasterBar {
     /**
      * Gets or sets all tempo automation for this bar.
      */
-    public tempoAutomations: Automation[] = [];  
+    public tempoAutomations: Automation[] = [];
 
     /**
      * The sync points for this master bar to synchronize the alphaTab time axis with the
@@ -300,5 +443,35 @@ export class MasterBar {
             this.syncPoints = [];
         }
         this.syncPoints!.push(syncPoint);
+    }
+
+    public finish(sharedDataBag: Map<string, unknown>) {
+        let beamingRules = this.beamingRules;
+        if (beamingRules) {
+            beamingRules.timeSignatureNumerator = this.timeSignatureNumerator;
+            beamingRules.timeSignatureDenominator = this.timeSignatureDenominator;
+            beamingRules.finish();
+        }
+
+        if (this.index > 0) {
+            this.start = this.previousMasterBar!.start + this.previousMasterBar!.calculateDuration();
+
+            // clear out equal rules to reduce memory consumption.
+            const previousRules = sharedDataBag.has('beamingRules')
+                ? (sharedDataBag.get('beamingRules')! as BeamingRules)
+                : undefined;
+
+            if (previousRules && previousRules.uniqueId === beamingRules?.uniqueId) {
+                this.beamingRules = undefined;
+                beamingRules = previousRules;
+            } else if (!beamingRules) {
+                beamingRules = previousRules;
+            }
+        }
+        this.actualBeamingRules = beamingRules;
+
+        if (this.beamingRules) {
+            sharedDataBag.set('beamingRules', beamingRules);
+        }
     }
 }

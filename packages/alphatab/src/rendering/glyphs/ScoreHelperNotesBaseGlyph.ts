@@ -1,17 +1,14 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
-import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
+import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 
 /**
  * @internal
  */
-export class ScoreHelperNotesBaseGlyph extends Glyph {
-    protected bendNoteHeads: BendNoteHeadGroupGlyph[] = [];
-
+export class ScoreHelperNotesBaseGlyph extends GlyphGroup {
     protected drawBendSlur(
         canvas: ICanvas,
         x1: number,
@@ -19,16 +16,18 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
         x2: number,
         y2: number,
         down: boolean,
-        scale: number,
         slurText?: string
     ): void {
-        TieGlyph.drawBendSlur(canvas, x1, y1, x2, y2, down, scale, this.renderer.smuflMetrics.tieHeight, slurText);
+        TieGlyph.drawBendSlur(canvas, x1, y1, x2, y2, down, this.renderer.smuflMetrics.tieHeight, slurText);
     }
 
     public override doLayout(): void {
-        super.doLayout();
+        if (!this.glyphs) {
+            return;
+        }
+
         this.width = 0;
-        for (const noteHeads of this.bendNoteHeads) {
+        for (const noteHeads of this.glyphs) {
             noteHeads.doLayout();
             this.width += noteHeads.width;
         }

@@ -1,0 +1,492 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`MidiFileGeneratorTest effect-note-durations dots tremolo-2 1`] = `
+Array [
+  "Note: C4 180",
+  "Note: C4 180",
+  "Note: C4 180",
+  "Note: C4 180",
+  "Note: D4 180",
+  "Note: D4 180",
+  "Note: D4 180",
+  "Note: D4 180",
+  "Note: E4 180",
+  "Note: E4 180",
+  "Note: E4 180",
+  "Note: E4 180",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations dots tremolo-3 1`] = `
+Array [
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: E4 90",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations dots trill 1`] = `
+Array [
+  "Note: C4 120",
+  "Note: C5 120",
+  "Note: C4 120",
+  "Note: C5 120",
+  "Note: C4 120",
+  "Note: C5 120",
+  "Note: D4 120",
+  "Note: D5 120",
+  "Note: D4 120",
+  "Note: D5 120",
+  "Note: D4 120",
+  "Note: D5 120",
+  "Note: E4 120",
+  "Note: E5 120",
+  "Note: E4 120",
+  "Note: E5 120",
+  "Note: E4 120",
+  "Note: E5 120",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations grace-notes-before-beat tremolo-2 1`] = `
+Array [
+  "Note: C4 120",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: D4 120",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: E4 120",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: F4 120",
+  "Note: F4 120",
+  "Note: F4 120",
+  "Note: F4 120",
+  "Note: F4 120",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations grace-notes-before-beat tremolo-3 1`] = `
+Array [
+  "Note: C4 120",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: D4 120",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: E4 120",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: F4 120",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations grace-notes-before-beat trill 1`] = `
+Array [
+  "Note: C4 120",
+  "Note: C4 120",
+  "Note: C5 120",
+  "Note: C4 120",
+  "Note: D4 120",
+  "Note: D4 120",
+  "Note: D5 120",
+  "Note: D4 120",
+  "Note: E4 120",
+  "Note: E4 120",
+  "Note: E5 120",
+  "Note: E4 120",
+  "Note: F4 120",
+  "Note: F4 120",
+  "Note: F5 120",
+  "Note: F4 120",
+  "Note: F5 120",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations grace-notes-on-beat tremolo-2 1`] = `
+Array [
+  "Note: C3 120",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: C4 90",
+  "Note: D3 120",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: D4 90",
+  "Note: E3 120",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: E4 90",
+  "Note: Gb3 120",
+  "Note: F4 90",
+  "Note: F4 90",
+  "Note: F4 90",
+  "Note: F4 90",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations grace-notes-on-beat tremolo-3 1`] = `
+Array [
+  "Note: C3 120",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: C4 45",
+  "Note: D3 120",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: D4 45",
+  "Note: E3 120",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: E4 45",
+  "Note: Gb3 120",
+  "Note: F4 45",
+  "Note: F4 45",
+  "Note: F4 45",
+  "Note: F4 45",
+  "Note: F4 45",
+  "Note: F4 45",
+  "Note: F4 45",
+  "Note: F4 45",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations grace-notes-on-beat trill 1`] = `
+Array [
+  "Note: C3 120",
+  "Note: C4 120",
+  "Note: C5 120",
+  "Note: C4 120",
+  "Note: D3 120",
+  "Note: D4 120",
+  "Note: D5 120",
+  "Note: D4 120",
+  "Note: E3 120",
+  "Note: E4 120",
+  "Note: E5 120",
+  "Note: E4 120",
+  "Note: Gb3 120",
+  "Note: F4 120",
+  "Note: F5 120",
+  "Note: F4 120",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations plain dot 1`] = `
+Array [
+  "Note: C4 720",
+  "Note: D4 720",
+  "Note: E4 720",
+  "Note: F4 720",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations plain tremolo-2 1`] = `
+Array [
+  "Note: C4 120",
+  "Note: C4 120",
+  "Note: C4 120",
+  "Note: C4 120",
+  "Note: D4 120",
+  "Note: D4 120",
+  "Note: D4 120",
+  "Note: D4 120",
+  "Note: E4 120",
+  "Note: E4 120",
+  "Note: E4 120",
+  "Note: E4 120",
+  "Note: F4 120",
+  "Note: F4 120",
+  "Note: F4 120",
+  "Note: F4 120",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations plain tremolo-3 1`] = `
+Array [
+  "Note: C4 60",
+  "Note: C4 60",
+  "Note: C4 60",
+  "Note: C4 60",
+  "Note: C4 60",
+  "Note: C4 60",
+  "Note: C4 60",
+  "Note: C4 60",
+  "Note: D4 60",
+  "Note: D4 60",
+  "Note: D4 60",
+  "Note: D4 60",
+  "Note: D4 60",
+  "Note: D4 60",
+  "Note: D4 60",
+  "Note: D4 60",
+  "Note: E4 60",
+  "Note: E4 60",
+  "Note: E4 60",
+  "Note: E4 60",
+  "Note: E4 60",
+  "Note: E4 60",
+  "Note: E4 60",
+  "Note: E4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+  "Note: F4 60",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations plain trill 1`] = `
+Array [
+  "Note: C4 120",
+  "Note: C5 120",
+  "Note: C4 120",
+  "Note: C5 120",
+  "Note: D4 120",
+  "Note: D5 120",
+  "Note: D4 120",
+  "Note: D5 120",
+  "Note: E4 120",
+  "Note: E5 120",
+  "Note: E4 120",
+  "Note: E5 120",
+  "Note: F4 120",
+  "Note: F5 120",
+  "Note: F4 120",
+  "Note: F5 120",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations plain tripletfeel 1`] = `
+Array [
+  "Note: C4 640",
+  "Note: D4 320",
+  "Note: E4 640",
+  "Note: F4 320",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations plain tuplet 1`] = `
+Array [
+  "Note: C4 320",
+  "Note: D4 320",
+  "Note: E4 320",
+  "Note: F4 320",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations triplet-feel tremolo-2 1`] = `
+Array [
+  "Note: C4 160",
+  "Note: C4 160",
+  "Note: C4 160",
+  "Note: C4 160",
+  "Note: D4 80",
+  "Note: D4 80",
+  "Note: D4 80",
+  "Note: D4 80",
+  "Note: E4 160",
+  "Note: E4 160",
+  "Note: E4 160",
+  "Note: E4 160",
+  "Note: F4 80",
+  "Note: F4 80",
+  "Note: F4 80",
+  "Note: F4 80",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations triplet-feel tremolo-3 1`] = `
+Array [
+  "Note: C4 80",
+  "Note: C4 80",
+  "Note: C4 80",
+  "Note: C4 80",
+  "Note: C4 80",
+  "Note: C4 80",
+  "Note: C4 80",
+  "Note: C4 80",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: E4 80",
+  "Note: E4 80",
+  "Note: E4 80",
+  "Note: E4 80",
+  "Note: E4 80",
+  "Note: E4 80",
+  "Note: E4 80",
+  "Note: E4 80",
+  "Note: F4 40",
+  "Note: F4 40",
+  "Note: F4 40",
+  "Note: F4 40",
+  "Note: F4 40",
+  "Note: F4 40",
+  "Note: F4 40",
+  "Note: F4 40",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations triplet-feel trill 1`] = `
+Array [
+  "Note: C4 120",
+  "Note: C5 120",
+  "Note: C4 120",
+  "Note: C5 120",
+  "Note: C4 120",
+  "Note: C5 40",
+  "Note: D4 120",
+  "Note: D5 120",
+  "Note: D4 80",
+  "Note: E4 120",
+  "Note: E5 120",
+  "Note: E4 120",
+  "Note: E5 120",
+  "Note: E4 120",
+  "Note: E5 40",
+  "Note: F4 120",
+  "Note: F5 120",
+  "Note: F4 80",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations tuplet tremolo-2 1`] = `
+Array [
+  "Note: C4 80",
+  "Note: C4 80",
+  "Note: C4 80",
+  "Note: C4 80",
+  "Note: D4 80",
+  "Note: D4 80",
+  "Note: D4 80",
+  "Note: D4 80",
+  "Note: E4 80",
+  "Note: E4 80",
+  "Note: E4 80",
+  "Note: E4 80",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations tuplet tremolo-3 1`] = `
+Array [
+  "Note: C4 40",
+  "Note: C4 40",
+  "Note: C4 40",
+  "Note: C4 40",
+  "Note: C4 40",
+  "Note: C4 40",
+  "Note: C4 40",
+  "Note: C4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: D4 40",
+  "Note: E4 40",
+  "Note: E4 40",
+  "Note: E4 40",
+  "Note: E4 40",
+  "Note: E4 40",
+  "Note: E4 40",
+  "Note: E4 40",
+  "Note: E4 40",
+]
+`;
+
+exports[`MidiFileGeneratorTest effect-note-durations tuplet trill 1`] = `
+Array [
+  "Note: C4 120",
+  "Note: C5 120",
+  "Note: C4 80",
+  "Note: D4 120",
+  "Note: D5 120",
+  "Note: D4 80",
+  "Note: E4 120",
+  "Note: E5 120",
+  "Note: E4 80",
+]
+`;

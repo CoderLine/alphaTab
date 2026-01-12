@@ -1,10 +1,10 @@
-import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { BeatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@coderline/alphatab/Settings';
+import { expect } from 'chai';
 import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
-import { expect } from 'chai';
 
 describe('EffectsAndAnnotationsTests', () => {
     it('markers', async () => {
@@ -250,7 +250,7 @@ describe('EffectsAndAnnotationsTests', () => {
 
     it('rasgueado', async () => {
         const settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTest('effects-and-annotations/rasgueado.gp', settings);
     });
 
@@ -304,5 +304,262 @@ describe('EffectsAndAnnotationsTests', () => {
             '3.3.4{ legatoOrigin } 10.3.4',
             'test-data/visual-tests/effects-and-annotations/legato.png'
         );
+    });
+
+    it('inscore-chord-diagrams', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\chordDiagramsInScore true
+            \\chord ("E" 0 0 1 2 2 0)
+            \\chord ("C" 0 1 0 2 3 x)
+
+            (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"} r r r |
+            (0.1 1.2 0.3 2.4 3.5){ch "C"} r r r |
+            `,
+            'test-data/visual-tests/effects-and-annotations/inscore-chord-diagrams.png'
+        );
+    });
+
+    describe('tremolo-extended', async () => {
+        function flagsTex(noteString: number) {
+            return ['8', '16', '32']
+                .map(
+                    tp =>
+                        `
+                    // 1 bar
+                    3.${noteString}.32 {beam split tp ${tp}} 
+                    3.${noteString}.16 {beam split  tp ${tp}} 
+                    3.${noteString}.8 {beam split  tp ${tp}} |
+
+                    5.${noteString}.32 {beam split tp ${tp}} 
+                    5.${noteString}.16 {beam split  tp ${tp}} 
+                    5.${noteString}.8 {beam split  tp ${tp}} |
+
+                    -21.${noteString}.32 {beam split tp ${tp}} 
+                    -21.${noteString}.16 {beam split  tp ${tp}} 
+                    -21.${noteString}.8 {beam split  tp ${tp}} |
+
+                    -19.${noteString}.32 {beam split tp ${tp}} 
+                    -19.${noteString}.16 {beam split  tp ${tp}} 
+                    -19.${noteString}.8 {beam split  tp ${tp}} |
+
+                    15.${noteString}.32 {beam split tp ${tp}} 
+                    15.${noteString}.16 {beam split  tp ${tp}} 
+                    15.${noteString}.8 {beam split  tp ${tp}} |
+
+                    17.${noteString}.32 {beam split tp ${tp}} 
+                    17.${noteString}.16 {beam split  tp ${tp}} 
+                    17.${noteString}.8 {beam split  tp ${tp}} |
+                    
+                    39.${noteString}.32 {beam split tp ${tp}} 
+                    39.${noteString}.16 {beam split  tp ${tp}} 
+                    39.${noteString}.8 {beam split  tp ${tp}} |
+
+                    41.${noteString}.32 {beam split tp ${tp}} 
+                    41.${noteString}.16 {beam split  tp ${tp}} 
+                    41.${noteString}.8 {beam split  tp ${tp}} |
+                `
+                )
+                .join('\n');
+        }
+
+        it('flags-mixed', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                    \\track {defaultsystemslayout 8}
+                    \\staff {score tabs numbered slash}
+                    ${flagsTex(4)}
+                `,
+                'test-data/visual-tests/effects-and-annotations/tremolo-flags-mixed.png',
+                undefined,
+                o => {
+                    o.settings.display.layoutMode = LayoutMode.Parchment;
+                }
+            );
+        });
+
+        it('flags-tab', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                    \\track {defaultsystemslayout 8}
+                    \\staff {tabs}
+                    ${flagsTex(4)}
+                `,
+                'test-data/visual-tests/effects-and-annotations/tremolo-flags.png',
+                undefined,
+                o => {
+                    o.settings.display.layoutMode = LayoutMode.Parchment;
+                }
+            );
+        });
+
+        it('flags-tab-bottom', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                    \\track {defaultsystemslayout 8}
+                    \\staff {tabs}
+                    ${flagsTex(6)}
+                `,
+                'test-data/visual-tests/effects-and-annotations/tremolo-flags-bottom.png',
+                undefined,
+                o => {
+                    o.settings.display.layoutMode = LayoutMode.Parchment;
+                }
+            );
+        });
+
+        async function test(tex: string, referenceFileName: string, configure?: (o: VisualTestOptions) => void) {
+            await VisualTestHelper.runVisualTestTex(
+                tex,
+                `test-data/visual-tests/effects-and-annotations/${referenceFileName}.png`,
+                undefined,
+                configure
+            );
+        }
+
+        describe('standard', () => {
+            it('default-flags', async () =>
+                await test(
+                    `
+                    \\staff {score slash}
+                    C4.8 {tp 1} | C4.32 {tp 1} | 
+                    C4.8 {tp 2} | C4.32 {tp 2} | 
+                    C4.8 {tp 3} | C4.32 {tp 3} | 
+                    C4.8 {tp 4} | C4.32 {tp 4} | 
+                    C4.8 {tp 5} | C4.32 {tp 5} 
+                `,
+                    'tremolo-standard-default-flags'
+                ));
+
+            it('default-beams', async () =>
+                await test(
+                    `
+                    \\staff {score slash}
+                    C4.8 {tp 1} C4.8 {tp 1} | C4.32 {tp 1} C4.32 {tp 1} | 
+                    C4.8 {tp 2} C4.8 {tp 2} | C4.32 {tp 2} C4.32 {tp 2} | 
+                    C4.8 {tp 3} C4.8 {tp 3} | C4.32 {tp 3} C4.32 {tp 3} | 
+                    C4.8 {tp 4} C4.8 {tp 4} | C4.32 {tp 4} C4.32 {tp 4} | 
+                    C4.8 {tp 5} C4.8 {tp 5} | C4.32 {tp 5} C4.32 {tp 5} 
+                `,
+                    'tremolo-standard-default-beams'
+                ));
+
+            it('buzzroll-flags', async () =>
+                await test(
+                    `
+                    \\staff {score slash}
+                    C4.8 {tp (1 buzzRoll)} | C4.32 {tp (1 buzzRoll)} | 
+                    C4.8 {tp (2 buzzRoll)} | C4.32 {tp (2 buzzRoll)} | 
+                    C4.8 {tp (3 buzzRoll)} | C4.32 {tp (3 buzzRoll)} | 
+                    C4.8 {tp (4 buzzRoll)} | C4.32 {tp (4 buzzRoll)} | 
+                    C4.8 {tp (5 buzzRoll)} | C4.32 {tp (5 buzzRoll)} 
+                `,
+                    'tremolo-standard-buzzroll-flags'
+                ));
+
+            it('buzzroll-beams', async () =>
+                await test(
+                    `
+                    \\staff {score slash}
+                    C4.8 {tp (1 buzzRoll)} C4.8 {tp (1 buzzRoll)} | C4.32 {tp (1 buzzRoll)} C4.32 {tp (1 buzzRoll)} | 
+                    C4.8 {tp (2 buzzRoll)} C4.8 {tp (2 buzzRoll)} | C4.32 {tp (2 buzzRoll)} C4.32 {tp (2 buzzRoll)} | 
+                    C4.8 {tp (3 buzzRoll)} C4.8 {tp (3 buzzRoll)} | C4.32 {tp (3 buzzRoll)} C4.32 {tp (3 buzzRoll)} | 
+                    C4.8 {tp (4 buzzRoll)} C4.8 {tp (4 buzzRoll)} | C4.32 {tp (4 buzzRoll)} C4.32 {tp (4 buzzRoll)} | 
+                    C4.8 {tp (5 buzzRoll)} C4.8 {tp (5 buzzRoll)} | C4.32 {tp (5 buzzRoll)} C4.32 {tp (5 buzzRoll)} 
+                `,
+                    'tremolo-standard-buzzroll-beams'
+                ));
+        });
+        describe('tabs', () => {
+            it('default-flags', async () =>
+                await test(
+                    `
+                    \\staff {tabs}
+                    3.6.8 {tp 1} | 3.6.32 {tp 1} | 
+                    3.6.8 {tp 2} | 3.6.32 {tp 2} | 
+                    3.6.8 {tp 3} | 3.6.32 {tp 3} | 
+                    3.6.8 {tp 4} | 3.6.32 {tp 4} |
+                    3.6.8 {tp 5} | 3.6.32 {tp 5} 
+                `,
+                    'tremolo-tabs-default-flags'
+                ));
+
+            it('default-beams', async () =>
+                await test(
+                    `
+                    \\staff {tabs}
+                    3.6.8 {tp 1} 3.6.8 {tp 1} | 3.6.32 {tp 1} 3.6.32 {tp 1} | 
+                    3.6.8 {tp 2} 3.6.8 {tp 2} | 3.6.32 {tp 2} 3.6.32 {tp 2} | 
+                    3.6.8 {tp 3} 3.6.8 {tp 3} | 3.6.32 {tp 3} 3.6.32 {tp 3} | 
+                    3.6.8 {tp 4} 3.6.8 {tp 4} | 3.6.32 {tp 4} 3.6.32 {tp 4} | 
+                    3.6.8 {tp 5} 3.6.8 {tp 5} | 3.6.32 {tp 5} 3.6.32 {tp 5} 
+                `,
+                    'tremolo-tabs-default-beams'
+                ));
+
+            it('buzzroll-flags', async () =>
+                await test(
+                    `
+                    \\staff {tabs}
+                    3.6.8 {tp (1 buzzRoll)} | 3.6.32 {tp (1 buzzRoll)} | 
+                    3.6.8 {tp (2 buzzRoll)} | 3.6.32 {tp (2 buzzRoll)} | 
+                    3.6.8 {tp (3 buzzRoll)} | 3.6.32 {tp (3 buzzRoll)} | 
+                    3.6.8 {tp (4 buzzRoll)} | 3.6.32 {tp (4 buzzRoll)} | 
+                    3.6.8 {tp (5 buzzRoll)} | 3.6.32 {tp (5 buzzRoll)} 
+                `,
+                    'tremolo-tabs-buzzroll-flags'
+                ));
+
+            it('buzzroll-beams', async () =>
+                await test(
+                    `
+                    \\staff {tabs}
+                    3.6.8 {tp (1 buzzRoll)} 3.6.8 {tp (1 buzzRoll)} | 3.6.32 {tp (1 buzzRoll)} 3.6.32 {tp (1 buzzRoll)} | 
+                    3.6.8 {tp (2 buzzRoll)} 3.6.8 {tp (2 buzzRoll)} | 3.6.32 {tp (2 buzzRoll)} 3.6.32 {tp (2 buzzRoll)} | 
+                    3.6.8 {tp (3 buzzRoll)} 3.6.8 {tp (3 buzzRoll)} | 3.6.32 {tp (3 buzzRoll)} 3.6.32 {tp (3 buzzRoll)} | 
+                    3.6.8 {tp (4 buzzRoll)} 3.6.8 {tp (4 buzzRoll)} | 3.6.32 {tp (4 buzzRoll)} 3.6.32 {tp (4 buzzRoll)} | 
+                    3.6.8 {tp (5 buzzRoll)} 3.6.8 {tp (5 buzzRoll)} | 3.6.32 {tp (5 buzzRoll)} 3.6.32 {tp (5 buzzRoll)} 
+                `,
+                    'tremolo-tabs-buzzroll-beams'
+                ));
+        });
+    });
+
+    describe('lyrics', () => {
+        it('single-line', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                \\lyrics "Do Re Mi Fa"
+                C4 C4 C4 C4
+                `,
+                `test-data/visual-tests/effects-and-annotations/lyrics-single-line.png`
+            );
+        });
+
+        it('multi-line', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                \\lyrics "Do Re Mi Fa"
+                \\lyrics "Do  Mi "
+                C4 C4 C4 C4
+                `,
+                `test-data/visual-tests/effects-and-annotations/lyrics-multi-line.png`
+            );
+        });
+
+        it('multi-line-spacing', async () => {
+            await VisualTestHelper.runVisualTestTex(
+                `
+                \\lyrics "Do Re Mi Fa"
+                \\lyrics "Do  Mi "
+                C4 C4 C4 C4
+                `,
+                `test-data/visual-tests/effects-and-annotations/lyrics-multi-line-spacing.png`,
+                undefined,
+                o => {
+                    o.settings.display.lyricLinesPaddingBetween = 20;
+                }
+            );
+        });
     });
 });
