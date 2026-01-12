@@ -589,7 +589,7 @@ function getDeclarationReferenceUrl(
         getDeclarationReferenceUrl(
           context,
           element.parent as ts.ClassDeclaration | ts.InterfaceDeclaration,
-        ) + '#' + page
+        ) + '/#' + page
       );
     case ts.SyntaxKind.EnumMember:
       return (
@@ -597,7 +597,7 @@ function getDeclarationReferenceUrl(
           context,
           element.parent as ts.EnumDeclaration
         ) +
-        "#" +
+        "/#" +
         (element as ts.EnumMember).name!.getText().toLowerCase()
       );
     case ts.SyntaxKind.TypeParameter:
