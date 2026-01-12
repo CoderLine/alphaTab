@@ -79,7 +79,7 @@ function getChangedPackages(force: boolean) {
     return packages;
 }
 
-const DRY_RUN = true;
+const DRY_RUN = process.env.DRY_RUN;
 function execDryRun(command: string, options: ExecSyncOptionsWithBufferEncoding) {
     console.info(`executing command ${command} in ${options.cwd}`);
     if (DRY_RUN) {
@@ -102,7 +102,6 @@ function publish(platform: string, packages: Set<string>) {
         case 'dotnet':
             const dotnetPackages = ['AlphaTab', 'AlphaTab.Windows'];
             for (const pkg of dotnetPackages) {
-                console.info('dotnet nuget push', pkg);
                 execDryRun(
                     `dotnet nuget push ${pkg}/bin/Release/*.nupkg -k ${process.env.NUGET_API_KEY} -s https://api.nuget.org/v3/index.json`,
                     {
@@ -113,7 +112,6 @@ function publish(platform: string, packages: Set<string>) {
             }
             break;
         case 'kotlin':
-            console.info('./gradlew publishToMavenCentral');
             execDryRun(`./gradlew publishToMavenCentral`, {
                 stdio: 'inherit',
                 cwd: resolve(import.meta.dirname, '../packages/kotlin/src/')
