@@ -43,7 +43,7 @@
         "@microsoft/api-extractor": "^7.55.2",
         "@types/chai": "^5.2.2",
         "@types/mocha": "^10.0.10",
-        "@types/node": "^25.0.6",
+        "@types/node": "^25.0.9",
         "assert": "^2.1.0",
         "chai": "^6.2.2",
         "mocha": "^11.7.4",
