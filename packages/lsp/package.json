@@ -39,7 +39,7 @@
         "vscode-languageserver-textdocument": "^1.0.12"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.3.11",
+        "@biomejs/biome": "^2.3.12",
         "@microsoft/api-extractor": "^7.55.2",
         "@types/chai": "^5.2.2",
         "@types/mocha": "^10.0.10",
