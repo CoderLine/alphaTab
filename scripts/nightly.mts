@@ -30,6 +30,7 @@ function getChangedPackages(force: boolean) {
             }
         )
             .split('\n')
+            .filter(l => l.trim().length > 0)
             .map(l => {
                 const p = l.split(';');
                 return { hash: p[0], author: p[1] };
