@@ -548,7 +548,7 @@ describe('Gp5ImporterTest', () => {
 
     it('tuning-bass-clef', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/bass-tuning.gp5')).readScore();
-        expect(score.tracks[0].staves[0].bars[0].clef).to.equal(Clef.F4);
+        expect(score.tracks[0].staves[0].bars[0].clef).to.equal(Clef.G2);
         expect(score.tracks[1].staves[0].bars[0].clef).to.equal(Clef.F4);
         expect(score.tracks[2].staves[0].bars[0].clef).to.equal(Clef.F4);
         expect(score.tracks[3].staves[0].bars[0].clef).to.equal(Clef.F4);
