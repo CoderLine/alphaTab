@@ -3,6 +3,7 @@ import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
 
 describe('MusicNotationTests', () => {
@@ -19,6 +20,21 @@ describe('MusicNotationTests', () => {
         settings.notation.elements.set(NotationElement.ScoreWords, false);
         settings.notation.elements.set(NotationElement.ScoreWordsAndMusic, false);
         await VisualTestHelper.runVisualTest('music-notation/clefs.gp', settings);
+    });
+
+    it('clefs-gp5', async () => {
+        const score = ScoreLoader.loadScoreFromBytes(
+            await TestPlatform.loadFile('test-data/guitarpro5/bass-tuning.gp5')
+        );
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Page;
+
+        const referenceFileName = 'test-data/visual-tests/music-notation/clefs-gp5.png';
+
+        const o = new VisualTestOptions(score, [new VisualTestRun(-1, referenceFileName)], settings);
+        o.tracks = score.tracks.map(t => t.index);
+
+        await VisualTestHelper.runVisualTestFull(o);
     });
 
     it('key-signatures-mixed', async () => {
