@@ -5,16 +5,14 @@ title: v1.8
 import { AlphaTab } from '@site/src/components/AlphaTab';
 import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
-TODO: describe how to use features 
-
 ## 1.8.0
 
-This has been one of the fastest alphaTab releases so far. Within 1 month we added 17 features/improvements 
-and fixed 10 bugs. Let's dive in. 
+This has been one of the fastest alphaTab releases so far. Within 1 month we added  quite a list of improvements and fixes. 
+Let's dive in. 🤘😎
 
 ### Music Notation
 
-#### render: extend barlines across staves in system
+#### notation: extend bar-lines across staves in system
 https://github.com/CoderLine/alphaTab/pull/2416
 
 This new option allows extending the bar lines across the staves in the system connecting them
@@ -40,7 +38,13 @@ the option can be set via alphaTex or on the stylesheet object after loading the
     0.3.4 2.3.4 5.3.4 7.3.4
 `}</AlphaTab>
 
-#### render: multi-system slurs
+This feature can be configured via: 
+
+* [`\\extendBarLine`](/docs/alphatex/score-metadata#extendbarlines) in alphaTex
+* File / StyleSheet / Systems & Staves in Guitar Pro 
+* [`score.stylesheet.extendBarLines`](/docs/reference/types/model/renderstylesheet/#extendbarlines) on the data model.
+
+#### notation: multi-system slurs
 https://github.com/CoderLine/alphaTab/pull/2425
 
 Previously alphaTab only rendered slurs on single-system breaks. If a slur spans multiple systems
@@ -56,14 +60,14 @@ r | r | r |
 r | C4 {slur s1} | r 
 `}</AlphaTab>
 
-#### render: improved note head alignment and displacement. 
+#### notation: improved note head alignment and displacement. 
 https://github.com/CoderLine/alphaTab/pull/2426
 
 https://github.com/CoderLine/alphaTab/pull/2430
 
 With this change we now align note heads according to more common practices. 
 
-The first change is to align the primary note heads on the same axis. Basically: on an upwards stem the left note heads, and on a downwards stem the right noteheads are now aligned. 
+The first change is to align the primary note heads on the same axis. Basically: on an upwards stem the left note heads, and on a downwards stem the right note heads are now aligned. 
 Displaced note-heads are shifted to the other side of the stem. 
 
 With this improvement as a base, we now also merge or further shift note-heads when multiple voices are contained in a bar. 
@@ -75,7 +79,7 @@ E5*5
 \\voice 
 C5 D5 E5 F5 G5`}</AlphaTab>
 
-#### render: in-score chord diagrams
+#### notation: in-score chord diagrams
 https://github.com/CoderLine/alphaTab/pull/2435
 
 Often requested but never shipped. Now they are available: chord diagrams inside the music sheet. 
@@ -89,7 +93,7 @@ With this change chord diagrams can be shown inside the music sheet above the st
 (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
 `}</AlphaTab>
 
-#### render: numbered notation ties and dash placement
+#### notation: numbered notation ties and dash placement
 https://github.com/CoderLine/alphaTab/pull/2438
 
 alphaTab 1.7 had some incorrect display of numbered notation. Following improvements were added in this release:
@@ -101,15 +105,15 @@ alphaTab 1.7 had some incorrect display of numbered notation. Following improvem
 * key signature has been moved to an own effect band.
 
 <AlphaTab tex={true}>{`
-\staff {score numbered}
-\hidedynamics
+\\staff {score numbered}
+\\hidedynamics
 
 C5.1 | C4 {tu 3} * 3
-\staff
+\\staff
 C4.4 *4 
 `}</AlphaTab>
 
-#### render: hide empty staves
+#### notation: hide empty staves
 https://github.com/CoderLine/alphaTab/pull/2443
 
 With this feature we add an option to hide staves if they are empty. This feature mainly targets
@@ -119,7 +123,7 @@ without content will be hidden.
 At this point alphaTab will not hide whole systems to avoid side-effects during playback and the related cursor placement. 
 If alphaTab detects tha all systems are empty, it will force the first one to be visible. 
 
-<AlphaTab tex={true}>{`
+<AlphaTab tex={true} tracks="all" settings={{display: {layoutmode: "parchment"}}}>{`
 \\hideEmptyStaves
 \\defaultSystemsLayout 3
 \\multiTrackTrackNamePolicy allSystems
@@ -139,8 +143,12 @@ C4.4 *4 | r.1 | r.1 |
     r.1 | C4 |
 `}</AlphaTab>
 
+This feature can be configured via: 
 
-#### render: parchment layout
+* [`\hideEmptyStaves`](/docs/alphatex/score-metadata#hideemptystaves) and [`\hideEmptyStavesInFirstSystem`](/docs/alphatex/score-metadata#hideemptystavesinfirstsystem) in alphaTex
+* [`score.stylesheet.hideEmptyStaves`](/docs/reference/types/model/renderstylesheet/#hideemptystaves) and [`score.stylesheet.hideEmptyStavesInFirstSystem`](/docs/reference/types/model/renderstylesheet/#hideemptystavesinfirstsystem) on the data model.
+
+#### notation: parchment layout
 https://github.com/CoderLine/alphaTab/pull/2459
 
 The parchment layout is is a variation of the currently available `page` layout. THe special thing about this layout is that the
@@ -160,10 +168,14 @@ The parchment layout is typically more optimized for printing and fixed layouts 
     \\scale 1 C4 * 4 |
 `}</AlphaTexSample>
 
+This feature can be configured via: 
+
+* [`settings.display.layoutMode`](/docs/reference/settings/display/layoutmode) setting it to [`LayoutMode.Parchment`](/docs/reference/types/layoutmode)
+
 #### notation: buzzroll tremolos
 https://github.com/CoderLine/alphaTab/pull/2476
 
-With this change we now support buzroll tremolos. It can be separately configured if these tremolos should be played like classical 
+With this change we now support buzzroll tremolos. It can be separately configured if these tremolos should be played like classical 
 ones. 
 
 <AlphaTexSample tex={true}>{`
@@ -174,7 +186,13 @@ C4 {tp 3} |
 C4 {tp (3 buzzRoll)} |
 `}</AlphaTexSample>
 
-#### render: advanced font configurations and lyric paddings
+BuzzRolls can be used via: 
+
+* [`tp`](/docs/alphatex/beat-properties#tp) on alphaTex
+* [MusicXML](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/tremolo/) using tremolo marks `0` or setting the `smufl` attribute.
+
+
+#### style: advanced font configurations and lyric paddings
 https://github.com/CoderLine/alphaTab/pull/2481
 
 This improvement changes extends how fonts can be configured in alphaTab. 
@@ -186,9 +204,18 @@ deprecated and fonts can now be configured individually as desired.
 This feature started with a request to customize the display of lyrics. To support this request further, the padding between individual 
 lyric lines can now be configured via `settings.display.lyricLinesPaddingBetween`
 
-TODO sample
+<AlphaTab tex={true} tracks="all" settings={{display: {lyricLinesPaddingBetween: 16, resources: { elementFonts: { EffectLyrics: "16px 'Noto Sans" } } }}}>{`
+\\lyrics "Do Re Mi Fa"
+\\lyrics "Do  Mi "
+C4 C4 C4 C4
+`}</AlphaTab>
 
-#### render: configure display of bar numbers
+This feature can be configured via: 
+
+* [`settings.display.resources.elementFonts`](/docs/reference/settings/display/resources#elementfonts)
+* [`settings.display.lyricLinesPaddingBetween`](/docs/reference/settings/display/lyriclinespaddingbetween)
+
+#### notation: configure display of bar numbers
 https://github.com/CoderLine/alphaTab/pull/2482
 
 Before this release alphaTab was always rendering bar numbers on all bars. Devs could trick the display by setting the bar number color
@@ -215,6 +242,12 @@ C4.1 | \\barNumberDisplay allBars C4.1 | C4.1 |
 C4.1 | C4.1 | C4.1
 `}</AlphaTexSample>
 
+This feature can be used via: 
+
+* [`\defaultBarNumberDisplay`](/docs/alphatex/score-metadata#defaultbarnumberdisplay) and [`\barNumberDisplay`] (/docs/alphatex/bar-metadata#barnumberdisplay) in alphaTex
+* [`score.stylesheet.barNumberDisplay`](/docs/reference/types/model/renderstylesheet/#barnumberdisplay) and [`score.tracks[].staves[].bars[].barNumberDisplay`](/docs/reference/types/model/bar/#barnumberdisplay) in the data model.
+* File / Stylesheet > Texts & Styles > Bar numbers in Guitar Pro
+* [`measure-numbering`](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/measure-numbering/) in MusicXML
 
 #### notation: custom beaming rules
 https://github.com/CoderLine/alphaTab/pull/2489
@@ -222,8 +255,8 @@ https://github.com/CoderLine/alphaTab/pull/2489
 alphaTab 1.8 ships significant improvements around the beaming of notes. 
 Previously alphaTab had only 2 rules on how notes were beamed.
 
-With alphaTab 1.8 not only we have **27** optimized breaming rules for a range of common time signatures.
-Users can now fully custoimze how notes should be beamed. 
+With alphaTab 1.8 not only we have **27** optimized beaming rules for a range of common time signatures.
+Users can now fully customize how notes should be beamed. 
 
 We read the information contained in Guitar Pro files and alphaTex provides new metadata tags for this feature. 
 In worst case devs can opt to set the rules after loading any custom file. 
@@ -239,6 +272,12 @@ In worst case devs can opt to set the rules after loading any custom file.
     C4.16 * 8 
     C4.16 * 8            
 `}</AlphaTexSample>
+
+This feature can be used via: 
+
+* [`\beaming`](/docs/alphatex/bar-metadata#beaming) alphaTex
+* [`score.masterBars[].beamingRules`](/docs/reference/types/model/masterbar#beamingrules) in the data model.
+* Bar / Time Signature in Guitar Pro
 
 ### Player
 
@@ -256,9 +295,21 @@ This was a problem for alphaTab as the time of this beat was suddenly negative r
 rewrite the notes to have some sort of beat to steal the duration from (e.g. via pick-up/anacrusis bar or changing to an on-beat grace note).
 This individualization is not always possible if the input file is consumed from an external source. 
 
-We now internally handle this negative underlow and ensure the playback and display works as a user would expect it. 
+We now internally handle this negative underflow and ensure the playback and display works as a user would expect it. 
 
-TOOD samples 
+export function enableMetronome(api) {
+    api.metronomeVolume = 1;
+}
+
+<AlphaTexSample tex={true} player={true} init={enableMetronome}>{`
+\\subtitle "Before-Beat Grace Note"
+C4 {gr bb} C4 C4 C4 C4       
+`}</AlphaTexSample>
+
+<AlphaTexSample tex={true} player={true} init={enableMetronome}>{`
+\\subtitle "On-Beat Grace Note"
+C4 {gr ob} C4 C4 C4 C4       
+`}</AlphaTexSample>
 
 #### player: smooth cursor and scrolling
 https://github.com/CoderLine/alphaTab/pull/2447
@@ -274,54 +325,85 @@ dedicated components and allow devs to set their own implementations.
 
 This way new extended scrolling systems can be built. 
 
-TODO sample
+<div id="smooth-scroll-h" className="horizontal-player-wrap">
 
-### Guitar Pro extensions
+<AlphaTab tex={true} player={true} settings={{player: {scrollElement: '#smooth-scroll-h .alphaTab', scrollOffsetX: -100, scrollMode: "smooth"}, display: {layoutMode: 'horizontal'}}}>{`
+\\title "Prelude in D Minor"
+\\artist "J.S. Bach (1685-1750)"
+\\copyright "Public Domain"
+\\tempo 80
+.
+\\ts 3 4
+0.4.16 (3.2 -.4) (1.1 -.4) (5.1 -.4) 1.1 3.2 1.1 3.2 2.3.8 (3.2 3.4) |
+(3.2 0.4).16 (3.2 -.4) (1.1 -.4) (5.1 -.4) 1.1 3.2 1.1 3.2 2.3.8 (3.2 3.4) | 
+(3.2 0.4).16 (3.2 -.4) (3.1 -.4) (6.1 -.4) 3.1 3.2 3.1 3.2 3.3.8 (3.2 0.3) | 
+(3.2 0.4).16 (3.2 -.4) (3.1 -.4) (6.1 -.4) 3.1 3.2 3.1 3.2 3.3.8 (3.2 0.3) |
+`}</AlphaTab>
 
-### exporter: improved RSE compatibility
-https://github.com/CoderLine/alphaTab/pull/2456
-https://github.com/CoderLine/alphaTab/pull/2477
+</div>
 
-Thanks [@L-Sun](https://github.com/CoderLine/alphaTab/pull/2456) for your contributions around this topic. 
+<div id="smooth-scroll-v" className="vertical-player-wrap">
 
-With these improvements alphaTab does now write extended RSE information into the exported Guitar Pro files.
-This way the playback mode in Guitar Pro can be changed to RSE resulting in proper playback. 
+<AlphaTab tex={true} player={true} settings={{player: {scrollElement: '#smooth-scroll-v .alphaTab', scrollOffsetY: -200, scrollMode: "smooth"}, display: {layoutMode: 'parchment'}}}>{`
+\\artist "Johann Pachelbel"
+\\title "Canon in D"
+\\track ("Piano" "Pno.") {instrument acousticgrandpiano}
+  \\staff
+    \\tempo 100
+    \\accidentals auto
+    \\clef g2
+    \\ks d
+      r.1{dy p instrument acousticgrandpiano} | 
+      r | 
+      r|
+      r{cre} | 
+      Gb5.2 E5 |
+      D5 Db5 |
+      B4 A4 |
+      B4 Db5 |
+      (A4 D5 Gb5) (A4 Db5 E5) |
+      (Gb4 B4 D5) (Gb4 A4 Db5) |
+      (D4 G4 B4) (D4 Gb4 A4) |
+      (D4 G4 B4){cre} (E4 A4 Db5){cre} |
+      D5.4 Gb5 A5 G5 |
+      Gb5{dy mf} D5 Gb5{d} E5.8 |
+      D5.4 B4 D5 Gb5 |
+      G5 B5 A5{d} G5.8 |
+      (D5 Gb5).4 Gb5 (E5 A5) G5 |
+      (D5 Gb5) D5 (Db5 Gb5){d} E5.8 |
+      (B4 D5).4 B4 (A4 D5) Gb5 |
+      (B4 G5) B5 (Db5 A5){d} G5.8
+  \\staff
+      \\clef f4
+      \\ks d
+        :8
+        D3{dy p} A3 D4 Gb4 A2 E3 A3 Db4 |
+        B2 Gb3 B3 D4 Gb2 Db3 Gb3 A3 |
+        G2 D3 G3 B3 D2 A2 D3 Gb3 |
+        G2 D3 G3 B3 A2 E3 A3 Db4 |
+        D3 A3 D4 Gb4 A2 E3 A3 Db4 |
+        B2 Gb3 B3 D4 Gb2 Db3 Gb3 A3 |
+        G2 D3 G3 B3 D2 A2 D3 Gb3 |
+        G2 D3 G3 B3 A2 E3 A3 Db4 |
+        D3 A3 D4 Gb4 A2 E3 A3 Db4 |
+        B2 Gb3 B3 D4 Gb2 Db3 Gb3  A3 |
+        G2 D3 G3 B3 D2 A2 D3 Gb3 | 
+        G2 D3 G3 B3 A2 E3 A3 Db4 |
+        D3{dy mf} A3 D4 Gb4 A2 E3 A3 Db4 |
+        B2 Gb3 B3 D4 Gb2 Db3 Gb3 A3 |
+        G2 D3 G3 B3 D2 A2 D3 Gb3 |
+        G2 D3 G3 B3 A2 E3 A3 Db4 |
+        D3 A3 D4 Gb4 A2 E3 A3 Db4 |
+        B2 Gb3 B3 D4 Gb2 Db3 Gb3 A3 |
+        G2 D3 G3 B3 D2 A2 D3 Gb3 |
+        G2 D3 G3 B3 A2 E3 A3 Db4
+`}</AlphaTab>
+</div>
 
-RSE is quite a complex feature of Guitar Pro allowing advanced effect and soundbank configurations. alphaTab tries
-to write at least the minimum amount of information to achieve correct playback.
+This feature can be used via 
 
-TODO sample
-
-### importer: detect bass clef (Guitar Pro 3-5)
-https://github.com/CoderLine/alphaTab/pull/2483
-
-Older Guitar Pro files did not always contain the exact information on what clef should be shown on the staves. 
-While some information can be contained, it was not fully working as expected and for older formats always a treble clef was shown.
-
-We now follow the Guitar Pro 5 behavior of switching to the a bass clef based on the configured string tuning. 
-
-TODO sample
-
-### alphaTex Extensions
-
-#### alphaTex: bar-wise voices
-https://github.com/CoderLine/alphaTab/pull/2429
-
-While writing various test-cases for multi-voice music sheets I realized that writing
-the notation voice-by-voice does not feel very natural. 
-
-By default in alphaTex, to write multiple voices, you first write the whole notation for the first voiec,
-then you start a new voice with `\voice` and begin again writing the second voice at bar 1. 
-
-With this new mode, we stay in the metal model of writing notation "bar-by-bar". The `\voice` tag starts a new
-voice on the current bar until we reach the end of the bar. Thanks to this you can only add a second voice to the
-bars which actually have a second voice and keep the other bars simple as single voice bars. 
-
-alphaTab takes care of the internal consolidation of voices. 
-
-TODO sample.
-
-### Improvements & Bugfixes
+* [`settings.player.scrollMode`](/docs/reference/settings/player/scrollmode) set to [`ScrollMode.Smooth`](/docs/reference/types/scrollmode)
+* [`api.customScrollHandler`](/docs/reference/api/customscrollhandler) and [`IScrollHandler`](/docs/reference/types/iscrollhandler)
 
 #### integration: Selection API
 https://github.com/CoderLine/alphaTab/pull/2418
@@ -337,7 +419,93 @@ and create new UI elements as needed (e.g. to create extended selection handles)
 Additionally we ensure now to snap the selection start to the beginning of the bar if the selection starts
 on the first beat.
 
-TODO sample
+import { SelectionHandleDemo } from '@site/src/components/SelectionHandleDemo';
+
+<SelectionHandleDemo>{`
+\\title "Prelude in D Minor"
+\\artist "J.S. Bach (1685-1750)"
+\\copyright "Public Domain"
+\\tempo 80
+.
+\\ts 3 4
+0.4.16 (3.2 -.4) (1.1 -.4) (5.1 -.4) 1.1 3.2 1.1 3.2 2.3.8 (3.2 3.4) |
+(3.2 0.4).16 (3.2 -.4) (1.1 -.4) (5.1 -.4) 1.1 3.2 1.1 3.2 2.3.8 (3.2 3.4) | 
+(3.2 0.4).16 (3.2 -.4) (3.1 -.4) (6.1 -.4) 3.1 3.2 3.1 3.2 3.3.8 (3.2 0.3) | 
+(3.2 0.4).16 (3.2 -.4) (3.1 -.4) (6.1 -.4) 3.1 3.2 3.1 3.2 3.3.8 (3.2 0.3) |
+`}</SelectionHandleDemo>
+
+This feature can be used via: 
+
+* [`api.playbackRangeHighlightChanged`](/docs/reference/api/playbackrangehighlightchanged)
+* [`api.highlightPlaybackRange`](/docs/reference/api/highlightplaybackrange)
+* [`api.applyPlaybackRangeFromHighlight`](/docs/reference/api/applyplaybackrangefromhighlight)
+
+A simple demo of the usage is also part of the [development playground](https://github.com/CoderLine/alphaTab/blob/develop/packages/playground/select-handles.ts). 
+
+### Guitar Pro extensions
+
+#### exporter: improved RSE compatibility
+https://github.com/CoderLine/alphaTab/pull/2456
+https://github.com/CoderLine/alphaTab/pull/2477
+
+Thanks [@L-Sun](https://github.com/CoderLine/alphaTab/pull/2456) for your contributions around this topic. 
+
+With these improvements alphaTab does now write extended RSE information into the exported Guitar Pro files.
+This way the playback mode in Guitar Pro can be changed to RSE resulting in proper playback. 
+
+RSE is quite a complex feature of Guitar Pro allowing advanced effect and soundbank configurations. alphaTab tries
+to write at least the minimum amount of information to achieve correct playback.
+
+#### importer: detect bass clef (Guitar Pro 3-5)
+https://github.com/CoderLine/alphaTab/pull/2483
+
+Older Guitar Pro files did not always contain the exact information on what clef should be shown on the staves. 
+While some information can be contained, it was not fully working as expected and for older formats always a treble clef was shown.
+
+We now follow the Guitar Pro 5 behavior of switching to the a bass clef based on the configured string tuning. 
+
+### alphaTex Extensions
+
+#### alphaTex: bar-wise voices
+https://github.com/CoderLine/alphaTab/pull/2429
+
+While writing various test-cases for multi-voice music sheets I realized that writing
+the notation voice-by-voice does not feel very natural. 
+
+By default in alphaTex, to write multiple voices, you first write the whole notation for the first voice,
+then you start a new voice with `\voice` and begin again writing the second voice at bar 1. 
+
+With this new mode, we stay in the metal model of writing notation "bar-by-bar". The `\voice` tag starts a new
+voice on the current bar until we reach the end of the bar. Thanks to this you can only add a second voice to the
+bars which actually have a second voice and keep the other bars simple as single voice bars. 
+
+alphaTab takes care of the internal consolidation of voices. 
+
+<AlphaTexSample tex={true}>{`
+\\subtitle "Staff-Wise Voices"
+\\voiceMode staffWise
+\\voice
+    C4 | C5
+\\voice
+    C3 | C4
+`}</AlphaTexSample>
+
+<AlphaTexSample tex={true}>{`
+\\voiceMode barWise
+// Bar 1
+    \\voice C4 
+    \\voice C3
+|
+// Bar 2
+    \\voice C5 
+    \\voice C4
+`}</AlphaTexSample>
+
+This feature can be used via:
+
+* [`\voiceMode`](/docs/alphatex/bar-metadata#voicemode) in alphaTex.
+
+### Improvements & Bugfixes
 
 #### alphaTex: Fixed diagnostics in Monaco integration
 https://github.com/CoderLine/alphaTab/pull/2413
@@ -354,7 +522,7 @@ in the code completions.
 
 Now they are included as expected.
 
-#### playground: Impovements in the development playground
+#### playground: Improvements in the development playground
 https://github.com/CoderLine/alphaTab/pull/2410
 
 The development playground was improved with some more convenience features like:
@@ -374,7 +542,7 @@ Internally this means there were own visual "staves" for the various effects and
 
 With this change we merged these effects into the main renderers bringing following improvements: 
 
-1. We layed the foundation to eventually align effects more efficiently with the notes contained in the bars allowing a more dense layout.
+1. We laid the foundation to eventually align effects more efficiently with the notes contained in the bars allowing a more dense layout.
    Currently there can be quite a lot of white-space (especially in the horizontal layout).
 2. When the main staves (standard notation, tabs, slash notation and numbered notation) are shown/hidden we tell the next main staff to show the effect instead. 
    Thanks to this all relevant effects are now shown for notes. 
@@ -399,14 +567,8 @@ The beaming helpers are responsible for grouping beats which can be beamed toget
 calculations around this. 
 
 Historically a lot of logic around the positioning of beams and related elements (tuplets, flags etc) was scattered
-across differetn places. With this improvement we have now a proper centralized handling of these aspects allowing easier 
+across different places. With this improvement we have now a proper centralized handling of these aspects allowing easier 
 adaptions and extensions for future features. 
-
-Along the way this resulted in a range of improvements for the rendered notation:
-
-* reserved overflows and paddings are now more precise causing less unneeded whitespace and (hopefully) no cropping. 
-
-TODO sample
 
 #### bundlers: warn about missing plugin usage
 https://github.com/CoderLine/alphaTab/pull/2436
@@ -422,15 +584,26 @@ https://github.com/CoderLine/alphaTab/pull/2448
 alphaTab only applied the padding `systemLabelPaddingLeft` if the tracks had a label. Now this padding is always applied ensuring a 
 consistent display regardless of track names being set. 
 
-TODO sample
+<div style={{border: "1px solid var(--ifm-toc-border-color)"}}>
+<AlphaTab tex={true} settings={{display: { padding: [5,5], systemLabelPaddingLeft: 100}}}>{`
+\\hideDynamics
+C4 * 4
+`}</AlphaTab>
+</div>
+
+<div style={{border: "1px solid var(--ifm-toc-border-color)"}}>
+<AlphaTab tex={true} settings={{display: { padding: [5,5], systemLabelPaddingLeft: 100}}}>{`
+\\hideDynamics
+\\track "Track1"
+C4 * 4
+`}</AlphaTab>
+</div>
 
 #### web: print dialog 
 https://github.com/CoderLine/alphaTab/pull/2480
 
 When we introduced the SMuFL font customization the print dialog got broken. The fonts were not registered in the
-print dialog and therefore no symbols were shown. This problem is now fixed. 
-
-TODO sample
+print dialog and therefore no symbols were shown. This problem is now fixed. Try it out on the landing page.
 
 #### audio: handle invalid BPMs
 https://github.com/CoderLine/alphaTab/pull/2484
@@ -439,8 +612,6 @@ There were some edge-cases where invalid files could lead to a hang inside alpha
 alphaTab cropped it to 0. A BPM=0 then caused a range of internal problems in the player. 
 
 alphaTab now forces the BPM to 1 inside the player to avoid any problems. 
-
-TODO sample
 
 #### rendering: prevent wobbly beam rendering
 https://github.com/CoderLine/alphaTab/pull/2494
@@ -451,8 +622,6 @@ beams not aligning to a clean slope but they appeared "wobbly" when spanning mul
 We fixed the rendering of these beams aiming for a clean display of slopes and avoiding sub-pixel related artifacts.
 
 On standard-DPI monitors there might still be slight artifacts due to subpixel-rendering and the related anti-aliasing.
-
-TODO sample
 
 #### rendering: avoid flickering and wrong notation display on layout changes
 https://github.com/CoderLine/alphaTab/pull/2495
@@ -467,5 +636,3 @@ Devs can supply new `renderingHints` in a range of API methods for scenarios whe
 the displayed notation stays similar. 
 
 e.g. when providing live editors a clearing of the viewport would have negative flickering effects when clearing all rendered notation.
-
-TODO sample
