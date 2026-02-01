@@ -4,6 +4,7 @@ import { Bar } from '@coderline/alphatab/model/Bar';
 import { Beat } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@coderline/alphatab/model/Score';
@@ -35,6 +36,26 @@ export class TuningParseResultTone {
         this.noteValue = noteValue;
         this.accidentalMode = accidentalMode;
     }
+}
+
+/**
+ * @internal
+ * @record
+ */
+export interface ResolvedSpelling {
+    degree: number;
+    accidentalOffset: number;
+    chroma: number;
+    octave: number;
+}
+
+/**
+ * @internal
+ * @record
+ */
+interface SpellingBase {
+    degree: number;
+    accidentalOffset: number;
 }
 
 /**
@@ -785,147 +806,6 @@ export class ModelUtils {
     }
 
     /**
-     * a lookup list containing an info whether the notes within an octave
-     * need an accidental rendered. the accidental symbol is determined based on the type of key signature.
-     */
-    private static _keySignatureLookup: Array<boolean[]> = [
-        // Flats (where the value is true, a flat accidental is required for the notes)
-        [true, true, true, true, true, true, true, true, true, true, true, true],
-        [true, true, true, true, true, false, true, true, true, true, true, true],
-        [false, true, true, true, true, false, true, true, true, true, true, true],
-        [false, true, true, true, true, false, false, false, true, true, true, true],
-        [false, false, false, true, true, false, false, false, true, true, true, true],
-        [false, false, false, true, true, false, false, false, false, false, true, true],
-        [false, false, false, false, false, false, false, false, false, false, true, true],
-        // natural
-        [false, false, false, false, false, false, false, false, false, false, false, false],
-        // sharps  (where the value is true, a flat accidental is required for the notes)
-        [false, false, false, false, false, true, true, false, false, false, false, false],
-        [true, true, false, false, false, true, true, false, false, false, false, false],
-        [true, true, false, false, false, true, true, true, true, false, false, false],
-        [true, true, true, true, false, true, true, true, true, false, false, false],
-        [true, true, true, true, false, true, true, true, true, true, true, false],
-        [true, true, true, true, true, true, true, true, true, true, true, false],
-        [true, true, true, true, true, true, true, true, true, true, true, true]
-    ];
-
-    /**
-     * Contains the list of notes within an octave have accidentals set.
-     * @internal
-     */
-    public static accidentalNotes: boolean[] = [
-        false,
-        true,
-        false,
-        true,
-        false,
-        false,
-        true,
-        false,
-        true,
-        false,
-        true,
-        false
-    ];
-
-    /**
-     * @internal
-     */
-    public static computeAccidental(
-        keySignature: KeySignature,
-        accidentalMode: NoteAccidentalMode,
-        noteValue: number,
-        quarterBend: boolean,
-        currentAccidental: AccidentalType | null = null
-    ) {
-        const ks: number = keySignature;
-        const ksi: number = ks + 7;
-        const index: number = noteValue % 12;
-
-        const accidentalForKeySignature: AccidentalType = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
-        const hasKeySignatureAccidentalSetForNote: boolean = ModelUtils._keySignatureLookup[ksi][index];
-        const hasNoteAccidentalWithinOctave: boolean = ModelUtils.accidentalNotes[index];
-
-        // the general logic is like this:
-        // - we check if the key signature has an accidental defined
-        // - we calculate which accidental a note needs according to its index in the octave
-        // - if the accidental is already placed at this line, nothing needs to be done, otherwise we place it
-        // - if there should not be an accidental, but there is one in the key signature, we clear it.
-
-        // the exceptions are:
-        // - for quarter bends we just place the corresponding accidental
-        // - the accidental mode can enforce the accidentals for the note
-
-        let accidentalToSet: AccidentalType = AccidentalType.None;
-        if (quarterBend) {
-            accidentalToSet = hasNoteAccidentalWithinOctave ? accidentalForKeySignature : AccidentalType.Natural;
-            switch (accidentalToSet) {
-                case AccidentalType.Natural:
-                    accidentalToSet = AccidentalType.NaturalQuarterNoteUp;
-                    break;
-                case AccidentalType.Sharp:
-                    accidentalToSet = AccidentalType.SharpQuarterNoteUp;
-                    break;
-                case AccidentalType.Flat:
-                    accidentalToSet = AccidentalType.FlatQuarterNoteUp;
-                    break;
-            }
-        } else {
-            // define which accidental should be shown ignoring what might be set on the KS already
-            switch (accidentalMode) {
-                case NoteAccidentalMode.ForceSharp:
-                    accidentalToSet = AccidentalType.Sharp;
-                    break;
-                case NoteAccidentalMode.ForceDoubleSharp:
-                    accidentalToSet = AccidentalType.DoubleSharp;
-                    break;
-                case NoteAccidentalMode.ForceFlat:
-                    accidentalToSet = AccidentalType.Flat;
-                    break;
-                case NoteAccidentalMode.ForceDoubleFlat:
-                    accidentalToSet = AccidentalType.DoubleFlat;
-                    break;
-                default:
-                    // if note has an accidental in the octave, we place a symbol
-                    // according to the Key Signature
-                    if (hasNoteAccidentalWithinOctave) {
-                        accidentalToSet = accidentalForKeySignature;
-                    } else if (hasKeySignatureAccidentalSetForNote) {
-                        // note does not get an accidental, but KS defines one -> Naturalize
-                        accidentalToSet = AccidentalType.Natural;
-                    }
-                    break;
-            }
-
-            // do we need an accidental on the note?
-            if (accidentalToSet !== AccidentalType.None) {
-                // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
-                if (currentAccidental != null) {
-                    if (currentAccidental === accidentalToSet) {
-                        accidentalToSet = AccidentalType.None;
-                    }
-                }
-                // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
-                else if (hasKeySignatureAccidentalSetForNote && accidentalToSet === accidentalForKeySignature) {
-                    accidentalToSet = AccidentalType.None;
-                }
-            } else {
-                // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
-                // and clear the registration
-                if (currentAccidental !== null) {
-                    if (currentAccidental === AccidentalType.Natural) {
-                        accidentalToSet = AccidentalType.None;
-                    } else {
-                        accidentalToSet = AccidentalType.Natural;
-                    }
-                }
-            }
-        }
-
-        return accidentalToSet;
-    }
-
-    /**
      * @internal
      */
     public static toArticulationId(plain: string): string {
@@ -963,5 +843,287 @@ export class ModelUtils {
         }
 
         return systemIndex < systemsLayout.length ? systemsLayout[systemIndex] : defaultSystemsLayout;
+    }
+
+    // diatonic accidentals
+
+    private static readonly _degreeSemitones: number[] = [0, 2, 4, 5, 7, 9, 11];
+
+    private static readonly _sharpPreferredSpellings: SpellingBase[] = [
+        { degree: 0, accidentalOffset: 0 }, // C
+        { degree: 0, accidentalOffset: 1 }, // C#
+        { degree: 1, accidentalOffset: 0 }, // D
+        { degree: 1, accidentalOffset: 1 }, // D#
+        { degree: 2, accidentalOffset: 0 }, // E
+        { degree: 3, accidentalOffset: 0 }, // F
+        { degree: 3, accidentalOffset: 1 }, // F#
+        { degree: 4, accidentalOffset: 0 }, // G
+        { degree: 4, accidentalOffset: 1 }, // G#
+        { degree: 5, accidentalOffset: 0 }, // A
+        { degree: 5, accidentalOffset: 1 }, // A#
+        { degree: 6, accidentalOffset: 0 } // B
+    ];
+
+    private static readonly _flatPreferredSpellings: SpellingBase[] = [
+        { degree: 0, accidentalOffset: 0 }, // C
+        { degree: 1, accidentalOffset: -1 }, // Db
+        { degree: 1, accidentalOffset: 0 }, // D
+        { degree: 2, accidentalOffset: -1 }, // Eb
+        { degree: 2, accidentalOffset: 0 }, // E
+        { degree: 3, accidentalOffset: 0 }, // F
+        { degree: 4, accidentalOffset: -1 }, // Gb
+        { degree: 4, accidentalOffset: 0 }, // G
+        { degree: 5, accidentalOffset: -1 }, // Ab
+        { degree: 5, accidentalOffset: 0 }, // A
+        { degree: 6, accidentalOffset: -1 }, // Bb
+        { degree: 6, accidentalOffset: 0 } // B
+    ];
+
+    // 12 chromatic pitch classes with always 3 possible spellings in the
+    // accidental range of bb..##
+    private static readonly _spellingCandidates: SpellingBase[][] = [
+        // 0: C
+        [
+            { degree: 0, accidentalOffset: 0 }, // C
+            { degree: 1, accidentalOffset: -2 }, // Dbb
+            { degree: 6, accidentalOffset: 1 } // B#
+        ],
+        // 1: C#/Db
+        [
+            { degree: 0, accidentalOffset: 1 }, // C#
+            { degree: 1, accidentalOffset: -1 }, // Db
+            { degree: 6, accidentalOffset: 2 } // B##
+        ],
+        // 2: D
+        [
+            { degree: 1, accidentalOffset: 0 }, // D
+            { degree: 0, accidentalOffset: 2 }, // C##
+            { degree: 2, accidentalOffset: -2 } // Ebb
+        ],
+        // 3: D#/Eb
+        [
+            { degree: 1, accidentalOffset: 1 }, // D#
+            { degree: 2, accidentalOffset: -1 }, // Eb
+            { degree: 3, accidentalOffset: -2 } // Fbb
+        ],
+        // 4: E
+        [
+            { degree: 2, accidentalOffset: 0 }, // E
+            { degree: 1, accidentalOffset: 2 }, // D##
+            { degree: 3, accidentalOffset: -1 } // Fb
+        ],
+        // 5: F
+        [
+            { degree: 3, accidentalOffset: 0 }, // F
+            { degree: 2, accidentalOffset: 1 }, // E#
+            { degree: 4, accidentalOffset: -2 } // Gbb
+        ],
+        // 6: F#/Gb
+        [
+            { degree: 3, accidentalOffset: 1 }, // F#
+            { degree: 4, accidentalOffset: -1 }, // Gb
+            { degree: 2, accidentalOffset: 2 } // E##
+        ],
+        // 7: G
+        [
+            { degree: 4, accidentalOffset: 0 }, // G
+            { degree: 3, accidentalOffset: 2 }, // F##
+            { degree: 5, accidentalOffset: -2 } // Abb
+        ],
+        // 8: G#/Ab
+        [
+            { degree: 4, accidentalOffset: 1 }, // G#
+            { degree: 5, accidentalOffset: -1 } // Ab
+        ],
+        // 9: A
+        [
+            { degree: 5, accidentalOffset: 0 }, // A
+            { degree: 4, accidentalOffset: 2 }, // G##
+            { degree: 6, accidentalOffset: -2 } // Bbb
+        ],
+        // 10: A#/Bb
+        [
+            { degree: 5, accidentalOffset: 1 }, // A#
+            { degree: 6, accidentalOffset: -1 }, // Bb
+            { degree: 0, accidentalOffset: -2 } // Cbb
+        ],
+        // 11: B
+        [
+            { degree: 6, accidentalOffset: 0 }, // B
+            { degree: 5, accidentalOffset: 2 }, // A##
+            { degree: 0, accidentalOffset: -1 } // Cb
+        ]
+    ];
+    private static readonly _sharpKeySignatureOrder: number[] = [3, 0, 4, 1, 5, 2, 6]; // F C G D A E B
+    private static readonly _flatKeySignatureOrder: number[] = [6, 2, 5, 1, 4, 0, 3]; // B E A D G C F
+
+    private static readonly _keySignatureAccidentalByDegree: number[][] =
+        ModelUtils._buildKeySignatureAccidentalByDegree();
+
+    private static readonly _accidentalOffsetToType = new Map<number, AccidentalType>([
+        [-2, AccidentalType.DoubleFlat],
+        [-1, AccidentalType.Flat],
+        [0, AccidentalType.Natural],
+        [1, AccidentalType.Sharp],
+        [2, AccidentalType.DoubleSharp]
+    ]);
+
+    private static readonly _forcedAccidentalOffsetByMode = new Map<NoteAccidentalMode, number | null>([
+        [NoteAccidentalMode.ForceSharp, 1],
+        [NoteAccidentalMode.ForceDoubleSharp, 2],
+        [NoteAccidentalMode.ForceFlat, -1],
+        [NoteAccidentalMode.ForceDoubleFlat, -2],
+        [NoteAccidentalMode.ForceNatural, 0],
+        [NoteAccidentalMode.ForceNone, 0],
+        [NoteAccidentalMode.Default, null]
+    ]);
+
+    private static _buildKeySignatureAccidentalByDegree(): number[][] {
+        const lookup: number[][] = [];
+        for (let ks = -7; ks <= 7; ks++) {
+            const row = new Array<number>(7).fill(0);
+            if (ks > 0) {
+                for (let i = 0; i < ks; i++) {
+                    row[ModelUtils._sharpKeySignatureOrder[i]] = 1;
+                }
+            } else if (ks < 0) {
+                for (let i = 0; i < -ks; i++) {
+                    row[ModelUtils._flatKeySignatureOrder[i]] = -1;
+                }
+            }
+            lookup.push(row);
+        }
+        return lookup;
+    }
+
+    public static getKeySignatureAccidentalOffset(keySignature: KeySignature, degree: number): number {
+        return ModelUtils._keySignatureAccidentalByDegree[(keySignature as number) + 7][degree];
+    }
+
+    public static resolveSpelling(
+        keySignature: KeySignature,
+        noteValue: number,
+        accidentalMode: NoteAccidentalMode
+    ): ResolvedSpelling {
+        const chroma = ModelUtils.flooredDivision(noteValue, 12);
+
+        const preferred = ModelUtils._getPreferredSpellingForKeySignature(keySignature, chroma);
+        const desiredOffset = ModelUtils._forcedAccidentalOffsetByMode.get(accidentalMode) ?? null;
+
+        let spelling: SpellingBase = preferred;
+        if (desiredOffset !== null) {
+            const candidates = ModelUtils._spellingCandidates[chroma];
+            const exact = candidates.find(c => c.accidentalOffset === desiredOffset);
+            if (exact) {
+                spelling = exact;
+            }
+        }
+
+        const baseSemitone = ModelUtils._degreeSemitones[spelling.degree] + spelling.accidentalOffset;
+        const octave = Math.floor((noteValue - baseSemitone) / 12) - 1;
+
+        return {
+            degree: spelling.degree,
+            accidentalOffset: spelling.accidentalOffset,
+            chroma,
+            octave
+        };
+    }
+
+    public static computeAccidental(
+        keySignature: KeySignature,
+        accidentalMode: NoteAccidentalMode,
+        noteValue: number,
+        quarterBend: boolean,
+        currentAccidentalOffset: number | null = null
+    ) {
+        const spelling = ModelUtils.resolveSpelling(keySignature, noteValue, accidentalMode);
+        return ModelUtils.computeAccidentalForSpelling(
+            keySignature,
+            accidentalMode,
+            spelling,
+            quarterBend,
+            currentAccidentalOffset
+        );
+    }
+
+    public static computeAccidentalForSpelling(
+        keySignature: KeySignature,
+        accidentalMode: NoteAccidentalMode,
+        spelling: ResolvedSpelling,
+        quarterBend: boolean,
+        currentAccidentalOffset: number | null = null
+    ) {
+        if (accidentalMode === NoteAccidentalMode.ForceNone) {
+            return AccidentalType.None;
+        }
+
+        if (quarterBend) {
+            if (spelling.accidentalOffset > 0) {
+                return AccidentalType.SharpQuarterNoteUp;
+            }
+            if (spelling.accidentalOffset < 0) {
+                return AccidentalType.FlatQuarterNoteUp;
+            }
+            return AccidentalType.NaturalQuarterNoteUp;
+        }
+
+        const desiredOffset = spelling.accidentalOffset;
+        const ksOffset = ModelUtils.getKeySignatureAccidentalOffset(keySignature, spelling.degree);
+
+        // already active in bar -> no accidental needed
+        if (currentAccidentalOffset === desiredOffset) {
+            return AccidentalType.None;
+        }
+
+        // key signature already defines the accidental and no explicit accidental is active
+        if (currentAccidentalOffset == null && desiredOffset === ksOffset) {
+            return AccidentalType.None;
+        }
+
+        return ModelUtils.accidentalOffsetToType(desiredOffset);
+    }
+
+    public static accidentalOffsetToType(offset: number): AccidentalType {
+        return ModelUtils._accidentalOffsetToType.get(offset) ?? AccidentalType.None;
+    }
+
+    private static _getPreferredSpellingForKeySignature(keySignature: KeySignature, chroma: number): SpellingBase {
+        const candidates = ModelUtils._spellingCandidates[chroma];
+
+        const ksMatch = candidates.find(
+            c => ModelUtils.getKeySignatureAccidentalOffset(keySignature, c.degree) === c.accidentalOffset
+        );
+        if (ksMatch) {
+            return ksMatch;
+        }
+
+        const preferFlat = ModelUtils.keySignatureIsFlat(keySignature);
+        return preferFlat ? ModelUtils._flatPreferredSpellings[chroma] : ModelUtils._sharpPreferredSpellings[chroma];
+    }
+
+    private static readonly _majorKeySignatureTonicDegrees: number[] = [
+        // Flats: Cb, Gb, Db, Ab, Eb, Bb, F
+        0, 4, 1, 5, 2, 6, 3,
+        // Natural: C
+        0,
+        // Sharps: G, D, A, E, B, F#, C#
+        4, 1, 5, 2, 6, 3, 0
+    ];
+
+    private static readonly _minorKeySignatureTonicDegrees: number[] = [
+        // Flats: Ab, Eb, Bb, F, C, G, D
+        5, 2, 6, 3, 0, 4, 1,
+        // Natural: A
+        5,
+        // Sharps: E, B, F#, C#, G#, D#, A#
+        2, 6, 3, 0, 4, 1, 5
+    ];
+
+    public static getKeySignatureTonicDegree(keySignature: KeySignature, keySignatureType: KeySignatureType): number {
+        const ksi = (keySignature as number) + 7;
+        return keySignatureType === KeySignatureType.Minor
+            ? ModelUtils._minorKeySignatureTonicDegrees[ksi]
+            : ModelUtils._majorKeySignatureTonicDegrees[ksi];
     }
 }

@@ -60,6 +60,7 @@ import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
 import { BeamingRules, type MasterBar } from '@coderline/alphatab/model/MasterBar';
@@ -3318,7 +3319,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             Atnf.prop(properties, 'slur', Atnf.identValue(slurId));
         }
 
-        if (note.accidentalMode !== NoteAccidentalMode.Default) {
+        // NOTE: it would be better to check via accidentalhelper what accidentals we really need to force
+        const skipAccidental =
+            note.accidentalMode === NoteAccidentalMode.Default ||
+            (note.beat.voice.bar.keySignature === KeySignature.C &&
+                note.accidentalMode === NoteAccidentalMode.ForceNatural);
+
+        if (!skipAccidental) {
             Atnf.prop(
                 properties,
                 'acc',
