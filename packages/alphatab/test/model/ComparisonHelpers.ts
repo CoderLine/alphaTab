@@ -99,6 +99,7 @@ export class ComparisonHelpers {
             // note level
             'ratioposition',
             'percussionarticulation',
+            'accidentalmode', // we need a better way to check defaults against forced modes
 
             // for now ignore the automations as they get reorganized from beat to masterbar level
             // which messes with the 1:1 validation

@@ -1214,7 +1214,7 @@ export default class CSharpAstTransformer {
                     nodeType: cs.SyntaxKind.PropertyDeclaration,
                     isAbstract: false,
                     isOverride: false,
-                    isStatic: false,
+                    isStatic: true,
                     isVirtual: false,
                     name: this.context.toPascalCase(d.name.getText()),
                     type: this.createUnresolvedTypeNode(null, d.type ?? d, type),

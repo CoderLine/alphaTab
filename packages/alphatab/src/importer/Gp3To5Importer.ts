@@ -54,6 +54,26 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
  */
 export class Gp3To5Importer extends ScoreImporter {
     private static readonly _versionString: string = 'FICHIER GUITAR PRO ';
+
+    // NOTE: General Midi only defines percussion instruments from 35-81
+    // Guitar Pro 5 allowed GS extensions (27-34 and 82-87)
+    // GP7-8 do not have all these definitions anymore, this lookup ensures some fallback 
+    // (even if they are not correct)
+    // we can support this properly in future when we allow custom alphaTex articulation definitions
+    // then we don't need to rely on GP specifics anymore but handle things on export/import
+    private static readonly _gp5PercussionInstrumentMap = new Map<number, number>([
+        // High Q -> GS "High Q / Filter Snap"
+        [27, 42],
+        // Slap
+        [28, 60],
+        // Scratch Push
+        [29, 29],
+        // Scratch Pull
+        [30, 30],
+        // Square Click
+        [32, 31]
+    ]);
+
     private _versionNumber: number = 0;
     private _score!: Score;
     private _globalTripletFeel: TripletFeel = TripletFeel.NoTripletFeel;
@@ -435,9 +455,9 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     /**
-     * Guitar Pro 3-6 changes to a bass clef if any string tuning is below B2;
+     * Guitar Pro 3-6 changes to a bass clef if any string tuning is below B1
      */
-    private static readonly _bassClefTuningThreshold = ModelUtils.parseTuning('B2')!.realValue;
+    private static readonly _bassClefTuningThreshold = ModelUtils.parseTuning('B1')!.realValue;
 
     public readTrack(): void {
         const newTrack: Track = new Track();
@@ -1225,7 +1245,9 @@ export class Gp3To5Importer extends ScoreImporter {
         }
 
         if (bar.staff.isPercussion) {
-            newNote.percussionArticulation = newNote.fret;
+            newNote.percussionArticulation = Gp3To5Importer._gp5PercussionInstrumentMap.has(newNote.fret)
+                ? Gp3To5Importer._gp5PercussionInstrumentMap.get(newNote.fret)!
+                : newNote.fret;
             newNote.string = -1;
             newNote.fret = -1;
         }
