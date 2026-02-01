@@ -9,6 +9,7 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { expect } from 'chai';
 import { Clef } from '@coderline/alphatab/model/Clef';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 
 describe('Gp5ImporterTest', () => {
     it('score-info', async () => {
@@ -552,5 +553,20 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[1].staves[0].bars[0].clef).to.equal(Clef.F4);
         expect(score.tracks[2].staves[0].bars[0].clef).to.equal(Clef.F4);
         expect(score.tracks[3].staves[0].bars[0].clef).to.equal(Clef.F4);
+    });
+
+    it('percusson', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/percussion-all.gp5')).readScore();
+
+        let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+
+        while (beat) {
+            if (beat.notes.length === 1) {
+                const articulationName = PercussionMapper.getArticulationName(beat.notes[0]);
+                const hasArticulation = PercussionMapper.instrumentArticulationNames.has(articulationName);
+                expect(hasArticulation).to.be.true;
+                beat = beat.nextBeat;
+            }
+        }
     });
 });

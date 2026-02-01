@@ -168,6 +168,10 @@ describe('AlphaTexExporterTest', () => {
         await testRoundTripEqual(`conversion/full-song.gp5`);
     });
 
+    it('gp5-articulation', async () => {
+        await testRoundTripEqual(`guitarpro5/percussion-all.gp5`);
+    });
+
     it('gp6-to-alphaTex', async () => {
         await testRoundTripEqual(`conversion/full-song.gpx`);
     });
