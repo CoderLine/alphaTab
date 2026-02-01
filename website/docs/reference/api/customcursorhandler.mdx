@@ -1,0 +1,78 @@
+---
+title: customCursorHandler
+sidebar_custom_props:
+  kind: property
+  category: Properties - Player
+  since: 1.8.1
+---
+
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, PropertyDescription } from '@site/src/reference-commons'
+
+<SinceBadge since="1.8.1" />
+<PropertyDescription />
+A custom cursor handler which will be used to update the cursor positions during playback.
+
+<Signature style="block"
+           js={[["identifier","customCursorHandler"],["token",":"],["whitespace"," "],["identifier","ICursorHandler"],["whitespace"," "],["token","|"],["whitespace"," "],["keyword","undefined"],["token",";"]]}
+           csharp={[["identifier","ICursorHandler"],["token","?"],["whitespace"," "],["identifier","CustomCursorHandler"],["whitespace"," "],["token","{"],["whitespace"," "],["keyword","get"],["token",";"],["whitespace"," "],["keyword","set"],["token",";"],["whitespace"," "],["token","}"]]}
+           kotlin={[["keyword","var"],["whitespace"," "],["identifier","customCursorHandler"],["token",":"],["whitespace"," "],["identifier","ICursorHandler"],["token","?"]]}
+/>
+
+
+## Examples
+
+<Tabs
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.customCursorHandler = {
+  _customAdorner: undefined,
+  onAttach(cursors) {
+    this._customAdorner = document.createElement('div');
+    this._customAdorner.classList.add('cursor-adorner');
+    cursors.cursorWrapper.element.appendChild(this._customAdorner);
+  },
+  onDetach(cursors) { this._customAdorner.remove(); },
+  placeBarCursor(barCursor, beatBounds) {
+    const barBoundings = beatBounds.barBounds.masterBarBounds;
+    const barBounds = barBoundings.visualBounds;
+    barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
+  },
+  placeBeatCursor(beatCursor, beatBounds, startBeatX) {
+    const barBoundings = beatBounds.barBounds.masterBarBounds;
+    const barBounds = barBoundings.visualBounds;
+    beatCursor.transitionToX(0, startBeatX);
+    beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
+    this._customAdorner.style.left = startBeatX + 'px';
+    this._customAdorner.style.top = (barBounds.y - 10) + 'px';
+    this._customAdorner.style.width = '1px';
+    this._customAdorner.style.height = '10px';
+    this._customAdorner.style.transition = 'left 0ms linear'; // stop animation
+  },
+  transitionBeatCursor(beatCursor, beatBounds, startBeatX, endBeatX, duration, cursorMode) {
+    this._customAdorner.style.transition = `left ${duration}ms linear`; // start animation
+    this._customAdorner.style.left = endBeatX + 'px';
+  }
+}
+```
+</TabItem>
+<TabItem value="csharp">
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.CustomCursorHandler = new CustomCursorHandler();
+```
+</TabItem>
+<TabItem value="android">
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.customCursorHandler = CustomCursorHandler();
+```
+</TabItem>
+</Tabs>
