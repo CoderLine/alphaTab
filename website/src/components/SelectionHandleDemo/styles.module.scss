@@ -1,0 +1,50 @@
+.wrapper {
+  position: relative;
+}
+
+.atSelectionHandles {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1001;
+  display: inline;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.atSelectionHandle {
+  position: absolute;
+  pointer-events: auto;
+  cursor: ew-resize;
+  background: #7cb9ff;
+  width: 4px;
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
+}
+
+.atSelectionHandle.active {
+  display: block;
+  opacity: 1;
+}
+
+.atSelectionHandle-drag * {
+  cursor: ew-resize !important;
+}
+
+.atSelectionHandle::before {
+  content: ' ';
+  display: block;
+  background: #7cb9ff;
+  width: 16px;
+  height: 16px;
+  border-radius: 15px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  position: absolute;
+}
+
+.atSelectionHandleEnd::before {
+  bottom: 0;
+  transform: translateX(-50%) translateY(50%);
+}
