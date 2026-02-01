@@ -2,8 +2,7 @@ import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Clef } from '@coderline/alphatab/model/Clef';
-import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { ModelUtils, type ResolvedSpelling } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
@@ -44,16 +43,11 @@ export class AccidentalHelper {
     private static _octaveSteps: number[] = [38, 32, 30, 26, 38];
 
     /**
-     * The step offsets of the notes within an octave in case of for sharp keysignatures
+     * Diatonic step offsets within an octave.
      */
-    public static readonly sharpNoteSteps: number[] = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
+    private static readonly _diatonicSteps: number[] = [0, 1, 2, 3, 4, 5, 6];
 
-    /**
-     * The step offsets of the notes within an octave in case of for flat keysignatures
-     */
-    public static readonly flatNoteSteps: number[] = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6];
-
-    private _registeredAccidentals: Map<number, AccidentalType> = new Map();
+    private _registeredAccidentals: Map<number, number> = new Map();
     private _appliedScoreSteps: Map<number, number> = new Map();
     private _appliedScoreStepsByValue: Map<number, number> = new Map();
     private _notesByValue: Map<number, Note> = new Map();
@@ -88,25 +82,7 @@ export class AccidentalHelper {
     }
 
     public static getNoteValue(note: Note) {
-        let noteValue: number = note.displayValue;
-
-        // adjust note height according to accidentals enforced
-        switch (note.accidentalMode) {
-            case NoteAccidentalMode.ForceDoubleFlat:
-                noteValue += 2;
-                break;
-            case NoteAccidentalMode.ForceDoubleSharp:
-                noteValue -= 2;
-                break;
-            case NoteAccidentalMode.ForceFlat:
-                noteValue += 1;
-                break;
-            case NoteAccidentalMode.ForceSharp:
-                noteValue -= 1;
-                break;
-        }
-
-        return noteValue;
+        return note.displayValue;
     }
 
     /**
@@ -146,7 +122,8 @@ export class AccidentalHelper {
         if (note.isPercussion) {
             steps = AccidentalHelper.getPercussionSteps(note);
         } else {
-            steps = AccidentalHelper.calculateNoteSteps(bar.keySignature, bar.clef, noteValue);
+            const spelling = ModelUtils.resolveSpelling(bar.keySignature, noteValue, note.accidentalMode);
+            steps = AccidentalHelper.calculateNoteSteps(bar.clef, spelling);
         }
         return steps;
     }
@@ -167,18 +144,19 @@ export class AccidentalHelper {
             steps = AccidentalHelper.getPercussionSteps(note!);
         } else {
             const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
-            steps = AccidentalHelper.calculateNoteSteps(this._bar.keySignature, this._bar.clef, noteValue);
+            const spelling = ModelUtils.resolveSpelling(this._bar.keySignature, noteValue, accidentalMode);
+            steps = AccidentalHelper.calculateNoteSteps(this._bar.clef, spelling);
 
-            const currentAccidental = this._registeredAccidentals.has(steps)
+            const currentAccidentalOffset = this._registeredAccidentals.has(steps)
                 ? this._registeredAccidentals.get(steps)!
                 : null;
 
-            accidentalToSet = ModelUtils.computeAccidental(
+            accidentalToSet = ModelUtils.computeAccidentalForSpelling(
                 this._bar.keySignature,
                 accidentalMode,
-                noteValue,
+                spelling,
                 quarterBend,
-                currentAccidental
+                currentAccidentalOffset
             );
 
             let skipAccidental = false;
@@ -208,13 +186,14 @@ export class AccidentalHelper {
 
                     if (skipAccidental) {
                         accidentalToSet = AccidentalType.None;
-                    } else {
-                        // do we need an accidental on the note?
-                        if (accidentalToSet !== AccidentalType.None) {
-                            this._registeredAccidentals.set(steps, accidentalToSet);
-                        }
                     }
                     break;
+            }
+
+            const shouldRegister = !quarterBend && accidentalToSet !== AccidentalType.None;
+
+            if (shouldRegister) {
+                this._registeredAccidentals.set(steps, spelling.accidentalOffset);
             }
         }
 
@@ -275,24 +254,15 @@ export class AccidentalHelper {
         return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.minStepsNote : null;
     }
 
-    public static calculateNoteSteps(keySignature: KeySignature, clef: Clef, noteValue: number): number {
-        const value: number = noteValue;
-        const ks: number = keySignature as number;
+    public static calculateNoteSteps(clef: Clef, spelling: ResolvedSpelling): number {
         const clefValue: number = clef as number;
-        const index: number = value % 12;
-        const octave: number = ((value / 12) | 0) - 1;
 
         // Initial Position
         let steps: number = AccidentalHelper._octaveSteps[clefValue];
         // Move to Octave
-        steps -= octave * AccidentalHelper._stepsPerOctave;
-        // get the step list for the current keySignature
-        const stepList =
-            ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
-                ? AccidentalHelper.sharpNoteSteps
-                : AccidentalHelper.flatNoteSteps;
-
-        steps -= stepList[index];
+        steps -= spelling.octave * AccidentalHelper._stepsPerOctave;
+        // Move within octave
+        steps -= AccidentalHelper._diatonicSteps[spelling.degree];
 
         return steps;
     }

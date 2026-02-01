@@ -18,7 +18,6 @@ import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NumberedNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedNoteHeadGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
-import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -28,7 +27,6 @@ import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
  * @internal
  */
 export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
-    public isNaturalizeAccidental = false;
     public accidental: AccidentalType = AccidentalType.None;
 
     public skipLayout = false;
@@ -48,34 +46,31 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
             if (this.container.beat.notes.length > 0) {
                 const note = this.container.beat.notes[0];
 
-                // Notes
-                // - Compared to standard notation accidentals:
-                //   - Flat keysigs: When there is a naturalize symbol (against key signature, not naturalizing same line) we have a # in Numbered notation
-                //   - Flat keysigs: When there is a flat symbol standard notation we also have a flat in Numbered notation
-                //   - C keysig: A sharp on standard notation is a sharp on numbered notation
-                //   - # keysigs:  When there is a # symbol on standard notation we also a sharp in numbered notation
-                //   - # keysigs:  When there is a naturalize symbol (against key signature, not naturalizing same line) we have a flat in Numbered notation
-
-                // Or generally:
-                //  - numbered notation has the same accidentals as standard notation if applied
-                //  - when the standard notation naturalizes the accidental from the key signature, the numbered notation has the reversed accidental
-
-                const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
-                const noteValue = AccidentalHelper.getNoteValue(note);
-                let accidentalToSet: AccidentalType = ModelUtils.computeAccidental(
+                const spelling = ModelUtils.resolveSpelling(
                     this.renderer.bar.keySignature,
-                    accidentalMode,
-                    noteValue,
-                    note.hasQuarterToneOffset
+                    note.displayValue,
+                    note.accidentalMode
                 );
 
-                if (accidentalToSet === AccidentalType.Natural) {
-                    const ks = this.renderer.bar.keySignature as number;
-                    const ksi = ks + 7;
-                    const naturalizeAccidentalForKeySignature: AccidentalType =
-                        ksi < 7 ? AccidentalType.Sharp : AccidentalType.Flat;
-                    accidentalToSet = naturalizeAccidentalForKeySignature;
-                    this.isNaturalizeAccidental = true;
+                const ksOffset = ModelUtils.getKeySignatureAccidentalOffset(
+                    this.renderer.bar.keySignature,
+                    spelling.degree
+                );
+                const requiredOffset = spelling.accidentalOffset - ksOffset;
+
+                let accidentalToSet: AccidentalType = AccidentalType.None;
+                if (note.accidentalMode !== NoteAccidentalMode.ForceNone) {
+                    if (note.hasQuarterToneOffset) {
+                        if (requiredOffset > 0) {
+                            accidentalToSet = AccidentalType.SharpQuarterNoteUp;
+                        } else if (requiredOffset < 0) {
+                            accidentalToSet = AccidentalType.FlatQuarterNoteUp;
+                        } else {
+                            accidentalToSet = AccidentalType.NaturalQuarterNoteUp;
+                        }
+                    } else if (requiredOffset !== 0) {
+                        accidentalToSet = ModelUtils.accidentalOffsetToType(requiredOffset);
+                    }
                 }
 
                 // do we need an accidental on the note?
@@ -201,22 +196,22 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         return 0;
     }
 
-    public static readonly majorKeySignatureOneValues: Array<number> = [
-        // Flats
-        59, 66, 61, 68, 63, 58, 65,
-        // natural
+    private static readonly _majorKeySignatureOneValues: Array<number> = [
+        // Flats: Cb, Gb, Db, Ab, Eb, Bb, F
+        59, 66, 61, 68, 63, 70, 65,
+        // natural: C
         60,
-        // sharps  (where the value is true, a flat accidental is required for the notes)
+        // sharps: G, D, A, E, B, F#, C#
         67, 62, 69, 64, 71, 66, 61
     ];
 
-    public static readonly minorKeySignatureOneValues: Array<number> = [
-        // Flats
-        71, 66, 73, 68, 63, 70, 65,
-        // natural
-        72,
-        // sharps  (where the value is true, a flat accidental is required for the notes)
-        67, 74, 69, 64, 71, 66, 73
+    private static readonly _minorKeySignatureOneValues: Array<number> = [
+        // Flats: Ab, Eb, Bb, F, C, G, D
+        68, 63, 70, 65, 60, 67, 62,
+        // natural: A
+        69,
+        // sharps: E, B, F#, C#, G#, D#, A#
+        64, 71, 66, 61, 68, 63, 70
     ];
 
     public override doLayout(): void {
@@ -234,47 +229,34 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             let numberWithinOctave = '0';
             if (this.container.beat.notes.length > 0) {
                 const note = this.container.beat.notes[0];
-                const kst = this.renderer.bar.keySignatureType;
-                const ks = this.renderer.bar.keySignature as number;
-                const ksi = ks + 7;
-
-                const oneNoteValues =
-                    kst === KeySignatureType.Minor
-                        ? NumberedBeatGlyph.minorKeySignatureOneValues
-                        : NumberedBeatGlyph.majorKeySignatureOneValues;
-                const oneNoteValue = oneNoteValues[ksi];
-
                 if (note.isDead) {
                     numberWithinOctave = 'X';
                 } else {
+                    const ks = this.renderer.bar.keySignature;
+                    const kst = this.renderer.bar.keySignatureType;
+                    const ksi = (ks as number) + 7;
+
+                    const oneNoteValues =
+                        kst === KeySignatureType.Minor
+                            ? NumberedBeatGlyph._minorKeySignatureOneValues
+                            : NumberedBeatGlyph._majorKeySignatureOneValues;
+
+                    const oneNoteValue = oneNoteValues[ksi];
+
+                    const spelling = ModelUtils.resolveSpelling(ks, note.displayValue, note.accidentalMode);
+
+                    const tonicDegree = ModelUtils.getKeySignatureTonicDegree(ks, kst);
+
+                    const effectiveTonic =
+                        kst === KeySignatureType.Minor
+                            ? (tonicDegree + 2) % 7 // relative major
+                            : tonicDegree;
+
+                    const degreeDistance = (spelling.degree - effectiveTonic + 7) % 7;
+                    numberWithinOctave = (degreeDistance + 1).toString();
+
                     const noteValue = note.displayValue - oneNoteValue;
-
-                    const index = noteValue < 0 ? ((noteValue % 12) + 12) % 12 : noteValue % 12;
-
-                    octaveDots = noteValue < 0 ? ((Math.abs(noteValue) + 12) / 12) | 0 : (noteValue / 12) | 0;
-                    if (noteValue < 0) {
-                        octaveDots *= -1;
-                    }
-                    const stepList =
-                        ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
-                            ? AccidentalHelper.flatNoteSteps
-                            : AccidentalHelper.sharpNoteSteps;
-
-                    let steps = stepList[index] + 1;
-
-                    const hasAccidental = ModelUtils.accidentalNotes[index];
-                    if (
-                        hasAccidental &&
-                        !(this.container.preNotes as NumberedBeatPreNotesGlyph).isNaturalizeAccidental
-                    ) {
-                        if (ksi < 7) {
-                            steps++;
-                        } else {
-                            steps--;
-                        }
-                    }
-
-                    numberWithinOctave = steps.toString();
+                    octaveDots = Math.floor(noteValue / 12);
                 }
             }
 

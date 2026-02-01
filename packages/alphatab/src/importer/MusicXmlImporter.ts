@@ -162,7 +162,8 @@ class TrackInfo {
             // no display pitch defined?
             musicXmlStaffSteps = 4; // middle of bar
         } else {
-            musicXmlStaffSteps = AccidentalHelper.calculateNoteSteps(bar.keySignature, bar.clef, noteValue);
+            const spelling = ModelUtils.resolveSpelling(bar.keySignature, noteValue, NoteAccidentalMode.Default);
+            musicXmlStaffSteps = AccidentalHelper.calculateNoteSteps(bar.clef, spelling);
         }
 
         // to translate this into the "staffLine" semantics we need to subtract additionally the steps "missing" from the absent lines
