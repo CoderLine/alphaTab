@@ -1155,9 +1155,8 @@ describe('MidiTickLookupTest', () => {
     });
 
     it('simple-repeat', () => {
-        it('not-applied', () => {
-            lookupTest(
-                `
+        lookupTest(
+            `
             C4.2 * 2 |
             C4.2 * 2 |
             \\ro 
@@ -1166,103 +1165,102 @@ describe('MidiTickLookupTest', () => {
             C4.2 * 2 |
             C4.2 * 2 |
             `,
-                [
-                    // 1st bar
-                    0, 960, 1920, 2880,
+            [
+                // 1st bar
+                0, 960, 1920, 2880,
 
-                    // 2nd bar
-                    3840, 4800, 5760, 6720,
+                // 2nd bar
+                3840, 4800, 5760, 6720,
 
-                    // 3rd bar
-                    7680, 8640, 9600, 10560,
+                // 3rd bar
+                7680, 8640, 9600, 10560,
 
-                    // 3rd bar (repeated)
-                    11520, 12480, 13440, 14400,
+                // 3rd bar (repeated)
+                11520, 12480, 13440, 14400,
 
-                    // 4th bar
-                    15360, 16320, 17280, 18240,
+                // 4th bar
+                15360, 16320, 17280, 18240,
 
-                    // 5th bar
-                    19200, 20160, 21120, 22080
-                ],
-                [0],
-                [
-                    // 1st bar
-                    1920, 1920, 1920, 1920,
-                    // 2nd bar
-                    1920, 1920, 1920, 1920,
-                    // 3rd bar
-                    1920, 1920, 1920, 1920,
-                    // 3rd bar (repeated)
-                    1920, 1920, 1920, 1920,
-                    // 4th bar
-                    1920, 1920, 1920, 1920,
-                    // 5th bar
-                    1920, 1920, 1920, 1920
-                ],
-                [
-                    // 1st bar
-                    0, 0, 1, 1,
-                    // 2nd bar
-                    2, 2, 3, 3,
-                    // 3rd bar
-                    4, 4, 5, 5,
-                    // 3rd bar (repeated)
-                    4, 4, 5, 5,
-                    // 4th bar
-                    6, 6, 7, 7,
-                    // 5th bar
-                    8, 8, 9, 9
-                ],
-                [
-                    // 1st bar
-                    1, 1, 2, 2,
-                    // 2nd bar
-                    3, 3, 4, 4,
-                    // 3rd bar
-                    5, 5, 4, 4,
-                    // 3rd bar (repeated)
-                    5, 5, 6, 6,
-                    // 4th bar
-                    7, 7, 8, 8,
-                    // 5th bar
-                    9, 9, -1, -1
-                ],
-                [
-                    // 1st bar
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    // 2nd bar
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    // 3rd bar
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
-                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
-                    // 3rd bar (repeated)
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    // 4th bar
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    // 5th bar
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
-                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat
-                ],
-                true
-            );
-        });
+                // 5th bar
+                19200, 20160, 21120, 22080
+            ],
+            [0],
+            [
+                // 1st bar
+                1920, 1920, 1920, 1920,
+                // 2nd bar
+                1920, 1920, 1920, 1920,
+                // 3rd bar
+                1920, 1920, 1920, 1920,
+                // 3rd bar (repeated)
+                1920, 1920, 1920, 1920,
+                // 4th bar
+                1920, 1920, 1920, 1920,
+                // 5th bar
+                1920, 1920, 1920, 1920
+            ],
+            [
+                // 1st bar
+                0, 0, 1, 1,
+                // 2nd bar
+                2, 2, 3, 3,
+                // 3rd bar
+                4, 4, 5, 5,
+                // 3rd bar (repeated)
+                4, 4, 5, 5,
+                // 4th bar
+                6, 6, 7, 7,
+                // 5th bar
+                8, 8, 9, 9
+            ],
+            [
+                // 1st bar
+                1, 1, 2, 2,
+                // 2nd bar
+                3, 3, 4, 4,
+                // 3rd bar
+                5, 5, 4, 4,
+                // 3rd bar (repeated)
+                5, 5, 6, 6,
+                // 4th bar
+                7, 7, 8, 8,
+                // 5th bar
+                9, 9, -1, -1
+            ],
+            [
+                // 1st bar
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                // 2nd bar
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                // 3rd bar
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                // 3rd bar (repeated)
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                // 4th bar
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                // 5th bar
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat
+            ],
+            true
+        );
     });
 
     describe('playback-range', () => {
