@@ -10,7 +10,7 @@ import {
 import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { Logger } from '@coderline/alphatab/Logger';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
-import type { BeatTickLookupItem, IBeatVisibilityChecker } from '@coderline/alphatab/midi/BeatTickLookup';
+import type { IBeatVisibilityChecker } from '@coderline/alphatab/midi/BeatTickLookup';
 import type {
     MetaDataEvent,
     MetaEvent,
@@ -42,16 +42,20 @@ import {
     MidiTickLookupFindBeatResultCursorMode
 } from '@coderline/alphatab/midi/MidiTickLookup';
 
+import {
+    type ICursorHandler,
+    NonAnimatingCursorHandler,
+    ToNextBeatAnimatingCursorHandler
+} from '@coderline/alphatab/CursorHandler';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { Track } from '@coderline/alphatab/model/Track';
-import { PlayerMode, ScrollMode } from '@coderline/alphatab/PlayerSettings';
 import type { IContainer } from '@coderline/alphatab/platform/IContainer';
 import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
 import type { IUiFacade } from '@coderline/alphatab/platform/IUiFacade';
-import { ResizeEventArgs } from '@coderline/alphatab/ResizeEventArgs';
+import { PlayerMode, ScrollMode } from '@coderline/alphatab/PlayerSettings';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
@@ -62,6 +66,7 @@ import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
 import type { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
+import { ResizeEventArgs } from '@coderline/alphatab/ResizeEventArgs';
 import {
     HorizontalContinuousScrollHandler,
     HorizontalOffScreenScrollHandler,
@@ -88,6 +93,7 @@ import type { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/Pl
 import { PlayerState } from '@coderline/alphatab/synth/PlayerState';
 import type { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerStateChangedEventArgs';
 import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
+import { Cursors } from '@coderline/alphatab/platform/Cursors';
 
 /**
  * @internal
@@ -166,6 +172,8 @@ export class AlphaTabApiBase<TSettings> {
     private _renderer: ScoreRendererWrapper;
 
     private _defaultScrollHandler?: IScrollHandler;
+    private _defaultCursorHandler?: ICursorHandler;
+    private _customCursorHandler?: ICursorHandler;
 
     /**
      * An indicator by how many midi-ticks the song contents are shifted.
@@ -988,6 +996,88 @@ export class AlphaTabApiBase<TSettings> {
         }
     }
 
+    /**
+     * A custom cursor handler which will be used to update the cursor positions during playback.
+     *
+     * @category Properties - Player
+     * @since 1.8.1
+     * @example
+     * JavaScript
+     * ```js
+     * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+     * api.customCursorHandler = {
+     *   _customAdorner: undefined,
+     *   onAttach(cursors) {
+     *     this._customAdorner = document.createElement('div');
+     *     this._customAdorner.classList.add('cursor-adorner');
+     *     cursors.cursorWrapper.element.appendChild(this._customAdorner);
+     *   },
+     *   onDetach(cursors) { this._customAdorner.remove(); },
+     *   placeBarCursor(barCursor, beatBounds) {
+     *     const barBoundings = beatBounds.barBounds.masterBarBounds;
+     *     const barBounds = barBoundings.visualBounds;
+     *     barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
+     *   },
+     *   placeBeatCursor(beatCursor, beatBounds, startBeatX) {
+     *     const barBoundings = beatBounds.barBounds.masterBarBounds;
+     *     const barBounds = barBoundings.visualBounds;
+     *     beatCursor.transitionToX(0, startBeatX);
+     *     beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
+     *     this._customAdorner.style.left = startBeatX + 'px';
+     *     this._customAdorner.style.top = (barBounds.y - 10) + 'px';
+     *     this._customAdorner.style.width = '1px';
+     *     this._customAdorner.style.height = '10px';
+     *     this._customAdorner.style.transition = 'left 0ms linear'; // stop animation
+     *   },
+     *   transitionBeatCursor(beatCursor, beatBounds, startBeatX, endBeatX, duration, cursorMode) {
+     *     this._customAdorner.style.transition = `left ${duration}ms linear`; // start animation
+     *     this._customAdorner.style.left = endBeatX + 'px';
+     *   }
+     * }
+     * ```
+     *
+     * @example
+     * C#
+     * ```cs
+     * var api = new AlphaTabApi<MyControl>(...);
+     * api.CustomCursorHandler = new CustomCursorHandler();
+     * ```
+     *
+     * @example
+     * Android
+     * ```kotlin
+     * val api = AlphaTabApi<MyControl>(...)
+     * api.customCursorHandler = CustomCursorHandler();
+     * ```
+     */
+    public get customCursorHandler(): ICursorHandler | undefined {
+        return this._customCursorHandler;
+    }
+
+    public set customCursorHandler(value: ICursorHandler | undefined) {
+        if (this._customCursorHandler === value) {
+            return;
+        }
+        const currentHandler = this._customCursorHandler ?? this._defaultCursorHandler;
+
+        this._customCursorHandler = value;
+        if (this._cursorWrapper) {
+            const cursors = new Cursors(
+                this._cursorWrapper,
+                this._barCursor!,
+                this._beatCursor!,
+                this._selectionWrapper!
+            );
+
+            currentHandler?.onDetach(cursors);
+            if (value) {
+                value?.onDetach(cursors);
+            } else if (this._defaultCursorHandler) {
+                this._defaultCursorHandler!.onAttach(cursors);
+            }
+        }
+    }
+
     private _tickCache: MidiTickLookup | null = null;
 
     /**
@@ -1487,6 +1577,9 @@ export class AlphaTabApiBase<TSettings> {
 
     public set playbackRange(value: PlaybackRange | null) {
         this._player.playbackRange = value;
+        if (this._tickCache) {
+            this._tickCache.playbackRange = value;
+        }
         this._updateSelectionCursor(value);
     }
 
@@ -1650,6 +1743,8 @@ export class AlphaTabApiBase<TSettings> {
 
         generator.generate();
         this._tickCache = generator.tickLookup;
+        this._tickCache.playbackRange = this.playbackRange;
+
         this._onMidiLoad(midiFile);
 
         const player = this._player;
@@ -2070,6 +2165,10 @@ export class AlphaTabApiBase<TSettings> {
         if (!this._cursorWrapper) {
             return;
         }
+        const cursorHandler = this.customCursorHandler ?? this._defaultCursorHandler!;
+        cursorHandler?.onDetach(
+            new Cursors(this._cursorWrapper, this._barCursor!, this._beatCursor!, this._selectionWrapper!)
+        );
         this.uiFacade.destroyCursors();
         this._cursorWrapper = null;
         this._barCursor = null;
@@ -2088,6 +2187,9 @@ export class AlphaTabApiBase<TSettings> {
             this._barCursor = cursors.barCursor;
             this._beatCursor = cursors.beatCursor;
             this._selectionWrapper = cursors.selectionWrapper;
+            const cursorHandler = this.customCursorHandler ?? this._defaultCursorHandler!;
+            cursorHandler?.onAttach(cursors);
+
             this._isInitialBeatCursorUpdate = true;
         }
         if (this._currentBeat !== null) {
@@ -2096,6 +2198,7 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private _updateCursors() {
+        this._updateCursorHandler();
         this._updateScrollHandler();
 
         const enable = this._hasCursor;
@@ -2103,6 +2206,23 @@ export class AlphaTabApiBase<TSettings> {
             this._createCursors();
         } else if (!enable && this._cursorWrapper) {
             this._destroyCursors();
+        }
+    }
+
+    private _cursorHandlerMode = false;
+    private _updateCursorHandler() {
+        const currentHandler = this._defaultCursorHandler;
+
+        const cursorHandlerMode = this.settings.player.enableAnimatedBeatCursor;
+        // no change
+        if (currentHandler !== undefined && this._cursorHandlerMode === cursorHandlerMode) {
+            return;
+        }
+
+        if (cursorHandlerMode) {
+            this._defaultCursorHandler = new ToNextBeatAnimatingCursorHandler();
+        } else {
+            this._defaultCursorHandler = new NonAnimatingCursorHandler();
         }
     }
 
@@ -2199,10 +2319,6 @@ export class AlphaTabApiBase<TSettings> {
         forceUpdate: boolean = false
     ): void {
         const beat: Beat = lookupResult.beat;
-        const nextBeat: Beat | null = lookupResult.nextBeat?.beat ?? null;
-        const duration: number = lookupResult.duration;
-        const beatsToHighlight = lookupResult.beatLookup.highlightedBeats;
-
         if (!beat) {
             return;
         }
@@ -2235,18 +2351,7 @@ export class AlphaTabApiBase<TSettings> {
         this._previousStateForCursor = this._player.state;
 
         this.uiFacade.beginInvoke(() => {
-            this._internalCursorUpdateBeat(
-                beat,
-                nextBeat,
-                duration,
-                stop,
-                beatsToHighlight,
-                cache!,
-                beatBoundings!,
-                shouldScroll,
-                lookupResult.cursorMode,
-                cursorSpeed
-            );
+            this._internalCursorUpdateBeat(lookupResult, stop, cache!, beatBoundings!, shouldScroll, cursorSpeed);
         });
     }
 
@@ -2266,19 +2371,22 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private _internalCursorUpdateBeat(
-        beat: Beat,
-        nextBeat: Beat | null,
-        duration: number,
+        lookupResult: MidiTickLookupFindBeatResult,
         stop: boolean,
-        beatsToHighlight: BeatTickLookupItem[],
-        cache: BoundsLookup,
+        boundsLookup: BoundsLookup,
         beatBoundings: BeatBounds,
         shouldScroll: boolean,
-        cursorMode: MidiTickLookupFindBeatResultCursorMode,
         cursorSpeed: number
     ) {
-        const barCursor = this._barCursor;
+        const beat = lookupResult.beat;
+        const nextBeat = lookupResult.nextBeat?.beat;
+        let duration = lookupResult.duration;
+        const beatsToHighlight = lookupResult.beatLookup.highlightedBeats;
+        const cursorMode = lookupResult.cursorMode;
+        const cursorHandler = this.customCursorHandler ?? this._defaultCursorHandler!;
+
         const beatCursor = this._beatCursor;
+        const barCursor = this._barCursor;
 
         const barBoundings: MasterBarBounds = beatBoundings.barBounds.masterBarBounds;
         const barBounds: Bounds = barBoundings.visualBounds;
@@ -2287,18 +2395,18 @@ export class AlphaTabApiBase<TSettings> {
         this._currentBeatBounds = beatBoundings;
 
         if (barCursor) {
-            barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
+            cursorHandler.placeBarCursor(barCursor, beatBoundings);
         }
 
         const isPlayingUpdate = this._player.state === PlayerState.Playing && !stop;
 
-        let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
+        let nextBeatX: number = beatBoundings.realBounds.x + beatBoundings.realBounds.w;
         let nextBeatBoundings: BeatBounds | null = null;
         // get position of next beat on same system
         if (nextBeat && cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
             // if we are moving within the same bar or to the next bar
             // transition to the next beat, otherwise transition to the end of the bar.
-            nextBeatBoundings = cache.findBeat(nextBeat);
+            nextBeatBoundings = boundsLookup.findBeat(nextBeat);
             if (
                 nextBeatBoundings &&
                 nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
@@ -2309,52 +2417,42 @@ export class AlphaTabApiBase<TSettings> {
 
         let startBeatX = beatBoundings.onNotesX;
         if (beatCursor) {
-            // relative positioning of the cursor
-            if (this.settings.player.enableAnimatedBeatCursor) {
-                const animationWidth = nextBeatX - beatBoundings.onNotesX;
-                const relativePosition = this._previousTick - this._currentBeat!.start;
-                const ratioPosition =
-                    this._currentBeat!.tickDuration > 0 ? relativePosition / this._currentBeat!.tickDuration : 0;
-                startBeatX = beatBoundings.onNotesX + animationWidth * ratioPosition;
-                duration -= duration * ratioPosition;
+            const animationWidth = nextBeatX - beatBoundings.onNotesX;
+            const relativePosition = this._previousTick - this._currentBeat!.start;
+            const ratioPosition =
+                this._currentBeat!.tickDuration > 0 ? relativePosition / this._currentBeat!.tickDuration : 0;
+            startBeatX = beatBoundings.onNotesX + animationWidth * ratioPosition;
+            duration -= duration * ratioPosition;
 
-                if (isPlayingUpdate) {
-                    // we do not "reset" the cursor if we are smoothly moving from left to right.
-                    const jumpCursor =
-                        !previousBeatBounds ||
-                        this._isInitialBeatCursorUpdate ||
-                        barBounds.y !== previousBeatBounds.barBounds.masterBarBounds.visualBounds.y ||
-                        startBeatX < previousBeatBounds.onNotesX ||
-                        barBoundings.index > previousBeatBounds.barBounds.masterBarBounds.index + 1;
+            // respect speed
+            duration = duration / cursorSpeed;
 
-                    if (jumpCursor) {
-                        beatCursor.transitionToX(0, startBeatX);
-                        beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
-                    }
+            if (isPlayingUpdate) {
+                // we do not "reset" the cursor if we are smoothly moving from left to right.
+                const jumpCursor =
+                    !previousBeatBounds ||
+                    this._isInitialBeatCursorUpdate ||
+                    barBounds.y !== previousBeatBounds.barBounds.masterBarBounds.visualBounds.y ||
+                    startBeatX < previousBeatBounds.onNotesX ||
+                    barBoundings.index > previousBeatBounds.barBounds.masterBarBounds.index + 1;
 
-                    // it can happen that the cursor reaches the target position slightly too early (especially on backing tracks)
-                    // to avoid the cursor stopping, causing a wierd look, we animate the cursor to the double position in double time.
-                    // beatCursor!.transitionToX((duration / cursorSpeed), nextBeatX);
-                    const factor = cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext ? 2 : 1;
-                    nextBeatX = startBeatX + (nextBeatX - startBeatX) * factor;
-                    duration = (duration / cursorSpeed) * factor;
-
-                    // we need to put the transition to an own animation frame
-                    // otherwise the stop animation above is not applied.
-                    this.uiFacade.beginInvoke(() => {
-                        beatCursor!.transitionToX(duration, nextBeatX);
-                    });
-                } else {
-                    duration = 0;
-                    beatCursor.transitionToX(duration, nextBeatX);
-                    beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
+                if (jumpCursor) {
+                    cursorHandler.placeBeatCursor(beatCursor, beatBoundings, startBeatX);
                 }
+
+                this.uiFacade.beginInvoke(() => {
+                    cursorHandler.transitionBeatCursor(
+                        beatCursor,
+                        beatBoundings,
+                        startBeatX,
+                        nextBeatX,
+                        duration,
+                        cursorMode
+                    );
+                });
             } else {
-                // ticking cursor
                 duration = 0;
-                nextBeatX = startBeatX;
-                beatCursor.transitionToX(duration, nextBeatX);
-                beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
+                cursorHandler.placeBeatCursor(beatCursor, beatBoundings, startBeatX);
             }
 
             this._isInitialBeatCursorUpdate = false;

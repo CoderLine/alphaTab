@@ -6,10 +6,22 @@ import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { Lazy } from '@coderline/alphatab/util/Lazy';
 
 /**
+ * A UI element implementation wrapping HTML elements.
+ * @target web
+ * @public
+ */
+export interface IHtmlElementContainer extends IContainer{
+    /**
+     * The wrapped UI element.
+     */
+    readonly element:HTMLElement;
+}
+
+/**
  * @target web
  * @internal
  */
-export class HtmlElementContainer implements IContainer {
+export class HtmlElementContainer implements IHtmlElementContainer {
     private static _resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(
         () =>
             new ResizeObserver((entries: ResizeObserverEntry[]) => {
