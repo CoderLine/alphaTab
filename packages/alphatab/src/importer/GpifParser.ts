@@ -2581,6 +2581,9 @@ export class GpifParser {
                 switch (c.localName) {
                     case 'Accidental':
                         switch (c.innerText) {
+                            case '':
+                                note.accidentalMode = NoteAccidentalMode.ForceNatural;
+                                break;
                             case 'x':
                                 note.accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
                                 break;

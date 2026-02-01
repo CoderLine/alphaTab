@@ -158,7 +158,7 @@ describe('MusicNotationTests', () => {
 
         const ocatve = 4;
         const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-        const accidentalModes = ['', '#', '##', 'b', 'bb'];
+        const accidentalModes = ['n', '#', '##', 'b', 'bb'];
 
         for (const keySignature of keySignatures) {
             tex += `\\ks ${keySignature} `;
@@ -190,8 +190,8 @@ describe('MusicNotationTests', () => {
         await VisualTestHelper.runVisualTestFull(
             new VisualTestOptions(
                 score,
-                [new VisualTestRun(-1, 'test-data/visual-tests/music-notation/accidentals-advanced.png')],
-                settings
+                [new VisualTestRun(-1, 'test-data/visual-tests/music-notation/accidentals-advanced-alphatex.png')],
+                settings    
             )
         );
     });

@@ -27,11 +27,12 @@ export class NumberedKeySignatureGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        const text = '1 = ';
+        let text = '';
         let text2 = '';
         let accidental = AccidentalType.None;
         switch (this._keySignatureType) {
             case KeySignatureType.Major:
+                text = '1 = ';
                 switch (this._keySignature) {
                     case KeySignature.Cb:
                         text2 = '  C';
@@ -95,6 +96,7 @@ export class NumberedKeySignatureGlyph extends EffectGlyph {
                 }
                 break;
             case KeySignatureType.Minor:
+                text = '6 = ';
                 switch (this._keySignature) {
                     case KeySignature.Cb:
                         text2 = '  a';
