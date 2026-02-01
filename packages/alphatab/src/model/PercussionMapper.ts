@@ -1068,7 +1068,8 @@ export class PercussionMapper {
             }
         }
 
-        return 'unknown';
+        // unknown combination, should not happen, fallback to some default value (Snare hit)
+        return 'Snare (hit)';
     }
 
     public static getArticulation(n: Note): InstrumentArticulation | null {
