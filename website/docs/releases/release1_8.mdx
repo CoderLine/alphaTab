@@ -5,6 +5,84 @@ title: v1.8
 import { AlphaTab } from '@site/src/components/AlphaTab';
 import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
+## 1.8.1
+
+This hotfix release brings following improvements
+
+### Music Notation
+
+#### render: respect diatonic scales for note placement
+
+https://github.com/CoderLine/alphaTab/pull/2534
+
+Up to this release alphaTab had rather a "chromatic spelling" when it comes to placing note heads and accidentals. This means it simply looked at the octave and 
+applied accidentals accordingly where needed. This leads to non-optimal display of notes in various key signatures. 
+
+e.g. For a F# key signature we would show a F-note with a naturalize accidental instead of a E# note without any accidental (the # is applied via key signature). 
+
+<AlphaTexSample>{`
+\\title "F# Major Scale"
+\\ks f#
+\\tuning (G2 D2 A1 E1)
+\\clef bass
+:4
+2.4 4.4 1.3 2.3 | 
+4.3 1.2 3.2 4.2 | 
+4.2 3.2 1.2 4.3 |
+2.3 1.3 4.4 2.4
+`}</AlphaTexSample>
+
+Thanks to [@tbreuss](https://github.com/tbreuss) for reporting this problem. 
+
+### Guitar Pro extensions
+
+#### importer: correct GP5 bass clef detection (Guitar Pro 3-5)
+https://github.com/CoderLine/alphaTab/pull/2531
+
+The improvements for detecting bass clefs in GP5 files caused a strange bug where we treated almost all 
+files with a bass clef. This fix ensures the correct behavior. 
+
+#### importer: handle all Guitar Pro 5 percussion instruments
+https://github.com/CoderLine/alphaTab/pull/2537
+
+As we updated the percussion handling 1.8.0 there broke some compatibility things with Guitar Pro 5. 
+The latest Guitar Pro versions do not support all percussion instruments which existed in Guitar Pro 5 and alphaTab inherited that problem. 
+
+We added some workarounds to ensure we are compatible with these special percussion instruments. 
+The affected instruments are mainly part of the "General Sound" MIDI standard and cover some rather rarely used instruments. 
+
+We map unsupported articulations to known ones and also handle fallback scenarios better. 
+
+Thanks [@LIUBINfighter](LIUBINfighter) for reporting this problem. 
+
+### Player
+
+#### player: animate cursor to playback range end
+https://github.com/CoderLine/alphaTab/pull/2536
+
+This is a small improvement in the cursor animation for alphaTab. Unless there are some repeats or jumps, the beat cursor typically
+animates from the start beat to the next beat. But if users select a part of the song to be played or the playback range is set via code, 
+the cursor visually exceeds the selected range. 
+
+While technically it is not wrong to indicate that the playback reaches over to the next beat, it looks rather wrong from a UI/UX perspective. 
+
+With this improvement the cursor will now animate to the end of the selected beat in such cases. 
+
+Thanks [@AvaTheArchitect](https://github.com/AvaTheArchitect) for reporting this problem. 
+
+#### player: allow custom cursor handlers
+https://github.com/CoderLine/alphaTab/pull/2536
+
+As part of the cursor animation improvements we also added the possibility to handle the cursor placement in a custom way.
+This extension point is similar to the `IScrollHandlers` we added (see below). The new `ICursorHandler` which can be set via `api.customCursorHandler` 
+allows custom placing of the bar and beat cursor. It is currently tightly coupled to the way alphaTab handles the cursor placement. 
+
+If you are implementing a custom extended cursor (e.g. with more complex UI elements) you can now handle all the placement and animation logic in a custom implementation.
+You can start your own implementation by looking at our default implementations in the alphaTex codebase and work your way from there. 
+
+Likely this API still needs some fine-tuning and extensions, but considering this is a patch release, it should allow handling most important bits.
+
+
 ## 1.8.0
 
 This has been one of the fastest alphaTab releases so far. Within 1 month we added  quite a list of improvements and fixes. 
