@@ -1,6 +1,6 @@
 {
     "name": "@coderline/alphatab-language-server",
-    "version": "1.8.0",
+    "version": "1.8.1",
     "description": "A language server for alphaTab providing coding assistance for alphaTex.",
     "keywords": [
         "guitar",
@@ -34,7 +34,7 @@
         "test": "mocha"
     },
     "dependencies": {
-        "@coderline/alphatab": "^1.8.0",
+        "@coderline/alphatab": "^1.8.1",
         "vscode-languageserver": "^9.0.1",
         "vscode-languageserver-textdocument": "^1.0.12"
     },
