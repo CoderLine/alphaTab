@@ -232,9 +232,9 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                 if (note.isDead) {
                     numberWithinOctave = 'X';
                 } else {
-                    const ks = this.renderer.bar.keySignature as number;
+                    const ks = this.renderer.bar.keySignature;
                     const kst = this.renderer.bar.keySignatureType;
-                    const ksi = ks + 7;
+                    const ksi = (ks as number) + 7;
 
                     const oneNoteValues =
                         kst === KeySignatureType.Minor

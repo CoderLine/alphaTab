@@ -968,20 +968,20 @@ export class ModelUtils {
         [2, AccidentalType.DoubleSharp]
     ]);
 
-    private static readonly _forcedAccidentalOffsetByMode = new Map<NoteAccidentalMode, number | null>([
+    private static readonly _forcedAccidentalOffsetByMode = new Map<NoteAccidentalMode, number>([
         [NoteAccidentalMode.ForceSharp, 1],
         [NoteAccidentalMode.ForceDoubleSharp, 2],
         [NoteAccidentalMode.ForceFlat, -1],
         [NoteAccidentalMode.ForceDoubleFlat, -2],
         [NoteAccidentalMode.ForceNatural, 0],
         [NoteAccidentalMode.ForceNone, 0],
-        [NoteAccidentalMode.Default, null]
+        [NoteAccidentalMode.Default, Number.NaN]
     ]);
 
     private static _buildKeySignatureAccidentalByDegree(): number[][] {
         const lookup: number[][] = [];
         for (let ks = -7; ks <= 7; ks++) {
-            const row = new Array<number>(7).fill(0);
+            const row = [0, 0, 0, 0, 0, 0, 0];
             if (ks > 0) {
                 for (let i = 0; i < ks; i++) {
                     row[ModelUtils._sharpKeySignatureOrder[i]] = 1;
@@ -1008,10 +1008,12 @@ export class ModelUtils {
         const chroma = ModelUtils.flooredDivision(noteValue, 12);
 
         const preferred = ModelUtils._getPreferredSpellingForKeySignature(keySignature, chroma);
-        const desiredOffset = ModelUtils._forcedAccidentalOffsetByMode.get(accidentalMode) ?? null;
+        const desiredOffset = ModelUtils._forcedAccidentalOffsetByMode.has(accidentalMode)
+            ? ModelUtils._forcedAccidentalOffsetByMode.get(accidentalMode)!
+            : Number.NaN;
 
         let spelling: SpellingBase = preferred;
-        if (desiredOffset !== null) {
+        if (!Number.isNaN(desiredOffset)) {
             const candidates = ModelUtils._spellingCandidates[chroma];
             const exact = candidates.find(c => c.accidentalOffset === desiredOffset);
             if (exact) {
@@ -1085,7 +1087,9 @@ export class ModelUtils {
     }
 
     public static accidentalOffsetToType(offset: number): AccidentalType {
-        return ModelUtils._accidentalOffsetToType.get(offset) ?? AccidentalType.None;
+        return ModelUtils._accidentalOffsetToType.has(offset)
+            ? ModelUtils._accidentalOffsetToType.get(offset)!
+            : AccidentalType.None;
     }
 
     private static _getPreferredSpellingForKeySignature(keySignature: KeySignature, chroma: number): SpellingBase {
