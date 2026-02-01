@@ -21,6 +21,7 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
+import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
 
 describe('MidiTickLookupTest', () => {
     function buildLookup(score: Score, settings: Settings): MidiTickLookup {
@@ -663,7 +664,8 @@ describe('MidiTickLookupTest', () => {
         currentBeatIds: number[],
         nextBeatIds: number[],
         expectedCursorModes: MidiTickLookupFindBeatResultCursorMode[] | null = null,
-        skipClean: boolean = false
+        skipClean: boolean = false,
+        prepareLookup: ((lookup: MidiTickLookup) => void) | null = null
     ) {
         const buffer = ByteBuffer.fromString(tex);
         const settings = new Settings();
@@ -684,6 +686,10 @@ describe('MidiTickLookupTest', () => {
                 0,
                 score.masterBars.length - 1
             );
+        }
+
+        if (prepareLookup) {
+            prepareLookup(lookup);
         }
 
         let currentLookup: MidiTickLookupFindBeatResult | null = null;
@@ -1119,16 +1125,16 @@ describe('MidiTickLookupTest', () => {
             ],
             [
                 // 1st bar
-                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
-                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
 
                 // 2nd bar
-                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
-                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
 
                 // 3rd bar
-                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
-                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
 
                 // 1st bar (repated)
                 MidiTickLookupFindBeatResultCursorMode.ToNextBext,
@@ -1141,10 +1147,217 @@ describe('MidiTickLookupTest', () => {
                 MidiTickLookupFindBeatResultCursorMode.ToNextBext,
 
                 // 4th bar
-                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
-                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat
             ],
             true
         );
+    });
+
+    it('simple-repeat', () => {
+        it('not-applied', () => {
+            lookupTest(
+                `
+            C4.2 * 2 |
+            C4.2 * 2 |
+            \\ro 
+            \\rc 2
+            C4.2 * 2 |
+            C4.2 * 2 |
+            C4.2 * 2 |
+            `,
+                [
+                    // 1st bar
+                    0, 960, 1920, 2880,
+
+                    // 2nd bar
+                    3840, 4800, 5760, 6720,
+
+                    // 3rd bar
+                    7680, 8640, 9600, 10560,
+
+                    // 3rd bar (repeated)
+                    11520, 12480, 13440, 14400,
+
+                    // 4th bar
+                    15360, 16320, 17280, 18240,
+
+                    // 5th bar
+                    19200, 20160, 21120, 22080
+                ],
+                [0],
+                [
+                    // 1st bar
+                    1920, 1920, 1920, 1920,
+                    // 2nd bar
+                    1920, 1920, 1920, 1920,
+                    // 3rd bar
+                    1920, 1920, 1920, 1920,
+                    // 3rd bar (repeated)
+                    1920, 1920, 1920, 1920,
+                    // 4th bar
+                    1920, 1920, 1920, 1920,
+                    // 5th bar
+                    1920, 1920, 1920, 1920
+                ],
+                [
+                    // 1st bar
+                    0, 0, 1, 1,
+                    // 2nd bar
+                    2, 2, 3, 3,
+                    // 3rd bar
+                    4, 4, 5, 5,
+                    // 3rd bar (repeated)
+                    4, 4, 5, 5,
+                    // 4th bar
+                    6, 6, 7, 7,
+                    // 5th bar
+                    8, 8, 9, 9
+                ],
+                [
+                    // 1st bar
+                    1, 1, 2, 2,
+                    // 2nd bar
+                    3, 3, 4, 4,
+                    // 3rd bar
+                    5, 5, 4, 4,
+                    // 3rd bar (repeated)
+                    5, 5, 6, 6,
+                    // 4th bar
+                    7, 7, 8, 8,
+                    // 5th bar
+                    9, 9, -1, -1
+                ],
+                [
+                    // 1st bar
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    // 2nd bar
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    // 3rd bar
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                    // 3rd bar (repeated)
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    // 4th bar
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    // 5th bar
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat
+                ],
+                true
+            );
+        });
+    });
+
+    describe('playback-range', () => {
+        it('full-bar', () => {
+            lookupTest(
+                `
+            C4.2 * 2 |
+            C4.2 * 2 
+            `,
+                [
+                    // 1st bar
+                    0, 960, 1920, 2880
+                ],
+                [0],
+                [
+                    // 1st bar
+                    1920, 1920, 1920, 1920
+                ],
+                [
+                    // 1st bar
+                    0, 0, 1, 1
+                ],
+                [
+                    // 1st bar
+                    1, 1, 2, 2
+                ],
+                [
+                    // 1st bar
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat
+                ],
+                true,
+                lookup => {
+                    // whole first bar
+                    const range = new PlaybackRange();
+                    range.startTick = 0;
+                    range.endTick = 3840;
+                    lookup.playbackRange = range;
+                }
+            );
+        });
+
+        it('mid-bar', () => {
+            lookupTest(
+                `
+            C4.2 * 2 |
+            C4.2 * 2 
+            `,
+                [
+                    // 1st bar
+                    0, 960, 1920, 2880,
+
+                    // 2nd bar
+                    3840, 4800
+                ],
+                [0],
+                [
+                    // 1st bar
+                    1920, 1920, 1920, 1920,
+                    // 2nd bar
+                    1920, 1920
+                ],
+                [
+                    // 1st bar
+                    0, 0, 1, 1,
+                    // 2nd bar
+                    2, 2
+                ],
+                [
+                    // 1st bar
+                    1, 1, 2, 2,
+                    // 2nd bar
+                    3, 3
+                ],
+                [
+                    // 1st bar
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                    // 2nd bar
+                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat,
+                    MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat
+                ],
+                true,
+                lookup => {
+                    // whole first bar
+                    const range = new PlaybackRange();
+                    range.startTick = 0;
+                    range.endTick = 5760;
+                    lookup.playbackRange = range;
+                }
+            );
+        });
     });
 });

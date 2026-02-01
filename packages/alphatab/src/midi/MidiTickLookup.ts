@@ -4,6 +4,7 @@ import { MasterBarTickLookup } from '@coderline/alphatab/midi/MasterBarTickLooku
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import type { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
 
 /**
  * Describes how a cursor should be moving.
@@ -21,9 +22,15 @@ export enum MidiTickLookupFindBeatResultCursorMode {
     ToNextBext = 1,
 
     /**
-     * The cursor should animate to the end of the bar (typically on repeats and jumps)
+     * @deprecated replaced by {@link ToEndOfBeat}
      */
-    ToEndOfBar = 2
+    ToEndOfBar = 2,
+
+    /**
+     * The cursor should animate to the end of the **beat** (typically on repeats and jumps)
+     * (this is named end of bar historically)
+     */
+    ToEndOfBeat = 3
 }
 
 /**
@@ -194,6 +201,12 @@ export class MidiTickLookup {
     public multiBarRestInfo: Map<number, number[]> | null = null;
 
     /**
+     * An optional playback range to consider when performing lookups.
+     * This will mainly influence the used {@link MidiTickLookupFindBeatResultCursorMode}
+     */
+    public playbackRange: PlaybackRange | null = null;
+
+    /**
      * Finds the currently played beat given a list of tracks and the current time.
      * @param trackLookup The tracks indices in which to search the played beat for.
      * @param tick The current time in midi ticks.
@@ -228,6 +241,14 @@ export class MidiTickLookup {
             result = this._findBeatSlow(checker, currentBeatHint, tick, false);
         }
 
+        if (result) {
+            const playbackRange = this.playbackRange;
+            const isBeyondRangeEnd = playbackRange !== null && result!.start >= playbackRange.endTick;
+            if (isBeyondRangeEnd) {
+                return null;
+            }
+        }
+
         return result;
     }
 
@@ -257,10 +278,7 @@ export class MidiTickLookup {
         return null;
     }
 
-    private _fillNextBeatMultiBarRest(
-        current: MidiTickLookupFindBeatResult,
-        checker: IBeatVisibilityChecker
-    ) {
+    private _fillNextBeatMultiBarRest(current: MidiTickLookupFindBeatResult, checker: IBeatVisibilityChecker) {
         const group = this.multiBarRestInfo!.get(current.masterBar.masterBar.index)!;
 
         // this is a bit sensitive. we assume that the sequence of multi-rest bars and the
@@ -288,22 +306,27 @@ export class MidiTickLookup {
                     current.tickDuration = current.nextBeat.start - current.start;
                     current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToNextBext;
 
+                    // jump back
                     if (
                         current.nextBeat.masterBar.masterBar.index !== endMasterBar.masterBar.index + 1 &&
                         (current.nextBeat.masterBar.masterBar.index !== endMasterBar.masterBar.index ||
                             current.nextBeat.beat.playbackStart <= current.beat.playbackStart)
                     ) {
-                        current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
+                        current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat;
+                    }
+                    // beyond end of playback range
+                    else if (this.playbackRange !== null && this.playbackRange.endTick <= current.nextBeat.start) {
+                        current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat;
                     }
                 }
                 // no next beat, animate to the end of the bar (could be an incomplete bar)
                 else {
                     current.tickDuration = endMasterBar.nextMasterBar.end - current.start;
-                    current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
+                    current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat;
                 }
             } else {
                 current.tickDuration = endMasterBar.end - current.start;
-                current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
+                current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat;
             }
         } else {
             Logger.warning(
@@ -313,16 +336,13 @@ export class MidiTickLookup {
             // this is wierd, we  have a masterbar without known tick?
             // make a best guess with the number of bars
             current.tickDuration = (current.masterBar.end - current.masterBar.start) * (group.length + 1);
-            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
+            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat;
         }
 
         current.calculateDuration();
     }
 
-    private _fillNextBeat(
-        current: MidiTickLookupFindBeatResult,
-        checker: IBeatVisibilityChecker
-    ) {
+    private _fillNextBeat(current: MidiTickLookupFindBeatResult, checker: IBeatVisibilityChecker) {
         // on multibar rests take the duration until the end.
         if (this._isMultiBarRestResult(current)) {
             this._fillNextBeatMultiBarRest(current, checker);
@@ -330,10 +350,7 @@ export class MidiTickLookup {
             this._fillNextBeatDefault(current, checker);
         }
     }
-    private _fillNextBeatDefault(
-        current: MidiTickLookupFindBeatResult,
-        checker: IBeatVisibilityChecker
-    ) {
+    private _fillNextBeatDefault(current: MidiTickLookupFindBeatResult, checker: IBeatVisibilityChecker) {
         current.nextBeat = this._findBeatInMasterBar(
             current.masterBar,
             current.beatLookup.nextBeat,
@@ -355,19 +372,24 @@ export class MidiTickLookup {
         // no next beat, animate to the end of the bar (could be an incomplete bar)
         else {
             current.tickDuration = current.masterBar.end - current.start;
-            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
+            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat;
             current.calculateDuration();
         }
 
-        // if the next beat is not directly the next master bar (e.g. jumping back or forth)
-        // we report no next beat and animate to the end
-        if (
-            current.nextBeat &&
-            current.nextBeat.masterBar.masterBar.index !== current.masterBar.masterBar.index + 1 &&
-            (current.nextBeat.masterBar.masterBar.index !== current.masterBar.masterBar.index ||
-                current.nextBeat.beat.playbackStart <= current.beat.playbackStart)
-        ) {
-            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
+        if (current.nextBeat) {
+            // if the next beat is not directly the next master bar (e.g. jumping back or forth)
+            // we report no next beat and animate to the end
+            if (
+                current.nextBeat.masterBar.masterBar.index !== current.masterBar.masterBar.index + 1 &&
+                (current.nextBeat.masterBar.masterBar.index !== current.masterBar.masterBar.index ||
+                    current.nextBeat.beat.playbackStart <= current.beat.playbackStart)
+            ) {
+                current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat;
+            }
+            // the next beat might also be the beyond the selected range
+            else if (this.playbackRange !== null && this.playbackRange.endTick <= current.nextBeat.start) {
+                current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBeat;
+            }
         }
     }
 
@@ -430,13 +452,7 @@ export class MidiTickLookup {
         // scan through beats and find first one which has a beat visible
         while (masterBar) {
             if (masterBar.firstBeat) {
-                const beat = this._findBeatInMasterBar(
-                    masterBar,
-                    masterBar.firstBeat,
-                    tick,
-                    checker,
-                    isNextSearch
-                );
+                const beat = this._findBeatInMasterBar(masterBar, masterBar.firstBeat, tick, checker, isNextSearch);
 
                 if (beat) {
                     return beat;

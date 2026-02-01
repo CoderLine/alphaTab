@@ -1487,6 +1487,9 @@ export class AlphaTabApiBase<TSettings> {
 
     public set playbackRange(value: PlaybackRange | null) {
         this._player.playbackRange = value;
+        if (this._tickCache) {
+            this._tickCache.playbackRange = value;
+        }
         this._updateSelectionCursor(value);
     }
 
@@ -1650,6 +1653,8 @@ export class AlphaTabApiBase<TSettings> {
 
         generator.generate();
         this._tickCache = generator.tickLookup;
+        this._tickCache.playbackRange = this.playbackRange;
+
         this._onMidiLoad(midiFile);
 
         const player = this._player;
@@ -2292,7 +2297,7 @@ export class AlphaTabApiBase<TSettings> {
 
         const isPlayingUpdate = this._player.state === PlayerState.Playing && !stop;
 
-        let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
+        let nextBeatX: number = beatBoundings.realBounds.x + beatBoundings.realBounds.w;
         let nextBeatBoundings: BeatBounds | null = null;
         // get position of next beat on same system
         if (nextBeat && cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
