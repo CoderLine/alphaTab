@@ -118,11 +118,11 @@ export class NonAnimatingCursorHandler implements ICursorHandler {
         // nothing to do
     }
 
-    public placeBeatCursor(beatCursor: IContainer, beatBounds: BeatBounds, startBeatX: number): void {
+    public placeBeatCursor(beatCursor: IContainer, beatBounds: BeatBounds, _startBeatX: number): void {
         const barBoundings = beatBounds.barBounds.masterBarBounds;
         const barBounds = barBoundings.visualBounds;
-        beatCursor.transitionToX(0, startBeatX);
-        beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
+        beatCursor.transitionToX(0, beatBounds.onNotesX);
+        beatCursor.setBounds(beatBounds.onNotesX, barBounds.y, 1, barBounds.h);
     }
 
     public placeBarCursor(barCursor: IContainer, beatBounds: BeatBounds): void {
