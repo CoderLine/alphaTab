@@ -65,6 +65,7 @@ interface ResultPlaceholder extends HTMLElement {
  */
 interface RegisteredWebFont {
     hash: number;
+    familyName: string;
     cssSource: string;
     elements: Map<
         HTMLDocument,
@@ -213,6 +214,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             element.element.innerText = '';
         }
         this._createStyleElements(settings);
+        settings.display.resources.smuflFontFamilyName = this._webFont.familyName;
         this._file = settings.core.file;
     }
 
@@ -444,10 +446,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         this._fontCheckers.set(familyName, checker);
         checker.checkForFontAvailability();
 
-        settings.display.resources.smuflFontFamilyName = familyName;
-
         const webFont: RegisteredWebFont = {
             hash,
+            familyName,
             elements: new Map(),
             fontSuffix,
             checker,
