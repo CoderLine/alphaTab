@@ -44,6 +44,14 @@ export class HorizontalScreenLayout extends ScoreLayout {
     public doResize(): void {
         // not supported
     }
+    
+    public override doUpdateForBars(_firstChangedMasterBar: number): boolean {
+        // not supported yet, modifications likely cause anyhow full updates
+        // as we do not optimize effect bands yet. with effect bands being more 
+        // isolated in bars we could try updating dynamically
+        return false;
+    }
+
 
     protected doLayoutAndRender(renderHints: RenderHints | undefined): void {
         const score: Score = this.renderer.score!;

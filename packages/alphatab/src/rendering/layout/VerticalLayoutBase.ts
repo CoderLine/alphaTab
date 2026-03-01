@@ -38,7 +38,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         y = this._layoutAndRenderChordDiagrams(y, -1);
         //
         // 4. One result per StaffSystem
-        y = this._layoutAndRenderScore(y);
+        y = this._layoutAndRenderScore(y, this.firstBarIndex);
 
         y = this.layoutAndRenderBottomScoreInfo(y);
 
@@ -62,6 +62,39 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
             x += this._systems[0].accoladeWidth;
         }
         return x;
+    }
+
+    public override doUpdateForBars(firstModifiedMasterBar: number): boolean {
+        // first update existing systems as needed
+        const systemIndex = this._systems.findIndex(s => {
+            const first = s.masterBarsRenderers[0].masterBar.index;
+            const last = s.masterBarsRenderers[s.masterBarsRenderers.length - 1].masterBar.index;
+            return first >= firstModifiedMasterBar && firstModifiedMasterBar <= last;
+        });
+
+        if (systemIndex === -1) {
+            return false;
+        }
+
+        // for now we do a full relayout from the first modified masterbar
+        // there is a lot of room for even more performant updates, but they come
+        // at a risk that features break.
+        // e.g. we could only shift systems where the content didn't change,
+        // but we might still have ties/slurs which have to be updated.
+        const removeSystems = this._systems.splice(systemIndex, this._systems.length - systemIndex);
+        const system = removeSystems[0];
+        let y = system.y;
+        const firstBarIndex = system.masterBarsRenderers[0].masterBar.index;
+
+        y = this._layoutAndRenderScore(y, firstBarIndex);
+
+        y = this.layoutAndRenderBottomScoreInfo(y);
+
+        y = this.layoutAndRenderAnnotation(y);
+
+        this.height = (y + this.pagePadding![3]) * this.renderer.settings.display.scale;
+
+        return true;
     }
 
     public doResize(): void {
@@ -270,8 +303,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         return y;
     }
 
-    private _layoutAndRenderScore(y: number): number {
-        const startIndex: number = this.firstBarIndex;
+    private _layoutAndRenderScore(y: number, startIndex: number): number {
         let currentBarIndex: number = startIndex;
         const endBarIndex: number = this.lastBarIndex;
 

@@ -97,6 +97,7 @@ req.onload = () => {
         const currentSystemCount = Math.floor(score.masterBars.length / score.tracks[0].defaultSystemsLayout);
         const neededSystemCount = currentSystemCount + 1;
         const neededBars = neededSystemCount * score.tracks[0].defaultSystemsLayout;
+        const lastMasterBarIndex = score.masterBars.length - 1;
 
         let missingBars = neededBars - score.masterBars.length;
 
@@ -118,7 +119,8 @@ req.onload = () => {
 
         // TODO: hints on edited score
         api.renderScore(score, undefined, {
-            reuseViewport: true
+            reuseViewport: currentSystemCount > 0,
+            firstChangedMasterBar: currentSystemCount > 0 ? lastMasterBarIndex : undefined
         });
     }
 
@@ -136,7 +138,6 @@ req.onload = () => {
 
     // add second bar and setup
     insertNewSystem();
-    api.renderScore(score);
 
     // extend the midi to be very long
     api.midiLoad.on(midi => {

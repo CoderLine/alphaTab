@@ -84,9 +84,19 @@ export abstract class ScoreLayout {
     }
     public abstract doResize(): void;
 
+    public abstract doUpdateForBars(firstChangedMasterBar: number): boolean;
+
     public layoutAndRender(renderHints?: RenderHints): void {
         this._lazyPartials.clear();
         this.slurRegistry.clear();
+
+        const firstChangedMasterBar = renderHints?.firstChangedMasterBar;
+        if (firstChangedMasterBar !== undefined) {
+            if (this.doUpdateForBars(firstChangedMasterBar)) {
+                return;
+            }
+        }
+
         this.beamingRuleLookups.clear();
         this._barRendererLookup.clear();
 
