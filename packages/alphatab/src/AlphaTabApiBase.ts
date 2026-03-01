@@ -2434,7 +2434,8 @@ export class AlphaTabApiBase<TSettings> {
                     this._isInitialBeatCursorUpdate ||
                     barBounds.y !== previousBeatBounds.barBounds.masterBarBounds.visualBounds.y ||
                     startBeatX < previousBeatBounds.onNotesX ||
-                    barBoundings.index > previousBeatBounds.barBounds.masterBarBounds.index + 1;
+                    barBoundings.index > previousBeatBounds.barBounds.masterBarBounds.index + 1 ||
+                    barBounds.h !== previousBeatBounds.barBounds.masterBarBounds.visualBounds.h;
 
                 if (jumpCursor) {
                     cursorHandler.placeBeatCursor(beatCursor, beatBoundings, startBeatX);

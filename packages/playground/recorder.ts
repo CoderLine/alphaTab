@@ -7,7 +7,9 @@ req.onload = () => {
 
     // this is a demo which builds a "recorder" with alphaTab.
     // in this case we do not actually play the song but just use the rendering and player capabilities
-    // to get a display of the notes and a cursor.
+    // to get a display of the notes and a cursor. for the sake of simplicity we do not have a real recorder but we
+    // 1. fill a bar with quarter rests
+    // 2. when pressing a key 0-9 we put a note at this fret in the currently active quarter.
 
     // the overall recorder goes with various assumptions:
     // 1. we only have one track/staff/voice being recorded
@@ -43,7 +45,7 @@ req.onload = () => {
     });
 
     // start with 2 bars to always have 1 future bar buffer
-    const score = alphaTab.importer.ScoreLoader.loadAlphaTex('');
+    const score = alphaTab.importer.ScoreLoader.loadAlphaTex('r.4 r r r');
     score.tracks[0].defaultSystemsLayout = 5;
 
     // threshold indicating we need to insert a new bar, -1 as marker to not do anything
@@ -66,7 +68,7 @@ req.onload = () => {
         return newMasterBar;
     }
 
-    function insertNewBar(masterBar: alphaTab.model.MasterBar) {
+    function insertNewBar() {
         const staff = score.tracks[0].staves[0];
         const previousBar = staff.bars[staff.bars.length - 1];
         const newBar = new alphaTab.model.Bar();
@@ -80,12 +82,14 @@ req.onload = () => {
         const initialVoice = new alphaTab.model.Voice();
         newBar.addVoice(initialVoice);
 
-        const emptyBeat = new alphaTab.model.Beat();
-        emptyBeat.isEmpty = true;
-        emptyBeat.duration = alphaTab.model.Duration.Whole;
-        initialVoice.addBeat(emptyBeat);
+        for (let i = 0; i < 4; i++) {
+            const emptyBeat = new alphaTab.model.Beat();
+            emptyBeat.isEmpty = false;
+            emptyBeat.duration = alphaTab.model.Duration.Quarter;
+            initialVoice.addBeat(emptyBeat);
 
-        api.tickCache?.addBeat(emptyBeat, 0, masterBar.calculateDuration());
+            api.tickCache?.addBeat(emptyBeat, i * 960, 960 /* midi quarter time */);
+        }
 
         return newBar;
     }
@@ -103,7 +107,7 @@ req.onload = () => {
 
         while (missingBars > 0) {
             const newMasterBar = insertNewMasterBar();
-            const newBar = insertNewBar(newMasterBar);
+            const newBar = insertNewBar();
 
             const sharedDataBag = new Map<string, unknown>();
             newMasterBar.finish(sharedDataBag);
@@ -117,7 +121,6 @@ req.onload = () => {
 
         updateInsertTickThreshold();
 
-        // TODO: hints on edited score
         api.renderScore(score, undefined, {
             reuseViewport: currentSystemCount > 0,
             firstChangedMasterBar: currentSystemCount > 0 ? lastMasterBarIndex : undefined
@@ -180,6 +183,49 @@ req.onload = () => {
             insertNewSystem();
         }
     });
+    let currentBeat: alphaTab.model.Beat | undefined = undefined;
+    api.playedBeatChanged.on(beat => {
+        currentBeat = beat;
+    });
+
+    // very basic recording feature, keyboard digits cause a new beat
+    // with the fret 0-9 on the first string to be added
+    // this is likely the trickiest part in a real recording: compute the beat lengths and filling the model
+    document.addEventListener(
+        'keydown',
+        e => {
+            if (!currentBeat) {
+                return;
+            }
+
+            let fret = -1;
+
+            if (e.code.startsWith('Digit') || e.code.startsWith('Numpad')) {
+                fret = Number.parseInt(e.code.substring(e.code.length - 1), 10);
+            } else {
+                return;
+            }
+
+            e.preventDefault();
+
+            if (currentBeat.notes.length === 0) {
+                const newNote = new alphaTab.model.Note();
+                newNote.string = 1;
+                newNote.fret = fret;
+                currentBeat.addNote(newNote);
+            } else {
+                currentBeat.notes[0].fret = fret;
+            }
+
+            currentBeat.voice.bar.finish(api.settings, null);
+
+            api.renderScore(score, undefined, {
+                reuseViewport: true,
+                firstChangedMasterBar: currentBeat.voice.bar.index
+            });
+        },
+        true
+    );
 
     (window as any).at = api;
 };

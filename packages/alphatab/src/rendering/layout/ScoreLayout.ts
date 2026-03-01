@@ -29,14 +29,11 @@ import { Lazy } from '@coderline/alphatab/util/Lazy';
 
 /**
  * @internal
+ * @record
  */
-class LazyPartial {
-    public args: RenderFinishedEventArgs;
-    public renderCallback: (canvas: ICanvas) => void;
-    public constructor(args: RenderFinishedEventArgs, renderCallback: (canvas: ICanvas) => void) {
-        this.args = args;
-        this.renderCallback = renderCallback;
-    }
+interface LazyPartial {
+    args: RenderFinishedEventArgs;
+    renderCallback: (canvas: ICanvas) => void;
 }
 
 /**
@@ -84,23 +81,10 @@ export abstract class ScoreLayout {
     }
     public abstract doResize(): void;
 
-    public abstract doUpdateForBars(firstChangedMasterBar: number): boolean;
+    public abstract doUpdateForBars(renderHints: RenderHints): boolean;
 
     public layoutAndRender(renderHints?: RenderHints): void {
-        this._lazyPartials.clear();
         this.slurRegistry.clear();
-
-        const firstChangedMasterBar = renderHints?.firstChangedMasterBar;
-        if (firstChangedMasterBar !== undefined) {
-            if (this.doUpdateForBars(firstChangedMasterBar)) {
-                return;
-            }
-        }
-
-        this.beamingRuleLookups.clear();
-        this._barRendererLookup.clear();
-
-        this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
 
         const score: Score = this.renderer.score!;
 
@@ -111,6 +95,19 @@ export abstract class ScoreLayout {
             this.firstBarIndex,
             this.lastBarIndex
         );
+
+        const firstChangedMasterBar = renderHints?.firstChangedMasterBar;
+        if (firstChangedMasterBar !== undefined) {
+            if (this.doUpdateForBars(renderHints!)) {
+                return;
+            }
+        }
+
+        this._lazyPartials.clear();
+        this.beamingRuleLookups.clear();
+        this._barRendererLookup.clear();
+
+        this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
 
         this.pagePadding = this.renderer.settings.display.padding.map(p => p / this.renderer.settings.display.scale);
         if (!this.pagePadding) {
@@ -127,6 +124,10 @@ export abstract class ScoreLayout {
     }
 
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
+
+    protected getExistingPartialArgs(id:string): RenderFinishedEventArgs|undefined {
+        return this._lazyPartials.has(id) ? this._lazyPartials.get(id)!.args : undefined;
+    }
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
         if (args.height === 0) {
@@ -147,7 +148,11 @@ export abstract class ScoreLayout {
             this._internalRenderLazyPartial(args, callback);
         } else {
             // in case of lazy loading -> first register lazy, then notify
-            this._lazyPartials.set(args.id, new LazyPartial(args, callback));
+            const partial: LazyPartial = {
+                args,
+                renderCallback: callback
+            };
+            this._lazyPartials.set(args.id, partial);
             (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
         }
     }
@@ -510,7 +515,7 @@ export abstract class ScoreLayout {
         }
     }
 
-    public layoutAndRenderAnnotation(y: number): number {
+    protected _layoutAndRenderAnnotation(y: number): number {
         // attention, you are not allowed to remove change this notice within any version of this library without permission!
         const msg: string = 'rendered by alphaTab';
         const resources: RenderingResources = this.renderer.settings.display.resources;

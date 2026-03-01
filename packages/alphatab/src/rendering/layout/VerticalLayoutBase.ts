@@ -1,13 +1,14 @@
+import type { EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
 import { Logger } from '@coderline/alphatab/Logger';
 import { ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 
 /**
  * Base layout for page and parchment style layouts where we have an endless
@@ -21,11 +22,18 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
 
     private _reuseViewPort: boolean = false;
 
+    private _preSystemPartialIds: string[] = [];
+    private _systemPartialIds: string[] = [];
+
     protected doLayoutAndRender(renderHints: RenderHints | undefined): void {
         let y: number = this.pagePadding![1];
         this.width = this.renderer.width;
         this._allMasterBarRenderers = [];
+        this._preSystemPartialIds = [];
+        this._systemPartialIds = [];
+
         this._reuseViewPort = renderHints?.reuseViewport ?? false;
+        this._systems = [];
 
         //
         // 1. Score Info
@@ -42,7 +50,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
 
         y = this.layoutAndRenderBottomScoreInfo(y);
 
-        y = this.layoutAndRenderAnnotation(y);
+        y = this._layoutAndRenderAnnotation(y);
 
         this.height = (y + this.pagePadding![3]) * this.renderer.settings.display.scale;
     }
@@ -50,6 +58,15 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
     protected override registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void): void {
         args.reuseViewport = this._reuseViewPort;
         super.registerPartial(args, callback);
+    }
+
+    protected reregisterPartial(id: string) {
+        const args = this.getExistingPartialArgs(id);
+        if (!args) {
+            return;
+        }
+        args.reuseViewport = this._reuseViewPort;
+        (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
     }
 
     public get supportsResize(): boolean {
@@ -64,15 +81,18 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         return x;
     }
 
-    public override doUpdateForBars(firstModifiedMasterBar: number): boolean {
+    public override doUpdateForBars(renderHints: RenderHints): boolean {
+        this._reuseViewPort = renderHints.reuseViewport ?? false;
+        const firstModifiedMasterBar = renderHints.firstChangedMasterBar!;
+
         // first update existing systems as needed
         const systemIndex = this._systems.findIndex(s => {
             const first = s.masterBarsRenderers[0].masterBar.index;
             const last = s.masterBarsRenderers[s.masterBarsRenderers.length - 1].masterBar.index;
-            return first >= firstModifiedMasterBar && firstModifiedMasterBar <= last;
+            return first <= firstModifiedMasterBar && firstModifiedMasterBar <= last;
         });
 
-        if (systemIndex === -1) {
+        if (systemIndex === -1 || !this.renderer.settings.core.enableLazyLoading) {
             return false;
         }
 
@@ -82,15 +102,25 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         // e.g. we could only shift systems where the content didn't change,
         // but we might still have ties/slurs which have to be updated.
         const removeSystems = this._systems.splice(systemIndex, this._systems.length - systemIndex);
+        this._systemPartialIds.splice(systemIndex, this._systemPartialIds.length - systemIndex);
         const system = removeSystems[0];
         let y = system.y;
         const firstBarIndex = system.masterBarsRenderers[0].masterBar.index;
 
+        // signal all partials which didn't change
+        for (const preSystemPartial of this._preSystemPartialIds) {
+            this.reregisterPartial(preSystemPartial);
+        }
+        for (let i = 0; i < systemIndex; i++) {
+            this.reregisterPartial(this._systemPartialIds[i]);
+        }
+
+        // new partials for all other prats
         y = this._layoutAndRenderScore(y, firstBarIndex);
 
         y = this.layoutAndRenderBottomScoreInfo(y);
 
-        y = this.layoutAndRenderAnnotation(y);
+        y = this._layoutAndRenderAnnotation(y);
 
         this.height = (y + this.pagePadding![3]) * this.renderer.settings.display.scale;
 
@@ -118,7 +148,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
 
         y = this.layoutAndRenderBottomScoreInfo(y);
 
-        y = this.layoutAndRenderAnnotation(y);
+        y = this._layoutAndRenderAnnotation(y);
 
         this.height = (y + this.pagePadding![3]) * this.renderer.settings.display.scale;
     }
@@ -148,6 +178,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
             canvas.textAlign = TextAlign.Center;
             this.tuningGlyph!.paint(0, 0, canvas);
         });
+        this._preSystemPartialIds.push(e.id);
 
         return y + tuningHeight;
     }
@@ -176,6 +207,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
             canvas.textAlign = TextAlign.Center;
             this.chordDiagrams!.paint(0, 0, canvas);
         });
+        this._preSystemPartialIds.push(e.id);
 
         return y + diagramHeight;
     }
@@ -230,6 +262,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
                     g.paint(0, 0, canvas);
                 }
             });
+            this._preSystemPartialIds.push(e.id);
         }
 
         return y + infoHeight;
@@ -238,6 +271,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
     private _resizeAndRenderScore(y: number, oldHeight: number): number {
         // if we have a fixed number of bars per row, we only need to refit them.
         const barsPerRowActive = this.getBarsPerSystem(0) > 0;
+        this._systemPartialIds = [];
         if (barsPerRowActive) {
             for (let i: number = 0; i < this._systems.length; i++) {
                 const system: StaffSystem = this._systems[i];
@@ -307,7 +341,6 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         let currentBarIndex: number = startIndex;
         const endBarIndex: number = this.lastBarIndex;
 
-        this._systems = [];
         while (currentBarIndex <= endBarIndex) {
             // create system and align set proper coordinates
             const system: StaffSystem = this._createStaffSystem(currentBarIndex, endBarIndex);
@@ -349,6 +382,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
             // since we use partial drawing
             system.paint(0, -(args.y / this.renderer.settings.display.scale), canvas);
         });
+        this._systemPartialIds.push(args.id);
 
         // calculate coordinates for next system
         return height;

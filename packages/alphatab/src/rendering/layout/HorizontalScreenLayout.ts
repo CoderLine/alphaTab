@@ -45,7 +45,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         // not supported
     }
     
-    public override doUpdateForBars(_firstChangedMasterBar: number): boolean {
+    public override doUpdateForBars(_renderHints: RenderHints): boolean {
         // not supported yet, modifications likely cause anyhow full updates
         // as we do not optimize effect bands yet. with effect bands being more 
         // isolated in bars we could try updating dynamically
@@ -158,7 +158,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         }
 
         this.height = this.layoutAndRenderBottomScoreInfo(this.height);
-        this.height = this.layoutAndRenderAnnotation(this.height);
+        this.height = this._layoutAndRenderAnnotation(this.height);
 
         this.height += this.pagePadding![3];
 
