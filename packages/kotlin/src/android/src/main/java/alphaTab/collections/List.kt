@@ -87,6 +87,10 @@ public class List<T> : Iterable<T> {
         })
     }
 
+    internal fun findIndex(predicate: (T) -> Boolean): Double {
+        return _data.indexOfFirst(predicate).toDouble()
+    }
+
     public fun some(predicate: (T) -> Boolean): Boolean {
         return _data.any(predicate)
     }
@@ -165,24 +169,42 @@ public class List<T> : Iterable<T> {
         return _data.removeAt(0)
     }
 
-    public fun splice(start: Double, deleteCount: Double, vararg newElements: T) {
+    public fun splice(start: Double, deleteCount: Double, vararg newElements: T): List<T> {
         var actualStart = start.toInt()
         if (actualStart < 0) {
             actualStart += _data.size
         }
 
+        val remove = if (deleteCount > 0) List(
+            ArrayListWithRemoveRange(
+                _data.subList(
+                    start.toInt(),
+                    _data.size
+                )
+            )
+        ) else List()
         _data.removeRange(start.toInt(), (start + deleteCount).toInt())
         _data.addAll(start.toInt(), newElements.toList())
+        return remove
     }
 
-    public fun splice(start: Double, deleteCount: Double, newElements: Iterable<T>) {
+    public fun splice(start: Double, deleteCount: Double, newElements: Iterable<T>): List<T> {
         var actualStart = start.toInt()
         if (actualStart < 0) {
             actualStart += _data.size
         }
 
+        val remove = if (deleteCount > 0) List(
+            ArrayListWithRemoveRange(
+                _data.subList(
+                    start.toInt(),
+                    _data.size
+                )
+            )
+        ) else List()
         _data.removeRange(start.toInt(), (start + deleteCount).toInt())
         _data.addAll(start.toInt(), newElements.toList())
+        return remove
     }
 
     public fun join(separator: String): String {

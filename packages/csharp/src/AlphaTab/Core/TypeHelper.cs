@@ -70,6 +70,20 @@ namespace AlphaTab.Core
             return list.FirstOrDefault(predicate);
         }
 
+        public static T FindIndex<T>(this IList<T> list, Func<T, bool> predicate)
+        {
+            var index = 0;
+            foreach (var item in list)
+            {
+                if (predicate(item)) 
+                {
+                    return index;
+                }
+                index++;
+            }
+            return -1;
+        }
+
         public static bool Includes<T>(this IList<T> list, T item)
         {
             return list.Contains(item);
