@@ -42,7 +42,7 @@
         "test": "mocha"
     },
     "dependencies": {
-        "webpack": "^5.105.2"
+        "webpack": "^5.105.3"
     },
     "engines": {
         "node": ">=20.19.0"
