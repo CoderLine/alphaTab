@@ -70,9 +70,7 @@ export class PartConfiguration {
                 if (trackIndex < score.tracks.length) {
                     const track: Track = score.tracks[trackIndex];
                     for (const staff of track.staves) {
-                        if(!staff.isPercussion){
-                            staff.showTablature = trackConfig.showTablature;
-                        }
+                        staff.showTablature = trackConfig.showTablature;
                         staff.showStandardNotation = trackConfig.showStandardNotation;
                         staff.showSlash = trackConfig.showSlash;
                         staff.showNumbered = trackConfig.showNumbered;

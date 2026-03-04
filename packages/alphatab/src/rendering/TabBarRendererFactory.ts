@@ -17,7 +17,6 @@ export class TabBarRendererFactory extends BarRendererFactory {
 
     public constructor(effectBands: EffectBandInfo[]) {
         super(effectBands);
-        this.hideOnPercussionTrack = true;
     }
 
     public override canCreate(track: Track, staff: Staff): boolean {

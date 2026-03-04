@@ -123,8 +123,6 @@ export class Staff {
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         if (this.isPercussion) {
-            this.stringTuning.tunings = [];
-            this.showTablature = false;
             this.displayTranspositionPitch = 0;
         }
         this.stringTuning.finish();

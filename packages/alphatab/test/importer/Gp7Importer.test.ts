@@ -1050,4 +1050,50 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].invertBeamDirection).to.be.false;
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
     });
+
+    it('drum-tabs-preserves-percussion-tab-data', async () => {
+        const reader = await prepareImporterWithFile('guitarpro7/drum-tabs.gp');
+        const score: Score = reader.readScore();
+
+        const staff = score.tracks[0].staves[0];
+        expect(staff.isPercussion).to.be.true;
+        expect(staff.tuning.length).to.equal(6);
+        expect(staff.tuning.every((t: number) => t === 0)).to.be.true;
+
+        const beats = staff.bars[0].voices[0].beats;
+        expect(beats.length).to.equal(4);
+
+        for (const beat of beats) {
+            for (const note of beat.notes) {
+                expect(note.isPercussion).to.be.true;
+                expect(note.isStringed).to.be.true;
+                expect(note.string).to.be.greaterThanOrEqual(1);
+                expect(note.string).to.be.lessThanOrEqual(6);
+                expect(note.fret).to.be.greaterThan(0);
+                expect(note.percussionArticulation).to.be.greaterThanOrEqual(0);
+            }
+        }
+    });
+
+    it('drum-custom-lines-preserves-string-assignments', async () => {
+        const reader = await prepareImporterWithFile('guitarpro7/drum-custom-lines.gp');
+        const score: Score = reader.readScore();
+
+        const staff = score.tracks[0].staves[0];
+        expect(staff.isPercussion).to.be.true;
+        expect(staff.showTablature).to.be.true;
+        expect(staff.tuning.length).to.equal(6);
+
+        const beats = staff.bars[0].voices[0].beats;
+        expect(beats.length).to.equal(4);
+
+        expect(beats[0].notes[0].string).to.equal(5);
+        expect(beats[0].notes[0].fret).to.equal(36);
+        expect(beats[1].notes[0].string).to.equal(4);
+        expect(beats[1].notes[0].fret).to.equal(36);
+        expect(beats[2].notes[0].string).to.equal(3);
+        expect(beats[2].notes[0].fret).to.equal(36);
+        expect(beats[3].notes[0].string).to.equal(2);
+        expect(beats[3].notes[0].fret).to.equal(36);
+    });
 });

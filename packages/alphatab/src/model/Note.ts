@@ -238,7 +238,7 @@ export class Note {
     public tone: number = -1;
 
     public get isPercussion(): boolean {
-        return !this.isStringed && this.percussionArticulation >= 0;
+        return this.percussionArticulation >= 0;
     }
 
     /**

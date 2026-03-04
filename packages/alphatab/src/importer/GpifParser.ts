@@ -979,9 +979,7 @@ export class GpifParser {
                     }
                 }
 
-                if (!staff.isPercussion) {
-                    staff.showTablature = true;
-                }
+                staff.showTablature = true;
 
                 break;
             case 'DiagramCollection':
@@ -2779,11 +2777,7 @@ export class GpifParser {
                                                 for (const noteId of this._notesOfBeat.get(beatId)!) {
                                                     if (noteId !== GpifParser._invalidId) {
                                                         const note = NoteCloner.clone(this._noteById.get(noteId)!);
-                                                        // reset midi value for non-percussion staves
-                                                        if (staff.isPercussion) {
-                                                            note.fret = -1;
-                                                            note.string = -1;
-                                                        } else {
+                                                        if (!staff.isPercussion) {
                                                             note.percussionArticulation = -1;
                                                         }
                                                         beat.addNote(note);
