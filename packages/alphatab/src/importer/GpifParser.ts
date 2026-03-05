@@ -2779,6 +2779,9 @@ export class GpifParser {
                                                         const note = NoteCloner.clone(this._noteById.get(noteId)!);
                                                         if (!staff.isPercussion) {
                                                             note.percussionArticulation = -1;
+                                                        } else if (note.string > 5) {
+                                                            // Drum notation uses 5 lines; string 6+ won't render
+                                                            note.string = 5;
                                                         }
                                                         beat.addNote(note);
                                                         if (this._tappedNotes.has(noteId)) {
