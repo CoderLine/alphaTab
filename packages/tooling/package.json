@@ -6,7 +6,7 @@
     "private": true,
     "devDependencies": {
         "@microsoft/api-extractor": "^7.57.6",
-        "@rollup/plugin-terser": "^0.4.4",
+        "@rollup/plugin-terser": "^1.0.0",
         "@rollup/plugin-typescript": "^12.3.0",
         "rollup-plugin-license": "^3.7.0",
         "typescript": "^5.9.3"
