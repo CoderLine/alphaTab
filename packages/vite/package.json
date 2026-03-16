@@ -50,7 +50,7 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^2.4.6",
-        "@microsoft/api-extractor": "^7.57.6",
+        "@microsoft/api-extractor": "^7.57.7",
         "@types/chai": "^5.2.3",
         "@types/mocha": "^10.0.10",
         "@types/node": "^25.3.5",
