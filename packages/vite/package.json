@@ -49,7 +49,7 @@
         "node": ">=20.19.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.7",
+        "@biomejs/biome": "^2.4.8",
         "@microsoft/api-extractor": "^7.57.7",
         "@types/chai": "^5.2.3",
         "@types/mocha": "^10.0.10",
