@@ -66,12 +66,17 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
                 }
             }
             if (!expanded) {
+                let slurText: string | undefined = undefined;
+                if (n.isHammerPullOrigin && n.hammerPullDestination) {
+                    slurText = n.hammerPullDestination.fret >= n.fret ? 'H' : 'P';
+                }
                 const effectSlur: TabSlurGlyph = new TabSlurGlyph(
                     `tab.slur.effect.${n.id}`,
                     n,
                     n.effectSlurDestination,
                     false,
-                    false
+                    false,
+                    slurText
                 );
                 this._effectSlurs.push(effectSlur);
                 this.addTie(effectSlur);

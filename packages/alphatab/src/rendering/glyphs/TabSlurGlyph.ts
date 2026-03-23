@@ -7,14 +7,20 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
  */
 export class TabSlurGlyph extends TabTieGlyph {
     private _forSlide: boolean;
+    private readonly _slurText?: string;
 
-    public constructor(slurEffectId: string, startNote: Note, endNote: Note, forSlide: boolean, forEnd:boolean) {
+    public constructor(slurEffectId: string, startNote: Note, endNote: Note, forSlide: boolean, forEnd:boolean, slurText?: string) {
         super(slurEffectId, startNote, endNote, forEnd);
         this._forSlide = forSlide;
+        this._slurText = slurText;
     }
 
     public override getTieHeight(startX: number, _startY: number, endX: number, _endY: number): number {
         return (Math.log(endX - startX + 1) * this.renderer.settings.notation.slurHeight) / 2;
+    }
+
+    protected override getSlurText(): string | undefined {
+        return this._slurText;
     }
 
     public tryExpand(startNote: Note, endNote: Note, forSlide: boolean, forEnd: boolean): boolean {

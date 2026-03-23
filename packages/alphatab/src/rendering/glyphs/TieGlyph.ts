@@ -165,6 +165,8 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             return;
         }
 
+        const isDown = this.tieDirection === BeamDirection.Down;
+
         if (this.shouldDrawBendSlur()) {
             TieGlyph.drawBendSlur(
                 canvas,
@@ -172,7 +174,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 cy + this._startY,
                 cx + this._endX,
                 cy + this._endY,
-                this.tieDirection === BeamDirection.Down,
+                isDown,
                 this.renderer.smuflMetrics.tieHeight
             );
         } else {
@@ -183,11 +185,31 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 cy + this._startY,
                 cx + this._endX,
                 cy + this._endY,
-                this.tieDirection === BeamDirection.Down,
+                isDown,
                 this._tieHeight,
                 this.renderer.smuflMetrics.tieMidpointThickness
             );
         }
+
+        const slurText = this.getSlurText();
+        if (slurText) {
+            const midX = cx + (this._startX + this._endX) / 2;
+            const midY = cy + (this._startY + this._endY) / 2;
+            const apexOffset = this._tieHeight * 0.75;
+            const apexY = midY + (isDown ? apexOffset : -apexOffset);
+            const w = canvas.measureText(slurText).width;
+            const fontSize = canvas.font.size;
+            // text above: fontSize already includes descender space below the baseline,
+            // providing natural padding for capital letters like H/P
+            const textY = isDown
+                ? apexY + fontSize * 0.3
+                : apexY - fontSize * 1.05;
+            canvas.fillText(slurText, midX - w / 2, textY);
+        }
+    }
+
+    protected getSlurText(): string | undefined {
+        return undefined;
     }
 
     protected abstract shouldDrawBendSlur(): boolean;
