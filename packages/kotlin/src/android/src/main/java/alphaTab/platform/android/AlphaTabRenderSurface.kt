@@ -12,6 +12,7 @@ import android.widget.ScrollView
 import java.io.Closeable
 import java.lang.RuntimeException
 import kotlin.contracts.ExperimentalContracts
+import java.util.concurrent.CopyOnWriteArrayList
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
@@ -44,7 +45,7 @@ internal class RenderPlaceholder(public var result: RenderFinishedEventArgs) : C
 @ExperimentalContracts
 internal class AlphaTabRenderSurface(context: Context, attributeSet: AttributeSet) :
     View(context, attributeSet), View.OnScrollChangeListener {
-    private val _placeholders: ArrayList<RenderPlaceholder> = arrayListOf()
+    private val _placeholders: CopyOnWriteArrayList<RenderPlaceholder> = CopyOnWriteArrayList()
     private val _resultIdToIndex: ObjectDoubleMap<String> = ObjectDoubleMap()
 
     private var _totalWidth: Int = 0
@@ -65,11 +66,10 @@ internal class AlphaTabRenderSurface(context: Context, attributeSet: AttributeSe
 
     public fun clearPlaceholders() {
         _resultIdToIndex.clear()
-        val placeholder = _placeholders
-        for (p in placeholder) {
+        for (p in _placeholders) {
             p.close();
         }
-        placeholder.clear()
+        _placeholders.clear()
     }
 
     override fun onAttachedToWindow() {
