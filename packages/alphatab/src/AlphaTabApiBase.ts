@@ -2416,11 +2416,12 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         let startBeatX = beatBoundings.onNotesX;
-        if (beatCursor) {
+        const currentBeat = this._currentBeat;
+        if (beatCursor && currentBeat) {
             const animationWidth = nextBeatX - beatBoundings.onNotesX;
-            const relativePosition = this._previousTick - this._currentBeat!.start;
+            const relativePosition = this._previousTick - currentBeat.start;
             const ratioPosition =
-                this._currentBeat!.tickDuration > 0 ? relativePosition / this._currentBeat!.tickDuration : 0;
+                currentBeat.tickDuration > 0 ? relativePosition / currentBeat.tickDuration : 0;
             startBeatX = beatBoundings.onNotesX + animationWidth * ratioPosition;
             duration -= duration * ratioPosition;
 
