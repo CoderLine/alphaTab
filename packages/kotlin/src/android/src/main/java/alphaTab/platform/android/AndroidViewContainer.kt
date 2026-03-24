@@ -179,7 +179,7 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
                 }
             }
             a.interpolator = LinearInterpolator()
-            a.duration = duration.toLong()
+            a.duration = maxOf(0L, duration.toLong()) // prevent negative duration
             view.startAnimation(a)
         }
     }
