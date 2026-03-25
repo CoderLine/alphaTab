@@ -39,7 +39,7 @@ internal class EnvironmentPartials {
             print("Screen Size: ${AndroidEnvironment.screenWidth}x${AndroidEnvironment.screenHeight}");
         }
 
-        private val throttleScope = CoroutineScope(Dispatchers.Default)
+        private val throttleScope = CoroutineScope(Dispatchers.Main)
         internal fun throttle(toThrottle: () -> Unit, delay: Double): () -> Unit {
             var job: Job? = null
             return {
