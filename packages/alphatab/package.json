@@ -61,7 +61,7 @@
         "@biomejs/biome": "^2.4.8",
         "@coderline/alphaskia": "^3.4.135",
         "@coderline/alphaskia-linux": "^3.4.135",
-        "@coderline/alphaskia-windows": "^3.4.135",
+        "@coderline/alphaskia-windows": "^3.5.147",
         "@types/chai": "^5.2.3",
         "@types/mocha": "^10.0.10",
         "@types/node": "^25.5.0",
