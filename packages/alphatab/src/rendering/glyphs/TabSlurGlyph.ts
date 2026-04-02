@@ -23,7 +23,11 @@ export class TabSlurGlyph extends TabTieGlyph {
         return this._slurText;
     }
 
-    public tryExpand(startNote: Note, endNote: Note, forSlide: boolean, forEnd: boolean): boolean {
+    public tryExpand(startNote: Note, endNote: Note, forSlide: boolean, forEnd: boolean, slurText?: string): boolean {
+        // same label required (when provided)
+        if (slurText !== undefined && this._slurText !== slurText) {
+            return false;
+        }
         // same type required
         if (this._forSlide !== forSlide) {
             return false;
