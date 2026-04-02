@@ -77,6 +77,15 @@ export class AccidentalHelper {
         this._bar = barRenderer.bar;
     }
 
+    private cacheNoteStepsIfNeeded(note: Note): void {
+        if (this._appliedScoreSteps.has(note.id)) {
+            return;
+        }
+        const steps = AccidentalHelper.computeStepsWithoutAccidentals(this._bar, note);
+        this._appliedScoreSteps.set(note.id, steps);
+        this._notesByValue.set(AccidentalHelper.getNoteValue(note), note);
+    }
+
     public static getPercussionSteps(note: Note): number {
         return PercussionMapper.getArticulation(note)?.staffLine ?? 0;
     }
@@ -268,6 +277,7 @@ export class AccidentalHelper {
     }
 
     public getNoteSteps(n: Note): number {
+        this.cacheNoteStepsIfNeeded(n);
         return this._appliedScoreSteps.get(n.id)!;
     }
 
