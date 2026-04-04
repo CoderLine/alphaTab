@@ -7,7 +7,7 @@ import type { HtmlElementContainer } from '@coderline/alphatab/platform/javascri
  * @internal
  */
 export class BrowserMouseEventArgs implements IMouseEventArgs {
-    public readonly mouseEvent: MouseEvent;
+    public readonly mouseEvent: PointerEvent;
 
     public get isLeftMouseButton(): boolean {
         return this.mouseEvent.button === 0;
@@ -31,7 +31,7 @@ export class BrowserMouseEventArgs implements IMouseEventArgs {
         this.mouseEvent.preventDefault();
     }
 
-    public constructor(e: MouseEvent) {
+    public constructor(e: PointerEvent) {
         this.mouseEvent = e;
     }
 }

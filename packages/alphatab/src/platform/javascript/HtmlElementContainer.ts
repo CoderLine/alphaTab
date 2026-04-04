@@ -83,12 +83,12 @@ export class HtmlElementContainer implements IHtmlElementContainer {
 
         this.mouseDown = {
             on: (value: any) => {
-                const nativeListener: (e: MouseEvent) => void = e => {
+                const nativeListener: (e: PointerEvent) => void = e => {
                     value(new BrowserMouseEventArgs(e));
                 };
-                this.element.addEventListener('mousedown', nativeListener, true);
+                this.element.addEventListener('pointerdown', nativeListener, true);
                 return () => {
-                    this.element.removeEventListener('mousedown', nativeListener, true);
+                    this.element.removeEventListener('pointerdown', nativeListener, true);
                 };
             },
             off: (_value: any) => {
@@ -98,14 +98,14 @@ export class HtmlElementContainer implements IHtmlElementContainer {
 
         this.mouseUp = {
             on: (value: any) => {
-                const nativeListener: (e: MouseEvent) => void = e => {
+                const nativeListener: (e: PointerEvent) => void = e => {
                     value(new BrowserMouseEventArgs(e));
                 };
 
-                this.element.addEventListener('mouseup', nativeListener, true);
+                this.element.addEventListener('pointerup', nativeListener, true);
 
                 return () => {
-                    this.element.removeEventListener('mouseup', nativeListener, true);
+                    this.element.removeEventListener('pointerup', nativeListener, true);
                 };
             },
             off: (_value: any) => {
@@ -115,13 +115,13 @@ export class HtmlElementContainer implements IHtmlElementContainer {
 
         this.mouseMove = {
             on: (value: any) => {
-                const nativeListener: (e: MouseEvent) => void = e => {
+                const nativeListener: (e: PointerEvent) => void = e => {
                     value(new BrowserMouseEventArgs(e));
                 };
-                this.element.addEventListener('mousemove', nativeListener, true);
+                this.element.addEventListener('pointermove', nativeListener, true);
 
                 return () => {
-                    this.element.removeEventListener('mousemove', nativeListener, true);
+                    this.element.removeEventListener('pointermove', nativeListener, true);
                 };
             },
             off: (_: any) => {
