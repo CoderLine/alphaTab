@@ -180,6 +180,28 @@ export enum BeatSubElement {
 }
 
 /**
+ * Lists the different modes for rendering a tuplet number.
+ * @public
+ */
+export enum TupletShowNumber {
+    /**
+     * Show the actual note count only.
+     * The renderer may still decide whether the denominator is implied by the meter.
+     */
+    Actual = 0,
+
+    /**
+     * Show both numerator and denominator.
+     */
+    Both = 1,
+
+    /**
+     * Do not show any tuplet number.
+     */
+    None = 2
+}
+
+/**
  * Defines the custom styles for beats.
  * @json
  * @json_strict
@@ -442,6 +464,16 @@ export class Beat {
      * Gets or sets the tuplet numerator.
      */
     public tupletNumerator: number = -1;
+
+    /**
+     * Gets or sets the tuplet number visibility.
+     */
+    public showTupletNumber: TupletShowNumber = TupletShowNumber.Actual;
+
+    /**
+     * Gets or sets the tuplet bracket visibility.
+     */
+    public showTupletBracket: boolean = true;
 
     public get hasTuplet(): boolean {
         return (

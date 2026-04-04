@@ -6,7 +6,7 @@ import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
 import { Bar, BarLineStyle, SustainPedalMarkerType, SustainPedalMarker } from '@coderline/alphatab/model/Bar';
-import { Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { Beat, BeatBeamingMode, TupletShowNumber } from '@coderline/alphatab/model/Beat';
 import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { BrushType } from '@coderline/alphatab/model/BrushType';
 import { Chord } from '@coderline/alphatab/model/Chord';
@@ -2429,6 +2429,9 @@ export class MusicXmlImporter extends ScoreImporter {
         let tupletNumerator = -1;
         let tupletDenominator = -1;
 
+        let tupletShowNumber: TupletShowNumber = TupletShowNumber.Actual;
+        let tupletShowBracket: boolean = true;
+
         let preferredBeamDirection: BeamDirection | null = null;
 
         // Note level
@@ -2599,6 +2602,8 @@ export class MusicXmlImporter extends ScoreImporter {
             } else {
                 newBeat.tupletNumerator = tupletNumerator;
                 newBeat.tupletDenominator = tupletDenominator;
+                newBeat.showTupletNumber = tupletShowNumber;
+                newBeat.showTupletBracket = tupletShowBracket;
                 newBeat.dots = dots;
                 newBeat.preferredBeamDirection = preferredBeamDirection;
                 this._applyBeatDurationFromTicks(newBeat, durationInTicks, beatDuration, true);
@@ -3278,7 +3283,9 @@ export class MusicXmlImporter extends ScoreImporter {
                         this._parseSlur(c, note);
                     }
                     break;
-                // case 'tuplet': Handled via time-modification
+                case 'tuplet': //Handled via time-modification
+                    this._parseTupletVisibility(c, beat);
+                    break;
                 case 'glissando':
                     if (note) {
                         this._parseGlissando(c, note);
@@ -3319,6 +3326,25 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'accidental-mark': Not supported
                 // case 'other-notation': Not supported
             }
+        }
+    }
+
+    private _parseTupletVisibility(element: XmlNode, beat: Beat) {
+        if (element.getAttribute('type') === 'start') {
+            
+            switch (element.getAttribute('show-number', 'actual')) {
+                case 'none': 
+                    beat.showTupletNumber = TupletShowNumber.None;
+                    break;
+                case 'both': 
+                    beat.showTupletNumber = TupletShowNumber.Both;
+                    break;
+                default:
+                    beat.showTupletNumber = TupletShowNumber.Actual;
+                    break;
+            }
+
+            beat.showTupletBracket = element.getAttribute('bracket', 'yes') !== 'no';
         }
     }
 
