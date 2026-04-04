@@ -1,6 +1,6 @@
 import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import type { BarSubElement } from '@coderline/alphatab/model/Bar';
-import { type Beat, BeatBeamingMode, type BeatSubElement } from '@coderline/alphatab/model/Beat';
+import { type Beat, BeatBeamingMode, type BeatSubElement, TupletShowNumber } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
@@ -212,9 +212,99 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return this.getBeamDirection(helper);
     }
 
+    private static _toTupletDigitSymbol(digit: number): MusicFontSymbol | null {
+        switch (digit) {
+            case 0:
+                return MusicFontSymbol.Tuplet0;
+            case 1:
+                return MusicFontSymbol.Tuplet1;
+            case 2:
+                return MusicFontSymbol.Tuplet2;
+            case 3:
+                return MusicFontSymbol.Tuplet3;
+            case 4:
+                return MusicFontSymbol.Tuplet4;
+            case 5:
+                return MusicFontSymbol.Tuplet5;
+            case 6:
+                return MusicFontSymbol.Tuplet6;
+            case 7:
+                return MusicFontSymbol.Tuplet7;
+            case 8:
+                return MusicFontSymbol.Tuplet8;
+            case 9:
+                return MusicFontSymbol.Tuplet9;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Appends SMuFL glyph symbols for a non-negative integer value into `target`.
+     * Handles any value ≥ 0; falls back to Tuplet0 for degenerate inputs.
+     */
+    private static _appendTupletNumberSymbols(target: MusicFontSymbol[], value: number): void {
+        // Sanitise — guard against NaN / negative / fractional values
+        let _value = value;
+        if (_value - _value !== 0) {
+            _value = 0; // NaN → 0
+        }
+        _value = Math.max(0, Math.floor(Math.abs(_value)));
+
+        if (_value < 10) {
+            const sym = LineBarRenderer._toTupletDigitSymbol(_value);
+            target.push(sym !== null ? sym : MusicFontSymbol.Tuplet0);
+            return;
+        }
+
+        // Multi-digit: convert each decimal digit to its SMuFL glyph
+        const digits = _value.toString();
+        let hasAnySymbol = false;
+        for (let i = 0; i < digits.length; i++) {
+            const digit = digits.charCodeAt(i) - 48; // '0'.charCodeAt(0) === 48
+            const symbol = LineBarRenderer._toTupletDigitSymbol(digit);
+            if (symbol !== null) {
+                target.push(symbol);
+                hasAnySymbol = true;
+            }
+        }
+        if (!hasAnySymbol) {
+            target.push(MusicFontSymbol.Tuplet0);
+        }
+    }
+
     protected calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
         this.ensureBeamDrawingInfo(h, direction);
         return h.drawingInfos.get(direction)!.calcY(x);
+    }
+
+    private static _gcdBinary(a: number, b: number): number {
+        if (a === 0) return b;
+        if (b === 0) return a;
+
+        // Find the greatest power of 2 that divides both
+        let shift = 0;
+        while (((a | b) & 1) === 0) {
+            a >>= 1;
+            b >>= 1;
+            shift++;
+        }
+
+        while ((a & 1) === 0) a >>= 1;
+
+        do {
+            while ((b & 1) === 0) b >>= 1;
+            if (a > b) [a, b] = [b, a];
+            b = b - a;
+        } while (b !== 0);
+
+        return a << shift;
+    }
+
+    private static _isNaturalDenominator(den: number): boolean {
+        let d = den;
+        while (d % 2 === 0) d >>= 1;
+        return d === 1 || d === 3;
     }
 
     private _paintTupletHelper(
@@ -225,55 +315,75 @@ export abstract class LineBarRenderer extends BarRendererBase {
         beatElement: BeatSubElement,
         bracketsAsArcs: boolean
     ): void {
+        const showTupletNum = h.beats[0].showTupletNumber;
+        const showBracket = h.beats[0].showTupletBracket;
+
         const res = this.resources;
         const oldAlign: TextAlign = canvas.textAlign;
         const oldBaseLine = canvas.textBaseline;
         canvas.color = h.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
         canvas.textAlign = TextAlign.Center;
         canvas.textBaseline = TextBaseline.Middle;
-        let s: MusicFontSymbol[];
+
+        // Build the symbol array only when the number should actually be shown.
+        let s: MusicFontSymbol[] = [];
         const num: number = h.beats[0].tupletNumerator;
         const den: number = h.beats[0].tupletDenominator;
-        // list as in Guitar Pro 7. for certain tuplets only the numerator is shown
-        if (num === 2 && den === 3) {
-            s = [MusicFontSymbol.Tuplet2];
-        } else if (num === 3 && den === 2) {
-            s = [MusicFontSymbol.Tuplet3];
-        } else if (num === 4 && den === 6) {
-            s = [MusicFontSymbol.Tuplet4];
-        } else if (num === 5 && den === 4) {
-            s = [MusicFontSymbol.Tuplet5];
-        } else if (num === 6 && den === 4) {
-            s = [MusicFontSymbol.Tuplet6];
-        } else if (num === 7 && den === 4) {
-            s = [MusicFontSymbol.Tuplet7];
-        } else if (num === 9 && den === 8) {
-            s = [MusicFontSymbol.Tuplet9];
-        } else if (num === 10 && den === 8) {
-            s = [MusicFontSymbol.Tuplet1, MusicFontSymbol.Tuplet0];
-        } else if (num === 11 && den === 8) {
-            s = [MusicFontSymbol.Tuplet1, MusicFontSymbol.Tuplet1];
-        } else if (num === 12 && den === 8) {
-            s = [MusicFontSymbol.Tuplet1, MusicFontSymbol.Tuplet2];
-        } else if (num === 13 && den === 8) {
-            s = [MusicFontSymbol.Tuplet1, MusicFontSymbol.Tuplet3];
-        } else {
-            s = [];
-            const zero = MusicFontSymbol.Tuplet0 as number;
-            if (num > 10) {
-                s.push((zero + Math.floor(num / 10)) as MusicFontSymbol);
-                s.push((zero + (num - 10)) as MusicFontSymbol);
-            } else {
-                s.push((zero + num) as MusicFontSymbol);
-            }
 
+        // Tuplet display rule — what to render above the bracket
+        //
+        // <time-modification> stores the "sound" ratio (actual-notes : normal-notes).
+        // For nested tuplets this is a compound product of all nesting levels, so the
+        // raw numbers (e.g. 6:9, 12:27) must never be rendered directly.
+        //
+        // The <tuplet type="start"> element in <notations> carries the display intent
+        // via the show-number attribute, mapped to the TupletShowNumber enum:
+        //
+        //  TupletShowNumber.None   (2) —   draw nothing; used by engravers to suppress
+        //                                  phantom labels on notes whose time-modification
+        //                                  is a compound nested ratio rather than a
+        //                                  standalone visible group.
+        //
+        //  TupletShowNumber.Both   (1) —   always draw "num : den" as written; the
+        //                                  engraver has explicitly decided both numbers
+        //                                  are needed regardless of meter context.
+        //
+        //  TupletShowNumber.Actual (0) —   apply the natural-denominator rule below.
+        //                                  This is the default when no <tuplet> element
+        //                                  is present in the source file.
+        //
+        //  Natural-denominator rule (Actual only):
+        //
+        //      Step 1 — reduce the fraction by GCD.
+        //              6:9   -> GCD=3 -> reduced denominator = 3
+        //              12:27 -> GCD=3 -> reduced denominator = 9
+        //
+        //      Step 2 — test whether the reduced denominator is a "natural" grouping.
+        //             After dividing out all factors of 2, the remainder must be
+        //             exactly 1 (binary meter:  2, 4, 8, 16 …) or
+        //             exactly 3 (ternary meter: 3, 6, 12, 24 …).
+        //             Natural   -> performer already understands the context from
+        //                          the meter; only the numerator is needed.
+        //             Unnatural -> the grouping is ambiguous; both numbers must be shown.
+        //
+        //      Step 3 — choose what to render.
+        //             Natural denominator   -> show the original (unreduced) numerator only.
+        //                                      "6" not "2": the performer needs the real
+        //                                      note count in the group, not the simplified ratio.
+        //             Unnatural denominator -> show original numerator : original denominator.
+
+        if (showTupletNum === TupletShowNumber.Both) {
+            LineBarRenderer._appendTupletNumberSymbols(s, num);
             s.push(MusicFontSymbol.TupletColon);
-
-            if (den > 10) {
-                s.push((zero + Math.floor(den / 10)) as MusicFontSymbol);
-                s.push((zero + (den - 10)) as MusicFontSymbol);
+            LineBarRenderer._appendTupletNumberSymbols(s, den);
+        } else if (showTupletNum === TupletShowNumber.Actual) {
+            const gcd = LineBarRenderer._gcdBinary(num, den);
+            if (LineBarRenderer._isNaturalDenominator(den / gcd)) {
+                LineBarRenderer._appendTupletNumberSymbols(s, num);
             } else {
-                s.push((zero + den) as MusicFontSymbol);
+                LineBarRenderer._appendTupletNumberSymbols(s, num);
+                s.push(MusicFontSymbol.TupletColon);
+                LineBarRenderer._appendTupletNumberSymbols(s, den);
             }
         }
 
@@ -288,24 +398,28 @@ export abstract class LineBarRenderer extends BarRendererBase {
         canvas.lineWidth = this.smuflMetrics.tupletBracketThickness;
 
         if (h.beats.length === 1 || !h.isFull) {
-            for (const beat of h.beats) {
-                const beamingHelper = this.helpers.getBeamingHelperForBeat(beat);
-                if (!beamingHelper) {
-                    continue;
+            // Simple footer: just a floating number above/below each stem.
+            // skip entirely when there is nothing to draw (s is empty because showTupletNum is TupletShowNumber.None).
+            if (s.length > 0) {
+                for (const beat of h.beats) {
+                    const beamingHelper = this.helpers.getBeamingHelperForBeat(beat);
+                    if (!beamingHelper) {
+                        continue;
+                    }
+
+                    const direction: BeamDirection = this.getTupletBeamDirection(beamingHelper);
+
+                    const tupletX: number = this.getBeatX(beat, BeatXPosition.Stem);
+                    let tupletY: number = this.calculateBeamYWithDirection(beamingHelper, tupletX, direction);
+
+                    if (direction === BeamDirection.Down) {
+                        tupletY += shift;
+                    } else {
+                        tupletY -= shift;
+                    }
+
+                    canvas.fillMusicFontSymbols(cx + this.x + tupletX, cy + this.y + tupletY + size * 0.5, 1, s, true);
                 }
-
-                const direction: BeamDirection = this.getTupletBeamDirection(beamingHelper);
-
-                const tupletX: number = this.getBeatX(beat, BeatXPosition.Stem);
-                let tupletY: number = this.calculateBeamYWithDirection(beamingHelper, tupletX, direction);
-
-                if (direction === BeamDirection.Down) {
-                    tupletY += shift;
-                } else {
-                    tupletY -= shift;
-                }
-
-                canvas.fillMusicFontSymbols(cx + this.x + tupletX, cy + this.y + tupletY + size * 0.5, 1, s, true);
             }
         } else {
             const firstBeat: Beat = h.beats[0];
@@ -364,8 +478,11 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             //
             // Calculate how many space the text will need
+            //
+            // When  showTupletNum is TupletShowNumber.None, the text gap collapses to zero —
+            // the bracket (if shown) becomes a continuous straight line.
             const sw: number = s.reduce((acc, sym) => acc + res.engravingSettings.glyphWidths.get(sym)!, 0);
-            const sp = res.engravingSettings.oneStaffSpace * 0.5;
+            const sp = s.length > 0 ? res.engravingSettings.oneStaffSpace * 0.5 : 0;
 
             //
             // Calculate the offsets where to break the bracket
@@ -388,7 +505,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
             cx += pixelAlignment;
             cy += pixelAlignment;
 
-            if (offset1X > startX) {
+            // Draw bracket lines only when showBracket is true.
+            if (showBracket && offset1X > startX) {
                 canvas.beginPath();
                 canvas.moveTo(cx + this.x + startX, cy + this.y + angleStartY);
                 if (bracketsAsArcs) {
@@ -421,7 +539,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             //
             // Draw the string
-            canvas.fillMusicFontSymbols(cx + this.x + middleX, cy + this.y + middleY + size * 0.5, 1, s, true);
+            // (only if showTupletNum is not TupletShowNumber.None and s is non-empty)
+            if (s.length > 0) {
+                canvas.fillMusicFontSymbols(cx + this.x + middleX, cy + this.y + middleY + size * 0.5, 1, s, true);
+            }
         }
 
         canvas.textAlign = oldAlign;
