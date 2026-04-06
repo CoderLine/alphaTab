@@ -43,7 +43,7 @@
     },
     "dependencies": {
         "magic-string": "^0.30.21",
-        "vite": "^7.3.1"
+        "vite": "^7.3.2"
     },
     "engines": {
         "node": ">=20.19.0"
