@@ -63,11 +63,11 @@ export type IAlphaSynthWorkerMessage =
     /* main -> worker */
     | { cmd: 'alphaSynth.initialize'; sampleRate: number; logLevel: LogLevel; bufferTimeInMilliseconds: number }
     | { cmd: 'alphaSynth.setLogLevel'; value: LogLevel }
-    | { cmd: 'alphaSynth.setMasterVolume'; value: LogLevel }
-    | { cmd: 'alphaSynth.setMetronomeVolume'; value: LogLevel }
-    | { cmd: 'alphaSynth.setPlaybackSpeed'; value: LogLevel }
-    | { cmd: 'alphaSynth.setTickPosition'; value: LogLevel }
-    | { cmd: 'alphaSynth.setTimePosition'; value: LogLevel }
+    | { cmd: 'alphaSynth.setMasterVolume'; value: number }
+    | { cmd: 'alphaSynth.setMetronomeVolume'; value: number }
+    | { cmd: 'alphaSynth.setPlaybackSpeed'; value: number }
+    | { cmd: 'alphaSynth.setTickPosition'; value: number }
+    | { cmd: 'alphaSynth.setTimePosition'; value: number }
     | { cmd: 'alphaSynth.setPlaybackRange'; value: PlaybackRange | null }
     | { cmd: 'alphaSynth.setIsLooping'; value: boolean }
     | { cmd: 'alphaSynth.setCountInVolume'; value: number }

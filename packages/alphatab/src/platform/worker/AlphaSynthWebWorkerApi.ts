@@ -396,7 +396,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 );
                 break;
             case 'alphaSynth.playbackRangeChanged':
-                this._playbackRange = (data as PlaybackRangeChangedEventArgs).playbackRange;
+                this._playbackRange = data.playbackRange;
                 (this.playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(
                     new PlaybackRangeChangedEventArgs(this._playbackRange)
                 );

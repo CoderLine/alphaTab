@@ -2,6 +2,7 @@ package alphaTab.platform.android
 
 import alphaTab.core.ecmaScript.MessageEvent
 import alphaTab.platform.worker.AlphaSynthWebWorker
+import alphaTab.platform.worker.AlphaTabWebWorker
 import alphaTab.platform.worker.IAlphaSynthWorker
 import alphaTab.platform.worker.IAlphaSynthWorkerMessage
 import alphaTab.platform.worker.IAlphaTabRenderingWorker
@@ -124,7 +125,7 @@ internal class JavaThreadAlphaTabRendererWorker(postToMain: (action: () -> Unit)
     @OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
     override fun onStartInsideWorker() {
         workerLookup[Thread.currentThread().id] = this;
-        AlphaSynthWebWorker.init();
+        AlphaTabWebWorker.init();
     }
 }
 

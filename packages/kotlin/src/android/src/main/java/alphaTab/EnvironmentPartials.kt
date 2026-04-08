@@ -47,9 +47,9 @@ internal class EnvironmentPartials {
         internal inline fun <reified T> getGlobalWorkerScope(): IAlphaTabWorkerGlobalScope<T> {
             @Suppress("UNCHECKED_CAST")
             return when (T::class) {
-                IAlphaSynthWorkerMessage::class::class -> JavaThreadAlphaSynthWorker.currentThreadWorker as IAlphaTabWorkerGlobalScope<T>
-                IAlphaTabWorkerMessage::class::class -> JavaThreadAlphaTabRendererWorker.currentThreadWorker as IAlphaTabWorkerGlobalScope<T>
-                else -> throw UnsupportedOperationException("Unsupported worker scope kind")
+                IAlphaSynthWorkerMessage::class -> JavaThreadAlphaSynthWorker.currentThreadWorker as IAlphaTabWorkerGlobalScope<T>
+                IAlphaTabWorkerMessage::class -> JavaThreadAlphaTabRendererWorker.currentThreadWorker as IAlphaTabWorkerGlobalScope<T>
+                else -> throw UnsupportedOperationException("Unsupported worker scope kind ${T::class::qualifiedName}")
             }
         }
 
