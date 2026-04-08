@@ -32,10 +32,22 @@ namespace AlphaTab.Wpf
 
         public override IEventEmitter RootContainerBecameVisible { get; }
 
+        private static double GetDpiScale(Visual visual)
+        {
+            var source = PresentationSource.FromVisual(visual);
+            if (source?.CompositionTarget != null)
+            {
+                var transformToDevice = source.CompositionTarget.TransformToDevice;
+                return transformToDevice.M11;
+            }
+            return 1.0;
+        }
+
         public WpfUiFacade(ScrollViewer scrollViewer)
         {
             _scrollViewer = scrollViewer;
             RootContainer = new FrameworkElementContainer(scrollViewer);
+            Environment.HighDpiFactor = GetDpiScale(scrollViewer);
             RootContainerBecameVisible = new DelegatedEventEmitter(
                 value =>
                 {
@@ -215,7 +227,7 @@ namespace AlphaTab.Wpf
                             {
                                 placeholder = new Image
                                 {
-                                    Stretch = Stretch.None,
+                                    Stretch = Stretch.Fill,
                                     SnapsToDevicePixels = true
                                 };
                                 panel.Children.Add(placeholder);

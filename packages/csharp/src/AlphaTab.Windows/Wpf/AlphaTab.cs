@@ -29,8 +29,8 @@ namespace AlphaTab.Wpf
         /// Identifies the <see cref="Tracks"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty TracksProperty =
-            DependencyProperty.Register("Tracks", typeof(IEnumerable<Track>), typeof(AlphaTab),
-                new PropertyMetadata(default(IEnumerable<Track>), OnTracksChanged));
+            DependencyProperty.Register(nameof(Tracks), typeof(IEnumerable<Track>), typeof(AlphaTab),
+                new PropertyMetadata(null, OnTracksChanged));
 
         private static void OnTracksChanged(DependencyObject d,
             DependencyPropertyChangedEventArgs e)
@@ -38,16 +38,16 @@ namespace AlphaTab.Wpf
             var observable = e.OldValue as INotifyCollectionChanged;
             if (observable != null)
             {
-                ((AlphaTab) d).UnregisterObservableCollection(observable);
+                ((AlphaTab)d).UnregisterObservableCollection(observable);
             }
 
             observable = e.NewValue as INotifyCollectionChanged;
             if (observable != null)
             {
-                ((AlphaTab) d).RegisterObservableCollection(observable);
+                ((AlphaTab)d).RegisterObservableCollection(observable);
             }
 
-            ((AlphaTab) d).RenderTracks();
+            ((AlphaTab)d).RenderTracks();
         }
 
         private void RegisterObservableCollection(INotifyCollectionChanged collection)
@@ -66,9 +66,9 @@ namespace AlphaTab.Wpf
         }
 
         /// <see cref="AlphaTabApiBase{TSettings}.Tracks"/>
-        public IEnumerable<Track> Tracks
+        public IEnumerable<Track>? Tracks
         {
-            get => (IEnumerable<Track>) GetValue(TracksProperty);
+            get => (IEnumerable<Track>)GetValue(TracksProperty);
             set => SetValue(TracksProperty, value);
         }
 
@@ -86,13 +86,13 @@ namespace AlphaTab.Wpf
         private static void OnSettingsChanged(DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            ((AlphaTab) d).SettingsChanged?.Invoke((Settings) e.NewValue);
+            ((AlphaTab)d).SettingsChanged?.Invoke((Settings)e.NewValue);
         }
 
         /// <see cref="AlphaTabApiBase{TSettings}.Settings"/>
         public Settings Settings
         {
-            get => (Settings) GetValue(SettingsProperty);
+            get => (Settings)GetValue(SettingsProperty);
             set => SetValue(SettingsProperty, value);
         }
 
@@ -113,7 +113,7 @@ namespace AlphaTab.Wpf
         /// </summary>
         public Brush BarCursorFill
         {
-            get => (Brush) GetValue(BarCursorFillProperty);
+            get => (Brush)GetValue(BarCursorFillProperty);
             set => SetValue(BarCursorFillProperty, value);
         }
 
@@ -134,7 +134,7 @@ namespace AlphaTab.Wpf
         /// </summary>
         public Brush BeatCursorFill
         {
-            get => (Brush) GetValue(BeatCursorFillProperty);
+            get => (Brush)GetValue(BeatCursorFillProperty);
             set => SetValue(BeatCursorFillProperty, value);
         }
 
@@ -155,16 +155,32 @@ namespace AlphaTab.Wpf
         /// </summary>
         public Brush SelectionFill
         {
-            get => (Brush) GetValue(SelectionCursorFillProperty);
+            get => (Brush)GetValue(SelectionCursorFillProperty);
             set => SetValue(SelectionCursorFillProperty, value);
         }
 
         #endregion
 
+        private static readonly DependencyPropertyKey ApiKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(Api),
+                typeof(AlphaTabApiBase<AlphaTab>),
+                typeof(AlphaTab),
+                new FrameworkPropertyMetadata(null));
+
+        /// <summary>
+        /// Identifies the <see cref="Api"/> property.
+        /// </summary>
+        public static readonly DependencyProperty ApiProperty = ApiKey.DependencyProperty;
+
         /// <summary>
         /// Gets the alphaTab API object.
         /// </summary>
-        public AlphaTabApiBase<AlphaTab> Api { get; private set; }
+        public AlphaTabApiBase<AlphaTab>? Api
+        {
+            get => GetValue(ApiProperty) as AlphaTabApiBase<AlphaTab>;
+            private set => SetValue(ApiKey, value);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AlphaTab"/> class.
@@ -184,7 +200,7 @@ namespace AlphaTab.Wpf
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _scrollView = (ScrollViewer) Template.FindName("PART_ScrollView", this);
+            _scrollView = (ScrollViewer)Template.FindName("PART_ScrollView", this);
             Api = new AlphaTabApiBase<AlphaTab>(new WpfUiFacade(_scrollView), this);
         }
 

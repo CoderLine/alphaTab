@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
-using AlphaTab.Collections;
 using AlphaTab.Platform.Worker;
 
 namespace AlphaTab.Platform.CSharp;
@@ -13,8 +12,8 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
     private readonly BlockingCollection<Action> _workerQueue;
     private readonly CancellationTokenSource _workerCancellationToken;
     private readonly ManualResetEventSlim? _threadStartedEvent;
-    private readonly List<Action<MessageEvent<T>>> _listenerInsideWorker = new();
-    private readonly List<Action<MessageEvent<T>>> _listenerOutsideWorker = new();
+    private readonly ConcurrentDictionary<Action<MessageEvent<T>>,Action<MessageEvent<T>>> _listenerInsideWorker = new();
+    private readonly ConcurrentDictionary<Action<MessageEvent<T>>,Action<MessageEvent<T>>> _listenerOutsideWorker = new();
 
     protected ManagedThreadWorkerBase(Action<Action> postToMain)
     {
@@ -63,7 +62,7 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
             {
                 foreach (var listener in _listenerOutsideWorker)
                 {
-                    listener(ev);
+                    listener.Value(ev);
                 }
             });
         }
@@ -74,7 +73,7 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
             {
                 foreach (var listener in _listenerInsideWorker)
                 {
-                    listener(ev);
+                    listener.Value(ev);
                 }
             });
         }
@@ -91,7 +90,7 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
         var listeners = Thread.CurrentThread.ManagedThreadId == _workerThread.ManagedThreadId
             ? _listenerInsideWorker
             : _listenerOutsideWorker;
-        listeners.Add(handler);
+        listeners[handler] = handler;
     }
 
     public void RemoveEventListener(string @event, Action<MessageEvent<T>> handler)
@@ -100,7 +99,7 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
         var listeners = Thread.CurrentThread.ManagedThreadId == _workerThread.ManagedThreadId
             ? _listenerInsideWorker
             : _listenerOutsideWorker;
-        listeners.Remove(handler);
+        listeners.TryRemove(handler, out _);
     }
 
     public virtual void Terminate()

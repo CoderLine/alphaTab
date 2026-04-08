@@ -21,8 +21,10 @@ internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
     private val _workerQueue = LinkedBlockingQueue<() -> Unit>()
     private var _isCancelled = false
     private val _threadStartedEvent = Semaphore(1)
-    private val _listenerInsideWorker = ArrayList<(ev: MessageEvent<T>) -> Unit>()
-    private val _listenerOutsideWorker = ArrayList<(ev: MessageEvent<T>) -> Unit>()
+    private val _listenerInsideWorker =
+        ConcurrentHashMap<(ev: MessageEvent<T>) -> Unit, (ev: MessageEvent<T>) -> Unit>()
+    private val _listenerOutsideWorker =
+        ConcurrentHashMap<(ev: MessageEvent<T>) -> Unit, (ev: MessageEvent<T>) -> Unit>()
 
     protected constructor(postToMain: (action: () -> Unit) -> Unit) {
         _postToMain = postToMain;
@@ -59,7 +61,7 @@ internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
             _postToMain(
                 {
                     for (listener in _listenerOutsideWorker) {
-                        listener(ev);
+                        listener.value(ev);
                     }
                 });
         } else {
@@ -67,7 +69,7 @@ internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
             postToWorker(
                 {
                     for (listener in _listenerInsideWorker) {
-                        listener(ev);
+                        listener.value(ev);
                     }
                 });
         }
@@ -86,7 +88,7 @@ internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
         } else {
             _listenerOutsideWorker
         };
-        listeners.add(handler);
+        listeners[handler] = handler;
     }
 
     override fun removeEventListener(event: String, handler: (arg1: MessageEvent<T>) -> Unit) {
