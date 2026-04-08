@@ -411,7 +411,7 @@ export class Environment {
 
         renderEngines.set(
             'skia',
-            new RenderEngineFactory(false, () => {
+            new RenderEngineFactory(true, () => {
                 return new SkiaCanvas();
             })
         );
