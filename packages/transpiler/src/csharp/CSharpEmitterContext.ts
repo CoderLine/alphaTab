@@ -346,6 +346,11 @@ export default class CSharpEmitterContext {
             (ts.isTypeAliasDeclaration(d) && ts.isTypeLiteralNode(d.type))
         );
     }
+
+    isDiscriminatedUnion(node: ts.Declaration) {
+        return ts.getJSDocTags(node).some(t => t.tagName.text === 'discriminated');
+    }
+
     private getTypeFromTsType(
         node: cs.Node,
         tsType: ts.Type,
@@ -819,6 +824,13 @@ export default class CSharpEmitterContext {
                     ts.DiagnosticCategory.Error
                 );
                 return null;
+            }
+
+            if ('typeArguments' in pTsType && cs.isTypeReference(pType)) {
+                const args = this.typeChecker.getTypeArguments(pTsType as ts.TypeReference);
+                if (args.length > 0) {
+                    pType.typeArguments = args.map(a => this.getTypeFromTsType(pType, a)!);
+                }
             }
 
             parameterTypes.push(pType);
@@ -1387,7 +1399,7 @@ export default class CSharpEmitterContext {
     }
 
     public registerSymbol(node: cs.NamedElement & cs.Node) {
-        const symbol = this.getSymbolForDeclaration(node.tsNode!);
+        const symbol = node.tsSymbol ?? this.getSymbolForDeclaration(node.tsNode!);
         if (symbol) {
             const symbolKey = this.getSymbolKey(symbol);
             this._symbolLookup.set(symbolKey, node);
@@ -1426,10 +1438,15 @@ export default class CSharpEmitterContext {
               ? symbol.declarations[0]
               : undefined;
 
-        if (declaration) {
-            return `${symbol.name}_${declaration.getSourceFile().fileName}_${declaration.pos}`;
+        let name = symbol.name;
+        if (name.startsWith('__')) {
+            name = '__';
         }
-        return symbol.name;
+
+        if (declaration) {
+            return `${name}_${declaration.getSourceFile().fileName}_${declaration.pos}`;
+        }
+        return name;
     }
 
     public getSymbolForDeclaration(node: ts.Node): ts.Symbol | undefined {
@@ -1814,8 +1831,15 @@ export default class CSharpEmitterContext {
         if (contextualType.symbol) {
             switch (contextualType.symbol.name) {
                 case 'ArrayLike':
-                case '__type':
                     return true;
+            }
+
+            // empty object type {} (basically object)
+            if (
+                contextualType.flags & ts.TypeFlags.Object &&
+                (contextualType as ts.ObjectType).getProperties().length === 0
+            ) {
+                return true;
             }
         }
 

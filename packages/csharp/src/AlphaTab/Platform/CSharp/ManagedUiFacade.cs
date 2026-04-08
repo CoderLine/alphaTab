@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using AlphaTab.Synth;
 using AlphaTab.Importer;
 using AlphaTab.Model;
+using AlphaTab.Platform.Worker;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 
@@ -34,41 +37,46 @@ public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
     }
 
     public abstract void StopScrolling(IContainer scrollElement);
+
     public abstract void SetCanvasOverflow(IContainer canvasElement, double overflow,
         bool isVertical);
 
     public IScoreRenderer CreateWorkerRenderer()
     {
-        return new ManagedThreadScoreRenderer(Api.Settings, BeginInvoke);
+        var worker = new ManagedThreadAlphaTabRendererWorker(PostToUIThread);
+        return new AlphaTabWorkerScoreRenderer<TSettings>(Api, worker);
     }
+
+    protected abstract void PostToUIThread(Action action);
 
     protected abstract Stream? OpenDefaultSoundFont();
 
     public IAlphaSynth CreateWorkerPlayer()
     {
-        var player = new ManagedThreadAlphaSynthWorkerApi(CreateSynthOutput(),
-            Api.Settings.Core.LogLevel, BeginInvoke, Api.Settings.Player.BufferTimeInMilliseconds);
+        var player = new AlphaSynthWebWorkerApi(
+            CreateSynthOutput(),
+            Api.Settings,
+            new ManagedThreadAlphaSynthWorker(PostToUIThread)
+        );
         player.Ready.On(() =>
         {
-            using (var sf = OpenDefaultSoundFont())
-            using (var ms = new MemoryStream())
-            {
-                sf.CopyTo(ms);
-                player.LoadSoundFont(new Uint8Array(ms.ToArray()), false);
-            }
+            using var sf = OpenDefaultSoundFont();
+            using var ms = new MemoryStream();
+            sf.CopyTo(ms);
+            player.LoadSoundFont(new Uint8Array(ms.ToArray()), false);
         });
         return player;
     }
 
     public IAudioExporterWorker CreateWorkerAudioExporter(IAlphaSynth? synth)
     {
-        var needNewWorker = synth == null || synth is not ManagedThreadAlphaSynthWorkerApi;
+        var needNewWorker = synth is not AlphaSynthWebWorkerApi;
         if (needNewWorker)
         {
             synth = CreateWorkerPlayer();
         }
 
-        return new ManagedThreadAlphaSynthAudioExporter((ManagedThreadAlphaSynthWorkerApi)synth, needNewWorker);
+        return new AlphaSynthAudioExporterWorkerApi(synth as AlphaSynthWebWorkerApi, needNewWorker);
     }
 
     public abstract IAlphaSynth? CreateBackingTrackPlayer();
@@ -86,8 +94,7 @@ public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
 
     public virtual void InitialRender()
     {
-        Api.Renderer.PreRender.On(resize => { TotalResultCount.Enqueue(new Counter()); });
-
+        Api.Renderer.PreRender.On(_ => { TotalResultCount.Enqueue(new Counter()); });
 
         RootContainerBecameVisible.On(() =>
         {
@@ -106,7 +113,45 @@ public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
     public abstract void BeginUpdateRenderResults(RenderFinishedEventArgs? renderResults);
     public abstract void DestroyCursors();
     public abstract Cursors? CreateCursors();
-    public abstract void BeginInvoke(Action action);
+
+    public void BeginInvoke(Action action)
+    {
+        // post to "own" event loop if running inside worker
+        var synthWorker = ManagedThreadAlphaSynthWorker.CurrentThreadWorker;
+        if (synthWorker != null)
+        {
+            synthWorker.PostToWorker(action);
+            return;
+        }
+
+        var renderWorker = ManagedThreadAlphaTabRendererWorker.CurrentThreadWorker;
+        if (renderWorker != null)
+        {
+            renderWorker.PostToWorker(action);
+            return;
+        }
+
+        // not in worker -> run on main
+        PostToUIThread(action);
+    }
+
+    public Action Throttle(Action action, double delay)
+    {
+        CancellationTokenSource? cancellationTokenSource = null;
+        return () =>
+        {
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
+
+            Task.Run(async () =>
+                {
+                    await Task.Delay((int)delay, cancellationTokenSource.Token);
+                    PostToUIThread(action);
+                },
+                cancellationTokenSource.Token);
+        };
+    }
+
     public abstract void RemoveHighlights();
     public abstract void HighlightElements(string groupId, double masterBarIndex);
     public abstract IContainer? CreateSelectionElement();
@@ -126,16 +171,14 @@ public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
                 success(ScoreLoader.LoadScoreFromBytes(new Uint8Array(b), Api.Settings));
                 return true;
             case Stream s:
-                {
-                    using (var ms = new MemoryStream())
-                    {
-                        s.CopyTo(ms);
-                        success(ScoreLoader.LoadScoreFromBytes(new Uint8Array(ms.ToArray()),
-                            Api.Settings));
-                    }
+            {
+                using var ms = new MemoryStream();
+                s.CopyTo(ms);
+                success(ScoreLoader.LoadScoreFromBytes(new Uint8Array(ms.ToArray()),
+                    Api.Settings));
 
-                    return true;
-                }
+                return true;
+            }
             default:
                 return false;
         }
@@ -149,15 +192,13 @@ public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
                 Api.Player.LoadSoundFont(new Uint8Array(bytes), append);
                 return true;
             case Stream stream:
-                {
-                    using (var ms = new MemoryStream())
-                    {
-                        stream.CopyTo(ms);
-                        Api.Player.LoadSoundFont(new Uint8Array(ms.ToArray()), append);
-                    }
+            {
+                using var ms = new MemoryStream();
+                stream.CopyTo(ms);
+                Api.Player.LoadSoundFont(new Uint8Array(ms.ToArray()), append);
 
-                    return true;
-                }
+                return true;
+            }
             default:
                 return false;
         }

@@ -1,21 +1,19 @@
 using System;
-using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
 using AlphaTab.Platform.CSharp;
+using AlphaTab.Platform.Worker;
 
 namespace AlphaTab;
 
 partial class Environment
 {
-    public const bool SupportsTextDecoder = true;
-
-    public static void PlatformInit()
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T PrepareForPostMessage<T>(T o)
     {
+        return o;
     }
 
     private static void _printPlatformInfo(System.Action<string> print)
@@ -24,23 +22,6 @@ partial class Environment
         print($"Process: {RuntimeInformation.ProcessArchitecture}");
         print($"OS Description: {RuntimeInformation.OSDescription}");
         print($"OS Arch: {RuntimeInformation.OSArchitecture}");
-    }
-
-    public static Action Throttle(Action action, double delay)
-    {
-        CancellationTokenSource? cancellationTokenSource = null;
-        return () =>
-        {
-            cancellationTokenSource?.Cancel();
-            cancellationTokenSource = new CancellationTokenSource();
-
-            Task.Run(async () =>
-                {
-                    await Task.Delay((int)delay, cancellationTokenSource.Token);
-                    action();
-                },
-                cancellationTokenSource.Token);
-        };
     }
 
     private static void _createPlatformSpecificRenderEngines(
@@ -62,5 +43,22 @@ partial class Environment
     internal static void SortDescending(System.Collections.Generic.IList<double> list)
     {
         list.Sort((a, b) => b - a);
+    }
+
+
+    internal static IAlphaTabWorkerGlobalScope<T> GetGlobalWorkerScope<T>()
+    {
+        if (typeof(T) == typeof(IAlphaSynthWorkerMessage))
+        {
+            return (IAlphaTabWorkerGlobalScope<T>)ManagedThreadAlphaSynthWorker.CurrentThreadWorker;
+        }
+
+        if (typeof(T) == typeof(IAlphaTabWorkerMessage))
+        {
+            return (IAlphaTabWorkerGlobalScope<T>)ManagedThreadAlphaTabRendererWorker
+                .CurrentThreadWorker;
+        }
+
+        throw new InvalidOperationException("Unsupported worker scope kind");
     }
 }

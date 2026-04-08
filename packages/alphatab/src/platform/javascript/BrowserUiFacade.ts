@@ -36,7 +36,7 @@ import { BackingTrackPlayer } from '@coderline/alphatab/synth/BackingTrackPlayer
 import { CoreSettings, FontFileFormat } from '@coderline/alphatab/CoreSettings';
 import type { IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExporter';
 import { AlphaSynthAudioExporterWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthAudioExporterWorkerApi';
-import { AlphaTabWorker, AlphaSynthWorker } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import { IAlphaTabRenderingWorker, IAlphaSynthWorker } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 
 /**
@@ -188,10 +188,10 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public createWorkerRenderer(): IScoreRenderer {
-        let worker: AlphaTabWorker | undefined;
+        let worker: IAlphaTabRenderingWorker | undefined;
         try {
             worker = BrowserUiFacade.createAlphaTabWebWorker(this._api.settings);
-            return new AlphaTabWorkerScoreRenderer<unknown>(this._api, this._api.settings, worker);
+            return new AlphaTabWorkerScoreRenderer<unknown>(this._api, worker);
         } catch (e) {
             Logger.error(
                 'Renderer',
@@ -727,7 +727,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
         if (supportsAudioWorklets && this._api.settings.player.outputMode === PlayerOutputMode.WebAudioAudioWorklets) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with worklets for playback');
-            let worker: AlphaSynthWorker | undefined;
+            let worker: IAlphaSynthWorker | undefined;
             try {
                 worker = BrowserUiFacade.createAlphaSynthWebWorker(this._api.settings);
             } catch (e) {
@@ -745,7 +745,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 'Player',
                 'Will use webworkers for synthesizing and web audio api with ScriptProcessor for playback'
             );
-            let worker: AlphaSynthWorker | undefined;
+            let worker: IAlphaSynthWorker | undefined;
             try {
                 worker = BrowserUiFacade.createAlphaSynthWebWorker(this._api.settings);
             } catch (e) {
@@ -1060,12 +1060,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     /**
      * @internal
      */
-    public static createAlphaTabWebWorker: (settings: Settings) => AlphaTabWorker;
+    public static createAlphaTabWebWorker: (settings: Settings) => IAlphaTabRenderingWorker;
 
     /**
      * @internal
      */
-    public static createAlphaSynthWebWorker: (settings: Settings) => AlphaSynthWorker;
+    public static createAlphaSynthWebWorker: (settings: Settings) => IAlphaSynthWorker;
 
     /**
      * @target web

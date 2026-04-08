@@ -10,7 +10,7 @@ import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
 import type {
-    AlphaTabWorker,
+    IAlphaTabRenderingWorker,
     IAlphaTabWorkerMessage
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
@@ -19,21 +19,21 @@ import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
- * @public
+ * @internal
  */
 export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     private _api: AlphaTabApiBase<T>;
-    private _worker!: AlphaTabWorker;
+    private _worker!: IAlphaTabRenderingWorker;
     private _width: number = 0;
 
     public boundsLookup: BoundsLookup | null = null;
 
-    public constructor(api: AlphaTabApiBase<T>, settings: Settings, worker: AlphaTabWorker) {
+    public constructor(api: AlphaTabApiBase<T>, worker: IAlphaTabRenderingWorker) {
         this._api = api;
         this._worker = worker;
         this._worker.postMessage({
             cmd: 'alphaTab.initialize',
-            settings: this._serializeSettingsForWorker(settings)
+            settings: this._serializeSettingsForWorker(api.settings)
         });
         this._worker.addEventListener('message', e => this._handleWorkerMessage(e));
     }

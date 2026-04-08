@@ -268,7 +268,7 @@ export default class CSharpAstTransformer {
             }
 
             // TODO: make root namespace configurable from outside.
-            const folders = path
+            const folders: string[] = path
                 .dirname(
                     path.relative(
                         path.resolve(this.context.compilerOptions.baseUrl!),
@@ -427,6 +427,8 @@ export default class CSharpAstTransformer {
             this.visitFunctionTypeAliasDeclaration(node);
         } else if (ts.isTypeLiteralNode(node.type)) {
             this.visitTypeLiteralAliasDeclaration(node);
+        } else if (this.context.isDiscriminatedUnion(node)) {
+            this.visitDiscriminatedUnion(node);
         } else if (isExported && !shouldSkip) {
             this.context.addTsNodeDiagnostics(
                 node,
@@ -502,6 +504,186 @@ export default class CSharpAstTransformer {
 
     protected visitTypeLiteralAliasDeclaration(node: ts.TypeAliasDeclaration) {
         this.visitRecordDeclaration(node);
+    }
+
+    protected visitDiscriminatedUnion(node: ts.TypeAliasDeclaration) {
+        const tag = ts.getJSDocTags(node).find(t => t.tagName.text === 'discriminated')!;
+        const values = (tag.comment as string).split(' ');
+        const discriminatorField = values[0];
+        const discriminatorValuePrefix = values[1];
+
+        const unionType = this.context.typeChecker.getTypeAtLocation(node.type);
+        if (!unionType.isUnion()) {
+            this.context.addTsNodeDiagnostics(
+                node,
+                `Discriminated union must be a union type`,
+                ts.DiagnosticCategory.Error
+            );
+            return;
+        }
+
+        // Create base interface
+        const baseInterface: cs.InterfaceDeclaration = {
+            visibility: this.getVisibility(node),
+            name: node.name.text,
+            nodeType: cs.SyntaxKind.InterfaceDeclaration,
+            parent: this.csharpFile.namespace,
+            members: [],
+            tsNode: node,
+            skipEmit: this.shouldSkip(node, false),
+            partial: false,
+            tsSymbol: this.context.getSymbolForDeclaration(node),
+            hasVirtualMembersOrSubClasses: false
+        };
+
+        if (node.name) {
+            baseInterface.documentation = this.visitDocumentation(node.name);
+        }
+
+        this._visitDocumentationAttributes(baseInterface, node);
+
+        // Add discriminator property to interface
+        const discriminatorProperty: cs.PropertyDeclaration = {
+            visibility: cs.Visibility.Public,
+            name: this.context.toPropertyName(discriminatorField),
+            nodeType: cs.SyntaxKind.PropertyDeclaration,
+            parent: baseInterface,
+            isVirtual: false,
+            isOverride: false,
+            isAbstract: false,
+            isStatic: false,
+            type: this.createUnresolvedTypeNode(null, node.type, this.context.typeChecker.getStringType()),
+            tsNode: node,
+            getAccessor: {
+                keyword: 'get'
+            } as cs.PropertyAccessorDeclaration,
+            setAccessor: {
+                keyword: 'set'
+            } as cs.PropertyAccessorDeclaration,
+            skipEmit: false
+        };
+
+        baseInterface.members.push(discriminatorProperty);
+
+        this.csharpFile.namespace.declarations.push(baseInterface);
+        this.context.registerSymbol(baseInterface);
+
+        const typeNamePrefix = baseInterface.name.startsWith('I')
+            ? baseInterface.name.substring(1)
+            : baseInterface.name;
+
+        // Create classes for each union member
+        for (const memberType of unionType.types) {
+            const properties = this.context.typeChecker.getPropertiesOfType(memberType);
+            const discriminatorProp = properties.find(p => p.name === discriminatorField);
+            if (!discriminatorProp) {
+                continue;
+            }
+
+            const discriminatorType = this.context.typeChecker.getTypeOfSymbolAtLocation(discriminatorProp, node);
+            if (!discriminatorType.isStringLiteral()) {
+                continue;
+            }
+
+            const discriminatorValue = discriminatorType.value;
+
+            // Compute class name
+            const suffix = discriminatorValue.startsWith(discriminatorValuePrefix)
+                ? discriminatorValue.substring(discriminatorValuePrefix.length)
+                : discriminatorValue;
+            const className =
+                typeNamePrefix +
+                suffix
+                    .split('.')
+                    .map(p => this.context.toPascalCase(p))
+                    .join('');
+
+            // Create class
+            const csClass: cs.ClassDeclaration = {
+                visibility: this.getVisibility(node),
+                name: className,
+                nodeType: cs.SyntaxKind.ClassDeclaration,
+                parent: this.csharpFile.namespace,
+                isAbstract: false,
+                members: [],
+                skipEmit: this.shouldSkip(node, false),
+                partial: false,
+                tsNode: memberType.symbol.declarations![0],
+                tsSymbol: memberType.symbol,
+                hasVirtualMembersOrSubClasses: false,
+                isRecord: true
+            };
+
+            // Add interface implementation
+            csClass.interfaces = [
+                {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: csClass,
+                    reference: this.context.makeTypeName(baseInterface.name),
+                    isAsync: false
+                } as cs.TypeReference
+            ];
+
+            // Add discriminator property
+            const discProp: cs.PropertyDeclaration = {
+                visibility: cs.Visibility.Public,
+                name: this.context.toPropertyName(discriminatorField),
+                nodeType: cs.SyntaxKind.PropertyDeclaration,
+                parent: csClass,
+                isVirtual: false,
+                isOverride: false,
+                isAbstract: false,
+                isStatic: false,
+                type: this.createUnresolvedTypeNode(null, node.type, this.context.typeChecker.getStringType()),
+                initializer: {
+                    nodeType: cs.SyntaxKind.StringLiteral,
+                    text: discriminatorValue
+                } as cs.StringLiteral,
+                getAccessor: {
+                    keyword: 'get'
+                } as cs.PropertyAccessorDeclaration,
+                setAccessor: {
+                    keyword: 'set'
+                } as cs.PropertyAccessorDeclaration,
+                tsNode: node,
+                skipEmit: false
+            };
+            discProp.initializer!.parent = discProp;
+
+            csClass.members.push(discProp);
+
+            // Add other properties
+            const otherProperties = properties.filter(p => p.name !== discriminatorField);
+            for (const prop of otherProperties) {
+                const propType = this.context.typeChecker.getTypeOfSymbolAtLocation(prop, node);
+
+                // Create property
+                const csProperty: cs.PropertyDeclaration = {
+                    visibility: cs.Visibility.Public,
+                    name: this.context.toPropertyName(prop.name),
+                    nodeType: cs.SyntaxKind.PropertyDeclaration,
+                    parent: csClass,
+                    isVirtual: false,
+                    isOverride: false,
+                    isAbstract: false,
+                    isStatic: false,
+                    type: this.createUnresolvedTypeNode(null, node.type, propType),
+                    tsNode: node,
+                    getAccessor: {
+                        keyword: 'get'
+                    } as cs.PropertyAccessorDeclaration,
+                    setAccessor: {
+                        keyword: 'set'
+                    } as cs.PropertyAccessorDeclaration,
+                    skipEmit: false
+                };
+
+                csClass.members.push(csProperty);
+            }
+
+            this.csharpFile.namespace.declarations.push(csClass);
+            this.context.registerSymbol(csClass);
+        }
     }
 
     protected visitInterfaceDeclaration(node: ts.InterfaceDeclaration) {
@@ -2371,13 +2553,17 @@ export default class CSharpAstTransformer {
     }
 
     protected visitReturnStatement(parent: cs.Node, s: ts.ReturnStatement) {
-        if(this.currentClassElement && ts.isMethodDeclaration(this.currentClassElement) && !!this.currentClassElement.asteriskToken) {
+        if (
+            this.currentClassElement &&
+            ts.isMethodDeclaration(this.currentClassElement) &&
+            !!this.currentClassElement.asteriskToken
+        ) {
             const yieldExpressionStmt = {
                 expression: null!,
                 nodeType: cs.SyntaxKind.ExpressionStatement,
                 parent: parent,
                 tsNode: s
-            } as cs.ExpressionStatement
+            } as cs.ExpressionStatement;
             const yieldExpression = {
                 expression: null,
                 parent: yieldExpressionStmt,
@@ -4095,6 +4281,13 @@ export default class CSharpAstTransformer {
     protected visitObjectLiteralExpression(parent: cs.Node, expression: ts.ObjectLiteralExpression) {
         let type = this.context.typeChecker.getContextualType(expression);
         let isRecord = type?.symbol?.declarations?.some(d => this.context.isRecord(d)) || this._recordCreation > 0;
+        const isDiscriminatedUnion =
+            type?.symbol?.declarations?.some(d => this.context.isDiscriminatedUnion(d)) ||
+            type?.aliasSymbol?.declarations?.some(d => this.context.isDiscriminatedUnion(d));
+
+        if (isDiscriminatedUnion) {
+            return this.visitDiscriminatedUnionCreate(parent, expression);
+        }
 
         // assignment of object literal to property without giving type
         // -> try to use specific type of property
@@ -4331,6 +4524,93 @@ export default class CSharpAstTransformer {
         }
 
         return objectLiteral;
+    }
+    protected visitDiscriminatedUnionCreate(parent: cs.Node, expression: ts.ObjectLiteralExpression) {
+        const unionType = this.context.typeChecker.getContextualType(expression)! as ts.UnionType;
+
+        // find concrete type within unionType with which the expression matches
+
+        const tag = ts
+            .getJSDocTags(unionType.aliasSymbol!.declarations![0])
+            .find(t => t.tagName.text === 'discriminated')!;
+        const values = (tag.comment as string).split(' ');
+        const discriminatorField = values[0];
+
+        const discriminatorProp = expression.properties.find(
+            p => ts.isPropertyAssignment(p) && ts.isIdentifier(p.name) && p.name.text === discriminatorField
+        ) as ts.PropertyAssignment;
+
+        const discriminatorValue = ts.isStringLiteral(discriminatorProp!.initializer) ? discriminatorProp.initializer.text : undefined;
+
+        const matching = unionType.types.find(memberType => {
+            const prop = memberType.getProperty(discriminatorField);
+            if (!prop) {return false;}
+            const propType = this.context.typeChecker.getTypeOfSymbolAtLocation(prop, expression);
+            return propType.flags & ts.TypeFlags.StringLiteral && (propType as ts.StringLiteralType).value === discriminatorValue;
+        });
+
+        if(!matching) {
+            this.context.addCsNodeDiagnostics(parent, "Could not resolve concrete union type", ts.DiagnosticCategory.Error);
+            return null;
+        }
+
+        const newObject = {
+            nodeType: cs.SyntaxKind.NewExpression,
+            type: this.createUnresolvedTypeNode(null, expression, matching),
+            arguments: [],
+            parent: parent,
+            objectInitializers: []
+        } as cs.NewExpression;
+
+        for (const p of expression.properties) {
+            const assignment = {
+                parent: newObject,
+                nodeType: cs.SyntaxKind.LabeledExpression,
+                label: '',
+                expression: {} as cs.Expression
+            } as cs.LabeledExpression;
+
+            if (ts.isPropertyAssignment(p)) {
+                assignment.label = this.context.toPropertyName(p.name.getText());
+                assignment.expression = this.visitExpression(assignment, p.initializer)!;
+                newObject.objectInitializers!.push(assignment);
+            } else if (ts.isShorthandPropertyAssignment(p)) {
+                assignment.label = this.context.toPropertyName(p.name.getText());
+                if (p.objectAssignmentInitializer) {
+                    assignment.expression = this.visitExpression(assignment, p.objectAssignmentInitializer)!;
+                } else {
+                    assignment.expression = {
+                        nodeType: cs.SyntaxKind.Identifier,
+                        parent: assignment,
+                        tsNode: p.name,
+                        text: p.name.getText()
+                    } as cs.Identifier;
+                }
+                newObject.objectInitializers!.push(assignment);
+            } else if (ts.isSpreadAssignment(p)) {
+                this.context.addTsNodeDiagnostics(p, 'Spread operator not supported', ts.DiagnosticCategory.Error);
+            } else if (ts.isMethodDeclaration(p)) {
+                this.context.addTsNodeDiagnostics(
+                    p,
+                    'Method declarations in object literals not supported',
+                    ts.DiagnosticCategory.Error
+                );
+            } else if (ts.isGetAccessorDeclaration(p)) {
+                this.context.addTsNodeDiagnostics(
+                    p,
+                    'Get accessor declarations in object literals not supported',
+                    ts.DiagnosticCategory.Error
+                );
+            } else if (ts.isSetAccessorDeclaration(p)) {
+                this.context.addTsNodeDiagnostics(
+                    p,
+                    'Set accessor declarations in object literals not supported',
+                    ts.DiagnosticCategory.Error
+                );
+            }
+        }
+
+        return newObject;
     }
 
     protected toInvariantString(expr: cs.Expression): cs.Expression {

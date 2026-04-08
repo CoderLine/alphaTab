@@ -134,9 +134,9 @@ export type IAlphaSynthWorkerMessage =
 /**
  * @internal
  */
-export interface AlphaTabWorker extends IAlphaTabWorker<IAlphaTabWorkerMessage> {}
+export interface IAlphaTabRenderingWorker extends IAlphaTabWorker<IAlphaTabWorkerMessage> {}
 
 /**
  * @internal
  */
-export interface AlphaSynthWorker extends IAlphaTabWorker<IAlphaSynthWorkerMessage> {}
+export interface IAlphaSynthWorker extends IAlphaTabWorker<IAlphaSynthWorkerMessage> {}

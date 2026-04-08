@@ -879,6 +879,19 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.write('(');
         this.writeCommaSeparated(expr.arguments, a => this.writeExpression(a));
         this.write(')');
+        if (expr.objectInitializers?.length) {
+            this.writeLine();
+            this.beginBlock();
+
+            for (const a of expr.objectInitializers!) {
+                this.write(a.label);
+                this.write(' = ');
+                this.writeExpression(a.expression);
+                this.writeLine(",");
+            }
+
+            this.endBlock();
+        }
     }
 
     protected writeCastExpression(expr: cs.CastExpression) {
@@ -1068,7 +1081,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
     }
 
     protected writeUsing(using: cs.UsingDeclaration) {
-         if (using.skipEmit) {
+        if (using.skipEmit) {
             return;
         }
 
@@ -1105,7 +1118,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected override writeThrowStatement(s: cs.ThrowStatement) {
         this.write('throw');
-        const currentException = this._currentCatchClauseIdentifier[this._currentCatchClauseIdentifier.length -1];
+        const currentException = this._currentCatchClauseIdentifier[this._currentCatchClauseIdentifier.length - 1];
         if (s.expression && (!cs.isIdentifier(s.expression) || s.expression.text !== currentException)) {
             this.write(' ');
             this.writeExpression(s.expression);

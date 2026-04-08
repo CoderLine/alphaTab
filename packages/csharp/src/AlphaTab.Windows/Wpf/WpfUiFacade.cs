@@ -109,7 +109,7 @@ namespace AlphaTab.Wpf
             return new NAudioSynthOutput();
         }
 
-        public override IAlphaSynth? CreateBackingTrackPlayer()
+        public override IAlphaSynth CreateBackingTrackPlayer()
         {
             return new BackingTrackPlayer(
                 new NAudioBackingTrackOutput(BeginInvoke),
@@ -294,7 +294,7 @@ namespace AlphaTab.Wpf
             );
         }
 
-        public override void BeginInvoke(Action action)
+        protected override void PostToUIThread(Action action)
         {
             SettingsContainer.Dispatcher?.BeginInvoke(action);
         }

@@ -13,7 +13,7 @@ import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type {
-    AlphaSynthWorker,
+    IAlphaSynthWorker,
     IAlphaSynthWorkerMessage
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -32,7 +32,7 @@ import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
  * @internal
  */
 export class AlphaSynthWebWorkerApi implements IAlphaSynth {
-    private _synth!: AlphaSynthWorker;
+    private _synth!: IAlphaSynthWorker;
     private _output: ISynthOutput;
     private _workerIsReadyForPlayback: boolean = false;
     private _workerIsReady: boolean = false;
@@ -68,7 +68,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         return Logger.logLevel;
     }
 
-    public get worker(): AlphaSynthWorker {
+    public get worker(): IAlphaSynthWorker {
         return this._synth;
     }
 
@@ -229,7 +229,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    public constructor(player: ISynthOutput, settings: Settings, synthWorker: AlphaSynthWorker) {
+    public constructor(player: ISynthOutput, settings: Settings, synthWorker: IAlphaSynthWorker) {
         this._workerIsReadyForPlayback = false;
         this._workerIsReady = false;
         this._outputIsReady = false;
