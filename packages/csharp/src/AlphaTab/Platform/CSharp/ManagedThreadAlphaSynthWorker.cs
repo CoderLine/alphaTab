@@ -106,6 +106,10 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
     {
         _workerCancellationToken.Cancel();
         _workerThread.Join();
+        while (_workerQueue.Count > 0)
+        {
+            _workerQueue.Take();
+        }
     }
 }
 

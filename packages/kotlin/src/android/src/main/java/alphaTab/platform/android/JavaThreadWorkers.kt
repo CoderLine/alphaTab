@@ -107,6 +107,7 @@ internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
         _isCancelled = true
         _workerThread.interrupt()
         _workerThread.join()
+        _workerQueue.clear()
     }
 }
 
