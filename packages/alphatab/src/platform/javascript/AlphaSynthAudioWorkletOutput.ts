@@ -14,7 +14,7 @@ import { CircularSampleBuffer } from '@coderline/alphatab/synth/ds/CircularSampl
  * @target web
  * @internal
  */
-type AudioWorkletProcessorMessagePort<T> = Omit<IAlphaTabWorker<T>, 'terminate'>;
+type AudioWorkletProcessorMessagePort<T> = Omit<IAlphaTabWorker<T>, 'terminate'> & Pick<MessagePort, 'start'>;
 
 /**
  * @target web
@@ -95,6 +95,7 @@ export class AlphaSynthWebWorklet {
                     );
 
                     this.port.addEventListener('message', e => this._handleMessage(e));
+                    this.port.start();
                 }
 
                 private _handleMessage(e: MessageEvent<IAlphaSynthWorkerMessage>) {
@@ -229,6 +230,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
                 }) as AudioWorkletNode<IAlphaSynthWorkerMessage>;
 
                 this._worklet.port.addEventListener('message', this._boundHandleMessage);
+                this._worklet.port.start();
                 this.source!.connect(this._worklet);
                 this.source!.start(0);
                 this._worklet.connect(ctx!.destination);
