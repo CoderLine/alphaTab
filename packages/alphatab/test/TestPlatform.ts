@@ -11,6 +11,17 @@ export class TestPlatform {
      * @target web
      * @partial
      */
+    public static throttle(action: () => void, delay: number): () => void {
+        let timeoutId: NodeJS.Timeout | undefined = undefined;
+        return () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(action, delay);
+        };
+    }
+    /**
+     * @target web
+     * @partial
+     */
     public static async saveFile(name: string, data: Uint8Array): Promise<void> {
         const directory = path.dirname(name);
         await fs.promises.mkdir(directory, { recursive: true });

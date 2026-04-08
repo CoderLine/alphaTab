@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AlphaTab;
@@ -28,6 +29,23 @@ static partial class TestPlatform
         throw new IOException(
             $"Could not find repository root via working dir {System.Environment.CurrentDirectory}");
     });
+
+    public static Action Throttle(Action action, double delay)
+    {
+        CancellationTokenSource? cancellationTokenSource = null;
+        return () =>
+        {
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
+
+            Task.Run(async () =>
+                {
+                    await Task.Delay((int)delay, cancellationTokenSource.Token);
+                    action();
+                },
+                cancellationTokenSource.Token);
+        };
+    }
 
     public static async Task<Uint8Array> LoadFile(string path)
     {
@@ -120,6 +138,7 @@ static partial class TestPlatform
             {
                 throw new JsonException();
             }
+
             var v0 = _keyConverter.Read(ref reader, _keyType, options)!;
 
             if (!reader.Read())
@@ -136,7 +155,8 @@ static partial class TestPlatform
             return new ArrayTuple<TKey, TValue>(v0, v1);
         }
 
-        public override void Write(Utf8JsonWriter writer, ArrayTuple<TKey, TValue> value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, ArrayTuple<TKey, TValue> value,
+            JsonSerializerOptions options)
         {
             writer.WriteStartArray();
             _keyConverter.Write(writer, value.V0, options);
@@ -167,7 +187,8 @@ static partial class TestPlatform
     {
         var path = Path.Combine(AlphaTabProjectRoot.Value, name);
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        await using var fs = new StreamWriter(new FileStream(path, FileMode.Create, FileAccess.ReadWrite));
+        await using var fs =
+            new StreamWriter(new FileStream(path, FileMode.Create, FileAccess.ReadWrite));
         await fs.WriteAsync(data);
     }
 
@@ -272,6 +293,7 @@ static partial class TestPlatform
             {
                 return "";
             }
+
             var testName = testMethodInfo.MethodInfo.GetCustomAttribute<TestMethodAttribute>()!
                 .DisplayName;
             return testName ?? "";

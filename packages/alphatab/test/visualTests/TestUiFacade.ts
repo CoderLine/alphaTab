@@ -106,13 +106,6 @@ class TestUiContainer implements IContainer {
         this.childNodes = [];
     }
 
-    public throttle(action: () => void, _delay: number): () => void {
-        // no throttling.
-        return () => {
-            action();
-        };
-    }
-
     public resize: IEventEmitter = new EventEmitter();
 
     public mouseDown: IEventEmitterOfT<IMouseEventArgs> = new EventEmitterOfT<IMouseEventArgs>();
@@ -338,10 +331,8 @@ export class TestUiFacade implements IUiFacade<unknown> {
         return null;
     }
 
-    public throttle(action: () => void, _delay: number): () => void {
-        return () => {
-            action();
-        };
+    public throttle(action: () => void, delay: number): () => void {
+        return TestPlatform.throttle(action, delay);
     }
 
     public readonly canRenderChanged: IEventEmitter = new EventEmitter();

@@ -198,7 +198,7 @@ export class VisualTestHelper {
                 throw errors[0];
             }
             if (errors.length > 0) {
-                const errorMessages = errors.map(e => e.message ?? 'Unknown error').join('\n');
+                const errorMessages = errors.map(e => `${e.message ?? 'Unknown error'}\n${e.stack}`).join('\n');
                 throw new Error(errorMessages);
             }
         } finally {
