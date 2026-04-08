@@ -14,14 +14,17 @@ import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { Logger } from '@coderline/alphatab/Logger';
 import { Environment } from '@coderline/alphatab/Environment';
+import type {
+    AlphaTabWorker,
+    IAlphaTabWorkerMessage
+} from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 
 /**
- * @target web
  * @public
  */
 export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     private _api: AlphaTabApiBase<T>;
-    private _worker!: Worker;
+    private _worker!: AlphaTabWorker;
     private _width: number = 0;
 
     public boundsLookup: BoundsLookup | null = null;
@@ -30,7 +33,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         this._api = api;
 
         try {
-            this._worker = Environment.createWebWorker(settings);
+            this._worker = Environment.createAlphaTabWebWorker(settings);
         } catch (e) {
             Logger.error('Rendering', `Failed to create WebWorker: ${e}`);
             return;
@@ -39,7 +42,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
             cmd: 'alphaTab.initialize',
             settings: this._serializeSettingsForWorker(settings)
         });
-        this._worker.addEventListener('message', this._handleWorkerMessage.bind(this));
+        this._worker.addEventListener('message', e => this._handleWorkerMessage(e));
     }
 
     public destroy(): void {
@@ -53,7 +56,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         });
     }
 
-    private _serializeSettingsForWorker(settings: Settings): unknown {
+    private _serializeSettingsForWorker(settings: Settings): Map<string, unknown> {
         const jsObject = JsonConverter.settingsToJsObject(Environment.prepareForPostMessage(settings))!;
         // cut out player settings, they are only needed on UI thread side
         jsObject.delete('player');
@@ -92,9 +95,9 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         });
     }
 
-    private _handleWorkerMessage(e: MessageEvent): void {
-        const data: any = e.data;
-        const cmd: string = data.cmd;
+    private _handleWorkerMessage(e: MessageEvent<IAlphaTabWorkerMessage>): void {
+        const data = e.data;
+        const cmd = data.cmd;
         switch (cmd) {
             case 'alphaTab.preRender':
                 (this.preRender as EventEmitterOfT<boolean>).trigger(data.resize);
@@ -110,7 +113,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
                 break;
             case 'alphaTab.postRenderFinished':
                 this.boundsLookup = BoundsLookup.fromJson(data.boundsLookup, this._api.score!);
-                this.boundsLookup.finish();
+                this.boundsLookup?.finish();
                 (this.postRenderFinished as EventEmitter).trigger();
                 break;
             case 'alphaTab.error':
@@ -120,7 +123,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     public renderScore(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
-        const jsObject: unknown =
+        const jsObject: Map<string, unknown> | null =
             score == null ? null : JsonConverter.scoreToJsObject(Environment.prepareForPostMessage(score));
         this._worker.postMessage({
             cmd: 'alphaTab.renderScore',

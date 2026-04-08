@@ -2,7 +2,8 @@ import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabEr
 import { Environment } from '@coderline/alphatab/Environment';
 import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
-import type { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/javascript/AlphaSynthWebWorkerApi';
+import type { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthWebWorkerApi';
+import type { IAlphaSynthWorkerMessage } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import type { BackingTrackSyncPoint } from '@coderline/alphatab/synth/IAlphaSynth';
 import type {
     AudioExportChunk,
@@ -11,7 +12,6 @@ import type {
 } from '@coderline/alphatab/synth/IAudioExporter';
 
 /**
- * @target web
  * @internal
  */
 export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
@@ -35,10 +35,10 @@ export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
         syncPoints: BackingTrackSyncPoint[],
         transpositionPitches: Map<number, number>
     ): Promise<void> {
-        const onmessage = this.handleWorkerMessage.bind(this);
-        this._worker.worker.addEventListener('message', onmessage, false);
+        const onmessage: (ev: MessageEvent<IAlphaSynthWorkerMessage>) => void = e => this.handleWorkerMessage(e);
+        this._worker.worker.addEventListener('message', onmessage);
         this._unsubscribe = () => {
-            this._worker.worker.removeEventListener('message', onmessage, false);
+            this._worker.worker.removeEventListener('message', onmessage);
         };
 
         this._promise = Promise.withResolvers();

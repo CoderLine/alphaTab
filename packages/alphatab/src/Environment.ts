@@ -14,8 +14,8 @@ import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { AlphaSynthWebWorklet } from '@coderline/alphatab/platform/javascript/AlphaSynthAudioWorkletOutput';
-import { AlphaSynthWebWorker } from '@coderline/alphatab/platform/javascript/AlphaSynthWebWorker';
-import { AlphaTabWebWorker } from '@coderline/alphatab/platform/javascript/AlphaTabWebWorker';
+import { AlphaSynthWebWorker } from '@coderline/alphatab/platform/worker/AlphaSynthWebWorker';
+import { AlphaTabWebWorker } from '@coderline/alphatab/platform/worker/AlphaTabWebWorker';
 import { Html5Canvas } from '@coderline/alphatab/platform/javascript/Html5Canvas';
 import { JQueryAlphaTab } from '@coderline/alphatab/platform/javascript/JQueryAlphaTab';
 import { WebPlatform } from '@coderline/alphatab/platform/javascript/WebPlatform';
@@ -76,6 +76,7 @@ import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { TabBarRendererFactory } from '@coderline/alphatab/rendering/TabBarRendererFactory';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
+import type { AlphaSynthWorker, AlphaTabWorker } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 
 /**
  * A factory for custom layout engines.
@@ -207,16 +208,19 @@ export class Environment {
     }
 
     /**
-     * @target web
      * @internal
      */
-    public static createWebWorker: (settings: Settings) => Worker;
+    public static createAlphaTabWebWorker: (settings: Settings) => AlphaTabWorker;
 
     /**
-     * @target web
      * @internal
      */
-    public static createAudioWorklet: (context: AudioContext, settings: Settings) => Promise<void>;
+    public static createAlphaSynthWebWorker: (settings: Settings) => AlphaSynthWorker;
+
+    /**
+     * @internal
+     */
+    public static createAlphaSynthAudioWorklet: (context: AudioContext, settings: Settings) => Promise<void>;
 
     /**
      * @target web
@@ -637,7 +641,7 @@ export class Environment {
      * @target web
      */
     public static initializeMain(
-        createWebWorker: (settings: Settings) => Worker,
+        createWebWorker: (settings: Settings, nameHint: string) => Worker,
         createAudioWorklet: (context: AudioContext, settings: Settings) => Promise<void>
     ) {
         if (Environment.isRunningInWorker || Environment.isRunningInAudioWorklet) {
@@ -650,8 +654,9 @@ export class Environment {
             Environment.highDpiFactor = window.devicePixelRatio;
         }
 
-        Environment.createWebWorker = createWebWorker;
-        Environment.createAudioWorklet = createAudioWorklet;
+        Environment.createAlphaTabWebWorker = s => createWebWorker(s, 'alphaTab Renderer');
+        Environment.createAlphaSynthWebWorker = s => createWebWorker(s, 'alphaSynth Worker');
+        Environment.createAlphaSynthAudioWorklet = createAudioWorklet;
     }
 
     /**
@@ -682,7 +687,10 @@ export class Environment {
         }
         AlphaTabWebWorker.init();
         AlphaSynthWebWorker.init();
-        Environment.createWebWorker = _ => {
+        Environment.createAlphaTabWebWorker = _ => {
+            throw new AlphaTabError(AlphaTabErrorType.General, 'Nested workers are not supported');
+        };
+        Environment.createAlphaSynthWebWorker = _ => {
             throw new AlphaTabError(AlphaTabErrorType.General, 'Nested workers are not supported');
         };
     }

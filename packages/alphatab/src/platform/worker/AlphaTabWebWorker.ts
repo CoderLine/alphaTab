@@ -3,35 +3,42 @@ import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerial
 import { Logger } from '@coderline/alphatab/Logger';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
-import type { IWorkerScope } from '@coderline/alphatab/platform/javascript/IWorkerScope';
 import { type FontSizeDefinition, FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
+import type {
+    IAlphaTabWorkerGlobalScope,
+    IAlphaTabWorkerMessage
+} from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
- * @target web
  * @public
+ * @partial
  */
 export class AlphaTabWebWorker {
     private _renderer!: ScoreRenderer;
-    private _main: IWorkerScope;
+    private _main: IAlphaTabWorkerGlobalScope<IAlphaTabWorkerMessage>;
 
-    public constructor(main: IWorkerScope) {
+    public constructor(main: IAlphaTabWorkerGlobalScope<IAlphaTabWorkerMessage>) {
         this._main = main;
-        this._main.addEventListener('message', this._handleMessage.bind(this), false);
+        main.addEventListener('message', e => this._handleMessage(e));
     }
 
+    /**
+     * @target web
+     * @partial
+     */
     public static init(): void {
-        (Environment.globalThis as any).alphaTabWebWorker = new AlphaTabWebWorker(
-            Environment.globalThis as IWorkerScope
-        );
+        new AlphaTabWebWorker(Environment.globalThis);
     }
 
     private _handleMessage(e: MessageEvent): void {
-        const data: any = e.data;
-        const cmd: any = data ? data.cmd : '';
-        switch (cmd) {
+        const data = e.data as IAlphaTabWorkerMessage;
+        if (!data?.cmd) {
+            return;
+        }
+        switch (data.cmd) {
             case 'alphaTab.initialize':
                 const settings: Settings = JsonConverter.jsObjectToSettings(data.settings);
                 Logger.logLevel = settings.core.logLevel;
@@ -92,19 +99,9 @@ export class AlphaTabWebWorker {
         }
     }
 
-    private _updateFontSizes(fontSizes: { [key: string]: FontSizeDefinition } | Map<string, FontSizeDefinition>): void {
-        if (!(fontSizes instanceof Map)) {
-            const obj = fontSizes;
-            fontSizes = new Map<string, FontSizeDefinition>();
-            for (const font in obj) {
-                fontSizes.set(font, obj[font]);
-            }
-        }
-
-        if (fontSizes) {
-            for (const [k, v] of fontSizes) {
-                FontSizes.fontSizeLookupTables.set(k, v);
-            }
+    private _updateFontSizes(fontSizes: Map<string, FontSizeDefinition>): void {
+        for (const [k, v] of fontSizes) {
+            FontSizes.fontSizeLookupTables.set(k, v);
         }
     }
 

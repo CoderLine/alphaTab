@@ -1,11 +1,18 @@
-import type { ISynthOutput, ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
-import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
-import type { IWorkerScope } from '@coderline/alphatab/platform/javascript/IWorkerScope';
-import { Logger } from '@coderline/alphatab/Logger';
 import { Environment } from '@coderline/alphatab/Environment';
+import {
+    EventEmitter,
+    EventEmitterOfT,
+    type IEventEmitter,
+    type IEventEmitterOfT
+} from '@coderline/alphatab/EventEmitter';
+import { Logger } from '@coderline/alphatab/Logger';
+import type {
+    IAlphaSynthWorkerMessage,
+    IAlphaTabWorkerGlobalScope
+} from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import type { ISynthOutput, ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
 
 /**
- * @target web
  * @internal
  */
 export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
@@ -24,7 +31,7 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     // that also includes the alphaSynth library into the worker.
     public static preferredSampleRate: number = 0;
 
-    private _worker!: IWorkerScope;
+    private _main!: IAlphaTabWorkerGlobalScope<IAlphaSynthWorkerMessage>;
 
     public get sampleRate(): number {
         return AlphaSynthWorkerSynthOutput.preferredSampleRate;
@@ -32,13 +39,13 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
 
     public open(): void {
         Logger.debug('AlphaSynth', 'Initializing synth worker');
-        this._worker = Environment.globalThis as IWorkerScope;
-        this._worker.addEventListener('message', this._handleMessage.bind(this));
+        this._main = Environment.globalThis;
+        this._main.addEventListener('message', this._handleMessage.bind(this));
         (this.ready as EventEmitter).trigger();
     }
 
     public destroy(): void {
-        this._worker.postMessage({
+        this._main.postMessage({
             cmd: 'alphaSynth.output.destroy'
         });
     }
@@ -61,26 +68,26 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     public readonly sampleRequest: IEventEmitter = new EventEmitter();
 
     public addSamples(samples: Float32Array): void {
-        this._worker.postMessage({
+        this._main.postMessage({
             cmd: 'alphaSynth.output.addSamples',
             samples: Environment.prepareForPostMessage(samples)
         });
     }
 
     public play(): void {
-        this._worker.postMessage({
+        this._main.postMessage({
             cmd: 'alphaSynth.output.play'
         });
     }
 
     public pause(): void {
-        this._worker.postMessage({
+        this._main.postMessage({
             cmd: 'alphaSynth.output.pause'
         });
     }
 
     public resetSamples(): void {
-        this._worker.postMessage({
+        this._main.postMessage({
             cmd: 'alphaSynth.output.resetSamples'
         });
     }
@@ -90,7 +97,7 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     }
 
     public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
-        return [];
+        return [] as ISynthOutputDevice[];
     }
     public async setOutputDevice(_device: ISynthOutputDevice | null): Promise<void> {}
     public async getOutputDevice(): Promise<ISynthOutputDevice | null> {

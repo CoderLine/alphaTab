@@ -18,9 +18,9 @@ import { Logger } from '@coderline/alphatab/Logger';
 import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
 import type { IUiFacade } from '@coderline/alphatab/platform/IUiFacade';
 import { AlphaSynthScriptProcessorOutput } from '@coderline/alphatab/platform/javascript/AlphaSynthScriptProcessorOutput';
-import { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/javascript/AlphaSynthWebWorkerApi';
+import { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthWebWorkerApi';
 import type { AlphaTabApi } from '@coderline/alphatab/platform/javascript/AlphaTabApi';
-import { AlphaTabWorkerScoreRenderer } from '@coderline/alphatab/platform/javascript/AlphaTabWorkerScoreRenderer';
+import { AlphaTabWorkerScoreRenderer } from '@coderline/alphatab/platform/worker/AlphaTabWorkerScoreRenderer';
 import type { BrowserMouseEventArgs } from '@coderline/alphatab/platform/javascript/BrowserMouseEventArgs';
 import { Cursors } from '@coderline/alphatab/platform/Cursors';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
@@ -35,7 +35,7 @@ import { AudioElementBackingTrackSynthOutput } from '@coderline/alphatab/platfor
 import { BackingTrackPlayer } from '@coderline/alphatab/synth/BackingTrackPlayer';
 import { CoreSettings, FontFileFormat } from '@coderline/alphatab/CoreSettings';
 import type { IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExporter';
-import { AlphaSynthAudioExporterWorkerApi } from '@coderline/alphatab/platform/javascript/AlphaSynthAudioExporterWorkerApi';
+import { AlphaSynthAudioExporterWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthAudioExporterWorkerApi';
 
 /**
  * @target web

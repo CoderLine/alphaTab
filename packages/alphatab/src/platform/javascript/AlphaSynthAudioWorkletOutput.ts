@@ -1,7 +1,7 @@
 import { CircularSampleBuffer } from '@coderline/alphatab/synth/ds/CircularSampleBuffer';
 import { Environment } from '@coderline/alphatab/Environment';
 import { Logger } from '@coderline/alphatab/Logger';
-import { AlphaSynthWorkerSynthOutput } from '@coderline/alphatab/platform/javascript/AlphaSynthWorkerSynthOutput';
+import { AlphaSynthWorkerSynthOutput } from '@coderline/alphatab/platform/worker/AlphaSynthWorkerSynthOutput';
 import { AlphaSynthWebAudioOutputBase } from '@coderline/alphatab/platform/javascript/AlphaSynthWebAudioOutputBase';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -198,7 +198,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
         super.play();
         const ctx = this.context!;
         // create a script processor node which will replace the silence with the generated audio
-        Environment.createAudioWorklet(ctx, this._settings).then(
+        Environment.createAlphaSynthAudioWorklet(ctx, this._settings).then(
             () => {
                 this._worklet = new AudioWorkletNode(ctx!, 'alphatab', {
                     numberOfOutputs: 1,
@@ -212,7 +212,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
                 this.source!.start(0);
                 this._worklet.connect(ctx!.destination);
             },
-            reason => {
+            (reason:any) => {
                 Logger.error('WebAudio', `Audio Worklet creation failed: reason=${reason}`);
             }
         );
