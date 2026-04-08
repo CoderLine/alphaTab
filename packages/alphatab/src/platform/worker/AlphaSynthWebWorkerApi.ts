@@ -229,7 +229,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    public constructor(player: ISynthOutput, settings: Settings) {
+    public constructor(player: ISynthOutput, settings: Settings, synthWorker: AlphaSynthWorker) {
         this._workerIsReadyForPlayback = false;
         this._workerIsReady = false;
         this._outputIsReady = false;
@@ -244,11 +244,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._output.samplesPlayed.on(this.onOutputSamplesPlayed.bind(this));
         this._output.sampleRequest.on(this.onOutputSampleRequest.bind(this));
         this._output.open(settings.player.bufferTimeInMilliseconds);
-        try {
-            this._synth = Environment.createAlphaSynthWebWorker(settings);
-        } catch (e) {
-            Logger.error('AlphaSynth', `Failed to create WebWorker: ${e}`);
-        }
+        this._synth = synthWorker;
         this._synth.addEventListener('message', e => this.handleWorkerMessage(e));
         this._synth.postMessage({
             cmd: 'alphaSynth.initialize',
@@ -390,7 +386,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 break;
             case 'alphaSynth.midiEventsPlayed':
                 (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(
-                    new MidiEventsPlayedEventArgs((data.events as unknown[]).map(JsonConverter.jsObjectToMidiEvent))
+                    new MidiEventsPlayedEventArgs(data.events.map(JsonConverter.jsObjectToMidiEvent))
                 );
                 break;
             case 'alphaSynth.playerStateChanged':

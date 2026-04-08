@@ -53,25 +53,32 @@ export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
         await this._promise.promise;
     }
 
-    public handleWorkerMessage(e: MessageEvent): void {
-        const data: any = e.data;
+    public handleWorkerMessage(e: MessageEvent<IAlphaSynthWorkerMessage>): void {
+        const data = e.data;
 
-        // for us?
-        if (data.exporterId !== this._exporterId) {
-            return;
-        }
-
-        const cmd: string = data.cmd;
-        switch (cmd) {
+        switch (data.cmd) {
             case 'alphaSynth.exporter.initialized':
+                // for us?
+                if (data.exporterId !== this._exporterId) {
+                    return;
+                }
+
                 this._promise?.resolve(null);
                 this._promise = null;
                 break;
             case 'alphaSynth.exporter.error':
+                // for us?
+                if (data.exporterId !== this._exporterId) {
+                    return;
+                }
                 this._promise?.reject(data.error);
                 this._promise = null;
                 break;
             case 'alphaSynth.exporter.rendered':
+                // for us?
+                if (data.exporterId !== this._exporterId) {
+                    return;
+                }
                 this._promise?.resolve(data.chunk);
                 this._promise = null;
                 break;

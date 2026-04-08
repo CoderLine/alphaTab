@@ -1,17 +1,27 @@
-import { CircularSampleBuffer } from '@coderline/alphatab/synth/ds/CircularSampleBuffer';
 import { Environment } from '@coderline/alphatab/Environment';
 import { Logger } from '@coderline/alphatab/Logger';
-import { AlphaSynthWorkerSynthOutput } from '@coderline/alphatab/platform/worker/AlphaSynthWorkerSynthOutput';
-import { AlphaSynthWebAudioOutputBase } from '@coderline/alphatab/platform/javascript/AlphaSynthWebAudioOutputBase';
-import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 import type { Settings } from '@coderline/alphatab/Settings';
+import { AlphaSynthWebAudioOutputBase } from '@coderline/alphatab/platform/javascript/AlphaSynthWebAudioOutputBase';
+import { BrowserUiFacade } from '@coderline/alphatab/platform/javascript/BrowserUiFacade';
+import type {
+    IAlphaSynthWorkerMessage,
+    IAlphaTabWorker
+} from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import { CircularSampleBuffer } from '@coderline/alphatab/synth/ds/CircularSampleBuffer';
+
+/**
+ * @target web
+ * @internal
+ */
+type AudioWorkletProcessorMessagePort<T> = Omit<IAlphaTabWorker<T>, 'terminate'>;
 
 /**
  * @target web
  * @internal
  */
 interface AudioWorkletProcessor {
-    readonly port: MessagePort;
+    readonly port: AudioWorkletProcessorMessagePort<IAlphaSynthWorkerMessage>;
     process(inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>): boolean;
 }
 
@@ -23,6 +33,14 @@ declare let AudioWorkletProcessor: {
     prototype: AudioWorkletProcessor;
     new (options?: AudioWorkletNodeOptions): AudioWorkletProcessor;
 };
+
+/**
+ * @target web
+ * @internal
+ */
+interface AudioWorkletNode<T> extends AudioNode {
+    readonly port: AudioWorkletProcessorMessagePort<IAlphaSynthWorkerMessage>;
+}
 
 // Bug 646: Safari 14.1 is buggy regarding audio worklets
 // globalThis cannot be used to access registerProcessor or samplerate
@@ -76,22 +94,22 @@ export class AlphaSynthWebWorklet {
                         AlphaSynthWebWorkletProcessor.BufferSize * this._bufferCount
                     );
 
-                    this.port.onmessage = this._handleMessage.bind(this);
+                    this.port.addEventListener('message', e => this._handleMessage(e));
                 }
 
-                private _handleMessage(e: MessageEvent) {
-                    const data: any = e.data;
-                    const cmd: any = data.cmd;
+                private _handleMessage(e: MessageEvent<IAlphaSynthWorkerMessage>) {
+                    const data = e.data;
+                    const cmd = data.cmd;
                     switch (cmd) {
-                        case AlphaSynthWorkerSynthOutput.CmdOutputAddSamples:
+                        case 'alphaSynth.output.addSamples':
                             const f: Float32Array = data.samples;
                             this._circularBuffer.write(f, 0, f.length);
                             this._requestedBufferCount--;
                             break;
-                        case AlphaSynthWorkerSynthOutput.CmdOutputResetSamples:
+                        case 'alphaSynth.output.resetSamples':
                             this._circularBuffer.clear();
                             break;
-                        case AlphaSynthWorkerSynthOutput.CmdOutputStop:
+                        case 'alphaSynth.output.stop':
                             this._isStopped = true;
                             break;
                     }
@@ -139,7 +157,7 @@ export class AlphaSynthWebWorklet {
                     }
 
                     this.port.postMessage({
-                        cmd: AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed,
+                        cmd: 'alphaSynth.output.samplesPlayed',
                         samples: samplesFromBuffer / SynthConstants.AudioChannels
                     });
                     this._requestBuffers();
@@ -161,7 +179,7 @@ export class AlphaSynthWebWorklet {
                     if (bufferedSamples < halfSamples) {
                         for (let i: number = 0; i < halfBufferCount; i++) {
                             this.port.postMessage({
-                                cmd: AlphaSynthWorkerSynthOutput.CmdOutputSampleRequest
+                                cmd: 'alphaSynth.output.sampleRequest'
                             });
                         }
                         this._requestedBufferCount += halfBufferCount;
@@ -179,13 +197,15 @@ export class AlphaSynthWebWorklet {
  * @internal
  */
 export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
-    private _worklet: AudioWorkletNode | null = null;
+    private _worklet: AudioWorkletNode<IAlphaSynthWorkerMessage> | null = null;
     private _bufferTimeInMilliseconds: number = 0;
     private readonly _settings: Settings;
+    private _boundHandleMessage: (e: MessageEvent<IAlphaSynthWorkerMessage>) => void;
 
     public constructor(settings: Settings) {
         super();
         this._settings = settings;
+        this._boundHandleMessage = e => this._handleMessage(e);
     }
 
     public override open(bufferTimeInMilliseconds: number) {
@@ -198,7 +218,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
         super.play();
         const ctx = this.context!;
         // create a script processor node which will replace the silence with the generated audio
-        Environment.createAlphaSynthAudioWorklet(ctx, this._settings).then(
+        BrowserUiFacade.createAlphaSynthAudioWorklet(ctx, this._settings).then(
             () => {
                 this._worklet = new AudioWorkletNode(ctx!, 'alphatab', {
                     numberOfOutputs: 1,
@@ -206,26 +226,27 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
                     processorOptions: {
                         bufferTimeInMilliseconds: this._bufferTimeInMilliseconds
                     }
-                });
-                this._worklet.port.onmessage = this._handleMessage.bind(this);
+                }) as AudioWorkletNode<IAlphaSynthWorkerMessage>;
+
+                this._worklet.port.addEventListener('message', this._boundHandleMessage);
                 this.source!.connect(this._worklet);
                 this.source!.start(0);
                 this._worklet.connect(ctx!.destination);
             },
-            (reason:any) => {
+            (reason: any) => {
                 Logger.error('WebAudio', `Audio Worklet creation failed: reason=${reason}`);
             }
         );
     }
 
-    private _handleMessage(e: MessageEvent) {
-        const data: any = e.data;
-        const cmd: any = data.cmd;
+    private _handleMessage(e: MessageEvent<IAlphaSynthWorkerMessage>) {
+        const data = e.data;
+        const cmd = data.cmd;
         switch (cmd) {
-            case AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed:
+            case 'alphaSynth.output.samplesPlayed':
                 this.onSamplesPlayed(data.samples);
                 break;
-            case AlphaSynthWorkerSynthOutput.CmdOutputSampleRequest:
+            case 'alphaSynth.output.sampleRequest':
                 this.onSampleRequest();
                 break;
         }
@@ -235,9 +256,9 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
         super.pause();
         if (this._worklet) {
             this._worklet.port.postMessage({
-                cmd: AlphaSynthWorkerSynthOutput.CmdOutputStop
+                cmd: 'alphaSynth.output.stop'
             });
-            this._worklet.port.onmessage = null;
+            this._worklet.port.removeEventListener('message', this._boundHandleMessage);
             this._worklet.disconnect();
         }
         this._worklet = null;
@@ -245,14 +266,14 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
 
     public addSamples(f: Float32Array): void {
         this._worklet?.port.postMessage({
-            cmd: AlphaSynthWorkerSynthOutput.CmdOutputAddSamples,
+            cmd: 'alphaSynth.output.addSamples',
             samples: Environment.prepareForPostMessage(f)
         });
     }
 
     public resetSamples(): void {
         this._worklet?.port.postMessage({
-            cmd: AlphaSynthWorkerSynthOutput.CmdOutputResetSamples
+            cmd: 'alphaSynth.output.resetSamples'
         });
     }
 }

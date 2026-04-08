@@ -103,17 +103,17 @@ export class BoundsLookup {
                         );
                         bb.realBounds = BoundsLookup._boundsFromJson(beat.get('realBounds') as Map<string, unknown>);
                         bb.onNotesX = beat.get('onNotesX') as number;
-                        const bd: any = beat;
                         bb.beat =
-                            score.tracks[bd.trackIndex].staves[bd.staffIndex].bars[bd.barIndex].voices[
-                                bd.voiceIndex
-                            ].beats[bd.beatIndex];
+                            score.tracks[beat.get('trackIndex') as number].staves[
+                                beat.get('staffIndex') as number
+                            ].bars[beat.get('barIndex') as number].voices[beat.get('voiceIndex') as number].beats[
+                                beat.get('beatIndex') as number
+                            ];
                         if (beat.has('notes')) {
                             bb.notes = [];
                             for (const note of beat.get('notes') as Map<string, unknown>[]) {
                                 const n: NoteBounds = new NoteBounds();
-                                const nd: any = note;
-                                n.note = bb.beat.notes[nd.index];
+                                n.note = bb.beat.notes[note.get('index') as number];
                                 n.noteHeadBounds = BoundsLookup._boundsFromJson(
                                     note.get('noteHeadBounds') as Map<string, unknown>
                                 );

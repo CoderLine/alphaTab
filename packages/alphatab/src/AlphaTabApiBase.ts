@@ -395,7 +395,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         this.container.resize.on(
-            Environment.throttle(() => {
+            this.uiFacade.throttle(() => {
                 if (this._isDestroyed) {
                     return;
                 }

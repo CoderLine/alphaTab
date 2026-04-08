@@ -1,23 +1,22 @@
 import type { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
+import { Environment } from '@coderline/alphatab/Environment';
 import {
     EventEmitter,
-    type IEventEmitterOfT,
+    EventEmitterOfT,
     type IEventEmitter,
-    EventEmitterOfT
+    type IEventEmitterOfT
 } from '@coderline/alphatab/EventEmitter';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
-import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
-import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
-import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
-import type { Settings } from '@coderline/alphatab/Settings';
-import { Logger } from '@coderline/alphatab/Logger';
-import { Environment } from '@coderline/alphatab/Environment';
 import type {
     AlphaTabWorker,
     IAlphaTabWorkerMessage
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @public
@@ -29,15 +28,9 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
 
     public boundsLookup: BoundsLookup | null = null;
 
-    public constructor(api: AlphaTabApiBase<T>, settings: Settings) {
+    public constructor(api: AlphaTabApiBase<T>, settings: Settings, worker: AlphaTabWorker) {
         this._api = api;
-
-        try {
-            this._worker = Environment.createAlphaTabWebWorker(settings);
-        } catch (e) {
-            Logger.error('Rendering', `Failed to create WebWorker: ${e}`);
-            return;
-        }
+        this._worker = worker;
         this._worker.postMessage({
             cmd: 'alphaTab.initialize',
             settings: this._serializeSettingsForWorker(settings)

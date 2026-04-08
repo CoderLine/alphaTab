@@ -16,30 +16,22 @@ import type { ISynthOutput, ISynthOutputDevice } from '@coderline/alphatab/synth
  * @internal
  */
 export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
-    public static readonly CmdOutputPrefix: string = 'alphaSynth.output.';
-    public static readonly CmdOutputAddSamples: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}addSamples`;
-    public static readonly CmdOutputPlay: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}play`;
-    public static readonly CmdOutputPause: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}pause`;
-    public static readonly CmdOutputResetSamples: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}resetSamples`;
-    public static readonly CmdOutputStop: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}stop`;
-    public static readonly CmdOutputSampleRequest: string =
-        `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}sampleRequest`;
-    public static readonly CmdOutputSamplesPlayed: string =
-        `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}samplesPlayed`;
-
     // this value is initialized by the alphaSynth WebWorker wrapper
     // that also includes the alphaSynth library into the worker.
     public static preferredSampleRate: number = 0;
 
-    private _main!: IAlphaTabWorkerGlobalScope<IAlphaSynthWorkerMessage>;
+    private _main: IAlphaTabWorkerGlobalScope<IAlphaSynthWorkerMessage>;
 
     public get sampleRate(): number {
         return AlphaSynthWorkerSynthOutput.preferredSampleRate;
     }
 
-    public open(): void {
+    public constructor(main: IAlphaTabWorkerGlobalScope<IAlphaSynthWorkerMessage>) {
+        this._main = main;
+    }
+
+    public open(_sampleRate: number): void {
         Logger.debug('AlphaSynth', 'Initializing synth worker');
-        this._main = Environment.globalThis;
         this._main.addEventListener('message', this._handleMessage.bind(this));
         (this.ready as EventEmitter).trigger();
     }
@@ -50,14 +42,13 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
         });
     }
 
-    private _handleMessage(e: MessageEvent): void {
-        const data: any = e.data;
-        const cmd: any = data.cmd;
-        switch (cmd) {
-            case AlphaSynthWorkerSynthOutput.CmdOutputSampleRequest:
+    private _handleMessage(e: MessageEvent<IAlphaSynthWorkerMessage>): void {
+        const data = e.data;
+        switch (data.cmd) {
+            case 'alphaSynth.output.sampleRequest':
                 (this.sampleRequest as EventEmitter).trigger();
                 break;
-            case AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed:
+            case 'alphaSynth.output.samplesPlayed':
                 (this.samplesPlayed as EventEmitterOfT<number>).trigger(data.samples);
                 break;
         }

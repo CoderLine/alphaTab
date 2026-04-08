@@ -36,6 +36,9 @@ export type IAlphaTabWorkerMessage =
     | { cmd: 'alphaTab.postRenderFinished'; boundsLookup: Map<string, unknown> | null }
     | { cmd: 'alphaTab.error'; error: Error };
 
+/**
+ * @internal
+ */
 export interface IAlphaTabWorker<T> {
     postMessage(message: T): void;
     addEventListener(event: 'message', handler: (ev: MessageEvent<T>) => void): void;
@@ -43,7 +46,10 @@ export interface IAlphaTabWorker<T> {
     terminate(): void;
 }
 
-export interface IAlphaTabWorkerGlobalScope<T> {
+/**
+ * @internal
+ */
+export interface IAlphaTabWorkerGlobalScope<T> {    
     postMessage(message: T): void;
     addEventListener(event: 'message', handler: (ev: MessageEvent<T>) => void): void;
     removeEventListener(event: 'message', handler: (ev: MessageEvent<T>) => void): void;
@@ -121,6 +127,7 @@ export type IAlphaSynthWorkerMessage =
     | { cmd: 'alphaSynth.output.addSamples'; samples: Float32Array }
     | { cmd: 'alphaSynth.output.play' }
     | { cmd: 'alphaSynth.output.pause' }
+    | { cmd: 'alphaSynth.output.stop' }
     | { cmd: 'alphaSynth.output.destroy' }
     | { cmd: 'alphaSynth.output.resetSamples' };
 

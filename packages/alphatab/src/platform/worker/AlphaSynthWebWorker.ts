@@ -28,12 +28,8 @@ export class AlphaSynthWebWorker {
         main.addEventListener('message', e => this.handleMessage(e));
     }
 
-    /**
-     * @target web
-     * @partial
-     */
     public static init(): void {
-        new AlphaSynthWebWorker(Environment.globalThis);
+        new AlphaSynthWebWorker(Environment.getGlobalWorkerScope<IAlphaSynthWorkerMessage>());
     }
 
     public handleMessage(e: MessageEvent<IAlphaSynthWorkerMessage>): void {
@@ -42,7 +38,10 @@ export class AlphaSynthWebWorker {
             case 'alphaSynth.initialize':
                 AlphaSynthWorkerSynthOutput.preferredSampleRate = data.sampleRate;
                 Logger.logLevel = data.logLevel;
-                this._player = new AlphaSynth(new AlphaSynthWorkerSynthOutput(), data.bufferTimeInMilliseconds);
+                this._player = new AlphaSynth(
+                    new AlphaSynthWorkerSynthOutput(this._main),
+                    data.bufferTimeInMilliseconds
+                );
                 this._player.positionChanged.on(e => this.onPositionChanged(e));
                 this._player.stateChanged.on(e => this.onPlayerStateChanged(e));
                 this._player.finished.on(() => this.onFinished());
@@ -142,15 +141,16 @@ export class AlphaSynthWebWorker {
             this._handleExporterMessage(e);
         }
     }
-    private _handleExporterMessage(e: MessageEvent<IAlphaSynthWorkerMessage>) {
-        const data = e.data;
+    private _handleExporterMessage(ev: MessageEvent<IAlphaSynthWorkerMessage>) {
+        const data = ev.data;
         const cmd = data.cmd;
+        let exporter:IAlphaSynthAudioExporter|undefined = undefined;
         let exporterId = 0;
         try {
             switch (cmd) {
                 case 'alphaSynth.exporter.initialize':
                     exporterId = data.exporterId;
-                    const exporter = this._player.exportAudio(
+                    exporter = this._player.exportAudio(
                         data.options,
                         JsonConverter.jsObjectToMidiFile(data.midi),
                         data.syncPoints,
@@ -167,7 +167,7 @@ export class AlphaSynthWebWorker {
                 case 'alphaSynth.exporter.render':
                     exporterId = data.exporterId;
                     if (this._exporter.has(data.exporterId)) {
-                        const exporter = this._exporter.get(data.exporterId)!;
+                        exporter = this._exporter.get(data.exporterId)!;
                         const chunk = exporter.render(data.milliseconds);
                         this._main.postMessage({
                             cmd: 'alphaSynth.exporter.rendered',

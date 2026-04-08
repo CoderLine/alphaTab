@@ -13,7 +13,7 @@ import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
- * @public
+ * @internal
  * @partial
  */
 export class AlphaTabWebWorker {
@@ -25,16 +25,12 @@ export class AlphaTabWebWorker {
         main.addEventListener('message', e => this._handleMessage(e));
     }
 
-    /**
-     * @target web
-     * @partial
-     */
     public static init(): void {
-        new AlphaTabWebWorker(Environment.globalThis);
+        new AlphaTabWebWorker(Environment.getGlobalWorkerScope<IAlphaTabWorkerMessage>());
     }
 
-    private _handleMessage(e: MessageEvent): void {
-        const data = e.data as IAlphaTabWorkerMessage;
+    private _handleMessage(e: MessageEvent<IAlphaTabWorkerMessage>): void {
+        const data = e.data;
         if (!data?.cmd) {
             return;
         }
