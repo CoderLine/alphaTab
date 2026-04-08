@@ -256,7 +256,7 @@ export default abstract class AstPrinterBase {
 
         if (expr.nullSafe) {
             this.write('?.');
-            this.write(this._context.toMethodName('invoke'));
+            this.write(this._context.toMethodNameCase('invoke'));
         }
 
         this.write('(');

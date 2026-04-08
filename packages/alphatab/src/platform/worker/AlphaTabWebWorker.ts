@@ -85,7 +85,7 @@ export class AlphaTabWebWorker {
                 break;
             case 'alphaTab.renderScore':
                 this._updateFontSizes(data.fontSizes);
-                const score: any =
+                const score =
                     data.score == null ? null : JsonConverter.jsObjectToScore(data.score, this._renderer.settings);
                 this._renderMultiple(score, data.trackIndexes);
                 break;

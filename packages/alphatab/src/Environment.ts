@@ -174,6 +174,7 @@ export class Environment {
     /**
      * @target web
      * @internal
+     * @partial
      */
     public static getGlobalWorkerScope<T>(): IAlphaTabWorkerGlobalScope<T> {
         return Environment.globalThis;

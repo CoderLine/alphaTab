@@ -1,0 +1,150 @@
+package alphaTab.platform.android
+
+import alphaTab.core.ecmaScript.MessageEvent
+import alphaTab.platform.worker.AlphaSynthWebWorker
+import alphaTab.platform.worker.IAlphaSynthWorker
+import alphaTab.platform.worker.IAlphaSynthWorkerMessage
+import alphaTab.platform.worker.IAlphaTabRenderingWorker
+import alphaTab.platform.worker.IAlphaTabWorker
+import alphaTab.platform.worker.IAlphaTabWorkerGlobalScope
+import alphaTab.platform.worker.IAlphaTabWorkerMessage
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.Semaphore
+import kotlin.contracts.ExperimentalContracts
+
+@OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
+internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
+    private val _postToMain: (action: () -> Unit) -> Unit
+    private val _workerThread: Thread
+    private val _workerQueue = LinkedBlockingQueue<() -> Unit>()
+    private var _isCancelled = false
+    private val _threadStartedEvent = Semaphore(1)
+    private val _listenerInsideWorker = ArrayList<(ev: MessageEvent<T>) -> Unit>()
+    private val _listenerOutsideWorker = ArrayList<(ev: MessageEvent<T>) -> Unit>()
+
+    protected constructor(postToMain: (action: () -> Unit) -> Unit) {
+        _postToMain = postToMain;
+
+        _workerThread = Thread(this)
+        _workerThread.isDaemon = true
+        _workerThread.start()
+
+        _threadStartedEvent.acquire()
+    }
+
+    protected abstract fun onStartInsideWorker()
+
+    override fun run() {
+        _threadStartedEvent.release();
+        onStartInsideWorker();
+        while (!_isCancelled) {
+            try {
+                val item = _workerQueue.take();
+                if (!_isCancelled && item != null) {
+                    item()
+                }
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+                break;
+            }
+        }
+    }
+
+    override fun postMessage(message: T) {
+        val ev = MessageEvent(message);
+        if (Thread.currentThread().id == _workerThread.id) {
+            // Inside Worker -> Post to main
+            _postToMain(
+                {
+                    for (listener in _listenerOutsideWorker) {
+                        listener(ev);
+                    }
+                });
+        } else {
+            // Outside Worker -> Post to worker
+            postToWorker(
+                {
+                    for (listener in _listenerInsideWorker) {
+                        listener(ev);
+                    }
+                });
+        }
+    }
+
+    public fun postToWorker(action: () -> Unit) {
+        _workerQueue.add(action);
+    }
+
+    public override fun addEventListener(event: String, handler: (ev: MessageEvent<T>) -> Unit) {
+        if (event != "message") {
+            return;
+        }
+        val listeners = if (Thread.currentThread().id == _workerThread.id) {
+            _listenerInsideWorker
+        } else {
+            _listenerOutsideWorker
+        };
+        listeners.add(handler);
+    }
+
+    override fun removeEventListener(event: String, handler: (arg1: MessageEvent<T>) -> Unit) {
+        if (event != "message") {
+            return;
+        }
+        val listeners = if (Thread.currentThread().id == _workerThread.id) {
+            _listenerInsideWorker
+        } else {
+            _listenerOutsideWorker
+        };
+        listeners.remove(handler);
+    }
+
+    override fun terminate() {
+        _isCancelled = true
+        _workerThread.interrupt()
+        _workerThread.join()
+    }
+}
+
+@OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
+internal class JavaThreadAlphaTabRendererWorker(postToMain: (action: () -> Unit) -> Unit) :
+    JavaThreadWorkerBase<IAlphaTabWorkerMessage>(postToMain),
+    IAlphaTabRenderingWorker,
+    IAlphaTabWorkerGlobalScope<IAlphaTabWorkerMessage> {
+    companion object {
+        private val workerLookup = ConcurrentHashMap<Long, JavaThreadAlphaTabRendererWorker>()
+
+        val currentThreadWorker: JavaThreadAlphaTabRendererWorker?
+            get() {
+                return workerLookup.getOrDefault(Thread.currentThread().id, null)
+            }
+    }
+
+    @OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
+    override fun onStartInsideWorker() {
+        workerLookup[Thread.currentThread().id] = this;
+        AlphaSynthWebWorker.init();
+    }
+}
+
+@OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
+internal class JavaThreadAlphaSynthWorker(postToMain: (action: () -> Unit) -> Unit) :
+    JavaThreadWorkerBase<IAlphaSynthWorkerMessage>(postToMain),
+    IAlphaSynthWorker,
+    IAlphaTabWorkerGlobalScope<IAlphaSynthWorkerMessage> {
+    companion object {
+        private val workerLookup = ConcurrentHashMap<Long, JavaThreadAlphaSynthWorker>()
+
+        val currentThreadWorker: JavaThreadAlphaSynthWorker?
+            get() {
+                return workerLookup.getOrDefault(Thread.currentThread().id, null)
+            }
+    }
+
+    @OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
+    override fun onStartInsideWorker() {
+        workerLookup[Thread.currentThread().id] = this;
+        AlphaSynthWebWorker.init();
+    }
+}

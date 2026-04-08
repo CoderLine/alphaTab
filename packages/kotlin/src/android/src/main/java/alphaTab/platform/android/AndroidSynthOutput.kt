@@ -19,8 +19,7 @@ import kotlin.math.min
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
 internal class AndroidSynthOutput(
-    private val context: Context,
-    private val synthInvoke: (action: (() -> Unit)) -> Unit
+    private val context: Context
 ) : ISynthOutput {
     companion object {
         private const val BufferSize = 4096
@@ -56,9 +55,7 @@ internal class AndroidSynthOutput(
     }
 
     private fun onReady() {
-        synthInvoke {
-            (ready as EventEmitter).trigger()
-        }
+        (ready as EventEmitter).trigger()
     }
 
     override fun destroy() {
@@ -103,15 +100,11 @@ internal class AndroidSynthOutput(
     }
 
     private fun onSampleRequest() {
-        synthInvoke {
-            (sampleRequest as EventEmitter).trigger()
-        }
+        (sampleRequest as EventEmitter).trigger()
     }
 
     internal fun onSamplesPlayed(samples: Int) {
-        synthInvoke {
-            (samplesPlayed as EventEmitterOfT<Double>).trigger(samples.toDouble())
-        }
+        (samplesPlayed as EventEmitterOfT<Double>).trigger(samples.toDouble())
     }
 
     fun read(buffer: FloatArray, offset: Int, sampleCount: Int): Int {

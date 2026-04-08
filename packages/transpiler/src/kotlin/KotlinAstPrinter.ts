@@ -241,6 +241,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     }
 
     protected writeInterfaceDeclaration(d: cs.InterfaceDeclaration) {
+        this._currentType = d;
         this.writeDocumentation(d);
 
         this.writeLine('@kotlin.contracts.ExperimentalContracts');
@@ -264,9 +265,11 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
 
         this.endBlock();
+        this._currentType = undefined;
     }
 
     protected writeEnumDeclaration(d: cs.EnumDeclaration) {
+        this._currentType = d;
         this._forceInteger = true;
         this.writeDocumentation(d);
         this.writeAttributes(d);
@@ -332,9 +335,12 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         this.endBlock();
         this._forceInteger = false;
+        this._currentType = undefined;
     }
 
+    private _currentType: cs.NamedTypeDeclaration | undefined = undefined;
     protected writeClassDeclaration(d: cs.ClassDeclaration) {
+        this._currentType = d;
         this.writeDocumentation(d);
         this.writeAttributes(d);
         this.writeLine('@kotlin.contracts.ExperimentalContracts');
@@ -465,6 +471,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
 
         this.endBlock();
+        this._currentType = undefined;
     }
 
     protected writeAttribute(a: cs.Attribute): void {
@@ -523,6 +530,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             this.write(' = iterator');
             this._thisScope.push((d.parent as cs.NamedTypeDeclaration).name);
         }
+
         this.writeBody(d.body);
         if (d.isGeneratorFunction) {
             this._thisScope.pop();
@@ -627,7 +635,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeType(d.type);
 
         const needsInitializer =
-            isAutoProperty && d.type.isNullable && d.parent!.nodeType !== cs.SyntaxKind.InterfaceDeclaration &&
+            isAutoProperty &&
+            d.type.isNullable &&
+            d.parent!.nodeType !== cs.SyntaxKind.InterfaceDeclaration &&
             !d.isAbstract;
 
         let initializerWritten = false;
@@ -1372,6 +1382,25 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.write('(');
         this.writeCommaSeparated(expr.arguments, a => this.writeExpression(a));
         this.write(')');
+
+        if (expr.objectInitializers?.length) {
+            this.write('.apply ');
+            this.beginBlock();
+
+            this._thisScope.push(this._currentType!.name);
+
+            for (const a of expr.objectInitializers!) {
+                this.write('this.');
+                this.write(a.label);
+                this.write(' = ');
+                this.writeExpression(a.expression);
+                this.writeLine();
+            }
+
+            this._thisScope.pop();
+
+            this.endBlock();
+        }
     }
 
     protected writeCastExpression(expr: cs.CastExpression) {
@@ -2043,6 +2072,14 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 this.write('>');
             }
             this.writeBlock(expr.arguments[0] as cs.Block);
+        } else if (
+            expr.arguments.length === 1 &&
+            cs.isMemberAccessExpression(expr.expression) &&
+            expr.expression.member === 'suspendToDeferred'
+        ) {
+            this._thisScope.push(this._currentType!.name);
+            super.writeInvocationExpression(expr);
+            this._thisScope.pop();
         } else {
             super.writeInvocationExpression(expr);
         }

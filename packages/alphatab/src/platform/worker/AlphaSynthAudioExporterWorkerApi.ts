@@ -21,7 +21,7 @@ export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
     private _exporterId: number;
     private _ownsWorker: boolean;
 
-    private _promise: PromiseWithResolvers<any> | null = null;
+    private _promise: PromiseWithResolvers<unknown> | null = null;
 
     public constructor(synthWorker: AlphaSynthWebWorkerApi, ownsWorker: boolean) {
         this._exporterId = AlphaSynthAudioExporterWorkerApi._nextExporterId++;
@@ -103,7 +103,8 @@ export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
             exporterId: this._exporterId,
             milliseconds: milliseconds
         });
-        return (await this._promise.promise) as AudioExportChunk | undefined;
+        const result = await this._promise.promise;
+        return result as AudioExportChunk | undefined;
     }
 
     destroy(): void {

@@ -87,24 +87,20 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
 
     public void AddEventListener(string @event, Action<MessageEvent<T>> handler)
     {
+        if (@event != "message") return;
         var listeners = Thread.CurrentThread.ManagedThreadId == _workerThread.ManagedThreadId
             ? _listenerInsideWorker
             : _listenerOutsideWorker;
-        if (@event == "message")
-        {
-            listeners.Add(handler);
-        }
+        listeners.Add(handler);
     }
 
     public void RemoveEventListener(string @event, Action<MessageEvent<T>> handler)
     {
+        if (@event != "message") return;
         var listeners = Thread.CurrentThread.ManagedThreadId == _workerThread.ManagedThreadId
             ? _listenerInsideWorker
             : _listenerOutsideWorker;
-        if (@event == "message")
-        {
-            listeners.Remove(handler);
-        }
+        listeners.Remove(handler);
     }
 
     public virtual void Terminate()
@@ -132,7 +128,7 @@ internal class ManagedThreadAlphaTabRendererWorker :
     protected override void OnStartInsideWorker()
     {
         WorkerLookup[Thread.CurrentThread.ManagedThreadId] = this;
-        AlphaSynthWebWorker.Init();
+        AlphaTabWebWorker.Init();
     }
 }
 
@@ -154,6 +150,6 @@ internal class ManagedThreadAlphaSynthWorker :
     protected override void OnStartInsideWorker()
     {
         WorkerLookup[Thread.CurrentThread.ManagedThreadId] = this;
-        AlphaTabWebWorker.Init();
+        AlphaSynthWebWorker.Init();
     }
 }
