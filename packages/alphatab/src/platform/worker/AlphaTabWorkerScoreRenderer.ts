@@ -105,8 +105,11 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
                 (this.renderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(data.result);
                 break;
             case 'alphaTab.postRenderFinished':
-                this.boundsLookup = BoundsLookup.fromJson(data.boundsLookup, this._api.score!);
-                this.boundsLookup?.finish();
+                const score = this._api.score;
+                if (score && data.boundsLookup) {
+                    this.boundsLookup = BoundsLookup.fromJson(data.boundsLookup, this._api.score!);
+                    this.boundsLookup?.finish();
+                }
                 (this.postRenderFinished as EventEmitter).trigger();
                 break;
             case 'alphaTab.error':
