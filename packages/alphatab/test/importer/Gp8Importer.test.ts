@@ -504,4 +504,10 @@ describe('Gp8ImporterTest', () => {
         expect(score.masterBars[5].beamingRules!.groups.has(Duration.Eighth)).to.be.true;
         expect(score.masterBars[5].beamingRules!.groups.get(Duration.Eighth)!.join(',')).to.be.equal('4,4');
     });
+
+    it('harmonics-lowercase', async () => {
+        const reader = await prepareImporterWithFile('guitarpro8/harmonics-lowercase.gp');
+        const score = reader.readScore();
+        GpImporterTestHelper.checkHarmonics(score);
+    });
 });

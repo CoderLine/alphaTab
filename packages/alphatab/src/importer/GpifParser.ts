@@ -2393,26 +2393,26 @@ export class GpifParser {
                         case 'HarmonicType':
                             const htype = c.findChildElement('HType');
                             if (htype) {
-                                switch (htype.innerText) {
-                                    case 'NoHarmonic':
+                                switch (htype.innerText.toLowerCase()) {
+                                    case 'noharmonic':
                                         note.harmonicType = HarmonicType.None;
                                         break;
-                                    case 'Natural':
+                                    case 'natural':
                                         note.harmonicType = HarmonicType.Natural;
                                         break;
-                                    case 'Artificial':
+                                    case 'artificial':
                                         note.harmonicType = HarmonicType.Artificial;
                                         break;
-                                    case 'Pinch':
+                                    case 'pinch':
                                         note.harmonicType = HarmonicType.Pinch;
                                         break;
-                                    case 'Tap':
+                                    case 'tap':
                                         note.harmonicType = HarmonicType.Tap;
                                         break;
-                                    case 'Semi':
+                                    case 'semi':
                                         note.harmonicType = HarmonicType.Semi;
                                         break;
-                                    case 'Feedback':
+                                    case 'feedback':
                                         note.harmonicType = HarmonicType.Feedback;
                                         break;
                                 }
