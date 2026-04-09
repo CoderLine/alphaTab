@@ -325,7 +325,7 @@ export class AlphaSynthBase implements IAlphaSynth {
         if (this._countInVolume > 0) {
             Logger.debug('AlphaSynth', 'Starting countin');
             this.sequencer.startCountIn();
-            this.synthesizer.setupMetronomeChannel(this._countInVolume);
+            this.synthesizer.setupMetronomeChannel(this.sequencer.metronomeChannel, this._countInVolume);
             this.updateTimePosition(0, true);
         }
 
@@ -340,7 +340,7 @@ export class AlphaSynthBase implements IAlphaSynth {
         }
 
         Logger.debug('AlphaSynth', 'Starting playback');
-        this.synthesizer.setupMetronomeChannel(this.metronomeVolume);
+        this.synthesizer.setupMetronomeChannel(this.sequencer.metronomeChannel, this.metronomeVolume);
         this._synthStopping = false;
         this.state = PlayerState.Playing;
         (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
@@ -442,7 +442,7 @@ export class AlphaSynthBase implements IAlphaSynth {
 
     private _checkReadyForPlayback(): void {
         if (this.isReadyForPlayback) {
-            this.synthesizer.setupMetronomeChannel(this.metronomeVolume);
+            this.synthesizer.setupMetronomeChannel(this.sequencer.metronomeChannel, this.metronomeVolume);
             const programs = this.sequencer.instrumentPrograms;
             const percussionKeys = this.sequencer.percussionKeys;
             let append = false;
@@ -875,7 +875,7 @@ export class AlphaSynthAudioExporter implements IAlphaSynthAudioExporter {
     private _generatedAudioEndTime: number = 0;
 
     public setup() {
-        this._synth.setupMetronomeChannel(this._synth.metronomeVolume);
+        this._synth.setupMetronomeChannel(this._sequencer.metronomeChannel, this._synth.metronomeVolume);
 
         const syncPoints = this._sequencer.currentSyncPoints;
         const alphaTabEndTime = this._sequencer.currentEndTime;

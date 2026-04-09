@@ -51,6 +51,7 @@ class MidiSequencerState {
     public endTime: number = 0;
     public currentTempo: number = 0;
     public syncPointTempo: number = 0;
+    public metronomeChannel: number = SynthConstants.DefaultChannelCount - 1;
 }
 
 /**
@@ -64,6 +65,10 @@ export class MidiFileSequencer {
     private _mainState: MidiSequencerState;
     private _oneTimeState: MidiSequencerState | null = null;
     private _countInState: MidiSequencerState | null = null;
+
+    public get metronomeChannel() {
+        return this._mainState.metronomeChannel;
+    }
 
     public get isPlayingMain(): boolean {
         return this._currentState === this._mainState;
@@ -171,7 +176,7 @@ export class MidiFileSequencer {
                 const metronomeVolume: number = this._synthesizer.metronomeVolume;
                 this._synthesizer.noteOffAll(true);
                 this._synthesizer.resetSoft();
-                this._synthesizer.setupMetronomeChannel(metronomeVolume);
+                this._synthesizer.setupMetronomeChannel(this.metronomeChannel, metronomeVolume);
             }
             this._mainSilentProcess(timePosition);
         }
@@ -239,6 +244,8 @@ export class MidiFileSequencer {
         let metronomeTick: number = midiFile.tickShift; // shift metronome to content
         let metronomeTime: number = 0.0;
 
+        let maxChannel = 0;
+
         let previousTick: number = 0;
         for (const mEvent of midiFile.events) {
             const synthData: SynthEvent = new SynthEvent(state.synthData.length, mEvent);
@@ -287,6 +294,9 @@ export class MidiFileSequencer {
                 if (!state.firstProgramEventPerChannel.has(channel)) {
                     state.firstProgramEventPerChannel.set(channel, synthData);
                 }
+                if (channel > maxChannel) {
+                    maxChannel = channel;
+                }
                 const isPercussion = channel === SynthConstants.PercussionChannel;
                 if (!isPercussion) {
                     this.instrumentPrograms.add(programChange.program);
@@ -296,6 +306,9 @@ export class MidiFileSequencer {
                 const isPercussion = noteOn.channel === SynthConstants.PercussionChannel;
                 if (isPercussion) {
                     this.percussionKeys.add(noteOn.noteKey);
+                }
+                if (noteOn.channel > maxChannel) {
+                    maxChannel = noteOn.channel;
                 }
             }
         }
@@ -314,6 +327,7 @@ export class MidiFileSequencer {
         });
         state.endTime = absTime;
         state.endTick = absTick;
+        state.metronomeChannel = maxChannel + 1;
 
         return state;
     }

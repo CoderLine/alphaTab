@@ -81,7 +81,7 @@ class BackingTrackAudioSynthesizer implements IAudioSampleSynthesizer {
         // not supported, ignore
     }
 
-    public setupMetronomeChannel(_metronomeVolume: number): void {
+    public setupMetronomeChannel(_metronomeChannel: number, _metronomeVolume: number): void {
         // not supported, ignore
     }
 
