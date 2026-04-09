@@ -26,6 +26,7 @@ import alphaTab.synth.IAudioExporterWorker
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -54,6 +55,8 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
     private val _renderSurface: AlphaTabRenderSurface
     private val _renderWrapper: RelativeLayout
 
+    private val _uiLooper:Handler;
+
     public constructor(
         outerScroll: SuspendableHorizontalScrollView,
         innerScroll: SuspendableScrollView,
@@ -64,6 +67,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         _innerScroll = innerScroll
         _renderSurface = renderSurface
         _renderWrapper = renderWrapper
+        _uiLooper = Handler(Looper.getMainLooper())
 
         rootContainer =
             AndroidRootViewContainer(outerScroll, innerScroll, renderSurface, this::beginInvoke)
@@ -163,7 +167,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
     }
 
     private fun postToUIThread(action: () -> Unit) {
-        this._renderSurface.post(action)
+        _uiLooper.post(action)
     }
 
     private fun openDefaultSoundFont(): InputStream {
