@@ -17,7 +17,7 @@ import kotlin.contracts.ExperimentalContracts
 @OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
 internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
     private val _postToMain: (action: () -> Unit) -> Unit
-    private val _workerThread: Thread
+    protected val workerThread: Thread
     private val _workerQueue = LinkedBlockingQueue<() -> Unit>()
     private var _isCancelled = false
     private val _threadStartedEvent = Semaphore(1)
@@ -29,9 +29,9 @@ internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
     protected constructor(postToMain: (action: () -> Unit) -> Unit) {
         _postToMain = postToMain;
 
-        _workerThread = Thread(this)
-        _workerThread.isDaemon = true
-        _workerThread.start()
+        workerThread = Thread(this)
+        workerThread.isDaemon = true
+        workerThread.start()
 
         _threadStartedEvent.acquire()
     }
@@ -56,7 +56,7 @@ internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
 
     override fun postMessage(message: T) {
         val ev = MessageEvent(message);
-        if (Thread.currentThread().id == _workerThread.id) {
+        if (Thread.currentThread().id == workerThread.id) {
             // Inside Worker -> Post to main
             _postToMain(
                 {
@@ -83,7 +83,7 @@ internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
         if (event != "message") {
             return;
         }
-        val listeners = if (Thread.currentThread().id == _workerThread.id) {
+        val listeners = if (Thread.currentThread().id == workerThread.id) {
             _listenerInsideWorker
         } else {
             _listenerOutsideWorker
@@ -95,7 +95,7 @@ internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
         if (event != "message") {
             return;
         }
-        val listeners = if (Thread.currentThread().id == _workerThread.id) {
+        val listeners = if (Thread.currentThread().id == workerThread.id) {
             _listenerInsideWorker
         } else {
             _listenerOutsideWorker
@@ -105,8 +105,8 @@ internal abstract class JavaThreadWorkerBase<T> : IAlphaTabWorker<T>, Runnable {
 
     override fun terminate() {
         _isCancelled = true
-        _workerThread.interrupt()
-        _workerThread.join()
+        workerThread.interrupt()
+        workerThread.join()
         _workerQueue.clear()
     }
 }
@@ -130,6 +130,11 @@ internal class JavaThreadAlphaTabRendererWorker(postToMain: (action: () -> Unit)
         workerLookup[Thread.currentThread().id] = this;
         AlphaTabWebWorker.init();
     }
+
+    override fun terminate() {
+        super.terminate()
+        workerLookup.remove(workerThread.id)
+    }
 }
 
 @OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
@@ -150,5 +155,10 @@ internal class JavaThreadAlphaSynthWorker(postToMain: (action: () -> Unit) -> Un
     override fun onStartInsideWorker() {
         workerLookup[Thread.currentThread().id] = this;
         AlphaSynthWebWorker.init();
+    }
+
+    override fun terminate() {
+        super.terminate()
+        workerLookup.remove(workerThread.id)
     }
 }

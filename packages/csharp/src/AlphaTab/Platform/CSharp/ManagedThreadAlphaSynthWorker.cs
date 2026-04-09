@@ -8,12 +8,13 @@ namespace AlphaTab.Platform.CSharp;
 internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
 {
     private readonly Action<Action> _postToMain;
-    private readonly Thread _workerThread;
     private readonly BlockingCollection<Action> _workerQueue;
     private readonly CancellationTokenSource _workerCancellationToken;
     private readonly ManualResetEventSlim? _threadStartedEvent;
     private readonly ConcurrentDictionary<Action<MessageEvent<T>>,Action<MessageEvent<T>>> _listenerInsideWorker = new();
     private readonly ConcurrentDictionary<Action<MessageEvent<T>>,Action<MessageEvent<T>>> _listenerOutsideWorker = new();
+
+    protected Thread WorkerThread { get; }
 
     protected ManagedThreadWorkerBase(Action<Action> postToMain)
     {
@@ -22,11 +23,11 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
         _workerQueue = new BlockingCollection<Action>();
         _workerCancellationToken = new CancellationTokenSource();
 
-        _workerThread = new Thread(DoWork)
+        WorkerThread = new Thread(DoWork)
         {
             IsBackground = true
         };
-        _workerThread.Start();
+        WorkerThread.Start();
 
         _threadStartedEvent.Wait();
         _threadStartedEvent.Dispose();
@@ -55,7 +56,7 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
     public void PostMessage(T message)
     {
         var ev = new MessageEvent<T>(message);
-        if (Thread.CurrentThread.ManagedThreadId == _workerThread.ManagedThreadId)
+        if (Thread.CurrentThread.ManagedThreadId == WorkerThread.ManagedThreadId)
         {
             // Inside Worker -> Post to main
             _postToMain(() =>
@@ -87,7 +88,7 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
     public void AddEventListener(string @event, Action<MessageEvent<T>> handler)
     {
         if (@event != "message") return;
-        var listeners = Thread.CurrentThread.ManagedThreadId == _workerThread.ManagedThreadId
+        var listeners = Thread.CurrentThread.ManagedThreadId == WorkerThread.ManagedThreadId
             ? _listenerInsideWorker
             : _listenerOutsideWorker;
         listeners[handler] = handler;
@@ -96,7 +97,7 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
     public void RemoveEventListener(string @event, Action<MessageEvent<T>> handler)
     {
         if (@event != "message") return;
-        var listeners = Thread.CurrentThread.ManagedThreadId == _workerThread.ManagedThreadId
+        var listeners = Thread.CurrentThread.ManagedThreadId == WorkerThread.ManagedThreadId
             ? _listenerInsideWorker
             : _listenerOutsideWorker;
         listeners.TryRemove(handler, out _);
@@ -105,7 +106,7 @@ internal abstract class ManagedThreadWorkerBase<T> : IAlphaTabWorker<T>
     public virtual void Terminate()
     {
         _workerCancellationToken.Cancel();
-        _workerThread.Join();
+        WorkerThread.Join();
         while (_workerQueue.Count > 0)
         {
             _workerQueue.Take();
@@ -133,6 +134,12 @@ internal class ManagedThreadAlphaTabRendererWorker :
         WorkerLookup[Thread.CurrentThread.ManagedThreadId] = this;
         AlphaTabWebWorker.Init();
     }
+
+    public override void Terminate()
+    {
+        base.Terminate();
+        WorkerLookup.TryRemove(WorkerThread.ManagedThreadId, out _);
+    }
 }
 
 internal class ManagedThreadAlphaSynthWorker :
@@ -154,5 +161,11 @@ internal class ManagedThreadAlphaSynthWorker :
     {
         WorkerLookup[Thread.CurrentThread.ManagedThreadId] = this;
         AlphaSynthWebWorker.Init();
+    }
+
+    public override void Terminate()
+    {
+        base.Terminate();
+        WorkerLookup.TryRemove(WorkerThread.ManagedThreadId, out _);
     }
 }
