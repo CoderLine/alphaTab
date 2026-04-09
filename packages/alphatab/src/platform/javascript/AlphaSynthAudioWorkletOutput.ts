@@ -203,6 +203,8 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     private readonly _settings: Settings;
     private _boundHandleMessage: (e: MessageEvent<IAlphaSynthWorkerMessage>) => void;
 
+    private _pendingEvents?: IAlphaSynthWorkerMessage[];
+
     public constructor(settings: Settings) {
         super();
         this._settings = settings;
@@ -234,6 +236,14 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
                 this.source!.connect(this._worklet);
                 this.source!.start(0);
                 this._worklet.connect(ctx!.destination);
+
+                const pending = this._pendingEvents;
+                if (pending) {
+                    for (const e of pending) {
+                        this._worklet.port.postMessage(e);
+                    }
+                    this._pendingEvents = undefined;
+                }
             },
             (reason: any) => {
                 Logger.error('WebAudio', `Audio Worklet creation failed: reason=${reason}`);
@@ -264,17 +274,28 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
             this._worklet.disconnect();
         }
         this._worklet = null;
+        this._pendingEvents = undefined;
+    }
+
+    private _postWorkerMessage(message: IAlphaSynthWorkerMessage) {
+        const worklet = this._worklet;
+        if (worklet) {
+            worklet.port.postMessage(message);
+        } else {
+            this._pendingEvents ??= [];
+            this._pendingEvents.push(message);
+        }
     }
 
     public addSamples(f: Float32Array): void {
-        this._worklet?.port.postMessage({
+        this._postWorkerMessage({
             cmd: 'alphaSynth.output.addSamples',
             samples: Environment.prepareForPostMessage(f)
         });
     }
 
     public resetSamples(): void {
-        this._worklet?.port.postMessage({
+        this._postWorkerMessage({
             cmd: 'alphaSynth.output.resetSamples'
         });
     }
