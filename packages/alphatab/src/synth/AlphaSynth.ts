@@ -1,29 +1,38 @@
+import {
+    EventEmitter,
+    EventEmitterOfT,
+    type IEventEmitter,
+    type IEventEmitterOfT
+} from '@coderline/alphatab/EventEmitter';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { LogLevel } from '@coderline/alphatab/LogLevel';
+import type { MidiEvent, MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
 import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Queue } from '@coderline/alphatab/synth/ds/Queue';
 import type { BackingTrackSyncPoint, IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
+import {
+    AudioExportChunk,
+    type AudioExportOptions,
+    type IAudioExporter
+} from '@coderline/alphatab/synth/IAudioExporter';
+import type { IAudioSampleSynthesizer } from '@coderline/alphatab/synth/IAudioSampleSynthesizer';
 import type { ISynthOutput } from '@coderline/alphatab/synth/ISynthOutput';
+import { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
 import { MidiFileSequencer } from '@coderline/alphatab/synth/MidiFileSequencer';
 import type { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/PlaybackRangeChangedEventArgs';
 import { PlayerState } from '@coderline/alphatab/synth/PlayerState';
 import { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerStateChangedEventArgs';
 import { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
 import { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
-import { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
-import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
-import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
-import { Logger } from '@coderline/alphatab/Logger';
-import type { LogLevel } from '@coderline/alphatab/LogLevel';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
-import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
-import { Queue } from '@coderline/alphatab/synth/ds/Queue';
-import { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
-import type { MidiEvent, MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
-import { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/PlaybackRangeChangedEventArgs';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import type { Score } from '@coderline/alphatab/model/Score';
-import type { IAudioSampleSynthesizer } from '@coderline/alphatab/synth/IAudioSampleSynthesizer';
-import { AudioExportChunk, type IAudioExporter, type AudioExportOptions } from '@coderline/alphatab/synth/IAudioExporter';
 import type { Preset } from '@coderline/alphatab/synth/synthesis/Preset';
-import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
+import { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
 
 /**
  * This is the base class for synthesizer components which can be used to
@@ -284,6 +293,20 @@ export class AlphaSynthBase implements IAlphaSynth {
             }
             this._notPlayedSamples += samples.length;
             this.output.addSamples(samples);
+
+
+            // if the sequencer finished, we instantly force a noteOff on all 
+            // voices to complete playback and stop voices fast. 
+            // Doing this in the samplePlayed callback is too late as we might
+            // continue generating audio for long-release notes (especially percussion like cymbals)
+          
+            // we still have checkForFinish which takes care of the counterpart
+            // on the sample played area to ensure we seek back. 
+            // but thanks to this code we ensure the output will complete fast as we won't 
+            // be adding more samples beside a 0.1s ramp-down
+            if (this.sequencer.isFinished) {
+                this.synthesizer.noteOffAll(true);
+            }
         } else {
             // Tell output that there is no data left for it.
             const samples: Float32Array = new Float32Array(0);

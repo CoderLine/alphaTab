@@ -35,4 +35,9 @@ export class SynthConstants {
 
     public static readonly MicroBufferCount: number = 32;
     public static readonly MicroBufferSize: number = 64;
+
+    /**
+     * approximately -60 dB, which is inaudible to humans
+     */
+    public static readonly AudibleLevelThreshold: number = 1e-3;
 }
