@@ -119,6 +119,11 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/tuplets.gp');
     });
 
+
+    it('hidden-dots', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/hidden-dots.mxml');
+    });
+
     it('tuplets-advanced', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/tuplets-advanced.gp', undefined, o => {
             o.tracks = [0, 1, 2];

@@ -264,12 +264,14 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 const group: GlyphGroup = new GlyphGroup(0, 0);
                 group.renderer = this.renderer;
                 for (const note of this.container.beat.notes) {
-                    const g = this._createBeatDot(sr.getNoteSteps(note), group);
-                    g.colorOverride = ElementStyleHelper.noteColor(
-                        sr.resources,
-                        NoteSubElement.StandardNotationEffects,
-                        note
-                    );
+                    if (note.isVisible) {
+                        const g = this._createBeatDot(sr.getNoteSteps(note), group);
+                        g.colorOverride = ElementStyleHelper.noteColor(
+                            sr.resources,
+                            NoteSubElement.StandardNotationEffects,
+                            note
+                        );
+                    }
                 }
                 this.addEffect(group);
             }
