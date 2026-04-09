@@ -119,6 +119,12 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/tuplets.gp');
     });
 
+    it('tuplets-huge', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            'C4 {tu 12 27} * 12',
+            'test-data/visual-tests/effects-and-annotations/tuplets-huge.png'
+        );
+    });
 
     it('hidden-dots', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/hidden-dots.mxml');
