@@ -140,7 +140,14 @@ export class ScoreRenderer implements IScoreRenderer {
             Logger.warning('Rendering', 'AlphaTab skipped rendering because of width=0 (element invisible)', null);
             return;
         }
-        this.boundsLookup = new BoundsLookup();
+        // For partial renders we preserve the existing lookup so bars outside the re-layouted
+        // range keep their already-scaled bounds - the layout will clear the changed range
+        // before the paint pass re-registers fresh entries for it.
+        if (renderHints?.firstChangedMasterBar !== undefined && this.boundsLookup) {
+            this.boundsLookup.resetForPartialUpdate();
+        } else {
+            this.boundsLookup = new BoundsLookup();
+        }
         this._recreateCanvas();
         this.canvas!.lineWidth = 1;
         this.canvas!.settings = this.settings;

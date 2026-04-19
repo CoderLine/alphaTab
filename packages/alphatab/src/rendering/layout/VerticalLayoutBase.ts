@@ -96,6 +96,12 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
             return false;
         }
 
+        // Bars from the start of the re-layouted system onward will be re-registered during the
+        // paint pass. Clear their old entries from the preserved BoundsLookup so registration
+        // produces a clean, complete lookup after this render finishes.
+        const firstRebuiltBarIndex = this._systems[systemIndex].masterBarsRenderers[0].masterBar.index;
+        this.renderer.boundsLookup!.clearFromMasterBar(firstRebuiltBarIndex);
+
         // for now we do a full relayout from the first modified masterbar
         // there is a lot of room for even more performant updates, but they come
         // at a risk that features break.

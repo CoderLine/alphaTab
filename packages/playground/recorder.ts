@@ -69,8 +69,9 @@ req.onload = () => {
     const RHYTHM_4_4_STRAIGHT: RhythmConfig = {
         timeSignatureNumerator: 4,
         timeSignatureDenominator: 4,
-        subdivisionsPerBeat: 8,
-        beatMask: Array.from({ length: 4 }, () => [4, 32, 16, 32, 8, 32, 16, 32]).flat(),
+        subdivisionsPerBeat: 4,
+        // per quarter: [quarter, 16th, 8th, 16th] - finest grid is 16th.
+        beatMask: Array.from({ length: 4 }, () => [4, 16, 8, 16]).flat(),
         displayWeightThreshold: 16
     };
 
@@ -388,10 +389,20 @@ req.onload = () => {
             return;
         }
 
+        // the grid renders as short tick marks above and below each bar's bounding box rather
+        // than full-height lines through the staff. this keeps the notation area itself visually
+        // unobstructed and reads as a gridline "guide" rather than an overlay.
+        const tickLength = 12;
+        const mainColor = 'rgba(0, 120, 220, 0.55)';
+        const subColor = 'rgba(0, 120, 220, 0.25)';
+
         for (const system of lookup.staffSystems) {
             for (const masterBarBounds of system.bars) {
                 for (const barBounds of masterBarBounds.bars) {
                     const beats = barBounds.beats;
+                    const barTop = barBounds.realBounds.y;
+                    const barBottom = barBounds.realBounds.y + barBounds.realBounds.h;
+
                     for (let i = 0; i < beats.length && i < activeRhythm.beatMask.length; i++) {
                         const weight = activeRhythm.beatMask[i];
                         if (weight > activeRhythm.displayWeightThreshold) {
@@ -399,16 +410,31 @@ req.onload = () => {
                         }
                         const beatBounds = beats[i];
                         const isMainBeat = weight === 4;
-                        const line = document.createElement('div');
-                        Object.assign(line.style, {
+                        const width = isMainBeat ? 2 : 1;
+                        const color = isMainBeat ? mainColor : subColor;
+                        const x = beatBounds.realBounds.x;
+
+                        const topTick = document.createElement('div');
+                        Object.assign(topTick.style, {
                             position: 'absolute',
-                            left: `${beatBounds.realBounds.x}px`,
-                            top: `${beatBounds.realBounds.y}px`,
-                            width: isMainBeat ? '2px' : '1px',
-                            height: `${beatBounds.realBounds.h}px`,
-                            background: isMainBeat ? 'rgba(0, 120, 220, 0.55)' : 'rgba(0, 120, 220, 0.25)'
+                            left: `${x}px`,
+                            top: `${barTop - tickLength}px`,
+                            width: `${width}px`,
+                            height: `${tickLength}px`,
+                            background: color
                         } as Partial<CSSStyleDeclaration>);
-                        overlayEl.appendChild(line);
+                        overlayEl.appendChild(topTick);
+
+                        const bottomTick = document.createElement('div');
+                        Object.assign(bottomTick.style, {
+                            position: 'absolute',
+                            left: `${x}px`,
+                            top: `${barBottom}px`,
+                            width: `${width}px`,
+                            height: `${tickLength}px`,
+                            background: color
+                        } as Partial<CSSStyleDeclaration>);
+                        overlayEl.appendChild(bottomTick);
                     }
                 }
             }

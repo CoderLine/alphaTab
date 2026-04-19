@@ -34,15 +34,27 @@ export class StaffSystemBounds {
     public boundsLookup!: BoundsLookup;
 
     /**
-     * Finished the lookup for optimized access.
+     * Whether this system's bounds have already been scaled via `finish`. Prevents double-scaling
+     * when the parent `BoundsLookup` is preserved across partial renders and `finish` is invoked
+     * again on a mix of already-scaled (preserved) and newly-registered (natural-coordinate) systems.
+     */
+    public isFinished: boolean = false;
+
+    /**
+     * Finished the lookup for optimized access. Idempotent: once finished, further calls are no-ops
+     * so preserved systems survive partial renders without being re-scaled.
      */
     public finish(scale: number = 1): void {
+        if (this.isFinished) {
+            return;
+        }
         this.realBounds.scaleWith(scale);
         this.visualBounds.scaleWith(scale);
 
         for (const t of this.bars) {
             t.finish(scale);
         }
+        this.isFinished = true;
     }
 
     /**

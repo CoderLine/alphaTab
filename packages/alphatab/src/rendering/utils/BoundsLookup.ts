@@ -171,6 +171,62 @@ export class BoundsLookup {
     }
 
     /**
+     * Re-opens the lookup for registrations without discarding previously registered bounds.
+     * Used by the renderer when it preserves this lookup across a partial render so that new
+     * bounds for the re-layouted range can be added while preserved systems stay intact.
+     * @internal
+     */
+    public resetForPartialUpdate(): void {
+        this.isFinished = false;
+    }
+
+    /**
+     * Removes all entries belonging to the given master bar index and any bars after it.
+     * Used before a partial render re-registers bounds for the re-layouted range, so the
+     * preserved lookup ends up with only the unchanged entries when registration begins.
+     *
+     * Assumes the layout aligns its re-layouted range to system boundaries - i.e. the first
+     * system to clear starts exactly at `masterBarIndex`. Caller is responsible for passing
+     * the first master-bar-index of the first re-layouted system.
+     * @internal
+     */
+    public clearFromMasterBar(masterBarIndex: number): void {
+        // drop staff systems whose bars start at or after the cleared range.
+        let firstRemovedSystem = -1;
+        for (let i = 0; i < this.staffSystems.length; i++) {
+            const systemBars = this.staffSystems[i].bars;
+            if (systemBars.length > 0 && systemBars[0].index >= masterBarIndex) {
+                firstRemovedSystem = i;
+                break;
+            }
+        }
+        if (firstRemovedSystem !== -1) {
+            this.staffSystems.splice(firstRemovedSystem, this.staffSystems.length - firstRemovedSystem);
+        }
+
+        // drop master bar entries at or beyond the cleared range.
+        for (const key of Array.from(this._masterBarLookup.keys())) {
+            if (key >= masterBarIndex) {
+                this._masterBarLookup.delete(key);
+            }
+        }
+
+        // drop beat entries whose beats belong to cleared bars.
+        for (const key of Array.from(this._beatLookup.keys())) {
+            const list = this._beatLookup.get(key)!;
+            const filtered = list.filter(b => b.beat.voice.bar.index < masterBarIndex);
+            if (filtered.length === 0) {
+                this._beatLookup.delete(key);
+            } else if (filtered.length !== list.length) {
+                this._beatLookup.set(key, filtered);
+            }
+        }
+
+        // drop the in-progress pointer - the next addStaffSystem call will replace it.
+        this._currentStaffSystem = null;
+    }
+
+    /**
      * Adds a new staff sytem to the lookup.
      * @param bounds The staff system bounds to add.
      */
