@@ -69,6 +69,11 @@ export class HorizontalScreenLayout extends ScoreLayout {
 
         endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
         this._system = this.createEmptyStaffSystem(0);
+        // Each bar in horizontal layout is sized independently (by bar.displayWidth or the bar's
+        // intrinsic width), so there is no shared staff width to distribute across bars. Keep each
+        // bar's spring constants referenced against its own local minimum-duration so rendering
+        // matches the historical per-bar behaviour.
+        this._system.shareMinDurationAcrossBars = false;
         this._system.isLast = true;
         this._system.x = this.pagePadding![0];
         this._system.y = this.pagePadding![1];

@@ -392,6 +392,11 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
      * Realignes the bars in this line according to the available space
      */
     private _fitSystem(system: StaffSystem): void {
+        // If a bar added late in the assembly introduced a shorter note than earlier bars, the
+        // earlier bars' spring constants (and the cached system widths / totals) are stale.
+        // Reconcile now - it's a no-op when nothing changed.
+        system.reconcileMinDurationIfDirty();
+
         if (system.isFull || system.width > this._maxWidth || this.renderer.settings.display.justifyLastSystem) {
             this._scaleToWidth(system, this._maxWidth);
         } else {

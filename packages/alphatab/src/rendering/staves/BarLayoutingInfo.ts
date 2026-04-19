@@ -46,6 +46,24 @@ export class BarLayoutingInfo {
     public minStretchForce: number = 0;
     public totalSpringConstant: number = 0;
 
+    /**
+     * The smallest note duration encountered within this bar's springs, used as the reference in
+     * the Gourlay stretch formula. Read by the owning {@link StaffSystem} so that the system can
+     * aggregate a shared minimum across all bars and trigger a reconcile if an added bar introduces
+     * a shorter duration than previously seen.
+     */
+    public get localMinDuration(): number {
+        return this._minDuration;
+    }
+
+    /**
+     * The minimum-duration reference against which the spring constants currently held by this info
+     * were computed. Set by {@link finish} and {@link recomputeSpringConstants}. The owning
+     * StaffSystem compares this against its system-wide minimum to decide whether spring constants
+     * need re-derivation.
+     */
+    public computedWithMinDuration: number = 0;
+
     private _updateMinStretchForce(force: number): void {
         if (this.minStretchForce < force) {
             this.minStretchForce = force;
@@ -238,11 +256,28 @@ export class BarLayoutingInfo {
             }
         }
 
-        this._calculateSpringConstants();
+        this._calculateSpringConstants(this._minDuration);
+        this.computedWithMinDuration = this._minDuration;
         this.version++;
     }
 
-    private _calculateSpringConstants(): void {
+    /**
+     * Re-derives the spring constants (and {@link minStretchForce} / {@link totalSpringConstant})
+     * using a caller-supplied minimum-duration reference rather than this bar's local minimum.
+     *
+     * Called by {@link StaffSystem.reconcileMinDurationIfDirty} when a bar added later to the
+     * system introduced a shorter note than previously seen, invalidating this bar's spring
+     * constants. Grace-rod data is not recomputed — it is independent of the minimum-duration
+     * reference. The internal {@link version} is bumped so downstream consumers (e.g.
+     * {@link BarRendererBase.applyLayoutingInfo}) pick up the refreshed positions.
+     */
+    public recomputeSpringConstants(minDuration: number): void {
+        this._calculateSpringConstants(minDuration);
+        this.computedWithMinDuration = minDuration;
+        this.version++;
+    }
+
+    private _calculateSpringConstants(minDuration: number): void {
         let totalSpringConstant: number = 0;
         const sortedSprings: Spring[] = this._timeSortedSprings;
         if (sortedSprings.length === 0) {
@@ -259,7 +294,7 @@ export class BarLayoutingInfo {
                 const nextSpring: Spring = sortedSprings[i + 1];
                 duration = Math.abs(nextSpring.timePosition - currentSpring.timePosition);
             }
-            currentSpring.springConstant = this._calculateSpringConstant(currentSpring, duration);
+            currentSpring.springConstant = this._calculateSpringConstant(currentSpring, duration, minDuration);
             totalSpringConstant += 1 / currentSpring.springConstant;
         }
         this.totalSpringConstant = 1 / totalSpringConstant;
@@ -334,7 +369,7 @@ export class BarLayoutingInfo {
     //     }
     // }
 
-    private _calculateSpringConstant(spring: Spring, duration: number): number {
+    private _calculateSpringConstant(spring: Spring, duration: number, minDuration: number): number {
         if (duration <= 0) {
             duration = MidiUtils.toTicks(Duration.TwoHundredFiftySixth);
         }
@@ -343,7 +378,6 @@ export class BarLayoutingInfo {
         }
         const smallestDuration: number = spring.smallestDuration;
 
-        const minDuration = this._minDuration;
         const minDurationWidth = BarLayoutingInfo._defaultMinDurationWidth;
 
         const phi: number = 1 + 0.85 * Math.log2(duration / minDuration);
