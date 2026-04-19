@@ -138,6 +138,8 @@ req.onload = () => {
     track.name = 'Drums';
     track.shortName = 'Drums';
     track.ensureStaveCount(1);
+    track.playbackInfo.primaryChannel = 9;
+    track.playbackInfo.secondaryChannel = 9;
     const staff = track.staves[0];
     staff.isPercussion = true;
     staff.showTablature = false;
@@ -312,7 +314,7 @@ req.onload = () => {
         const note = new alphaTab.model.Note();
         note.percussionArticulation = midiNote;
         currentBeat.addNote(note);
-        // flip isEmpty so the newly-populated beat renders (previously suppressed for empty slots)
+        // a beat with a note is no longer empty - keep the data model correct.
         currentBeat.isEmpty = false;
 
         const bar = currentBeat.voice.bar;
@@ -513,7 +515,19 @@ req.onload = () => {
             padGrid.style.pointerEvents = 'none';
         }
     }
-    api.playerStateChanged.on(() => {
+    // whenever playback stops/pauses we regenerate the midi from the current score so
+    // previously-recorded drums become audible on replay. the existing midiLoad hook re-extends
+    // the fresh midi with rest events so further recording still has playback runway beyond the
+    // last bar. on pause (stopped=false) we restore api.tickPosition so the cursor stays where
+    // the user paused; on full stop (stopped=true) we skip the restore so the player's natural
+    // reset to the start takes effect.
+    let wasPlaying = false;
+    api.playerStateChanged.on(e => {
+        const isPlaying = e.state === alphaTab.synth.PlayerState.Playing;
+        if (wasPlaying && !isPlaying) {
+            api.loadMidiForScore();
+        }
+        wasPlaying = isPlaying;
         refreshPadState();
     });
 
