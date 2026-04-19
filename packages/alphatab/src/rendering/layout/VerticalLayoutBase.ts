@@ -400,40 +400,51 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         system.finalizeSystem();
     }
 
+    /**
+     * Whether the layout honours the model's {@link Bar.displayScale} when distributing staff width.
+     * When `true` (Parchment, Page with `SystemsLayoutMode.UseModelLayout`), bars are weighted by
+     * `displayScale`. When `false` (Page with `SystemsLayoutMode.Automatic`), `displayScale` is ignored
+     * and bars are weighted by their natural content width produced by the built-in spacing engine.
+     * Prefix/postfix overhead (clef, key sig, time sig, barlines) is treated as fixed in both modes.
+     */
     protected abstract get shouldApplyBarScale(): boolean;
 
     private _scaleToWidth(system: StaffSystem, width: number): void {
         const staffWidth = width - system.accoladeWidth;
         const shouldApplyBarScale = this.shouldApplyBarScale;
 
-        const totalScale = system.totalBarDisplayScale;
-
-        // NOTE: it currently delivers best results if we evenly distribute the available space across bars
-        // scaling bars relatively to their computed width, rather causes distortions whenever bars have
-        // pre-beat glyphs.
-
-        // most precise scaling would come if we use the contents (voiceContainerGlyph) width as a calculation
-        // factor. but this would make the calculation additionally complex with not much gain.
-
-        const difference: number = width - system.computedWidth;
-        const spacePerBar: number = difference / system.masterBarsRenderers.length;
+        // Industry fixed-overhead model (Behind Bars, Dorico, Finale, Sibelius, MuseScore, Guitar Pro):
+        // prefix/postfix glyphs (clef, key sig, time sig, barlines) are treated as fixed overhead and the
+        // remaining staff width is distributed across bars by a per-bar weight.
+        //
+        //   distributable = staffWidth - totalFixedOverhead
+        //   contentShare  = distributable / sum(weight)
+        //   bar.width     = bar.maxFixedOverhead + weight * contentShare
+        //
+        // The weight depends on the layout mode:
+        //   - shouldApplyBarScale=true  -> weight = bar.displayScale (model-driven, matches Guitar Pro)
+        //                                  displayScale defaults to 1, so an unset value behaves identically
+        //                                  to an explicit 1 (GP omits the property when not customized).
+        //   - shouldApplyBarScale=false -> weight = natural content width (automatic, ignores displayScale)
+        //
+        // Per-bar maxFixedOverhead / maxContentWidth and the system-wide totals are maintained incrementally
+        // in StaffSystem._applyLayoutAndUpdateWidth / revertLastBar so this pass can apply directly.
+        const weightTotal = shouldApplyBarScale ? system.totalBarDisplayScale : system.totalContentWidth;
+        const distributable = Math.max(0, staffWidth - system.totalFixedOverhead);
+        const contentShare = weightTotal > 0 ? distributable / weightTotal : 0;
 
         for (const s of system.allStaves) {
             s.resetSharedLayoutData();
 
-            // scale the bars by keeping their respective ratio size
             let w = 0;
-            for (const renderer of s.barRenderers) {
+            for (let i = 0; i < s.barRenderers.length; i++) {
+                const renderer = s.barRenderers[i];
+                const mb = system.masterBarsRenderers[i];
                 renderer.x = w;
                 renderer.y = s.topPadding + s.topOverflow;
 
-                let actualBarWidth: number;
-                if (shouldApplyBarScale) {
-                    const barDisplayScale = system.getBarDisplayScale(renderer);
-                    actualBarWidth = (barDisplayScale * staffWidth) / totalScale;
-                } else {
-                    actualBarWidth = renderer.computedWidth + spacePerBar;
-                }
+                const weight = shouldApplyBarScale ? system.getBarDisplayScale(renderer) : mb.maxContentWidth;
+                const actualBarWidth = mb.maxFixedOverhead + weight * contentShare;
 
                 renderer.scaleToWidth(actualBarWidth);
                 w += renderer.width;

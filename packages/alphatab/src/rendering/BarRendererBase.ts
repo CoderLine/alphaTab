@@ -214,6 +214,16 @@ export class BarRendererBase {
         return false;
     }
 
+    /**
+     * The fixed-overhead width of this renderer: glyphs that do not stretch when
+     * the bar is scaled (clef, key signature, time signature, barlines, courtesy
+     * accidentals, etc). Treated as a fixed allocation by the system-level layout
+     * before distributing remaining width across bars by {@link Bar.displayScale}.
+     */
+    public get fixedOverhead(): number {
+        return this._preBeatGlyphs.width + this._postBeatGlyphs.width;
+    }
+
     public scaleToWidth(width: number): void {
         // preBeat and postBeat glyphs do not get resized
         const containerWidth: number = width - this._preBeatGlyphs.width - this._postBeatGlyphs.width;

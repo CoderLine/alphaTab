@@ -394,9 +394,16 @@ export class DisplaySettings {
      *
      * The page layout does not use `displayWidth`. The use of absolute widths would break the proper alignments needed for this kind of display.
      *
-     * Also note that the sizing is including any glyphs and notation elements within the bar. e.g. if there are clefs in the bar, they are still "squeezed" into the available size.
-     * It is not the case that the actual notes with their lengths are sized accordingly. This fits the sizing system of Guitar Pro and when files are customized there,
-     * alphaTab will match this layout quite close.
+     * In both modes, prefix and postfix glyphs (clef, key signature, time signature, barlines) are treated as fixed overhead: they keep their
+     * natural size and the remaining staff width is distributed across bars by a per-bar weight. This matches the convention used by
+     * Guitar Pro, Dorico, Finale, Sibelius and MuseScore. Bars that carry a system-start prefix or a mid-line clef/key/time-signature change
+     * are therefore visibly wider than plain bars with the same weight. The weight source depends on the mode:
+     *
+     * * `Automatic` (default for `page` layout): weights come from the built-in spacing engine (the natural content width of each bar).
+     *   `displayScale` on the model is ignored.
+     * * `UseModelLayout` (and the `parchment` layout): weights come from `bar.displayScale` / `masterBar.displayScale`. An unset
+     *   `displayScale` defaults to `1` and behaves identically to an explicit `1`, matching Guitar Pro (which omits the value when the
+     *   author hasn't customized it).
      *
      * ### Horizontal Layout
      *

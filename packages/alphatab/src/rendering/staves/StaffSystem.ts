@@ -203,6 +203,20 @@ export class StaffSystem {
      */
     public totalBarDisplayScale: number = 0;
 
+    /**
+     * Sum of per-bar {@link MasterBarsRenderers.maxFixedOverhead} across the system. The layout-mode
+     * horizontal scaling pass subtracts this from the available staff width before distributing the
+     * remainder across bars.
+     */
+    public totalFixedOverhead: number = 0;
+
+    /**
+     * Sum of per-bar {@link MasterBarsRenderers.maxContentWidth} across the system. Used as the
+     * denominator when distributing staff width in modes that weight bars by natural content width
+     * (Page layout with `SystemsLayoutMode.Automatic`).
+     */
+    public totalContentWidth: number = 0;
+
     public isLast: boolean = false;
     public masterBarsRenderers: MasterBarsRenderers[] = [];
     public staves: StaffTrackGroup[] = [];
@@ -400,6 +414,8 @@ export class StaffSystem {
             this.width -= width;
             this.computedWidth -= width;
             this.totalBarDisplayScale -= barDisplayScale;
+            this.totalFixedOverhead -= toRemove.maxFixedOverhead;
+            this.totalContentWidth -= toRemove.maxContentWidth;
             return toRemove;
         }
         return null;
@@ -407,6 +423,8 @@ export class StaffSystem {
 
     private _applyLayoutAndUpdateWidth(): number {
         let realWidth: number = 0;
+        let maxFixedOverhead: number = 0;
+        let maxContentWidth: number = 0;
 
         let barDisplayScale = 0;
         for (const s of this.allStaves) {
@@ -418,9 +436,24 @@ export class StaffSystem {
             if (last.computedWidth > realWidth) {
                 realWidth = last.computedWidth;
             }
+
+            const overhead = last.fixedOverhead;
+            if (overhead > maxFixedOverhead) {
+                maxFixedOverhead = overhead;
+            }
+            const content = Math.max(0, last.computedWidth - overhead);
+            if (content > maxContentWidth) {
+                maxContentWidth = content;
+            }
         }
 
+        const renderers = this.masterBarsRenderers[this.masterBarsRenderers.length - 1];
+        renderers.maxFixedOverhead = maxFixedOverhead;
+        renderers.maxContentWidth = maxContentWidth;
+
         this.totalBarDisplayScale += barDisplayScale;
+        this.totalFixedOverhead += maxFixedOverhead;
+        this.totalContentWidth += maxContentWidth;
         this.width += realWidth;
         this.computedWidth += realWidth;
 
