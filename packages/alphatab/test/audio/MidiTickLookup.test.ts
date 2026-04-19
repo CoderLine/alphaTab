@@ -16,8 +16,11 @@ import { Beat } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { Bar } from '@coderline/alphatab/model/Bar';
 import { Note } from '@coderline/alphatab/model/Note';
-import type { Score } from '@coderline/alphatab/model/Score';
+import { Score } from '@coderline/alphatab/model/Score';
+import { Track } from '@coderline/alphatab/model/Track';
+import { Voice } from '@coderline/alphatab/model/Voice';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestPlatform } from 'test/TestPlatform';
 import { expect } from 'chai';
@@ -1261,6 +1264,47 @@ describe('MidiTickLookupTest', () => {
             ],
             true
         );
+    });
+
+    it('resolves empty beat in mixed-content voice', () => {
+        // Regression: in a voice that has both isEmpty and non-empty beats, the tick lookup
+        // must still resolve the empty beats so click-to-seek / cursor navigation can land on
+        // them. A previous filter in BeatTickLookup.highlightBeat excluded isEmpty beats from
+        // non-empty voices, which broke cursor navigation to e.g. recording-grid slots after
+        // the first note was recorded.
+        const score = new Score();
+        const track = new Track();
+        track.ensureStaveCount(1);
+        score.addTrack(track);
+        const staff = track.staves[0];
+
+        const masterBar = new MasterBar();
+        score.addMasterBar(masterBar);
+        const bar = new Bar();
+        staff.addBar(bar);
+        const voice = new Voice();
+        bar.addVoice(voice);
+
+        const emptyBeat = new Beat();
+        emptyBeat.isEmpty = true;
+        emptyBeat.duration = Duration.Quarter;
+        voice.addBeat(emptyBeat);
+
+        const noteBeat = new Beat();
+        noteBeat.duration = Duration.Quarter;
+        voice.addBeat(noteBeat);
+        noteBeat.addNote(new Note());
+
+        const settings = new Settings();
+        score.finish(settings);
+
+        const lookup = buildLookup(score, settings);
+
+        // with the filter removed, an isEmpty beat in a mixed voice should still be findable
+        expect(voice.isEmpty).to.equal(false);
+        const result = lookup.findBeat(new Set([0]), 0);
+        expect(result).to.not.equal(null);
+        expect(result!.beat).to.equal(emptyBeat);
     });
 
     describe('playback-range', () => {
