@@ -346,11 +346,27 @@ export abstract class LineBarRenderer extends BarRendererBase {
             const firstNonRestBeamingHelper = this.helpers.getBeamingHelperForBeat(firstNonRestBeat)!;
             const lastNonRestBeamingHelper = this.helpers.getBeamingHelperForBeat(lastNonRestBeat)!;
             const direction = this.getTupletBeamDirection(firstNonRestBeamingHelper);
-            let startY: number = this.calculateBeamYWithDirection(firstNonRestBeamingHelper, startX, direction);
-            let endY: number = this.calculateBeamYWithDirection(lastNonRestBeamingHelper, endX, direction);
+            let startY: number;
+            let endY: number;
             if (isRestOnly) {
-                startY = Math.max(startY, endY);
+                // rests have no stems, so anchor to the actual rest glyph bounds
+                // instead of a stem-adjusted flag position (which would place the bracket
+                // a full quarter-stem length away from the rests).
+                if (direction === BeamDirection.Up) {
+                    startY = Math.min(
+                        this.getRestY(firstNonRestBeat, NoteYPosition.Top),
+                        this.getRestY(lastNonRestBeat, NoteYPosition.Top)
+                    );
+                } else {
+                    startY = Math.max(
+                        this.getRestY(firstNonRestBeat, NoteYPosition.Bottom),
+                        this.getRestY(lastNonRestBeat, NoteYPosition.Bottom)
+                    );
+                }
                 endY = startY;
+            } else {
+                startY = this.calculateBeamYWithDirection(firstNonRestBeamingHelper, startX, direction);
+                endY = this.calculateBeamYWithDirection(lastNonRestBeamingHelper, endX, direction);
             }
 
             // align line centered in available space
@@ -872,7 +888,33 @@ export abstract class LineBarRenderer extends BarRendererBase {
         for (const v of this.helpers.beamHelpers) {
             for (const h of v) {
                 if (!this.shouldPaintBeamingHelper(h)) {
-                    // no visible helper
+                    // beam is not drawn, but a rest-only tuplet still draws a bracket
+                    // anchored to the rest glyph bounds and needs overflow reserved.
+                    if (h.hasTuplet && h.isRestBeamHelper) {
+                        const tupletGroup = h.beats[0].tupletGroup!;
+                        const tupletFirst = tupletGroup.beats[0];
+                        const tupletLast = tupletGroup.beats[tupletGroup.beats.length - 1];
+                        const tupletDirection = this.getTupletBeamDirection(h);
+                        if (tupletDirection === BeamDirection.Up) {
+                            const restTop = Math.min(
+                                this.getRestY(tupletFirst, NoteYPosition.Top),
+                                this.getRestY(tupletLast, NoteYPosition.Top)
+                            );
+                            const topY = restTop - this.tupletSize - this.tupletOffset;
+                            if (topY < maxNoteY) {
+                                maxNoteY = topY;
+                            }
+                        } else {
+                            const restBottom = Math.max(
+                                this.getRestY(tupletFirst, NoteYPosition.Bottom),
+                                this.getRestY(tupletLast, NoteYPosition.Bottom)
+                            );
+                            const bottomY = restBottom + this.tupletSize + this.tupletOffset;
+                            if (bottomY > minNoteY) {
+                                minNoteY = bottomY;
+                            }
+                        }
+                    }
                 }
                 // notes with stems (and potential flags)
                 else if (h.beats.length === 1 && h.beats[0].duration >= Duration.Half) {
