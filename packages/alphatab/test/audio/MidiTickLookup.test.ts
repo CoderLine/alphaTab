@@ -1307,6 +1307,77 @@ describe('MidiTickLookupTest', () => {
         expect(result!.beat).to.equal(emptyBeat);
     });
 
+    it('multi-beat empty voice produces non-overlapping slices', () => {
+        // Regression: _generateBeat previously overrode every beat's audioDuration to
+        // masterBarDuration whenever bar.isEmpty was true. That was right for the typical
+        // "single whole-bar rest" placeholder case, but in a multi-beat empty voice
+        // (e.g. a recording grid of isEmpty=true placeholder slots) it made every beat claim
+        // the full bar - the resulting overlapping slices accumulated prior beats into each
+        // subsequent slice's highlightedBeats, which broke cursor/highlighting logic.
+        const score = new Score();
+        const track = new Track();
+        track.ensureStaveCount(1);
+        score.addTrack(track);
+        const staff = track.staves[0];
+
+        const masterBar = new MasterBar();
+        score.addMasterBar(masterBar);
+        const bar = new Bar();
+        staff.addBar(bar);
+        const voice = new Voice();
+        bar.addVoice(voice);
+
+        const slotCount = 16;
+        for (let i = 0; i < slotCount; i++) {
+            const b = new Beat();
+            b.duration = Duration.Sixteenth;
+            b.isEmpty = true;
+            voice.addBeat(b);
+        }
+
+        const settings = new Settings();
+        score.finish(settings);
+        expect(bar.isEmpty).to.equal(true);
+        expect(voice.beats.length).to.equal(slotCount);
+
+        const lookup = buildLookup(score, settings);
+        const mbLookup = lookup.masterBars[0];
+
+        let slice = mbLookup.firstBeat;
+        let sliceIdx = 0;
+        while (slice) {
+            // every slice must contain exactly one beat - otherwise slices are overlapping
+            // and the multi-beat empty voice has regressed.
+            expect(slice.highlightedBeats.length, `slice ${sliceIdx} range [${slice.start},${slice.end})`).to.equal(1);
+            expect(slice.highlightedBeats[0].beat).to.equal(voice.beats[sliceIdx]);
+            slice = slice.nextBeat;
+            sliceIdx++;
+        }
+        expect(sliceIdx).to.equal(slotCount);
+
+        // single-beat empty bar still gets the full-bar override (existing behaviour
+        // preserved for the typical whole-bar-rest placeholder case).
+        const singleBeatScore = new Score();
+        const t = new Track();
+        t.ensureStaveCount(1);
+        singleBeatScore.addTrack(t);
+        const mb2 = new MasterBar();
+        singleBeatScore.addMasterBar(mb2);
+        const bar2 = new Bar();
+        t.staves[0].addBar(bar2);
+        const v2 = new Voice();
+        bar2.addVoice(v2);
+        const placeholder = new Beat();
+        placeholder.isEmpty = true;
+        placeholder.duration = Duration.Quarter;
+        v2.addBeat(placeholder);
+        singleBeatScore.finish(settings);
+
+        const singleLookup = buildLookup(singleBeatScore, settings);
+        const singleMb = singleLookup.masterBars[0];
+        expect(singleMb.firstBeat!.end - singleMb.firstBeat!.start).to.equal(singleMb.end - singleMb.start);
+    });
+
     describe('playback-range', () => {
         it('full-bar', () => {
             lookupTest(
