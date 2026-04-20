@@ -88,7 +88,15 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         const tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
 
         const centeredEffectGlyphs: Glyph[] = [];
-        if (!this.container.beat.isRest) {
+        // A beat on a stringed staff that contains ONLY piano notes has
+        // nothing to draw in tab form. Drop through to the rest path so
+        // TabNoteChordGlyph.doLayout doesn't call getNoteY(null) via
+        // minStringNote — it stays null because every loop below would
+        // skip the piano notes.
+        const hasStringedNoteForTab = this.container.beat.notes.some(
+            n => n.isVisible && !n.isPiano
+        );
+        if (!this.container.beat.isRest && hasStringedNoteForTab) {
             //
             // Note numbers
             const isGrace: boolean =
@@ -111,7 +119,15 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 this.noteNumbers = tabNoteNumbers;
                 tabNoteNumbers.beat = this.container.beat;
                 for (const note of this.container.beat.notes) {
-                    if (note.isVisible) {
+                    // Piano notes (string = -1) have no fret/string to place
+                    // on the tab staff. `getNoteLine(note)` returns
+                    // `tuning.length - note.string` = `tuning.length + 1`,
+                    // and `collectSpaces` then indexes past the end of the
+                    // `spaces` array and crashes when painting staff lines.
+                    // Piano notes render fine via `ScoreBeatGlyph` on the
+                    // standard-notation staff; skip them here so stringed
+                    // and piano notes can coexist in a single beat.
+                    if (note.isVisible && !note.isPiano) {
                         this._createNoteGlyph(note);
                     }
                 }

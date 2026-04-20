@@ -4,6 +4,7 @@ import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { expect } from 'chai';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { Note } from '@coderline/alphatab/model/Note';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 
@@ -127,5 +128,78 @@ describe('BrokenRendersTests', () => {
                 }
             );
         });
+    });
+
+    it('piano-note-on-stringed-beat', () => {
+        // A beat on a stringed (tab + score) staff that also carries a
+        // piano note must render cleanly. Previously the TabBeatGlyph
+        // iterated every visible note and called getNoteLine(n) which
+        // returns tuning.length - n.string — for n.string === -1 (piano)
+        // that indexes past the end of collectSpaces' `spaces` array and
+        // crashed while painting the tab staff lines. AlphaTex rejects
+        // mixed notes on one staff at import time, but the runtime data
+        // model allows it and downstream tools (step-time editors) rely
+        // on that flexibility.
+        const settings = new Settings();
+        settings.core.engine = 'svg';
+        settings.core.enableLazyLoading = false;
+
+        const score = ScoreLoader.loadAlphaTex('3.3.4', settings);
+
+        // Add a piano note to the first beat alongside the stringed note.
+        // C7 = MIDI 96: octave 8, tone 0 (AlphaTab convention).
+        const beat = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        const pianoNote = new Note();
+        pianoNote.octave = 8;
+        pianoNote.tone = 0;
+        beat.addNote(pianoNote);
+        expect(pianoNote.isPiano).to.equal(true);
+
+        let error: Error | null = null;
+        const api = new ScoreRenderer(settings);
+        api.error.on(e => {
+            error = e;
+        });
+        api.width = 1300;
+        api.renderScore(score, [0]);
+
+        error = error as Error | null;
+        if (error != null) {
+            throw error;
+        }
+    });
+
+    it('piano-only-beat-on-stringed-staff', () => {
+        // A beat with ONLY piano notes (no stringed notes) on a stringed
+        // staff: the tab renderer has nothing to draw there. Previously
+        // TabNoteChordGlyph.doLayout called getNoteY(this.minStringNote)
+        // and crashed on `note.string` because minStringNote stays null
+        // when every note is filtered as piano.
+        const settings = new Settings();
+        settings.core.engine = 'svg';
+        settings.core.enableLazyLoading = false;
+
+        const score = ScoreLoader.loadAlphaTex('3.3.4', settings);
+
+        // Replace the stringed note with a piano-only one.
+        const beat = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        beat.notes.splice(0, beat.notes.length);
+        const pianoNote = new Note();
+        pianoNote.octave = 8;
+        pianoNote.tone = 0;
+        beat.addNote(pianoNote);
+
+        let error: Error | null = null;
+        const api = new ScoreRenderer(settings);
+        api.error.on(e => {
+            error = e;
+        });
+        api.width = 1300;
+        api.renderScore(score, [0]);
+
+        error = error as Error | null;
+        if (error != null) {
+            throw error;
+        }
     });
 });
