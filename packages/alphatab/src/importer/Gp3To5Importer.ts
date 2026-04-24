@@ -1571,12 +1571,15 @@ export class GpBinaryHelpers {
      * @returns
      */
     public static gpReadStringByteLength(data: IReadable, length: number, encoding: string): string {
+        // Fixed-width string field: 1 length byte + `length` data bytes, decoded
+        // up to min(stringLength, length). Always consumes 1 + length bytes.
         const stringLength: number = data.readByte();
-        const s: string = GpBinaryHelpers.gpReadString(data, stringLength, encoding);
-        if (stringLength < length) {
-            data.skip(length - stringLength);
-        }
-        return s;
+        const fieldBytes: Uint8Array = new Uint8Array(length);
+        data.read(fieldBytes, 0, length);
+        const effectiveLength: number = Math.max(0, Math.min(stringLength, length));
+        const decoded: Uint8Array = new Uint8Array(effectiveLength);
+        decoded.set(fieldBytes.subarray(0, effectiveLength));
+        return IOHelper.toString(decoded, encoding);
     }
 }
 

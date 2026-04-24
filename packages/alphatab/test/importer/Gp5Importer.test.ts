@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Settings } from '@coderline/alphatab/Settings';
+import { GpBinaryHelpers } from '@coderline/alphatab/importer/Gp3To5Importer';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { Direction } from '@coderline/alphatab/model/Direction';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
@@ -568,5 +570,29 @@ describe('Gp5ImporterTest', () => {
                 beat = beat.nextBeat;
             }
         }
+    });
+
+    it('chord-name-overflow', async () => {
+        // GP5 file with a chord name length byte that exceeds the 21-byte field
+        // (length=32). Pre-fix, gpReadStringByteLength consumed the full 32 bytes,
+        // mis-aligning the stream and triggering an unbounded readBend loop.
+        const score = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/chord-name-overflow.gp5')
+        ).readScore();
+        expect(score.tracks.length).to.equal(1);
+        expect(score.masterBars.length).to.equal(193);
+    });
+
+    it('gpReadStringByteLength caps consumption at field width', () => {
+        const sentinelByte = 0xca;
+        const fieldSize = 21;
+        const overlongHint = 32;
+        const buffer = ByteBuffer.fromBuffer(
+            new Uint8Array([overlongHint, ...new Array(fieldSize).fill(0x41), sentinelByte])
+        );
+        const result = GpBinaryHelpers.gpReadStringByteLength(buffer, fieldSize, 'utf-8');
+        expect(result).to.equal('A'.repeat(fieldSize));
+        expect(buffer.position).to.equal(1 + fieldSize);
+        expect(buffer.readByte()).to.equal(sentinelByte);
     });
 });
