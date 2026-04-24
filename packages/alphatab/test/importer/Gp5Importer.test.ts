@@ -1,4 +1,5 @@
 import { Settings } from '@coderline/alphatab/Settings';
+import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { Direction } from '@coderline/alphatab/model/Direction';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
@@ -568,5 +569,14 @@ describe('Gp5ImporterTest', () => {
                 beat = beat.nextBeat;
             }
         }
+    });
+
+    it('corrupted-bend-point-count', async () => {
+        // Regression: misaligned read produced pointCount ~5e8, OOM-crashing the
+        // import. Now rejected upfront with a typed error.
+        const reader = await GpImporterTestHelper.prepareImporterWithFile(
+            'guitarpro5/corrupted-bend-point-count.gp5'
+        );
+        expect(() => reader.readScore()).to.throw(UnsupportedFormatError);
     });
 });

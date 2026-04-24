@@ -1039,6 +1039,8 @@ export class Gp3To5Importer extends ScoreImporter {
         IOHelper.readInt32LE(this.data); // value
 
         const pointCount: number = IOHelper.readInt32LE(this.data);
+        // 9 bytes per point (i32 offset + i32 value + 1 byte vibrato)
+        Gp3To5Importer._requireFits(this.data, pointCount, 9, 'whammy bar point count');
         if (pointCount > 0) {
             for (let i: number = 0; i < pointCount; i++) {
                 const point: BendPoint = new BendPoint(0, 0);
@@ -1050,6 +1052,15 @@ export class Gp3To5Importer extends ScoreImporter {
 
                 beat.addWhammyBarPoint(point);
             }
+        }
+    }
+
+    private static _requireFits(data: IReadable, count: number, bytesPerItem: number, fieldName: string): void {
+        const remaining = data.length - data.position;
+        if (count < 0 || count * bytesPerItem > remaining) {
+            throw new UnsupportedFormatError(
+                `${fieldName}=${count} (${count * bytesPerItem} bytes) exceeds remaining ${remaining} bytes`
+            );
         }
     }
 
@@ -1337,6 +1348,8 @@ export class Gp3To5Importer extends ScoreImporter {
         IOHelper.readInt32LE(this.data); // value
 
         const pointCount: number = IOHelper.readInt32LE(this.data);
+        // 9 bytes per point (i32 offset + i32 value + 1 byte vibrato)
+        Gp3To5Importer._requireFits(this.data, pointCount, 9, 'bend point count');
         if (pointCount > 0) {
             for (let i: number = 0; i < pointCount; i++) {
                 const point: BendPoint = new BendPoint(0, 0);
