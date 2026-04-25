@@ -53,9 +53,6 @@
             "@coderline/alphatab-language-server": [
                 "${configDir}/../lsp/src/index"
             ],
-            "@coderline/alphatab-playground/*": [
-                "${configDir}/../playground/src/*"
-            ],
             "@coderline/alphatab-tooling/*": [
                 "${configDir}/../tooling/src/*"
             ],
@@ -80,8 +77,16 @@
             "@coderline/alphatab-alphatex/*": [
                 "${configDir}/../alphatex/src/*"
             ],
+            "@coderline/alphasynth/*": [
+                "${configDir}/../alphasynth/src/*"
+            ],
+            "src/*": [
+                "${configDir}/src/*"
+            ],
+            "test/*": [
+                "${configDir}/test/*"
+            ],
         },
-        "baseUrl": "${configDir}",
         "typeRoots": [
             // monorepo root
             "${configDir}/../../node_modules/@types",

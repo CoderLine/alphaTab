@@ -7,7 +7,7 @@ export default defineConfig(_ => {
     const config: UserConfig = {
         plugins: [server()],
         server: {
-            open: '/control.html'
+            open: '/index.html'
         },
         esbuild: false
     };

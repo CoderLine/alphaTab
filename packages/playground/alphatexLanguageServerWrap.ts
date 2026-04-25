@@ -1,3 +1,4 @@
-// TODO: Vite behaves quite strange, it doesn't transpile the worker entry point correctly, we need 
-// to import again another nested module to get it transpiled
+// Vite ?worker imports are passed through to esbuild as a separate entry. Importing
+// `@coderline/alphatab-monaco/worker` directly here breaks symbol resolution; importing it
+// indirectly through this nested module gives Vite a TS source it transpiles correctly.
 import './alphatexLanguageServer';

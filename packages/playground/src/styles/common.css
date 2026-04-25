@@ -1,0 +1,83 @@
+@import url('@fontsource/noto-sans/300.css');
+@import url('@fontsource/noto-sans/400.css');
+@import url('@fontsource/noto-sans/500.css');
+@import url('@fontsource/noto-sans/700.css');
+
+@import url('@fontsource/noto-sans/300-italic.css');
+@import url('@fontsource/noto-sans/400-italic.css');
+@import url('@fontsource/noto-sans/500-italic.css');
+@import url('@fontsource/noto-sans/700-italic.css');
+
+@import url('@fontsource/noto-serif/300.css');
+@import url('@fontsource/noto-serif/400.css');
+@import url('@fontsource/noto-serif/500.css');
+@import url('@fontsource/noto-serif/700.css');
+
+@import url('@fontsource/noto-serif/300-italic.css');
+@import url('@fontsource/noto-serif/400-italic.css');
+@import url('@fontsource/noto-serif/500-italic.css');
+@import url('@fontsource/noto-serif/700-italic.css');
+
+:root {
+    --at-accent: #4972a1;
+    --at-accent-hover: #5588c7;
+    --at-footer-bg: #436d9d;
+    --at-footer-fg: #ffffff;
+    --at-divider: rgba(255, 255, 255, 0.18);
+    --at-sidebar-bg: #f7f7f7;
+    --at-overlay-bg: rgba(0, 0, 0, 0.5);
+    --at-track-active-bg: rgba(0, 0, 0, 0.03);
+    --at-cursor-beat: rgba(64, 64, 255, 0.75);
+    --at-cursor-bar: rgba(255, 242, 0, 0.25);
+    --at-selection: rgba(64, 64, 255, 0.2);
+    --at-highlight: #0078ff;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 14px;
+    height: 100vh;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+body > * {
+    overflow: hidden;
+}
+
+button {
+    font-family: inherit;
+}
+
+.at-cursor-bar {
+    background: var(--at-cursor-bar);
+}
+
+.at-selection div {
+    background: var(--at-selection);
+}
+
+.at-cursor-beat {
+    background: var(--at-cursor-beat);
+    width: 3px;
+}
+
+.at-highlight * {
+    fill: var(--at-highlight);
+    stroke: var(--at-highlight);
+}
