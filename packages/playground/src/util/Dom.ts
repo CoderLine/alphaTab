@@ -42,16 +42,18 @@ export function parseHtml(markup: string): HTMLElement {
     return document.adoptNode(el);
 }
 
-const injectedSheets = new Set<string>();
 export function injectStyles(key: string, sheet: string): void {
-    if (injectedSheets.has(key)) {
-        return;
+    // The DOM is the source of truth — keying off `data-cmp` rather than a module-level Set
+    // means HMR re-runs of a component module update the sheet in place. A Set in this module
+    // would stay populated across HMR (Dom.ts itself doesn't reload) and silently drop the
+    // updated sheet, leaving the page styled by the stale one.
+    let el = document.head.querySelector<HTMLStyleElement>(`style[data-cmp="${key}"]`);
+    if (!el) {
+        el = document.createElement('style');
+        el.dataset.cmp = key;
+        document.head.appendChild(el);
     }
-    injectedSheets.add(key);
-    const el = document.createElement('style');
-    el.dataset.cmp = key;
     el.textContent = sheet;
-    document.head.appendChild(el);
 }
 
 export function mount<T extends Mountable>(container: HTMLElement, selector: string, component: T): T {
