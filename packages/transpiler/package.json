@@ -5,6 +5,11 @@
     "description": "The transpiler toolkit to translate alphaTab to C# and Kotlin",
     "private": true,
     "scripts": {
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run",
+        "test-web": "npm run test"
+    },
+    "devDependencies": {
+        "vitest": "^4.1.5"
     }
 }

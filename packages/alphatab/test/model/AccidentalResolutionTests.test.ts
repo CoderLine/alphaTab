@@ -1,9 +1,8 @@
+import { describe, expect, it } from 'vitest';
 import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
-import { expect } from 'chai';
-
 describe('AccidentalResolutionTests', () => {
     const degreeSemitones = [0, 2, 4, 5, 7, 9, 11];
 
@@ -36,8 +35,8 @@ describe('AccidentalResolutionTests', () => {
             for (let degree = 0; degree < 7; degree++) {
                 const noteValue = noteValueForDegree(ks, degree, 4);
                 const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.Default);
-                expect(spelling.degree, `ks=${ks} degree=${degree}`).to.equal(degree);
-                expect(spelling.accidentalOffset, `ks=${ks} degree=${degree}`).to.equal(
+                expect(spelling.degree, `ks=${ks} degree=${degree}`).toBe(degree);
+                expect(spelling.accidentalOffset, `ks=${ks} degree=${degree}`).toBe(
                     ModelUtils.getKeySignatureAccidentalOffset(ks, degree)
                 );
 
@@ -48,7 +47,7 @@ describe('AccidentalResolutionTests', () => {
                     false,
                     null
                 );
-                expect(accidental, `ks=${ks} degree=${degree}`).to.equal(AccidentalType.None);
+                expect(accidental, `ks=${ks} degree=${degree}`).toBe(AccidentalType.None);
             }
         }
     });
@@ -57,50 +56,50 @@ describe('AccidentalResolutionTests', () => {
         const ks = KeySignature.FSharp;
         const noteValue = 65; // F natural
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.Default);
-        expect(spelling.degree).to.equal(2); // E
-        expect(spelling.accidentalOffset).to.equal(1); // E#
+        expect(spelling.degree).toBe(2); // E
+        expect(spelling.accidentalOffset).toBe(1); // E#
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.Default, spelling, false, null);
-        expect(accidental).to.equal(AccidentalType.None);
+        expect(accidental).toBe(AccidentalType.None);
     });
 
     it('spells Cb in Cb major for pitch B natural', () => {
         const ks = KeySignature.Cb;
         const noteValue = 59; // B natural
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.Default);
-        expect(spelling.degree).to.equal(0); // C
-        expect(spelling.accidentalOffset).to.equal(-1); // Cb
+        expect(spelling.degree).toBe(0); // C
+        expect(spelling.accidentalOffset).toBe(-1); // Cb
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.Default, spelling, false, null);
-        expect(accidental).to.equal(AccidentalType.None);
+        expect(accidental).toBe(AccidentalType.None);
     });
 
     it('forces flat spelling preference when requested', () => {
         const ks = KeySignature.C;
         const noteValue = 61; // C# / Db
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.ForceFlat);
-        expect(spelling.degree).to.equal(1); // D
-        expect(spelling.accidentalOffset).to.equal(-1); // Db
+        expect(spelling.degree).toBe(1); // D
+        expect(spelling.accidentalOffset).toBe(-1); // Db
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.ForceFlat, spelling, false, null);
-        expect(accidental).to.equal(AccidentalType.Flat);
+        expect(accidental).toBe(AccidentalType.Flat);
     });
 
     it('forces sharp spelling preference when requested', () => {
         const ks = KeySignature.C;
         const noteValue = 61; // C# / Db
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.ForceSharp);
-        expect(spelling.degree).to.equal(0); // C
-        expect(spelling.accidentalOffset).to.equal(1); // C#
+        expect(spelling.degree).toBe(0); // C
+        expect(spelling.accidentalOffset).toBe(1); // C#
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.ForceSharp, spelling, false, null);
-        expect(accidental).to.equal(AccidentalType.Sharp);
+        expect(accidental).toBe(AccidentalType.Sharp);
     });
 
     it('force natural displays a natural accidental when key signature would otherwise apply one', () => {
         const ks = KeySignature.D; // F#, C#
         const noteValue = 65; // F natural
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.ForceNatural);
-        expect(spelling.degree).to.equal(3); // F
-        expect(spelling.accidentalOffset).to.equal(0); // natural
+        expect(spelling.degree).toBe(3); // F
+        expect(spelling.accidentalOffset).toBe(0); // natural
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.ForceNatural, spelling, false, null);
-        expect(accidental).to.equal(AccidentalType.Natural);
+        expect(accidental).toBe(AccidentalType.Natural);
     });
 
     it('force none suppresses accidentals regardless of spelling', () => {
@@ -108,7 +107,7 @@ describe('AccidentalResolutionTests', () => {
         const noteValue = 61; // C#
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.ForceNone);
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.ForceNone, spelling, false, null);
-        expect(accidental).to.equal(AccidentalType.None);
+        expect(accidental).toBe(AccidentalType.None);
     });
 
     it('no accidental when current accidental already matches', () => {
@@ -116,7 +115,7 @@ describe('AccidentalResolutionTests', () => {
         const noteValue = 61; // C#
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.Default);
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.Default, spelling, false, 1);
-        expect(accidental).to.equal(AccidentalType.None);
+        expect(accidental).toBe(AccidentalType.None);
     });
 
     it('quarter tone accidentals are chosen when quarter bend is true', () => {
@@ -124,6 +123,6 @@ describe('AccidentalResolutionTests', () => {
         const noteValue = 61; // C# -> requires sharp
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.Default);
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.Default, spelling, true, null);
-        expect(accidental).to.equal(AccidentalType.SharpQuarterNoteUp);
+        expect(accidental).toBe(AccidentalType.SharpQuarterNoteUp);
     });
 });

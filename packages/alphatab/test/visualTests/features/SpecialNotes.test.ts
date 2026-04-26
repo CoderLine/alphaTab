@@ -1,3 +1,4 @@
+import { describe, it } from 'vitest';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
 
 describe('SpecialNotesTests', () => {

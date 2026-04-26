@@ -2,8 +2,6 @@ import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { TestPlatform } from 'test/TestPlatform';
-import { assert } from 'chai';
-
 /**
  * @partial
  * @internal
@@ -142,36 +140,36 @@ export class ComparisonHelpers {
         const actualType = typeof actual;
 
         if (actualType !== expectedType) {
-            assert.fail(`Type Mismatch on hierarchy: ${path}, actual<'${actualType}'> != expected<'${expectedType}'>`);
+            throw new Error(`Type Mismatch on hierarchy: ${path}, actual<'${actualType}'> != expected<'${expectedType}'>`);
         }
 
         switch (actualType) {
             case 'boolean':
                 if ((actual as boolean) !== (expected as boolean)) {
-                    assert.fail(
+                    throw new Error(
                         `Boolean mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`
                     );
                 }
                 break;
             case 'number':
                 if (Math.abs((actual as number) - (expected as number)) >= 0.000001) {
-                    assert.fail(
+                    throw new Error(
                         `Number mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`
                     );
                 }
                 break;
             case 'object':
                 if ((actual === null) !== (expected === null)) {
-                    assert.fail(`Null mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`);
+                    throw new Error(`Null mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`);
                 } else if (actual) {
                     if (Array.isArray(actual) !== Array.isArray(expected)) {
-                        assert.fail(`IsArray mismatch on hierarchy: ${path}`);
+                        throw new Error(`IsArray mismatch on hierarchy: ${path}`);
                     } else if (Array.isArray(actual) && Array.isArray(expected)) {
                         const actualArray = TestPlatform.typedArrayAsUnknownArray(actual);
                         const expectedArray = TestPlatform.typedArrayAsUnknownArray(expected);
 
                         if (actualArray.length !== expectedArray.length) {
-                            assert.fail(
+                            throw new Error(
                                 `Array Length mismatch on hierarchy: ${path}, actual<${actualArray.length}> != expected<${expectedArray.length}>`
                             );
                         } else {
@@ -187,7 +185,7 @@ export class ComparisonHelpers {
                         }
                     } else if (expected instanceof Map) {
                         if (!(actual instanceof Map)) {
-                            assert.fail(
+                            throw new Error(
                                 `Map mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`
                             );
                         } else {
@@ -223,7 +221,7 @@ export class ComparisonHelpers {
                             const actualKeyList = actualKeys.join(',');
                             const expectedKeyList = expectedKeys.join(',');
                             if (actualKeyList !== expectedKeyList) {
-                                assert.fail(
+                                throw new Error(
                                     `Object Keys mismatch on hierarchy: ${path}, actual<'${actualKeyList}'> != expected<'${expectedKeyList}'>`
                                 );
                             } else {
@@ -245,14 +243,14 @@ export class ComparisonHelpers {
                 break;
             case 'string':
                 if ((actual as string) !== (expected as string)) {
-                    assert.fail(
+                    throw new Error(
                         `String mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`
                     );
                 }
                 break;
             case 'undefined':
                 if (actual !== expected) {
-                    assert.fail(`null mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`);
+                    throw new Error(`null mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`);
                 }
                 break;
         }
@@ -268,7 +266,6 @@ export class ComparisonHelpers {
         path: string,
         _ignoreKeys: string[] | null
     ): boolean {
-        assert.fail(`Cannot compare unknown object types on path ${path}`);
-        return false;
+        throw new Error(`Cannot compare unknown object types on path ${path}`);
     }
 }

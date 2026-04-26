@@ -1,3 +1,4 @@
+import { describe, it } from 'vitest';
 import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
 import { AlphaTexErrorWithDiagnostics } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
@@ -5,8 +6,6 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { TestPlatform } from 'test/TestPlatform';
-import { assert } from 'chai';
-
 describe('AlphaTexExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
         const data = await TestPlatform.loadFile(`test-data/${name}`);
@@ -50,7 +49,7 @@ describe('AlphaTexExporterTest', () => {
                 }
             }
 
-            assert.fail(
+            throw new Error(
                 `<${fileName}>${unwrapped.toString()}\n${errorLines.join('\n')}${error.stack}\n Tex:\n${exported}`
             );
         }
@@ -123,7 +122,7 @@ describe('AlphaTexExporterTest', () => {
 
         if (errors.length > 0) {
             await TestPlatform.saveFileAsString('test-data/exporter/notation-legend-formatted.atex.new', data);
-            assert.fail(errors.join('\n'));
+            throw new Error(errors.join('\n'));
         } else {
             await TestPlatform.deleteFile('test-data/exporter/notation-legend-formatted.atex.new');
         }

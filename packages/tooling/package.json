@@ -4,11 +4,18 @@
     "type": "module",
     "description": "Additional build tooling for alphaTab like common build configurations",
     "private": true,
+    "scripts": {
+        "test": "vitest run",
+        "test-web": "npm run test"
+    },
     "devDependencies": {
         "@microsoft/api-extractor": "^7.57.7",
         "@rollup/plugin-terser": "^1.0.0",
         "@rollup/plugin-typescript": "^12.3.0",
         "rollup-plugin-license": "^3.7.0",
-        "typescript": "^5.9.3"
+        "rollup-plugin-node-externals": "^8.1.2",
+        "typescript": "^5.9.3",
+        "vite-tsconfig-paths": "^6.1.1",
+        "vitest": "^4.1.5"
     }
 }

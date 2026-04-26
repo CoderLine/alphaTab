@@ -1254,6 +1254,10 @@ export default class CSharpAstTransformer {
             }
         }
 
+        // vitest signature: it(name, options?, fn). Options object is optional.
+        const fnArgIndex =
+            d.arguments.length >= 3 && ts.isObjectLiteralExpression(d.arguments[1]) ? 2 : 1;
+
         name = this.context.toMethodNameCase(name);
         const csMethod: cs.MethodDeclaration = {
             parent: parent,
@@ -1271,7 +1275,7 @@ export default class CSharpAstTransformer {
                 parent: null,
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
                 type: cs.PrimitiveType.Void,
-                tsNode: d.arguments[1]
+                tsNode: d.arguments[fnArgIndex]
             } as cs.PrimitiveTypeNode,
             visibility: cs.Visibility.Public,
             tsNode: d,
@@ -1300,7 +1304,7 @@ export default class CSharpAstTransformer {
             ]
         });
 
-        const testFunction = d.arguments![1] as ts.ArrowFunction;
+        const testFunction = d.arguments![fnArgIndex] as ts.ArrowFunction;
         csMethod.isAsync =
             !!testFunction.modifiers && !!testFunction.modifiers.find(m => m.kind === ts.SyntaxKind.AsyncKeyword);
 
@@ -1308,7 +1312,7 @@ export default class CSharpAstTransformer {
             csMethod.returnType = {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: csMethod,
-                tsNode: d.arguments[1],
+                tsNode: d.arguments[fnArgIndex],
                 isAsync: true,
                 reference: {
                     nodeType: cs.SyntaxKind.PrimitiveTypeNode,
@@ -1343,7 +1347,10 @@ export default class CSharpAstTransformer {
         const sourcePath = d.getSourceFile().fileName;
         const snapshotFilePath = path.resolve(sourcePath, '..', '__snapshots__', `${path.basename(sourcePath)}.snap`);
         if (fs.existsSync(snapshotFilePath)) {
-            const relative = path.relative(path.dirname(this.context.compilerOptions.configFilePath as string), snapshotFilePath);
+            const relative = path.relative(
+                path.dirname(this.context.compilerOptions.configFilePath as string),
+                snapshotFilePath
+            );
             csMethod.attributes.push({
                 parent: csMethod,
                 nodeType: cs.SyntaxKind.Attribute,
@@ -4214,7 +4221,20 @@ export default class CSharpAstTransformer {
         }
 
         if (memberAccess.tsSymbol) {
-            const parentSymbol = (memberAccess.tsSymbol as any).parent as ts.Symbol;
+            let parentSymbol = (memberAccess.tsSymbol as any).parent as ts.Symbol | undefined;
+            if (!parentSymbol) {
+                const propertyDeclaration = memberAccess.tsSymbol.declarations?.find(
+                    d => ts.isPropertyDeclaration(d) || ts.isPropertySignature(d)
+                );
+                if (propertyDeclaration) {
+                    parentSymbol =
+                        propertyDeclaration.parent &&
+                        (ts.isClassLike(propertyDeclaration.parent) ||
+                            ts.isInterfaceDeclaration(propertyDeclaration.parent))
+                            ? this.context.typeChecker.getSymbolAtLocation(propertyDeclaration.parent.name!)
+                            : undefined;
+                }
+            }
             if (parentSymbol) {
                 const renamed = this.getSymbolName(parentSymbol!, memberAccess.tsSymbol!);
                 if (renamed) {

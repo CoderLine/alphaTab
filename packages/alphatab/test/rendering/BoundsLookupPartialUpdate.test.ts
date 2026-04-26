@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { Bar } from '@coderline/alphatab/model/Bar';
 import { Beat } from '@coderline/alphatab/model/Beat';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
@@ -11,8 +12,6 @@ import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
 import { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
-import { expect } from 'chai';
-
 // Covers the partial-render preservation path: ScoreRenderer.render reuses an existing
 // BoundsLookup when renderHints.firstChangedMasterBar is set, VerticalLayoutBase prunes the
 // changed range via BoundsLookup.clearFromMasterBar, and BoundsLookup.finish must remain
@@ -91,30 +90,30 @@ describe('BoundsLookupPartialUpdate', () => {
         system.visualBounds = makeBounds(10, 20, 100, 50);
         system.realBounds = makeBounds(10, 20, 100, 80);
 
-        expect(system.isFinished).to.equal(false);
+        expect(system.isFinished).toBe(false);
 
         system.finish(2);
 
-        expect(system.isFinished).to.equal(true);
-        expect(system.visualBounds.x).to.equal(20);
-        expect(system.realBounds.w).to.equal(200);
+        expect(system.isFinished).toBe(true);
+        expect(system.visualBounds.x).toBe(20);
+        expect(system.realBounds.w).toBe(200);
 
         // second finish() call must be a no-op - otherwise preserved systems get double-scaled
         system.finish(2);
 
-        expect(system.visualBounds.x).to.equal(20);
-        expect(system.realBounds.w).to.equal(200);
+        expect(system.visualBounds.x).toBe(20);
+        expect(system.realBounds.w).toBe(200);
     });
 
     it('BoundsLookup.resetForPartialUpdate reopens the lookup for registrations', () => {
         const lookup = new BoundsLookup();
         lookup.finish(1);
 
-        expect(lookup.isFinished).to.equal(true);
+        expect(lookup.isFinished).toBe(true);
 
         lookup.resetForPartialUpdate();
 
-        expect(lookup.isFinished).to.equal(false);
+        expect(lookup.isFinished).toBe(false);
     });
 
     it('BoundsLookup.clearFromMasterBar keeps preserved entries and drops the changed range', () => {
@@ -122,27 +121,27 @@ describe('BoundsLookupPartialUpdate', () => {
         const score = buildScore(10, 2);
         const lookup = populateLookup(score, 5);
 
-        expect(lookup.staffSystems.length).to.equal(2);
-        expect(lookup.findMasterBarByIndex(0)).to.not.equal(null);
-        expect(lookup.findMasterBarByIndex(9)).to.not.equal(null);
+        expect(lookup.staffSystems.length).toBe(2);
+        expect(lookup.findMasterBarByIndex(0)).not.toBe(null);
+        expect(lookup.findMasterBarByIndex(9)).not.toBe(null);
 
         // partial render targeting system 1 - clear from the first bar of system 1
         lookup.clearFromMasterBar(5);
 
         // system 0 survives with its bars intact
-        expect(lookup.staffSystems.length).to.equal(1);
-        expect(lookup.findMasterBarByIndex(0)).to.not.equal(null);
-        expect(lookup.findMasterBarByIndex(4)).to.not.equal(null);
+        expect(lookup.staffSystems.length).toBe(1);
+        expect(lookup.findMasterBarByIndex(0)).not.toBe(null);
+        expect(lookup.findMasterBarByIndex(4)).not.toBe(null);
 
         // everything from bar 5 onward is gone
-        expect(lookup.findMasterBarByIndex(5)).to.equal(null);
-        expect(lookup.findMasterBarByIndex(9)).to.equal(null);
+        expect(lookup.findMasterBarByIndex(5)).toBe(null);
+        expect(lookup.findMasterBarByIndex(9)).toBe(null);
 
         // beat lookup: beats in preserved bars still findable, beats in cleared bars are not
         const preservedBeat = score.tracks[0].staves[0].bars[2].voices[0].beats[0];
         const clearedBeat = score.tracks[0].staves[0].bars[7].voices[0].beats[0];
-        expect(lookup.findBeat(preservedBeat)).to.not.equal(null);
-        expect(lookup.findBeat(clearedBeat)).to.equal(null);
+        expect(lookup.findBeat(preservedBeat)).not.toBe(null);
+        expect(lookup.findBeat(clearedBeat)).toBe(null);
     });
 
     it('clearFromMasterBar + re-register preserves already-scaled bounds and scales only new ones', () => {
@@ -182,11 +181,11 @@ describe('BoundsLookupPartialUpdate', () => {
         // finish again at the same scale - preserved system must NOT be re-scaled
         lookup.finish(2);
 
-        expect(preservedSystem0.realBounds.x).to.equal(preservedRealX);
-        expect(preservedSystem0.realBounds.w).to.equal(preservedRealW);
+        expect(preservedSystem0.realBounds.x).toBe(preservedRealX);
+        expect(preservedSystem0.realBounds.w).toBe(preservedRealW);
 
         // the newly registered system gets scaled exactly once
-        expect(newSystem.isFinished).to.equal(true);
-        expect(newSystem.realBounds.w).to.equal(2000);
+        expect(newSystem.isFinished).toBe(true);
+        expect(newSystem.realBounds.w).toBe(2000);
     });
 });

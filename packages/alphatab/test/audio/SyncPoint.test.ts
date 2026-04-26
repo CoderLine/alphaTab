@@ -1,9 +1,5 @@
-import {
-    type IEventEmitterOfT,
-    type IEventEmitter,
-    EventEmitterOfT,
-    EventEmitter
-} from '@coderline/alphatab/EventEmitter';
+import { describe, expect, it } from 'vitest';
+import { type IEventEmitterOfT, type IEventEmitter, EventEmitterOfT, EventEmitter } from '@coderline/alphatab/EventEmitter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
@@ -24,7 +20,6 @@ import type { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
 import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
 import { FlatMidiEventGenerator } from 'test/audio/FlatMidiEventGenerator';
 import { TestPlatform } from 'test/TestPlatform';
-import { expect } from 'chai';
 
 describe('SyncPointTests', () => {
     it('sync-point-update', async () => {
@@ -68,24 +63,24 @@ describe('SyncPointTests', () => {
         sequencer.loadMidi(midi);
 
         sequencer.currentUpdateCurrentTempo(0);
-        expect(sequencer.currentTempo).to.equal(90);
-        expect(sequencer.modifiedTempo).to.equal(90);
+        expect(sequencer.currentTempo).toBe(90);
+        expect(sequencer.modifiedTempo).toBe(90);
 
         sequencer.currentUpdateCurrentTempo(1000);
-        expect(sequencer.currentTempo).to.equal(90);
-        expect(sequencer.modifiedTempo).to.equal(90);
+        expect(sequencer.currentTempo).toBe(90);
+        expect(sequencer.modifiedTempo).toBe(90);
 
         sequencer.currentUpdateCurrentTempo(2000);
-        expect(sequencer.currentTempo).to.equal(90);
-        expect(sequencer.modifiedTempo).to.equal(90);
+        expect(sequencer.currentTempo).toBe(90);
+        expect(sequencer.modifiedTempo).toBe(90);
 
         sequencer.currentUpdateCurrentTempo(3000);
-        expect(sequencer.currentTempo).to.equal(120);
-        expect(sequencer.modifiedTempo).to.equal(120);
+        expect(sequencer.currentTempo).toBe(120);
+        expect(sequencer.modifiedTempo).toBe(120);
 
         sequencer.currentUpdateCurrentTempo(4000);
-        expect(sequencer.currentTempo).to.equal(120);
-        expect(sequencer.modifiedTempo).to.equal(120);
+        expect(sequencer.currentTempo).toBe(120);
+        expect(sequencer.modifiedTempo).toBe(120);
     });
 
     async function syncPointTestScore() {
@@ -117,15 +112,15 @@ describe('SyncPointTests', () => {
 
         const update = MidiFileGenerator.generateSyncPoints(score);
 
-        expect(generator.syncPoints.length).to.equal(update.length);
+        expect(generator.syncPoints.length).toBe(update.length);
         for (let i = 0; i < generator.syncPoints.length; i++) {
-            expect(update[i].masterBarIndex).to.equal(generator.syncPoints[i].masterBarIndex);
-            expect(update[i].masterBarOccurence).to.equal(generator.syncPoints[i].masterBarOccurence);
-            expect(update[i].syncBpm).to.equal(generator.syncPoints[i].syncBpm);
-            expect(update[i].syncTime).to.equal(generator.syncPoints[i].syncTime);
-            expect(update[i].synthBpm).to.equal(generator.syncPoints[i].synthBpm);
-            expect(update[i].synthTick).to.equal(generator.syncPoints[i].synthTick);
-            expect(update[i].synthTime).to.equal(generator.syncPoints[i].synthTime);
+            expect(update[i].masterBarIndex).toBe(generator.syncPoints[i].masterBarIndex);
+            expect(update[i].masterBarOccurence).toBe(generator.syncPoints[i].masterBarOccurence);
+            expect(update[i].syncBpm).toBe(generator.syncPoints[i].syncBpm);
+            expect(update[i].syncTime).toBe(generator.syncPoints[i].syncTime);
+            expect(update[i].synthBpm).toBe(generator.syncPoints[i].synthBpm);
+            expect(update[i].synthTick).toBe(generator.syncPoints[i].synthTick);
+            expect(update[i].synthTime).toBe(generator.syncPoints[i].synthTime);
         }
     });
 

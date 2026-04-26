@@ -1,57 +1,57 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`AlphaTexLexerTest basic-tokens 1`] = `
-Array [
+exports[`AlphaTexLexerTest > basic-tokens 1`] = `
+[
   Dot (1,1) -> (1,2),
 ]
 `;
 
-exports[`AlphaTexLexerTest basic-tokens 2`] = `
-Array [
+exports[`AlphaTexLexerTest > basic-tokens 2`] = `
+[
   Colon (1,1) -> (1,2),
 ]
 `;
 
-exports[`AlphaTexLexerTest basic-tokens 3`] = `
-Array [
+exports[`AlphaTexLexerTest > basic-tokens 3`] = `
+[
   LParen (1,1) -> (1,2),
 ]
 `;
 
-exports[`AlphaTexLexerTest basic-tokens 4`] = `
-Array [
+exports[`AlphaTexLexerTest > basic-tokens 4`] = `
+[
   RParen (1,1) -> (1,2),
 ]
 `;
 
-exports[`AlphaTexLexerTest basic-tokens 5`] = `
-Array [
+exports[`AlphaTexLexerTest > basic-tokens 5`] = `
+[
   LBrace (1,1) -> (1,2),
 ]
 `;
 
-exports[`AlphaTexLexerTest basic-tokens 6`] = `
-Array [
+exports[`AlphaTexLexerTest > basic-tokens 6`] = `
+[
   RBrace (1,1) -> (1,2),
 ]
 `;
 
-exports[`AlphaTexLexerTest basic-tokens 7`] = `
-Array [
+exports[`AlphaTexLexerTest > basic-tokens 7`] = `
+[
   Pipe (1,1) -> (1,2),
 ]
 `;
 
-exports[`AlphaTexLexerTest basic-tokens 8`] = `
-Array [
+exports[`AlphaTexLexerTest > basic-tokens 8`] = `
+[
   Asterisk (1,1) -> (1,2),
 ]
 `;
 
-exports[`AlphaTexLexerTest errors at001 1`] = `Array []`;
+exports[`AlphaTexLexerTest > errors > at001 1`] = `[]`;
 
-exports[`AlphaTexLexerTest errors at001 2`] = `
-Array [
+exports[`AlphaTexLexerTest > errors > at001 2`] = `
+[
   Map {
     "code" => 1,
     "severity" => 2,
@@ -65,14 +65,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest errors at002 1`] = `
-Array [
+exports[`AlphaTexLexerTest > errors > at002 1`] = `
+[
   String "Test" (1,3) -> (1,8),
 ]
 `;
 
-exports[`AlphaTexLexerTest errors at002 2`] = `
-Array [
+exports[`AlphaTexLexerTest > errors > at002 2`] = `
+[
   Map {
     "code" => 2,
     "severity" => 2,
@@ -86,14 +86,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest errors at003 1`] = `Array []`;
+exports[`AlphaTexLexerTest > errors > at003 1`] = `[]`;
 
-exports[`AlphaTexLexerTest errors at003 2`] = `
-Array [
+exports[`AlphaTexLexerTest > errors > at003 2`] = `
+[
   Map {
     "code" => 3,
     "severity" => 2,
-    "message" => "Unexpected end of file. Need 4 hex characters on a \\\\uXXXX escape sequence",
+    "message" => "Unexpected end of file. Need 4 hex characters on a \\uXXXX escape sequence",
     "start" => Map {
       "col" => 7,
       "line" => 1,
@@ -103,14 +103,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest errors at004 1`] = `Array []`;
+exports[`AlphaTexLexerTest > errors > at004 1`] = `[]`;
 
-exports[`AlphaTexLexerTest errors at004 2`] = `
-Array [
+exports[`AlphaTexLexerTest > errors > at004 2`] = `
+[
   Map {
     "code" => 4,
     "severity" => 2,
-    "message" => "Invalid unicode value. Need 4 hex characters on a \\\\uXXXX escape sequence.",
+    "message" => "Invalid unicode value. Need 4 hex characters on a \\uXXXX escape sequence.",
     "start" => Map {
       "col" => 7,
       "line" => 1,
@@ -120,14 +120,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest errors at005 1`] = `Array []`;
+exports[`AlphaTexLexerTest > errors > at005 1`] = `[]`;
 
-exports[`AlphaTexLexerTest errors at005 2`] = `
-Array [
+exports[`AlphaTexLexerTest > errors > at005 2`] = `
+[
   Map {
     "code" => 5,
     "severity" => 2,
-    "message" => "Unsupported escape sequence. Expected '\\\\n', '\\\\r', '\\\\t', or '\\\\uXXXX' but found '\\\\b'.",
+    "message" => "Unsupported escape sequence. Expected '\\n', '\\r', '\\t', or '\\uXXXX' but found '\\b'.",
     "start" => Map {
       "col" => 3,
       "line" => 1,
@@ -137,10 +137,10 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest errors at006 1`] = `Array []`;
+exports[`AlphaTexLexerTest > errors > at006 1`] = `[]`;
 
-exports[`AlphaTexLexerTest errors at006 2`] = `
-Array [
+exports[`AlphaTexLexerTest > errors > at006 2`] = `
+[
   Map {
     "code" => 6,
     "severity" => 2,
@@ -154,10 +154,10 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest errors at006 3`] = `Array []`;
+exports[`AlphaTexLexerTest > errors > at006 3`] = `[]`;
 
-exports[`AlphaTexLexerTest errors at006 4`] = `
-Array [
+exports[`AlphaTexLexerTest > errors > at006 4`] = `
+[
   Map {
     "code" => 6,
     "severity" => 2,
@@ -171,96 +171,96 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 1`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 1`] = `
+[
   Number "1.1" (1,1) -> (1,4),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 2`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 2`] = `
+[
   Number "11.22" (1,1) -> (1,6),
   Number "33.44" (1,7) -> (1,12),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 3`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 3`] = `
+[
   Number "1.1" (1,1) -> (1,4),
   Dot (1,4) -> (1,5),
   Number "4" (1,5) -> (1,6),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 4`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 4`] = `
+[
   Number "1.1" (1,1) -> (1,4),
   Dot (1,5) -> (1,6),
   Number "4" (1,6) -> (1,7),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 5`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 5`] = `
+[
   Number "1" (1,1) -> (1,2),
   Dot (1,3) -> (1,4),
   Number "1.4" (1,4) -> (1,7),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 6`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 6`] = `
+[
   Number "-1.1" (1,1) -> (1,5),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 7`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 7`] = `
+[
   Ident "-" (1,1) -> (1,2),
   Dot (1,2) -> (1,3),
   Number "1" (1,3) -> (1,4),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 8`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 8`] = `
+[
   Number "1.1" (1,1) -> (1,4),
   LParen (1,4) -> (1,5),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 9`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 9`] = `
+[
   Number "1.1" (1,1) -> (1,4),
   LBrace (1,4) -> (1,5),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 10`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 10`] = `
+[
   Number "1.1" (1,1) -> (1,4),
   Pipe (1,4) -> (1,5),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 11`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 11`] = `
+[
   Number "1" (1,1) -> (1,2),
   Dot (1,2) -> (1,3),
   Ident "1a" (1,3) -> (1,5),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 12`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 12`] = `
+[
   Ident "1a" (1,1) -> (1,3),
   Dot (1,3) -> (1,4),
   Number "1" (1,4) -> (1,5),
 ]
 `;
 
-exports[`AlphaTexLexerTest floats 13`] = `
-Array [
+exports[`AlphaTexLexerTest > floats 13`] = `
+[
   Number "1.1" (1,1) -> (1,4),
   Tag "test" (1,4) -> (1,9) {
     prefix: Backslash (1,4) -> (1,5),
@@ -269,79 +269,79 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest identifiers 1`] = `
-Array [
+exports[`AlphaTexLexerTest > identifiers 1`] = `
+[
   Ident "true" (1,1) -> (1,5),
 ]
 `;
 
-exports[`AlphaTexLexerTest identifiers 2`] = `
-Array [
+exports[`AlphaTexLexerTest > identifiers 2`] = `
+[
   Ident "false" (1,1) -> (1,6),
 ]
 `;
 
-exports[`AlphaTexLexerTest identifiers 3`] = `
-Array [
+exports[`AlphaTexLexerTest > identifiers 3`] = `
+[
   Ident "HelloWorld" (1,1) -> (1,11),
 ]
 `;
 
-exports[`AlphaTexLexerTest identifiers 4`] = `
-Array [
+exports[`AlphaTexLexerTest > identifiers 4`] = `
+[
   Ident "C4" (1,1) -> (1,3),
 ]
 `;
 
-exports[`AlphaTexLexerTest identifiers 5`] = `
-Array [
+exports[`AlphaTexLexerTest > identifiers 5`] = `
+[
   Ident "C#4" (1,1) -> (1,4),
 ]
 `;
 
-exports[`AlphaTexLexerTest identifiers 6`] = `
-Array [
+exports[`AlphaTexLexerTest > identifiers 6`] = `
+[
   Ident "Cb4" (1,1) -> (1,4),
 ]
 `;
 
-exports[`AlphaTexLexerTest identifiers 7`] = `
-Array [
+exports[`AlphaTexLexerTest > identifiers 7`] = `
+[
   Ident "electricpiano1" (1,1) -> (1,15),
 ]
 `;
 
-exports[`AlphaTexLexerTest identifiers 8`] = `
-Array [
+exports[`AlphaTexLexerTest > identifiers 8`] = `
+[
   Ident "Unicodeöäü" (1,1) -> (1,11),
   Ident "Unicode😸" (1,12) -> (1,20),
   Ident "Utf16🤘🏻" (1,21) -> (1,28),
 ]
 `;
 
-exports[`AlphaTexLexerTest identifiers 9`] = `
-Array [
+exports[`AlphaTexLexerTest > identifiers 9`] = `
+[
   Ident "dashed-identifier" (1,1) -> (1,18),
 ]
 `;
 
-exports[`AlphaTexLexerTest identifiers 10`] = `
-Array [
+exports[`AlphaTexLexerTest > identifiers 10`] = `
+[
   Ident "HelloWorld" (1,1) -> (1,11),
   Ident "Multiple" (1,12) -> (1,20),
   Ident "Identifiers" (1,21) -> (1,32),
 ]
 `;
 
-exports[`AlphaTexLexerTest leading-comments 1`] = `
-Array [
+exports[`AlphaTexLexerTest > leading-comments 1`] = `
+[
   Ident "true" (3,9) -> (3,13) {
-    leadingComments: Array [
+    leadingComments: [
       "// Single",
     ],
   },
   Ident "false" (7,9) -> (7,14) {
-    leadingComments: Array [
+    leadingComments: [
       "/** Multi **/",
       "/** Multi2 **/",
       "// Single",
@@ -350,8 +350,8 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest meta-command 1`] = `
-Array [
+exports[`AlphaTexLexerTest > meta-command 1`] = `
+[
   Tag "title" (1,1) -> (1,7) {
     prefix: Backslash (1,1) -> (1,2),
     tag: Ident "title" (1,2) -> (1,7),
@@ -359,8 +359,8 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest meta-command 2`] = `
-Array [
+exports[`AlphaTexLexerTest > meta-command 2`] = `
+[
   Tag "double" (1,1) -> (1,9) {
     prefix: DoubleBackslash (1,1) -> (1,3),
     tag: Ident "double" (1,3) -> (1,9),
@@ -368,8 +368,8 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest meta-command 3`] = `
-Array [
+exports[`AlphaTexLexerTest > meta-command 3`] = `
+[
   Tag "withNumber123" (1,1) -> (1,15) {
     prefix: Backslash (1,1) -> (1,2),
     tag: Ident "withNumber123" (1,2) -> (1,15),
@@ -377,8 +377,8 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest meta-command 4`] = `
-Array [
+exports[`AlphaTexLexerTest > meta-command 4`] = `
+[
   Tag "withUnicode😼" (1,1) -> (1,14) {
     prefix: Backslash (1,1) -> (1,2),
     tag: Ident "withUnicode😼" (1,2) -> (1,14),
@@ -386,8 +386,8 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest meta-command 5`] = `
-Array [
+exports[`AlphaTexLexerTest > meta-command 5`] = `
+[
   Tag "withUnicode😼" (1,1) -> (1,14) {
     prefix: Backslash (1,1) -> (1,2),
     tag: Ident "withUnicode😼" (1,2) -> (1,14),
@@ -400,122 +400,122 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest numbers 1`] = `
-Array [
+exports[`AlphaTexLexerTest > numbers 1`] = `
+[
   Number "1" (1,1) -> (1,2),
 ]
 `;
 
-exports[`AlphaTexLexerTest numbers 2`] = `
-Array [
+exports[`AlphaTexLexerTest > numbers 2`] = `
+[
   Number "1234" (1,1) -> (1,5),
 ]
 `;
 
-exports[`AlphaTexLexerTest numbers 3`] = `
-Array [
+exports[`AlphaTexLexerTest > numbers 3`] = `
+[
   Number "-1" (1,1) -> (1,3),
 ]
 `;
 
-exports[`AlphaTexLexerTest numbers 4`] = `
-Array [
+exports[`AlphaTexLexerTest > numbers 4`] = `
+[
   Number "-1234" (1,1) -> (1,6),
 ]
 `;
 
-exports[`AlphaTexLexerTest numbers 5`] = `
-Array [
+exports[`AlphaTexLexerTest > numbers 5`] = `
+[
   Number "1234" (1,1) -> (1,5),
   Number "5678" (1,6) -> (1,10),
 ]
 `;
 
-exports[`AlphaTexLexerTest strings 1`] = `
-Array [
+exports[`AlphaTexLexerTest > strings 1`] = `
+[
   String "Double Quoted" (1,1) -> (1,15),
 ]
 `;
 
-exports[`AlphaTexLexerTest strings 2`] = `
-Array [
+exports[`AlphaTexLexerTest > strings 2`] = `
+[
   String "Single Quoted" (1,1) -> (1,15),
 ]
 `;
 
-exports[`AlphaTexLexerTest strings 3`] = `
-Array [
+exports[`AlphaTexLexerTest > strings 3`] = `
+[
   String "Multiple" (1,1) -> (1,10),
   String "Strings" (1,12) -> (1,20),
 ]
 `;
 
-exports[`AlphaTexLexerTest strings 4`] = `
-Array [
+exports[`AlphaTexLexerTest > strings 4`] = `
+[
   String "Double \\"Quoted\\"" (1,1) -> (1,19),
 ]
 `;
 
-exports[`AlphaTexLexerTest strings 5`] = `
-Array [
+exports[`AlphaTexLexerTest > strings 5`] = `
+[
   String "Single 'Quoted'" (1,1) -> (1,19),
 ]
 `;
 
-exports[`AlphaTexLexerTest strings 6`] = `
-Array [
+exports[`AlphaTexLexerTest > strings 6`] = `
+[
   String "\\r\\n\\t" (1,1) -> (1,8),
 ]
 `;
 
-exports[`AlphaTexLexerTest strings 7`] = `
-Array [
+exports[`AlphaTexLexerTest > strings 7`] = `
+[
   String "\\r\\n\\t" (1,1) -> (1,8),
 ]
 `;
 
-exports[`AlphaTexLexerTest strings 8`] = `
-Array [
+exports[`AlphaTexLexerTest > strings 8`] = `
+[
   String "😸" (1,1) -> (1,14),
 ]
 `;
 
-exports[`AlphaTexLexerTest strings 9`] = `
-Array [
+exports[`AlphaTexLexerTest > strings 9`] = `
+[
   String "😸🤘🏻" (1,1) -> (1,5),
 ]
 `;
 
-exports[`AlphaTexLexerTest trailing-comments 1`] = `
-Array [
+exports[`AlphaTexLexerTest > trailing-comments 1`] = `
+[
   Ident "true" (2,9) -> (2,13) {
-    trailingComments: Array [
+    trailingComments: [
       "// Single After",
     ],
   },
   Ident "false" (3,9) -> (3,14) {
-    trailingComments: Array [
+    trailingComments: [
       "/** Multi After **/",
     ],
   },
   Ident "true" (4,22) -> (4,26) {
-    leadingComments: Array [
+    leadingComments: [
       "/** before **/",
     ],
-    trailingComments: Array [
+    trailingComments: [
       "/** middle **/",
     ],
   },
   Ident "false" (4,40) -> (4,45) {
-    trailingComments: Array [
+    trailingComments: [
       "// after",
     ],
   },
 ]
 `;
 
-exports[`AlphaTexLexerTest whitespace 1`] = `
-Array [
+exports[`AlphaTexLexerTest > whitespace 1`] = `
+[
   Dot (1,3) -> (1,4),
   Dot (2,7) -> (2,8),
 ]

@@ -1,25 +1,24 @@
+import { describe, expect, it } from 'vitest';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
-import { expect } from 'chai';
-
 describe('Gp4ImporterTest', () => {
     it('score-info', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro4/score-info.gp4');
         const score: Score = reader.readScore();
-        expect(score.title).to.equal('Title');
-        expect(score.subTitle).to.equal('Subtitle');
-        expect(score.artist).to.equal('Artist');
-        expect(score.album).to.equal('Album');
-        expect(score.words).to.equal('Music'); // no words in gp4
+        expect(score.title).toBe('Title');
+        expect(score.subTitle).toBe('Subtitle');
+        expect(score.artist).toBe('Artist');
+        expect(score.album).toBe('Album');
+        expect(score.words).toBe('Music'); // no words in gp4
 
-        expect(score.music).to.equal('Music');
-        expect(score.copyright).to.equal('Copyright');
-        expect(score.tab).to.equal('Tab');
-        expect(score.instructions).to.equal('Instructions');
-        expect(score.notices).to.equal('Notice1\r\nNotice2');
-        expect(score.masterBars.length).to.equal(5);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.tracks[0].name).to.equal('Track 1');
+        expect(score.music).toBe('Music');
+        expect(score.copyright).toBe('Copyright');
+        expect(score.tab).toBe('Tab');
+        expect(score.instructions).toBe('Instructions');
+        expect(score.notices).toBe('Notice1\r\nNotice2');
+        expect(score.masterBars.length).toBe(5);
+        expect(score.tracks.length).toBe(1);
+        expect(score.tracks[0].name).toBe('Track 1');
     });
 
     it('notes', async () => {

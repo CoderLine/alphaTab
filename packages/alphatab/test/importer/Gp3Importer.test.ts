@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { BrushType } from '@coderline/alphatab/model/BrushType';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
@@ -5,26 +6,24 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
-import { expect } from 'chai';
-
 describe('Gp3ImporterTest', () => {
     it('score-info', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/score-info.gp3');
         const score: Score = reader.readScore();
-        expect(score.title).to.equal('Title');
-        expect(score.subTitle).to.equal('Subtitle');
-        expect(score.artist).to.equal('Artist');
-        expect(score.album).to.equal('Album');
-        expect(score.words).to.equal('Music'); // no words in gp4
+        expect(score.title).toBe('Title');
+        expect(score.subTitle).toBe('Subtitle');
+        expect(score.artist).toBe('Artist');
+        expect(score.album).toBe('Album');
+        expect(score.words).toBe('Music'); // no words in gp4
 
-        expect(score.music).to.equal('Music');
-        expect(score.copyright).to.equal('Copyright');
-        expect(score.tab).to.equal('Tab');
-        expect(score.instructions).to.equal('Instructions');
-        expect(score.notices).to.equal('Notice1\r\nNotice2');
-        expect(score.masterBars.length).to.equal(5);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.tracks[0].name).to.equal('Track 1');
+        expect(score.music).toBe('Music');
+        expect(score.copyright).toBe('Copyright');
+        expect(score.tab).toBe('Tab');
+        expect(score.instructions).toBe('Instructions');
+        expect(score.notices).toBe('Notice1\r\nNotice2');
+        expect(score.masterBars.length).toBe(5);
+        expect(score.tracks.length).toBe(1);
+        expect(score.tracks[0].name).toBe('Track 1');
     });
 
     it('notes', async () => {
@@ -48,28 +47,28 @@ describe('Gp3ImporterTest', () => {
     it('accentuations', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/accentuations.gp3');
         const score: Score = reader.readScore();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isGhost).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isGhost).toBe(true);
         // it seems accentuation is handled as Forte Fortissimo
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].dynamics).to.equal(DynamicValue.FFF);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isLetRing).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].dynamics).toBe(DynamicValue.FFF);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isLetRing).toBe(true);
     });
 
     it('harmonics', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/harmonics.gp3');
         const score: Score = reader.readScore();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).to.be.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).toBe(
             HarmonicType.Natural
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).to.be.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).toBe(
             HarmonicType.Artificial
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).to.be.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).toBe(
             HarmonicType.Artificial
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).to.be.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).toBe(
             HarmonicType.Artificial
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).to.be.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).toBe(
             HarmonicType.Artificial
         );
     });
@@ -89,10 +88,10 @@ describe('Gp3ImporterTest', () => {
     it('slides', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/slides.gp3');
         const score: Score = reader.readScore();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(5)!.slideOutType).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(5)!.slideOutType).toBe(
             SlideOutType.Shift
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].getNoteOnString(2)!.slideOutType).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].getNoteOnString(2)!.slideOutType).toBe(
             SlideOutType.Shift
         );
     });
@@ -106,28 +105,28 @@ describe('Gp3ImporterTest', () => {
     it('other-effects', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/other-effects.gp3');
         const score: Score = reader.readScore();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tap).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].slap).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].pop).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].fadeIn).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].hasChord).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].chord!.name).to.equal('C');
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].text).to.equal('Text');
-        expect(score.tracks[0].staves[0].bars[4].masterBar.tempoAutomations.length).to.equal(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tap).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].slap).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].pop).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].fadeIn).toBe(true);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].hasChord).toBe(true);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].chord!.name).toBe('C');
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].text).toBe('Text');
+        expect(score.tracks[0].staves[0].bars[4].masterBar.tempoAutomations.length).toBe(1);
         expect(
             score.tracks[0].staves[0].bars[4].masterBar.tempoAutomations[0]!.value
-        ).to.equal(120);
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)).to.be.ok;
+        ).toBe(120);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)).toBeTruthy();
         expect(
             score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)!.value
-        ).to.equal(25);
+        ).toBe(25);
     });
 
     it('strokes', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/strokes.gp3');
         const score: Score = reader.readScore();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushType).to.equal(BrushType.BrushDown);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushType).to.equal(BrushType.BrushUp);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushType).toBe(BrushType.BrushDown);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushType).toBe(BrushType.BrushUp);
     });
 
     it('tuplets', async () => {
@@ -139,10 +138,10 @@ describe('Gp3ImporterTest', () => {
     it('ranges', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/ranges.gp3');
         const score: Score = reader.readScore();
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].isLetRing).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].isLetRing).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].isLetRing).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].notes[0].isLetRing).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].isLetRing).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].isLetRing).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].isLetRing).toBe(true);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].notes[0].isLetRing).toBe(true);
     });
 
     it('effects', async () => {

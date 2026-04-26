@@ -1,22 +1,41 @@
 /** @target web */
-import * as chai from 'chai';
-import { afterAll, beforeEachTest, initializeJestSnapshot } from './mocha.jest-snapshot';
 import { TestPlatform } from 'test/TestPlatform';
+import { beforeEach, expect } from 'vitest';
+import {
+    AlphaTexAstNodePlugin,
+    AlphaTexDiagnosticPlugin,
+    MidiEventSerializerPlugin,
+    type PrettyFormatConfig,
+    type PrettyFormatPrinter,
+    ScoreSerializerPlugin
+} from './PrettyFormat';
 
-export const mochaHooks = {
-    async beforeAll() {
-        chai.config.truncateThreshold = 0; // disable truncating
-        await initializeJestSnapshot();
-    },
+const plugins = [
+    ScoreSerializerPlugin.instance,
+    MidiEventSerializerPlugin.instance,
+    AlphaTexDiagnosticPlugin.instance,
+    AlphaTexAstNodePlugin.instance
+];
 
-    beforeEach: function (done) {
-        beforeEachTest(this.currentTest!);
-        TestPlatform.currentTestName = this.currentTest!.title;
-        done();
-    },
+for (const plugin of plugins) {
+    expect.addSnapshotSerializer({
+        test(val) {
+            return plugin.test(val);
+        },
+        serialize(val, config, indentation, depth, refs, printer) {
+            return plugin.serialize(
+                val,
+                config as PrettyFormatConfig,
+                indentation,
+                depth,
+                refs,
+                printer as PrettyFormatPrinter
+            );
+        }
+    });
+}
 
-    afterAll(done) {
-        afterAll();
-        done();
-    }
-} satisfies Mocha.RootHookObject;
+beforeEach(() => {
+    const fullName = expect.getState().currentTestName ?? '';
+    TestPlatform.currentTestName = fullName.split(' > ').pop() ?? '';
+});

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
@@ -8,7 +9,6 @@ import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { FingeringMode, NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
-import { assert, expect } from 'chai';
 import { TestPlatform } from 'test/TestPlatform';
 import { ComparisonHelpers } from './ComparisonHelpers';
 
@@ -40,7 +40,7 @@ describe('JsonConverterTest', () => {
                 null
             );
         } catch (e) {
-            assert.fail(String(e));
+            throw new Error(String(e));
         }
     }
 
@@ -170,14 +170,14 @@ describe('JsonConverterTest', () => {
 
         SettingsSerializer.fromJson(settings, raw);
 
-        expect(settings.core.enableLazyLoading).to.equal(false);
-        expect(settings.core.logLevel).to.equal(LogLevel.Error);
-        expect(settings.display.layoutMode).to.equal(LayoutMode.Horizontal);
-        expect(settings.display.scale).to.equal(5);
-        expect(settings.notation.rhythmMode).to.equal(TabRhythmMode.ShowWithBars);
-        expect(settings.display.resources.mainGlyphColor.r).to.equal(255);
-        expect(settings.display.resources.mainGlyphColor.g).to.equal(0);
-        expect(settings.display.resources.mainGlyphColor.b).to.equal(0);
+        expect(settings.core.enableLazyLoading).toBe(false);
+        expect(settings.core.logLevel).toBe(LogLevel.Error);
+        expect(settings.display.layoutMode).toBe(LayoutMode.Horizontal);
+        expect(settings.display.scale).toBe(5);
+        expect(settings.notation.rhythmMode).toBe(TabRhythmMode.ShowWithBars);
+        expect(settings.display.resources.mainGlyphColor.r).toBe(255);
+        expect(settings.display.resources.mainGlyphColor.g).toBe(0);
+        expect(settings.display.resources.mainGlyphColor.b).toBe(0);
     });
 
     /*@target web*/
@@ -202,13 +202,13 @@ describe('JsonConverterTest', () => {
 
         SettingsSerializer.fromJson(settings, raw);
 
-        expect(settings.core.enableLazyLoading).to.equal(false);
-        expect(settings.core.logLevel).to.equal(LogLevel.Error);
-        expect(settings.display.layoutMode).to.equal(LayoutMode.Horizontal);
-        expect(settings.display.scale).to.equal(5);
-        expect(settings.notation.rhythmMode).to.equal(TabRhythmMode.ShowWithBars);
-        expect(settings.display.resources.mainGlyphColor.r).to.equal(255);
-        expect(settings.display.resources.mainGlyphColor.g).to.equal(0);
-        expect(settings.display.resources.mainGlyphColor.b).to.equal(0);
+        expect(settings.core.enableLazyLoading).toBe(false);
+        expect(settings.core.logLevel).toBe(LogLevel.Error);
+        expect(settings.display.layoutMode).toBe(LayoutMode.Horizontal);
+        expect(settings.display.scale).toBe(5);
+        expect(settings.notation.rhythmMode).toBe(TabRhythmMode.ShowWithBars);
+        expect(settings.display.resources.mainGlyphColor.r).toBe(255);
+        expect(settings.display.resources.mainGlyphColor.g).toBe(0);
+        expect(settings.display.resources.mainGlyphColor.b).toBe(0);
     });
 });

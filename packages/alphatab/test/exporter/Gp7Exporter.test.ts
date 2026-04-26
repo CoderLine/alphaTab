@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { Gp7Exporter } from '@coderline/alphatab/exporter/Gp7Exporter';
 import {
     GpifInstrumentArticulation,
@@ -16,7 +17,6 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
-import { assert, expect } from 'chai';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { TestPlatform } from 'test/TestPlatform';
 
@@ -170,11 +170,11 @@ describe('Gp7ExporterTest', () => {
 
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
 
-        expect(actual.tracks[0].percussionArticulations.length).to.equal(2);
-        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
-        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(0);
-        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(1);
+        expect(actual.tracks[0].percussionArticulations.length).toBe(2);
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).toBe(0);
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).toBe(1);
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).toBe(0);
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).toBe(1);
     });
 
     it('gp7-lyrics-null', async () => {
@@ -255,7 +255,7 @@ describe('Gp7ExporterTest', () => {
         const expected = await TestPlatform.loadFileAsString('test-data/exporter/articulations.source');
         if (expected !== sourceCode) {
             await TestPlatform.saveFileAsString('test-data/exporter/articulations.source.new', sourceCode);
-            assert.fail('Articulations have changed, update the PercussionMapper and update the snapshot file');
+            throw new Error('Articulations have changed, update the PercussionMapper and update the snapshot file');
         }
     });
 
@@ -411,7 +411,7 @@ describe('Gp7ExporterTest', () => {
         const expected = await TestPlatform.loadFileAsString('test-data/exporter/soundmapper.source');
         if (expected !== sourceCode) {
             await TestPlatform.saveFileAsString('test-data/exporter/soundmapper.source.new', sourceCode);
-            assert.fail('RSE instrument set has, update the GpifSoundMapper and update the snapshot file');
+            throw new Error('RSE instrument set has, update the GpifSoundMapper and update the snapshot file');
         }
     });
 
@@ -433,72 +433,62 @@ describe('Gp7ExporterTest', () => {
         const actualInstrumentSet = getInstrumentSet(exported);
 
         // order IS important for the elements and articulations. the InstrumentArticulation is index based.
-        expect(actualInstrumentSet.name).to.equal(expectedInstrumentSet.name);
-        expect(actualInstrumentSet.type).to.equal(expectedInstrumentSet.type);
-        expect(actualInstrumentSet.lineCount).to.equal(expectedInstrumentSet.lineCount);
+        expect(actualInstrumentSet.name).toBe(expectedInstrumentSet.name);
+        expect(actualInstrumentSet.type).toBe(expectedInstrumentSet.type);
+        expect(actualInstrumentSet.lineCount).toBe(expectedInstrumentSet.lineCount);
 
         const expectedElements = Array.from(expectedInstrumentSet.elements);
         const actualElements = Array.from(actualInstrumentSet.elements);
 
         for (let i = 0; i < expectedElements.length; i++) {
             const expectedElement = expectedElements[i];
-            expect(actualElements.length).to.be.greaterThan(
-                i,
-                `Element ${i} (${expectedElement.name}) missing in actual file`
+            expect(actualElements.length, `Element ${i} (${expectedElement.name}) missing in actual file`).toBeGreaterThan(
+                i
             );
             const actualElement = actualElements[i];
 
-            expect(actualElement.name).to.equal(expectedElement.name);
-            expect(actualElement.type).to.equal(expectedElement.type);
-            expect(actualElement.soundbankName).to.equal(expectedElement.soundbankName);
+            expect(actualElement.name).toBe(expectedElement.name);
+            expect(actualElement.type).toBe(expectedElement.type);
+            expect(actualElement.soundbankName).toBe(expectedElement.soundbankName);
 
             for (let j = 0; j < expectedElement.articulations.length; j++) {
                 const expectedArticulation = expectedElement.articulations[j];
-                expect(actualElement.articulations.length).to.be.greaterThan(
-                    j,
-                    `Articulation ${i} missing in actual file`
+                expect(actualElement.articulations.length, `Articulation ${i} missing in actual file`).toBeGreaterThan(
+                    j
                 );
 
                 const actualArticulation = actualElement.articulations[j];
 
-                expect(actualArticulation.name).to.equal(expectedArticulation.name);
-                expect(actualArticulation.staffLine).to.equal(
-                    expectedArticulation.staffLine,
-                    `Wrong staffline for articulation ${actualArticulation.name}`
+                expect(actualArticulation.name).toBe(expectedArticulation.name);
+                expect(actualArticulation.staffLine, `Wrong staffline for articulation ${actualArticulation.name}`).toBe(
+                    expectedArticulation.staffLine
                 );
-                expect(actualArticulation.noteHeads.map(s => MusicFontSymbol[s]).join(' ')).to.equal(
-                    expectedArticulation.noteHeads.map(s => MusicFontSymbol[s]).join(' '),
-                    `Wrong noteHeads for articulation ${actualArticulation.name}`
+                expect(actualArticulation.noteHeads.map(s => MusicFontSymbol[s]).join(' '), `Wrong noteHeads for articulation ${actualArticulation.name}`).toBe(
+                    expectedArticulation.noteHeads.map(s => MusicFontSymbol[s]).join(' ')
                 );
-                expect(MusicFontSymbol[actualArticulation.techniqueSymbol]).to.equal(
-                    MusicFontSymbol[expectedArticulation.techniqueSymbol],
-                    `Wrong techniqueSymbol for articulation ${actualArticulation.name}`
+                expect(MusicFontSymbol[actualArticulation.techniqueSymbol], `Wrong techniqueSymbol for articulation ${actualArticulation.name}`).toBe(
+                    MusicFontSymbol[expectedArticulation.techniqueSymbol]
                 );
-                expect(TechniqueSymbolPlacement[actualArticulation.techniqueSymbolPlacement]).to.equal(
-                    TechniqueSymbolPlacement[expectedArticulation.techniqueSymbolPlacement],
-                    `Wrong techniqueSymbolPlacement for articulation ${actualArticulation.name}`
+                expect(TechniqueSymbolPlacement[actualArticulation.techniqueSymbolPlacement], `Wrong techniqueSymbolPlacement for articulation ${actualArticulation.name}`).toBe(
+                    TechniqueSymbolPlacement[expectedArticulation.techniqueSymbolPlacement]
                 );
-                expect(actualArticulation.inputMidiNumbers.map(i => i.toString()).join(',')).to.equal(
-                    expectedArticulation.inputMidiNumbers.map(i => i.toString()).join(','),
-                    `Wrong inputMidiNumbers for articulation ${actualArticulation.name}`
+                expect(actualArticulation.inputMidiNumbers.map(i => i.toString()).join(','), `Wrong inputMidiNumbers for articulation ${actualArticulation.name}`).toBe(
+                    expectedArticulation.inputMidiNumbers.map(i => i.toString()).join(',')
                 );
-                expect(actualArticulation.outputMidiNumber).to.equal(
-                    expectedArticulation.outputMidiNumber,
-                    `Wrong outputMidiNumber for articulation ${actualArticulation.name}`
+                expect(actualArticulation.outputMidiNumber, `Wrong outputMidiNumber for articulation ${actualArticulation.name}`).toBe(
+                    expectedArticulation.outputMidiNumber
                 );
-                expect(actualArticulation.outputRSESound).to.equal(
-                    expectedArticulation.outputRSESound,
-                    `Wrong outputRSESound for articulation ${actualArticulation.name}`
+                expect(actualArticulation.outputRSESound, `Wrong outputRSESound for articulation ${actualArticulation.name}`).toBe(
+                    expectedArticulation.outputRSESound
                 );
             }
 
-            expect(actualElement.articulations.length).to.equal(
-                expectedElement.articulations.length,
-                `articulation length mismatch on element ${expectedElement.name}`
+            expect(actualElement.articulations.length, `articulation length mismatch on element ${expectedElement.name}`).toBe(
+                expectedElement.articulations.length
             );
         }
 
-        expect(actualInstrumentSet.elements.length).to.equal(expectedInstrumentSet.elements.length);
+        expect(actualInstrumentSet.elements.length).toBe(expectedInstrumentSet.elements.length);
 
         // await TestPlatform.saveFile('test-data/exporter/articulations.exported.gp', exported);
     });

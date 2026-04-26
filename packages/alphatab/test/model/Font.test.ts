@@ -1,15 +1,14 @@
+import { describe, expect, it } from 'vitest';
 import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
-import { expect } from 'chai';
-
 describe('FontTests', () => {
     function parseText(text: string, expected: Font) {
         const font = Font.fromJson(text);
-        expect(font!.families.join(', ')).to.equal(expected.families.join(', '));
-        expect(font!.isBold).to.equal(expected.isBold);
-        expect(font!.isItalic).to.equal(expected.isItalic);
-        expect(font!.size).to.equal(expected.size);
-        expect(font!.style).to.equal(expected.style);
-        expect(font!.weight).to.equal(expected.weight);
+        expect(font!.families.join(', ')).toBe(expected.families.join(', '));
+        expect(font!.isBold).toBe(expected.isBold);
+        expect(font!.isItalic).toBe(expected.isItalic);
+        expect(font!.size).toBe(expected.size);
+        expect(font!.style).toBe(expected.style);
+        expect(font!.weight).toBe(expected.weight);
     }
 
     it('parses-full', () => {
@@ -83,7 +82,7 @@ describe('FontTests', () => {
     });
 
     function toCssStringTest(f: Font, expected: string) {
-        expect(f.toCssString()).to.equal(expected);
+        expect(f.toCssString()).toBe(expected);
     }
 
     it('css-string-tests', () => {

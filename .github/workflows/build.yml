@@ -67,11 +67,11 @@ jobs:
           dotnet-version: '8'
       - run: npm ci
       - run: npm run build-csharp
-      - run: npm run test-csharp
+      - run: npm run test-ci-csharp
         id: test
       - uses: actions/upload-artifact@v7
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
-        with: 
+        with:
           name: test-results-csharp
           path: |
             packages/alphatab/test-data/**/*.new.png
@@ -80,9 +80,11 @@ jobs:
   build_kotlin:
     name: Build and Test Kotlin
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
     steps:
       - uses: actions/checkout@v6
-        with: 
+        with:
           fetch-depth: 100
       - uses: actions/setup-node@v6
         with:
@@ -99,11 +101,17 @@ jobs:
       - run: npm run build-kotlin
       - run: npm run test-kotlin
         id: test
+      - uses: dorny/test-reporter@v2
+        if: ${{ always() }}
+        with:
+          name: Kotlin Tests
+          path: 'packages/kotlin/**/build/test-results/**/*.xml'
+          reporter: java-junit
       - uses: actions/upload-artifact@v7
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
-        with: 
+        with:
           name: test-results-kotlin
           path: |
             packages/alphatab/test-data/**/*.new.png
-            packages/alphatab/test-data/**/*.diff.png      
+            packages/alphatab/test-data/**/*.diff.png
       - run: ./packages/kotlin/src/gradlew --stop

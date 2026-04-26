@@ -1,3 +1,4 @@
+import { describe, it } from 'vitest';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';

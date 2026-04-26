@@ -39,7 +39,8 @@
         "lint": "biome lint",
         "typecheck": "tsc --noEmit",
         "build": "vite build",
-        "test": "mocha"
+        "test": "vitest run",
+        "test-web": "npm run test"
     },
     "dependencies": {
         "webpack": "^5.105.4"
@@ -48,19 +49,15 @@
         "node": ">=20.19.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.10",
-        "@types/chai": "^5.2.3",
-        "@types/mocha": "^10.0.10",
-        "@types/node": "^25.6.0",
-        "assert": "^2.1.0",
-        "chai": "^6.2.2",
+        "@biomejs/biome": "^2.3.14",
+        "@types/node": "^25.2.2",
         "html-webpack-plugin": "^5.6.6",
-        "mocha": "^11.7.5",
-        "rimraf": "^6.1.3",
+        "rimraf": "^6.1.2",
         "tslib": "^2.8.1",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3",
-        "webpack-cli": "^7.0.2"
+        "vitest": "^4.1.5",
+        "webpack-cli": "^6.0.1"
     },
     "files": [
         "/dist/**",

@@ -1,8 +1,8 @@
+import { describe, expect, it } from 'vitest';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import { Settings } from '@coderline/alphatab/Settings';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 import { TestPlatform } from 'test/TestPlatform';
-import { expect } from 'chai';
 import { Logger } from '@coderline/alphatab/Logger';
 import { BarStyle, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { BeatStyle, BeatSubElement } from '@coderline/alphatab/model/Beat';
@@ -172,7 +172,7 @@ describe('GeneralTests', () => {
             const coloredDuration = coloredEnd - coloredStart;
             const defaultDuration = defaultEnd - defaultStart;
 
-            expect(coloredDuration - defaultDuration).to.be.lessThan(120);
+            expect(coloredDuration - defaultDuration).toBeLessThan(120);
 
             Logger.info('Test-color-performance', 'Colored', i, coloredDuration);
             Logger.info('Test-color-performance', 'Default', i, defaultDuration);

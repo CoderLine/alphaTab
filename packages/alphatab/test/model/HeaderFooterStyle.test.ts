@@ -1,42 +1,41 @@
+import { describe, expect, it } from 'vitest';
 import { Score } from '@coderline/alphatab/model/Score';
 import { HeaderFooterStyle } from '@coderline/alphatab/model/Score';
-import { expect } from 'chai';
-
 describe('HeaderFooterStyleTests', () => {
     it('buildTextSimple', () => {
         const score = new Score();
         score.title = 'Title';
         const style = new HeaderFooterStyle('%TITLE%');
-        expect(style.buildText(score)).to.equal('Title');
+        expect(style.buildText(score)).toBe('Title');
     });
 
     it('buildTextMultiple', () => {
         const score = new Score();
         score.title = 'Title';
         const style = new HeaderFooterStyle('%TITLE% %TITLE%');
-        expect(style.buildText(score)).to.equal('Title Title');
+        expect(style.buildText(score)).toBe('Title Title');
     });
 
     it('buildTextReuse', () => {
         const score = new Score();
         score.title = 'Title';
         const style = new HeaderFooterStyle('%TITLE% %TITLE%');
-        expect(style.buildText(score)).to.equal('Title Title');
-        expect(style.buildText(score)).to.equal('Title Title');
+        expect(style.buildText(score)).toBe('Title Title');
+        expect(style.buildText(score)).toBe('Title Title');
     });
 
     it('buildTextMultipleUnknown', () => {
         const score = new Score();
         score.title = 'Title';
         const style = new HeaderFooterStyle('%TITLE% %TITLE% %UNKNOWN% %INVALID%');
-        expect(style.buildText(score)).to.equal('Title Title  ');
+        expect(style.buildText(score)).toBe('Title Title  ');
     });
 
     it('buildTextEmptyIfMissingPlaceholderValue', () => {
         const score = new Score();
         score.words = '';
         const style = new HeaderFooterStyle('Words by %WORDS%');
-        expect(style.buildText(score)).to.equal('');
+        expect(style.buildText(score)).toBe('');
     });
 
     it('buildTextAll', () => {
@@ -51,6 +50,6 @@ describe('HeaderFooterStyleTests', () => {
         score.copyright = 'Copyright';
 
         const style = new HeaderFooterStyle('%TITLE% %SUBTITLE% %ARTIST% %ALBUM% %WORDS% %MUSIC% %TABBER% %COPYRIGHT%');
-        expect(style.buildText(score)).to.equal('Title Subtitle Artist Album Words Music Tab Copyright');
+        expect(style.buildText(score)).toBe('Title Subtitle Artist Album Words Music Tab Copyright');
     });
 });

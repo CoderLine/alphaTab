@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { Logger } from '@coderline/alphatab/Logger';
@@ -23,7 +24,6 @@ import { Track } from '@coderline/alphatab/model/Track';
 import { Voice } from '@coderline/alphatab/model/Voice';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestPlatform } from 'test/TestPlatform';
-import { expect } from 'chai';
 import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
 
 describe('MidiTickLookupTest', () => {
@@ -48,11 +48,11 @@ describe('MidiTickLookupTest', () => {
         const nb = new Beat();
         lookup.addBeat(nb, 0, MidiUtils.QuarterTime);
 
-        expect(masterBarLookup.firstBeat).to.be.ok;
-        expect(masterBarLookup.firstBeat!.start).to.equal(0);
-        expect(masterBarLookup.firstBeat!.end).to.equal(MidiUtils.QuarterTime);
-        expect(masterBarLookup.firstBeat!.highlightedBeats.length).to.equal(1);
-        expect(masterBarLookup.firstBeat!.highlightedBeats[0].beat).to.equal(nb);
+        expect(masterBarLookup.firstBeat).toBeTruthy();
+        expect(masterBarLookup.firstBeat!.start).toBe(0);
+        expect(masterBarLookup.firstBeat!.end).toBe(MidiUtils.QuarterTime);
+        expect(masterBarLookup.firstBeat!.highlightedBeats.length).toBe(1);
+        expect(masterBarLookup.firstBeat!.highlightedBeats[0].beat).toBe(nb);
     });
 
     function prepareVariantTest(): MidiTickLookup {
@@ -68,17 +68,17 @@ describe('MidiTickLookupTest', () => {
         lookup.addBeat(new Beat(), MidiUtils.QuarterTime * 0, MidiUtils.QuarterTime);
         lookup.addBeat(new Beat(), MidiUtils.QuarterTime * 1, MidiUtils.QuarterTime);
 
-        expect(masterBarLookup.firstBeat).to.be.ok;
-        expect(masterBarLookup.firstBeat!.start).to.equal(0);
-        expect(masterBarLookup.firstBeat!.end).to.equal(MidiUtils.QuarterTime);
-        expect(masterBarLookup.firstBeat!.highlightedBeats.length).to.equal(1);
+        expect(masterBarLookup.firstBeat).toBeTruthy();
+        expect(masterBarLookup.firstBeat!.start).toBe(0);
+        expect(masterBarLookup.firstBeat!.end).toBe(MidiUtils.QuarterTime);
+        expect(masterBarLookup.firstBeat!.highlightedBeats.length).toBe(1);
 
-        expect(masterBarLookup.lastBeat).to.be.ok;
-        expect(masterBarLookup.lastBeat!.start).to.equal(MidiUtils.QuarterTime);
-        expect(masterBarLookup.lastBeat!.end).to.equal(2 * MidiUtils.QuarterTime);
-        expect(masterBarLookup.lastBeat!.highlightedBeats.length).to.equal(1);
+        expect(masterBarLookup.lastBeat).toBeTruthy();
+        expect(masterBarLookup.lastBeat!.start).toBe(MidiUtils.QuarterTime);
+        expect(masterBarLookup.lastBeat!.end).toBe(2 * MidiUtils.QuarterTime);
+        expect(masterBarLookup.lastBeat!.highlightedBeats.length).toBe(1);
 
-        expect(masterBarLookup.firstBeat!.nextBeat).to.equal(masterBarLookup.lastBeat);
+        expect(masterBarLookup.firstBeat!.nextBeat).toBe(masterBarLookup.lastBeat);
 
         return lookup;
     }
@@ -94,14 +94,14 @@ describe('MidiTickLookupTest', () => {
 
         const n1 = masterBar.lastBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0].beat).to.equal(nb);
-        expect(n1.start).to.equal(MidiUtils.QuarterTime * 2);
-        expect(n1.end).to.equal(MidiUtils.QuarterTime * 3);
+        expect(n1.highlightedBeats.length).toBe(1);
+        expect(n1.highlightedBeats[0].beat).toBe(nb);
+        expect(n1.start).toBe(MidiUtils.QuarterTime * 2);
+        expect(n1.end).toBe(MidiUtils.QuarterTime * 3);
 
-        expect(l1).to.equal(masterBar.firstBeat!);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2.nextBeat).to.equal(n1);
+        expect(l1).toBe(masterBar.firstBeat!);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2.nextBeat).toBe(n1);
     });
 
     it('variant-c', () => {
@@ -115,15 +115,15 @@ describe('MidiTickLookupTest', () => {
 
         const n1 = masterBar.lastBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0].beat).to.equal(nb);
-        expect(n1.start).to.equal(MidiUtils.QuarterTime * 2);
-        expect(n1.end).to.equal(MidiUtils.QuarterTime * 4);
+        expect(n1.highlightedBeats.length).toBe(1);
+        expect(n1.highlightedBeats[0].beat).toBe(nb);
+        expect(n1.start).toBe(MidiUtils.QuarterTime * 2);
+        expect(n1.end).toBe(MidiUtils.QuarterTime * 4);
 
-        expect(l1).to.equal(masterBar.firstBeat!);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2.nextBeat).to.equal(n1);
-        expect(n1).to.equal(masterBar.lastBeat!);
+        expect(l1).toBe(masterBar.firstBeat!);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2.nextBeat).toBe(n1);
+        expect(n1).toBe(masterBar.lastBeat!);
     });
 
     it('variant-d', () => {
@@ -137,15 +137,15 @@ describe('MidiTickLookupTest', () => {
 
         const n1 = masterBar.firstBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0].beat).to.equal(nb);
-        expect(n1.start).to.equal(-MidiUtils.QuarterTime);
-        expect(n1.end).to.equal(0);
+        expect(n1.highlightedBeats.length).toBe(1);
+        expect(n1.highlightedBeats[0].beat).toBe(nb);
+        expect(n1.start).toBe(-MidiUtils.QuarterTime);
+        expect(n1.end).toBe(0);
 
-        expect(n1).to.equal(masterBar.firstBeat!);
-        expect(n1.nextBeat).to.equal(l1);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2).to.equal(masterBar.lastBeat!);
+        expect(n1).toBe(masterBar.firstBeat!);
+        expect(n1.nextBeat).toBe(l1);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2).toBe(masterBar.lastBeat!);
     });
 
     it('variant-e', () => {
@@ -159,15 +159,15 @@ describe('MidiTickLookupTest', () => {
 
         const n1 = masterBar.firstBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0].beat).to.equal(nb);
-        expect(n1.start).to.equal(-MidiUtils.QuarterTime * 2);
-        expect(n1.end).to.equal(0);
+        expect(n1.highlightedBeats.length).toBe(1);
+        expect(n1.highlightedBeats[0].beat).toBe(nb);
+        expect(n1.start).toBe(-MidiUtils.QuarterTime * 2);
+        expect(n1.end).toBe(0);
 
-        expect(n1).to.equal(masterBar.firstBeat!);
-        expect(n1.nextBeat).to.equal(l1);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2).to.equal(masterBar.lastBeat!);
+        expect(n1).toBe(masterBar.firstBeat!);
+        expect(n1.nextBeat).toBe(l1);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2).toBe(masterBar.lastBeat!);
     });
 
     it('variant-f', () => {
@@ -182,26 +182,26 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.firstBeat!;
         const n2 = n1.nextBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0].beat).to.equal(nb);
-        expect(n1.start).to.equal(-MidiUtils.QuarterTime * 0.5);
-        expect(n1.end).to.equal(0);
+        expect(n1.highlightedBeats.length).toBe(1);
+        expect(n1.highlightedBeats[0].beat).toBe(nb);
+        expect(n1.start).toBe(-MidiUtils.QuarterTime * 0.5);
+        expect(n1.end).toBe(0);
 
-        expect(n2.highlightedBeats.length).to.equal(2);
-        expect(n2.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
-        expect(n2.highlightedBeats[1].beat).to.equal(nb);
-        expect(n2.start).to.equal(0);
-        expect(n2.end).to.equal(MidiUtils.QuarterTime * 0.5);
+        expect(n2.highlightedBeats.length).toBe(2);
+        expect(n2.highlightedBeats[0].beat).toBe(l1.highlightedBeats[0].beat);
+        expect(n2.highlightedBeats[1].beat).toBe(nb);
+        expect(n2.start).toBe(0);
+        expect(n2.end).toBe(MidiUtils.QuarterTime * 0.5);
 
-        expect(l1.highlightedBeats.length).to.equal(1);
-        expect(l1.start).to.equal(MidiUtils.QuarterTime * 0.5);
-        expect(l1.end).to.equal(MidiUtils.QuarterTime);
+        expect(l1.highlightedBeats.length).toBe(1);
+        expect(l1.start).toBe(MidiUtils.QuarterTime * 0.5);
+        expect(l1.end).toBe(MidiUtils.QuarterTime);
 
-        expect(n1).to.equal(masterBar.firstBeat!);
-        expect(n1.nextBeat).to.equal(n2);
-        expect(n2.nextBeat).to.equal(l1);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2).to.equal(masterBar.lastBeat!);
+        expect(n1).toBe(masterBar.firstBeat!);
+        expect(n1.nextBeat).toBe(n2);
+        expect(n2.nextBeat).toBe(l1);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2).toBe(masterBar.lastBeat!);
     });
 
     it('variant-g', () => {
@@ -215,20 +215,20 @@ describe('MidiTickLookupTest', () => {
 
         const n1 = masterBar.firstBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0].beat).to.equal(nb);
-        expect(n1.start).to.equal(-MidiUtils.QuarterTime);
-        expect(n1.end).to.equal(0);
+        expect(n1.highlightedBeats.length).toBe(1);
+        expect(n1.highlightedBeats[0].beat).toBe(nb);
+        expect(n1.start).toBe(-MidiUtils.QuarterTime);
+        expect(n1.end).toBe(0);
 
-        expect(l1.highlightedBeats.length).to.equal(2);
-        expect(l1.highlightedBeats[1].beat).to.equal(nb);
-        expect(l1.start).to.equal(0);
-        expect(l1.end).to.equal(MidiUtils.QuarterTime);
+        expect(l1.highlightedBeats.length).toBe(2);
+        expect(l1.highlightedBeats[1].beat).toBe(nb);
+        expect(l1.start).toBe(0);
+        expect(l1.end).toBe(MidiUtils.QuarterTime);
 
-        expect(n1).to.equal(masterBar.firstBeat!);
-        expect(n1.nextBeat).to.equal(l1);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2).to.equal(masterBar.lastBeat!);
+        expect(n1).toBe(masterBar.firstBeat!);
+        expect(n1.nextBeat).toBe(l1);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2).toBe(masterBar.lastBeat!);
     });
 
     it('variant-h-variant-m', () => {
@@ -243,31 +243,31 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.firstBeat!;
         const n2 = l1.nextBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0].beat).to.equal(nb);
-        expect(n1.start).to.equal(-MidiUtils.QuarterTime);
-        expect(n1.end).to.equal(0);
+        expect(n1.highlightedBeats.length).toBe(1);
+        expect(n1.highlightedBeats[0].beat).toBe(nb);
+        expect(n1.start).toBe(-MidiUtils.QuarterTime);
+        expect(n1.end).toBe(0);
 
-        expect(l1.highlightedBeats.length).to.equal(2);
-        expect(l1.highlightedBeats[1].beat).to.equal(nb);
-        expect(l1.start).to.equal(0);
-        expect(l1.end).to.equal(MidiUtils.QuarterTime);
+        expect(l1.highlightedBeats.length).toBe(2);
+        expect(l1.highlightedBeats[1].beat).toBe(nb);
+        expect(l1.start).toBe(0);
+        expect(l1.end).toBe(MidiUtils.QuarterTime);
 
-        expect(n2.highlightedBeats.length).to.equal(2);
-        expect(n2.highlightedBeats[0].beat).to.equal(l2.highlightedBeats[0].beat);
-        expect(n2.highlightedBeats[1].beat).to.equal(nb);
-        expect(n2.start).to.equal(MidiUtils.QuarterTime);
-        expect(n2.end).to.equal(MidiUtils.QuarterTime * 1.5);
+        expect(n2.highlightedBeats.length).toBe(2);
+        expect(n2.highlightedBeats[0].beat).toBe(l2.highlightedBeats[0].beat);
+        expect(n2.highlightedBeats[1].beat).toBe(nb);
+        expect(n2.start).toBe(MidiUtils.QuarterTime);
+        expect(n2.end).toBe(MidiUtils.QuarterTime * 1.5);
 
-        expect(l2.highlightedBeats.length).to.equal(1);
-        expect(l2.start).to.equal(MidiUtils.QuarterTime * 1.5);
-        expect(l2.end).to.equal(MidiUtils.QuarterTime * 2);
+        expect(l2.highlightedBeats.length).toBe(1);
+        expect(l2.start).toBe(MidiUtils.QuarterTime * 1.5);
+        expect(l2.end).toBe(MidiUtils.QuarterTime * 2);
 
-        expect(n1).to.equal(masterBar.firstBeat!);
-        expect(n1.nextBeat).to.equal(l1);
-        expect(l1.nextBeat).to.equal(n2);
-        expect(n2.nextBeat).to.equal(l2);
-        expect(l2).to.equal(masterBar.lastBeat!);
+        expect(n1).toBe(masterBar.firstBeat!);
+        expect(n1.nextBeat).toBe(l1);
+        expect(l1.nextBeat).toBe(n2);
+        expect(n2.nextBeat).toBe(l2);
+        expect(l2).toBe(masterBar.lastBeat!);
     });
 
     it('variant-i', () => {
@@ -281,24 +281,24 @@ describe('MidiTickLookupTest', () => {
 
         const n1 = masterBar.firstBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
-        expect(n1.start).to.equal(0);
-        expect(n1.end).to.equal(MidiUtils.QuarterTime * 0.5);
+        expect(n1.highlightedBeats.length).toBe(1);
+        expect(n1.highlightedBeats[0].beat).toBe(l1.highlightedBeats[0].beat);
+        expect(n1.start).toBe(0);
+        expect(n1.end).toBe(MidiUtils.QuarterTime * 0.5);
 
-        expect(l1.highlightedBeats.length).to.equal(2);
-        expect(l1.highlightedBeats[1].beat).to.equal(nb);
-        expect(l1.start).to.equal(MidiUtils.QuarterTime * 0.5);
-        expect(l1.end).to.equal(MidiUtils.QuarterTime);
+        expect(l1.highlightedBeats.length).toBe(2);
+        expect(l1.highlightedBeats[1].beat).toBe(nb);
+        expect(l1.start).toBe(MidiUtils.QuarterTime * 0.5);
+        expect(l1.end).toBe(MidiUtils.QuarterTime);
 
-        expect(l2.highlightedBeats.length).to.equal(1);
-        expect(l2.start).to.equal(MidiUtils.QuarterTime * 1);
-        expect(l2.end).to.equal(MidiUtils.QuarterTime * 2);
+        expect(l2.highlightedBeats.length).toBe(1);
+        expect(l2.start).toBe(MidiUtils.QuarterTime * 1);
+        expect(l2.end).toBe(MidiUtils.QuarterTime * 2);
 
-        expect(n1).to.equal(masterBar.firstBeat!);
-        expect(n1.nextBeat).to.equal(l1);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2).to.equal(masterBar.lastBeat!);
+        expect(n1).toBe(masterBar.firstBeat!);
+        expect(n1.nextBeat).toBe(l1);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2).toBe(masterBar.lastBeat!);
     });
 
     it('variant-j', () => {
@@ -313,30 +313,30 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.firstBeat!;
         const n2 = n1.nextBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
-        expect(n1.start).to.equal(0);
-        expect(n1.end).to.equal(MidiUtils.QuarterTime * 0.25);
+        expect(n1.highlightedBeats.length).toBe(1);
+        expect(n1.highlightedBeats[0].beat).toBe(l1.highlightedBeats[0].beat);
+        expect(n1.start).toBe(0);
+        expect(n1.end).toBe(MidiUtils.QuarterTime * 0.25);
 
-        expect(n2.highlightedBeats.length).to.equal(2);
-        expect(n2.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
-        expect(n2.highlightedBeats[1].beat).to.equal(nb);
-        expect(n2.start).to.equal(MidiUtils.QuarterTime * 0.25);
-        expect(n2.end).to.equal(MidiUtils.QuarterTime * 0.75);
+        expect(n2.highlightedBeats.length).toBe(2);
+        expect(n2.highlightedBeats[0].beat).toBe(l1.highlightedBeats[0].beat);
+        expect(n2.highlightedBeats[1].beat).toBe(nb);
+        expect(n2.start).toBe(MidiUtils.QuarterTime * 0.25);
+        expect(n2.end).toBe(MidiUtils.QuarterTime * 0.75);
 
-        expect(l1.highlightedBeats.length).to.equal(1);
-        expect(l1.start).to.equal(MidiUtils.QuarterTime * 0.75);
-        expect(l1.end).to.equal(MidiUtils.QuarterTime);
+        expect(l1.highlightedBeats.length).toBe(1);
+        expect(l1.start).toBe(MidiUtils.QuarterTime * 0.75);
+        expect(l1.end).toBe(MidiUtils.QuarterTime);
 
-        expect(l2.highlightedBeats.length).to.equal(1);
-        expect(l2.start).to.equal(MidiUtils.QuarterTime * 1);
-        expect(l2.end).to.equal(MidiUtils.QuarterTime * 2);
+        expect(l2.highlightedBeats.length).toBe(1);
+        expect(l2.start).toBe(MidiUtils.QuarterTime * 1);
+        expect(l2.end).toBe(MidiUtils.QuarterTime * 2);
 
-        expect(n1).to.equal(masterBar.firstBeat!);
-        expect(n1.nextBeat).to.equal(n2);
-        expect(n2.nextBeat).to.equal(l1);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2).to.equal(masterBar.lastBeat!);
+        expect(n1).toBe(masterBar.firstBeat!);
+        expect(n1.nextBeat).toBe(n2);
+        expect(n2.nextBeat).toBe(l1);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2).toBe(masterBar.lastBeat!);
     });
 
     it('variant-k-variant-m', () => {
@@ -351,30 +351,30 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.firstBeat!;
         const n2 = n1.nextBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
-        expect(n1.start).to.equal(0);
-        expect(n1.end).to.equal(MidiUtils.QuarterTime * 0.25);
+        expect(n1.highlightedBeats.length).toBe(1);
+        expect(n1.highlightedBeats[0].beat).toBe(l1.highlightedBeats[0].beat);
+        expect(n1.start).toBe(0);
+        expect(n1.end).toBe(MidiUtils.QuarterTime * 0.25);
 
-        expect(n2.highlightedBeats.length).to.equal(2);
-        expect(n2.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
-        expect(n2.highlightedBeats[1].beat).to.equal(nb);
-        expect(n2.start).to.equal(MidiUtils.QuarterTime * 0.25);
-        expect(n2.end).to.equal(MidiUtils.QuarterTime * 0.75);
+        expect(n2.highlightedBeats.length).toBe(2);
+        expect(n2.highlightedBeats[0].beat).toBe(l1.highlightedBeats[0].beat);
+        expect(n2.highlightedBeats[1].beat).toBe(nb);
+        expect(n2.start).toBe(MidiUtils.QuarterTime * 0.25);
+        expect(n2.end).toBe(MidiUtils.QuarterTime * 0.75);
 
-        expect(l1.highlightedBeats.length).to.equal(1);
-        expect(l1.start).to.equal(MidiUtils.QuarterTime * 0.75);
-        expect(l1.end).to.equal(MidiUtils.QuarterTime);
+        expect(l1.highlightedBeats.length).toBe(1);
+        expect(l1.start).toBe(MidiUtils.QuarterTime * 0.75);
+        expect(l1.end).toBe(MidiUtils.QuarterTime);
 
-        expect(l2.highlightedBeats.length).to.equal(1);
-        expect(l2.start).to.equal(MidiUtils.QuarterTime * 1);
-        expect(l2.end).to.equal(MidiUtils.QuarterTime * 2);
+        expect(l2.highlightedBeats.length).toBe(1);
+        expect(l2.start).toBe(MidiUtils.QuarterTime * 1);
+        expect(l2.end).toBe(MidiUtils.QuarterTime * 2);
 
-        expect(n1).to.equal(masterBar.firstBeat!);
-        expect(n1.nextBeat).to.equal(n2);
-        expect(n2.nextBeat).to.equal(l1);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2).to.equal(masterBar.lastBeat!);
+        expect(n1).toBe(masterBar.firstBeat!);
+        expect(n1.nextBeat).toBe(n2);
+        expect(n2.nextBeat).toBe(l1);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2).toBe(masterBar.lastBeat!);
     });
 
     it('variant-l', () => {
@@ -386,12 +386,12 @@ describe('MidiTickLookupTest', () => {
         const nb = new Beat();
         lookup.addBeat(nb, l1.start, MidiUtils.QuarterTime);
 
-        expect(l1.highlightedBeats.length).to.equal(2);
-        expect(l1.highlightedBeats[1].beat).to.equal(nb);
+        expect(l1.highlightedBeats.length).toBe(2);
+        expect(l1.highlightedBeats[1].beat).toBe(nb);
 
-        expect(l1).to.equal(masterBar.firstBeat!);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2).to.equal(masterBar.lastBeat!);
+        expect(l1).toBe(masterBar.firstBeat!);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2).toBe(masterBar.lastBeat!);
     });
 
     it('variant-m', () => {
@@ -405,24 +405,24 @@ describe('MidiTickLookupTest', () => {
 
         const n1 = masterBar.firstBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(2);
-        expect(n1.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
-        expect(n1.highlightedBeats[1].beat).to.equal(nb);
-        expect(n1.start).to.equal(0);
-        expect(n1.end).to.equal(MidiUtils.QuarterTime * 0.5);
+        expect(n1.highlightedBeats.length).toBe(2);
+        expect(n1.highlightedBeats[0].beat).toBe(l1.highlightedBeats[0].beat);
+        expect(n1.highlightedBeats[1].beat).toBe(nb);
+        expect(n1.start).toBe(0);
+        expect(n1.end).toBe(MidiUtils.QuarterTime * 0.5);
 
-        expect(l1.highlightedBeats.length).to.equal(1);
-        expect(l1.start).to.equal(MidiUtils.QuarterTime * 0.5);
-        expect(l1.end).to.equal(MidiUtils.QuarterTime);
+        expect(l1.highlightedBeats.length).toBe(1);
+        expect(l1.start).toBe(MidiUtils.QuarterTime * 0.5);
+        expect(l1.end).toBe(MidiUtils.QuarterTime);
 
-        expect(l2.highlightedBeats.length).to.equal(1);
-        expect(l2.start).to.equal(MidiUtils.QuarterTime * 1);
-        expect(l2.end).to.equal(MidiUtils.QuarterTime * 2);
+        expect(l2.highlightedBeats.length).toBe(1);
+        expect(l2.start).toBe(MidiUtils.QuarterTime * 1);
+        expect(l2.end).toBe(MidiUtils.QuarterTime * 2);
 
-        expect(n1).to.equal(masterBar.firstBeat!);
-        expect(n1.nextBeat).to.equal(l1);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2).to.equal(masterBar.lastBeat!);
+        expect(n1).toBe(masterBar.firstBeat!);
+        expect(n1.nextBeat).toBe(l1);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2).toBe(masterBar.lastBeat!);
     });
 
     it('variant-h-variant-n-variant-b', () => {
@@ -437,31 +437,31 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.firstBeat!;
         const n2 = l2.nextBeat!;
 
-        expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0].beat).to.equal(nb);
-        expect(n1.start).to.equal(-MidiUtils.QuarterTime);
-        expect(n1.end).to.equal(0);
+        expect(n1.highlightedBeats.length).toBe(1);
+        expect(n1.highlightedBeats[0].beat).toBe(nb);
+        expect(n1.start).toBe(-MidiUtils.QuarterTime);
+        expect(n1.end).toBe(0);
 
-        expect(l1.highlightedBeats.length).to.equal(2);
-        expect(l1.highlightedBeats[1].beat).to.equal(nb);
-        expect(l1.start).to.equal(0);
-        expect(l1.end).to.equal(MidiUtils.QuarterTime);
+        expect(l1.highlightedBeats.length).toBe(2);
+        expect(l1.highlightedBeats[1].beat).toBe(nb);
+        expect(l1.start).toBe(0);
+        expect(l1.end).toBe(MidiUtils.QuarterTime);
 
-        expect(l2.highlightedBeats.length).to.equal(2);
-        expect(l2.highlightedBeats[1].beat).to.equal(nb);
-        expect(l2.start).to.equal(MidiUtils.QuarterTime * 1);
-        expect(l2.end).to.equal(MidiUtils.QuarterTime * 2);
+        expect(l2.highlightedBeats.length).toBe(2);
+        expect(l2.highlightedBeats[1].beat).toBe(nb);
+        expect(l2.start).toBe(MidiUtils.QuarterTime * 1);
+        expect(l2.end).toBe(MidiUtils.QuarterTime * 2);
 
-        expect(n2.highlightedBeats.length).to.equal(1);
-        expect(n2.highlightedBeats[0].beat).to.equal(nb);
-        expect(n2.start).to.equal(MidiUtils.QuarterTime * 2);
-        expect(n2.end).to.equal(MidiUtils.QuarterTime * 3);
+        expect(n2.highlightedBeats.length).toBe(1);
+        expect(n2.highlightedBeats[0].beat).toBe(nb);
+        expect(n2.start).toBe(MidiUtils.QuarterTime * 2);
+        expect(n2.end).toBe(MidiUtils.QuarterTime * 3);
 
-        expect(n1).to.equal(masterBar.firstBeat!);
-        expect(n1.nextBeat).to.equal(l1);
-        expect(l1.nextBeat).to.equal(l2);
-        expect(l2.nextBeat).to.equal(n2);
-        expect(n2).to.equal(masterBar.lastBeat!);
+        expect(n1).toBe(masterBar.firstBeat!);
+        expect(n1.nextBeat).toBe(l1);
+        expect(l1.nextBeat).toBe(l2);
+        expect(l2.nextBeat).toBe(n2);
+        expect(n2).toBe(masterBar.lastBeat!);
     });
 
     function beatWithFret(fret: number) {
@@ -522,30 +522,30 @@ describe('MidiTickLookupTest', () => {
         // validate first bar
         let current = lookup.masterBars[0].firstBeat!;
 
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('0,2');
-        expect(current.start).to.equal(0);
-        expect(current.duration).to.equal(1920);
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('0,2');
+        expect(current.start).toBe(0);
+        expect(current.duration).toBe(1920);
 
         current = current.nextBeat!;
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('1,2');
-        expect(current.start).to.equal(1920);
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('1,2');
+        expect(current.start).toBe(1920);
         // quarter note ends earlier due to grace note
-        expect(current.duration).to.equal(840);
+        expect(current.duration).toBe(840);
 
         current = current.nextBeat!;
         // on last slice we have the grace note but not the quarter note
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('2,3');
-        expect(current.start).to.equal(2760);
-        expect(current.duration).to.equal(120);
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('2,3');
+        expect(current.start).toBe(2760);
+        expect(current.duration).toBe(120);
 
         //
         // validate second bar
         current = lookup.masterBars[1].firstBeat!;
 
         // no grace note, normal quarter note
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('4');
-        expect(current.start).to.equal(0);
-        expect(current.duration).to.equal(960);
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('4');
+        expect(current.start).toBe(0);
+        expect(current.duration).toBe(960);
     });
 
     it('grace-multivoice-with-overlap', () => {
@@ -555,36 +555,36 @@ describe('MidiTickLookupTest', () => {
         // validate first bar
         let current = lookup.masterBars[0].firstBeat!;
 
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('0,2');
-        expect(current.start).to.equal(0);
-        expect(current.duration).to.equal(1920);
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('0,2');
+        expect(current.start).toBe(0);
+        expect(current.duration).toBe(1920);
 
         current = current.nextBeat!;
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('1,2');
-        expect(current.start).to.equal(1920);
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('1,2');
+        expect(current.start).toBe(1920);
         // quarter note ends earlier due to grace note
-        expect(current.duration).to.equal(840);
+        expect(current.duration).toBe(840);
 
         current = current.nextBeat!;
         // on last slice we have the grace note but not the quarter note
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('2,3');
-        expect(current.start).to.equal(2760);
-        expect(current.duration).to.equal(120);
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('2,3');
+        expect(current.start).toBe(2760);
+        expect(current.duration).toBe(120);
 
         //
         // validate second bar
         current = lookup.masterBars[1].firstBeat!;
 
         // half the grace note
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('3');
-        expect(current.start).to.equal(0);
-        expect(current.duration).to.equal(120);
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('3');
+        expect(current.start).toBe(0);
+        expect(current.duration).toBe(120);
 
         // no grace note, normal quarter note
         current = current.nextBeat!;
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('4');
-        expect(current.start).to.equal(120);
-        expect(current.duration).to.equal(840);
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('4');
+        expect(current.start).toBe(120);
+        expect(current.duration).toBe(840);
     });
 
     it('cursor-snapping', async () => {
@@ -599,32 +599,32 @@ describe('MidiTickLookupTest', () => {
         // with the quarter rest on the second voice as next beat
         const firstBeat = lookup.findBeat(tracks, 0, null);
 
-        expect(firstBeat!.beat.id).to.equal(score.tracks[0].staves[0].bars[0].voices[0].beats[0].id);
-        expect(firstBeat!.nextBeat!.beat.id).to.equal(score.tracks[0].staves[0].bars[0].voices[1].beats[1].id);
-        expect(firstBeat!.beat.duration).to.equal(Duration.Whole);
-        expect(firstBeat!.nextBeat!.beat.duration).to.equal(Duration.Quarter);
+        expect(firstBeat!.beat.id).toBe(score.tracks[0].staves[0].bars[0].voices[0].beats[0].id);
+        expect(firstBeat!.nextBeat!.beat.id).toBe(score.tracks[0].staves[0].bars[0].voices[1].beats[1].id);
+        expect(firstBeat!.beat.duration).toBe(Duration.Whole);
+        expect(firstBeat!.nextBeat!.beat.duration).toBe(Duration.Quarter);
 
         // Duration must only go to the next rest on the second voice despite the whole note
-        expect(firstBeat!.duration).to.equal(750);
-        expect(firstBeat!.beatLookup.duration).to.equal(960);
+        expect(firstBeat!.duration).toBe(750);
+        expect(firstBeat!.beatLookup.duration).toBe(960);
 
         // Still playing first beat
         const stillFirst = lookup.findBeat(tracks, 400, firstBeat);
-        expect(stillFirst!.beat.id).to.equal(score.tracks[0].staves[0].bars[0].voices[0].beats[0].id);
-        expect(stillFirst!.nextBeat!.beat.id).to.equal(score.tracks[0].staves[0].bars[0].voices[1].beats[1].id);
-        expect(stillFirst!.beat.duration).to.equal(Duration.Whole);
-        expect(stillFirst!.nextBeat!.beat.duration).to.equal(Duration.Quarter);
-        expect(stillFirst!.duration).to.equal(750);
-        expect(stillFirst!.beatLookup.duration).to.equal(960);
+        expect(stillFirst!.beat.id).toBe(score.tracks[0].staves[0].bars[0].voices[0].beats[0].id);
+        expect(stillFirst!.nextBeat!.beat.id).toBe(score.tracks[0].staves[0].bars[0].voices[1].beats[1].id);
+        expect(stillFirst!.beat.duration).toBe(Duration.Whole);
+        expect(stillFirst!.nextBeat!.beat.duration).toBe(Duration.Quarter);
+        expect(stillFirst!.duration).toBe(750);
+        expect(stillFirst!.beatLookup.duration).toBe(960);
 
         // Now we're past the second rest heading to the third
         const secondBeat = lookup.findBeat(tracks, 970 /* after first quarter */, stillFirst);
-        expect(secondBeat!.beat.id).to.equal(score.tracks[0].staves[0].bars[0].voices[1].beats[1].id);
-        expect(secondBeat!.nextBeat!.beat.id).to.equal(score.tracks[0].staves[0].bars[0].voices[1].beats[2].id);
-        expect(secondBeat!.beat.duration).to.equal(Duration.Quarter);
-        expect(secondBeat!.nextBeat!.beat.duration).to.equal(Duration.Quarter);
-        expect(secondBeat!.duration).to.equal(750);
-        expect(secondBeat!.beatLookup.duration).to.equal(960);
+        expect(secondBeat!.beat.id).toBe(score.tracks[0].staves[0].bars[0].voices[1].beats[1].id);
+        expect(secondBeat!.nextBeat!.beat.id).toBe(score.tracks[0].staves[0].bars[0].voices[1].beats[2].id);
+        expect(secondBeat!.beat.duration).toBe(Duration.Quarter);
+        expect(secondBeat!.nextBeat!.beat.duration).toBe(Duration.Quarter);
+        expect(secondBeat!.duration).toBe(750);
+        expect(secondBeat!.beatLookup.duration).toBe(960);
     });
 
     it('before-beat-grace-later-bars', () => {
@@ -639,24 +639,24 @@ describe('MidiTickLookupTest', () => {
         const bar2 = lookup.masterBars[1];
 
         let current = bar2.firstBeat;
-        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('2');
-        expect(current!.start).to.equal(0);
-        expect(current!.duration).to.equal(960);
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('2');
+        expect(current!.start).toBe(0);
+        expect(current!.duration).toBe(960);
 
         current = current!.nextBeat;
-        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('3');
-        expect(current!.start).to.equal(960);
-        expect(current!.duration).to.equal(840); // 120 ticks stolen by grace beats
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('3');
+        expect(current!.start).toBe(960);
+        expect(current!.duration).toBe(840); // 120 ticks stolen by grace beats
 
         current = current!.nextBeat;
-        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('4');
-        expect(current!.start).to.equal(960 + 840);
-        expect(current!.duration).to.equal(60);
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('4');
+        expect(current!.start).toBe(960 + 840);
+        expect(current!.duration).toBe(60);
 
         current = current!.nextBeat;
-        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('5');
-        expect(current!.start).to.equal(960 + 840 + 60);
-        expect(current!.duration).to.equal(60);
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).toBe('5');
+        expect(current!.start).toBe(960 + 840 + 60);
+        expect(current!.duration).toBe(60);
     });
 
     function lookupTest(
@@ -710,7 +710,7 @@ describe('MidiTickLookupTest', () => {
             currentLookup = lookup.findBeat(tracks, ticks[i], currentLookup);
 
             Logger.info('Test', `Checking index ${i} with tick ${ticks[i]}`);
-            expect(currentLookup).to.be.ok;
+            expect(currentLookup).toBeTruthy();
             actualIncrementalIds.push(idOfBeat(currentLookup!.beat));
             actualIncrementalNextIds.push(idOfBeat(currentLookup!.nextBeat?.beat ?? null));
             actualIncrementalTickDurations.push(currentLookup!.tickDuration);
@@ -725,20 +725,19 @@ describe('MidiTickLookupTest', () => {
             }
         }
 
-        expect(actualIncrementalIds.join(',')).to.equal(currentBeatIds.join(','), 'currentBeatIds mismatch');
-        expect(actualIncrementalNextIds.join(',')).to.equal(nextBeatIds.join(','), 'nextBeatIds mismatch');
-        expect(actualIncrementalTickDurations.join(',')).to.equal(durations.join(','), 'durations mismatch');
+        expect(actualIncrementalIds.join(','), 'currentBeatIds mismatch').toBe(currentBeatIds.join(','));
+        expect(actualIncrementalNextIds.join(','), 'nextBeatIds mismatch').toBe(nextBeatIds.join(','));
+        expect(actualIncrementalTickDurations.join(','), 'durations mismatch').toBe(durations.join(','));
         if (expectedCursorModes) {
-            expect(expectedCursorModes.map(m => MidiTickLookupFindBeatResultCursorMode[m]).join(',')).to.equal(
-                actualCursorModes.map(m => MidiTickLookupFindBeatResultCursorMode[m]).join(','),
-                'cursorModes mismatch'
+            expect(expectedCursorModes.map(m => MidiTickLookupFindBeatResultCursorMode[m]).join(','), 'cursorModes mismatch').toBe(
+                actualCursorModes.map(m => MidiTickLookupFindBeatResultCursorMode[m]).join(',')
             );
         }
 
         if (!skipClean) {
-            expect(actualCleanIds.join(',')).to.equal(currentBeatIds.join(','), 'cleanIds mismatch');
-            expect(actualCleanNextIds.join(',')).to.equal(nextBeatIds.join(','), 'cleanNextIds mismatch');
-            expect(actualCleanTickDurations.join(',')).to.equal(durations.join(','), 'cleanTickDurations mismatch');
+            expect(actualCleanIds.join(','), 'cleanIds mismatch').toBe(currentBeatIds.join(','));
+            expect(actualCleanNextIds.join(','), 'cleanNextIds mismatch').toBe(nextBeatIds.join(','));
+            expect(actualCleanTickDurations.join(','), 'cleanTickDurations mismatch').toBe(durations.join(','));
         }
     }
 
@@ -1301,10 +1300,10 @@ describe('MidiTickLookupTest', () => {
         const lookup = buildLookup(score, settings);
 
         // with the filter removed, an isEmpty beat in a mixed voice should still be findable
-        expect(voice.isEmpty).to.equal(false);
+        expect(voice.isEmpty).toBe(false);
         const result = lookup.findBeat(new Set<number>([0]), 0);
-        expect(result).to.not.equal(null);
-        expect(result!.beat).to.equal(emptyBeat);
+        expect(result).not.toBe(null);
+        expect(result!.beat).toBe(emptyBeat);
     });
 
     it('multi-beat empty voice produces non-overlapping slices', () => {
@@ -1337,8 +1336,8 @@ describe('MidiTickLookupTest', () => {
 
         const settings = new Settings();
         score.finish(settings);
-        expect(bar.isEmpty).to.equal(true);
-        expect(voice.beats.length).to.equal(slotCount);
+        expect(bar.isEmpty).toBe(true);
+        expect(voice.beats.length).toBe(slotCount);
 
         const lookup = buildLookup(score, settings);
         const mbLookup = lookup.masterBars[0];
@@ -1348,12 +1347,12 @@ describe('MidiTickLookupTest', () => {
         while (slice) {
             // every slice must contain exactly one beat - otherwise slices are overlapping
             // and the multi-beat empty voice has regressed.
-            expect(slice.highlightedBeats.length, `slice ${sliceIdx} range [${slice.start},${slice.end})`).to.equal(1);
-            expect(slice.highlightedBeats[0].beat).to.equal(voice.beats[sliceIdx]);
+            expect(slice.highlightedBeats.length, `slice ${sliceIdx} range [${slice.start},${slice.end})`).toBe(1);
+            expect(slice.highlightedBeats[0].beat).toBe(voice.beats[sliceIdx]);
             slice = slice.nextBeat;
             sliceIdx++;
         }
-        expect(sliceIdx).to.equal(slotCount);
+        expect(sliceIdx).toBe(slotCount);
 
         // single-beat empty bar still gets the full-bar override (existing behaviour
         // preserved for the typical whole-bar-rest placeholder case).
@@ -1375,7 +1374,7 @@ describe('MidiTickLookupTest', () => {
 
         const singleLookup = buildLookup(singleBeatScore, settings);
         const singleMb = singleLookup.masterBars[0];
-        expect(singleMb.firstBeat!.end - singleMb.firstBeat!.start).to.equal(singleMb.end - singleMb.start);
+        expect(singleMb.firstBeat!.end - singleMb.firstBeat!.start).toBe(singleMb.end - singleMb.start);
     });
 
     describe('playback-range', () => {

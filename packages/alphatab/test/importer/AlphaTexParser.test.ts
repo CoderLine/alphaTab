@@ -1,12 +1,12 @@
 import { AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 
 describe('AlphaTexParserTest', () => {
     function parserTest(source: string) {
         const parser = new AlphaTexParser(source);
         parser.mode = AlphaTexParseMode.Full;
         const node = parser.read();
-        expect(node).to.be.ok;
+        expect(node).toBeTruthy();
         expect(node).toMatchSnapshot();
         expect(parser.lexerDiagnostics.errors).toMatchSnapshot('lexer-diagnostics');
         expect(parser.parserDiagnostics.errors).toMatchSnapshot('parser-diagnostics');

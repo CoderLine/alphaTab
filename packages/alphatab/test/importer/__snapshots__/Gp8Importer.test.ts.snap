@@ -1,17 +1,17 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Gp8ImporterTest audio-track 1`] = `
+exports[`Gp8ImporterTest > audio-track 1`] = `
 Map {
   "__kind" => "Score",
   "artist" => "JerryC",
   "music" => "JerryC",
   "title" => "Canon Rock",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
       "beamingrules" => Map {
         "groups" => Map {
-          "8" => Array [
+          "8" => [
             2,
             2,
             2,
@@ -19,7 +19,7 @@ Map {
           ],
         },
       },
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -29,7 +29,7 @@ Map {
           "isvisible" => true,
         },
       ],
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -58,7 +58,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -124,7 +124,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -146,7 +146,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -156,7 +156,7 @@ Map {
           "isvisible" => true,
         },
       ],
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -174,7 +174,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -328,7 +328,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -402,7 +402,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -707,13 +707,13 @@ Map {
       "timesignaturenumerator" => 6,
       "beamingrules" => Map {
         "groups" => Map {
-          "8" => Array [
+          "8" => [
             6,
             6,
           ],
         },
       },
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -723,7 +723,7 @@ Map {
           "isvisible" => true,
         },
       ],
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -743,7 +743,7 @@ Map {
       "__kind" => "MasterBar",
       "beamingrules" => Map {
         "groups" => Map {
-          "8" => Array [
+          "8" => [
             2,
             2,
             2,
@@ -751,7 +751,7 @@ Map {
           ],
         },
       },
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -761,7 +761,7 @@ Map {
           "isvisible" => true,
         },
       ],
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -783,7 +783,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -797,7 +797,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -811,7 +811,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -825,7 +825,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -839,7 +839,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -853,7 +853,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -867,7 +867,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -877,7 +877,7 @@ Map {
           "isvisible" => true,
         },
       ],
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -899,7 +899,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -917,7 +917,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -979,7 +979,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -1025,7 +1025,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -1074,7 +1074,7 @@ Map {
       "timesignaturenumerator" => 6,
       "beamingrules" => Map {
         "groups" => Map {
-          "8" => Array [
+          "8" => [
             6,
             6,
           ],
@@ -1086,7 +1086,7 @@ Map {
       "__kind" => "MasterBar",
       "beamingrules" => Map {
         "groups" => Map {
-          "8" => Array [
+          "8" => [
             2,
             2,
             2,
@@ -1218,7 +1218,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1228,7 +1228,7 @@ Map {
           "isvisible" => true,
         },
       ],
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -1258,7 +1258,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1268,7 +1268,7 @@ Map {
           "isvisible" => true,
         },
       ],
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -1298,7 +1298,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1320,7 +1320,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1334,7 +1334,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1376,7 +1376,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,

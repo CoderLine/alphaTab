@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { expect } from 'chai';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { describe, expect, it } from 'vitest';
 import webpack from 'webpack';
 import { AlphaTabWebPackPlugin } from '../src/alphaTab.webpack';
 
 describe('WebPack', () => {
-    it('bundle-correctly', async () => {
+    it('bundle-correctly', { timeout: 30000 }, async () => {
         const bundlerProject = './test-data/project';
         // biome-ignore lint/suspicious/noAsyncPromiseExecutor: resolve/reject called accordingly
         await new Promise(async (resolve, reject) => {
@@ -76,7 +76,7 @@ describe('WebPack', () => {
             path.join(bundlerProject, 'out', 'soundfont', 'sonivox.sf2')
         ];
         for (const file of files) {
-            expect(fs.existsSync(file)).to.eq(true, `File '${file}' Missing`);
+            expect(fs.existsSync(file), `File '${file}' Missing`).toBe(true);
         }
 
         const dir = await fs.promises.readdir(path.join(bundlerProject, 'out'), { withFileTypes: true });
@@ -93,45 +93,45 @@ describe('WebPack', () => {
 
                 if (file.name.startsWith('app-')) {
                     // ensure new worker has worker import
-                    expect(text).to.include(
+                    expect(text).toContain(
                         'new Environment.alphaTabWorker(new Environment.alphaTabUrl(/* worker import */'
                     );
                     // ensure worklet bootstrapper exists
-                    expect(text).to.include('/* worklet bootstrap */ async function(__webpack_worklet__) {');
+                    expect(text).toContain('/* worklet bootstrap */ async function(__webpack_worklet__) {');
                     // without custom bundling the app will bundle alphatab directly
-                    expect(text).to.include('class AlphaTabApiBase');
+                    expect(text).toContain('class AlphaTabApiBase');
                     // ensure the library mode is active as needed
-                    expect(text).to.include('alphaTabApp = __webpack_exports__');
+                    expect(text).toContain('alphaTabApp = __webpack_exports__');
                     // ensure __ALPHATAB_WEBPACK__ got replaced
-                    expect(text).to.not.include('__ALPHATAB_WEBPACK__');
+                    expect(text).not.toContain('__ALPHATAB_WEBPACK__');
                     appValidated = true;
                 } else if (file.name.endsWith('.js')) {
                     if (text.includes('class AlphaTabApiBase')) {
                         // ensure the library mode is does not affect chunks
-                        expect(text).to.not.include('alphaTabApp = __webpack_exports__');
+                        expect(text).not.toContain('alphaTabApp = __webpack_exports__');
                         coreFileValidated = true; // found core file (imported by worker and worklet)
                     } else if (text.includes('initializeAudioWorklet()')) {
                         // ensure the library mode is does not affect chunks
-                        expect(text).to.not.include('alphaTabApp = __webpack_exports__');
+                        expect(text).not.toContain('alphaTabApp = __webpack_exports__');
 
                         // ensure chunk installer is there
-                        expect(text).to.include('webpack/runtime/alphaTab audio worker chunk loading');
+                        expect(text).toContain('webpack/runtime/alphaTab audio worker chunk loading');
                         workletValidated = true;
                     } else if (text.includes('initializeWorker()')) {
                         // ensure the library mode is does not affect chunks
-                        expect(text).to.not.include('alphaTabApp = __webpack_exports__');
+                        expect(text).not.toContain('alphaTabApp = __webpack_exports__');
 
                         // ensure chunk loader is there
-                        expect(text).to.include('webpack/runtime/importScripts chunk loading');
+                        expect(text).toContain('webpack/runtime/importScripts chunk loading');
                         workerValidated = true;
                     }
                 }
             }
         }
 
-        expect(appValidated).to.eq(true, 'Missing app validation');
-        expect(coreFileValidated).to.eq(true, 'Missing core file validation');
-        expect(workerValidated).to.eq(true, 'Missing worker validation');
-        expect(workletValidated).to.eq(true, 'Missing worklet validation');
-    }).timeout(30000);
+        expect(appValidated, 'Missing app validation').toBe(true);
+        expect(coreFileValidated, 'Missing core file validation').toBe(true);
+        expect(workerValidated, 'Missing worker validation').toBe(true);
+        expect(workletValidated, 'Missing worklet validation').toBe(true);
+    });
 });

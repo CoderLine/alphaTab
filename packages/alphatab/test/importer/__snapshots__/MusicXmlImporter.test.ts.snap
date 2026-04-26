@@ -1,12 +1,12 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`MusicXmlImporterTests 2102-corrupt-direction 1`] = `
+exports[`MusicXmlImporterTests > 2102-corrupt-direction 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -18,25 +18,25 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -44,7 +44,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -79,14 +79,14 @@ Map {
 }
 `;
 
-exports[`MusicXmlImporterTests barlines 1`] = `
+exports[`MusicXmlImporterTests > barlines 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
       "timesignaturecommon" => true,
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -166,26 +166,26 @@ Map {
       "start" => 65280,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -207,11 +207,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
@@ -228,11 +228,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -249,11 +249,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -270,11 +270,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -291,11 +291,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -311,11 +311,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 6,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
@@ -331,11 +331,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 7,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -351,11 +351,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 8,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
@@ -371,11 +371,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 9,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 9,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 9,
@@ -391,11 +391,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 10,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 10,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 10,
@@ -411,11 +411,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 11,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 11,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 11,
@@ -431,11 +431,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 12,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 12,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 12,
@@ -451,11 +451,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 13,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 13,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 13,
@@ -471,11 +471,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 14,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 14,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 14,
@@ -491,11 +491,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 15,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 15,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 15,
@@ -511,11 +511,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 16,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 16,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 16,
@@ -531,11 +531,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 17,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 17,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 17,
@@ -562,7 +562,7 @@ Map {
 }
 `;
 
-exports[`MusicXmlImporterTests buzzroll 1`] = `
+exports[`MusicXmlImporterTests > buzzroll 1`] = `
 Map {
   "__kind" => "Score",
   "artist" => "Artist",
@@ -572,10 +572,10 @@ Map {
   "title" => "Title",
   "words" => "Words",
   "tab" => "Tab",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -587,25 +587,25 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -613,7 +613,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -634,7 +634,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -655,7 +655,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 2,
@@ -676,7 +676,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 3,
@@ -716,7 +716,7 @@ Map {
 }
 `;
 
-exports[`MusicXmlImporterTests partwise-anacrusis 1`] = `
+exports[`MusicXmlImporterTests > partwise-anacrusis 1`] = `
 Map {
   "__kind" => "Score",
   "artist" => "Artist",
@@ -726,10 +726,10 @@ Map {
   "title" => "Title",
   "words" => "Words",
   "tab" => "Tab",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -758,26 +758,26 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -798,11 +798,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
@@ -817,11 +817,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -836,11 +836,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -856,11 +856,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -885,23 +885,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -922,11 +922,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 6,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
@@ -941,11 +941,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 7,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -960,11 +960,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 8,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
@@ -980,11 +980,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 9,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 9,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 9,
@@ -1016,7 +1016,7 @@ Map {
 }
 `;
 
-exports[`MusicXmlImporterTests partwise-basic 1`] = `
+exports[`MusicXmlImporterTests > partwise-basic 1`] = `
 Map {
   "__kind" => "Score",
   "artist" => "Artist",
@@ -1026,10 +1026,10 @@ Map {
   "title" => "Title",
   "words" => "Words",
   "tab" => "Tab",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1049,26 +1049,26 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1088,11 +1088,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
@@ -1107,11 +1107,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -1136,23 +1136,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1172,11 +1172,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -1191,11 +1191,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -1222,23 +1222,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 6,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1258,11 +1258,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 7,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -1277,11 +1277,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 8,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
@@ -1313,14 +1313,14 @@ Map {
 }
 `;
 
-exports[`MusicXmlImporterTests partwise-complex-measures 1`] = `
+exports[`MusicXmlImporterTests > partwise-complex-measures 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
       "timesignaturecommon" => true,
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1336,25 +1336,25 @@ Map {
       "start" => 3840,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -1368,7 +1368,7 @@ Map {
                           "tone" => 2,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1385,7 +1385,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 2,
@@ -1413,7 +1413,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 3,
@@ -1435,15 +1435,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 6,
@@ -1464,7 +1464,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 9,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 8,
@@ -1492,7 +1492,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 11,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 9,
@@ -1516,15 +1516,15 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -1537,7 +1537,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 4,
@@ -1556,7 +1556,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
@@ -1569,7 +1569,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 5,
@@ -1591,11 +1591,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 12,
@@ -1608,7 +1608,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 13,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 10,
@@ -1627,7 +1627,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 14,
@@ -1640,7 +1640,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 15,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 11,
@@ -1671,24 +1671,24 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 16,
                       "isempty" => true,
                       "duration" => 256,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1705,7 +1705,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 17,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 12,
@@ -1725,7 +1725,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 18,
@@ -1738,7 +1738,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 19,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 13,
@@ -1757,7 +1757,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 20,
@@ -1770,7 +1770,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 21,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 14,
@@ -1793,11 +1793,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 9,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 22,
@@ -1810,7 +1810,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 23,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 15,
@@ -1830,7 +1830,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 10,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 24,
@@ -1843,7 +1843,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 25,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 16,
@@ -1862,7 +1862,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 11,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 26,
@@ -1875,7 +1875,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 27,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 17,
@@ -1913,14 +1913,14 @@ Map {
 }
 `;
 
-exports[`MusicXmlImporterTests partwise-staff-change 1`] = `
+exports[`MusicXmlImporterTests > partwise-staff-change 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
       "timesignaturecommon" => true,
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1932,26 +1932,26 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "duration" => 16,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1979,7 +1979,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 14,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 11,
@@ -1999,7 +1999,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 15,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 12,
@@ -2019,7 +2019,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 16,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 13,
@@ -2040,7 +2040,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 17,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 14,
@@ -2067,16 +2067,16 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 1,
               "clef" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
@@ -2089,7 +2089,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -2109,7 +2109,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -2130,7 +2130,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 2,
@@ -2150,7 +2150,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 3,
@@ -2170,7 +2170,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 4,
@@ -2190,7 +2190,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 5,
@@ -2210,7 +2210,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 6,
@@ -2230,7 +2230,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 9,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 7,
@@ -2251,7 +2251,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 10,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 8,
@@ -2271,7 +2271,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 11,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 9,
@@ -2291,7 +2291,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 12,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 10,
@@ -2313,7 +2313,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 47,
@@ -2326,7 +2326,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 48,
@@ -2339,7 +2339,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 49,
@@ -2352,11 +2352,11 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 18,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 15,
@@ -2376,7 +2376,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 19,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 16,
@@ -2397,7 +2397,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 20,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 17,
@@ -2418,7 +2418,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 21,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 18,
@@ -2439,7 +2439,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 22,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 19,
@@ -2460,7 +2460,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 23,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 20,
@@ -2481,7 +2481,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 24,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 21,
@@ -2502,7 +2502,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 25,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 22,
@@ -2537,23 +2537,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 26,
                       "duration" => 16,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -2581,7 +2581,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 36,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 30,
@@ -2621,7 +2621,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 42,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 33,
@@ -2641,7 +2641,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 43,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 34,
@@ -2661,7 +2661,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 44,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 35,
@@ -2681,7 +2681,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 45,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 36,
@@ -2701,7 +2701,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 46,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 37,
@@ -2727,15 +2727,15 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 27,
@@ -2748,7 +2748,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 28,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 23,
@@ -2768,7 +2768,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 29,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 24,
@@ -2788,7 +2788,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 30,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 25,
@@ -2808,7 +2808,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 31,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 26,
@@ -2828,7 +2828,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 32,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 27,
@@ -2848,7 +2848,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 33,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 28,
@@ -2868,7 +2868,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 34,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 29,
@@ -2899,7 +2899,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 38,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 31,
@@ -2919,7 +2919,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 39,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 32,
@@ -2958,7 +2958,7 @@ Map {
 }
 `;
 
-exports[`MusicXmlImporterTests timewise-anacrusis 1`] = `
+exports[`MusicXmlImporterTests > timewise-anacrusis 1`] = `
 Map {
   "__kind" => "Score",
   "artist" => "Artist",
@@ -2968,10 +2968,10 @@ Map {
   "title" => "Title",
   "words" => "Words",
   "tab" => "Tab",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -3000,26 +3000,26 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3040,11 +3040,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
@@ -3059,11 +3059,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -3078,11 +3078,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 6,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -3098,11 +3098,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 8,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -3127,23 +3127,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3164,11 +3164,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
@@ -3183,11 +3183,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -3202,11 +3202,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 7,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
@@ -3222,11 +3222,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 9,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 9,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 9,
@@ -3258,7 +3258,7 @@ Map {
 }
 `;
 
-exports[`MusicXmlImporterTests timewise-basic 1`] = `
+exports[`MusicXmlImporterTests > timewise-basic 1`] = `
 Map {
   "__kind" => "Score",
   "artist" => "Artist",
@@ -3268,10 +3268,10 @@ Map {
   "title" => "Title",
   "words" => "Words",
   "tab" => "Tab",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -3291,26 +3291,26 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3330,11 +3330,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
@@ -3349,11 +3349,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 6,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -3378,23 +3378,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3414,11 +3414,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -3433,11 +3433,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 7,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -3464,23 +3464,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3500,11 +3500,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -3519,11 +3519,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 8,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,

@@ -1,3 +1,4 @@
+import { describe, it } from 'vitest';
 import { SystemsLayoutMode } from '@coderline/alphatab/DisplaySettings';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { Settings } from '@coderline/alphatab/Settings';

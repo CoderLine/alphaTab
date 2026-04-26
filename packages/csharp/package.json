@@ -9,7 +9,8 @@
         "transpile": "tsx scripts/transpile.ts",
         "typecheck": "tsc --noEmit",
         "build": "npm run transpile && cd src && dotnet build -c Release",
-        "test": "cd src && dotnet test -c Release"
+        "test": "cd src && dotnet test -c Release",
+        "test-ci": "cd src && dotnet test -c Release --logger GitHubActions --logger \"console;verbosity=normal\""
     },
     "devDependencies": {
         "@coderline/alphatab-transpiler": "*",

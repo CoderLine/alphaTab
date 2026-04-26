@@ -1,3 +1,4 @@
+import { describe, it } from 'vitest';
 import { Color } from '@coderline/alphatab/model/Color';
 import { VisualTestHelper, VisualTestOptions } from '../VisualTestHelper';
 import { AlphaSkiaCanvas } from '@coderline/alphaskia';

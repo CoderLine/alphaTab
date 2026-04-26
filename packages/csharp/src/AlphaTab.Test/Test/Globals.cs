@@ -44,7 +44,7 @@ internal static class TestGlobals
     {
         if (!string.IsNullOrEmpty(hint))
         {
-            baseName += $": {hint}";
+            baseName += $" > {hint}";
         }
 
         var value = SnapshotAssertionCounters.GetValueOrDefault(baseName) + 1;
@@ -56,7 +56,6 @@ internal static class TestGlobals
 internal class NotExpector<T>
 {
     private readonly T? _actual;
-    public NotExpector<T> Be => this;
     private readonly string? _message;
 
     public NotExpector(T? actual, string? message = null)
@@ -92,9 +91,98 @@ internal class NotExpector<T>
         }
     }
 
-    public void Undefined()
+    public void ToBe(object? expected)
+    {
+        Equal(expected);
+    }
+
+    public void ToEqual(object? expected, string? message = null)
+    {
+        Equal(expected, message);
+    }
+
+    public void ToBeTruthy()
+    {
+        Ok();
+    }
+
+    public void ToBeFalsy()
+    {
+        if (_actual is null)
+        {
+            Assert.Fail(_message ?? "Expected non-falsy value");
+            return;
+        }
+        if (_actual is bool b)
+        {
+            Assert.IsTrue(b, _message);
+            return;
+        }
+        if (_actual is string s)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(s), _message);
+            return;
+        }
+        if (_actual is IConvertible c)
+        {
+            Assert.AreNotEqual(0.0, c.ToDouble(System.Globalization.CultureInfo.InvariantCulture), _message);
+            return;
+        }
+    }
+
+    public void ToContain(object element)
+    {
+        if (_actual is ICollection collection)
+        {
+            CollectionAssert.DoesNotContain(collection, element, _message);
+        }
+        else
+        {
+            Assert.Fail("Contain can only be used with collection operands");
+        }
+    }
+
+    public void ToHaveLength(int length)
+    {
+        if (_actual is ICollection collection)
+        {
+            Assert.AreNotEqual(length, collection.Count, _message);
+        }
+        else
+        {
+            Assert.Fail("Length can only be used with collection operands");
+        }
+    }
+
+    public void ToBeGreaterThan(double expected)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsFalse(d.CompareTo(expected) > 0, _message);
+        }
+    }
+
+    public void ToBeLessThan(double expected)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsFalse(d.CompareTo(expected) < 0, _message);
+        }
+    }
+
+    public void ToBeNull()
     {
         Assert.IsNotNull(_actual, _message);
+    }
+
+    public void ToBeUndefined()
+    {
+        Assert.IsNotNull(_actual, _message);
+    }
+
+    public void ToBeInstanceOf(Type expected)
+    {
+        Assert.IsNotInstanceOfType(_actual, expected, _message);
     }
 }
 
@@ -109,15 +197,10 @@ internal class Expector<T>
         _message = message;
     }
 
-    public Expector<T> To => this;
-
     public NotExpector<T> Not()
     {
         return new NotExpector<T>(_actual, _message);
     }
-
-    public Expector<T> Be => this;
-    public Expector<T> Have => this;
 
     public void Equal(object? expected, string? message = null)
     {
@@ -179,17 +262,92 @@ internal class Expector<T>
             expected = (double)i;
         }
 
+        if (expected is double d && _actual is int)
+        {
+            expected = (int)d;
+        }
+
         Assert.AreEqual(expected, _actual, _message);
+    }
+
+    public void ToBeTruthy()
+    {
+        Ok();
+    }
+
+    public void ToBeFalsy()
+    {
+        if (_actual is null)
+        {
+            return;
+        }
+        if (_actual is bool b)
+        {
+            Assert.IsFalse(b, _message);
+            return;
+        }
+        if (_actual is string s)
+        {
+            Assert.IsTrue(string.IsNullOrEmpty(s), _message);
+            return;
+        }
+        if (_actual is IConvertible c)
+        {
+            Assert.AreEqual(0.0, c.ToDouble(System.Globalization.CultureInfo.InvariantCulture), _message);
+            return;
+        }
+        Assert.Fail(_message ?? "Expected a falsy value");
+    }
+
+    public void ToBeCloseTo(double expected, int decimals = 2)
+    {
+        var delta = System.Math.Pow(10, -decimals) / 2;
+        CloseTo(expected, delta);
+    }
+
+    public void ToContain(object element)
+    {
+        Contain(element);
+    }
+
+    public void ToHaveLength(int length)
+    {
+        Length(length);
+    }
+
+    public void ToBeGreaterThan(double expected, string? message = null)
+    {
+        GreaterThan(expected, message);
+    }
+
+    public void ToBeLessThan(double expected)
+    {
+        LessThan(expected);
+    }
+
+    public void ToBeInstanceOf(Type expected)
+    {
+        Assert.IsInstanceOfType(_actual, expected, _message);
+    }
+
+    public void ToBeNull()
+    {
+        Assert.IsNull(_actual, _message);
+    }
+
+    public void ToBeUndefined()
+    {
+        Assert.IsNull(_actual, _message);
+    }
+
+    public void ToThrow(Type expected)
+    {
+        Throw(expected);
     }
 
     public void Ok()
     {
         Assert.AreNotEqual(default!, _actual, _message);
-    }
-
-    public void Undefined()
-    {
-        Assert.IsNull(_actual, _message);
     }
 
     public void Length(int length)
@@ -216,29 +374,6 @@ internal class Expector<T>
         }
     }
 
-    public void True()
-    {
-        if (_actual is bool b)
-        {
-            Assert.IsTrue(b, _message);
-        }
-        else
-        {
-            Assert.Fail("ToBeTrue can only be used on bools:");
-        }
-    }
-
-    public void False()
-    {
-        if (_actual is bool b)
-        {
-            Assert.IsFalse(b, _message);
-        }
-        else
-        {
-            Assert.Fail("ToBeFalse can only be used on bools:");
-        }
-    }
 
 
     public void Throw(Type expected)
@@ -295,7 +430,7 @@ internal class Expector<T>
             .DisplayName;
         parts.Add(testName ?? "");
 
-        var snapshotName = TestGlobals.UseSnapshotValue(string.Join(" ", parts), hint);
+        var snapshotName = TestGlobals.UseSnapshotValue(string.Join(" > ", parts), hint);
 
         var error = snapshotFile.Match(snapshotName, _actual);
         if (!string.IsNullOrEmpty(error))

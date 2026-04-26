@@ -1,6 +1,6 @@
+import { describe, expect, it } from 'vitest';
 import { type AlphaTexAstNode, AlphaTexNodeType, type AlphaTexNumberLiteral } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
-import { expect } from 'chai';
 
 describe('AlphaTexLexerTest', () => {
     function lexerTest(source: string, diagnostics: boolean = false) {

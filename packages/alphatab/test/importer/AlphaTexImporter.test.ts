@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
 import { AlphaTexStaffNoteKind } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
@@ -50,7 +51,6 @@ import { Settings } from '@coderline/alphatab/Settings';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
-import { assert, expect } from 'chai';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { TremoloPickingEffectSerializer } from '@coderline/alphatab/generated/model/TremoloPickingEffectSerializer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
@@ -64,7 +64,7 @@ describe('AlphaTexImporterTest', () => {
         importer.initFromString(tex, new Settings());
         try {
             importer.readScore();
-            assert.fail('Expected error on import');
+            throw new Error('Expected error on import');
         } catch {
             expect(importer.lexerDiagnostics.errors).toMatchSnapshot('lexer-diagnostics');
             expect(importer.parserDiagnostics.errors).toMatchSnapshot('parser-diagnostics');
@@ -88,7 +88,7 @@ describe('AlphaTexImporterTest', () => {
                 if (e instanceof UnsupportedFormatError) {
                     throw new UnsupportedFormatError(withDiag.toString());
                 } else {
-                    assert.fail(`${withDiag.toString()}`);
+                    throw new Error(`${withDiag.toString()}`);
                 }
             }
             throw e;
@@ -119,53 +119,53 @@ describe('AlphaTexImporterTest', () => {
         0.5.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2`;
 
         const score = parseTex(tex);
-        expect(score.title).to.equal('Test');
-        expect(score.words).to.equal('test');
-        expect(score.music).to.equal('alphaTab');
-        expect(score.copyright).to.equal('test');
-        expect(score.tempo).to.equal(200);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.tracks[0].playbackInfo.program).to.equal(30);
-        expect(score.tracks[0].staves[0].capo).to.equal(2);
-        expect(score.tracks[0].staves[0].tuning.join(',')).to.equal('55,38,43,47,50,69');
-        expect(score.masterBars.length).to.equal(2);
+        expect(score.title).toBe('Test');
+        expect(score.words).toBe('test');
+        expect(score.music).toBe('alphaTab');
+        expect(score.copyright).toBe('test');
+        expect(score.tempo).toBe(200);
+        expect(score.tracks.length).toBe(1);
+        expect(score.tracks[0].playbackInfo.program).toBe(30);
+        expect(score.tracks[0].staves[0].capo).toBe(2);
+        expect(score.tracks[0].staves[0].tuning.join(',')).toBe('55,38,43,47,50,69');
+        expect(score.masterBars.length).toBe(2);
 
         // bars[0]
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].duration).to.equal(Duration.Half);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].string).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].duration).to.equal(Duration.Quarter);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].fret).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].string).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].duration).to.equal(Duration.Quarter);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].fret).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].string).to.equal(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].duration).toBe(Duration.Half);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toBe(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].string).toBe(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].duration).toBe(Duration.Quarter);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].fret).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].string).toBe(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].duration).toBe(Duration.Quarter);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].fret).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].string).toBe(3);
 
         // bars[1]
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].duration).to.equal(Duration.Eighth);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].fret).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].string).to.equal(4);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].duration).to.equal(Duration.Eighth);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].fret).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].string).to.equal(4);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].duration).to.equal(Duration.Eighth);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].fret).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].string).to.equal(4);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].duration).to.equal(Duration.Eighth);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].fret).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].string).to.equal(4);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].notes.length).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].duration).to.equal(Duration.Half);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].isRest).to.equal(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).toBe(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].duration).toBe(Duration.Eighth);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].fret).toBe(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].string).toBe(4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].duration).toBe(Duration.Eighth);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].fret).toBe(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].string).toBe(4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].duration).toBe(Duration.Eighth);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].fret).toBe(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].string).toBe(4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].duration).toBe(Duration.Eighth);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].fret).toBe(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].string).toBe(4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].notes.length).toBe(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].duration).toBe(Duration.Half);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].isRest).toBe(true);
     });
 
     it('tuning', () => {
@@ -174,71 +174,71 @@ describe('AlphaTexImporterTest', () => {
         0.5.1`;
 
         const score = parseTex(tex);
-        expect(score.tracks[0].staves[0].tuning.join(',')).to.equal(Tuning.getDefaultTuningFor(6)!.tunings.join(','));
+        expect(score.tracks[0].staves[0].tuning.join(',')).toBe(Tuning.getDefaultTuningFor(6)!.tunings.join(','));
     });
 
     it('dead-notes1-issue79', () => {
         const tex: string = ':4 x.3';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isDead).to.equal(true);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toBe(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isDead).toBe(true);
     });
 
     it('dead-notes2-issue79', () => {
         const tex: string = ':4 3.3{x}';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isDead).to.equal(true);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isDead).toBe(true);
     });
 
     it('dead', () => {
         const tex: string = 'x.1 3.1{x}';
         const score = parseTex(tex);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].string).to.equal(6);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].fret).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].string).to.equal(6);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toBe(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].string).toBe(6);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].fret).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].string).toBe(6);
     });
 
     it('trill-issue79', () => {
         const tex: string = ':4 3.3{tr 5 16}';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isTrill).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillSpeed).to.equal(Duration.Sixteenth);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillFret).to.equal(5);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isTrill).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillSpeed).toBe(Duration.Sixteenth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillFret).toBe(5);
     });
 
     it('tremolo-issue79', () => {
         const tex: string = ':4 3.3{tr 5 16}';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isTrill).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillSpeed).to.equal(Duration.Sixteenth);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillFret).to.equal(5);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isTrill).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillSpeed).toBe(Duration.Sixteenth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillFret).toBe(5);
     });
 
     it('tremolo-picking-issue79', () => {
         const tex: string = ':4 3.3{tp 16}';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isTremolo).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].tremoloPicking!.marks).to.equal(2);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isTremolo).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].tremoloPicking!.marks).toBe(2);
     });
 
     it('brushes-arpeggio', () => {
@@ -248,67 +248,67 @@ describe('AlphaTexImporterTest', () => {
             (1.1 2.2 3.3 4.4).4{bd} (1.1 2.2 3.3 4.4).8{bu} (1.1 2.2 3.3 4.4).2{ad} (1.1 2.2 3.3 4.4).16{au} r
         `;
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushType).to.equal(BrushType.BrushDown);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].playbackDuration).to.equal(960);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushDuration).to.equal(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushType).to.equal(BrushType.BrushUp);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].playbackDuration).to.equal(480);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushDuration).to.equal(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].brushType).to.equal(BrushType.ArpeggioDown);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].playbackDuration).to.equal(1920);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].brushDuration).to.equal(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].brushType).to.equal(BrushType.ArpeggioUp);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].playbackDuration).to.equal(240);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].brushDuration).to.equal(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].isRest).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].brushType).to.equal(BrushType.None);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].playbackDuration).to.equal(240);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].brushDuration).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].brushType).to.equal(BrushType.BrushDown);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].brushDuration).to.equal(120);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].brushType).to.equal(BrushType.BrushUp);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].brushDuration).to.equal(120);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].brushType).to.equal(BrushType.ArpeggioDown);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].brushDuration).to.equal(120);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].brushType).to.equal(BrushType.ArpeggioUp);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].brushDuration).to.equal(120);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].isRest).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].brushType).to.equal(BrushType.None);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].brushDuration).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats.length).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].brushType).to.equal(BrushType.BrushDown);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].brushDuration).to.equal(60);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].brushType).to.equal(BrushType.BrushUp);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].brushDuration).to.equal(30);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].brushType).to.equal(BrushType.ArpeggioDown);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].brushDuration).to.equal(480);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].brushType).to.equal(BrushType.ArpeggioUp);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].brushDuration).to.equal(60);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].isRest).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushType).to.equal(BrushType.None);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushDuration).to.equal(0);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushType).toBe(BrushType.BrushDown);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].playbackDuration).toBe(960);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushDuration).toBe(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushType).toBe(BrushType.BrushUp);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].playbackDuration).toBe(480);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushDuration).toBe(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].brushType).toBe(BrushType.ArpeggioDown);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].playbackDuration).toBe(1920);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].brushDuration).toBe(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].brushType).toBe(BrushType.ArpeggioUp);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].playbackDuration).toBe(240);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].brushDuration).toBe(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].isRest).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].brushType).toBe(BrushType.None);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].playbackDuration).toBe(240);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].brushDuration).toBe(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).toBe(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].brushType).toBe(BrushType.BrushDown);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].brushDuration).toBe(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].brushType).toBe(BrushType.BrushUp);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].brushDuration).toBe(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].brushType).toBe(BrushType.ArpeggioDown);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].brushDuration).toBe(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].brushType).toBe(BrushType.ArpeggioUp);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].brushDuration).toBe(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].isRest).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].brushType).toBe(BrushType.None);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].brushDuration).toBe(0);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats.length).toBe(5);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].brushType).toBe(BrushType.BrushDown);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].brushDuration).toBe(60);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].brushType).toBe(BrushType.BrushUp);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].brushDuration).toBe(30);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].brushType).toBe(BrushType.ArpeggioDown);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].brushDuration).toBe(480);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].brushType).toBe(BrushType.ArpeggioUp);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].brushDuration).toBe(60);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].isRest).toBe(true);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushType).toBe(BrushType.None);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushDuration).toBe(0);
         testExportRoundtrip(score);
     });
 
     it('hamonics-issue79', () => {
         const tex: string = ':8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).to.equal(
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).toBe(
             HarmonicType.Natural
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).toBe(
             HarmonicType.Artificial
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).to.equal(HarmonicType.Tap);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).to.equal(HarmonicType.Pinch);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).to.equal(HarmonicType.Semi);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).toBe(HarmonicType.Tap);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).toBe(HarmonicType.Pinch);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).toBe(HarmonicType.Semi);
     });
 
     it('hamonics-rendering-text-issue79', async () => {
@@ -332,51 +332,51 @@ describe('AlphaTexImporterTest', () => {
             new RegExp(regexTemplate.replace('{0}', HarmonicsEffectInfo.harmonicToString(HarmonicType.Natural))).exec(
                 svg
             )
-        ).to.be.ok;
+        ).toBeTruthy();
         expect(
             new RegExp(
                 regexTemplate.replace('{0}', HarmonicsEffectInfo.harmonicToString(HarmonicType.Artificial))
             ).exec(svg)
-        ).to.be.ok;
+        ).toBeTruthy();
         expect(
             new RegExp(regexTemplate.replace('{0}', HarmonicsEffectInfo.harmonicToString(HarmonicType.Tap))).exec(svg)
-        ).to.be.ok;
+        ).toBeTruthy();
         expect(
             new RegExp(regexTemplate.replace('{0}', HarmonicsEffectInfo.harmonicToString(HarmonicType.Pinch))).exec(svg)
-        ).to.be.ok;
+        ).toBeTruthy();
         expect(
             new RegExp(regexTemplate.replace('{0}', HarmonicsEffectInfo.harmonicToString(HarmonicType.Semi))).exec(svg)
-        ).to.be.ok;
+        ).toBeTruthy();
     });
 
     it('grace-issue79', () => {
         const tex: string = ':8 3.3{gr} 3.3{gr ob}';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].graceType).to.equal(GraceType.BeforeBeat);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].graceType).to.equal(GraceType.OnBeat);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].graceType).toBe(GraceType.BeforeBeat);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].graceType).toBe(GraceType.OnBeat);
         testExportRoundtrip(score);
     });
 
     it('left-hand-finger-single-note', () => {
         const tex: string = ':8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5}';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].leftHandFinger).to.equal(Fingers.Thumb);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].leftHandFinger).to.equal(
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].leftHandFinger).toBe(Fingers.Thumb);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].leftHandFinger).toBe(
             Fingers.IndexFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].leftHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].leftHandFinger).toBe(
             Fingers.MiddleFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].leftHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].leftHandFinger).toBe(
             Fingers.AnnularFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].leftHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].leftHandFinger).toBe(
             Fingers.LittleFinger
         );
         testExportRoundtrip(score);
@@ -385,20 +385,20 @@ describe('AlphaTexImporterTest', () => {
     it('right-hand-finger-single-note', () => {
         const tex: string = ':8 3.3{rf 1} 3.3{rf 2} 3.3{rf 3} 3.3{rf 4} 3.3{rf 5}';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].rightHandFinger).to.equal(Fingers.Thumb);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].rightHandFinger).to.equal(
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].rightHandFinger).toBe(Fingers.Thumb);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].rightHandFinger).toBe(
             Fingers.IndexFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].rightHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].rightHandFinger).toBe(
             Fingers.MiddleFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].rightHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].rightHandFinger).toBe(
             Fingers.AnnularFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].rightHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].rightHandFinger).toBe(
             Fingers.LittleFinger
         );
         testExportRoundtrip(score);
@@ -407,21 +407,21 @@ describe('AlphaTexImporterTest', () => {
     it('left-hand-finger-chord', () => {
         const tex: string = ':8 (3.1{lf 1} 3.2{lf 2} 3.3{lf 3} 3.4{lf 4} 3.5{lf 5})';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].leftHandFinger).to.equal(Fingers.Thumb);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[1].leftHandFinger).to.equal(
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).toBe(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].leftHandFinger).toBe(Fingers.Thumb);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[1].leftHandFinger).toBe(
             Fingers.IndexFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[2].leftHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[2].leftHandFinger).toBe(
             Fingers.MiddleFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[3].leftHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[3].leftHandFinger).toBe(
             Fingers.AnnularFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[4].leftHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[4].leftHandFinger).toBe(
             Fingers.LittleFinger
         );
         testExportRoundtrip(score);
@@ -430,21 +430,21 @@ describe('AlphaTexImporterTest', () => {
     it('right-hand-finger-chord', () => {
         const tex: string = ':8 (3.1{rf 1} 3.2{rf 2} 3.3{rf 3} 3.4{rf 4} 3.5{rf 5})';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].rightHandFinger).to.equal(Fingers.Thumb);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[1].rightHandFinger).to.equal(
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).toBe(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].rightHandFinger).toBe(Fingers.Thumb);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[1].rightHandFinger).toBe(
             Fingers.IndexFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[2].rightHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[2].rightHandFinger).toBe(
             Fingers.MiddleFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[3].rightHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[3].rightHandFinger).toBe(
             Fingers.AnnularFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[4].rightHandFinger).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[4].rightHandFinger).toBe(
             Fingers.LittleFinger
         );
         testExportRoundtrip(score);
@@ -453,97 +453,97 @@ describe('AlphaTexImporterTest', () => {
     it('unstringed', () => {
         const tex: string = '\\instrument piano . c4 c#4 d4 d#4 | c4 db4 d4 eb4';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(2);
-        expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(4);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPiano).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].realValue).to.equal(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPiano).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].realValue).to.equal(61);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPiano).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].realValue).to.equal(62);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPiano).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].realValue).to.equal(63);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).to.equal(4);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPiano).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].realValue).to.equal(60);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPiano).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].realValue).to.equal(61);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPiano).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].realValue).to.equal(62);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPiano).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].realValue).to.equal(63);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(2);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toBe(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPiano).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].realValue).toBe(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPiano).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].realValue).toBe(61);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPiano).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].realValue).toBe(62);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPiano).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].realValue).toBe(63);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).toBe(4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPiano).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].realValue).toBe(60);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPiano).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].realValue).toBe(61);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPiano).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].realValue).toBe(62);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPiano).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].realValue).toBe(63);
         testExportRoundtrip(score);
     });
 
     it('multi-staff-default-settings', () => {
         const tex: string = '1.1 | 1.1 | \\staff 2.1 | 2.1';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(2);
-        expect(score.tracks[0].staves.length).to.equal(2);
-        expect(score.tracks[0].staves[0].showTablature).to.be.equal(true);
-        expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
-        expect(score.tracks[0].staves[1].showTablature).to.be.equal(true); // default settings used
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(2);
+        expect(score.tracks[0].staves.length).toBe(2);
+        expect(score.tracks[0].staves[0].showTablature).toBe(true);
+        expect(score.tracks[0].staves[0].showStandardNotation).toBe(true);
+        expect(score.tracks[0].staves[0].bars.length).toBe(2);
+        expect(score.tracks[0].staves[1].showTablature).toBe(true); // default settings used
 
-        expect(score.tracks[0].staves[1].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[0].staves[1].bars.length).to.equal(2);
+        expect(score.tracks[0].staves[1].showStandardNotation).toBe(true);
+        expect(score.tracks[0].staves[1].bars.length).toBe(2);
         testExportRoundtrip(score);
     });
 
     it('multi-staff-default-settings-braces', () => {
         const tex: string = '1.1 | 1.1 | \\staff{} 2.1 | 2.1';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(2);
-        expect(score.tracks[0].staves.length).to.equal(2);
-        expect(score.tracks[0].staves[0].showTablature).to.be.equal(true);
-        expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
-        expect(score.tracks[0].staves[1].showTablature).to.be.equal(true); // default settings used
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(2);
+        expect(score.tracks[0].staves.length).toBe(2);
+        expect(score.tracks[0].staves[0].showTablature).toBe(true);
+        expect(score.tracks[0].staves[0].showStandardNotation).toBe(true);
+        expect(score.tracks[0].staves[0].bars.length).toBe(2);
+        expect(score.tracks[0].staves[1].showTablature).toBe(true); // default settings used
 
-        expect(score.tracks[0].staves[1].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[0].staves[1].bars.length).to.equal(2);
+        expect(score.tracks[0].staves[1].showStandardNotation).toBe(true);
+        expect(score.tracks[0].staves[1].bars.length).toBe(2);
         testExportRoundtrip(score);
     });
 
     it('single-staff-with-setting', () => {
         const tex: string = '\\staff{score} 1.1 | 1.1';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(2);
-        expect(score.tracks[0].staves.length).to.equal(1);
-        expect(score.tracks[0].staves[0].showTablature).to.be.equal(false);
-        expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(2);
+        expect(score.tracks[0].staves.length).toBe(1);
+        expect(score.tracks[0].staves[0].showTablature).toBe(false);
+        expect(score.tracks[0].staves[0].showStandardNotation).toBe(true);
+        expect(score.tracks[0].staves[0].bars.length).toBe(2);
         testExportRoundtrip(score);
     });
 
     it('single-staff-with-slash', () => {
         const tex: string = '\\staff{slash} 1.1 | 1.1';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(2);
-        expect(score.tracks[0].staves.length).to.equal(1);
-        expect(score.tracks[0].staves[0].showSlash).to.be.equal(true);
-        expect(score.tracks[0].staves[0].showTablature).to.be.equal(false);
-        expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(false);
-        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(2);
+        expect(score.tracks[0].staves.length).toBe(1);
+        expect(score.tracks[0].staves[0].showSlash).toBe(true);
+        expect(score.tracks[0].staves[0].showTablature).toBe(false);
+        expect(score.tracks[0].staves[0].showStandardNotation).toBe(false);
+        expect(score.tracks[0].staves[0].bars.length).toBe(2);
         testExportRoundtrip(score);
     });
 
     it('single-staff-with-score-and-slash', () => {
         const tex: string = '\\staff{score slash} 1.1 | 1.1';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(2);
-        expect(score.tracks[0].staves.length).to.equal(1);
-        expect(score.tracks[0].staves[0].showSlash).to.be.equal(true);
-        expect(score.tracks[0].staves[0].showTablature).to.be.equal(false);
-        expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(2);
+        expect(score.tracks[0].staves.length).toBe(1);
+        expect(score.tracks[0].staves[0].showSlash).toBe(true);
+        expect(score.tracks[0].staves[0].showTablature).toBe(false);
+        expect(score.tracks[0].staves[0].showStandardNotation).toBe(true);
+        expect(score.tracks[0].staves[0].bars.length).toBe(2);
         testExportRoundtrip(score);
     });
 
@@ -552,42 +552,42 @@ describe('AlphaTexImporterTest', () => {
         \\staff{tabs} \\capo 2 2.1 | 2.1 |
         \\staff{score tabs} \\tuning A1 D2 A2 D3 G3 B3 E4 3.1 | 3.1`;
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(2);
-        expect(score.tracks[0].staves.length).to.equal(3);
-        expect(score.tracks[0].staves[0].showTablature).to.be.equal(false);
-        expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
-        expect(score.tracks[0].staves[1].showTablature).to.be.equal(true);
-        expect(score.tracks[0].staves[1].showStandardNotation).to.be.equal(false);
-        expect(score.tracks[0].staves[1].bars.length).to.equal(2);
-        expect(score.tracks[0].staves[1].capo).to.equal(2);
-        expect(score.tracks[0].staves[2].showTablature).to.be.equal(true);
-        expect(score.tracks[0].staves[2].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[0].staves[2].bars.length).to.equal(2);
-        expect(score.tracks[0].staves[2].tuning.length).to.equal(7);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(2);
+        expect(score.tracks[0].staves.length).toBe(3);
+        expect(score.tracks[0].staves[0].showTablature).toBe(false);
+        expect(score.tracks[0].staves[0].showStandardNotation).toBe(true);
+        expect(score.tracks[0].staves[0].bars.length).toBe(2);
+        expect(score.tracks[0].staves[1].showTablature).toBe(true);
+        expect(score.tracks[0].staves[1].showStandardNotation).toBe(false);
+        expect(score.tracks[0].staves[1].bars.length).toBe(2);
+        expect(score.tracks[0].staves[1].capo).toBe(2);
+        expect(score.tracks[0].staves[2].showTablature).toBe(true);
+        expect(score.tracks[0].staves[2].showStandardNotation).toBe(true);
+        expect(score.tracks[0].staves[2].bars.length).toBe(2);
+        expect(score.tracks[0].staves[2].tuning.length).toBe(7);
         testExportRoundtrip(score);
     });
 
     it('multi-track', () => {
         const tex: string = '\\track "First" 1.1 | 1.1 | \\track "Second" 2.2 | 2.2';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(2);
-        expect(score.masterBars.length).to.equal(2);
-        expect(score.tracks[0].staves.length).to.equal(1);
-        expect(score.tracks[0].name).to.equal('First');
-        expect(score.tracks[0].playbackInfo.primaryChannel).to.equal(0);
-        expect(score.tracks[0].playbackInfo.secondaryChannel).to.equal(1);
-        expect(score.tracks[0].staves[0].showTablature).to.be.equal(true);
-        expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
-        expect(score.tracks[1].staves.length).to.equal(1);
-        expect(score.tracks[1].name).to.equal('Second');
-        expect(score.tracks[1].playbackInfo.primaryChannel).to.equal(2);
-        expect(score.tracks[1].playbackInfo.secondaryChannel).to.equal(3);
-        expect(score.tracks[1].staves[0].showTablature).to.be.equal(true);
-        expect(score.tracks[1].staves[0].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[1].staves[0].bars.length).to.equal(2);
+        expect(score.tracks.length).toBe(2);
+        expect(score.masterBars.length).toBe(2);
+        expect(score.tracks[0].staves.length).toBe(1);
+        expect(score.tracks[0].name).toBe('First');
+        expect(score.tracks[0].playbackInfo.primaryChannel).toBe(0);
+        expect(score.tracks[0].playbackInfo.secondaryChannel).toBe(1);
+        expect(score.tracks[0].staves[0].showTablature).toBe(true);
+        expect(score.tracks[0].staves[0].showStandardNotation).toBe(true);
+        expect(score.tracks[0].staves[0].bars.length).toBe(2);
+        expect(score.tracks[1].staves.length).toBe(1);
+        expect(score.tracks[1].name).toBe('Second');
+        expect(score.tracks[1].playbackInfo.primaryChannel).toBe(2);
+        expect(score.tracks[1].playbackInfo.secondaryChannel).toBe(3);
+        expect(score.tracks[1].staves[0].showTablature).toBe(true);
+        expect(score.tracks[1].staves[0].showStandardNotation).toBe(true);
+        expect(score.tracks[1].staves[0].bars.length).toBe(2);
         testExportRoundtrip(score);
     });
 
@@ -595,32 +595,32 @@ describe('AlphaTexImporterTest', () => {
         const tex: string =
             '\\track 1.1 | 1.1 | \\track "Only Long Name" 2.2 | 2.2 | \\track "Very Long Name" "shrt" 3.3 | 3.3 ';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(3);
-        expect(score.masterBars.length).to.equal(2);
-        expect(score.tracks[0].staves.length).to.equal(1);
-        expect(score.tracks[0].name).to.equal('');
-        expect(score.tracks[0].shortName).to.equal('');
-        expect(score.tracks[0].playbackInfo.primaryChannel).to.equal(0);
-        expect(score.tracks[0].playbackInfo.secondaryChannel).to.equal(1);
-        expect(score.tracks[0].staves[0].showTablature).to.be.equal(true);
-        expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
-        expect(score.tracks[1].staves.length).to.equal(1);
-        expect(score.tracks[1].name).to.equal('Only Long Name');
-        expect(score.tracks[1].shortName).to.equal('Only Long ');
-        expect(score.tracks[1].playbackInfo.primaryChannel).to.equal(2);
-        expect(score.tracks[1].playbackInfo.secondaryChannel).to.equal(3);
-        expect(score.tracks[1].staves[0].showTablature).to.be.equal(true);
-        expect(score.tracks[1].staves[0].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[1].staves[0].bars.length).to.equal(2);
-        expect(score.tracks[2].staves.length).to.equal(1);
-        expect(score.tracks[2].name).to.equal('Very Long Name');
-        expect(score.tracks[2].shortName).to.equal('shrt');
-        expect(score.tracks[2].playbackInfo.primaryChannel).to.equal(4);
-        expect(score.tracks[2].playbackInfo.secondaryChannel).to.equal(5);
-        expect(score.tracks[2].staves[0].showTablature).to.be.equal(true);
-        expect(score.tracks[2].staves[0].showStandardNotation).to.be.equal(true);
-        expect(score.tracks[2].staves[0].bars.length).to.equal(2);
+        expect(score.tracks.length).toBe(3);
+        expect(score.masterBars.length).toBe(2);
+        expect(score.tracks[0].staves.length).toBe(1);
+        expect(score.tracks[0].name).toBe('');
+        expect(score.tracks[0].shortName).toBe('');
+        expect(score.tracks[0].playbackInfo.primaryChannel).toBe(0);
+        expect(score.tracks[0].playbackInfo.secondaryChannel).toBe(1);
+        expect(score.tracks[0].staves[0].showTablature).toBe(true);
+        expect(score.tracks[0].staves[0].showStandardNotation).toBe(true);
+        expect(score.tracks[0].staves[0].bars.length).toBe(2);
+        expect(score.tracks[1].staves.length).toBe(1);
+        expect(score.tracks[1].name).toBe('Only Long Name');
+        expect(score.tracks[1].shortName).toBe('Only Long ');
+        expect(score.tracks[1].playbackInfo.primaryChannel).toBe(2);
+        expect(score.tracks[1].playbackInfo.secondaryChannel).toBe(3);
+        expect(score.tracks[1].staves[0].showTablature).toBe(true);
+        expect(score.tracks[1].staves[0].showStandardNotation).toBe(true);
+        expect(score.tracks[1].staves[0].bars.length).toBe(2);
+        expect(score.tracks[2].staves.length).toBe(1);
+        expect(score.tracks[2].name).toBe('Very Long Name');
+        expect(score.tracks[2].shortName).toBe('shrt');
+        expect(score.tracks[2].playbackInfo.primaryChannel).toBe(4);
+        expect(score.tracks[2].playbackInfo.secondaryChannel).toBe(5);
+        expect(score.tracks[2].staves[0].showTablature).toBe(true);
+        expect(score.tracks[2].staves[0].showStandardNotation).toBe(true);
+        expect(score.tracks[2].staves[0].bars.length).toBe(2);
         testExportRoundtrip(score);
     });
 
@@ -640,62 +640,62 @@ describe('AlphaTexImporterTest', () => {
                 1.2 3.2 0.1 1.1
         `;
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(3);
-        expect(score.masterBars.length).to.equal(1);
+        expect(score.tracks.length).toBe(3);
+        expect(score.masterBars.length).toBe(1);
         {
             const track1: Track = score.tracks[0];
-            expect(track1.name).to.equal('Piano');
-            expect(track1.staves.length).to.equal(2);
-            expect(track1.playbackInfo.program).to.equal(0);
-            expect(track1.playbackInfo.primaryChannel).to.equal(0);
-            expect(track1.playbackInfo.secondaryChannel).to.equal(1);
+            expect(track1.name).toBe('Piano');
+            expect(track1.staves.length).toBe(2);
+            expect(track1.playbackInfo.program).toBe(0);
+            expect(track1.playbackInfo.primaryChannel).toBe(0);
+            expect(track1.playbackInfo.secondaryChannel).toBe(1);
             {
                 const staff1: Staff = track1.staves[0];
-                expect(staff1.showTablature).to.be.equal(false);
-                expect(staff1.showStandardNotation).to.be.equal(true);
-                expect(staff1.tuning.length).to.equal(0);
-                expect(staff1.bars.length).to.equal(1);
-                expect(staff1.bars[0].clef).to.equal(Clef.G2);
+                expect(staff1.showTablature).toBe(false);
+                expect(staff1.showStandardNotation).toBe(true);
+                expect(staff1.tuning.length).toBe(0);
+                expect(staff1.bars.length).toBe(1);
+                expect(staff1.bars[0].clef).toBe(Clef.G2);
             }
             {
                 const staff2: Staff = track1.staves[1];
-                expect(staff2.showTablature).to.be.equal(false);
-                expect(staff2.showStandardNotation).to.be.equal(true);
-                expect(staff2.tuning.length).to.equal(0);
-                expect(staff2.bars.length).to.equal(1);
-                expect(staff2.bars[0].clef).to.equal(Clef.F4);
+                expect(staff2.showTablature).toBe(false);
+                expect(staff2.showStandardNotation).toBe(true);
+                expect(staff2.tuning.length).toBe(0);
+                expect(staff2.bars.length).toBe(1);
+                expect(staff2.bars[0].clef).toBe(Clef.F4);
             }
         }
         {
             const track2: Track = score.tracks[1];
-            expect(track2.name).to.equal('Guitar');
-            expect(track2.staves.length).to.equal(1);
-            expect(track2.playbackInfo.program).to.equal(25);
-            expect(track2.playbackInfo.primaryChannel).to.equal(2);
-            expect(track2.playbackInfo.secondaryChannel).to.equal(3);
+            expect(track2.name).toBe('Guitar');
+            expect(track2.staves.length).toBe(1);
+            expect(track2.playbackInfo.program).toBe(25);
+            expect(track2.playbackInfo.primaryChannel).toBe(2);
+            expect(track2.playbackInfo.secondaryChannel).toBe(3);
             {
                 const staff1: Staff = track2.staves[0];
-                expect(staff1.showTablature).to.be.equal(true);
-                expect(staff1.showStandardNotation).to.be.equal(false);
-                expect(staff1.tuning.length).to.equal(6);
-                expect(staff1.bars.length).to.equal(1);
-                expect(staff1.bars[0].clef).to.equal(Clef.G2);
+                expect(staff1.showTablature).toBe(true);
+                expect(staff1.showStandardNotation).toBe(false);
+                expect(staff1.tuning.length).toBe(6);
+                expect(staff1.bars.length).toBe(1);
+                expect(staff1.bars[0].clef).toBe(Clef.G2);
             }
         }
         {
             const track3: Track = score.tracks[2];
-            expect(track3.name).to.equal('Second Guitar');
-            expect(track3.staves.length).to.equal(1);
-            expect(track3.playbackInfo.program).to.equal(25);
-            expect(track3.playbackInfo.primaryChannel).to.equal(4);
-            expect(track3.playbackInfo.secondaryChannel).to.equal(5);
+            expect(track3.name).toBe('Second Guitar');
+            expect(track3.staves.length).toBe(1);
+            expect(track3.playbackInfo.program).toBe(25);
+            expect(track3.playbackInfo.primaryChannel).toBe(4);
+            expect(track3.playbackInfo.secondaryChannel).toBe(5);
             {
                 const staff1: Staff = track3.staves[0];
-                expect(staff1.showTablature).to.be.equal(true);
-                expect(staff1.showStandardNotation).to.be.equal(true);
-                expect(staff1.tuning.length).to.equal(6);
-                expect(staff1.bars.length).to.equal(1);
-                expect(staff1.bars[0].clef).to.equal(Clef.G2);
+                expect(staff1.showTablature).toBe(true);
+                expect(staff1.showStandardNotation).toBe(true);
+                expect(staff1.tuning.length).toBe(6);
+                expect(staff1.bars.length).toBe(1);
+                expect(staff1.bars[0].clef).toBe(Clef.G2);
             }
         }
         testExportRoundtrip(score);
@@ -718,74 +718,74 @@ describe('AlphaTexImporterTest', () => {
             1.2 3.2 0.1 1.1
         `;
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(3);
-        expect(score.masterBars.length).to.equal(3);
+        expect(score.tracks.length).toBe(3);
+        expect(score.masterBars.length).toBe(3);
         {
             const track1: Track = score.tracks[0];
-            expect(track1.name).to.equal('Piano');
-            expect(track1.staves.length).to.equal(2);
-            expect(track1.playbackInfo.program).to.equal(0);
-            expect(track1.playbackInfo.primaryChannel).to.equal(0);
-            expect(track1.playbackInfo.secondaryChannel).to.equal(1);
+            expect(track1.name).toBe('Piano');
+            expect(track1.staves.length).toBe(2);
+            expect(track1.playbackInfo.program).toBe(0);
+            expect(track1.playbackInfo.primaryChannel).toBe(0);
+            expect(track1.playbackInfo.secondaryChannel).toBe(1);
             {
                 const staff1: Staff = track1.staves[0];
-                expect(staff1.showTablature).to.be.equal(false);
-                expect(staff1.showStandardNotation).to.be.equal(true);
-                expect(staff1.tuning.length).to.equal(0);
-                expect(staff1.bars.length).to.equal(3);
-                expect(staff1.bars[0].isEmpty).to.be.equal(false);
-                expect(staff1.bars[1].isEmpty).to.be.equal(true);
-                expect(staff1.bars[2].isEmpty).to.be.equal(true);
-                expect(staff1.bars[0].clef).to.equal(Clef.G2);
+                expect(staff1.showTablature).toBe(false);
+                expect(staff1.showStandardNotation).toBe(true);
+                expect(staff1.tuning.length).toBe(0);
+                expect(staff1.bars.length).toBe(3);
+                expect(staff1.bars[0].isEmpty).toBe(false);
+                expect(staff1.bars[1].isEmpty).toBe(true);
+                expect(staff1.bars[2].isEmpty).toBe(true);
+                expect(staff1.bars[0].clef).toBe(Clef.G2);
             }
             {
                 const staff2: Staff = track1.staves[1];
-                expect(staff2.showTablature).to.be.equal(false);
-                expect(staff2.showStandardNotation).to.be.equal(true);
-                expect(staff2.tuning.length).to.equal(0);
-                expect(staff2.bars.length).to.equal(3);
-                expect(staff2.bars[0].isEmpty).to.be.equal(false);
-                expect(staff2.bars[1].isEmpty).to.be.equal(false);
-                expect(staff2.bars[2].isEmpty).to.be.equal(false);
-                expect(staff2.bars[0].clef).to.equal(Clef.F4);
+                expect(staff2.showTablature).toBe(false);
+                expect(staff2.showStandardNotation).toBe(true);
+                expect(staff2.tuning.length).toBe(0);
+                expect(staff2.bars.length).toBe(3);
+                expect(staff2.bars[0].isEmpty).toBe(false);
+                expect(staff2.bars[1].isEmpty).toBe(false);
+                expect(staff2.bars[2].isEmpty).toBe(false);
+                expect(staff2.bars[0].clef).toBe(Clef.F4);
             }
         }
         {
             const track2: Track = score.tracks[1];
-            expect(track2.name).to.equal('Guitar');
-            expect(track2.staves.length).to.equal(1);
-            expect(track2.playbackInfo.program).to.equal(25);
-            expect(track2.playbackInfo.primaryChannel).to.equal(2);
-            expect(track2.playbackInfo.secondaryChannel).to.equal(3);
+            expect(track2.name).toBe('Guitar');
+            expect(track2.staves.length).toBe(1);
+            expect(track2.playbackInfo.program).toBe(25);
+            expect(track2.playbackInfo.primaryChannel).toBe(2);
+            expect(track2.playbackInfo.secondaryChannel).toBe(3);
             {
                 const staff1: Staff = track2.staves[0];
-                expect(staff1.showTablature).to.be.equal(true);
-                expect(staff1.showStandardNotation).to.be.equal(false);
-                expect(staff1.tuning.length).to.equal(6);
-                expect(staff1.bars.length).to.equal(3);
-                expect(staff1.bars[0].isEmpty).to.be.equal(false);
-                expect(staff1.bars[1].isEmpty).to.be.equal(false);
-                expect(staff1.bars[2].isEmpty).to.be.equal(true);
-                expect(staff1.bars[0].clef).to.equal(Clef.G2);
+                expect(staff1.showTablature).toBe(true);
+                expect(staff1.showStandardNotation).toBe(false);
+                expect(staff1.tuning.length).toBe(6);
+                expect(staff1.bars.length).toBe(3);
+                expect(staff1.bars[0].isEmpty).toBe(false);
+                expect(staff1.bars[1].isEmpty).toBe(false);
+                expect(staff1.bars[2].isEmpty).toBe(true);
+                expect(staff1.bars[0].clef).toBe(Clef.G2);
             }
         }
         {
             const track3: Track = score.tracks[2];
-            expect(track3.name).to.equal('Second Guitar');
-            expect(track3.staves.length).to.equal(1);
-            expect(track3.playbackInfo.program).to.equal(25);
-            expect(track3.playbackInfo.primaryChannel).to.equal(4);
-            expect(track3.playbackInfo.secondaryChannel).to.equal(5);
+            expect(track3.name).toBe('Second Guitar');
+            expect(track3.staves.length).toBe(1);
+            expect(track3.playbackInfo.program).toBe(25);
+            expect(track3.playbackInfo.primaryChannel).toBe(4);
+            expect(track3.playbackInfo.secondaryChannel).toBe(5);
             {
                 const staff1: Staff = track3.staves[0];
-                expect(staff1.showTablature).to.be.equal(true);
-                expect(staff1.showStandardNotation).to.be.equal(true);
-                expect(staff1.tuning.length).to.equal(6);
-                expect(staff1.bars.length).to.equal(3);
-                expect(staff1.bars[0].isEmpty).to.be.equal(false);
-                expect(staff1.bars[1].isEmpty).to.be.equal(true);
-                expect(staff1.bars[2].isEmpty).to.be.equal(true);
-                expect(staff1.bars[0].clef).to.equal(Clef.G2);
+                expect(staff1.showTablature).toBe(true);
+                expect(staff1.showStandardNotation).toBe(true);
+                expect(staff1.tuning.length).toBe(6);
+                expect(staff1.bars.length).toBe(3);
+                expect(staff1.bars[0].isEmpty).toBe(false);
+                expect(staff1.bars[1].isEmpty).toBe(true);
+                expect(staff1.bars[2].isEmpty).toBe(true);
+                expect(staff1.bars[0].clef).toBe(Clef.G2);
             }
         }
         testExportRoundtrip(score);
@@ -794,32 +794,32 @@ describe('AlphaTexImporterTest', () => {
     it('slides', () => {
         const tex: string = '3.3{sl} 4.3 | 3.3{ss} 4.3 | 3.3{sib} 3.3{sia} 3.3{sou} 3.3{sod} | 3.3{psd} 3.3{psu}';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(4);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].slideOutType).to.equal(
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].slideOutType).toBe(
             SlideOutType.Legato
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].slideTarget!.id).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].slideTarget!.id).toBe(
             score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].id
         );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].slideOutType).to.equal(SlideOutType.Shift);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].slideTarget!.id).to.equal(
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].slideOutType).toBe(SlideOutType.Shift);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].slideTarget!.id).toBe(
             score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].id
         );
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].notes[0].slideInType).to.equal(
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].notes[0].slideInType).toBe(
             SlideInType.IntoFromBelow
         );
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].notes[0].slideInType).to.equal(
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].notes[0].slideInType).toBe(
             SlideInType.IntoFromAbove
         );
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].notes[0].slideOutType).to.equal(SlideOutType.OutUp);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].notes[0].slideOutType).to.equal(
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].notes[0].slideOutType).toBe(SlideOutType.OutUp);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].notes[0].slideOutType).toBe(
             SlideOutType.OutDown
         );
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].notes[0].slideOutType).to.equal(
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].notes[0].slideOutType).toBe(
             SlideOutType.PickSlideDown
         );
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].notes[0].slideOutType).to.equal(
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].notes[0].slideOutType).toBe(
             SlideOutType.PickSlideUp
         );
         testExportRoundtrip(score);
@@ -828,18 +828,18 @@ describe('AlphaTexImporterTest', () => {
     it('section', () => {
         const tex: string = '\\section Intro 1.1 | 1.1 | \\section "Chorus 01" 1.1 | \\section S Solo';
         const score = parseTex(tex);
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(4);
-        expect(score.masterBars[0].isSectionStart).to.be.equal(true);
-        expect(score.masterBars[0].section!.text).to.equal('Intro');
-        expect(score.masterBars[0].section!.marker).to.equal('');
-        expect(score.masterBars[1].isSectionStart).to.be.equal(false);
-        expect(score.masterBars[2].isSectionStart).to.be.equal(true);
-        expect(score.masterBars[2].section!.text).to.equal('Chorus 01');
-        expect(score.masterBars[2].section!.marker).to.equal('');
-        expect(score.masterBars[3].isSectionStart).to.be.equal(true);
-        expect(score.masterBars[3].section!.text).to.equal('Solo');
-        expect(score.masterBars[3].section!.marker).to.equal('S');
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(4);
+        expect(score.masterBars[0].isSectionStart).toBe(true);
+        expect(score.masterBars[0].section!.text).toBe('Intro');
+        expect(score.masterBars[0].section!.marker).toBe('');
+        expect(score.masterBars[1].isSectionStart).toBe(false);
+        expect(score.masterBars[2].isSectionStart).toBe(true);
+        expect(score.masterBars[2].section!.text).toBe('Chorus 01');
+        expect(score.masterBars[2].section!.marker).toBe('');
+        expect(score.masterBars[3].isSectionStart).toBe(true);
+        expect(score.masterBars[3].section!.text).toBe('Solo');
+        expect(score.masterBars[3].section!.marker).toBe('S');
         testExportRoundtrip(score);
     });
 
@@ -870,8 +870,8 @@ describe('AlphaTexImporterTest', () => {
         ];
 
         for (let i = 0; i < expected.length; i++) {
-            expect(bars[i].keySignature).to.equal(expected[i][0]);
-            expect(bars[i].keySignatureType).to.equal(expected[i][1]);
+            expect(bars[i].keySignature).toBe(expected[i][0]);
+            expect(bars[i].keySignatureType).toBe(expected[i][1]);
         }
         testExportRoundtrip(score);
     });
@@ -911,15 +911,15 @@ describe('AlphaTexImporterTest', () => {
         ];
 
         for (let i = 0; i < expected.length; i++) {
-            expect(bars[i].keySignature).to.equal(expected[i][0]);
-            expect(bars[i].keySignatureType).to.equal(expected[i][1]);
+            expect(bars[i].keySignature).toBe(expected[i][0]);
+            expect(bars[i].keySignatureType).toBe(expected[i][1]);
         }
 
         bars = score.tracks[0].staves[1].bars;
         expected.reverse();
         for (let i = 0; i < expected.length; i++) {
-            expect(bars[i].keySignature).to.equal(expected[i][0], `at ${i}`);
-            expect(bars[i].keySignatureType).to.equal(expected[i][1], `at ${i}`);
+            expect(bars[i].keySignature, `at ${i}`).toBe(expected[i][0]);
+            expect(bars[i].keySignatureType, `at ${i}`).toBe(expected[i][1]);
         }
         testExportRoundtrip(score);
     });
@@ -927,22 +927,22 @@ describe('AlphaTexImporterTest', () => {
     it('pop-slap-tap', () => {
         const tex: string = '3.3{p} 3.3{s} 3.3{tt} r';
         const score = parseTex(tex);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].pop).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].slap).to.be.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tap).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].pop).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].slap).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tap).toBe(true);
         testExportRoundtrip(score);
     });
 
     it('triplet-feel-numeric', () => {
         const tex: string = '\\tf 0 | \\tf 1 | \\tf 2 | \\tf 3 | \\tf 4 | \\tf 5 | \\tf 6';
         const score = parseTex(tex);
-        expect(score.masterBars[0].tripletFeel).to.equal(TripletFeel.NoTripletFeel);
-        expect(score.masterBars[1].tripletFeel).to.equal(TripletFeel.Triplet16th);
-        expect(score.masterBars[2].tripletFeel).to.equal(TripletFeel.Triplet8th);
-        expect(score.masterBars[3].tripletFeel).to.equal(TripletFeel.Dotted16th);
-        expect(score.masterBars[4].tripletFeel).to.equal(TripletFeel.Dotted8th);
-        expect(score.masterBars[5].tripletFeel).to.equal(TripletFeel.Scottish16th);
-        expect(score.masterBars[6].tripletFeel).to.equal(TripletFeel.Scottish8th);
+        expect(score.masterBars[0].tripletFeel).toBe(TripletFeel.NoTripletFeel);
+        expect(score.masterBars[1].tripletFeel).toBe(TripletFeel.Triplet16th);
+        expect(score.masterBars[2].tripletFeel).toBe(TripletFeel.Triplet8th);
+        expect(score.masterBars[3].tripletFeel).toBe(TripletFeel.Dotted16th);
+        expect(score.masterBars[4].tripletFeel).toBe(TripletFeel.Dotted8th);
+        expect(score.masterBars[5].tripletFeel).toBe(TripletFeel.Scottish16th);
+        expect(score.masterBars[6].tripletFeel).toBe(TripletFeel.Scottish8th);
         testExportRoundtrip(score);
     });
 
@@ -950,41 +950,41 @@ describe('AlphaTexImporterTest', () => {
         const tex: string =
             '\\tf none | \\tf triplet-16th | \\tf triplet-8th | \\tf dotted-16th | \\tf dotted-8th | \\tf scottish-16th | \\tf scottish-8th';
         const score = parseTex(tex);
-        expect(score.masterBars[0].tripletFeel).to.equal(TripletFeel.NoTripletFeel);
-        expect(score.masterBars[1].tripletFeel).to.equal(TripletFeel.Triplet16th);
-        expect(score.masterBars[2].tripletFeel).to.equal(TripletFeel.Triplet8th);
-        expect(score.masterBars[3].tripletFeel).to.equal(TripletFeel.Dotted16th);
-        expect(score.masterBars[4].tripletFeel).to.equal(TripletFeel.Dotted8th);
-        expect(score.masterBars[5].tripletFeel).to.equal(TripletFeel.Scottish16th);
-        expect(score.masterBars[6].tripletFeel).to.equal(TripletFeel.Scottish8th);
+        expect(score.masterBars[0].tripletFeel).toBe(TripletFeel.NoTripletFeel);
+        expect(score.masterBars[1].tripletFeel).toBe(TripletFeel.Triplet16th);
+        expect(score.masterBars[2].tripletFeel).toBe(TripletFeel.Triplet8th);
+        expect(score.masterBars[3].tripletFeel).toBe(TripletFeel.Dotted16th);
+        expect(score.masterBars[4].tripletFeel).toBe(TripletFeel.Dotted8th);
+        expect(score.masterBars[5].tripletFeel).toBe(TripletFeel.Scottish16th);
+        expect(score.masterBars[6].tripletFeel).toBe(TripletFeel.Scottish8th);
         testExportRoundtrip(score);
     });
 
     it('triplet-feel-short-names', () => {
         const tex: string = '\\tf no | \\tf t16 | \\tf t8 | \\tf d16 | \\tf d8 | \\tf s16 | \\tf s8';
         const score = parseTex(tex);
-        expect(score.masterBars[0].tripletFeel).to.equal(TripletFeel.NoTripletFeel);
-        expect(score.masterBars[1].tripletFeel).to.equal(TripletFeel.Triplet16th);
-        expect(score.masterBars[2].tripletFeel).to.equal(TripletFeel.Triplet8th);
-        expect(score.masterBars[3].tripletFeel).to.equal(TripletFeel.Dotted16th);
-        expect(score.masterBars[4].tripletFeel).to.equal(TripletFeel.Dotted8th);
-        expect(score.masterBars[5].tripletFeel).to.equal(TripletFeel.Scottish16th);
-        expect(score.masterBars[6].tripletFeel).to.equal(TripletFeel.Scottish8th);
+        expect(score.masterBars[0].tripletFeel).toBe(TripletFeel.NoTripletFeel);
+        expect(score.masterBars[1].tripletFeel).toBe(TripletFeel.Triplet16th);
+        expect(score.masterBars[2].tripletFeel).toBe(TripletFeel.Triplet8th);
+        expect(score.masterBars[3].tripletFeel).toBe(TripletFeel.Dotted16th);
+        expect(score.masterBars[4].tripletFeel).toBe(TripletFeel.Dotted8th);
+        expect(score.masterBars[5].tripletFeel).toBe(TripletFeel.Scottish16th);
+        expect(score.masterBars[6].tripletFeel).toBe(TripletFeel.Scottish8th);
         testExportRoundtrip(score);
     });
 
     it('triplet-feel-multi-bar', () => {
         const tex: string = '\\tf t16 C4 | C4  | C4  | \\tf t8 C4 | C4 | C4 | \\tf no | C4  | C4 ';
         const score = parseTex(tex);
-        expect(score.masterBars[0].tripletFeel).to.equal(TripletFeel.Triplet16th);
-        expect(score.masterBars[1].tripletFeel).to.equal(TripletFeel.Triplet16th);
-        expect(score.masterBars[2].tripletFeel).to.equal(TripletFeel.Triplet16th);
-        expect(score.masterBars[3].tripletFeel).to.equal(TripletFeel.Triplet8th);
-        expect(score.masterBars[4].tripletFeel).to.equal(TripletFeel.Triplet8th);
-        expect(score.masterBars[5].tripletFeel).to.equal(TripletFeel.Triplet8th);
-        expect(score.masterBars[6].tripletFeel).to.equal(TripletFeel.NoTripletFeel);
-        expect(score.masterBars[7].tripletFeel).to.equal(TripletFeel.NoTripletFeel);
-        expect(score.masterBars[8].tripletFeel).to.equal(TripletFeel.NoTripletFeel);
+        expect(score.masterBars[0].tripletFeel).toBe(TripletFeel.Triplet16th);
+        expect(score.masterBars[1].tripletFeel).toBe(TripletFeel.Triplet16th);
+        expect(score.masterBars[2].tripletFeel).toBe(TripletFeel.Triplet16th);
+        expect(score.masterBars[3].tripletFeel).toBe(TripletFeel.Triplet8th);
+        expect(score.masterBars[4].tripletFeel).toBe(TripletFeel.Triplet8th);
+        expect(score.masterBars[5].tripletFeel).toBe(TripletFeel.Triplet8th);
+        expect(score.masterBars[6].tripletFeel).toBe(TripletFeel.NoTripletFeel);
+        expect(score.masterBars[7].tripletFeel).toBe(TripletFeel.NoTripletFeel);
+        expect(score.masterBars[8].tripletFeel).toBe(TripletFeel.NoTripletFeel);
         testExportRoundtrip(score);
     });
 
@@ -996,16 +996,16 @@ describe('AlphaTexImporterTest', () => {
         let i: number = 0;
         let b: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
         while (b) {
-            expect(b.duration).to.equal(durations[i], `Duration on beat ${i} was wrong`);
+            expect(b.duration, `Duration on beat ${i} was wrong`).toBe(durations[i]);
             if (tuplets[i] === 1) {
-                expect(b.hasTuplet).to.be.equal(false);
+                expect(b.hasTuplet).toBe(false);
             } else {
-                expect(b.tupletNumerator).to.equal(tuplets[i], `Tuplet on beat ${i} was wrong`);
+                expect(b.tupletNumerator, `Tuplet on beat ${i} was wrong`).toBe(tuplets[i]);
             }
             b = b.nextBeat;
             i++;
         }
-        expect(i).to.equal(durations.length);
+        expect(i).toBe(durations.length);
         testExportRoundtrip(score);
     });
 
@@ -1018,8 +1018,8 @@ describe('AlphaTexImporterTest', () => {
         let i: number = 0;
         let b: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
         while (b) {
-            expect(b.tupletNumerator).to.equal(tupletNumerators[i], `Tuplet on beat ${i} was wrong`);
-            expect(b.tupletDenominator).to.equal(tupletDenominators[i], `Tuplet on beat ${i} was wrong`);
+            expect(b.tupletNumerator, `Tuplet on beat ${i} was wrong`).toBe(tupletNumerators[i]);
+            expect(b.tupletDenominator, `Tuplet on beat ${i} was wrong`).toBe(tupletDenominators[i]);
             b = b.nextBeat;
             i++;
         }
@@ -1029,34 +1029,34 @@ describe('AlphaTexImporterTest', () => {
     it('simple-anacrusis', () => {
         const tex: string = '\\ac 3.3 3.3 | 1.1 2.1 3.1 4.1';
         const score = parseTex(tex);
-        expect(score.masterBars[0].isAnacrusis).to.be.equal(true);
-        expect(score.masterBars[0].calculateDuration()).to.equal(1920);
-        expect(score.masterBars[1].calculateDuration()).to.equal(3840);
+        expect(score.masterBars[0].isAnacrusis).toBe(true);
+        expect(score.masterBars[0].calculateDuration()).toBe(1920);
+        expect(score.masterBars[1].calculateDuration()).toBe(3840);
         testExportRoundtrip(score);
     });
 
     it('multi-bar-anacrusis', () => {
         const tex: string = '\\ac 3.3 3.3 | \\ac 3.3 3.3 | 1.1 2.1 3.1 4.1';
         const score = parseTex(tex);
-        expect(score.masterBars[0].isAnacrusis).to.be.equal(true);
-        expect(score.masterBars[1].isAnacrusis).to.be.equal(true);
-        expect(score.masterBars[0].calculateDuration()).to.equal(1920);
-        expect(score.masterBars[1].calculateDuration()).to.equal(1920);
-        expect(score.masterBars[2].calculateDuration()).to.equal(3840);
+        expect(score.masterBars[0].isAnacrusis).toBe(true);
+        expect(score.masterBars[1].isAnacrusis).toBe(true);
+        expect(score.masterBars[0].calculateDuration()).toBe(1920);
+        expect(score.masterBars[1].calculateDuration()).toBe(1920);
+        expect(score.masterBars[2].calculateDuration()).toBe(3840);
         testExportRoundtrip(score);
     });
 
     it('random-anacrusis', () => {
         const tex: string = '\\ac 3.3 3.3 | 1.1 2.1 3.1 4.1 | \\ac 3.3 3.3 | 1.1 2.1 3.1 4.1';
         const score = parseTex(tex);
-        expect(score.masterBars[0].isAnacrusis).to.be.equal(true);
-        expect(score.masterBars[1].isAnacrusis).to.be.equal(false);
-        expect(score.masterBars[2].isAnacrusis).to.be.equal(true);
-        expect(score.masterBars[3].isAnacrusis).to.be.equal(false);
-        expect(score.masterBars[0].calculateDuration()).to.equal(1920);
-        expect(score.masterBars[1].calculateDuration()).to.equal(3840);
-        expect(score.masterBars[2].calculateDuration()).to.equal(1920);
-        expect(score.masterBars[3].calculateDuration()).to.equal(3840);
+        expect(score.masterBars[0].isAnacrusis).toBe(true);
+        expect(score.masterBars[1].isAnacrusis).toBe(false);
+        expect(score.masterBars[2].isAnacrusis).toBe(true);
+        expect(score.masterBars[3].isAnacrusis).toBe(false);
+        expect(score.masterBars[0].calculateDuration()).toBe(1920);
+        expect(score.masterBars[1].calculateDuration()).toBe(3840);
+        expect(score.masterBars[2].calculateDuration()).toBe(1920);
+        expect(score.masterBars[3].calculateDuration()).toBe(3840);
         testExportRoundtrip(score);
     });
 
@@ -1064,29 +1064,29 @@ describe('AlphaTexImporterTest', () => {
         const tex: string =
             '\\ro 1.3 2.3 3.3 4.3 | 5.3 6.3 7.3 8.3 | \\rc 2 1.3 2.3 3.3 4.3 | \\ro \\rc 3 1.3 2.3 3.3 4.3 |';
         const score = parseTex(tex);
-        expect(score.masterBars[0].isRepeatStart).to.be.equal(true);
-        expect(score.masterBars[1].isRepeatStart).to.be.equal(false);
-        expect(score.masterBars[2].isRepeatStart).to.be.equal(false);
-        expect(score.masterBars[3].isRepeatStart).to.be.equal(true);
-        expect(score.masterBars[0].repeatCount).to.equal(0);
-        expect(score.masterBars[1].repeatCount).to.equal(0);
-        expect(score.masterBars[2].repeatCount).to.equal(2);
-        expect(score.masterBars[3].repeatCount).to.equal(3);
+        expect(score.masterBars[0].isRepeatStart).toBe(true);
+        expect(score.masterBars[1].isRepeatStart).toBe(false);
+        expect(score.masterBars[2].isRepeatStart).toBe(false);
+        expect(score.masterBars[3].isRepeatStart).toBe(true);
+        expect(score.masterBars[0].repeatCount).toBe(0);
+        expect(score.masterBars[1].repeatCount).toBe(0);
+        expect(score.masterBars[2].repeatCount).toBe(2);
+        expect(score.masterBars[3].repeatCount).toBe(3);
         testExportRoundtrip(score);
     });
 
     it('alternate-endings', () => {
         const tex: string = '\\ro 4.3*4 | \\ae (1 2 3) 6.3*4 | \\ae 4 \\rc 4 6.3 6.3 6.3 5.3 |';
         const score = parseTex(tex);
-        expect(score.masterBars[0].isRepeatStart).to.be.equal(true);
-        expect(score.masterBars[1].isRepeatStart).to.be.equal(false);
-        expect(score.masterBars[2].isRepeatStart).to.be.equal(false);
-        expect(score.masterBars[0].repeatCount).to.equal(0);
-        expect(score.masterBars[1].repeatCount).to.equal(0);
-        expect(score.masterBars[2].repeatCount).to.equal(4);
-        expect(score.masterBars[0].alternateEndings).to.equal(0b0000);
-        expect(score.masterBars[1].alternateEndings).to.equal(0b0111);
-        expect(score.masterBars[2].alternateEndings).to.equal(0b1000);
+        expect(score.masterBars[0].isRepeatStart).toBe(true);
+        expect(score.masterBars[1].isRepeatStart).toBe(false);
+        expect(score.masterBars[2].isRepeatStart).toBe(false);
+        expect(score.masterBars[0].repeatCount).toBe(0);
+        expect(score.masterBars[1].repeatCount).toBe(0);
+        expect(score.masterBars[2].repeatCount).toBe(4);
+        expect(score.masterBars[0].alternateEndings).toBe(0b0000);
+        expect(score.masterBars[1].alternateEndings).toBe(0b0111);
+        expect(score.masterBars[2].alternateEndings).toBe(0b1000);
         testExportRoundtrip(score);
     });
 
@@ -1099,24 +1099,24 @@ describe('AlphaTexImporterTest', () => {
             \\ae (1 3) 1.1.1 | \\ae 2 \\rc 3 2.1 |
         `;
         const score = parseTex(tex);
-        expect(score.masterBars[0].isRepeatStart).to.be.equal(true);
+        expect(score.masterBars[0].isRepeatStart).toBe(true);
         for (let i = 1; i <= 9; i++) {
-            expect(score.masterBars[i].isRepeatStart).to.be.equal(false);
+            expect(score.masterBars[i].isRepeatStart).toBe(false);
         }
         for (let i = 0; i <= 8; i++) {
-            expect(score.masterBars[i].repeatCount).to.equal(0);
+            expect(score.masterBars[i].repeatCount).toBe(0);
         }
-        expect(score.masterBars[9].repeatCount).to.equal(3);
-        expect(score.masterBars[0].alternateEndings).to.equal(0b001);
-        expect(score.masterBars[1].alternateEndings).to.equal(0b010);
-        expect(score.masterBars[2].alternateEndings).to.equal(0b100);
-        expect(score.masterBars[3].alternateEndings).to.equal(0b000);
-        expect(score.masterBars[4].alternateEndings).to.equal(0b001);
-        expect(score.masterBars[5].alternateEndings).to.equal(0b010);
-        expect(score.masterBars[6].alternateEndings).to.equal(0b100);
-        expect(score.masterBars[7].alternateEndings).to.equal(0b000);
-        expect(score.masterBars[8].alternateEndings).to.equal(0b101);
-        expect(score.masterBars[9].alternateEndings).to.equal(0b010);
+        expect(score.masterBars[9].repeatCount).toBe(3);
+        expect(score.masterBars[0].alternateEndings).toBe(0b001);
+        expect(score.masterBars[1].alternateEndings).toBe(0b010);
+        expect(score.masterBars[2].alternateEndings).toBe(0b100);
+        expect(score.masterBars[3].alternateEndings).toBe(0b000);
+        expect(score.masterBars[4].alternateEndings).toBe(0b001);
+        expect(score.masterBars[5].alternateEndings).toBe(0b010);
+        expect(score.masterBars[6].alternateEndings).toBe(0b100);
+        expect(score.masterBars[7].alternateEndings).toBe(0b000);
+        expect(score.masterBars[8].alternateEndings).toBe(0b101);
+        expect(score.masterBars[9].alternateEndings).toBe(0b010);
         testExportRoundtrip(score);
     });
 
@@ -1133,101 +1133,101 @@ describe('AlphaTexImporterTest', () => {
         `;
         const score = parseTex(tex);
 
-        expect(score.tracks[0].staves[0].transpositionPitch).to.equal(0);
-        expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(0);
-        expect(score.tracks[0].staves[1].transpositionPitch).to.equal(0);
-        expect(score.tracks[0].staves[1].displayTranspositionPitch).to.equal(0);
-        expect(score.tracks[1].staves[0].transpositionPitch).to.equal(0);
-        expect(score.tracks[1].staves[0].displayTranspositionPitch).to.equal(-12);
+        expect(score.tracks[0].staves[0].transpositionPitch).toBe(0);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toBe(0);
+        expect(score.tracks[0].staves[1].transpositionPitch).toBe(0);
+        expect(score.tracks[0].staves[1].displayTranspositionPitch).toBe(0);
+        expect(score.tracks[1].staves[0].transpositionPitch).toBe(0);
+        expect(score.tracks[1].staves[0].displayTranspositionPitch).toBe(-12);
         testExportRoundtrip(score);
     });
 
     it('dynamics', () => {
         const tex: string = '1.1.8{dy ppp} 1.1{dy pp} 1.1{dy p} 1.1{dy mp} 1.1{dy mf} 1.1{dy f} 1.1{dy ff} 1.1{dy fff}';
         const score = parseTex(tex);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).to.equal(DynamicValue.PPP);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].dynamics).to.equal(DynamicValue.PP);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].dynamics).to.equal(DynamicValue.P);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].dynamics).to.equal(DynamicValue.MP);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].dynamics).to.equal(DynamicValue.MF);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[5].dynamics).to.equal(DynamicValue.F);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[6].dynamics).to.equal(DynamicValue.FF);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].dynamics).to.equal(DynamicValue.FFF);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).toBe(DynamicValue.PPP);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].dynamics).toBe(DynamicValue.PP);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].dynamics).toBe(DynamicValue.P);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].dynamics).toBe(DynamicValue.MP);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].dynamics).toBe(DynamicValue.MF);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[5].dynamics).toBe(DynamicValue.F);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[6].dynamics).toBe(DynamicValue.FF);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].dynamics).toBe(DynamicValue.FFF);
         testExportRoundtrip(score);
     });
 
     it('dynamics-auto', () => {
         const tex: string = '1.1.4{dy ppp} 1.1 1.1{dy mp} 1.1';
         const score = parseTex(tex);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).to.equal(DynamicValue.PPP);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].dynamics).to.equal(DynamicValue.PPP);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].dynamics).to.equal(DynamicValue.MP);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].dynamics).to.equal(DynamicValue.MP);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).toBe(DynamicValue.PPP);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].dynamics).toBe(DynamicValue.PPP);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].dynamics).toBe(DynamicValue.MP);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].dynamics).toBe(DynamicValue.MP);
         testExportRoundtrip(score);
     });
 
     it('dynamics-auto-reset-on-track', () => {
         const tex: string = '1.1.4{dy ppp} 1.1 \\track "Second" 1.1.4';
         const score = parseTex(tex);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).to.equal(DynamicValue.PPP);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].dynamics).to.equal(DynamicValue.PPP);
-        expect(score.tracks[1].staves[0].bars[0].voices[0].beats[0].dynamics).to.equal(DynamicValue.F);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).toBe(DynamicValue.PPP);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].dynamics).toBe(DynamicValue.PPP);
+        expect(score.tracks[1].staves[0].bars[0].voices[0].beats[0].dynamics).toBe(DynamicValue.F);
         testExportRoundtrip(score);
     });
 
     it('dynamics-auto-reset-on-staff', () => {
         const tex: string = '1.1.4{dy ppp} 1.1 \\staff 1.1.4';
         const score = parseTex(tex);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).to.equal(DynamicValue.PPP);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].dynamics).to.equal(DynamicValue.PPP);
-        expect(score.tracks[0].staves[1].bars[0].voices[0].beats[0].dynamics).to.equal(DynamicValue.F);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).toBe(DynamicValue.PPP);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].dynamics).toBe(DynamicValue.PPP);
+        expect(score.tracks[0].staves[1].bars[0].voices[0].beats[0].dynamics).toBe(DynamicValue.F);
         testExportRoundtrip(score);
     });
 
     it('crescendo', () => {
         const tex: string = '1.1.4{dec} 1.1{dec} 1.1{cre} 1.1{cre}';
         const score = parseTex(tex);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].crescendo).to.equal(CrescendoType.Decrescendo);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].crescendo).to.equal(CrescendoType.Decrescendo);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].crescendo).to.equal(CrescendoType.Crescendo);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].crescendo).to.equal(CrescendoType.Crescendo);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].crescendo).toBe(CrescendoType.Decrescendo);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].crescendo).toBe(CrescendoType.Decrescendo);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].crescendo).toBe(CrescendoType.Crescendo);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].crescendo).toBe(CrescendoType.Crescendo);
         testExportRoundtrip(score);
     });
 
     it('left-hand-tapping', () => {
         const tex: string = ':4 1.1{lht} 1.1 1.1{lht} 1.1';
         const score = parseTex(tex);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isLeftHandTapped).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isLeftHandTapped).to.equal(false);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isLeftHandTapped).to.equal(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isLeftHandTapped).to.equal(false);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isLeftHandTapped).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isLeftHandTapped).toBe(false);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isLeftHandTapped).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isLeftHandTapped).toBe(false);
         testExportRoundtrip(score);
     });
 
     it('expect-invalid-format-xml', () => {
-        expect(() => parseTex('<xml>')).to.throw(UnsupportedFormatError);
+        expect(() => parseTex('<xml>')).toThrow(UnsupportedFormatError);
     });
 
     it('expect-invalid-format-other-text', () => {
-        expect(() => parseTex('This is not an alphaTex file')).to.throw(UnsupportedFormatError);
+        expect(() => parseTex('This is not an alphaTex file')).toThrow(UnsupportedFormatError);
     });
 
     it('auto-detect-tuning-from-instrument', () => {
         let score = parseTex('\\instrument acousticguitarsteel . 3.3');
-        expect(score.tracks[0].staves[0].tuning.length).to.equal(6);
-        expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(-12);
+        expect(score.tracks[0].staves[0].tuning.length).toBe(6);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toBe(-12);
 
         score = parseTex('\\instrument acousticbass . 3.3');
-        expect(score.tracks[0].staves[0].tuning.length).to.equal(4);
-        expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(-12);
+        expect(score.tracks[0].staves[0].tuning.length).toBe(4);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toBe(-12);
 
         score = parseTex('\\instrument violin . 3.3');
-        expect(score.tracks[0].staves[0].tuning.length).to.equal(4);
-        expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(0);
+        expect(score.tracks[0].staves[0].tuning.length).toBe(4);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toBe(0);
 
         score = parseTex('\\instrument acousticpiano . C4');
-        expect(score.tracks[0].staves[0].tuning.length).to.equal(0);
-        expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(0);
+        expect(score.tracks[0].staves[0].tuning.length).toBe(0);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toBe(0);
     });
 
     it('multibyte-encoding', () => {
@@ -1238,20 +1238,20 @@ describe('AlphaTexImporterTest', () => {
         \\lyrics "Test Lyrics 🤘"
         (1.2 1.1).4 x.2.8 0.1 1.1 | 1.2 3.2 0.1 1.1`);
 
-        expect(score.title).to.equal(multiByteChars);
-        expect(score.tracks[0].name).to.equal('🎸');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).to.equal('🤘');
+        expect(score.title).toBe(multiByteChars);
+        expect(score.tracks[0].name).toBe('🎸');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).toBe('🤘');
         testExportRoundtrip(score);
     });
 
     function runSectionNoteSymbolTest(noteSymbol: string) {
         const score = parseTex(`1.3.4 * 4 | \\section "Verse" ${noteSymbol}.1 | 2.3.4*4`);
 
-        expect(score.masterBars.length).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(4);
-        expect(score.masterBars[1].section!.text).to.equal('Verse');
-        expect(score.masterBars[1].section!.marker).to.equal('');
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).to.equal(1);
+        expect(score.masterBars.length).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(4);
+        expect(score.masterBars[1].section!.text).toBe('Verse');
+        expect(score.masterBars[1].section!.marker).toBe('');
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).toBe(1);
     }
 
     it('does-not-interpret-note-symbols-on-section', () => {
@@ -1275,66 +1275,66 @@ describe('AlphaTexImporterTest', () => {
         for (const _i of [1, 2]) {
             importer.initFromString(tex, new Settings());
             const score = importer.readScore();
-            expect(score.title).to.equal('Test');
-            expect(score.words).to.equal('test');
-            expect(score.music).to.equal('alphaTab');
-            expect(score.copyright).to.equal('test');
-            expect(score.tempo).to.equal(200);
-            expect(score.tracks.length).to.equal(1);
-            expect(score.tracks[0].playbackInfo.program).to.equal(30);
-            expect(score.tracks[0].staves[0].capo).to.equal(2);
-            expect(score.tracks[0].staves[0].tuning.join(',')).to.equal('55,38,43,47,50,69');
-            expect(score.masterBars.length).to.equal(2);
+            expect(score.title).toBe('Test');
+            expect(score.words).toBe('test');
+            expect(score.music).toBe('alphaTab');
+            expect(score.copyright).toBe('test');
+            expect(score.tempo).toBe(200);
+            expect(score.tracks.length).toBe(1);
+            expect(score.tracks[0].playbackInfo.program).toBe(30);
+            expect(score.tracks[0].staves[0].capo).toBe(2);
+            expect(score.tracks[0].staves[0].tuning.join(',')).toBe('55,38,43,47,50,69');
+            expect(score.masterBars.length).toBe(2);
 
             // bars[0]
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(3);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).to.equal(1);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].duration).to.equal(Duration.Half);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(0);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].string).to.equal(2);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes.length).to.equal(1);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].duration).to.equal(Duration.Quarter);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].fret).to.equal(1);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].string).to.equal(2);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes.length).to.equal(1);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].duration).to.equal(Duration.Quarter);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].fret).to.equal(3);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].string).to.equal(3);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toBe(3);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).toBe(1);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].duration).toBe(Duration.Half);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toBe(0);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].string).toBe(2);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes.length).toBe(1);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].duration).toBe(Duration.Quarter);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].fret).toBe(1);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].string).toBe(2);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes.length).toBe(1);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].duration).toBe(Duration.Quarter);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].fret).toBe(3);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].string).toBe(3);
 
             // bars[1]
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).to.equal(5);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes.length).to.equal(1);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].duration).to.equal(Duration.Eighth);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].fret).to.equal(5);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].string).to.equal(4);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes.length).to.equal(1);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].duration).to.equal(Duration.Eighth);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].fret).to.equal(5);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].string).to.equal(4);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes.length).to.equal(1);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].duration).to.equal(Duration.Eighth);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].fret).to.equal(5);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].string).to.equal(4);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes.length).to.equal(1);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].duration).to.equal(Duration.Eighth);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].fret).to.equal(5);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].string).to.equal(4);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].notes.length).to.equal(0);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].duration).to.equal(Duration.Half);
-            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].isRest).to.equal(true);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).toBe(5);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes.length).toBe(1);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].duration).toBe(Duration.Eighth);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].fret).toBe(5);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].string).toBe(4);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes.length).toBe(1);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].duration).toBe(Duration.Eighth);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].fret).toBe(5);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].string).toBe(4);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes.length).toBe(1);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].duration).toBe(Duration.Eighth);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].fret).toBe(5);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].string).toBe(4);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes.length).toBe(1);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].duration).toBe(Duration.Eighth);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].fret).toBe(5);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].string).toBe(4);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].notes.length).toBe(0);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].duration).toBe(Duration.Half);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].isRest).toBe(true);
         }
     });
 
     it('tempo-as-float', () => {
         const score = parseTex('\\tempo 112.5 .');
-        expect(score.tempo).to.equal(112.5);
+        expect(score.tempo).toBe(112.5);
         testExportRoundtrip(score);
     });
 
     it('tempo-as-float-in-bar', () => {
         const score = parseTex('\\tempo 112 . 3.3.1 | \\tempo 333.3 3.3');
-        expect(score.tempo).to.equal(112);
-        expect(score.tracks[0].staves[0].bars[1].masterBar.tempoAutomations[0]?.value).to.equal(333.3);
+        expect(score.tempo).toBe(112);
+        expect(score.tracks[0].staves[0].bars[1].masterBar.tempoAutomations[0]?.value).toBe(333.3);
         testExportRoundtrip(score);
     });
 
@@ -1344,16 +1344,16 @@ describe('AlphaTexImporterTest', () => {
             .
             30 31 33 34
         `);
-        expect(score.tracks[0].playbackInfo.primaryChannel).to.equal(9);
-        expect(score.tracks[0].staves[0].isPercussion).to.be.true;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
-        expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).to.equal(49);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(40);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(2);
-        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
-        expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
+        expect(score.tracks[0].playbackInfo.primaryChannel).toBe(9);
+        expect(score.tracks[0].staves[0].isPercussion).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).toBe(0);
+        expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).toBe(49);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).toBe(1);
+        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).toBe(40);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).toBe(2);
+        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).toBe(37);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).toBe(3);
+        expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).toBe(38);
         testExportRoundtrip(score);
     });
 
@@ -1367,16 +1367,16 @@ describe('AlphaTexImporterTest', () => {
             .
             A B C D
         `);
-        expect(score.tracks[0].playbackInfo.primaryChannel).to.equal(9);
-        expect(score.tracks[0].staves[0].isPercussion).to.be.true;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
-        expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).to.equal(49);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(40);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(2);
-        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
-        expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
+        expect(score.tracks[0].playbackInfo.primaryChannel).toBe(9);
+        expect(score.tracks[0].staves[0].isPercussion).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).toBe(0);
+        expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).toBe(49);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).toBe(1);
+        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).toBe(40);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).toBe(2);
+        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).toBe(37);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).toBe(3);
+        expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).toBe(38);
         testExportRoundtrip(score);
     });
 
@@ -1387,16 +1387,16 @@ describe('AlphaTexImporterTest', () => {
             .
             "Cymbal (hit)" "Snare (side stick)" "Snare (side stick) 2" "Snare (hit)"
         `);
-        expect(score.tracks[0].playbackInfo.primaryChannel).to.equal(9);
-        expect(score.tracks[0].staves[0].isPercussion).to.be.true;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
-        expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).to.equal(49);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(37);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(2);
-        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(40);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
-        expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
+        expect(score.tracks[0].playbackInfo.primaryChannel).toBe(9);
+        expect(score.tracks[0].staves[0].isPercussion).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).toBe(0);
+        expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).toBe(49);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).toBe(1);
+        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).toBe(37);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).toBe(2);
+        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).toBe(40);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).toBe(3);
+        expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).toBe(38);
         testExportRoundtrip(score);
     });
 
@@ -1407,16 +1407,16 @@ describe('AlphaTexImporterTest', () => {
             .
             CymbalHit SnareSideStick SnareSideStick2 SnareHit
         `);
-        expect(score.tracks[0].playbackInfo.primaryChannel).to.equal(9);
-        expect(score.tracks[0].staves[0].isPercussion).to.be.true;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
-        expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).to.equal(49);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).to.equal(37);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(2);
-        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(40);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
-        expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
+        expect(score.tracks[0].playbackInfo.primaryChannel).toBe(9);
+        expect(score.tracks[0].staves[0].isPercussion).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).toBe(0);
+        expect(score.tracks[0].percussionArticulations[0].outputMidiNumber).toBe(49);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).toBe(1);
+        expect(score.tracks[0].percussionArticulations[1].outputMidiNumber).toBe(37);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).toBe(2);
+        expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).toBe(40);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).toBe(3);
+        expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).toBe(38);
         testExportRoundtrip(score);
     });
 
@@ -1424,11 +1424,11 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             . \\tempo 120 1.1.4 1.1 1.1{tempo 60} 1.1 | 1.1.4{tempo 100} 1.1 1.1{tempo 120} 1.1
         `);
-        expect(score.masterBars[0].tempoAutomations.length).to.equal(2);
-        expect(score.masterBars[0].tempoAutomations[0].value).to.equal(120);
-        expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.equal(0);
-        expect(score.masterBars[0].tempoAutomations[1].value).to.equal(60);
-        expect(score.masterBars[0].tempoAutomations[1].ratioPosition).to.equal(0.5);
+        expect(score.masterBars[0].tempoAutomations.length).toBe(2);
+        expect(score.masterBars[0].tempoAutomations[0].value).toBe(120);
+        expect(score.masterBars[0].tempoAutomations[0].ratioPosition).toBe(0);
+        expect(score.masterBars[0].tempoAutomations[1].value).toBe(60);
+        expect(score.masterBars[0].tempoAutomations[1].ratioPosition).toBe(0.5);
         testExportRoundtrip(score);
     });
 
@@ -1452,41 +1452,41 @@ describe('AlphaTexImporterTest', () => {
             b = b.nextBeat;
         }
 
-        expect(actualAccidentalModes.join(',')).to.equal(expectedAccidentalModes.join(','));
+        expect(actualAccidentalModes.join(',')).toBe(expectedAccidentalModes.join(','));
         testExportRoundtrip(score);
     });
 
     it('accidental-mode', () => {
         // song level
         let score = parseTex('\\accidentals auto . F##4');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).toBe(
             NoteAccidentalMode.Default
         );
 
         // track level
         score = parseTex('\\track "T1" F##4 | \\track "T2" \\accidentals auto F##4');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).toBe(
             NoteAccidentalMode.ForceDoubleSharp
         );
-        expect(score.tracks[1].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+        expect(score.tracks[1].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).toBe(
             NoteAccidentalMode.Default
         );
 
         // staff level
         score = parseTex('\\track "T1" \\staff F##4 \\staff \\accidentals auto F##4');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).toBe(
             NoteAccidentalMode.ForceDoubleSharp
         );
-        expect(score.tracks[0].staves[1].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+        expect(score.tracks[0].staves[1].bars[0].voices[0].beats[0].notes[0].accidentalMode).toBe(
             NoteAccidentalMode.Default
         );
 
         // bar level
         score = parseTex('F##4 | \\accidentals auto F##4');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).toBe(
             NoteAccidentalMode.ForceDoubleSharp
         );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].accidentalMode).toBe(
             NoteAccidentalMode.Default
         );
         testExportRoundtrip(score);
@@ -1494,47 +1494,47 @@ describe('AlphaTexImporterTest', () => {
 
     it('dead-slap', () => {
         const score = parseTex('r { ds }');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isRest).to.be.false;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].deadSlapped).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isRest).toBe(false);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].deadSlapped).toBe(true);
         testExportRoundtrip(score);
     });
 
     it('golpe', () => {
         const score = parseTex('3.3 { glpf } 3.3 { glpt }');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].golpe).to.equal(GolpeType.Finger);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].golpe).to.equal(GolpeType.Thumb);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].golpe).toBe(GolpeType.Finger);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].golpe).toBe(GolpeType.Thumb);
         testExportRoundtrip(score);
     });
 
     it('fade', () => {
         const score = parseTex('3.3 { f } 3.3 { fo } 3.3 { vs } ');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].fade).to.equal(FadeType.FadeIn);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].fade).to.equal(FadeType.FadeOut);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fade).to.equal(FadeType.VolumeSwell);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].fade).toBe(FadeType.FadeIn);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].fade).toBe(FadeType.FadeOut);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fade).toBe(FadeType.VolumeSwell);
         testExportRoundtrip(score);
     });
 
     it('barre', () => {
         const score = parseTex('3.3 { barre 5 } 3.3 { barre 14 half }');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreFret).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreShape).to.equal(BarreShape.Full);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreFret).toBe(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreShape).toBe(BarreShape.Full);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].barreFret).to.equal(14);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].barreShape).to.equal(BarreShape.Half);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].barreFret).toBe(14);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].barreShape).toBe(BarreShape.Half);
         testExportRoundtrip(score);
         testExportRoundtrip(score);
     });
 
     it('ornaments', () => {
         const score = parseTex('3.3 { turn } 3.3 { iturn } 3.3 { umordent } 3.3 { lmordent }');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].ornament).to.equal(NoteOrnament.Turn);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].ornament).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].ornament).toBe(NoteOrnament.Turn);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].ornament).toBe(
             NoteOrnament.InvertedTurn
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].ornament).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].ornament).toBe(
             NoteOrnament.UpperMordent
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].ornament).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].ornament).toBe(
             NoteOrnament.LowerMordent
         );
         testExportRoundtrip(score);
@@ -1542,26 +1542,26 @@ describe('AlphaTexImporterTest', () => {
 
     it('rasgueado', () => {
         const score = parseTex('3.3 { rasg mi } 3.3 { rasg pmptriplet } 3.3 { rasg amianapaest }');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].rasgueado).to.equal(Rasgueado.Mi);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].hasRasgueado).to.be.true;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].rasgueado).to.equal(Rasgueado.PmpTriplet);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].hasRasgueado).to.be.true;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].rasgueado).to.equal(Rasgueado.AmiAnapaest);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].hasRasgueado).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].rasgueado).toBe(Rasgueado.Mi);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].hasRasgueado).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].rasgueado).toBe(Rasgueado.PmpTriplet);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].hasRasgueado).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].rasgueado).toBe(Rasgueado.AmiAnapaest);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].hasRasgueado).toBe(true);
         testExportRoundtrip(score);
     });
 
     it('directions', () => {
         const score = parseTex('. \\jump Segno | | \\jump DaCapoAlCoda \\jump Coda \\jump SegnoSegno ');
-        expect(score.masterBars[0].directions).to.be.ok;
-        expect(score.masterBars[0].directions).to.contain(Direction.TargetSegno);
+        expect(score.masterBars[0].directions).toBeTruthy();
+        expect(score.masterBars[0].directions).toContain(Direction.TargetSegno);
 
-        expect(score.masterBars[1].directions).to.not.be.ok;
+        expect(score.masterBars[1].directions).not.toBeTruthy();
 
-        expect(score.masterBars[2].directions).to.be.ok;
-        expect(score.masterBars[2].directions).to.contain(Direction.JumpDaCapoAlCoda);
-        expect(score.masterBars[2].directions).to.contain(Direction.TargetCoda);
-        expect(score.masterBars[2].directions).to.contain(Direction.TargetSegnoSegno);
+        expect(score.masterBars[2].directions).toBeTruthy();
+        expect(score.masterBars[2].directions).toContain(Direction.JumpDaCapoAlCoda);
+        expect(score.masterBars[2].directions).toContain(Direction.TargetCoda);
+        expect(score.masterBars[2].directions).toContain(Direction.TargetSegnoSegno);
         testExportRoundtrip(score);
     });
 
@@ -1575,11 +1575,11 @@ describe('AlphaTexImporterTest', () => {
                         c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
-        expect(score.masterBars.length).to.equal(2);
+        expect(score.masterBars.length).toBe(2);
 
-        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[1].voices.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars.length).toBe(2);
+        expect(score.tracks[0].staves[0].bars[0].voices.length).toBe(2);
+        expect(score.tracks[0].staves[0].bars[1].voices.length).toBe(2);
         testExportRoundtrip(score);
     });
 
@@ -1591,11 +1591,11 @@ describe('AlphaTexImporterTest', () => {
                 c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
-        expect(score.masterBars.length).to.equal(2);
+        expect(score.masterBars.length).toBe(2);
 
-        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[1].voices.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars.length).toBe(2);
+        expect(score.tracks[0].staves[0].bars[0].voices.length).toBe(2);
+        expect(score.tracks[0].staves[0].bars[1].voices.length).toBe(2);
         testExportRoundtrip(score);
     });
 
@@ -1606,11 +1606,11 @@ describe('AlphaTexImporterTest', () => {
             c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
-        expect(score.masterBars.length).to.equal(2);
+        expect(score.masterBars.length).toBe(2);
 
-        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[1].voices.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars.length).toBe(2);
+        expect(score.tracks[0].staves[0].bars[0].voices.length).toBe(2);
+        expect(score.tracks[0].staves[0].bars[1].voices.length).toBe(2);
         testExportRoundtrip(score);
     });
 
@@ -1618,7 +1618,7 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             \\staff { score 3 }
         `);
-        expect(score.tracks[0].staves[0].standardNotationLineCount).to.equal(3);
+        expect(score.tracks[0].staves[0].standardNotationLineCount).toBe(3);
         testExportRoundtrip(score);
     });
 
@@ -1628,8 +1628,8 @@ describe('AlphaTexImporterTest', () => {
             \\instructions "Line1\nLine2"
             .
         `);
-        expect(score.title).to.equal('Title\tTitle');
-        expect(score.instructions).to.equal('Line1\nLine2');
+        expect(score.title).toBe('Title\tTitle');
+        expect(score.instructions).toBe('Line1\nLine2');
         testExportRoundtrip(score);
     });
 
@@ -1638,8 +1638,8 @@ describe('AlphaTexImporterTest', () => {
             \\tempo (80 "Label")
             .
         `);
-        expect(score.tempo).to.equal(80);
-        expect(score.tempoLabel).to.equal('Label');
+        expect(score.tempo).toBe(80);
+        expect(score.tempoLabel).toBe('Label');
         testExportRoundtrip(score);
     });
 
@@ -1650,8 +1650,8 @@ describe('AlphaTexImporterTest', () => {
             \\transpose 6
             .
         `);
-        expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(-12);
-        expect(score.tracks[0].staves[0].transpositionPitch).to.equal(-6);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toBe(-12);
+        expect(score.tracks[0].staves[0].transpositionPitch).toBe(-6);
         testExportRoundtrip(score);
     });
 
@@ -1659,8 +1659,8 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             3.3.4{v} 3.3.4{vw}
         `);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].vibrato).to.equal(VibratoType.Slight);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].vibrato).to.equal(VibratoType.Wide);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].vibrato).toBe(VibratoType.Slight);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].vibrato).toBe(VibratoType.Wide);
         testExportRoundtrip(score);
     });
 
@@ -1668,8 +1668,8 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             3.3{v}.4 3.3{vw}.4
         `);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].vibrato).to.equal(VibratoType.Slight);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].vibrato).to.equal(VibratoType.Wide);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].vibrato).toBe(VibratoType.Slight);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].vibrato).toBe(VibratoType.Wide);
         testExportRoundtrip(score);
     });
 
@@ -1678,16 +1678,16 @@ describe('AlphaTexImporterTest', () => {
             3.3.4{ tb dive (0 -12.5) } |
             3.3.4{ tb dive gradual (0 -12.5) } |
         `);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarType).to.equal(WhammyType.Dive);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12.5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarType).toBe(WhammyType.Dive);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).toBe(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).toBe(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).toBe(-12.5);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarType).to.equal(WhammyType.Dive);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyStyle).to.equal(BendStyle.Gradual);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12.5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarType).toBe(WhammyType.Dive);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyStyle).toBe(BendStyle.Gradual);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).toBe(2);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).toBe(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).toBe(-12.5);
         testExportRoundtrip(score);
     });
 
@@ -1695,8 +1695,8 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             3.3.4{ ot 15ma } 3.3.4{ ot 8vb }
         `);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].ottava).to.equal(Ottavia._15ma);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].ottava).to.equal(Ottavia._8vb);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].ottava).toBe(Ottavia._15ma);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].ottava).toBe(Ottavia._8vb);
         testExportRoundtrip(score);
     });
 
@@ -1704,8 +1704,8 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             3.3.4{ txt "Hello World" } 3.3.4{ txt Hello }
         `);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].text).to.equal('Hello World');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].text).to.equal('Hello');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].text).toBe('Hello World');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].text).toBe('Hello');
         testExportRoundtrip(score);
     });
 
@@ -1713,8 +1713,8 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             3.3.4{ legatoOrigin } 4.3.4
         `);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isLegatoOrigin).to.be.true;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].isLegatoDestination).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isLegatoOrigin).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].isLegatoDestination).toBe(true);
         testExportRoundtrip(score);
     });
 
@@ -1723,12 +1723,12 @@ describe('AlphaTexImporterTest', () => {
             \\instrument acousticgrandpiano
             G4 G4 G4 { instrument brightacousticpiano }
         `);
-        expect(score.tracks[0].playbackInfo.program).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(
+        expect(score.tracks[0].playbackInfo.program).toBe(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).toBe(
             AutomationType.Instrument
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].value).to.equal(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].value).toBe(1);
         testExportRoundtrip(score);
     });
 
@@ -1736,9 +1736,9 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             G4 G4 G4 { fermata medium 4 }
         `);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata).to.be.ok;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata!.type).to.equal(FermataType.Medium);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata!.length).to.equal(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata).toBeTruthy();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata!.type).toBe(FermataType.Medium);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata!.length).toBe(4);
         testExportRoundtrip(score);
     });
 
@@ -1746,9 +1746,9 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             3.3{ b bend gradual (0 4)}
         `);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendType).to.equal(BendType.Bend);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendStyle).to.equal(BendStyle.Gradual);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendType).toBe(BendType.Bend);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendStyle).toBe(BendStyle.Gradual);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).toBe(2);
         testExportRoundtrip(score);
     });
 
@@ -1756,48 +1756,48 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
         2.3{nh} 2.3{ah} 2.3{ah 7} 2.3{th} 2.3{th 7} 2.3{ph} 2.3{ph 7} 2.3{sh} 2.3{sh 7} 2.3{fh} 2.3{fh 7}
         `);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).toBe(
             HarmonicType.Natural
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicValue).to.equal(2.4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicValue).toBe(2.4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).toBe(
             HarmonicType.Artificial
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicValue).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicValue).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).toBe(
             HarmonicType.Artificial
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicValue).to.equal(7);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicValue).toBe(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).to.equal(HarmonicType.Tap);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicValue).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).toBe(HarmonicType.Tap);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicValue).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).to.equal(HarmonicType.Tap);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicValue).to.equal(7);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).toBe(HarmonicType.Tap);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicValue).toBe(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[5].notes[0].harmonicType).to.equal(HarmonicType.Pinch);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[5].notes[0].harmonicValue).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[5].notes[0].harmonicType).toBe(HarmonicType.Pinch);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[5].notes[0].harmonicValue).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[6].notes[0].harmonicType).to.equal(HarmonicType.Pinch);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[6].notes[0].harmonicValue).to.equal(7);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[6].notes[0].harmonicType).toBe(HarmonicType.Pinch);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[6].notes[0].harmonicValue).toBe(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].notes[0].harmonicType).to.equal(HarmonicType.Semi);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].notes[0].harmonicValue).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].notes[0].harmonicType).toBe(HarmonicType.Semi);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].notes[0].harmonicValue).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[8].notes[0].harmonicType).to.equal(HarmonicType.Semi);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[8].notes[0].harmonicValue).to.equal(7);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[8].notes[0].harmonicType).toBe(HarmonicType.Semi);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[8].notes[0].harmonicValue).toBe(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[9].notes[0].harmonicType).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[9].notes[0].harmonicType).toBe(
             HarmonicType.Feedback
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[9].notes[0].harmonicValue).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[9].notes[0].harmonicValue).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[10].notes[0].harmonicType).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[10].notes[0].harmonicType).toBe(
             HarmonicType.Feedback
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[10].notes[0].harmonicValue).to.equal(7);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[10].notes[0].harmonicValue).toBe(7);
         testExportRoundtrip(score);
     });
 
@@ -1805,9 +1805,9 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
         \\ts common
         `);
-        expect(score.masterBars[0].timeSignatureNumerator).to.equal(4);
-        expect(score.masterBars[0].timeSignatureDenominator).to.equal(4);
-        expect(score.masterBars[0].timeSignatureCommon).to.be.true;
+        expect(score.masterBars[0].timeSignatureNumerator).toBe(4);
+        expect(score.masterBars[0].timeSignatureDenominator).toBe(4);
+        expect(score.masterBars[0].timeSignatureCommon).toBe(true);
         testExportRoundtrip(score);
     });
 
@@ -1815,7 +1815,7 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
         \\ottava 15ma
         `);
-        expect(score.tracks[0].staves[0].bars[0].clefOttava).to.equal(Ottavia._15ma);
+        expect(score.tracks[0].staves[0].bars[0].clefOttava).toBe(Ottavia._15ma);
         testExportRoundtrip(score);
     });
 
@@ -1823,7 +1823,7 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
         \\simile simple
         `);
-        expect(score.tracks[0].staves[0].bars[0].simileMark).to.equal(SimileMark.Simple);
+        expect(score.tracks[0].staves[0].bars[0].simileMark).toBe(SimileMark.Simple);
         testExportRoundtrip(score);
     });
 
@@ -1833,19 +1833,19 @@ describe('AlphaTexImporterTest', () => {
         .
         3.3.4 * 4 | \\tempo (80 "T2") 4.3.4*4
         `);
-        expect(score.tempo).to.equal(100);
-        expect(score.tempoLabel).to.equal('T1');
+        expect(score.tempo).toBe(100);
+        expect(score.tempoLabel).toBe('T1');
 
-        expect(score.masterBars[1].tempoAutomations.length).to.equal(1);
-        expect(score.masterBars[1].tempoAutomations[0].value).to.equal(80);
-        expect(score.masterBars[1].tempoAutomations[0].text).to.equal('T2');
+        expect(score.masterBars[1].tempoAutomations.length).toBe(1);
+        expect(score.masterBars[1].tempoAutomations[0].value).toBe(80);
+        expect(score.masterBars[1].tempoAutomations[0].text).toBe('T2');
         testExportRoundtrip(score);
     });
 
     it('double-bar', () => {
         const tex: string = '3.3 3.3 3.3 3.3 | \\db 1.1 2.1 3.1 4.1';
         const score = parseTex(tex);
-        expect(score.masterBars[1].isDoubleBar).to.be.equal(true);
+        expect(score.masterBars[1].isDoubleBar).toBe(true);
         testExportRoundtrip(score);
     });
 
@@ -1865,20 +1865,20 @@ describe('AlphaTexImporterTest', () => {
             .
         `);
 
-        expect(score.defaultSystemsLayout).to.equal(5);
-        expect(score.systemsLayout.length).to.equal(3);
-        expect(score.systemsLayout[0]).to.equal(3);
-        expect(score.systemsLayout[1]).to.equal(2);
-        expect(score.systemsLayout[2]).to.equal(3);
-        expect(score.stylesheet.hideDynamics).to.be.true;
-        expect(score.stylesheet.bracketExtendMode).to.equal(BracketExtendMode.NoBrackets);
-        expect(score.stylesheet.useSystemSignSeparator).to.be.true;
-        expect(score.stylesheet.singleTrackTrackNamePolicy).to.equal(TrackNamePolicy.AllSystems);
-        expect(score.stylesheet.multiTrackTrackNamePolicy).to.equal(TrackNamePolicy.Hidden);
-        expect(score.stylesheet.firstSystemTrackNameMode).to.equal(TrackNameMode.FullName);
-        expect(score.stylesheet.otherSystemsTrackNameMode).to.equal(TrackNameMode.FullName);
-        expect(score.stylesheet.firstSystemTrackNameOrientation).to.equal(TrackNameOrientation.Horizontal);
-        expect(score.stylesheet.otherSystemsTrackNameOrientation).to.equal(TrackNameOrientation.Horizontal);
+        expect(score.defaultSystemsLayout).toBe(5);
+        expect(score.systemsLayout.length).toBe(3);
+        expect(score.systemsLayout[0]).toBe(3);
+        expect(score.systemsLayout[1]).toBe(2);
+        expect(score.systemsLayout[2]).toBe(3);
+        expect(score.stylesheet.hideDynamics).toBe(true);
+        expect(score.stylesheet.bracketExtendMode).toBe(BracketExtendMode.NoBrackets);
+        expect(score.stylesheet.useSystemSignSeparator).toBe(true);
+        expect(score.stylesheet.singleTrackTrackNamePolicy).toBe(TrackNamePolicy.AllSystems);
+        expect(score.stylesheet.multiTrackTrackNamePolicy).toBe(TrackNamePolicy.Hidden);
+        expect(score.stylesheet.firstSystemTrackNameMode).toBe(TrackNameMode.FullName);
+        expect(score.stylesheet.otherSystemsTrackNameMode).toBe(TrackNameMode.FullName);
+        expect(score.stylesheet.firstSystemTrackNameOrientation).toBe(TrackNameOrientation.Horizontal);
+        expect(score.stylesheet.otherSystemsTrackNameOrientation).toBe(TrackNameOrientation.Horizontal);
         testExportRoundtrip(score);
     });
 
@@ -1887,8 +1887,8 @@ describe('AlphaTexImporterTest', () => {
             3.3.4 | \\scale 0.5 3.3.4 | \\width 300 3.3.4
         `);
 
-        expect(score.masterBars[1].displayScale).to.equal(0.5);
-        expect(score.masterBars[2].displayWidth).to.equal(300);
+        expect(score.masterBars[1].displayScale).toBe(0.5);
+        expect(score.masterBars[2].displayWidth).toBe(300);
         testExportRoundtrip(score);
     });
 
@@ -1905,16 +1905,16 @@ describe('AlphaTexImporterTest', () => {
             }
         `);
 
-        expect(score.tracks[0].color.rgba).to.equal('#FF0000');
-        expect(score.tracks[0].defaultSystemsLayout).to.equal(6);
-        expect(score.tracks[0].systemsLayout.length).to.equal(3);
-        expect(score.tracks[0].systemsLayout[0]).to.equal(3);
-        expect(score.tracks[0].systemsLayout[1]).to.equal(2);
-        expect(score.tracks[0].systemsLayout[0]).to.equal(3);
-        expect(score.tracks[0].playbackInfo.volume).to.equal(7);
-        expect(score.tracks[0].playbackInfo.balance).to.equal(3);
-        expect(score.tracks[0].playbackInfo.isMute).to.be.true;
-        expect(score.tracks[0].playbackInfo.isSolo).to.be.true;
+        expect(score.tracks[0].color.rgba).toBe('#FF0000');
+        expect(score.tracks[0].defaultSystemsLayout).toBe(6);
+        expect(score.tracks[0].systemsLayout.length).toBe(3);
+        expect(score.tracks[0].systemsLayout[0]).toBe(3);
+        expect(score.tracks[0].systemsLayout[1]).toBe(2);
+        expect(score.tracks[0].systemsLayout[0]).toBe(3);
+        expect(score.tracks[0].playbackInfo.volume).toBe(7);
+        expect(score.tracks[0].playbackInfo.balance).toBe(3);
+        expect(score.tracks[0].playbackInfo.isMute).toBe(true);
+        expect(score.tracks[0].playbackInfo.isSolo).toBe(true);
         testExportRoundtrip(score);
     });
 
@@ -1928,16 +1928,16 @@ describe('AlphaTexImporterTest', () => {
             3.3{ beam merge } 3.3 |
         `);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].invertBeamDirection).to.be.true;
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].invertBeamDirection).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].preferredBeamDirection).toBe(BeamDirection.Up);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).toBe(
             BeamDirection.Down
         );
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).toBe(
             BeatBeamingMode.ForceSplitToNext
         );
-        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).toBe(
             BeatBeamingMode.ForceMergeWithNext
         );
         testExportRoundtrip(score);
@@ -1948,7 +1948,7 @@ describe('AlphaTexImporterTest', () => {
             :8 3.3{ string }
         `);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].showStringNumber).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].showStringNumber).toBe(true);
         testExportRoundtrip(score);
     });
 
@@ -1957,7 +1957,7 @@ describe('AlphaTexImporterTest', () => {
             :8 3.3{ hide }
         `);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isVisible).to.be.false;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isVisible).toBe(false);
     });
 
     it('note-slur', () => {
@@ -1965,8 +1965,8 @@ describe('AlphaTexImporterTest', () => {
             :8 (3.3{ slur s1 } 3.4 3.5)  (10.3 {slur s1} 17.4 15.5)
         `);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isSlurOrigin).to.be.true;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isSlurDestination).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isSlurOrigin).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isSlurDestination).toBe(true);
         testExportRoundtrip(score);
     });
 
@@ -1978,10 +1978,10 @@ describe('AlphaTexImporterTest', () => {
             \\tuning A1 D2 A2 D3 G3 B3 E4 hide
             4.1 3.1 2.1 1.1`);
 
-        expect(score.tracks[1].staves[0].stringTuning.tunings[0]).to.equal(33);
-        expect(score.stylesheet.perTrackDisplayTuning).to.be.ok;
-        expect(score.stylesheet.perTrackDisplayTuning!.has(1)).to.be.true;
-        expect(score.stylesheet.perTrackDisplayTuning!.get(1)).to.be.false;
+        expect(score.tracks[1].staves[0].stringTuning.tunings[0]).toBe(33);
+        expect(score.stylesheet.perTrackDisplayTuning).toBeTruthy();
+        expect(score.stylesheet.perTrackDisplayTuning!.has(1)).toBe(true);
+        expect(score.stylesheet.perTrackDisplayTuning!.get(1)).toBe(false);
         testExportRoundtrip(score);
     });
 
@@ -1995,31 +1995,26 @@ describe('AlphaTexImporterTest', () => {
         \\clef "n" | \\clef "alto" | \\clef "tenor" | \\clef "bass" | \\clef "treble"
         `);
         let barIndex = 0;
-        expect(score.tracks[0].staves[0].bars[barIndex].clef).to.equal(Clef.C4);
-        expect(score.tracks[0].staves[0].bars[barIndex++].clefOttava).to.equal(Ottavia._15ma);
-        expect(score.tracks[0].staves[0].bars[barIndex].clef).to.equal(Clef.C4);
-        expect(score.tracks[0].staves[0].bars[barIndex++].clefOttava).to.equal(Ottavia._15ma);
+        expect(score.tracks[0].staves[0].bars[barIndex].clef).toBe(Clef.C4);
+        expect(score.tracks[0].staves[0].bars[barIndex++].clefOttava).toBe(Ottavia._15ma);
+        expect(score.tracks[0].staves[0].bars[barIndex].clef).toBe(Clef.C4);
+        expect(score.tracks[0].staves[0].bars[barIndex++].clefOttava).toBe(Ottavia._15ma);
 
         for (let i = 0; i < 5; i++) {
-            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(
-                Clef.Neutral,
-                `Invalid clef at index ${barIndex - 1}`
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef, `Invalid clef at index ${barIndex - 1}`).toBe(
+                Clef.Neutral
             );
-            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(
-                Clef.C3,
-                `Invalid clef at index ${barIndex - 1}`
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef, `Invalid clef at index ${barIndex - 1}`).toBe(
+                Clef.C3
             );
-            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(
-                Clef.C4,
-                `Invalid clef at index ${barIndex - 1}`
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef, `Invalid clef at index ${barIndex - 1}`).toBe(
+                Clef.C4
             );
-            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(
-                Clef.F4,
-                `Invalid clef at index ${barIndex - 1}`
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef, `Invalid clef at index ${barIndex - 1}`).toBe(
+                Clef.F4
             );
-            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(
-                Clef.G2,
-                `Invalid clef at index ${barIndex - 1}`
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef, `Invalid clef at index ${barIndex - 1}`).toBe(
+                Clef.G2
             );
         }
 
@@ -2036,10 +2031,10 @@ describe('AlphaTexImporterTest', () => {
         3.3
 
         `);
-        expect(score.stylesheet.multiTrackMultiBarRest).to.be.true;
-        expect(score.stylesheet.perTrackMultiBarRest).to.be.ok;
-        expect(score.stylesheet.perTrackMultiBarRest!.has(0)).to.be.true;
-        expect(score.stylesheet.perTrackMultiBarRest!.has(1)).to.be.false;
+        expect(score.stylesheet.multiTrackMultiBarRest).toBe(true);
+        expect(score.stylesheet.perTrackMultiBarRest).toBeTruthy();
+        expect(score.stylesheet.perTrackMultiBarRest!.has(0)).toBe(true);
+        expect(score.stylesheet.perTrackMultiBarRest!.has(1)).toBe(false);
         testExportRoundtrip(score);
     });
 
@@ -2058,63 +2053,63 @@ describe('AlphaTexImporterTest', () => {
             .
             `);
 
-        expect(score.style).to.be.ok;
+        expect(score.style).toBeTruthy();
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Title)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.template).to.equal('Title: %TITLE%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.textAlign).to.equal(TextAlign.Left);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Title)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.template).toBe('Title: %TITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.textAlign).toBe(TextAlign.Left);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.SubTitle)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.template).to.equal('Subtitle: %SUBTITLE%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.textAlign).to.equal(TextAlign.Center);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.SubTitle)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.template).toBe('Subtitle: %SUBTITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.textAlign).toBe(TextAlign.Center);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Artist)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.template).to.equal('Artist: %ARTIST%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.textAlign).to.equal(TextAlign.Right);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Artist)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.template).toBe('Artist: %ARTIST%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.textAlign).toBe(TextAlign.Right);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Album)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.template).to.equal('Album: %ALBUM%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.textAlign).to.equal(TextAlign.Left);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Album)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.template).toBe('Album: %ALBUM%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.textAlign).toBe(TextAlign.Left);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Words)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.template).to.equal('Words: %WORDS%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.textAlign).to.equal(TextAlign.Center);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Words)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.template).toBe('Words: %WORDS%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.textAlign).toBe(TextAlign.Center);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Music)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.template).to.equal('Music: %MUSIC%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.textAlign).to.equal(TextAlign.Right);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Music)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.template).toBe('Music: %MUSIC%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.textAlign).toBe(TextAlign.Right);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.WordsAndMusic)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.template).to.equal(
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.WordsAndMusic)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.template).toBe(
             'Words & Music: %MUSIC%'
         );
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.textAlign).to.equal(TextAlign.Left);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.textAlign).toBe(TextAlign.Left);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Transcriber)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.template).to.equal(
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Transcriber)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.template).toBe(
             'Transcriber: %TABBER%'
         );
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.textAlign).to.equal(TextAlign.Center);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.textAlign).toBe(TextAlign.Center);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Copyright)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).to.equal(
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Copyright)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).toBe(
             'Copyright: %COPYRIGHT%'
         );
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.textAlign).to.equal(TextAlign.Right);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.textAlign).toBe(TextAlign.Right);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.CopyrightSecondLine)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.template).to.equal('Copyright2');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).to.equal(
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.CopyrightSecondLine)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.template).toBe('Copyright2');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).toBe(
             TextAlign.Right
         );
         testExportRoundtrip(score);
@@ -2203,10 +2198,10 @@ describe('AlphaTexImporterTest', () => {
             \\tuning E4 B3 G3 D3 A2 E2 "Default"
         `);
 
-        expect(score.tracks[0].staves[0].stringTuning.tunings.join(',')).to.equal(
+        expect(score.tracks[0].staves[0].stringTuning.tunings.join(',')).toBe(
             Tuning.getDefaultTuningFor(6)!.tunings.join(',')
         );
-        expect(score.tracks[0].staves[0].stringTuning.name).to.equal('Default');
+        expect(score.tracks[0].staves[0].stringTuning.name).toBe('Default');
         testExportRoundtrip(score);
     });
 
@@ -2218,19 +2213,19 @@ describe('AlphaTexImporterTest', () => {
             G4 G4 { volume 8 } G4 { volume 9 }
         `);
 
-        expect(score.tracks[0].playbackInfo.volume).to.equal(7);
+        expect(score.tracks[0].playbackInfo.volume).toBe(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].type).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].type).toBe(
             AutomationType.Volume
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].value).to.equal(8);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].value).toBe(8);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).toBe(
             AutomationType.Volume
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].value).to.equal(9);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].value).toBe(9);
         testExportRoundtrip(score);
     });
 
@@ -2242,19 +2237,19 @@ describe('AlphaTexImporterTest', () => {
             G4 G4 { balance 8 } G4 { balance 9 }
         `);
 
-        expect(score.tracks[0].playbackInfo.balance).to.equal(7);
+        expect(score.tracks[0].playbackInfo.balance).toBe(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].type).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].type).toBe(
             AutomationType.Balance
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].value).to.equal(8);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].value).toBe(8);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).toBe(
             AutomationType.Balance
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].value).to.equal(9);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].value).toBe(9);
         testExportRoundtrip(score);
     });
 
@@ -2263,8 +2258,8 @@ describe('AlphaTexImporterTest', () => {
             3.3.4 { barre 5 half }
         `);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreFret).to.equal(5);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreShape).to.equal(BarreShape.Half);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreFret).toBe(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreShape).toBe(BarreShape.Half);
         testExportRoundtrip(score);
     });
 
@@ -2273,8 +2268,8 @@ describe('AlphaTexImporterTest', () => {
             ().16 {ds}
         `);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].deadSlapped).to.be.true;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].deadSlapped).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).toBe(0);
         testExportRoundtrip(score);
     });
 
@@ -2284,13 +2279,13 @@ describe('AlphaTexImporterTest', () => {
             .
         `);
 
-        expect(score.title).to.equal('😸');
+        expect(score.title).toBe('😸');
     });
 
     it('utf16', () => {
         const score = parseTex(`\\title "🤘🏻" .`);
 
-        expect(score.title).to.equal('🤘🏻');
+        expect(score.title).toBe('🤘🏻');
     });
 
     it('beat-lyrics', () => {
@@ -2302,21 +2297,21 @@ describe('AlphaTexImporterTest', () => {
             3.3.4 {lyrics 0 "E" lyrics 1 "F" lyrics 2 "G"}
         `);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].lyrics).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].lyrics).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics).to.be.ok;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics!.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics![0]).to.equal('A');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics).toBeTruthy();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics!.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics![0]).toBe('A');
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics).to.be.ok;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics!.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).to.equal('B C D');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics).toBeTruthy();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics!.length).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).toBe('B C D');
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics).to.be.ok;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics!.length).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![0]).to.equal('E');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![1]).to.equal('F');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![2]).to.equal('G');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics).toBeTruthy();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics!.length).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![0]).toBe('E');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![1]).toBe('F');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![2]).toBe('G');
 
         testExportRoundtrip(score);
     });
@@ -2330,11 +2325,11 @@ describe('AlphaTexImporterTest', () => {
             c4 d4 e4 f4
         `);
 
-        expect(score.tracks[0].playbackInfo.program).to.equal(4);
-        expect(score.tracks[0].playbackInfo.bank).to.equal(0);
+        expect(score.tracks[0].playbackInfo.program).toBe(4);
+        expect(score.tracks[0].playbackInfo.bank).toBe(0);
 
-        expect(score.tracks[1].playbackInfo.program).to.equal(4);
-        expect(score.tracks[1].playbackInfo.bank).to.equal(2);
+        expect(score.tracks[1].playbackInfo.program).toBe(4);
+        expect(score.tracks[1].playbackInfo.bank).toBe(2);
 
         testExportRoundtrip(score);
     });
@@ -2442,7 +2437,7 @@ describe('AlphaTexImporterTest', () => {
             const importer = new AlphaTexImporter();
             importer.initFromString(tex, new Settings());
             const s = importer.readScore();
-            expect(importer.getStaffNoteKind(s.tracks[0].staves[0])).to.equal(type);
+            expect(importer.getStaffNoteKind(s.tracks[0].staves[0])).toBe(type);
         }
 
         // - direct values
@@ -2488,7 +2483,7 @@ describe('AlphaTexImporterTest', () => {
               0.3.4 2.3.4 5.3.4 7.3.4
         `);
 
-        expect(score.stylesheet.extendBarLines).to.be.true;
+        expect(score.stylesheet.extendBarLines).toBe(true);
 
         testExportRoundtrip(score);
     });
@@ -2537,21 +2532,21 @@ describe('AlphaTexImporterTest', () => {
             \\chord ("E" 0 0 1 2 2 0)
             (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
         `);
-        expect(score.stylesheet.globalDisplayChordDiagramsInScore).to.be.true;
+        expect(score.stylesheet.globalDisplayChordDiagramsInScore).toBe(true);
 
         score = parseTex(`
             \\chordDiagramsInScore true
             \\chord ("E" 0 0 1 2 2 0)
             (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
         `);
-        expect(score.stylesheet.globalDisplayChordDiagramsInScore).to.be.true;
+        expect(score.stylesheet.globalDisplayChordDiagramsInScore).toBe(true);
 
         score = parseTex(`
             \\chordDiagramsInScore false
             \\chord ("E" 0 0 1 2 2 0)
             (0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
         `);
-        expect(score.stylesheet.globalDisplayChordDiagramsInScore).to.be.false;
+        expect(score.stylesheet.globalDisplayChordDiagramsInScore).toBe(false);
     });
 
     it('empty-staff-options', () => {
@@ -2559,29 +2554,29 @@ describe('AlphaTexImporterTest', () => {
             \\hideEmptyStaves
             C4
         `);
-        expect(score.stylesheet.hideEmptyStaves).to.be.true;
-        expect(score.stylesheet.hideEmptyStavesInFirstSystem).to.be.false;
-        expect(score.stylesheet.showSingleStaffBrackets).to.be.false;
+        expect(score.stylesheet.hideEmptyStaves).toBe(true);
+        expect(score.stylesheet.hideEmptyStavesInFirstSystem).toBe(false);
+        expect(score.stylesheet.showSingleStaffBrackets).toBe(false);
 
         score = parseTex(`
             \\hideEmptyStaves
             \\hideEmptyStavesInFirstSystem
         `);
-        expect(score.stylesheet.hideEmptyStaves).to.be.true;
-        expect(score.stylesheet.hideEmptyStavesInFirstSystem).to.be.true;
+        expect(score.stylesheet.hideEmptyStaves).toBe(true);
+        expect(score.stylesheet.hideEmptyStavesInFirstSystem).toBe(true);
 
         score = parseTex(`
             \\hideEmptyStavesInFirstSystem
             C4
         `);
-        expect(score.stylesheet.hideEmptyStaves).to.be.false;
-        expect(score.stylesheet.hideEmptyStavesInFirstSystem).to.be.true;
+        expect(score.stylesheet.hideEmptyStaves).toBe(false);
+        expect(score.stylesheet.hideEmptyStavesInFirstSystem).toBe(true);
 
         score = parseTex(`
             \\showSingleStaffBrackets
             C4
         `);
-        expect(score.stylesheet.showSingleStaffBrackets).to.be.true;
+        expect(score.stylesheet.showSingleStaffBrackets).toBe(true);
     });
 
     describe('tremolos', () => {
@@ -2623,7 +2618,7 @@ describe('AlphaTexImporterTest', () => {
     describe('defaultBarNumberDisplay', () => {
         function test(tex: string, mode: BarNumberDisplay) {
             const score = parseTex(tex);
-            expect(score.stylesheet.barNumberDisplay).to.equal(mode);
+            expect(score.stylesheet.barNumberDisplay).toBe(mode);
 
             testExportRoundtrip(score);
         }
@@ -2636,8 +2631,8 @@ describe('AlphaTexImporterTest', () => {
     describe('barNumberDisplay', () => {
         function test(tex: string, mode: BarNumberDisplay | undefined) {
             const score = parseTex(tex);
-            expect(score.tracks[0].staves[0].bars[0].barNumberDisplay).to.be.undefined;
-            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).to.equal(mode);
+            expect(score.tracks[0].staves[0].bars[0].barNumberDisplay).toBeUndefined();
+            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).toBe(mode);
 
             testExportRoundtrip(score);
         }

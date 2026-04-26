@@ -65,7 +65,7 @@ export function generateClass(
     generate: (program: ts.Program, classDeclaration: ts.ClassDeclaration) => ts.SourceFile
 ) {
     const sourceFileName = path.relative(
-        path.resolve(path.dirname(program.getCompilerOptions().configFilePath as string), 'src'),
+        path.join(path.dirname(program.getCompilerOptions().configFilePath as string), 'src'),
         path.resolve(classDeclaration.getSourceFile().fileName)
     );
 

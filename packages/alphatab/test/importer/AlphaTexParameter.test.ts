@@ -1,7 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import { AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';
 import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { Settings } from '@coderline/alphatab/Settings';
-import { expect } from 'chai';
 
 describe('AlphaTexParameterTests', () => {
     describe('parser', () => {
@@ -9,7 +9,7 @@ describe('AlphaTexParameterTests', () => {
             const parser = new AlphaTexParser(tex);
             parser.mode = AlphaTexParseMode.Full;
             const node = parser.read();
-            expect(node).to.be.ok;
+            expect(node).toBeTruthy();
             expect(node).toMatchSnapshot();
             expect(parser.lexerDiagnostics.errors).toMatchSnapshot('lexer-diagnostics');
             expect(parser.parserDiagnostics.errors).toMatchSnapshot('parser-diagnostics');
@@ -132,7 +132,7 @@ describe('AlphaTexParameterTests', () => {
                 // ignore
             }
 
-            expect(importer.scoreNode).to.be.ok;
+            expect(importer.scoreNode).toBeTruthy();
             expect(importer.scoreNode).toMatchSnapshot();
             expect(importer.lexerDiagnostics.errors).toMatchSnapshot('lexer-diagnostics');
             expect(importer.parserDiagnostics.errors).toMatchSnapshot('parser-diagnostics');

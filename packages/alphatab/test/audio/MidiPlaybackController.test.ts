@@ -1,10 +1,9 @@
+import { describe, expect, it } from 'vitest';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { Logger } from '@coderline/alphatab/Logger';
 import { MidiPlaybackController } from '@coderline/alphatab/midi/MidiPlaybackController';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
-import { assert, expect } from 'chai';
-
 describe('MidiPlaybackControllerTest', () => {
     function testRepeat(score: Score, expectedIndexes: number[], maxBars: number): void {
         const controller: MidiPlaybackController = new MidiPlaybackController(score);
@@ -16,7 +15,7 @@ describe('MidiPlaybackControllerTest', () => {
             controller.processCurrent();
             if (controller.shouldPlay) {
                 if (i > maxBars) {
-                    assert.fail('Too many bars generated');
+                    throw new Error('Too many bars generated');
                 }
                 Logger.debug('Test', `Checking index ${i}, expected[${expectedIndexes[i]}]`, i, expectedIndexes[i]);
                 if (index !== expectedIndexes[i]) {
@@ -28,14 +27,14 @@ describe('MidiPlaybackControllerTest', () => {
             controller.moveNext();
         }
         if (errors.length > 0) {
-            assert.fail(
+            throw new Error(
                 `Sequence errors: ${errors.join(', ')}, Expected: [${expectedIndexes.join(
                     ', '
                 )}], Actual: [${actual.join(', ')}]`
             );
         }
-        expect(i).to.equal(expectedIndexes.length);
-        expect(controller.finished).to.be.equal(true);
+        expect(i).toBe(expectedIndexes.length);
+        expect(controller.finished).toBe(true);
     }
 
     async function testGuitarProRepeat(file: string, expectedBars: number[], maxBars: number): Promise<void> {

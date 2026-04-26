@@ -407,7 +407,7 @@ function findModule(type: ts.Type, options: ts.CompilerOptions) {
         for (const decl of type.symbol.declarations) {
             const file = decl.getSourceFile();
             if (file) {
-                const relative = path.relative(path.join(path.dirname(options.configFilePath as string)), path.resolve(file.fileName));
+                const relative = path.relative(path.dirname(options.configFilePath as string), path.resolve(file.fileName));
                 return toImportPath(relative);
             }
         }

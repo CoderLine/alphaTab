@@ -1845,6 +1845,8 @@ export default class CSharpEmitterContext {
         if (contextualType.symbol) {
             switch (contextualType.symbol.name) {
                 case 'ArrayLike':
+                case 'Assertion':
+                case 'SnapshotMatcher':
                     return true;
             }
 

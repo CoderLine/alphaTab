@@ -73,23 +73,88 @@ class NotExpector<T>(private val actual: T, private val message: String? = null)
         }
     }
 
+    fun toBe(expected: Any?) {
+        equal(expected)
+    }
 
-    fun undefined() {
+    fun toEqual(expected: Any?, message: String? = null) {
+        equal(expected, message)
+    }
+
+    fun toBeTruthy() {
+        ok()
+    }
+
+    fun toBeFalsy() {
+        when (actual) {
+            null -> Assert.fail(message ?: "Expected non-falsy value")
+            is Boolean -> Assert.assertTrue(message, actual)
+            is String -> Assert.assertFalse(message, actual.isEmpty())
+            is Number -> Assert.assertNotEquals(message, 0.0, actual.toDouble(), 0.0)
+        }
+    }
+
+    fun toContain(value: Any) {
+        if (actual is Iterable<*>) {
+            Assert.assertFalse(
+                message ?: "Expected collection ${actual.joinToString(",")} to not contain $value",
+                actual.contains(value)
+            )
+        } else {
+            Assert.fail("toContain can only be used with Iterable operands");
+        }
+    }
+
+    fun toHaveLength(expected: Double) {
+        when (actual) {
+            is alphaTab.collections.List<*> -> Assert.assertNotEquals(message, expected.toInt(), actual.length.toInt())
+            is alphaTab.collections.DoubleList -> Assert.assertNotEquals(message, expected.toInt(), actual.length.toInt())
+            is alphaTab.collections.BooleanList -> Assert.assertNotEquals(message, expected.toInt(), actual.length.toInt())
+            else -> Assert.fail("toHaveLength can only be used with collection operands")
+        }
+    }
+
+    fun toBeGreaterThan(expected: Double) {
+        if (actual is Number) {
+            Assert.assertFalse(
+                message ?: "Expected $actual to not be greater than $expected",
+                actual.toDouble() > expected
+            )
+        } else {
+            Assert.fail("toBeGreaterThan can only be used with numeric operands")
+        }
+    }
+
+    fun toBeLessThan(expected: Double) {
+        if (actual is Number) {
+            Assert.assertFalse(
+                message ?: "Expected $actual to not be less than $expected",
+                actual.toDouble() < expected
+            )
+        } else {
+            Assert.fail("toBeLessThan can only be used with numeric operands")
+        }
+    }
+
+    fun toBeNull() {
         Assert.assertNotNull(message, actual)
     }
 
+    fun toBeUndefined() {
+        Assert.assertNotNull(message, actual)
+    }
+
+    fun toBeInstanceOf(expected: kotlin.reflect.KClass<*>) {
+        Assert.assertFalse(
+            message ?: "Expected ${actual?.let { it::class.qualifiedName }} to not be instance of ${expected.qualifiedName}",
+            expected.isInstance(actual)
+        )
+    }
 }
 
 class Expector<T>(private val actual: T, private val message: String? = null) {
-    val to
-        get() = this
-
-    fun not() = NotExpector(actual, message)
-
-    val be
-        get() = this
-    val have
-        get() = this
+    val not
+        get() = NotExpector(actual, message)
 
     fun equal(expected: Any?, message: String? = null) {
         var actualToCheck = actual
@@ -188,26 +253,67 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
         }
     }
 
-    fun undefined() {
+    fun toBe(expected: Any?) {
+        equal(expected)
+    }
+
+    fun toEqual(expected: Any?, message: String? = null) {
+        equal(expected, message)
+    }
+
+    fun toBeTruthy() {
+        ok()
+    }
+
+    fun toBeFalsy() {
+        when (actual) {
+            null -> return
+            is Boolean -> Assert.assertFalse(message, actual)
+            is String -> Assert.assertTrue(message, actual.isEmpty())
+            is Number -> Assert.assertEquals(message, 0.0, actual.toDouble(), 0.0)
+            else -> Assert.fail(message ?: "Expected a falsy value")
+        }
+    }
+
+    fun toBeCloseTo(expected: Double, decimals: Double = 2.0) {
+        val delta = Math.pow(10.0, -decimals) / 2
+        closeTo(expected, delta)
+    }
+
+    fun toContain(value: Any) {
+        contain(value)
+    }
+
+    fun toHaveLength(expected: Double) {
+        length(expected)
+    }
+
+    fun toBeGreaterThan(expected: Double, message: String? = null) {
+        greaterThan(expected, message)
+    }
+
+    fun toBeLessThan(expected: Double) {
+        lessThan(expected)
+    }
+
+    fun toBeInstanceOf(expected: KClass<*>) {
+        Assert.assertTrue(
+            message ?: "Expected ${actual?.let { it::class.qualifiedName }} to be instance of ${expected.qualifiedName}",
+            expected.isInstance(actual)
+        )
+    }
+
+    fun toBeNull() {
         Assert.assertNull(message, actual)
     }
 
-    fun `true`() {
-        if (actual is Boolean) {
-            Assert.assertTrue(message, actual);
-        } else {
-            Assert.fail("toBeTrue can only be used on booleans:");
-        }
+    fun toBeUndefined() {
+        Assert.assertNull(message, actual)
     }
 
-    fun `false`() {
-        if (actual is Boolean) {
-            Assert.assertFalse(message, actual);
-        } else {
-            Assert.fail("toBeFalse can only be used on booleans:");
-        }
+    fun toThrow(expected: KClass<out Throwable>) {
+        `throw`(expected)
     }
-
 
     fun `throw`(expected: KClass<out Throwable>) {
         val actual = actual
@@ -252,7 +358,7 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
         val testName = testMethodInfo.getAnnotation(TestName::class.java)!!.name
         parts.push(testName)
 
-        val snapshotName = TestGlobals.useSnapshotValue(parts.joinToString(" "), hint);
+        val snapshotName = TestGlobals.useSnapshotValue(parts.joinToString(" > "), hint);
 
         val error = snapshotFile.match(snapshotName, actual)
         if (!error.isNullOrEmpty()) {
@@ -280,7 +386,7 @@ class TestGlobals {
         fun useSnapshotValue(baseName: String, hint: String): String {
             var fullName = baseName
             if (hint.isNotEmpty()) {
-                fullName += ": $hint";
+                fullName += " > $hint";
             }
 
             val value =

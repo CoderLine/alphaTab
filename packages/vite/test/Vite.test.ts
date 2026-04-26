@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 import { alphaTab } from '../src/alphaTab.vite';
 
 describe('Vite', () => {
-    it('bundle-correctly', async () => {
+    it('bundle-correctly', { timeout: 30000 }, async () => {
         const bundlerProject = './test-data/project';
 
         const cwd = process.cwd();
@@ -40,7 +40,7 @@ describe('Vite', () => {
             path.join(bundlerProject, 'dist', 'soundfont', 'sonivox.sf2')
         ];
         for (const file of files) {
-            expect(fs.existsSync(file)).to.eq(true, `File '${file}' Missing`);
+            expect(fs.existsSync(file), `File '${file}' Missing`).toBe(true);
         }
 
         const dir = await fs.promises.readdir(path.join(bundlerProject, 'dist', 'assets'), { withFileTypes: true });
@@ -55,33 +55,33 @@ describe('Vite', () => {
 
                 if (file.name.startsWith('index-')) {
                     // ensure new worker has worker import
-                    expect(text.match(/new [^ ]+\.alphaTabWorker\(new [^ ]+\.alphaTabUrl/)).to.be.ok;
+                    expect(text.match(/new [^ ]+\.alphaTabWorker\(new [^ ]+\.alphaTabUrl/)).toBeTruthy();
                     // ensure worker bootstrapping script is references
-                    expect(text).to.include('assets/alphaTab.worker-');
+                    expect(text).toContain('assets/alphaTab.worker-');
                     // ensure worklet bootstrapper script is references
-                    expect(text).to.include('assets/alphaTab.worklet-');
+                    expect(text).toContain('assets/alphaTab.worklet-');
                     // without custom chunking the app will bundle alphatab directly
-                    expect(text).to.include(".at-surface");
+                    expect(text).toContain(".at-surface");
                     // ensure __ALPHATAB_VITE__ got replaced
-                    expect(text).to.not.include("__ALPHATAB_VITE__");
+                    expect(text).not.toContain("__ALPHATAB_VITE__");
                     appValidated = true;
                 } else if (file.name.startsWith('alphaTab.worker-')) {
-                    expect(text).to.include('initializeWorker()');
+                    expect(text).toContain('initializeWorker()');
                     // without custom chunking the app will bundle alphatab directly
-                    expect(text).to.include(".at-surface");
+                    expect(text).toContain(".at-surface");
 
                     workerValidated = true;
                 } else if (file.name.startsWith('alphaTab.worklet-')) {
-                    expect(text).to.include('initializeAudioWorklet()');
+                    expect(text).toContain('initializeAudioWorklet()');
                     // without custom chunking the app will bundle alphatab directly
-                    expect(text).to.include(".at-surface");
+                    expect(text).toContain(".at-surface");
                     workletValidated = true;
                 }
             }
         }
 
-        expect(appValidated).to.eq(true, 'Missing app validation');
-        expect(workerValidated).to.eq(true, 'Missing worker validation');
-        expect(workletValidated).to.eq(true, 'Missing worklet validation');
-    }).timeout(30000);
+        expect(appValidated, 'Missing app validation').toBe(true);
+        expect(workerValidated, 'Missing worker validation').toBe(true);
+        expect(workletValidated, 'Missing worklet validation').toBe(true);
+    });
 });

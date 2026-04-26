@@ -26,10 +26,11 @@
         "test": "npm run test --workspace=packages/alphatab",
 
         "build-web": "npm run build && npm run build-webpack && npm run build-vite",
-        "test-web": "npm run test && npm run test-webpack && npm run test-vite",
+        "test-web": "npm run test-web --workspaces --if-present",
 
         "build-csharp": "npm run generate-typescript && npm run build --workspace=packages/csharp",
         "test-csharp": "npm run test --workspace=packages/csharp",
+        "test-ci-csharp": "npm run test-ci --workspace=packages/csharp",
 
         "build-kotlin": "npm run generate-typescript && npm run build --workspace=packages/kotlin",
         "test-kotlin": "npm run test --workspace=packages/kotlin",
