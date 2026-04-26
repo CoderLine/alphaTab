@@ -39,7 +39,7 @@ declare let AudioWorkletProcessor: {
  * @internal
  */
 interface AudioWorkletNode<T> extends AudioNode {
-    readonly port: AudioWorkletProcessorMessagePort<IAlphaSynthWorkerMessage>;
+    readonly port: AudioWorkletProcessorMessagePort<T>;
 }
 
 // Bug 646: Safari 14.1 is buggy regarding audio worklets

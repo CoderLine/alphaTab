@@ -34,7 +34,7 @@ import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/Positio
 import { expect } from 'chai';
 import {
     FlatControlChangeEvent,
-    FlatMidiEvent,
+    type FlatMidiEvent,
     FlatMidiEventGenerator,
     FlatNoteBendEvent,
     FlatNoteEvent,

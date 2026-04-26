@@ -36,7 +36,7 @@ import { BackingTrackPlayer } from '@coderline/alphatab/synth/BackingTrackPlayer
 import { CoreSettings, FontFileFormat } from '@coderline/alphatab/CoreSettings';
 import type { IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExporter';
 import { AlphaSynthAudioExporterWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthAudioExporterWorkerApi';
-import { IAlphaTabRenderingWorker, IAlphaSynthWorker } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import type { IAlphaTabRenderingWorker, IAlphaSynthWorker } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 
 /**
