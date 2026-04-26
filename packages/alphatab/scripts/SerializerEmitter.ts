@@ -14,7 +14,7 @@ import { buildTypeSchema, toImportPath } from './TypeSchema';
 export default createEmitter('json', (program, input) => {
     console.log(`Writing Serializer for ${input.name!.text}`);
     const sourceFileName = path.relative(
-        path.join(path.resolve(program.getCompilerOptions().baseUrl!)),
+        path.dirname(program.getCompilerOptions().configFilePath as string),
         path.resolve(input.getSourceFile().fileName)
     );
 

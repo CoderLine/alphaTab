@@ -10,7 +10,7 @@ export const GENERATED_FILE_HEADER = `\
 // </auto-generated>`;
 
 export function generateFile(program: ts.Program, sourceFile: ts.SourceFile, fileName: string) {
-    const targetFileName = path.join(path.resolve(program.getCompilerOptions().baseUrl!), 'src/generated', fileName);
+    const targetFileName = path.join(path.dirname(program.getCompilerOptions().configFilePath as string), 'src/generated', fileName);
 
     fs.mkdirSync(path.dirname(targetFileName), { recursive: true });
 
@@ -65,7 +65,7 @@ export function generateClass(
     generate: (program: ts.Program, classDeclaration: ts.ClassDeclaration) => ts.SourceFile
 ) {
     const sourceFileName = path.relative(
-        path.resolve(program.getCompilerOptions().baseUrl!, 'src'),
+        path.resolve(path.dirname(program.getCompilerOptions().configFilePath as string), 'src'),
         path.resolve(classDeclaration.getSourceFile().fileName)
     );
 

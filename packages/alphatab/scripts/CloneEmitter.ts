@@ -329,7 +329,7 @@ function createCloneMethod(
 export default createEmitter('cloneable', (program, input) => {
     console.log(`Writing Cloner for ${input.name!.text}`);
     const sourceFileName = path.relative(
-        path.join(path.resolve(program.getCompilerOptions().baseUrl!)),
+        path.dirname(program.getCompilerOptions().configFilePath as string),
         path.resolve(input.getSourceFile().fileName)
     );
 

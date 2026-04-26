@@ -25,7 +25,7 @@ export default class CSharpAstTransformer {
         this.context = context;
 
         let fileName = path.relative(
-            path.resolve(this.context.compilerOptions.baseUrl!),
+            path.dirname(this.context.compilerOptions.configFilePath as string),
             path.resolve(this.typeScriptFile.fileName)
         );
         fileName = this.buildFileName(fileName, context, this.typeScriptFile.fileName.includes('/test/'));
@@ -271,7 +271,7 @@ export default class CSharpAstTransformer {
             const folders: string[] = path
                 .dirname(
                     path.relative(
-                        path.resolve(this.context.compilerOptions.baseUrl!),
+                        path.dirname(this.context.compilerOptions.configFilePath as string),
                         path.resolve(this.typeScriptFile.fileName)
                     )
                 )
@@ -1343,7 +1343,7 @@ export default class CSharpAstTransformer {
         const sourcePath = d.getSourceFile().fileName;
         const snapshotFilePath = path.resolve(sourcePath, '..', '__snapshots__', `${path.basename(sourcePath)}.snap`);
         if (fs.existsSync(snapshotFilePath)) {
-            const relative = path.relative(path.resolve(this.context.compilerOptions.baseUrl!), snapshotFilePath);
+            const relative = path.relative(path.dirname(this.context.compilerOptions.configFilePath as string), snapshotFilePath);
             csMethod.attributes.push({
                 parent: csMethod,
                 nodeType: cs.SyntaxKind.Attribute,
