@@ -65,6 +65,21 @@ internal class NotExpector<T>
         _message = message;
     }
 
+    public void Equal(object? expected, string? message = null)
+    {
+        if (expected is int i && _actual is double)
+        {
+            expected = (double)i;
+        }
+
+        if (expected is double d && _actual is int)
+        {
+            expected = (int)d;
+        }
+
+        Assert.AreNotEqual(expected, _actual, message ?? _message);
+    }
+
     public void Ok()
     {
         if (_actual is string s)

@@ -28,6 +28,31 @@ class NotExpector<T>(private val actual: T, private val message: String? = null)
     val be
         get() = this
 
+    fun equal(expected: Any?, message: String? = null) {
+        var actualToCheck = actual
+        var expectedTyped: Any? = expected
+
+        if (expected is Int && actualToCheck is Double) {
+            expectedTyped = expected.toDouble();
+        }
+
+        if (expected is Double && actualToCheck is Int) {
+            expectedTyped = expected.toInt();
+        }
+
+        if (expected is Double && expected == 0.0 &&
+            actualToCheck is Double
+        ) {
+            val d = actualToCheck as Double;
+            if (d == -0.0) {
+                @Suppress("UNCHECKED_CAST")
+                actualToCheck = 0.0 as T
+            }
+        }
+
+        Assert.assertNotEquals(this.message ?: message, expectedTyped, actualToCheck as Any?)
+    }
+
     fun ok() {
         when (actual) {
             is Int -> {

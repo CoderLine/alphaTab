@@ -1302,7 +1302,7 @@ describe('MidiTickLookupTest', () => {
 
         // with the filter removed, an isEmpty beat in a mixed voice should still be findable
         expect(voice.isEmpty).to.equal(false);
-        const result = lookup.findBeat(new Set([0]), 0);
+        const result = lookup.findBeat(new Set<number>([0]), 0);
         expect(result).to.not.equal(null);
         expect(result!.beat).to.equal(emptyBeat);
     });
