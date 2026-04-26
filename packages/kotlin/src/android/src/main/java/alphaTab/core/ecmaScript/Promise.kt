@@ -1,5 +1,7 @@
 package alphaTab.core.ecmaScript
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
@@ -19,6 +21,14 @@ internal class Promise {
                     }.also { coroutineContext.cancelChildren() }
                 }
             }
+        }
+
+        fun <T> withResolvers(): PromiseWithResolvers<T> {
+            return PromiseWithResolvers();
+        }
+
+        fun <T> resolve(value: T): Deferred<T> {
+            return CompletableDeferred(value)
         }
     }
 }

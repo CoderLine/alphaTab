@@ -3,11 +3,6 @@ import * as cs from '../csharp/CSharpAst';
 import CSharpEmitterContext from '../csharp/CSharpEmitterContext';
 
 export default class KotlinEmitterContext extends CSharpEmitterContext {
-    public constructor(program: ts.Program, srcOutDir: string, testOutDir: string) {
-        super(program, srcOutDir, testOutDir);
-        this.noPascalCase = true;
-    }
-
     public override get targetTag(): string {
         return 'kotlin';
     }
@@ -41,7 +36,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
     }
 
     public override getDefaultUsings(): string[] {
-        return [`${this.toPascalCase('alphaTab')}.${this.toPascalCase('core')}`];
+        return [`${this.toNamespaceNameCase('alphaTab')}.${this.toNamespaceNameCase('core')}`];
     }
 
     public override makeExceptionType(): string {
@@ -77,7 +72,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         }
 
         if (symbol.name === 'iterator' && (!parent || parent.name === 'SymbolConstructor')) {
-            return this.toMethodName('iterator');
+            return this.toMethodNameCase('iterator');
         }
 
         return '';
@@ -93,5 +88,21 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
 
     public override makeIteratorType(): string {
         return this.makeTypeName('kotlin.collections.Iterator');
+    }
+
+    public override toMethodNameCase(text: string): string {
+        return this.toIdentifier(text);
+    }
+
+    public override toPropertyNameCase(text: string): string {
+        return this.toIdentifier(text);
+    }
+
+    public override toNamespaceNameCase(text: string): string {
+        return text;
+    }
+
+    public override toTypeNameCase(text: string): string {
+        return this.toPascalCase(text);
     }
 }

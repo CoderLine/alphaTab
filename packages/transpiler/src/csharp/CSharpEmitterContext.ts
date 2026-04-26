@@ -14,7 +14,6 @@ export default class CSharpEmitterContext {
     private _unresolvedTypeNodes: cs.UnresolvedTypeNode[] = [];
     private _program: ts.Program;
     public typeChecker: ts.TypeChecker;
-    public noPascalCase: boolean = false;
 
     public csharpFiles: cs.SourceFile[] = [];
     public processingSkippedElement: boolean = false;
@@ -30,12 +29,20 @@ export default class CSharpEmitterContext {
         return this.typeChecker.getTypeAtLocation(n);
     }
 
-    public toMethodName(text: string): string {
+    public toMethodNameCase(text: string): string {
         return this.toPascalCase(this.toIdentifier(text));
     }
 
-    public toPropertyName(text: string): string {
+    public toPropertyNameCase(text: string): string {
         return this.toPascalCase(this.toIdentifier(text));
+    }
+
+    public toNamespaceNameCase(text: string): string {
+        return this.toPascalCase(text);
+    }
+
+    public toTypeNameCase(text: string): string {
+        return this.toPascalCase(text);
     }
 
     public toIdentifier(text: string): string {
@@ -65,7 +72,18 @@ export default class CSharpEmitterContext {
     }
 
     public isPropertySymbol(tsSymbol: ts.Symbol) {
-        return (tsSymbol.flags & ts.SymbolFlags.Property) !== 0;
+        if (
+            (tsSymbol.flags & (ts.SymbolFlags.Property | ts.SymbolFlags.GetAccessor | ts.SymbolFlags.SetAccessor)) !== 0
+        ) {
+            return true;
+        }
+
+        // globals
+        if((tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable) !== 0 && this.isGlobalVariable(tsSymbol)) {
+            return true;
+        }
+
+        return false;
     }
 
     public isTypeAssignable(targetType: ts.Type, contextualTypeNullable: ts.Type, actualType: ts.Type) {
@@ -136,7 +154,7 @@ export default class CSharpEmitterContext {
 
             if (expr.tsSymbol.flags & ts.SymbolFlags.Function) {
                 if (this.isTestFunction(expr.tsSymbol)) {
-                    return `${this.toPascalCase('alphaTab.test')}.Globals.${this.toPascalCase(expr.tsSymbol.name)}`;
+                    return `${this.toNamespaceNameCase('alphaTab.test')}.Globals.${this.toMethodNameCase(expr.tsSymbol.name)}`;
                 }
 
                 if (expr.tsSymbol.valueDeclaration && expr.tsNode) {
@@ -146,20 +164,20 @@ export default class CSharpEmitterContext {
                     }
                 }
 
-                return `${this.toPascalCase('alphaTab.core')}.Globals.${this.toPascalCase(expr.tsSymbol.name)}`;
+                return `${this.toNamespaceNameCase('alphaTab.core')}.Globals.${this.toMethodNameCase(expr.tsSymbol.name)}`;
             }
 
             if (
                 (expr.tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable && this.isGlobalVariable(expr.tsSymbol)) ||
                 (expr.tsSymbol.flags & ts.SymbolFlags.NamespaceModule && this.isKnownModule(expr.tsSymbol))
             ) {
-                return `${this.toPascalCase('alphaTab.core')}.Globals.${this.toPascalCase(expr.tsSymbol.name)}`;
+                return `${this.toNamespaceNameCase('alphaTab.core')}.Globals.${this.toPropertyNameCase(expr.tsSymbol.name)}`;
             }
 
             if (expr.tsSymbol) {
                 const externalModule = this.resolveExternalModuleOfType(expr.tsSymbol);
                 if (externalModule) {
-                    return externalModule + this.toPascalCase(expr.tsSymbol.name);
+                    return externalModule + this.toTypeNameCase(expr.tsSymbol.name);
                 }
             }
         }
@@ -346,6 +364,11 @@ export default class CSharpEmitterContext {
             (ts.isTypeAliasDeclaration(d) && ts.isTypeLiteralNode(d.type))
         );
     }
+
+    isDiscriminatedUnion(node: ts.Declaration) {
+        return ts.getJSDocTags(node).some(t => t.tagName.text === 'discriminated');
+    }
+
     private getTypeFromTsType(
         node: cs.Node,
         tsType: ts.Type,
@@ -821,6 +844,13 @@ export default class CSharpEmitterContext {
                 return null;
             }
 
+            if ('typeArguments' in pTsType && cs.isTypeReference(pType)) {
+                const args = this.typeChecker.getTypeArguments(pTsType as ts.TypeReference);
+                if (args.length > 0) {
+                    pType.typeArguments = args.map(a => this.getTypeFromTsType(pType, a)!);
+                }
+            }
+
             parameterTypes.push(pType);
         }
 
@@ -1280,9 +1310,9 @@ export default class CSharpEmitterContext {
                 result += '.';
             }
             if (i === parts.length - 1) {
-                result += parts[i];
+                result += this.toTypeNameCase(parts[i]);
             } else {
-                result += this.toPascalCase(parts[i]);
+                result += this.toNamespaceNameCase(parts[i]);
             }
         }
         return result;
@@ -1293,7 +1323,7 @@ export default class CSharpEmitterContext {
 
         if (aliasSymbol) {
             if (aliasSymbol.name === 'Map') {
-                return `${this.toPascalCase('alphaTab.collections') + suffix}.`;
+                return `${this.toNamespaceNameCase('alphaTab.collections') + suffix}.`;
             }
 
             if (aliasSymbol.name === 'Error') {
@@ -1308,18 +1338,18 @@ export default class CSharpEmitterContext {
                         if (fileName.length) {
                             suffix = fileName.split('.').map(s => {
                                 if (s.match(/webworker/i)) {
-                                    return `.${this.toPascalCase('ecmaScript')}`;
+                                    return `.${this.toNamespaceNameCase('ecmaScript')}`;
                                 }
                                 if (s.match(/esnext/)) {
-                                    return `.${this.toPascalCase('ecmaScript')}`;
+                                    return `.${this.toNamespaceNameCase('ecmaScript')}`;
                                 }
                                 if (s.match(/es[0-9]{4}/)) {
-                                    return `.${this.toPascalCase('ecmaScript')}`;
+                                    return `.${this.toNamespaceNameCase('ecmaScript')}`;
                                 }
                                 if (s.match(/es[0-9]{1}/)) {
-                                    return `.${this.toPascalCase('ecmaScript')}`;
+                                    return `.${this.toNamespaceNameCase('ecmaScript')}`;
                                 }
-                                return `.${this.toPascalCase(s)}`;
+                                return `.${this.toNamespaceNameCase(s)}`;
                             })[0];
                         }
                     }
@@ -1327,7 +1357,7 @@ export default class CSharpEmitterContext {
             }
         }
 
-        return `${this.toPascalCase('alphaTab.core') + suffix}.`;
+        return `${this.toNamespaceNameCase('alphaTab.core') + suffix}.`;
     }
     protected toCoreTypeName(s: string) {
         if (s === 'Map') {
@@ -1339,10 +1369,6 @@ export default class CSharpEmitterContext {
     public toPascalCase(text: string): string {
         if (text.indexOf('-') >= 0) {
             return this.kebabCaseToPascalCase(text);
-        }
-
-        if (this.noPascalCase) {
-            return text;
         }
 
         if (!text) {
@@ -1387,7 +1413,7 @@ export default class CSharpEmitterContext {
     }
 
     public registerSymbol(node: cs.NamedElement & cs.Node) {
-        const symbol = this.getSymbolForDeclaration(node.tsNode!);
+        const symbol = node.tsSymbol ?? this.getSymbolForDeclaration(node.tsNode!);
         if (symbol) {
             const symbolKey = this.getSymbolKey(symbol);
             this._symbolLookup.set(symbolKey, node);
@@ -1426,10 +1452,15 @@ export default class CSharpEmitterContext {
               ? symbol.declarations[0]
               : undefined;
 
-        if (declaration) {
-            return `${symbol.name}_${declaration.getSourceFile().fileName}_${declaration.pos}`;
+        let name = symbol.name;
+        if (name.startsWith('__')) {
+            name = '__';
         }
-        return symbol.name;
+
+        if (declaration) {
+            return `${name}_${declaration.getSourceFile().fileName}_${declaration.pos}`;
+        }
+        return name;
     }
 
     public getSymbolForDeclaration(node: ts.Node): ts.Symbol | undefined {
@@ -1451,7 +1482,7 @@ export default class CSharpEmitterContext {
         }
 
         if (symbol.name === 'iterator' && (!parent || parent.name === 'SymbolConstructor')) {
-            return this.toMethodName('getEnumerator');
+            return this.toMethodNameCase('getEnumerator');
         }
 
         return '';
@@ -1814,8 +1845,15 @@ export default class CSharpEmitterContext {
         if (contextualType.symbol) {
             switch (contextualType.symbol.name) {
                 case 'ArrayLike':
-                case '__type':
                     return true;
+            }
+
+            // empty object type {} (basically object)
+            if (
+                contextualType.flags & ts.TypeFlags.Object &&
+                (contextualType as ts.ObjectType).getProperties().length === 0
+            ) {
+                return true;
             }
         }
 
@@ -2101,7 +2139,10 @@ export default class CSharpEmitterContext {
     }
 
     public getDefaultUsings(): string[] {
-        return [this.toPascalCase('system'), `${this.toPascalCase('alphaTab')}.${this.toPascalCase('core')}`];
+        return [
+            this.toNamespaceNameCase('system'),
+            `${this.toNamespaceNameCase('alphaTab')}.${this.toNamespaceNameCase('core')}`
+        ];
     }
 
     public buildMethodName(propertyName: ts.PropertyName) {
@@ -2131,7 +2172,7 @@ export default class CSharpEmitterContext {
             this.addTsNodeDiagnostics(propertyName, 'Unsupported method name syntax', ts.DiagnosticCategory.Error);
         }
 
-        return this.toMethodName(methodName);
+        return this.toMethodNameCase(methodName);
     }
 
     public isSymbolArrayTupleInstance(expression: ts.Expression) {

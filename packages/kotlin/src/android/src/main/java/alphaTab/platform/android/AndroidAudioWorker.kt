@@ -56,23 +56,28 @@ internal class AndroidAudioWorker(
 
     private fun writeSamples() {
         while (!_stopped) {
-            if (_track.playState == AudioTrack.PLAYSTATE_PLAYING) {
-                val samplesFromBuffer = _output.read(_buffer, 0, _buffer.size)
-                if (_previousPosition == -1) {
-                    _previousPosition = _track.playbackHeadPosition
-                    _track.getTimestamp(_timestamp)
+            try {
+                if (_track.playState == AudioTrack.PLAYSTATE_PLAYING) {
+                    val samplesFromBuffer = _output.read(_buffer, 0, _buffer.size)
+                    if (_previousPosition == -1) {
+                        _previousPosition = _track.playbackHeadPosition
+                        _track.getTimestamp(_timestamp)
+                    }
+                    _track.write(_buffer, 0, samplesFromBuffer, AudioTrack.WRITE_BLOCKING)
+                } else {
+                    _playingSemaphore.acquire() // wait for playing to start
+                    _playingSemaphore.release() // release semaphore for others
                 }
-                _track.write(_buffer, 0, samplesFromBuffer, AudioTrack.WRITE_BLOCKING)
-            } else {
-                _playingSemaphore.acquire() // wait for playing to start
-                _playingSemaphore.release() // release semaphore for others
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+                break;
             }
         }
     }
 
     fun close() {
-        _playingSemaphore.release() // proceed thread
         _stopped = true
+        _playingSemaphore.release() // proceed thread
         _track.stop()
         _writeThread!!.interrupt()
         _writeThread!!.join()

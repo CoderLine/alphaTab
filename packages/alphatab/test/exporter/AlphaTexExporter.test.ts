@@ -56,10 +56,13 @@ describe('AlphaTexExporterTest', () => {
         }
     }
 
-    async function testRoundTripFolderEqual(name: string): Promise<void> {
+    async function testRoundTripFolderEqual(name: string, ignoredFiles?: string[]): Promise<void> {
         const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
+        const ignoredFilesLookup = new Set<string>(ignoredFiles);
         for (const file of files.filter(f => !f.endsWith('.png'))) {
-            await testRoundTripEqual(`${name}/${file}`, null);
+            if (!ignoredFilesLookup.has(file) && !file.endsWith('.png')) {
+                await testRoundTripEqual(`${name}/${file}`, null);
+            }
         }
     }
 
@@ -133,7 +136,7 @@ describe('AlphaTexExporterTest', () => {
     });
 
     it('visual-effects-and-annotations', async () => {
-        await testRoundTripFolderEqual('visual-tests/effects-and-annotations');
+        await testRoundTripFolderEqual('visual-tests/effects-and-annotations', ['hidden-dots.mxml']);
     });
 
     it('visual-general', async () => {

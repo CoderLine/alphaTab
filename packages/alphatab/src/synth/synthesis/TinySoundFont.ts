@@ -63,6 +63,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
     public currentTempo: number = 0;
     public timeSignatureNumerator: number = 0;
     public timeSignatureDenominator: number = 0;
+    private _metronomeChannel: number = SynthConstants.DefaultChannelCount - 1;
 
     public constructor(sampleRate: number) {
         this.outSampleRate = sampleRate;
@@ -188,8 +189,8 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
         while (!this._midiEventQueue.isEmpty) {
             const m: SynthEvent = this._midiEventQueue.dequeue()!;
             if (m.isMetronome && this.metronomeVolume > 0) {
-                this.channelNoteOff(SynthConstants.MetronomeChannel, SynthConstants.MetronomeKey);
-                this.channelNoteOn(SynthConstants.MetronomeChannel, SynthConstants.MetronomeKey, 95 / 127);
+                this.channelNoteOff(this._metronomeChannel, SynthConstants.MetronomeKey);
+                this.channelNoteOn(this._metronomeChannel, SynthConstants.MetronomeKey, 95 / 127);
             } else if (m.event) {
                 this.processMidiMessage(m.event);
             }
@@ -204,7 +205,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
                 // exception. metronome is implicitly added in solo
                 const isChannelMuted: boolean =
                     this._mutedChannels.has(channel) ||
-                    (anySolo && channel !== SynthConstants.MetronomeChannel && !this._soloChannels.has(channel));
+                    (anySolo && channel !== this._metronomeChannel && !this._soloChannels.has(channel));
 
                 if (!buffer) {
                     voice.kill();
@@ -261,18 +262,19 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
     }
 
     public get metronomeVolume(): number {
-        return this.channelGetMixVolume(SynthConstants.MetronomeChannel);
+        return this.channelGetMixVolume(this._metronomeChannel);
     }
 
     public set metronomeVolume(value: number) {
-        this.setupMetronomeChannel(value);
+        this.setupMetronomeChannel(this._metronomeChannel, value);
     }
 
-    public setupMetronomeChannel(volume: number): void {
-        this.channelSetMixVolume(SynthConstants.MetronomeChannel, volume);
+    public setupMetronomeChannel(channel:number, volume: number): void {
+        this._metronomeChannel = channel;
+        this.channelSetMixVolume(channel, volume);
         if (volume > 0) {
-            this.channelSetVolume(SynthConstants.MetronomeChannel, 1);
-            this.channelSetPresetNumber(SynthConstants.MetronomeChannel, 0, true);
+            this.channelSetVolume(channel, 1);
+            this.channelSetPresetNumber(channel, 0, true);
         }
     }
 

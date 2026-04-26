@@ -213,18 +213,17 @@ export class Voice {
                 noteGain = SynthHelper.decibelsToGain(this.noteGainDb + this.modLfo.level * tmpModLfoToVolume);
             }
 
-            gainMono = noteGain * this.ampEnv.level;
-
-            if (isMuted) {
-                gainMono = 0;
-            } else {
-                gainMono *= this.mixVolume;
-            }
-
             // Update EG.
             this.ampEnv.process(blockSamples, f.outSampleRate);
             if (updateModEnv) {
                 this.modEnv.process(blockSamples, f.outSampleRate);
+            }
+
+            gainMono = noteGain * this.ampEnv.level;
+            if (isMuted) {
+                gainMono = 0;
+            } else {
+                gainMono *= this.mixVolume;
             }
 
             // Update LFOs.
@@ -321,7 +320,15 @@ export class Voice {
                     break;
             }
 
-            if (tmpSourceSamplePosition >= tmpSampleEndDbl || this.ampEnv.segment === VoiceEnvelopeSegment.Done) {
+            const inaudible =
+                this.ampEnv.segment === VoiceEnvelopeSegment.Release &&
+                Math.abs(gainMono) < SynthConstants.AudibleLevelThreshold;
+            if (
+                tmpSourceSamplePosition >= tmpSampleEndDbl ||
+                this.ampEnv.segment === VoiceEnvelopeSegment.Done ||
+                // Check if voice is inaudible during release to terminate early
+                inaudible
+            ) {
                 this.kill();
                 return;
             }

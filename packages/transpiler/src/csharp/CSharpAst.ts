@@ -161,7 +161,7 @@ export interface ClassDeclaration extends NamedTypeDeclaration {
     interfaces?: TypeNode[];
     isAbstract: boolean;
     members: ClassMember[];
-    isRecord?:boolean;
+    isRecord?: boolean;
 }
 
 export type ClassMember =
@@ -458,6 +458,7 @@ export interface NewExpression extends Node {
     nodeType: SyntaxKind.NewExpression;
     type: TypeNode;
     arguments: Expression[];
+    objectInitializers?: LabeledExpression[];
 }
 
 export interface CastExpression extends Node {

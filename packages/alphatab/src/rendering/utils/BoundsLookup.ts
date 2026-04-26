@@ -13,105 +13,110 @@ import { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSyst
  * @public
  */
 export class BoundsLookup {
-    /**
-     * @target web
-     */
-    public toJson(): unknown {
-        const json: any = {} as any;
-        const systems: StaffSystemBounds[] = [];
-        json.staffSystems = systems;
+    public toJson(): Map<string, unknown> {
+        const json = new Map<string, unknown>();
+        const systems: Map<string, unknown>[] = [];
+        json.set('staffSystems', systems);
         for (const system of this.staffSystems) {
-            const g: StaffSystemBounds = {} as any;
-            g.visualBounds = this._boundsToJson(system.visualBounds);
-            g.realBounds = this._boundsToJson(system.realBounds);
-            g.bars = [];
+            const g = new Map<string, unknown>();
+            g.set('visualBounds', BoundsLookup._boundsToJson(system.visualBounds));
+            g.set('realBounds', BoundsLookup._boundsToJson(system.realBounds));
+            const gBars: Map<string, unknown>[] = [];
+            g.set('bars', gBars);
+
             for (const masterBar of system.bars) {
-                const mb: MasterBarBounds = {} as any;
-                mb.lineAlignedBounds = this._boundsToJson(masterBar.lineAlignedBounds);
-                mb.visualBounds = this._boundsToJson(masterBar.visualBounds);
-                mb.realBounds = this._boundsToJson(masterBar.realBounds);
-                mb.index = masterBar.index;
-                mb.isFirstOfLine = masterBar.isFirstOfLine;
-                mb.bars = [];
+                const mb = new Map<string, unknown>();
+                mb.set('lineAlignedBounds', BoundsLookup._boundsToJson(masterBar.lineAlignedBounds));
+                mb.set('visualBounds', BoundsLookup._boundsToJson(masterBar.visualBounds));
+                mb.set('realBounds', BoundsLookup._boundsToJson(masterBar.realBounds));
+                mb.set('index', masterBar.index);
+                mb.set('isFirstOfLine', masterBar.isFirstOfLine);
+                const mbBars: Map<string, unknown>[] = [];
+                mb.set('bars', mbBars);
                 for (const bar of masterBar.bars) {
-                    const b: BarBounds = {} as any;
-                    b.visualBounds = this._boundsToJson(bar.visualBounds);
-                    b.realBounds = this._boundsToJson(bar.realBounds);
-                    b.beats = [];
+                    const b = new Map<string, unknown>();
+                    b.set('visualBounds', BoundsLookup._boundsToJson(bar.visualBounds));
+                    b.set('realBounds', BoundsLookup._boundsToJson(bar.realBounds));
+                    const bBeats: Map<string, unknown>[] = [];
+                    b.set('beats', bBeats);
                     for (const beat of bar.beats) {
-                        const bb: BeatBounds = {} as any;
-                        bb.visualBounds = this._boundsToJson(beat.visualBounds);
-                        bb.realBounds = this._boundsToJson(beat.realBounds);
-                        bb.onNotesX = beat.onNotesX;
-                        const bbd: any = bb;
-                        bbd.beatIndex = beat.beat.index;
-                        bbd.voiceIndex = beat.beat.voice.index;
-                        bbd.barIndex = beat.beat.voice.bar.index;
-                        bbd.staffIndex = beat.beat.voice.bar.staff.index;
-                        bbd.trackIndex = beat.beat.voice.bar.staff.track.index;
+                        const bb = new Map<string, unknown>();
+                        bb.set('visualBounds', BoundsLookup._boundsToJson(beat.visualBounds));
+                        bb.set('realBounds', BoundsLookup._boundsToJson(beat.realBounds));
+                        bb.set('onNotesX', beat.onNotesX);
+                        bb.set('beatIndex', beat.beat.index);
+                        bb.set('voiceIndex', beat.beat.voice.index);
+                        bb.set('barIndex', beat.beat.voice.bar.index);
+                        bb.set('staffIndex', beat.beat.voice.bar.staff.index);
+                        bb.set('trackIndex', beat.beat.voice.bar.staff.track.index);
                         if (beat.notes) {
-                            const notes: NoteBounds[] = [];
-                            bb.notes = notes;
+                            const notes: Map<string, unknown>[] = [];
+                            bb.set('notes', notes);
                             for (const note of beat.notes) {
-                                const n: NoteBounds = {} as any;
-                                const nd: any = n;
-                                nd.index = note.note.index;
-                                n.noteHeadBounds = this._boundsToJson(note.noteHeadBounds);
+                                const n = new Map<string, unknown>();
+                                n.set('index', note.note.index);
+                                n.set('noteHeadBounds', BoundsLookup._boundsToJson(note.noteHeadBounds));
                                 notes.push(n);
                             }
                         }
-                        b.beats.push(bb);
+                        bBeats.push(bb);
                     }
-                    mb.bars.push(b);
+                    mbBars.push(b);
                 }
-                g.bars.push(mb);
+                gBars.push(mb);
             }
             systems.push(g);
         }
         return json;
     }
 
-    /**
-     * @target web
-     */
-    public static fromJson(json: unknown, score: Score): BoundsLookup {
+    public static fromJson(json: Map<string, unknown> | null, score: Score): BoundsLookup | null {
+        if (json === null) {
+            return null;
+        }
         const lookup: BoundsLookup = new BoundsLookup();
-        const staffSystems: StaffSystemBounds[] = (json as any).staffSystems;
+        const staffSystems = json.get('staffSystems')! as Map<string, unknown>[];
         for (const staffSystem of staffSystems) {
             const sg: StaffSystemBounds = new StaffSystemBounds();
-            sg.visualBounds = BoundsLookup._boundsFromJson(staffSystem.visualBounds);
-            sg.realBounds = BoundsLookup._boundsFromJson(staffSystem.realBounds);
+            sg.visualBounds = BoundsLookup._boundsFromJson(staffSystem.get('visualBounds') as Map<string, unknown>);
+            sg.realBounds = BoundsLookup._boundsFromJson(staffSystem.get('realBounds') as Map<string, unknown>);
             lookup.addStaffSystem(sg);
-            for (const masterBar of staffSystem.bars) {
+            for (const masterBar of staffSystem.get('bars') as Map<string, unknown>[]) {
                 const mb: MasterBarBounds = new MasterBarBounds();
-                mb.index = masterBar.index;
-                mb.isFirstOfLine = masterBar.isFirstOfLine;
-                mb.lineAlignedBounds = BoundsLookup._boundsFromJson(masterBar.lineAlignedBounds);
-                mb.visualBounds = BoundsLookup._boundsFromJson(masterBar.visualBounds);
-                mb.realBounds = BoundsLookup._boundsFromJson(masterBar.realBounds);
+                mb.index = masterBar.get('index') as number;
+                mb.isFirstOfLine = masterBar.get('isFirstOfLine') as boolean;
+                mb.lineAlignedBounds = BoundsLookup._boundsFromJson(
+                    masterBar.get('lineAlignedBounds') as Map<string, unknown>
+                );
+                mb.visualBounds = BoundsLookup._boundsFromJson(masterBar.get('visualBounds') as Map<string, unknown>);
+                mb.realBounds = BoundsLookup._boundsFromJson(masterBar.get('realBounds') as Map<string, unknown>);
                 lookup.addMasterBar(mb);
-                for (const bar of masterBar.bars) {
+                for (const bar of masterBar.get('bars') as Map<string, unknown>[]) {
                     const b: BarBounds = new BarBounds();
-                    b.visualBounds = BoundsLookup._boundsFromJson(bar.visualBounds);
-                    b.realBounds = BoundsLookup._boundsFromJson(bar.realBounds);
+                    b.visualBounds = BoundsLookup._boundsFromJson(bar.get('visualBounds') as Map<string, unknown>);
+                    b.realBounds = BoundsLookup._boundsFromJson(bar.get('realBounds') as Map<string, unknown>);
                     mb.addBar(b);
-                    for (const beat of bar.beats) {
+                    for (const beat of bar.get('beats') as Map<string, unknown>[]) {
                         const bb: BeatBounds = new BeatBounds();
-                        bb.visualBounds = BoundsLookup._boundsFromJson(beat.visualBounds);
-                        bb.realBounds = BoundsLookup._boundsFromJson(beat.realBounds);
-                        bb.onNotesX = beat.onNotesX;
-                        const bd: any = beat;
+                        bb.visualBounds = BoundsLookup._boundsFromJson(
+                            beat.get('visualBounds') as Map<string, unknown>
+                        );
+                        bb.realBounds = BoundsLookup._boundsFromJson(beat.get('realBounds') as Map<string, unknown>);
+                        bb.onNotesX = beat.get('onNotesX') as number;
                         bb.beat =
-                            score.tracks[bd.trackIndex].staves[bd.staffIndex].bars[bd.barIndex].voices[
-                                bd.voiceIndex
-                            ].beats[bd.beatIndex];
-                        if (beat.notes) {
+                            score.tracks[beat.get('trackIndex') as number].staves[
+                                beat.get('staffIndex') as number
+                            ].bars[beat.get('barIndex') as number].voices[beat.get('voiceIndex') as number].beats[
+                                beat.get('beatIndex') as number
+                            ];
+                        if (beat.has('notes')) {
                             bb.notes = [];
-                            for (const note of beat.notes) {
+                            for (const note of beat.get('notes') as Map<string, unknown>[]) {
                                 const n: NoteBounds = new NoteBounds();
-                                const nd: any = note;
-                                n.note = bb.beat.notes[nd.index];
-                                n.noteHeadBounds = BoundsLookup._boundsFromJson(note.noteHeadBounds);
+                                n.note = bb.beat.notes[note.get('index') as number];
+                                n.noteHeadBounds = BoundsLookup._boundsFromJson(
+                                    note.get('noteHeadBounds') as Map<string, unknown>
+                                );
                                 bb.addNote(n);
                             }
                         }
@@ -123,27 +128,21 @@ export class BoundsLookup {
         return lookup;
     }
 
-    /**
-     * @target web
-     */
-    private static _boundsFromJson(boundsRaw: Bounds): Bounds {
+    private static _boundsFromJson(boundsRaw: Map<string, unknown>): Bounds {
         const b = new Bounds();
-        b.x = boundsRaw.x;
-        b.y = boundsRaw.y;
-        b.w = boundsRaw.w;
-        b.h = boundsRaw.h;
+        b.x = boundsRaw.get('x') as number;
+        b.y = boundsRaw.get('y') as number;
+        b.w = boundsRaw.get('w') as number;
+        b.h = boundsRaw.get('h') as number;
         return b;
     }
 
-    /**
-     * @target web
-     */
-    private _boundsToJson(bounds: Bounds): Bounds {
-        const json: Bounds = {} as any;
-        json.x = bounds.x;
-        json.y = bounds.y;
-        json.w = bounds.w;
-        json.h = bounds.h;
+    private static _boundsToJson(bounds: Bounds): Map<string, unknown> {
+        const json = new Map<string, unknown>();
+        json.set('x', bounds.x);
+        json.set('y', bounds.y);
+        json.set('w', bounds.w);
+        json.set('h', bounds.h);
         return json;
     }
 

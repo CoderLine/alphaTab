@@ -12,4 +12,15 @@ internal static class Promise
         var completed = await Task.WhenAny(tasks);
         await completed;
     }
+
+    public static PromiseWithResolvers<T> WithResolvers<T>()
+    {
+        return new PromiseWithResolvers<T>();
+    }
+
+
+    public static PromiseWithResolvers<object> WithResolvers()
+    {
+        return new PromiseWithResolvers<object>();
+    }
 }

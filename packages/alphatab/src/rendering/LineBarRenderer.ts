@@ -261,8 +261,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
             s = [];
             const zero = MusicFontSymbol.Tuplet0 as number;
             if (num > 10) {
-                s.push((zero + Math.floor(num / 10)) as MusicFontSymbol);
-                s.push((zero + (num - 10)) as MusicFontSymbol);
+                const tens = Math.floor(num / 10);
+                s.push((zero + tens) as MusicFontSymbol);
+                s.push((zero + (num - 10 * tens)) as MusicFontSymbol);
             } else {
                 s.push((zero + num) as MusicFontSymbol);
             }
@@ -270,8 +271,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
             s.push(MusicFontSymbol.TupletColon);
 
             if (den > 10) {
-                s.push((zero + Math.floor(den / 10)) as MusicFontSymbol);
-                s.push((zero + (den - 10)) as MusicFontSymbol);
+                const tens = Math.floor(den / 10);
+                s.push((zero + tens) as MusicFontSymbol);
+                s.push((zero + (den - 10 * tens)) as MusicFontSymbol);
             } else {
                 s.push((zero + den) as MusicFontSymbol);
             }

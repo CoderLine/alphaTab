@@ -18,9 +18,9 @@ import { Logger } from '@coderline/alphatab/Logger';
 import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
 import type { IUiFacade } from '@coderline/alphatab/platform/IUiFacade';
 import { AlphaSynthScriptProcessorOutput } from '@coderline/alphatab/platform/javascript/AlphaSynthScriptProcessorOutput';
-import { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/javascript/AlphaSynthWebWorkerApi';
+import { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthWebWorkerApi';
 import type { AlphaTabApi } from '@coderline/alphatab/platform/javascript/AlphaTabApi';
-import { AlphaTabWorkerScoreRenderer } from '@coderline/alphatab/platform/javascript/AlphaTabWorkerScoreRenderer';
+import { AlphaTabWorkerScoreRenderer } from '@coderline/alphatab/platform/worker/AlphaTabWorkerScoreRenderer';
 import type { BrowserMouseEventArgs } from '@coderline/alphatab/platform/javascript/BrowserMouseEventArgs';
 import { Cursors } from '@coderline/alphatab/platform/Cursors';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
@@ -35,7 +35,9 @@ import { AudioElementBackingTrackSynthOutput } from '@coderline/alphatab/platfor
 import { BackingTrackPlayer } from '@coderline/alphatab/synth/BackingTrackPlayer';
 import { CoreSettings, FontFileFormat } from '@coderline/alphatab/CoreSettings';
 import type { IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExporter';
-import { AlphaSynthAudioExporterWorkerApi } from '@coderline/alphatab/platform/javascript/AlphaSynthAudioExporterWorkerApi';
+import { AlphaSynthAudioExporterWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthAudioExporterWorkerApi';
+import { IAlphaTabRenderingWorker, IAlphaSynthWorker } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 
 /**
  * @target web
@@ -186,7 +188,18 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public createWorkerRenderer(): IScoreRenderer {
-        return new AlphaTabWorkerScoreRenderer<unknown>(this._api, this._api.settings);
+        let worker: IAlphaTabRenderingWorker | undefined;
+        try {
+            worker = BrowserUiFacade.createAlphaTabWebWorker(this._api.settings);
+            return new AlphaTabWorkerScoreRenderer<unknown>(this._api, worker);
+        } catch (e) {
+            Logger.error(
+                'Renderer',
+                'Failed to create worker for background rendering, fallback to non-worker rendering',
+                e
+            );
+            return new ScoreRenderer(this._api.settings);
+        }
     }
 
     public initialize(api: AlphaTabApiBase<unknown>, raw: SettingsJson | Settings): void {
@@ -714,16 +727,33 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
         if (supportsAudioWorklets && this._api.settings.player.outputMode === PlayerOutputMode.WebAudioAudioWorklets) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with worklets for playback');
+            let worker: IAlphaSynthWorker | undefined;
+            try {
+                worker = BrowserUiFacade.createAlphaSynthWebWorker(this._api.settings);
+            } catch (e) {
+                Logger.error('Player', 'Failed to create worker for synthesizing audio', e);
+                return null;
+            }
+
             player = new AlphaSynthWebWorkerApi(
                 new AlphaSynthAudioWorkletOutput(this._api.settings),
-                this._api.settings
+                this._api.settings,
+                worker
             );
         } else if (supportsScriptProcessor) {
             Logger.debug(
                 'Player',
                 'Will use webworkers for synthesizing and web audio api with ScriptProcessor for playback'
             );
-            player = new AlphaSynthWebWorkerApi(new AlphaSynthScriptProcessorOutput(), this._api.settings);
+            let worker: IAlphaSynthWorker | undefined;
+            try {
+                worker = BrowserUiFacade.createAlphaSynthWebWorker(this._api.settings);
+            } catch (e) {
+                Logger.error('Player', 'Failed to create worker for synthesizing audio', e);
+                return null;
+            }
+
+            player = new AlphaSynthWebWorkerApi(new AlphaSynthScriptProcessorOutput(), this._api.settings, worker);
         }
 
         if (!player) {
@@ -1018,4 +1048,28 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             this._api.settings.player.bufferTimeInMilliseconds
         );
     }
+
+    public throttle(action: () => void, delay: number): () => void {
+        let timeoutId: number = 0;
+        return () => {
+            Environment.globalThis.clearTimeout(timeoutId);
+            timeoutId = Environment.globalThis.setTimeout(action, delay);
+        };
+    }
+
+    /**
+     * @internal
+     */
+    public static createAlphaTabWebWorker: (settings: Settings) => IAlphaTabRenderingWorker;
+
+    /**
+     * @internal
+     */
+    public static createAlphaSynthWebWorker: (settings: Settings) => IAlphaSynthWorker;
+
+    /**
+     * @target web
+     * @internal
+     */
+    public static createAlphaSynthAudioWorklet: (context: AudioContext, settings: Settings) => Promise<void>;
 }

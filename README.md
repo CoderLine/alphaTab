@@ -3,9 +3,7 @@
 [![Official Site](https://img.shields.io/badge/site-alphatab.net-blue.svg)](https://www.alphatab.net/)
 [![Documentation](https://img.shields.io/badge/docs-alphatab.net-blue.svg)](https://www.alphatab.net/docs/introduction)
 [![License MPL-2.0](https://img.shields.io/badge/license-MPL--2.0-green.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
-[![Twitter](https://img.shields.io/badge/twitter-alphaTabMusic-blue.svg)](https://twitter.com/alphaTabMusic)
-[![Facebook](https://img.shields.io/badge/facebook-alphaTabMusic-blue.svg)](https://facebook.com/alphaTabMusic)
-[![Build](https://github.com/CoderLine/alphaTab/workflows/Build/badge.svg?branch=develop)](https://github.com/CoderLine/alphaTab/actions/workflows/build.yml)
+[![Build](https://github.com/CoderLine/alphaTab/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/CoderLine/alphaTab/actions/workflows/build.yml)
 
 alphaTab is a cross platform music notation and guitar tablature rendering library. You can use alphaTab within your own website or application to load and display music sheets from data sources like Guitar Pro or the built in markup language named alphaTex.
 
@@ -22,9 +20,9 @@ To get started follow our guides and tutorials at:
 
 alphaTab mostly focuses on web based platforms allowing music notation to be embedded into websites and browser based apps but is also designed to be used on various other platforms like .net and Android either as a platform native integration or through runtime specific JavaScript engines.
 
-alphaTab can load music notation from various sources like Guitar Pro 3-7, AlphaTex and MusicXML (experimental) and render them into beautiful music sheets right within your browser (or application). Using a built in midi synthesizer named alphaSynth the music sheets can also be played in your browser.
+alphaTab can load music notation from various sources like Guitar Pro 3-7, AlphaTex and MusicXML and render them into beautiful music sheets right within your browser (or application). Using a built in midi synthesizer named alphaSynth the music sheets can also be played in your browser.
 
-* Load GuitarPro 3-5, GuitarPro 6, Guitar Pro 7, AlphaTex or MusicXML (experimental)
+* Load GuitarPro 3-5, GuitarPro 6, Guitar Pro 7, AlphaTex or MusicXML
 * Render as SVG or Raster Graphics (raster graphics depends on platform: HTML5 canvas, GDI+, SkiaSharp, Android Canvas)...
 * Display single or multiple instruments as standard music notation and guitar tablatures consisting of song information, repeats, alternate endings, guitar tunints, clefs, key signatures, time signatures, notes, rests, accidentals, drum tabs, piano grand staff, tied notes, grace notes, dead notes, ghost notes, markers, tempos, lyrics, chords, vibratos, dynamics, tap/slap/pop, fade-in, let-ring, palm-mute, string bends, whammy bar, tremolo picking, strokes, slides, trills, pick strokes, tuplets, fingering, triplet feels,...
 * Adapt to your responsive design by dynamic resizing

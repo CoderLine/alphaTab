@@ -76,7 +76,7 @@ export class JsonConverter {
      * @param score The score object to serialize
      * @returns A serialized score object without ciruclar dependencies that can be used for further serializations.
      */
-    public static scoreToJsObject(score: Score): unknown {
+    public static scoreToJsObject(score: Score): Map<string, unknown>|null {
         return ScoreSerializer.toJson(score);
     }
 

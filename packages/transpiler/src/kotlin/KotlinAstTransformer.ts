@@ -221,7 +221,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     }
 
     override visitCallExpression(parent: cs.Node, expression: ts.CallExpression) {
-        const invocation = super.visitCallExpression(parent, expression);
+        let invocation = super.visitCallExpression(parent, expression);
         if (!invocation) {
             return invocation;
         }
@@ -252,7 +252,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                             (body.right.text === 'undefined' || body.right.text === 'null')))
                 ) {
                     (invocation.expression as cs.MemberAccessExpression).member =
-                        this.context.toMethodName('filterNotNull');
+                        this.context.toMethodNameCase('filterNotNull');
                     invocation.arguments = [];
                 }
             }
@@ -272,10 +272,11 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                         nodeType: cs.SyntaxKind.InvocationExpression
                     } as cs.InvocationExpression;
 
+                    
                     suspendToDeferred.expression = this.makeMemberAccess(
                         suspendToDeferred,
                         this.context.makeTypeName('alphaTab.core.TypeHelper'),
-                        this.context.toMethodName('suspendToDeferred')
+                        this.context.toMethodNameCase('suspendToDeferred')
                     );
 
                     suspendToDeferred.arguments = [
@@ -729,5 +730,65 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         }
 
         return d;
+    }
+
+    protected override createDiscriminatedUnionClass(
+        node: ts.TypeAliasDeclaration,
+        className: string,
+        memberType: ts.Type,
+        baseInterface: cs.InterfaceDeclaration,
+        discriminatorField: string,
+        discriminatorValue: string
+    ): cs.ClassDeclaration {
+        const csClass = super.createDiscriminatedUnionClass(
+            node,
+            className,
+            memberType,
+            baseInterface,
+            discriminatorField,
+            discriminatorValue
+        );
+
+        // need initializers or late init
+        for (const p of csClass.members) {
+            if (cs.isPropertyDeclaration(p)) {
+                if (!p.initializer) {
+                    const tsProp = p.tsNode as ts.PropertyDeclaration;
+                    const type = this.context.getType(tsProp);
+                    const isNullable = this.context.isNullableType(type);
+                    if (type === this.context.typeChecker.getNumberType()) {
+                        p.initializer = {
+                            nodeType: cs.SyntaxKind.NumericLiteral,
+                            parent: p,
+                            value: '0.0'
+                        } as cs.NumericLiteral;
+                    } else if (type === this.context.typeChecker.getBooleanType()) {
+                        p.initializer = {
+                            nodeType: cs.SyntaxKind.FalseLiteral,
+                            parent: p
+                        } as cs.BooleanLiteral;
+                    } else if (isNullable || type === this.context.typeChecker.getUnknownType()) {
+                        // default null
+                        p.initializer = {
+                            nodeType: cs.SyntaxKind.NullLiteral,
+                            parent: p
+                        } as cs.NullLiteral;
+                    } else if (!isNullable) {
+                        // lateinit
+                        p.initializer = {
+                            nodeType: cs.SyntaxKind.NonNullExpression,
+                            parent: p,
+                            expression: {
+                                nodeType: cs.SyntaxKind.NullLiteral
+                            } as cs.NullLiteral
+                        } as cs.NonNullExpression;
+                    }
+                } else if (p.name === this.context.toPropertyNameCase(discriminatorField)) {
+                    p.isOverride = true;
+                }
+            }
+        }
+
+        return csClass;
     }
 }

@@ -44,7 +44,7 @@ export default class CSharpAstTransformer {
             namespace: {
                 parent: null,
                 nodeType: cs.SyntaxKind.NamespaceDeclaration,
-                namespace: this.context.toPascalCase('alphaTab'),
+                namespace: this.context.toNamespaceNameCase('alphaTab'),
                 declarations: []
             }
         };
@@ -268,7 +268,7 @@ export default class CSharpAstTransformer {
             }
 
             // TODO: make root namespace configurable from outside.
-            const folders = path
+            const folders: string[] = path
                 .dirname(
                     path.relative(
                         path.resolve(this.context.compilerOptions.baseUrl!),
@@ -281,7 +281,8 @@ export default class CSharpAstTransformer {
                 folders.shift();
             }
             this.csharpFile.namespace.namespace =
-                this.context.toPascalCase('alphaTab') + folders.map(f => `.${this.context.toPascalCase(f)}`).join('');
+                this.context.toNamespaceNameCase('alphaTab') +
+                folders.map(f => `.${this.context.toNamespaceNameCase(f)}`).join('');
 
             if (defaultExport) {
                 this.visit(
@@ -427,6 +428,8 @@ export default class CSharpAstTransformer {
             this.visitFunctionTypeAliasDeclaration(node);
         } else if (ts.isTypeLiteralNode(node.type)) {
             this.visitTypeLiteralAliasDeclaration(node);
+        } else if (this.context.isDiscriminatedUnion(node)) {
+            this.visitDiscriminatedUnion(node);
         } else if (isExported && !shouldSkip) {
             this.context.addTsNodeDiagnostics(
                 node,
@@ -502,6 +505,208 @@ export default class CSharpAstTransformer {
 
     protected visitTypeLiteralAliasDeclaration(node: ts.TypeAliasDeclaration) {
         this.visitRecordDeclaration(node);
+    }
+
+    protected visitDiscriminatedUnion(node: ts.TypeAliasDeclaration) {
+        const tag = ts.getJSDocTags(node).find(t => t.tagName.text === 'discriminated')!;
+        const values = (tag.comment as string).split(' ');
+        const discriminatorField = values[0];
+        const discriminatorValuePrefix = values[1];
+
+        const unionType = this.context.typeChecker.getTypeAtLocation(node.type);
+        if (!unionType.isUnion()) {
+            this.context.addTsNodeDiagnostics(
+                node,
+                `Discriminated union must be a union type`,
+                ts.DiagnosticCategory.Error
+            );
+            return;
+        }
+
+        // Create base interface
+        const baseInterface = this.createDiscriminatedUnionBaseInterface(node, discriminatorField);
+        this.csharpFile.namespace.declarations.push(baseInterface);
+        this.context.registerSymbol(baseInterface);
+
+        const typeNamePrefix = baseInterface.name.startsWith('I')
+            ? baseInterface.name.substring(1)
+            : baseInterface.name;
+
+        // Create classes for each union member
+        for (const memberType of unionType.types) {
+            const properties = this.context.typeChecker.getPropertiesOfType(memberType);
+            const discriminatorProp = properties.find(p => p.name === discriminatorField);
+            if (!discriminatorProp) {
+                continue;
+            }
+
+            const discriminatorType = this.context.typeChecker.getTypeOfSymbolAtLocation(discriminatorProp, node);
+            if (!discriminatorType.isStringLiteral()) {
+                continue;
+            }
+
+            const discriminatorValue = discriminatorType.value;
+
+            // Compute class name
+            const suffix = discriminatorValue.startsWith(discriminatorValuePrefix)
+                ? discriminatorValue.substring(discriminatorValuePrefix.length)
+                : discriminatorValue;
+            const className =
+                typeNamePrefix +
+                suffix
+                    .split('.')
+                    .map(p => this.context.toTypeNameCase(p))
+                    .join('');
+
+            const csClass = this.createDiscriminatedUnionClass(
+                node,
+                className,
+                memberType,
+                baseInterface,
+                discriminatorField,
+                discriminatorValue
+            );
+            this.csharpFile.namespace.declarations.push(csClass);
+            this.context.registerSymbol(csClass);
+        }
+    }
+    protected createDiscriminatedUnionClass(
+        node: ts.TypeAliasDeclaration,
+        className: string,
+        memberType: ts.Type,
+        baseInterface: cs.InterfaceDeclaration,
+        discriminatorField: string,
+        discriminatorValue: string
+    ) {
+        // Create class
+        const csClass: cs.ClassDeclaration = {
+            visibility: this.getVisibility(node),
+            name: className,
+            nodeType: cs.SyntaxKind.ClassDeclaration,
+            parent: this.csharpFile.namespace,
+            isAbstract: false,
+            members: [],
+            skipEmit: this.shouldSkip(node, false),
+            partial: false,
+            tsNode: memberType.symbol.declarations![0],
+            tsSymbol: memberType.symbol,
+            hasVirtualMembersOrSubClasses: false,
+            isRecord: true
+        };
+
+        // Add interface implementation
+        csClass.interfaces = [
+            {
+                nodeType: cs.SyntaxKind.TypeReference,
+                parent: csClass,
+                reference: this.context.makeTypeName(baseInterface.name),
+                isAsync: false
+            } as cs.TypeReference
+        ];
+
+        // Add discriminator property
+        const discProp: cs.PropertyDeclaration = {
+            visibility: cs.Visibility.Public,
+            name: this.context.toPropertyNameCase(discriminatorField),
+            nodeType: cs.SyntaxKind.PropertyDeclaration,
+            parent: csClass,
+            isVirtual: false,
+            isOverride: false,
+            isAbstract: false,
+            isStatic: false,
+            type: this.createUnresolvedTypeNode(null, node.type, this.context.typeChecker.getStringType()),
+            initializer: {
+                nodeType: cs.SyntaxKind.StringLiteral,
+                text: discriminatorValue
+            } as cs.StringLiteral,
+            getAccessor: {
+                keyword: 'get'
+            } as cs.PropertyAccessorDeclaration,
+            setAccessor: {
+                keyword: 'set'
+            } as cs.PropertyAccessorDeclaration,
+            tsNode: node,
+            skipEmit: false
+        };
+        discProp.initializer!.parent = discProp;
+
+        csClass.members.push(discProp);
+
+        // Add other properties
+        const properties = this.context.typeChecker.getPropertiesOfType(memberType);
+        const otherProperties = properties.filter(p => p.name !== discriminatorField);
+        for (const prop of otherProperties) {
+            const propType = this.context.typeChecker.getTypeOfSymbolAtLocation(prop, node);
+
+            // Create property
+            const csProperty: cs.PropertyDeclaration = {
+                visibility: cs.Visibility.Public,
+                name: this.context.toPropertyNameCase(prop.name),
+                nodeType: cs.SyntaxKind.PropertyDeclaration,
+                parent: csClass,
+                isVirtual: false,
+                isOverride: false,
+                isAbstract: false,
+                isStatic: false,
+                type: this.createUnresolvedTypeNode(null, node.type, propType),
+                tsNode: prop.valueDeclaration ?? prop.declarations![0],
+                getAccessor: {
+                    keyword: 'get'
+                } as cs.PropertyAccessorDeclaration,
+                setAccessor: {
+                    keyword: 'set'
+                } as cs.PropertyAccessorDeclaration,
+                skipEmit: false
+            };
+
+            csClass.members.push(csProperty);
+        }
+        return csClass;
+    }
+
+    protected createDiscriminatedUnionBaseInterface(node: ts.TypeAliasDeclaration, discriminatorField: string) {
+        const baseInterface: cs.InterfaceDeclaration = {
+            visibility: this.getVisibility(node),
+            name: node.name.text,
+            nodeType: cs.SyntaxKind.InterfaceDeclaration,
+            parent: this.csharpFile.namespace,
+            members: [],
+            tsNode: node,
+            skipEmit: this.shouldSkip(node, false),
+            partial: false,
+            tsSymbol: this.context.getSymbolForDeclaration(node),
+            hasVirtualMembersOrSubClasses: false
+        };
+
+        if (node.name) {
+            baseInterface.documentation = this.visitDocumentation(node.name);
+        }
+
+        this._visitDocumentationAttributes(baseInterface, node);
+
+        // Add discriminator property to interface
+        const discriminatorProperty: cs.PropertyDeclaration = {
+            visibility: cs.Visibility.Public,
+            name: this.context.toPropertyNameCase(discriminatorField),
+            nodeType: cs.SyntaxKind.PropertyDeclaration,
+            parent: baseInterface,
+            isVirtual: false,
+            isOverride: false,
+            isAbstract: false,
+            isStatic: false,
+            type: this.createUnresolvedTypeNode(null, node.type, this.context.typeChecker.getStringType()),
+            tsNode: node,
+            getAccessor: {
+                keyword: 'get'
+            } as cs.PropertyAccessorDeclaration,
+            setAccessor: {
+                keyword: 'set'
+            } as cs.PropertyAccessorDeclaration,
+            skipEmit: false
+        };
+
+        baseInterface.members.push(discriminatorProperty);
+        return baseInterface;
     }
 
     protected visitInterfaceDeclaration(node: ts.InterfaceDeclaration) {
@@ -703,7 +908,7 @@ export default class CSharpAstTransformer {
                             isOverride: false,
                             isStatic: false,
                             isVirtual: false,
-                            name: this.context.toPascalCase(m.name.getText()),
+                            name: this.context.toPropertyNameCase(m.name.getText()),
                             type: this.createUnresolvedTypeNode(null, m.type ?? m, type),
                             visibility: cs.Visibility.Public,
                             tsNode: m,
@@ -833,7 +1038,7 @@ export default class CSharpAstTransformer {
                         nodeType: cs.SyntaxKind.ThisLiteral,
                         parent: stmt.expression
                     } as cs.ThisLiteral,
-                    member: this.context.toPascalCase(p.name.getText())
+                    member: this.context.toPropertyNameCase(p.name.getText())
                 } as cs.MemberAccessExpression;
 
                 ((stmt.expression as cs.BinaryExpression).left as cs.MemberAccessExpression).expression.parent = (
@@ -922,7 +1127,7 @@ export default class CSharpAstTransformer {
         const testClassName = (d.arguments[0] as ts.StringLiteral).text;
         const csClass: cs.ClassDeclaration = {
             visibility: cs.Visibility.Public,
-            name: this.context.toPascalCase(this.context.toIdentifier(testClassName)),
+            name: this.context.toTypeNameCase(this.context.toIdentifier(testClassName)),
             tsNode: d,
             nodeType: cs.SyntaxKind.ClassDeclaration,
             parent: this.csharpFile.namespace,
@@ -1011,7 +1216,7 @@ export default class CSharpAstTransformer {
             isVirtual: false,
             isGeneratorFunction: false,
             partial: !!ts.getJSDocTags(d).find(t => t.tagName.text === 'partial'),
-            name: this.context.toPascalCase((d.name as ts.Identifier).text),
+            name: this.context.toMethodNameCase((d.name as ts.Identifier).text),
             parameters: [],
             returnType: this.createUnresolvedTypeNode(null, d.type ?? d, returnType),
             visibility: this.mapVisibility(d, cs.Visibility.Private),
@@ -1049,7 +1254,7 @@ export default class CSharpAstTransformer {
             }
         }
 
-        name = this.context.toMethodName(name);
+        name = this.context.toMethodNameCase(name);
         const csMethod: cs.MethodDeclaration = {
             parent: parent,
             nodeType: cs.SyntaxKind.MethodDeclaration,
@@ -1172,7 +1377,7 @@ export default class CSharpAstTransformer {
                     isTestMethod: false,
                     isGeneratorFunction: false,
                     partial: !!ts.getJSDocTags(d).find(t => t.tagName.text === 'partial'),
-                    name: this.context.toPascalCase(d.name.getText()),
+                    name: this.context.toMethodNameCase(d.name.getText()),
                     returnType: {} as cs.TypeNode,
                     visibility: cs.Visibility.Private,
                     tsNode: d,
@@ -1216,7 +1421,7 @@ export default class CSharpAstTransformer {
                     isOverride: false,
                     isStatic: true,
                     isVirtual: false,
-                    name: this.context.toPascalCase(d.name.getText()),
+                    name: this.context.toPropertyNameCase(d.name.getText()),
                     type: this.createUnresolvedTypeNode(null, d.type ?? d, type),
                     visibility: cs.Visibility.Private,
                     tsNode: d
@@ -1545,7 +1750,7 @@ export default class CSharpAstTransformer {
             isOverride: false,
             isStatic: false,
             isVirtual: false,
-            name: this.context.toPascalCase((classElement.name as ts.Identifier).text),
+            name: this.context.toPropertyNameCase((classElement.name as ts.Identifier).text),
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: cs.Visibility.None,
             tsNode: classElement,
@@ -1588,7 +1793,7 @@ export default class CSharpAstTransformer {
     }
 
     protected visitGetAccessor(parent: cs.ClassDeclaration, classElement: ts.GetAccessorDeclaration) {
-        const propertyName = this.context.toPascalCase(classElement.name.getText());
+        const propertyName = this.context.toPropertyNameCase(classElement.name.getText());
         const member = parent.members.find(m => m.name === propertyName);
         if (member && cs.isPropertyDeclaration(member)) {
             member.getAccessor = {
@@ -1654,7 +1859,7 @@ export default class CSharpAstTransformer {
     }
 
     protected visitSetAccessor(parent: cs.ClassDeclaration, classElement: ts.SetAccessorDeclaration) {
-        const propertyName = this.context.toPascalCase(classElement.name.getText());
+        const propertyName = this.context.toPropertyNameCase(classElement.name.getText());
         const member = parent.members.find(m => m.name === propertyName);
         if (member && cs.isPropertyDeclaration(member)) {
             member.setAccessor = {
@@ -1808,7 +2013,7 @@ export default class CSharpAstTransformer {
             isOverride: false,
             isStatic: false,
             isVirtual: false,
-            name: this.context.toPropertyName(classElement.name.getText()),
+            name: this.context.toPropertyNameCase(classElement.name.getText()),
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: visibility,
             tsNode: classElement,
@@ -1963,13 +2168,13 @@ export default class CSharpAstTransformer {
         }
 
         switch (csMethod.name) {
-            case this.context.toMethodName('toString'):
+            case this.context.toMethodNameCase('toString'):
                 if (csMethod.parameters.length === 0) {
                     csMethod.isVirtual = false;
                     csMethod.isOverride = true;
                 }
                 break;
-            case this.context.toMethodName('equals'):
+            case this.context.toMethodNameCase('equals'):
                 if (csMethod.parameters.length === 1) {
                     csMethod.isVirtual = false;
                     csMethod.isOverride = true;
@@ -2371,13 +2576,17 @@ export default class CSharpAstTransformer {
     }
 
     protected visitReturnStatement(parent: cs.Node, s: ts.ReturnStatement) {
-        if(this.currentClassElement && ts.isMethodDeclaration(this.currentClassElement) && !!this.currentClassElement.asteriskToken) {
+        if (
+            this.currentClassElement &&
+            ts.isMethodDeclaration(this.currentClassElement) &&
+            !!this.currentClassElement.asteriskToken
+        ) {
             const yieldExpressionStmt = {
                 expression: null!,
                 nodeType: cs.SyntaxKind.ExpressionStatement,
                 parent: parent,
                 tsNode: s
-            } as cs.ExpressionStatement
+            } as cs.ExpressionStatement;
             const yieldExpression = {
                 expression: null,
                 parent: yieldExpressionStmt,
@@ -2859,7 +3068,7 @@ export default class CSharpAstTransformer {
                 parent: parent,
                 expression: null!,
                 tsSymbol: enumMember.symbol,
-                member: this.context.toPropertyName(enumMember.symbol.name)
+                member: this.context.toPropertyNameCase(enumMember.symbol.name)
             } as cs.MemberAccessExpression;
 
             const identifier = {
@@ -2975,7 +3184,7 @@ export default class CSharpAstTransformer {
         csExpr.expression = this.makeMemberAccess(
             csExpr,
             this.context.makeTypeName('alphaTab.core.TypeHelper'),
-            this.context.toMethodName('typeOf')
+            this.context.toMethodNameCase('typeOf')
         );
         const e = this.visitExpression(csExpr, expression.expression);
         if (e) {
@@ -3032,7 +3241,7 @@ export default class CSharpAstTransformer {
             csExpr.expression = this.makeMemberAccess(
                 csExpr,
                 this.context.makeTypeName('alphaTab.core.TypeHelper'),
-                this.context.toMethodName('in')
+                this.context.toMethodNameCase('in')
             );
 
             let e = this.visitExpression(csExpr, expression.left)!;
@@ -3504,7 +3713,7 @@ export default class CSharpAstTransformer {
             tsNode: expression.tsNode,
             nodeType: cs.SyntaxKind.MemberAccessExpression,
             expression: {} as cs.Expression,
-            member: this.context.toMethodName('isTruthy')
+            member: this.context.toMethodNameCase('isTruthy')
         } as cs.MemberAccessExpression;
         call.expression = access;
 
@@ -3679,7 +3888,7 @@ export default class CSharpAstTransformer {
         csExpr.expression = this.makeMemberAccess(
             csExpr,
             this.context.makeTypeName('alphaTab.core.TypeHelper'),
-            this.context.toMethodName('createRegex')
+            this.context.toMethodNameCase('createRegex')
         );
         csExpr.arguments.push({
             parent: csExpr,
@@ -3977,7 +4186,7 @@ export default class CSharpAstTransformer {
 
         const memberAccess = {
             expression: {} as cs.Expression,
-            member: this.context.toPropertyName(expression.name.text),
+            member: this.context.toPropertyNameCase(expression.name.text),
             parent: parent,
             tsNode: expression,
             tsSymbol: tsSymbol,
@@ -3990,7 +4199,9 @@ export default class CSharpAstTransformer {
             if (this.context.isMethodSymbol(memberAccess.tsSymbol)) {
                 memberAccess.member = this.context.buildMethodName(expression.name);
             } else if (this.context.isPropertySymbol(memberAccess.tsSymbol)) {
-                memberAccess.member = this.context.toPropertyName(expression.name.text);
+                memberAccess.member = this.context.toPropertyNameCase(expression.name.text);
+            } else if (memberAccess.tsSymbol.flags & ts.SymbolFlags.EnumMember) {
+                memberAccess.member = expression.name.text;
             }
         }
 
@@ -4095,6 +4306,13 @@ export default class CSharpAstTransformer {
     protected visitObjectLiteralExpression(parent: cs.Node, expression: ts.ObjectLiteralExpression) {
         let type = this.context.typeChecker.getContextualType(expression);
         let isRecord = type?.symbol?.declarations?.some(d => this.context.isRecord(d)) || this._recordCreation > 0;
+        const isDiscriminatedUnion =
+            type?.symbol?.declarations?.some(d => this.context.isDiscriminatedUnion(d)) ||
+            type?.aliasSymbol?.declarations?.some(d => this.context.isDiscriminatedUnion(d));
+
+        if (isDiscriminatedUnion) {
+            return this.visitDiscriminatedUnionCreate(parent, expression);
+        }
 
         // assignment of object literal to property without giving type
         // -> try to use specific type of property
@@ -4332,6 +4550,104 @@ export default class CSharpAstTransformer {
 
         return objectLiteral;
     }
+    protected visitDiscriminatedUnionCreate(parent: cs.Node, expression: ts.ObjectLiteralExpression) {
+        const unionType = this.context.typeChecker.getContextualType(expression)! as ts.UnionType;
+
+        // find concrete type within unionType with which the expression matches
+
+        const tag = ts
+            .getJSDocTags(unionType.aliasSymbol!.declarations![0])
+            .find(t => t.tagName.text === 'discriminated')!;
+        const values = (tag.comment as string).split(' ');
+        const discriminatorField = values[0];
+
+        const discriminatorProp = expression.properties.find(
+            p => ts.isPropertyAssignment(p) && ts.isIdentifier(p.name) && p.name.text === discriminatorField
+        ) as ts.PropertyAssignment;
+
+        const discriminatorValue = ts.isStringLiteral(discriminatorProp!.initializer)
+            ? discriminatorProp.initializer.text
+            : undefined;
+
+        const matching = unionType.types.find(memberType => {
+            const prop = memberType.getProperty(discriminatorField);
+            if (!prop) {
+                return false;
+            }
+            const propType = this.context.typeChecker.getTypeOfSymbolAtLocation(prop, expression);
+            return (
+                propType.flags & ts.TypeFlags.StringLiteral &&
+                (propType as ts.StringLiteralType).value === discriminatorValue
+            );
+        });
+
+        if (!matching) {
+            this.context.addCsNodeDiagnostics(
+                parent,
+                'Could not resolve concrete union type',
+                ts.DiagnosticCategory.Error
+            );
+            return null;
+        }
+
+        const newObject = {
+            nodeType: cs.SyntaxKind.NewExpression,
+            type: this.createUnresolvedTypeNode(null, expression, matching),
+            arguments: [],
+            parent: parent,
+            objectInitializers: []
+        } as cs.NewExpression;
+
+        for (const p of expression.properties) {
+            const assignment = {
+                parent: newObject,
+                nodeType: cs.SyntaxKind.LabeledExpression,
+                label: '',
+                expression: {} as cs.Expression
+            } as cs.LabeledExpression;
+
+            if (ts.isPropertyAssignment(p)) {
+                assignment.label = this.context.toPropertyNameCase(p.name.getText());
+                assignment.expression = this.visitExpression(assignment, p.initializer)!;
+                newObject.objectInitializers!.push(assignment);
+            } else if (ts.isShorthandPropertyAssignment(p)) {
+                assignment.label = this.context.toPropertyNameCase(p.name.getText());
+                if (p.objectAssignmentInitializer) {
+                    assignment.expression = this.visitExpression(assignment, p.objectAssignmentInitializer)!;
+                } else {
+                    assignment.expression = {
+                        nodeType: cs.SyntaxKind.Identifier,
+                        parent: assignment,
+                        tsNode: p.name,
+                        text: p.name.getText()
+                    } as cs.Identifier;
+                }
+                newObject.objectInitializers!.push(assignment);
+            } else if (ts.isSpreadAssignment(p)) {
+                this.context.addTsNodeDiagnostics(p, 'Spread operator not supported', ts.DiagnosticCategory.Error);
+            } else if (ts.isMethodDeclaration(p)) {
+                this.context.addTsNodeDiagnostics(
+                    p,
+                    'Method declarations in object literals not supported',
+                    ts.DiagnosticCategory.Error
+                );
+            } else if (ts.isGetAccessorDeclaration(p)) {
+                this.context.addTsNodeDiagnostics(
+                    p,
+                    'Get accessor declarations in object literals not supported',
+                    ts.DiagnosticCategory.Error
+                );
+            } else if (ts.isSetAccessorDeclaration(p)) {
+                this.context.addTsNodeDiagnostics(
+                    p,
+                    'Set accessor declarations in object literals not supported',
+                    ts.DiagnosticCategory.Error
+                );
+            }
+        }
+
+        return newObject;
+    }
 
     protected toInvariantString(expr: cs.Expression): cs.Expression {
         const callExpr = {
@@ -4343,7 +4659,7 @@ export default class CSharpAstTransformer {
         } as cs.InvocationExpression;
         const memberAccess = {
             expression: null!,
-            member: this.context.toPascalCase('toInvariantString'),
+            member: this.context.toMethodNameCase('toInvariantString'),
             parent: callExpr,
             tsNode: expr.tsNode,
             nodeType: cs.SyntaxKind.MemberAccessExpression
@@ -4380,7 +4696,7 @@ export default class CSharpAstTransformer {
 
                 const memberAccess = {
                     expression: {} as cs.Expression,
-                    member: this.context.toPascalCase('toString'),
+                    member: this.context.toMethodNameCase('toString'),
                     parent: callExpr,
                     tsNode: expression,
                     nodeType: cs.SyntaxKind.MemberAccessExpression
@@ -4406,7 +4722,7 @@ export default class CSharpAstTransformer {
             callExpr.expression = this.makeMemberAccess(
                 callExpr,
                 this.context.makeTypeName('alphaTab.core.TypeHelper'),
-                this.context.toMethodName('parseEnum')
+                this.context.toMethodNameCase('parseEnum')
             );
 
             const enumType = this.context.typeChecker.getTypeAtLocation(expression.expression);
@@ -4436,7 +4752,7 @@ export default class CSharpAstTransformer {
             const memberAccess = {
                 nodeType: cs.SyntaxKind.MemberAccessExpression,
                 expression: {} as cs.Expression,
-                member: this.context.toMethodName(elementAccessMethod),
+                member: this.context.toMethodNameCase(elementAccessMethod),
                 parent: parent,
                 tsNode: expression,
                 nullSafe: !!expression.questionDotToken
@@ -4512,7 +4828,7 @@ export default class CSharpAstTransformer {
             if (ts.isNumericLiteral(index)) {
                 return {
                     expression: elementAccess.expression,
-                    member: this.context.toPropertyName(`v${index.text}`),
+                    member: this.context.toPropertyNameCase(`v${index.text}`),
                     parent: parent,
                     tsNode: expression,
                     nodeType: cs.SyntaxKind.MemberAccessExpression,
@@ -4626,7 +4942,7 @@ export default class CSharpAstTransformer {
                 parent: callExpression,
                 tsNode: expression.expression,
                 nodeType: cs.SyntaxKind.Identifier,
-                text: `TestGlobals.${this.context.toPascalCase('expect')}`
+                text: `TestGlobals.${this.context.toMethodNameCase('expect')}`
             } as cs.Identifier;
         } else {
             callExpression.expression = this.visitExpression(callExpression, expression.expression)!;
@@ -4685,7 +5001,7 @@ export default class CSharpAstTransformer {
             invocation.expression = this.makeMemberAccess(
                 invocation,
                 this.context.makeTypeName('alphaTab.core.TypeHelper'),
-                this.context.toMethodName('createPromise')
+                this.context.toMethodNameCase('createPromise')
             );
 
             const e = this.visitExpression(invocation, expression.arguments![0]);
@@ -4799,7 +5115,7 @@ export default class CSharpAstTransformer {
                 csExpr.expression = this.makeMemberAccess(
                     csExpr,
                     this.context.makeTypeName('alphaTab.core.TypeHelper'),
-                    this.context.toMethodName('unknownToNumber')
+                    this.context.toMethodNameCase('unknownToNumber')
                 );
                 const e = this.visitExpression(csExpr, expression.expression);
                 if (e) {
@@ -4898,6 +5214,14 @@ export default class CSharpAstTransformer {
         identifier.text = this.getIdentifierName(identifier, expression);
 
         if (identifier.tsSymbol) {
+            if (identifier.tsSymbol) {
+                if (this.context.isMethodSymbol(identifier.tsSymbol)) {
+                    identifier.text = this.context.toMethodNameCase(identifier.text);
+                } else if (this.context.isPropertySymbol(identifier.tsSymbol)) {
+                    identifier.text = this.context.toPropertyNameCase(identifier.text);
+                }
+            }
+
             switch (expression.parent.kind) {
                 case ts.SyntaxKind.PropertyAccessExpression:
                 case ts.SyntaxKind.BinaryExpression:

@@ -2,7 +2,8 @@ import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabEr
 import { Environment } from '@coderline/alphatab/Environment';
 import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
-import type { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/javascript/AlphaSynthWebWorkerApi';
+import type { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthWebWorkerApi';
+import type { IAlphaSynthWorkerMessage } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import type { BackingTrackSyncPoint } from '@coderline/alphatab/synth/IAlphaSynth';
 import type {
     AudioExportChunk,
@@ -11,7 +12,6 @@ import type {
 } from '@coderline/alphatab/synth/IAudioExporter';
 
 /**
- * @target web
  * @internal
  */
 export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
@@ -21,7 +21,7 @@ export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
     private _exporterId: number;
     private _ownsWorker: boolean;
 
-    private _promise: PromiseWithResolvers<any> | null = null;
+    private _promise: PromiseWithResolvers<unknown> | null = null;
 
     public constructor(synthWorker: AlphaSynthWebWorkerApi, ownsWorker: boolean) {
         this._exporterId = AlphaSynthAudioExporterWorkerApi._nextExporterId++;
@@ -35,10 +35,10 @@ export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
         syncPoints: BackingTrackSyncPoint[],
         transpositionPitches: Map<number, number>
     ): Promise<void> {
-        const onmessage = this.handleWorkerMessage.bind(this);
-        this._worker.worker.addEventListener('message', onmessage, false);
+        const onmessage: (ev: MessageEvent<IAlphaSynthWorkerMessage>) => void = e => this.handleWorkerMessage(e);
+        this._worker.worker.addEventListener('message', onmessage);
         this._unsubscribe = () => {
-            this._worker.worker.removeEventListener('message', onmessage, false);
+            this._worker.worker.removeEventListener('message', onmessage);
         };
 
         this._promise = Promise.withResolvers();
@@ -53,25 +53,32 @@ export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
         await this._promise.promise;
     }
 
-    public handleWorkerMessage(e: MessageEvent): void {
-        const data: any = e.data;
+    public handleWorkerMessage(e: MessageEvent<IAlphaSynthWorkerMessage>): void {
+        const data = e.data;
 
-        // for us?
-        if (data.exporterId !== this._exporterId) {
-            return;
-        }
-
-        const cmd: string = data.cmd;
-        switch (cmd) {
+        switch (data.cmd) {
             case 'alphaSynth.exporter.initialized':
+                // for us?
+                if (data.exporterId !== this._exporterId) {
+                    return;
+                }
+
                 this._promise?.resolve(null);
                 this._promise = null;
                 break;
             case 'alphaSynth.exporter.error':
+                // for us?
+                if (data.exporterId !== this._exporterId) {
+                    return;
+                }
                 this._promise?.reject(data.error);
                 this._promise = null;
                 break;
             case 'alphaSynth.exporter.rendered':
+                // for us?
+                if (data.exporterId !== this._exporterId) {
+                    return;
+                }
                 this._promise?.resolve(data.chunk);
                 this._promise = null;
                 break;
@@ -96,7 +103,8 @@ export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
             exporterId: this._exporterId,
             milliseconds: milliseconds
         });
-        return (await this._promise.promise) as AudioExportChunk | undefined;
+        const result = await this._promise.promise;
+        return result as AudioExportChunk | undefined;
     }
 
     destroy(): void {

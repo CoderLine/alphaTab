@@ -23,6 +23,11 @@ import com.beust.klaxon.JsonValue
 import com.beust.klaxon.Klaxon
 import com.beust.klaxon.KlaxonException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.junit.Assert
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -323,6 +328,18 @@ class TestPlatformPartials {
             }
 
             return testMethod!!
+        }
+
+        private val throttleScope = CoroutineScope(Dispatchers.Default)
+        internal fun throttle(toThrottle: () -> Unit, delay: Double): () -> Unit {
+            var job: Job? = null
+            return {
+                job?.cancel()
+                job = throttleScope.launch {
+                    delay(delay.toLong())
+                    toThrottle()
+                }
+            }
         }
 
         internal val currentTestName: String

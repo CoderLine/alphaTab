@@ -1,4 +1,9 @@
-import { type IEventEmitterOfT, type IEventEmitter, EventEmitterOfT, EventEmitter } from '@coderline/alphatab/EventEmitter';
+import {
+    type IEventEmitterOfT,
+    type IEventEmitter,
+    EventEmitterOfT,
+    EventEmitter
+} from '@coderline/alphatab/EventEmitter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
@@ -464,7 +469,7 @@ class EmptyAudioSynthesizer implements IAudioSampleSynthesizer {
         _percussionKeys: Set<number>,
         _append: boolean
     ): void {}
-    public setupMetronomeChannel(_metronomeVolume: number): void {}
+    public setupMetronomeChannel(_metronomeChannel: number, _metronomeVolume: number): void {}
     public synthesizeSilent(_sampleCount: number): void {}
     public dispatchEvent(_synthEvent: SynthEvent): void {}
     public synthesize(_buffer: Float32Array, _bufferPos: number, _ampleCount: number): SynthEvent[] {

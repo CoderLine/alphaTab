@@ -1,30 +1,38 @@
+import { Environment } from '@coderline/alphatab/Environment';
+import {
+    EventEmitter,
+    EventEmitterOfT,
+    type IEventEmitter,
+    type IEventEmitterOfT
+} from '@coderline/alphatab/EventEmitter';
+import { Logger } from '@coderline/alphatab/Logger';
+import type { LogLevel } from '@coderline/alphatab/LogLevel';
+import type { MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
 import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type {
+    IAlphaSynthWorker,
+    IAlphaSynthWorkerMessage
+} from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import type { Settings } from '@coderline/alphatab/Settings';
 import type { BackingTrackSyncPoint, IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
 import type { ISynthOutput } from '@coderline/alphatab/synth/ISynthOutput';
+import { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
 import type { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/PlaybackRangeChangedEventArgs';
 import { PlayerState } from '@coderline/alphatab/synth/PlayerState';
 import { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerStateChangedEventArgs';
 import { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
-import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
-import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
-import { Logger } from '@coderline/alphatab/Logger';
-import type { LogLevel } from '@coderline/alphatab/LogLevel';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
-import { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
-import type { MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
-import { Environment } from '@coderline/alphatab/Environment';
-import { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/PlaybackRangeChangedEventArgs';
-import type { Settings } from '@coderline/alphatab/Settings';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import type { Score } from '@coderline/alphatab/model/Score';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
- * @target web
  * @internal
  */
 export class AlphaSynthWebWorkerApi implements IAlphaSynth {
-    private _synth!: Worker;
+    private _synth!: IAlphaSynthWorker;
     private _output: ISynthOutput;
     private _workerIsReadyForPlayback: boolean = false;
     private _workerIsReady: boolean = false;
@@ -60,7 +68,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         return Logger.logLevel;
     }
 
-    public get worker(): Worker {
+    public get worker(): IAlphaSynthWorker {
         return this._synth;
     }
 
@@ -221,7 +229,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    public constructor(player: ISynthOutput, settings: Settings) {
+    public constructor(player: ISynthOutput, settings: Settings, synthWorker: IAlphaSynthWorker) {
         this._workerIsReadyForPlayback = false;
         this._workerIsReady = false;
         this._outputIsReady = false;
@@ -236,12 +244,8 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._output.samplesPlayed.on(this.onOutputSamplesPlayed.bind(this));
         this._output.sampleRequest.on(this.onOutputSampleRequest.bind(this));
         this._output.open(settings.player.bufferTimeInMilliseconds);
-        try {
-            this._synth = Environment.createWebWorker(settings);
-        } catch (e) {
-            Logger.error('AlphaSynth', `Failed to create WebWorker: ${e}`);
-        }
-        this._synth.addEventListener('message', this.handleWorkerMessage.bind(this), false);
+        this._synth = synthWorker;
+        this._synth.addEventListener('message', e => this.handleWorkerMessage(e));
         this._synth.postMessage({
             cmd: 'alphaSynth.initialize',
             sampleRate: this._output.sampleRate,
@@ -319,9 +323,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.applyTranspositionPitches',
-            transpositionPitches: JSON.stringify(
-                Array.from(Environment.prepareForPostMessage(transpositionPitches).entries())
-            )
+            transpositionPitches: Environment.prepareForPostMessage(transpositionPitches)
         });
     }
 
@@ -364,10 +366,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    public handleWorkerMessage(e: MessageEvent): void {
-        const data: any = e.data;
-        const cmd: string = data.cmd;
-        switch (cmd) {
+    public handleWorkerMessage(e: MessageEvent<IAlphaSynthWorkerMessage>): void {
+        const data = e.data;
+        switch (data.cmd) {
             case 'alphaSynth.ready':
                 this._workerIsReady = true;
                 this._checkReady();
@@ -380,20 +381,12 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 this._checkReadyForPlayback();
                 break;
             case 'alphaSynth.positionChanged':
-                this._currentPosition = new PositionChangedEventArgs(
-                    data.currentTime,
-                    data.endTime,
-                    data.currentTick,
-                    data.endTick,
-                    data.isSeek,
-                    data.originalTempo,
-                    data.modifiedTempo
-                );
+                this._currentPosition = data.args;
                 (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(this._currentPosition);
                 break;
             case 'alphaSynth.midiEventsPlayed':
                 (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(
-                    new MidiEventsPlayedEventArgs((data.events as unknown[]).map(JsonConverter.jsObjectToMidiEvent))
+                    new MidiEventsPlayedEventArgs(data.events.map(JsonConverter.jsObjectToMidiEvent))
                 );
                 break;
             case 'alphaSynth.playerStateChanged':
@@ -403,7 +396,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 );
                 break;
             case 'alphaSynth.playbackRangeChanged':
-                this._playbackRange = (data as PlaybackRangeChangedEventArgs).playbackRange;
+                this._playbackRange = data.playbackRange;
                 (this.playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(
                     new PlaybackRangeChangedEventArgs(this._playbackRange)
                 );
@@ -419,15 +412,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 break;
             case 'alphaSynth.midiLoaded':
                 this._checkReadyForPlayback();
-                this._loadedMidiInfo = new PositionChangedEventArgs(
-                    data.currentTime,
-                    data.endTime,
-                    data.currentTick,
-                    data.endTick,
-                    data.isSeek,
-                    data.originalTempo,
-                    data.modifiedTempo
-                );
+                this._loadedMidiInfo = data.args;
                 (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(this._loadedMidiInfo);
                 break;
             case 'alphaSynth.midiLoadFailed':

@@ -1,68 +1,62 @@
-import { AlphaSynth, type IAlphaSynthAudioExporter } from '@coderline/alphatab/synth/AlphaSynth';
-import type { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerStateChangedEventArgs';
-import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
-import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
-import { AlphaSynthWorkerSynthOutput } from '@coderline/alphatab/platform/javascript/AlphaSynthWorkerSynthOutput';
-import type { IWorkerScope } from '@coderline/alphatab/platform/javascript/IWorkerScope';
-import { Logger } from '@coderline/alphatab/Logger';
 import { Environment } from '@coderline/alphatab/Environment';
+import { Logger } from '@coderline/alphatab/Logger';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { AlphaSynthWorkerSynthOutput } from '@coderline/alphatab/platform/worker/AlphaSynthWorkerSynthOutput';
+import type {
+    IAlphaSynthWorkerMessage,
+    IAlphaTabWorkerGlobalScope
+} from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import { AlphaSynth, type IAlphaSynthAudioExporter } from '@coderline/alphatab/synth/AlphaSynth';
 import type { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
 import type { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/PlaybackRangeChangedEventArgs';
+import type { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerStateChangedEventArgs';
+import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
 
 /**
  * This class implements a HTML5 WebWorker based version of alphaSynth
  * which can be controlled via WebWorker messages.
- * @target web
  * @internal
+ * @partial
  */
 export class AlphaSynthWebWorker {
-    private _player: AlphaSynth;
-    private _main: IWorkerScope;
+    private _player!: AlphaSynth;
+    private _main: IAlphaTabWorkerGlobalScope<IAlphaSynthWorkerMessage>;
     private _exporter: Map<number, IAlphaSynthAudioExporter> = new Map<number, IAlphaSynthAudioExporter>();
 
-    public constructor(main: IWorkerScope, bufferTimeInMilliseconds: number) {
+    public constructor(main: IAlphaTabWorkerGlobalScope<IAlphaSynthWorkerMessage>) {
         this._main = main;
-        this._main.addEventListener('message', this.handleMessage.bind(this));
-
-        this._player = new AlphaSynth(new AlphaSynthWorkerSynthOutput(), bufferTimeInMilliseconds);
-        this._player.positionChanged.on(this.onPositionChanged.bind(this));
-        this._player.stateChanged.on(this.onPlayerStateChanged.bind(this));
-        this._player.finished.on(this.onFinished.bind(this));
-        this._player.soundFontLoaded.on(this.onSoundFontLoaded.bind(this));
-        this._player.soundFontLoadFailed.on(this.onSoundFontLoadFailed.bind(this));
-        this._player.soundFontLoadFailed.on(this.onSoundFontLoadFailed.bind(this));
-        this._player.midiLoaded.on(this.onMidiLoaded.bind(this));
-        this._player.midiLoadFailed.on(this.onMidiLoadFailed.bind(this));
-        this._player.readyForPlayback.on(this.onReadyForPlayback.bind(this));
-        this._player.midiEventsPlayed.on(this.onMidiEventsPlayed.bind(this));
-        this._player.playbackRangeChanged.on(this.onPlaybackRangeChanged.bind(this));
-        this._main.postMessage({
-            cmd: 'alphaSynth.ready'
-        });
+        main.addEventListener('message', e => this.handleMessage(e));
     }
 
     public static init(): void {
-        const main: IWorkerScope = Environment.globalThis as IWorkerScope;
-        main.addEventListener('message', e => {
-            const data: any = e.data;
-            const cmd: string = data.cmd;
-            switch (cmd) {
-                case 'alphaSynth.initialize':
-                    AlphaSynthWorkerSynthOutput.preferredSampleRate = data.sampleRate;
-                    Logger.logLevel = data.logLevel;
-                    Environment.globalThis.alphaSynthWebWorker = new AlphaSynthWebWorker(
-                        main,
-                        data.bufferTimeInMilliseconds
-                    );
-                    break;
-            }
-        });
+        new AlphaSynthWebWorker(Environment.getGlobalWorkerScope<IAlphaSynthWorkerMessage>());
     }
 
-    public handleMessage(e: MessageEvent): void {
-        const data: any = e.data;
-        const cmd: string = data.cmd;
-        switch (cmd) {
+    public handleMessage(e: MessageEvent<IAlphaSynthWorkerMessage>): void {
+        const data = e.data;
+        switch (data.cmd) {
+            case 'alphaSynth.initialize':
+                AlphaSynthWorkerSynthOutput.preferredSampleRate = data.sampleRate;
+                Logger.logLevel = data.logLevel;
+                this._player = new AlphaSynth(
+                    new AlphaSynthWorkerSynthOutput(this._main),
+                    data.bufferTimeInMilliseconds
+                );
+                this._player.positionChanged.on(e => this.onPositionChanged(e));
+                this._player.stateChanged.on(e => this.onPlayerStateChanged(e));
+                this._player.finished.on(() => this.onFinished());
+                this._player.soundFontLoaded.on(() => this.onSoundFontLoaded());
+                this._player.soundFontLoadFailed.on(e => this.onSoundFontLoadFailed(e));
+                this._player.midiLoaded.on(e => this.onMidiLoaded(e));
+                this._player.midiLoadFailed.on(e => this.onMidiLoadFailed(e));
+                this._player.readyForPlayback.on(() => this.onReadyForPlayback());
+                this._player.midiEventsPlayed.on(e => this.onMidiEventsPlayed(e));
+                this._player.playbackRangeChanged.on(e => this.onPlaybackRangeChanged(e));
+                this._main.postMessage({
+                    cmd: 'alphaSynth.ready'
+                });
+
+                break;
             case 'alphaSynth.setLogLevel':
                 Logger.logLevel = data.value;
                 break;
@@ -139,21 +133,24 @@ export class AlphaSynthWebWorker {
                 });
                 break;
             case 'alphaSynth.applyTranspositionPitches':
-                this._player.applyTranspositionPitches(new Map<number, number>(JSON.parse(data.transpositionPitches)));
+                this._player.applyTranspositionPitches(data.transpositionPitches);
                 break;
         }
 
-        if (cmd.startsWith('alphaSynth.exporter')) {
+        if (data.cmd.startsWith('alphaSynth.exporter')) {
             this._handleExporterMessage(e);
         }
     }
-    private _handleExporterMessage(e: MessageEvent) {
-        const data: any = e.data;
-        const cmd: string = data.cmd;
+    private _handleExporterMessage(ev: MessageEvent<IAlphaSynthWorkerMessage>) {
+        const data = ev.data;
+        const cmd = data.cmd;
+        let exporter:IAlphaSynthAudioExporter|undefined = undefined;
+        let exporterId = 0;
         try {
             switch (cmd) {
                 case 'alphaSynth.exporter.initialize':
-                    const exporter = this._player.exportAudio(
+                    exporterId = data.exporterId;
+                    exporter = this._player.exportAudio(
                         data.options,
                         JsonConverter.jsObjectToMidiFile(data.midi),
                         data.syncPoints,
@@ -168,8 +165,9 @@ export class AlphaSynthWebWorker {
                     break;
 
                 case 'alphaSynth.exporter.render':
+                    exporterId = data.exporterId;
                     if (this._exporter.has(data.exporterId)) {
-                        const exporter = this._exporter.get(data.exporterId)!;
+                        exporter = this._exporter.get(data.exporterId)!;
                         const chunk = exporter.render(data.milliseconds);
                         this._main.postMessage({
                             cmd: 'alphaSynth.exporter.rendered',
@@ -186,14 +184,15 @@ export class AlphaSynthWebWorker {
                     break;
 
                 case 'alphaSynth.exporter.destroy':
+                    exporterId = data.exporterId;
                     this._exporter.delete(data.exporterId);
                     break;
             }
         } catch (e) {
             this._main.postMessage({
                 cmd: 'alphaSynth.exporter.error',
-                exporterId: data.exporterId,
-                error: e
+                exporterId: exporterId,
+                error: e as Error
             });
         }
     }
@@ -201,13 +200,7 @@ export class AlphaSynthWebWorker {
     public onPositionChanged(e: PositionChangedEventArgs): void {
         this._main.postMessage({
             cmd: 'alphaSynth.positionChanged',
-            currentTime: e.currentTime,
-            endTime: e.endTime,
-            currentTick: e.currentTick,
-            endTick: e.endTick,
-            isSeek: e.isSeek,
-            originalTempo: e.originalTempo,
-            modifiedTempo: e.modifiedTempo
+            args: e
         });
     }
 
@@ -234,41 +227,21 @@ export class AlphaSynthWebWorker {
     public onSoundFontLoadFailed(e: any): void {
         this._main.postMessage({
             cmd: 'alphaSynth.soundFontLoadFailed',
-            error: this._serializeException(Environment.prepareForPostMessage(e))
+            error: e
         });
-    }
-
-    private _serializeException(e: any): unknown {
-        const error: any = JSON.parse(JSON.stringify(e));
-        if (e.message) {
-            error.message = e.message;
-        }
-        if (e.stack) {
-            error.stack = e.stack;
-        }
-        if (e.constructor && e.constructor.name) {
-            error.type = e.constructor.name;
-        }
-        return error;
     }
 
     public onMidiLoaded(e: PositionChangedEventArgs): void {
         this._main.postMessage({
             cmd: 'alphaSynth.midiLoaded',
-            currentTime: e.currentTime,
-            endTime: e.endTime,
-            currentTick: e.currentTick,
-            endTick: e.endTick,
-            isSeek: e.isSeek,
-            originalTempo: e.originalTempo,
-            modifiedTempo: e.modifiedTempo
+            args: e
         });
     }
 
     public onMidiLoadFailed(e: any): void {
         this._main.postMessage({
-            cmd: 'alphaSynth.midiLoaded',
-            error: this._serializeException(Environment.prepareForPostMessage(e))
+            cmd: 'alphaSynth.midiLoadFailed',
+            error: e
         });
     }
 

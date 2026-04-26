@@ -331,6 +331,10 @@ export class TestUiFacade implements IUiFacade<unknown> {
         return null;
     }
 
+    public throttle(action: () => void, delay: number): () => void {
+        return TestPlatform.throttle(action, delay);
+    }
+
     public readonly canRenderChanged: IEventEmitter = new EventEmitter();
     public readonly rootContainerBecameVisible: IEventEmitter = new EventEmitter();
 }

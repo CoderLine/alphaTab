@@ -14,13 +14,17 @@ import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { AlphaSynthWebWorklet } from '@coderline/alphatab/platform/javascript/AlphaSynthAudioWorkletOutput';
-import { AlphaSynthWebWorker } from '@coderline/alphatab/platform/javascript/AlphaSynthWebWorker';
-import { AlphaTabWebWorker } from '@coderline/alphatab/platform/javascript/AlphaTabWebWorker';
+import { BrowserUiFacade } from '@coderline/alphatab/platform/javascript/BrowserUiFacade';
 import { Html5Canvas } from '@coderline/alphatab/platform/javascript/Html5Canvas';
 import { JQueryAlphaTab } from '@coderline/alphatab/platform/javascript/JQueryAlphaTab';
 import { WebPlatform } from '@coderline/alphatab/platform/javascript/WebPlatform';
 import { SkiaCanvas } from '@coderline/alphatab/platform/skia/SkiaCanvas';
 import { CssFontSvgCanvas } from '@coderline/alphatab/platform/svg/CssFontSvgCanvas';
+import { AlphaSynthWebWorker } from '@coderline/alphatab/platform/worker/AlphaSynthWebWorker';
+import { AlphaTabWebWorker } from '@coderline/alphatab/platform/worker/AlphaTabWebWorker';
+import type {
+    IAlphaTabWorkerGlobalScope
+} from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import { EffectBandMode, type BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { AlternateEndingsEffectInfo } from '@coderline/alphatab/rendering/effects/AlternateEndingsEffectInfo';
 import { BeatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
@@ -169,6 +173,15 @@ export class Environment {
 
     /**
      * @target web
+     * @internal
+     * @partial
+     */
+    public static getGlobalWorkerScope<T>(): IAlphaTabWorkerGlobalScope<T> {
+        return Environment.globalThis;
+    }
+
+    /**
+     * @target web
      */
     public static readonly webPlatform: WebPlatform = Environment._detectWebPlatform();
 
@@ -204,30 +217,6 @@ export class Environment {
      */
     public static get isRunningInAudioWorklet(): boolean {
         return 'AudioWorkletGlobalScope' in Environment.globalThis;
-    }
-
-    /**
-     * @target web
-     * @internal
-     */
-    public static createWebWorker: (settings: Settings) => Worker;
-
-    /**
-     * @target web
-     * @internal
-     */
-    public static createAudioWorklet: (context: AudioContext, settings: Settings) => Promise<void>;
-
-    /**
-     * @target web
-     * @partial
-     */
-    public static throttle(action: () => void, delay: number): () => void {
-        let timeoutId: number = 0;
-        return () => {
-            Environment.globalThis.clearTimeout(timeoutId);
-            timeoutId = Environment.globalThis.setTimeout(action, delay);
-        };
     }
 
     /**
@@ -422,7 +411,7 @@ export class Environment {
 
         renderEngines.set(
             'skia',
-            new RenderEngineFactory(false, () => {
+            new RenderEngineFactory(true, () => {
                 return new SkiaCanvas();
             })
         );
@@ -637,7 +626,7 @@ export class Environment {
      * @target web
      */
     public static initializeMain(
-        createWebWorker: (settings: Settings) => Worker,
+        createWebWorker: (settings: Settings, nameHint: string) => Worker,
         createAudioWorklet: (context: AudioContext, settings: Settings) => Promise<void>
     ) {
         if (Environment.isRunningInWorker || Environment.isRunningInAudioWorklet) {
@@ -650,8 +639,9 @@ export class Environment {
             Environment.highDpiFactor = window.devicePixelRatio;
         }
 
-        Environment.createWebWorker = createWebWorker;
-        Environment.createAudioWorklet = createAudioWorklet;
+        BrowserUiFacade.createAlphaTabWebWorker = s => createWebWorker(s, 'alphaTab Renderer');
+        BrowserUiFacade.createAlphaSynthWebWorker = s => createWebWorker(s, 'alphaSynth Worker');
+        BrowserUiFacade.createAlphaSynthAudioWorklet = createAudioWorklet;
     }
 
     /**
@@ -682,9 +672,6 @@ export class Environment {
         }
         AlphaTabWebWorker.init();
         AlphaSynthWebWorker.init();
-        Environment.createWebWorker = _ => {
-            throw new AlphaTabError(AlphaTabErrorType.General, 'Nested workers are not supported');
-        };
     }
 
     /**
@@ -828,6 +815,7 @@ export class Environment {
      * create proxy objects for all objects used. This code handles the necessary unwrapping.
      * @internal
      * @target web
+     * @partial
      */
     public static prepareForPostMessage<T>(object: T): T {
         if (!object) {

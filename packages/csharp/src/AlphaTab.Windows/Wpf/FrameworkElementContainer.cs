@@ -120,6 +120,7 @@ namespace AlphaTab.Wpf
 
 
         private double _targetX = 0;
+
         public void StopAnimation()
         {
             Control.Dispatcher.BeginInvoke((Action)(() =>
@@ -134,8 +135,16 @@ namespace AlphaTab.Wpf
             _targetX = x;
             Control.Dispatcher.BeginInvoke((Action)(() =>
             {
-                Control.BeginAnimation(Canvas.LeftProperty,
-                    new DoubleAnimation(x, new Duration(TimeSpan.FromMilliseconds(duration))));
+                if (duration > 0)
+                {
+                    Control.BeginAnimation(Canvas.LeftProperty,
+                        new DoubleAnimation(x, new Duration(TimeSpan.FromMilliseconds(duration))));
+                }
+                else
+                {
+                    Control.BeginAnimation(Canvas.LeftProperty, null);
+                    Canvas.SetLeft(Control, x);
+                }
             }));
         }
 
