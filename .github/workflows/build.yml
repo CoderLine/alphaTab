@@ -101,7 +101,7 @@ jobs:
       - run: npm run build-kotlin
       - run: npm run test-kotlin
         id: test
-      - uses: dorny/test-reporter@v2
+      - uses: dorny/test-reporter@v3
         if: ${{ always() }}
         with:
           name: Kotlin Tests
