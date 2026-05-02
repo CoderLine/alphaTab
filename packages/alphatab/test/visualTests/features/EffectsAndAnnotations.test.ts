@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { BeatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
+import { describe, expect, it } from 'vitest';
 
 describe('EffectsAndAnnotationsTests', () => {
     it('markers', async () => {
@@ -572,5 +572,29 @@ describe('EffectsAndAnnotationsTests', () => {
                 }
             );
         });
+    });
+
+    describe('hopo-arcs', () => {
+        async function test(test: string, tex: string) {
+            await VisualTestHelper.runVisualTestTex(
+                tex,
+                `test-data/visual-tests/effects-and-annotations/hopo-arcs-${test}.png`
+            );
+        }
+
+        it('at1', async () => await test('at1', ':4 5.3{h} 7.3 r r'));
+        it('at2', async () => await test('at2', ':4 7.3{h} 5.3 r r'));
+        it('at3', async () => await test('at3', ':4 5.3{h} 7.3 7.3{h} 5.3'));
+        it('at4', async () => await test('at4', ':4 5.3{h} 7.3 8.4{h} 5.4'));
+        it('at5', async () => await test('at5', ':4 5.3{h} 7.3{h} 5.3 r'));
+        it('at6', async () => await test('at6', ':8 5.3{h} 7.3{h} 5.3{h} 7.3 r r r r'));
+        it('at7', async () => await test('at7', ':4 5.3{sl} 7.3 r r'));
+        it('at8', async () => await test('at8', ':4 5.3 7.3 5.3 7.3'));
+        it('at9', async () => await test('at9', ':4 (5.3{h} 5.4) (7.3 7.4) r r'));
+        it('at10', async () => await test('at10', ':4 (5.3 5.4{h}) (7.3 7.4) r r'));
+        it('at11', async () => await test('at11', ':4 (5.3{h} 5.4{h}) (7.3 7.4) r r'));
+        it('at12', async () => await test('at12', ':4 (5.3{h} 7.4{h}) (7.3 5.4) r r'));
+        it('at13', async () => await test('at13', ':4 (5.3{h} 7.4{h}) (7.3{h} 5.4{h}) (5.3 7.4) r'));
+        it('at14', async () => await test('at14', ':4 5.3 {h} 7.3{h} 5.3 | 5.4 {h} 7.4{h} 5.4'));
     });
 });

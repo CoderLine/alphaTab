@@ -1,5 +1,6 @@
 import type { Note } from '@coderline/alphatab/model/Note';
-import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import { TextAlign, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
@@ -33,6 +34,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 
     private _startX: number = 0;
     private _startY: number = 0;
+    private _slurTextY: number = 0;
     private _endX: number = 0;
     private _endY: number = 0;
     private _tieHeight: number = 0;
@@ -146,6 +148,25 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         }
 
         this._boundingBox = tieBoundingBox;
+        const slurText = this.getSlurText();
+        if (slurText) {
+            // text will be aligned on the arc with a slight padding
+            const c = this.renderer.scoreRenderer.canvas!;
+            const settings = this.renderer.settings;
+            const res = settings.display.resources;
+            c.font = res.getFontForNotationElement(NotationElement.EffectHammerOnPullOffText);
+            const textSize = c.measureText(slurText);
+            const padding = this.renderer.smuflMetrics.tieMidpointThickness;
+
+            if (this.tieDirection === BeamDirection.Up) {
+                tieBoundingBox.y -= textSize.height + padding;
+                this._slurTextY = tieBoundingBox.y;
+                tieBoundingBox.h += textSize.height + padding;
+            } else {
+                this._slurTextY = tieBoundingBox.y + tieBoundingBox.h + padding;
+                tieBoundingBox.h += textSize.height + padding;
+            }
+        }
 
         this.height = tieBoundingBox.h;
 
@@ -193,18 +214,12 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 
         const slurText = this.getSlurText();
         if (slurText) {
+            const ta = canvas.textAlign;
+            canvas.textAlign = TextAlign.Center;
+            canvas.font = this.renderer.resources.getFontForNotationElement(NotationElement.EffectHammerOnPullOffText);
             const midX = cx + (this._startX + this._endX) / 2;
-            const midY = cy + (this._startY + this._endY) / 2;
-            const apexOffset = this._tieHeight * 0.75;
-            const apexY = midY + (isDown ? apexOffset : -apexOffset);
-            const w = canvas.measureText(slurText).width;
-            const fontSize = canvas.font.size;
-            // text above: fontSize already includes descender space below the baseline,
-            // providing natural padding for capital letters like H/P
-            const textY = isDown
-                ? apexY + fontSize * 0.3
-                : apexY - fontSize * 1.05;
-            canvas.fillText(slurText, midX - w / 2, textY);
+            canvas.fillText(slurText, midX, cy + this._slurTextY);
+            canvas.textAlign = ta;
         }
     }
 

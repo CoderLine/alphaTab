@@ -6,10 +6,17 @@ import { type Mountable, css, html, injectStyles, parseHtml } from '../util/Dom'
 injectStyles(
     'TestResultsApp',
     css`
+    body {
+        justify-content: flex-start;
+    }
+    body > * {
+        overflow: visible;
+    }
     .at-test-results {
         padding: 1rem;
         font-family: 'Noto Sans', sans-serif;
         min-height: 100vh;
+        max-width: 90vw;
     }
     .at-test-results > h1 { margin-top: 0; }
     .at-test-results-toolbar { margin: 1rem 0; }
@@ -26,12 +33,48 @@ injectStyles(
         margin: 0 0 8px 0;
     }
     .at-test-comparer { position: relative; }
-    .at-test-comparer .slider {
+    .at-test-comparer .slider-handle {
         position: absolute;
-        top: 30px;
-        right: 0;
-        left: 0;
-        width: 100%;
+        bottom: 0;
+        width: 40px;
+        transform: translateX(-50%);
+        cursor: ew-resize;
+        z-index: 10;
+        touch-action: none;
+        user-select: none;
+    }
+    .at-test-comparer .slider-handle::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 2px;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 0 4px rgba(0, 0, 0, 0.15);
+        pointer-events: none;
+    }
+    .at-test-comparer .slider-handle::after {
+        content: '';
+        position: sticky;
+        top: calc(50vh - 20px);
+        display: block;
+        width: 40px;
+        height: 40px;
+        margin-top: var(--knob-margin-top, 0);
+        background-color: #fff;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 18L3 12l6-6M15 6l6 6-6 6' fill='none' stroke='%23555' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 22px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(0, 0, 0, 0.15);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.06);
+        pointer-events: none;
+    }
+    .at-test-comparer .slider-handle:hover::after {
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35), 0 0 0 1.5px rgba(0, 0, 0, 0.12);
     }
     .at-test-comparer .expected,
     .at-test-comparer .actual,
@@ -63,9 +106,11 @@ injectStyles(
     body.hide-accepted .at-test-card.accepted { display: none; }
 
     .at-test-controls {
-        position: absolute;
+        position: sticky;
         top: 0;
-        left: 0;
+        z-index: 20;
+        background: #fff;
+        padding: 6px 0;
         display: flex;
         gap: 12px;
         align-items: center;
@@ -199,9 +244,7 @@ export class TestResultsApp implements Mountable {
         this.listEl.replaceChildren();
         this.currentResults = results;
         if (results.length === 0) {
-            const banner = parseHtml(
-                html`<div class="at-test-no-failures">No reported errors on visual tests.</div>`
-            );
+            const banner = parseHtml(html`<div class="at-test-no-failures">No reported errors on visual tests.</div>`);
             this.listEl.appendChild(banner);
             this.updateRemaining();
             return;
@@ -216,15 +259,15 @@ export class TestResultsApp implements Mountable {
         const card = parseHtml(html`
             <div class="at-test-card">
                 <h5 class="at-test-card-title">${result.originalFile}</h5>
+                <div class="at-test-controls">
+                    <label><input type="checkbox" class="diff-toggle" /> Show Diff</label>
+                    <button type="button" class="btn accept">Accept</button>
+                </div>
                 <div class="at-test-comparer">
                     <div class="expected"><img alt="expected" /></div>
                     <div class="actual"><img alt="actual" /></div>
                     <div class="diff"><img alt="diff" /></div>
-                    <input type="range" min="0" max="1" step="0.001" value="0.5" class="slider" />
-                    <div class="at-test-controls">
-                        <label><input type="checkbox" class="diff-toggle" /> Show Diff</label>
-                        <button type="button" class="btn accept">Accept</button>
-                    </div>
+                    <div class="slider-handle"></div>
                 </div>
             </div>
         `);
@@ -232,7 +275,7 @@ export class TestResultsApp implements Mountable {
         const ex = comparer.querySelector<HTMLElement>('.expected')!;
         const ac = comparer.querySelector<HTMLElement>('.actual')!;
         const df = comparer.querySelector<HTMLElement>('.diff')!;
-        const slider = comparer.querySelector<HTMLInputElement>('.slider')!;
+        const handle = comparer.querySelector<HTMLElement>('.slider-handle')!;
         const exImg = ex.querySelector<HTMLImageElement>('img')!;
         const acImg = ac.querySelector<HTMLImageElement>('img')!;
         const dfImg = df.querySelector<HTMLImageElement>('img')!;
@@ -245,26 +288,33 @@ export class TestResultsApp implements Mountable {
 
         const width = Math.max(exImg.width, acImg.width);
         const height = Math.max(exImg.height, acImg.height);
-        const controlsHeight = 60;
         comparer.style.width = `${width}px`;
-        comparer.style.height = `${height + controlsHeight}px`;
+        comparer.style.height = `${height}px`;
         ex.style.width = `${width}px`;
         ex.style.height = `${height}px`;
-        ex.style.top = `${controlsHeight}px`;
         ac.style.width = `${width / 2}px`;
         ac.style.height = `${height}px`;
-        ac.style.top = `${controlsHeight}px`;
         df.style.width = `${width}px`;
         df.style.height = `${height}px`;
-        df.style.top = `${controlsHeight}px`;
 
-        slider.oninput = () => {
-            ac.style.width = `${width * (1 - slider.valueAsNumber)}px`;
-        };
-        comparer.querySelector<HTMLInputElement>('.diff-toggle')!.onchange = e => {
+        handle.style.left = `${width / 2}px`;
+        handle.style.setProperty('--knob-margin-top', `${height / 2 - 20}px`);
+
+        handle.addEventListener('pointerdown', e => {
+            handle.setPointerCapture(e.pointerId);
+            e.preventDefault();
+        });
+        handle.addEventListener('pointermove', e => {
+            if (!e.buttons) { return; }
+            const rect = comparer.getBoundingClientRect();
+            const x = Math.max(0, Math.min(e.clientX - rect.left, width));
+            handle.style.left = `${x}px`;
+            ac.style.width = `${width - x}px`;
+        });
+        card.querySelector<HTMLInputElement>('.diff-toggle')!.onchange = e => {
             df.style.display = (e.target as HTMLInputElement).checked ? 'block' : 'none';
         };
-        const acceptBtn = comparer.querySelector<HTMLButtonElement>('.accept')!;
+        const acceptBtn = card.querySelector<HTMLButtonElement>('.accept')!;
         acceptBtn.onclick = async () => {
             acceptBtn.disabled = true;
             acceptBtn.textContent = 'Accepting...';
