@@ -22,6 +22,7 @@ export { Color } from '@coderline/alphatab/model/Color';
 export { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
 export { Direction } from '@coderline/alphatab/model/Direction';
 export { Duration } from '@coderline/alphatab/model/Duration';
+export { RestPosition } from '@coderline/alphatab/model/RestPosition';
 export { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
 export { FadeType } from '@coderline/alphatab/model/FadeType';
 export { FermataType, Fermata } from '@coderline/alphatab/model/Fermata';

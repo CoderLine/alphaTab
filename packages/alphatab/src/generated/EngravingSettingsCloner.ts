@@ -41,6 +41,8 @@ export class EngravingSettingsCloner {
         clone.repeatOffsetX = new Map(original.repeatOffsetX);
         clone.standardStemLength = original.standardStemLength;
         clone.stemFlagOffsets = new Map(original.stemFlagOffsets);
+        clone.restPositionMain = original.restPositionMain;
+        clone.restPositionSecondary = original.restPositionSecondary;
         clone.glyphTop = new Map(original.glyphTop);
         clone.glyphBottom = new Map(original.glyphBottom);
         clone.glyphWidths = new Map(original.glyphWidths);

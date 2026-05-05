@@ -3,6 +3,7 @@ import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
 import { Logger } from '@coderline/alphatab/Logger';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { MusicFontSymbol, MusicFontSymbolLookup } from '@coderline/alphatab/model/MusicFontSymbol';
+import { RestPosition } from '@coderline/alphatab/model/RestPosition';
 import type { SmuflMetadata } from '@coderline/alphatab/SmuflMetadata';
 
 /**
@@ -255,6 +256,22 @@ export class EngravingSettings {
      * @smufl 1.4
      */
     public stemFlagOffsets: Map<Duration, number> = new Map<Duration, number>();
+
+    /**
+     * Overrides the vertical position of rests for the primary voice (voice 0).
+     * Use {@link RestPosition} constants for named staff line positions.
+     * When null, the position is calculated automatically from the staff line count.
+     * @public
+     */
+    public restPositionMain: RestPosition | null = null;
+
+    /**
+     * Overrides the vertical position of rests for secondary voices (voice 1+).
+     * Use {@link RestPosition} constants for named staff line positions.
+     * When null, the position is calculated automatically from the staff line count.
+     * @public
+     */
+    public restPositionSecondary: RestPosition | null = null;
 
     /**
      * A lookup containing the offset from the visual top to the glyph center.

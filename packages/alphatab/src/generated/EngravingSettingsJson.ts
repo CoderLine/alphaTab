@@ -6,6 +6,7 @@
 import { MusicFontSymbol } from "@coderline/alphatab/model/MusicFontSymbol";
 import { EngravingStemInfoJson } from "@coderline/alphatab/generated/EngravingStemInfoJson";
 import { Duration } from "@coderline/alphatab/model/Duration";
+import { RestPosition } from "@coderline/alphatab/model/RestPosition";
 /**
  * This class holds all all spacing, thickness and scaling metrics
  * related to engraving the music notation.
@@ -184,6 +185,20 @@ export interface EngravingSettingsJson {
      * @smufl 1.4
      */
     stemFlagOffsets?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
+    /**
+     * Overrides the vertical position of rests for the primary voice (voice 0).
+     * Use {@link RestPosition} constants for named staff line positions.
+     * When null, the position is calculated automatically from the staff line count.
+     * @public
+     */
+    restPositionMain?: (RestPosition | null) | keyof typeof RestPosition | Lowercase<keyof typeof RestPosition>;
+    /**
+     * Overrides the vertical position of rests for secondary voices (voice 1+).
+     * Use {@link RestPosition} constants for named staff line positions.
+     * When null, the position is calculated automatically from the staff line count.
+     * @public
+     */
+    restPositionSecondary?: (RestPosition | null) | keyof typeof RestPosition | Lowercase<keyof typeof RestPosition>;
     /**
      * A lookup containing the offset from the visual top to the glyph center.
      * The glyph center is the origin coordinate at which the glyph paths start when drawn on the alphabetic baseline.

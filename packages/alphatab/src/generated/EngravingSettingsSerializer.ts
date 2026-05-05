@@ -9,6 +9,7 @@ import { EngravingStemInfoSerializer } from "@coderline/alphatab/generated/Engra
 import { MusicFontSymbol } from "@coderline/alphatab/model/MusicFontSymbol";
 import { EngravingStemInfo } from "@coderline/alphatab/EngravingSettings";
 import { Duration } from "@coderline/alphatab/model/Duration";
+import { RestPosition } from "@coderline/alphatab/model/RestPosition";
 /**
  * @internal
  */
@@ -79,6 +80,8 @@ export class EngravingSettingsSerializer {
                 m.set(k.toString(), v);
             }
         }
+        o.set("restpositionmain", obj.restPositionMain as number | null);
+        o.set("restpositionsecondary", obj.restPositionSecondary as number | null);
         {
             const m = new Map<string, unknown>();
             o.set("glyphtop", m);
@@ -274,6 +277,12 @@ export class EngravingSettingsSerializer {
                 JsonHelper.forEach(v, (v, k) => {
                     obj.stemFlagOffsets.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number);
                 });
+                return true;
+            case "restpositionmain":
+                obj.restPositionMain = JsonHelper.parseEnum<RestPosition>(v, RestPosition) ?? null;
+                return true;
+            case "restpositionsecondary":
+                obj.restPositionSecondary = JsonHelper.parseEnum<RestPosition>(v, RestPosition) ?? null;
                 return true;
             case "glyphtop":
                 obj.glyphTop = new Map<MusicFontSymbol, number>();

@@ -302,15 +302,29 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _createRestGlyphs() {
         const sr = this.renderer as ScoreBarRenderer;
 
-        let steps = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
+        const engraving = sr.resources.engravingSettings;
+        const voiceIndex = this.container.beat.voice.index;
+        const override = voiceIndex === 0 ? engraving.restPositionMain : engraving.restPositionSecondary;
+        const lineCount = this.renderer.bar.staff.standardNotationLineCount;
+
+        let steps: number;
+
+        // If there is a restPosition settings override and there are 5 staff lines or fewer then use 
+        // it after adjusting its value based on the lineCount other wise just use the standard placement
+        if (override !== null && lineCount <= 5) {
+            steps = override - (5 - lineCount) * 2;
+        } 
+        else {
+            steps = Math.ceil((lineCount - 1) / 2) * 2;
+        }
 
         // this positioning is quite strange, for most staff line counts
         // the whole/rest are aligned as half below the whole rest.
         // but for staff line count 1 and 3 they are aligned centered on the same line.
         if (
             this.container.beat.duration === Duration.Whole &&
-            this.renderer.bar.staff.standardNotationLineCount !== 1 &&
-            this.renderer.bar.staff.standardNotationLineCount !== 3
+            lineCount !== 1 &&
+            lineCount !== 3
         ) {
             steps -= 2;
         }
