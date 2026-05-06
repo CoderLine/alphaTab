@@ -300,11 +300,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     private _createRestGlyphs() {
-        const sr = this.renderer as ScoreBarRenderer;
 
+        const sr = this.renderer as ScoreBarRenderer;
         const engraving = sr.resources.engravingSettings;
-        const voiceIndex = this.container.beat.voice.index;
-        const override = voiceIndex === 0 ? engraving.restPositionMain : engraving.restPositionSecondary;
+        const override = this.container.beat.voice.index === 0 ? engraving.restPositionMain : engraving.restPositionSecondary;
         const lineCount = this.renderer.bar.staff.standardNotationLineCount;
 
         let steps: number;
@@ -313,6 +312,13 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         // it after adjusting its value based on the lineCount other wise just use the standard placement
         if (override !== null && lineCount <= 5) {
             steps = override - (5 - lineCount) * 2;
+            
+            if (
+                this.container.beat.duration === Duration.Whole &&
+                (lineCount == 1 || lineCount == 3)
+            ) {
+                steps -= 1;
+            }
         } 
         else {
             steps = Math.ceil((lineCount - 1) / 2) * 2;
