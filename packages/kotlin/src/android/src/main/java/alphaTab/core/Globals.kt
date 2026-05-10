@@ -374,3 +374,11 @@ internal inline fun <reified T> List<T>.concat(other: Iterable<T>): List<T> {
     copy.push(other)
     return copy
 }
+
+internal inline fun Throwable.cause(): Throwable? {
+    return this.cause
+}
+
+internal inline fun Throwable.stack(): String {
+    return this.stackTraceToString()
+}

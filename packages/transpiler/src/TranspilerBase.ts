@@ -34,7 +34,7 @@ export default function (emitters: Emitter[], handleErrors: boolean) {
     )!;
 
     parsedCommandLine.fileNames = parsedCommandLine.fileNames.filter(
-        f => (!f.includes('playground') && (f.includes('src/')) || f.includes('test/'))
+        f => (!f.includes('playground') && f.includes('src/')) || f.includes('test/')
     );
 
     const pretty = !!ts.sys.writeOutputIsTTY?.();

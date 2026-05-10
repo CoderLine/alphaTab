@@ -6,6 +6,7 @@
     "private": true,
     "scripts": {
         "typecheck": "tsc --noEmit",
+        "lint": "biome lint",
         "test": "vitest run",
         "test-web": "npm run test"
     },

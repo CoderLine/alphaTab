@@ -4,10 +4,14 @@ import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOf
 import { Logger } from '@coderline/alphatab/Logger';
 import type { ISynthOutput, ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
 
+/**
+ * @target web
+ * @internal
+ */
 declare const webkitAudioContext: any;
 
 /**
- * @target 
+ * @target web
  * @internal
  */
 export class AlphaSynthWebAudioSynthOutputDevice implements ISynthOutputDevice {

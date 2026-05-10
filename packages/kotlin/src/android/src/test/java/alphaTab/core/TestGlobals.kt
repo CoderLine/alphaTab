@@ -153,8 +153,7 @@ class NotExpector<T>(private val actual: T, private val message: String? = null)
 }
 
 class Expector<T>(private val actual: T, private val message: String? = null) {
-    val not
-        get() = NotExpector(actual, message)
+    fun not() = NotExpector(actual, message)
 
     fun equal(expected: Any?, message: String? = null) {
         var actualToCheck = actual
