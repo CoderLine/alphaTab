@@ -31,6 +31,7 @@ export class LyricsGlyph extends EffectGlyph {
             this._linePositions.push(y);
             const size = canvas.measureText(line.length > 0 ? line : ' ');
             y += size.height + lineSpacing;
+            this.width = Math.max(this.width, size.width);
         }
         y -= lineSpacing;
 

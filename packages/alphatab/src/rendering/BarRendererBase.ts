@@ -4,7 +4,8 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
-import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import { CanvasHelper, type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import {
@@ -13,7 +14,9 @@ import {
 } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
+import type { LyricsGlyph } from '@coderline/alphatab/rendering/glyphs/LyricsGlyph';
 import { MultiVoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/MultiVoiceContainerGlyph';
+import type { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import { ContinuationTieGlyph, type ITieGlyph, type TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
@@ -283,6 +286,42 @@ export class BarRendererBase {
         }
     }
 
+    public _registerOverlayRods(): void {
+        const info: BarLayoutingInfo = this.layoutingInfo;
+        this._collectOverlayRods(this.topEffects, info);
+        this._collectOverlayRods(this.bottomEffects, info);
+    }
+
+    private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo): void {
+        for (const band of container.bands) {
+            // TODO(overlay-rods, more-types): extend whitelist to chord symbols, tempo
+            // markers, section names, dynamics. Non-SingleOnBeat sizings need a
+            // different extent calculation.
+            const id = band.info.notationElement;
+            if (id !== NotationElement.EffectLyrics && id !== NotationElement.EffectText) {
+                continue;
+            }
+            const bandKey = String(id);
+            for (const glyph of band.iterateAllGlyphs()) {
+                if (!glyph.beat || glyph.width <= 0) {
+                    continue;
+                }
+                const w = glyph.width;
+                const align = (glyph as LyricsGlyph | TextGlyph).textAlign;
+                let leftExtent = w * 0.5;
+                let rightExtent = w * 0.5;
+                if (align === TextAlign.Left) {
+                    leftExtent = 0;
+                    rightExtent = w;
+                } else if (align === TextAlign.Right) {
+                    leftExtent = w;
+                    rightExtent = 0;
+                }
+                info.addOverlayRod(bandKey, glyph.beat.absoluteDisplayStart, leftExtent, rightExtent);
+            }
+        }
+    }
+
     private _appliedLayoutingInfo: number = 0;
 
     public afterReverted() {
@@ -436,6 +475,7 @@ export class BarRendererBase {
         this.createPostBeatGlyphs();
 
         this._registerLayoutingInfo();
+        this._registerOverlayRods();
 
         // registering happened during creation
         this.topEffects.sizeAndAlignEffectBands(false);
@@ -691,6 +731,7 @@ export class BarRendererBase {
         }
 
         this._registerLayoutingInfo();
+        this._registerOverlayRods();
         this.calculateOverflows(0, this.height);
     }
 

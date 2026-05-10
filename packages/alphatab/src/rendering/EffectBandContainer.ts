@@ -28,6 +28,10 @@ export class EffectBandContainer {
         }
     }
 
+    public get bands(): EffectBand[] {
+        return this._bands;
+    }
+
     public get previousContainer(): EffectBandContainer | undefined {
         return this._renderer.index === 0
             ? undefined
