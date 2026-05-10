@@ -50,6 +50,33 @@ export class RenderingResourcesSerializer {
             case "smuflfontfamilyname":
                 obj.smuflFontFamilyName = v as string | undefined;
                 return true;
+            case "copyrightfont":
+                obj.copyrightFont = Font.fromJson(v)!;
+                return true;
+            case "titlefont":
+                obj.titleFont = Font.fromJson(v)!;
+                return true;
+            case "subtitlefont":
+                obj.subTitleFont = Font.fromJson(v)!;
+                return true;
+            case "wordsfont":
+                obj.wordsFont = Font.fromJson(v)!;
+                return true;
+            case "timerfont":
+                obj.timerFont = Font.fromJson(v)!;
+                return true;
+            case "directionsfont":
+                obj.directionsFont = Font.fromJson(v)!;
+                return true;
+            case "fretboardnumberfont":
+                obj.fretboardNumberFont = Font.fromJson(v)!;
+                return true;
+            case "markerfont":
+                obj.markerFont = Font.fromJson(v)!;
+                return true;
+            case "barnumberfont":
+                obj.barNumberFont = Font.fromJson(v)!;
+                return true;
             case "elementfonts":
                 JsonHelper.forEach(v, (v, k) => {
                     obj.elementFonts.set(JsonHelper.parseEnum<NotationElement>(k, NotationElement)!, Font.fromJson(v)!);

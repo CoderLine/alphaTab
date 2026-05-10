@@ -211,6 +211,7 @@ export class MasterBar {
     /**
      * The key signature used on all bars.
      * @deprecated Use key signatures on bar level
+     * @json_read_only
      */
     public get keySignature(): KeySignature {
         return this.score.tracks[0].staves[0].bars[this.index].keySignature;
@@ -227,6 +228,7 @@ export class MasterBar {
     /**
      * The type of key signature (major/minor)
      * @deprecated Use key signatures on bar level
+     * @json_read_only
      */
     public get keySignatureType(): KeySignatureType {
         return this.score.tracks[0].staves[0].bars[this.index].keySignatureType;

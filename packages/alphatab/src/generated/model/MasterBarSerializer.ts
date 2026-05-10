@@ -9,6 +9,8 @@ import { BeamingRulesSerializer } from "@coderline/alphatab/generated/model/Beam
 import { SectionSerializer } from "@coderline/alphatab/generated/model/SectionSerializer";
 import { AutomationSerializer } from "@coderline/alphatab/generated/model/AutomationSerializer";
 import { FermataSerializer } from "@coderline/alphatab/generated/model/FermataSerializer";
+import { KeySignature } from "@coderline/alphatab/model/KeySignature";
+import { KeySignatureType } from "@coderline/alphatab/model/KeySignatureType";
 import { BeamingRules } from "@coderline/alphatab/model/MasterBar";
 import { TripletFeel } from "@coderline/alphatab/model/TripletFeel";
 import { Section } from "@coderline/alphatab/model/Section";
@@ -73,6 +75,12 @@ export class MasterBarSerializer {
         switch (property) {
             case "alternateendings":
                 obj.alternateEndings = v! as number;
+                return true;
+            case "keysignature":
+                obj.keySignature = JsonHelper.parseEnum<KeySignature>(v, KeySignature)!;
+                return true;
+            case "keysignaturetype":
+                obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(v, KeySignatureType)!;
                 return true;
             case "isdoublebar":
                 obj.isDoubleBar = v! as boolean;
