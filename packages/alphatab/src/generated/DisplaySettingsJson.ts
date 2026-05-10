@@ -40,6 +40,34 @@ export interface DisplaySettingsJson {
      */
     stretchForce?: number;
     /**
+     * The proportional spacing ratio between successive note durations.
+     * @since 1.9.0
+     * @category Display
+     * @defaultValue `Math.SQRT2` (≈ 1.414, matches Dorico's default)
+     * @remarks
+     * Controls the *shape* of the horizontal spacing curve - how much wider a note of duration `2d` is rendered relative to a note of duration `d`.
+     * AlphaTab uses a power-law spacing model (the same approach used by Dorico, MuseScore and Finale): doubling the note duration multiplies its
+     * allocated horizontal space by `spacingRatio`.
+     *
+     * Reference values for cross-application comparison:
+     *
+     * | Application / Style        | Ratio                | Character                          |
+     * |----------------------------|----------------------|------------------------------------|
+     * | Dorico default             | √2 ≈ 1.414           | Tight, efficient, orchestral       |
+     * | MuseScore default          | 1.5                  | Balanced, general-purpose          |
+     * | Finale default (Fibonacci) | φ ≈ 1.618            | Loose, traditional engraving       |
+     *
+     * AlphaTab defaults to `√2` (Dorico's value). This produces tighter spacing at long
+     * durations than the alternatives, which matters for guitar tablature where rest bars and
+     * whole notes are common - looser ratios make those bars dominate system width.
+     *
+     * This setting is orthogonal to {@link stretchForce}: `spacingRatio` controls the *shape* of the spacing (proportions between durations),
+     * `stretchForce` controls the overall *density* (how tightly or loosely the music is packed). Both can be adjusted independently.
+     *
+     * Values are clamped to the range `[1.2, 2.0]`. A value of `1.0` would produce equal spacing for all durations and is rejected.
+     */
+    spacingRatio?: number;
+    /**
      * The layouting mode used to arrange the the notation.
      * @remarks
      * AlphaTab has various layout engines that arrange the rendered bars differently. This setting controls which layout mode is used.

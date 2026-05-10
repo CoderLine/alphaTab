@@ -24,7 +24,34 @@ interface BarLayoutingInfoBeatSizes {
  */
 export class BarLayoutingInfo {
     private static readonly _defaultMinDuration: number = 30;
-    private static readonly _defaultMinDurationWidth: number = 7;
+    private static readonly _defaultMinDurationWidth: number = 6.5;
+
+    /**
+     * The valid range for {@link DisplaySettings.spacingRatio}. Values outside this range produce
+     * pathological layouts (`r < 1.2` collapses durations onto each other; `r > 2.0` makes long
+     * durations overwhelmingly dominant). Mirrors the documented public range.
+     */
+    private static readonly _spacingRatioMin: number = 1.2;
+    private static readonly _spacingRatioMax: number = 2.0;
+
+    /**
+     * Computes the exponent used by the power-law spring formula from a user-facing
+     * {@link DisplaySettings.spacingRatio}. Clamps the input to the documented valid range so that
+     * out-of-range settings degrade gracefully instead of producing collapsed or runaway layouts.
+     *
+     * `phi(d, dmin) = (d / dmin) ^ exponent` where `exponent = log2(spacingRatio)`. By construction
+     * `phi(2*dmin, dmin) === spacingRatio`: doubling the duration multiplies horizontal allocation
+     * by the configured ratio.
+     */
+    public static spacingExponentFromRatio(spacingRatio: number): number {
+        let r = spacingRatio;
+        if (r < BarLayoutingInfo._spacingRatioMin) {
+            r = BarLayoutingInfo._spacingRatioMin;
+        } else if (r > BarLayoutingInfo._spacingRatioMax) {
+            r = BarLayoutingInfo._spacingRatioMax;
+        }
+        return Math.log2(r);
+    }
 
     private _timeSortedSprings: Spring[] = [];
     private _minTime: number = -1;
@@ -35,6 +62,18 @@ export class BarLayoutingInfo {
 
     // the smallest duration we have between two springs to ensure we have positive spring constants
     private _minDuration: number = BarLayoutingInfo._defaultMinDuration;
+
+    /**
+     * Precomputed exponent for the power-law spring constant formula. Set at construction time
+     * from {@link DisplaySettings.spacingRatio} via {@link spacingExponentFromRatio}. Defaults to
+     * `log2(√2) = 0.5` to match the {@link DisplaySettings.spacingRatio} default for callers that
+     * construct a {@link BarLayoutingInfo} without explicit settings (e.g. unit tests).
+     */
+    private readonly _spacingExponent: number;
+
+    public constructor(spacingRatio: number = Math.SQRT2) {
+        this._spacingExponent = BarLayoutingInfo.spacingExponentFromRatio(spacingRatio);
+    }
 
     /**
      * an internal version number that increments whenever a change was made.
@@ -380,7 +419,12 @@ export class BarLayoutingInfo {
 
         const minDurationWidth = BarLayoutingInfo._defaultMinDurationWidth;
 
-        const phi: number = 1 + 0.85 * Math.log2(duration / minDuration);
+        // Power-law (Dorico/MuseScore/Finale) model: phi grows as a configurable power of the
+        // duration ratio so that doubling the duration multiplies horizontal allocation by
+        // exactly `spacingRatio` (= 2 ^ _spacingExponent). Replaces the previous additive
+        // `1 + 0.85 * log2(d/dmin)` formula which produced a compressing ratio at long
+        // durations and caused rest-only bars to balloon under high stretch force.
+        const phi: number = (duration / minDuration) ** this._spacingExponent;
         return (smallestDuration / duration) * (1 / (phi * minDurationWidth));
     }
 

@@ -337,7 +337,7 @@ export class StaffSystem {
     ): MasterBarsRenderers {
         const result: MasterBarsRenderers = new MasterBarsRenderers();
         result.additionalMultiBarRestIndexes = additionalMultiBarRestIndexes;
-        result.layoutingInfo = new BarLayoutingInfo();
+        result.layoutingInfo = new BarLayoutingInfo(this.layout.renderer.settings.display.spacingRatio);
         result.masterBar = tracks[0].score.masterBars[barIndex];
         this.masterBarsRenderers.push(result);
 
