@@ -403,11 +403,29 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         // Reconcile now - it's a no-op when nothing changed.
         system.reconcileMinDurationIfDirty();
 
-        if (system.isFull || system.width > this._maxWidth || this.renderer.settings.display.justifyLastSystem) {
-            this._scaleToWidth(system, this._maxWidth);
-        } else {
-            this._scaleToWidth(system, system.width);
+        const display = this.renderer.settings.display;
+        const overflowsAvailable = system.width > this._maxWidth;
+        let shouldJustify = system.isFull || overflowsAvailable;
+
+        // Last-system fill threshold (industry convention from Dorico / MuseScore): the last
+        // system in a flow is justified to fill the row only when its natural fullness meets
+        // the configured `lastSystemFillThreshold`. A threshold of 0 always justifies (matches
+        // legacy `justifyLastSystem = true`); a threshold of 1 never justifies (matches legacy
+        // `justifyLastSystem = false`); intermediate values yield Dorico-style "justify only
+        // when reasonably full" behaviour.
+        //
+        // Overflow is handled before the threshold: if the natural width already exceeds the
+        // available staff width, the system must compress to fit regardless of the threshold,
+        // since otherwise content would overflow horizontally.
+        if (system.isLast && !shouldJustify && this._maxWidth > 0) {
+            const threshold = Math.max(0, Math.min(1, display.lastSystemFillThreshold));
+            const fillRatio = system.width / this._maxWidth;
+            if (fillRatio >= threshold) {
+                shouldJustify = true;
+            }
         }
+
+        this._scaleToWidth(system, shouldJustify ? this._maxWidth : system.width);
         system.finalizeSystem();
     }
 
