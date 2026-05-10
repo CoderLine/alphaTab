@@ -303,22 +303,19 @@ export class TestResultsApp implements Mountable {
         const diffImg = comparer.querySelector<HTMLImageElement>('.diff')!;
         const handle = comparer.querySelector<HTMLElement>('.slider-handle')!;
 
-        const setClip = (x: number, width: number): void => {
-            expected.style.clipPath = `inset(0 ${width - x}px 0 0)`;
+        let fraction = 0.5;
+        const applyClip = (): void => {
+            const width = comparer.getBoundingClientRect().width;
+            if (width === 0) {
+                return;
+            }
+            const x = fraction * width;
+            const expectedRight = Math.max(0, expected.clientWidth - x);
+            expected.style.clipPath = `inset(0 ${expectedRight}px 0 0)`;
             actual.style.clipPath = `inset(0 0 0 ${x}px)`;
             handle.style.left = `${x}px`;
         };
-        const initialiseClip = (): void => {
-            const width = comparer.getBoundingClientRect().width;
-            if (width > 0) {
-                setClip(width / 2, width);
-            }
-        };
-        if (expected.complete && expected.naturalWidth > 0) {
-            initialiseClip();
-        } else {
-            expected.addEventListener('load', initialiseClip, { once: true });
-        }
+        new ResizeObserver(applyClip).observe(comparer);
 
         handle.addEventListener('pointerdown', e => {
             handle.setPointerCapture(e.pointerId);
@@ -333,7 +330,8 @@ export class TestResultsApp implements Mountable {
                 return;
             }
             const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-            setClip(x, rect.width);
+            fraction = x / rect.width;
+            applyClip();
         });
 
         card.querySelector<HTMLInputElement>('.diff-toggle')!.onchange = e => {
