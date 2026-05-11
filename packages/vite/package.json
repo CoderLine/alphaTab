@@ -50,7 +50,7 @@
         "node": ">=20.19.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.14",
+        "@biomejs/biome": "^2.4.15",
         "@microsoft/api-extractor": "^7.56.3",
         "@types/node": "^25.2.2",
         "rimraf": "^6.1.2",

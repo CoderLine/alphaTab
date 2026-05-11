@@ -59,7 +59,7 @@
         "test-accept-reference": "tsx scripts/accept-new-reference-files.ts"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.14",
+        "@biomejs/biome": "^2.4.15",
         "@coderline/alphaskia": "^3.5.147",
         "@coderline/alphaskia-linux": "^3.5.147",
         "@coderline/alphaskia-windows": "^3.5.147",
