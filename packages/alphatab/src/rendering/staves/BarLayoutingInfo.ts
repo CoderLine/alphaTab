@@ -475,7 +475,7 @@ export class BarLayoutingInfo {
         // Last-rod phantom-next-beat: treat the bar's right edge as a phantom beat
         // with leftExtent=0. Natural gap = force/k_last + postBeatSize, floored by
         // lastSpring.postSpringWidth + postBeatSize. Fires only on overflow.
-        // TODO(overlay-rods, more-edges): symmetric handling for the first beat's
+        // TODO: symmetric handling for the first beat's
         // LEFT edge is an accepted MVP gap (no force-scaled gap before first onTime).
         const lastRod = rods[rods.length - 1];
         const lastSpring = sortedSprings[sortedSprings.length - 1];
@@ -548,7 +548,7 @@ export class BarLayoutingInfo {
         // exactly `spacingRatio` (= 2 ^ _spacingExponent). Replaces the previous additive
         // `1 + 0.85 * log2(d/dmin)` formula which produced a compressing ratio at long
         // durations and caused rest-only bars to balloon under high stretch force.
-        const phi: number = (duration / minDuration) ** this._spacingExponent;
+        const phi: number = Math.pow(duration / minDuration, this._spacingExponent);
         return (smallestDuration / duration) * (1 / (phi * minDurationWidth));
     }
 

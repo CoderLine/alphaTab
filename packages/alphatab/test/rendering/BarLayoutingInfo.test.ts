@@ -167,7 +167,7 @@ describe('BarLayoutingInfoPowerLawFormula', () => {
         const phiWhole = phiFromGap(960, 60, r); // d/dmin = 16
         // Whole rest is `r^4 = 1.5^4 = 5.0625` times stiffer in *natural length*, which is the
         // correct, proportional behaviour. The previous formula gave 1.0 for both - the bug.
-        expect(phiWhole / phi16).toBeCloseTo(r ** 4, 4);
+        expect(phiWhole / phi16).toBeCloseTo(Math.pow(r, 4), 4);
     });
 
     it('r = 1.0 produces equal phi for all durations (degenerate baseline)', () => {
@@ -195,7 +195,7 @@ describe('BarLayoutingInfoPowerLawFormula', () => {
         // phi = 0.5 ^ log2(1.5) = 0.5 ^ 0.5849... ≈ 0.6667
         const phi = 1 / (spring.springConstant * minDurationWidth);
         expect(phi).toBeLessThan(1.0);
-        expect(phi).toBeCloseTo(0.5 ** Math.log2(1.5), 6);
+        expect(phi).toBeCloseTo(Math.pow(0.5, Math.log2(1.5)), 6);
     });
 
     describe('spacingExponentFromRatio clamps to documented range', () => {

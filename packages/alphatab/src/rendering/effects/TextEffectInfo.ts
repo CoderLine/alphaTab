@@ -28,6 +28,10 @@ export class TextEffectInfo extends EffectInfo {
         return EffectBarGlyphSizing.SingleOnBeat;
     }
 
+    public override get contributesOverlayRods(): boolean {
+        return true;
+    }
+
     public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return !!beat.text;
     }

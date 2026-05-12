@@ -24,6 +24,10 @@ export class FreeTimeEffectInfo extends EffectInfo {
         return true;
     }
 
+    public override get contributesOverlayRods(): boolean {
+        return true;
+    }
+
     public get sizingMode(): EffectBarGlyphSizing {
         return EffectBarGlyphSizing.SinglePreBeat;
     }

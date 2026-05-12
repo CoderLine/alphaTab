@@ -56,6 +56,15 @@ export abstract class EffectInfo {
     public abstract get sizingMode(): EffectBarGlyphSizing;
 
     /**
+     * Gets a value indicating whether glyphs created by this effect contribute
+     * overlay rods used during bar spacing. Defaults to false; override and
+     * return true to opt in.
+     */
+    public get contributesOverlayRods(): boolean {
+        return false;
+    }
+
+    /**
      * Creates a new effect glyph for the given beat.
      * @param renderer the renderer which requests for glyph creation
      * @param beat the beat storing the data

@@ -4,7 +4,6 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
@@ -294,14 +293,10 @@ export class BarRendererBase {
 
     private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo): void {
         for (const band of container.bands) {
-            // TODO(overlay-rods, more-types): extend whitelist to chord symbols, tempo
-            // markers, section names, dynamics. Non-SingleOnBeat sizings need a
-            // different extent calculation.
-            const id = band.info.notationElement;
-            if (id !== NotationElement.EffectLyrics && id !== NotationElement.EffectText) {
+            if (!band.info.contributesOverlayRods) {
                 continue;
             }
-            const bandKey = String(id);
+            const bandKey = String(band.info.notationElement);
             for (const glyph of band.iterateAllGlyphs()) {
                 if (!glyph.beat || glyph.width <= 0) {
                     continue;
