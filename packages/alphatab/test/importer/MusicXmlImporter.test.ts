@@ -275,6 +275,20 @@ describe('MusicXmlImporterTests', () => {
         expect(score).toMatchSnapshot();
     });
 
+    it('percussion-articulation', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/percussion-articulation.xml');
+        const notes = score.tracks[0].staves[0].bars[0].voices[0].beats.flatMap(b => b.notes);
+
+        expect(notes).toHaveLength(2);
+        expect(notes[0].displayValue).toBe(38);
+        expect(notes[0].isPercussion).toBe(true);
+        expect(notes[0].percussionArticulation).toBe(38);
+
+        expect(notes[1].displayValue).toBe(49);
+        expect(notes[1].isPercussion).toBe(true);
+        expect(notes[1].percussionArticulation).toBe(49);
+    });
+
     describe('barnumberdisplay', async () => {
         async function testPartwise(filename: string, display: BarNumberDisplay) {
             const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/${filename}`);
