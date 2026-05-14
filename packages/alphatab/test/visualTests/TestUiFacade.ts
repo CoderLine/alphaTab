@@ -8,16 +8,18 @@ import {
 import { Settings } from '@coderline/alphatab/Settings';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { Score } from '@coderline/alphatab/model/Score';
-import type { Cursors } from '@coderline/alphatab/platform/Cursors';
+import { Cursors } from '@coderline/alphatab/platform/Cursors';
 import type { IContainer } from '@coderline/alphatab/platform/IContainer';
 import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
 import type { IUiFacade } from '@coderline/alphatab/platform/IUiFacade';
 import type { IScoreRenderer } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import type { IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
 import type { IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExporter';
 import { TestPlatform } from 'test/TestPlatform';
+import { TestOutput } from 'test/audio/TestOutput';
 
 /**
  * @internal
@@ -222,11 +224,18 @@ export class TestUiFacade implements IUiFacade<unknown> {
     }
 
     public createWorkerPlayer(): IAlphaSynth | null {
-        throw new Error('Not supported');
+        return new AlphaSynth(new TestOutput(), 500);
     }
 
+    private _cursors?: Cursors;
     public createCursors(): Cursors | null {
-        return null;
+        this._cursors = this._cursors ?? new Cursors(
+            new TestUiContainer(),
+            new TestUiContainer(),
+            new TestUiContainer(),
+            new TestUiContainer()
+        );
+        return this._cursors;
     }
 
     public destroyCursors(): void {}
@@ -240,7 +249,7 @@ export class TestUiFacade implements IUiFacade<unknown> {
     public highlightElements(_groupId: string, _masterBarIndex: number): void {}
 
     public createSelectionElement(): IContainer | null {
-        return null;
+        return new TestUiContainer();
     }
 
     public getScrollContainer(): IContainer {

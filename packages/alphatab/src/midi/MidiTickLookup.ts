@@ -4,7 +4,7 @@ import { MasterBarTickLookup } from '@coderline/alphatab/midi/MasterBarTickLooku
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
-import type { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
 
 /**
  * Describes how a cursor should be moving.
@@ -187,6 +187,14 @@ export class MidiTickLookup {
      * @internal
      */
     public readonly masterBarLookup: Map<number, MasterBarTickLookup> = new Map();
+
+    /**
+     * A dictionary of all beat played. The index is the id to {@link Beat.id}.
+     * The value is the bar relative tick time at which the beat was registered during midi generation.
+     * This lookup only contains the first time a Beat is played.
+     * @internal
+     */
+    public readonly beatLookup: Map<number, PlaybackRange> = new Map();
 
     /**
      * A list of all {@link MasterBarTickLookup} sorted by time.
@@ -671,11 +679,23 @@ export class MidiTickLookup {
      * @returns The time in midi ticks at which the beat is played the first time or 0 if the beat is not contained
      */
     public getBeatStart(beat: Beat): number {
-        if (!this.masterBarLookup.has(beat.voice.bar.index)) {
+        if (!this.masterBarLookup.has(beat.voice.bar.index) || !this.beatLookup.has(beat.id)) {
             return 0;
         }
 
-        return this.masterBarLookup.get(beat.voice.bar.index)!.start + beat.playbackStart;
+        const mb = this.masterBarLookup.get(beat.voice.bar.index)!;
+        return mb.start + this.beatLookup.get(beat.id)!.startTick;
+    }
+    /**
+     * Gets the playback range in midi ticks for a given beat.
+     * @param beat The beat to find the time period for.
+     * @returns The relative playback range within the parent masterbar at which the beat start and ends playing 
+     */
+    public getRelativeBeatPlaybackRange(beat: Beat): PlaybackRange | undefined{
+        if (!this.beatLookup.has(beat.id)) {
+            return undefined;
+        }
+        return this.beatLookup.get(beat.id)!;
     }
 
     /**
@@ -695,6 +715,12 @@ export class MidiTickLookup {
     }
 
     public addBeat(beat: Beat, start: number, duration: number): void {
+        if (!this.beatLookup.has(beat.id)) {
+            const playbackRange = new PlaybackRange();
+            playbackRange.startTick = start;
+            playbackRange.endTick = start + duration;
+            this.beatLookup.set(beat.id, playbackRange);
+        }
         const currentMasterBar = this._currentMasterBar;
         if (currentMasterBar) {
             // pre-beat grace notes at the start of the bar we also add the beat to the previous bar
