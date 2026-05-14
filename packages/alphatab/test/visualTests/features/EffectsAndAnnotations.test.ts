@@ -1,5 +1,6 @@
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { BeatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestPlatform } from 'test/TestPlatform';
@@ -596,5 +597,43 @@ describe('EffectsAndAnnotationsTests', () => {
         it('at12', async () => await test('at12', ':4 (5.3{h} 7.4{h}) (7.3 5.4) r r'));
         it('at13', async () => await test('at13', ':4 (5.3{h} 7.4{h}) (7.3{h} 5.4{h}) (5.3 7.4) r'));
         it('at14', async () => await test('at14', ':4 5.3 {h} 7.3{h} 5.3 | 5.4 {h} 7.4{h} 5.4'));
+
+        // Pure descending pull-off chain
+        it('pull-off-chain', async () => await test('pull-off-chain', ':4 9.3{h} 7.3{h} 5.3 r'));
+
+        // Mixed hammer-on + legato slide in one chain — the core
+        // "combined effects" case that motivated the redesign. Both
+        // labels (H, sl.) appear above the single arc.
+        it('mixed-h-slide', async () => await test('mixed-h-slide', ':4 5.3{h} 7.3{sl} 9.3 r'));
+        it('mixed-slide-h-p', async () => await test('mixed-slide-h-p', ':4 5.3{sl} 7.3{h} 9.3{h} 7.3'));
+
+        // Chain that swings up then down: H then P inside one arc
+        it('asc-then-desc', async () => await test('asc-then-desc', ':4 5.3{h} 7.3{h} 9.3{h} 7.3{h} 5.3'));
+
+        // Three-note chord with H/P chain on the upper string
+        it('chord-with-chain', async () =>
+            await test('chord-with-chain', ':4 (5.3{h} 5.4 5.5) (7.3{h} 7.4 7.5) (5.3 5.4 5.5) r'));
+
+        // Score-only — confirms ScoreSlurGlyph paints labels even
+        // without the tab staff present.
+        it('score-only', async () =>
+            await test('score-only', '\\track "T" \\staff {score} :4 5.3{h} 7.3{h} 5.3{sl} 7.3'));
+
+        // Tab-only — confirms TabSlurGlyph paints labels in isolation.
+        it('tab-only', async () =>
+            await test('tab-only', '\\track "T" \\staff {tabs} :4 5.3{h} 7.3{h} 5.3{sl} 7.3'));
+
+        // Labels disabled via NotationSettings — arcs still render but
+        // without H/P/sl. text above them.
+        it('labels-disabled', async () => {
+            const settings = new Settings();
+            settings.notation.elements.set(NotationElement.EffectHammerOnPullOffText, false);
+            settings.notation.elements.set(NotationElement.EffectSlideText, false);
+            await VisualTestHelper.runVisualTestTex(
+                ':4 5.3{h} 7.3{h} 5.3{sl} 7.3',
+                'test-data/visual-tests/effects-and-annotations/hopo-arcs-labels-disabled.png',
+                settings
+            );
+        });
     });
 });

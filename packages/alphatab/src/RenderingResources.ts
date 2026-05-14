@@ -54,7 +54,8 @@ export class RenderingResources {
         [NotationElement.BarNumber, new Font(RenderingResources._sansFont, 11, FontStyle.Plain)],
         [NotationElement.ScoreBendSlur, new Font(RenderingResources._sansFont, 11, FontStyle.Plain)],
         [NotationElement.EffectAlternateEndings, new Font(RenderingResources._serifFont, 15, FontStyle.Plain)],
-        [NotationElement.EffectHammerOnPullOffText, RenderingResources._effectFont]
+        [NotationElement.EffectHammerOnPullOffText, RenderingResources._effectFont],
+        [NotationElement.EffectSlideText, RenderingResources._effectFont]
     ]);
 
     /**

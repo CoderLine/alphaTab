@@ -56,56 +56,8 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
             const tapSlur: TabTieGlyph = new TabTieGlyph(`tab.tie.leftHandTap.${n.id}`, n, n, false);
             this.addTie(tapSlur);
         }
-        // H/P arc start-side: create individual arc per hammer-pull pair
-        if (n.isHammerPullOrigin && n.hammerPullDestination) {
-            const dest = n.hammerPullDestination;
-            const slurText = dest.fret >= n.fret ? 'H' : 'P';
-            let expanded: boolean = false;
-            for (const slur of this._effectSlurs) {
-                if (slur.tryExpand(n, dest, false, false, slurText)) {
-                    expanded = true;
-                    break;
-                }
-            }
-            if (!expanded) {
-                const effectSlur: TabSlurGlyph = new TabSlurGlyph(
-                    `tab.slur.effect.${n.id}`,
-                    n,
-                    dest,
-                    false,
-                    false,
-                    slurText
-                );
-                this._effectSlurs.push(effectSlur);
-                this.addTie(effectSlur);
-            }
-        }
-        // H/P arc end-side: for cross-bar rendering
-        if (n.isHammerPullDestination && n.hammerPullOrigin) {
-            const origin = n.hammerPullOrigin;
-            const slurText = n.fret >= origin.fret ? 'H' : 'P';
-            let expanded: boolean = false;
-            for (const slur of this._effectSlurs) {
-                if (slur.tryExpand(origin, n, false, true, slurText)) {
-                    expanded = true;
-                    break;
-                }
-            }
-            if (!expanded) {
-                const effectSlur: TabSlurGlyph = new TabSlurGlyph(
-                    `tab.slur.effect.${origin.id}`,
-                    origin,
-                    n,
-                    false,
-                    true,
-                    slurText
-                );
-                this._effectSlurs.push(effectSlur);
-                this.addTie(effectSlur);
-            }
-        }
-        // start non-H/P effect slur (e.g. legato slide)
-        if (n.isEffectSlurOrigin && n.effectSlurDestination && !n.isHammerPullOrigin) {
+        // start effect slur on first beat
+        if (n.isEffectSlurOrigin && n.effectSlurDestination) {
             let expanded: boolean = false;
             for (const slur of this._effectSlurs) {
                 if (slur.tryExpand(n, n.effectSlurDestination, false, false)) {
@@ -125,8 +77,8 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
                 this.addTie(effectSlur);
             }
         }
-        // end non-H/P effect slur
-        if (n.isEffectSlurDestination && n.effectSlurOrigin && !n.isHammerPullDestination) {
+        // end effect slur on last beat
+        if (n.isEffectSlurDestination && n.effectSlurOrigin) {
             let expanded: boolean = false;
             for (const slur of this._effectSlurs) {
                 if (slur.tryExpand(n.effectSlurOrigin, n, false, true)) {

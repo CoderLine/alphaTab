@@ -378,6 +378,11 @@ export enum NotationElement {
      * The hammer-on pull-off text shown on slurs.
      */
     EffectHammerOnPullOffText = 56,
+
+    /**
+     * The slide text shown on slurs.
+     */
+    EffectSlideText = 57
 }
 
 /**
