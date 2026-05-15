@@ -409,9 +409,7 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].preferredBeamDirection).not.toBeTruthy();
 
         // break
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).toBe(
-            BeatBeamingMode.ForceSplitToNext
-        );
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.ForceSplitToNext);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].invertBeamDirection).toBe(false);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).not.toBeTruthy();
 
@@ -421,9 +419,7 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].invertBeamDirection).toBe(false);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].preferredBeamDirection).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).toBe(
-            BeatBeamingMode.ForceSplitToNext
-        );
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).toBe(BeatBeamingMode.ForceSplitToNext);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].invertBeamDirection).toBe(false);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].preferredBeamDirection).not.toBeTruthy();
 
@@ -449,9 +445,7 @@ describe('Gp5ImporterTest', () => {
         // invert to down
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.Auto);
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].invertBeamDirection).toBe(false);
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).toBe(
-            BeamDirection.Down
-        );
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).toBe(BeamDirection.Down);
 
         // invert to up
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.Auto);
@@ -525,18 +519,14 @@ describe('Gp5ImporterTest', () => {
         expect(score.style!.headerAndFooter.has(ScoreSubElement.Transcriber)).toBe(false);
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.Copyright)).toBe(true);
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).toBe(
-            'Copyright: %COPYRIGHT%'
-        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).toBe('Copyright: %COPYRIGHT%');
         expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.isVisible).toBe(true);
         expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.textAlign).toBe(TextAlign.Center);
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.CopyrightSecondLine)).toBe(true);
         expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.template).toBe('Copyright2');
         expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).toBe(true);
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).toBe(
-            TextAlign.Center
-        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).toBe(TextAlign.Center);
     });
 
     it('bank', async () => {
@@ -579,20 +569,27 @@ describe('Gp5ImporterTest', () => {
         const score = (
             await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/chord-name-overflow.gp5')
         ).readScore();
-        expect(score.tracks.length).to.equal(1);
-        expect(score.masterBars.length).to.equal(193);
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(193);
     });
 
     it('gpReadStringByteLength caps consumption at field width', () => {
         const sentinelByte = 0xca;
         const fieldSize = 21;
         const overlongHint = 32;
-        const buffer = ByteBuffer.fromBuffer(
-            new Uint8Array([overlongHint, ...new Array(fieldSize).fill(0x41), sentinelByte])
-        );
+
+        const raw = new Uint8Array(fieldSize + 2);
+        raw[0] = overlongHint;
+        for(let i = 0; i < fieldSize; i++) {
+            raw[i + 1] = 0x41;
+        }
+        raw[fieldSize + 1] = sentinelByte;
+
+        const buffer = ByteBuffer.fromBuffer(raw);
+
         const result = GpBinaryHelpers.gpReadStringByteLength(buffer, fieldSize, 'utf-8');
-        expect(result).to.equal('A'.repeat(fieldSize));
-        expect(buffer.position).to.equal(1 + fieldSize);
-        expect(buffer.readByte()).to.equal(sentinelByte);
+        expect(result).toBe('A'.repeat(fieldSize));
+        expect(buffer.position).toBe(1 + fieldSize);
+        expect(buffer.readByte()).toBe(sentinelByte);
     });
 });
