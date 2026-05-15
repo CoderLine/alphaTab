@@ -513,7 +513,7 @@ describe('Gp8ImporterTest', () => {
         // bar deletion). Should be skipped instead of null-dereferencing.
         const reader = await prepareImporterWithFile('guitarpro8/orphan-tempo-automation.gp');
         const score = reader.readScore();
-        expect(score.masterBars.length).to.equal(100);
-        expect(score.tracks.length).to.equal(3);
+        expect(score.masterBars.length).toBe(100);
+        expect(score.tracks.length).toBe(3);
     });
 });
