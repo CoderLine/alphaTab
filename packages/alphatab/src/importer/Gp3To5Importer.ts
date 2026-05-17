@@ -174,7 +174,11 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         // contents
         this._barCount = IOHelper.readInt32LE(this.data);
+        this._ensureLoopBoundary(this._barCount, Gp3To5Importer._maxBarCount, 'bar count');
+
         this._trackCount = IOHelper.readInt32LE(this.data);
+        this._ensureLoopBoundary(this._trackCount, Gp3To5Importer._maxTrackCount, 'track count');
+
         this.readMasterBars();
         this.readTracks();
         this.readBars();
@@ -277,6 +281,7 @@ export class Gp3To5Importer extends ScoreImporter {
             this.settings.importer.maxDecodingBufferSize
         );
         const noticeLines: number = IOHelper.readInt32LE(this.data);
+        this._ensureLoopBoundary(noticeLines, Gp3To5Importer._maxNoticeLines, 'notice line count');
         let notice: string = '';
         for (let i: number = 0; i < noticeLines; i++) {
             if (i > 0) {
@@ -289,6 +294,33 @@ export class Gp3To5Importer extends ScoreImporter {
             )?.toString();
         }
         this._score.notices = notice;
+    }
+
+    // very generous thresholds for values which control loop boundaries
+    // prevents DoS or resource exhaustion for corrupt files or files with malicious intent
+    // not configurable, as realistically GP3-5 files will not exceed these values,
+
+    // I don't hink anyone is that verbose in the small GP5 box where you can add notices
+    private static readonly _maxNoticeLines = 1000;
+
+    // I haven't encountered such a long song in the wild. beyond 1000 bars something is clearly off
+    private static readonly _maxBarCount = 1000;
+    
+    // I think GP5 itself limits already to ~10. 100 tracks is just unrealistic, proof me wrong
+    private static readonly _maxTrackCount = 100;
+
+    // nobody reallistically writes that many beats in one bar either.
+    private static readonly _maxBeatCount = 100;
+
+    // I think GP5 already limits this to way less, very generous to allow 4 times more than likely the UI supports
+    private static readonly _maxBendPointCount = BendPoint.MaxPosition * 4;
+
+    private _ensureLoopBoundary(value: number, maximumValue: number, label: string) {
+        if (value > maximumValue) {
+            throw new OverflowError(
+                `'${label}' with value ${value} has exceeded the internal safety threshold of ${maximumValue}`
+            );
+        }
     }
 
     public readLyrics(): void {
@@ -751,6 +783,8 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         const newVoice: Voice = new Voice();
         bar.addVoice(newVoice);
+
+        this._ensureLoopBoundary(beatCount, Gp3To5Importer._maxBeatCount, 'beat count');
         for (let i: number = 0; i < beatCount; i++) {
             this.readBeat(track, bar, newVoice);
         }
@@ -1147,6 +1181,7 @@ export class Gp3To5Importer extends ScoreImporter {
         IOHelper.readInt32LE(this.data); // value
 
         const pointCount: number = IOHelper.readInt32LE(this.data);
+        this._ensureLoopBoundary(pointCount, Gp3To5Importer._maxBendPointCount, 'tremolo bar point count');
         if (pointCount > 0) {
             for (let i: number = 0; i < pointCount; i++) {
                 const point: BendPoint = new BendPoint(0, 0);
@@ -1457,6 +1492,8 @@ export class Gp3To5Importer extends ScoreImporter {
         IOHelper.readInt32LE(this.data); // value
 
         const pointCount: number = IOHelper.readInt32LE(this.data);
+
+        this._ensureLoopBoundary(pointCount, Gp3To5Importer._maxBendPointCount, 'note bend point count');
         if (pointCount > 0) {
             for (let i: number = 0; i < pointCount; i++) {
                 const point: BendPoint = new BendPoint(0, 0);

@@ -12,6 +12,7 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { Clef } from '@coderline/alphatab/model/Clef';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { OverflowError } from '@coderline/alphatab/io/IReadable';
 
 describe('Gp5ImporterTest', () => {
     it('score-info', async () => {
@@ -591,5 +592,12 @@ describe('Gp5ImporterTest', () => {
         expect(result).toBe('A'.repeat(fieldSize));
         expect(buffer.position).toBe(1 + fieldSize);
         expect(buffer.readByte()).toBe(sentinelByte);
+    });
+
+    it('corrupted-bend-point-count', async () => {
+        const reader = await GpImporterTestHelper.prepareImporterWithFile(
+            'corrupt/corrupted-bend-point-count.gp5'
+        );
+        expect(() => reader.readScore()).toThrow(OverflowError);
     });
 });
