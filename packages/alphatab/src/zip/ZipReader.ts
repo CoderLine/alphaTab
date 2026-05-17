@@ -74,7 +74,7 @@ export class ZipReader {
                 target.write(buffer, 0, bytes);
                 if (target.length > this._maxDecodingBufferSize) {
                     throw new OverflowError(
-                        `Zip entry ${fname} contains file contents exceeding the configured maxDecodingBufferSize`
+                        `Zip entry "${fname}" contains data exceeding the configured maxDecodingBufferSize`
                     );
                 }
                 if (bytes < buffer.length) {
