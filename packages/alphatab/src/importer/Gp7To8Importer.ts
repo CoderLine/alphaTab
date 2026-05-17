@@ -78,7 +78,7 @@ export class Gp7To8Importer extends ScoreImporter {
 
         if (binaryStylesheetData) {
             Logger.debug(this.name, 'Start Parsing BinaryStylesheet');
-            const stylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData);
+            const stylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData, this.settings.importer.maxDecodingBufferSize);
             stylesheet.apply(score);
             Logger.debug(this.name, 'BinaryStylesheet parsed');
         }
