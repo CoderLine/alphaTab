@@ -230,7 +230,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private _extractMusicXml(): string {
-        const zip = new ZipReader(this.data);
+        const zip = new ZipReader(this.data, this.settings.importer.maxDecodingBufferSize);
         let entries: ZipEntry[];
         try {
             entries = zip.read();

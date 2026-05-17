@@ -26,7 +26,7 @@ export class Gp7To8Importer extends ScoreImporter {
         // at first we need to load the binary file system
         // from the GPX container
         Logger.debug(this.name, 'Loading ZIP entries');
-        const fileSystem: ZipReader = new ZipReader(this.data);
+        const fileSystem: ZipReader = new ZipReader(this.data, this.settings.importer.maxDecodingBufferSize);
         let entries: ZipEntry[];
         try {
             entries = fileSystem.read();

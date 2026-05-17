@@ -4,7 +4,7 @@ import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
-import type { IReadable } from '@coderline/alphatab/io/IReadable';
+import { OverflowError, type IReadable } from '@coderline/alphatab/io/IReadable';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
 import { Bar, BarLineStyle } from '@coderline/alphatab/model/Bar';
@@ -126,7 +126,11 @@ export class Gp3To5Importer extends ScoreImporter {
         this._initialTempo = Automation.buildTempoAutomation(false, 0, 0, 0);
         if (this._versionNumber >= 500) {
             this.readPageSetup();
-            this._initialTempo.text = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            this._initialTempo.text = GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
         }
         // tempo stuff
         this._initialTempo.value = IOHelper.readInt32LE(this.data);
@@ -224,25 +228,65 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readScoreInformation(): void {
-        this._score.title = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-        this._score.subTitle = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-        this._score.artist = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-        this._score.album = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-        this._score.words = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+        this._score.title = GpBinaryHelpers.gpReadStringIntUnused(
+            this.data,
+            this.settings.importer.encoding,
+            this.settings.importer.maxDecodingBufferSize
+        );
+        this._score.subTitle = GpBinaryHelpers.gpReadStringIntUnused(
+            this.data,
+            this.settings.importer.encoding,
+            this.settings.importer.maxDecodingBufferSize
+        );
+        this._score.artist = GpBinaryHelpers.gpReadStringIntUnused(
+            this.data,
+            this.settings.importer.encoding,
+            this.settings.importer.maxDecodingBufferSize
+        );
+        this._score.album = GpBinaryHelpers.gpReadStringIntUnused(
+            this.data,
+            this.settings.importer.encoding,
+            this.settings.importer.maxDecodingBufferSize
+        );
+        this._score.words = GpBinaryHelpers.gpReadStringIntUnused(
+            this.data,
+            this.settings.importer.encoding,
+            this.settings.importer.maxDecodingBufferSize
+        );
         this._score.music =
             this._versionNumber >= 500
-                ? GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding)
+                ? GpBinaryHelpers.gpReadStringIntUnused(
+                      this.data,
+                      this.settings.importer.encoding,
+                      this.settings.importer.maxDecodingBufferSize
+                  )
                 : this._score.words;
-        this._score.copyright = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-        this._score.tab = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-        this._score.instructions = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+        this._score.copyright = GpBinaryHelpers.gpReadStringIntUnused(
+            this.data,
+            this.settings.importer.encoding,
+            this.settings.importer.maxDecodingBufferSize
+        );
+        this._score.tab = GpBinaryHelpers.gpReadStringIntUnused(
+            this.data,
+            this.settings.importer.encoding,
+            this.settings.importer.maxDecodingBufferSize
+        );
+        this._score.instructions = GpBinaryHelpers.gpReadStringIntUnused(
+            this.data,
+            this.settings.importer.encoding,
+            this.settings.importer.maxDecodingBufferSize
+        );
         const noticeLines: number = IOHelper.readInt32LE(this.data);
         let notice: string = '';
         for (let i: number = 0; i < noticeLines; i++) {
             if (i > 0) {
                 notice += '\r\n';
             }
-            notice += GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding)?.toString();
+            notice += GpBinaryHelpers.gpReadStringIntUnused(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            )?.toString();
         }
         this._score.notices = notice;
     }
@@ -253,7 +297,11 @@ export class Gp3To5Importer extends ScoreImporter {
         for (let i: number = 0; i < 5; i++) {
             const lyrics: Lyrics = new Lyrics();
             lyrics.startBar = IOHelper.readInt32LE(this.data) - 1;
-            lyrics.text = GpBinaryHelpers.gpReadStringInt(this.data, this.settings.importer.encoding);
+            lyrics.text = GpBinaryHelpers.gpReadStringInt(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
             this._lyrics.push(lyrics);
         }
     }
@@ -272,49 +320,89 @@ export class Gp3To5Importer extends ScoreImporter {
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Title).isVisible =
             (flags & (0x01 << 0)) !== 0;
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Title).template =
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
 
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.SubTitle).isVisible =
             (flags & (0x01 << 1)) !== 0;
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.SubTitle).template =
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
 
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Artist).isVisible =
             (flags & (0x01 << 2)) !== 0;
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Artist).template =
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
 
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Album).isVisible =
             (flags & (0x01 << 3)) !== 0;
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Album).template =
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
 
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Words).isVisible =
             (flags & (0x01 << 4)) !== 0;
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Words).template =
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
 
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Music).isVisible =
             (flags & (0x01 << 5)) !== 0;
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Music).template =
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
 
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.WordsAndMusic).isVisible =
             (flags & (0x01 << 6)) !== 0;
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.WordsAndMusic).template =
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
 
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Copyright).isVisible =
             (flags & (0x01 << 7)) !== 0;
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Copyright).template =
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
 
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.CopyrightSecondLine).isVisible =
             (flags & (0x01 << 7)) !== 0;
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.CopyrightSecondLine).template =
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
         // page number format
-        GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        GpBinaryHelpers.gpReadStringIntByte(
+            this.data,
+            this.settings.importer.encoding,
+            this.settings.importer.maxDecodingBufferSize
+        );
     }
 
     public readPlaybackInfos(): void {
@@ -397,7 +485,11 @@ export class Gp3To5Importer extends ScoreImporter {
         // marker
         if ((flags & 0x20) !== 0) {
             const section: Section = new Section();
-            section.text = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            section.text = GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
             section.marker = '';
             GpBinaryHelpers.gpReadColor(this.data, false);
             newMasterBar.section = section;
@@ -589,10 +681,18 @@ export class Gp3To5Importer extends ScoreImporter {
                 this.data.skip(4);
 
                 // RSE: effect name
-                GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+                GpBinaryHelpers.gpReadStringIntByte(
+                    this.data,
+                    this.settings.importer.encoding,
+                    this.settings.importer.maxDecodingBufferSize
+                );
 
                 // RSE: effect category
-                GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+                GpBinaryHelpers.gpReadStringIntByte(
+                    this.data,
+                    this.settings.importer.encoding,
+                    this.settings.importer.maxDecodingBufferSize
+                );
             }
         } else {
             if (tuning[tuning.length - 1] < Gp3To5Importer._bassClefTuningThreshold) {
@@ -732,7 +832,11 @@ export class Gp3To5Importer extends ScoreImporter {
         const beatTextAsLyrics = this.settings.importer.beatTextAsLyrics && track.index !== this._lyricsTrack; // detect if not lyrics track
 
         if ((flags & 0x04) !== 0) {
-            const text = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+            const text = GpBinaryHelpers.gpReadStringIntUnused(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
             if (beatTextAsLyrics) {
                 const lyrics = new Lyrics();
                 lyrics.text = text.trim();
@@ -925,7 +1029,11 @@ export class Gp3To5Importer extends ScoreImporter {
                 }
             } else {
                 const strings: number = this._versionNumber >= 406 ? 7 : 6;
-                chord.name = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+                chord.name = GpBinaryHelpers.gpReadStringIntByte(
+                    this.data,
+                    this.settings.importer.encoding,
+                    this.settings.importer.maxDecodingBufferSize
+                );
                 chord.firstFret = IOHelper.readInt32LE(this.data);
                 if (chord.firstFret > 0) {
                     for (let i: number = 0; i < strings; i++) {
@@ -1109,7 +1217,11 @@ export class Gp3To5Importer extends ScoreImporter {
         const phaser: number = IOHelper.readSInt8(this.data);
         const tremolo: number = IOHelper.readSInt8(this.data);
         if (this._versionNumber >= 500) {
-            tableChange.tempoName = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            tableChange.tempoName = GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
         }
         tableChange.tempo = IOHelper.readInt32LE(this.data);
 
@@ -1155,8 +1267,16 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         // unknown
         if (this._versionNumber >= 510) {
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
+            GpBinaryHelpers.gpReadStringIntByte(
+                this.data,
+                this.settings.importer.encoding,
+                this.settings.importer.maxDecodingBufferSize
+            );
         }
         if (tableChange.volume >= 0) {
             const volumeAutomation: Automation = new Automation();
@@ -1529,28 +1649,36 @@ export class GpBinaryHelpers {
      * Skips an integer (4byte) and reads a string using
      * a bytesize
      */
-    public static gpReadStringIntUnused(data: IReadable, encoding: string): string {
+    public static gpReadStringIntUnused(data: IReadable, encoding: string, maxDecodingBufferSize: number): string {
         data.skip(4);
-        return GpBinaryHelpers.gpReadString(data, data.readByte(), encoding);
+        return GpBinaryHelpers.gpReadString(data, data.readByte(), encoding, maxDecodingBufferSize);
     }
 
     /**
      * Reads an integer as size, and then the string itself
      */
-    public static gpReadStringInt(data: IReadable, encoding: string): string {
-        return GpBinaryHelpers.gpReadString(data, IOHelper.readInt32LE(data), encoding);
+    public static gpReadStringInt(data: IReadable, encoding: string, maxDecodingBufferSize: number): string {
+        return GpBinaryHelpers.gpReadString(data, IOHelper.readInt32LE(data), encoding, maxDecodingBufferSize);
     }
 
     /**
      * Reads an integer as size, skips a byte and reads the string itself
      */
-    public static gpReadStringIntByte(data: IReadable, encoding: string): string {
+    public static gpReadStringIntByte(data: IReadable, encoding: string, maxDecodingBufferSize: number): string {
         const length: number = IOHelper.readInt32LE(data) - 1;
         data.readByte();
-        return GpBinaryHelpers.gpReadString(data, length, encoding);
+        return GpBinaryHelpers.gpReadString(data, length, encoding, maxDecodingBufferSize);
     }
 
-    public static gpReadString(data: IReadable, length: number, encoding: string): string {
+    public static gpReadString(
+        data: IReadable,
+        length: number,
+        encoding: string,
+        maxDecodingBufferSize: number
+    ): string {
+        if (length > maxDecodingBufferSize) {
+            throw new OverflowError(`Detected string exceeding maxDecodingBufferSize at offset ${data.position}`);
+        }
         const b: Uint8Array = new Uint8Array(length);
         data.read(b, 0, b.length);
         return IOHelper.toString(b, encoding);

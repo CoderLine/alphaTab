@@ -352,7 +352,7 @@ export class TestResultsApp implements Mountable {
             if (!(buffer instanceof ArrayBuffer)) {
                 return;
             }
-            const zip = new ZipReader(ByteBuffer.fromBuffer(new Uint8Array(buffer)));
+            const zip = new ZipReader(ByteBuffer.fromBuffer(new Uint8Array(buffer)), 128000000);
             const entries = zip.read();
             const grouped = new Map<string, TestResult>();
             for (const entry of entries) {

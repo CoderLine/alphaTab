@@ -8,7 +8,7 @@ import { TestPlatform } from 'test/TestPlatform';
 describe('ZipReaderWriter', () => {
     it('simple-read', async () => {
         const data = await TestPlatform.loadFile('test-data/guitarpro7/score-info.gp');
-        const reader = new ZipReader(ByteBuffer.fromBuffer(data));
+        const reader = new ZipReader(ByteBuffer.fromBuffer(data), 128000000);
         const entries = reader.read();
 
         expect(entries.map(e => e.fileName).join(',')).toBe(
@@ -45,7 +45,7 @@ describe('ZipReaderWriter', () => {
         writer.end();
 
         data.position = 0;
-        const reader = new ZipReader(data);
+        const reader = new ZipReader(data, 128000000);
         const entries = reader.read();
 
         expect(entries[0].fileName).toBe('File01.txt');

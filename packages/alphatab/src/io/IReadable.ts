@@ -49,11 +49,22 @@ export interface IReadable {
 }
 
 /**
- * @internal
+ * Thrown whenever we hit the end of input data unexpectedly.
+ * @public
  */
 export class EndOfReaderError extends AlphaTabError {
     public constructor() {
         super(AlphaTabErrorType.Format, 'Unexpected end of data within reader');
+    }
+}
+
+/**
+ * Thrown whenever an overflow in data or buffer sizes is detected.
+ * @public
+ */
+export class OverflowError extends AlphaTabError {
+    public constructor(message: string) {
+        super(AlphaTabErrorType.Format, message);
     }
 }
 
