@@ -368,6 +368,10 @@ internal class Expector<T>
         {
             CollectionAssert.Contains(collection, element, _message);
         }
+        else if(_actual is string s)
+        {
+            Assert.Contains((string)element, s, _message);
+        }
         else
         {
             Assert.Fail("Contain can only be used with collection operands");

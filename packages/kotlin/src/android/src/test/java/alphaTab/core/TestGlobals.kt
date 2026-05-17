@@ -231,6 +231,11 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
                 message ?: "Expected collection ${actual.joinToString(",")} to contain $value",
                 actual.contains(value)
             )
+        } else if(actual is String) {
+            Assert.assertTrue(
+                message ?: "Expected string $actual to contain $value",
+                actual.contains(value as String)
+            )
         } else {
             Assert.fail("contain can only be used with Iterable operands");
         }
