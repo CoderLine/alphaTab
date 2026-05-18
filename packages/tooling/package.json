@@ -14,7 +14,7 @@
         "@rollup/plugin-typescript": "^12.3.0",
         "rollup-plugin-license": "^3.7.0",
         "rollup-plugin-node-externals": "^9.0.1",
-        "typescript": "^5.9.3",
+        "typescript": "^6.0.3",
         "vite-tsconfig-paths": "^6.1.1",
         "vitest": "^4.1.6"
     }
