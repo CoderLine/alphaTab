@@ -5,10 +5,11 @@ import { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
 import { ZipWriter } from '@coderline/alphatab/zip/ZipWriter';
 import { TestPlatform } from 'test/TestPlatform';
+import { OverflowError } from '@coderline/alphatab/io/IReadable';
 describe('ZipReaderWriter', () => {
     it('simple-read', async () => {
         const data = await TestPlatform.loadFile('test-data/guitarpro7/score-info.gp');
-        const reader = new ZipReader(ByteBuffer.fromBuffer(data));
+        const reader = new ZipReader(ByteBuffer.fromBuffer(data), 128000000);
         const entries = reader.read();
 
         expect(entries.map(e => e.fileName).join(',')).toBe(
@@ -45,7 +46,7 @@ describe('ZipReaderWriter', () => {
         writer.end();
 
         data.position = 0;
-        const reader = new ZipReader(data);
+        const reader = new ZipReader(data, 128000000);
         const entries = reader.read();
 
         expect(entries[0].fileName).toBe('File01.txt');
@@ -56,5 +57,70 @@ describe('ZipReaderWriter', () => {
 
         expect(entries[3].fileName).toBe('LargeFile');
         expect(IOHelper.toString(entries[3].data, 'utf-8')).toBe(text);
+    });
+
+    describe('corrupt', () => {
+        async function corruptTest(
+            maxBuffer: number,
+            mainpulate: (buffer: Uint8Array) => void,
+            expectedOverflowLabel: string
+        ) {
+            const buffer = await TestPlatform.loadFile(`test-data/corrupt/healthy.gp`);
+
+            mainpulate(buffer);
+
+            const importer = new ZipReader(ByteBuffer.fromBuffer(buffer), maxBuffer);
+
+            try {
+                importer.read();
+                throw new Error('Expected zip read to fail with an OverflowError');
+            } catch (e) {
+                if (e instanceof OverflowError) {
+                    expect((e as OverflowError).message).toContain(expectedOverflowLabel);
+                    return;
+                }
+                throw e;
+            }
+        }
+
+        // properly announce compressed size which exceeds the range (100kb max, 300kb announced)
+        it('uncompressed-size', async () =>
+            await corruptTest(
+                100000,
+                buffer => {
+                    const intToWrite = 300000;
+                    buffer[22] = (intToWrite >> 0) & 0xff;
+                    buffer[23] = (intToWrite >> 8) & 0xff;
+                    buffer[24] = (intToWrite >> 16) & 0xff;
+                    buffer[25] = (intToWrite >> 24) & 0xff;
+                },
+                'contains files exceeding'
+            ));
+
+        // properly announce filename size which exceeds the range (30kb max, 31kb announced)
+        it('filename', async () =>
+            await corruptTest(
+                30000,
+                buffer => {
+                    const shortToWrite = 31000;
+                    buffer[26] = (shortToWrite >> 0) & 0xff;
+                    buffer[27] = (shortToWrite >> 8) & 0xff;
+                },
+                'contains file names exceeding'
+            ));
+
+        // unexpected large inflation (binary stylesheet is ~21kb, limit to 15kb and fake binary stylesheet to be in-limit )
+        it('inflate', async () =>
+            await corruptTest(
+                15000,
+                buffer => {
+                    const intToWrite = 10000;
+                    buffer[60] = (intToWrite >> 0) & 0xff;
+                    buffer[61] = (intToWrite >> 8) & 0xff;
+                    buffer[62] = (intToWrite >> 16) & 0xff;
+                    buffer[63] = (intToWrite >> 24) & 0xff;
+                },
+                'Zip entry "Content/BinaryStylesheet" contains data'
+            ));
     });
 });

@@ -193,7 +193,8 @@ describe('Gp7ExporterTest', () => {
     it('percussion-articulations', async () => {
         const settings = new Settings();
         const zip = new ZipReader(
-            ByteBuffer.fromBuffer(await TestPlatform.loadFile('test-data/exporter/articulations.gp'))
+            ByteBuffer.fromBuffer(await TestPlatform.loadFile('test-data/exporter/articulations.gp')),
+            settings.importer.maxDecodingBufferSize
         ).read();
         const gpifData = zip.find(e => e.fileName === 'score.gpif')!.data;
 
@@ -371,7 +372,8 @@ describe('Gp7ExporterTest', () => {
     it('sound-mapper', async () => {
         const settings = new Settings();
         const zip = new ZipReader(
-            ByteBuffer.fromBuffer(await TestPlatform.loadFile('test-data/exporter/articulations.gp'))
+            ByteBuffer.fromBuffer(await TestPlatform.loadFile('test-data/exporter/articulations.gp')), 
+            settings.importer.maxDecodingBufferSize
         ).read();
         const gpifData = zip.find(e => e.fileName === 'score.gpif')!.data;
 
@@ -416,7 +418,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     function getInstrumentSet(gp: Uint8Array) {
-        const zip = new ZipReader(ByteBuffer.fromBuffer(gp));
+        const zip = new ZipReader(ByteBuffer.fromBuffer(gp), new Settings().importer.maxDecodingBufferSize);
         const gpifData = zip.read().find(e => e.fileName === 'score.gpif')!.data;
         const xml = new XmlDocument();
         xml.parse(IOHelper.toString(gpifData, ''));

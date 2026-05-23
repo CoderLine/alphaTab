@@ -69,7 +69,7 @@ export class GpxImporter extends ScoreImporter {
 
         if (binaryStylesheetData) {
             Logger.debug(this.name, 'Start Parsing BinaryStylesheet');
-            const binaryStylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData);
+            const binaryStylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData, this.settings.importer.maxDecodingBufferSize);
             binaryStylesheet.apply(score);
             Logger.debug(this.name, 'BinaryStylesheet parsed');
         }

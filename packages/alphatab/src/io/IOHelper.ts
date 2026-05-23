@@ -155,7 +155,7 @@ export class IOHelper {
             encoding = 'utf-8';
         }
         const decoder: TextDecoder = new TextDecoder(encoding);
-        return decoder.decode(data.buffer as ArrayBuffer);
+        return decoder.decode(data);
     }
 
     private static _detectEncoding(data: Uint8Array): string | null {

@@ -21,7 +21,7 @@ export class CapellaImporter extends ScoreImporter {
 
     public readScore(): Score {
         Logger.debug(this.name, 'Loading ZIP entries');
-        const fileSystem: ZipReader = new ZipReader(this.data);
+        const fileSystem: ZipReader = new ZipReader(this.data, this.settings.importer.maxDecodingBufferSize);
         let entries: ZipEntry[];
         let xml: string | null = null;
         entries = fileSystem.read();

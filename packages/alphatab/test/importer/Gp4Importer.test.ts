@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
+import { describe, expect, it } from 'vitest';
 describe('Gp4ImporterTest', () => {
     it('score-info', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro4/score-info.gp4');
@@ -139,5 +140,37 @@ describe('Gp4ImporterTest', () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro4/colors.gp4');
         const score: Score = reader.readScore();
         GpImporterTestHelper.checkColors(score);
+    });
+
+    it('harmonic-types', async () => {
+        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro4/harmonic-types.gp4');
+        const score = reader.readScore();
+        const b0 = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        expect(b0.notes[0].harmonicType).toBe(HarmonicType.Natural);
+        expect(b0.notes[0].harmonicValue).toBe(12);
+
+        const b1 = score.tracks[0].staves[0].bars[0].voices[0].beats[1];
+        expect(b1.notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(b1.notes[0].harmonicValue).toBe(5);
+
+        const b2 = score.tracks[0].staves[0].bars[0].voices[0].beats[2];
+        expect(b2.notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(b2.notes[0].harmonicValue).toBe(7);
+
+        const b3 = score.tracks[0].staves[0].bars[0].voices[0].beats[3];
+        expect(b3.notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(b3.notes[0].harmonicValue).toBe(12);
+
+        const b4 = score.tracks[0].staves[0].bars[1].voices[0].beats[0];
+        expect(b4.notes[0].harmonicType).toBe(HarmonicType.Tap);
+        expect(b4.notes[0].harmonicValue).toBe(12);
+
+        const b5 = score.tracks[0].staves[0].bars[1].voices[0].beats[1];
+        expect(b5.notes[0].harmonicType).toBe(HarmonicType.Pinch);
+        expect(b5.notes[0].harmonicValue).toBe(12);
+
+        const b6 = score.tracks[0].staves[0].bars[1].voices[0].beats[2];
+        expect(b6.notes[0].harmonicType).toBe(HarmonicType.Semi);
+        expect(b6.notes[0].harmonicValue).toBe(12);
     });
 });

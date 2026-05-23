@@ -1,11 +1,11 @@
-import { describe, expect, it } from 'vitest';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { BrushType } from '@coderline/alphatab/model/BrushType';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
-import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { describe, expect, it } from 'vitest';
 describe('Gp3ImporterTest', () => {
     it('score-info', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/score-info.gp3');
@@ -155,4 +155,20 @@ describe('Gp3ImporterTest', () => {
         const score: Score = reader.readScore();
         GpImporterTestHelper.checkStrings(score);
     });
+
+    it('beat-harmonics', async () => {
+        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/beat-harmonics.gp3');
+        const score = reader.readScore();
+        const b0 = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        const b1 = score.tracks[0].staves[0].bars[0].voices[0].beats[1];
+        expect(b0.notes[0].harmonicType).toBe(HarmonicType.Natural);
+        expect(b0.notes[0].harmonicValue).toBe(12);
+        expect(b0.notes[1].harmonicType).toBe(HarmonicType.Natural);
+        expect(b0.notes[1].harmonicValue).toBe(12);
+        expect(b1.notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(b1.notes[0].harmonicValue).toBe(12);
+        expect(b1.notes[1].harmonicType).toBe(HarmonicType.Artificial);
+        expect(b1.notes[1].harmonicValue).toBe(12);
+    });
 });
+     

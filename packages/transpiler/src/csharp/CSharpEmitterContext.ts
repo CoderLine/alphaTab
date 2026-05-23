@@ -73,13 +73,14 @@ export default class CSharpEmitterContext {
 
     public isPropertySymbol(tsSymbol: ts.Symbol) {
         if (
-            (tsSymbol.flags & (ts.SymbolFlags.Property | ts.SymbolFlags.GetAccessor | ts.SymbolFlags.SetAccessor)) !== 0
+            (tsSymbol.flags & (ts.SymbolFlags.Property | ts.SymbolFlags.GetAccessor | ts.SymbolFlags.SetAccessor)) !==
+            0
         ) {
             return true;
         }
 
         // globals
-        if((tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable) !== 0 && this.isGlobalVariable(tsSymbol)) {
+        if ((tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable) !== 0 && this.isGlobalVariable(tsSymbol)) {
             return true;
         }
 
@@ -645,19 +646,9 @@ export default class CSharpEmitterContext {
                 } as cs.TypeReference;
 
                 // remove ArrayBuffer type arguments
-                switch (symbolName) {
-                    case 'Int8Array':
-                    case 'Uint8Array':
-                    case 'Int16Array':
-                    case 'Uint16Array':
-                    case 'Int32Array':
-                    case 'Uint32Array':
-                    case 'Float32Array':
-                    case 'Float64Array':
-                    case 'DataView':
-                        typeRef.typeArguments = [];
-                        typeRef.tsSymbol = undefined;
-                        break;
+                if (this._isTypedArrayName(symbolName)) {
+                    typeRef.typeArguments = [];
+                    typeRef.tsSymbol = undefined;
                 }
 
                 if (!typeRef.typeArguments && (tsType as ts.Type).aliasTypeArguments) {
@@ -668,6 +659,21 @@ export default class CSharpEmitterContext {
 
                 return typeRef;
         }
+    }
+    private _isTypedArrayName(symbolName: string) {
+        switch (symbolName) {
+            case 'Int8Array':
+            case 'Uint8Array':
+            case 'Int16Array':
+            case 'Uint16Array':
+            case 'Int32Array':
+            case 'Uint32Array':
+            case 'Float32Array':
+            case 'Float64Array':
+            case 'DataView':
+                return true;
+        }
+        return false;
     }
 
     private resolveExternalModuleOfType(tsSymbol: ts.Symbol): string | undefined {
@@ -844,7 +850,8 @@ export default class CSharpEmitterContext {
                 return null;
             }
 
-            if ('typeArguments' in pTsType && cs.isTypeReference(pType)) {
+            if(!this._isTypedArrayName(pTsType.symbol?.name ?? '')
+                && 'typeArguments' in pTsType && cs.isTypeReference(pType)) {
                 const args = this.typeChecker.getTypeArguments(pTsType as ts.TypeReference);
                 if (args.length > 0) {
                     pType.typeArguments = args.map(a => this.getTypeFromTsType(pType, a)!);

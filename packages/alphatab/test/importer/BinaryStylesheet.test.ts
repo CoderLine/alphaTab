@@ -5,7 +5,7 @@ import { TestPlatform } from 'test/TestPlatform';
 describe('BinaryStylesheetParserTest', () => {
     it('testRead', async () => {
         const data = await TestPlatform.loadFile('test-data/guitarpro7/BinaryStylesheet');
-        const stylesheet: BinaryStylesheet = new BinaryStylesheet(data);
+        const stylesheet: BinaryStylesheet = new BinaryStylesheet(data, 1280000);
 
         expect(stylesheet.raw.has('Global/chordNameStyle')).toBe(true);
         expect(stylesheet.raw.get('Global/chordNameStyle')).toBe(2);

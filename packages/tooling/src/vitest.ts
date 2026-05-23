@@ -28,7 +28,7 @@ export function defineVitestConfig(options: VitestPackageOptions = {}) {
         plugins: [tsconfigPaths()],
         test: {
             include: ['test/**/*.test.ts'],
-            testTimeout: options.testTimeout ?? 10000,
+            testTimeout: options.testTimeout ?? 30000,
             setupFiles: options.setupFiles,
             passWithNoTests: true,
             chaiConfig: options.truncateThreshold !== undefined

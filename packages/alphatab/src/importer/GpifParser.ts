@@ -2892,6 +2892,10 @@ export class GpifParser {
 
         // build masterbar automations
         for (const [barNumber, automations] of this._masterTrackAutomations) {
+            if (barNumber < 0 || barNumber >= this.score.masterBars.length) {
+                // automation references a bar that is not in the score's masterBars list
+                continue;
+            }
             const masterBar: MasterBar = this.score.masterBars[barNumber];
             for (let i: number = 0, j: number = automations.length; i < j; i++) {
                 const automation: Automation = automations[i];

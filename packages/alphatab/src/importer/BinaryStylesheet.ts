@@ -76,18 +76,18 @@ export class BinaryStylesheet {
     private readonly _types: Map<string, DataType> = new Map();
     public readonly raw: Map<string, unknown> = new Map();
 
-    public constructor(data?: Uint8Array) {
+    public constructor(data?: Uint8Array, maxDecodingBufferSize: number = 0) {
         if (data) {
-            this._read(data);
+            this._read(data, maxDecodingBufferSize);
         }
     }
 
-    private _read(data: Uint8Array) {
+    private _read(data: Uint8Array, maxDecodingBufferSize: number) {
         // BinaryStylesheet apears to be big-endien
         const readable: ByteBuffer = ByteBuffer.fromBuffer(data);
         const entryCount: number = IOHelper.readInt32BE(readable);
         for (let i: number = 0; i < entryCount; i++) {
-            const key: string = GpBinaryHelpers.gpReadString(readable, readable.readByte(), 'utf-8');
+            const key: string = GpBinaryHelpers.gpReadString(readable, readable.readByte(), 'utf-8', maxDecodingBufferSize);
             const type: DataType = readable.readByte() as DataType;
             this._types.set(key, type);
             switch (type) {
@@ -104,7 +104,7 @@ export class BinaryStylesheet {
                     this.addValue(key, fvalue);
                     break;
                 case DataType.String:
-                    const s: string = GpBinaryHelpers.gpReadString(readable, IOHelper.readInt16BE(readable), 'utf-8');
+                    const s: string = GpBinaryHelpers.gpReadString(readable, IOHelper.readInt16BE(readable), 'utf-8', maxDecodingBufferSize);
                     this.addValue(key, s);
                     break;
                 case DataType.Point:

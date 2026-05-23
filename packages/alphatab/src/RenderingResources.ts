@@ -53,7 +53,9 @@ export class RenderingResources {
         [NotationElement.RepeatCount, new Font(RenderingResources._sansFont, 11, FontStyle.Plain)],
         [NotationElement.BarNumber, new Font(RenderingResources._sansFont, 11, FontStyle.Plain)],
         [NotationElement.ScoreBendSlur, new Font(RenderingResources._sansFont, 11, FontStyle.Plain)],
-        [NotationElement.EffectAlternateEndings, new Font(RenderingResources._serifFont, 15, FontStyle.Plain)]
+        [NotationElement.EffectAlternateEndings, new Font(RenderingResources._serifFont, 15, FontStyle.Plain)],
+        [NotationElement.EffectHammerOnPullOffText, RenderingResources._effectFont],
+        [NotationElement.EffectSlideText, RenderingResources._effectFont]
     ]);
 
     /**
@@ -381,8 +383,16 @@ export class RenderingResources {
                 break;
         }
 
+        return this.getFontForNotationElement(notationElement);
+    }
+
+    /**
+     * @internal
+     * @param element
+     */
+    public getFontForNotationElement(notationElement: NotationElement): Font {
         return this.elementFonts.has(notationElement)
             ? this.elementFonts.get(notationElement)!
-            : RenderingResources.defaultFonts.get(NotationElement.ScoreWords)!;
+            : RenderingResources.defaultFonts.get(notationElement)!;
     }
 }

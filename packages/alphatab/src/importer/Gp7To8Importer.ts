@@ -26,7 +26,7 @@ export class Gp7To8Importer extends ScoreImporter {
         // at first we need to load the binary file system
         // from the GPX container
         Logger.debug(this.name, 'Loading ZIP entries');
-        const fileSystem: ZipReader = new ZipReader(this.data);
+        const fileSystem: ZipReader = new ZipReader(this.data, this.settings.importer.maxDecodingBufferSize);
         let entries: ZipEntry[];
         try {
             entries = fileSystem.read();
@@ -78,7 +78,7 @@ export class Gp7To8Importer extends ScoreImporter {
 
         if (binaryStylesheetData) {
             Logger.debug(this.name, 'Start Parsing BinaryStylesheet');
-            const stylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData);
+            const stylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData, this.settings.importer.maxDecodingBufferSize);
             stylesheet.apply(score);
             Logger.debug(this.name, 'BinaryStylesheet parsed');
         }
