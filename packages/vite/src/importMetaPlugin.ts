@@ -75,7 +75,7 @@ function getWorkerType(code: string, match: RegExpExecArray): AlphaTabWorkerType
         return AlphaTabWorkerTypes.AudioWorklet;
     }
 
-    const endOfMatch = match.indices![0][1];
+    const endOfMatch = match.indices![0]![1];
 
     const startOfOptions = code.indexOf('{', endOfMatch);
     if (startOfOptions === -1) {
@@ -141,8 +141,12 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
 
             let s: MagicString | undefined;
 
+            // Match `new alphaTabWorker(new ...alphaTabUrl(...))` and any
+            // `<expr>.addModule(new ...alphaTabUrl(...))` (the worklet path,
+            // which may have its alias inlined away). Worker vs worklet is
+            // disambiguated by `getWorkerType` based on the URL string.
             const alphaTabWorkerPattern =
-                /\b(alphaTabWorker|alphaTabWorklet\.addModule)\s*\(\s*(new\s+[^ (]+alphaTabUrl\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))/dg;
+                /\b(alphaTabWorker|[\w.]+\.addModule)\s*\(\s*(new\s+[^ (]+alphaTabUrl\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))/dg;
 
             let match: RegExpExecArray | null = alphaTabWorkerPattern.exec(code);
             while (match) {
@@ -166,7 +170,7 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
 
                 s ??= new MagicString(code);
 
-                const url = code.slice(match.indices![3][0] + 1, match.indices![3][1] - 1);
+                const url = code.slice(match.indices![3]![0] + 1, match.indices![3]![1] - 1);
 
                 let file = path.resolve(path.dirname(id), url);
                 file =
@@ -182,8 +186,8 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
                     builtUrl = injectQuery(builtUrl, `${WORKER_FILE_ID}&type=${workerType}`);
                 }
                 s.update(
-                    match.indices![3][0],
-                    match.indices![3][1],
+                    match.indices![3]![0],
+                    match.indices![3]![1],
                     // add `'' +` to skip vite:asset-import-meta-url plugin
                     `new URL('' + ${JSON.stringify(builtUrl)}, import.meta.url)`
                 );

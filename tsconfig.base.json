@@ -11,6 +11,7 @@
             "es2022.regexp",
             "es2022.error",
             "ES2024.Promise",
+            "ESNext.Disposable",
             "WebWorker",
             "DOM",
             "DOM.Iterable",
@@ -91,6 +92,8 @@
             "${configDir}/node_modules/@types",
             "${configDir}/types",
         ],
+        // include all @types/* packages found in `typeRoots` as ambient.
+        "types": ["*"],
     },
     "include": [
         "${configDir}/*.ts",

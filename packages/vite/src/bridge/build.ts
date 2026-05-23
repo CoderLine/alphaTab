@@ -1,7 +1,10 @@
 // index.ts for more details on contents and license of this file
 
 import * as path from 'node:path';
-import type { InternalModuleFormat, MinimalPluginContext, PluginContext } from 'rollup';
+import type { MinimalPluginContext, PluginContext } from 'rolldown';
+// rollup's `InternalModuleFormat` is the wider union ("amd" | "cjs" | "es" |
+// "iife" | "system" | "umd") covering every entry in the format map below.
+import type { InternalModuleFormat } from 'rollup';
 import type { BuildEnvironment, Plugin } from 'vite';
 import type { ResolvedConfig } from './config';
 import { ROLLUP_HOOKS } from './constants';
@@ -133,8 +136,11 @@ export function injectEnvironmentToHooks(environment: BuildEnvironment, plugin: 
                 clone[hook] = wrapEnvironmentTransform(environment, transform);
                 break;
             default:
+                // ROLLUP_HOOKS enumerates the full rollup hook set; the
+                // `.includes` guard skips hooks the active plugin (and the
+                // active bundler — rolldown drops some) does not declare.
                 if (ROLLUP_HOOKS.includes(hook)) {
-                    (clone as any)[hook] = wrapEnvironmentHook(environment, clone[hook]);
+                    (clone as any)[hook] = wrapEnvironmentHook(environment, (clone as any)[hook]);
                 }
                 break;
         }
@@ -240,7 +246,9 @@ function injectEnvironmentInContext<Context extends MinimalPluginContext>(
     context: Context,
     environment: BuildEnvironment
 ) {
-    context.environment ??= environment;
+    // Vite augments the bundler's MinimalPluginContext with `environment`;
+    // the upstream type does not surface it.
+    (context as Context & { environment?: BuildEnvironment }).environment ??= environment;
     return context;
 }
 

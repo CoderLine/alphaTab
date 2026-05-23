@@ -5,17 +5,18 @@
     "description": "Additional build tooling for alphaTab like common build configurations",
     "private": true,
     "scripts": {
+        "lint": "biome lint",
         "test": "vitest run",
         "test-web": "npm run test"
     },
     "devDependencies": {
         "@microsoft/api-extractor": "^7.57.7",
         "@rollup/plugin-terser": "^1.0.0",
-        "@rollup/plugin-typescript": "^12.3.0",
+        "magic-string": "^0.30.21",
         "rollup-plugin-license": "^3.7.0",
         "rollup-plugin-node-externals": "^9.0.1",
-        "typescript": "^5.9.3",
-        "vite-tsconfig-paths": "^6.1.1",
+        "typescript": "^6.0.3",
+        "vite": "^8.0.14",
         "vitest": "^4.1.6"
     }
 }

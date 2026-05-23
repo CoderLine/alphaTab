@@ -1,8 +1,7 @@
 import path from 'node:path';
 import url from 'node:url';
-import ts from 'typescript';
-
 import { createDiagnosticReporter } from '@coderline/alphatab-tooling/typescript';
+import ts from 'typescript';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 

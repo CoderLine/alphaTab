@@ -302,9 +302,9 @@ export function getTypeWithNullableInfo(
             fillBaseInfoFrom(node);
         } else if (node.isUnion()) {
             for (const t of node.types) {
-                if ((t.flags & ts.TypeFlags.Null) !== 0) {
+                if (t === checker.getNullType()) {
                     typeInfo.isNullable = true;
-                } else if ((t.flags & ts.TypeFlags.Undefined) !== 0) {
+                } else if (t === checker.getUndefinedType()) {
                     typeInfo.isOptional = true;
                 } else if (!mainType) {
                     fillBaseInfoFrom(t);

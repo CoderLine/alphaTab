@@ -1,18 +1,14 @@
 import { defaultClientMainFields, defineConfig } from 'vite';
-import { defaultBuildUserConfig, dtsPathsTransformer, esm } from '../tooling/src/vite';
+import { addDts, defaultBuildUserConfig, esm } from '../tooling/src/vite';
 
 export default defineConfig(() => {
-    const config = defaultBuildUserConfig();
+    const config = defaultBuildUserConfig(import.meta.dirname);
     config.build!.sourcemap = true;
     config.resolve ??= {};
     config.resolve.mainFields = defaultClientMainFields.filter(f => f !== 'browser');
 
-    esm(config, import.meta.dirname, 'server', 'src/index.ts', {
-        module: 'preserve',
-        transformers: {
-            afterDeclarations: [dtsPathsTransformer()]
-        }
-    });
+    esm(config, import.meta.dirname, 'server', 'src/index.ts');
     (config.build!.rollupOptions!.external as (RegExp | string)[]).push('@coderline/alphatab');
+    addDts(config, import.meta.dirname);
     return config;
 });

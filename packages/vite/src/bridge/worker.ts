@@ -1,11 +1,11 @@
 // index.ts for more details on contents and license of this file
 
-import type { ResolvedConfig } from './config';
-import { cleanUrl, getHash } from './utils';
-import type { OutputChunk } from 'rollup';
 import * as path from 'node:path';
 import { BuildEnvironment } from 'vite';
 import { injectEnvironmentToHooks } from './build';
+import { BundlerKind, detectBundler } from './bundler';
+import type { ResolvedConfig } from './config';
+import { cleanUrl, getHash } from './utils';
 
 /**
  * @internal
@@ -45,6 +45,12 @@ export const WORKER_FILE_ID = 'alphatab_worker';
  */
 export const WORKER_ASSET_ID = '__ALPHATAB_WORKER_ASSET__';
 
+interface BundledWorkerChunk {
+    fileName: string;
+    code: string;
+    map?: { toString(): string } | null;
+}
+
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/plugins/worker.ts#L47
 function saveEmitWorkerAsset(config: ResolvedConfig, asset: WorkerBundleAsset): void {
     const workerMap = workerCache.get(config.mainConfig || config)!;
@@ -80,8 +86,7 @@ function encodeWorkerAssetFileName(fileName: string, workerCache: WorkerCache): 
     return `${WORKER_ASSET_ID}${hash}__`;
 }
 
-// https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/plugins/worker.ts#L55
-async function bundleWorkerEntry(config: ResolvedConfig, id: string): Promise<OutputChunk> {
+async function bundleWorkerEntry(config: ResolvedConfig, id: string): Promise<BundledWorkerChunk> {
     const input = cleanUrl(id);
     const bundleChain = config.bundleChain ?? [];
     const newBundleChain = [...bundleChain, input];
@@ -91,66 +96,138 @@ async function bundleWorkerEntry(config: ResolvedConfig, id: string): Promise<Ou
         );
     }
 
-    // bundle the file as entry to support imports
-    const { rollup } = await import('rollup');
-    const { plugins, rollupOptions, format } = config.worker;
+    const { plugins, format } = config.worker;
+    // Vite 8 exposes `rolldownOptions`; Vite 7 only `rollupOptions`.
+    const workerOptionsCarrier = config.worker as { rolldownOptions?: any; rollupOptions?: any };
+    const workerBundlerOptions = workerOptionsCarrier.rolldownOptions ?? workerOptionsCarrier.rollupOptions;
 
     const workerConfig = await plugins(newBundleChain);
-    const workerEnvironment = new BuildEnvironment('client', workerConfig); // TODO: should this be 'worker'?
+    const workerEnvironment = new BuildEnvironment('client', workerConfig);
     await workerEnvironment.init();
 
-    const bundle = await rollup({
-        ...rollupOptions,
-        input,
-        plugins: workerEnvironment.plugins.map(p => injectEnvironmentToHooks(workerEnvironment, p)),
-        preserveEntrySignatures: false
-    });
-    let chunk: OutputChunk;
-    try {
-        const workerOutputConfig = config.worker.rollupOptions.output;
-        const workerConfig = workerOutputConfig
-            ? Array.isArray(workerOutputConfig)
-                ? workerOutputConfig[0] || {}
-                : workerOutputConfig
-            : {};
-        const {
-            output: [outputChunk, ...outputChunks]
-        } = await bundle.generate({
-            entryFileNames: path.posix.join(config.build.assetsDir, '[name]-[hash].js'),
-            chunkFileNames: path.posix.join(config.build.assetsDir, '[name]-[hash].js'),
-            assetFileNames: path.posix.join(config.build.assetsDir, '[name]-[hash].[ext]'),
-            ...workerConfig,
-            format,
-            sourcemap: config.build.sourcemap
-        });
-        chunk = outputChunk;
-        for (const outputChunk of outputChunks) {
-            if (outputChunk.type === 'asset') {
-                saveEmitWorkerAsset(config, outputChunk);
-            } else if (outputChunk.type === 'chunk') {
-                saveEmitWorkerAsset(config, {
-                    fileName: outputChunk.fileName,
-                    source: outputChunk.code
-                });
-            }
-        }
-    } finally {
-        await bundle.close();
+    const wrappedPlugins = workerEnvironment.plugins.map(p => injectEnvironmentToHooks(workerEnvironment, p));
+
+    const workerOutputConfig = workerBundlerOptions.output;
+    const outputConfig = workerOutputConfig
+        ? Array.isArray(workerOutputConfig)
+            ? workerOutputConfig[0] || {}
+            : workerOutputConfig
+        : {};
+
+    const generateOptions = {
+        entryFileNames: path.posix.join(config.build.assetsDir, '[name]-[hash].js'),
+        chunkFileNames: path.posix.join(config.build.assetsDir, '[name]-[hash].js'),
+        assetFileNames: path.posix.join(config.build.assetsDir, '[name]-[hash].[ext]'),
+        ...outputConfig,
+        format,
+        sourcemap: config.build.sourcemap
+    };
+
+    let chunk: BundledWorkerChunk;
+    if (detectBundler(config) === BundlerKind.Rolldown) {
+        chunk = await bundleWorkerEntryRolldown(
+            config,
+            input,
+            workerBundlerOptions,
+            wrappedPlugins,
+            generateOptions,
+            workerEnvironment
+        );
+    } else {
+        chunk = await bundleWorkerEntryRollup(config, input, workerBundlerOptions, wrappedPlugins, generateOptions);
     }
+
     return emitSourcemapForWorkerEntry(config, chunk);
 }
 
-// https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/plugins/worker.ts#L124
-function emitSourcemapForWorkerEntry(config: ResolvedConfig, chunk: OutputChunk): OutputChunk {
-    const { map: sourcemap } = chunk;
+// Rollup path (Vite 7 and earlier).
+async function bundleWorkerEntryRollup(
+    config: ResolvedConfig,
+    input: string,
+    bundlerOptions: any,
+    plugins: any,
+    generateOptions: any
+): Promise<BundledWorkerChunk> {
+    const { rollup } = await import('rollup');
+    const bundle = await rollup({
+        ...bundlerOptions,
+        input,
+        plugins,
+        preserveEntrySignatures: false
+    });
+    try {
+        const { output } = await bundle.generate(generateOptions);
+        const [outputChunk, ...rest] = output;
+        for (const o of rest) {
+            if (o.type === 'asset') {
+                saveEmitWorkerAsset(config, o);
+            } else {
+                saveEmitWorkerAsset(config, { fileName: o.fileName, source: o.code });
+            }
+        }
+        return outputChunk;
+    } finally {
+        await bundle.close();
+    }
+}
 
+// Rolldown path (Vite 8+).
+async function bundleWorkerEntryRolldown(
+    config: ResolvedConfig,
+    input: string,
+    bundlerOptions: any,
+    plugins: any,
+    generateOptions: any,
+    workerEnvironment: BuildEnvironment
+): Promise<BundledWorkerChunk> {
+    const { rolldown } = await import('rolldown');
+    const workerBuildTarget = workerEnvironment.config.build.target;
+    const bundle = await rolldown({
+        ...bundlerOptions,
+        input,
+        plugins,
+        transform: {
+            target: workerBuildTarget === false ? undefined : workerBuildTarget,
+            ...bundlerOptions.transform,
+            define: {
+                ...bundlerOptions.transform?.define,
+                'process.env.NODE_ENV': 'process.env.NODE_ENV'
+            }
+        },
+        moduleTypes: {
+            '.css': 'js',
+            ...bundlerOptions.moduleTypes
+        },
+        preserveEntrySignatures: false,
+        experimental: {
+            ...bundlerOptions.experimental,
+            viteMode: true
+        }
+    });
+    try {
+        const { output } = await bundle.generate(generateOptions);
+        const [outputChunk, ...rest] = output;
+        for (const o of rest) {
+            if (o.type === 'asset') {
+                saveEmitWorkerAsset(config, o);
+            } else {
+                saveEmitWorkerAsset(config, { fileName: o.fileName, source: o.code });
+            }
+        }
+        return outputChunk;
+    } finally {
+        await bundle.close();
+    }
+}
+
+// https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/plugins/worker.ts#L124
+function emitSourcemapForWorkerEntry(config: ResolvedConfig, chunk: BundledWorkerChunk): BundledWorkerChunk {
+    const sourcemap = chunk.map;
     if (sourcemap) {
         if (config.build.sourcemap === 'hidden' || config.build.sourcemap === true) {
-            const data = sourcemap.toString();
-            const mapFileName = `${chunk.fileName}.map`;
             saveEmitWorkerAsset(config, {
-                fileName: mapFileName,
-                source: data
+                fileName: `${chunk.fileName}.map`,
+                source: sourcemap.toString()
             });
         }
     }

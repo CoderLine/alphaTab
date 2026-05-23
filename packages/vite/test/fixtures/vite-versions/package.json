@@ -1,0 +1,10 @@
+{
+    "name": "alphatab-vite-version-fixtures",
+    "version": "0.0.0",
+    "private": true,
+    "description": "Side-by-side Vite installs used by packages/vite smoke tests. Kept out of the workspace so its bin-link collision stays contained.",
+    "dependencies": {
+        "vite-v7": "npm:vite@^7.3.3",
+        "vite-v8": "npm:vite@^8.0.14"
+    }
+}

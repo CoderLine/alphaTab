@@ -1,21 +1,14 @@
 import { defineConfig, type UserConfig } from 'vite';
-import { elementStyleUsingTransformer } from '../tooling/src/typescript';
-import { enableTypeScript } from '../tooling/src/vite';
+import { elementStyleUsingPlugin } from '../tooling/src/vite.plugin.transform';
 import server from './vite.plugin.server';
 
 export default defineConfig(_ => {
     const config: UserConfig = {
-        plugins: [server()],
+        plugins: [server(), elementStyleUsingPlugin()],
         server: {
             open: '/index.html'
-        },
-        esbuild: false
-    };
-    enableTypeScript(config, {
-        transformers: {
-            before: [elementStyleUsingTransformer()]
         }
-    });
+    };
 
     return config;
 });
