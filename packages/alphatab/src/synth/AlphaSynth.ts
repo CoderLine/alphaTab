@@ -294,15 +294,14 @@ export class AlphaSynthBase implements IAlphaSynth {
             this._notPlayedSamples += samples.length;
             this.output.addSamples(samples);
 
-
-            // if the sequencer finished, we instantly force a noteOff on all 
-            // voices to complete playback and stop voices fast. 
+            // if the sequencer finished, we instantly force a noteOff on all
+            // voices to complete playback and stop voices fast.
             // Doing this in the samplePlayed callback is too late as we might
             // continue generating audio for long-release notes (especially percussion like cymbals)
-          
+
             // we still have checkForFinish which takes care of the counterpart
-            // on the sample played area to ensure we seek back. 
-            // but thanks to this code we ensure the output will complete fast as we won't 
+            // on the sample played area to ensure we seek back.
+            // but thanks to this code we ensure the output will complete fast as we won't
             // be adding more samples beside a 0.1s ramp-down
             if (this.sequencer.isFinished) {
                 this.synthesizer.noteOffAll(true);
@@ -403,6 +402,9 @@ export class AlphaSynthBase implements IAlphaSynth {
         this._notPlayedSamples = 0;
         this.output.resetSamples();
 
+        this.output.activate();
+        this._synthStopping = false;
+        this.state = PlayerState.Playing;
         this.output.play();
     }
 
@@ -577,6 +579,7 @@ export class AlphaSynthBase implements IAlphaSynth {
 
     private _stopOneTimeMidi() {
         this.output.pause();
+        this.output.resetSamples();
         this.synthesizer.noteOffAll(true);
         this.sequencer.resetOneTimeMidi();
         this.timePosition = this.sequencer.currentTime;
