@@ -1,19 +1,20 @@
-import { describe, expect, it } from 'vitest';
 import { Settings } from '@coderline/alphatab/Settings';
 import { GpBinaryHelpers } from '@coderline/alphatab/importer/Gp3To5Importer';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { EndOfReaderError, OverflowError } from '@coderline/alphatab/io/IReadable';
 import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { Clef } from '@coderline/alphatab/model/Clef';
 import { Direction } from '@coderline/alphatab/model/Direction';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { type Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
-import { Clef } from '@coderline/alphatab/model/Clef';
-import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
-import { EndOfReaderError, OverflowError } from '@coderline/alphatab/io/IReadable';
 import { TestPlatform } from 'test/TestPlatform';
+import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
+import { describe, expect, it } from 'vitest';
 
 describe('Gp5ImporterTest', () => {
     it('score-info', async () => {
@@ -636,7 +637,31 @@ describe('Gp5ImporterTest', () => {
 
             const importer = GpImporterTestHelper.prepareImporterWithBytes(buffer, new Settings());
 
-            expect(()=> importer.readScore()).toThrow(EndOfReaderError);
+            expect(() => importer.readScore()).toThrow(EndOfReaderError);
         });
+    });
+
+    it('harmonic-types', async () => {
+        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/harmonic-types.gp5');
+        const score = reader.readScore();
+        const b0 = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        expect(b0.notes[0].harmonicType).toBe(HarmonicType.Natural);
+        expect(b0.notes[0].harmonicValue).toBe(12);
+
+        const b1 = score.tracks[0].staves[0].bars[0].voices[0].beats[1];
+        expect(b1.notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(b1.notes[0].harmonicValue).toBe(17);
+
+        const b2 = score.tracks[0].staves[0].bars[0].voices[0].beats[2];
+        expect(b2.notes[0].harmonicType).toBe(HarmonicType.Tap);
+        expect(b2.notes[0].harmonicValue).toBe(12);
+
+        const b3 = score.tracks[0].staves[0].bars[0].voices[0].beats[3];
+        expect(b3.notes[0].harmonicType).toBe(HarmonicType.Pinch);
+        expect(b3.notes[0].harmonicValue).toBe(12);
+
+        const b4 = score.tracks[0].staves[0].bars[1].voices[0].beats[0];
+        expect(b4.notes[0].harmonicType).toBe(HarmonicType.Semi);
+        expect(b4.notes[0].harmonicValue).toBe(12);
     });
 });

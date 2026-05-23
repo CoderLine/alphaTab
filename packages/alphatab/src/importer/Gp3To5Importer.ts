@@ -901,9 +901,7 @@ export class Gp3To5Importer extends ScoreImporter {
                 const note = this.readNote(track, bar, voice, newBeat, 6 - i);
                 if (allNoteHarmonicType !== HarmonicType.None) {
                     note.harmonicType = allNoteHarmonicType;
-                    if (note.harmonicType === HarmonicType.Natural) {
-                        note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
-                    }
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
                 }
             }
         }
@@ -1600,10 +1598,30 @@ export class Gp3To5Importer extends ScoreImporter {
                     note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
                     break;
                 case 2:
-                    /*let _harmonicTone: number = */ this.data.readByte();
-                    /*let _harmonicKey: number =  */ this.data.readByte();
-                    /*let _harmonicOctaveOffset: number = */ this.data.readByte();
+                    // C (0), D (2), E (4), F (5), G (7),A (9),B (11)
+                    const harmonicTone: number = this.data.readByte();
+                    // b (255/-1), none (0), # (1)
+                    let harmonicKey: number = this.data.readByte();
+                    if (harmonicKey === 255) {
+                        harmonicKey = -1;
+                    }
+                    // Loco (0), 8va (1), 15ma (2)
+                    const harmonicOctaveOffset: number = this.data.readByte();
+
+                    const harmonicPitch = harmonicTone + harmonicKey; // 0-11 pitch class
+                    const playedPitch = (note.fret + note.stringTuning) % 12; // 0-11 pitch class
+
+                    let targetHarmonic = harmonicPitch + harmonicOctaveOffset * 12;
+
+                    // Adjust to ensure harmonic is higher than played note (single octave should be enough with 0-11 played pitch)
+                    if (targetHarmonic < playedPitch) {
+                        targetHarmonic += 12;
+                    }
+
+                    const deltaFrets = targetHarmonic - playedPitch;
                     note.harmonicType = HarmonicType.Artificial;
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(deltaFrets);
+
                     break;
                 case 3:
                     note.harmonicType = HarmonicType.Tap;
@@ -1611,35 +1629,43 @@ export class Gp3To5Importer extends ScoreImporter {
                     break;
                 case 4:
                     note.harmonicType = HarmonicType.Pinch;
-                    note.harmonicValue = 12;
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(12);
                     break;
                 case 5:
                     note.harmonicType = HarmonicType.Semi;
-                    note.harmonicValue = 12;
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(12);
                     break;
             }
         } else if (this._versionNumber >= 400) {
             switch (type) {
                 case 1:
                     note.harmonicType = HarmonicType.Natural;
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
                     break;
                 case 3:
                     note.harmonicType = HarmonicType.Tap;
+                    // GP4 help: The tapped harmonic is an artificial harmonic obtained by tapping quickly on the string 12 frets higher.
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(12);
                     break;
                 case 4:
                     note.harmonicType = HarmonicType.Pinch;
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(12);
                     break;
                 case 5:
                     note.harmonicType = HarmonicType.Semi;
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(12);
                     break;
-                case 15:
+                case 15: // artificial + 5
                     note.harmonicType = HarmonicType.Artificial;
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(5);
                     break;
-                case 17:
+                case 17: // artificial + 7
                     note.harmonicType = HarmonicType.Artificial;
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(7);
                     break;
-                case 22:
+                case 22: // artificial + 12
                     note.harmonicType = HarmonicType.Artificial;
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(12);
                     break;
             }
         }
