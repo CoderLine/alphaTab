@@ -1903,7 +1903,9 @@ export class MusicXmlImporter extends ScoreImporter {
                 break;
             case 'percussion':
                 bar.clef = Clef.Neutral;
-                bar.staff.isPercussion = true;
+                if(bar.index === 0){
+                    bar.staff.isPercussion = true;
+                }
                 break;
             case 'tab':
                 bar.clef = Clef.G2;
