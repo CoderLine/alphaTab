@@ -62,9 +62,6 @@
             "@coderline/alphatab-vite/*": [
                 "${configDir}/../vite/src/*"
             ],
-            "alphatab-vscode/*": [
-                "${configDir}/../vscode/src/*"
-            ],
             "@coderline/alphatab-webpack/*": [
                 "${configDir}/../webpack/src/*"
             ],
