@@ -308,7 +308,8 @@ export class AlphaSynthBase implements IAlphaSynth {
             }
         } else {
             // Tell output that there is no data left for it.
-            const samples: Float32Array = new Float32Array(0);
+            // Send silence instead of 0-length array to prevent audio track underrun.
+            const samples: Float32Array = new Float32Array(SynthConstants.MicroBufferSize * SynthConstants.MicroBufferCount * SynthConstants.AudioChannels);
             this.output.addSamples(samples);
         }
     }
