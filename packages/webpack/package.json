@@ -43,7 +43,7 @@
         "test-web": "npm run test"
     },
     "dependencies": {
-        "webpack": "^5.105.4"
+        "webpack": "^5.107.1"
     },
     "engines": {
         "node": ">=20.19.0"
