@@ -1616,6 +1616,23 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'txt':
                 beat.text = (p.arguments!.arguments[0] as AlphaTexTextNode).text;
                 return ApplyNodeResult.Applied;
+            case 'restdisplaypitch': {
+                const tuning = ModelUtils.parseTuning((p.arguments!.arguments[0] as AlphaTexTextNode).text);
+                if (tuning !== null) {
+                    beat.restDisplayTone = tuning.tone.noteValue;
+                    beat.restDisplayOctave = tuning.octave - 1;
+                } else {
+                    importer.addSemanticDiagnostic({
+                        code: AlphaTexDiagnosticCode.AT212,
+                        message: `Invalid pitch value '${(p.arguments!.arguments[0] as AlphaTexTextNode).text}', expected format like 'C5' or 'G4'`,
+                        severity: AlphaTexDiagnosticsSeverity.Error,
+                        start: p.arguments!.arguments[0].start,
+                        end: p.arguments!.arguments[0].end
+                    });
+                    return ApplyNodeResult.NotAppliedSemanticError;
+                }
+                return ApplyNodeResult.Applied;
+            }
             case 'lyrics':
                 let lyricsLine = 0;
                 let lyricsText = '';

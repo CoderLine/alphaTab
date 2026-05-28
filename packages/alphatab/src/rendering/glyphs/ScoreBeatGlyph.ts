@@ -1,5 +1,6 @@
 import { Logger } from '@coderline/alphatab/Logger';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
+import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
@@ -301,17 +302,20 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
     private _createRestGlyphs() {
         const sr = this.renderer as ScoreBarRenderer;
+        const beat = this.container.beat;
+        const lineCount = this.renderer.bar.staff.standardNotationLineCount;
 
-        let steps = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
+        let steps: number;
+        if (beat.restDisplayTone !== -1 && beat.restDisplayOctave !== -1) {
+            steps = AccidentalHelper.calculateRestDisplaySteps(sr.bar, beat.restDisplayTone, beat.restDisplayOctave);
+        } else {
+            steps = Math.ceil((lineCount - 1) / 2) * 2;
+        }
 
         // this positioning is quite strange, for most staff line counts
         // the whole/rest are aligned as half below the whole rest.
         // but for staff line count 1 and 3 they are aligned centered on the same line.
-        if (
-            this.container.beat.duration === Duration.Whole &&
-            this.renderer.bar.staff.standardNotationLineCount !== 1 &&
-            this.renderer.bar.staff.standardNotationLineCount !== 3
-        ) {
+        if (beat.duration === Duration.Whole && lineCount !== 1 && lineCount !== 3) {
             steps -= 2;
         }
 

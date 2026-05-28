@@ -425,6 +425,18 @@ export class Beat {
     public deadSlapped: boolean = false;
 
     /**
+     * Gets or sets the chromatic tone value (0–11) of the pitch at which this rest should be displayed.
+     * A value of -1 means use the default position formula.
+     */
+    public restDisplayTone: number = -1;
+
+    /**
+     * Gets or sets the octave at which this rest should be displayed.
+     * Only relevant when {@link restDisplayTone} is set. -1 means use the default position formula.
+     */
+    public restDisplayOctave: number = -1;
+
+    /**
      * Gets or sets the brush type applied to the notes of this beat.
      */
     public brushType: BrushType = BrushType.None;
