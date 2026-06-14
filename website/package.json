@@ -53,7 +53,7 @@
     "remark-github-admonitions-to-directives": "^2.1.0",
     "resolve-url-loader": "^5.0.0",
     "sass": "^1.85.1",
-    "tsx": "^4.19.3",
+    "tsx": "^4.22.4",
     "typescript": "^5.7.3"
   },
   "browserslist": {
