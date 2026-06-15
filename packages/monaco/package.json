@@ -40,7 +40,7 @@
         "vscode-textmate": "^9.3.2"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.16",
+        "@biomejs/biome": "^2.5.0",
         "@microsoft/api-extractor": "^7.57.7",
         "@types/node": "^25.9.2",
         "rimraf": "^6.1.3",
