@@ -1,6 +1,6 @@
 import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
-import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
+import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
@@ -9,6 +9,7 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
 import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
@@ -20,7 +21,8 @@ import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/Sc
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
-import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
+import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper, BeamingHelperDrawInfo } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -34,8 +36,23 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     public simpleWhammyOverflow: number = 0;
 
-    private _isOnlyNumbered: boolean;
     public shortestDuration = Duration.QuadrupleWhole;
+
+    public override resolveTimeSignatureDisplay(): ElementDisplay {
+        return StaffDisplayResolver.merge(
+            this.bar.numberedDisplay?.timeSignature,
+            this.bar.staff.numberedConfig?.timeSignature,
+            this.bar.staff.track.score.stylesheet.numberedConfig.timeSignature
+        );
+    }
+
+    protected override resolveBarNumberDisplay(): BarNumberDisplay {
+        return (
+            this.bar.numberedDisplay?.barNumber ??
+            this.bar.staff.numberedConfig?.barNumber ??
+            this.bar.staff.track.score.stylesheet.numberedConfig.barNumber!
+        );
+    }
 
     get dotSpacing(): number {
         return this.smuflMetrics.glyphHeights.get(MusicFontSymbol.AugmentationDot)! * 2;
@@ -55,11 +72,6 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     public override get staffLineBarSubElement(): BarSubElement {
         return BarSubElement.NumberedStaffLine;
-    }
-
-    public constructor(renderer: ScoreRenderer, bar: Bar) {
-        super(renderer, bar);
-        this._isOnlyNumbered = !bar.staff.showSlash && !bar.staff.showTablature && !bar.staff.showStandardNotation;
     }
 
     public override get lineSpacing(): number {
@@ -254,7 +266,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     protected override createPreBeatGlyphs(): void {
         this.wasFirstOfStaff = this.isFirstOfStaff;
-        if (this.index === 0 || (this.bar.masterBar.isRepeatStart && this._isOnlyNumbered)) {
+        if (this.index === 0 || (this.bar.masterBar.isRepeatStart && this.staff!.isCascadePrimary)) {
             this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         }
         this.createLinePreBeatGlyphs();
@@ -267,8 +279,11 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override createLinePreBeatGlyphs(): void {
+        // No header KS glyph: the "1=X" key designation is rendered as an
+        // above-staff label by {@link NumberedBarKeySignatureEffectInfo}.
+        const timeSignatureDisplay = this.resolveTimeSignatureDisplay();
         if (
-            this._isOnlyNumbered &&
+            StaffDisplayResolver.isPrimaryForElement(this.staff!, timeSignatureDisplay) &&
             (!this.bar.previousBar ||
                 (this.bar.previousBar &&
                     this.bar.masterBar.timeSignatureNumerator !==
@@ -302,7 +317,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override createPostBeatGlyphs(): void {
-        if (this._isOnlyNumbered) {
+        if (this.staff!.isCascadePrimary) {
             super.createPostBeatGlyphs();
         }
     }

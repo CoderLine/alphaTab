@@ -340,6 +340,53 @@ internal class Expector<T>
         Assert.IsNull(_actual, _message);
     }
 
+    public void ToBeDefined()
+    {
+        Assert.IsNotNull(_actual, _message);
+    }
+
+    public void ToEqual(object? expected, string? message = null)
+    {
+        if (expected is null && _actual is null)
+        {
+            return;
+        }
+        if (expected is null || _actual is null)
+        {
+            Assert.Fail(message ?? _message ?? $"Expected {(expected is null ? "null" : expected.ToString())}, got {((object?)_actual is null ? "null" : _actual!.ToString())}");
+            return;
+        }
+
+        var expectedType = expected.GetType();
+        var actualType = _actual.GetType();
+
+        if (expectedType == actualType)
+        {
+            Assert.AreEqual(expected, _actual, message ?? _message);
+            return;
+        }
+
+        // Structural comparison: walk expected's properties (e.g. an anonymous object from a
+        // TS object-literal `expect(x).toEqual({...})`) and match against the actual instance's
+        // properties case-insensitively (TS source uses camelCase, C# properties are PascalCase).
+        var expectedProps = expectedType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        foreach (var prop in expectedProps)
+        {
+            var actualProp = actualType.GetProperty(
+                prop.Name,
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase
+            );
+            if (actualProp is null)
+            {
+                Assert.Fail(message ?? _message ?? $"Property '{prop.Name}' not found on {actualType.Name}");
+                return;
+            }
+            var expectedValue = prop.GetValue(expected);
+            var actualValue = actualProp.GetValue(_actual);
+            Assert.AreEqual(expectedValue, actualValue, $"Property '{prop.Name}'");
+        }
+    }
+
     public void ToThrow(Type expected)
     {
         Throw(expected);

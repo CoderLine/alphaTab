@@ -7,6 +7,10 @@ import { Bar } from "@coderline/alphatab/model/Bar";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { VoiceSerializer } from "@coderline/alphatab/generated/model/VoiceSerializer";
 import { SustainPedalMarkerSerializer } from "@coderline/alphatab/generated/model/SustainPedalMarkerSerializer";
+import { ScoreBarOverrideSerializer } from "@coderline/alphatab/generated/model/ScoreBarOverrideSerializer";
+import { TabBarOverrideSerializer } from "@coderline/alphatab/generated/model/TabBarOverrideSerializer";
+import { SlashBarOverrideSerializer } from "@coderline/alphatab/generated/model/SlashBarOverrideSerializer";
+import { NumberedBarOverrideSerializer } from "@coderline/alphatab/generated/model/NumberedBarOverrideSerializer";
 import { BarStyleSerializer } from "@coderline/alphatab/generated/model/BarStyleSerializer";
 import { Clef } from "@coderline/alphatab/model/Clef";
 import { Ottavia } from "@coderline/alphatab/model/Ottavia";
@@ -28,7 +32,7 @@ export class BarSerializer {
         }
         JsonHelper.forEach(m, (v, k) => BarSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: Bar | null): Map<string, unknown> | null {
+    public static toJson(obj: Bar | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }
@@ -46,6 +50,18 @@ export class BarSerializer {
         o.set("keysignature", obj.keySignature as number);
         o.set("keysignaturetype", obj.keySignatureType as number);
         o.set("barnumberdisplay", obj.barNumberDisplay as number | undefined);
+        if (obj.scoreDisplay) {
+            o.set("scoredisplay", ScoreBarOverrideSerializer.toJson(obj.scoreDisplay));
+        }
+        if (obj.tabDisplay) {
+            o.set("tabdisplay", TabBarOverrideSerializer.toJson(obj.tabDisplay));
+        }
+        if (obj.slashDisplay) {
+            o.set("slashdisplay", SlashBarOverrideSerializer.toJson(obj.slashDisplay));
+        }
+        if (obj.numberedDisplay) {
+            o.set("numbereddisplay", NumberedBarOverrideSerializer.toJson(obj.numberedDisplay));
+        }
         if (obj.style) {
             o.set("style", BarStyleSerializer.toJson(obj.style));
         }
@@ -101,6 +117,42 @@ export class BarSerializer {
                 return true;
             case "barnumberdisplay":
                 obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(v, BarNumberDisplay);
+                return true;
+            case "scoredisplay":
+                if (v) {
+                    obj.scoreDisplay = {};
+                    ScoreBarOverrideSerializer.fromJson(obj.scoreDisplay, v);
+                }
+                else {
+                    obj.scoreDisplay = undefined;
+                }
+                return true;
+            case "tabdisplay":
+                if (v) {
+                    obj.tabDisplay = {};
+                    TabBarOverrideSerializer.fromJson(obj.tabDisplay, v);
+                }
+                else {
+                    obj.tabDisplay = undefined;
+                }
+                return true;
+            case "slashdisplay":
+                if (v) {
+                    obj.slashDisplay = {};
+                    SlashBarOverrideSerializer.fromJson(obj.slashDisplay, v);
+                }
+                else {
+                    obj.slashDisplay = undefined;
+                }
+                return true;
+            case "numbereddisplay":
+                if (v) {
+                    obj.numberedDisplay = {};
+                    NumberedBarOverrideSerializer.fromJson(obj.numberedDisplay, v);
+                }
+                else {
+                    obj.numberedDisplay = undefined;
+                }
                 return true;
             case "style":
                 if (v) {

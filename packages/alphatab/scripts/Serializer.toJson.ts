@@ -283,14 +283,30 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
         } else {
             const itemSerializer = `${prop.type.typeAsString}Serializer`;
             importer(itemSerializer, findSerializerModule(prop.type));
-            propertyStatements.push(
-                createNodeFromSource<ts.ExpressionStatement>(
-                    `
-                    o.set(${JSON.stringify(jsonName)}, ${itemSerializer}.toJson(obj.${fieldName}));
-                `,
-                    ts.SyntaxKind.ExpressionStatement
-                )
-            );
+            if (prop.type.isRecord && (prop.type.isNullable || prop.type.isOptional)) {
+                // @record-typed optional / nullable fields skip emission when unset, so the JSON
+                // output omits null entries rather than carrying a Map value the C# JS-style
+                // TypeOf shim would render as `undefined` (TypeHelper.cs:606+).
+                propertyStatements.push(
+                    createNodeFromSource<ts.IfStatement>(
+                        `
+                        if(obj.${fieldName}) {
+                            o.set(${JSON.stringify(jsonName)}, ${itemSerializer}.toJson(obj.${fieldName}));
+                        }
+                    `,
+                        ts.SyntaxKind.IfStatement
+                    )
+                );
+            } else {
+                propertyStatements.push(
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `
+                        o.set(${JSON.stringify(jsonName)}, ${itemSerializer}.toJson(obj.${fieldName}));
+                    `,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
+                );
+            }
         }
 
         if (prop.target) {
@@ -314,13 +330,13 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
 }
 
 export function createToJsonMethod(
-    input: ts.ClassDeclaration,
+    input: ts.ClassDeclaration | ts.InterfaceDeclaration,
     serializable: TypeSchema,
     importer: (name: string, module: string) => void
 ) {
     const methodDecl = createNodeFromSource<ts.MethodDeclaration>(
         `public class Serializer {
-            public static toJson(obj: ${input.name!.text} | null): Map<string, unknown> | null {
+            public static toJson(obj: ${input.name!.text} | null | undefined): Map<string, unknown> | null {
             }
         }`,
         ts.SyntaxKind.MethodDeclaration

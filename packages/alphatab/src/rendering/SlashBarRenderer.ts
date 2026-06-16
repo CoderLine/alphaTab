@@ -1,10 +1,13 @@
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import type { Note } from '@coderline/alphatab/model/Note';
+import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { LineBarRenderer } from '@coderline/alphatab/rendering//LineBarRenderer';
 import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
@@ -21,13 +24,34 @@ export class SlashBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'slash';
 
     public simpleWhammyOverflow: number = 0;
-    private _isOnlySlash: boolean;
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
-        // ignore numbered notation here
-        this._isOnlySlash = !bar.staff.showTablature && !bar.staff.showStandardNotation;
         this.helpers.preferredBeamDirection = BeamDirection.Up;
+    }
+
+    public override resolveKeySignatureDisplay(): ElementDisplay {
+        return StaffDisplayResolver.merge(
+            this.bar.slashDisplay?.keySignature,
+            this.bar.staff.slashConfig?.keySignature,
+            this.bar.staff.track.score.stylesheet.slashConfig.keySignature
+        );
+    }
+
+    public override resolveTimeSignatureDisplay(): ElementDisplay {
+        return StaffDisplayResolver.merge(
+            this.bar.slashDisplay?.timeSignature,
+            this.bar.staff.slashConfig?.timeSignature,
+            this.bar.staff.track.score.stylesheet.slashConfig.timeSignature
+        );
+    }
+
+    protected override resolveBarNumberDisplay(): BarNumberDisplay {
+        return (
+            this.bar.slashDisplay?.barNumber ??
+            this.bar.staff.slashConfig?.barNumber ??
+            this.bar.staff.track.score.stylesheet.slashConfig.barNumber!
+        );
     }
 
     public override get repeatsBarSubElement(): BarSubElement {
@@ -109,9 +133,9 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override createLinePreBeatGlyphs(): void {
-        // Key signature
+        const timeSignatureDisplay = this.resolveTimeSignatureDisplay();
         if (
-            this._isOnlySlash &&
+            StaffDisplayResolver.isPrimaryForElement(this.staff!, timeSignatureDisplay) &&
             (!this.bar.previousBar ||
                 (this.bar.previousBar &&
                     this.bar.masterBar.timeSignatureNumerator !==

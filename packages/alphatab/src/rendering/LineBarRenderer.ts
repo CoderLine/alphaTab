@@ -11,6 +11,8 @@ import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
 import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
+import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
 import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
@@ -651,17 +653,31 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
     }
 
-    public shouldCreateBarNumber(): boolean {
-        let display = BarNumberDisplay.AllBars;
-        if (!this.settings.notation.isNotationElementVisible(NotationElement.BarNumber)) {
-            display = BarNumberDisplay.Hide;
-        } else if (this.bar.barNumberDisplay !== undefined) {
-            display = this.bar.barNumberDisplay!;
-        } else {
-            display = this.bar.staff.track.score.stylesheet.barNumberDisplay;
-        }
+    public resolveClefDisplay(): ElementDisplay {
+        return { isVisible: false };
+    }
 
-        switch (display) {
+    public resolveKeySignatureDisplay(): ElementDisplay {
+        return { isVisible: false };
+    }
+
+    public abstract resolveTimeSignatureDisplay(): ElementDisplay;
+
+    protected abstract resolveBarNumberDisplay(): BarNumberDisplay;
+
+    public resolveRestsDisplay(): ElementDisplay {
+        return { isVisible: false };
+    }
+
+    public resolveRhythm(): TabRhythmMode {
+        return TabRhythmMode.Hidden;
+    }
+
+    public shouldCreateBarNumber(): boolean {
+        if (!this.settings.notation.isNotationElementVisible(NotationElement.BarNumber)) {
+            return false;
+        }
+        switch (this.resolveBarNumberDisplay()) {
             case BarNumberDisplay.AllBars:
                 return true;
             case BarNumberDisplay.FirstOfSystem:

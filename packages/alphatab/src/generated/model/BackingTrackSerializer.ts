@@ -15,7 +15,7 @@ export class BackingTrackSerializer {
         }
         JsonHelper.forEach(m, (v, k) => BackingTrackSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: BackingTrack | null): Map<string, unknown> | null {
+    public static toJson(obj: BackingTrack | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

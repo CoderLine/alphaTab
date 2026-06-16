@@ -8,6 +8,7 @@ import {
     EffectBandMode
 } from '@coderline/alphatab/rendering/BarRendererFactory';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
 
@@ -50,6 +51,18 @@ export class RenderStaff {
 
     public get staffId(): string {
         return this._factory.staffId;
+    }
+
+    public get cascadePriority(): number {
+        return this._factory.cascadePriority;
+    }
+
+    private _isCascadePrimary: boolean | null = null;
+    public get isCascadePrimary(): boolean {
+        if (this._isCascadePrimary === null) {
+            this._isCascadePrimary = StaffDisplayResolver.computeCascadePrimary(this);
+        }
+        return this._isCascadePrimary;
     }
 
     /**

@@ -13,7 +13,9 @@ import { TabClefGlyph } from '@coderline/alphatab/rendering/glyphs/TabClefGlyph'
 import type { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteChordGlyph';
 import { TabTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TabTimeSignatureGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
-import { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
+import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
+import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
+import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import type { ReservedLayoutAreaSlot } from '@coderline/alphatab/rendering/utils/BarCollisionHelper';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
@@ -28,14 +30,56 @@ export class TabBarRenderer extends LineBarRenderer {
 
     private _hasTuplets = false;
 
-    public showTimeSignature: boolean = false;
-    public showRests: boolean = false;
-    public showTiedNotes: boolean = false;
+    public override resolveClefDisplay(): ElementDisplay {
+        return StaffDisplayResolver.merge(
+            this.bar.tabDisplay?.clef,
+            this.bar.staff.tabConfig?.clef,
+            this.bar.staff.track.score.stylesheet.tabConfig.clef
+        );
+    }
 
-    private _showMultiBarRest: boolean = false;
+    public override resolveTimeSignatureDisplay(): ElementDisplay {
+        return StaffDisplayResolver.merge(
+            this.bar.tabDisplay?.timeSignature,
+            this.bar.staff.tabConfig?.timeSignature,
+            this.bar.staff.track.score.stylesheet.tabConfig.timeSignature
+        );
+    }
+
+    public override resolveRestsDisplay(): ElementDisplay {
+        return StaffDisplayResolver.merge(
+            undefined,
+            this.bar.staff.tabConfig?.rests,
+            this.bar.staff.track.score.stylesheet.tabConfig.rests
+        );
+    }
+
+    public override resolveRhythm(): TabRhythmMode {
+        return this.bar.staff.tabConfig?.rhythm ?? this.bar.staff.track.score.stylesheet.tabConfig.rhythm!;
+    }
+
+    protected override resolveBarNumberDisplay(): BarNumberDisplay {
+        return (
+            this.bar.tabDisplay?.barNumber ??
+            this.bar.staff.tabConfig?.barNumber ??
+            this.bar.staff.track.score.stylesheet.tabConfig.barNumber!
+        );
+    }
+
+    public get showTimeSignature(): boolean {
+        return StaffDisplayResolver.isPrimaryForElement(this.staff!, this.resolveTimeSignatureDisplay());
+    }
+
+    public get showRests(): boolean {
+        return StaffDisplayResolver.isPrimaryForElement(this.staff!, this.resolveRestsDisplay());
+    }
+
+    public get showTiedNotes(): boolean {
+        return this.staff!.isCascadePrimary;
+    }
 
     public override get showMultiBarRest(): boolean {
-        return this._showMultiBarRest;
+        return this.staff!.isCascadePrimary;
     }
 
     public override get repeatsBarSubElement(): BarSubElement {
@@ -109,16 +153,6 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     public override doLayout(): void {
-        const hasStandardNotation =
-            this.bar.staff.showStandardNotation && this.scoreRenderer.layout!.profile.has(ScoreBarRenderer.StaffId);
-
-        if (!hasStandardNotation) {
-            this.showTimeSignature = true;
-            this.showRests = true;
-            this.showTiedNotes = true;
-            this._showMultiBarRest = true;
-        }
-
         super.doLayout();
 
         const hasNoteOnTopString = this.minString === 0;
@@ -140,14 +174,16 @@ export class TabBarRenderer extends LineBarRenderer {
 
     protected override createLinePreBeatGlyphs(): void {
         // Clef
-        if (this.isFirstOfStaff) {
+        const clefDisplay = this.resolveClefDisplay();
+        if (StaffDisplayResolver.isPrimaryForElement(this.staff!, clefDisplay) && this.isFirstOfStaff) {
             const center: number = (this.bar.staff.tuning.length - 1) / 2;
             this.createStartSpacing();
             this.addPreBeatGlyph(new TabClefGlyph(0, this.getLineY(center)));
         }
         // Time Signature
+        const timeSignatureDisplay = this.resolveTimeSignatureDisplay();
         if (
-            this.showTimeSignature &&
+            StaffDisplayResolver.isPrimaryForElement(this.staff!, timeSignatureDisplay) &&
             (!this.bar.previousBar ||
                 (this.bar.previousBar &&
                     this.bar.masterBar.timeSignatureNumerator !==

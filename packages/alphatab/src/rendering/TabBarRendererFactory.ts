@@ -11,8 +11,12 @@ import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
  * @internal
  */
 export class TabBarRendererFactory extends BarRendererFactory {
-    public get staffId(): string {
+    public override get staffId(): string {
         return TabBarRenderer.StaffId;
+    }
+
+    public override get cascadePriority(): number {
+        return 1;
     }
 
     public constructor(effectBands: EffectBandInfo[]) {

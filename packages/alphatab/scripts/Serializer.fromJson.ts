@@ -3,7 +3,7 @@ import * as ts from 'typescript';
 import type { TypeSchema } from './TypeSchema';
 
 function generateFromJsonBody(
-    input: ts.ClassDeclaration,
+    input: ts.ClassDeclaration | ts.InterfaceDeclaration,
     serializable: TypeSchema,
     importer: (name: string, module: string) => void
 ) {
@@ -33,7 +33,7 @@ function generateFromJsonBody(
 }
 
 export function createFromJsonMethod(
-    input: ts.ClassDeclaration,
+    input: ts.ClassDeclaration | ts.InterfaceDeclaration,
     serializable: TypeSchema,
     importer: (name: string, module: string) => void
 ) {

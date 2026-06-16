@@ -17,7 +17,7 @@ export class CoreSettingsSerializer {
         }
         JsonHelper.forEach(m, (v, k) => CoreSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
-    public static toJson(obj: CoreSettings | null): Map<string, unknown> | null {
+    public static toJson(obj: CoreSettings | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

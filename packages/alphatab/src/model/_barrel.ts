@@ -70,3 +70,20 @@ export { WahPedal } from '@coderline/alphatab/model/WahPedal';
 export { WhammyType } from '@coderline/alphatab/model/WhammyType';
 export { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
 export { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
+export {
+    StaffPlacement,
+    SystemDisplay,
+    type ElementDisplay
+} from '@coderline/alphatab/model/ElementDisplay';
+export type {
+    ScoreStaffConfig,
+    TabStaffConfig,
+    SlashStaffConfig,
+    NumberedStaffConfig
+} from '@coderline/alphatab/model/StaffConfigs';
+export type {
+    ScoreBarOverride,
+    TabBarOverride,
+    SlashBarOverride,
+    NumberedBarOverride
+} from '@coderline/alphatab/model/BarOverrides';

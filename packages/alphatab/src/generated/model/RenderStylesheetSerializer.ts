@@ -5,6 +5,10 @@
 // </auto-generated>
 import { RenderStylesheet } from "@coderline/alphatab/model/RenderStylesheet";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { ScoreStaffConfigSerializer } from "@coderline/alphatab/generated/model/ScoreStaffConfigSerializer";
+import { TabStaffConfigSerializer } from "@coderline/alphatab/generated/model/TabStaffConfigSerializer";
+import { SlashStaffConfigSerializer } from "@coderline/alphatab/generated/model/SlashStaffConfigSerializer";
+import { NumberedStaffConfigSerializer } from "@coderline/alphatab/generated/model/NumberedStaffConfigSerializer";
 import { BracketExtendMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNamePolicy } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameMode } from "@coderline/alphatab/model/RenderStylesheet";
@@ -20,7 +24,7 @@ export class RenderStylesheetSerializer {
         }
         JsonHelper.forEach(m, (v, k) => RenderStylesheetSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: RenderStylesheet | null): Map<string, unknown> | null {
+    public static toJson(obj: RenderStylesheet | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }
@@ -64,6 +68,10 @@ export class RenderStylesheetSerializer {
         o.set("hideemptystavesinfirstsystem", obj.hideEmptyStavesInFirstSystem);
         o.set("showsinglestaffbrackets", obj.showSingleStaffBrackets);
         o.set("barnumberdisplay", obj.barNumberDisplay as number);
+        o.set("scoreconfig", ScoreStaffConfigSerializer.toJson(obj.scoreConfig));
+        o.set("tabconfig", TabStaffConfigSerializer.toJson(obj.tabConfig));
+        o.set("slashconfig", SlashStaffConfigSerializer.toJson(obj.slashConfig));
+        o.set("numberedconfig", NumberedStaffConfigSerializer.toJson(obj.numberedConfig));
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
@@ -136,6 +144,18 @@ export class RenderStylesheetSerializer {
                 return true;
             case "barnumberdisplay":
                 obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(v, BarNumberDisplay)!;
+                return true;
+            case "scoreconfig":
+                ScoreStaffConfigSerializer.fromJson(obj.scoreConfig, v);
+                return true;
+            case "tabconfig":
+                TabStaffConfigSerializer.fromJson(obj.tabConfig, v);
+                return true;
+            case "slashconfig":
+                SlashStaffConfigSerializer.fromJson(obj.slashConfig, v);
+                return true;
+            case "numberedconfig":
+                NumberedStaffConfigSerializer.fromJson(obj.numberedConfig, v);
                 return true;
         }
         return false;

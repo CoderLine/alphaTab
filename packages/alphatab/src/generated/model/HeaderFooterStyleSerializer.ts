@@ -16,7 +16,7 @@ export class HeaderFooterStyleSerializer {
         }
         JsonHelper.forEach(m, (v, k) => HeaderFooterStyleSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: HeaderFooterStyle | null): Map<string, unknown> | null {
+    public static toJson(obj: HeaderFooterStyle | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

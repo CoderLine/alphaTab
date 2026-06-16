@@ -11,8 +11,12 @@ import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer'
  * @internal
  */
 export class NumberedBarRendererFactory extends BarRendererFactory {
-    public get staffId(): string {
+    public override get staffId(): string {
         return NumberedBarRenderer.StaffId;
+    }
+
+    public override get cascadePriority(): number {
+        return 3;
     }
 
     public create(renderer: ScoreRenderer, bar: Bar): BarRendererBase {

@@ -566,31 +566,15 @@ export class Environment {
 
     private static _createDefaultStaveProfiles(): Map<StaveProfile, Set<string>> {
         const staveProfiles = new Map<StaveProfile, Set<string>>();
+        const all = new Set<string>([
+            SlashBarRenderer.StaffId,
+            ScoreBarRenderer.StaffId,
+            NumberedBarRenderer.StaffId,
+            TabBarRenderer.StaffId
+        ]);
 
-        // the general layout is repeating the same pattern across the different notation staffs:
-        // * general effects before notation renderer, shown also if notation renderer is hidden (`before-xxxx-always`)
-        // * effects specific to the notation renderer, hidden if the nottation renderer is hidden (`before-xxxx-hideable`)
-        // * the notation renderer itself, hidden based on settings (`xxxx`)
-
-        staveProfiles.set(
-            StaveProfile.Default,
-            new Set<string>([
-                SlashBarRenderer.StaffId,
-                ScoreBarRenderer.StaffId,
-                NumberedBarRenderer.StaffId,
-                TabBarRenderer.StaffId
-            ])
-        );
-        staveProfiles.set(
-            StaveProfile.ScoreTab,
-            new Set<string>([
-                SlashBarRenderer.StaffId,
-                ScoreBarRenderer.StaffId,
-                NumberedBarRenderer.StaffId,
-                TabBarRenderer.StaffId
-            ])
-        );
-
+        staveProfiles.set(StaveProfile.Default, all);
+        staveProfiles.set(StaveProfile.ScoreTab, all);
         staveProfiles.set(StaveProfile.Score, new Set<string>([ScoreBarRenderer.StaffId]));
         staveProfiles.set(StaveProfile.Tab, new Set<string>([TabBarRenderer.StaffId]));
         staveProfiles.set(StaveProfile.TabMixed, new Set<string>([TabBarRenderer.StaffId]));

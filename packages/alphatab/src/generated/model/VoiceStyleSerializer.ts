@@ -17,7 +17,7 @@ export class VoiceStyleSerializer {
         }
         JsonHelper.forEach(m, (v, k) => VoiceStyleSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: VoiceStyle | null): Map<string, unknown> | null {
+    public static toJson(obj: VoiceStyle | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

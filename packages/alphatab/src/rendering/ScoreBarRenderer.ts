@@ -16,9 +16,12 @@ import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { KeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/KeySignatureGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
+import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
@@ -30,6 +33,7 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
  */
 export class ScoreBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'score';
+
     private static _sharpKsSteps: number[] = [-1, 2, -2, 1, 4, 0, 3];
     private static _flatKsSteps: number[] = [3, 0, 4, 1, 5, 2, 6];
 
@@ -38,6 +42,38 @@ export class ScoreBarRenderer extends LineBarRenderer {
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
         this.accidentalHelper = new AccidentalHelper(this);
+    }
+
+    public override resolveClefDisplay(): ElementDisplay {
+        return StaffDisplayResolver.merge(
+            this.bar.scoreDisplay?.clef,
+            this.bar.staff.scoreConfig?.clef,
+            this.bar.staff.track.score.stylesheet.scoreConfig.clef
+        );
+    }
+
+    public override resolveKeySignatureDisplay(): ElementDisplay {
+        return StaffDisplayResolver.merge(
+            this.bar.scoreDisplay?.keySignature,
+            this.bar.staff.scoreConfig?.keySignature,
+            this.bar.staff.track.score.stylesheet.scoreConfig.keySignature
+        );
+    }
+
+    public override resolveTimeSignatureDisplay(): ElementDisplay {
+        return StaffDisplayResolver.merge(
+            this.bar.scoreDisplay?.timeSignature,
+            this.bar.staff.scoreConfig?.timeSignature,
+            this.bar.staff.track.score.stylesheet.scoreConfig.timeSignature
+        );
+    }
+
+    protected override resolveBarNumberDisplay(): BarNumberDisplay {
+        return (
+            this.bar.scoreDisplay?.barNumber ??
+            this.bar.staff.scoreConfig?.barNumber ??
+            this.bar.staff.track.score.stylesheet.scoreConfig.barNumber!
+        );
     }
 
     public override get repeatsBarSubElement(): BarSubElement {
@@ -176,10 +212,12 @@ export class ScoreBarRenderer extends LineBarRenderer {
     protected override createLinePreBeatGlyphs(): void {
         // Clef
         let hasClef = false;
+        const clefDisplay = this.resolveClefDisplay();
         if (
-            this.isFirstOfStaff ||
-            this.bar.clef !== this.bar.previousBar!.clef ||
-            this.bar.clefOttava !== this.bar.previousBar!.clefOttava
+            StaffDisplayResolver.isPrimaryForElement(this.staff!, clefDisplay) &&
+            (this.isFirstOfStaff ||
+                this.bar.clef !== this.bar.previousBar!.clef ||
+                this.bar.clefOttava !== this.bar.previousBar!.clefOttava)
         ) {
             // SMUFL: Clefs should be positioned such that the pitch the clef refers to is on the baseline
             // (e.g. the F clef is placed such that the upper dot is above and the lower dot below the baseline).
@@ -210,25 +248,30 @@ export class ScoreBarRenderer extends LineBarRenderer {
             hasClef = true;
         }
         // Key signature
+        const keySignatureDisplay = this.resolveKeySignatureDisplay();
         if (
-            hasClef ||
-            (this.index === 0 && this.bar.keySignature !== KeySignature.C) ||
-            (this.bar.previousBar && this.bar.keySignature !== this.bar.previousBar.keySignature)
+            StaffDisplayResolver.isPrimaryForElement(this.staff!, keySignatureDisplay) &&
+            (hasClef ||
+                (this.index === 0 && this.bar.keySignature !== KeySignature.C) ||
+                (this.bar.previousBar && this.bar.keySignature !== this.bar.previousBar.keySignature))
         ) {
             this.createStartSpacing();
             this._createKeySignatureGlyphs();
         }
         // Time Signature
+        const timeSignatureDisplay = this.resolveTimeSignatureDisplay();
         if (
-            !this.bar.previousBar ||
-            (this.bar.previousBar &&
-                this.bar.masterBar.timeSignatureNumerator !== this.bar.previousBar.masterBar.timeSignatureNumerator) ||
-            (this.bar.previousBar &&
-                this.bar.masterBar.timeSignatureDenominator !==
-                    this.bar.previousBar.masterBar.timeSignatureDenominator) ||
-            (this.bar.previousBar &&
-                this.bar.masterBar.isFreeTime &&
-                this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime)
+            StaffDisplayResolver.isPrimaryForElement(this.staff!, timeSignatureDisplay) &&
+            (!this.bar.previousBar ||
+                (this.bar.previousBar &&
+                    this.bar.masterBar.timeSignatureNumerator !==
+                        this.bar.previousBar.masterBar.timeSignatureNumerator) ||
+                (this.bar.previousBar &&
+                    this.bar.masterBar.timeSignatureDenominator !==
+                        this.bar.previousBar.masterBar.timeSignatureDenominator) ||
+                (this.bar.previousBar &&
+                    this.bar.masterBar.isFreeTime &&
+                    this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime))
         ) {
             this.createStartSpacing();
             this._createTimeSignatureGlyphs();
