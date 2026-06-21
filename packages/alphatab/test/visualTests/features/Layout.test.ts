@@ -124,6 +124,24 @@ describe('LayoutTests', () => {
         });
     });
 
+    it('inline-tuning-first-system', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\track { defaultSystemsLayout 2 }
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+            2.5.4 3.5.4 0.4.4 2.4.4 |
+            3.4.4 0.3.4 2.3.4 3.3.4 |
+            0.2.4 1.2.4 3.2.4 0.1.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-first-system.png',
+            settings
+        );
+    });
+
     it('system-layout-tex', async () => {
         const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
