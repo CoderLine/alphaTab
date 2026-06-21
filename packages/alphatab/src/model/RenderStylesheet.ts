@@ -73,6 +73,22 @@ export enum TrackNameOrientation {
 }
 
 /**
+ * Lists the different places where string tuning information is displayed.
+ * @public
+ */
+export enum TuningDisplayMode {
+    /**
+     * Tuning information is displayed above the score.
+     */
+    Score = 0,
+
+    /**
+     * Tuning note names are displayed beside the corresponding tab staff lines.
+     */
+    Staff = 1
+}
+
+/**
  * How bar numbers are displayed
  * @public
  */
@@ -118,6 +134,11 @@ export class RenderStylesheet {
      * Whether to show the tuning.
      */
     public globalDisplayTuning: boolean = true;
+
+    /**
+     * The place where tuning information is displayed.
+     */
+    public tuningDisplayMode: TuningDisplayMode = TuningDisplayMode.Score;
 
     /**
      * Whether to show the tuning.(per-track)

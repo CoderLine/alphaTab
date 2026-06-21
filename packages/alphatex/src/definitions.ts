@@ -43,6 +43,7 @@ import { subtitle } from '@coderline/alphatab-alphatex//metadata/score/subtitle'
 import { systemsLayout } from '@coderline/alphatab-alphatex//metadata/score/systemslayout';
 import { tab } from '@coderline/alphatab-alphatex//metadata/score/tab';
 import { title } from '@coderline/alphatab-alphatex//metadata/score/title';
+import { tuningDisplayMode } from '@coderline/alphatab-alphatex//metadata/score/tuningdisplaymode';
 import { useSystemSignSeparator } from '@coderline/alphatab-alphatex//metadata/score/usesystemsignseparator';
 import { words } from '@coderline/alphatab-alphatex//metadata/score/words';
 import { wordsAndMusic } from '@coderline/alphatab-alphatex//metadata/score/wordsandmusic';
@@ -178,6 +179,7 @@ export const scoreMetaData = metadata(
     showDynamics,
     hideDynamics,
     useSystemSignSeparator,
+    tuningDisplayMode,
     multiBarRest,
     bracketExtendMode,
     singleTrackTrackNamePolicy,

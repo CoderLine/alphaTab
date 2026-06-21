@@ -6,6 +6,7 @@
 import { RenderStylesheet } from "@coderline/alphatab/model/RenderStylesheet";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { BracketExtendMode } from "@coderline/alphatab/model/RenderStylesheet";
+import { TuningDisplayMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNamePolicy } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameOrientation } from "@coderline/alphatab/model/RenderStylesheet";
@@ -29,6 +30,7 @@ export class RenderStylesheetSerializer {
         o.set("bracketextendmode", obj.bracketExtendMode as number);
         o.set("usesystemsignseparator", obj.useSystemSignSeparator);
         o.set("globaldisplaytuning", obj.globalDisplayTuning);
+        o.set("tuningdisplaymode", obj.tuningDisplayMode as number);
         if (obj.perTrackDisplayTuning !== null) {
             const m = new Map<string, unknown>();
             o.set("pertrackdisplaytuning", m);
@@ -79,6 +81,9 @@ export class RenderStylesheetSerializer {
                 return true;
             case "globaldisplaytuning":
                 obj.globalDisplayTuning = v! as boolean;
+                return true;
+            case "tuningdisplaymode":
+                obj.tuningDisplayMode = JsonHelper.parseEnum<TuningDisplayMode>(v, TuningDisplayMode)!;
                 return true;
             case "pertrackdisplaytuning":
                 obj.perTrackDisplayTuning = new Map<number, boolean>();

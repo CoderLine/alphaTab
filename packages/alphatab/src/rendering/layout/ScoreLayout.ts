@@ -4,6 +4,7 @@ import { Logger } from '@coderline/alphatab/Logger';
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { TuningDisplayMode } from '@coderline/alphatab/model/RenderStylesheet';
 import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
@@ -305,7 +306,11 @@ export abstract class ScoreLayout {
                 }
             }
             // tuning info
-            if (stavesWithTuning.length > 0 && score.stylesheet.globalDisplayTuning) {
+            if (
+                stavesWithTuning.length > 0 &&
+                score.stylesheet.globalDisplayTuning &&
+                score.stylesheet.tuningDisplayMode === TuningDisplayMode.Score
+            ) {
                 this.tuningGlyph = new TuningContainerGlyph(0, 0);
                 this.tuningGlyph.renderer = fakeBarRenderer;
                 for (const staff of stavesWithTuning) {

@@ -51,6 +51,7 @@ export {
     TrackNamePolicy,
     TrackNameMode,
     TrackNameOrientation,
+    TuningDisplayMode,
     BarNumberDisplay
 } from '@coderline/alphatab/model/RenderStylesheet';
 export { RepeatGroup } from '@coderline/alphatab/model/RepeatGroup';

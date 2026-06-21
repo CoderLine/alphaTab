@@ -32,7 +32,8 @@ import {
     BracketExtendMode,
     TrackNameMode,
     TrackNameOrientation,
-    TrackNamePolicy
+    TrackNamePolicy,
+    TuningDisplayMode
 } from '@coderline/alphatab/model/RenderStylesheet';
 import { type Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
@@ -1856,6 +1857,7 @@ describe('AlphaTexImporterTest', () => {
             \\hideDynamics
             \\bracketExtendMode nobrackets
             \\useSystemSignSeparator
+            \\tuningDisplayMode staff
             \\singleTrackTrackNamePolicy allsystems
             \\multiTrackTrackNamePolicy Hidden
             \\firstSystemTrackNameMode fullname
@@ -1873,6 +1875,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.hideDynamics).toBe(true);
         expect(score.stylesheet.bracketExtendMode).toBe(BracketExtendMode.NoBrackets);
         expect(score.stylesheet.useSystemSignSeparator).toBe(true);
+        expect(score.stylesheet.tuningDisplayMode).toBe(TuningDisplayMode.Staff);
         expect(score.stylesheet.singleTrackTrackNamePolicy).toBe(TrackNamePolicy.AllSystems);
         expect(score.stylesheet.multiTrackTrackNamePolicy).toBe(TrackNamePolicy.Hidden);
         expect(score.stylesheet.firstSystemTrackNameMode).toBe(TrackNameMode.FullName);

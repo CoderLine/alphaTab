@@ -71,7 +71,7 @@ import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
-import { BarNumberDisplay, type RenderStylesheet } from '@coderline/alphatab/model/RenderStylesheet';
+import { BarNumberDisplay, type RenderStylesheet, TuningDisplayMode } from '@coderline/alphatab/model/RenderStylesheet';
 import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
@@ -187,6 +187,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'usesystemsignseparator':
                 score.stylesheet.useSystemSignSeparator = true;
+                return ApplyNodeResult.Applied;
+            case 'tuningdisplaymode':
+                const tuningDisplayMode = AlphaTex1LanguageHandler._parseEnumValue(
+                    importer,
+                    metaData.arguments!,
+                    'tuning display mode',
+                    AlphaTex1EnumMappings.tuningDisplayMode
+                );
+                if (tuningDisplayMode === undefined) {
+                    return ApplyNodeResult.NotAppliedSemanticError;
+                }
+                score.stylesheet.tuningDisplayMode = tuningDisplayMode!;
                 return ApplyNodeResult.Applied;
             case 'multibarrest':
                 score.stylesheet.multiTrackMultiBarRest = true;
@@ -2561,6 +2573,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
         if (stylesheet.useSystemSignSeparator) {
             nodes.push(Atnf.meta('useSystemSignSeparator'));
+        }
+        if (stylesheet.tuningDisplayMode !== TuningDisplayMode.Score) {
+            nodes.push(
+                Atnf.identMeta(
+                    'tuningDisplayMode',
+                    AlphaTex1EnumMappings.tuningDisplayModeReversed.get(stylesheet.tuningDisplayMode)!
+                )
+            );
         }
         if (stylesheet.multiTrackMultiBarRest) {
             nodes.push(Atnf.meta('multiBarRest'));
