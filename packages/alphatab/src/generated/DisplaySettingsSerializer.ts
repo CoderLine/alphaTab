@@ -42,6 +42,7 @@ export class DisplaySettingsSerializer {
         o.set("systemlabelpaddingleft", obj.systemLabelPaddingLeft);
         o.set("systemlabelpaddingright", obj.systemLabelPaddingRight);
         o.set("accoladebarpaddingright", obj.accoladeBarPaddingRight);
+        o.set("inlinetuningpaddingright", obj.inlineTuningPaddingRight);
         o.set("firstnotationstaffpaddingtop", obj.firstNotationStaffPaddingTop);
         o.set("lastnotationstaffpaddingbottom", obj.lastNotationStaffPaddingBottom);
         o.set("notationstaffpaddingtop", obj.notationStaffPaddingTop);
@@ -108,6 +109,9 @@ export class DisplaySettingsSerializer {
                 return true;
             case "accoladebarpaddingright":
                 obj.accoladeBarPaddingRight = v! as number;
+                return true;
+            case "inlinetuningpaddingright":
+                obj.inlineTuningPaddingRight = v! as number;
                 return true;
             case "firstnotationstaffpaddingtop":
                 obj.firstNotationStaffPaddingTop = v! as number;

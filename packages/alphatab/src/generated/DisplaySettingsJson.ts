@@ -219,6 +219,13 @@ export interface DisplaySettingsJson {
      */
     accoladeBarPaddingRight?: number;
     /**
+     * The padding between inline tuning labels and the start of the tab staff.
+     * @since 1.9.0
+     * @category Display
+     * @defaultValue `5`
+     */
+    inlineTuningPaddingRight?: number;
+    /**
      * The top padding applied to the first main notation staff (standard, tabs, numbered, slash).
      * @since 1.8.0
      * @category Display

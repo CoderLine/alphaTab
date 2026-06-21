@@ -248,6 +248,14 @@ export class DisplaySettings {
      */
     public accoladeBarPaddingRight: number = 3;
 
+    /**
+     * The padding between inline tuning labels and the start of the tab staff.
+     * @since 1.9.0
+     * @category Display
+     * @defaultValue `5`
+     */
+    public inlineTuningPaddingRight: number = 5;
+
     // Staff padding
 
     /**
