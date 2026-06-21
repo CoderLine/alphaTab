@@ -10,7 +10,6 @@ import {
     TuningDisplayMode
 } from '@coderline/alphatab/model/RenderStylesheet';
 import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
-import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
@@ -18,6 +17,7 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+import { InlineTuningGlyph } from '@coderline/alphatab/rendering/glyphs/InlineTuningGlyph';
 import { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
@@ -161,6 +161,8 @@ export class StaffSystem {
 
     private _brackets: SystemBracket[] = [];
     private _staffToBracket = new Map<RenderStaff, SystemBracket>();
+    private _inlineTuningGlyphs: InlineTuningGlyph[] = [];
+    private _inlineTuningWidth = 0;
     private _contentHeight = 0;
 
     private _hasSystemSeparator = false;
@@ -660,7 +662,8 @@ export class StaffSystem {
                 }
             }
 
-            this.accoladeWidth += this._getInlineTuningWidth(this.allStaves, this.layout.renderer.canvas!);
+            this._createInlineTuningGlyphs();
+            this.accoladeWidth += this._inlineTuningWidth;
 
             // NOTE: we have a chicken-egg problem when it comes to scaling braces which we try to mitigate here:
             // - The brace scales with the height of the system
@@ -701,15 +704,42 @@ export class StaffSystem {
         }
     }
 
-    private _shouldRenderInlineTuning(staff: RenderStaff): boolean {
+    private _createInlineTuningGlyphs(): void {
+        this._inlineTuningGlyphs = [];
+        this._inlineTuningWidth = 0;
+
         const score = this.layout.renderer.score!;
         if (
             this.index !== 0 ||
-            !staff.isVisible ||
-            staff.staffId !== TabBarRenderer.StaffId ||
             !this.layout.renderer.settings.notation.isNotationElementVisible(NotationElement.GuitarTuning) ||
             !score.stylesheet.globalDisplayTuning ||
             score.stylesheet.tuningDisplayMode !== TuningDisplayMode.Staff
+        ) {
+            return;
+        }
+
+        for (const staff of this.allStaves) {
+            if (!this._shouldCreateInlineTuningGlyph(staff)) {
+                continue;
+            }
+
+            const renderer = staff.barRenderers[0];
+            if (!(renderer instanceof TabBarRenderer)) {
+                continue;
+            }
+
+            const glyph = new InlineTuningGlyph(staff, renderer);
+            glyph.doLayout();
+            this._inlineTuningGlyphs.push(glyph);
+            this._inlineTuningWidth = Math.max(this._inlineTuningWidth, glyph.width);
+        }
+    }
+
+    private _shouldCreateInlineTuningGlyph(staff: RenderStaff): boolean {
+        const score = this.layout.renderer.score!;
+        if (
+            !staff.isVisible ||
+            staff.staffId !== TabBarRenderer.StaffId
         ) {
             return false;
         }
@@ -732,30 +762,22 @@ export class StaffSystem {
         );
     }
 
-    private _getInlineTuningWidth(staves: Iterable<RenderStaff>, canvas: ICanvas): number {
-        const oldFont = canvas.font;
-        canvas.font = this.layout.renderer.settings.display.resources.elementFonts.get(NotationElement.GuitarTuning)!;
-
-        let maxWidth = 0;
-        for (const staff of staves) {
-            if (!this._shouldRenderInlineTuning(staff)) {
-                continue;
-            }
-
-            for (const tuning of staff.modelStaff.stringTuning.tunings) {
-                maxWidth = Math.max(maxWidth, canvas.measureText(Tuning.getTextForTuning(tuning, false)).width);
-            }
-        }
-        canvas.font = oldFont;
-
-        return maxWidth > 0 ? maxWidth + this.layout.renderer.settings.display.inlineTuningPaddingRight : 0;
+    private _getInlineTuningWidthForTrackGroup(group: StaffTrackGroup): number {
+        return this._getInlineTuningWidth(glyph => glyph.staff.staffTrackGroup === group);
     }
 
-    private _getInlineTuningWidthForBracket(bracket: SystemBracket, canvas: ICanvas): number {
-        return this._getInlineTuningWidth(
-            this.allStaves.filter(staff => bracket.includesStaff(staff)),
-            canvas
-        );
+    private _getInlineTuningWidthForBracket(bracket: SystemBracket): number {
+        return this._getInlineTuningWidth(glyph => bracket.includesStaff(glyph.staff));
+    }
+
+    private _getInlineTuningWidth(includeGlyph: (glyph: InlineTuningGlyph) => boolean): number {
+        let width = 0;
+        for (const glyph of this._inlineTuningGlyphs) {
+            if (includeGlyph(glyph)) {
+                width = Math.max(width, glyph.width);
+            }
+        }
+        return width;
     }
 
     private _getStaffTrackGroup(track: Track): StaffTrackGroup | null {
@@ -936,7 +958,7 @@ export class StaffSystem {
                                     g.staves[0].x -
                                     // left side of the bracket
                                     settings.display.accoladeBarPaddingRight -
-                                    this._getInlineTuningWidth(g.staves, canvas) -
+                                    this._getInlineTuningWidthForTrackGroup(g) -
                                     (g.bracket?.width ?? 0) -
                                     // padding between label and bracket
                                     settings.display.systemLabelPaddingRight;
@@ -1010,39 +1032,9 @@ export class StaffSystem {
     }
 
     private _paintInlineTunings(cx: number, cy: number, canvas: ICanvas): void {
-        const oldFont = canvas.font;
-        const oldBaseLine = canvas.textBaseline;
-        const oldTextAlign = canvas.textAlign;
-
-        canvas.font = this.layout.renderer.settings.display.resources.elementFonts.get(NotationElement.GuitarTuning)!;
-        canvas.textBaseline = TextBaseline.Middle;
-        canvas.textAlign = TextAlign.Right;
-
-        for (const staff of this.allStaves) {
-            if (!this._shouldRenderInlineTuning(staff)) {
-                continue;
-            }
-
-            const renderer = staff.barRenderers[0];
-            if (!(renderer instanceof TabBarRenderer)) {
-                continue;
-            }
-            const textEndX = cx + staff.x - this.layout.renderer.settings.display.inlineTuningPaddingRight;
-
-            using _ = ElementStyleHelper.track(canvas, TrackSubElement.StringTuning, staff.modelStaff.track, true);
-
-            for (let i = 0, j = staff.modelStaff.stringTuning.tunings.length; i < j; i++) {
-                canvas.fillText(
-                    Tuning.getTextForTuning(staff.modelStaff.stringTuning.tunings[i], false),
-                    textEndX,
-                    cy + staff.y + renderer.y + renderer.getLineY(i)
-                );
-            }
+        for (const glyph of this._inlineTuningGlyphs) {
+            glyph.paint(cx + glyph.staff.x, cy + glyph.staff.y, canvas);
         }
-
-        canvas.font = oldFont;
-        canvas.textBaseline = oldBaseLine;
-        canvas.textAlign = oldTextAlign;
     }
 
     private _paintBrackets(cx: number, cy: number, canvas: ICanvas) {
@@ -1053,7 +1045,7 @@ export class StaffSystem {
                 const barStartX: number = cx + bracket.firstVisibleStaffInBracket!.x;
                 const barSize: number = bracket.width;
                 const barOffset: number =
-                    settings.display.accoladeBarPaddingRight + this._getInlineTuningWidthForBracket(bracket, canvas);
+                    settings.display.accoladeBarPaddingRight + this._getInlineTuningWidthForBracket(bracket);
                 const firstStart: number = cy + bracket.firstVisibleStaffInBracket!.contentTop;
                 const lastEnd: number = cy + bracket.lastVisibleStaffInBracket!.contentBottom;
                 let accoladeStart: number = firstStart;
