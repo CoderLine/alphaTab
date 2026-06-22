@@ -1109,7 +1109,8 @@ export class StaffSystem {
             if (bracket.canPaint) {
                 const barStartX: number = cx + bracket.firstVisibleStaffInBracket!.x;
                 const barSize: number = bracket.width;
-                const barOffset: number = settings.display.accoladeBarPaddingRight;
+                const barOffset: number =
+                    settings.display.accoladeBarPaddingRight + this._getInlineTuningWidthForBracket(bracket);
                 const firstStart: number = cy + bracket.firstVisibleStaffInBracket!.contentTop;
                 const lastEnd: number = cy + bracket.lastVisibleStaffInBracket!.contentBottom;
                 let accoladeStart: number = firstStart;
