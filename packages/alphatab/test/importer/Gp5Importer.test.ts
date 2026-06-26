@@ -1,15 +1,20 @@
-import { describe, expect, it } from 'vitest';
 import { Settings } from '@coderline/alphatab/Settings';
+import { GpBinaryHelpers } from '@coderline/alphatab/importer/Gp3To5Importer';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { EndOfReaderError, OverflowError } from '@coderline/alphatab/io/IReadable';
 import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { Clef } from '@coderline/alphatab/model/Clef';
 import { Direction } from '@coderline/alphatab/model/Direction';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { type Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { TestPlatform } from 'test/TestPlatform';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
-import { Clef } from '@coderline/alphatab/model/Clef';
-import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { describe, expect, it } from 'vitest';
 
 describe('Gp5ImporterTest', () => {
     it('score-info', async () => {
@@ -407,9 +412,7 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].preferredBeamDirection).not.toBeTruthy();
 
         // break
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).toBe(
-            BeatBeamingMode.ForceSplitToNext
-        );
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.ForceSplitToNext);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].invertBeamDirection).toBe(false);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).not.toBeTruthy();
 
@@ -419,9 +422,7 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].invertBeamDirection).toBe(false);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].preferredBeamDirection).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).toBe(
-            BeatBeamingMode.ForceSplitToNext
-        );
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).toBe(BeatBeamingMode.ForceSplitToNext);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].invertBeamDirection).toBe(false);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].preferredBeamDirection).not.toBeTruthy();
 
@@ -447,9 +448,7 @@ describe('Gp5ImporterTest', () => {
         // invert to down
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.Auto);
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].invertBeamDirection).toBe(false);
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).toBe(
-            BeamDirection.Down
-        );
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).toBe(BeamDirection.Down);
 
         // invert to up
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.Auto);
@@ -523,18 +522,14 @@ describe('Gp5ImporterTest', () => {
         expect(score.style!.headerAndFooter.has(ScoreSubElement.Transcriber)).toBe(false);
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.Copyright)).toBe(true);
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).toBe(
-            'Copyright: %COPYRIGHT%'
-        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).toBe('Copyright: %COPYRIGHT%');
         expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.isVisible).toBe(true);
         expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.textAlign).toBe(TextAlign.Center);
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.CopyrightSecondLine)).toBe(true);
         expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.template).toBe('Copyright2');
         expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).toBe(true);
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).toBe(
-            TextAlign.Center
-        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).toBe(TextAlign.Center);
     });
 
     it('bank', async () => {
@@ -568,5 +563,105 @@ describe('Gp5ImporterTest', () => {
                 beat = beat.nextBeat;
             }
         }
+    });
+
+    it('chord-name-overflow', async () => {
+        // GP5 file with a chord name length byte that exceeds the 21-byte field
+        // (length=32). Pre-fix, gpReadStringByteLength consumed the full 32 bytes,
+        // mis-aligning the stream and triggering an unbounded readBend loop.
+        const score = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/chord-name-overflow.gp5')
+        ).readScore();
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(193);
+    });
+
+    it('gpReadStringByteLength caps consumption at field width', () => {
+        const sentinelByte = 0xca;
+        const fieldSize = 21;
+        const overlongHint = 32;
+
+        const raw = new Uint8Array(fieldSize + 2);
+        raw[0] = overlongHint;
+        for (let i = 0; i < fieldSize; i++) {
+            raw[i + 1] = 0x41;
+        }
+        raw[fieldSize + 1] = sentinelByte;
+
+        const buffer = ByteBuffer.fromBuffer(raw);
+
+        const result = GpBinaryHelpers.gpReadStringByteLength(buffer, fieldSize, 'utf-8');
+        expect(result).toBe('A'.repeat(fieldSize));
+        expect(buffer.position).toBe(1 + fieldSize);
+        expect(buffer.readByte()).toBe(sentinelByte);
+    });
+
+    describe('corrupt', () => {
+        async function corruptTest(intToWrite: number, offset: number, expectedOverflowLabel: string) {
+            const buffer = await TestPlatform.loadFile(`test-data/corrupt/healthy.gp5`);
+
+            buffer[offset + 0] = (intToWrite >> 0) & 0xff;
+            buffer[offset + 1] = (intToWrite >> 8) & 0xff;
+            buffer[offset + 2] = (intToWrite >> 16) & 0xff;
+            buffer[offset + 3] = (intToWrite >> 24) & 0xff;
+
+            const importer = GpImporterTestHelper.prepareImporterWithBytes(buffer, new Settings());
+
+            try {
+                importer.readScore();
+                throw new Error('Expected readScore to fail with an OverflowError');
+            } catch (e) {
+                if (e instanceof OverflowError) {
+                    expect((e as OverflowError).message).toContain(expectedOverflowLabel);
+                    return;
+                }
+                throw e;
+            }
+        }
+
+        it('max-bar-count', async () => await corruptTest(5000, 1235, 'bar count'));
+
+        it('max-track-count', async () => await corruptTest(300, 1239, 'track count'));
+
+        it('notice-lines-count', async () => await corruptTest(5000, 82, 'notice line count'));
+
+        it('beat-count', async () => await corruptTest(200, 1460, 'beat count'));
+
+        it('tremolo-count', async () => await corruptTest(500, 1584, 'tremolo bar point count'));
+
+        it('bend-count', async () => await corruptTest(500, 1479, 'note bend point count'));
+        it('eof', async () => {
+            let buffer = await TestPlatform.loadFile(`test-data/corrupt/healthy.gp5`);
+
+            buffer = buffer.slice(0, buffer.length / 2);
+
+            const importer = GpImporterTestHelper.prepareImporterWithBytes(buffer, new Settings());
+
+            expect(() => importer.readScore()).toThrow(EndOfReaderError);
+        });
+    });
+
+    it('harmonic-types', async () => {
+        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/harmonic-types.gp5');
+        const score = reader.readScore();
+        const b0 = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        expect(b0.notes[0].harmonicType).toBe(HarmonicType.Natural);
+        expect(b0.notes[0].harmonicValue).toBe(12);
+
+        const b1 = score.tracks[0].staves[0].bars[0].voices[0].beats[1];
+        expect(b1.notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(b1.notes[0].harmonicValue).toBe(17);
+
+        const b2 = score.tracks[0].staves[0].bars[0].voices[0].beats[2];
+        expect(b2.notes[0].harmonicType).toBe(HarmonicType.Tap);
+        expect(b2.notes[0].harmonicValue).toBe(12);
+
+        const b3 = score.tracks[0].staves[0].bars[0].voices[0].beats[3];
+        expect(b3.notes[0].harmonicType).toBe(HarmonicType.Pinch);
+        expect(b3.notes[0].harmonicValue).toBe(12);
+
+        const b4 = score.tracks[0].staves[0].bars[1].voices[0].beats[0];
+        expect(b4.notes[0].harmonicType).toBe(HarmonicType.Semi);
+        expect(b4.notes[0].harmonicValue).toBe(12);
     });
 });

@@ -25,6 +25,10 @@ import { Voice } from '@coderline/alphatab/model/Voice';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestPlatform } from 'test/TestPlatform';
 import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import { FlatMidiEvent, FlatMidiEventGenerator, FlatNoteEvent } from 'test/audio/FlatMidiEventGenerator';
+import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
+import { TestUiFacade } from 'test/visualTests/TestUiFacade';
+import { PlayerMode } from '@coderline/alphatab/PlayerSettings';
 
 describe('MidiTickLookupTest', () => {
     function buildLookup(score: Score, settings: Settings): MidiTickLookup {
@@ -729,9 +733,10 @@ describe('MidiTickLookupTest', () => {
         expect(actualIncrementalNextIds.join(','), 'nextBeatIds mismatch').toBe(nextBeatIds.join(','));
         expect(actualIncrementalTickDurations.join(','), 'durations mismatch').toBe(durations.join(','));
         if (expectedCursorModes) {
-            expect(expectedCursorModes.map(m => MidiTickLookupFindBeatResultCursorMode[m]).join(','), 'cursorModes mismatch').toBe(
-                actualCursorModes.map(m => MidiTickLookupFindBeatResultCursorMode[m]).join(',')
-            );
+            expect(
+                expectedCursorModes.map(m => MidiTickLookupFindBeatResultCursorMode[m]).join(','),
+                'cursorModes mismatch'
+            ).toBe(actualCursorModes.map(m => MidiTickLookupFindBeatResultCursorMode[m]).join(','));
         }
 
         if (!skipClean) {
@@ -1471,5 +1476,56 @@ describe('MidiTickLookupTest', () => {
                 }
             );
         });
+    });
+
+    it('swing-click-lookup', async () => {
+        const settings = new Settings();
+        settings.core.engine = 'svg';
+
+        const score = ScoreLoader.loadAlphaTex(`\\tf triplet8th C4.8 * 8`, settings);
+        const handler = new FlatMidiEventGenerator();
+        const generator = new MidiFileGenerator(score, settings, handler);
+        generator.generate();
+
+        const noteEvents = handler.midiEvents.filter<FlatMidiEvent>(e => e instanceof FlatNoteEvent);
+        expect(noteEvents.length).toBe(8);
+
+        const beats = score.tracks[0].staves[0].bars[0].voices[0].beats;
+
+        const facade = new TestUiFacade();
+        facade.rootContainer.width = 1300;
+
+        settings.player.playerMode = PlayerMode.EnabledSynthesizer;
+        const api = new AlphaTabApiBase<unknown>(facade, settings);
+
+        const promise = Promise.withResolvers<Score>();
+        api.postRenderFinished.on(() => {
+            promise.resolve(score);
+        });
+        api.error.on(e => promise.reject(e));
+        api.renderScore(score, [0]);
+
+        await promise.promise;
+
+        for (let i = 0; i < beats.length; i++) {
+            const range = generator.tickLookup.getRelativeBeatPlaybackRange(beats[i]);
+            expect(range).not.toBeUndefined();
+
+            const noteStart = noteEvents[i].tick;
+            const noteEnd = noteEvents[i].tick + (noteEvents[i] as FlatNoteEvent).length;
+
+            expect(range!.startTick).toBe(noteStart);
+            expect(range!.endTick).toBe(noteEnd);
+
+            const playbackRangePadding = 50; // small offset to avoid overshoot, see applyPlaybackRangeFromHighlight
+            if (i < beats.length - 1) {
+                api.highlightPlaybackRange(beats[i], beats[i + 1]);
+                api.applyPlaybackRangeFromHighlight();
+
+                expect(api.playbackRange!.startTick).toBe(noteStart);
+                const nextNoteEnd = noteEvents[i + 1].tick + (noteEvents[i + 1] as FlatNoteEvent).length;
+                expect(api.playbackRange!.endTick).toBe(nextNoteEnd - playbackRangePadding);
+            }
+        }
     });
 });

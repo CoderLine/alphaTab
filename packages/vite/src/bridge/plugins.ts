@@ -1,6 +1,6 @@
 // index.ts for more details on contents and license of this file
 
-import type { ObjectHook } from 'rollup';
+import type { ObjectHook } from 'rolldown';
 import type { HookHandler } from 'vite';
 
 // https://github.com/vitejs/vite/blob/v6.1.1/packages/vite/src/node/plugins/index.ts#L161

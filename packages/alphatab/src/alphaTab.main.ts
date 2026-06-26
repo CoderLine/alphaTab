@@ -114,7 +114,10 @@ if (alphaTab.Environment.isRunningInWorker) {
                 alphaTab.Environment.isViteBundled
             ) {
                 alphaTab.Logger.debug('AlphaTab', 'Creating Module worklet');
-                const alphaTabWorklet = context.audioWorklet; // this name triggers the WebPack Plugin
+                // destructure-rename keeps the `alphaTabWorklet` binding alive past
+                // rolldown's single-use inlining and isolates the call from the
+                // built-in bundler handlers that match on `audioWorklet.addModule`.
+                const { audioWorklet: alphaTabWorklet } = context;
                 return alphaTabWorklet.addModule(
                     new alphaTab.Environment.alphaTabUrl('./alphaTab.worklet.ts', import.meta.url)
                 );

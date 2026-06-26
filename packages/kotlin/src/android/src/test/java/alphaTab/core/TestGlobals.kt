@@ -153,8 +153,7 @@ class NotExpector<T>(private val actual: T, private val message: String? = null)
 }
 
 class Expector<T>(private val actual: T, private val message: String? = null) {
-    val not
-        get() = NotExpector(actual, message)
+    fun not() = NotExpector(actual, message)
 
     fun equal(expected: Any?, message: String? = null) {
         var actualToCheck = actual
@@ -230,6 +229,11 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
             Assert.assertTrue(
                 message ?: "Expected collection ${actual.joinToString(",")} to contain $value",
                 actual.contains(value)
+            )
+        } else if(actual is String) {
+            Assert.assertTrue(
+                message ?: "Expected string $actual to contain $value",
+                actual.contains(value as String)
             )
         } else {
             Assert.fail("contain can only be used with Iterable operands");

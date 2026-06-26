@@ -1,0 +1,1 @@
+input.ts:16:13: Method declarations in object literals not supported

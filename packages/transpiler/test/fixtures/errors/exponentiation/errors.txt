@@ -1,0 +1,1 @@
+input.ts:6:16: Exponentiation expresssions are not yet supported

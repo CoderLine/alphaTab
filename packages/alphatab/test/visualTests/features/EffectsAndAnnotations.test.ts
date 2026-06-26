@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { BeatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
+import { describe, expect, it } from 'vitest';
 
 describe('EffectsAndAnnotationsTests', () => {
     it('markers', async () => {
@@ -570,6 +571,68 @@ describe('EffectsAndAnnotationsTests', () => {
                 o => {
                     o.settings.display.lyricLinesPaddingBetween = 20;
                 }
+            );
+        });
+    });
+
+    describe('hopo-arcs', () => {
+        async function test(test: string, tex: string) {
+            await VisualTestHelper.runVisualTestTex(
+                tex,
+                `test-data/visual-tests/effects-and-annotations/hopo-arcs-${test}.png`
+            );
+        }
+
+        it('at1', async () => await test('at1', ':4 5.3{h} 7.3 r r'));
+        it('at2', async () => await test('at2', ':4 7.3{h} 5.3 r r'));
+        it('at3', async () => await test('at3', ':4 5.3{h} 7.3 7.3{h} 5.3'));
+        it('at4', async () => await test('at4', ':4 5.3{h} 7.3 8.4{h} 5.4'));
+        it('at5', async () => await test('at5', ':4 5.3{h} 7.3{h} 5.3 r'));
+        it('at6', async () => await test('at6', ':8 5.3{h} 7.3{h} 5.3{h} 7.3 r r r r'));
+        it('at7', async () => await test('at7', ':4 5.3{sl} 7.3 r r'));
+        it('at8', async () => await test('at8', ':4 5.3 7.3 5.3 7.3'));
+        it('at9', async () => await test('at9', ':4 (5.3{h} 5.4) (7.3 7.4) r r'));
+        it('at10', async () => await test('at10', ':4 (5.3 5.4{h}) (7.3 7.4) r r'));
+        it('at11', async () => await test('at11', ':4 (5.3{h} 5.4{h}) (7.3 7.4) r r'));
+        it('at12', async () => await test('at12', ':4 (5.3{h} 7.4{h}) (7.3 5.4) r r'));
+        it('at13', async () => await test('at13', ':4 (5.3{h} 7.4{h}) (7.3{h} 5.4{h}) (5.3 7.4) r'));
+        it('at14', async () => await test('at14', ':4 5.3 {h} 7.3{h} 5.3 | 5.4 {h} 7.4{h} 5.4'));
+
+        // Pure descending pull-off chain
+        it('pull-off-chain', async () => await test('pull-off-chain', ':4 9.3{h} 7.3{h} 5.3 r'));
+
+        // Mixed hammer-on + legato slide in one chain — the core
+        // "combined effects" case that motivated the redesign. Both
+        // labels (H, sl.) appear above the single arc.
+        it('mixed-h-slide', async () => await test('mixed-h-slide', ':4 5.3{h} 7.3{sl} 9.3 r'));
+        it('mixed-slide-h-p', async () => await test('mixed-slide-h-p', ':4 5.3{sl} 7.3{h} 9.3{h} 7.3'));
+
+        // Chain that swings up then down: H then P inside one arc
+        it('asc-then-desc', async () => await test('asc-then-desc', ':4 5.3{h} 7.3{h} 9.3{h} 7.3{h} 5.3'));
+
+        // Three-note chord with H/P chain on the upper string
+        it('chord-with-chain', async () =>
+            await test('chord-with-chain', ':4 (5.3{h} 5.4 5.5) (7.3{h} 7.4 7.5) (5.3 5.4 5.5) r'));
+
+        // Score-only — confirms ScoreSlurGlyph paints labels even
+        // without the tab staff present.
+        it('score-only', async () =>
+            await test('score-only', '\\track "T" \\staff {score} :4 5.3{h} 7.3{h} 5.3{sl} 7.3'));
+
+        // Tab-only — confirms TabSlurGlyph paints labels in isolation.
+        it('tab-only', async () =>
+            await test('tab-only', '\\track "T" \\staff {tabs} :4 5.3{h} 7.3{h} 5.3{sl} 7.3'));
+
+        // Labels disabled via NotationSettings — arcs still render but
+        // without H/P/sl. text above them.
+        it('labels-disabled', async () => {
+            const settings = new Settings();
+            settings.notation.elements.set(NotationElement.EffectHammerOnPullOffText, false);
+            settings.notation.elements.set(NotationElement.EffectSlideText, false);
+            await VisualTestHelper.runVisualTestTex(
+                ':4 5.3{h} 7.3{h} 5.3{sl} 7.3',
+                'test-data/visual-tests/effects-and-annotations/hopo-arcs-labels-disabled.png',
+                settings
             );
         });
     });

@@ -2,7 +2,10 @@ package alphaTab.platform.android
 
 import android.media.*
 import java.util.concurrent.*
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.contracts.ExperimentalContracts
+import kotlin.math.max
+import kotlin.math.min
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
@@ -61,9 +64,28 @@ internal class AndroidAudioWorker(
                     val samplesFromBuffer = _output.read(_buffer, 0, _buffer.size)
                     if (_previousPosition == -1) {
                         _previousPosition = _track.playbackHeadPosition
+                        _startPosition = _previousPosition
                         _track.getTimestamp(_timestamp)
                     }
-                    _track.write(_buffer, 0, samplesFromBuffer, AudioTrack.WRITE_BLOCKING)
+                    val silenceFloats = _buffer.size - samplesFromBuffer
+                    if (silenceFloats > 0) {
+                        _buffer.fill(0f, samplesFromBuffer, _buffer.size)
+                    }
+                    // write() may return less than requested (or a negative AudioTrack.ERROR_*
+                    // code) when the track is paused/stopped/disconnected mid-write. Only credit
+                    // counters for what actually landed in the track to keep them in sync with
+                    // playbackHeadPosition.
+                    val floatsWritten = _track.write(
+                        _buffer, 0, _buffer.size, AudioTrack.WRITE_BLOCKING
+                    )
+                    if (floatsWritten > 0) {
+                        val realFloatsWritten = min(floatsWritten, samplesFromBuffer)
+                        val silenceFloatsWritten = floatsWritten - realFloatsWritten
+                        _totalFramesWrittenToTrack.addAndGet((floatsWritten / 2).toLong())
+                        if (silenceFloatsWritten > 0) {
+                            _silenceFramesWrittenToTrack.addAndGet((silenceFloatsWritten / 2).toLong())
+                        }
+                    }
                 } else {
                     _playingSemaphore.acquire() // wait for playing to start
                     _playingSemaphore.release() // release semaphore for others
@@ -87,7 +109,14 @@ internal class AndroidAudioWorker(
 
     fun play() {
         if (_track.playState != AudioTrack.PLAYSTATE_PLAYING) {
-            _previousPosition = _track.playbackHeadPosition
+            _previousPosition = -1
+            _startPosition = -1
+            _totalFramesWrittenToTrack.set(0)
+            _silenceFramesWrittenToTrack.set(0)
+            _silenceFramesAccountedAsPlayed = 0
+            _lastTimestampUpdateNanos = -1L
+            _timestamp.nanoTime = 0
+            _timestamp.framePosition = 0
             _track.play()
             _stopped = false
 
@@ -110,14 +139,23 @@ internal class AndroidAudioWorker(
         }
     }
 
-    private var _previousPosition: Int = -1
+    @Volatile private var _previousPosition: Int = -1
+    @Volatile private var _startPosition: Int = -1
+    private val _totalFramesWrittenToTrack = AtomicLong(0)
+    private val _silenceFramesWrittenToTrack = AtomicLong(0)
+    private var _silenceFramesAccountedAsPlayed: Long = 0
     private val _timestamp = AudioTimestamp()
-    private val _lastTimestampUpdate: Long = -1L
+    private var _lastTimestampUpdateNanos: Long = -1L
 
     private fun onUpdatePlayedSamples() {
-        val sinceUpdateInMillis = (System.nanoTime() - _lastTimestampUpdate) / 10e6
-        if (sinceUpdateInMillis >= 10000) {
-            if (!_track.getTimestamp(_timestamp)) {
+        val now = System.nanoTime()
+        val sinceUpdateMs =
+            if (_lastTimestampUpdateNanos == -1L) Long.MAX_VALUE
+            else (now - _lastTimestampUpdateNanos) / 1_000_000L
+        if (sinceUpdateMs >= 10_000L) {
+            if (_track.getTimestamp(_timestamp)) {
+                _lastTimestampUpdateNanos = now
+            } else {
                 _timestamp.nanoTime = 0
                 _timestamp.framePosition = 0
             }
@@ -133,12 +171,35 @@ internal class AndroidAudioWorker(
             return
         }
 
-        val playedSamples = samplePosition - _previousPosition
-        if (playedSamples < 0) {
+        val rawDelta = samplePosition - _previousPosition
+        if (rawDelta < 0) {
+            return
+        }
+        _previousPosition = samplePosition
+
+        val silenceWritten = _silenceFramesWrittenToTrack.get()
+        if (silenceWritten == 0L) {
+            // Happy path: synth has kept the ring buffer fed the entire session — no silence
+            // has ever been queued. Behavior is bit-identical to the pre-fix logic.
+            if (rawDelta > 0) {
+                _output.onSamplesPlayed(rawDelta)
+            }
             return
         }
 
-        _previousPosition = samplePosition
-        _output.onSamplesPlayed(playedSamples)
+        // Slow path: writer has silence-padded at least once this session. Compensate for
+        // silence the head has now crossed; mathematically equivalent to capping the
+        // cumulative reported count at the cumulative real frames written.
+        val totalWritten = _totalFramesWrittenToTrack.get()
+        val realWritten = totalWritten - silenceWritten
+        val headFromStart = (samplePosition - _startPosition).toLong()
+        val silencePlayedCum = max(0L, headFromStart - realWritten)
+        val silenceCrossedThisTick = silencePlayedCum - _silenceFramesAccountedAsPlayed
+        _silenceFramesAccountedAsPlayed = silencePlayedCum
+
+        val realDelta = rawDelta.toLong() - silenceCrossedThisTick
+        if (realDelta > 0) {
+            _output.onSamplesPlayed(realDelta.toInt())
+        }
     }
 }

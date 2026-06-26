@@ -248,7 +248,6 @@ export class MasterBarTickLookup {
         if (this.firstBeat == null) {
             const n1 = new BeatTickLookup(sliceStart, end);
             n1.highlightBeat(beat, beatPlaybackStart);
-
             this._insertAfter(this.firstBeat, n1);
         }
         // Variant B

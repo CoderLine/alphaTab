@@ -23,6 +23,7 @@ export class ImporterSettingsSerializer {
         o.set("encoding", obj.encoding);
         o.set("mergepartgroupsinmusicxml", obj.mergePartGroupsInMusicXml);
         o.set("beattextaslyrics", obj.beatTextAsLyrics);
+        o.set("maxdecodingbuffersize", obj.maxDecodingBufferSize);
         return o;
     }
     public static setProperty(obj: ImporterSettings, property: string, v: unknown): boolean {
@@ -35,6 +36,9 @@ export class ImporterSettingsSerializer {
                 return true;
             case "beattextaslyrics":
                 obj.beatTextAsLyrics = v! as boolean;
+                return true;
+            case "maxdecodingbuffersize":
+                obj.maxDecodingBufferSize = v! as number;
                 return true;
         }
         return false;

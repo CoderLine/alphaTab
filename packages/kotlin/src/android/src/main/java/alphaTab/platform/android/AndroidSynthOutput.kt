@@ -32,6 +32,7 @@ internal class AndroidSynthOutput(
 
     private lateinit var _audioContext: AndroidAudioWorker
     private lateinit var _circularBuffer: CircularSampleBuffer
+    private var _readWrapper: Float32Array? = null
 
     override val sampleRate: Double
         get() = PreferredSampleRate.toDouble()
@@ -108,12 +109,18 @@ internal class AndroidSynthOutput(
     }
 
     fun read(buffer: FloatArray, offset: Int, sampleCount: Int): Int {
-        val read = Float32Array(sampleCount.toDouble())
-        val actual = _circularBuffer.read(read, 0.0, min(read.length, _circularBuffer.count))
-
-        read.data.copyInto(buffer, offset, 0, sampleCount)
+        // AndroidAudioWorker has one static buffer which is reused, we can cache the read wrapper
+        var wrapper = _readWrapper
+        if (wrapper == null || wrapper.data !== buffer) {
+            wrapper = Float32Array(buffer)
+            _readWrapper = wrapper
+        }
+        val actual = _circularBuffer.read(
+            wrapper,
+            offset.toDouble(),
+            min(sampleCount.toDouble(), _circularBuffer.count)
+        )
         requestBuffers()
-
         return actual.toInt()
     }
 
@@ -122,7 +129,7 @@ internal class AndroidSynthOutput(
     override val sampleRequest: IEventEmitter = EventEmitter()
 
     override suspend fun enumerateOutputDevices(): List<ISynthOutputDevice> {
-        val audioService = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+        val audioService = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager?
             ?: return List()
 
         return List(

@@ -2,6 +2,7 @@ import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
 import { NavMenu } from '../components/NavMenu';
 import { type Mountable, css, html, injectStyles, parseHtml } from '../util/Dom';
+import { Settings } from '@coderline/alphatab';
 
 injectStyles(
     'TestResultsApp',
@@ -395,7 +396,7 @@ export class TestResultsApp implements Mountable {
             if (!(buffer instanceof ArrayBuffer)) {
                 return;
             }
-            const zip = new ZipReader(ByteBuffer.fromBuffer(new Uint8Array(buffer)));
+            const zip = new ZipReader(ByteBuffer.fromBuffer(new Uint8Array(buffer)), new Settings().importer.maxDecodingBufferSize);
             const entries = zip.read();
             const grouped = new Map<string, TestResult>();
             for (const entry of entries) {

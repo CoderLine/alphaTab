@@ -1,7 +1,8 @@
 import * as ts from 'typescript';
 import AstPrinterBase from '../AstPrinterBase';
-import * as cs from '../csharp/CSharpAst';
-import type KotlinEmitterContext from './KotlinEmitterContext';
+import type EmitterContextBase from '../EmitterContextBase';
+import * as cs from '../ir/Ir';
+import { AlphaTabCore } from '../typeRegistry';
 
 export default class KotlinAstPrinter extends AstPrinterBase {
     private _forceInteger: boolean = false;
@@ -9,9 +10,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     private _thisScope: string[] = [];
     private _useScopes: number[] = [];
 
-    protected override _context: KotlinEmitterContext;
+    protected override _context: EmitterContextBase;
 
-    public constructor(sourceFile: cs.SourceFile, context: KotlinEmitterContext) {
+    public constructor(sourceFile: cs.SourceFile, context: EmitterContextBase) {
         super(sourceFile, context);
         this._context = context;
     }
@@ -347,6 +348,19 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeLine('@kotlin.ExperimentalUnsignedTypes');
         this.writeVisibility(d.visibility);
 
+        if (d.isStatic) {
+            this.write('object ');
+            this.writeIdentifier(d.name);
+            this.writeLine();
+            this.beginBlock();
+            for (const m of d.members) {
+                this.writeMember(m);
+            }
+            this.endBlock();
+            this._currentType = undefined;
+            return;
+        }
+
         if (d.isAbstract) {
             this.write('abstract ');
         } else if (d.hasVirtualMembersOrSubClasses) {
@@ -632,7 +646,19 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         this.writeIdentifier(d.name);
         this.write(': ');
+        const nullInitializer = d.initializer && cs.isNullLiteral(d.initializer);
+        const anyWithNullInit =
+            nullInitializer &&
+            cs.isPrimitiveTypeNode(d.type) &&
+            (d.type as cs.PrimitiveTypeNode).type === cs.PrimitiveType.Object &&
+            !d.type.isNullable;
+        if (anyWithNullInit) {
+            d.type.isNullable = true;
+        }
         this.writeType(d.type);
+        if (anyWithNullInit) {
+            d.type.isNullable = false;
+        }
 
         const needsInitializer =
             isAutoProperty &&
@@ -640,10 +666,36 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             d.parent!.nodeType !== cs.SyntaxKind.InterfaceDeclaration &&
             !d.isAbstract;
 
+        const needsOverrideDefault =
+            d.isOverride &&
+            !d.isAbstract &&
+            !d.initializer &&
+            !isLateInit &&
+            isAutoProperty &&
+            d.parent!.nodeType !== cs.SyntaxKind.InterfaceDeclaration;
+
         let initializerWritten = false;
         if (d.initializer && !isLateInit) {
             this.write(' = ');
             this.writeExpression(d.initializer);
+            initializerWritten = true;
+            this.writeLine();
+        } else if (needsOverrideDefault) {
+            if (cs.isPrimitiveTypeNode(d.type)) {
+                const pt = (d.type as cs.PrimitiveTypeNode).type;
+                if (pt === cs.PrimitiveType.Bool) {
+                    this.write(' = false');
+                } else if (pt === cs.PrimitiveType.Double) {
+                    this.write(' = 0.0');
+                } else if (pt === cs.PrimitiveType.Int || pt === cs.PrimitiveType.Long) {
+                    this.write(' = 0');
+                } else if (d.type.isNullable) {
+                    this.write(' = null');
+                }
+                // String/Object non-nullable: lateinit handled separately; skip default
+            } else if (d.type.isNullable) {
+                this.write(' = null');
+            }
             initializerWritten = true;
             this.writeLine();
         } else if (writeAsField) {
@@ -706,19 +758,21 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     protected writeFieldDeclarat1on(d: cs.FieldDeclaration) {
         this.writeDocumentation(d);
         this.writeAttributes(d);
-        this.writeVisibility(d.visibility);
 
-        if (this._context.isConst(d)) {
-            this.write('const ');
-        } else {
-            if (d.isReadonly) {
-                this.write('readonly ');
-            }
+        if (d.isStatic) {
+            this.writeLine('@kotlin.jvm.JvmStatic');
         }
 
-        this.writeType(d.type);
-        this.write(' ');
+        this.writeVisibility(d.visibility);
+
+        if (this._context.symbols.isConst(d)) {
+            this.write('const ');
+        }
+
+        this.write(d.isReadonly ? 'val ' : 'var ');
         this.writeIdentifier(d.name);
+        this.write(': ');
+        this.writeType(d.type);
         if (d.initializer) {
             this.write(' = ');
             this.writeExpression(d.initializer);
@@ -836,9 +890,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
                 if (arrayTupleType.types.length > 2) {
                     if (forNew) {
-                        this.write('alphaTab.core.ArrayTuple');
+                        this.write(AlphaTabCore.arrayTuple);
                     } else {
-                        this.write('alphaTab.core.IArrayTuple');
+                        this.write(AlphaTabCore.arrayTupleInterface);
                     }
                     this.write(arrayTupleType.types.length.toString());
                     this.write('<');
@@ -975,6 +1029,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 this.write(this._context.getFullName((type as cs.EnumMember).parent as cs.NamedTypeDeclaration));
                 break;
             default:
+                // Load-bearing debug fallthrough: same role as the C# printer's writeType
+                // default — an unhandled TypeNode kind surfaces as `TODO: <kind>` in the
+                // emitted .kt source. Snapshot tests today contain no such marker.
                 this.write(`TODO: ${cs.SyntaxKind[type.nodeType]}`);
                 break;
         }
@@ -1122,57 +1179,15 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this._returnRunTest.pop();
     }
 
-    protected shouldWriteDoubleSuffix(expr: cs.Expression): boolean {
-        let shouldWriteSuffix = false;
-        if (!this._forceInteger && expr.parent) {
-            shouldWriteSuffix = cs.isNumericLiteral(expr) ? expr.value.indexOf('.') === -1 : false;
-
-            switch (expr.parent.nodeType) {
-                case cs.SyntaxKind.ParenthesizedExpression:
-                    shouldWriteSuffix = this.shouldWriteDoubleSuffix(expr.parent!.parent!);
-                    break;
-                case cs.SyntaxKind.PropertyDeclaration:
-                case cs.SyntaxKind.FieldDeclaration:
-                case cs.SyntaxKind.VariableDeclaration:
-                case cs.SyntaxKind.ConditionalExpression:
-                    break;
-                case cs.SyntaxKind.PrefixUnaryExpression:
-                    switch ((expr.parent as cs.PrefixUnaryExpression).operator) {
-                        case '~':
-                            shouldWriteSuffix = false;
-                            break;
-                    }
-                    break;
-                case cs.SyntaxKind.BinaryExpression:
-                    const bin = expr.parent as cs.BinaryExpression;
-                    switch (bin.operator) {
-                        case '<<':
-                        case '>>':
-                        case '<':
-                        case '>':
-                        case '<=':
-                        case '>=':
-                        case '|':
-                        case '^':
-                        case '&':
-                        case '|=':
-                        case '^=':
-                        case '&=':
-                            shouldWriteSuffix = false;
-                            break;
-                        case '==':
-                        case '!=':
-                            const otherExpr = bin.left === expr ? bin.right : bin.left;
-                            shouldWriteSuffix = !this.isIntResultExpression(otherExpr);
-                            break;
-                    }
-                    break;
-            }
-        }
-
-        return shouldWriteSuffix;
-    }
-
+    /**
+     * Whether `expr` evaluates to an integer-valued result. Used by
+     * `writePrefixUnaryExpression` to decide whether a bitwise-NOT
+     * result needs a `.toDouble()` coercion based on its consumer.
+     * The numeric-literal double-suffix decision moved to
+     * `DoubleSuffixPass`; this remains because the unary-NOT cast
+     * decision is keyed on the *parent* expression's kind, not on the
+     * literal being written.
+     */
     protected isIntResultExpression(expr: cs.Expression): boolean {
         if (cs.isInvocationExpression(expr)) {
             return this.isIntResultExpression(expr.expression);
@@ -1198,7 +1213,13 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     protected writeNumericLiteral(expr: cs.NumericLiteral) {
         this.write(expr.value);
 
-        if (!expr.value.endsWith('L') && this.shouldWriteDoubleSuffix(expr)) {
+        // `DoubleSuffixPass` precomputes the Double-suffix decision and
+        // stores it on the literal. The `_forceInteger` printer flag
+        // (true while inside `writeEnumDeclaration`) suppresses the
+        // suffix even when the pass marked it; the pass already skips
+        // EnumDeclaration subtrees, so this is a defence-in-depth check
+        // for any future enum-adjacent contexts that flip the flag.
+        if (!this._forceInteger && !expr.value.endsWith('L') && expr.forceDoubleSuffix) {
             this.write('.0');
         }
     }
@@ -1265,7 +1286,6 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 this.write(')');
             }
         } else if (expr.values && expr.values.length > 0) {
-            // TODO: check for typed array creation
             this.write('alphaTab.collections.');
             this.write('List(');
             this.writeCommaSeparated(expr.values, v => {
@@ -1276,7 +1296,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             });
             this.write(')');
         } else {
-            this._context.addCsNodeDiagnostics(expr, 'Unknown array type', ts.DiagnosticCategory.Error);
+            this._context.addNodeDiagnostics(expr, 'Unknown array type', ts.DiagnosticCategory.Error);
         }
     }
 
@@ -1411,6 +1431,10 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                     this.write('.toString()');
                     return;
                 case cs.PrimitiveType.Double:
+                    if (this._forceInteger) {
+                        this.writeExpression(expr.expression);
+                        return;
+                    }
                     this.writeExpression(expr.expression);
                     if (this._isNullable(expr.expression)) {
                         this.write('!!');
@@ -1687,7 +1711,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 case cs.SyntaxKind.PrefixUnaryExpression:
                     const preOp = (s.incrementor as cs.PrefixUnaryExpression).operand;
                     if (preOp.nodeType !== cs.SyntaxKind.Identifier) {
-                        this._context.addCsNodeDiagnostics(
+                        this._context.addNodeDiagnostics(
                             s.incrementor,
                             'Unknown for incrementor',
                             ts.DiagnosticCategory.Error
@@ -1701,7 +1725,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                                 this.write('it - 1');
                                 break;
                             default:
-                                this._context.addCsNodeDiagnostics(
+                                this._context.addNodeDiagnostics(
                                     s.incrementor,
                                     'Unknown for incrementor',
                                     ts.DiagnosticCategory.Error
@@ -1719,7 +1743,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                             this.write('it - 1');
                             break;
                         default:
-                            this._context.addCsNodeDiagnostics(
+                            this._context.addNodeDiagnostics(
                                 s.incrementor,
                                 'Unknown incrementor',
                                 ts.DiagnosticCategory.Error
@@ -1738,7 +1762,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                             this.writeExpression((s.incrementor as cs.BinaryExpression).right);
                             break;
                         default:
-                            this._context.addCsNodeDiagnostics(
+                            this._context.addNodeDiagnostics(
                                 s.incrementor,
                                 'Unknown incrementor',
                                 ts.DiagnosticCategory.Error

@@ -15,4 +15,9 @@ internal class TextDecoder
     {
         return _encoding.GetString(data.Raw, 0, (int)data.ByteLength);
     }
+
+    public string Decode(Uint8Array data)
+    {
+        return _encoding.GetString(data.Buffer.Raw, (int)data.ByteOffset, (int)data.Length);
+    }
 }

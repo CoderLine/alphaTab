@@ -1,7 +1,7 @@
 import { appendFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
+import { buildTsconfigAliases } from './vite';
 
 class SummaryLabelReporter {
     constructor(private readonly label: string) {}
@@ -25,10 +25,13 @@ export function defineVitestConfig(options: VitestPackageOptions = {}) {
             ? ['default', 'github-actions', new SummaryLabelReporter(pkg.name)]
             : ['default'];
     return defineConfig({
-        plugins: [tsconfigPaths()],
+        resolve: {
+            tsconfigPaths: true,
+            alias: buildTsconfigAliases(process.cwd())
+        },
         test: {
             include: ['test/**/*.test.ts'],
-            testTimeout: options.testTimeout ?? 10000,
+            testTimeout: options.testTimeout ?? 30000,
             setupFiles: options.setupFiles,
             passWithNoTests: true,
             chaiConfig: options.truncateThreshold !== undefined

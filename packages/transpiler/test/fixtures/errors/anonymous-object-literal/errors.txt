@@ -1,0 +1,1 @@
+input.ts:10:20: Unsupported internal type of kind TypeLiteral: { x: number; y: number; }

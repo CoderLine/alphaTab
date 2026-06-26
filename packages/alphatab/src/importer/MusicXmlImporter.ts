@@ -230,7 +230,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private _extractMusicXml(): string {
-        const zip = new ZipReader(this.data);
+        const zip = new ZipReader(this.data, this.settings.importer.maxDecodingBufferSize);
         let entries: ZipEntry[];
         try {
             entries = zip.read();
@@ -1903,7 +1903,9 @@ export class MusicXmlImporter extends ScoreImporter {
                 break;
             case 'percussion':
                 bar.clef = Clef.Neutral;
-                bar.staff.isPercussion = true;
+                if(bar.index === 0){
+                    bar.staff.isPercussion = true;
+                }
                 break;
             case 'tab':
                 bar.clef = Clef.G2;
@@ -2582,16 +2584,6 @@ export class MusicXmlImporter extends ScoreImporter {
 
             this._insertBeatToVoice(newBeat, voice);
 
-            if (note !== null) {
-                note!.isVisible = noteIsVisible;
-                const trackInfo = this._indexToTrackInfo.get(track.index)!;
-                if (instrumentId !== null) {
-                    note!.percussionArticulation = trackInfo.getOrCreateArticulation(instrumentId!, note!);
-                } else if (!isPitched) {
-                    note!.percussionArticulation = trackInfo.getOrCreateArticulation('', note!);
-                }
-            }
-
             // duration only after we added it into the tree
             if (graceType !== GraceType.None) {
                 newBeat.graceType = graceType;
@@ -2759,6 +2751,52 @@ export class MusicXmlImporter extends ScoreImporter {
 
         // if not yet created do it befor we exit to ensure we created the beat/note
         ensureBeat();
+
+        if (note !== null) {
+            // Final note post-processing depends on the note already being attached to the
+            // beat/voice/bar/staff tree (e.g. percussion clef context on the resolved staff).
+            // Therefore this must run after ensureBeat() and after transposition has been applied.
+            this._finalizeImportedNote(note, track, instrumentId, isPitched, noteIsVisible);
+        }
+    }
+
+    /**
+     * Applies note-level post-processing that requires the fully resolved parse context.
+     *
+     * Purpose:
+     * - Set final visibility.
+     * - Resolve percussion articulation consistently in one place.
+     *
+     * Why this is called at the end of _parseNote:
+     * - The logic relies on final note context (attached beat/voice/bar/staff), especially
+     *   staff percussion state, and on the final display value after transposition.
+     * - Running this earlier could use incomplete or wrong context and produce wrong
+     *   articulation mapping.
+     */
+    private _finalizeImportedNote(
+        note: Note,
+        track: Track,
+        instrumentId: string | null,
+        isPitched: boolean,
+        noteIsVisible: boolean
+    ) {
+        note.isVisible = noteIsVisible;
+
+        if (note.percussionArticulation >= 0) {
+            return;
+        }
+
+        const trackInfo = this._indexToTrackInfo.get(track.index)!;
+        if (instrumentId !== null) {
+            note.percussionArticulation = trackInfo.getOrCreateArticulation(instrumentId, note);
+        } else if (note.beat.voice.bar.staff.isPercussion && isPitched) {
+            const knownArticulation = PercussionMapper.getArticulationById(note.displayValue);
+            if (knownArticulation) {
+                note.percussionArticulation = knownArticulation.id;
+            }
+        } else if (!isPitched) {
+            note.percussionArticulation = trackInfo.getOrCreateArticulation('', note);
+        }
     }
 
     private _parsePlay(element: XmlNode, note: Note | null) {

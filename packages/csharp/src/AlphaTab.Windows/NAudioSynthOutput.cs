@@ -26,6 +26,7 @@ namespace AlphaTab
         private int _bufferCount;
         private int _requestedBufferCount;
         private ISynthOutputDevice? _device;
+        private Float32Array? _readWrapper;
 
         /// <inheritdoc />
         public double SampleRate => PreferredSampleRate;
@@ -139,13 +140,18 @@ namespace AlphaTab
         /// <inheritdoc />
         public override int Read(float[] buffer, int offset, int count)
         {
-            var read = new Float32Array(count);
+            // NAudio reuses the same provider buffer across reads, so cache the
+            // Float32Array wrapper to avoid a per-call allocation that otherwise
+            // builds up GC pressure during steady-state playback.
+            var wrapper = _readWrapper;
+            if (wrapper == null || wrapper.Data.Array != buffer)
+            {
+                wrapper = new Float32Array(buffer);
+                _readWrapper = wrapper;
+            }
 
-            var samplesFromBuffer = (int)_circularBuffer.Read(read, 0,
-                System.Math.Min(read.Length, _circularBuffer.Count));
-
-            Buffer.BlockCopy(read.Data.Array!, read.Data.Offset, buffer, offset * sizeof(float),
-                samplesFromBuffer * sizeof(float));
+            var samplesFromBuffer = (int)_circularBuffer.Read(wrapper, offset,
+                System.Math.Min(count, _circularBuffer.Count));
 
             ((EventEmitterOfT<double>)SamplesPlayed).Trigger(samplesFromBuffer /
                                                              SynthConstants.AudioChannels);

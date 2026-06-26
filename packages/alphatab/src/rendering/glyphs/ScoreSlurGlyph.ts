@@ -2,14 +2,34 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { ScoreTieGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTieGlyph';
+import { TieGlyphLabels, type TieGlyphLabel } from '@coderline/alphatab/rendering/glyphs/TieGlyphLabel';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal
  */
 export class ScoreSlurGlyph extends ScoreTieGlyph {
+    private _labels: TieGlyphLabel[] | null = null;
+
     public override getTieHeight(startX: number, _startY: number, endX: number, _endY: number): number {
         return (Math.log2(endX - startX + 1) * this.renderer.settings.notation.slurHeight) / 2;
+    }
+
+    protected override getSlurLabels(): TieGlyphLabel[] | null {
+        if (this._labels === null) {
+            this._labels = [];
+            const slur = this.startNote.beat.effectSlur;
+            if (slur !== null) {
+                const notationSettings = this.renderer.settings.notation;
+                for (const s of slur.segments) {
+                    const label = TieGlyphLabels.build(s, s.toNote.realValue >= s.fromNote.realValue);
+                    if (notationSettings.isNotationElementVisible(label.element)) {
+                        this._labels.push(label);
+                    }
+                }
+            }
+        }
+        return this._labels.length > 0 ? this._labels : null;
     }
 
     protected override calculateStartX(): number {

@@ -6,10 +6,12 @@
     "private": true,
     "scripts": {
         "typecheck": "tsc --noEmit",
+        "lint": "biome lint",
         "test": "vitest run",
         "test-web": "npm run test"
     },
     "devDependencies": {
-        "vitest": "^4.1.5"
+        "typescript": "^6.0.3",
+        "vitest": "^4.1.8"
     }
 }

@@ -3121,28 +3121,29 @@ export class AlphaTabApiBase<TSettings> {
         if (this._selectionStart && this._tickCache) {
             // get the start and stop ticks (which consider properly repeats)
             const tickCache: MidiTickLookup = this._tickCache;
-            const realMasterBarStart: number = tickCache.getMasterBarStart(
+            const realStartMasterBarStart: number = tickCache.getMasterBarStart(
                 this._selectionStart.beat.voice.bar.masterBar
             );
+            const startBeatPlaybackRange = tickCache.getRelativeBeatPlaybackRange(this._selectionStart.beat);
+            const startBeatPlaybackStart = startBeatPlaybackRange?.startTick ?? this._selectionStart.beat.playbackStart;
             // move to selection start
             this._currentBeat = null; // reset current beat so it is updating the cursor
             if (this._player.state === PlayerState.Paused) {
-                this._cursorUpdateTick(this._tickCache.getBeatStart(this._selectionStart.beat), false, 1);
+                this._cursorUpdateTick(realStartMasterBarStart + startBeatPlaybackStart, false, 1);
             }
-            this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
+            this.tickPosition = realStartMasterBarStart + startBeatPlaybackStart;
             // set playback range
             if (this._selectionEnd && this._selectionStart.beat !== this._selectionEnd.beat) {
-                const realMasterBarEnd: number = tickCache.getMasterBarStart(
+                const realEndMasterBarStart: number = tickCache.getMasterBarStart(
                     this._selectionEnd.beat.voice.bar.masterBar
                 );
-
+                const endBeatPlaybackRange = tickCache.getRelativeBeatPlaybackRange(this._selectionEnd.beat);
+                const endBeatPlaybackEnd =
+                    endBeatPlaybackRange?.endTick ??
+                    this._selectionEnd.beat.playbackStart + this._selectionEnd.beat.playbackDuration;
                 const range = new PlaybackRange();
-                range.startTick = realMasterBarStart + this._selectionStart.beat.playbackStart;
-                range.endTick =
-                    realMasterBarEnd +
-                    this._selectionEnd.beat.playbackStart +
-                    this._selectionEnd.beat.playbackDuration -
-                    50;
+                range.startTick = realStartMasterBarStart + startBeatPlaybackStart;
+                range.endTick = realEndMasterBarStart + endBeatPlaybackEnd - 50;
                 this.playbackRange = range;
             } else {
                 this._selectionStart = undefined;
@@ -3622,7 +3623,7 @@ export class AlphaTabApiBase<TSettings> {
 
         this._currentBeat = null;
         this._cursorUpdateTick(this._previousTick, false, 1, true, true);
-        if(this._selectionStart) {
+        if (this._selectionStart) {
             this.highlightPlaybackRange(this._selectionStart.beat, this._selectionEnd!.beat);
         }
 

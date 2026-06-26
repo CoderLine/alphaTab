@@ -1,6 +1,9 @@
 // index.ts for more details on contents and license of this file
 
 // https://github.com/vitejs/vite/blob/v6.1.1/packages/vite/src/node/typeUtils.ts
+// rollup's `Plugin` is intentionally the union of valid hook names — wider
+// than rolldown's. `build.ts` runtime-guards hooks that the active plugin
+// doesn't declare, so the wider type stays safe.
 import type { ObjectHook, MinimalPluginContext as RollupMinimalPluginContext, Plugin as RollupPlugin } from 'rollup';
 
 /**
