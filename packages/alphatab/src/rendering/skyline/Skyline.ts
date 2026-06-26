@@ -205,6 +205,218 @@ export class Skyline {
         }
     }
 
+    /**
+     * Three-input variant of {@link unionShifted} fused into a single 4-way
+     * pair-merge pass: one result list and one segment rebuild instead of
+     * three.
+     */
+    public unionShifted3(o1: Skyline, dx1: number, o2: Skyline, dx2: number, o3: Skyline, dx3: number): void {
+        const a: SkylineSegment[] = o1._segments;
+        const b: SkylineSegment[] = o2._segments;
+        const c: SkylineSegment[] = o3._segments;
+        const aLast: number = a.length - 1;
+        const bLast: number = b.length - 1;
+        const cLast: number = c.length - 1;
+        const xMin: number = this.xMin;
+        const xMax: number = this.xMax;
+
+        // Treat streams that are out-of-range or have no positive height as absent.
+        let aActive: boolean = !(a[aLast].xStart + dx1 <= xMin || a[0].xStart + dx1 >= xMax);
+        if (aActive) {
+            let any: boolean = false;
+            for (let k: number = 0; k < aLast; k = k + 1) {
+                if (a[k].height > 0) {
+                    any = true;
+                    break;
+                }
+            }
+            aActive = any;
+        }
+        let bActive: boolean = !(b[bLast].xStart + dx2 <= xMin || b[0].xStart + dx2 >= xMax);
+        if (bActive) {
+            let any: boolean = false;
+            for (let k: number = 0; k < bLast; k = k + 1) {
+                if (b[k].height > 0) {
+                    any = true;
+                    break;
+                }
+            }
+            bActive = any;
+        }
+        let cActive: boolean = !(c[cLast].xStart + dx3 <= xMin || c[0].xStart + dx3 >= xMax);
+        if (cActive) {
+            let any: boolean = false;
+            for (let k: number = 0; k < cLast; k = k + 1) {
+                if (c[k].height > 0) {
+                    any = true;
+                    break;
+                }
+            }
+            cActive = any;
+        }
+        if (!aActive && !bActive && !cActive) {
+            return;
+        }
+
+        const t: SkylineSegment[] = this._segments;
+        const tLast: number = t.length - 1;
+
+        const newSegs: SkylineSegment[] = [];
+
+        let i: number = 0;
+        let ja: number = 0;
+        let jb: number = 0;
+        let jc: number = 0;
+
+        // Skip leading segments that end at or before xMin.
+        if (aActive) {
+            while (ja < aLast && a[ja + 1].xStart + dx1 <= xMin) {
+                ja = ja + 1;
+            }
+        }
+        if (bActive) {
+            while (jb < bLast && b[jb + 1].xStart + dx2 <= xMin) {
+                jb = jb + 1;
+            }
+        }
+        if (cActive) {
+            while (jc < cLast && c[jc + 1].xStart + dx3 <= xMin) {
+                jc = jc + 1;
+            }
+        }
+
+        let x: number = xMin;
+        while (x < xMax) {
+            const thisH: number = i < tLast ? t[i].height : 0;
+            let h: number = thisH;
+
+            if (aActive && ja < aLast) {
+                const oStart: number = a[ja].xStart + dx1;
+                if (x >= oStart) {
+                    const ah: number = a[ja].height;
+                    if (ah > h) {
+                        h = ah;
+                    }
+                }
+            }
+            if (bActive && jb < bLast) {
+                const oStart: number = b[jb].xStart + dx2;
+                if (x >= oStart) {
+                    const bh: number = b[jb].height;
+                    if (bh > h) {
+                        h = bh;
+                    }
+                }
+            }
+            if (cActive && jc < cLast) {
+                const oStart: number = c[jc].xStart + dx3;
+                if (x >= oStart) {
+                    const ch: number = c[jc].height;
+                    if (ch > h) {
+                        h = ch;
+                    }
+                }
+            }
+
+            // Find next breakpoint across all 4 streams.
+            let nextX: number = xMax;
+            if (i < tLast) {
+                const tNext: number = t[i + 1].xStart;
+                if (tNext < nextX) {
+                    nextX = tNext;
+                }
+            }
+            if (aActive && ja < aLast) {
+                const oStart: number = a[ja].xStart + dx1;
+                if (x < oStart) {
+                    if (oStart < nextX) {
+                        nextX = oStart;
+                    }
+                } else {
+                    const oExit: number = a[ja + 1].xStart + dx1;
+                    if (oExit < nextX) {
+                        nextX = oExit;
+                    }
+                }
+            }
+            if (bActive && jb < bLast) {
+                const oStart: number = b[jb].xStart + dx2;
+                if (x < oStart) {
+                    if (oStart < nextX) {
+                        nextX = oStart;
+                    }
+                } else {
+                    const oExit: number = b[jb + 1].xStart + dx2;
+                    if (oExit < nextX) {
+                        nextX = oExit;
+                    }
+                }
+            }
+            if (cActive && jc < cLast) {
+                const oStart: number = c[jc].xStart + dx3;
+                if (x < oStart) {
+                    if (oStart < nextX) {
+                        nextX = oStart;
+                    }
+                } else {
+                    const oExit: number = c[jc + 1].xStart + dx3;
+                    if (oExit < nextX) {
+                        nextX = oExit;
+                    }
+                }
+            }
+            if (nextX > xMax) {
+                nextX = xMax;
+            }
+            if (nextX <= x) {
+                nextX = xMax;
+            }
+
+            if (newSegs.length > 0 && newSegs[newSegs.length - 1].height === h) {
+                // coalesce equal-height neighbours
+            } else {
+                const ns: SkylineSegment = this._pool.acquire();
+                ns.xStart = x;
+                ns.height = h;
+                newSegs.push(ns);
+            }
+
+            x = nextX;
+
+            while (i < tLast && t[i + 1].xStart <= x) {
+                i = i + 1;
+            }
+            if (aActive) {
+                while (ja < aLast && a[ja + 1].xStart + dx1 <= x) {
+                    ja = ja + 1;
+                }
+            }
+            if (bActive) {
+                while (jb < bLast && b[jb + 1].xStart + dx2 <= x) {
+                    jb = jb + 1;
+                }
+            }
+            if (cActive) {
+                while (jc < cLast && c[jc + 1].xStart + dx3 <= x) {
+                    jc = jc + 1;
+                }
+            }
+        }
+
+        const sentinel: SkylineSegment = this._pool.acquire();
+        sentinel.xStart = xMax;
+        sentinel.height = 0;
+        newSegs.push(sentinel);
+
+        while (this._segments.length > 0) {
+            const s: SkylineSegment = this._segments.pop()!;
+            this._pool.release(s);
+        }
+        for (let k: number = 0; k < newSegs.length; k = k + 1) {
+            this._segments.push(newSegs[k]);
+        }
+    }
+
     public maxHeightInRange(xStart: number, xEnd: number): number {
         return this._maxHeightInRange(xStart, xEnd);
     }

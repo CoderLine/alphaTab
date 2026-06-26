@@ -1,6 +1,7 @@
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { Profiler } from '@coderline/alphatab/profiling/Profiler';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import {
     type BarRendererFactory,
@@ -242,12 +243,8 @@ export class RenderStaff {
         // group's final x (settled by scaleToWidth) before unioning.
         const postBaseX = baseX + renderer.postBeatGroupOffset;
 
-        sky.upSky.unionShifted(bar.upSky, baseX);
-        sky.downSky.unionShifted(bar.downSky, baseX);
-        sky.upSky.unionShifted(pre.upSky, baseX);
-        sky.downSky.unionShifted(pre.downSky, baseX);
-        sky.upSky.unionShifted(post.upSky, postBaseX);
-        sky.downSky.unionShifted(post.downSky, postBaseX);
+        sky.upSky.unionShifted3(bar.upSky, baseX, pre.upSky, baseX, post.upSky, postBaseX);
+        sky.downSky.unionShifted3(bar.downSky, baseX, pre.downSky, baseX, post.downSky, postBaseX);
     }
 
     /**
@@ -274,6 +271,7 @@ export class RenderStaff {
     }
 
     public finalizeStaff(): void {
+        Profiler.begin('layout.finalizeStaff');
         this._applyStaffPaddings();
 
         this.height = 0;
@@ -311,6 +309,7 @@ export class RenderStaff {
         this.height = Math.ceil(this.height);
 
         this._updateVisibility();
+        Profiler.end('layout.finalizeStaff');
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas, startIndex: number, count: number): void {

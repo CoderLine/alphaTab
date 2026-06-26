@@ -39,6 +39,18 @@ export class TabBarRenderer extends LineBarRenderer {
 
     private _showMultiBarRest: boolean = false;
 
+    /**
+     * Layout-time staff-line gap cache, bucketed by string-line index.
+     * `_gapBucketEnd[i]` is the exclusive end-offset into the parallel
+     * `_gapRelXAndWidth` / `_gapBeatRefs` arrays for line `i`. Stores the
+     * width-invariant payload; absolute x is projected at paint time via
+     * `beatGlyphsStart + bg.x + relativeX`.
+     */
+    private _gapBucketEnd: Uint32Array | null = null;
+    private _gapRelXAndWidth: Float32Array | null = null;
+    private _gapBeatRefs: BeatContainerGlyphBase[] | null = null;
+    private _gapCount: number = 0;
+
     public override get showMultiBarRest(): boolean {
         return this._showMultiBarRest;
     }
@@ -86,13 +98,147 @@ export class TabBarRenderer extends LineBarRenderer {
     public minString = Number.NaN;
     public maxString = Number.NaN;
 
+    /**
+     * Legacy adapter projecting the gap cache into the base class
+     * `spaces[][]` shape. The real consumer is {@link paintStaffLines}
+     * which reads the cache directly.
+     */
     protected override collectSpaces(spaces: Float32Array[][]): void {
         if (this.additionalMultiRestBars) {
             return;
         }
+        if (this._gapBucketEnd === null) {
+            this._buildGapCache();
+        }
+        const count = this._gapCount;
+        if (count === 0) {
+            return;
+        }
+        const bucketEnd = this._gapBucketEnd!;
+        const relXAndWidth = this._gapRelXAndWidth!;
+        const beatRefs = this._gapBeatRefs!;
+        const base = this.beatGlyphsStart;
+        let line = 0;
+        for (let i = 0; i < count; i++) {
+            while (i >= bucketEnd[line]) {
+                line++;
+            }
+            const absX = base + beatRefs[i].x + relXAndWidth[i * 2];
+            spaces[line].push(new Float32Array([absX, relXAndWidth[i * 2 + 1]]));
+        }
+    }
 
-        const padding: number = this.smuflMetrics.staffLineThickness;
+    protected override paintStaffLines(cx: number, cy: number, canvas: ICanvas): void {
+        using _ = ElementStyleHelper.bar(canvas, this.staffLineBarSubElement, this.bar, true);
+
+        const lineWidth = this.width;
+        const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
+        const thickness = this.smuflMetrics.staffLineThickness;
+        const drawnLineCount = this.drawnLineCount;
+        const cxLocal = cx + this.x;
+        const cyLocal = cy + this.y;
+
+        if (this.additionalMultiRestBars) {
+            for (let line = 0; line < drawnLineCount; line++) {
+                const lineY = this.getLineY(line) - lineYOffset;
+                canvas.fillRect(cxLocal, cyLocal + lineY, lineWidth, thickness);
+            }
+            return;
+        }
+
+        if (this._gapBucketEnd === null) {
+            this._buildGapCache();
+        }
+
+        const count = this._gapCount;
+        if (count === 0) {
+            for (let line = 0; line < drawnLineCount; line++) {
+                const lineY = this.getLineY(line) - lineYOffset;
+                canvas.fillRect(cxLocal, cyLocal + lineY, lineWidth, thickness);
+            }
+            return;
+        }
+
+        const bucketEnd = this._gapBucketEnd!;
+        const relXAndWidth = this._gapRelXAndWidth!;
+        const beatRefs = this._gapBeatRefs!;
+        const base = this.beatGlyphsStart;
+
+        let cursor = 0;
+        for (let line = 0; line < drawnLineCount; line++) {
+            const lineY = this.getLineY(line) - lineYOffset;
+            const cyLine = cyLocal + lineY;
+            const end = bucketEnd[line];
+
+            // Gaps were built in beat-iteration order, which is left-to-right
+            // except for grace-note edge cases — sort only on inversion.
+            let lineX = 0;
+            if (end > cursor + 1) {
+                let inverted = false;
+                let prevX = base + beatRefs[cursor].x + relXAndWidth[cursor * 2];
+                for (let k = cursor + 1; k < end; k++) {
+                    const xk = base + beatRefs[k].x + relXAndWidth[k * 2];
+                    if (xk < prevX) {
+                        inverted = true;
+                        break;
+                    }
+                    prevX = xk;
+                }
+                if (inverted) {
+                    const segCount = end - cursor;
+                    const xs = new Float32Array(segCount);
+                    const ws = new Float32Array(segCount);
+                    for (let k = 0; k < segCount; k++) {
+                        const ki = cursor + k;
+                        xs[k] = base + beatRefs[ki].x + relXAndWidth[ki * 2];
+                        ws[k] = relXAndWidth[ki * 2 + 1];
+                    }
+                    const order = new Uint32Array(segCount);
+                    for (let k = 0; k < segCount; k++) {
+                        order[k] = k;
+                    }
+                    for (let k = 1; k < segCount; k++) {
+                        const cur = order[k];
+                        const curX = xs[cur];
+                        let m = k - 1;
+                        while (m >= 0 && xs[order[m]] > curX) {
+                            order[m + 1] = order[m];
+                            m--;
+                        }
+                        order[m + 1] = cur;
+                    }
+                    for (let k = 0; k < segCount; k++) {
+                        const oi = order[k];
+                        const gx = xs[oi];
+                        const gw = ws[oi];
+                        canvas.fillRect(cxLocal + lineX, cyLine, gx - lineX, thickness);
+                        lineX = gx + gw;
+                    }
+                    canvas.fillRect(cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
+                    cursor = end;
+                    continue;
+                }
+            }
+
+            for (let k = cursor; k < end; k++) {
+                const gx = base + beatRefs[k].x + relXAndWidth[k * 2];
+                const gw = relXAndWidth[k * 2 + 1];
+                canvas.fillRect(cxLocal + lineX, cyLine, gx - lineX, thickness);
+                lineX = gx + gw;
+            }
+            canvas.fillRect(cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
+            cursor = end;
+        }
+    }
+
+    private _buildGapCache(): void {
+        const drawnLineCount = this.drawnLineCount;
         const tuning = this.bar.staff.tuning;
+        const tuningLen = tuning.length;
+
+        // First pass: count gaps per string-line for exact typed-array sizing.
+        const bucketCount = new Uint32Array(drawnLineCount);
+        let total = 0;
         for (const voice of this.voiceContainer.beatGlyphs.values()) {
             for (const bg of voice) {
                 const notes: TabBeatGlyph = (bg as TabBeatContainerGlyph).onNotes as TabBeatGlyph;
@@ -100,17 +246,81 @@ export class TabBarRenderer extends LineBarRenderer {
                 if (noteNumbers) {
                     for (const [str, noteNumber] of noteNumbers.notesPerString) {
                         if (!noteNumber.isEmpty) {
-                            spaces[tuning.length - str].push(
-                                new Float32Array([
-                                    this.beatGlyphsStart + bg.x + notes.x + noteNumbers!.x - padding,
-                                    noteNumbers!.width + padding * 2
-                                ])
-                            );
+                            const lineIdx = tuningLen - str;
+                            if (lineIdx >= 0 && lineIdx < drawnLineCount) {
+                                bucketCount[lineIdx]++;
+                                total++;
+                            }
                         }
                     }
                 }
             }
         }
+
+        this._gapCount = total;
+        if (total === 0) {
+            this._gapBucketEnd = new Uint32Array(drawnLineCount);
+            this._gapRelXAndWidth = new Float32Array(0);
+            this._gapBeatRefs = [];
+            return;
+        }
+
+        // CSR-style prefix sum to exclusive end-offsets, with parallel write cursors.
+        const bucketEnd = new Uint32Array(drawnLineCount);
+        const fwdCursor = new Uint32Array(drawnLineCount);
+        let running = 0;
+        for (let line = 0; line < drawnLineCount; line++) {
+            fwdCursor[line] = running;
+            running += bucketCount[line];
+            bucketEnd[line] = running;
+        }
+
+        const relXAndWidth = new Float32Array(total * 2);
+        const beatRefs: BeatContainerGlyphBase[] = new Array(total);
+        const padding: number = this.smuflMetrics.staffLineThickness;
+
+        for (const voice of this.voiceContainer.beatGlyphs.values()) {
+            for (const bg of voice) {
+                const notes: TabBeatGlyph = (bg as TabBeatContainerGlyph).onNotes as TabBeatGlyph;
+                const noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
+                if (noteNumbers) {
+                    const relativeXBase = notes.x + noteNumbers.x - padding;
+                    const fullWidth = noteNumbers.width + padding * 2;
+                    for (const [str, noteNumber] of noteNumbers.notesPerString) {
+                        if (!noteNumber.isEmpty) {
+                            const lineIdx = tuningLen - str;
+                            if (lineIdx >= 0 && lineIdx < drawnLineCount) {
+                                const idx = fwdCursor[lineIdx]++;
+                                relXAndWidth[idx * 2] = relativeXBase;
+                                relXAndWidth[idx * 2 + 1] = fullWidth;
+                                beatRefs[idx] = bg;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        this._gapBucketEnd = bucketEnd;
+        this._gapRelXAndWidth = relXAndWidth;
+        this._gapBeatRefs = beatRefs;
+    }
+
+    private _invalidateGapCache(): void {
+        this._gapBucketEnd = null;
+        this._gapRelXAndWidth = null;
+        this._gapBeatRefs = null;
+        this._gapCount = 0;
+    }
+
+    public override invalidateLayoutCache(): void {
+        super.invalidateLayoutCache();
+        this._invalidateGapCache();
+    }
+
+    protected override recreatePreBeatGlyphs(): void {
+        super.recreatePreBeatGlyphs();
+        this._invalidateGapCache();
     }
 
     public override doLayout(): void {

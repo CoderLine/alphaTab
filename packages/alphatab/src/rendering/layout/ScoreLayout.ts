@@ -9,6 +9,7 @@ import type { Staff } from '@coderline/alphatab/model/Staff';
 import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { Profiler } from '@coderline/alphatab/profiling/Profiler';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
@@ -84,7 +85,9 @@ export abstract class ScoreLayout {
     public resize(): void {
         this._lazyPartials.clear();
         this.slurRegistry.clear();
+        Profiler.begin('layout.doResize');
         this.doResize();
+        Profiler.end('layout.doResize');
     }
     public abstract doResize(): void;
 
@@ -127,7 +130,9 @@ export abstract class ScoreLayout {
         }
 
         this._createScoreInfoGlyphs();
+        Profiler.begin('layout.doLayoutAndRender');
         this.doLayoutAndRender(renderHints);
+        Profiler.end('layout.doLayoutAndRender');
     }
 
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();

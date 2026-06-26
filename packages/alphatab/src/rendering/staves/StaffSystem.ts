@@ -12,6 +12,7 @@ import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { Profiler } from '@coderline/alphatab/profiling/Profiler';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
@@ -1070,6 +1071,7 @@ export class StaffSystem {
     }
 
     public finalizeSystem(): void {
+        Profiler.begin('layout.finalizeSystem');
         const settings = this.layout.renderer.settings;
         if (this.index === 0) {
             this.topPadding = settings.display.firstSystemPaddingTop;
@@ -1103,6 +1105,7 @@ export class StaffSystem {
         for (const b of this._brackets!) {
             b.finalizeBracket(settings.display.resources.engravingSettings);
         }
+        Profiler.end('layout.finalizeSystem');
     }
 
     private _finalizeTrackGroups(onlyFirstGroup: boolean = false) {

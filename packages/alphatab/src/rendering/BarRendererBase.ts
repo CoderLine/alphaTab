@@ -440,17 +440,28 @@ export class BarRendererBase {
         return !this.bar || this.bar.index === this.scoreRenderer.layout!.lastBarIndex;
     }
 
+    /**
+     * Gates the voice-container walk in {@link _registerLayoutingInfo}.
+     * Broker outputs from the walk are bar-local invariant; only the
+     * pre/post-beat `max` writes need to run each resize cycle (the broker
+     * zeroes `preBeatSize` at the head of every resize).
+     */
+    private _voiceWalkDone: boolean = false;
+
     public _registerLayoutingInfo(): void {
         const info: BarLayoutingInfo = this.layoutingInfo;
         const preSize: number = this._preBeatGlyphs.width;
         if (info.preBeatSize < preSize) {
             info.preBeatSize = preSize;
         }
-        const container = this.voiceContainer;
-        container.registerLayoutingInfo(info);
+        if (!this._voiceWalkDone) {
+            const container = this.voiceContainer;
+            container.registerLayoutingInfo(info);
 
-        this.topEffects.registerLayoutingInfo(info);
-        this.bottomEffects.registerLayoutingInfo(info);
+            this.topEffects.registerLayoutingInfo(info);
+            this.bottomEffects.registerLayoutingInfo(info);
+            this._voiceWalkDone = true;
+        }
 
         const postSize: number = this._postBeatGlyphs.width;
         if (info.postBeatSize < postSize) {
@@ -501,6 +512,9 @@ export class BarRendererBase {
         this.staff = undefined;
         this.registerMultiSystemSlurs(undefined);
         this.isFinalized = false;
+        // `_layoutInvariantCached` and `_voiceWalkDone` deliberately survive:
+        // they cache bar-local invariant state and `afterReverted` fires every
+        // resize cycle — invalidating here would defeat the optimisation.
     }
 
     public afterStaffBarReverted() {
@@ -537,6 +551,18 @@ export class BarRendererBase {
     }
 
     public isFinalized: boolean = false;
+
+    /**
+     * Set once {@link doLayout} has populated the bar-local invariant state
+     * (`_preBeatGlyphs.width`, `_postBeatGlyphs.width`, broker per-beat sizes,
+     * local pre/post-beat skylines). Lets {@link reLayout} skip the bar-local
+     * re-walk on width-only changes.
+     */
+    private _layoutInvariantCached: boolean = false;
+
+    public invalidateLayoutCache(): void {
+        this._layoutInvariantCached = false;
+    }
 
     public registerMultiSystemSlurs(startedTies: Generator<TieGlyph> | undefined) {
         if (!startedTies) {
@@ -679,6 +705,8 @@ export class BarRendererBase {
         this.computedWidth = this.width;
 
         this.calculateOverflows(0, this.height);
+
+        this._layoutInvariantCached = true;
     }
 
     protected calculateOverflows(_rendererTop: number, rendererBottom: number) {
@@ -923,12 +951,18 @@ export class BarRendererBase {
             this.recreatePreBeatGlyphs();
         }
 
+        // Must always re-register: the broker zeroes `preBeatSize` at the head of every resize cycle.
         this._registerLayoutingInfo();
         this._registerOverlayRods();
-        this.calculateOverflows(0, this.height);
+        if (!this._layoutInvariantCached) {
+            this.calculateOverflows(0, this.height);
+            this._layoutInvariantCached = true;
+        }
     }
 
     protected recreatePreBeatGlyphs() {
+        // Pre-beat composition is changing — invalidate cached bar-local state.
+        this._layoutInvariantCached = false;
         this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
         this._preBeatGlyphs.renderer = this;
         this.createPreBeatGlyphs();
