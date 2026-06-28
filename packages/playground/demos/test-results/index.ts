@@ -6,3 +6,10 @@ if (!root) {
 }
 const app = new TestResultsApp();
 root.appendChild(app.root);
+
+if (import.meta.hot) {
+    import.meta.hot.accept();
+    import.meta.hot.dispose(() => {
+        app.dispose();
+    });
+}

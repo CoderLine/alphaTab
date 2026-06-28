@@ -6,6 +6,7 @@ import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGly
 import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { LyricsGlyph } from '@coderline/alphatab/rendering/glyphs/LyricsGlyph';
+import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -26,6 +27,10 @@ export class LyricsEffectInfo extends EffectInfo {
 
     public override get placementCategory(): EffectBandPlacementCategory {
         return EffectBandPlacementCategory.HorizontalRow;
+    }
+
+    public override get overlayRodPolicy(): OverlayRodPolicy {
+        return OverlayRodPolicy.Centered;
     }
 
     public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {

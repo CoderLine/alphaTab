@@ -6,6 +6,7 @@ import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGly
 import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
+import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -18,6 +19,10 @@ export class FreeTimeEffectInfo extends EffectInfo {
 
     public get hideOnMultiTrack(): boolean {
         return false;
+    }
+
+    public override get overlayRodPolicy(): OverlayRodPolicy {
+        return OverlayRodPolicy.Left;
     }
 
     public get sizingMode(): EffectBarGlyphSizing {

@@ -36,6 +36,7 @@ export class LyricsGlyph extends EffectGlyph {
             if (size.width > maxWidth) {
                 maxWidth = size.width;
             }
+            this.width = Math.max(this.width, size.width);
         }
         y -= lineSpacing;
 

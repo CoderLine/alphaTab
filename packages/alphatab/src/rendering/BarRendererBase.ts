@@ -18,6 +18,7 @@ import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/gl
 import { MultiVoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/MultiVoiceContainerGlyph';
 import { ContinuationTieGlyph, type ITieGlyph, type TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
+import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { BarLocalSkyline, StaffSide } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
@@ -457,6 +458,45 @@ export class BarRendererBase {
         }
     }
 
+    public _registerOverlayRods(): void {
+        const info: BarLayoutingInfo = this.layoutingInfo;
+        this._collectOverlayRods(this.topEffects, info);
+        this._collectOverlayRods(this.bottomEffects, info);
+    }
+
+    private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo): void {
+        for (const band of container.bands) {
+            const policy = band.info.overlayRodPolicy;
+            if (policy === OverlayRodPolicy.None) {
+                continue;
+            }
+            const bandKey = String(band.info.notationElement);
+            for (const voiceGlyphs of band.glyphsByVoice) {
+                for (const glyph of voiceGlyphs) {
+                    if (!glyph.beat || glyph.width <= 0) {
+                        continue;
+                    }
+                    const w = glyph.width;
+                    const t = glyph.beat.absoluteDisplayStart;
+                    switch (policy) {
+                        case OverlayRodPolicy.Left:
+                            info.addOverlayRod(bandKey, t, 0, w);
+                            break;
+                        case OverlayRodPolicy.Right:
+                            info.addOverlayRod(bandKey, t, w, 0);
+                            break;
+                        default: {
+                            const half = w * 0.5;
+                            info.addOverlayRod(bandKey, t, half, half);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     public afterReverted() {
         this.staff = undefined;
         this.registerMultiSystemSlurs(undefined);
@@ -625,6 +665,7 @@ export class BarRendererBase {
         this.createPostBeatGlyphs();
 
         this._registerLayoutingInfo();
+        this._registerOverlayRods();
 
         this.updateSizes();
 
@@ -883,6 +924,7 @@ export class BarRendererBase {
         }
 
         this._registerLayoutingInfo();
+        this._registerOverlayRods();
         this.calculateOverflows(0, this.height);
     }
 

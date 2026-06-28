@@ -7,8 +7,7 @@ export default defineConfig(_ => {
     const config: UserConfig = {
         plugins: [server(), elementStyleUsingPlugin()],
         resolve: {
-            tsconfigPaths: true,
-            alias: buildTsconfigAliases(process.cwd())
+            alias: buildTsconfigAliases(__dirname)
         },
         server: {
             open: '/index.html'

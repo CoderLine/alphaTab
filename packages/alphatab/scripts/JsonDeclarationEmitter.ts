@@ -129,7 +129,7 @@ function cloneJsDoc<T extends ts.Node>(node: T, source: ts.Node, additionalTags:
 
 function createJsonMember(
     program: ts.Program,
-    input: ts.PropertyDeclaration,
+    input: ts.PropertyDeclaration | ts.GetAccessorDeclaration,
     importer: (name: string, module: string) => void
 ): ts.TypeElement {
     const typeInfo = getTypeWithNullableInfo(program, input.type ?? program.getTypeChecker().getTypeAtLocation(input.name), true, false, undefined);
@@ -150,14 +150,18 @@ function createJsonMembers(
     input: ts.ClassDeclaration,
     importer: (name: string, module: string) => void
 ): ts.TypeElement[] {
+    const hasMatchingSetter = (name: string): boolean =>
+        input.members.some(m => ts.isSetAccessorDeclaration(m) && (m.name as ts.Identifier).text === name);
+
     return input.members
         .filter(
             m =>
-                ts.isPropertyDeclaration(m) &&
-                m.modifiers &&
-                !m.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword)
+                (ts.isPropertyDeclaration(m) || ts.isGetAccessorDeclaration(m)) &&
+                !m.modifiers?.find(m => m.kind === ts.SyntaxKind.StaticKeyword) &&
+                !ts.getJSDocTags(m).find(t => t.tagName.text === 'json_ignore') &&
+                (!ts.isGetAccessorDeclaration(m) || hasMatchingSetter((m.name as ts.Identifier).text))
         )
-        .map(m => createJsonMember(program, m as ts.PropertyDeclaration, importer));
+        .map(m => createJsonMember(program, m as ts.PropertyDeclaration | ts.GetAccessorDeclaration, importer));
 }
 
 let allJsonTypes: Map<string, string> = new Map<string, string>();

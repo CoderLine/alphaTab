@@ -8,6 +8,7 @@ internal static class Math
 {
     private static readonly Random Rnd = new Random();
     public static double PI => System.Math.PI;
+    public const double SQRT2 = 1.4142135623730951;
 
     public static double Random()
     {

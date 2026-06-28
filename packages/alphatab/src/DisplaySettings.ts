@@ -53,6 +53,35 @@ export class DisplaySettings {
     public stretchForce: number = 1.0;
 
     /**
+     * The proportional spacing ratio between successive note durations.
+     * @since 1.9.0
+     * @category Display
+     * @defaultValue `Math.SQRT2` (≈ 1.414, matches Dorico's default)
+     * @remarks
+     * Controls the *shape* of the horizontal spacing curve - how much wider a note of duration `2d` is rendered relative to a note of duration `d`.
+     * AlphaTab uses a power-law spacing model (the same approach used by Dorico, MuseScore and Finale): doubling the note duration multiplies its
+     * allocated horizontal space by `spacingRatio`.
+     *
+     * Reference values for cross-application comparison:
+     *
+     * | Application / Style        | Ratio                | Character                          |
+     * |----------------------------|----------------------|------------------------------------|
+     * | Dorico default             | √2 ≈ 1.414           | Tight, efficient, orchestral       |
+     * | MuseScore default          | 1.5                  | Balanced, general-purpose          |
+     * | Finale default (Fibonacci) | φ ≈ 1.618            | Loose, traditional engraving       |
+     *
+     * AlphaTab defaults to `√2` (Dorico's value). This produces tighter spacing at long
+     * durations than the alternatives, which matters for guitar tablature where rest bars and
+     * whole notes are common - looser ratios make those bars dominate system width.
+     *
+     * This setting is orthogonal to {@link stretchForce}: `spacingRatio` controls the *shape* of the spacing (proportions between durations),
+     * `stretchForce` controls the overall *density* (how tightly or loosely the music is packed). Both can be adjusted independently.
+     *
+     * Values are clamped to the range `[1.2, 2.0]`. A value of `1.0` would produce equal spacing for all durations and is rejected.
+     */
+    public spacingRatio: number = Math.SQRT2;
+
+    /**
      * The layouting mode used to arrange the the notation.
      * @remarks
      * AlphaTab has various layout engines that arrange the rendered bars differently. This setting controls which layout mode is used.
@@ -124,18 +153,64 @@ export class DisplaySettings {
     public barCountPerPartial: number = 10;
 
     /**
-     * Whether to justify also the last system in page layouts.
+     * The minimum fullness ratio at which the last system in a flow is justified to fill the
+     * available staff width.
+     * @since 1.9.0
+     * @category Display
+     * @defaultValue `1`
      * @remarks
-     * Setting this option to `true` tells alphaTab to also justify the last system (row) like it
-     * already does for the systems which are full.
+     * The "fullness" of a system is its natural unjustified width divided by the available
+     * staff width. The last system is stretched to full width only when its fullness is
+     * **greater than or equal to** this threshold; otherwise it renders at its natural width.
+     *
+     * Following industry convention (Dorico, MuseScore), a sparsely populated final system
+     * looks better compact than spread across the full page. The threshold lets users tune
+     * where that boundary sits.
+     *
+     * Common values:
+     *
+     * - `1` (default) — never justify the last system. Equivalent to the legacy
+     *   `justifyLastSystem = false` behaviour.
+     * - `0` — always justify the last system, even when sparse. Equivalent to the legacy
+     *   `justifyLastSystem = true` behaviour.
+     * - `0.4`–`0.7` — Dorico/MuseScore-style: justify when the last system is reasonably full,
+     *   leave compact when only a few bars trail.
+     *
+     * The threshold is bypassed when the last system is naturally wider than the available
+     * staff width - in that case the system still compresses to fit, since otherwise content
+     * would overflow horizontally.
+     *
+     * Values outside `[0, 1]` are clamped.
+     */
+    public lastSystemFillThreshold: number = 1;
+
+    /**
+     * Whether to justify also the last system in page layouts.
+     *
+     * @remarks
+     * @deprecated Use {@link lastSystemFillThreshold} for fine-grained control over when the
+     * last system is justified. This property is now a thin wrapper:
+     *
+     * - **Get** returns `true` when {@link lastSystemFillThreshold} is less than `1` (i.e. some
+     *   degree of last-system justification is enabled), `false` otherwise.
+     * - **Set** to `true` writes `lastSystemFillThreshold = 0` (always justify regardless of
+     *   fullness). Set to `false` writes `lastSystemFillThreshold = 1` (never justify).
+     *
      * | Justification Disabled                                       | Justification Enabled                                |
      * |--------------------------------------------------------------|-------------------------------------------------------|
      * | ![Disabled](https://alphatab.net/img/reference/property/justify-last-system-false.png) | ![Enabled](https://alphatab.net/img/reference/property/justify-last-system-true.png) |
+     *
      * @since 1.3.0
      * @category Display
      * @defaultValue `false`
+     * @json_read_only
      */
-    public justifyLastSystem: boolean = false;
+    public get justifyLastSystem(): boolean {
+        return this.lastSystemFillThreshold < 1;
+    }
+    public set justifyLastSystem(value: boolean) {
+        this.lastSystemFillThreshold = value ? 0 : 1;
+    }
 
     /**
      * Allows adjusting of the used fonts and colors for rendering.

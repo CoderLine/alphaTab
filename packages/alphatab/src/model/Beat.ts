@@ -364,6 +364,7 @@ export class Beat {
     /**
      * Gets a value indicating whether this beat is fade-in.
      * @deprecated Use `fade`
+     * @json_read_only
      */
     public get fadeIn(): boolean {
         return this.fade === FadeType.FadeIn;
@@ -551,6 +552,7 @@ export class Beat {
     /**
      * The speed of the tremolo.
      * @deprecated Set {@link tremoloPicking} instead.
+     * @json_read_only
      */
     public get tremoloSpeed(): Duration | null {
         const tremolo = this.tremoloPicking;

@@ -4,6 +4,7 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 import type { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -64,6 +65,15 @@ export abstract class EffectInfo {
      * @returns the sizing mode to apply to the glyphs during layout
      */
     public abstract get sizingMode(): EffectBarGlyphSizing;
+
+    /**
+     * Describes how glyphs created by this effect contribute overlay rods
+     * during bar spacing. Defaults to {@link OverlayRodPolicy.None} (no
+     * contribution); override to opt in and declare the alignment policy.
+     */
+    public get overlayRodPolicy(): OverlayRodPolicy {
+        return OverlayRodPolicy.None;
+    }
 
     /**
      * Creates a new effect glyph for the given beat.

@@ -6,6 +6,7 @@ import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGly
 import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
+import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -22,6 +23,10 @@ export class TextEffectInfo extends EffectInfo {
 
     public get sizingMode(): EffectBarGlyphSizing {
         return EffectBarGlyphSizing.SingleOnBeat;
+    }
+
+    public override get overlayRodPolicy(): OverlayRodPolicy {
+        return OverlayRodPolicy.Left;
     }
 
     public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
