@@ -4,7 +4,7 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
-import { CanvasHelper, type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import {
@@ -13,11 +13,10 @@ import {
 } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
-import type { LyricsGlyph } from '@coderline/alphatab/rendering/glyphs/LyricsGlyph';
 import { MultiVoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/MultiVoiceContainerGlyph';
-import type { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import { ContinuationTieGlyph, type ITieGlyph, type TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
+import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
@@ -293,7 +292,8 @@ export class BarRendererBase {
 
     private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo): void {
         for (const band of container.bands) {
-            if (!band.info.contributesOverlayRods) {
+            const policy = band.info.overlayRodPolicy;
+            if (policy === OverlayRodPolicy.None) {
                 continue;
             }
             const bandKey = String(band.info.notationElement);
@@ -302,17 +302,20 @@ export class BarRendererBase {
                     continue;
                 }
                 const w = glyph.width;
-                const align = (glyph as LyricsGlyph | TextGlyph).textAlign;
-                let leftExtent = w * 0.5;
-                let rightExtent = w * 0.5;
-                if (align === TextAlign.Left) {
-                    leftExtent = 0;
-                    rightExtent = w;
-                } else if (align === TextAlign.Right) {
-                    leftExtent = w;
-                    rightExtent = 0;
+                const t = glyph.beat.absoluteDisplayStart;
+                switch (policy) {
+                    case OverlayRodPolicy.Left:
+                        info.addOverlayRod(bandKey, t, 0, w);
+                        break;
+                    case OverlayRodPolicy.Right:
+                        info.addOverlayRod(bandKey, t, w, 0);
+                        break;
+                    default: {
+                        const half = w * 0.5;
+                        info.addOverlayRod(bandKey, t, half, half);
+                        break;
+                    }
                 }
-                info.addOverlayRod(bandKey, glyph.beat.absoluteDisplayStart, leftExtent, rightExtent);
             }
         }
     }

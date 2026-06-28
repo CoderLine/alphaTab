@@ -4,6 +4,7 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 import type { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -56,12 +57,12 @@ export abstract class EffectInfo {
     public abstract get sizingMode(): EffectBarGlyphSizing;
 
     /**
-     * Gets a value indicating whether glyphs created by this effect contribute
-     * overlay rods used during bar spacing. Defaults to false; override and
-     * return true to opt in.
+     * Describes how glyphs created by this effect contribute overlay rods
+     * during bar spacing. Defaults to {@link OverlayRodPolicy.None} (no
+     * contribution); override to opt in and declare the alignment policy.
      */
-    public get contributesOverlayRods(): boolean {
-        return false;
+    public get overlayRodPolicy(): OverlayRodPolicy {
+        return OverlayRodPolicy.None;
     }
 
     /**
