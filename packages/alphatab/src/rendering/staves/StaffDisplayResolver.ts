@@ -1,6 +1,21 @@
 import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
-import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+
+/**
+ * Per-staff view required by {@link StaffDisplayResolver} to evaluate
+ * placement decisions. Exposed as an interface so unit tests can supply
+ * lightweight stand-ins without instantiating a full render pipeline.
+ * {@link RenderStaff} implements this directly.
+ * @internal
+ */
+export interface IStaffDisplayContext {
+    readonly modelStaff: Staff;
+    readonly cascadePriority: number;
+    readonly systemIndex: number;
+    readonly isCascadePrimary: boolean;
+    readonly cascadeSiblings: IStaffDisplayContext[];
+}
 
 /**
  * Helpers for the staff-placement cascade and the per-axis
@@ -41,11 +56,11 @@ export class StaffDisplayResolver {
         };
     }
 
-    public static isPrimaryForElement(staff: RenderStaff, display: ElementDisplay): boolean {
+    public static isPrimaryForElement(staff: IStaffDisplayContext, display: ElementDisplay): boolean {
         if (display.isVisible === false) {
             return false;
         }
-        if (display.systemDisplay === SystemDisplay.FirstSystemOnly && staff.system.index !== 0) {
+        if (display.systemDisplay === SystemDisplay.FirstSystemOnly && staff.systemIndex !== 0) {
             return false;
         }
         switch (display.staffPlacement) {
@@ -57,10 +72,10 @@ export class StaffDisplayResolver {
         return true;
     }
 
-    public static computeCascadePrimary(staff: RenderStaff): boolean {
+    public static computeCascadePrimary(staff: IStaffDisplayContext): boolean {
         const modelStaff = staff.modelStaff;
         let primary = staff;
-        for (const sibling of staff.staffTrackGroup.staves) {
+        for (const sibling of staff.cascadeSiblings) {
             if (sibling === staff || sibling.modelStaff !== modelStaff) {
                 continue;
             }

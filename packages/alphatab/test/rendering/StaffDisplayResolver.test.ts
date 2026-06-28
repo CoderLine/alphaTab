@@ -1,99 +1,138 @@
-import { describe, expect, it } from 'vitest';
-import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
-import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
-import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
-import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
-import type { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
+import { Staff } from '@coderline/alphatab/model/Staff';
+import { type IStaffDisplayContext, StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
+import { describe, expect, it } from 'vitest';
 
 /**
- * Build a {@link RenderStaff}-shaped stub. Each siblings entry becomes
- * a peer in the same {@link StaffTrackGroup}; the focused stub is at
- * `siblings[focusIndex]`.
+ * Lightweight {@link IStaffDisplayContext} implementation used to drive
+ * {@link StaffDisplayResolver} without a full render pipeline. Sibling
+ * arrays are shared by reference across peers in the same group.
  * @internal
  */
-function makeGroup(
-    focusIndex: number,
-    siblings: Array<{ cascadePriority: number; modelStaff: Staff; systemIndex?: number }>
-): RenderStaff {
-    const group = { staves: [] as RenderStaff[] } as unknown as StaffTrackGroup;
-    const staves: RenderStaff[] = siblings.map(s => {
-        let cachedPrimary: boolean | null = null;
-        const stub = {
-            modelStaff: s.modelStaff,
-            cascadePriority: s.cascadePriority,
-            staffTrackGroup: group,
-            system: { index: s.systemIndex ?? 0 } as unknown as StaffSystem,
-            get isCascadePrimary(): boolean {
-                if (cachedPrimary === null) {
-                    cachedPrimary = StaffDisplayResolver.computeCascadePrimary(stub);
-                }
-                return cachedPrimary;
-            }
-        } as unknown as RenderStaff;
-        return stub;
-    });
-    (group as { staves: RenderStaff[] }).staves = staves;
-    return staves[focusIndex];
+class StaffDisplayContextStub implements IStaffDisplayContext {
+    public modelStaff: Staff;
+    public cascadePriority: number;
+    public systemIndex: number;
+    public cascadeSiblings: IStaffDisplayContext[] = [];
+
+    private _cachedPrimary: boolean = false;
+    private _cachedPrimaryComputed: boolean = false;
+
+    public constructor(modelStaff: Staff, cascadePriority: number, systemIndex: number = 0) {
+        this.modelStaff = modelStaff;
+        this.cascadePriority = cascadePriority;
+        this.systemIndex = systemIndex;
+    }
+
+    public get isCascadePrimary(): boolean {
+        if (!this._cachedPrimaryComputed) {
+            this._cachedPrimary = StaffDisplayResolver.computeCascadePrimary(this);
+            this._cachedPrimaryComputed = true;
+        }
+        return this._cachedPrimary;
+    }
+}
+
+/**
+ * @internal
+ */
+class StaffDisplayContextSpec {
+    public cascadePriority: number;
+    public modelStaff: Staff;
+    public systemIndex: number;
+
+    public constructor(cascadePriority: number, modelStaff: Staff, systemIndex: number = 0) {
+        this.cascadePriority = cascadePriority;
+        this.modelStaff = modelStaff;
+        this.systemIndex = systemIndex;
+    }
+}
+
+/**
+ * @internal
+ */
+class StaffDisplayContextFixtures {
+    /**
+     * Build a {@link IStaffDisplayContext}-shaped stub group. Each entry in
+     * `siblings` becomes a peer sharing the same sibling array; the
+     * focused stub is returned at `siblings[focusIndex]`.
+     */
+    public static makeGroup(focusIndex: number, siblings: StaffDisplayContextSpec[]): IStaffDisplayContext {
+        const staves: StaffDisplayContextStub[] = [];
+        for (const s of siblings) {
+            staves.push(new StaffDisplayContextStub(s.modelStaff, s.cascadePriority, s.systemIndex));
+        }
+        const sharedSiblings: IStaffDisplayContext[] = [];
+        for (const staff of staves) {
+            sharedSiblings.push(staff);
+        }
+        for (const staff of staves) {
+            staff.cascadeSiblings = sharedSiblings;
+        }
+        return staves[focusIndex];
+    }
 }
 
 describe('StaffDisplayResolver.merge', () => {
     it('returns fallback when every layer leaves all axes undefined', () => {
-        const display = StaffDisplayResolver.merge(undefined, undefined, undefined);
+        const display: ElementDisplay = StaffDisplayResolver.merge(undefined, undefined, undefined);
         expect(display.isVisible).toBe(true);
         expect(display.staffPlacement).toBe(StaffPlacement.AllStaves);
         expect(display.systemDisplay).toBe(SystemDisplay.AllSystems);
     });
 
     it('walks per-bar → per-staff → stylesheet → fallback per-axis', () => {
-        const display = StaffDisplayResolver.merge(
-            { isVisible: false },
-            { staffPlacement: StaffPlacement.Primary },
-            { systemDisplay: SystemDisplay.FirstSystemOnly }
-        );
+        const perBar: ElementDisplay = { isVisible: false };
+        const perStaff: ElementDisplay = { staffPlacement: StaffPlacement.Primary };
+        const stylesheet: ElementDisplay = { systemDisplay: SystemDisplay.FirstSystemOnly };
+        const display: ElementDisplay = StaffDisplayResolver.merge(perBar, perStaff, stylesheet);
         expect(display.isVisible).toBe(false);
         expect(display.staffPlacement).toBe(StaffPlacement.Primary);
         expect(display.systemDisplay).toBe(SystemDisplay.FirstSystemOnly);
     });
 
     it('earlier defined value wins over later layers', () => {
-        const display = StaffDisplayResolver.merge(
-            { isVisible: false },
-            { isVisible: true, staffPlacement: StaffPlacement.Primary },
-            { isVisible: true, staffPlacement: StaffPlacement.AllStaves }
-        );
+        const perBar: ElementDisplay = { isVisible: false };
+        const perStaff: ElementDisplay = { isVisible: true, staffPlacement: StaffPlacement.Primary };
+        const stylesheet: ElementDisplay = { isVisible: true, staffPlacement: StaffPlacement.AllStaves };
+        const display: ElementDisplay = StaffDisplayResolver.merge(perBar, perStaff, stylesheet);
         expect(display.isVisible).toBe(false);
         expect(display.staffPlacement).toBe(StaffPlacement.Primary);
     });
 });
 
 describe('StaffDisplayResolver.isPrimaryForElement', () => {
-    const modelStaffA = {} as Staff;
-    const modelStaffB = {} as Staff;
-    const scoreStub = (focusIndex: number) =>
-        makeGroup(focusIndex, [
-            { cascadePriority: 0, modelStaff: modelStaffA },
-            { cascadePriority: 1, modelStaff: modelStaffA }
+    const modelStaffA: Staff = new Staff();
+    const modelStaffB: Staff = new Staff();
+
+    function scoreStub(focusIndex: number): IStaffDisplayContext {
+        return StaffDisplayContextFixtures.makeGroup(focusIndex, [
+            new StaffDisplayContextSpec(0, modelStaffA),
+            new StaffDisplayContextSpec(1, modelStaffA)
         ]);
+    }
 
     it('returns false when isVisible is false', () => {
-        const staff = scoreStub(0);
-        expect(StaffDisplayResolver.isPrimaryForElement(staff, { isVisible: false })).toBe(false);
+        const staff: IStaffDisplayContext = scoreStub(0);
+        const display: ElementDisplay = { isVisible: false };
+        expect(StaffDisplayResolver.isPrimaryForElement(staff, display)).toBe(false);
     });
 
     it('suppresses paint on systems with index != 0 when systemDisplay is FirstSystemOnly', () => {
-        const focus = makeGroup(0, [{ cascadePriority: 0, modelStaff: modelStaffA, systemIndex: 1 }]);
-        expect(
-            StaffDisplayResolver.isPrimaryForElement(focus, {
-                isVisible: true,
-                staffPlacement: StaffPlacement.AllStaves,
-                systemDisplay: SystemDisplay.FirstSystemOnly
-            })
-        ).toBe(false);
+        const focus: IStaffDisplayContext = StaffDisplayContextFixtures.makeGroup(0, [
+            new StaffDisplayContextSpec(0, modelStaffA, 1)
+        ]);
+        const display: ElementDisplay = {
+            isVisible: true,
+            staffPlacement: StaffPlacement.AllStaves,
+            systemDisplay: SystemDisplay.FirstSystemOnly
+        };
+        expect(StaffDisplayResolver.isPrimaryForElement(focus, display)).toBe(false);
     });
 
     it('AllStaves paints on every staff regardless of cascade winner', () => {
-        const display = {
+        const display: ElementDisplay = {
             isVisible: true,
             staffPlacement: StaffPlacement.AllStaves,
             systemDisplay: SystemDisplay.AllSystems
@@ -103,7 +142,7 @@ describe('StaffDisplayResolver.isPrimaryForElement', () => {
     });
 
     it('Primary paints only on the cascade winner among siblings sharing the model Staff', () => {
-        const display = {
+        const display: ElementDisplay = {
             isVisible: true,
             staffPlacement: StaffPlacement.Primary,
             systemDisplay: SystemDisplay.AllSystems
@@ -113,20 +152,28 @@ describe('StaffDisplayResolver.isPrimaryForElement', () => {
     });
 
     it('cascade evaluates per model Staff — different model staves elect independent primaries', () => {
-        const display = {
+        const display: ElementDisplay = {
             isVisible: true,
             staffPlacement: StaffPlacement.Primary,
             systemDisplay: SystemDisplay.AllSystems
         };
-        const group = [
-            { cascadePriority: 0, modelStaff: modelStaffA },
-            { cascadePriority: 1, modelStaff: modelStaffA },
-            { cascadePriority: 0, modelStaff: modelStaffB },
-            { cascadePriority: 1, modelStaff: modelStaffB }
+        const group: StaffDisplayContextSpec[] = [
+            new StaffDisplayContextSpec(0, modelStaffA),
+            new StaffDisplayContextSpec(1, modelStaffA),
+            new StaffDisplayContextSpec(0, modelStaffB),
+            new StaffDisplayContextSpec(1, modelStaffB)
         ];
-        expect(StaffDisplayResolver.isPrimaryForElement(makeGroup(0, group), display)).toBe(true);
-        expect(StaffDisplayResolver.isPrimaryForElement(makeGroup(1, group), display)).toBe(false);
-        expect(StaffDisplayResolver.isPrimaryForElement(makeGroup(2, group), display)).toBe(true);
-        expect(StaffDisplayResolver.isPrimaryForElement(makeGroup(3, group), display)).toBe(false);
+        expect(StaffDisplayResolver.isPrimaryForElement(StaffDisplayContextFixtures.makeGroup(0, group), display)).toBe(
+            true
+        );
+        expect(StaffDisplayResolver.isPrimaryForElement(StaffDisplayContextFixtures.makeGroup(1, group), display)).toBe(
+            false
+        );
+        expect(StaffDisplayResolver.isPrimaryForElement(StaffDisplayContextFixtures.makeGroup(2, group), display)).toBe(
+            true
+        );
+        expect(StaffDisplayResolver.isPrimaryForElement(StaffDisplayContextFixtures.makeGroup(3, group), display)).toBe(
+            false
+        );
     });
 });
