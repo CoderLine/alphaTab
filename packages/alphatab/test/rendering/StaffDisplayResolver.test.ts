@@ -14,8 +14,8 @@ class StaffDisplayContextStub implements IStaffDisplayContext {
     public modelStaff: Staff;
     public cascadePriority: number;
     public systemIndex: number;
-    public cascadeSiblings: IStaffDisplayContext[] = [];
 
+    private _siblings: IStaffDisplayContext[] = [];
     private _cachedPrimary: boolean = false;
     private _cachedPrimaryComputed: boolean = false;
 
@@ -23,6 +23,14 @@ class StaffDisplayContextStub implements IStaffDisplayContext {
         this.modelStaff = modelStaff;
         this.cascadePriority = cascadePriority;
         this.systemIndex = systemIndex;
+    }
+
+    public get cascadeSiblings(): Iterable<IStaffDisplayContext> {
+        return this._siblings;
+    }
+
+    public setSiblings(siblings: IStaffDisplayContext[]): void {
+        this._siblings = siblings;
     }
 
     public get isCascadePrimary(): boolean {
@@ -68,7 +76,7 @@ class StaffDisplayContextFixtures {
             sharedSiblings.push(staff);
         }
         for (const staff of staves) {
-            staff.cascadeSiblings = sharedSiblings;
+            staff.setSiblings(sharedSiblings);
         }
         return staves[focusIndex];
     }

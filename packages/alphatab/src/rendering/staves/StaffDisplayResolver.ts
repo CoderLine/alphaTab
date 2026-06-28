@@ -14,7 +14,7 @@ export interface IStaffDisplayContext {
     readonly cascadePriority: number;
     readonly systemIndex: number;
     readonly isCascadePrimary: boolean;
-    readonly cascadeSiblings: IStaffDisplayContext[];
+    readonly cascadeSiblings: Iterable<IStaffDisplayContext>;
 }
 
 /**

@@ -74,7 +74,7 @@ export class RenderStaff implements IStaffDisplayContext {
         return this.system.index;
     }
 
-    public get cascadeSiblings(): IStaffDisplayContext[] {
+    public get cascadeSiblings(): Iterable<IStaffDisplayContext> {
         return this.staffTrackGroup.staves;
     }
 
