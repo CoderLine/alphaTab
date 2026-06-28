@@ -99,6 +99,14 @@ namespace AlphaTab.Core
             return list.Any(predicate);
         }
 
+        public static IList<T> Splice<T>(this IList<T> data, double start)
+        {
+            var deleteCount = data.Count - (int)start;
+            var items = data.GetRange((int)start, deleteCount);
+            data.RemoveRange((int)start, deleteCount);
+            return new List<T>(items);
+        }
+
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
         {
             var items = data.GetRange((int)start, (int)deleteCount);

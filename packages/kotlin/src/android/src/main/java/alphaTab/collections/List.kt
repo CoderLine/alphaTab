@@ -175,6 +175,23 @@ public class List<T> : Iterable<T> {
         return _data.removeAt(0)
     }
 
+    public fun splice(start: Double): List<T> {
+        var actualStart = start.toInt()
+        if (actualStart < 0) {
+            actualStart += _data.size
+        }
+        if (actualStart < 0) {
+            actualStart = 0
+        }
+        if (actualStart >= _data.size) {
+            return List()
+        }
+
+        val remove = List(ArrayListWithRemoveRange(_data.subList(actualStart, _data.size)))
+        _data.removeRange(actualStart, _data.size)
+        return remove
+    }
+
     public fun splice(start: Double, deleteCount: Double, vararg newElements: T): List<T> {
         var actualStart = start.toInt()
         if (actualStart < 0) {
