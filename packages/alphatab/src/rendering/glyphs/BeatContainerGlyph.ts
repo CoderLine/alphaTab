@@ -19,9 +19,31 @@ import { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 
 /**
+ * Per-beat effect-glyph overflow; consumed by the per-beat skyline emission
+ * walk in {@link BarRendererBase.scaleToWidth}.
+ *
+ * @record
+ * @internal
+ */
+export interface BeatEffectOverflow {
+    minY: number;
+    maxY: number;
+}
+
+/**
  * @internal
  */
 export abstract class BeatContainerGlyphBase extends Glyph {
+    public pendingEffectOverflows: BeatEffectOverflow[] = [];
+
+    /** Drain pending overflows before the next producer pass; consumer may not run. */
+    public prepareForOverflowPass(): void {
+        const pending = this.pendingEffectOverflows;
+        if (pending.length > 0) {
+            pending.splice(0, pending.length);
+        }
+    }
+
     public abstract get beatId(): number;
     public abstract get absoluteDisplayStart(): number;
     public abstract get displayDuration(): number;

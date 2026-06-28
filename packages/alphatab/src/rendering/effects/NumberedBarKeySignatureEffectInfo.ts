@@ -19,10 +19,6 @@ export class NumberedBarKeySignatureEffectInfo extends EffectInfo {
         return false;
     }
 
-    public get canShareBand(): boolean {
-        return false;
-    }
-
     public get sizingMode(): EffectBarGlyphSizing {
         return EffectBarGlyphSizing.FullBar;
     }

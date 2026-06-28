@@ -54,6 +54,7 @@ export class AsyncRewritePass implements IrPass {
         // multiple `SourceFile`s; without the shared dedupe we would
         // wrap the same node once per containing file.
         const candidates: cs.InvocationExpression[] = [];
+        const awaitedNonInvocations: cs.AwaitExpression[] = [];
         const seen = new Set<cs.Node>();
         for (const file of files) {
             const stack: cs.Node[] = [file];
@@ -64,8 +65,19 @@ export class AsyncRewritePass implements IrPass {
                 }
                 seen.add(node);
 
-                if (cs.isInvocationExpression(node) && node.tsNode && ts.isCallExpression(node.tsNode)) {
+                if (
+                    cs.isInvocationExpression(node) &&
+                    node.tsNode &&
+                    (ts.isCallExpression(node.tsNode) || ts.isNewExpression(node.tsNode))
+                ) {
                     candidates.push(node);
+                } else if (cs.isAwaitExpression(node) && !cs.isInvocationExpression(node.expression)) {
+                    // `await x.promise`, `await variable`, etc. — operand is a
+                    // non-invocation expression that still carries a `Promise<T>`
+                    // type at the TS level. Handled separately because the
+                    // in-place mutation strategy used for invocations doesn't
+                    // apply (nodeType cannot change).
+                    awaitedNonInvocations.push(node);
                 }
 
                 for (const key of Object.getOwnPropertyNames(node)) {
@@ -99,10 +111,13 @@ export class AsyncRewritePass implements IrPass {
         for (const invocation of candidates) {
             this._rewrite(invocation, context);
         }
+        for (const awaitExpr of awaitedNonInvocations) {
+            this._rewriteAwaitedOperand(awaitExpr, context);
+        }
     }
 
     private _rewrite(invocation: cs.InvocationExpression, context: EmitterContextBase): void {
-        const expression = invocation.tsNode as ts.CallExpression;
+        const expression = invocation.tsNode as ts.CallExpression | ts.NewExpression;
         const returnType = context.typeChecker.getTypeAtLocation(expression);
         if (returnType?.symbol?.name !== TsBuiltin.Promise) {
             return;
@@ -220,5 +235,42 @@ export class AsyncRewritePass implements IrPass {
         invocation.arguments = [];
         invocation.typeArguments = undefined;
         invocation.nullSafe = undefined;
+    }
+
+    /**
+     * For an `await <non-invocation-expression>` whose operand has a
+     * `Promise<T>` type at the TS level (e.g. `await x.promise`,
+     * `await someVariable`), replace the `AwaitExpression.expression`
+     * slot with a synthetic `<original-operand>.await()` invocation.
+     */
+    private _rewriteAwaitedOperand(awaitExpr: cs.AwaitExpression, context: EmitterContextBase): void {
+        const operand = awaitExpr.expression;
+        if (!operand.tsNode) {
+            return;
+        }
+        const operandTsNode = operand.tsNode as ts.Expression;
+        const operandType = context.typeChecker.getTypeAtLocation(operandTsNode);
+        if (operandType?.symbol?.name !== TsBuiltin.Promise) {
+            return;
+        }
+
+        const memberAccess: cs.MemberAccessExpression = {
+            expression: operand,
+            member: 'await',
+            parent: null as unknown as cs.Node,
+            nodeType: cs.SyntaxKind.MemberAccessExpression
+        } as cs.MemberAccessExpression;
+
+        const invocation: cs.InvocationExpression = {
+            parent: awaitExpr,
+            tsNode: operand.tsNode,
+            nodeType: cs.SyntaxKind.InvocationExpression,
+            expression: memberAccess,
+            arguments: []
+        } as cs.InvocationExpression;
+
+        memberAccess.parent = invocation;
+        operand.parent = memberAccess;
+        awaitExpr.expression = invocation;
     }
 }

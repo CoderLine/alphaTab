@@ -49,6 +49,15 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         return super.getBoundingBoxBottom() + this._calculateMaxSlurHeight(BeamDirection.Down);
     }
 
+    /** Staff-local x ({@link ITieGlyph} convention); spans the start beat. */
+    public override getBoundingBoxLeft(): number {
+        return this.renderer.x + this.renderer.getBeatX(this._beat, BeatXPosition.PostNotes);
+    }
+
+    public override getBoundingBoxRight(): number {
+        return this.renderer.x + this.renderer.getBeatX(this._beat, BeatXPosition.EndBeat);
+    }
+
     public doMultiVoiceLayout(): void {
         this._middleNoteGlyph?.doMultiVoiceLayout();
         this._endNoteGlyph?.doMultiVoiceLayout();

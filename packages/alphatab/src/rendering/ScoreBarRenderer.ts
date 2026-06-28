@@ -184,10 +184,9 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return this.getScoreY(this.bar.staff.standardNotationLineCount - 1);
     }
 
-    public override applyLayoutingInfo(): boolean {
-        const result = super.applyLayoutingInfo();
-        if (result && this.bar.isMultiVoice) {
-            // consider rest overflows
+    public override applyLayoutingInfo(): void {
+        super.applyLayoutingInfo();
+        if (this.bar.isMultiVoice) {
             const top: number = this.getScoreY(-2);
             const bottom: number = this.getScoreY(this.heightLineCount * 2);
             const minMax = this.helpers.collisionHelper.getBeatMinMaxY();
@@ -198,7 +197,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.registerOverflowBottom(Math.abs(minMax[1]) - bottom);
             }
         }
-        return result;
     }
 
     protected override getMinLineOfBeat(beat: Beat): number {

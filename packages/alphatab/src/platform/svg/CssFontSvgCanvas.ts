@@ -1,6 +1,5 @@
-import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
-import { SvgCanvas } from '@coderline/alphatab/platform/svg/SvgCanvas';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { SvgCanvas } from '@coderline/alphatab/platform/svg/SvgCanvas';
 
 /**
  * This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements.
@@ -43,22 +42,26 @@ export class CssFontSvgCanvas extends SvgCanvas {
         symbols: string,
         centerAtPosition?: boolean
     ): void {
-        x *= this.scale;
-        y *= this.scale;
-
-        this.buffer += `<g transform="translate(${x} ${y})" class="at" ><text`;
-        const scale = this.scale * relativeScale;
+        const s = this.scale;
+        if (s === 1) {
+            this.buffer += '<g transform="translate(' + x + ' ' + y + ')" class="at" ><text';
+        } else {
+            const sx = x * s;
+            const sy = y * s;
+            this.buffer += `<g transform="translate(${sx} ${sy})" class="at" ><text`;
+        }
+        const scale = s * relativeScale;
         if (scale !== 1) {
             this.buffer += ` style="font-size: ${scale * 100}%; stroke:none"`;
         } else {
             this.buffer += ' style="stroke:none"';
         }
         if (this.color.rgba !== '#000000') {
-            this.buffer += ` fill="${this.color.rgba}"`;
+            this.buffer += ' fill="' + this.color.rgba + '"';
         }
         if (centerAtPosition) {
-            this.buffer += ` text-anchor="${this.getSvgTextAlignment(TextAlign.Center)}"`;
+            this.buffer += ' text-anchor="middle"';
         }
-        this.buffer += `>${symbols}</text></g>`;
+        this.buffer += '>' + symbols + '</text></g>';
     }
 }

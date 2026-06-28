@@ -170,6 +170,22 @@ internal class NotExpector<T>
         }
     }
 
+    public void ToBeGreaterThanOrEqual(double expected)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsFalse(d.CompareTo(expected) >= 0, _message);
+        }
+    }
+
+    public void ToBeLessThanOrEqual(double expected)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsFalse(d.CompareTo(expected) <= 0, _message);
+        }
+    }
+
     public void ToBeNull()
     {
         Assert.IsNotNull(_actual, _message);
@@ -323,6 +339,24 @@ internal class Expector<T>
     public void ToBeLessThan(double expected)
     {
         LessThan(expected);
+    }
+
+    public void ToBeGreaterThanOrEqual(double expected, string? message = null)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsTrue(d.CompareTo(expected) >= 0,
+                _message ?? message ?? $"Expected {_actual} to be greater than or equal to {expected}");
+        }
+    }
+
+    public void ToBeLessThanOrEqual(double expected, string? message = null)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsTrue(d.CompareTo(expected) <= 0,
+                _message ?? message ?? $"Expected {_actual} to be less than or equal to {expected}");
+        }
     }
 
     public void ToBeInstanceOf(Type expected)

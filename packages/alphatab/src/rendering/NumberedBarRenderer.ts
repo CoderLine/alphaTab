@@ -405,7 +405,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     protected override calculateBeamYWithDirection(h: BeamingHelper, _x: number, direction: BeamDirection): number {
         this.ensureBeamDrawingInfo(h, direction);
-        const info = h.drawingInfos.get(direction)!;
+        const info = h.getDrawingInfo(direction);
         if (direction === BeamDirection.Up) {
             return Math.min(info.startY, info.endY);
         } else {

@@ -3,9 +3,10 @@ import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { LyricsGlyph } from '@coderline/alphatab/rendering/glyphs/LyricsGlyph';
+import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -20,12 +21,16 @@ export class LyricsEffectInfo extends EffectInfo {
         return false;
     }
 
-    public get canShareBand(): boolean {
-        return false;
-    }
-
     public get sizingMode(): EffectBarGlyphSizing {
         return EffectBarGlyphSizing.SingleOnBeat;
+    }
+
+    public override get placementCategory(): EffectBandPlacementCategory {
+        return EffectBandPlacementCategory.HorizontalRow;
+    }
+
+    public override get overlayRodPolicy(): OverlayRodPolicy {
+        return OverlayRodPolicy.Centered;
     }
 
     public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {

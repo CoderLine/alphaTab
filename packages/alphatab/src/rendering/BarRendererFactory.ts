@@ -48,6 +48,10 @@ export enum EffectBandMode {
 export interface EffectBandInfo {
     mode: EffectBandMode;
     effect: EffectInfo;
+    /**
+     * Visual-stack position within {@link EffectInfo.placementCategory}.
+     * Higher value = closer to staff. Defaults to the declaration index.
+     */
     order?: number;
     shouldCreate?: (staff: Staff) => boolean;
 }

@@ -9,6 +9,7 @@ import type { Staff } from '@coderline/alphatab/model/Staff';
 import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { Profiler } from '@coderline/alphatab/profiling/Profiler';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
@@ -20,6 +21,7 @@ import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { SlurRegistry } from '@coderline/alphatab/rendering/layout/SlurRegistry';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { SkylineSegmentPool } from '@coderline/alphatab/rendering/skyline/SkylineSegmentPool';
 import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
@@ -53,6 +55,8 @@ export abstract class ScoreLayout {
     public width: number = 0;
     public height: number = 0;
 
+    public readonly skylinePool: SkylineSegmentPool = new SkylineSegmentPool();
+
     public multiBarRestInfo: Map<number, number[]> | null = null;
 
     public get scaledWidth() {
@@ -71,13 +75,19 @@ export abstract class ScoreLayout {
     public abstract get firstBarX(): number;
     public abstract get supportsResize(): boolean;
 
+    /** All staff systems currently held by the layout. Implementations may
+     *  return a single-element list when the layout is single-system. */
+    public abstract get systems(): StaffSystem[];
+
     public slurRegistry = new SlurRegistry();
     public beamingRuleLookups = new Map<string, BeamingRuleLookup>();
 
     public resize(): void {
         this._lazyPartials.clear();
         this.slurRegistry.clear();
+        Profiler.begin('layout.doResize');
         this.doResize();
+        Profiler.end('layout.doResize');
     }
     public abstract doResize(): void;
 
@@ -120,12 +130,14 @@ export abstract class ScoreLayout {
         }
 
         this._createScoreInfoGlyphs();
+        Profiler.begin('layout.doLayoutAndRender');
         this.doLayoutAndRender(renderHints);
+        Profiler.end('layout.doLayoutAndRender');
     }
 
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
 
-    protected getExistingPartialArgs(id:string): RenderFinishedEventArgs|undefined {
+    protected getExistingPartialArgs(id: string): RenderFinishedEventArgs | undefined {
         return this._lazyPartials.has(id) ? this._lazyPartials.get(id)!.args : undefined;
     }
 

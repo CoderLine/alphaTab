@@ -12,6 +12,7 @@ import { createApiDtsFiles } from './typescript';
 import generateDts from './vite.plugin.dts';
 import { emitDtsPlugin } from './vite.plugin.emit-dts';
 import min from './vite.plugin.min';
+import { stripProfilingPlugin } from './vite.plugin.strip-profiling';
 import { elementStyleUsingPlugin } from './vite.plugin.transform';
 
 const terserOptions: MinifyOptions = {
@@ -122,7 +123,7 @@ export function buildTsconfigAliases(projectDir: string): Array<{ find: RegExp; 
 
 export function defaultBuildUserConfig(projectDir: string = process.cwd()): UserConfig {
     return {
-        plugins: [licenseHeaderPlugin(), elementStyleUsingPlugin()],
+        plugins: [licenseHeaderPlugin(), elementStyleUsingPlugin(), stripProfilingPlugin({ enabled: false })],
         resolve: {
             tsconfigPaths: true,
             alias: buildTsconfigAliases(projectDir)

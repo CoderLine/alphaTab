@@ -1,9 +1,9 @@
 import { Direction } from '@coderline/alphatab/model/Direction';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { type ICanvas, TextBaseline, TextAlign } from '@coderline/alphatab/platform/ICanvas';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -22,12 +22,15 @@ class TargetDirectionGlyph extends Glyph {
         // NOTE: It's nowhere documented explicitly in SMuFL but it appears direction symbols need to be scaled down
         const scale = this.renderer.smuflMetrics.directionsScale;
         this._scale = scale;
+        let totalWidth = 0;
         for (const s of this._symbols) {
             const h = this.renderer.smuflMetrics.glyphHeights.get(s)! * scale;
             if (h > this.height) {
                 this.height = h;
             }
+            totalWidth += this.renderer.smuflMetrics.glyphWidths.get(s)! * scale;
         }
+        this.width = totalWidth;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -49,7 +52,9 @@ class JumpDirectionGlyph extends Glyph {
     public override doLayout(): void {
         const c = this.renderer.scoreRenderer.canvas!;
         c.font = this.renderer.resources.elementFonts.get(NotationElement.EffectDirections)!;
-        this.height = c.measureText(this._text).height;
+        const m = c.measureText(this._text);
+        this.height = m.height;
+        this.width = m.width;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -167,6 +172,29 @@ export class DirectionsContainerGlyph extends EffectGlyph {
         }
 
         return y;
+    }
+
+    /** End-of-bar jump text (`D.C. al Coda`, …) may paint past either bar edge on narrow bars. */
+    public override getBoundingBoxLeft(): number {
+        let min = this.x;
+        for (const g of this._barEndGlyphs) {
+            const left = this.x + this.width - g.width;
+            if (left < min) {
+                min = left;
+            }
+        }
+        return min;
+    }
+
+    public override getBoundingBoxRight(): number {
+        let max = this.x + this.width;
+        for (const g of this._barBeginGlyphs) {
+            const right = this.x + g.width;
+            if (right > max) {
+                max = right;
+            }
+        }
+        return max;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

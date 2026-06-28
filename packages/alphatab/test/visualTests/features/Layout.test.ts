@@ -330,6 +330,66 @@ describe('LayoutTests', () => {
         );
     });
 
+    // §G.5 — Mid-system visibility flip: hideEmptyStaves + multi-staff where a
+    // staff is invisible at the start of a system but a later bar in the same
+    // system has content and flips it visible. The v5 §G.5 invariant requires
+    // `_calculateAccoladeSpacing` to recompute when this flip happens so the
+    // brace and per-staff Y positions reflect the post-flip visibility. Closes
+    // B.5 (firstVisibleStaff first-call-only) and B.23 (staff.height locked too
+    // early). System 2 (bars 5-8) flips staff 2 visible at bar 8.
+    it('ghost-staff-visibility', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\defaultSystemsLayout 4
+            \\track "T1"
+            \\staff {score}
+            C4.4 *4 | r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | r.1 |
+                C4.1 |
+            \\staff {score}
+                \\clef C3
+                r.1 | r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | c4.1 |
+                r.1 |
+            `,
+            'test-data/visual-tests/layout/ghost-staff-visibility.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.layoutMode = LayoutMode.Parchment;
+            }
+        );
+    });
+
+    // §G.7 — Accolade reflects post-add visibility: multi-track score where one
+    // track has content only on specific bars. The brace must scale to cover
+    // visible staves on each system; on systems where a track's bars are all
+    // rests, `hideEmptyStaves` makes its staff invisible and the brace shrinks.
+    // The visibility-fingerprint gate triggers the recompute that produces the
+    // correct accolade width per system.
+    it('accolade-on-revert', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\showSingleStaffBrackets
+            \\defaultSystemsLayout 3
+            \\track "T1"
+                C4.4 *4 | C4.4 *4 | C4.4 *4 |
+                C4.4 *4 | C4.4 *4 | C4.4 *4
+            \\track "T2"
+                C4.4 *4 | C4.4 *4 | C4.4 *4 |
+                r.1 | r.1 | r.1
+            `,
+            'test-data/visual-tests/layout/accolade-on-revert.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.layoutMode = LayoutMode.Parchment;
+            }
+        );
+    });
+
     describe('barnumberdisplay', () => {
         describe('stylesheet', () => {
             it('all', async () =>
