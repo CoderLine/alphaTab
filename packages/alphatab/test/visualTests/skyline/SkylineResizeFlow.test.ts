@@ -13,7 +13,6 @@ import { Settings } from '@coderline/alphatab/Settings';
 import { describe, expect, it } from 'vitest';
 import { TestUiFacade } from '../TestUiFacade';
 import { VisualTestHelper } from '../VisualTestHelper';
-import type { ScoreLayoutInternals } from './SkylineTestHarness';
 
 /**
  * @record
@@ -68,7 +67,7 @@ class SkylineResizeFlowHelper {
     public static captureSnapshot(api: AlphaTabApiBase<unknown>): StaffSkylineResizeSnapshot[] {
         const wrapper = api.renderer as unknown as ScoreRendererWrapper;
         const inner = wrapper.instance as unknown as ScoreRenderer;
-        const systems = (inner.layout as unknown as ScoreLayoutInternals).systems;
+        const systems = inner.layout!.systems;
 
         const out: StaffSkylineResizeSnapshot[] = [];
         for (const system of systems) {

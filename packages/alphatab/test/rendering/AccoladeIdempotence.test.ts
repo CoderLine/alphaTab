@@ -10,7 +10,6 @@ import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { ScoreRendererWrapper } from '@coderline/alphatab/rendering/ScoreRendererWrapper';
-import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import { Settings } from '@coderline/alphatab/Settings';
 import { describe, expect, it } from 'vitest';
 import { TestUiFacade } from '../visualTests/TestUiFacade';
@@ -25,14 +24,6 @@ interface SystemMetrics {
     width: number;
     computedWidth: number;
     barWidths: number[];
-}
-
-/**
- * @record
- * @internal
- */
-interface ScoreLayoutInternals {
-    systems: StaffSystem[];
 }
 
 /**
@@ -62,7 +53,7 @@ class AccoladeIdempotenceHelper {
                 api.renderer.postRenderFinished.on(() => {
                     const wrapper = api.renderer as unknown as ScoreRendererWrapper;
                     const inner = wrapper.instance as unknown as ScoreRenderer;
-                    const systems = (inner.layout as unknown as ScoreLayoutInternals).systems;
+                    const systems = inner.layout!.systems;
                     if (systems.length === 0) {
                         reject(new Error('expected at least one system'));
                         return;

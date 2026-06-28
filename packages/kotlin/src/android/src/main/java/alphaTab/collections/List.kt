@@ -112,7 +112,13 @@ public class List<T> : Iterable<T> {
     }
 
     public fun sort(comparison: (a: T, b: T) -> Double): List<T> {
-        _data.sortWith { a, b -> comparison(a, b).toInt() }
+        // Sign-only conversion: `.toInt()` truncates and can overflow when
+        // the JS-style comparator returns values outside Int range
+        // (e.g. packed sort keys at 2^40).
+        _data.sortWith { a, b ->
+            val d = comparison(a, b)
+            if (d < 0) -1 else if (d > 0) 1 else 0
+        }
         return this
     }
 

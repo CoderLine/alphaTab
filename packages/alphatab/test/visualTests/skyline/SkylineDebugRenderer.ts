@@ -3,15 +3,6 @@ import type { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { ScoreRendererWrapper } from '@coderline/alphatab/rendering/ScoreRendererWrapper';
 import type { Skyline } from '@coderline/alphatab/rendering/skyline/Skyline';
-import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
-
-/**
- * @record
- * @internal
- */
-interface OptionalSystemsRef {
-    systems?: StaffSystem[] | undefined;
-}
 
 /**
  * Test-only diagnostic that overlays the assembled up/down skylines on
@@ -36,11 +27,10 @@ export class SkylineDebugRenderer {
         // ScoreRenderer which exposes `layout`.
         const wrapper = api.renderer as unknown as ScoreRendererWrapper;
         const innerRenderer = wrapper.instance as unknown as ScoreRenderer | undefined;
-        const layoutAny = innerRenderer?.layout as unknown as OptionalSystemsRef | undefined;
-        if (!layoutAny || !Array.isArray(layoutAny.systems)) {
+        const systems = innerRenderer?.layout?.systems;
+        if (!systems || systems.length === 0) {
             return;
         }
-        const systems = layoutAny.systems as StaffSystem[];
 
         // Diagnostic overlay paints last; no need to restore canvas state.
         canvas.lineWidth = 1.5;

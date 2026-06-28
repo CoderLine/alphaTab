@@ -24,6 +24,11 @@ export class HorizontalScreenLayoutPartialInfo {
  */
 export class HorizontalScreenLayout extends ScoreLayout {
     private _system: StaffSystem | null = null;
+    private _systems: StaffSystem[] = [];
+
+    public override get systems(): StaffSystem[] {
+        return this._systems;
+    }
 
     public get name(): string {
         return 'HorizontalScreen';
@@ -68,6 +73,8 @@ export class HorizontalScreenLayout extends ScoreLayout {
 
         endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
         this._system = this.createEmptyStaffSystem(0);
+        this._systems.splice(0, this._systems.length);
+        this._systems.push(this._system);
         // Each bar in horizontal layout is sized independently (by bar.displayWidth or the bar's
         // intrinsic width), so there is no shared staff width to distribute across bars. Keep each
         // bar's spring constants referenced against its own local minimum-duration so rendering

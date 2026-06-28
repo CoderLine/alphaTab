@@ -14,7 +14,6 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { ScoreRendererWrapper } from '@coderline/alphatab/rendering/ScoreRendererWrapper';
-import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import { Settings } from '@coderline/alphatab/Settings';
 import { describe, expect, it } from 'vitest';
 import { TestUiFacade } from '../visualTests/TestUiFacade';
@@ -43,16 +42,7 @@ class ScaleToWidthCallCountHelper {
     public static collectRenderers(api: AlphaTabApiBase<unknown>): BarRendererBase[] {
         const wrapper = api.renderer as unknown as ScoreRendererWrapper;
         const inner = wrapper.instance as unknown as ScoreRenderer;
-        // VerticalLayoutBase exposes `systems: StaffSystem[]`; HorizontalScreenLayout
-        // exposes a single private `_system: StaffSystem | null`. Try both.
-        const layout = inner.layout as unknown as Record<string, unknown>;
-        const systemsArray = layout.systems as StaffSystem[] | undefined;
-        const singleSystem = layout._system as StaffSystem | null | undefined;
-        const systems: StaffSystem[] = systemsArray
-            ? [...systemsArray]
-            : singleSystem
-              ? [singleSystem]
-              : [];
+        const systems = inner.layout!.systems;
         const out: BarRendererBase[] = [];
         for (const s of systems) {
             for (const g of s.staves) {

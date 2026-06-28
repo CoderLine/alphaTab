@@ -12,7 +12,6 @@ import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { ScoreRendererWrapper } from '@coderline/alphatab/rendering/ScoreRendererWrapper';
-import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestUiFacade } from '../TestUiFacade';
 import { VisualTestHelper } from '../VisualTestHelper';
@@ -56,14 +55,6 @@ export interface StaffSkylineSnapshot {
 }
 
 /**
- * @record
- * @internal
- */
-export interface ScoreLayoutInternals {
-    systems: StaffSystem[];
-}
-
-/**
  * @internal
  */
 export class SkylineTestHarness {
@@ -93,7 +84,7 @@ export class SkylineTestHarness {
     public static captureSnapshot(api: AlphaTabApiBase<unknown>): StaffSkylineSnapshot[] {
         const wrapper = api.renderer as unknown as ScoreRendererWrapper;
         const inner = wrapper.instance as unknown as ScoreRenderer;
-        const systems = (inner.layout as unknown as ScoreLayoutInternals).systems;
+        const systems = inner.layout!.systems;
 
         const out: StaffSkylineSnapshot[] = [];
         for (const system of systems) {

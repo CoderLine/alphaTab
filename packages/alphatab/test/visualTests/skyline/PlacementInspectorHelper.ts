@@ -25,7 +25,6 @@ import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSyst
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestUiFacade } from '../TestUiFacade';
 import { VisualTestHelper } from '../VisualTestHelper';
-import type { ScoreLayoutInternals } from './SkylineTestHarness';
 import type { EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
 
 /**
@@ -176,7 +175,7 @@ export class PlacementInspectorHelper {
     public static captureReport(api: AlphaTabApiBase<unknown>, tex: string, width: number): string {
         const wrapper = api.renderer as unknown as ScoreRendererWrapper;
         const inner = wrapper.instance as unknown as ScoreRenderer;
-        const systems = (inner.layout as unknown as ScoreLayoutInternals).systems;
+        const systems = inner.layout!.systems;
 
         const lines: string[] = [];
         const escaped = tex.replace(/\n/g, '\\n');

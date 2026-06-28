@@ -20,7 +20,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
     private _barsFromPreviousSystem: MasterBarsRenderers[] = [];
 
-    public get systems(): StaffSystem[] {
+    public override get systems(): StaffSystem[] {
         return this._systems;
     }
 

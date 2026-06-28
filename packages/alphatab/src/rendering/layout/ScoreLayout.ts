@@ -74,6 +74,10 @@ export abstract class ScoreLayout {
     public abstract get firstBarX(): number;
     public abstract get supportsResize(): boolean;
 
+    /** All staff systems currently held by the layout. Implementations may
+     *  return a single-element list when the layout is single-system. */
+    public abstract get systems(): StaffSystem[];
+
     public slurRegistry = new SlurRegistry();
     public beamingRuleLookups = new Map<string, BeamingRuleLookup>();
 

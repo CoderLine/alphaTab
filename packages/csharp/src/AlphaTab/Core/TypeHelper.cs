@@ -263,13 +263,22 @@ namespace AlphaTab.Core
 
         public static IList<T> Sort<T>(this IList<T> data, Func<T, T, double> func)
         {
+            // Sign-only conversion: a direct (int) cast truncates and can
+            // overflow when the JS-style comparator returns values outside
+            // int range (e.g. packed sort keys at 2^40).
+            int Compare(T a, T b)
+            {
+                var d = func(a, b);
+                return d < 0 ? -1 : d > 0 ? 1 : 0;
+            }
+
             switch (data)
             {
                 case List<T> l:
-                    l.Sort((a, b) => (int)func(a, b));
+                    l.Sort(Compare);
                     break;
                 case T[] array:
-                    System.Array.Sort(array, (a, b) => (int)func(a, b));
+                    System.Array.Sort(array, Compare);
                     break;
                 default:
                     throw new NotSupportedException("Cannot sort list of type " +
