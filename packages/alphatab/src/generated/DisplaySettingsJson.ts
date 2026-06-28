@@ -6,6 +6,7 @@
 import { LayoutMode } from "@coderline/alphatab/LayoutMode";
 import { StaveProfile } from "@coderline/alphatab/StaveProfile";
 import { RenderingResourcesJson } from "@coderline/alphatab/generated/RenderingResourcesJson";
+import { TuningAccidentalMode } from "@coderline/alphatab/model/Tuning";
 import { SystemsLayoutMode } from "@coderline/alphatab/DisplaySettings";
 /**
  * The display settings control how the general layout and display of alphaTab is done.
@@ -293,6 +294,13 @@ export interface DisplaySettingsJson {
      * @defaultValue `5`
      */
     inlineTuningPaddingRight?: number;
+    /**
+     * The accidental style used to display tuning note names.
+     * @since 1.9.0
+     * @category Display
+     * @defaultValue `TuningAccidentalMode.Flat`
+     */
+    tuningAccidentalMode?: TuningAccidentalMode | keyof typeof TuningAccidentalMode | Lowercase<keyof typeof TuningAccidentalMode>;
     /**
      * The top padding applied to the first main notation staff (standard, tabs, numbered, slash).
      * @since 1.8.0

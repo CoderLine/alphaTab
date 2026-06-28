@@ -1,4 +1,20 @@
 /**
+ * Lists the different accidental styles used to format tuning note names.
+ * @public
+ */
+export enum TuningAccidentalMode {
+    /**
+     * Use flat note names for enharmonic tuning notes.
+     */
+    Flat = 0,
+
+    /**
+     * Use sharp note names for enharmonic tuning notes.
+     */
+    Sharp = 1
+}
+
+/**
  * This public class represents a predefined string tuning.
  * @json
  * @json_strict
@@ -11,17 +27,27 @@ export class Tuning {
     private static _fourStrings: Tuning[] = [];
     private static _defaultTunings: Map<number, Tuning> = new Map();
 
-    public static readonly noteNames: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+    public static readonly flatNoteNames: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+    public static readonly sharpNoteNames: string[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    public static readonly noteNames: string[] = Tuning.flatNoteNames;
 
-    public static getTextForTuning(tuning: number, includeOctave: boolean): string {
-        const parts = Tuning.getTextPartsForTuning(tuning);
+    public static getTextForTuning(
+        tuning: number,
+        includeOctave: boolean,
+        accidentalMode: TuningAccidentalMode = TuningAccidentalMode.Flat
+    ): string {
+        const parts = Tuning.getTextPartsForTuning(tuning, -1, accidentalMode);
         return includeOctave ? parts.join('') : parts[0];
     }
 
-    public static getTextPartsForTuning(tuning: number, octaveShift: number = -1): string[] {
+    public static getTextPartsForTuning(
+        tuning: number,
+        octaveShift: number = -1,
+        accidentalMode: TuningAccidentalMode = TuningAccidentalMode.Flat
+    ): string[] {
         const octave: number = (tuning / 12) | 0;
         const note: number = tuning % 12;
-        const notes: string[] = Tuning.noteNames;
+        const notes = accidentalMode === TuningAccidentalMode.Sharp ? Tuning.sharpNoteNames : Tuning.flatNoteNames;
         return [notes[note], (octave + octaveShift).toString()];
     }
 

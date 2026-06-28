@@ -8,6 +8,7 @@ import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { RenderingResourcesSerializer } from "@coderline/alphatab/generated/RenderingResourcesSerializer";
 import { LayoutMode } from "@coderline/alphatab/LayoutMode";
 import { StaveProfile } from "@coderline/alphatab/StaveProfile";
+import { TuningAccidentalMode } from "@coderline/alphatab/model/Tuning";
 import { SystemsLayoutMode } from "@coderline/alphatab/DisplaySettings";
 /**
  * @internal
@@ -44,6 +45,7 @@ export class DisplaySettingsSerializer {
         o.set("systemlabelpaddingright", obj.systemLabelPaddingRight);
         o.set("accoladebarpaddingright", obj.accoladeBarPaddingRight);
         o.set("inlinetuningpaddingright", obj.inlineTuningPaddingRight);
+        o.set("tuningaccidentalmode", obj.tuningAccidentalMode as number);
         o.set("firstnotationstaffpaddingtop", obj.firstNotationStaffPaddingTop);
         o.set("lastnotationstaffpaddingbottom", obj.lastNotationStaffPaddingBottom);
         o.set("notationstaffpaddingtop", obj.notationStaffPaddingTop);
@@ -119,6 +121,9 @@ export class DisplaySettingsSerializer {
                 return true;
             case "inlinetuningpaddingright":
                 obj.inlineTuningPaddingRight = v! as number;
+                return true;
+            case "tuningaccidentalmode":
+                obj.tuningAccidentalMode = JsonHelper.parseEnum<TuningAccidentalMode>(v, TuningAccidentalMode)!;
                 return true;
             case "firstnotationstaffpaddingtop":
                 obj.firstNotationStaffPaddingTop = v! as number;

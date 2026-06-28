@@ -277,7 +277,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         canvasElement.style.overflow = 'hidden';
         canvasElement.style.lineHeight = '0';
         canvasElement.style.position = 'relative';
-        return new HtmlElementContainer(canvasElement);
+        return new HtmlElementContainer(
+            canvasElement,
+            () => this.getScrollContainer(),
+            () => this._api.settings.player.enableUserInteraction
+        );
     }
 
     public setCanvasOverflow(canvasElement: IContainer, overflow: number, isVertical: boolean): void {

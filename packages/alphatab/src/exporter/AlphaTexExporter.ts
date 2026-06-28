@@ -512,7 +512,13 @@ export class AlphaTexExporter extends ScoreExporter {
         if (data.bars.length === 0) {
             const bar: AlphaTexBarNode = {
                 nodeType: AlphaTexNodeType.Bar,
-                metaData: this._handler.buildBarMetaDataNodes(data, undefined, 0, false),
+                metaData: this._handler.buildBarMetaDataNodes(
+                    data,
+                    undefined,
+                    0,
+                    false,
+                    this.settings.display.tuningAccidentalMode
+                ),
                 beats: [],
                 pipe: undefined
             };
@@ -533,7 +539,13 @@ export class AlphaTexExporter extends ScoreExporter {
     private _bar(score: AlphaTexScoreNode, data: Bar, voiceIndex: number, isMultiVoice: boolean) {
         const bar: AlphaTexBarNode = {
             nodeType: AlphaTexNodeType.Bar,
-            metaData: this._handler.buildBarMetaDataNodes(data.staff, data, voiceIndex, isMultiVoice),
+            metaData: this._handler.buildBarMetaDataNodes(
+                data.staff,
+                data,
+                voiceIndex,
+                isMultiVoice,
+                this.settings.display.tuningAccidentalMode
+            ),
             beats: [],
             pipe: undefined
         };
@@ -677,7 +689,11 @@ export class AlphaTexExporter extends ScoreExporter {
         } else if (data.isPiano) {
             note.noteValue = {
                 nodeType: AlphaTexNodeType.Ident,
-                text: Tuning.getTextForTuning(data.realValueWithoutHarmonic, true)
+                text: Tuning.getTextForTuning(
+                    data.realValueWithoutHarmonic,
+                    true,
+                    this.settings.display.tuningAccidentalMode
+                )
             } as AlphaTexIdentifier;
         } else if (data.isStringed) {
             note.noteValue = {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { Tuning, TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 describe('TuningParserTest', () => {
     it('standard', () => {
@@ -13,5 +13,12 @@ describe('TuningParserTest', () => {
         }
         expect(tuning.join(',')).toBe(standard.tunings.join(','));
         expect(tuningText2.join(',')).toBe(tuningText.join(','));
+    });
+
+    it('formats-accidental-mode', () => {
+        const tuning = ModelUtils.getTuningForText('Gb2');
+
+        expect(Tuning.getTextForTuning(tuning, true)).toBe('Gb2');
+        expect(Tuning.getTextForTuning(tuning, true, TuningAccidentalMode.Sharp)).toBe('F#2');
     });
 });

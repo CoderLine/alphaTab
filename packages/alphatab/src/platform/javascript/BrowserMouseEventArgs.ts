@@ -9,6 +9,8 @@ import type { HtmlElementContainer } from '@coderline/alphatab/platform/javascri
 export class BrowserMouseEventArgs implements IMouseEventArgs {
     public readonly mouseEvent: MouseEvent;
 
+    private readonly _allowPreventDefault: boolean;
+
     public get isLeftMouseButton(): boolean {
         return this.mouseEvent.button === 0;
     }
@@ -28,10 +30,13 @@ export class BrowserMouseEventArgs implements IMouseEventArgs {
     }
 
     public preventDefault(): void {
-        this.mouseEvent.preventDefault();
+        if (this._allowPreventDefault) {
+            this.mouseEvent.preventDefault();
+        }
     }
 
-    public constructor(e: MouseEvent) {
+    public constructor(e: MouseEvent, allowPreventDefault: boolean = true) {
         this.mouseEvent = e;
+        this._allowPreventDefault = allowPreventDefault;
     }
 }
