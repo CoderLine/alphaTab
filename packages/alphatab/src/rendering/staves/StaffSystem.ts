@@ -41,6 +41,13 @@ export abstract class SystemBracket {
 
     public canPaint = false;
 
+    // Captured on the first updateCanPaint call; locks whether this bracket reserves
+    // horizontal space in the accolade. A bracket that wasn't initially paintable
+    // (deferred-visibility staff) never joins the accolade even if it becomes paintable
+    // later, so staves stay aligned with bracket-less systems on the same page.
+    private _initialPaintabilityCaptured = false;
+    public reservesAccoladeSpace = false;
+
     public constructor(system: StaffSystem) {
         this._system = system;
     }
@@ -64,17 +71,20 @@ export abstract class SystemBracket {
 
         if (!firstVisibleStaff || !lastVisibleStaff) {
             this.canPaint = false;
-            return;
+        } else {
+            // single staff brackets?
+            const singleStaffBrackets = this._system.layout.renderer.score!.stylesheet.showSingleStaffBrackets;
+            if (!singleStaffBrackets && firstVisibleStaff === lastVisibleStaff) {
+                this.canPaint = false;
+            } else {
+                this.canPaint = true;
+            }
         }
 
-        // single staff brackets?
-        const singleStaffBrackets = this._system.layout.renderer.score!.stylesheet.showSingleStaffBrackets;
-        if (!singleStaffBrackets && firstVisibleStaff === lastVisibleStaff) {
-            this.canPaint = false;
-            return;
+        if (!this._initialPaintabilityCaptured) {
+            this.reservesAccoladeSpace = this.canPaint;
+            this._initialPaintabilityCaptured = true;
         }
-
-        this.canPaint = true;
     }
 
     public finalizeBracket(smuflMetrics: EngravingSettings) {
@@ -711,22 +721,6 @@ export class StaffSystem {
             }
         }
 
-        // NOTE: we have a chicken-egg problem when it comes to scaling braces which we try to mitigate here:
-        // - The brace scales with the height of the system
-        // - The height of the system depends on the bars which can be fitted
-        // By taking another bar into the system, the height can grow and by this the width of the brace and then it doesn't fit anymore.
-        // It is not worth the complexity to align the height and width of the brace.
-        // So we do a rough approximation of the space needed for the brace based on the staves we have at this point.
-        // Additional Staff separations caused later are not respected.
-        // users can mitigate truncation with specfiying a systemLabelPaddingLeft.
-
-        // alternative idea for the future:
-        // - we could force the brace to the width we initially calculate here so it will not grow beyond that.
-        // - requires a feature to draw glyphs with a max-width or a horizontal stretch scale
-
-        // currentY is a local accumulator that resets to 0 here; staff.y is an
-        // assignment (not accumulation), and staff.calculateHeightForAccolade()
-        // is itself idempotent — so this block is safe under repeated invocation.
         let currentY: number = 0;
         for (const staff of this.allStaves) {
             staff.y = currentY;
@@ -734,14 +728,13 @@ export class StaffSystem {
             currentY += staff.height;
         }
 
-        // Brace width depends on per-staff visibility (via updateCanPaint), so
-        // it must be recomputed when visibility changes — catches the
-        // accolade-shrink case when a revert hides a staff.
         let braceWidth = 0;
         for (const b of this._brackets) {
             b.updateCanPaint();
             b.finalizeBracket(settings.display.resources.engravingSettings);
-            braceWidth = Math.max(braceWidth, b.width);
+            if (b.reservesAccoladeSpace) {
+                braceWidth = Math.max(braceWidth, b.width);
+            }
         }
 
         this.accoladeWidth += braceWidth;
