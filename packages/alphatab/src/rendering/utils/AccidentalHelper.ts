@@ -269,7 +269,6 @@ export class AccidentalHelper {
     }
 
     public static calculateRestDisplaySteps(bar: Bar, tone: number, octave: number): number {
-
         let noteValue = (octave + 1) * 12 + tone;
         switch (bar.clefOttava) {
             case Ottavia._15ma:
@@ -285,9 +284,9 @@ export class AccidentalHelper {
                 noteValue += 24;
                 break;
         }
-        
+
         const spelling = ModelUtils.resolveSpelling(bar.keySignature, noteValue, NoteAccidentalMode.Default);
-        return AccidentalHelper.calculateNoteSteps(bar.clef, spelling) + 0.5;
+        return AccidentalHelper.calculateNoteSteps(bar.clef, spelling);
     }
 
     public getNoteSteps(n: Note): number {

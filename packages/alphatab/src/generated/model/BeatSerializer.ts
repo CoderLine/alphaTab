@@ -168,7 +168,7 @@ export class BeatSerializer {
                 obj.deadSlapped = v! as boolean;
                 return true;
             case "restdisplaytone":
-                obj.restDisplayTone = v !== null && v !== undefined ? v as number : -1;
+                obj.restDisplayTone = v! as number;
                 return true;
             case "restdisplayoctave":
                 obj.restDisplayOctave = v! as number;

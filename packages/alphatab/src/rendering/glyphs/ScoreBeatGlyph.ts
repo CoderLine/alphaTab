@@ -307,16 +307,18 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
         let steps: number;
         if (beat.restDisplayTone !== -1 && beat.restDisplayOctave !== -1) {
+            // Per-beat override: same step as a note at that pitch. SMuFL rest glyphs use the same
+            // baseline convention as note heads, so no further adjustment is applied.
             steps = AccidentalHelper.calculateRestDisplaySteps(sr.bar, beat.restDisplayTone, beat.restDisplayOctave);
         } else {
+            // Default placement: centred on the staff. Whole rests sit one line above (per SMuFL/Guitar Pro
+            // convention) so their hanging body lines up with where half/shorter rest bodies appear.
+            // 1- and 3-line staves keep the whole rest on the default rest line (Guitar Pro convention;
+            // see musescore/MuseScore#25279).
             steps = Math.ceil((lineCount - 1) / 2) * 2;
-        }
-
-        // this positioning is quite strange, for most staff line counts
-        // the whole/rest are aligned as half below the whole rest.
-        // but for staff line count 1 and 3 they are aligned centered on the same line.
-        if (beat.duration === Duration.Whole && lineCount !== 1 && lineCount !== 3) {
-            steps -= 2;
+            if (beat.duration === Duration.Whole && lineCount !== 1 && lineCount !== 3) {
+                steps -= 2;
+            }
         }
 
         const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(steps), this.container.beat.duration);
