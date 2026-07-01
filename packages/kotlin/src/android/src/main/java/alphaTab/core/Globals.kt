@@ -118,6 +118,10 @@ internal inline fun String.lastIndexOfInDouble(item: String): Double {
     return this.lastIndexOf(item).toDouble()
 }
 
+internal inline fun String.localeCompare(other: String): Double {
+    return this.compareTo(other).toDouble()
+}
+
 internal inline operator fun Double.plus(str: String): String {
     return this.toInvariantString() + str
 }

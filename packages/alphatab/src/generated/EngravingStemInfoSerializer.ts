@@ -15,7 +15,7 @@ export class EngravingStemInfoSerializer {
         }
         JsonHelper.forEach(m, (v, k) => EngravingStemInfoSerializer.setProperty(obj, k.toLowerCase(), v));
     }
-    public static toJson(obj: EngravingStemInfo | null): Map<string, unknown> | null {
+    public static toJson(obj: EngravingStemInfo | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

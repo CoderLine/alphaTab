@@ -342,7 +342,6 @@ export class VisualTestHelper {
             const expectedImageData = expected.readPixels()!;
 
             // do visual comparison
-            const diffImageData = new ArrayBuffer(actualImageData.byteLength);
             pass = true;
             errorMessage = '';
 
@@ -350,13 +349,11 @@ export class VisualTestHelper {
                 const pixelMatchOptions = new PixelMatchOptions();
                 pixelMatchOptions.threshold = 0.3;
                 pixelMatchOptions.includeAA = false;
-                pixelMatchOptions.diffMask = true;
                 pixelMatchOptions.alpha = 1;
 
                 const match = PixelMatch.match(
                     new Uint8Array(expectedImageData),
                     new Uint8Array(actualImageData),
-                    new Uint8Array(diffImageData),
                     expected.width,
                     expected.height,
                     pixelMatchOptions
@@ -374,9 +371,7 @@ export class VisualTestHelper {
                     const percentDifferenceText = percentDifference.toFixed(2);
                     errorMessage = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
 
-                    using diffPng = AlphaSkiaImage.fromPixels(actual.width, actual.height, diffImageData)!;
-
-                    await VisualTestHelper.saveFiles(expectedFileName, oldActual, diffPng);
+                    await VisualTestHelper.saveFiles(expectedFileName, oldActual);
                 }
 
                 if (sizeMismatch) {
@@ -390,7 +385,7 @@ export class VisualTestHelper {
         } else {
             pass = false;
             errorMessage = `Missing reference image file${expectedFileName}`;
-            await VisualTestHelper.saveFiles(expectedFileName, oldActual, undefined);
+            await VisualTestHelper.saveFiles(expectedFileName, oldActual);
         }
 
         if (!pass) {
@@ -399,18 +394,7 @@ export class VisualTestHelper {
         await VisualTestHelper.deleteFiles(expectedFileName);
     }
 
-    static async saveFiles(
-        expectedFilePath: string,
-        actual: AlphaSkiaImage,
-        diff: AlphaSkiaImage | undefined
-    ): Promise<void> {
-        if (diff) {
-            const diffData = diff.toPng()!;
-
-            const diffFileName = TestPlatform.changeExtension(expectedFilePath, '.diff.png');
-            await TestPlatform.saveFile(diffFileName, new Uint8Array(diffData));
-        }
-
+    static async saveFiles(expectedFilePath: string, actual: AlphaSkiaImage): Promise<void> {
         const actualData = actual.toPng()!;
         const actualFile = TestPlatform.changeExtension(expectedFilePath, '.new.png');
         await TestPlatform.saveFile(actualFile, new Uint8Array(actualData));

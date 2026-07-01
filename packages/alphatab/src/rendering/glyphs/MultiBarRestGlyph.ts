@@ -1,8 +1,8 @@
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NumberGlyph } from '@coderline/alphatab/rendering/glyphs/NumberGlyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 
 /**
  * @internal
@@ -33,7 +33,6 @@ export class MultiBarRestGlyph extends Glyph {
 
         const numberGlyphTop = smufl.glyphTop.get(this._numberGlyph[0])!;
         this.renderer.registerOverflowTop(Math.abs(this._numberTop) + numberGlyphTop);
-
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

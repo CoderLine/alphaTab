@@ -1,12 +1,13 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { EffectBandPlacementCategory } from '@coderline/alphatab/rendering/EffectInfo';
 import { NoteEffectInfoBase } from '@coderline/alphatab/rendering/effects/NoteEffectInfoBase';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -41,5 +42,8 @@ export class SlightNoteVibratoEffectInfo extends NoteEffectInfoBase {
     public constructor(hideOnTiedBend: boolean) {
         super();
         this._hideOnTiedBend = hideOnTiedBend;
+    }
+    public override get placementCategory(): EffectBandPlacementCategory {
+        return EffectBandPlacementCategory.Span;
     }
 }

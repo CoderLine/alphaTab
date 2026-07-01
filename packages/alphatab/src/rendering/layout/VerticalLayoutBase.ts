@@ -2,13 +2,13 @@ import type { EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
 import { Logger } from '@coderline/alphatab/Logger';
 import { ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 
 /**
  * Base layout for page and parchment style layouts where we have an endless
@@ -19,6 +19,10 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
     private _systems: StaffSystem[] = [];
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
     private _barsFromPreviousSystem: MasterBarsRenderers[] = [];
+
+    public override get systems(): StaffSystem[] {
+        return this._systems;
+    }
 
     private _reuseViewPort: boolean = false;
 
@@ -335,10 +339,12 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
                     system.y = y;
                 }
             }
-            system.isLast = this.lastBarIndex === system.lastBarIndex;
-            // don't forget to finish the last system
-            this._fitSystem(system);
-            y += this._paintSystem(system, oldHeight);
+            if (system.masterBarsRenderers.length > 0) {
+                system.isLast = this.lastBarIndex === system.lastBarIndex;
+                this._systems.push(system);
+                this._fitSystem(system);
+                y += this._paintSystem(system, oldHeight);
+            }
         }
         return y;
     }
@@ -403,11 +409,29 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         // Reconcile now - it's a no-op when nothing changed.
         system.reconcileMinDurationIfDirty();
 
-        if (system.isFull || system.width > this._maxWidth || this.renderer.settings.display.justifyLastSystem) {
-            this._scaleToWidth(system, this._maxWidth);
-        } else {
-            this._scaleToWidth(system, system.width);
+        const display = this.renderer.settings.display;
+        const overflowsAvailable = system.width > this._maxWidth;
+        let shouldJustify = system.isFull || overflowsAvailable;
+
+        // Last-system fill threshold (industry convention from Dorico / MuseScore): the last
+        // system in a flow is justified to fill the row only when its natural fullness meets
+        // the configured `lastSystemFillThreshold`. A threshold of 0 always justifies (matches
+        // legacy `justifyLastSystem = true`); a threshold of 1 never justifies (matches legacy
+        // `justifyLastSystem = false`); intermediate values yield Dorico-style "justify only
+        // when reasonably full" behaviour.
+        //
+        // Overflow is handled before the threshold: if the natural width already exceeds the
+        // available staff width, the system must compress to fit regardless of the threshold,
+        // since otherwise content would overflow horizontally.
+        if (system.isLast && !shouldJustify && this._maxWidth > 0) {
+            const threshold = Math.max(0, Math.min(1, display.lastSystemFillThreshold));
+            const fillRatio = system.width / this._maxWidth;
+            if (fillRatio >= threshold) {
+                shouldJustify = true;
+            }
         }
+
+        this._scaleToWidth(system, shouldJustify ? this._maxWidth : system.width);
         system.finalizeSystem();
     }
 
@@ -444,15 +468,14 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         const distributable = Math.max(0, staffWidth - system.totalFixedOverhead);
         const contentShare = weightTotal > 0 ? distributable / weightTotal : 0;
 
-        for (const s of system.allStaves) {
-            s.resetSharedLayoutData();
+        system.resetAllStavesSharedLayoutData();
 
+        for (const s of system.allStaves) {
             let w = 0;
             for (let i = 0; i < s.barRenderers.length; i++) {
                 const renderer = s.barRenderers[i];
                 const mb = system.masterBarsRenderers[i];
                 renderer.x = w;
-                renderer.y = s.topPadding + s.topOverflow;
 
                 const weight = shouldApplyBarScale ? system.getBarDisplayScale(renderer) : mb.maxContentWidth;
                 const actualBarWidth = mb.maxFixedOverhead + weight * contentShare;

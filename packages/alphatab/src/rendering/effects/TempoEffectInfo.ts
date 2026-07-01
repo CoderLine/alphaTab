@@ -1,11 +1,11 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
-import type { Settings } from '@coderline/alphatab/Settings';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import { BarTempoGlyph } from '@coderline/alphatab/rendering/glyphs/BarTempoGlyph';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
@@ -17,10 +17,6 @@ export class TempoEffectInfo extends EffectInfo {
 
     public get hideOnMultiTrack(): boolean {
         return true;
-    }
-
-    public get canShareBand(): boolean {
-        return false;
     }
 
     public get sizingMode(): EffectBarGlyphSizing {
@@ -42,5 +38,8 @@ export class TempoEffectInfo extends EffectInfo {
 
     public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
+    }
+    public override get placementCategory(): EffectBandPlacementCategory {
+        return EffectBandPlacementCategory.SystemMarker;
     }
 }

@@ -54,6 +54,11 @@ internal class RegExp
         return null;
     }
 
+    public bool Test(string s)
+    {
+        return _regex.IsMatch(s);
+    }
+
     public string Replace(string input, string replacement)
     {
         return _global

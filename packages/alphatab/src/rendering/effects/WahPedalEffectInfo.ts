@@ -3,7 +3,7 @@ import { WahPedal } from '@coderline/alphatab/model/WahPedal';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { WahPedalGlyph } from '@coderline/alphatab/rendering/glyphs/WahPedalGlyph';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -20,10 +20,6 @@ export class WahPedalEffectInfo extends EffectInfo {
         return false;
     }
 
-    public get canShareBand(): boolean {
-        return true;
-    }
-
     public get sizingMode(): EffectBarGlyphSizing {
         return EffectBarGlyphSizing.SingleOnBeat;
     }
@@ -38,5 +34,8 @@ export class WahPedalEffectInfo extends EffectInfo {
 
     public canExpand(_from: Beat, _to: Beat): boolean {
         return false;
+    }
+    public override get placementCategory(): EffectBandPlacementCategory {
+        return EffectBandPlacementCategory.Span;
     }
 }

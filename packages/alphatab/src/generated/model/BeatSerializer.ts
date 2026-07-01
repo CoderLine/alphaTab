@@ -42,7 +42,7 @@ export class BeatSerializer {
         }
         JsonHelper.forEach(m, (v, k) => BeatSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: Beat | null): Map<string, unknown> | null {
+    public static toJson(obj: Beat | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }
@@ -143,6 +143,9 @@ export class BeatSerializer {
             case "dots":
                 obj.dots = v! as number;
                 return true;
+            case "fadein":
+                obj.fadeIn = v! as boolean;
+                return true;
             case "fade":
                 obj.fade = JsonHelper.parseEnum<FadeType>(v, FadeType)!;
                 return true;
@@ -221,6 +224,9 @@ export class BeatSerializer {
                 else {
                     obj.tremoloPicking = undefined;
                 }
+                return true;
+            case "tremolospeed":
+                obj.tremoloSpeed = JsonHelper.parseEnum<Duration>(v, Duration) ?? null;
                 return true;
             case "crescendo":
                 obj.crescendo = JsonHelper.parseEnum<CrescendoType>(v, CrescendoType)!;

@@ -1,12 +1,12 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import { CrescendoGlyph } from '@coderline/alphatab/rendering/glyphs/CrescendoGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -18,10 +18,6 @@ export class CrescendoEffectInfo extends EffectInfo {
 
     public get hideOnMultiTrack(): boolean {
         return false;
-    }
-
-    public get canShareBand(): boolean {
-        return true;
     }
 
     public get sizingMode(): EffectBarGlyphSizing {
@@ -38,5 +34,8 @@ export class CrescendoEffectInfo extends EffectInfo {
 
     public canExpand(from: Beat, to: Beat): boolean {
         return from.crescendo === to.crescendo;
+    }
+    public override get placementCategory(): EffectBandPlacementCategory {
+        return EffectBandPlacementCategory.Span;
     }
 }

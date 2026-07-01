@@ -7,6 +7,7 @@ import { NavMenu } from '../components/NavMenu';
 import { Sidebar } from '../components/Sidebar';
 import { type Mountable, css, html, injectStyles, mount, parseHtml } from '../util/Dom';
 import { Paths } from '../util/Paths';
+import { DragDrop } from 'src/components/DragDrop';
 
 injectStyles(
     'AlphaTexEditorApp',
@@ -94,6 +95,7 @@ export class AlphaTexEditorApp implements Mountable {
     private split: ReturnType<typeof Split> | null = null;
     private fromTex = true;
     private subscriptions: (() => void)[] = [];
+    private dragDrop: DragDrop;
 
     constructor(options: AlphaTexEditorAppOptions = {}) {
         this.root = parseHtml(html`
@@ -151,11 +153,7 @@ export class AlphaTexEditorApp implements Mountable {
 
         this.overlay = mount(this.root, '.cmp-overlay', new LoadingOverlay(this.api));
         this.sidebar = mount(this.root, '.cmp-sidebar', new Sidebar(this.api));
-        this.footer = mount(
-            this.root,
-            '.cmp-footer',
-            new Footer(this.api, { trackList: this.sidebar.trackList })
-        );
+        this.footer = mount(this.root, '.cmp-footer', new Footer(this.api, { trackList: this.sidebar.trackList }));
 
         const initialCode =
             (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(STORAGE_KEY) : null) ??
@@ -165,6 +163,10 @@ export class AlphaTexEditorApp implements Mountable {
         this.editor = mount(this.root, '.cmp-editor', new MonacoEditor({ initialCode }));
         this.editor.onChange = tex => this.loadTex(tex);
 
+        this.dragDrop = new DragDrop(this.api, {
+            onEnter: () => this.overlay.enterDrag(),
+            onLeave: () => this.overlay.leaveDrag()
+        });
         this.nav = new NavMenu();
         document.body.appendChild(this.nav.root);
 
@@ -176,6 +178,7 @@ export class AlphaTexEditorApp implements Mountable {
             window.api = this.api;
             window.alphaTab = alphaTab;
         }
+
     }
 
     private afterMount(initialCode: string): void {
@@ -216,6 +219,7 @@ export class AlphaTexEditorApp implements Mountable {
         this.subscriptions = [];
         this.split?.destroy();
         this.nav.dispose();
+        this.dragDrop.dispose();
         this.editor.dispose();
         this.footer.dispose();
         this.sidebar.dispose();

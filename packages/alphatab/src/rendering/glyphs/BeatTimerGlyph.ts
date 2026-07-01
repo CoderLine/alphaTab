@@ -1,5 +1,5 @@
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
-import { type ICanvas, TextBaseline, TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 
 /**
@@ -29,6 +29,14 @@ export class BeatTimerGlyph extends EffectGlyph {
         this._textWidth = size.width + this.renderer.smuflMetrics.beatTimerPadding * 2;
 
         this.height = this._textHeight + this.renderer.smuflMetrics.beatTimerPadding * 2;
+    }
+
+    public override getBoundingBoxLeft(): number {
+        return this.x - this._textWidth / 2;
+    }
+
+    public override getBoundingBoxRight(): number {
+        return this.x + this._textWidth / 2;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

@@ -8,9 +8,8 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
-import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
 
 /**
@@ -106,12 +105,14 @@ export class BeamingHelper {
         this._beamingRuleLookup = beamingRuleLookup;
     }
 
-    public alignWithBeats() {
-        for (const v of this.drawingInfos.values()) {
-            v.startX = this._renderer.getBeatX(v.startBeat!, BeatXPosition.Stem);
-            v.endX = this._renderer.getBeatX(v.endBeat!, BeatXPosition.Stem);
-            this.drawingInfos.clear();
-        }
+    /**
+     * Invalidates cached drawing infos. The emit path (`emitHelperSkyline` →
+     * `_computeBeamingBounds` → `ensureBeamDrawingInfo`) repopulates them
+     * with post-spring X.
+     */
+    public invalidateDrawingInfos() {
+        this._drawingInfoUpValid = false;
+        this._drawingInfoDownValid = false;
     }
 
     public finish(): void {
@@ -312,5 +313,35 @@ export class BeamingHelper {
         return this.highestNoteInHelper!.beat;
     }
 
-    public drawingInfos: Map<BeamDirection, BeamingHelperDrawInfo> = new Map<BeamDirection, BeamingHelperDrawInfo>();
+    /**
+     * Per-direction beam drawing info cache. BeamDirection is a 2-value enum
+     * (Up=0, Down=1) so we use two pre-allocated `BeamingHelperDrawInfo`
+     * instances plus paired `*Valid: boolean` flags. The slot is reused
+     * across cycles; `*Valid=false` means callers must re-initialize before
+     * reading. This avoids the per-cycle Map allocation and lookup cost on
+     * the hot beam-paint path. The "paired Valid + non-null T" pattern
+     * follows {@link BarTempoGlyph} — `T | null` does not transpile cleanly
+     * to C# (nullable struct/class semantics diverge), but plain fields plus
+     * a boolean do.
+     */
+    private readonly _drawingInfoUp: BeamingHelperDrawInfo = new BeamingHelperDrawInfo();
+    private readonly _drawingInfoDown: BeamingHelperDrawInfo = new BeamingHelperDrawInfo();
+    private _drawingInfoUpValid: boolean = false;
+    private _drawingInfoDownValid: boolean = false;
+
+    public getDrawingInfo(direction: BeamDirection): BeamingHelperDrawInfo {
+        return direction === BeamDirection.Up ? this._drawingInfoUp : this._drawingInfoDown;
+    }
+
+    public hasDrawingInfo(direction: BeamDirection): boolean {
+        return direction === BeamDirection.Up ? this._drawingInfoUpValid : this._drawingInfoDownValid;
+    }
+
+    public markDrawingInfoValid(direction: BeamDirection): void {
+        if (direction === BeamDirection.Up) {
+            this._drawingInfoUpValid = true;
+        } else {
+            this._drawingInfoDownValid = true;
+        }
+    }
 }

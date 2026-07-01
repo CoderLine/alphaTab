@@ -794,6 +794,18 @@ Map {
                 },
               ],
               "barnumberdisplay" => 2,
+              "scoredisplay" => Map {
+                "barnumber" => 2,
+              },
+              "tabdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "slashdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "numbereddisplay" => Map {
+                "barnumber" => 2,
+              },
             },
             Map {
               "__kind" => "Bar",
@@ -852,6 +864,18 @@ Map {
                 },
               ],
               "barnumberdisplay" => 2,
+              "scoredisplay" => Map {
+                "barnumber" => 2,
+              },
+              "tabdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "slashdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "numbereddisplay" => Map {
+                "barnumber" => 2,
+              },
             },
             Map {
               "__kind" => "Bar",
@@ -918,6 +942,18 @@ Map {
                 },
               ],
               "barnumberdisplay" => 2,
+              "scoredisplay" => Map {
+                "barnumber" => 2,
+              },
+              "tabdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "slashdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "numbereddisplay" => Map {
+                "barnumber" => 2,
+              },
             },
             Map {
               "__kind" => "Bar",
@@ -976,6 +1012,18 @@ Map {
                 },
               ],
               "barnumberdisplay" => 2,
+              "scoredisplay" => Map {
+                "barnumber" => 2,
+              },
+              "tabdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "slashdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "numbereddisplay" => Map {
+                "barnumber" => 2,
+              },
             },
             Map {
               "__kind" => "Bar",
@@ -3036,6 +3084,18 @@ Map {
                 },
               ],
               "barnumberdisplay" => 2,
+              "scoredisplay" => Map {
+                "barnumber" => 2,
+              },
+              "tabdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "slashdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "numbereddisplay" => Map {
+                "barnumber" => 2,
+              },
             },
             Map {
               "__kind" => "Bar",
@@ -3094,6 +3154,18 @@ Map {
                 },
               ],
               "barnumberdisplay" => 2,
+              "scoredisplay" => Map {
+                "barnumber" => 2,
+              },
+              "tabdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "slashdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "numbereddisplay" => Map {
+                "barnumber" => 2,
+              },
             },
             Map {
               "__kind" => "Bar",
@@ -3160,6 +3232,18 @@ Map {
                 },
               ],
               "barnumberdisplay" => 2,
+              "scoredisplay" => Map {
+                "barnumber" => 2,
+              },
+              "tabdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "slashdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "numbereddisplay" => Map {
+                "barnumber" => 2,
+              },
             },
             Map {
               "__kind" => "Bar",
@@ -3218,6 +3302,18 @@ Map {
                 },
               ],
               "barnumberdisplay" => 2,
+              "scoredisplay" => Map {
+                "barnumber" => 2,
+              },
+              "tabdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "slashdisplay" => Map {
+                "barnumber" => 2,
+              },
+              "numbereddisplay" => Map {
+                "barnumber" => 2,
+              },
             },
             Map {
               "__kind" => "Bar",

@@ -2,6 +2,7 @@ import { appendFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { defineConfig } from 'vitest/config';
 import { buildTsconfigAliases } from './vite';
+import { stripProfilingPlugin } from './vite.plugin.strip-profiling';
 
 class SummaryLabelReporter {
     constructor(private readonly label: string) {}
@@ -25,6 +26,7 @@ export function defineVitestConfig(options: VitestPackageOptions = {}) {
             ? ['default', 'github-actions', new SummaryLabelReporter(pkg.name)]
             : ['default'];
     return defineConfig({
+        plugins: [stripProfilingPlugin({ enabled: false })],
         resolve: {
             tsconfigPaths: true,
             alias: buildTsconfigAliases(process.cwd())

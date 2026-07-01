@@ -15,7 +15,7 @@ export class BendPointSerializer {
         }
         JsonHelper.forEach(m, (v, k) => BendPointSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: BendPoint | null): Map<string, unknown> | null {
+    public static toJson(obj: BendPoint | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

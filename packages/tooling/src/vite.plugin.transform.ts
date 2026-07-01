@@ -101,8 +101,45 @@ function isElementStyleHelperUsing(
     if (stmt.kind !== 'using' && stmt.kind !== 'await using') { return false; }
     if (stmt.declarations.length !== 1) { return false; }
     const init = stmt.declarations[0].init;
-    if (!init || init.type !== 'CallExpression') { return false; }
-    const callee = (init as { callee: unknown }).callee as MemberExpression | { type: string };
+    if (!init) { return false; }
+    // Accept a direct `ElementStyleHelper.X(...)` call or a ternary
+    // whose leaves are each a call or undefined/void 0.
+    return isElementStyleHelperInit(init as unknown as { type: string }) && hasElementStyleHelperCall(init as unknown as { type: string });
+}
+
+function isElementStyleHelperInit(expr: { type: string } | null | undefined): boolean {
+    if (!expr) { return false; }
+    if (expr.type === 'CallExpression') {
+        return isElementStyleHelperCall(expr);
+    }
+    if (expr.type === 'Identifier') {
+        return (expr as IdentifierName).name === 'undefined';
+    }
+    if (expr.type === 'UnaryExpression') {
+        // `void 0`, `void undefined`, etc.
+        return (expr as unknown as { operator: string }).operator === 'void';
+    }
+    if (expr.type === 'ConditionalExpression') {
+        const c = expr as unknown as { consequent: { type: string }; alternate: { type: string } };
+        return isElementStyleHelperInit(c.consequent) && isElementStyleHelperInit(c.alternate);
+    }
+    return false;
+}
+
+function hasElementStyleHelperCall(expr: { type: string } | null | undefined): boolean {
+    if (!expr) { return false; }
+    if (expr.type === 'CallExpression') {
+        return isElementStyleHelperCall(expr);
+    }
+    if (expr.type === 'ConditionalExpression') {
+        const c = expr as unknown as { consequent: { type: string }; alternate: { type: string } };
+        return hasElementStyleHelperCall(c.consequent) || hasElementStyleHelperCall(c.alternate);
+    }
+    return false;
+}
+
+function isElementStyleHelperCall(expr: { type: string }): boolean {
+    const callee = (expr as unknown as { callee: unknown }).callee as MemberExpression | { type: string } | undefined;
     if (!callee || callee.type !== 'MemberExpression') { return false; }
     const object = (callee as MemberExpression).object;
     return object.type === 'Identifier' && (object as IdentifierName).name === 'ElementStyleHelper';

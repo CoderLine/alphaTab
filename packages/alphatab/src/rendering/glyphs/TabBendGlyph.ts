@@ -7,7 +7,7 @@ import type { Font } from '@coderline/alphatab/model/Font';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
-import { TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
@@ -34,6 +34,23 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
 
     public constructor() {
         super(0, 0);
+    }
+
+    /** Staff-local x ({@link ITieGlyph} convention); spans the first bending beat. */
+    public override getBoundingBoxLeft(): number {
+        if (this._notes.length === 0) {
+            return this.x;
+        }
+        const beat = this._notes[0].beat;
+        return this.renderer.x + this.renderer.getBeatX(beat, BeatXPosition.PostNotes);
+    }
+
+    public override getBoundingBoxRight(): number {
+        if (this._notes.length === 0) {
+            return this.x;
+        }
+        const beat = this._notes[0].beat;
+        return this.renderer.x + this.renderer.getBeatX(beat, BeatXPosition.EndBeat);
     }
 
     public addBends(note: Note): void {

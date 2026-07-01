@@ -1,11 +1,11 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { FermataGlyph } from '@coderline/alphatab/rendering/glyphs/FermataGlyph';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -16,10 +16,6 @@ export class FermataEffectInfo extends EffectInfo {
     }
 
     public get hideOnMultiTrack(): boolean {
-        return false;
-    }
-
-    public get canShareBand(): boolean {
         return false;
     }
 
@@ -36,6 +32,11 @@ export class FermataEffectInfo extends EffectInfo {
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {
+        return true;
+    }
+
+    /** Centered around onTimeX; needs its half-width reserved in the beat spring. */
+    public override get contributesToBeatSpacing(): boolean {
         return true;
     }
 }

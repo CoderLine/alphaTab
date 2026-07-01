@@ -1,3 +1,11 @@
+import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
+import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
+import type {
+    NumberedStaffConfig,
+    ScoreStaffConfig,
+    SlashStaffConfig,
+    TabStaffConfig
+} from '@coderline/alphatab/model/StaffConfigs';
 import type { Track } from '@coderline/alphatab/model/Track';
 
 /**
@@ -205,7 +213,57 @@ export class RenderStylesheet {
     public showSingleStaffBrackets: boolean = false;
 
     /**
-     * How bar numbers should be displayed.
+     * How bar numbers should be displayed score-wide.
+     * @deprecated Use {@link scoreConfig}, {@link tabConfig},
+     * {@link slashConfig}, or {@link numberedConfig} `.barNumber` for
+     * per-staff-type control. The setter broadcasts to all four
+     * staff-type entries.
      */
-    public barNumberDisplay: BarNumberDisplay = BarNumberDisplay.AllBars;
+    public get barNumberDisplay(): BarNumberDisplay {
+        return this.scoreConfig.barNumber!;
+    }
+    public set barNumberDisplay(value: BarNumberDisplay) {
+        this.scoreConfig.barNumber = value;
+        this.tabConfig.barNumber = value;
+        this.slashConfig.barNumber = value;
+        this.numberedConfig.barNumber = value;
+    }
+
+    /**
+     * Score-wide display configuration for the standard-notation staff.
+     */
+    public scoreConfig: ScoreStaffConfig = {
+        clef: { isVisible: true, staffPlacement: StaffPlacement.AllStaves, systemDisplay: SystemDisplay.AllSystems },
+        keySignature: { isVisible: true, staffPlacement: StaffPlacement.AllStaves, systemDisplay: SystemDisplay.AllSystems },
+        timeSignature: { isVisible: true, staffPlacement: StaffPlacement.AllStaves, systemDisplay: SystemDisplay.AllSystems },
+        barNumber: BarNumberDisplay.AllBars
+    };
+
+    /**
+     * Score-wide display configuration for the tablature staff.
+     */
+    public tabConfig: TabStaffConfig = {
+        clef: { isVisible: true, staffPlacement: StaffPlacement.AllStaves, systemDisplay: SystemDisplay.AllSystems },
+        timeSignature: { isVisible: true, staffPlacement: StaffPlacement.Primary, systemDisplay: SystemDisplay.AllSystems },
+        barNumber: BarNumberDisplay.AllBars,
+        rhythm: TabRhythmMode.Automatic,
+        rests: { isVisible: true, staffPlacement: StaffPlacement.Primary }
+    };
+
+    /**
+     * Score-wide display configuration for the slash staff.
+     */
+    public slashConfig: SlashStaffConfig = {
+        keySignature: { isVisible: false },
+        timeSignature: { isVisible: true, staffPlacement: StaffPlacement.Primary, systemDisplay: SystemDisplay.AllSystems },
+        barNumber: BarNumberDisplay.AllBars
+    };
+
+    /**
+     * Score-wide display configuration for the numbered (jianpu) staff.
+     */
+    public numberedConfig: NumberedStaffConfig = {
+        timeSignature: { isVisible: true, staffPlacement: StaffPlacement.Primary, systemDisplay: SystemDisplay.AllSystems },
+        barNumber: BarNumberDisplay.AllBars
+    };
 }

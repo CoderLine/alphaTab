@@ -1,11 +1,11 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import { AlternateEndingsGlyph } from '@coderline/alphatab/rendering/glyphs/AlternateEndingsGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -17,10 +17,6 @@ export class AlternateEndingsEffectInfo extends EffectInfo {
 
     public get hideOnMultiTrack(): boolean {
         return true;
-    }
-
-    public get canShareBand(): boolean {
-        return false;
     }
 
     public get sizingMode(): EffectBarGlyphSizing {
@@ -55,5 +51,9 @@ export class AlternateEndingsEffectInfo extends EffectInfo {
 
     public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
+    }
+    public override get placementCategory(): EffectBandPlacementCategory {
+        // Voltas share one baseline across the system (Gould Ch.11).
+        return EffectBandPlacementCategory.HorizontalRow;
     }
 }
