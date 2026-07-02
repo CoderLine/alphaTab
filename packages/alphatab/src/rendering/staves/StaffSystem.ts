@@ -723,12 +723,8 @@ export class StaffSystem {
                 continue;
             }
 
-            const renderer = staff.barRenderers[0];
-            if (!(renderer instanceof TabBarRenderer)) {
-                continue;
-            }
-
-            const glyph = new InlineTuningGlyph(staff, renderer);
+            const glyph = new InlineTuningGlyph(staff);
+            glyph.renderer = staff.barRenderers[0];
             glyph.doLayout();
             this._inlineTuningGlyphs.push(glyph);
             this._inlineTuningWidth = Math.max(this._inlineTuningWidth, glyph.width);

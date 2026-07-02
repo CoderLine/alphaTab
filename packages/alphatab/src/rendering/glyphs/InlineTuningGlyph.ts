@@ -1,9 +1,9 @@
-import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { TrackSubElement } from '@coderline/alphatab/model/Track';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
-import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
@@ -13,15 +13,12 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 export class InlineTuningGlyph extends Glyph {
     public readonly staff: RenderStaff;
 
-    private readonly _tabRenderer: TabBarRenderer;
     private readonly _tunings: number[];
 
-    public constructor(staff: RenderStaff, tabRenderer: TabBarRenderer) {
+    public constructor(staff: RenderStaff) {
         super(0, 0);
         this.staff = staff;
-        this._tabRenderer = tabRenderer;
         this._tunings = staff.modelStaff.stringTuning.tunings;
-        this.renderer = tabRenderer;
     }
 
     public override doLayout(): void {
@@ -37,7 +34,7 @@ export class InlineTuningGlyph extends Glyph {
         canvas.font = oldFont;
 
         this.width = textWidth > 0 ? textWidth + this.renderer.settings.display.inlineTuningPaddingRight : 0;
-        this.height = this._tabRenderer.height;
+        this.height = this.renderer.height;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -61,7 +58,7 @@ export class InlineTuningGlyph extends Glyph {
             canvas.fillText(
                 Tuning.getTextForTuning(this._tunings[i], false),
                 textEndX,
-                cy + this._tabRenderer.y + this._tabRenderer.getLineY(i)
+                cy + this.renderer.y + (this.renderer as LineBarRenderer).getLineY(i)
             );
         }
 
