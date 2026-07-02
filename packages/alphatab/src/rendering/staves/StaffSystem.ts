@@ -806,10 +806,7 @@ export class StaffSystem {
 
     private _shouldCreateInlineTuningGlyph(staff: RenderStaff): boolean {
         const score = this.layout.renderer.score!;
-        if (
-            !staff.isVisible ||
-            staff.staffId !== TabBarRenderer.StaffId
-        ) {
+        if (!staff.isVisible || staff.staffId !== TabBarRenderer.StaffId) {
             return false;
         }
 
@@ -832,17 +829,9 @@ export class StaffSystem {
     }
 
     private _getInlineTuningWidthForTrackGroup(group: StaffTrackGroup): number {
-        return this._getInlineTuningWidth(glyph => glyph.staff.staffTrackGroup === group);
-    }
-
-    private _getInlineTuningWidthForBracket(bracket: SystemBracket): number {
-        return this._getInlineTuningWidth(glyph => bracket.includesStaff(glyph.staff));
-    }
-
-    private _getInlineTuningWidth(includeGlyph: (glyph: InlineTuningGlyph) => boolean): number {
         let width = 0;
         for (const glyph of this._inlineTuningGlyphs) {
-            if (includeGlyph(glyph)) {
+            if (glyph.staff.staffTrackGroup === group) {
                 width = Math.max(width, glyph.width);
             }
         }
@@ -1101,8 +1090,15 @@ export class StaffSystem {
     }
 
     private _paintInlineTunings(cx: number, cy: number, canvas: ICanvas): void {
+        const accoladeBarPaddingRight = this.layout.renderer.settings.display.accoladeBarPaddingRight;
         for (const glyph of this._inlineTuningGlyphs) {
-            glyph.paint(cx + glyph.staff.x, cy + glyph.staff.y, canvas);
+            // Place labels between the track name and the bracket:
+            // shift the glyph's anchor left by the bracket's paint area
+            // (accolade bar padding + bracket width) so the tuning sits on the
+            // outside of the bracket rather than inside it.
+            const bracket = this._staffToBracket.has(glyph.staff) ? this._staffToBracket.get(glyph.staff)! : undefined;
+            const bracketOffset = bracket && bracket.width > 0 ? accoladeBarPaddingRight + bracket.width : 0;
+            glyph.paint(cx + glyph.staff.x - bracketOffset, cy + glyph.staff.y, canvas);
         }
     }
 
@@ -1113,8 +1109,7 @@ export class StaffSystem {
             if (bracket.canPaint) {
                 const barStartX: number = cx + bracket.firstVisibleStaffInBracket!.x;
                 const barSize: number = bracket.width;
-                const barOffset: number =
-                    settings.display.accoladeBarPaddingRight + this._getInlineTuningWidthForBracket(bracket);
+                const barOffset: number = settings.display.accoladeBarPaddingRight;
                 const firstStart: number = cy + bracket.firstVisibleStaffInBracket!.contentTop;
                 const lastEnd: number = cy + bracket.lastVisibleStaffInBracket!.contentBottom;
                 let accoladeStart: number = firstStart;
