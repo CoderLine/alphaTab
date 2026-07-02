@@ -15,7 +15,7 @@ export class TuningSerializer {
         }
         JsonHelper.forEach(m, (v, k) => TuningSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: Tuning | null): Map<string, unknown> | null {
+    public static toJson(obj: Tuning | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

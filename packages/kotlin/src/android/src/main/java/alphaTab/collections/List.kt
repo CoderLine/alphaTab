@@ -112,7 +112,13 @@ public class List<T> : Iterable<T> {
     }
 
     public fun sort(comparison: (a: T, b: T) -> Double): List<T> {
-        _data.sortWith { a, b -> comparison(a, b).toInt() }
+        // Sign-only conversion: `.toInt()` truncates and can overflow when
+        // the JS-style comparator returns values outside Int range
+        // (e.g. packed sort keys at 2^40).
+        _data.sortWith { a, b ->
+            val d = comparison(a, b)
+            if (d < 0) -1 else if (d > 0) 1 else 0
+        }
         return this
     }
 
@@ -167,6 +173,23 @@ public class List<T> : Iterable<T> {
 
     public fun shift(): T {
         return _data.removeAt(0)
+    }
+
+    public fun splice(start: Double): List<T> {
+        var actualStart = start.toInt()
+        if (actualStart < 0) {
+            actualStart += _data.size
+        }
+        if (actualStart < 0) {
+            actualStart = 0
+        }
+        if (actualStart >= _data.size) {
+            return List()
+        }
+
+        val remove = List(ArrayListWithRemoveRange(_data.subList(actualStart, _data.size)))
+        _data.removeRange(actualStart, _data.size)
+        return remove
     }
 
     public fun splice(start: Double, deleteCount: Double, vararg newElements: T): List<T> {

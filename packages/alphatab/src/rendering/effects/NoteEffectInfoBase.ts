@@ -26,10 +26,6 @@ export abstract class NoteEffectInfoBase extends EffectInfo {
         return false;
     }
 
-    public get canShareBand(): boolean {
-        return true;
-    }
-
     public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }

@@ -1,5 +1,5 @@
 import type { Note } from '@coderline/alphatab/model/Note';
-import { TextAlign, TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { ResolvedTieGlyphLabel, TieGlyphLabel } from '@coderline/alphatab/rendering/glyphs/TieGlyphLabel';
@@ -16,6 +16,10 @@ export interface ITieGlyph {
      * If set, the tie bounds will be requested and the overflow is applied.
      */
     readonly checkForOverflow: boolean;
+    getBoundingBoxTop(): number;
+    getBoundingBoxBottom(): number;
+    getBoundingBoxLeft(): number;
+    getBoundingBoxRight(): number;
 }
 
 /**
@@ -50,6 +54,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         return this._shouldPaint && this._boundingBox !== undefined;
     }
 
+    /** Renderer-local Y. Staff finalize may shift `renderer.y` after tie layout, so geometry stays renderer-relative. */
     public override getBoundingBoxTop(): number {
         if (this._boundingBox) {
             return this._boundingBox!.y;
@@ -62,6 +67,21 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             return this._boundingBox.y + this._boundingBox.h;
         }
         return this._startY;
+    }
+
+    /** Staff-absolute X — `_startX`/`_endX` bake in their renderers' `.x` for cross-bar ties. */
+    public override getBoundingBoxLeft(): number {
+        if (this._boundingBox) {
+            return this._boundingBox.x;
+        }
+        return this._startX;
+    }
+
+    public override getBoundingBoxRight(): number {
+        if (this._boundingBox) {
+            return this._boundingBox.x + this._boundingBox.w;
+        }
+        return this._endX;
     }
 
     public override doLayout(): void {
@@ -179,9 +199,10 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             // Single Y line for all labels — the outer arc apex.
             // Painted offset adds `padding` on the outward side, so
             // every label sits the same fixed distance from its arc.
-            const labelLineY = cps.length > 0
-                ? 0.125 * cps[7] + 0.375 * cps[9] + 0.375 * cps[11] + 0.125 * cps[13]
-                : (this._startY + this._endY) / 2;
+            const labelLineY =
+                cps.length > 0
+                    ? 0.125 * cps[7] + 0.375 * cps[9] + 0.375 * cps[11] + 0.125 * cps[13]
+                    : (this._startY + this._endY) / 2;
 
             for (const label of labels) {
                 const fromX = this.resolveLabelAnchorX(label.fromNote);
@@ -254,15 +275,18 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             return;
         }
 
+        // Tie Y is renderer-local; resolve `renderer.y` at paint time.
+        const rendererY = this.renderer.y;
+
         const isDown = this.tieDirection === BeamDirection.Down;
 
         if (this.shouldDrawBendSlur()) {
             TieGlyph.drawBendSlur(
                 canvas,
                 cx + this._startX,
-                cy + this._startY,
+                cy + rendererY + this._startY,
                 cx + this._endX,
-                cy + this._endY,
+                cy + rendererY + this._endY,
                 isDown,
                 this.renderer.smuflMetrics.tieHeight
             );
@@ -271,9 +295,9 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 canvas,
                 1,
                 cx + this._startX,
-                cy + this._startY,
+                cy + rendererY + this._startY,
                 cx + this._endX,
-                cy + this._endY,
+                cy + rendererY + this._endY,
                 isDown,
                 this._tieHeight,
                 this.renderer.smuflMetrics.tieMidpointThickness
@@ -293,7 +317,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                     canvas.font = res.getFontForNotationElement(label.element);
                     lastElement = label.element;
                 }
-                canvas.fillText(label.text, cx + label.x, cy + label.y + this._labelBaselineOffset);
+                canvas.fillText(label.text, cx + label.x, cy + rendererY + label.y + this._labelBaselineOffset);
             }
             canvas.textAlign = ta;
             canvas.textBaseline = tb;
@@ -368,11 +392,8 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 
     protected abstract calculateEndX(): number;
 
-    public calculateMultiSystemSlurY(renderer: BarRendererBase) {
-        const startRenderer = this.lookupStartBeatRenderer();
-        const startY = this.calculateStartY();
-        const relY = startY - startRenderer.y;
-        return renderer.y + relY;
+    public calculateMultiSystemSlurY(_renderer: BarRendererBase) {
+        return this.calculateStartY();
     }
 
     public shouldCreateMultiSystemSlur(renderer: BarRendererBase) {
@@ -530,7 +551,6 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         const ry = dx * Math.sin(angle) + dy * Math.cos(angle);
         return [rotateX + rx, rotateY + ry];
     }
-
 
     public static paintTie(
         canvas: ICanvas,
@@ -727,14 +747,14 @@ export abstract class NoteTieGlyph extends TieGlyph {
     protected override calculateStartY(): number {
         const startNoteRenderer = this.lookupStartBeatRenderer();
         if (this.isLeftHandTap) {
-            return startNoteRenderer.y + startNoteRenderer.getNoteY(this.startNote, NoteYPosition.Center);
+            return startNoteRenderer.getNoteY(this.startNote, NoteYPosition.Center);
         }
 
         switch (this.tieDirection) {
             case BeamDirection.Up:
-                return startNoteRenderer.y + startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Top);
+                return startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Top);
             default:
-                return startNoteRenderer.y + startNoteRenderer.getNoteY(this.startNote, NoteYPosition.Bottom);
+                return startNoteRenderer.getNoteY(this.startNote, NoteYPosition.Bottom);
         }
     }
 
@@ -760,14 +780,14 @@ export abstract class NoteTieGlyph extends TieGlyph {
         }
 
         if (this.isLeftHandTap) {
-            return endNoteRenderer.y + endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Center);
+            return endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Center);
         }
 
         switch (this.tieDirection) {
             case BeamDirection.Up:
-                return endNoteRenderer.y + endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Top);
+                return endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Top);
             default:
-                return endNoteRenderer.y + endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Bottom);
+                return endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Bottom);
         }
     }
 

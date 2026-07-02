@@ -136,6 +136,28 @@ class NotExpector<T>(private val actual: T, private val message: String? = null)
         }
     }
 
+    fun toBeGreaterThanOrEqual(expected: Double) {
+        if (actual is Number) {
+            Assert.assertFalse(
+                message ?: "Expected $actual to not be greater than or equal to $expected",
+                actual.toDouble() >= expected
+            )
+        } else {
+            Assert.fail("toBeGreaterThanOrEqual can only be used with numeric operands")
+        }
+    }
+
+    fun toBeLessThanOrEqual(expected: Double) {
+        if (actual is Number) {
+            Assert.assertFalse(
+                message ?: "Expected $actual to not be less than or equal to $expected",
+                actual.toDouble() <= expected
+            )
+        } else {
+            Assert.fail("toBeLessThanOrEqual can only be used with numeric operands")
+        }
+    }
+
     fun toBeNull() {
         Assert.assertNotNull(message, actual)
     }
@@ -201,6 +223,28 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
             )
         } else {
             Assert.fail("greaterThan can only be used with numeric operands");
+        }
+    }
+
+    fun greaterThanOrEqual(expected: Double, message: String? = null) {
+        if (actual is Number) {
+            Assert.assertTrue(
+                this.message ?: (message ?: "Expected $actual to be greater than or equal to $expected"),
+                actual.toDouble() >= expected
+            )
+        } else {
+            Assert.fail("greaterThanOrEqual can only be used with numeric operands");
+        }
+    }
+
+    fun lessThanOrEqual(expected: Double, message: String? = null) {
+        if (actual is Number) {
+            Assert.assertTrue(
+                this.message ?: (message ?: "Expected $actual to be less than or equal to $expected"),
+                actual.toDouble() <= expected
+            )
+        } else {
+            Assert.fail("lessThanOrEqual can only be used with numeric operands");
         }
     }
 
@@ -298,6 +342,14 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
 
     fun toBeLessThan(expected: Double) {
         lessThan(expected)
+    }
+
+    fun toBeGreaterThanOrEqual(expected: Double, message: String? = null) {
+        greaterThanOrEqual(expected, message)
+    }
+
+    fun toBeLessThanOrEqual(expected: Double, message: String? = null) {
+        lessThanOrEqual(expected, message)
     }
 
     fun toBeInstanceOf(expected: KClass<*>) {

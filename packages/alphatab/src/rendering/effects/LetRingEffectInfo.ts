@@ -1,11 +1,11 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@coderline/alphatab/rendering/glyphs/LineRangedGlyph';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -13,10 +13,6 @@ import { NotationElement } from '@coderline/alphatab/NotationSettings';
 export class LetRingEffectInfo extends EffectInfo {
     public get notationElement(): NotationElement {
         return NotationElement.EffectLetRing;
-    }
-
-    public get canShareBand(): boolean {
-        return false;
     }
 
     public get hideOnMultiTrack(): boolean {
@@ -37,5 +33,8 @@ export class LetRingEffectInfo extends EffectInfo {
 
     public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
+    }
+    public override get placementCategory(): EffectBandPlacementCategory {
+        return EffectBandPlacementCategory.Span;
     }
 }

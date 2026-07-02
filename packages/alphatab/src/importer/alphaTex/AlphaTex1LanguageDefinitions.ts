@@ -666,6 +666,7 @@ export class AlphaTex1LanguageDefinitions {
             ]
         ],
         ['txt', [[[[17, 10], 0]]]],
+        ['restdisplaypitch', [[[[10, 17], 0]]]],
         [
             'lyrics',
             [

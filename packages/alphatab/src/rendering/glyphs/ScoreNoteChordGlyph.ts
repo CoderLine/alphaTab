@@ -240,7 +240,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
 
         if (minEffectY !== null) {
-            scoreRenderer.registerBeatEffectOverflows(minEffectY, maxEffectY ?? 0);
+            scoreRenderer.registerBeatEffectOverflowsForBeat(this.beat, minEffectY, maxEffectY ?? 0);
         }
 
         if (this.beat.isTremolo && !this.beat.deadSlapped) {

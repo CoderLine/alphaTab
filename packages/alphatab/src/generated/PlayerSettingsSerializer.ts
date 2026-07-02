@@ -20,7 +20,7 @@ export class PlayerSettingsSerializer {
         }
         JsonHelper.forEach(m, (v, k) => PlayerSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
-    public static toJson(obj: PlayerSettings | null): Map<string, unknown> | null {
+    public static toJson(obj: PlayerSettings | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

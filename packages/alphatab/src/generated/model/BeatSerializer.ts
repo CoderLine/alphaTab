@@ -42,7 +42,7 @@ export class BeatSerializer {
         }
         JsonHelper.forEach(m, (v, k) => BeatSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: Beat | null): Map<string, unknown> | null {
+    public static toJson(obj: Beat | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }
@@ -64,6 +64,8 @@ export class BeatSerializer {
         o.set("text", obj.text);
         o.set("slashed", obj.slashed);
         o.set("deadslapped", obj.deadSlapped);
+        o.set("restdisplaytone", obj.restDisplayTone);
+        o.set("restdisplayoctave", obj.restDisplayOctave);
         o.set("brushtype", obj.brushType as number);
         o.set("brushduration", obj.brushDuration);
         o.set("tupletdenominator", obj.tupletDenominator);
@@ -141,6 +143,9 @@ export class BeatSerializer {
             case "dots":
                 obj.dots = v! as number;
                 return true;
+            case "fadein":
+                obj.fadeIn = v! as boolean;
+                return true;
             case "fade":
                 obj.fade = JsonHelper.parseEnum<FadeType>(v, FadeType)!;
                 return true;
@@ -164,6 +169,12 @@ export class BeatSerializer {
                 return true;
             case "deadslapped":
                 obj.deadSlapped = v! as boolean;
+                return true;
+            case "restdisplaytone":
+                obj.restDisplayTone = v! as number;
+                return true;
+            case "restdisplayoctave":
+                obj.restDisplayOctave = v! as number;
                 return true;
             case "brushtype":
                 obj.brushType = JsonHelper.parseEnum<BrushType>(v, BrushType)!;
@@ -213,6 +224,9 @@ export class BeatSerializer {
                 else {
                     obj.tremoloPicking = undefined;
                 }
+                return true;
+            case "tremolospeed":
+                obj.tremoloSpeed = JsonHelper.parseEnum<Duration>(v, Duration) ?? null;
                 return true;
             case "crescendo":
                 obj.crescendo = JsonHelper.parseEnum<CrescendoType>(v, CrescendoType)!;

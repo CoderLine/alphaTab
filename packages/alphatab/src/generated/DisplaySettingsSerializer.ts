@@ -19,20 +19,21 @@ export class DisplaySettingsSerializer {
         }
         JsonHelper.forEach(m, (v, k) => DisplaySettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
-    public static toJson(obj: DisplaySettings | null): Map<string, unknown> | null {
+    public static toJson(obj: DisplaySettings | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }
         const o = new Map<string, unknown>();
         o.set("scale", obj.scale);
         o.set("stretchforce", obj.stretchForce);
+        o.set("spacingratio", obj.spacingRatio);
         o.set("layoutmode", obj.layoutMode as number);
         o.set("staveprofile", obj.staveProfile as number);
         o.set("barsperrow", obj.barsPerRow);
         o.set("startbar", obj.startBar);
         o.set("barcount", obj.barCount);
         o.set("barcountperpartial", obj.barCountPerPartial);
-        o.set("justifylastsystem", obj.justifyLastSystem);
+        o.set("lastsystemfillthreshold", obj.lastSystemFillThreshold);
         o.set("resources", RenderingResourcesSerializer.toJson(obj.resources));
         o.set("padding", obj.padding);
         o.set("firstsystempaddingtop", obj.firstSystemPaddingTop);
@@ -65,6 +66,9 @@ export class DisplaySettingsSerializer {
             case "stretchforce":
                 obj.stretchForce = v! as number;
                 return true;
+            case "spacingratio":
+                obj.spacingRatio = v! as number;
+                return true;
             case "layoutmode":
                 obj.layoutMode = JsonHelper.parseEnum<LayoutMode>(v, LayoutMode)!;
                 return true;
@@ -82,6 +86,9 @@ export class DisplaySettingsSerializer {
                 return true;
             case "barcountperpartial":
                 obj.barCountPerPartial = v! as number;
+                return true;
+            case "lastsystemfillthreshold":
+                obj.lastSystemFillThreshold = v! as number;
                 return true;
             case "justifylastsystem":
                 obj.justifyLastSystem = v! as boolean;

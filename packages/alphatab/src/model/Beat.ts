@@ -364,6 +364,7 @@ export class Beat {
     /**
      * Gets a value indicating whether this beat is fade-in.
      * @deprecated Use `fade`
+     * @json_read_only
      */
     public get fadeIn(): boolean {
         return this.fade === FadeType.FadeIn;
@@ -423,6 +424,18 @@ export class Beat {
      * Whether this beat should rendered and played as "dead slapped".
      */
     public deadSlapped: boolean = false;
+
+    /**
+     * Gets or sets the chromatic tone value (0–11) of the pitch at which this rest should be displayed.
+     * A value of -1 means use the default position formula.
+     */
+    public restDisplayTone: number = -1;
+
+    /**
+     * Gets or sets the octave at which this rest should be displayed.
+     * Only relevant when {@link restDisplayTone} is set. -1 means use the default position formula.
+     */
+    public restDisplayOctave: number = -1;
 
     /**
      * Gets or sets the brush type applied to the notes of this beat.
@@ -551,6 +564,7 @@ export class Beat {
     /**
      * The speed of the tremolo.
      * @deprecated Set {@link tremoloPicking} instead.
+     * @json_read_only
      */
     public get tremoloSpeed(): Duration | null {
         const tremolo = this.tremoloPicking;

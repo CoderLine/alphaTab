@@ -42,6 +42,10 @@ internal class RegExp {
         return _regex.matcher(s).matches()
     }
 
+    public fun test(s: String): Boolean {
+        return _regex.matcher(s).find()
+    }
+
     public fun replace(s: String, replacement: String): String {
         return if (_global)
             _regex.matcher(s).replaceAll(replacement)

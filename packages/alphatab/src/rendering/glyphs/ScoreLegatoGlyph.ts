@@ -73,18 +73,18 @@ export class ScoreLegatoGlyph extends TieGlyph {
         if (this.startBeat!.isRest) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
-                    return startBeatRenderer.y + startBeatRenderer.getRestY(this.startBeat, NoteYPosition.Top);
+                    return startBeatRenderer.getRestY(this.startBeat, NoteYPosition.Top);
                 default:
-                    return startBeatRenderer.y + startBeatRenderer.getRestY(this.startBeat, NoteYPosition.Bottom);
+                    return startBeatRenderer.getRestY(this.startBeat, NoteYPosition.Bottom);
             }
         }
 
         switch (this.tieDirection) {
             case BeamDirection.Up:
                 // below lowest note
-                return startBeatRenderer.y + startBeatRenderer.getNoteY(this.startBeat!.maxNote!, NoteYPosition.Top);
+                return startBeatRenderer.getNoteY(this.startBeat!.maxNote!, NoteYPosition.Top);
             default:
-                return startBeatRenderer.y + startBeatRenderer.getNoteY(this.startBeat!.minNote!, NoteYPosition.Bottom);
+                return startBeatRenderer.getNoteY(this.startBeat!.minNote!, NoteYPosition.Bottom);
         }
     }
 
@@ -114,9 +114,9 @@ export class ScoreLegatoGlyph extends TieGlyph {
         if (this.endBeat.isRest) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
-                    return endBeatRenderer.y + endBeatRenderer.getRestY(this.endBeat, NoteYPosition.Top);
+                    return endBeatRenderer.getRestY(this.endBeat, NoteYPosition.Top);
                 default:
-                    return endBeatRenderer.y + endBeatRenderer.getRestY(this.endBeat, NoteYPosition.Bottom);
+                    return endBeatRenderer.getRestY(this.endBeat, NoteYPosition.Bottom);
             }
         }
 
@@ -128,40 +128,29 @@ export class ScoreLegatoGlyph extends TieGlyph {
                 switch (this.tieDirection) {
                     case BeamDirection.Up:
                         // stem upper end
-                        return (
-                            endBeatRenderer.y +
-                            endBeatRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.TopWithStem)
-                        );
+                        return endBeatRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.TopWithStem);
                     default:
                         // stem lower end
-                        return (
-                            endBeatRenderer.y +
-                            endBeatRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.BottomWithStem)
-                        );
+                        return endBeatRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.BottomWithStem);
                 }
             }
             switch (this.tieDirection) {
                 case BeamDirection.Up:
                     // stem upper end
-                    return (
-                        endBeatRenderer.y +
-                        endBeatRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.BottomWithStem)
-                    );
+                    return endBeatRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.BottomWithStem);
                 default:
                     // stem lower end
-                    return (
-                        endBeatRenderer.y + endBeatRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.TopWithStem)
-                    );
+                    return endBeatRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.TopWithStem);
             }
         }
 
         switch (this.tieDirection) {
             case BeamDirection.Up:
                 // below lowest note
-                return endBeatRenderer.y + endBeatRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.Top);
+                return endBeatRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.Top);
             default:
                 // above highest note
-                return endBeatRenderer.y + endBeatRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.Bottom);
+                return endBeatRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.Bottom);
         }
     }
 }

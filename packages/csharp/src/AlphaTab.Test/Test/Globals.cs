@@ -170,6 +170,22 @@ internal class NotExpector<T>
         }
     }
 
+    public void ToBeGreaterThanOrEqual(double expected)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsFalse(d.CompareTo(expected) >= 0, _message);
+        }
+    }
+
+    public void ToBeLessThanOrEqual(double expected)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsFalse(d.CompareTo(expected) <= 0, _message);
+        }
+    }
+
     public void ToBeNull()
     {
         Assert.IsNotNull(_actual, _message);
@@ -325,6 +341,24 @@ internal class Expector<T>
         LessThan(expected);
     }
 
+    public void ToBeGreaterThanOrEqual(double expected, string? message = null)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsTrue(d.CompareTo(expected) >= 0,
+                _message ?? message ?? $"Expected {_actual} to be greater than or equal to {expected}");
+        }
+    }
+
+    public void ToBeLessThanOrEqual(double expected, string? message = null)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsTrue(d.CompareTo(expected) <= 0,
+                _message ?? message ?? $"Expected {_actual} to be less than or equal to {expected}");
+        }
+    }
+
     public void ToBeInstanceOf(Type expected)
     {
         Assert.IsInstanceOfType(_actual, expected, _message);
@@ -338,6 +372,53 @@ internal class Expector<T>
     public void ToBeUndefined()
     {
         Assert.IsNull(_actual, _message);
+    }
+
+    public void ToBeDefined()
+    {
+        Assert.IsNotNull(_actual, _message);
+    }
+
+    public void ToEqual(object? expected, string? message = null)
+    {
+        if (expected is null && _actual is null)
+        {
+            return;
+        }
+        if (expected is null || _actual is null)
+        {
+            Assert.Fail(message ?? _message ?? $"Expected {(expected is null ? "null" : expected.ToString())}, got {((object?)_actual is null ? "null" : _actual!.ToString())}");
+            return;
+        }
+
+        var expectedType = expected.GetType();
+        var actualType = _actual.GetType();
+
+        if (expectedType == actualType)
+        {
+            Assert.AreEqual(expected, _actual, message ?? _message);
+            return;
+        }
+
+        // Structural comparison: walk expected's properties (e.g. an anonymous object from a
+        // TS object-literal `expect(x).toEqual({...})`) and match against the actual instance's
+        // properties case-insensitively (TS source uses camelCase, C# properties are PascalCase).
+        var expectedProps = expectedType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        foreach (var prop in expectedProps)
+        {
+            var actualProp = actualType.GetProperty(
+                prop.Name,
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase
+            );
+            if (actualProp is null)
+            {
+                Assert.Fail(message ?? _message ?? $"Property '{prop.Name}' not found on {actualType.Name}");
+                return;
+            }
+            var expectedValue = prop.GetValue(expected);
+            var actualValue = actualProp.GetValue(_actual);
+            Assert.AreEqual(expectedValue, actualValue, $"Property '{prop.Name}'");
+        }
     }
 
     public void ToThrow(Type expected)

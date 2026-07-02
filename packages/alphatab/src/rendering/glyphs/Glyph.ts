@@ -26,7 +26,24 @@ export class Glyph {
         return this.getBoundingBoxTop() + this.height;
     }
 
+    /**
+     * Paint extent — distinct from the rhythmic-spacing extent (`x`, `x + width`).
+     * Override on zero-width "no-rod" glyphs so the bar-local skyline still sees them.
+     */
+    public getBoundingBoxLeft(): number {
+        return this.x;
+    }
+
+    public getBoundingBoxRight(): number {
+        return this.x + this.width;
+    }
+
     public doLayout(): void {
+        // to be implemented in subclass
+    }
+
+    /** Hook for glyphs whose bbox is only final after `scaleToWidth`. Default no-op. */
+    public populateSkyline(): void {
         // to be implemented in subclass
     }
 

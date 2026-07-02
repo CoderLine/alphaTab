@@ -15,7 +15,7 @@ export class ImporterSettingsSerializer {
         }
         JsonHelper.forEach(m, (v, k) => ImporterSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
-    public static toJson(obj: ImporterSettings | null): Map<string, unknown> | null {
+    public static toJson(obj: ImporterSettings | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

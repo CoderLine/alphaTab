@@ -15,7 +15,7 @@ export class PlaybackInformationSerializer {
         }
         JsonHelper.forEach(m, (v, k) => PlaybackInformationSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: PlaybackInformation | null): Map<string, unknown> | null {
+    public static toJson(obj: PlaybackInformation | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

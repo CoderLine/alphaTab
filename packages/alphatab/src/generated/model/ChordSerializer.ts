@@ -15,7 +15,7 @@ export class ChordSerializer {
         }
         JsonHelper.forEach(m, (v, k) => ChordSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: Chord | null): Map<string, unknown> | null {
+    public static toJson(obj: Chord | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

@@ -18,7 +18,7 @@ export class NoteStyleSerializer {
         }
         JsonHelper.forEach(m, (v, k) => NoteStyleSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: NoteStyle | null): Map<string, unknown> | null {
+    public static toJson(obj: NoteStyle | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

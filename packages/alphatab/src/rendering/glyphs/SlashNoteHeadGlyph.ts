@@ -66,7 +66,7 @@ export class SlashNoteHeadGlyph extends NoteHeadGlyphBase {
         }
 
         if (!Number.isNaN(minEffectY)) {
-            lr.registerBeatEffectOverflows(minEffectY, maxEffectY);
+            lr.registerBeatEffectOverflowsForBeat(this.beat!, minEffectY, maxEffectY);
         }
 
         const direction = lr.getBeatDirection(this.beat!);

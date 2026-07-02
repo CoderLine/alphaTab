@@ -17,7 +17,7 @@ export class InstrumentArticulationSerializer {
         }
         JsonHelper.forEach(m, (v, k) => InstrumentArticulationSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: InstrumentArticulation | null): Map<string, unknown> | null {
+    public static toJson(obj: InstrumentArticulation | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

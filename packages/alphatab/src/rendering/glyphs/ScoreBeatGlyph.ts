@@ -1,5 +1,6 @@
 import { Logger } from '@coderline/alphatab/Logger';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
+import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
@@ -301,18 +302,23 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
     private _createRestGlyphs() {
         const sr = this.renderer as ScoreBarRenderer;
+        const beat = this.container.beat;
+        const lineCount = this.renderer.bar.staff.standardNotationLineCount;
 
-        let steps = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
-
-        // this positioning is quite strange, for most staff line counts
-        // the whole/rest are aligned as half below the whole rest.
-        // but for staff line count 1 and 3 they are aligned centered on the same line.
-        if (
-            this.container.beat.duration === Duration.Whole &&
-            this.renderer.bar.staff.standardNotationLineCount !== 1 &&
-            this.renderer.bar.staff.standardNotationLineCount !== 3
-        ) {
-            steps -= 2;
+        let steps: number;
+        if (beat.restDisplayTone !== -1 && beat.restDisplayOctave !== -1) {
+            // Per-beat override: same step as a note at that pitch. SMuFL rest glyphs use the same
+            // baseline convention as note heads, so no further adjustment is applied.
+            steps = AccidentalHelper.calculateRestDisplaySteps(sr.bar, beat.restDisplayTone, beat.restDisplayOctave);
+        } else {
+            // Default placement: centred on the staff. Whole rests sit one line above (per SMuFL/Guitar Pro
+            // convention) so their hanging body lines up with where half/shorter rest bodies appear.
+            // 1- and 3-line staves keep the whole rest on the default rest line (Guitar Pro convention;
+            // see musescore/MuseScore#25279).
+            steps = Math.ceil((lineCount - 1) / 2) * 2;
+            if (beat.duration === Duration.Whole && lineCount !== 1 && lineCount !== 3) {
+                steps -= 2;
+            }
         }
 
         const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(steps), this.container.beat.duration);

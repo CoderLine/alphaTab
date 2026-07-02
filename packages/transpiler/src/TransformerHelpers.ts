@@ -72,11 +72,20 @@ export function getVisibility(context: EmitterContextBase, node: ts.Node): cs.Vi
     if (hasTag(node, JsDocTag.internal)) {
         return cs.Visibility.Internal;
     }
-    context.addTsNodeDiagnostics(
-        node,
-        'All types need to define their visibility with @public or @internal',
-        ts.DiagnosticCategory.Error
-    );
+
+    switch (node.kind) {
+        case ts.SyntaxKind.ClassDeclaration:
+        case ts.SyntaxKind.InterfaceDeclaration:
+        case ts.SyntaxKind.EnumDeclaration:
+        case ts.SyntaxKind.TypeAliasDeclaration:
+            context.addTsNodeDiagnostics(
+                node,
+                'All types need to define their visibility with @public or @internal',
+                ts.DiagnosticCategory.Error
+            );
+            break;
+    }
+
     return cs.Visibility.Internal;
 }
 

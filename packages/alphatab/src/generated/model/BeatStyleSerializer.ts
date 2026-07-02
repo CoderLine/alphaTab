@@ -17,7 +17,7 @@ export class BeatStyleSerializer {
         }
         JsonHelper.forEach(m, (v, k) => BeatStyleSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: BeatStyle | null): Map<string, unknown> | null {
+    public static toJson(obj: BeatStyle | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

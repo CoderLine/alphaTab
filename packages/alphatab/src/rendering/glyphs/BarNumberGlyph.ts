@@ -1,9 +1,9 @@
-import { TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -22,6 +22,25 @@ export class BarNumberGlyph extends Glyph {
         this.width = size.width;
         this.height = size.height;
         this.y -= this.height;
+    }
+
+    public override populateSkyline(): void {
+        this.renderer.insertSkylineFromBbox(this);
+    }
+
+    /** Collapse bbox on non-first staves so the per-x skyline doesn't see a phantom obstacle. */
+    public override getBoundingBoxLeft(): number {
+        if (!this.renderer.staff!.isFirstInSystem) {
+            return this.x;
+        }
+        return super.getBoundingBoxLeft();
+    }
+
+    public override getBoundingBoxRight(): number {
+        if (!this.renderer.staff!.isFirstInSystem) {
+            return this.x;
+        }
+        return super.getBoundingBoxRight();
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
