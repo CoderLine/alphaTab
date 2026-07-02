@@ -68,7 +68,7 @@ public class Float32Array : IEnumerable<float>
         System.Buffer.BlockCopy(subarray.Data.Array!,
             subarray.Data.Offset * sizeof(float),
             Data.Array!,
-            Data.Offset + (int)offset * sizeof(float),
+            (Data.Offset + (int)offset) * sizeof(float),
             subarray.Data.Count * sizeof(float));
     }
 

@@ -1,12 +1,12 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { OttavaGlyph } from '@coderline/alphatab/rendering/glyphs/OttavaGlyph';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
@@ -24,10 +24,6 @@ export class OttaviaEffectInfo extends EffectInfo {
 
     public get hideOnMultiTrack(): boolean {
         return false;
-    }
-
-    public get canShareBand(): boolean {
-        return true;
     }
 
     public get sizingMode(): EffectBarGlyphSizing {
@@ -59,5 +55,8 @@ export class OttaviaEffectInfo extends EffectInfo {
 
     public canExpand(from: Beat, to: Beat): boolean {
         return from.ottava === to.ottava;
+    }
+    public override get placementCategory(): EffectBandPlacementCategory {
+        return EffectBandPlacementCategory.Span;
     }
 }

@@ -16,7 +16,7 @@ export class BeamingRulesSerializer {
         }
         JsonHelper.forEach(m, (v, k) => BeamingRulesSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: BeamingRules | null): Map<string, unknown> | null {
+    public static toJson(obj: BeamingRules | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

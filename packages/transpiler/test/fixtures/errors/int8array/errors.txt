@@ -1,0 +1,2 @@
+input.ts:5:20: Int8Array is not supported. The C# runtime has no Int8Array class. Use Uint8Array or a custom sbyte[] wrapper instead.
+input.ts:5:36: Int8Array is not supported. The C# runtime has no Int8Array class. Use Uint8Array or a custom sbyte[] wrapper instead.

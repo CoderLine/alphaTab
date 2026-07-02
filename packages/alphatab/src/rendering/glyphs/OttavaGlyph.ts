@@ -1,8 +1,8 @@
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@coderline/alphatab/rendering/glyphs/GroupedEffectGlyph';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
  * @internal
@@ -10,6 +10,7 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 export class OttavaGlyph extends GroupedEffectGlyph {
     private _ottava: Ottavia;
     private _aboveStaff: boolean;
+    private _symbolWidth: number = 0;
 
     public constructor(ottava: Ottavia, aboveStaff: boolean) {
         super(BeatXPosition.PostNotes);
@@ -20,6 +21,30 @@ export class OttavaGlyph extends GroupedEffectGlyph {
     public override doLayout(): void {
         super.doLayout();
         this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.QuindicesimaAlta)!;
+        this._symbolWidth = OttavaGlyph._resolveSymbolWidth(this._ottava, this.renderer.smuflMetrics.glyphWidths);
+    }
+
+    public override getBoundingBoxLeft(): number {
+        return this.x - this._symbolWidth / 2;
+    }
+
+    private static _resolveSymbolWidth(ottava: Ottavia, glyphWidths: Map<MusicFontSymbol, number>): number {
+        switch (ottava) {
+            case Ottavia._15ma:
+                return glyphWidths.get(MusicFontSymbol.QuindicesimaAlta) ?? 0;
+            case Ottavia._8va:
+                return glyphWidths.get(MusicFontSymbol.OttavaAlta) ?? 0;
+            case Ottavia._8vb:
+                return glyphWidths.get(MusicFontSymbol.OttavaBassaVb) ?? 0;
+            case Ottavia._15mb:
+                return (
+                    (glyphWidths.get(MusicFontSymbol.Quindicesima) ?? 0) +
+                    (glyphWidths.get(MusicFontSymbol.OctaveBaselineM) ?? 0) +
+                    (glyphWidths.get(MusicFontSymbol.OctaveBaselineB) ?? 0)
+                );
+            default:
+                return 0;
+        }
     }
 
     protected override paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {
@@ -31,7 +56,8 @@ export class OttavaGlyph extends GroupedEffectGlyph {
         switch (this._ottava) {
             case Ottavia._15ma:
                 size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.QuindicesimaAlta)!;
-                CanvasHelper.fillMusicFontSymbolSafe(canvas,
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     1,
@@ -41,7 +67,8 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                 break;
             case Ottavia._8va:
                 size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OttavaAlta)!;
-                CanvasHelper.fillMusicFontSymbolSafe(canvas,
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     1,
@@ -51,7 +78,8 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                 break;
             case Ottavia._8vb:
                 size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OttavaBassaVb)!;
-                CanvasHelper.fillMusicFontSymbolSafe(canvas,
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     1,
@@ -67,7 +95,8 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                     1;
 
                 // NOTE: SMUFL does not have a glyph for 15mb so we build it
-                CanvasHelper.fillMusicFontSymbolsSafe(canvas,
+                CanvasHelper.fillMusicFontSymbolsSafe(
+                    canvas,
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     1,

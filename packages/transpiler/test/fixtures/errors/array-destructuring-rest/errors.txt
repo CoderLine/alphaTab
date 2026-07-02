@@ -1,0 +1,1 @@
+input.ts:6:15: Rest binding in array destructuring ([, ...rest] = arr) is not supported. See SYNTAX.md for the workaround.

@@ -40,12 +40,6 @@ internal inline fun UByteArray.decodeToDoubleArray(): DoubleArray {
     return da
 }
 
-@ExperimentalUnsignedTypes
-internal inline fun UByteArray.decodeToString(encoding: String): String {
-    return String(this.toByteArray(), 0, this.size, Charset.forName(encoding))
-}
-
-
 internal inline fun <T : Comparable<T>> List<T>.sort() {
     this.sort { a, b ->
         a.compareTo(b).toDouble()
@@ -122,6 +116,10 @@ internal inline fun Double.toFixed(decimals: Double): String {
 
 internal inline fun String.lastIndexOfInDouble(item: String): Double {
     return this.lastIndexOf(item).toDouble()
+}
+
+internal inline fun String.localeCompare(other: String): Double {
+    return this.compareTo(other).toDouble()
 }
 
 internal inline operator fun Double.plus(str: String): String {
@@ -379,4 +377,12 @@ internal inline fun <reified T> List<T>.concat(other: Iterable<T>): List<T> {
     val copy = this.slice()
     copy.push(other)
     return copy
+}
+
+internal inline fun Throwable.cause(): Throwable? {
+    return this.cause
+}
+
+internal inline fun Throwable.stack(): String {
+    return this.stackTraceToString()
 }

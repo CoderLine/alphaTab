@@ -1,16 +1,15 @@
+import { describe, expect, it } from 'vitest';
 import { Beat } from '@coderline/alphatab/model/Beat';
 import { Note } from '@coderline/alphatab/model/Note';
-import { expect } from 'chai';
-
 describe('BeatTests', () => {
     it('add-stringed-note', () => {
         const beat = new Beat();
         const note = new Note();
         note.string = 2;
         beat.addNote(note);
-        expect(beat.notes.length).to.be.equal(1);
-        expect(beat.hasNoteOnString(2)).to.be.equal(true);
-        expect(beat.getNoteOnString(2)).to.be.equal(note);
+        expect(beat.notes.length).toBe(1);
+        expect(beat.hasNoteOnString(2)).toBe(true);
+        expect(beat.getNoteOnString(2)).toBe(note);
     });
 
     it('remove-stringed-note', () => {
@@ -19,8 +18,8 @@ describe('BeatTests', () => {
         note.string = 1;
         beat.addNote(note);
         beat.removeNote(note);
-        expect(beat.notes.length).to.be.equal(0);
-        expect(beat.hasNoteOnString(2)).to.be.equal(false);
-        expect(beat.getNoteOnString(2)).to.be.equal(null);
+        expect(beat.notes.length).toBe(0);
+        expect(beat.hasNoteOnString(2)).toBe(false);
+        expect(beat.getNoteOnString(2)).toBe(null);
     });
 });

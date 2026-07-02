@@ -13,6 +13,7 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { Note } from '@coderline/alphatab/model/Note';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
+import type { Slur } from '@coderline/alphatab/model/Slur';
 import { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import type { Voice } from '@coderline/alphatab/model/Voice';
@@ -363,6 +364,7 @@ export class Beat {
     /**
      * Gets a value indicating whether this beat is fade-in.
      * @deprecated Use `fade`
+     * @json_read_only
      */
     public get fadeIn(): boolean {
         return this.fade === FadeType.FadeIn;
@@ -422,6 +424,18 @@ export class Beat {
      * Whether this beat should rendered and played as "dead slapped".
      */
     public deadSlapped: boolean = false;
+
+    /**
+     * Gets or sets the chromatic tone value (0–11) of the pitch at which this rest should be displayed.
+     * A value of -1 means use the default position formula.
+     */
+    public restDisplayTone: number = -1;
+
+    /**
+     * Gets or sets the octave at which this rest should be displayed.
+     * Only relevant when {@link restDisplayTone} is set. -1 means use the default position formula.
+     */
+    public restDisplayOctave: number = -1;
 
     /**
      * Gets or sets the brush type applied to the notes of this beat.
@@ -550,6 +564,7 @@ export class Beat {
     /**
      * The speed of the tremolo.
      * @deprecated Set {@link tremoloPicking} instead.
+     * @json_read_only
      */
     public get tremoloSpeed(): Duration | null {
         const tremolo = this.tremoloPicking;
@@ -686,6 +701,24 @@ export class Beat {
      * @json_ignore
      */
     public effectSlurDestination: Beat | null = null;
+
+    /**
+     * Convenience accessor for the {@link Slur} of this beat. Returns
+     * the effect slur of whichever note in this beat owns it (the
+     * chain-origin note populated during `Note.finish()`), or `null`
+     * when no note in the beat is an effect-slur origin.
+     * @clone_ignore
+     * @json_ignore
+     * @internal
+     */
+    public get effectSlur(): Slur | null {
+        for (const n of this.notes) {
+            if (n.effectSlur !== null) {
+                return n.effectSlur;
+            }
+        }
+        return null;
+    }
 
     /**
      * Gets or sets how the beaming should be done for this beat.

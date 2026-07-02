@@ -33,7 +33,7 @@
  * @internal
  */
 export class PrettyFormatConfig {
-    public escapeString: boolean = true;
+    public escapeString: boolean = false;
     public indent: string = '  ';
     public maxDepth: number = Number.POSITIVE_INFINITY;
     public maxWidth: number = Number.POSITIVE_INFINITY;
@@ -166,7 +166,7 @@ export class PrettyFormat {
             return 'Uint32Array';
         }
         if (Array.isArray(val)) {
-            return 'Array';
+            return '_Array';
         }
         if (val instanceof Set) {
             return 'Set';
@@ -200,7 +200,7 @@ export class PrettyFormat {
             return hitMaxDepth
                 ? `[${arrayTypeName}]`
                 : `${
-                      min ? '' : `${arrayTypeName} `
+                      min || arrayTypeName.startsWith('_') ? '' : `${arrayTypeName} `
                   }[${PrettyFormat.printIterableValues(TestPlatform.typedArrayAsUnknownIterable(val), config, indentation, depth, refs, PrettyFormat.printer)}]`;
         }
 

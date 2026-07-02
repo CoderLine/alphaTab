@@ -245,7 +245,7 @@ namespace AlphaTab.WinForms
             return null;
         }
 
-        public override void BeginInvoke(Action action)
+        protected override void PostToUIThread(Action action)
         {
             SettingsContainer.BeginInvoke(action);
         }

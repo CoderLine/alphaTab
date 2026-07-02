@@ -19,7 +19,7 @@ export class ScoreStyleSerializer {
         }
         JsonHelper.forEach(m, (v, k) => ScoreStyleSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: ScoreStyle | null): Map<string, unknown> | null {
+    public static toJson(obj: ScoreStyle | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

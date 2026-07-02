@@ -1,3 +1,4 @@
+import { describe, it } from 'vitest';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';

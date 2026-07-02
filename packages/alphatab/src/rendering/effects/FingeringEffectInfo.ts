@@ -4,11 +4,11 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import { FingeringMode, NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
-import type { Settings } from '@coderline/alphatab/Settings';
+import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { FingeringGroupGlyph } from '@coderline/alphatab/rendering/glyphs/FingeringGroupGlyph';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
@@ -20,10 +20,6 @@ export class FingeringEffectInfo extends EffectInfo {
 
     public get hideOnMultiTrack(): boolean {
         return false;
-    }
-
-    public get canShareBand(): boolean {
-        return true;
     }
 
     public get sizingMode(): EffectBarGlyphSizing {

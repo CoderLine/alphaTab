@@ -11,6 +11,7 @@
             "es2022.regexp",
             "es2022.error",
             "ES2024.Promise",
+            "ESNext.Disposable",
             "WebWorker",
             "DOM",
             "DOM.Iterable",
@@ -53,9 +54,6 @@
             "@coderline/alphatab-language-server": [
                 "${configDir}/../lsp/src/index"
             ],
-            "@coderline/alphatab-playground/*": [
-                "${configDir}/../playground/src/*"
-            ],
             "@coderline/alphatab-tooling/*": [
                 "${configDir}/../tooling/src/*"
             ],
@@ -64,9 +62,6 @@
             ],
             "@coderline/alphatab-vite/*": [
                 "${configDir}/../vite/src/*"
-            ],
-            "alphatab-vscode/*": [
-                "${configDir}/../vscode/src/*"
             ],
             "@coderline/alphatab-webpack/*": [
                 "${configDir}/../webpack/src/*"
@@ -80,8 +75,16 @@
             "@coderline/alphatab-alphatex/*": [
                 "${configDir}/../alphatex/src/*"
             ],
+            "@coderline/alphasynth/*": [
+                "${configDir}/../alphasynth/src/*"
+            ],
+            "src/*": [
+                "${configDir}/src/*"
+            ],
+            "test/*": [
+                "${configDir}/test/*"
+            ],
         },
-        "baseUrl": "${configDir}",
         "typeRoots": [
             // monorepo root
             "${configDir}/../../node_modules/@types",
@@ -89,6 +92,8 @@
             "${configDir}/node_modules/@types",
             "${configDir}/types",
         ],
+        // include all @types/* packages found in `typeRoots` as ambient.
+        "types": ["*"],
     },
     "include": [
         "${configDir}/*.ts",

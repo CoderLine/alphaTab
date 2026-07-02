@@ -3,7 +3,7 @@ import { WhammyType } from '@coderline/alphatab/model/WhammyType';
 import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { TabWhammyBarGlyph } from '@coderline/alphatab/rendering/glyphs/TabWhammyBarGlyph';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -21,10 +21,6 @@ export class SimpleDipWhammyBarEffectInfo extends EffectInfo {
     }
 
     public get hideOnMultiTrack(): boolean {
-        return false;
-    }
-
-    public get canShareBand(): boolean {
         return false;
     }
 
@@ -46,5 +42,8 @@ export class SimpleDipWhammyBarEffectInfo extends EffectInfo {
 
     public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
+    }
+    public override get placementCategory(): EffectBandPlacementCategory {
+        return EffectBandPlacementCategory.Span;
     }
 }

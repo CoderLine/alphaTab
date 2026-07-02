@@ -1,3 +1,4 @@
+import { describe, it } from 'vitest';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 

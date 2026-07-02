@@ -1,0 +1,1 @@
+input.ts:1:1: Global statements in modules are only allowed if there is a default class export

@@ -2385,26 +2385,26 @@ export class GpifParser {
                         case 'HarmonicType':
                             const htype = c.findChildElement('HType');
                             if (htype) {
-                                switch (htype.innerText) {
-                                    case 'NoHarmonic':
+                                switch (htype.innerText.toLowerCase()) {
+                                    case 'noharmonic':
                                         note.harmonicType = HarmonicType.None;
                                         break;
-                                    case 'Natural':
+                                    case 'natural':
                                         note.harmonicType = HarmonicType.Natural;
                                         break;
-                                    case 'Artificial':
+                                    case 'artificial':
                                         note.harmonicType = HarmonicType.Artificial;
                                         break;
-                                    case 'Pinch':
+                                    case 'pinch':
                                         note.harmonicType = HarmonicType.Pinch;
                                         break;
-                                    case 'Tap':
+                                    case 'tap':
                                         note.harmonicType = HarmonicType.Tap;
                                         break;
-                                    case 'Semi':
+                                    case 'semi':
                                         note.harmonicType = HarmonicType.Semi;
                                         break;
-                                    case 'Feedback':
+                                    case 'feedback':
                                         note.harmonicType = HarmonicType.Feedback;
                                         break;
                                 }
@@ -2882,6 +2882,10 @@ export class GpifParser {
 
         // build masterbar automations
         for (const [barNumber, automations] of this._masterTrackAutomations) {
+            if (barNumber < 0 || barNumber >= this.score.masterBars.length) {
+                // automation references a bar that is not in the score's masterBars list
+                continue;
+            }
             const masterBar: MasterBar = this.score.masterBars[barNumber];
             for (let i: number = 0, j: number = automations.length; i < j; i++) {
                 const automation: Automation = automations[i];

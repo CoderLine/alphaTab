@@ -1,12 +1,12 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-staff 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-staff 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -18,27 +18,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -60,7 +60,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -80,13 +80,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-staff-staff 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-staff-staff 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -98,27 +98,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -140,7 +140,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -152,15 +152,15 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
@@ -177,7 +177,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -197,13 +197,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-staff-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-staff-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -215,27 +215,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -257,7 +257,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -277,13 +277,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-staff-voice-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-staff-voice-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -295,27 +295,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -333,7 +333,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
@@ -350,7 +350,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -370,13 +370,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-track 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -388,27 +388,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -430,7 +430,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -452,13 +452,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-staff 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-track-staff 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -470,27 +470,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -512,7 +512,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -534,13 +534,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-staff-staff 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-track-staff-staff 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -552,27 +552,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -594,7 +594,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -606,15 +606,15 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
@@ -631,7 +631,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -653,13 +653,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-staff-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-track-staff-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -671,27 +671,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -713,7 +713,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -735,13 +735,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-staff-voice-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-track-staff-voice-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -753,27 +753,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -791,7 +791,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
@@ -808,7 +808,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -830,13 +830,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-track 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-track-track 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -848,27 +848,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -890,7 +890,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -910,23 +910,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -948,7 +948,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -971,13 +971,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-track-meta 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-track-track-meta 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -989,27 +989,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1031,7 +1031,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -1051,24 +1051,24 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 1,
               "clef" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1090,7 +1090,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -1113,13 +1113,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-track-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1131,27 +1131,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1173,7 +1173,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -1195,13 +1195,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-track-voice-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-track-voice-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1213,27 +1213,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1251,7 +1251,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
@@ -1268,7 +1268,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -1290,13 +1290,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1308,27 +1308,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1350,7 +1350,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -1370,13 +1370,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving initial meta-voice-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > initial > meta-voice-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1388,27 +1388,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1426,7 +1426,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
@@ -1443,7 +1443,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -1463,13 +1463,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-staff 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-staff 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1489,25 +1489,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -1515,7 +1515,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1535,15 +1535,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -1562,11 +1562,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -1583,15 +1583,15 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -1606,11 +1606,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -1625,11 +1625,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -1646,7 +1646,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -1666,13 +1666,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-staff-staff 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-staff-staff 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1692,25 +1692,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -1718,7 +1718,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -1738,15 +1738,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -1765,11 +1765,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -1786,15 +1786,15 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -1809,11 +1809,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -1828,11 +1828,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 6,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
@@ -1849,7 +1849,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -1861,15 +1861,15 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -1884,11 +1884,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 7,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -1903,11 +1903,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 8,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
@@ -1924,7 +1924,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -1944,13 +1944,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-staff-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-staff-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -1970,25 +1970,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -1996,7 +1996,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -2016,15 +2016,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -2043,11 +2043,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -2064,15 +2064,15 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -2087,11 +2087,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -2106,11 +2106,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -2127,7 +2127,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -2147,13 +2147,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-staff-voice-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-staff-voice-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -2173,25 +2173,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -2199,7 +2199,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -2219,15 +2219,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -2246,11 +2246,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -2267,15 +2267,15 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -2288,7 +2288,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -2303,11 +2303,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -2320,7 +2320,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
@@ -2335,11 +2335,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -2352,7 +2352,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
@@ -2369,7 +2369,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -2389,13 +2389,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-track 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -2415,25 +2415,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -2441,7 +2441,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -2461,15 +2461,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -2488,11 +2488,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -2515,23 +2515,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -2551,11 +2551,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -2570,11 +2570,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -2591,7 +2591,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -2614,13 +2614,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-staff 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-track-staff 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -2640,25 +2640,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -2666,7 +2666,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -2686,15 +2686,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -2713,11 +2713,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -2740,23 +2740,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -2776,11 +2776,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -2795,11 +2795,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -2816,7 +2816,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -2839,13 +2839,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-staff-staff 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-track-staff-staff 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -2865,25 +2865,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -2891,7 +2891,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -2911,15 +2911,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -2938,11 +2938,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -2965,23 +2965,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3001,11 +3001,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -3020,11 +3020,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 6,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
@@ -3041,7 +3041,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -3053,15 +3053,15 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -3076,11 +3076,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 7,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -3095,11 +3095,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 8,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
@@ -3116,7 +3116,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -3139,13 +3139,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-staff-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-track-staff-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -3165,25 +3165,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -3191,7 +3191,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3211,15 +3211,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -3238,11 +3238,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -3265,23 +3265,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3301,11 +3301,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -3320,11 +3320,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -3341,7 +3341,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -3364,13 +3364,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-staff-voice-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-track-staff-voice-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -3390,25 +3390,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -3416,7 +3416,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3436,15 +3436,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -3463,11 +3463,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -3490,23 +3490,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3524,7 +3524,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -3539,11 +3539,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -3556,7 +3556,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
@@ -3571,11 +3571,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -3588,7 +3588,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
@@ -3605,7 +3605,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -3628,13 +3628,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-track 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-track-track 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -3654,25 +3654,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -3680,7 +3680,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3700,15 +3700,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -3727,11 +3727,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -3754,23 +3754,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3790,11 +3790,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -3809,11 +3809,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 6,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
@@ -3830,7 +3830,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -3851,23 +3851,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -3887,11 +3887,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 7,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -3906,11 +3906,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 8,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
@@ -3927,7 +3927,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -3950,13 +3950,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-track-meta 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-track-track-meta 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -3976,25 +3976,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -4002,7 +4002,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -4022,15 +4022,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -4049,11 +4049,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -4076,23 +4076,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -4112,11 +4112,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -4131,11 +4131,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 6,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
@@ -4152,7 +4152,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -4173,24 +4173,24 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
               "clef" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -4211,11 +4211,11 @@ Map {
               "__kind" => "Bar",
               "id" => 7,
               "clef" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -4231,11 +4231,11 @@ Map {
               "__kind" => "Bar",
               "id" => 8,
               "clef" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
@@ -4252,7 +4252,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -4275,13 +4275,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-track-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -4301,25 +4301,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -4327,7 +4327,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -4347,15 +4347,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -4374,11 +4374,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -4401,23 +4401,23 @@ Map {
     },
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -4437,11 +4437,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 4,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -4456,11 +4456,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 5,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -4477,7 +4477,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -4500,13 +4500,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-track-voice-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-track-voice-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -4518,27 +4518,27 @@ Map {
       ],
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -4556,7 +4556,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
@@ -4573,7 +4573,7 @@ Map {
           "stringtuning" => Map {
             "isstandard" => true,
             "name" => "Guitar Standard Tuning",
-            "tunings" => Array [
+            "tunings" => [
               64,
               59,
               55,
@@ -4595,13 +4595,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -4621,25 +4621,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -4647,7 +4647,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -4665,7 +4665,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -4680,15 +4680,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -4704,7 +4704,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -4720,11 +4720,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -4737,7 +4737,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -4762,13 +4762,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest bar-meta-interweaving with-previous-bars meta-voice-voice 1`] = `
+exports[`AlphaTexImporterTest > bar-meta-interweaving > with-previous-bars > meta-voice-voice 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -4788,25 +4788,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -4814,7 +4814,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -4832,7 +4832,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -4845,7 +4845,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 6,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
@@ -4860,15 +4860,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -4884,7 +4884,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
@@ -4897,7 +4897,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
@@ -4913,11 +4913,11 @@ Map {
               "__kind" => "Bar",
               "id" => 2,
               "clef" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
@@ -4930,7 +4930,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 5,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
@@ -4943,7 +4943,7 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 8,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -4968,13 +4968,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest barlines 1`] = `
+exports[`AlphaTexImporterTest > barlines 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -4990,26 +4990,26 @@ Map {
       "start" => 3840,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
                       "isempty" => true,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -5031,11 +5031,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
@@ -5054,15 +5054,15 @@ Map {
         },
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
@@ -5079,11 +5079,11 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 3,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
@@ -5111,15 +5111,15 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest custom-beaming 1`] = `
+exports[`AlphaTexImporterTest > custom-beaming 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
       "beamingrules" => Map {
         "groups" => Map {
-          "8" => Array [
+          "8" => [
             2,
             2,
             2,
@@ -5127,7 +5127,7 @@ Map {
           ],
         },
       },
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -5146,7 +5146,7 @@ Map {
       "__kind" => "MasterBar",
       "beamingrules" => Map {
         "groups" => Map {
-          "8" => Array [
+          "8" => [
             4,
             4,
           ],
@@ -5155,25 +5155,25 @@ Map {
       "start" => 7680,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -5182,7 +5182,7 @@ Map {
                         },
                       ],
                       "duration" => 8,
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -5198,7 +5198,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -5215,7 +5215,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 2,
@@ -5232,7 +5232,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 3,
@@ -5249,7 +5249,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 4,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 4,
@@ -5266,7 +5266,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 5,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 5,
@@ -5283,7 +5283,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 6,
@@ -5300,7 +5300,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 7,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 7,
@@ -5321,15 +5321,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 8,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 8,
@@ -5344,7 +5344,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 9,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 9,
@@ -5361,7 +5361,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 10,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 10,
@@ -5378,7 +5378,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 11,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 11,
@@ -5395,7 +5395,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 12,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 12,
@@ -5412,7 +5412,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 13,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 13,
@@ -5429,7 +5429,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 14,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 14,
@@ -5446,7 +5446,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 15,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 15,
@@ -5467,15 +5467,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 2,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 16,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 16,
@@ -5490,7 +5490,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 17,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 17,
@@ -5507,7 +5507,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 18,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 18,
@@ -5524,7 +5524,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 19,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 19,
@@ -5541,7 +5541,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 20,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 20,
@@ -5558,7 +5558,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 21,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 21,
@@ -5575,7 +5575,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 22,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 22,
@@ -5592,7 +5592,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 23,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 23,
@@ -5609,7 +5609,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 24,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 24,
@@ -5626,7 +5626,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 25,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 25,
@@ -5643,7 +5643,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 26,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 26,
@@ -5660,7 +5660,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 27,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 27,
@@ -5677,7 +5677,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 28,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 28,
@@ -5694,7 +5694,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 29,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 29,
@@ -5711,7 +5711,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 30,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 30,
@@ -5728,7 +5728,7 @@ Map {
                     Map {
                       "__kind" => "Beat",
                       "id" => 31,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 31,
@@ -5759,31 +5759,12 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest errors at209 accidentalmode: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > articulation > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 accidentalmode: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > articulation > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 accidentalmode: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected accidental mode value 'invalid', expected: auto,explicit",
-    "start" => Map {
-      "col" => 21,
-      "line" => 1,
-      "offset" => 20,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 articulation: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 articulation: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 articulation: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at209 > articulation > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 209,
     "severity" => 2,
@@ -5797,98 +5778,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at209 bar optional: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > beat tuplet > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 bar optional: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > beat tuplet > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 bar optional: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected additional value 'Number', expected: required(String|Ident),optional(String|Ident)",
-    "start" => Map {
-      "col" => 18,
-      "line" => 1,
-      "offset" => 17,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 bar required: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 bar required: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 bar required: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected required value 'String', expected: required(Number)",
-    "start" => Map {
-      "col" => 10,
-      "line" => 1,
-      "offset" => 9,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 barre: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 barre: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 barre: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected additional value 'Ident', expected: required(Number),optional(String|Ident)",
-    "start" => Map {
-      "col" => 21,
-      "line" => 1,
-      "offset" => 20,
-    },
-  },
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected barre shape value 'invalid', expected: none,full,half",
-    "start" => Map {
-      "col" => 21,
-      "line" => 1,
-      "offset" => 20,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 beam: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 beam: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 beam: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected beam value 'invalid', expected: invert,up,down,auto,split,merge,splitsecondary",
-    "start" => Map {
-      "col" => 19,
-      "line" => 1,
-      "offset" => 18,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 beat tuplet: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 beat tuplet: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 beat tuplet: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at209 > beat tuplet > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 209,
     "severity" => 2,
@@ -5902,69 +5797,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at209 bendstyle: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > duration tuplet > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 bendstyle: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > duration tuplet > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 bendstyle: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected bend style value 'invalid', expected: default,gradual,fast",
-    "start" => Map {
-      "col" => 19,
-      "line" => 1,
-      "offset" => 18,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 bendtype: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 bendtype: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 bendtype: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected bend type value 'invalid', expected: none,custom,bend,release,bendrelease,hold,prebend,prebendbend,prebendrelease",
-    "start" => Map {
-      "col" => 14,
-      "line" => 1,
-      "offset" => 13,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 bracketextendmode: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 bracketextendmode: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 bracketextendmode: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected bracket extend mode value 'invalid', expected: nobrackets,groupstaves,groupsimilarinstruments",
-    "start" => Map {
-      "col" => 27,
-      "line" => 1,
-      "offset" => 26,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 duration tuplet: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 duration tuplet: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 duration tuplet: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at209 > duration tuplet > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 209,
     "severity" => 2,
@@ -5978,279 +5816,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at209 dynamic: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > textalign > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 dynamic: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > textalign > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 dynamic: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected dynamic value 'invalid', expected: ppp,pp,p,mp,mf,f,ff,fff,pppp,ppppp,pppppp,ffff,fffff,ffffff,sf,sfp,sfpp,fp,rf,rfz,sfz,sffz,fz,n,pf,sfzp",
-    "start" => Map {
-      "col" => 15,
-      "line" => 1,
-      "offset" => 14,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 fermata: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 fermata: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 fermata: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected additional value 'Ident', expected: optional(String|Ident),optional(Number)",
-    "start" => Map {
-      "col" => 21,
-      "line" => 1,
-      "offset" => 20,
-    },
-  },
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected fermata value 'invalid', expected: short,medium,long",
-    "start" => Map {
-      "col" => 21,
-      "line" => 1,
-      "offset" => 20,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 firstsystemtracknamemode: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 firstsystemtracknamemode: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 firstsystemtracknamemode: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected track name mode value 'invalid', expected: fullname,shortname",
-    "start" => Map {
-      "col" => 34,
-      "line" => 1,
-      "offset" => 33,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 firstsystemtracknameorientation: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 firstsystemtracknameorientation: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 firstsystemtracknameorientation: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected track name orientation value 'invalid', expected: horizontal,vertical",
-    "start" => Map {
-      "col" => 41,
-      "line" => 1,
-      "offset" => 40,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 gracetype: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 gracetype: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 gracetype: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected additional value 'Ident', expected: optional(String|Ident)",
-    "start" => Map {
-      "col" => 16,
-      "line" => 1,
-      "offset" => 15,
-    },
-  },
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected whammy style value 'invalid', expected: ob,b,bb",
-    "start" => Map {
-      "col" => 16,
-      "line" => 1,
-      "offset" => 15,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 multitracktracknamepolicy: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 multitracktracknamepolicy: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 multitracktracknamepolicy: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected track name policy value 'invalid', expected: hidden,firstsystem,allsystems",
-    "start" => Map {
-      "col" => 35,
-      "line" => 1,
-      "offset" => 34,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 othersystemstracknamemode: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 othersystemstracknamemode: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 othersystemstracknamemode: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected track name mode value 'invalid', expected: fullname,shortname",
-    "start" => Map {
-      "col" => 35,
-      "line" => 1,
-      "offset" => 34,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 othersystemstracknameorientation: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 othersystemstracknameorientation: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 othersystemstracknameorientation: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected track name orientation value 'invalid', expected: horizontal,vertical",
-    "start" => Map {
-      "col" => 41,
-      "line" => 1,
-      "offset" => 40,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 ottava: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 ottava: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 ottava: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected ottava value 'invalid', expected: 15ma,8va,regular,8vb,15mb",
-    "start" => Map {
-      "col" => 15,
-      "line" => 1,
-      "offset" => 14,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 rasg: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 rasg: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 rasg: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected rasgueado pattern value 'invalid', expected: none,ii,mi,miitriplet,miianapaest,pmptriplet,pmpanapaest,peitriplet,peianapaest,paitriplet,paianapaest,amitriplet,amianapaest,ppp,amii,amip,eami,eamii,peami",
-    "start" => Map {
-      "col" => 17,
-      "line" => 1,
-      "offset" => 16,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 score optional: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 score optional: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 score optional: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected additional value 'Number', expected: required(String|Ident),optional(String),optional(String|Ident)",
-    "start" => Map {
-      "col" => 18,
-      "line" => 1,
-      "offset" => 17,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 score required: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 score required: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 score required: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected required value 'Number', expected: required(String|Ident)",
-    "start" => Map {
-      "col" => 10,
-      "line" => 1,
-      "offset" => 9,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 singletracktracknamepolicy: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 singletracktracknamepolicy: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 singletracktracknamepolicy: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected track name policy value 'invalid', expected: hidden,firstsystem,allsystems",
-    "start" => Map {
-      "col" => 36,
-      "line" => 1,
-      "offset" => 35,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 textalign: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 textalign: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 textalign: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at209 > textalign > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 209,
     "severity" => 2,
@@ -6264,12 +5835,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at209 tremolo speed: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > tremolo speed > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 tremolo speed: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > tremolo speed > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 tremolo speed: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at209 > tremolo speed > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 209,
     "severity" => 2,
@@ -6283,12 +5854,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at209 trill: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > trill > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 trill: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > trill > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 trill: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at209 > trill > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 209,
     "severity" => 2,
@@ -6302,12 +5873,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at209 tuning: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > tuning > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 tuning: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at209 > tuning > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 tuning: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at209 > tuning > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 209,
     "severity" => 2,
@@ -6321,105 +5892,10 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at209 whammybarstyle: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > accidentalmode > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at209 whammybarstyle: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 whammybarstyle: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected whammy style value 'invalid', expected: default,gradual,fast",
-    "start" => Map {
-      "col" => 20,
-      "line" => 1,
-      "offset" => 19,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at209 whammybartype: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 whammybartype: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at209 whammybartype: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 209,
-    "severity" => 2,
-    "message" => "Unexpected whammy type value 'invalid', expected: none,custom,dive,dip,hold,predive,predivedive",
-    "start" => Map {
-      "col" => 15,
-      "line" => 1,
-      "offset" => 14,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at210 bar empty: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at210 bar empty: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at210 bar empty: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 210,
-    "severity" => 2,
-    "message" => "Missing arguments. Expected following arguments: required(Number)",
-    "start" => Map {
-      "col" => 9,
-      "line" => 1,
-      "offset" => 8,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at210 bar missing: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at210 bar missing: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at210 bar missing: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 210,
-    "severity" => 2,
-    "message" => "Missing arguments. Expected following arguments: required(Number)",
-    "start" => Map {
-      "col" => 10,
-      "line" => 1,
-      "offset" => 9,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at210 score empty: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at210 score empty: parser-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at210 score empty: semantic-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 210,
-    "severity" => 2,
-    "message" => "Missing arguments. Expected following arguments: required(String|Ident)",
-    "start" => Map {
-      "col" => 10,
-      "line" => 1,
-      "offset" => 9,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexImporterTest errors at219 accidentalmode: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexImporterTest errors at219 accidentalmode: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > accidentalmode > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6434,14 +5910,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 accidentalmode: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > accidentalmode > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bar empty: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bar empty > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bar empty: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bar empty > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bar empty: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > bar empty > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6457,12 +5933,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 bar missing: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bar missing > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bar missing: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bar missing > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bar missing: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > bar missing > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6478,18 +5954,18 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 bar optional: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bar optional > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bar optional: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bar optional > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bar optional: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bar optional > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bar required: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bar required > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bar required: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bar required > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bar required: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > bar required > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6504,12 +5980,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 barre: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > barre > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 barre: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > barre > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 barre: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > barre > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 209,
     "severity" => 2,
@@ -6523,10 +5999,10 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 beam: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > beam > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 beam: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > beam > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6551,24 +6027,24 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 beam: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > beam > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bendstyle: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bendstyle > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bendstyle: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bendstyle > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bendstyle: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bendstyle > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bendtype: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bendtype > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bendtype: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bendtype > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bendtype: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bendtype > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bracketextendmode: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bracketextendmode > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 bracketextendmode: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > bracketextendmode > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6583,12 +6059,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 bracketextendmode: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > bracketextendmode > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 dynamic: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > dynamic > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 dynamic: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > dynamic > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6613,14 +6089,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 dynamic: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > dynamic > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 fermata: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > fermata > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 fermata: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > fermata > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 fermata: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > fermata > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6635,10 +6111,10 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 firstsystemtracknamemode: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > firstsystemtracknamemode > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 firstsystemtracknamemode: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > firstsystemtracknamemode > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6653,12 +6129,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 firstsystemtracknamemode: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > firstsystemtracknamemode > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 firstsystemtracknameorientation: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > firstsystemtracknameorientation > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 firstsystemtracknameorientation: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > firstsystemtracknameorientation > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6673,14 +6149,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 firstsystemtracknameorientation: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > firstsystemtracknameorientation > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 gracetype: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > gracetype > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 gracetype: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > gracetype > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 gracetype: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > gracetype > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 209,
     "severity" => 2,
@@ -6694,10 +6170,10 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 multitracktracknamepolicy: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > multitracktracknamepolicy > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 multitracktracknamepolicy: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > multitracktracknamepolicy > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6712,12 +6188,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 multitracktracknamepolicy: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > multitracktracknamepolicy > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 othersystemstracknamemode: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > othersystemstracknamemode > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 othersystemstracknamemode: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > othersystemstracknamemode > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6732,12 +6208,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 othersystemstracknamemode: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > othersystemstracknamemode > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 othersystemstracknameorientation: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > othersystemstracknameorientation > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 othersystemstracknameorientation: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > othersystemstracknameorientation > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6752,12 +6228,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 othersystemstracknameorientation: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > othersystemstracknameorientation > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 ottava: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > ottava > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 ottava: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > ottava > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6782,12 +6258,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 ottava: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > ottava > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 rasg: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > rasg > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 rasg: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > rasg > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6812,14 +6288,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 rasg: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > rasg > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 score empty: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > score empty > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 score empty: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > score empty > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 score empty: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > score empty > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6834,18 +6310,18 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 score optional: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > score optional > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 score optional: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > score optional > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 score optional: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > score optional > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 score required: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > score required > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 score required: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > score required > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 score required: semantic-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > score required > semantic-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6860,10 +6336,10 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 singletracktracknamepolicy: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > singletracktracknamepolicy > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 singletracktracknamepolicy: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > singletracktracknamepolicy > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 219,
     "severity" => 2,
@@ -6878,12 +6354,12 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 singletracktracknamepolicy: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > singletracktracknamepolicy > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 whammybarstyle: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > whammybarstyle > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 whammybarstyle: parser-diagnostics 1`] = `
-Array [
+exports[`AlphaTexImporterTest > errors > at219 > whammybarstyle > parser-diagnostics 1`] = `
+[
   Map {
     "code" => 205,
     "severity" => 2,
@@ -6897,21 +6373,21 @@ Array [
 ]
 `;
 
-exports[`AlphaTexImporterTest errors at219 whammybarstyle: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > whammybarstyle > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 whammybartype: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > whammybartype > lexer-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 whammybartype: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > whammybartype > parser-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest errors at219 whammybartype: semantic-diagnostics 1`] = `Array []`;
+exports[`AlphaTexImporterTest > errors > at219 > whammybartype > semantic-diagnostics 1`] = `[]`;
 
-exports[`AlphaTexImporterTest sync 1`] = `
+exports[`AlphaTexImporterTest > sync 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -6921,7 +6397,7 @@ Map {
           "isvisible" => true,
         },
       ],
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -6950,7 +6426,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -6973,7 +6449,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -7012,7 +6488,7 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -7032,17 +6508,17 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest sync-expect-dot 1`] = `
+exports[`AlphaTexImporterTest > sync-expect-dot 1`] = `
 Map {
   "__kind" => "Score",
   "artist" => "J.S. Bach (1685-1750)",
   "copyright" => "Public Domain",
   "title" => "Prelude in D Minor",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
       "timesignaturenumerator" => 3,
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -7052,7 +6528,7 @@ Map {
           "isvisible" => true,
         },
       ],
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -7082,7 +6558,7 @@ Map {
     Map {
       "__kind" => "MasterBar",
       "timesignaturenumerator" => 3,
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -7101,7 +6577,7 @@ Map {
     Map {
       "__kind" => "MasterBar",
       "timesignaturenumerator" => 3,
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -7120,7 +6596,7 @@ Map {
     Map {
       "__kind" => "MasterBar",
       "timesignaturenumerator" => 3,
-      "syncpoints" => Array [
+      "syncpoints" => [
         Map {
           "islinear" => false,
           "type" => 4,
@@ -7140,139 +6616,139 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos buzzroll-default1 1`] = `
+exports[`AlphaTexImporterTest > tremolos > buzzroll-default1 1`] = `
 Map {
   "marks" => 1,
   "style" => 1,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos buzzroll-default2 1`] = `
+exports[`AlphaTexImporterTest > tremolos > buzzroll-default2 1`] = `
 Map {
   "marks" => 2,
   "style" => 1,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos buzzroll-default3 1`] = `
+exports[`AlphaTexImporterTest > tremolos > buzzroll-default3 1`] = `
 Map {
   "marks" => 3,
   "style" => 1,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos buzzroll-default4 1`] = `
+exports[`AlphaTexImporterTest > tremolos > buzzroll-default4 1`] = `
 Map {
   "marks" => 4,
   "style" => 1,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos buzzroll-default5 1`] = `
+exports[`AlphaTexImporterTest > tremolos > buzzroll-default5 1`] = `
 Map {
   "marks" => 5,
   "style" => 1,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo-default1 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo-default1 1`] = `
 Map {
   "marks" => 1,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo-default2 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo-default2 1`] = `
 Map {
   "marks" => 2,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo-default3 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo-default3 1`] = `
 Map {
   "marks" => 3,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo-default4 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo-default4 1`] = `
 Map {
   "marks" => 4,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo-default5 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo-default5 1`] = `
 Map {
   "marks" => 5,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo1 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo1 1`] = `
 Map {
   "marks" => 1,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo2 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo2 1`] = `
 Map {
   "marks" => 2,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo3 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo3 1`] = `
 Map {
   "marks" => 3,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo4 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo4 1`] = `
 Map {
   "marks" => 4,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo5 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo5 1`] = `
 Map {
   "marks" => 5,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo8 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo8 1`] = `
 Map {
   "marks" => 1,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo16 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo16 1`] = `
 Map {
   "marks" => 2,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest tremolos tremolo32 1`] = `
+exports[`AlphaTexImporterTest > tremolos > tremolo32 1`] = `
 Map {
   "marks" => 3,
   "style" => 0,
 }
 `;
 
-exports[`AlphaTexImporterTest voice-mode barWise 1`] = `
+exports[`AlphaTexImporterTest > voice-mode > barWise 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -7288,25 +6764,25 @@ Map {
       "start" => 3840,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -7314,7 +6790,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -7332,11 +6808,11 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -7354,15 +6830,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 2,
@@ -7378,11 +6854,11 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 3,
@@ -7410,13 +6886,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest voice-mode default 1`] = `
+exports[`AlphaTexImporterTest > voice-mode > default 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -7432,25 +6908,25 @@ Map {
       "start" => 3840,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -7458,7 +6934,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -7476,11 +6952,11 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 2,
@@ -7498,15 +6974,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -7522,11 +6998,11 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 3,
@@ -7554,13 +7030,13 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest voice-mode staffWise 1`] = `
+exports[`AlphaTexImporterTest > voice-mode > staffWise 1`] = `
 Map {
   "__kind" => "Score",
-  "masterbars" => Array [
+  "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "tempoautomations" => Array [
+      "tempoautomations" => [
         Map {
           "islinear" => false,
           "type" => 0,
@@ -7576,25 +7052,25 @@ Map {
       "start" => 3840,
     },
   ],
-  "tracks" => Array [
+  "tracks" => [
     Map {
       "__kind" => "Track",
-      "staves" => Array [
+      "staves" => [
         Map {
           "__kind" => "Staff",
-          "bars" => Array [
+          "bars" => [
             Map {
               "__kind" => "Bar",
               "id" => 0,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 0,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 0,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 0,
@@ -7602,7 +7078,7 @@ Map {
                           "tone" => 0,
                         },
                       ],
-                      "automations" => Array [
+                      "automations" => [
                         Map {
                           "islinear" => false,
                           "type" => 2,
@@ -7620,11 +7096,11 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 2,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 2,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 2,
@@ -7642,15 +7118,15 @@ Map {
             Map {
               "__kind" => "Bar",
               "id" => 1,
-              "voices" => Array [
+              "voices" => [
                 Map {
                   "__kind" => "Voice",
                   "id" => 1,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 1,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 1,
@@ -7666,11 +7142,11 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 3,
-                  "beats" => Array [
+                  "beats" => [
                     Map {
                       "__kind" => "Beat",
                       "id" => 3,
-                      "notes" => Array [
+                      "notes" => [
                         Map {
                           "__kind" => "Note",
                           "id" => 3,

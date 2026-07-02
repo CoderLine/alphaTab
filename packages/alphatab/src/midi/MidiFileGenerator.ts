@@ -726,7 +726,13 @@ export class MidiFileGenerator {
         let audioDuration: number = beat.playbackDuration;
         const masterBarDuration = beat.voice.bar.masterBar.calculateDuration();
 
-        if (beat.voice.bar.isEmpty) {
+        // For a bar whose voice contains a single empty beat (the typical "whole-bar rest"
+        // placeholder inserted during score.finish), extend the beat's audio duration to cover
+        // the full bar so cursor navigation has a beat to follow across the whole bar. Don't
+        // apply this when the voice has multiple beats: those represent explicit rhythmic
+        // subdivisions even when each beat is empty (e.g. a recording grid of placeholder
+        // slots), and overriding would make every beat overlap the whole bar.
+        if (beat.voice.bar.isEmpty && beat.voice.beats.length === 1) {
             audioDuration = masterBarDuration;
         } else if (
             beat.voice.bar.masterBar.tripletFeel !== TripletFeel.NoTripletFeel &&

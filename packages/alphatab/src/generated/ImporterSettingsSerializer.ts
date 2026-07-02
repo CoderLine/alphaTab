@@ -15,7 +15,7 @@ export class ImporterSettingsSerializer {
         }
         JsonHelper.forEach(m, (v, k) => ImporterSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
-    public static toJson(obj: ImporterSettings | null): Map<string, unknown> | null {
+    public static toJson(obj: ImporterSettings | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }
@@ -23,6 +23,7 @@ export class ImporterSettingsSerializer {
         o.set("encoding", obj.encoding);
         o.set("mergepartgroupsinmusicxml", obj.mergePartGroupsInMusicXml);
         o.set("beattextaslyrics", obj.beatTextAsLyrics);
+        o.set("maxdecodingbuffersize", obj.maxDecodingBufferSize);
         return o;
     }
     public static setProperty(obj: ImporterSettings, property: string, v: unknown): boolean {
@@ -35,6 +36,9 @@ export class ImporterSettingsSerializer {
                 return true;
             case "beattextaslyrics":
                 obj.beatTextAsLyrics = v! as boolean;
+                return true;
+            case "maxdecodingbuffersize":
+                obj.maxDecodingBufferSize = v! as number;
                 return true;
         }
         return false;

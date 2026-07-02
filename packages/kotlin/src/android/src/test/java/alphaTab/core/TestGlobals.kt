@@ -28,6 +28,31 @@ class NotExpector<T>(private val actual: T, private val message: String? = null)
     val be
         get() = this
 
+    fun equal(expected: Any?, message: String? = null) {
+        var actualToCheck = actual
+        var expectedTyped: Any? = expected
+
+        if (expected is Int && actualToCheck is Double) {
+            expectedTyped = expected.toDouble();
+        }
+
+        if (expected is Double && actualToCheck is Int) {
+            expectedTyped = expected.toInt();
+        }
+
+        if (expected is Double && expected == 0.0 &&
+            actualToCheck is Double
+        ) {
+            val d = actualToCheck as Double;
+            if (d == -0.0) {
+                @Suppress("UNCHECKED_CAST")
+                actualToCheck = 0.0 as T
+            }
+        }
+
+        Assert.assertNotEquals(this.message ?: message, expectedTyped, actualToCheck as Any?)
+    }
+
     fun ok() {
         when (actual) {
             is Int -> {
@@ -48,23 +73,109 @@ class NotExpector<T>(private val actual: T, private val message: String? = null)
         }
     }
 
+    fun toBe(expected: Any?) {
+        equal(expected)
+    }
 
-    fun undefined() {
+    fun toEqual(expected: Any?, message: String? = null) {
+        equal(expected, message)
+    }
+
+    fun toBeTruthy() {
+        ok()
+    }
+
+    fun toBeFalsy() {
+        when (actual) {
+            null -> Assert.fail(message ?: "Expected non-falsy value")
+            is Boolean -> Assert.assertTrue(message, actual)
+            is String -> Assert.assertFalse(message, actual.isEmpty())
+            is Number -> Assert.assertNotEquals(message, 0.0, actual.toDouble(), 0.0)
+        }
+    }
+
+    fun toContain(value: Any) {
+        if (actual is Iterable<*>) {
+            Assert.assertFalse(
+                message ?: "Expected collection ${actual.joinToString(",")} to not contain $value",
+                actual.contains(value)
+            )
+        } else {
+            Assert.fail("toContain can only be used with Iterable operands");
+        }
+    }
+
+    fun toHaveLength(expected: Double) {
+        when (actual) {
+            is alphaTab.collections.List<*> -> Assert.assertNotEquals(message, expected.toInt(), actual.length.toInt())
+            is alphaTab.collections.DoubleList -> Assert.assertNotEquals(message, expected.toInt(), actual.length.toInt())
+            is alphaTab.collections.BooleanList -> Assert.assertNotEquals(message, expected.toInt(), actual.length.toInt())
+            else -> Assert.fail("toHaveLength can only be used with collection operands")
+        }
+    }
+
+    fun toBeGreaterThan(expected: Double) {
+        if (actual is Number) {
+            Assert.assertFalse(
+                message ?: "Expected $actual to not be greater than $expected",
+                actual.toDouble() > expected
+            )
+        } else {
+            Assert.fail("toBeGreaterThan can only be used with numeric operands")
+        }
+    }
+
+    fun toBeLessThan(expected: Double) {
+        if (actual is Number) {
+            Assert.assertFalse(
+                message ?: "Expected $actual to not be less than $expected",
+                actual.toDouble() < expected
+            )
+        } else {
+            Assert.fail("toBeLessThan can only be used with numeric operands")
+        }
+    }
+
+    fun toBeGreaterThanOrEqual(expected: Double) {
+        if (actual is Number) {
+            Assert.assertFalse(
+                message ?: "Expected $actual to not be greater than or equal to $expected",
+                actual.toDouble() >= expected
+            )
+        } else {
+            Assert.fail("toBeGreaterThanOrEqual can only be used with numeric operands")
+        }
+    }
+
+    fun toBeLessThanOrEqual(expected: Double) {
+        if (actual is Number) {
+            Assert.assertFalse(
+                message ?: "Expected $actual to not be less than or equal to $expected",
+                actual.toDouble() <= expected
+            )
+        } else {
+            Assert.fail("toBeLessThanOrEqual can only be used with numeric operands")
+        }
+    }
+
+    fun toBeNull() {
         Assert.assertNotNull(message, actual)
     }
 
+    fun toBeUndefined() {
+        Assert.assertNotNull(message, actual)
+    }
+
+    fun toBeInstanceOf(expected: kotlin.reflect.KClass<*>) {
+        Assert.assertFalse(
+            message ?: "Expected ${actual?.let { it::class.qualifiedName }} to not be instance of ${expected.qualifiedName}",
+            expected.isInstance(actual)
+        )
+    }
 }
 
 class Expector<T>(private val actual: T, private val message: String? = null) {
-    val to
-        get() = this
-
     fun not() = NotExpector(actual, message)
-
-    val be
-        get() = this
-    val have
-        get() = this
 
     fun equal(expected: Any?, message: String? = null) {
         var actualToCheck = actual
@@ -115,6 +226,28 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
         }
     }
 
+    fun greaterThanOrEqual(expected: Double, message: String? = null) {
+        if (actual is Number) {
+            Assert.assertTrue(
+                this.message ?: (message ?: "Expected $actual to be greater than or equal to $expected"),
+                actual.toDouble() >= expected
+            )
+        } else {
+            Assert.fail("greaterThanOrEqual can only be used with numeric operands");
+        }
+    }
+
+    fun lessThanOrEqual(expected: Double, message: String? = null) {
+        if (actual is Number) {
+            Assert.assertTrue(
+                this.message ?: (message ?: "Expected $actual to be less than or equal to $expected"),
+                actual.toDouble() <= expected
+            )
+        } else {
+            Assert.fail("lessThanOrEqual can only be used with numeric operands");
+        }
+    }
+
     fun closeTo(expected: Double, delta: Double, message: String? = null) {
         if (actual is Number) {
             Assert.assertEquals(this.message ?: message, expected, actual.toDouble(), delta)
@@ -141,6 +274,11 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
                 message ?: "Expected collection ${actual.joinToString(",")} to contain $value",
                 actual.contains(value)
             )
+        } else if(actual is String) {
+            Assert.assertTrue(
+                message ?: "Expected string $actual to contain $value",
+                actual.contains(value as String)
+            )
         } else {
             Assert.fail("contain can only be used with Iterable operands");
         }
@@ -163,26 +301,75 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
         }
     }
 
-    fun undefined() {
+    fun toBe(expected: Any?) {
+        equal(expected)
+    }
+
+    fun toEqual(expected: Any?, message: String? = null) {
+        equal(expected, message)
+    }
+
+    fun toBeTruthy() {
+        ok()
+    }
+
+    fun toBeFalsy() {
+        when (actual) {
+            null -> return
+            is Boolean -> Assert.assertFalse(message, actual)
+            is String -> Assert.assertTrue(message, actual.isEmpty())
+            is Number -> Assert.assertEquals(message, 0.0, actual.toDouble(), 0.0)
+            else -> Assert.fail(message ?: "Expected a falsy value")
+        }
+    }
+
+    fun toBeCloseTo(expected: Double, decimals: Double = 2.0) {
+        val delta = Math.pow(10.0, -decimals) / 2
+        closeTo(expected, delta)
+    }
+
+    fun toContain(value: Any) {
+        contain(value)
+    }
+
+    fun toHaveLength(expected: Double) {
+        length(expected)
+    }
+
+    fun toBeGreaterThan(expected: Double, message: String? = null) {
+        greaterThan(expected, message)
+    }
+
+    fun toBeLessThan(expected: Double) {
+        lessThan(expected)
+    }
+
+    fun toBeGreaterThanOrEqual(expected: Double, message: String? = null) {
+        greaterThanOrEqual(expected, message)
+    }
+
+    fun toBeLessThanOrEqual(expected: Double, message: String? = null) {
+        lessThanOrEqual(expected, message)
+    }
+
+    fun toBeInstanceOf(expected: KClass<*>) {
+        Assert.assertTrue(
+            message ?: "Expected ${actual?.let { it::class.qualifiedName }} to be instance of ${expected.qualifiedName}",
+            expected.isInstance(actual)
+        )
+    }
+
+    fun toBeNull() {
         Assert.assertNull(message, actual)
     }
 
-    fun `true`() {
-        if (actual is Boolean) {
-            Assert.assertTrue(message, actual);
-        } else {
-            Assert.fail("toBeTrue can only be used on booleans:");
-        }
+    fun toBeUndefined() {
+        Assert.assertNull(message, actual)
     }
 
-    fun `false`() {
-        if (actual is Boolean) {
-            Assert.assertFalse(message, actual);
-        } else {
-            Assert.fail("toBeFalse can only be used on booleans:");
-        }
+    fun toThrow(expected: KClass<out Throwable>) {
+        `throw`(expected)
     }
-
 
     fun `throw`(expected: KClass<out Throwable>) {
         val actual = actual
@@ -227,7 +414,7 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
         val testName = testMethodInfo.getAnnotation(TestName::class.java)!!.name
         parts.push(testName)
 
-        val snapshotName = TestGlobals.useSnapshotValue(parts.joinToString(" "), hint);
+        val snapshotName = TestGlobals.useSnapshotValue(parts.joinToString(" > "), hint);
 
         val error = snapshotFile.match(snapshotName, actual)
         if (!error.isNullOrEmpty()) {
@@ -255,7 +442,7 @@ class TestGlobals {
         fun useSnapshotValue(baseName: String, hint: String): String {
             var fullName = baseName
             if (hint.isNotEmpty()) {
-                fullName += ": $hint";
+                fullName += " > $hint";
             }
 
             val value =

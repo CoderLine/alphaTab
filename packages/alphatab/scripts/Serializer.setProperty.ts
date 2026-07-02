@@ -342,13 +342,17 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
             importer(itemSerializer, findSerializerModule(prop.type));
 
             if (prop.type.isNullable || prop.type.isOptional) {
-                importer(prop.type.typeAsString, prop.type.modulePath);
+                if (!prop.type.isRecord) {
+                    // @record types are constructed via `{}` object literal (not `new T()`), so no value-import is needed.
+                    importer(prop.type.typeAsString, prop.type.modulePath);
+                }
+                const constructExpr = prop.type.isRecord ? '{}' : `new ${prop.type.typeAsString}()`;
                 caseStatements.push(
                     createNodeFromSource<ts.IfStatement>(
                         `
-                        if (v) { 
-                            obj.${fieldName} = new ${prop.type.typeAsString}(); 
-                            ${itemSerializer}.fromJson(obj.${fieldName}, v); 
+                        if (v) {
+                            obj.${fieldName} = ${constructExpr};
+                            ${itemSerializer}.fromJson(obj.${fieldName}, v);
                         } else {
                             obj.${fieldName} = ${prop.type.isNullable ? 'null' : 'undefined'}
                         }`,
@@ -379,7 +383,8 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
 
             const itemSerializer = `${prop.type.typeAsString}Serializer`;
             importer(itemSerializer, findSerializerModule(prop.type));
-            if (prop.type.isNullable || prop.type.isOptional) {
+            if ((prop.type.isNullable || prop.type.isOptional) && !prop.type.isRecord) {
+                // @record types are constructed via `{}` object literal (not `new T()`), so no value-import is needed.
                 importer(prop.type.typeAsString, prop.type.modulePath);
             }
 
@@ -427,11 +432,13 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
                                       ts.factory.createBlock(
                                           [
                                               assignField(
-                                                  ts.factory.createNewExpression(
-                                                      ts.factory.createIdentifier(prop.type.typeAsString),
-                                                      undefined,
-                                                      []
-                                                  )
+                                                  prop.type.isRecord
+                                                      ? ts.factory.createObjectLiteralExpression([], false)
+                                                      : ts.factory.createNewExpression(
+                                                            ts.factory.createIdentifier(prop.type.typeAsString),
+                                                            undefined,
+                                                            []
+                                                        )
                                               ),
                                               ts.factory.createExpressionStatement(
                                                   ts.factory.createCallExpression(
@@ -456,7 +463,16 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
                                           ],
                                           true
                                       ),
-                                      ts.factory.createBlock([assignField(ts.factory.createNull())], true)
+                                      ts.factory.createBlock(
+                                          [
+                                              assignField(
+                                                  prop.type.isOptional
+                                                      ? ts.factory.createIdentifier('undefined')
+                                                      : ts.factory.createNull()
+                                              )
+                                          ],
+                                          true
+                                      )
                                   ),
                                   ts.factory.createReturnStatement(ts.factory.createTrue())
                               ],
@@ -509,11 +525,13 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
                                                         ),
                                                         ts.factory.createBlock([
                                                             assignField(
-                                                                ts.factory.createNewExpression(
-                                                                    ts.factory.createIdentifier(prop.type.typeAsString),
-                                                                    [],
-                                                                    []
-                                                                )
+                                                                prop.type.isRecord
+                                                                    ? ts.factory.createObjectLiteralExpression([], false)
+                                                                    : ts.factory.createNewExpression(
+                                                                          ts.factory.createIdentifier(prop.type.typeAsString),
+                                                                          [],
+                                                                          []
+                                                                      )
                                                             )
                                                         ])
                                                     )),
@@ -604,7 +622,7 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
 }
 
 export function createSetPropertyMethod(
-    input: ts.ClassDeclaration,
+    input: ts.ClassDeclaration | ts.InterfaceDeclaration,
     serializable: TypeSchema,
     importer: (name: string, module: string) => void
 ) {

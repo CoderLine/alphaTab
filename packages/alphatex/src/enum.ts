@@ -19,6 +19,7 @@ export const alphaTexMappedEnumLookup = {
     TrackNamePolicy: alphaTab.model.TrackNamePolicy,
     TrackNameOrientation: alphaTab.model.TrackNameOrientation,
     TrackNameMode: alphaTab.model.TrackNameMode,
+    TuningDisplayMode: alphaTab.model.TuningDisplayMode,
     TextAlign: alphaTab.platform.TextAlign,
     BendType: alphaTab.model.BendType,
     KeySignature: alphaTab.model.KeySignature,
@@ -230,6 +231,10 @@ export const alphaTexMappedEnumMapping: {
     TrackNameMode: {
         FullName: { snippet: 'fullName', shortDescription: 'Short track names (abbreviations) are displayed.' },
         ShortName: { snippet: 'shortName', shortDescription: 'Full track names are displayed.' }
+    },
+    TuningDisplayMode: {
+        Score: { snippet: 'score', shortDescription: 'Display tuning information above the score.' },
+        Staff: { snippet: 'staff', shortDescription: 'Display tuning note names beside tab staff lines.' }
     },
     TextAlign: {
         Left: {

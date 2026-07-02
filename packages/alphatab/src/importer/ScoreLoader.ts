@@ -4,6 +4,7 @@ import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter'
 import type { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { ThrowingReadable } from '@coderline/alphatab/io/IReadable';
 import { Logger } from '@coderline/alphatab/Logger';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
@@ -88,12 +89,12 @@ export class ScoreLoader {
         const importers: ScoreImporter[] = Environment.buildImporters();
         Logger.debug('ScoreLoader', `Loading score from ${data.length} bytes using ${importers.length} importers`);
         let score: Score | null = null;
-        const bb: ByteBuffer = ByteBuffer.fromBuffer(data);
+        const readable = new ThrowingReadable(ByteBuffer.fromBuffer(data));
         for (const importer of importers) {
-            bb.reset();
+            readable.reset();
             try {
                 Logger.debug('ScoreLoader', `Importing using importer ${importer.name}`);
-                importer.init(bb, settings);
+                importer.init(readable, settings);
                 score = importer.readScore();
                 Logger.debug('ScoreLoader', `Score imported using ${importer.name}`);
                 break;

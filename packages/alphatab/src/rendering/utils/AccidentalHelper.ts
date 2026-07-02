@@ -5,6 +5,7 @@ import type { Clef } from '@coderline/alphatab/model/Clef';
 import { ModelUtils, type ResolvedSpelling } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
@@ -265,6 +266,27 @@ export class AccidentalHelper {
         steps -= AccidentalHelper._diatonicSteps[spelling.degree];
 
         return steps;
+    }
+
+    public static calculateRestDisplaySteps(bar: Bar, tone: number, octave: number): number {
+        let noteValue = (octave + 1) * 12 + tone;
+        switch (bar.clefOttava) {
+            case Ottavia._15ma:
+                noteValue -= 24;
+                break;
+            case Ottavia._8va:
+                noteValue -= 12;
+                break;
+            case Ottavia._8vb:
+                noteValue += 12;
+                break;
+            case Ottavia._15mb:
+                noteValue += 24;
+                break;
+        }
+
+        const spelling = ModelUtils.resolveSpelling(bar.keySignature, noteValue, NoteAccidentalMode.Default);
+        return AccidentalHelper.calculateNoteSteps(bar.clef, spelling);
     }
 
     public getNoteSteps(n: Note): number {

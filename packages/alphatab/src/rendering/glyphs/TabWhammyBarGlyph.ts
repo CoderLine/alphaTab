@@ -30,6 +30,42 @@ export class TabWhammyBarGlyph extends EffectGlyph {
         this._renderPoints = this._createRenderingPoints(beat);
     }
 
+    /** Right edge may reach into the next renderer's x for cross-bar curves. */
+    public override getBoundingBoxLeft(): number {
+        if (this._isSimpleDip) {
+            return this.renderer.getBeatX(this._beat, BeatXPosition.OnNotes, true);
+        }
+        return this.renderer.getBeatX(this._beat, BeatXPosition.MiddleNotes, true);
+    }
+
+    public override getBoundingBoxRight(): number {
+        if (this._isSimpleDip) {
+            return this.renderer.getBeatX(this._beat, BeatXPosition.PostNotes, true);
+        }
+        const nextBeat = this._beat.nextBeat;
+        if (nextBeat) {
+            const nextRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+                this.renderer.staff!.staffId,
+                nextBeat.voice.bar
+            );
+            if (nextRenderer && nextRenderer.staff === this.renderer.staff) {
+                const sameRenderer = nextRenderer === this.renderer;
+                if (sameRenderer || nextBeat.hasWhammyBar) {
+                    const endXPositionType: BeatXPosition =
+                        nextBeat.hasWhammyBar &&
+                        (this.renderer.settings.notation.notationMode !== NotationMode.SongBook ||
+                            nextBeat.whammyBarType !== WhammyType.Dip)
+                            ? BeatXPosition.MiddleNotes
+                            : BeatXPosition.PreNotes;
+                    return nextRenderer.x - this.renderer.x + nextRenderer.getBeatX(nextBeat, endXPositionType, true);
+                }
+            }
+        }
+        return (
+            this.renderer.getBeatX(this._beat, BeatXPosition.EndBeat) - this.renderer.smuflMetrics.postNoteEffectPadding
+        );
+    }
+
     private _createRenderingPoints(beat: Beat): BendPoint[] {
         // advanced rendering
         if (beat.whammyBarType === WhammyType.Custom) {

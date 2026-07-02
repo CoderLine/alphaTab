@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { type GpxFile, GpxFileSystem } from '@coderline/alphatab/importer/GpxFileSystem';
 import { GpxImporter } from '@coderline/alphatab/importer/GpxImporter';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
@@ -6,8 +7,6 @@ import { Settings } from '@coderline/alphatab/Settings';
 import { Logger } from '@coderline/alphatab/Logger';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { TestPlatform } from 'test/TestPlatform';
-import { expect } from 'chai';
-
 describe('GpxImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<GpxImporter> {
         const data = await TestPlatform.loadFile(`test-data/${name}`);
@@ -35,28 +34,28 @@ describe('GpxImporterTest', () => {
         for (let i: number = 0; i < fileSystem.files.length; i++) {
             const file: GpxFile = fileSystem.files[i];
             Logger.info('Test', `${file.fileName} - ${file.fileSize}`);
-            expect(file.fileName).to.equal(names[i]);
-            expect(file.fileSize).to.equal(sizes[i]);
+            expect(file.fileName).toBe(names[i]);
+            expect(file.fileSize).toBe(sizes[i]);
         }
     });
 
     it('score-info', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/score-info.gpx');
         const score: Score = reader.readScore();
-        expect(score.title).to.equal('Title');
-        expect(score.subTitle).to.equal('Subtitle');
-        expect(score.artist).to.equal('Artist');
-        expect(score.album).to.equal('Album');
-        expect(score.words).to.equal('Words');
-        expect(score.music).to.equal('Music');
-        expect(score.copyright).to.equal('Copyright');
-        expect(score.tab).to.equal('Tab');
-        expect(score.instructions).to.equal('Instructions');
-        expect(score.notices).to.equal('Notice1\nNotice2');
-        expect(score.masterBars.length).to.equal(5);
-        expect(score.tracks.length).to.equal(2);
-        expect(score.tracks[0].name).to.equal('Track 1');
-        expect(score.tracks[1].name).to.equal('Track 2');
+        expect(score.title).toBe('Title');
+        expect(score.subTitle).toBe('Subtitle');
+        expect(score.artist).toBe('Artist');
+        expect(score.album).toBe('Album');
+        expect(score.words).toBe('Words');
+        expect(score.music).toBe('Music');
+        expect(score.copyright).toBe('Copyright');
+        expect(score.tab).toBe('Tab');
+        expect(score.instructions).toBe('Instructions');
+        expect(score.notices).toBe('Notice1\nNotice2');
+        expect(score.masterBars.length).toBe(5);
+        expect(score.tracks.length).toBe(2);
+        expect(score.tracks[0].name).toBe('Track 1');
+        expect(score.tracks[1].name).toBe('Track 2');
     });
 
     it('notes', async () => {
@@ -104,138 +103,87 @@ describe('GpxImporterTest', () => {
     it('bends', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/bends.gpx');
         const score: Score = reader.readScore();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).toBe(2);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(
-            0,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].value).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).toBeCloseTo(0, 3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].value).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).to.be.closeTo(
-            60,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].value).to.equal(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).toBeCloseTo(60, 3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].value).toBe(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints!.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints!.length).toBe(2);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].offset).to.be.closeTo(
-            0,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].value).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].offset).toBeCloseTo(0, 3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].value).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].offset).to.be.closeTo(
-            60,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].value).to.equal(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].offset).toBeCloseTo(60, 3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].value).toBe(4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints!.length).toBe(4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(
-            0,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].value).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).toBeCloseTo(0, 3);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].value).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(
-            0,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].value).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).toBeCloseTo(0, 3);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].value).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].offset).to.be.closeTo(
-            30,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].value).to.equal(12);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].offset).toBeCloseTo(30, 3);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].value).toBe(12);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].offset).to.be.closeTo(
-            30,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].value).to.equal(12);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].offset).toBeCloseTo(30, 3);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].value).toBe(12);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![3].offset).to.be.closeTo(
-            60,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![3].value).to.equal(6);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![3].offset).toBeCloseTo(60, 3);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![3].value).toBe(6);
     });
 
     it('tremolo', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/tremolo.gpx');
         const score: Score = reader.readScore();
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).to.equal(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).toBe(3);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].offset).toBeCloseTo(0, 3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
-            30,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).toBeCloseTo(30, 3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).toBe(-4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
-            60,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].value).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).toBeCloseTo(60, 3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].value).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).toBe(2);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(-4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].offset).toBeCloseTo(0, 3);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).toBe(-4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
-            60,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).toBeCloseTo(60, 3);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints!.length).to.equal(3);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints!.length).toBe(3);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].offset).toBeCloseTo(0, 3);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].value).toBe(0);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
-            30,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).toBeCloseTo(30, 3);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].value).toBe(-4);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
-            60,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].value).to.equal(-4);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).toBeCloseTo(60, 3);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].value).toBe(-4);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints!.length).to.equal(4);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints!.length).toBe(4);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].value).to.equal(-4);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].offset).toBeCloseTo(0, 3);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].value).toBe(-4);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
-            15,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].offset).toBeCloseTo(15, 3);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].value).toBe(-12);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
-            30.6,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].value).to.equal(-12);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].offset).toBeCloseTo(30.6, 3);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].value).toBe(-12);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(
-            45,
-            0.001
-        );
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].value).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].offset).toBeCloseTo(45, 3);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].value).toBe(0);
     });
 
     it('slides', async () => {

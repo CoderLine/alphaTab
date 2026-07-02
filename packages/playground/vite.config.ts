@@ -1,21 +1,19 @@
 import { defineConfig, type UserConfig } from 'vite';
-import { elementStyleUsingTransformer } from '../tooling/src/typescript';
-import { enableTypeScript } from '../tooling/src/vite';
+import { buildTsconfigAliases } from '../tooling/src/vite';
+import { stripProfilingPlugin } from '../tooling/src/vite.plugin.strip-profiling';
+import { elementStyleUsingPlugin } from '../tooling/src/vite.plugin.transform';
 import server from './vite.plugin.server';
 
 export default defineConfig(_ => {
     const config: UserConfig = {
-        plugins: [server()],
-        server: {
-            open: '/control.html'
+        plugins: [server(), elementStyleUsingPlugin(), stripProfilingPlugin({ enabled: false })],
+        resolve: {
+            alias: buildTsconfigAliases(__dirname)
         },
-        esbuild: false
-    };
-    enableTypeScript(config, {
-        transformers: {
-            before: [elementStyleUsingTransformer()]
+        server: {
+            open: '/index.html'
         }
-    });
+    };
 
     return config;
 });

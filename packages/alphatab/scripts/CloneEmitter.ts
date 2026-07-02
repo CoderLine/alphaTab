@@ -260,7 +260,7 @@ function generateClonePropertyStatements(
 
 function generateCloneBody(
     program: ts.Program,
-    input: ts.ClassDeclaration,
+    input: ts.ClassDeclaration | ts.InterfaceDeclaration,
     importer: (name: string, module: string) => void
 ): ts.Block {
     const propertiesToSerialize = input.members
@@ -299,7 +299,7 @@ function generateCloneBody(
 
 function createCloneMethod(
     program: ts.Program,
-    input: ts.ClassDeclaration,
+    input: ts.ClassDeclaration | ts.InterfaceDeclaration,
     importer: (name: string, module: string) => void
 ) {
     return ts.factory.createMethodDeclaration(
@@ -329,7 +329,7 @@ function createCloneMethod(
 export default createEmitter('cloneable', (program, input) => {
     console.log(`Writing Cloner for ${input.name!.text}`);
     const sourceFileName = path.relative(
-        path.join(path.resolve(program.getCompilerOptions().baseUrl!)),
+        path.dirname(program.getCompilerOptions().configFilePath as string),
         path.resolve(input.getSourceFile().fileName)
     );
 

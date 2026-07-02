@@ -70,6 +70,20 @@ namespace AlphaTab.Core
             return list.FirstOrDefault(predicate);
         }
 
+        public static double FindIndex<T>(this IList<T> list, Func<T, bool> predicate)
+        {
+            var index = 0;
+            foreach (var item in list)
+            {
+                if (predicate(item)) 
+                {
+                    return index;
+                }
+                index++;
+            }
+            return -1;
+        }
+
         public static bool Includes<T>(this IList<T> list, T item)
         {
             return list.Contains(item);
@@ -83,6 +97,14 @@ namespace AlphaTab.Core
         public static bool Some<T>(this IList<T> list, Func<T, bool> predicate)
         {
             return list.Any(predicate);
+        }
+
+        public static IList<T> Splice<T>(this IList<T> data, double start)
+        {
+            var deleteCount = data.Count - (int)start;
+            var items = data.GetRange((int)start, deleteCount);
+            data.RemoveRange((int)start, deleteCount);
+            return new List<T>(items);
         }
 
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
@@ -249,13 +271,22 @@ namespace AlphaTab.Core
 
         public static IList<T> Sort<T>(this IList<T> data, Func<T, T, double> func)
         {
+            // Sign-only conversion: a direct (int) cast truncates and can
+            // overflow when the JS-style comparator returns values outside
+            // int range (e.g. packed sort keys at 2^40).
+            int Compare(T a, T b)
+            {
+                var d = func(a, b);
+                return d < 0 ? -1 : d > 0 ? 1 : 0;
+            }
+
             switch (data)
             {
                 case List<T> l:
-                    l.Sort((a, b) => (int)func(a, b));
+                    l.Sort(Compare);
                     break;
                 case T[] array:
-                    System.Array.Sort(array, (a, b) => (int)func(a, b));
+                    System.Array.Sort(array, Compare);
                     break;
                 default:
                     throw new NotSupportedException("Cannot sort list of type " +

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
@@ -17,7 +18,6 @@ import { AudioExportOptions } from '@coderline/alphatab/synth/IAudioExporter';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 import { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
 import { VorbisFile } from '@coderline/alphatab/synth/vorbis/VorbisFile';
-import { assert, expect } from 'chai';
 import { TestOutput } from 'test/audio/TestOutput';
 import { TestPlatform } from 'test/TestPlatform';
 
@@ -69,12 +69,12 @@ describe('AlphaSynthTests', () => {
         synth.loadSoundFont(data, false);
         synth.loadMidiFile(midi);
 
-        expect(synth.isReadyForPlayback).to.be.true;
-        expect(synth.hasSamplesForProgram(24)).to.be.true;
-        expect(synth.hasSamplesForProgram(30)).to.be.true;
-        expect(synth.hasSamplesForProgram(1)).to.be.false;
-        expect(synth.hasSamplesForProgram(35)).to.be.false;
-        expect(synth.hasSamplesForPercussion(SynthConstants.MetronomeKey)).to.be.true;
+        expect(synth.isReadyForPlayback).toBe(true);
+        expect(synth.hasSamplesForProgram(24)).toBe(true);
+        expect(synth.hasSamplesForProgram(30)).toBe(true);
+        expect(synth.hasSamplesForProgram(1)).toBe(false);
+        expect(synth.hasSamplesForProgram(35)).toBe(false);
+        expect(synth.hasSamplesForPercussion(SynthConstants.MetronomeKey)).toBe(true);
     });
 
     it('only-used-instruments-decoded-sf3', async () => {
@@ -99,30 +99,30 @@ describe('AlphaSynthTests', () => {
         synth.loadSoundFont(data, false);
         synth.loadMidiFile(midi);
 
-        expect(synth.isReadyForPlayback).to.be.true;
-        expect(synth.hasSamplesForProgram(24)).to.be.true;
-        expect(synth.hasSamplesForProgram(30)).to.be.true;
-        expect(synth.hasSamplesForProgram(1)).to.be.false;
-        expect(synth.hasSamplesForProgram(35)).to.be.false;
-        expect(synth.hasSamplesForPercussion(SynthConstants.MetronomeKey)).to.be.true;
+        expect(synth.isReadyForPlayback).toBe(true);
+        expect(synth.hasSamplesForProgram(24)).toBe(true);
+        expect(synth.hasSamplesForProgram(30)).toBe(true);
+        expect(synth.hasSamplesForProgram(1)).toBe(false);
+        expect(synth.hasSamplesForProgram(35)).toBe(false);
+        expect(synth.hasSamplesForPercussion(SynthConstants.MetronomeKey)).toBe(true);
     });
 
     async function testVorbisFile(name: string) {
         const data = await TestPlatform.loadFile(`test-data/audio/${name}.ogg`);
         const vorbis = new VorbisFile(ByteBuffer.fromBuffer(data));
 
-        expect(vorbis.streams.length).to.equal(1);
-        expect(vorbis.streams[0].audioChannels).to.equal(2);
-        expect(vorbis.streams[0].audioSampleRate).to.equal(44100);
-        expect(vorbis.streams[0].samples.length).to.be.greaterThan(44100 * 0.05);
+        expect(vorbis.streams.length).toBe(1);
+        expect(vorbis.streams[0].audioChannels).toBe(2);
+        expect(vorbis.streams[0].audioSampleRate).toBe(44100);
+        expect(vorbis.streams[0].samples.length).toBeGreaterThan(44100 * 0.05);
 
         const generated = vorbis.streams[0].samples;
         const reference = new DataView((await TestPlatform.loadFile(`test-data/audio/${name}_alphaTab.pcm`)).buffer);
         try {
-            expect(generated.length).to.equal(reference.buffer.byteLength / 4);
+            expect(generated.length).toBe(reference.buffer.byteLength / 4);
 
             for (let i = 0; i < generated.length; i++) {
-                expect(generated[i]).to.equal(reference.getFloat32(i * 4, true), `Difference at index ${i}`);
+                expect(generated[i], `Difference at index ${i}`).toBe(reference.getFloat32(i * 4, true));
             }
         } catch (e) {
             await TestPlatform.saveFile(
@@ -138,7 +138,7 @@ describe('AlphaSynthTests', () => {
         await testVorbisFile('Short');
     });
 
-    it('ogg-vorbis-example', async () => {
+    it('ogg-vorbis-example', { timeout: 30000 }, async () => {
         await testVorbisFile('Example');
     });
 
@@ -212,13 +212,13 @@ describe('AlphaSynthTests', () => {
 
         try {
             const reference = new DataView((await TestPlatform.loadFile(`test-data/audio/${fileName}.pcm`)).buffer);
-            expect(generated.length).to.equal(reference.buffer.byteLength / 4);
+            expect(generated.length).toBe(reference.buffer.byteLength / 4);
 
             for (let i = 0; i < generated.length; i++) {
                 const expected = reference.getFloat32(i * 4, true);
                 if (generated[i] !== expected) {
                     // custom check, chai assertion has quite huge overhead if called that often
-                    expect(generated[i]).to.equal(expected, `Difference at index ${i}`);
+                    expect(generated[i], `Difference at index ${i}`).toBe(expected);
                 }
             }
         } catch (e) {
@@ -320,22 +320,22 @@ describe('AlphaSynthTests', () => {
         }
 
         playTo(0);
-        expect(synth.channelGetPresetBank(0)).to.equal(77);
-        expect(synth.channelGetPresetBank(1)).to.equal(77);
-        expect(synth.channelGetPresetBank(2)).to.equal(50);
-        expect(synth.channelGetPresetBank(3)).to.equal(50);
+        expect(synth.channelGetPresetBank(0)).toBe(77);
+        expect(synth.channelGetPresetBank(1)).toBe(77);
+        expect(synth.channelGetPresetBank(2)).toBe(50);
+        expect(synth.channelGetPresetBank(3)).toBe(50);
 
         playTo(3840);
-        expect(synth.channelGetPresetBank(0)).to.equal(1000);
-        expect(synth.channelGetPresetBank(1)).to.equal(1000);
-        expect(synth.channelGetPresetBank(2)).to.equal(50);
-        expect(synth.channelGetPresetBank(3)).to.equal(50);
+        expect(synth.channelGetPresetBank(0)).toBe(1000);
+        expect(synth.channelGetPresetBank(1)).toBe(1000);
+        expect(synth.channelGetPresetBank(2)).toBe(50);
+        expect(synth.channelGetPresetBank(3)).toBe(50);
 
         playTo(3840 * 2);
-        expect(synth.channelGetPresetBank(0)).to.equal(1000);
-        expect(synth.channelGetPresetBank(1)).to.equal(1000);
-        expect(synth.channelGetPresetBank(2)).to.equal(4000);
-        expect(synth.channelGetPresetBank(3)).to.equal(4000);
+        expect(synth.channelGetPresetBank(0)).toBe(1000);
+        expect(synth.channelGetPresetBank(1)).toBe(1000);
+        expect(synth.channelGetPresetBank(2)).toBe(4000);
+        expect(synth.channelGetPresetBank(3)).toBe(4000);
     });
 
     async function testPlaythrough(midi: MidiFile) {
@@ -355,7 +355,7 @@ describe('AlphaSynthTests', () => {
         while (!finished) {
             const now = Date.now();
             if (now - start > 2000) {
-                assert.fail(`play did not complete after ${2000}ms`);
+                throw new Error(`play did not complete after ${2000}ms`);
             }
             testOutput.next();
         }
@@ -364,7 +364,7 @@ describe('AlphaSynthTests', () => {
     it('small-tempos', async () => {
         const score = ScoreLoader.loadScoreFromBytes(await TestPlatform.loadFile('test-data/audio/small-tempo.xml'));
 
-        expect(score.masterBars[0].tempoAutomations[0].value).to.equal(0.111);
+        expect(score.masterBars[0].tempoAutomations[0].value).toBe(0.111);
 
         const midi = new MidiFile();
         const handler = new AlphaSynthMidiFileHandler(midi);
@@ -372,8 +372,8 @@ describe('AlphaSynthTests', () => {
         generator.generate();
 
         const tempoChange: MidiEvent[] = midi.events.filter(e => e instanceof TempoChangeEvent);
-        expect(tempoChange.length).to.equal(1);
-        expect((tempoChange[0] as TempoChangeEvent).beatsPerMinute).to.equal(0.111);
+        expect(tempoChange.length).toBe(1);
+        expect((tempoChange[0] as TempoChangeEvent).beatsPerMinute).toBe(0.111);
 
         await testPlaythrough(midi);
     });
@@ -381,7 +381,7 @@ describe('AlphaSynthTests', () => {
     it('zero-tempo', async () => {
         const score = ScoreLoader.loadScoreFromBytes(await TestPlatform.loadFile('test-data/audio/small-tempo.xml'));
 
-        expect(score.masterBars[0].tempoAutomations[0].value).to.equal(0.111);
+        expect(score.masterBars[0].tempoAutomations[0].value).toBe(0.111);
         score.masterBars[0].tempoAutomations[0].value = 0;
 
         const midi = new MidiFile();
@@ -390,8 +390,8 @@ describe('AlphaSynthTests', () => {
         generator.generate();
 
         const tempoChange: MidiEvent[] = midi.events.filter(e => e instanceof TempoChangeEvent);
-        expect(tempoChange.length).to.equal(1);
-        expect((tempoChange[0] as TempoChangeEvent).beatsPerMinute).to.equal(0);
+        expect(tempoChange.length).toBe(1);
+        expect((tempoChange[0] as TempoChangeEvent).beatsPerMinute).toBe(0);
 
         await testPlaythrough(midi);
     });

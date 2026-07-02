@@ -67,4 +67,15 @@ export interface ImporterSettingsJson {
      * ![Disabled](https://alphatab.net/img/reference/property/beattextaslyrics-disabled.png)
      */
     beatTextAsLyrics?: boolean;
+    /**
+     * This setting controls the escape hatch for handling potentially malicous or corrupt
+     * input files. At selected spots in the codebase, we use this buffer size as maximum
+     * allowed sizes. e.g. during unzipping or decoding strings.
+     * This prevents resource exhaustion, especially when alphaTab is used on server side.
+     * Increase this buffer size if you need to handle very big files.
+     * @defaultValue `128000000`
+     * @category Core
+     * @since 1.9.0
+     */
+    maxDecodingBufferSize?: number;
 }

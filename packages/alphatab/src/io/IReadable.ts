@@ -49,10 +49,73 @@ export interface IReadable {
 }
 
 /**
- * @internal
+ * Thrown whenever we hit the end of input data unexpectedly.
+ * @public
  */
 export class EndOfReaderError extends AlphaTabError {
     public constructor() {
         super(AlphaTabErrorType.Format, 'Unexpected end of data within reader');
+    }
+}
+
+/**
+ * Thrown whenever an overflow in data or buffer sizes is detected.
+ * @public
+ */
+export class OverflowError extends AlphaTabError {
+    public constructor(message: string) {
+        super(AlphaTabErrorType.Format, message);
+    }
+}
+
+/**
+ * An {@see IReadable} implementation throwing when the end of stream is reached guarding against
+ * corrupted or maliciously crafted files leading to endless reading
+ * @internal
+ */
+export class ThrowingReadable implements IReadable {
+    private _readable: IReadable;
+    public constructor(readable: IReadable) {
+        this._readable = readable;
+    }
+    public get position(): number {
+        return this._readable.position;
+    }
+
+    public set position(value: number) {
+        this._readable.position = value;
+    }
+
+    public get length(): number {
+        return this._readable.length;
+    }
+
+    public reset(): void {
+        this._readable.reset();
+    }
+
+    public skip(offset: number): void {
+        this._readable.skip(offset);
+    }
+
+    private _requireBytes(bytes: number) {
+        const remaining = this.length - this.position;
+        if (remaining < bytes) {
+            throw new EndOfReaderError();
+        }
+    }
+
+    public readByte(): number {
+        this._requireBytes(1);
+        return this._readable.readByte();
+    }
+
+    public read(buffer: Uint8Array, offset: number, count: number): number {
+        this._requireBytes(count);
+        return this._readable.read(buffer, offset, count);
+    }
+
+    public readAll(): Uint8Array {
+        return this._readable.readAll();
     }
 }

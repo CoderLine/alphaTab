@@ -4,11 +4,13 @@ import { Logger } from '@coderline/alphatab/Logger';
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { TuningDisplayMode } from '@coderline/alphatab/model/RenderStylesheet';
 import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { type Track, TrackSubElement } from '@coderline/alphatab/model/Track';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { Profiler } from '@coderline/alphatab/profiling/Profiler';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
@@ -20,6 +22,7 @@ import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { SlurRegistry } from '@coderline/alphatab/rendering/layout/SlurRegistry';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { SkylineSegmentPool } from '@coderline/alphatab/rendering/skyline/SkylineSegmentPool';
 import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
@@ -29,14 +32,11 @@ import { Lazy } from '@coderline/alphatab/util/Lazy';
 
 /**
  * @internal
+ * @record
  */
-class LazyPartial {
-    public args: RenderFinishedEventArgs;
-    public renderCallback: (canvas: ICanvas) => void;
-    public constructor(args: RenderFinishedEventArgs, renderCallback: (canvas: ICanvas) => void) {
-        this.args = args;
-        this.renderCallback = renderCallback;
-    }
+interface LazyPartial {
+    args: RenderFinishedEventArgs;
+    renderCallback: (canvas: ICanvas) => void;
 }
 
 /**
@@ -56,6 +56,8 @@ export abstract class ScoreLayout {
     public width: number = 0;
     public height: number = 0;
 
+    public readonly skylinePool: SkylineSegmentPool = new SkylineSegmentPool();
+
     public multiBarRestInfo: Map<number, number[]> | null = null;
 
     public get scaledWidth() {
@@ -74,23 +76,26 @@ export abstract class ScoreLayout {
     public abstract get firstBarX(): number;
     public abstract get supportsResize(): boolean;
 
+    /** All staff systems currently held by the layout. Implementations may
+     *  return a single-element list when the layout is single-system. */
+    public abstract get systems(): StaffSystem[];
+
     public slurRegistry = new SlurRegistry();
     public beamingRuleLookups = new Map<string, BeamingRuleLookup>();
 
     public resize(): void {
         this._lazyPartials.clear();
         this.slurRegistry.clear();
+        Profiler.begin('layout.doResize');
         this.doResize();
+        Profiler.end('layout.doResize');
     }
     public abstract doResize(): void;
 
-    public layoutAndRender(renderHints?: RenderHints): void {
-        this._lazyPartials.clear();
-        this.slurRegistry.clear();
-        this.beamingRuleLookups.clear();
-        this._barRendererLookup.clear();
+    public abstract doUpdateForBars(renderHints: RenderHints): boolean;
 
-        this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
+    public layoutAndRender(renderHints?: RenderHints): void {
+        this.slurRegistry.clear();
 
         const score: Score = this.renderer.score!;
 
@@ -101,6 +106,19 @@ export abstract class ScoreLayout {
             this.firstBarIndex,
             this.lastBarIndex
         );
+
+        const firstChangedMasterBar = renderHints?.firstChangedMasterBar;
+        if (firstChangedMasterBar !== undefined) {
+            if (this.doUpdateForBars(renderHints!)) {
+                return;
+            }
+        }
+
+        this._lazyPartials.clear();
+        this.beamingRuleLookups.clear();
+        this._barRendererLookup.clear();
+
+        this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
 
         this.pagePadding = this.renderer.settings.display.padding.map(p => p / this.renderer.settings.display.scale);
         if (!this.pagePadding) {
@@ -113,10 +131,16 @@ export abstract class ScoreLayout {
         }
 
         this._createScoreInfoGlyphs();
+        Profiler.begin('layout.doLayoutAndRender');
         this.doLayoutAndRender(renderHints);
+        Profiler.end('layout.doLayoutAndRender');
     }
 
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
+
+    protected getExistingPartialArgs(id: string): RenderFinishedEventArgs | undefined {
+        return this._lazyPartials.has(id) ? this._lazyPartials.get(id)!.args : undefined;
+    }
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
         if (args.height === 0) {
@@ -137,7 +161,11 @@ export abstract class ScoreLayout {
             this._internalRenderLazyPartial(args, callback);
         } else {
             // in case of lazy loading -> first register lazy, then notify
-            this._lazyPartials.set(args.id, new LazyPartial(args, callback));
+            const partial: LazyPartial = {
+                args,
+                renderCallback: callback
+            };
+            this._lazyPartials.set(args.id, partial);
             (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
         }
     }
@@ -290,7 +318,11 @@ export abstract class ScoreLayout {
                 }
             }
             // tuning info
-            if (stavesWithTuning.length > 0 && score.stylesheet.globalDisplayTuning) {
+            if (
+                stavesWithTuning.length > 0 &&
+                score.stylesheet.globalDisplayTuning &&
+                score.stylesheet.tuningDisplayMode === TuningDisplayMode.Score
+            ) {
                 this.tuningGlyph = new TuningContainerGlyph(0, 0);
                 this.tuningGlyph.renderer = fakeBarRenderer;
                 for (const staff of stavesWithTuning) {
@@ -500,7 +532,7 @@ export abstract class ScoreLayout {
         }
     }
 
-    public layoutAndRenderAnnotation(y: number): number {
+    protected _layoutAndRenderAnnotation(y: number): number {
         // attention, you are not allowed to remove change this notice within any version of this library without permission!
         const msg: string = 'rendered by alphaTab';
         const resources: RenderingResources = this.renderer.settings.display.resources;

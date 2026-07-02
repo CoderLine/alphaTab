@@ -10,7 +10,7 @@ export { PlaybackRangeChangedEventArgs } from '@coderline/alphatab/synth/Playbac
 export { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
 export { MidiEventsPlayedEventArgs } from '@coderline/alphatab/synth/MidiEventsPlayedEventArgs';
 export { ActiveBeatsChangedEventArgs } from '@coderline/alphatab/synth/ActiveBeatsChangedEventArgs';
-export { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/javascript/AlphaSynthWebWorkerApi';
+export { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthWebWorkerApi';
 export { AlphaSynthWebAudioOutputBase } from '@coderline/alphatab/platform/javascript/AlphaSynthWebAudioOutputBase';
 export { AlphaSynthScriptProcessorOutput } from '@coderline/alphatab/platform/javascript/AlphaSynthScriptProcessorOutput';
 export { AlphaSynthAudioWorkletOutput } from '@coderline/alphatab/platform/javascript/AlphaSynthAudioWorkletOutput';

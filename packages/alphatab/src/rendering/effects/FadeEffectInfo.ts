@@ -1,12 +1,12 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { FadeType } from '@coderline/alphatab/model/FadeType';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
-import type { Settings } from '@coderline/alphatab/Settings';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
-import { FadeType } from '@coderline/alphatab/model/FadeType';
 import { FadeGlyph } from '@coderline/alphatab/rendering/glyphs/FadeGlyph';
+import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
@@ -18,10 +18,6 @@ export class FadeEffectInfo extends EffectInfo {
 
     public get hideOnMultiTrack(): boolean {
         return false;
-    }
-
-    public get canShareBand(): boolean {
-        return true;
     }
 
     public get sizingMode(): EffectBarGlyphSizing {
@@ -38,5 +34,8 @@ export class FadeEffectInfo extends EffectInfo {
 
     public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
+    }
+    public override get placementCategory(): EffectBandPlacementCategory {
+        return EffectBandPlacementCategory.Span;
     }
 }

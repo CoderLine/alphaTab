@@ -1,10 +1,11 @@
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { BeatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@coderline/alphatab/Settings';
-import { expect } from 'chai';
 import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
+import { describe, expect, it } from 'vitest';
 
 describe('EffectsAndAnnotationsTests', () => {
     it('markers', async () => {
@@ -119,6 +120,17 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/tuplets.gp');
     });
 
+    it('tuplets-huge', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            'C4 {tu 12 27} * 12',
+            'test-data/visual-tests/effects-and-annotations/tuplets-huge.png'
+        );
+    });
+
+    it('hidden-dots', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/hidden-dots.mxml');
+    });
+
     it('tuplets-advanced', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/tuplets-advanced.gp', undefined, o => {
             o.tracks = [0, 1, 2];
@@ -180,7 +192,7 @@ describe('EffectsAndAnnotationsTests', () => {
         );
         score.stylesheet.hideDynamics = true;
 
-        expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(0);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toBe(0);
 
         await VisualTestHelper.runVisualTestFull(
             new VisualTestOptions(
@@ -208,36 +220,36 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('roman-numbers', () => {
-        expect(BeatBarreEffectInfo.toRoman(0)).to.equal('');
-        expect(BeatBarreEffectInfo.toRoman(1)).to.equal('I');
-        expect(BeatBarreEffectInfo.toRoman(2)).to.equal('II');
-        expect(BeatBarreEffectInfo.toRoman(3)).to.equal('III');
-        expect(BeatBarreEffectInfo.toRoman(4)).to.equal('IV');
-        expect(BeatBarreEffectInfo.toRoman(5)).to.equal('V');
-        expect(BeatBarreEffectInfo.toRoman(6)).to.equal('VI');
-        expect(BeatBarreEffectInfo.toRoman(7)).to.equal('VII');
-        expect(BeatBarreEffectInfo.toRoman(8)).to.equal('VIII');
-        expect(BeatBarreEffectInfo.toRoman(9)).to.equal('IX');
-        expect(BeatBarreEffectInfo.toRoman(10)).to.equal('X');
-        expect(BeatBarreEffectInfo.toRoman(11)).to.equal('XI');
-        expect(BeatBarreEffectInfo.toRoman(12)).to.equal('XII');
-        expect(BeatBarreEffectInfo.toRoman(13)).to.equal('XIII');
-        expect(BeatBarreEffectInfo.toRoman(14)).to.equal('XIV');
-        expect(BeatBarreEffectInfo.toRoman(15)).to.equal('XV');
-        expect(BeatBarreEffectInfo.toRoman(16)).to.equal('XVI');
-        expect(BeatBarreEffectInfo.toRoman(17)).to.equal('XVII');
-        expect(BeatBarreEffectInfo.toRoman(18)).to.equal('XVIII');
-        expect(BeatBarreEffectInfo.toRoman(19)).to.equal('XIX');
-        expect(BeatBarreEffectInfo.toRoman(20)).to.equal('XX');
-        expect(BeatBarreEffectInfo.toRoman(21)).to.equal('XXI');
-        expect(BeatBarreEffectInfo.toRoman(22)).to.equal('XXII');
-        expect(BeatBarreEffectInfo.toRoman(23)).to.equal('XXIII');
-        expect(BeatBarreEffectInfo.toRoman(24)).to.equal('XXIV');
-        expect(BeatBarreEffectInfo.toRoman(25)).to.equal('XXV');
-        expect(BeatBarreEffectInfo.toRoman(26)).to.equal('XXVI');
-        expect(BeatBarreEffectInfo.toRoman(27)).to.equal('XXVII');
-        expect(BeatBarreEffectInfo.toRoman(28)).to.equal('XXVIII');
-        expect(BeatBarreEffectInfo.toRoman(29)).to.equal('XXIX');
+        expect(BeatBarreEffectInfo.toRoman(0)).toBe('');
+        expect(BeatBarreEffectInfo.toRoman(1)).toBe('I');
+        expect(BeatBarreEffectInfo.toRoman(2)).toBe('II');
+        expect(BeatBarreEffectInfo.toRoman(3)).toBe('III');
+        expect(BeatBarreEffectInfo.toRoman(4)).toBe('IV');
+        expect(BeatBarreEffectInfo.toRoman(5)).toBe('V');
+        expect(BeatBarreEffectInfo.toRoman(6)).toBe('VI');
+        expect(BeatBarreEffectInfo.toRoman(7)).toBe('VII');
+        expect(BeatBarreEffectInfo.toRoman(8)).toBe('VIII');
+        expect(BeatBarreEffectInfo.toRoman(9)).toBe('IX');
+        expect(BeatBarreEffectInfo.toRoman(10)).toBe('X');
+        expect(BeatBarreEffectInfo.toRoman(11)).toBe('XI');
+        expect(BeatBarreEffectInfo.toRoman(12)).toBe('XII');
+        expect(BeatBarreEffectInfo.toRoman(13)).toBe('XIII');
+        expect(BeatBarreEffectInfo.toRoman(14)).toBe('XIV');
+        expect(BeatBarreEffectInfo.toRoman(15)).toBe('XV');
+        expect(BeatBarreEffectInfo.toRoman(16)).toBe('XVI');
+        expect(BeatBarreEffectInfo.toRoman(17)).toBe('XVII');
+        expect(BeatBarreEffectInfo.toRoman(18)).toBe('XVIII');
+        expect(BeatBarreEffectInfo.toRoman(19)).toBe('XIX');
+        expect(BeatBarreEffectInfo.toRoman(20)).toBe('XX');
+        expect(BeatBarreEffectInfo.toRoman(21)).toBe('XXI');
+        expect(BeatBarreEffectInfo.toRoman(22)).toBe('XXII');
+        expect(BeatBarreEffectInfo.toRoman(23)).toBe('XXIII');
+        expect(BeatBarreEffectInfo.toRoman(24)).toBe('XXIV');
+        expect(BeatBarreEffectInfo.toRoman(25)).toBe('XXV');
+        expect(BeatBarreEffectInfo.toRoman(26)).toBe('XXVI');
+        expect(BeatBarreEffectInfo.toRoman(27)).toBe('XXVII');
+        expect(BeatBarreEffectInfo.toRoman(28)).toBe('XXVIII');
+        expect(BeatBarreEffectInfo.toRoman(29)).toBe('XXIX');
     });
 
     it('barre', async () => {
@@ -559,6 +571,68 @@ describe('EffectsAndAnnotationsTests', () => {
                 o => {
                     o.settings.display.lyricLinesPaddingBetween = 20;
                 }
+            );
+        });
+    });
+
+    describe('hopo-arcs', () => {
+        async function test(test: string, tex: string) {
+            await VisualTestHelper.runVisualTestTex(
+                tex,
+                `test-data/visual-tests/effects-and-annotations/hopo-arcs-${test}.png`
+            );
+        }
+
+        it('at1', async () => await test('at1', ':4 5.3{h} 7.3 r r'));
+        it('at2', async () => await test('at2', ':4 7.3{h} 5.3 r r'));
+        it('at3', async () => await test('at3', ':4 5.3{h} 7.3 7.3{h} 5.3'));
+        it('at4', async () => await test('at4', ':4 5.3{h} 7.3 8.4{h} 5.4'));
+        it('at5', async () => await test('at5', ':4 5.3{h} 7.3{h} 5.3 r'));
+        it('at6', async () => await test('at6', ':8 5.3{h} 7.3{h} 5.3{h} 7.3 r r r r'));
+        it('at7', async () => await test('at7', ':4 5.3{sl} 7.3 r r'));
+        it('at8', async () => await test('at8', ':4 5.3 7.3 5.3 7.3'));
+        it('at9', async () => await test('at9', ':4 (5.3{h} 5.4) (7.3 7.4) r r'));
+        it('at10', async () => await test('at10', ':4 (5.3 5.4{h}) (7.3 7.4) r r'));
+        it('at11', async () => await test('at11', ':4 (5.3{h} 5.4{h}) (7.3 7.4) r r'));
+        it('at12', async () => await test('at12', ':4 (5.3{h} 7.4{h}) (7.3 5.4) r r'));
+        it('at13', async () => await test('at13', ':4 (5.3{h} 7.4{h}) (7.3{h} 5.4{h}) (5.3 7.4) r'));
+        it('at14', async () => await test('at14', ':4 5.3 {h} 7.3{h} 5.3 | 5.4 {h} 7.4{h} 5.4'));
+
+        // Pure descending pull-off chain
+        it('pull-off-chain', async () => await test('pull-off-chain', ':4 9.3{h} 7.3{h} 5.3 r'));
+
+        // Mixed hammer-on + legato slide in one chain — the core
+        // "combined effects" case that motivated the redesign. Both
+        // labels (H, sl.) appear above the single arc.
+        it('mixed-h-slide', async () => await test('mixed-h-slide', ':4 5.3{h} 7.3{sl} 9.3 r'));
+        it('mixed-slide-h-p', async () => await test('mixed-slide-h-p', ':4 5.3{sl} 7.3{h} 9.3{h} 7.3'));
+
+        // Chain that swings up then down: H then P inside one arc
+        it('asc-then-desc', async () => await test('asc-then-desc', ':4 5.3{h} 7.3{h} 9.3{h} 7.3{h} 5.3'));
+
+        // Three-note chord with H/P chain on the upper string
+        it('chord-with-chain', async () =>
+            await test('chord-with-chain', ':4 (5.3{h} 5.4 5.5) (7.3{h} 7.4 7.5) (5.3 5.4 5.5) r'));
+
+        // Score-only — confirms ScoreSlurGlyph paints labels even
+        // without the tab staff present.
+        it('score-only', async () =>
+            await test('score-only', '\\track "T" \\staff {score} :4 5.3{h} 7.3{h} 5.3{sl} 7.3'));
+
+        // Tab-only — confirms TabSlurGlyph paints labels in isolation.
+        it('tab-only', async () =>
+            await test('tab-only', '\\track "T" \\staff {tabs} :4 5.3{h} 7.3{h} 5.3{sl} 7.3'));
+
+        // Labels disabled via NotationSettings — arcs still render but
+        // without H/P/sl. text above them.
+        it('labels-disabled', async () => {
+            const settings = new Settings();
+            settings.notation.elements.set(NotationElement.EffectHammerOnPullOffText, false);
+            settings.notation.elements.set(NotationElement.EffectSlideText, false);
+            await VisualTestHelper.runVisualTestTex(
+                ':4 5.3{h} 7.3{h} 5.3{sl} 7.3',
+                'test-data/visual-tests/effects-and-annotations/hopo-arcs-labels-disabled.png',
+                settings
             );
         });
     });

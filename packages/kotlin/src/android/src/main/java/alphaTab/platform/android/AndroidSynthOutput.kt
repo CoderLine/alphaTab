@@ -19,8 +19,7 @@ import kotlin.math.min
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
 internal class AndroidSynthOutput(
-    private val context: Context,
-    private val synthInvoke: (action: (() -> Unit)) -> Unit
+    private val context: Context
 ) : ISynthOutput {
     companion object {
         private const val BufferSize = 4096
@@ -33,6 +32,7 @@ internal class AndroidSynthOutput(
 
     private lateinit var _audioContext: AndroidAudioWorker
     private lateinit var _circularBuffer: CircularSampleBuffer
+    private var _readWrapper: Float32Array? = null
 
     override val sampleRate: Double
         get() = PreferredSampleRate.toDouble()
@@ -56,9 +56,7 @@ internal class AndroidSynthOutput(
     }
 
     private fun onReady() {
-        synthInvoke {
-            (ready as EventEmitter).trigger()
-        }
+        (ready as EventEmitter).trigger()
     }
 
     override fun destroy() {
@@ -103,24 +101,26 @@ internal class AndroidSynthOutput(
     }
 
     private fun onSampleRequest() {
-        synthInvoke {
-            (sampleRequest as EventEmitter).trigger()
-        }
+        (sampleRequest as EventEmitter).trigger()
     }
 
     internal fun onSamplesPlayed(samples: Int) {
-        synthInvoke {
-            (samplesPlayed as EventEmitterOfT<Double>).trigger(samples.toDouble())
-        }
+        (samplesPlayed as EventEmitterOfT<Double>).trigger(samples.toDouble())
     }
 
     fun read(buffer: FloatArray, offset: Int, sampleCount: Int): Int {
-        val read = Float32Array(sampleCount.toDouble())
-        val actual = _circularBuffer.read(read, 0.0, min(read.length, _circularBuffer.count))
-
-        read.data.copyInto(buffer, offset, 0, sampleCount)
+        // AndroidAudioWorker has one static buffer which is reused, we can cache the read wrapper
+        var wrapper = _readWrapper
+        if (wrapper == null || wrapper.data !== buffer) {
+            wrapper = Float32Array(buffer)
+            _readWrapper = wrapper
+        }
+        val actual = _circularBuffer.read(
+            wrapper,
+            offset.toDouble(),
+            min(sampleCount.toDouble(), _circularBuffer.count)
+        )
         requestBuffers()
-
         return actual.toInt()
     }
 
@@ -129,7 +129,7 @@ internal class AndroidSynthOutput(
     override val sampleRequest: IEventEmitter = EventEmitter()
 
     override suspend fun enumerateOutputDevices(): List<ISynthOutputDevice> {
-        val audioService = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+        val audioService = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager?
             ?: return List()
 
         return List(

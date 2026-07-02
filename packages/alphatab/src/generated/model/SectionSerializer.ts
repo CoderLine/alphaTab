@@ -15,7 +15,7 @@ export class SectionSerializer {
         }
         JsonHelper.forEach(m, (v, k) => SectionSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: Section | null): Map<string, unknown> | null {
+    public static toJson(obj: Section | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

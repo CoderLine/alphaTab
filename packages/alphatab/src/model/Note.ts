@@ -11,6 +11,8 @@ import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { Slur } from '@coderline/alphatab/model/Slur';
+import { SlurSegmentKind } from '@coderline/alphatab/model/SlurSegmentKind';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { NotationMode } from '@coderline/alphatab/NotationSettings';
@@ -605,6 +607,17 @@ export class Note {
     public effectSlurDestination: Note | null = null;
 
     /**
+     * The {@link Slur} object whose origin is this note. Populated by
+     * `finish()`; non-null only on the chain-origin note of an effect
+     * slur. Carries the inner articulation segments used by the
+     * renderer to paint H/P/sl. labels along the arc.
+     * @clone_ignore
+     * @json_ignore
+     * @internal
+     */
+    public effectSlur: Slur | null = null;
+
+    /**
      * The ornament applied on the note.
      */
     public ornament: NoteOrnament = NoteOrnament.None;
@@ -906,21 +919,50 @@ export class Note {
                 break;
         }
         let effectSlurDestination: Note | null = null;
+        let effectSlurSegmentKind: SlurSegmentKind | null = null;
         if (this.isHammerPullOrigin && this.hammerPullDestination) {
             effectSlurDestination = this.hammerPullDestination;
+            effectSlurSegmentKind = SlurSegmentKind.HammerPull;
         } else if (this.slideOutType === SlideOutType.Legato && this.slideTarget) {
             effectSlurDestination = this.slideTarget;
+            effectSlurSegmentKind = SlurSegmentKind.LegatoSlide;
         }
         if (effectSlurDestination) {
             this.hasEffectSlur = true;
             if (this.effectSlurOrigin && this.beat.pickStroke === PickStroke.None) {
-                this.effectSlurOrigin.effectSlurDestination = effectSlurDestination;
-                this.effectSlurOrigin.effectSlurDestination.effectSlurOrigin = this.effectSlurOrigin;
+                const chainOrigin = this.effectSlurOrigin;
+                chainOrigin.effectSlurDestination = effectSlurDestination;
+                effectSlurDestination.effectSlurOrigin = chainOrigin;
                 this.effectSlurOrigin = null;
+
+                if (effectSlurSegmentKind !== null && chainOrigin.effectSlur !== null) {
+                    chainOrigin.effectSlur.destinationNote = effectSlurDestination;
+                    chainOrigin.effectSlur.segments.push({
+                        fromNote: this,
+                        toNote: effectSlurDestination,
+                        kind: effectSlurSegmentKind,
+                        text: null
+                    });
+                }
             } else {
                 this.isEffectSlurOrigin = true;
                 this.effectSlurDestination = effectSlurDestination;
-                this.effectSlurDestination.effectSlurOrigin = this;
+                effectSlurDestination.effectSlurOrigin = this;
+
+                // Always allocate a fresh Slur — finish() may run twice (worker re-finish);
+                // overwriting unconditionally keeps the derivation idempotent.
+                const slur = new Slur();
+                slur.originNote = this;
+                slur.destinationNote = effectSlurDestination;
+                if (effectSlurSegmentKind !== null) {
+                    slur.segments.push({
+                        fromNote: this,
+                        toNote: effectSlurDestination,
+                        kind: effectSlurSegmentKind,
+                        text: null
+                    });
+                }
+                this.effectSlur = slur;
             }
         }
         // try to detect what kind of bend was used and cleans unneeded points if required

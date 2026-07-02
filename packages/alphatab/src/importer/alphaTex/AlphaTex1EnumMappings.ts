@@ -18,7 +18,8 @@ import type {
     BracketExtendMode,
     TrackNameMode,
     TrackNameOrientation,
-    TrackNamePolicy
+    TrackNamePolicy,
+    TuningDisplayMode
 } from '@coderline/alphatab/model/RenderStylesheet';
 import type { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import type { TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
@@ -198,6 +199,13 @@ export class AlphaTex1EnumMappings {
         ['shortname', 1]
     ]);
     public static readonly trackNameModeReversed = AlphaTex1EnumMappings._reverse(AlphaTex1EnumMappings.trackNameMode);
+    public static readonly tuningDisplayMode = new Map<string, TuningDisplayMode>([
+        ['score', 0],
+        ['staff', 1]
+    ]);
+    public static readonly tuningDisplayModeReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.tuningDisplayMode
+    );
     public static readonly textAlign = new Map<string, TextAlign>([
         ['left', 0],
         ['center', 1],

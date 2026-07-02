@@ -71,7 +71,7 @@ import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
-import { BarNumberDisplay, type RenderStylesheet } from '@coderline/alphatab/model/RenderStylesheet';
+import { BarNumberDisplay, type RenderStylesheet, TuningDisplayMode } from '@coderline/alphatab/model/RenderStylesheet';
 import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
@@ -187,6 +187,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'usesystemsignseparator':
                 score.stylesheet.useSystemSignSeparator = true;
+                return ApplyNodeResult.Applied;
+            case 'tuningdisplaymode':
+                const tuningDisplayMode = AlphaTex1LanguageHandler._parseEnumValue(
+                    importer,
+                    metaData.arguments!,
+                    'tuning display mode',
+                    AlphaTex1EnumMappings.tuningDisplayMode
+                );
+                if (tuningDisplayMode === undefined) {
+                    return ApplyNodeResult.NotAppliedSemanticError;
+                }
+                score.stylesheet.tuningDisplayMode = tuningDisplayMode!;
                 return ApplyNodeResult.Applied;
             case 'multibarrest':
                 score.stylesheet.multiTrackMultiBarRest = true;
@@ -1616,6 +1628,23 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'txt':
                 beat.text = (p.arguments!.arguments[0] as AlphaTexTextNode).text;
                 return ApplyNodeResult.Applied;
+            case 'restdisplaypitch': {
+                const tuning = ModelUtils.parseTuning((p.arguments!.arguments[0] as AlphaTexTextNode).text);
+                if (tuning !== null) {
+                    beat.restDisplayTone = tuning.tone.noteValue;
+                    beat.restDisplayOctave = tuning.octave - 1;
+                } else {
+                    importer.addSemanticDiagnostic({
+                        code: AlphaTexDiagnosticCode.AT212,
+                        message: `Invalid pitch value '${(p.arguments!.arguments[0] as AlphaTexTextNode).text}', expected format like 'C5' or 'G4'`,
+                        severity: AlphaTexDiagnosticsSeverity.Error,
+                        start: p.arguments!.arguments[0].start,
+                        end: p.arguments!.arguments[0].end
+                    });
+                    return ApplyNodeResult.NotAppliedSemanticError;
+                }
+                return ApplyNodeResult.Applied;
+            }
             case 'lyrics':
                 let lyricsLine = 0;
                 let lyricsText = '';
@@ -2561,6 +2590,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
         if (stylesheet.useSystemSignSeparator) {
             nodes.push(Atnf.meta('useSystemSignSeparator'));
+        }
+        if (stylesheet.tuningDisplayMode !== TuningDisplayMode.Score) {
+            nodes.push(
+                Atnf.identMeta(
+                    'tuningDisplayMode',
+                    AlphaTex1EnumMappings.tuningDisplayModeReversed.get(stylesheet.tuningDisplayMode)!
+                )
+            );
         }
         if (stylesheet.multiTrackMultiBarRest) {
             nodes.push(Atnf.meta('multiBarRest'));

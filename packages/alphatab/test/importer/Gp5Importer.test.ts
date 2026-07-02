@@ -1,34 +1,39 @@
 import { Settings } from '@coderline/alphatab/Settings';
+import { GpBinaryHelpers } from '@coderline/alphatab/importer/Gp3To5Importer';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { EndOfReaderError, OverflowError } from '@coderline/alphatab/io/IReadable';
 import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
+import { Clef } from '@coderline/alphatab/model/Clef';
 import { Direction } from '@coderline/alphatab/model/Direction';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { type Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { TestPlatform } from 'test/TestPlatform';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
-import { expect } from 'chai';
-import { Clef } from '@coderline/alphatab/model/Clef';
-import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { describe, expect, it } from 'vitest';
 
 describe('Gp5ImporterTest', () => {
     it('score-info', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/score-info.gp5');
         const score: Score = reader.readScore();
-        expect(score.title).to.equal('Title');
-        expect(score.subTitle).to.equal('Subtitle');
-        expect(score.artist).to.equal('Artist');
-        expect(score.album).to.equal('Album');
-        expect(score.words).to.equal('Words');
-        expect(score.music).to.equal('Music');
-        expect(score.copyright).to.equal('Copyright');
-        expect(score.tab).to.equal('Tab');
-        expect(score.instructions).to.equal('Instructions');
-        expect(score.notices).to.equal('Notice1\r\nNotice2');
-        expect(score.masterBars.length).to.equal(5);
-        expect(score.tracks.length).to.equal(2);
-        expect(score.tracks[0].name).to.equal('Track 1');
-        expect(score.tracks[1].name).to.equal('Track 2');
+        expect(score.title).toBe('Title');
+        expect(score.subTitle).toBe('Subtitle');
+        expect(score.artist).toBe('Artist');
+        expect(score.album).toBe('Album');
+        expect(score.words).toBe('Words');
+        expect(score.music).toBe('Music');
+        expect(score.copyright).toBe('Copyright');
+        expect(score.tab).toBe('Tab');
+        expect(score.instructions).toBe('Instructions');
+        expect(score.notices).toBe('Notice1\r\nNotice2');
+        expect(score.masterBars.length).toBe(5);
+        expect(score.tracks.length).toBe(2);
+        expect(score.tracks[0].name).toBe('Track 1');
+        expect(score.tracks[1].name).toBe('Track 2');
     });
 
     it('notes', async () => {
@@ -174,36 +179,36 @@ describe('Gp5ImporterTest', () => {
             'guitarpro5/alternate-endings-section-error.gp5'
         );
         const score: Score = reader.readScore();
-        expect(score.masterBars.length).to.be.equal(2);
-        expect(score.masterBars[1].alternateEndings).to.be.equal(4);
-        expect(score.masterBars[1].section).to.be.ok;
-        expect(score.masterBars[1].section?.text).to.be.equal('Outro');
+        expect(score.masterBars.length).toBe(2);
+        expect(score.masterBars[1].alternateEndings).toBe(4);
+        expect(score.masterBars[1].section).toBeTruthy();
+        expect(score.masterBars[1].section?.text).toBe('Outro');
     });
 
     it('canon', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/canon.gp5');
         const score: Score = reader.readScore();
-        expect(score.title).to.equal('Canon Rock');
-        expect(score.subTitle).to.equal('');
-        expect(score.artist).to.equal('JerryC');
-        expect(score.album).to.equal('');
-        expect(score.words).to.equal('');
-        expect(score.music).to.equal('JerryC');
-        expect(score.copyright).to.equal('');
-        expect(score.tab).to.equal('');
-        expect(score.instructions).to.equal('');
-        expect(score.notices).to.equal('');
-        expect(score.masterBars.length).to.equal(224);
-        expect(score.tracks.length).to.equal(9);
-        expect(score.tracks[0].name).to.equal('Guitar Player');
-        expect(score.tracks[1].name).to.equal('Low Bassy Sound');
-        expect(score.tracks[2].name).to.equal('High Soundy Thing');
-        expect(score.tracks[3].name).to.equal('Second Guitar');
-        expect(score.tracks[4].name).to.equal('Drums');
-        expect(score.tracks[5].name).to.equal('Harmonizer');
-        expect(score.tracks[6].name).to.equal('The clean guitar');
-        expect(score.tracks[7].name).to.equal('Track 8');
-        expect(score.tracks[8].name).to.equal('Percussion');
+        expect(score.title).toBe('Canon Rock');
+        expect(score.subTitle).toBe('');
+        expect(score.artist).toBe('JerryC');
+        expect(score.album).toBe('');
+        expect(score.words).toBe('');
+        expect(score.music).toBe('JerryC');
+        expect(score.copyright).toBe('');
+        expect(score.tab).toBe('');
+        expect(score.instructions).toBe('');
+        expect(score.notices).toBe('');
+        expect(score.masterBars.length).toBe(224);
+        expect(score.tracks.length).toBe(9);
+        expect(score.tracks[0].name).toBe('Guitar Player');
+        expect(score.tracks[1].name).toBe('Low Bassy Sound');
+        expect(score.tracks[2].name).toBe('High Soundy Thing');
+        expect(score.tracks[3].name).toBe('Second Guitar');
+        expect(score.tracks[4].name).toBe('Drums');
+        expect(score.tracks[5].name).toBe('Harmonizer');
+        expect(score.tracks[6].name).toBe('The clean guitar');
+        expect(score.tracks[7].name).toBe('Track 8');
+        expect(score.tracks[8].name).toBe('Percussion');
     });
     it('beat-text-lyrics', async () => {
         const settings = new Settings();
@@ -272,7 +277,7 @@ describe('Gp5ImporterTest', () => {
             beat = beat.nextBeat;
         }
 
-        expect(actualChunks.join(';')).to.equal(expectedChunks.join(';'));
+        expect(actualChunks.join(';')).toBe(expectedChunks.join(';'));
     });
 
     it('layout-configuration', async () => {
@@ -295,42 +300,42 @@ describe('Gp5ImporterTest', () => {
     it('hide-tuning', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/hide-tuning.gp5')).readScore();
 
-        expect(score.stylesheet.perTrackDisplayTuning).to.be.ok;
-        expect(score.stylesheet.perTrackDisplayTuning!.has(0)).to.be.true;
-        expect(score.stylesheet.perTrackDisplayTuning!.get(0)).to.equal(false);
+        expect(score.stylesheet.perTrackDisplayTuning).toBeTruthy();
+        expect(score.stylesheet.perTrackDisplayTuning!.has(0)).toBe(true);
+        expect(score.stylesheet.perTrackDisplayTuning!.get(0)).toBe(false);
 
-        expect(score.stylesheet.perTrackDisplayTuning!.has(1)).to.be.true;
-        expect(score.stylesheet.perTrackDisplayTuning!.get(1)).to.equal(true);
+        expect(score.stylesheet.perTrackDisplayTuning!.has(1)).toBe(true);
+        expect(score.stylesheet.perTrackDisplayTuning!.get(1)).toBe(true);
     });
 
     it('staves', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/staves.gp5')).readScore();
 
-        expect(score.tracks[0].staves[0].showNumbered).to.be.false;
-        expect(score.tracks[0].staves[0].showSlash).to.be.false;
-        expect(score.tracks[0].staves[0].showTablature).to.be.true;
-        expect(score.tracks[0].staves[0].showStandardNotation).to.be.true;
+        expect(score.tracks[0].staves[0].showNumbered).toBe(false);
+        expect(score.tracks[0].staves[0].showSlash).toBe(false);
+        expect(score.tracks[0].staves[0].showTablature).toBe(true);
+        expect(score.tracks[0].staves[0].showStandardNotation).toBe(true);
 
-        expect(score.tracks[1].staves[0].showNumbered).to.be.false;
-        expect(score.tracks[1].staves[0].showSlash).to.be.false;
-        expect(score.tracks[1].staves[0].showTablature).to.be.false;
-        expect(score.tracks[1].staves[0].showStandardNotation).to.be.true;
+        expect(score.tracks[1].staves[0].showNumbered).toBe(false);
+        expect(score.tracks[1].staves[0].showSlash).toBe(false);
+        expect(score.tracks[1].staves[0].showTablature).toBe(false);
+        expect(score.tracks[1].staves[0].showStandardNotation).toBe(true);
 
-        expect(score.tracks[2].staves[0].showNumbered).to.be.false;
-        expect(score.tracks[2].staves[0].showSlash).to.be.false;
-        expect(score.tracks[2].staves[0].showTablature).to.be.true;
-        expect(score.tracks[2].staves[0].showStandardNotation).to.be.false;
+        expect(score.tracks[2].staves[0].showNumbered).toBe(false);
+        expect(score.tracks[2].staves[0].showSlash).toBe(false);
+        expect(score.tracks[2].staves[0].showTablature).toBe(true);
+        expect(score.tracks[2].staves[0].showStandardNotation).toBe(false);
     });
 
     it('hide-diagram', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/hide-diagrams.gp5')).readScore();
 
-        expect(score.stylesheet.perTrackChordDiagramsOnTop).to.be.ok;
-        expect(score.stylesheet.perTrackChordDiagramsOnTop!.has(0)).to.be.true;
-        expect(score.stylesheet.perTrackChordDiagramsOnTop!.get(0)).to.equal(false);
+        expect(score.stylesheet.perTrackChordDiagramsOnTop).toBeTruthy();
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.has(0)).toBe(true);
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.get(0)).toBe(false);
 
-        expect(score.stylesheet.perTrackChordDiagramsOnTop!.has(1)).to.be.true;
-        expect(score.stylesheet.perTrackChordDiagramsOnTop!.get(1)).to.equal(true);
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.has(1)).toBe(true);
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.get(1)).toBe(true);
     });
 
     it('directions', async () => {
@@ -366,8 +371,8 @@ describe('Gp5ImporterTest', () => {
         ];
 
         for (let i = 0; i < expectedDirections.length; i++) {
-            expect(score.masterBars[i].directions).to.be.ok;
-            expect(score.masterBars[i].directions!.has(expectedDirections[i])).to.be.true;
+            expect(score.masterBars[i].directions).toBeTruthy();
+            expect(score.masterBars[i].directions!.has(expectedDirections[i])).toBe(true);
         }
     });
 
@@ -375,184 +380,174 @@ describe('Gp5ImporterTest', () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/beaming-mode.gp5')).readScore();
 
         // auto
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].preferredBeamDirection).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.Auto);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].beamingMode).toBe(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].preferredBeamDirection).not.toBeTruthy();
 
         // force
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].beamingMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].beamingMode).toBe(
             BeatBeamingMode.Auto // already has beam, no need to force
         );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].preferredBeamDirection).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].beamingMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].beamingMode).toBe(
             BeatBeamingMode.ForceMergeWithNext
         );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].preferredBeamDirection).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].beamingMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].beamingMode).toBe(
             BeatBeamingMode.Auto // already has beam, no need to force
         );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].preferredBeamDirection).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].beamingMode).to.equal(BeatBeamingMode.Auto);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].beamingMode).toBe(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].preferredBeamDirection).not.toBeTruthy();
 
         // break
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).to.equal(
-            BeatBeamingMode.ForceSplitToNext
-        );
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.ForceSplitToNext);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].beamingMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].beamingMode).toBe(
             BeatBeamingMode.Auto // already has no beam, no need to break
         );
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].preferredBeamDirection).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).to.equal(
-            BeatBeamingMode.ForceSplitToNext
-        );
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).toBe(BeatBeamingMode.ForceSplitToNext);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].preferredBeamDirection).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].beamingMode).to.equal(BeatBeamingMode.Auto);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].beamingMode).toBe(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].preferredBeamDirection).not.toBeTruthy();
 
         // break secondary
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).to.equal(
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).toBe(
             BeatBeamingMode.ForceSplitOnSecondaryToNext
         );
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].preferredBeamDirection).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.Auto);
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].beamingMode).toBe(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].preferredBeamDirection).not.toBeTruthy();
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].beamingMode).to.equal(BeatBeamingMode.Auto);
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].preferredBeamDirection).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].beamingMode).toBe(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].preferredBeamDirection).not.toBeTruthy();
 
         // invert to down
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).to.equal(
-            BeamDirection.Down
-        );
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).toBe(BeamDirection.Down);
 
         // invert to up
-        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
-        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].invertBeamDirection).toBe(false);
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].preferredBeamDirection).toBe(BeamDirection.Up);
     });
 
     it('ottavia', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/ottavia.gp5')).readScore();
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].ottava).to.equal(Ottavia._8va);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].ottava).to.equal(Ottavia._8vb);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].ottava).to.equal(Ottavia._15ma);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].ottava).to.equal(Ottavia._15mb);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].ottava).to.equal(Ottavia.Regular);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].ottava).toBe(Ottavia._8va);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].ottava).toBe(Ottavia._8vb);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].ottava).toBe(Ottavia._15ma);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].ottava).toBe(Ottavia._15mb);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].ottava).toBe(Ottavia.Regular);
     });
 
     it('wah-wah', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/wah-wah.gp5')).readScore();
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].wahPedal).to.equal(WahPedal.None);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].wahPedal).to.equal(WahPedal.Open);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].wahPedal).to.equal(WahPedal.Closed);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].wahPedal).to.equal(WahPedal.Open);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].wahPedal).to.equal(WahPedal.Closed);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].wahPedal).to.equal(WahPedal.None);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].wahPedal).toBe(WahPedal.None);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].wahPedal).toBe(WahPedal.Open);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].wahPedal).toBe(WahPedal.Closed);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].wahPedal).toBe(WahPedal.Open);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].wahPedal).toBe(WahPedal.Closed);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].wahPedal).toBe(WahPedal.None);
     });
 
     it('header-footer', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/header-footer.gp5')).readScore();
 
-        expect(score.style).to.be.ok;
+        expect(score.style).toBeTruthy();
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Title)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.template).to.equal('Title: %TITLE%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.isVisible).to.be.false;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.textAlign).to.equal(TextAlign.Center);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Title)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.template).toBe('Title: %TITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.isVisible).toBe(false);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.textAlign).toBe(TextAlign.Center);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.SubTitle)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.template).to.equal('Subtitle: %SUBTITLE%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.textAlign).to.equal(TextAlign.Center);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.SubTitle)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.template).toBe('Subtitle: %SUBTITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.textAlign).toBe(TextAlign.Center);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Artist)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.template).to.equal('Artist: %ARTIST%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.isVisible).to.be.false;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.textAlign).to.equal(TextAlign.Center);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Artist)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.template).toBe('Artist: %ARTIST%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.isVisible).toBe(false);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.textAlign).toBe(TextAlign.Center);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Album)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.template).to.equal('Album: %ALBUM%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.textAlign).to.equal(TextAlign.Center);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Album)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.template).toBe('Album: %ALBUM%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.textAlign).toBe(TextAlign.Center);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Words)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.template).to.equal('Words: %WORDS%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.isVisible).to.be.false;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.textAlign).to.equal(TextAlign.Left);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Words)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.template).toBe('Words: %WORDS%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.isVisible).toBe(false);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.textAlign).toBe(TextAlign.Left);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Music)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.template).to.equal('Music: %MUSIC%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.textAlign).to.equal(TextAlign.Right);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Music)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.template).toBe('Music: %MUSIC%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.textAlign).toBe(TextAlign.Right);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.WordsAndMusic)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.template).to.equal(
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.WordsAndMusic)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.template).toBe(
             'Words & Music: %WORDSMUSIC%'
         );
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.isVisible).to.be.false;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.textAlign).to.equal(TextAlign.Right);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.isVisible).toBe(false);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.textAlign).toBe(TextAlign.Right);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Transcriber)).to.be.false;
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Transcriber)).toBe(false);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.Copyright)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).to.equal(
-            'Copyright: %COPYRIGHT%'
-        );
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.textAlign).to.equal(TextAlign.Center);
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Copyright)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).toBe('Copyright: %COPYRIGHT%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.textAlign).toBe(TextAlign.Center);
 
-        expect(score.style!.headerAndFooter.has(ScoreSubElement.CopyrightSecondLine)).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.template).to.equal('Copyright2');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).to.be.true;
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).to.equal(
-            TextAlign.Center
-        );
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.CopyrightSecondLine)).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.template).toBe('Copyright2');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).toBe(true);
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).toBe(TextAlign.Center);
     });
 
     it('bank', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/bank.gp5')).readScore();
 
-        expect(score.tracks[0].playbackInfo.program).to.equal(25);
-        expect(score.tracks[0].playbackInfo.bank).to.equal(0);
+        expect(score.tracks[0].playbackInfo.program).toBe(25);
+        expect(score.tracks[0].playbackInfo.bank).toBe(0);
 
-        expect(score.tracks[1].playbackInfo.program).to.equal(25);
-        expect(score.tracks[1].playbackInfo.bank).to.equal(77);
+        expect(score.tracks[1].playbackInfo.program).toBe(25);
+        expect(score.tracks[1].playbackInfo.bank).toBe(77);
     });
 
     it('tuning-bass-clef', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/bass-tuning.gp5')).readScore();
-        expect(score.tracks[0].staves[0].bars[0].clef).to.equal(Clef.G2);
-        expect(score.tracks[1].staves[0].bars[0].clef).to.equal(Clef.F4);
-        expect(score.tracks[2].staves[0].bars[0].clef).to.equal(Clef.F4);
-        expect(score.tracks[3].staves[0].bars[0].clef).to.equal(Clef.F4);
+        expect(score.tracks[0].staves[0].bars[0].clef).toBe(Clef.G2);
+        expect(score.tracks[1].staves[0].bars[0].clef).toBe(Clef.F4);
+        expect(score.tracks[2].staves[0].bars[0].clef).toBe(Clef.F4);
+        expect(score.tracks[3].staves[0].bars[0].clef).toBe(Clef.F4);
     });
 
     it('percusson', async () => {
@@ -564,9 +559,109 @@ describe('Gp5ImporterTest', () => {
             if (beat.notes.length === 1) {
                 const articulationName = PercussionMapper.getArticulationName(beat.notes[0]);
                 const hasArticulation = PercussionMapper.instrumentArticulationNames.has(articulationName);
-                expect(hasArticulation).to.be.true;
+                expect(hasArticulation).toBe(true);
                 beat = beat.nextBeat;
             }
         }
+    });
+
+    it('chord-name-overflow', async () => {
+        // GP5 file with a chord name length byte that exceeds the 21-byte field
+        // (length=32). Pre-fix, gpReadStringByteLength consumed the full 32 bytes,
+        // mis-aligning the stream and triggering an unbounded readBend loop.
+        const score = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/chord-name-overflow.gp5')
+        ).readScore();
+        expect(score.tracks.length).toBe(1);
+        expect(score.masterBars.length).toBe(193);
+    });
+
+    it('gpReadStringByteLength caps consumption at field width', () => {
+        const sentinelByte = 0xca;
+        const fieldSize = 21;
+        const overlongHint = 32;
+
+        const raw = new Uint8Array(fieldSize + 2);
+        raw[0] = overlongHint;
+        for (let i = 0; i < fieldSize; i++) {
+            raw[i + 1] = 0x41;
+        }
+        raw[fieldSize + 1] = sentinelByte;
+
+        const buffer = ByteBuffer.fromBuffer(raw);
+
+        const result = GpBinaryHelpers.gpReadStringByteLength(buffer, fieldSize, 'utf-8');
+        expect(result).toBe('A'.repeat(fieldSize));
+        expect(buffer.position).toBe(1 + fieldSize);
+        expect(buffer.readByte()).toBe(sentinelByte);
+    });
+
+    describe('corrupt', () => {
+        async function corruptTest(intToWrite: number, offset: number, expectedOverflowLabel: string) {
+            const buffer = await TestPlatform.loadFile(`test-data/corrupt/healthy.gp5`);
+
+            buffer[offset + 0] = (intToWrite >> 0) & 0xff;
+            buffer[offset + 1] = (intToWrite >> 8) & 0xff;
+            buffer[offset + 2] = (intToWrite >> 16) & 0xff;
+            buffer[offset + 3] = (intToWrite >> 24) & 0xff;
+
+            const importer = GpImporterTestHelper.prepareImporterWithBytes(buffer, new Settings());
+
+            try {
+                importer.readScore();
+                throw new Error('Expected readScore to fail with an OverflowError');
+            } catch (e) {
+                if (e instanceof OverflowError) {
+                    expect((e as OverflowError).message).toContain(expectedOverflowLabel);
+                    return;
+                }
+                throw e;
+            }
+        }
+
+        it('max-bar-count', async () => await corruptTest(5000, 1235, 'bar count'));
+
+        it('max-track-count', async () => await corruptTest(300, 1239, 'track count'));
+
+        it('notice-lines-count', async () => await corruptTest(5000, 82, 'notice line count'));
+
+        it('beat-count', async () => await corruptTest(200, 1460, 'beat count'));
+
+        it('tremolo-count', async () => await corruptTest(500, 1584, 'tremolo bar point count'));
+
+        it('bend-count', async () => await corruptTest(500, 1479, 'note bend point count'));
+        it('eof', async () => {
+            let buffer = await TestPlatform.loadFile(`test-data/corrupt/healthy.gp5`);
+
+            buffer = buffer.slice(0, buffer.length / 2);
+
+            const importer = GpImporterTestHelper.prepareImporterWithBytes(buffer, new Settings());
+
+            expect(() => importer.readScore()).toThrow(EndOfReaderError);
+        });
+    });
+
+    it('harmonic-types', async () => {
+        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/harmonic-types.gp5');
+        const score = reader.readScore();
+        const b0 = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        expect(b0.notes[0].harmonicType).toBe(HarmonicType.Natural);
+        expect(b0.notes[0].harmonicValue).toBe(12);
+
+        const b1 = score.tracks[0].staves[0].bars[0].voices[0].beats[1];
+        expect(b1.notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(b1.notes[0].harmonicValue).toBe(17);
+
+        const b2 = score.tracks[0].staves[0].bars[0].voices[0].beats[2];
+        expect(b2.notes[0].harmonicType).toBe(HarmonicType.Tap);
+        expect(b2.notes[0].harmonicValue).toBe(12);
+
+        const b3 = score.tracks[0].staves[0].bars[0].voices[0].beats[3];
+        expect(b3.notes[0].harmonicType).toBe(HarmonicType.Pinch);
+        expect(b3.notes[0].harmonicValue).toBe(12);
+
+        const b4 = score.tracks[0].staves[0].bars[1].voices[0].beats[0];
+        expect(b4.notes[0].harmonicType).toBe(HarmonicType.Semi);
+        expect(b4.notes[0].harmonicValue).toBe(12);
     });
 });

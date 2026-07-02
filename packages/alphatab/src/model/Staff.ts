@@ -1,5 +1,11 @@
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Chord } from '@coderline/alphatab/model/Chord';
+import type {
+    NumberedStaffConfig,
+    ScoreStaffConfig,
+    SlashStaffConfig,
+    TabStaffConfig
+} from '@coderline/alphatab/model/StaffConfigs';
 import type { Track } from '@coderline/alphatab/model/Track';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -99,6 +105,26 @@ export class Staff {
      * Gets or sets whether the standard notation is shown.
      */
     public showStandardNotation: boolean = true;
+
+    /**
+     * Per-{@link Staff} override for the standard-notation staff's display.
+     */
+    public scoreConfig?: ScoreStaffConfig;
+
+    /**
+     * Per-{@link Staff} override for the tablature staff's display.
+     */
+    public tabConfig?: TabStaffConfig;
+
+    /**
+     * Per-{@link Staff} override for the slash staff's display.
+     */
+    public slashConfig?: SlashStaffConfig;
+
+    /**
+     * Per-{@link Staff} override for the numbered (jianpu) staff's display.
+     */
+    public numberedConfig?: NumberedStaffConfig;
 
     /**
      * Gets or sets whether the staff contains percussion notation

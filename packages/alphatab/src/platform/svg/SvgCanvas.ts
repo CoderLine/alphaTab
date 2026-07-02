@@ -37,7 +37,7 @@ export abstract class SvgCanvas implements ICanvas {
     }
 
     public beginGroup(identifier: string): void {
-        this.buffer += `<g class="${identifier}">`;
+        this.buffer += '<g class="' + identifier + '">';
     }
 
     public endGroup(): void {
@@ -51,9 +51,24 @@ export abstract class SvgCanvas implements ICanvas {
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this.buffer += `<rect x="${x * this.scale}" y="${y * this.scale}" width="${
-                w * this.scale
-            }" height="${h * this.scale}" fill="${this.color.rgba}" />\n`;
+            // scale=1 fast path: skip the 4 multiplies and use `+` concat to avoid template-literal overhead.
+            const s = this.scale;
+            if (s === 1) {
+                this.buffer +=
+                    '<rect x="' +
+                    x +
+                    '" y="' +
+                    y +
+                    '" width="' +
+                    w +
+                    '" height="' +
+                    h +
+                    '" fill="' +
+                    this.color.rgba +
+                    '" />\n';
+            } else {
+                this.buffer += `<rect x="${x * s}" y="${y * s}" width="${w * s}" height="${h * s}" fill="${this.color.rgba}" />\n`;
+            }
         }
     }
 
@@ -77,12 +92,22 @@ export abstract class SvgCanvas implements ICanvas {
     }
 
     public moveTo(x: number, y: number): void {
-        this._currentPath += ` M${x * this.scale},${y * this.scale}`;
+        const s = this.scale;
+        if (s === 1) {
+            this._currentPath += ' M' + x + ',' + y;
+        } else {
+            this._currentPath += ` M${x * s},${y * s}`;
+        }
     }
 
     public lineTo(x: number, y: number): void {
         this._currentPathIsEmpty = false;
-        this._currentPath += ` L${x * this.scale},${y * this.scale}`;
+        const s = this.scale;
+        if (s === 1) {
+            this._currentPath += ' L' + x + ',' + y;
+        } else {
+            this._currentPath += ` L${x * s},${y * s}`;
+        }
     }
 
     public quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
@@ -92,9 +117,13 @@ export abstract class SvgCanvas implements ICanvas {
 
     public bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void {
         this._currentPathIsEmpty = false;
-        this._currentPath += ` C${cp1X * this.scale},${cp1Y * this.scale},${cp2X * this.scale},${cp2Y * this.scale},${
-            x * this.scale
-        },${y * this.scale}`;
+        const s = this.scale;
+        if (s === 1) {
+            this._currentPath +=
+                ' C' + cp1X + ',' + cp1Y + ',' + cp2X + ',' + cp2Y + ',' + x + ',' + y;
+        } else {
+            this._currentPath += ` C${cp1X * s},${cp1Y * s},${cp2X * s},${cp2Y * s},${x * s},${y * s}`;
+        }
     }
 
     public fillCircle(x: number, y: number, radius: number): void {
@@ -125,9 +154,9 @@ export abstract class SvgCanvas implements ICanvas {
 
     public fill(): void {
         if (!this._currentPathIsEmpty) {
-            this.buffer += `<path d="${this._currentPath}"`;
+            this.buffer += '<path d="' + this._currentPath + '"';
             if (this.color.rgba !== '#000000') {
-                this.buffer += ` fill="${this.color.rgba}"`;
+                this.buffer += ' fill="' + this.color.rgba + '"';
             }
             this.buffer += ' style="stroke: none"/>';
         }
@@ -137,7 +166,7 @@ export abstract class SvgCanvas implements ICanvas {
 
     public stroke(): void {
         if (!this._currentPathIsEmpty) {
-            let s: string = `<path d="${this._currentPath}" stroke="${this.color.rgba}"`;
+            let s: string = '<path d="' + this._currentPath + '" stroke="' + this.color.rgba + '"';
             if (this.lineWidth !== 1 || this.scale !== 1) {
                 s += ` stroke-width="${this.lineWidth * this.scale}"`;
             }
@@ -152,9 +181,22 @@ export abstract class SvgCanvas implements ICanvas {
         if (text === '') {
             return;
         }
-        let s: string = `<text x="${x * this.scale}" y="${
-            y * this.scale
-        }" style='stroke: none; font:${this.font.toCssString(this.settings.display.scale)}; ${this.getSvgBaseLine()}'`;
+        const sc = this.scale;
+        let s: string;
+        if (sc === 1) {
+            s =
+                '<text x="' +
+                x +
+                '" y="' +
+                y +
+                '" style=\'stroke: none; font:' +
+                this.font.toCssString(this.settings.display.scale) +
+                '; ' +
+                this.getSvgBaseLine() +
+                "'";
+        } else {
+            s = `<text x="${x * sc}" y="${y * sc}" style='stroke: none; font:${this.font.toCssString(this.settings.display.scale)}; ${this.getSvgBaseLine()}'`;
+        }
         if (this.color.rgba !== '#000000') {
             s += ` fill="${this.color.rgba}"`;
         }
@@ -165,7 +207,13 @@ export abstract class SvgCanvas implements ICanvas {
         this.buffer += s;
     }
 
+    private static readonly _escapeTextRegex = /[&<>"']/;
+
     private static _escapeText(text: string) {
+        // Short-circuit: most rendered text (bar numbers, fret numbers, etc.) has no escapable chars.
+        if (!SvgCanvas._escapeTextRegex.test(text)) {
+            return text;
+        }
         return text
             .replace(/&/g, '&amp;')
             .replace(/"/g, '&quot;')

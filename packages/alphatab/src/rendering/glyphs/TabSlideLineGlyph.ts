@@ -3,13 +3,27 @@ import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { type BarRendererBase, NoteYPosition, NoteXPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
 import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+
+/**
+ * Staff-absolute coordinates. See {@link ScoreSlideLineGlyph}.
+ *
+ * @record
+ * @internal
+ */
+interface SlideSegment {
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    waves: boolean;
+}
 
 /**
  * @internal
@@ -19,6 +33,14 @@ export class TabSlideLineGlyph extends Glyph implements ITieGlyph {
     private _outType: SlideOutType;
     private _startNote: Note;
     private _parent: BeatContainerGlyph;
+
+    // Per-cycle cache; invalidated in doLayout. Paired *CacheValid flags
+    // rather than nullable-as-sentinel — C# transpile doesn't unwrap
+    // `T | null` with `!` cleanly. See {@link ScoreSlideLineGlyph}.
+    private _slideInCache: SlideSegment | null = null;
+    private _slideInCacheValid: boolean = false;
+    private _slideOutCache: SlideSegment | null = null;
+    private _slideOutCacheValid: boolean = false;
 
     // the slide line cannot overflow anything and there are ties drawn in here
     public readonly checkForOverflow = false;
@@ -32,15 +54,87 @@ export class TabSlideLineGlyph extends Glyph implements ITieGlyph {
     }
 
     public override doLayout(): void {
+        this._slideInCacheValid = false;
+        this._slideInCache = null;
+        this._slideOutCacheValid = false;
+        this._slideOutCache = null;
         this.width = 0;
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        this._paintSlideIn(cx, cy, canvas);
-        this._paintSlideOut(cx, cy, canvas);
+    public override getBoundingBoxLeft(): number {
+        let min = 0;
+        let found = false;
+        const slideIn = this._computeSlideIn();
+        if (slideIn) {
+            min = Math.min(slideIn.startX, slideIn.endX);
+            found = true;
+        }
+        const slideOut = this._computeSlideOut();
+        if (slideOut) {
+            const localMin = Math.min(slideOut.startX, slideOut.endX);
+            if (!found || localMin < min) {
+                min = localMin;
+                found = true;
+            }
+        }
+        return found ? min : this.x;
     }
 
-    private _paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
+    public override getBoundingBoxRight(): number {
+        let max = 0;
+        let found = false;
+        const slideIn = this._computeSlideIn();
+        if (slideIn) {
+            max = Math.max(slideIn.startX, slideIn.endX);
+            found = true;
+        }
+        const slideOut = this._computeSlideOut();
+        if (slideOut) {
+            const localMax = Math.max(slideOut.startX, slideOut.endX);
+            if (!found || localMax > max) {
+                max = localMax;
+                found = true;
+            }
+        }
+        return found ? max : this.x;
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        const slideIn = this._computeSlideIn();
+        if (slideIn) {
+            this._paintSlideLine(
+                canvas,
+                false,
+                cx + slideIn.startX,
+                cx + slideIn.endX,
+                cy + slideIn.startY,
+                cy + slideIn.endY
+            );
+        }
+        const slideOut = this._computeSlideOut();
+        if (slideOut) {
+            this._paintSlideLine(
+                canvas,
+                slideOut.waves,
+                cx + slideOut.startX,
+                cx + slideOut.endX,
+                cy + slideOut.startY,
+                cy + slideOut.endY
+            );
+        }
+    }
+
+    private _computeSlideIn(): SlideSegment | null {
+        if (this._slideInCacheValid) {
+            return this._slideInCache;
+        }
+        const result = this._computeSlideInUncached();
+        this._slideInCache = result;
+        this._slideInCacheValid = true;
+        return result;
+    }
+
+    private _computeSlideInUncached(): SlideSegment | null {
         const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
         const sizeX: number = this.renderer.smuflMetrics.simpleSlideWidth;
         const sizeY: number = this.renderer.smuflMetrics.simpleSlideHeight;
@@ -51,48 +145,36 @@ export class TabSlideLineGlyph extends Glyph implements ITieGlyph {
         const offsetX = this.renderer.smuflMetrics.preNoteEffectPadding;
         switch (this._inType) {
             case SlideInType.IntoFromBelow:
-                endX =
-                    cx +
-                    startNoteRenderer.x +
-                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) -
-                    offsetX;
-                endY =
-                    cy +
-                    startNoteRenderer.y +
-                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) -
-                    sizeY;
+                endX = startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - offsetX;
+                endY = startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) - sizeY;
                 startX = endX - sizeX;
                 startY =
-                    cy +
-                    startNoteRenderer.y +
-                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) +
-                    sizeY;
+                    startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) + sizeY;
                 break;
             case SlideInType.IntoFromAbove:
-                endX =
-                    cx +
-                    startNoteRenderer.x +
-                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) -
-                    offsetX;
-                endY =
-                    cy +
-                    startNoteRenderer.y +
-                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) +
-                    sizeY;
+                endX = startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - offsetX;
+                endY = startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) + sizeY;
                 startX = endX - sizeX;
                 startY =
-                    cy +
-                    startNoteRenderer.y +
-                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) -
-                    sizeY;
+                    startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) - sizeY;
                 break;
             default:
-                return;
+                return null;
         }
-        this._paintSlideLine(canvas, false, startX, endX, startY, endY);
+        return { startX, startY, endX, endY, waves: false };
     }
 
-    private _paintSlideOut(cx: number, cy: number, canvas: ICanvas): void {
+    private _computeSlideOut(): SlideSegment | null {
+        if (this._slideOutCacheValid) {
+            return this._slideOutCache;
+        }
+        const result = this._computeSlideOutUncached();
+        this._slideOutCache = result;
+        this._slideOutCacheValid = true;
+        return result;
+    }
+
+    private _computeSlideOutUncached(): SlideSegment | null {
         const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
         const sizeX: number = this.renderer.smuflMetrics.simpleSlideWidth;
         const sizeY: number = this.renderer.smuflMetrics.simpleSlideHeight;
@@ -108,11 +190,10 @@ export class TabSlideLineGlyph extends Glyph implements ITieGlyph {
             case SlideOutType.Shift:
             case SlideOutType.Legato:
                 startX =
-                    cx +
                     startNoteRenderer.x +
                     startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes) +
                     offsetX;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+                startY = startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 if (this._startNote.slideTarget) {
                     const endNoteRenderer: BarRendererBase | null =
                         this.renderer.scoreRenderer.layout!.getRendererForBar(
@@ -120,16 +201,14 @@ export class TabSlideLineGlyph extends Glyph implements ITieGlyph {
                             this._startNote.slideTarget.beat.voice.bar
                         );
                     if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
-                        endX = cx + startNoteRenderer.x + startNoteRenderer.width;
+                        endX = startNoteRenderer.x + startNoteRenderer.width;
                         endY = startY;
                     } else {
                         endX =
-                            cx +
                             endNoteRenderer.x +
                             endNoteRenderer.getBeatX(this._startNote.slideTarget.beat, BeatXPosition.OnNotes) -
                             offsetX;
                         endY =
-                            cy +
                             endNoteRenderer.y +
                             endNoteRenderer.getNoteY(this._startNote.slideTarget, NoteYPosition.Center);
                     }
@@ -142,61 +221,39 @@ export class TabSlideLineGlyph extends Glyph implements ITieGlyph {
                         endY += sizeY;
                     }
                 } else {
-                    endX = cx + startNoteRenderer.x + this._parent.x;
+                    endX = startNoteRenderer.x + this._parent.x;
                     endY = startY;
                 }
                 break;
             case SlideOutType.OutUp:
                 startX =
-                    cx +
-                    startNoteRenderer.x +
-                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
-                    offsetX;
+                    startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX;
                 startY =
-                    cy +
-                    startNoteRenderer.y +
-                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) +
-                    sizeY;
+                    startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) + sizeY;
                 endX = startX + sizeX;
-                endY =
-                    cy +
-                    startNoteRenderer.y +
-                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) -
-                    sizeY;
+                endY = startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) - sizeY;
                 break;
             case SlideOutType.OutDown:
                 startX =
-                    cx +
-                    startNoteRenderer.x +
-                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
-                    offsetX;
+                    startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX;
                 startY =
-                    cy +
-                    startNoteRenderer.y +
-                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) -
-                    sizeY;
+                    startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) - sizeY;
                 endX = startX + sizeX;
-                endY =
-                    cy +
-                    startNoteRenderer.y +
-                    startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) +
-                    sizeY;
+                endY = startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) + sizeY;
                 break;
             case SlideOutType.PickSlideDown:
                 startX =
-                    cx +
                     startNoteRenderer.x +
                     startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
                     offsetX * 2;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
-                endX = cx + startNoteRenderer.x + startNoteRenderer.width;
+                startY = startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+                endX = startNoteRenderer.x + startNoteRenderer.width;
                 endY = startY + sizeY * 3;
                 if (
                     this._startNote.beat.nextBeat &&
                     this._startNote.beat.nextBeat.voice === this._startNote.beat.voice
                 ) {
                     endX =
-                        cx +
                         startNoteRenderer.x +
                         startNoteRenderer.getBeatX(this._startNote.beat.nextBeat, BeatXPosition.PreNotes);
                 }
@@ -204,28 +261,26 @@ export class TabSlideLineGlyph extends Glyph implements ITieGlyph {
                 break;
             case SlideOutType.PickSlideUp:
                 startX =
-                    cx +
                     startNoteRenderer.x +
                     startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
                     offsetX * 2;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
-                endX = cx + startNoteRenderer.x + startNoteRenderer.width;
+                startY = startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+                endX = startNoteRenderer.x + startNoteRenderer.width;
                 endY = startY - sizeY * 3;
                 if (
                     this._startNote.beat.nextBeat &&
                     this._startNote.beat.nextBeat.voice === this._startNote.beat.voice
                 ) {
                     endX =
-                        cx +
                         startNoteRenderer.x +
                         startNoteRenderer.getBeatX(this._startNote.beat.nextBeat, BeatXPosition.PreNotes);
                 }
                 waves = true;
                 break;
             default:
-                return;
+                return null;
         }
-        this._paintSlideLine(canvas, waves, startX, endX, startY, endY);
+        return { startX, startY, endX, endY, waves };
     }
 
     private _paintSlideLine(

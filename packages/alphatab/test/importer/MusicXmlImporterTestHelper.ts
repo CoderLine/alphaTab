@@ -12,7 +12,6 @@ import { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
 import { Voice } from '@coderline/alphatab/model/Voice';
 import { Settings } from '@coderline/alphatab/Settings';
-import { assert } from 'chai';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
@@ -48,7 +47,7 @@ export class MusicXmlImporterTestHelper {
             score = importer.readScore();
         } catch (e) {
             if (e instanceof UnsupportedFormatError) {
-                assert.fail(`Failed to load file ${file}: ${e}`);
+                throw new Error(`Failed to load file ${file}: ${e}`);
             }
             throw e;
         }
@@ -62,7 +61,7 @@ export class MusicXmlImporterTestHelper {
 
             ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${file}>`, null);
         } catch (e) {
-            assert.fail((e as Error).message + (e as Error).stack);
+            throw new Error((e as Error).message + (e as Error).stack);
         }
 
         if (render) {

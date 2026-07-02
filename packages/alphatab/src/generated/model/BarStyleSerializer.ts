@@ -17,7 +17,7 @@ export class BarStyleSerializer {
         }
         JsonHelper.forEach(m, (v, k) => BarStyleSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: BarStyle | null): Map<string, unknown> | null {
+    public static toJson(obj: BarStyle | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

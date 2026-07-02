@@ -1,3 +1,4 @@
+import { describe, it } from 'vitest';
 import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
 
 describe('MusicXmlImporterTestSuiteTests', () => {

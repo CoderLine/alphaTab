@@ -1,8 +1,8 @@
+import { describe, expect, it } from 'vitest';
 import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '../VisualTestHelper';
 import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
-import { expect } from 'chai';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
@@ -83,8 +83,8 @@ describe('BrokenRendersTests', () => {
                 const xml = new XmlDocument();
                 xml.parse(r.renderResult as string);
 
-                expect(xml.firstElement).to.be.ok;
-                expect(xml.firstElement!.localName).to.equal('svg');
+                expect(xml.firstElement).toBeTruthy();
+                expect(xml.firstElement!.localName).toBe('svg');
             }
         }
     });

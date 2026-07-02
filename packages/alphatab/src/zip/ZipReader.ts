@@ -1,6 +1,6 @@
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
-import type { IReadable } from '@coderline/alphatab/io/IReadable';
+import { OverflowError, type IReadable } from '@coderline/alphatab/io/IReadable';
 import { Inflate } from '@coderline/alphatab/zip/Inflate';
 import { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
 
@@ -9,9 +9,11 @@ import { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
  */
 export class ZipReader {
     private _readable: IReadable;
+    private _maxDecodingBufferSize: number;
 
-    public constructor(readable: IReadable) {
+    public constructor(readable: IReadable, maxDecodingBufferSize: number) {
         this._readable = readable;
+        this._maxDecodingBufferSize = maxDecodingBufferSize;
     }
 
     public read(): ZipEntry[] {
@@ -48,8 +50,16 @@ export class ZipReader {
         IOHelper.readInt32LE(readable); // compressed size
 
         const uncompressedSize: number = IOHelper.readInt32LE(readable);
+        if (uncompressedSize > this._maxDecodingBufferSize) {
+            throw new OverflowError(`Zip contains files exceeding the configured maxDecodingBufferSize`);
+        }
         const fileNameLength: number = IOHelper.readInt16LE(readable);
+        if (fileNameLength > this._maxDecodingBufferSize) {
+            throw new OverflowError(`Zip contains file names exceeding the configured maxDecodingBufferSize`);
+        }
+
         const extraFieldLength: number = IOHelper.readInt16LE(readable);
+
         const fname: string = IOHelper.toString(IOHelper.readByteArray(readable, fileNameLength), 'utf-8');
         readable.skip(extraFieldLength);
 
@@ -62,6 +72,11 @@ export class ZipReader {
             while (true) {
                 const bytes: number = z.readBytes(buffer, 0, buffer.length);
                 target.write(buffer, 0, bytes);
+                if (target.length > this._maxDecodingBufferSize) {
+                    throw new OverflowError(
+                        `Zip entry "${fname}" contains data exceeding the configured maxDecodingBufferSize`
+                    );
+                }
                 if (bytes < buffer.length) {
                     break;
                 }

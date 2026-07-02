@@ -1,3 +1,4 @@
+import { describe, it } from 'vitest';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { Settings } from '@coderline/alphatab/Settings';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
@@ -121,6 +122,83 @@ describe('LayoutTests', () => {
         await VisualTestHelper.runVisualTest('layout/track-names-all-systems-multi.gp', settings, o => {
             o.tracks = [0, 1];
         });
+    });
+
+    it('inline-tuning-first-system', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\track { defaultSystemsLayout 2 }
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+            2.5.4 3.5.4 0.4.4 2.4.4 |
+            3.4.4 0.3.4 2.3.4 3.3.4 |
+            0.2.4 1.2.4 3.2.4 0.1.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-first-system.png',
+            settings
+        );
+    });
+
+    it('inline-tuning-with-bracket', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\bracketExtendMode groupsimilarinstruments
+            \\track "Guitar 1"
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+            \\track "Guitar 2"
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-with-bracket.png',
+            settings,
+            o => {
+                o.tracks = [0, 1];
+            }
+        );
+    });
+
+    it('inline-tuning-seven-string', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\tuning E4 B3 G3 D3 A2 E2 B1
+            \\staff { tabs }
+            0.7.4 2.7.4 3.7.4 0.6.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-seven-string.png',
+            settings
+        );
+    });
+
+    it('inline-tuning-per-track-hidden', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\track "Guitar"
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+            \\track "Bass"
+            \\staff { tabs }
+            \\tuning E2 A1 D2 G2 hide
+            0.4.4 2.4.4 3.4.4 0.3.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-per-track-hidden.png',
+            settings,
+            o => {
+                o.tracks = [0, 1];
+            }
+        );
     });
 
     it('system-layout-tex', async () => {
@@ -321,6 +399,66 @@ describe('LayoutTests', () => {
                 r.1 | C4 |
             `,
             'test-data/visual-tests/layout/single-staff-brackets-hide.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.layoutMode = LayoutMode.Parchment;
+            }
+        );
+    });
+
+    // §G.5 — Mid-system visibility flip: hideEmptyStaves + multi-staff where a
+    // staff is invisible at the start of a system but a later bar in the same
+    // system has content and flips it visible. The v5 §G.5 invariant requires
+    // `_calculateAccoladeSpacing` to recompute when this flip happens so the
+    // brace and per-staff Y positions reflect the post-flip visibility. Closes
+    // B.5 (firstVisibleStaff first-call-only) and B.23 (staff.height locked too
+    // early). System 2 (bars 5-8) flips staff 2 visible at bar 8.
+    it('ghost-staff-visibility', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\defaultSystemsLayout 4
+            \\track "T1"
+            \\staff {score}
+            C4.4 *4 | r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | r.1 |
+                C4.1 |
+            \\staff {score}
+                \\clef C3
+                r.1 | r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | c4.1 |
+                r.1 |
+            `,
+            'test-data/visual-tests/layout/ghost-staff-visibility.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.layoutMode = LayoutMode.Parchment;
+            }
+        );
+    });
+
+    // §G.7 — Accolade reflects post-add visibility: multi-track score where one
+    // track has content only on specific bars. The brace must scale to cover
+    // visible staves on each system; on systems where a track's bars are all
+    // rests, `hideEmptyStaves` makes its staff invisible and the brace shrinks.
+    // The visibility-fingerprint gate triggers the recompute that produces the
+    // correct accolade width per system.
+    it('accolade-on-revert', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\showSingleStaffBrackets
+            \\defaultSystemsLayout 3
+            \\track "T1"
+                C4.4 *4 | C4.4 *4 | C4.4 *4 |
+                C4.4 *4 | C4.4 *4 | C4.4 *4
+            \\track "T2"
+                C4.4 *4 | C4.4 *4 | C4.4 *4 |
+                r.1 | r.1 | r.1
+            `,
+            'test-data/visual-tests/layout/accolade-on-revert.png',
             undefined,
             o => {
                 o.tracks = o.score.tracks.map(t => t.index);

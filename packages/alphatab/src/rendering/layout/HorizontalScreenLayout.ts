@@ -24,6 +24,11 @@ export class HorizontalScreenLayoutPartialInfo {
  */
 export class HorizontalScreenLayout extends ScoreLayout {
     private _system: StaffSystem | null = null;
+    private _systems: StaffSystem[] = [];
+
+    public override get systems(): StaffSystem[] {
+        return this._systems;
+    }
 
     public get name(): string {
         return 'HorizontalScreen';
@@ -45,6 +50,13 @@ export class HorizontalScreenLayout extends ScoreLayout {
         // not supported
     }
 
+    public override doUpdateForBars(_renderHints: RenderHints): boolean {
+        // not supported yet, modifications likely cause anyhow full updates
+        // as we do not optimize effect bands yet. with effect bands being more
+        // isolated in bars we could try updating dynamically
+        return false;
+    }
+
     protected doLayoutAndRender(renderHints: RenderHints | undefined): void {
         const score: Score = this.renderer.score!;
 
@@ -61,6 +73,13 @@ export class HorizontalScreenLayout extends ScoreLayout {
 
         endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
         this._system = this.createEmptyStaffSystem(0);
+        this._systems.splice(0, this._systems.length);
+        this._systems.push(this._system);
+        // Each bar in horizontal layout is sized independently (by bar.displayWidth or the bar's
+        // intrinsic width), so there is no shared staff width to distribute across bars. Keep each
+        // bar's spring constants referenced against its own local minimum-duration so rendering
+        // matches the historical per-bar behaviour.
+        this._system.shareMinDurationAcrossBars = false;
         this._system.isLast = true;
         this._system.x = this.pagePadding![0];
         this._system.y = this.pagePadding![1];
@@ -150,7 +169,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         }
 
         this.height = this.layoutAndRenderBottomScoreInfo(this.height);
-        this.height = this.layoutAndRenderAnnotation(this.height);
+        this.height = this._layoutAndRenderAnnotation(this.height);
 
         this.height += this.pagePadding![3];
 
@@ -163,9 +182,8 @@ export class HorizontalScreenLayout extends ScoreLayout {
         for (const r of result.renderers) {
             const barDisplayWidth =
                 r.staff!.system.staves.length > 1 ? r.bar.masterBar.displayWidth : r.bar.displayWidth;
-            if (barDisplayWidth > 0) {
-                r.scaleToWidth(barDisplayWidth);
-            }
+            // Fall back to natural width so `scaleToWidth` still runs.
+            r.scaleToWidth(barDisplayWidth > 0 ? barDisplayWidth : r.width);
             const w = r.x + r.width;
             if (w > result.width) {
                 result.width = w;
@@ -204,16 +222,12 @@ export class HorizontalScreenLayout extends ScoreLayout {
     private _alignRenderers(): void {
         this.width = 0;
         const system = this._system!;
+        // `_scaleBars` already ran. supportsResize=false ⇒ fresh
+        // StaffSystem per render, so no shared-layout-data reset is needed.
         for (const s of system.allStaves) {
-            s.resetSharedLayoutData();
-
             let w = 0;
             for (const renderer of s.barRenderers) {
                 renderer.x = w;
-                renderer.y = s.topPadding + s.topOverflow;
-                // note: this will ensure aspects like beaming helpers
-                // and overflows are prepared for finalization
-                renderer.scaleToWidth(renderer.width);
                 w += renderer.width;
             }
 

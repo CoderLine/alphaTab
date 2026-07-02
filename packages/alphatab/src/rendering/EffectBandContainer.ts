@@ -3,28 +3,54 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { EffectBandInfo } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
-import { EffectBandSizingInfo } from '@coderline/alphatab/rendering/EffectBandSizingInfo';
-import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 
 /**
- * Wraps the whole effect band staff for having two times the same container
- * holding bands (one for the top effects, one for the bottom effects)
+ * Per-(voice × effect) {@link EffectBand} list for one side of a bar
+ * renderer. Owns band lifecycle, glyph alignment, painting. Placement
+ * is delegated to {@link EffectSystemPlacement}.
  * @internal
  */
 export class EffectBandContainer {
     private _bands: EffectBand[] = [];
-    private _bandLookup: Map<string, EffectBand> = new Map();
-    private _effectBandSizingInfo: EffectBandSizingInfo | null = null;
-    private _effectInfosSortOrder: Map<EffectInfo, number> = new Map<EffectInfo, number>();
+    /** Per-voice (effectId → band) lookup; nested to avoid string-key allocation in `_createOrResizeGlyph`. */
+    private _bandLookup: Map<number, Map<string, EffectBand>> = new Map();
     public height: number = 0;
 
     public infos!: EffectBandInfo[];
     private _renderer: BarRendererBase;
     private _isTopContainer: boolean;
 
+    public get bands(): EffectBand[] {
+        return this._bands;
+    }
+
+    public get isTopContainer(): boolean {
+        return this._isTopContainer;
+    }
+
     public alignGlyphs() {
         for (const effectBand of this._bands) {
+            effectBand.resetHeight();
             effectBand.alignGlyphs();
+        }
+    }
+
+    public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
+        for (const band of this._bands) {
+            band.registerLayoutingInfo(layoutings);
+        }
+    }
+
+    public finalizeChainSpans(): void {
+        for (const band of this._bands) {
+            band.finalizeChainSpans();
+        }
+    }
+
+    public populateSkyline(): void {
+        for (const band of this._bands) {
+            band.populateSkyline();
         }
     }
 
@@ -37,7 +63,12 @@ export class EffectBandContainer {
     }
 
     public get isLinkedToPreviousRenderer() {
-        return this._bands.some(b => b.isLinkedToPrevious);
+        for (let i = 0, n = this._bands.length; i < n; i++) {
+            if (this._bands[i].isLinkedToPrevious) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public constructor(renderer: BarRendererBase, isTopContainer: boolean) {
@@ -45,124 +76,47 @@ export class EffectBandContainer {
         this._isTopContainer = isTopContainer;
     }
 
-    public reLayout() {
-        this.resetEffectBandSizingInfo();
-        this.sizeAndAlignEffectBands();
-    }
-
-    public afterStaffBarReverted() {
-        this.resetEffectBandSizingInfo();
-        this.sizeAndAlignEffectBands();
-    }
-
     public createVoiceGlyphs(voice: Voice) {
-        let i = 0;
         const renderer = this._renderer;
         const notationSettings = renderer.settings.notation;
-        for (const info of this.infos) {
+        for (let i = 0; i < this.infos.length; i++) {
+            const info = this.infos[i];
             if (!notationSettings.isNotationElementVisible(info.effect.notationElement)) {
                 continue;
             }
 
+            // Fallback: declaration index in the staff's infos list.
+            const order = info.order ?? i;
+
             let band: EffectBand | undefined = undefined;
-            this._effectInfosSortOrder.set(info.effect, info.order ?? i);
 
             for (const b of voice.beats) {
                 // lazy create band to avoid creating and managing bands for all events
                 // even if only a few exist
                 if (!band && EffectBand.shouldCreateGlyph(b, info.effect, renderer)) {
-                    band = new EffectBand(voice, info.effect, this);
-                    band.renderer = this._renderer;
+                    band = new EffectBand(voice, info.effect, this, this._renderer, order);
                     band.doLayout();
                     this._bands.push(band);
-                    this._bandLookup.set(`${voice.index}.${info.effect.effectId}`, band);
+                    let perVoice = this._bandLookup.get(voice.index);
+                    if (!perVoice) {
+                        perVoice = new Map<string, EffectBand>();
+                        this._bandLookup.set(voice.index, perVoice);
+                    }
+                    perVoice.set(info.effect.effectId, band);
                 }
 
                 if (band !== undefined) {
                     band.createGlyph(b);
                 }
             }
-            i++;
         }
     }
 
     public doLayout() {
-        this._effectInfosSortOrder.clear();
-
-        this._bands = [];
-        this._bandLookup = new Map<string, EffectBand>();
-        this.resetEffectBandSizingInfo();
-    }
-
-    public resetEffectBandSizingInfo() {
-        if (this._renderer.index > 0) {
-            this._effectBandSizingInfo = this.previousContainer!._effectBandSizingInfo;
-        } else {
-            // try reusing current one to avoid GC pressure
-            if (this._effectBandSizingInfo && this._effectBandSizingInfo.owner === this) {
-                this._effectBandSizingInfo.reset();
-            } else {
-                this._effectBandSizingInfo = new EffectBandSizingInfo(this);
-            }
-        }
-    }
-
-    public finalizeEffects() {
-        return this._updateEffectBandHeights(true);
-    }
-
-    public updateEffectBandHeights(): boolean {
-        return this._updateEffectBandHeights(false);
-    }
-
-    private _updateEffectBandHeights(finalize: boolean): boolean {
-        if (!this._effectBandSizingInfo) {
-            return false;
-        }
-
-        let y: number = 0;
-        // TODO. activate padding
-        // const paddingTop = this._isTopContainer ? 0 : this._renderer.settings.display.effectBandPaddingBottom;
-        // const paddingBottom = this._isTopContainer ? this._renderer.settings.display.effectBandPaddingBottom : 0;
-        const paddingTop = 0;
-        const paddingBottom = this._renderer.settings.display.effectBandPaddingBottom;
-
-        for (const slot of this._effectBandSizingInfo.slots) {
-            slot.shared.y = y;
-            for (const band of slot.bands) {
-                y += paddingTop;
-                band.y = y;
-                if (finalize) {
-                    band.finalizeBand();
-                }
-                band.height = slot.shared.height;
-            }
-            y += slot.shared.height + paddingBottom;
-        }
-        y = Math.ceil(y);
-
-        if (y !== this.height) {
-            this.height = y;
-            return true;
-        }
-        return false;
-    }
-
-    public sizeAndAlignEffectBands(register: boolean = true) {
-        for (const effectBand of this._bands) {
-            effectBand.resetHeight();
-            effectBand.alignGlyphs();
-            if (register && !effectBand.isEmpty) {
-                // find a slot that ended before the start of the band
-                this._effectBandSizingInfo!.register(effectBand);
-            }
-        }
-
-        // if we're registering new slots for the effects, we need to sort the
-        // slots afterwards to keep the registered order. we don't want the "first occured" effect on top but the "first registered"
-        if (register) {
-            this._effectBandSizingInfo!.sortSlots(this._effectInfosSortOrder);
-        }
+        // splice() instead of `.length = 0`: transpile-safe array clear.
+        this._bands.splice(0, this._bands.length);
+        this._bandLookup.clear();
+        this.height = 0;
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas) {
@@ -176,10 +130,10 @@ export class EffectBandContainer {
     }
 
     public getBand(voice: Voice, effectId: string): EffectBand | null {
-        const id: string = `${voice.index}.${effectId}`;
-        if (this._bandLookup.has(id)) {
-            return this._bandLookup.get(id)!;
+        const perVoice = this._bandLookup.get(voice.index);
+        if (!perVoice) {
+            return null;
         }
-        return null;
+        return perVoice.get(effectId) ?? null;
     }
 }

@@ -14,6 +14,20 @@ export class MasterBarsRenderers {
     public masterBar!: MasterBar;
     public additionalMultiBarRestIndexes: number[] | null = null;
 
+    /**
+     * Max fixed overhead (prefix + postfix glyph width) across all staves of this bar.
+     * Used by the layout-mode horizontal scaling pass to carve out the fixed-overhead bucket
+     * before distributing staff width across bars.
+     */
+    public maxFixedOverhead: number = 0;
+
+    /**
+     * Max natural content width (computedWidth - fixedOverhead) across all staves of this bar.
+     * Used as the bar weight when the layout ignores {@link MasterBar.displayScale} (e.g.
+     * Page layout with `SystemsLayoutMode.Automatic`).
+     */
+    public maxContentWidth: number = 0;
+
     public get lastMasterBarIndex(): number {
         if (this.additionalMultiBarRestIndexes) {
             return this.additionalMultiBarRestIndexes[this.additionalMultiBarRestIndexes.length - 1];

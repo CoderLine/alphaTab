@@ -4,11 +4,30 @@ import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererB
 import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 import type { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
- * A classes inheriting from this base can provide the
- * data needed by a EffectBarRenderer to create effect glyphs dynamically.
+ * Lower = placed first = closer to staff. Gould (Behind Bars p.118, 184, 484).
+ * @internal
+ */
+export enum EffectBandPlacementCategory {
+    /** Articulations, fingerings, dynamics, text, ornaments, fermatas. */
+    NoteAttached = 0,
+    /** Vibrato, let-ring, palm-mute, trill, whammy, hairpins, ottava, pedal, rasgueado, barré. */
+    Span = 1,
+    /** Tempo, rehearsal, section markers, free-time, alternate endings, chords. */
+    SystemMarker = 2,
+    /**
+     * Single-baseline rows parallel to the stave (Gould p.300). Bands sharing
+     * {@link EffectInfo.effectId} align at the deepest magnitude across the
+     * row's combined x-range.
+     */
+    HorizontalRow = 3
+}
+
+/**
+ * Provides the data an EffectBarRenderer needs to create effect glyphs.
  * @internal
  */
 export abstract class EffectInfo {
@@ -23,14 +42,6 @@ export abstract class EffectInfo {
      * Gets the notation element that this effect represents. (Used for dynamic showing/hiding)
      */
     public abstract get notationElement(): NotationElement;
-
-    /**
-     * Gets a value indicating whether this effect can share the space
-     * with other effects if required.
-     * (Example: tempo and dynamics don't share their space with other effects, a let-ring and palm-mute will share the space if possible)
-     * @returns true if this effect bar should only be created once for the first track, otherwise false.
-     */
-    public abstract get canShareBand(): boolean;
 
     /**
      * Gets a value indicating whether this effect glyphs
@@ -56,6 +67,15 @@ export abstract class EffectInfo {
     public abstract get sizingMode(): EffectBarGlyphSizing;
 
     /**
+     * Describes how glyphs created by this effect contribute overlay rods
+     * during bar spacing. Defaults to {@link OverlayRodPolicy.None} (no
+     * contribution); override to opt in and declare the alignment policy.
+     */
+    public get overlayRodPolicy(): OverlayRodPolicy {
+        return OverlayRodPolicy.None;
+    }
+
+    /**
      * Creates a new effect glyph for the given beat.
      * @param renderer the renderer which requests for glyph creation
      * @param beat the beat storing the data
@@ -70,6 +90,16 @@ export abstract class EffectInfo {
      * @returns true if the glyph can be expanded, false if a new glyph needs to be created.
      */
     public abstract canExpand(from: Beat, to: Beat): boolean;
+
+    /** Default {@link EffectBandPlacementCategory.NoteAttached} keeps unknown effects close to the staff. */
+    public get placementCategory(): EffectBandPlacementCategory {
+        return EffectBandPlacementCategory.NoteAttached;
+    }
+
+    /** When `true`, the band feeds each beat-glyph's paint extent into the rhythmic-spacing solver. */
+    public get contributesToBeatSpacing(): boolean {
+        return false;
+    }
 
     /**
      * Override this method to finalize an effect band with all glyphs created.

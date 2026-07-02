@@ -83,9 +83,6 @@ export class BeatTickLookup {
      * @param beat The beat to add.
      */
     public highlightBeat(beat: Beat, playbackStart: number): void {
-        if (beat.isEmpty && !beat.voice.isEmpty) {
-            return;
-        }
         if (!this._highlightedBeats.has(beat.id)) {
             this._highlightedBeats.set(beat.id, true);
             this.highlightedBeats.push(new BeatTickLookupItem(beat, playbackStart));

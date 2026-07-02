@@ -14,6 +14,9 @@ import alphaTab.platform.IContainer
 import alphaTab.platform.IMouseEventArgs
 import alphaTab.platform.IUiFacade
 import alphaTab.platform.skia.AlphaSkiaImage
+import alphaTab.platform.worker.AlphaSynthAudioExporterWorkerApi
+import alphaTab.platform.worker.AlphaSynthWebWorkerApi
+import alphaTab.platform.worker.AlphaTabWorkerScoreRenderer
 import alphaTab.rendering.IScoreRenderer
 import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.utils.Bounds
@@ -23,12 +26,19 @@ import alphaTab.synth.IAudioExporterWorker
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
 import androidx.core.view.children
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -39,12 +49,13 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalUnsignedTypes
 @SuppressLint("ClickableViewAccessibility")
 internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
-    private var _handler: Handler
     private var _internalRootContainerBecameVisible: EventEmitter? = EventEmitter()
     private val _outerScroll: SuspendableHorizontalScrollView
     private val _innerScroll: SuspendableScrollView
     private val _renderSurface: AlphaTabRenderSurface
     private val _renderWrapper: RelativeLayout
+
+    private val _uiLooper:Handler;
 
     public constructor(
         outerScroll: SuspendableHorizontalScrollView,
@@ -56,10 +67,10 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         _innerScroll = innerScroll
         _renderSurface = renderSurface
         _renderWrapper = renderWrapper
+        _uiLooper = Handler(Looper.getMainLooper())
 
         rootContainer =
             AndroidRootViewContainer(outerScroll, innerScroll, renderSurface, this::beginInvoke)
-        _handler = Handler(outerScroll.context.mainLooper)
 
         rootContainerBecameVisible = object : IEventEmitter,
             ViewTreeObserver.OnGlobalLayoutListener, View.OnLayoutChangeListener {
@@ -151,7 +162,12 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
     }
 
     override fun createWorkerRenderer(): IScoreRenderer {
-        return AndroidThreadScoreRenderer(api.settings, this::beginInvoke)
+        val worker = JavaThreadAlphaTabRendererWorker(this::postToUIThread)
+        return AlphaTabWorkerScoreRenderer(api, worker)
+    }
+
+    private fun postToUIThread(action: () -> Unit) {
+        _uiLooper.post(action)
     }
 
     private fun openDefaultSoundFont(): InputStream {
@@ -159,15 +175,12 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
     }
 
     override fun createWorkerPlayer(): IAlphaSynth {
-        var player: AndroidThreadAlphaSynthWorkerPlayer? = null
-        player = AndroidThreadAlphaSynthWorkerPlayer(
-            api.settings.core.logLevel,
-            AndroidSynthOutput(_renderWrapper.context) {
-                player!!.addToWorker(it)
-            },
-            this::beginInvoke,
-            api.settings.player.bufferTimeInMilliseconds
+        val player = AlphaSynthWebWorkerApi(
+            AndroidSynthOutput(_renderWrapper.context),
+            api.settings,
+            JavaThreadAlphaSynthWorker(this::postToUIThread)
         )
+
         player.ready.on {
             val soundFont = openDefaultSoundFont()
             val bos = ByteArrayOutputStream()
@@ -180,16 +193,16 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
     }
 
     override fun createWorkerAudioExporter(synth: IAlphaSynth?): IAudioExporterWorker {
-        val needNewWorker = synth == null || synth !is AndroidThreadAlphaSynthWorkerPlayer
+        val needNewWorker = synth == null || synth !is AlphaSynthWebWorkerApi
         var synthToUse = synth
         if (needNewWorker) {
-            synthToUse = this.createWorkerPlayer();
+            synthToUse = this.createWorkerPlayer()
         }
 
-        return AndroidThreadAlphaSynthAudioExporter(
-            synthToUse as AndroidThreadAlphaSynthWorkerPlayer,
+        return AlphaSynthAudioExporterWorkerApi(
+            synthToUse as AlphaSynthWebWorkerApi,
             needNewWorker
-        );
+        )
     }
 
 
@@ -232,7 +245,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
     }
 
     override fun beginAppendRenderResults(renderResults: RenderFinishedEventArgs?) {
-        _handler.post {
+        postToUIThread {
             if (renderResults != null) {
                 _renderSurface.addPlaceholder(renderResults)
             }
@@ -240,7 +253,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
     }
 
     override fun beginUpdateRenderResults(renderResults: RenderFinishedEventArgs) {
-        _handler.post {
+        postToUIThread {
             // convert AlphaSkia image to Android Bitmap
             val renderResult = renderResults.renderResult
             if (renderResult is AlphaSkiaImage) {
@@ -345,10 +358,40 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
     }
 
     override fun beginInvoke(action: () -> Unit) {
-        _handler.post(action)
+        // post to "own" event loop if running inside worker
+        val synthWorker = JavaThreadAlphaSynthWorker.currentThreadWorker
+        if (synthWorker != null) {
+            synthWorker.postToWorker(action)
+            return
+        }
+
+        val renderWorker = JavaThreadAlphaTabRendererWorker.currentThreadWorker
+        if (renderWorker != null) {
+            renderWorker.postToWorker(action)
+            return
+        }
+
+        // not in worker -> run on main
+        postToUIThread(action)
     }
 
     override fun removeHighlights() {
+    }
+
+    // The main throttle scope is not on Main but we then trigger the actual logic via postToUIThread.
+    // this way we do not load the UI thread unnecessarily until we have actual work.
+    private val throttleScope = CoroutineScope(Dispatchers.Default)
+    override fun throttle(action: () -> Unit, delay: Double): () -> Unit {
+        // we schedule delayed jobs
+        var job: Job? = null
+        return {
+            job?.cancel()
+            @Suppress("AssignedValueIsNeverRead")
+            job = throttleScope.launch {
+                delay(delay.toLong())
+                postToUIThread(action)
+            }
+        }
     }
 
     override fun createSelectionElement(): IContainer? {
@@ -403,7 +446,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         overflow: Double,
         isVertical: Boolean
     ) {
-        val view = (canvasElement as AndroidViewContainer).view;
+        val view = (canvasElement as AndroidViewContainer).view
         if (view is AlphaTabRenderSurface) {
             if (isVertical) {
                 view.setPadding(0, 0, 0, overflow.toInt())

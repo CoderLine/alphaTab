@@ -1,7 +1,6 @@
+import { describe, expect, it } from 'vitest';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { expect } from 'chai';
-
 describe('TuningParserTest', () => {
     it('standard', () => {
         const standard: Tuning = Tuning.getDefaultTuningFor(6)!;
@@ -12,7 +11,7 @@ describe('TuningParserTest', () => {
             tuning[i] = ModelUtils.getTuningForText(tuningText[i]);
             tuningText2[i] = Tuning.getTextForTuning(tuning[i], true);
         }
-        expect(tuning.join(',')).to.equal(standard.tunings.join(','));
-        expect(tuningText2.join(',')).to.equal(tuningText.join(','));
+        expect(tuning.join(',')).toBe(standard.tunings.join(','));
+        expect(tuningText2.join(',')).toBe(tuningText.join(','));
     });
 });

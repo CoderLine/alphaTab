@@ -48,6 +48,28 @@ export class TextGlyph extends EffectGlyph {
         }
     }
 
+    public override getBoundingBoxLeft(): number {
+        switch (this.textAlign) {
+            case TextAlign.Center:
+                return this.x - this.width / 2;
+            case TextAlign.Right:
+                return this.x - this.width;
+            default:
+                return this.x;
+        }
+    }
+
+    public override getBoundingBoxRight(): number {
+        switch (this.textAlign) {
+            case TextAlign.Center:
+                return this.x + this.width / 2;
+            case TextAlign.Right:
+                return this.x;
+            default:
+                return this.x + this.width;
+        }
+    }
+
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const color = canvas.color;
         canvas.color = this.colorOverride ?? color;

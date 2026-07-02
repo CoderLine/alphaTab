@@ -78,8 +78,8 @@ class AlphaTabView : RelativeLayout {
     }
 
     override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
         _api.destroy()
+        super.onDetachedFromWindow()
     }
 
     private fun init(context: Context) {

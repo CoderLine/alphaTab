@@ -1,7 +1,7 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SyncPointTests modified-tempo-lookup 1`] = `
-Array [
+exports[`SyncPointTests > modified-tempo-lookup 1`] = `
+[
   "0 => 120",
   "4000 => 240",
   "5000 => 240",
@@ -14,8 +14,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests playback-fast-backing-track 1`] = `
-Array [
+exports[`SyncPointTests > playback-fast-backing-track 1`] = `
+[
   "0,120,240",
   "500,120,240",
   "1000,120,240",
@@ -62,8 +62,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests playback-fast-external-media 1`] = `
-Array [
+exports[`SyncPointTests > playback-fast-external-media 1`] = `
+[
   "0,120,240",
   "500,120,240",
   "1000,120,240",
@@ -110,8 +110,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests playback-normal-backing-track 1`] = `
-Array [
+exports[`SyncPointTests > playback-normal-backing-track 1`] = `
+[
   "0,120,120",
   "500,120,120",
   "1000,120,120",
@@ -200,8 +200,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests playback-normal-external-media 1`] = `
-Array [
+exports[`SyncPointTests > playback-normal-external-media 1`] = `
+[
   "0,120,120",
   "500,120,120",
   "1000,120,120",
@@ -290,8 +290,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests seek-fast-backing-track 1`] = `
-Array [
+exports[`SyncPointTests > seek-fast-backing-track 1`] = `
+[
   "2000,120,240",
   "5000,60,240",
   "13000,80,240",
@@ -302,8 +302,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests seek-fast-backing-track 2`] = `
-Array [
+exports[`SyncPointTests > seek-fast-backing-track 2`] = `
+[
   0,
   0,
   0.5208333333333334,
@@ -315,8 +315,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests seek-fast-external-media 1`] = `
-Array [
+exports[`SyncPointTests > seek-fast-external-media 1`] = `
+[
   "2000,120,240",
   "5000,60,240",
   "13000,80,240",
@@ -327,8 +327,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests seek-fast-external-media 2`] = `
-Array [
+exports[`SyncPointTests > seek-fast-external-media 2`] = `
+[
   0,
   0,
   0.5208333333333334,
@@ -340,8 +340,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests seek-normal-backing-track 1`] = `
-Array [
+exports[`SyncPointTests > seek-normal-backing-track 1`] = `
+[
   "2000,120,120",
   "5000,120,120",
   "13000,60,120",
@@ -352,8 +352,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests seek-normal-backing-track 2`] = `
-Array [
+exports[`SyncPointTests > seek-normal-backing-track 2`] = `
+[
   0,
   0,
   0.5208333333333334,
@@ -364,8 +364,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests seek-normal-external-media 1`] = `
-Array [
+exports[`SyncPointTests > seek-normal-external-media 1`] = `
+[
   "2000,120,120",
   "5000,120,120",
   "13000,60,120",
@@ -376,8 +376,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests seek-normal-external-media 2`] = `
-Array [
+exports[`SyncPointTests > seek-normal-external-media 2`] = `
+[
   0,
   0,
   0.5208333333333334,
@@ -388,8 +388,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests sync-point-generation 1`] = `
-Array [
+exports[`SyncPointTests > sync-point-generation 1`] = `
+[
   "0,0,120,120,0,0",
   "2,0,120,240,4000,4000",
   "3,0,120,240,6000,5000",
@@ -403,8 +403,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests sync-point-generation-new 1`] = `
-Array [
+exports[`SyncPointTests > sync-point-generation-new 1`] = `
+[
   "0,0,120,120,0,0",
   "4,0,60,60,8000,8000",
   "8,0,80,80,24000,24000",
@@ -412,8 +412,8 @@ Array [
 ]
 `;
 
-exports[`SyncPointTests sync-point-update 1`] = `
-Array [
+exports[`SyncPointTests > sync-point-update 1`] = `
+[
   "0,0,120,120,0,0",
   "2,0,120,240,4000,4000",
   "3,0,120,240,6000,5000",

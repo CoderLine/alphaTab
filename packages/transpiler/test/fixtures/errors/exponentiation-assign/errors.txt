@@ -1,0 +1,1 @@
+input.ts:7:9: Exponentiation assignment (**=) is not supported. See SYNTAX.md for the workaround.

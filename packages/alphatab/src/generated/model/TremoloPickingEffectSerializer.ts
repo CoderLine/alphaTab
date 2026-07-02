@@ -16,7 +16,7 @@ export class TremoloPickingEffectSerializer {
         }
         JsonHelper.forEach(m, (v, k) => TremoloPickingEffectSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: TremoloPickingEffect | null): Map<string, unknown> | null {
+    public static toJson(obj: TremoloPickingEffect | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }

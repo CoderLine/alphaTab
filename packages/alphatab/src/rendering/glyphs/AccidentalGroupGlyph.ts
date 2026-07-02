@@ -73,6 +73,8 @@ export class AccidentalGroupGlyph extends GlyphGroup {
             column.x = this.width;
         }
 
+        this.width += this.renderer.smuflMetrics.preBeatGlyphSpacing;
+
         for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
             const g: Glyph = this.glyphs[i];
 

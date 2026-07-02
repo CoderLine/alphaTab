@@ -62,11 +62,18 @@ internal class Object
 
     private static Func<object, object> CompilePropertyAccessor(PropertyInfo propertyInfo)
     {
-        var param = Expression.Parameter(typeof(object));
-        var castParam = Expression.Convert(param, propertyInfo.DeclaringType!);
-        var accessor = Expression.Property(castParam, propertyInfo);
-        var castReturn = Expression.Convert(accessor, typeof(object));
-        return Expression.Lambda<Func<object, object>>(castReturn, param)
-            .Compile();
+        try 
+        {
+            var param = Expression.Parameter(typeof(object));
+            var castParam = Expression.Convert(param, propertyInfo.DeclaringType!);
+            var accessor = Expression.Property(castParam, propertyInfo);
+            var castReturn = Expression.Convert(accessor, typeof(object));
+            return Expression.Lambda<Func<object, object>>(castReturn, param)
+                .Compile();
+        }
+        catch(Exception e)
+        {
+            throw new InvalidOperationException($"Failed to compile simple property accessor for property {propertyInfo.DeclaringType!.FullName}.{propertyInfo.Name}", e);
+        }
     }
 }

@@ -8,7 +8,6 @@
  */
 export class SynthConstants {
     public static readonly DefaultChannelCount: number = 16 + 1;
-    public static readonly MetronomeChannel: number = SynthConstants.DefaultChannelCount - 1;
     public static readonly MetronomeKey: number = 33;
     public static readonly AudioChannels: number = 2;
     public static readonly MinVolume: number = 0;
@@ -35,4 +34,9 @@ export class SynthConstants {
 
     public static readonly MicroBufferCount: number = 32;
     public static readonly MicroBufferSize: number = 64;
+
+    /**
+     * approximately -60 dB, which is inaudible to humans
+     */
+    public static readonly AudibleLevelThreshold: number = 1e-3;
 }

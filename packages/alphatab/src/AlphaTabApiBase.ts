@@ -352,14 +352,16 @@ export class AlphaTabApiBase<TSettings> {
         this.container = uiFacade.rootContainer;
 
         this.activeBeatsChanged = new EventEmitterOfT<ActiveBeatsChangedEventArgs>(() => {
-            if (this._player.state === PlayerState.Playing && this._currentBeat) {
-                return new ActiveBeatsChangedEventArgs(this._currentBeat!.beatLookup.highlightedBeats.map(h => h.beat));
+            const currentBeat = this._currentBeat;
+            if (this._player.state === PlayerState.Playing && currentBeat) {
+                return new ActiveBeatsChangedEventArgs(currentBeat.beatLookup.highlightedBeats.map(h => h.beat));
             }
             return null;
         });
         this.playedBeatChanged = new EventEmitterOfT<Beat>(() => {
-            if (this._player.state === PlayerState.Playing && this._currentBeat) {
-                return this._currentBeat.beat;
+            const currentBeat = this._currentBeat;
+            if (this._player.state === PlayerState.Playing && currentBeat) {
+                return currentBeat.beat;
             }
             return null;
         });
@@ -395,7 +397,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         this.container.resize.on(
-            Environment.throttle(() => {
+            this.uiFacade.throttle(() => {
                 if (this._isDestroyed) {
                     return;
                 }
@@ -2192,8 +2194,9 @@ export class AlphaTabApiBase<TSettings> {
 
             this._isInitialBeatCursorUpdate = true;
         }
-        if (this._currentBeat !== null) {
-            this._cursorUpdateBeat(this._currentBeat!, false, this._previousTick > 10, 1, true);
+        const currentBeat = this._currentBeat;
+        if (currentBeat) {
+            this._cursorUpdateBeat(currentBeat, false, this._previousTick > 10, 1, true);
         }
     }
 
@@ -2351,7 +2354,15 @@ export class AlphaTabApiBase<TSettings> {
         this._previousStateForCursor = this._player.state;
 
         this.uiFacade.beginInvoke(() => {
-            this._internalCursorUpdateBeat(lookupResult, stop, cache!, beatBoundings!, shouldScroll, cursorSpeed);
+            this._internalCursorUpdateBeat(
+                lookupResult,
+                stop,
+                cache!,
+                beatBoundings!,
+                shouldScroll,
+                cursorSpeed,
+                forceUpdate
+            );
         });
     }
 
@@ -2376,7 +2387,8 @@ export class AlphaTabApiBase<TSettings> {
         boundsLookup: BoundsLookup,
         beatBoundings: BeatBounds,
         shouldScroll: boolean,
-        cursorSpeed: number
+        cursorSpeed: number,
+        forceUpdate: boolean
     ) {
         const beat = lookupResult.beat;
         const nextBeat = lookupResult.nextBeat?.beat;
@@ -2418,9 +2430,12 @@ export class AlphaTabApiBase<TSettings> {
         let startBeatX = beatBoundings.onNotesX;
         if (beatCursor) {
             const animationWidth = nextBeatX - beatBoundings.onNotesX;
-            const relativePosition = this._previousTick - this._currentBeat!.start;
-            const ratioPosition =
-                this._currentBeat!.tickDuration > 0 ? relativePosition / this._currentBeat!.tickDuration : 0;
+            const relativePosition = this._previousTick - lookupResult!.start;
+            let ratioPosition = lookupResult.tickDuration > 0 ? relativePosition / lookupResult.tickDuration : 0;
+            // state got out-of-sync
+            if (ratioPosition > 1) {
+                ratioPosition = 1;
+            }
             startBeatX = beatBoundings.onNotesX + animationWidth * ratioPosition;
             duration -= duration * ratioPosition;
 
@@ -2431,10 +2446,12 @@ export class AlphaTabApiBase<TSettings> {
                 // we do not "reset" the cursor if we are smoothly moving from left to right.
                 const jumpCursor =
                     !previousBeatBounds ||
+                    forceUpdate ||
                     this._isInitialBeatCursorUpdate ||
                     barBounds.y !== previousBeatBounds.barBounds.masterBarBounds.visualBounds.y ||
                     startBeatX < previousBeatBounds.onNotesX ||
-                    barBoundings.index > previousBeatBounds.barBounds.masterBarBounds.index + 1;
+                    barBoundings.index > previousBeatBounds.barBounds.masterBarBounds.index + 1 ||
+                    barBounds.h !== previousBeatBounds.barBounds.masterBarBounds.visualBounds.h;
 
                 if (jumpCursor) {
                     cursorHandler.placeBeatCursor(beatCursor, beatBoundings, startBeatX);
@@ -3104,28 +3121,29 @@ export class AlphaTabApiBase<TSettings> {
         if (this._selectionStart && this._tickCache) {
             // get the start and stop ticks (which consider properly repeats)
             const tickCache: MidiTickLookup = this._tickCache;
-            const realMasterBarStart: number = tickCache.getMasterBarStart(
+            const realStartMasterBarStart: number = tickCache.getMasterBarStart(
                 this._selectionStart.beat.voice.bar.masterBar
             );
+            const startBeatPlaybackRange = tickCache.getRelativeBeatPlaybackRange(this._selectionStart.beat);
+            const startBeatPlaybackStart = startBeatPlaybackRange?.startTick ?? this._selectionStart.beat.playbackStart;
             // move to selection start
             this._currentBeat = null; // reset current beat so it is updating the cursor
             if (this._player.state === PlayerState.Paused) {
-                this._cursorUpdateTick(this._tickCache.getBeatStart(this._selectionStart.beat), false, 1);
+                this._cursorUpdateTick(realStartMasterBarStart + startBeatPlaybackStart, false, 1);
             }
-            this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
+            this.tickPosition = realStartMasterBarStart + startBeatPlaybackStart;
             // set playback range
             if (this._selectionEnd && this._selectionStart.beat !== this._selectionEnd.beat) {
-                const realMasterBarEnd: number = tickCache.getMasterBarStart(
+                const realEndMasterBarStart: number = tickCache.getMasterBarStart(
                     this._selectionEnd.beat.voice.bar.masterBar
                 );
-
+                const endBeatPlaybackRange = tickCache.getRelativeBeatPlaybackRange(this._selectionEnd.beat);
+                const endBeatPlaybackEnd =
+                    endBeatPlaybackRange?.endTick ??
+                    this._selectionEnd.beat.playbackStart + this._selectionEnd.beat.playbackDuration;
                 const range = new PlaybackRange();
-                range.startTick = realMasterBarStart + this._selectionStart.beat.playbackStart;
-                range.endTick =
-                    realMasterBarEnd +
-                    this._selectionEnd.beat.playbackStart +
-                    this._selectionEnd.beat.playbackDuration -
-                    50;
+                range.startTick = realStartMasterBarStart + startBeatPlaybackStart;
+                range.endTick = realEndMasterBarStart + endBeatPlaybackEnd - 50;
                 this.playbackRange = range;
             } else {
                 this._selectionStart = undefined;
@@ -3605,6 +3623,9 @@ export class AlphaTabApiBase<TSettings> {
 
         this._currentBeat = null;
         this._cursorUpdateTick(this._previousTick, false, 1, true, true);
+        if (this._selectionStart) {
+            this.highlightPlaybackRange(this._selectionStart.beat, this._selectionEnd!.beat);
+        }
 
         (this.postRenderFinished as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'postRenderFinished', null);
@@ -4024,12 +4045,9 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
-        const currentTick = e.currentTick;
-
-        this._previousTick = currentTick;
         this.uiFacade.beginInvoke(() => {
             const cursorSpeed = e.modifiedTempo / e.originalTempo;
-            this._cursorUpdateTick(currentTick, false, cursorSpeed, false, e.isSeek);
+            this._cursorUpdateTick(e.currentTick, false, cursorSpeed, false, e.isSeek);
         });
 
         this.uiFacade.triggerEvent(this.container, 'playerPositionChanged', e);

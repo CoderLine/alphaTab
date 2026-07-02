@@ -1,12 +1,11 @@
+import { describe, expect, it } from 'vitest';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
-import { expect } from 'chai';
-
 describe('ModelUtilsTests', () => {
     function trimTest(tex: string, expectedBars: number) {
         const score = ScoreLoader.loadAlphaTex(tex);
-        expect(score.masterBars.length).to.equal(expectedBars);
+        expect(score.masterBars.length).toBe(expectedBars);
     }
 
     it('trimEmptyBarsAtEndFullyEmpty', () => {
@@ -41,10 +40,10 @@ describe('ModelUtilsTests', () => {
     describe('parseTuning', () => {
         function test(s:string, toneValue:number, accidental:NoteAccidentalMode, octave:number) {
             const result = ModelUtils.parseTuning(s);
-            expect(result).to.be.ok;
-            expect(result!.tone.noteValue).to.equal(toneValue);
-            expect(result!.tone.accidentalMode).to.equal(accidental);
-            expect(result!.octave).to.equal(octave);
+            expect(result).toBeTruthy();
+            expect(result!.tone.noteValue).toBe(toneValue);
+            expect(result!.tone.accidentalMode).toBe(accidental);
+            expect(result!.octave).toBe(octave);
         }
 
         it('octave-c', () => test('C4', 0, NoteAccidentalMode.Default, 5))

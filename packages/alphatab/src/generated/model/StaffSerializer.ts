@@ -8,6 +8,10 @@ import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { BarSerializer } from "@coderline/alphatab/generated/model/BarSerializer";
 import { ChordSerializer } from "@coderline/alphatab/generated/model/ChordSerializer";
 import { TuningSerializer } from "@coderline/alphatab/generated/model/TuningSerializer";
+import { ScoreStaffConfigSerializer } from "@coderline/alphatab/generated/model/ScoreStaffConfigSerializer";
+import { TabStaffConfigSerializer } from "@coderline/alphatab/generated/model/TabStaffConfigSerializer";
+import { SlashStaffConfigSerializer } from "@coderline/alphatab/generated/model/SlashStaffConfigSerializer";
+import { NumberedStaffConfigSerializer } from "@coderline/alphatab/generated/model/NumberedStaffConfigSerializer";
 import { Bar } from "@coderline/alphatab/model/Bar";
 import { Chord } from "@coderline/alphatab/model/Chord";
 /**
@@ -20,7 +24,7 @@ export class StaffSerializer {
         }
         JsonHelper.forEach(m, (v, k) => StaffSerializer.setProperty(obj, k, v));
     }
-    public static toJson(obj: Staff | null): Map<string, unknown> | null {
+    public static toJson(obj: Staff | null | undefined): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }
@@ -41,6 +45,18 @@ export class StaffSerializer {
         o.set("shownumbered", obj.showNumbered);
         o.set("showtablature", obj.showTablature);
         o.set("showstandardnotation", obj.showStandardNotation);
+        if (obj.scoreConfig) {
+            o.set("scoreconfig", ScoreStaffConfigSerializer.toJson(obj.scoreConfig));
+        }
+        if (obj.tabConfig) {
+            o.set("tabconfig", TabStaffConfigSerializer.toJson(obj.tabConfig));
+        }
+        if (obj.slashConfig) {
+            o.set("slashconfig", SlashStaffConfigSerializer.toJson(obj.slashConfig));
+        }
+        if (obj.numberedConfig) {
+            o.set("numberedconfig", NumberedStaffConfigSerializer.toJson(obj.numberedConfig));
+        }
         o.set("ispercussion", obj.isPercussion);
         o.set("standardnotationlinecount", obj.standardNotationLineCount);
         return o;
@@ -86,6 +102,42 @@ export class StaffSerializer {
                 return true;
             case "showstandardnotation":
                 obj.showStandardNotation = v! as boolean;
+                return true;
+            case "scoreconfig":
+                if (v) {
+                    obj.scoreConfig = {};
+                    ScoreStaffConfigSerializer.fromJson(obj.scoreConfig, v);
+                }
+                else {
+                    obj.scoreConfig = undefined;
+                }
+                return true;
+            case "tabconfig":
+                if (v) {
+                    obj.tabConfig = {};
+                    TabStaffConfigSerializer.fromJson(obj.tabConfig, v);
+                }
+                else {
+                    obj.tabConfig = undefined;
+                }
+                return true;
+            case "slashconfig":
+                if (v) {
+                    obj.slashConfig = {};
+                    SlashStaffConfigSerializer.fromJson(obj.slashConfig, v);
+                }
+                else {
+                    obj.slashConfig = undefined;
+                }
+                return true;
+            case "numberedconfig":
+                if (v) {
+                    obj.numberedConfig = {};
+                    NumberedStaffConfigSerializer.fromJson(obj.numberedConfig, v);
+                }
+                else {
+                    obj.numberedConfig = undefined;
+                }
                 return true;
             case "ispercussion":
                 obj.isPercussion = v! as boolean;

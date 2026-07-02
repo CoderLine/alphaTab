@@ -20,10 +20,6 @@ export class NoteOrnamentEffectInfo extends EffectInfo {
         return false;
     }
 
-    public get canShareBand(): boolean {
-        return true;
-    }
-
     public get sizingMode(): EffectBarGlyphSizing {
         return EffectBarGlyphSizing.SingleOnBeat;
     }
@@ -38,5 +34,9 @@ export class NoteOrnamentEffectInfo extends EffectInfo {
 
     public canExpand(_from: Beat, _to: Beat): boolean {
         return false;
+    }
+
+    public override get contributesToBeatSpacing(): boolean {
+        return true;
     }
 }
