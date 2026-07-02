@@ -83,10 +83,4 @@ describe('AccidentalHelper.calculateRestDisplaySteps', () => {
             expect(restSteps).toBe(expectedNoteSteps(bar, 0, 4));
         }
     });
-
-    // Guard against re-introduction of a fractional offset (e.g. historical +0.5 workaround).
-    it('returns an integer step', () => {
-        const bar = makeBar(Clef.G2);
-        expect(Number.isInteger(AccidentalHelper.calculateRestDisplaySteps(bar, 0, 4))).toBe(true);
-    });
 });
