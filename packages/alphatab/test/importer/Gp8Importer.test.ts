@@ -10,7 +10,8 @@ import {
     BracketExtendMode,
     TrackNameMode,
     TrackNameOrientation,
-    TrackNamePolicy
+    TrackNamePolicy,
+    TuningDisplayMode
 } from '@coderline/alphatab/model/RenderStylesheet';
 import { ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
@@ -516,4 +517,12 @@ describe('Gp8ImporterTest', () => {
         expect(score.masterBars.length).toBe(100);
         expect(score.tracks.length).toBe(3);
     });
+
+    it('tuning-before-staff', async () =>{
+        const reader = await prepareImporterWithFile('guitarpro8/tuning-before-staff.gp');
+        const score = reader.readScore();
+
+        expect(score.stylesheet.tuningDisplayMode).toBe(TuningDisplayMode.Staff);
+        
+    })
 });
