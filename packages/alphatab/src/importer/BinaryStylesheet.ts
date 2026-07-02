@@ -10,7 +10,8 @@ import {
     type BracketExtendMode,
     TrackNameMode,
     TrackNameOrientation,
-    TrackNamePolicy
+    TrackNamePolicy,
+    TuningDisplayMode
 } from '@coderline/alphatab/model/RenderStylesheet';
 import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
 import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
@@ -87,7 +88,12 @@ export class BinaryStylesheet {
         const readable: ByteBuffer = ByteBuffer.fromBuffer(data);
         const entryCount: number = IOHelper.readInt32BE(readable);
         for (let i: number = 0; i < entryCount; i++) {
-            const key: string = GpBinaryHelpers.gpReadString(readable, readable.readByte(), 'utf-8', maxDecodingBufferSize);
+            const key: string = GpBinaryHelpers.gpReadString(
+                readable,
+                readable.readByte(),
+                'utf-8',
+                maxDecodingBufferSize
+            );
             const type: DataType = readable.readByte() as DataType;
             this._types.set(key, type);
             switch (type) {
@@ -104,7 +110,12 @@ export class BinaryStylesheet {
                     this.addValue(key, fvalue);
                     break;
                 case DataType.String:
-                    const s: string = GpBinaryHelpers.gpReadString(readable, IOHelper.readInt16BE(readable), 'utf-8', maxDecodingBufferSize);
+                    const s: string = GpBinaryHelpers.gpReadString(
+                        readable,
+                        IOHelper.readInt16BE(readable),
+                        'utf-8',
+                        maxDecodingBufferSize
+                    );
                     this.addValue(key, s);
                     break;
                 case DataType.Point:
@@ -362,6 +373,16 @@ export class BinaryStylesheet {
                             break;
                     }
                     break;
+                case 'Global/TuningDisplayMode':
+                    switch (value as number) {
+                        case 0:
+                            score.stylesheet.tuningDisplayMode = TuningDisplayMode.Staff;
+                            break;
+                        case 2:
+                            score.stylesheet.tuningDisplayMode = TuningDisplayMode.Score;
+                            break;
+                    }
+                    break;
             }
         }
     }
@@ -596,6 +617,15 @@ export class BinaryStylesheet {
                 break;
         }
 
+        switch (score.stylesheet.tuningDisplayMode) {
+            case TuningDisplayMode.Score:
+                binaryStylesheet.addValue('Global/TuningDisplayMode', 2, DataType.Integer);
+                break;
+            case TuningDisplayMode.Staff:
+                binaryStylesheet.addValue('Global/TuningDisplayMode', 0, DataType.Integer);
+                break;
+        }
+        
         const writer = ByteBuffer.withCapacity(128);
         binaryStylesheet.writeTo(writer);
         return writer.toArray();
