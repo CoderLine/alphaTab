@@ -606,8 +606,6 @@ export class GpifParser {
 
         const track: Track = new Track();
         track.ensureStaveCount(1);
-        const staff: Staff = track.staves[0];
-        staff.showStandardNotation = true;
         const trackId: string = node.getAttribute('id');
 
         for (const c of node.childElements()) {
@@ -979,8 +977,6 @@ export class GpifParser {
                     }
                 }
 
-                staff.showTablature = true;
-
                 break;
             case 'DiagramCollection':
             case 'ChordCollection':
@@ -1159,8 +1155,6 @@ export class GpifParser {
                 }
                 for (const staff of track.staves) {
                     staff.stringTuning.tunings = tuning;
-                    staff.showStandardNotation = true;
-                    staff.showTablature = true;
                 }
                 break;
             case 'DiagramCollection':
@@ -2777,11 +2771,10 @@ export class GpifParser {
                                                 for (const noteId of this._notesOfBeat.get(beatId)!) {
                                                     if (noteId !== GpifParser._invalidId) {
                                                         const note = NoteCloner.clone(this._noteById.get(noteId)!);
-                                                        if (!staff.isPercussion) {
+                                                        if (staff.isPercussion) {
+                                                            note.fret = -1;
+                                                        } else {
                                                             note.percussionArticulation = -1;
-                                                        } else if (note.string > 5) {
-                                                            // Drum notation uses 5 lines; string 6+ won't render
-                                                            note.string = 5;
                                                         }
                                                         beat.addNote(note);
                                                         if (this._tappedNotes.has(noteId)) {
