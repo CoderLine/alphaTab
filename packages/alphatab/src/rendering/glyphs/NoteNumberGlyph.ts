@@ -3,6 +3,7 @@ import type { Font } from '@coderline/alphatab/model/Font';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
@@ -43,10 +44,21 @@ export class NoteNumberGlyph extends Glyph {
 
     public override doLayout(): void {
         const n: Note = this._note;
-        let fret: number = n.fret - n.beat.voice.bar.staff.transpositionPitch;
-        if (n.harmonicType === HarmonicType.Natural && n.harmonicValue !== 0) {
-            fret = n.harmonicValue - n.beat.voice.bar.staff.transpositionPitch;
+        let fret: number;
+        if (n.isPercussion) {
+            const articulation = PercussionMapper.getArticulation(n);
+            if (articulation) {
+                fret = articulation.id;
+            } else {
+                fret = n.percussionArticulation;
+            }
+        } else {
+            fret = n.fret - n.beat.voice.bar.staff.transpositionPitch;
+            if (n.harmonicType === HarmonicType.Natural && n.harmonicValue !== 0) {
+                fret = n.harmonicValue - n.beat.voice.bar.staff.transpositionPitch;
+            }
         }
+
         if (!n.isTieDestination) {
             this._noteString = n.isDead ? 'x' : fret.toString();
             if (n.isGhost) {
