@@ -1,5 +1,6 @@
 ﻿import { AlphaTex1MetaDataReader } from '@coderline/alphatab/importer/alphaTex/AlphaTex1MetaDataReader';
 import {
+    type AlphaTexArgumentList,
     type AlphaTexAsteriskTokenNode,
     type AlphaTexAstNode,
     type AlphaTexBarNode,
@@ -23,7 +24,7 @@ import {
     type AlphaTexPropertyNode,
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
-    type AlphaTexArgumentList
+    type IAlphaTexStringSeparatorNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
 import {
@@ -427,13 +428,13 @@ export class AlphaTexParser {
             start: noteValue.start
         };
         try {
-            let canHaveString = false;
+            let canHaveStringDot = false;
             switch (noteValue.nodeType) {
                 case AlphaTexNodeType.Number:
                     note.noteValue = noteValue as AlphaTexNumberLiteral;
                     this.lexer.advance();
 
-                    canHaveString = true;
+                    canHaveStringDot = true;
 
                     break;
                 case AlphaTexNodeType.String:
@@ -442,7 +443,7 @@ export class AlphaTexParser {
                     switch ((note.noteValue as AlphaTexStringLiteral).text) {
                         case 'x':
                         case '-':
-                            canHaveString = true;
+                            canHaveStringDot = true;
                             break;
                     }
                     break;
@@ -452,7 +453,7 @@ export class AlphaTexParser {
                     switch ((note.noteValue as AlphaTexIdentifier).text) {
                         case 'x':
                         case '-':
-                            canHaveString = true;
+                            canHaveStringDot = true;
                             break;
                     }
                     break;
@@ -465,35 +466,36 @@ export class AlphaTexParser {
                     return undefined;
             }
 
-            if (canHaveString) {
-                const dot = this.lexer.peekToken();
-                if (dot?.nodeType === AlphaTexNodeType.Dot) {
-                    const noteStringDot = dot as AlphaTexDotTokenNode;
+            const separator = this.lexer.peekToken();
+            if (
+                (canHaveStringDot && separator?.nodeType === AlphaTexNodeType.Dot) ||
+                separator?.nodeType === AlphaTexNodeType.At
+            ) {
+                const noteStringSeparator = separator as IAlphaTexStringSeparatorNode;
+                this.lexer.advance();
+
+                const noteString = this.lexer.peekToken();
+                if (!noteString) {
+                    this.unexpectedToken(noteString, [AlphaTexNodeType.Number], true);
+                    return undefined;
+                }
+
+                if (noteString.nodeType === AlphaTexNodeType.Tag) {
+                    // backwards compatibility with older alphaTex: there was a dot separator
+                    // between the song content and sync points at the end
+
+                    // handle switch to sync points like: 3 4 5 . \sync 1 1 1
+                    // in this example the numbers are percussion articulations
+
+                    // (we can drop the separation dot as it is not part of the AST)
+                    return note;
+                } else if (noteString.nodeType === AlphaTexNodeType.Number) {
+                    note.noteStringSeparator = noteStringSeparator;
+                    note.noteString = noteString as AlphaTexNumberLiteral;
                     this.lexer.advance();
-
-                    const noteString = this.lexer.peekToken();
-                    if (!noteString) {
-                        this.unexpectedToken(noteString, [AlphaTexNodeType.Number], true);
-                        return undefined;
-                    }
-
-                    if (noteString.nodeType === AlphaTexNodeType.Tag) {
-                        // backwards compatibility with older alphaTex: there was a dot separator
-                        // between the song content and sync points at the end
-
-                        // handle switch to sync points like: 3 4 5 . \sync 1 1 1
-                        // in this example the numbers are percussion articulations
-
-                        // (we can drop the separation dot as it is not part of the AST)
-                        return note;
-                    } else if (noteString.nodeType === AlphaTexNodeType.Number) {
-                        note.noteStringDot = noteStringDot;
-                        note.noteString = noteString as AlphaTexNumberLiteral;
-                        this.lexer.advance();
-                    } else {
-                        this.unexpectedToken(noteString, [AlphaTexNodeType.Number], true);
-                        return undefined;
-                    }
+                } else {
+                    this.unexpectedToken(noteString, [AlphaTexNodeType.Number], true);
+                    return undefined;
                 }
             }
 

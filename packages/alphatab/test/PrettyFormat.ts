@@ -633,8 +633,8 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 if (note.noteValue) {
                     children.push(['noteValue', note.noteValue]);
                 }
-                if (note.noteStringDot) {
-                    children.push(['noteStringDot', note.noteStringDot]);
+                if (note.noteStringSeparator) {
+                    children.push(['noteStringSeparator', note.noteStringSeparator]);
                 }
                 if (note.noteString) {
                     children.push(['noteString', note.noteString]);

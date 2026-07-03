@@ -181,7 +181,7 @@ class AlphaTexPrinter {
         this._writeComments(n.leadingComments);
 
         this._writeValue(n.noteValue);
-        this._writeToken(n.noteStringDot, false);
+        this._writeToken(n.noteStringSeparator, false);
         this._writeValue(n.noteString);
 
         if (n.noteEffects) {
@@ -668,7 +668,7 @@ export class AlphaTexExporter extends ScoreExporter {
                 nodeType: AlphaTexNodeType.Number,
                 value: data.fret
             } as AlphaTexNumberLiteral;
-            note.noteStringDot = {
+            note.noteStringSeparator = {
                 nodeType: AlphaTexNodeType.Dot
             };
             const stringNumber = data.beat.voice.bar.staff.tuning.length - data.string + 1;

@@ -570,7 +570,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 isTie = str === '-';
                 if (isTie || isDead) {
                     numericValue = 0;
-                    if (node.noteStringDot && node.noteString) {
+                    if (node.noteStringSeparator && node.noteString) {
                         detectedNoteKind = AlphaTexStaffNoteKind.Fretted;
                     } else {
                         detectedNoteKind = undefined; // don't know on those notes
@@ -674,8 +674,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                             code: AlphaTexDiagnosticCode.AT208,
                             message: `Note string is out of range. Available range: 1-${this._state.currentStaff!.tuning.length}`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: noteValue.end,
-                            end: noteValue.end
+                            start: node.noteString.start,
+                            end: node.noteString.end
                         });
                         return;
                     }
@@ -716,6 +716,34 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         this._state.articulationUniqueIdToIndex.set(articulationValue, articulationIndex);
                     }
                     note.percussionArticulation = articulationIndex;
+
+                    if (node.noteString) {
+                        const noteString: number = node.noteString!.value;
+                        if (noteString < 1 || noteString > this._state.currentStaff!.tuning.length) {
+                            this.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT208,
+                                message: `Note string is out of range. Available range: 1-${this._state.currentStaff!.tuning.length}`,
+                                severity: AlphaTexDiagnosticsSeverity.Error,
+                                start: node.noteString.start,
+                                end: node.noteString.end
+                            });
+                            return;
+                        }
+                        note.string = this._state.currentStaff!.tuning.length - (noteString - 1);
+                    } else {
+                        // find free string
+                        for(let i = 0; i < this._state.currentStaff!.tuning.length; i++) {
+                            const s = this._state.currentStaff!.tuning.length - i;
+                            if(!beat.noteStringLookup.has(s)) {
+                                note.string = s;
+                                break;
+                            }
+                        }
+                        if(note.string === -1) {
+                            note.string = this._state.currentStaff!.tuning.length; 
+                        }
+                    }
+
                     break;
             }
         }
@@ -742,7 +770,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         switch (staffNoteKind) {
             case AlphaTexStaffNoteKind.Pitched:
                 staff.isPercussion = false;
-                staff.stringTuning.reset();
+                staff.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
                 if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
                     staff.displayTranspositionPitch = 0;
                 }
@@ -1097,7 +1125,6 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
     public applyPercussionStaff(staff: Staff) {
         staff.isPercussion = true;
-        staff.showTablature = false;
         staff.track.playbackInfo.program = 0;
     }
 

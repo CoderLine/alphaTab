@@ -1181,6 +1181,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 const instrumentName = (args!.arguments[0] as AlphaTexTextNode).text.toLowerCase();
                 if (instrumentName === 'percussion') {
                     for (const staff of track.staves) {
+                        // hide tablature by default unless explicitly requested in staff
+                        staff.showTablature = false;
                         importer.applyStaffNoteKind(staff, AlphaTexStaffNoteKind.Articulation);
                     }
                     track.playbackInfo.primaryChannel = SynthConstants.PercussionChannel;

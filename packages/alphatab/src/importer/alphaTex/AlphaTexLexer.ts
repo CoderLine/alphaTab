@@ -2,6 +2,7 @@
     type AlphaTexAsteriskTokenNode,
     type AlphaTexAstNode,
     type AlphaTexAstNodeLocation,
+    AlphaTexAtTokenNode,
     type AlphaTexBackSlashTokenNode,
     type AlphaTexBraceCloseTokenNode,
     type AlphaTexBraceOpenTokenNode,
@@ -225,6 +226,7 @@ export class AlphaTexLexer {
         [0x7d /* } */, l => l._token({ nodeType: AlphaTexNodeType.RBrace } as AlphaTexBraceCloseTokenNode)],
         [0x7c /* | */, l => l._token({ nodeType: AlphaTexNodeType.Pipe } as AlphaTexPipeTokenNode)],
         [0x2a /* * */, l => l._token({ nodeType: AlphaTexNodeType.Asterisk } as AlphaTexAsteriskTokenNode)],
+        [0x40 /* @ */, l => l._token({ nodeType: AlphaTexNodeType.At } as AlphaTexAtTokenNode)],
         [0x5c /* \ */, l => l._metaCommand()],
 
         [0x09 /* \t */, l => l._whitespace()],
