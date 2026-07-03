@@ -1023,11 +1023,11 @@ describe('Gp7ImporterTest', () => {
 
         const staff = score.tracks[0].staves[0];
         expect(staff.isPercussion).toBe(true);
-        expect(staff.tuning.length).to.equal(6);
-        expect(staff.tuning.every((t: number) => t === 0)).toBe(true);
+        expect(staff.tuning.length).toBe(6);
+        expect(staff.tuning.some((t: number) => t !== 0)).toBe(false);
 
         const beats = staff.bars[0].voices[0].beats;
-        expect(beats.length).to.equal(16);
+        expect(beats.length).toBe(16);
 
         const articulationIds = [29, 30, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
         const articulationStrings = [1, 1, 1, 1, 1, 1, 1, 4, 4, 1, 1, 2, 5, 2, 5, 2];
@@ -1035,8 +1035,8 @@ describe('Gp7ImporterTest', () => {
         for (const beat of beats) {
             for (const note of beat.notes) {
                 expect(note.isPercussion).toBe(true);
-                expect(note.isStringed).to.be.false;
-                expect(note.string).to.be.greaterThanOrEqual(1);
+                expect(note.isStringed).toBe(false);
+                expect(note.string).toBeGreaterThanOrEqual(1);
                 expect(note.string).toBe(articulationStrings[noteIndex]);
                 expect(PercussionMapper.getArticulation(note)!.id).toBe(articulationIds[noteIndex]);
                 noteIndex++;
@@ -1051,18 +1051,18 @@ describe('Gp7ImporterTest', () => {
         const staff = score.tracks[0].staves[0];
         expect(staff.isPercussion).toBe(true);
         expect(staff.showTablature).toBe(true);
-        expect(staff.tuning.length).to.equal(6);
+        expect(staff.tuning.length).toBe(6);
 
         const beats = staff.bars[0].voices[0].beats;
-        expect(beats.length).to.equal(4);
+        expect(beats.length).toBe(4);
 
-        expect(beats[0].notes[0].string).to.equal(5);
+        expect(beats[0].notes[0].string).toBe(5);
         expect(PercussionMapper.getArticulation(beats[0].notes[0])!.id).toBe(36);
-        expect(beats[1].notes[0].string).to.equal(4);
+        expect(beats[1].notes[0].string).toBe(4);
         expect(PercussionMapper.getArticulation(beats[1].notes[0])!.id).toBe(36);
-        expect(beats[2].notes[0].string).to.equal(3);
+        expect(beats[2].notes[0].string).toBe(3);
         expect(PercussionMapper.getArticulation(beats[2].notes[0])!.id).toBe(36);
-        expect(beats[3].notes[0].string).to.equal(2);
+        expect(beats[3].notes[0].string).toBe(2);
         expect(PercussionMapper.getArticulation(beats[3].notes[0])!.id).toBe(36);
     });
 });

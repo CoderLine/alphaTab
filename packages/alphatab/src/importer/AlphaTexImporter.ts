@@ -668,8 +668,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         return;
                     }
 
-                    const noteString: number = node.noteString!.value;
-                    if (noteString < 1 || noteString > this._state.currentStaff!.tuning.length) {
+                    const frettedNoteString: number = node.noteString!.value;
+                    if (frettedNoteString < 1 || frettedNoteString > this._state.currentStaff!.tuning.length) {
                         this.addSemanticDiagnostic({
                             code: AlphaTexDiagnosticCode.AT208,
                             message: `Note string is out of range. Available range: 1-${this._state.currentStaff!.tuning.length}`,
@@ -680,7 +680,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         return;
                     }
 
-                    note.string = this._state.currentStaff!.tuning.length - (noteString - 1);
+                    note.string = this._state.currentStaff!.tuning.length - (frettedNoteString - 1);
                     if (!isTie) {
                         note.fret = numericValue;
                     }
@@ -718,8 +718,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                     note.percussionArticulation = articulationIndex;
 
                     if (node.noteString) {
-                        const noteString: number = node.noteString!.value;
-                        if (noteString < 1 || noteString > this._state.currentStaff!.tuning.length) {
+                        const percussionNoteString: number = node.noteString!.value;
+                        if (percussionNoteString < 1 || percussionNoteString > this._state.currentStaff!.tuning.length) {
                             this.addSemanticDiagnostic({
                                 code: AlphaTexDiagnosticCode.AT208,
                                 message: `Note string is out of range. Available range: 1-${this._state.currentStaff!.tuning.length}`,
@@ -729,7 +729,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                             });
                             return;
                         }
-                        note.string = this._state.currentStaff!.tuning.length - (noteString - 1);
+                        note.string = this._state.currentStaff!.tuning.length - (percussionNoteString - 1);
                     } else {
                         // find free string
                         for (let i = 0; i < this._state.currentStaff!.tuning.length; i++) {

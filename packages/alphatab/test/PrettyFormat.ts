@@ -873,7 +873,7 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
                             isEqual = (v as string) === (dv as string);
                             break;
                         case 'number':
-                            isEqual = (v as number) === (dv as number) || (Number.isNaN(v) && Number.isNaN(dv));
+                            isEqual = (v as number) === (dv as number) || (Number.isNaN(v as number) && Number.isNaN(dv as number));
                             break;
                         case 'bigint':
                             isEqual = (v as bigint) === (dv as bigint);

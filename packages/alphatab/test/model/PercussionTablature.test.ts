@@ -23,7 +23,7 @@ describe('PercussionTablature', () => {
             note.percussionArticulation = 38;
 
             expect(note.isPercussion).toBe(true);
-            expect(note.isStringed).to.be.false;
+            expect(note.isStringed).toBe(false);
         });
 
         it('returns false when percussionArticulation is not set', () => {
@@ -31,7 +31,7 @@ describe('PercussionTablature', () => {
             note.string = 1;
             note.fret = 5;
 
-            expect(note.isPercussion).to.be.false;
+            expect(note.isPercussion).toBe(false);
             expect(note.isStringed).toBe(true);
         });
     });
@@ -109,14 +109,14 @@ describe('PercussionTablature', () => {
             const factory = new TabBarRendererFactory([]);
             const [track, staff] = createStaff(true, false, [0, 0, 0, 0, 0, 0]);
 
-            expect(factory.canCreate(track, staff)).to.be.false;
+            expect(factory.canCreate(track, staff)).toBe(false);
         });
 
         it('rejects percussion staff without tuning', () => {
             const factory = new TabBarRendererFactory([]);
             const [track, staff] = createStaff(true, true, []);
 
-            expect(factory.canCreate(track, staff)).to.be.false;
+            expect(factory.canCreate(track, staff)).toBe(false);
         });
 
         it('allows creation for regular guitar staff', () => {
