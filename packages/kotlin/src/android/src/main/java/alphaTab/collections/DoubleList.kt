@@ -187,4 +187,13 @@ public class DoubleList : IDoubleIterable {
         for (element in _items) accumulator = operation(accumulator, element)
         return accumulator
     }
+
+    public fun some(predicate: (Double) -> Boolean): Boolean {
+        for (el in this) {
+            if(predicate(el)) {
+                return true
+            }
+        }
+        return false
+    }
 }
