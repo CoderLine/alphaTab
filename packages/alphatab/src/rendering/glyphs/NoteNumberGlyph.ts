@@ -45,17 +45,17 @@ export class NoteNumberGlyph extends Glyph {
     public override doLayout(): void {
         const n: Note = this._note;
         let fret: number;
-        if (n.isPercussion) {
+        if (n.isStringed) {
+            fret = n.fret - n.beat.voice.bar.staff.transpositionPitch;
+            if (n.harmonicType === HarmonicType.Natural && n.harmonicValue !== 0) {
+                fret = n.harmonicValue - n.beat.voice.bar.staff.transpositionPitch;
+            }
+        } else {
             const articulation = PercussionMapper.getArticulation(n);
             if (articulation) {
                 fret = articulation.id;
             } else {
                 fret = n.percussionArticulation;
-            }
-        } else {
-            fret = n.fret - n.beat.voice.bar.staff.transpositionPitch;
-            if (n.harmonicType === HarmonicType.Natural && n.harmonicValue !== 0) {
-                fret = n.harmonicValue - n.beat.voice.bar.staff.transpositionPitch;
             }
         }
 

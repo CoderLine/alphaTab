@@ -2429,7 +2429,7 @@ export class GpifParser {
                         case 'Octave':
                             note.octave = GpifParser._parseIntSafe(c.findChildElement('Number')?.innerText, 0);
                             // when exporting GP6 from GP7 the tone might be missing
-                            if (note.tone === -1) {
+                            if (Number.isNaN(note.tone)) {
                                 note.tone = 0;
                             }
                             break;
@@ -2772,9 +2772,9 @@ export class GpifParser {
                                                     if (noteId !== GpifParser._invalidId) {
                                                         const note = NoteCloner.clone(this._noteById.get(noteId)!);
                                                         if (staff.isPercussion) {
-                                                            note.fret = -1;
+                                                            note.fret = Number.NaN;
                                                         } else {
-                                                            note.percussionArticulation = -1;
+                                                            note.percussionArticulation = Number.NaN;
                                                         }
                                                         beat.addNote(note);
                                                         if (this._tappedNotes.has(noteId)) {

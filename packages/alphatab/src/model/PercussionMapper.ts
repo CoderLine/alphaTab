@@ -1180,7 +1180,7 @@ export class PercussionMapper {
 
         return articulationsByOutputNumber.has(articulation.outputMidiNumber)
             ? articulationsByOutputNumber.get(articulation.outputMidiNumber)!.id
-            : -1;
+            : Number.NaN;
     }
 
     private static _instrumentArticulationsByUniqueId: Map<string, InstrumentArticulation> | undefined;

@@ -542,10 +542,10 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         // Note value
         let isDead: boolean = false;
         let isTie: boolean = false;
-        let numericValue: number = -1;
+        let numericValue: number = Number.NaN;
         let articulationValue: string = '';
-        let octave: number = -1;
-        let tone: number = -1;
+        let octave: number = Number.NaN;
+        let tone: number = Number.NaN;
         let accidentalMode = NoteAccidentalMode.Default;
         const noteValue = node.noteValue as AlphaTexAstNode;
         let detectedNoteKind: AlphaTexStaffNoteKind | undefined = undefined;
@@ -732,15 +732,15 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         note.string = this._state.currentStaff!.tuning.length - (noteString - 1);
                     } else {
                         // find free string
-                        for(let i = 0; i < this._state.currentStaff!.tuning.length; i++) {
+                        for (let i = 0; i < this._state.currentStaff!.tuning.length; i++) {
                             const s = this._state.currentStaff!.tuning.length - i;
-                            if(!beat.noteStringLookup.has(s)) {
+                            if (!beat.noteStringLookup.has(s)) {
                                 note.string = s;
                                 break;
                             }
                         }
-                        if(note.string === -1) {
-                            note.string = this._state.currentStaff!.tuning.length; 
+                        if (Number.isNaN(note.string)) {
+                            note.string = this._state.currentStaff!.tuning.length;
                         }
                     }
 

@@ -306,7 +306,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         const lineCount = this.renderer.bar.staff.standardNotationLineCount;
 
         let steps: number;
-        if (beat.restDisplayTone !== -1 && beat.restDisplayOctave !== -1) {
+        if (!Number.isNaN(beat.restDisplayTone) && !Number.isNaN(beat.restDisplayOctave)) {
             // Per-beat override: same step as a note at that pitch. SMuFL rest glyphs use the same
             // baseline convention as note heads, so no further adjustment is applied.
             steps = AccidentalHelper.calculateRestDisplaySteps(sr.bar, beat.restDisplayTone, beat.restDisplayOctave);

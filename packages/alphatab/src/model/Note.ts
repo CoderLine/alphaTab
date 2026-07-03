@@ -204,21 +204,21 @@ export class Note {
     }
 
     public get isStringed(): boolean {
-        return this.string >= 0 && this.fret >= 0;
+        return !Number.isNaN(this.string) && !Number.isNaN(this.fret);
     }
 
     /**
      * Gets or sets the fret on which this note is played on the instrument.
      * 0 is the nut.
      */
-    public fret: number = -1;
+    public fret: number = Number.NaN;
 
     /**
      * Gets or sets the string number where the note is placed.
      * 1 is the lowest string on the guitar and the bottom line on the tablature.
      * It then increases the the number of strings on available on the track.
      */
-    public string: number = -1;
+    public string: number = Number.NaN;
 
     /**
      * Gets or sets whether the string number for this note should be shown.
@@ -226,21 +226,21 @@ export class Note {
     public showStringNumber: boolean = false;
 
     public get isPiano(): boolean {
-        return !this.isStringed && this.octave >= 0 && this.tone >= 0;
+        return !this.isStringed && !Number.isNaN(this.octave) && !Number.isNaN(this.tone);
     }
 
     /**
      * Gets or sets the octave on which this note is played.
      */
-    public octave: number = -1;
+    public octave: number = Number.NaN;
 
     /**
      * Gets or sets the tone of this note within the octave.
      */
-    public tone: number = -1;
+    public tone: number = Number.NaN;
 
     public get isPercussion(): boolean {
-        return this.percussionArticulation >= 0;
+        return !Number.isNaN(this.percussionArticulation);
     }
 
     /**
@@ -358,7 +358,7 @@ export class Note {
      * - 126 Ride (middle)
      * - 127 Ride (bell)
      */
-    public percussionArticulation: number = -1;
+    public percussionArticulation: number = Number.NaN;
 
     /**
      * Gets or sets whether this note is visible on the music sheet.
@@ -633,7 +633,7 @@ export class Note {
     }
 
     public static getStringTuning(staff: Staff, noteString: number): number {
-        if (staff.tuning.length > 0) {
+        if (staff.tuning.length > 0 && noteString >= 0) {
             return staff.tuning[staff.tuning.length - (noteString - 1) - 1];
         }
         return 0;
@@ -1171,7 +1171,7 @@ export class Note {
                     return noteOnString;
                 }
             } else {
-                if (note.octave === -1 && note.tone === -1) {
+                if (Number.isNaN(note.octave) && Number.isNaN(note.tone)) {
                     // if the note has no value (e.g. alphaTex dash tie), we try to find a matching
                     // note on the previous beat by index.
                     if (note.index < previousBeat.notes.length) {
