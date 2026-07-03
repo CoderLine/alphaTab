@@ -17,7 +17,9 @@ import {
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
     type AlphaTexArgumentList,
-    type IAlphaTexAstNode
+    type IAlphaTexAstNode,
+    AlphaTexDotTokenNode,
+    AlphaTexAtTokenNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { IAlphaTexLanguageImportHandler } from '@coderline/alphatab/importer/alphaTex/IAlphaTexLanguageImportHandler';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
@@ -378,6 +380,9 @@ class AlphaTexPrinter {
                 case AlphaTexNodeType.Dot:
                     this._writer.write('.');
                     break;
+                case AlphaTexNodeType.At:
+                    this._writer.write('@');
+                    break;
                 case AlphaTexNodeType.Backslash:
                     this._writer.write('\\');
                     break;
@@ -658,6 +663,17 @@ export class AlphaTexExporter extends ScoreExporter {
                 nodeType: AlphaTexNodeType.String,
                 text: PercussionMapper.getArticulationName(data)
             } as AlphaTexStringLiteral;
+
+            if (!Number.isNaN(data.string)) {
+                note.noteStringSeparator = {
+                    nodeType: AlphaTexNodeType.At
+                } as AlphaTexAtTokenNode;
+                const stringNumber = data.beat.voice.bar.staff.tuning.length - data.string + 1;
+                note.noteString = {
+                    nodeType: AlphaTexNodeType.Number,
+                    value: stringNumber
+                };
+            }
         } else if (data.isPiano) {
             note.noteValue = {
                 nodeType: AlphaTexNodeType.Ident,
@@ -670,7 +686,7 @@ export class AlphaTexExporter extends ScoreExporter {
             } as AlphaTexNumberLiteral;
             note.noteStringSeparator = {
                 nodeType: AlphaTexNodeType.Dot
-            };
+            } as AlphaTexDotTokenNode;
             const stringNumber = data.beat.voice.bar.staff.tuning.length - data.string + 1;
             note.noteString = {
                 nodeType: AlphaTexNodeType.Number,

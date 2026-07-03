@@ -137,28 +137,29 @@ export class Staff {
      */
     public standardNotationLineCount: number = Staff.DefaultStandardNotationLineCount;
 
-    private _filledVoices:Set<number> = new Set<number>([0]);
+    private _filledVoices: Set<number> = new Set<number>([0]);
 
     /**
      * The indexes of the non-empty voices in this staff..
      * @json_ignore
      */
-    public get filledVoices():Set<number> {
+    public get filledVoices(): Set<number> {
         return this._filledVoices;
     }
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
+        this.stringTuning.finish();
         if (this.isPercussion) {
             this.displayTranspositionPitch = 0;
+            this.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
         }
-        this.stringTuning.finish();
-        if(this.stringTuning.tunings.length === 0){
+        if (this.stringTuning.tunings.length === 0) {
             this.showTablature = false;
         }
 
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {
             this.bars[i].finish(settings, sharedDataBag);
-            for(const v of this.bars[i].filledVoices) {
+            for (const v of this.bars[i].filledVoices) {
                 this._filledVoices.add(v);
             }
         }

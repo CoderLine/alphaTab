@@ -770,7 +770,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         switch (staffNoteKind) {
             case AlphaTexStaffNoteKind.Pitched:
                 staff.isPercussion = false;
-                staff.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
+                staff.showTablature = false;
+                staff.stringTuning.reset();
                 if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
                     staff.displayTranspositionPitch = 0;
                 }
@@ -783,6 +784,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             case AlphaTexStaffNoteKind.Articulation:
                 staff.isPercussion = true;
                 staff.stringTuning.reset();
+                staff.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
                 if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
                     staff.displayTranspositionPitch = 0;
                 }
@@ -841,7 +843,9 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             // reset to defaults
             staff.stringTuning.reset();
 
-            if (program === 15) {
+            if (staff.isPercussion) {
+                staff.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
+            } else if (program === 15) {
                 // dulcimer E4 B3 G3 D3 A2 E2
                 staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
             } else if (program >= 24 && program <= 31) {

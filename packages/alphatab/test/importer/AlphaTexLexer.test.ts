@@ -73,6 +73,7 @@ describe('AlphaTexLexerTest', () => {
         lexerTest(`}`);
         lexerTest(`|`);
         lexerTest(`*`);
+        lexerTest(`@`);
     });
 
     it('meta-command', () => {

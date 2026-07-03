@@ -4,7 +4,7 @@ import { Track } from '@coderline/alphatab/model/Track';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { TabBarRendererFactory } from '@coderline/alphatab/rendering/TabBarRendererFactory';
 import { Settings } from '@coderline/alphatab/Settings';
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 
 describe('PercussionTablature', () => {
     describe('Note.isPercussion', () => {
@@ -14,15 +14,15 @@ describe('PercussionTablature', () => {
             note.string = 6;
             note.fret = 36;
 
-            expect(note.isPercussion).to.be.true;
-            expect(note.isStringed).to.be.true;
+            expect(note.isPercussion).toBe(true);
+            expect(note.isStringed).toBe(true);
         });
 
         it('returns true when percussionArticulation is set without string', () => {
             const note = new Note();
             note.percussionArticulation = 38;
 
-            expect(note.isPercussion).to.be.true;
+            expect(note.isPercussion).toBe(true);
             expect(note.isStringed).to.be.false;
         });
 
@@ -32,7 +32,7 @@ describe('PercussionTablature', () => {
             note.fret = 5;
 
             expect(note.isPercussion).to.be.false;
-            expect(note.isStringed).to.be.true;
+            expect(note.isStringed).toBe(true);
         });
     });
 
@@ -45,12 +45,12 @@ describe('PercussionTablature', () => {
 
             staff.finish(new Settings());
 
-            expect(staff.showTablature).to.be.true;
-            expect(staff.tuning.length).to.equal(6);
-            expect(staff.displayTranspositionPitch).to.equal(0);
+            expect(staff.showTablature).toBe(true);
+            expect(staff.tuning.length).toBe(6);
+            expect(staff.displayTranspositionPitch).toBe(0);
         });
 
-        it('disables showTablature for percussion without tuning', () => {
+        it('preserves showTablature for percussion without tuning', () => {
             const staff = new Staff();
             staff.isPercussion = true;
             staff.showTablature = true;
@@ -58,8 +58,8 @@ describe('PercussionTablature', () => {
 
             staff.finish(new Settings());
 
-            expect(staff.showTablature).to.be.false;
-            expect(staff.tuning.length).to.equal(0);
+            expect(staff.showTablature).toBe(true);
+            expect(staff.tuning.length).toBe(6);
         });
 
         it('resets displayTranspositionPitch for percussion', () => {
@@ -70,7 +70,7 @@ describe('PercussionTablature', () => {
 
             staff.finish(new Settings());
 
-            expect(staff.displayTranspositionPitch).to.equal(0);
+            expect(staff.displayTranspositionPitch).toBe(0);
         });
 
         it('preserves showTablature for non-percussion with tuning', () => {
@@ -81,8 +81,8 @@ describe('PercussionTablature', () => {
 
             staff.finish(new Settings());
 
-            expect(staff.showTablature).to.be.true;
-            expect(staff.tuning.length).to.equal(6);
+            expect(staff.showTablature).toBe(true);
+            expect(staff.tuning.length).toBe(6);
         });
     });
 
@@ -102,7 +102,7 @@ describe('PercussionTablature', () => {
             const factory = new TabBarRendererFactory([]);
             const [track, staff] = createStaff(true, true, [0, 0, 0, 0, 0, 0]);
 
-            expect(factory.canCreate(track, staff)).to.be.true;
+            expect(factory.canCreate(track, staff)).toBe(true);
         });
 
         it('rejects percussion staff when showTablature is false', () => {
@@ -123,7 +123,7 @@ describe('PercussionTablature', () => {
             const factory = new TabBarRendererFactory([]);
             const [track, staff] = createStaff(false, true, [64, 59, 55, 50, 45, 40]);
 
-            expect(factory.canCreate(track, staff)).to.be.true;
+            expect(factory.canCreate(track, staff)).toBe(true);
         });
     });
 });

@@ -19,6 +19,7 @@ import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { TestPlatform } from 'test/TestPlatform';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 
 describe('Gp7ImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {
@@ -974,21 +975,15 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].preferredBeamDirection).toBe(BeamDirection.Up);
 
         // break
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).toBe(
-            BeatBeamingMode.ForceSplitToNext
-        );
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.ForceSplitToNext);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].invertBeamDirection).toBe(false);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).toBe(BeamDirection.Up);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].beamingMode).toBe(
-            BeatBeamingMode.ForceSplitToNext
-        );
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].beamingMode).toBe(BeatBeamingMode.ForceSplitToNext);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].invertBeamDirection).toBe(false);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].preferredBeamDirection).toBe(BeamDirection.Up);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).toBe(
-            BeatBeamingMode.ForceSplitToNext
-        );
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).toBe(BeatBeamingMode.ForceSplitToNext);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].invertBeamDirection).toBe(false);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].preferredBeamDirection).toBe(BeamDirection.Up);
 
@@ -1014,9 +1009,7 @@ describe('Gp7ImporterTest', () => {
         // invert to down
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.Auto);
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].invertBeamDirection).toBe(false);
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).toBe(
-            BeamDirection.Down
-        );
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).toBe(BeamDirection.Down);
 
         // invert to up
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).toBe(BeatBeamingMode.Auto);
@@ -1029,21 +1022,24 @@ describe('Gp7ImporterTest', () => {
         const score: Score = reader.readScore();
 
         const staff = score.tracks[0].staves[0];
-        expect(staff.isPercussion).to.be.true;
+        expect(staff.isPercussion).toBe(true);
         expect(staff.tuning.length).to.equal(6);
-        expect(staff.tuning.every((t: number) => t === 0)).to.be.true;
+        expect(staff.tuning.every((t: number) => t === 0)).toBe(true);
 
         const beats = staff.bars[0].voices[0].beats;
-        expect(beats.length).to.equal(4);
+        expect(beats.length).to.equal(16);
 
+        const articulationIds = [29, 30, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
+        const articulationStrings = [1, 1, 1, 1, 1, 1, 1, 4, 4, 1, 1, 2, 5, 2, 5, 2];
+        let noteIndex = 0;
         for (const beat of beats) {
             for (const note of beat.notes) {
-                expect(note.isPercussion).to.be.true;
-                expect(note.isStringed).to.be.true;
+                expect(note.isPercussion).toBe(true);
+                expect(note.isStringed).to.be.false;
                 expect(note.string).to.be.greaterThanOrEqual(1);
-                expect(note.string).to.be.lessThanOrEqual(6);
-                expect(note.fret).to.be.greaterThan(0);
-                expect(note.percussionArticulation).to.be.greaterThanOrEqual(0);
+                expect(note.string).toBe(articulationStrings[noteIndex]);
+                expect(PercussionMapper.getArticulation(note)!.id).toBe(articulationIds[noteIndex]);
+                noteIndex++;
             }
         }
     });
@@ -1053,20 +1049,20 @@ describe('Gp7ImporterTest', () => {
         const score: Score = reader.readScore();
 
         const staff = score.tracks[0].staves[0];
-        expect(staff.isPercussion).to.be.true;
-        expect(staff.showTablature).to.be.true;
+        expect(staff.isPercussion).toBe(true);
+        expect(staff.showTablature).toBe(true);
         expect(staff.tuning.length).to.equal(6);
 
         const beats = staff.bars[0].voices[0].beats;
         expect(beats.length).to.equal(4);
 
         expect(beats[0].notes[0].string).to.equal(5);
-        expect(beats[0].notes[0].fret).to.equal(36);
+        expect(PercussionMapper.getArticulation(beats[0].notes[0])!.id).toBe(36);
         expect(beats[1].notes[0].string).to.equal(4);
-        expect(beats[1].notes[0].fret).to.equal(36);
+        expect(PercussionMapper.getArticulation(beats[1].notes[0])!.id).toBe(36);
         expect(beats[2].notes[0].string).to.equal(3);
-        expect(beats[2].notes[0].fret).to.equal(36);
+        expect(PercussionMapper.getArticulation(beats[2].notes[0])!.id).toBe(36);
         expect(beats[3].notes[0].string).to.equal(2);
-        expect(beats[3].notes[0].fret).to.equal(36);
+        expect(PercussionMapper.getArticulation(beats[3].notes[0])!.id).toBe(36);
     });
 });
