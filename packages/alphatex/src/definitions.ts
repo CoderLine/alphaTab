@@ -159,6 +159,7 @@ import { instrumentMeta } from '@coderline/alphatab-alphatex/metadata/staff/inst
 import type { AlphaTexExample, WithDescription, WithSignatures } from '@coderline/alphatab-alphatex/types';
 import { barNumberDisplay } from '@coderline/alphatab-alphatex/metadata/bar/barnumberdisplay';
 import { beaming } from '@coderline/alphatab-alphatex/metadata/bar/beamingRule';
+import { restDisplayPitch } from '@coderline/alphatab-alphatex/properties/beat/restDisplayPitch';
 
 export const structuralMetaData = metadata(track, staff, voice);
 export const scoreMetaData = metadata(
@@ -295,7 +296,8 @@ export const beatProperties = properties(
     instrument,
     bank,
     fermata,
-    beam
+    beam,
+    restDisplayPitch
 );
 
 export const noteProperties = properties(

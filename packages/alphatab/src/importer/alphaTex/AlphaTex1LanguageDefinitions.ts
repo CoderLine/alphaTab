@@ -836,7 +836,8 @@ export class AlphaTex1LanguageDefinitions {
                 ]
             ]
         ],
-        ['beam', [[[[100, 107], 0, ['invert', 'up', 'down', 'auto', 'split', 'merge', 'splitsecondary']]]]]
+        ['beam', [[[[100, 107], 0, ['invert', 'up', 'down', 'auto', 'split', 'merge', 'splitsecondary']]]]],
+        ['restdisplaypitch', [[[[100], 0]]]]
     ]);
     public static readonly noteProperties = AlphaTex1LanguageDefinitions._props([
         ['nh', null],
