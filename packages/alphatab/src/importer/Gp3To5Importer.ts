@@ -1401,7 +1401,6 @@ export class Gp3To5Importer extends ScoreImporter {
             newNote.percussionArticulation = Gp3To5Importer._gp5PercussionInstrumentMap.has(newNote.fret)
                 ? Gp3To5Importer._gp5PercussionInstrumentMap.get(newNote.fret)!
                 : newNote.fret;
-            newNote.string = -1;
             newNote.fret = -1;
         }
         if (swapAccidentals) {

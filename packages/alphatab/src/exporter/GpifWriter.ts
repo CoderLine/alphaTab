@@ -290,6 +290,10 @@ export class GpifWriter {
             }
         }
 
+        if (note.isPercussion) {
+            this._writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
+        }
+
         if (note.isPiano) {
             this._writeSimplePropertyNode(properties, 'Octave', 'Number', note.octave.toString());
             this._writeSimplePropertyNode(properties, 'Tone', 'Step', note.tone.toString());

@@ -823,7 +823,7 @@ export class Beat {
         note.beat = this;
         note.index = this.notes.length;
         this.notes.push(note);
-        if (note.isStringed) {
+        if (note.string >= 0 ) {
             this.noteStringLookup.set(note.string, note);
         }
     }
@@ -832,7 +832,7 @@ export class Beat {
         const index: number = this.notes.indexOf(note);
         if (index >= 0) {
             this.notes.splice(index, 1);
-            if (note.isStringed) {
+            if (note.string >= 0) {
                 this.noteStringLookup.delete(note.string);
             }
         }

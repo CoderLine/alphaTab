@@ -204,7 +204,7 @@ export class Note {
     }
 
     public get isStringed(): boolean {
-        return this.string >= 0;
+        return this.string >= 0 && this.fret >= 0;
     }
 
     /**
