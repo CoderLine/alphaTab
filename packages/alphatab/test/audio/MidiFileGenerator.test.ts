@@ -59,9 +59,10 @@ describe('MidiFileGeneratorTest', () => {
         for (let i: number = 0; i < actualEvents.length; i++) {
             Logger.info('Test', `i[${i}] ${actualEvents[i]}`);
             if (i < expectedEvents.length) {
-                expect(expectedEvents[i].equals(actualEvents[i]), `i[${i}] expected[${expectedEvents[i]}] !== actual[${actualEvents[i]}]`).toBe(
-                    true
-                );
+                expect(
+                    expectedEvents[i].equals(actualEvents[i]),
+                    `i[${i}] expected[${expectedEvents[i]}] !== actual[${actualEvents[i]}]`
+                ).toBe(true);
             }
         }
         expect(actualEvents.length).toBe(expectedEvents.length);
@@ -614,54 +615,122 @@ describe('MidiFileGeneratorTest', () => {
         assertEvents(handler.midiEvents, expectedEvents);
     });
 
-    it('triplet-feel', () => {
-        const tex: string =
-            '\\ts 2 4 \\tf t8 3.2.8*4 | \\tf t16 3.2.16*8 | \\tf d8 3.2.8*4 | \\tf d16 3.2.16*8 | \\tf s8 3.2.8*4 | \\tf s16 3.2.16*8';
-        const score: Score = parseTex(tex);
-        // prettier-ignore
-        const expectedPlaybackStartTimes: number[] = [
-            0, 480, 960, 1440, 0, 240, 480, 720, 960, 1200, 1440, 1680, 0, 480, 960, 1440, 0, 240, 480, 720, 960, 1200,
-            1440, 1680, 0, 480, 960, 1440, 0, 240, 480, 720, 960, 1200, 1440, 1680
-        ];
-        // prettier-ignore
-        const expectedPlaybackDurations: number[] = [
-            480, 480, 480, 480, 240, 240, 240, 240, 240, 240, 240, 240, 480, 480, 480, 480, 240, 240, 240, 240, 240,
-            240, 240, 240, 480, 480, 480, 480, 240, 240, 240, 240, 240, 240, 240, 240
-        ];
-        const actualPlaybackStartTimes: number[] = [];
-        const actualPlaybackDurations: number[] = [];
-        let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
-        while (beat) {
-            actualPlaybackStartTimes.push(beat.playbackStart);
-            actualPlaybackDurations.push(beat.playbackDuration);
-            beat = beat.nextBeat;
-        }
-        expect(actualPlaybackStartTimes.join(',')).toBe(expectedPlaybackStartTimes.join(','));
-        expect(actualPlaybackDurations.join(',')).toBe(expectedPlaybackDurations.join(','));
-        // prettier-ignore
-        const expectedMidiStartTimes: number[] = [
-            0, 640, 960, 1600, 1920, 2240, 2400, 2720, 2880, 3200, 3360, 3680, 3840, 4560, 4800, 5520, 5760, 6120, 6240,
-            6600, 6720, 7080, 7200, 7560, 7680, 7920, 8640, 8880, 9600, 9720, 10080, 10200, 10560, 10680, 11040, 11160
-        ];
-        // prettier-ignore
-        const expectedMidiDurations: number[] = [
-            640, 320, 640, 320, 320, 160, 320, 160, 320, 160, 320, 160, 720, 240, 720, 240, 360, 120, 360, 120, 360,
-            120, 360, 120, 240, 720, 240, 720, 120, 360, 120, 360, 120, 360, 120, 360
-        ];
+    describe('triplet-feel', () => {
+        function testTripletFeel(
+            tex: string,
+            expectedPlaybackStartTimes: number[],
+            expectedPlaybackDurations: number[],
+            expectedMidiStartTimes: number[],
+            expectedMidiDurations: number[]
+        ) {
+            const score: Score = parseTex(tex);
 
-        const actualMidiStartTimes: number[] = [];
-        const actualMidiDurations: number[] = [];
-        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
-        generator.generate();
-        for (const midiEvent of handler.midiEvents) {
-            if (midiEvent instanceof FlatNoteEvent) {
-                actualMidiStartTimes.push(midiEvent.tick);
-                actualMidiDurations.push(midiEvent.length);
+            const actualPlaybackStartTimes: number[] = [];
+            const actualPlaybackDurations: number[] = [];
+            let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+            while (beat) {
+                actualPlaybackStartTimes.push(beat.playbackStart);
+                actualPlaybackDurations.push(beat.playbackDuration);
+                beat = beat.nextBeat;
             }
+            expect(actualPlaybackStartTimes.join(','), 'expectedPlaybackStartTimes').toBe(
+                expectedPlaybackStartTimes.join(',')
+            );
+            expect(actualPlaybackDurations.join(','), 'expectedPlaybackDurations').toBe(
+                expectedPlaybackDurations.join(',')
+            );
+
+            const actualMidiStartTimes: number[] = [];
+            const actualMidiDurations: number[] = [];
+            const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+            const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+            generator.generate();
+            for (const midiEvent of handler.midiEvents) {
+                if (midiEvent instanceof FlatNoteEvent) {
+                    actualMidiStartTimes.push(midiEvent.tick);
+                    actualMidiDurations.push(midiEvent.length);
+                }
+            }
+            expect(actualMidiStartTimes.join(','), 'expectedMidiStartTimes').toBe(expectedMidiStartTimes.join(','));
+            expect(actualMidiDurations.join(','), 'expectedMidiDurations').toBe(expectedMidiDurations.join(','));
         }
-        expect(actualMidiStartTimes.join(',')).toBe(expectedMidiStartTimes.join(','));
-        expect(actualMidiDurations.join(',')).toBe(expectedMidiDurations.join(','));
+
+        it('variants', () => {
+            const tex: string =
+                '\\ts 2 4 \\tf t8 3.2.8*4 | \\tf t16 3.2.16*8 | \\tf d8 3.2.8*4 | \\tf d16 3.2.16*8 | \\tf s8 3.2.8*4 | \\tf s16 3.2.16*8';
+            const expectedPlaybackStartTimes: number[] = [
+                0, 480, 960, 1440, 0, 240, 480, 720, 960, 1200, 1440, 1680, 0, 480, 960, 1440, 0, 240, 480, 720, 960,
+                1200, 1440, 1680, 0, 480, 960, 1440, 0, 240, 480, 720, 960, 1200, 1440, 1680
+            ];
+            const expectedPlaybackDurations: number[] = [
+                480, 480, 480, 480, 240, 240, 240, 240, 240, 240, 240, 240, 480, 480, 480, 480, 240, 240, 240, 240, 240,
+                240, 240, 240, 480, 480, 480, 480, 240, 240, 240, 240, 240, 240, 240, 240
+            ];
+            const expectedMidiStartTimes: number[] = [
+                0, 640, 960, 1600, 1920, 2240, 2400, 2720, 2880, 3200, 3360, 3680, 3840, 4560, 4800, 5520, 5760, 6120,
+                6240, 6600, 6720, 7080, 7200, 7560, 7680, 7920, 8640, 8880, 9600, 9720, 10080, 10200, 10560, 10680,
+                11040, 11160
+            ];
+            const expectedMidiDurations: number[] = [
+                640, 320, 640, 320, 320, 160, 320, 160, 320, 160, 320, 160, 720, 240, 720, 240, 360, 120, 360, 120, 360,
+                120, 360, 120, 240, 720, 240, 720, 120, 360, 120, 360, 120, 360, 120, 360
+            ];
+            testTripletFeel(
+                tex,
+                expectedPlaybackStartTimes,
+                expectedPlaybackDurations,
+                expectedMidiStartTimes,
+                expectedMidiDurations
+            );
+        });
+
+        it('not-matching-with-grace', () => {
+            testTripletFeel(
+                `
+            \\tf triplet8th
+            0.1.8
+            0.1.8{gr onbeat}
+            0.1.4
+            0.1.8
+            0.1.8
+            0.1.8
+            0.1.8
+            0.1.8 |
+            0.1.8 * 8
+            `,
+                // no swing on playback start/durations
+                [
+                    // Bar 1
+                    0, 480, 600, 1440, 1920, 2400, 2880, 3360,
+                    // Bar 2
+                    0, 480, 960, 1440, 1920, 2400, 2880, 3360
+                ],
+                [
+                    // Bar 1
+                    480, 120, 840, 480, 480, 480, 480, 480,
+                    // Bar 2
+                    480, 480, 480, 480, 480, 480, 480, 480
+                ],
+                // swing on generated midi
+                [
+                    // Bar 1
+                    // no swing on the first 4 notes as they do not align with the swing definition
+                    0, 480, 600, 1440,
+                    // the last two 8th note pairs swing
+                    1920, 2560, 2880, 3520,
+                    // Bar 2 fully swings
+                    3840, 4480, 4800, 5440, 5760, 6400, 6720, 7360
+                ],
+                [
+                    // no swing
+                    480, 120, 840, 480,
+                    // the last two 8th note pairs swing
+                    640, 320, 640, 320,
+                    // Swing on second bar
+                    640, 320, 640, 320, 640, 320, 640, 320
+                ]
+            );
+        });
     });
 
     it('beat-multi-bend', () => {
