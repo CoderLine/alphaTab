@@ -8,7 +8,6 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
@@ -107,11 +106,7 @@ export class BeamingHelper {
     }
 
     public alignWithBeats() {
-        for (const v of this.drawingInfos.values()) {
-            v.startX = this._renderer.getBeatX(v.startBeat!, BeatXPosition.Stem);
-            v.endX = this._renderer.getBeatX(v.endBeat!, BeatXPosition.Stem);
-            this.drawingInfos.clear();
-        }
+        this.drawingInfos.clear();
     }
 
     public finish(): void {
