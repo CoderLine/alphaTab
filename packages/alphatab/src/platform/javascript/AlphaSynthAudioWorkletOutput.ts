@@ -220,6 +220,13 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     public override play(): void {
         super.play();
         const ctx = this.context!;
+
+        // clear any pending events buffered from previous playback rounds
+        // we just want the events which come in after the play call until the worklet is created
+        if (this._pendingEvents) {
+            this._pendingEvents = undefined;
+        }
+
         // create a script processor node which will replace the silence with the generated audio
         BrowserUiFacade.createAlphaSynthAudioWorklet(ctx, this._settings).then(
             () => {
