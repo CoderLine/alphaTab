@@ -17,6 +17,6 @@
         "rollup-plugin-node-externals": "^9.0.1",
         "typescript": "^6.0.3",
         "vite": "^8.1.0",
-        "vitest": "^4.1.9"
+        "vitest": "^4.1.10"
     }
 }
