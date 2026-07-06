@@ -57,7 +57,7 @@
         "tsx": "^4.22.4",
         "typescript": "^6.0.3",
         "vitest": "^4.1.9",
-        "webpack-cli": "^7.0.3"
+        "webpack-cli": "^7.2.1"
     },
     "files": [
         "/dist/**",
