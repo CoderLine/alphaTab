@@ -40,6 +40,13 @@ describe('Gp7ExporterTest', () => {
         return new Gp7Exporter().export(score, null);
     }
 
+    function readExportedGpif(buffer: Uint8Array): string {
+        const settings = new Settings();
+        const zip = new ZipReader(ByteBuffer.fromBuffer(buffer), settings.importer.maxDecodingBufferSize).read();
+        const gpifData = zip.find(e => e.fileName === 'score.gpif')!.data;
+        return IOHelper.toString(gpifData, settings.importer.encoding);
+    }
+
     async function testRoundTripEqual(name: string, ignoreKeys: string[] | null): Promise<void> {
         const expected = await loadScore(name);
         if (!expected) {
@@ -148,6 +155,31 @@ describe('Gp7ExporterTest', () => {
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
+    });
+
+    it('alphatex-to-gp7-score-metadata', () => {
+        const tex = `\\title "Multitrack Metadata"
+        \\artist "alphaTab"
+        \\tempo 90
+        .
+        \\track "Piano"
+        \\instrument acousticgrandpiano
+        C4.4 D4.4 E4.4 F4.4
+        .
+        \\track "Guitar"
+        \\instrument acousticguitarsteel
+        0.3.4 2.3.4 3.3.4 5.3.4
+        `;
+
+        const score = ScoreLoader.loadAlphaTex(tex);
+        const gpif = readExportedGpif(exportGp7(score));
+
+        expect(gpif).toContain('<ScoreSystemsDefaultLayout>3</ScoreSystemsDefaultLayout>');
+        expect(gpif).toContain('<ScoreSystemsLayout>');
+        expect(gpif).not.toContain('<ScoreSystemsDefaultLayout><![CDATA[');
+        expect(gpif).not.toContain('<ScoreSystemsLayout><![CDATA[');
+        expect(gpif).toContain('<MultiVoice>0</MultiVoice>');
+        expect(gpif).not.toContain('<MultiVoice>1></MultiVoice>');
     });
 
     it('alphatex-drums-to-gp7', () => {

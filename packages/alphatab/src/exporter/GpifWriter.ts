@@ -968,13 +968,12 @@ export class GpifWriter {
         scoreNode.addElement('PageHeader').setCData('');
         scoreNode.addElement('PageFooter').setCData('');
 
-        scoreNode.addElement('ScoreSystemsDefaultLayout').setCData(score.defaultSystemsLayout.toString());
-        scoreNode.addElement('ScoreSystemsLayout').setCData(score.systemsLayout.join(' '));
+        scoreNode.addElement('ScoreSystemsDefaultLayout').innerText = score.defaultSystemsLayout.toString();
+        scoreNode.addElement('ScoreSystemsLayout').innerText = score.systemsLayout.join(' ');
 
         scoreNode.addElement('ScoreZoomPolicy').innerText = 'Value';
         scoreNode.addElement('ScoreZoom').innerText = '1';
-        // not fully clear at this point so we rather activate it
-        scoreNode.addElement('MultiVoice').innerText = '1>';
+        scoreNode.addElement('MultiVoice').innerText = '0';
     }
 
     private _writeMasterTrackNode(parent: XmlNode, score: Score) {
