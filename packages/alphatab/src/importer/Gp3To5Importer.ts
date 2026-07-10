@@ -1813,6 +1813,7 @@ class MixTableChange {
 /**
  * The midi channel information
  * @internal
+ * @record
  */
 interface Gp3To5MidiChannelInfo {
     program: number;
