@@ -923,6 +923,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 }
                 bar.barNumberDisplay = barNumberDisplay!;
                 return ApplyNodeResult.Applied;
+            case 'barnumber':
+                switch (metaData.arguments!.arguments[0].nodeType) {
+                    case AlphaTexNodeType.Number:
+                        bar.masterBar.customBarNumber = (
+                            metaData.arguments!.arguments[0] as AlphaTexNumberLiteral
+                        ).value;
+                        break;
+                    case AlphaTexNodeType.String:
+                        bar.masterBar.customBarNumberText = (metaData.arguments!.arguments[0] as AlphaTexTextNode).text;
+                        break;
+                }
+                return ApplyNodeResult.Applied;
             default:
                 return ApplyNodeResult.NotAppliedUnrecognizedMarker;
         }
@@ -3074,6 +3086,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 tempo.arguments!.closeParenthesis = undefined;
             }
             nodes.push(tempo);
+        }
+
+        if (masterBar.customBarNumber !== undefined) {
+            nodes.push(Atnf.numberMeta('barNumber', masterBar.customBarNumber!));
+        }
+
+        if (masterBar.customBarNumberText !== undefined) {
+            nodes.push(Atnf.meta('barNumber', Atnf.args([Atnf.string(masterBar.barNumberText)])));
         }
 
         if (firstMetaIndex < nodes.length) {
