@@ -180,6 +180,7 @@ describe('Gp7ExporterTest', () => {
         expect(gpif).toContain('<ScoreSystemsLayout>3 2 3</ScoreSystemsLayout>');
         expect(gpif).not.toContain('<ScoreSystemsDefaultLayout><![CDATA[');
         expect(gpif).not.toContain('<ScoreSystemsLayout><![CDATA[');
+        expect(gpif).toContain('<MultiVoice>1></MultiVoice>');
     });
 
     it('alphatex-drums-to-gp7', () => {

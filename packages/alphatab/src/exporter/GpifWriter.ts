@@ -973,7 +973,9 @@ export class GpifWriter {
 
         scoreNode.addElement('ScoreZoomPolicy').innerText = 'Value';
         scoreNode.addElement('ScoreZoom').innerText = '1';
-        // not fully clear at this point so we rather activate it
+        // Activate MultiVoice mode. the content looks strange, but
+        // 0> is 'Multi Voice' off (secondary voices are half-transparent/light-ray)
+        // 1> is 'Multi Voice' on  (secondary voices are fully-visible/black)
         scoreNode.addElement('MultiVoice').innerText = '1>';
     }
 
@@ -1073,6 +1075,7 @@ export class GpifWriter {
         trackNode.addElement('ShortName').setCData(track.shortName);
         trackNode.addElement('Color').innerText = `${track.color.r} ${track.color.g} ${track.color.b}`;
 
+        // this typo is on purpose, guitar pro bug to have SystemsDefautLayout instead of SystemsDefaultLayout
         trackNode.addElement('SystemsDefautLayout').innerText = track.defaultSystemsLayout.toString();
         trackNode.addElement('SystemsLayout').innerText = track.systemsLayout.join(' ');
 
