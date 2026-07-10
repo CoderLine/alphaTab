@@ -287,11 +287,49 @@ export class PlayerSettings {
      * @since 0.9.7
      * @defaultValue `true`
      * @category Player
+     * @json_read_only
      * @remarks
      * This setting configures whether alphaTab provides the default user interaction features like selection of the playback range and "seek on click".
      * By default users can select the desired playback range with the mouse and also jump to individual beats by click. This behavior can be contolled with this setting.
+     * @deprecated Use {@link enableSeekToClick} and {@link enablePlaybackRangeSelection} individually
      */
-    public enableUserInteraction: boolean = true;
+    public get enableUserInteraction(): boolean {
+        return this.enableSeekToClick || this.enablePlaybackRangeSelection;
+    }
+
+    /**
+     * @deprecated Use {@link enableSeekToClick} and {@link enablePlaybackRangeSelection} individually
+     */
+    public set enableUserInteraction(value: boolean) {
+        this.enableSeekToClick = value;
+        this.enablePlaybackRangeSelection = value;
+        this.resetPlaybackRangeOnClick = value;
+    }
+
+    /**
+     * Whether the a click on the music sheet triggers a player seek to the note/beat at the
+     * clicked location.
+     * @since 1.9.0
+     * @defaultValue `true`
+     * @category Player
+     */
+    public enableSeekToClick: boolean = true;
+
+    /**
+     * Whether user click and drag results in a selection defining the playback range.
+     * @since 1.9.0
+     * @defaultValue `true`
+     * @category Player
+     */
+    public enablePlaybackRangeSelection: boolean = true;
+
+    /**
+     * Whether a simple click (no range drag) should reset the current playback range.
+     * @since 1.9.0
+     * @defaultValue `true`
+     * @category Player
+     */
+    public resetPlaybackRangeOnClick: boolean = true;
 
     /**
      * The X-offset to add when scrolling.

@@ -2863,7 +2863,7 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
-        if (this._hasCursor && this.settings.player.enableUserInteraction) {
+        if (this._hasCursor && this.settings.player.enablePlaybackRangeSelection) {
             this._selectionStart = { beat };
             this._selectionEnd = undefined;
         }
@@ -2887,10 +2887,14 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
-        if (this.settings.player.enableUserInteraction) {
+        if (this.settings.player.enablePlaybackRangeSelection) {
             if (!this._selectionEnd || this._selectionEnd.beat !== beat) {
-                this._selectionEnd = { beat };
-                this._cursorSelectRange(this._selectionStart, this._selectionEnd);
+                // ensure we do not clear the selection until we have different beats
+                const hasRange = this._selectionStart?.beat !== beat;
+                if (hasRange) {
+                    this._selectionEnd = { beat };
+                    this._cursorSelectRange(this._selectionStart, this._selectionEnd);
+                }
             }
         }
         (this.beatMouseMove as EventEmitterOfT<Beat>).trigger(beat);
@@ -2911,13 +2915,50 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
-        if (this._hasCursor && this.settings.player.enableUserInteraction) {
-            this.applyPlaybackRangeFromHighlight();
+        if (this._hasCursor) {
+            let shouldSeekToBeat = beat && this.settings.player.enableSeekToClick;
+            if (this.settings.player.enablePlaybackRangeSelection) {
+                if (this._internalApplyPlaybackRangeFromHighlight()) {
+                    shouldSeekToBeat = false;
+                }
+            }
+
+            if (shouldSeekToBeat) {
+                this._seekToBeat(beat!);
+            }
         }
 
         (this.beatMouseUp as EventEmitterOfT<Beat | null>).trigger(beat);
         this.uiFacade.triggerEvent(this.container, 'beatMouseUp', beat, originalEvent);
         this._isBeatMouseDown = false;
+    }
+
+    private _seekToBeat(beat: Beat) {
+        const tickCache = this._tickCache;
+        if (!tickCache) {
+            return;
+        }
+
+        this._currentBeat = null;
+        const realStartMasterBarStart: number = tickCache.getMasterBarStart(beat.voice.bar.masterBar);
+        const startBeatPlaybackRange = tickCache.getRelativeBeatPlaybackRange(beat);
+        const startBeatPlaybackStart = startBeatPlaybackRange?.startTick ?? beat.playbackStart;
+
+        // clamp to playback range
+        let beatTick = realStartMasterBarStart + startBeatPlaybackStart;
+        const playbackRange = this.playbackRange;
+        if (playbackRange) {
+            if (beatTick < playbackRange.startTick) {
+                beatTick = playbackRange.startTick;
+            } else if (beatTick > playbackRange.endTick) {
+                beatTick = playbackRange.endTick;
+            }
+        }
+
+        if (this._player.state === PlayerState.Paused) {
+            this._cursorUpdateTick(beatTick, false, 1);
+        }
+        this.tickPosition = beatTick;
     }
 
     private _onNoteMouseUp(originalEvent: IMouseEventArgs, note: Note | null): void {
@@ -2952,7 +2993,7 @@ export class AlphaTabApiBase<TSettings> {
             if (!e.isLeftMouseButton) {
                 return;
             }
-            if (this.settings.player.enableUserInteraction) {
+            if (this.settings.player.enablePlaybackRangeSelection || this.settings.player.enableSeekToClick) {
                 e.preventDefault();
             }
             const relX: number = e.getX(this.canvasElement);
@@ -2991,7 +3032,7 @@ export class AlphaTabApiBase<TSettings> {
             if (!this._isBeatMouseDown) {
                 return;
             }
-            if (this.settings.player.enableUserInteraction) {
+            if (this.settings.player.enablePlaybackRangeSelection || this.settings.player.enableSeekToClick) {
                 e.preventDefault();
             }
             const relX: number = e.getX(this.canvasElement);
@@ -3009,7 +3050,7 @@ export class AlphaTabApiBase<TSettings> {
             }
         });
         this._renderer.postRenderFinished.on(() => {
-            if (!this._selectionStart || !this._hasCursor || !this.settings.player.enableUserInteraction) {
+            if (!this._selectionStart || !this._hasCursor || !this.settings.player.enablePlaybackRangeSelection) {
                 return;
             }
             this._cursorSelectRange(this._selectionStart, this._selectionEnd);
@@ -3105,6 +3146,10 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public applyPlaybackRangeFromHighlight() {
+        this._internalApplyPlaybackRangeFromHighlight();
+    }
+
+    private _internalApplyPlaybackRangeFromHighlight() {
         if (this._selectionEnd) {
             const startTick: number =
                 this._tickCache?.getBeatStart(this._selectionStart!.beat) ??
@@ -3117,7 +3162,11 @@ export class AlphaTabApiBase<TSettings> {
                 this._selectionStart = this._selectionEnd;
                 this._selectionEnd = t;
             }
+        } else if (!this.settings.player.resetPlaybackRangeOnClick) {
+            // no new range selected -> do not reset playback range if respective option is set
+            return false;
         }
+
         if (this._selectionStart && this._tickCache) {
             // get the start and stop ticks (which consider properly repeats)
             const tickCache: MidiTickLookup = this._tickCache;
@@ -3126,14 +3175,12 @@ export class AlphaTabApiBase<TSettings> {
             );
             const startBeatPlaybackRange = tickCache.getRelativeBeatPlaybackRange(this._selectionStart.beat);
             const startBeatPlaybackStart = startBeatPlaybackRange?.startTick ?? this._selectionStart.beat.playbackStart;
-            // move to selection start
-            this._currentBeat = null; // reset current beat so it is updating the cursor
-            if (this._player.state === PlayerState.Paused) {
-                this._cursorUpdateTick(realStartMasterBarStart + startBeatPlaybackStart, false, 1);
-            }
-            this.tickPosition = realStartMasterBarStart + startBeatPlaybackStart;
+
+            let seekToStart = this.settings.player.enableSeekToClick;
+
             // set playback range
             if (this._selectionEnd && this._selectionStart.beat !== this._selectionEnd.beat) {
+                seekToStart = true;
                 const realEndMasterBarStart: number = tickCache.getMasterBarStart(
                     this._selectionEnd.beat.voice.bar.masterBar
                 );
@@ -3145,12 +3192,22 @@ export class AlphaTabApiBase<TSettings> {
                 range.startTick = realStartMasterBarStart + startBeatPlaybackStart;
                 range.endTick = realEndMasterBarStart + endBeatPlaybackEnd - 50;
                 this.playbackRange = range;
-            } else {
+            } else if (this.settings.player.resetPlaybackRangeOnClick) {
                 this._selectionStart = undefined;
                 this.playbackRange = null;
                 this._cursorSelectRange(this._selectionStart, this._selectionEnd);
             }
+
+            if (seekToStart) {
+                this._currentBeat = null; // reset current beat so it is updating the cursor
+                if (this._player.state === PlayerState.Paused) {
+                    this._cursorUpdateTick(realStartMasterBarStart + startBeatPlaybackStart, false, 1);
+                }
+                this.tickPosition = realStartMasterBarStart + startBeatPlaybackStart;
+            }
         }
+
+        return true;
     }
 
     /**

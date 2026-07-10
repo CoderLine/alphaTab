@@ -34,7 +34,9 @@ export class PlayerSettingsSerializer {
         o.set("enablecursor", obj.enableCursor);
         o.set("enableanimatedbeatcursor", obj.enableAnimatedBeatCursor);
         o.set("enableelementhighlighting", obj.enableElementHighlighting);
-        o.set("enableuserinteraction", obj.enableUserInteraction);
+        o.set("enableseektoclick", obj.enableSeekToClick);
+        o.set("enableplaybackrangeselection", obj.enablePlaybackRangeSelection);
+        o.set("resetplaybackrangeonclick", obj.resetPlaybackRangeOnClick);
         o.set("scrolloffsetx", obj.scrollOffsetX);
         o.set("scrolloffsety", obj.scrollOffsetY);
         o.set("scrollmode", obj.scrollMode as number);
@@ -80,6 +82,15 @@ export class PlayerSettingsSerializer {
                 return true;
             case "enableuserinteraction":
                 obj.enableUserInteraction = v! as boolean;
+                return true;
+            case "enableseektoclick":
+                obj.enableSeekToClick = v! as boolean;
+                return true;
+            case "enableplaybackrangeselection":
+                obj.enablePlaybackRangeSelection = v! as boolean;
+                return true;
+            case "resetplaybackrangeonclick":
+                obj.resetPlaybackRangeOnClick = v! as boolean;
                 return true;
             case "scrolloffsetx":
                 obj.scrollOffsetX = v! as number;
