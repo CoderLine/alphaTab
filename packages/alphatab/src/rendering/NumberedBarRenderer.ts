@@ -3,13 +3,14 @@ import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
+import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
+import type { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
 import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
@@ -21,7 +22,6 @@ import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/Sc
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
-import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper, BeamingHelperDrawInfo } from '@coderline/alphatab/rendering/utils/BeamingHelper';
@@ -272,7 +272,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
         this.createLinePreBeatGlyphs();
         const hasSpaceAfterStartGlyphs = this.createStartSpacing();
         if (this.shouldCreateBarNumber()) {
-            this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
+            const barNumberGlyph = new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1);
+            this.barNumberGlyph = barNumberGlyph;
+            this.addPreBeatGlyph(barNumberGlyph);
         } else if (!hasSpaceAfterStartGlyphs) {
             this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
         }

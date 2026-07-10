@@ -68,6 +68,17 @@ export abstract class BeatContainerGlyphBase extends Glyph {
     public scaleToWidth(beatWidth: number) {
         this.width = beatWidth;
     }
+
+    /**
+     * Repositions this beat so its {@link onTimeX} anchor lands at `target`, used for the
+     * centered full-bar note/rest (see {@link BarLayoutingInfo.isCenteredFullBar}). The default
+     * shifts the whole container, matching the regular (non-centered) positioning formula.
+     * {@link BeatContainerGlyph} overrides this to shift only its ink, keeping `x`/`width`
+     * spanning the full bar so bounds lookups and skyline emission stay correct.
+     */
+    public applyCenterOffset(target: number): void {
+        this.x = target - this.onTimeX;
+    }
 }
 
 /**
@@ -214,12 +225,31 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         this.preNotes.renderer = this.renderer;
         this.preNotes.container = this;
         this.preNotes.doLayout();
-        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        // preNotes.width is only final once preNotes.doLayout() has run, so onNotes.x must be
+        // derived here, not before.
+        this._layoutOnsetX();
         this.onNotes.renderer = this.renderer;
         this.onNotes.container = this;
         this.onNotes.doLayout();
         this.createBeatTies();
         this.updateWidth();
+    }
+
+    /**
+     * Resets `preNotes.x`/`onNotes.x` to their natural (un-centered) baseline.
+     * Shared by {@link doLayout} and {@link applyCenterOffset} so the latter can be called
+     * repeatedly (once per `_scaleToForce` pass) without compounding a previous offset.
+     */
+    private _layoutOnsetX(): void {
+        this.preNotes.x = 0;
+        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+    }
+
+    public override applyCenterOffset(target: number): void {
+        this._layoutOnsetX();
+        const offset = target - this.onTimeX;
+        this.preNotes.x = offset;
+        this.onNotes.x = this.preNotes.x + this.preNotes.width;
     }
 
     protected createBeatTies() {

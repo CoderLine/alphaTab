@@ -34,7 +34,11 @@ export class AlphaSynthWebWorker {
 
     public handleMessage(e: MessageEvent<IAlphaSynthWorkerMessage>): void {
         const data = e.data;
-        switch (data.cmd) {
+        const cmd = data.cmd;
+        if(!cmd) {
+            return;
+        }
+        switch (cmd) {
             case 'alphaSynth.initialize':
                 AlphaSynthWorkerSynthOutput.preferredSampleRate = data.sampleRate;
                 Logger.logLevel = data.logLevel;
@@ -137,7 +141,7 @@ export class AlphaSynthWebWorker {
                 break;
         }
 
-        if (data.cmd.startsWith('alphaSynth.exporter')) {
+        if (cmd.startsWith('alphaSynth.exporter')) {
             this._handleExporterMessage(e);
         }
     }
