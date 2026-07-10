@@ -17,10 +17,21 @@ export class ImporterSettings {
      *
      * * Guitar Pro 7
      * * Guitar Pro 6
-     * * Guitar Pro 3-5
      * * MusicXML
      */
     public encoding: string = 'utf-8';
+
+    /**
+     * The text encoding to use when decoding strings within GuitarPro3-5 files.
+     * @since 1.9.0
+     * @defaultValue `windows-1252`
+     * @category Importer
+     * @remarks
+     * Guitar Pro 3-5 encode strings as system specific ANSI encoding, typically Windows-1252 in western system cultures.
+     * This is different to the other typically used utf-8 encoding.
+     * Via this setting the Guitar Pro 3-5 specific decoding can be used.
+     */
+    public gp3To5encoding: string = 'windows-1252';
 
     /**
      * If part-groups should be merged into a single track (MusicXML).

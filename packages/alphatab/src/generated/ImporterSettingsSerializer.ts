@@ -21,6 +21,7 @@ export class ImporterSettingsSerializer {
         }
         const o = new Map<string, unknown>();
         o.set("encoding", obj.encoding);
+        o.set("gp3to5encoding", obj.gp3To5encoding);
         o.set("mergepartgroupsinmusicxml", obj.mergePartGroupsInMusicXml);
         o.set("beattextaslyrics", obj.beatTextAsLyrics);
         o.set("maxdecodingbuffersize", obj.maxDecodingBufferSize);
@@ -30,6 +31,9 @@ export class ImporterSettingsSerializer {
         switch (property) {
             case "encoding":
                 obj.encoding = v! as string;
+                return true;
+            case "gp3to5encoding":
+                obj.gp3To5encoding = v! as string;
                 return true;
             case "mergepartgroupsinmusicxml":
                 obj.mergePartGroupsInMusicXml = v! as boolean;

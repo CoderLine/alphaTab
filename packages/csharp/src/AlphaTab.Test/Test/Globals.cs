@@ -136,6 +136,10 @@ internal class NotExpector<T>
         {
             CollectionAssert.DoesNotContain(collection, element, _message);
         }
+        else if (_actual is string str)
+        {
+            Assert.DoesNotContain((string)element, str);
+        }
         else
         {
             Assert.Fail("Contain can only be used with collection operands");
