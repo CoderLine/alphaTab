@@ -888,14 +888,14 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private _parsePartwiseMeasure(element: XmlNode, track: Track, index: number) {
-        const masterBar = this._getOrCreateMasterBar(element, index);
+        const masterBar = this._getOrCreateMasterBar(element, index, element.getAttribute('number'));
         const implicit = element.attributes.get('implicit') === 'yes';
         this._parsePartMeasure(element, masterBar, track, implicit, true);
         this._currentBarNumberDisplayBar = undefined;
     }
 
     private _parseTimewiseMeasure(element: XmlNode, index: number) {
-        const masterBar = this._getOrCreateMasterBar(element, index);
+        const masterBar = this._getOrCreateMasterBar(element, index, element.getAttribute('number'));
         const implicit = element.attributes.get('implicit') === 'yes';
 
         for (const c of element.childElements()) {
@@ -913,13 +913,21 @@ export class MusicXmlImporter extends ScoreImporter {
         this._currentBarNumberDisplayBar = undefined;
     }
 
-    private _getOrCreateMasterBar(element: XmlNode, index: number) {
+    private _getOrCreateMasterBar(element: XmlNode, index: number, measureNumber: string) {
         const implicit = element.attributes.get('implicit') === 'yes';
         while (this._score.masterBars.length <= index) {
             const newMasterBar = new MasterBar();
             if (implicit) {
                 newMasterBar.isAnacrusis = true;
+            } else {
+                const number = Number.parseInt(measureNumber, 10);
+                if (!Number.isNaN(number)) {
+                    newMasterBar.customBarNumber = number;
+                } else {
+                    newMasterBar.customBarNumberText = measureNumber;
+                }
             }
+
             this._score.addMasterBar(newMasterBar);
             if (newMasterBar.index > 0) {
                 newMasterBar.timeSignatureDenominator = newMasterBar.previousMasterBar!.timeSignatureDenominator;
