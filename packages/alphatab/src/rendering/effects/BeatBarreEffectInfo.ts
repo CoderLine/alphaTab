@@ -3,32 +3,58 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@coderline/alphatab/rendering/glyphs/LineRangedGlyph';
-import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
  */
-export class BeatBarreEffectInfo extends EffectInfo {
-    public get notationElement(): NotationElement {
-        return NotationElement.EffectLetRing;
+const romanLetters = new Map<string, number>([
+    // ['M', 1000],
+    // ['CM', 900],
+    // ['D', 500],
+    // ['CD', 400],
+    // ['C', 100],
+    // ['XC', 90],
+    ['L', 50],
+    ['XL', 40],
+    ['X', 10],
+    ['IX', 9],
+    ['V', 5],
+    ['IV', 4],
+    ['I', 1]
+]);
+
+/**
+ * @internal
+ */
+export function toRoman(num: number): string {
+    let str = '';
+
+    if (num > 0) {
+        for (const [romanLetter, romanNumber] of romanLetters) {
+            const q = Math.floor(num / romanNumber);
+            num -= q * romanNumber;
+            str += romanLetter.repeat(q);
+        }
     }
 
-    public get hideOnMultiTrack(): boolean {
-        return false;
-    }
+    return str;
+}
 
-    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
+/**
+ * @internal
+ */
+export const beatBarreEffectInfo: EffectInfo = {
+    effectId: 'EffectLetRing',
+    notationElement: NotationElement.EffectLetRing,
+    hideOnMultiTrack: false,
+    shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
         return beat.isBarre;
-    }
-
-    public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.GroupedOnBeat;
-    }
-
-    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    },
+    sizingMode: EffectBarGlyphSizing.GroupedOnBeat,
+    createNewGlyph: (_renderer: BarRendererBase, beat: Beat): EffectGlyph => {
         let barre = '';
         switch (beat.barreShape) {
             case BarreShape.None:
@@ -39,45 +65,12 @@ export class BeatBarreEffectInfo extends EffectInfo {
                 break;
         }
 
-        barre += `B ${BeatBarreEffectInfo.toRoman(beat.barreFret)}`;
+        barre += `B ${toRoman(beat.barreFret)}`;
 
         return new LineRangedGlyph(barre, NotationElement.EffectBeatBarre, false);
-    }
-
-    private static readonly _romanLetters = new Map<string, number>([
-        // ['M', 1000],
-        // ['CM', 900],
-        // ['D', 500],
-        // ['CD', 400],
-        // ['C', 100],
-        // ['XC', 90],
-        ['L', 50],
-        ['XL', 40],
-        ['X', 10],
-        ['IX', 9],
-        ['V', 5],
-        ['IV', 4],
-        ['I', 1]
-    ]);
-
-    public static toRoman(num: number): string {
-        let str = '';
-
-        if (num > 0) {
-            for (const [romanLetter, romanNumber] of BeatBarreEffectInfo._romanLetters) {
-                const q = Math.floor(num / romanNumber);
-                num -= q * romanNumber;
-                str += romanLetter.repeat(q);
-            }
-        }
-
-        return str;
-    }
-
-    public canExpand(from: Beat, to: Beat): boolean {
+    },
+    canExpand: (from: Beat, to: Beat): boolean => {
         return from.barreFret === to.barreFret && from.barreShape === to.barreShape;
-    }
-    public override get placementCategory(): EffectBandPlacementCategory {
-        return EffectBandPlacementCategory.Span;
-    }
-}
+    },
+    placementCategory: EffectBandPlacementCategory.Span
+};

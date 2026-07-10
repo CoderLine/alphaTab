@@ -478,7 +478,7 @@ export class BarRendererBase {
     private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo): void {
         for (const band of container.bands) {
             const policy = band.info.overlayRodPolicy;
-            if (policy === OverlayRodPolicy.None) {
+            if (policy === undefined) {
                 continue;
             }
             const bandKey = String(band.info.notationElement);

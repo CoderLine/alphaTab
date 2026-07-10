@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
+import { TremoloPickingEffectSerializer } from '@coderline/alphatab/generated/model/TremoloPickingEffectSerializer';
 import { AlphaTexStaffNoteKind } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { BarreShape } from '@coderline/alphatab/model/BarreShape';
@@ -46,15 +47,14 @@ import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { WhammyType } from '@coderline/alphatab/model/WhammyType';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
-import { HarmonicsEffectInfo } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
+import { harmonicToString } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { Settings } from '@coderline/alphatab/Settings';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
-import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
-import { TremoloPickingEffectSerializer } from '@coderline/alphatab/generated/model/TremoloPickingEffectSerializer';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { describe, expect, it } from 'vitest';
 
 describe('AlphaTexImporterTest', () => {
     /**
@@ -328,23 +328,23 @@ describe('AlphaTexImporterTest', () => {
         renderer.renderScore(score, [0]);
         const regexTemplate: string = '<text[^>]+>\\s*{0}\\s*</text>';
         expect(
-            new RegExp(regexTemplate.replace('{0}', HarmonicsEffectInfo.harmonicToString(HarmonicType.Natural))).exec(
+            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Natural))).exec(
                 svg
             )
         ).toBeTruthy();
         expect(
             new RegExp(
-                regexTemplate.replace('{0}', HarmonicsEffectInfo.harmonicToString(HarmonicType.Artificial))
+                regexTemplate.replace('{0}', harmonicToString(HarmonicType.Artificial))
             ).exec(svg)
         ).toBeTruthy();
         expect(
-            new RegExp(regexTemplate.replace('{0}', HarmonicsEffectInfo.harmonicToString(HarmonicType.Tap))).exec(svg)
+            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Tap))).exec(svg)
         ).toBeTruthy();
         expect(
-            new RegExp(regexTemplate.replace('{0}', HarmonicsEffectInfo.harmonicToString(HarmonicType.Pinch))).exec(svg)
+            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Pinch))).exec(svg)
         ).toBeTruthy();
         expect(
-            new RegExp(regexTemplate.replace('{0}', HarmonicsEffectInfo.harmonicToString(HarmonicType.Semi))).exec(svg)
+            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Semi))).exec(svg)
         ).toBeTruthy();
     });
 

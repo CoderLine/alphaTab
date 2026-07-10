@@ -3,28 +3,26 @@ import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
-import { BarTempoGlyph } from '@coderline/alphatab/rendering/glyphs/BarTempoGlyph';
+import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 
 /**
  * @internal
  */
-export const tempoEffectInfo: EffectInfo = {
-    effectId: 'EffectTempo',
-    notationElement: NotationElement.EffectTempo,
+export const barNumberEffectInfo: EffectInfo = {
+    effectId: 'BarNumber',
+    notationElement: NotationElement.BarNumber,
     hideOnMultiTrack: true,
-    sizingMode: EffectBarGlyphSizing.SinglePreBeat,
-    shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
-        return (
-            beat.voice.bar.staff.index === 0 &&
-            beat.voice.index === 0 &&
-            beat.index === 0 &&
-            beat.voice.bar.masterBar.tempoAutomations.some(t => t.isVisible)
-        );
+    sizingMode: EffectBarGlyphSizing.FullBar,
+    shouldCreateGlyph: (renderer: BarRendererBase, beat: Beat): boolean => {
+        return beat.voice.index === 0 && beat.index === 0 && (renderer as LineBarRenderer).shouldCreateBarNumber();
     },
     createNewGlyph: (_renderer: BarRendererBase, beat: Beat): EffectGlyph => {
-        return new BarTempoGlyph(beat.voice.bar.masterBar.tempoAutomations.filter(a => a.isVisible));
+        const masterBar = beat.voice.bar.masterBar;
+        return new BarNumberGlyph(0, 0, masterBar.barNumberText);
     },
     canExpand: (_from: Beat, _to: Beat): boolean => true,
+    // Voltas share one baseline across the system (Gould Ch.11).
     placementCategory: EffectBandPlacementCategory.SystemMarker
 };

@@ -3,39 +3,24 @@ import { WahPedal } from '@coderline/alphatab/model/WahPedal';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { WahPedalGlyph } from '@coderline/alphatab/rendering/glyphs/WahPedalGlyph';
-import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
  */
-export class WahPedalEffectInfo extends EffectInfo {
-    public get notationElement(): NotationElement {
-        return NotationElement.EffectWahPedal;
-    }
-
-    public get hideOnMultiTrack(): boolean {
-        return false;
-    }
-
-    public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.SingleOnBeat;
-    }
-
-    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
+export const wahPedalEffectInfo: EffectInfo = {
+    effectId: 'EffectWahPedal',
+    notationElement: NotationElement.EffectWahPedal,
+    hideOnMultiTrack: false,
+    sizingMode: EffectBarGlyphSizing.SingleOnBeat,
+    shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
         return beat.wahPedal !== WahPedal.None;
-    }
-
-    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    },
+    createNewGlyph: (_renderer: BarRendererBase, beat: Beat): EffectGlyph => {
         return new WahPedalGlyph(beat.wahPedal);
-    }
-
-    public canExpand(_from: Beat, _to: Beat): boolean {
-        return false;
-    }
-    public override get placementCategory(): EffectBandPlacementCategory {
-        return EffectBandPlacementCategory.Span;
-    }
-}
+    },
+    canExpand: (_from: Beat, _to: Beat): boolean => false,
+    placementCategory: EffectBandPlacementCategory.Span
+};

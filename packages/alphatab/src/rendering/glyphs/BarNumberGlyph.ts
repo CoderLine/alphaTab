@@ -1,14 +1,14 @@
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
-import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal
  */
-export class BarNumberGlyph extends Glyph {
+export class BarNumberGlyph extends EffectGlyph {
     private _barNumberText: string;
 
     public constructor(x: number, y: number, barNumberText: string) {
