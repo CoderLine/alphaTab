@@ -14,7 +14,7 @@ export const barNumberEffectInfo: EffectInfo = {
     effectId: 'BarNumber',
     notationElement: NotationElement.BarNumber,
     hideOnMultiTrack: true,
-    sizingMode: EffectBarGlyphSizing.FullBar,
+    sizingMode: EffectBarGlyphSizing.SingleStartBar,
     shouldCreateGlyph: (renderer: BarRendererBase, beat: Beat): boolean => {
         return beat.voice.index === 0 && beat.index === 0 && (renderer as LineBarRenderer).shouldCreateBarNumber();
     },
@@ -22,7 +22,6 @@ export const barNumberEffectInfo: EffectInfo = {
         const masterBar = beat.voice.bar.masterBar;
         return new BarNumberGlyph(0, 0, masterBar.barNumberText);
     },
-    canExpand: (_from: Beat, _to: Beat): boolean => true,
-    // Voltas share one baseline across the system (Gould Ch.11).
-    placementCategory: EffectBandPlacementCategory.SystemMarker
+    canExpand: (_from: Beat, _to: Beat): boolean => false,
+    placementCategory: EffectBandPlacementCategory.NoteAttached
 };

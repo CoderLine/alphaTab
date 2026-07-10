@@ -13,7 +13,6 @@ import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
-import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
 import {
     NumberedDashBeatContainerGlyph,
     NumberedNoteBeatContainerGlyphBase
@@ -271,11 +270,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
         }
         this.createLinePreBeatGlyphs();
         const hasSpaceAfterStartGlyphs = this.createStartSpacing();
-        if (this.shouldCreateBarNumber()) {
-            const barNumberGlyph = new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.masterBar.barNumberText);
-            this.barNumberGlyph = barNumberGlyph;
-            this.addPreBeatGlyph(barNumberGlyph);
-        } else if (!hasSpaceAfterStartGlyphs) {
+        if (!hasSpaceAfterStartGlyphs) {
             this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
         }
     }

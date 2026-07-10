@@ -58,6 +58,8 @@ export class PlacementInspectorHelper {
                 return 'GroupedOnBeatToEnd';
             case EffectBarGlyphSizing.FullBar:
                 return 'FullBar';
+            case EffectBarGlyphSizing.SingleStartBar:
+                return 'SingleStartBar';
             default:
                 return 'Unknown';
         }

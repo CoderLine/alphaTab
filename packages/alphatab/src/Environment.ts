@@ -468,7 +468,7 @@ export class Environment {
             { effect: beatTimerEffectInfo, mode: EffectBandMode.SharedTop },
             { effect: chordsEffectInfo, mode: EffectBandMode.SharedTop },
             { effect: alternateEndingsEffectInfo, mode: EffectBandMode.SharedTop, order: 1000 },
-            // { effect: barNumberEffectInfo, mode: EffectBandMode.SharedTop, order: 1100 }
+            { effect: barNumberEffectInfo, mode: EffectBandMode.SharedTop, order: 2000 }
         ]),
 
         //

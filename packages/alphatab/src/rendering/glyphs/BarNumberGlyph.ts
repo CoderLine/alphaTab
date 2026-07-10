@@ -14,8 +14,6 @@ export class BarNumberGlyph extends EffectGlyph {
     public constructor(x: number, y: number, barNumberText: string) {
         super(x, y);
         this._barNumberText = barNumberText;
-        // TEMP: for visual regression parity
-        this._barNumberText += '  ';
     }
 
     public override doLayout(): void {
@@ -23,7 +21,6 @@ export class BarNumberGlyph extends EffectGlyph {
         const size = this.renderer.scoreRenderer.canvas!.measureText(this._barNumberText);
         this.width = size.width;
         this.height = size.height;
-        this.y -= this.height;
     }
 
     public override populateSkyline(): void {

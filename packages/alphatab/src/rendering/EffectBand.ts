@@ -230,10 +230,7 @@ export class EffectBand extends Glyph {
     }
 
     public static shouldCreateGlyph(beat: Beat, info: EffectInfo, renderer: BarRendererBase) {
-        return (
-            info.shouldCreateGlyph(renderer, beat) &&
-            (!info.hideOnMultiTrack || renderer.staff!.trackIndex === 0)
-        );
+        return info.shouldCreateGlyph(renderer, beat) && (!info.hideOnMultiTrack || renderer.staff!.trackIndex === 0);
     }
 
     public createGlyph(beat: Beat): void {
@@ -275,6 +272,7 @@ export class EffectBand extends Glyph {
         let g: EffectGlyph;
         switch (sizing) {
             case EffectBarGlyphSizing.FullBar:
+            case EffectBarGlyphSizing.SingleStartBar:
                 g = this.info.createNewGlyph(this.renderer, b);
                 g.renderer = this.renderer;
                 g.beat = b;
@@ -445,6 +443,8 @@ export class EffectBand extends Glyph {
                 break;
             case EffectBarGlyphSizing.FullBar:
                 g.width = this.renderer.width;
+                break;
+            case EffectBarGlyphSizing.SingleStartBar:
                 break;
         }
     }

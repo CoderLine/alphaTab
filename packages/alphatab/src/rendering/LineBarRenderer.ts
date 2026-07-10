@@ -2,20 +2,18 @@ import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import type { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatBeamingMode, type BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
+import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
-import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
+import { NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
-import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
-import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { RepeatCountGlyph } from '@coderline/alphatab/rendering/glyphs/RepeatCountGlyph';
 import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
@@ -649,26 +647,15 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return this.calculateBeamYWithDirection(h, x, this.getBeamDirection(h));
     }
 
-    protected barNumberGlyph?: BarNumberGlyph;
-    public get barNumberWidth(): number {
-        return this.barNumberGlyph?.width ?? 0;
-    }
-
     protected override createPreBeatGlyphs(): void {
         super.createPreBeatGlyphs();
-        this.barNumberGlyph = undefined;
         this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         this.createLinePreBeatGlyphs();
         let hasSpaceAfterStartGlyphs = false;
         if (this.index === 0) {
             hasSpaceAfterStartGlyphs = this.createStartSpacing();
         }
-
-        if (this.shouldCreateBarNumber()) {
-            const barNumberGlyph = new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.masterBar.barNumberText);
-            this.barNumberGlyph = barNumberGlyph;
-            this.addPreBeatGlyph(barNumberGlyph);
-        } else if (!hasSpaceAfterStartGlyphs) {
+        if (!hasSpaceAfterStartGlyphs) {
             this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
         }
     }
