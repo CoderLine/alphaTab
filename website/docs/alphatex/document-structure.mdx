@@ -31,7 +31,7 @@ Before alphaTex 1.7 the 3 sections needed to be separated by a `.` This was impr
 Bars (aka. measures) are starting with an optional list of metadata tags followed by the beats contained
 in the bar. See [Bar Metadata](./bar-metadata.mdx) for details on the tags which can be applied here.
 
-A bar is completed by a pipe `|` symbol
+A bar is completed by a pipe `|` symbol or a new metadata tag. 
 
 <AlphaTexSample>{`
 // bar 1 metadata tags
@@ -43,7 +43,33 @@ A bar is completed by a pipe `|` symbol
 \\ks A
     // bar 2 contents
     C4 
+// bar 3 metadata tags (notice the missing pipe, bar 3 start is indicated by the time signature tag)
+\\ts (3 4)
+    C4
 `}</AlphaTexSample>
+
+Metadata tags need to be at the start of bar followed by the content as a new metadata tag is also a marker for a new bar.
+This can be confusing for tags which control display of elements at the end of the bar. e.g. a repeat end or a `barLineRight` are 
+still declared in the start of a bar. 
+
+
+<AlphaTexSample>{`
+\\barLineLeft lightlight
+  C4 
+|
+\\barLineRight dashed
+  C4
+\\barLineRight dotted
+  C4
+\\barLineRight heavyHeavy
+  C4
+|
+  C4
+`}</AlphaTexSample>
+
+Specifically `\barLineRight dotted` is important in this example, it starts bar 3 and specifies the right barline of it.
+This behavior exists for backwards compatibility. In future alphaTex versions we will make the `|` mandatory setting clear boundaries 
+of what belongs to a bar.
 
 ## Beats
 
@@ -188,7 +214,7 @@ The percussion can be a quoted string or an identifier (name without quotes).
 More details are described over at the [`\\articulation`](./staff-metadata.mdx#articulation) metadata docs.
 
 <AlphaTexSample>{`
-\\instrument percussion
+\\track { instrument percussion }
 \\articulation defaults
 :4
     (KickHit RideBell) 
