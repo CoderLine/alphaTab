@@ -10,7 +10,7 @@ import type { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { StaffSide } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
