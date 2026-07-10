@@ -100,7 +100,12 @@ class NotExpector<T>(private val actual: T, private val message: String? = null)
                 message ?: "Expected collection ${actual.joinToString(",")} to not contain $value",
                 actual.contains(value)
             )
-        } else {
+        } else if(actual is String) {
+            Assert.assertFalse(
+                message ?: "Expected string $actual to no contain $value",
+                actual.contains(value as String)
+            )
+        }else {
             Assert.fail("toContain can only be used with Iterable operands");
         }
     }
