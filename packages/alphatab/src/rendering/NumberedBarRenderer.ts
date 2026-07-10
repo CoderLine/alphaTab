@@ -272,7 +272,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
         this.createLinePreBeatGlyphs();
         const hasSpaceAfterStartGlyphs = this.createStartSpacing();
         if (this.shouldCreateBarNumber()) {
-            const barNumberGlyph = new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1);
+            const barNumberGlyph = new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.masterBar.barNumberText);
             this.barNumberGlyph = barNumberGlyph;
             this.addPreBeatGlyph(barNumberGlyph);
         } else if (!hasSpaceAfterStartGlyphs) {

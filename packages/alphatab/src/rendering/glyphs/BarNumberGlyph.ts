@@ -9,16 +9,18 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
  * @internal
  */
 export class BarNumberGlyph extends Glyph {
-    private _number: string;
+    private _barNumberText: string;
 
-    public constructor(x: number, y: number, num: number) {
+    public constructor(x: number, y: number, barNumberText: string) {
         super(x, y);
-        this._number = `${num}  `;
+        this._barNumberText = barNumberText;
+        // TEMP: for visual regression parity
+        this._barNumberText += '  ';
     }
 
     public override doLayout(): void {
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.elementFonts.get(NotationElement.BarNumber)!;
-        const size = this.renderer.scoreRenderer.canvas!.measureText(this._number);
+        const size = this.renderer.scoreRenderer.canvas!.measureText(this._barNumberText);
         this.width = size.width;
         this.height = size.height;
         this.y -= this.height;
@@ -59,7 +61,7 @@ export class BarNumberGlyph extends Glyph {
         const baseline = canvas.textBaseline;
         canvas.font = res.elementFonts.get(NotationElement.BarNumber)!;
         canvas.textBaseline = TextBaseline.Top;
-        canvas.fillText(this._number, cx + this.x, cy + this.y);
+        canvas.fillText(this._barNumberText, cx + this.x, cy + this.y);
         canvas.textBaseline = baseline;
     }
 }
