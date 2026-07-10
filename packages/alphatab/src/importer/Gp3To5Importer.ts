@@ -81,7 +81,10 @@ export class Gp3To5Importer extends ScoreImporter {
     private _lyrics: Lyrics[] = [];
     private _barCount: number = 0;
     private _trackCount: number = 0;
-    private _playbackInfos: PlaybackInformation[] = [];
+    /**
+     * For 4 ports, 16 channels of information
+     */
+    private _midiChannelInfo: Gp3To5MidiChannelInfo[][] = [];
     private _doubleBars: Set<number> = new Set<number>();
     private _clefsPerTrack: Map<number, Clef> = new Map<number, Clef>();
     private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<
@@ -446,17 +449,25 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readPlaybackInfos(): void {
-        this._playbackInfos = [];
-        let channel = 0;
-        for (let i: number = 0; i < 64; i++) {
-            const info: PlaybackInformation = new PlaybackInformation();
-            info.primaryChannel = channel++;
-            info.secondaryChannel = channel++;
-            info.program = IOHelper.readInt32LE(this.data);
-            info.volume = this.data.readByte();
-            info.balance = this.data.readByte();
-            this.data.skip(6);
-            this._playbackInfos.push(info);
+        this._midiChannelInfo = [];
+        for (let port = 0; port < 4; port++) {
+            const portInfo: Gp3To5MidiChannelInfo[] = [];
+            this._midiChannelInfo.push(portInfo);
+
+            for (let channel = 0; channel < 16; channel++) {
+                const info: Gp3To5MidiChannelInfo = {
+                    program: IOHelper.readInt32LE(this.data),
+                    volume: this.data.readByte(),
+                    balance: this.data.readByte(),
+                    chorus: this.data.readByte(),
+                    reverb: this.data.readByte(),
+                    phase: this.data.readByte(),
+                    tremolo: this.data.readByte()
+                };
+                // gp3 backwards compatibiliy (blanks)
+                this.data.skip(2);
+                portInfo.push(info);
+            }
         }
     }
 
@@ -632,22 +643,29 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         mainStaff.stringTuning.tunings = tuning;
 
-        const port: number = IOHelper.readInt32LE(this.data);
-        const index: number = IOHelper.readInt32LE(this.data) - 1;
+        const port: number = IOHelper.readInt32LE(this.data) - 1;
+        const channel: number = IOHelper.readInt32LE(this.data) - 1;
         const effectChannel: number = IOHelper.readInt32LE(this.data) - 1;
         this.data.skip(4); // Fretcount
 
-        if (index >= 0 && index < this._playbackInfos.length) {
-            const info: PlaybackInformation = this._playbackInfos[index];
-            info.port = port;
-            info.isSolo = (flags & 0x10) !== 0;
-            info.isMute = (flags & 0x20) !== 0;
-            info.secondaryChannel = effectChannel;
-            if (GeneralMidi.isGuitar(info.program)) {
-                mainStaff.displayTranspositionPitch = -12;
-            }
-            newTrack.playbackInfo = info;
+        const mainMidiChannelInfo = this._midiChannelInfo[port][channel];
+        // const effectMidiChannelInfo = this._midiChannelInfo[port][effectChannel];
+
+        const trackPlaybackInfo = new PlaybackInformation();
+        trackPlaybackInfo.volume = mainMidiChannelInfo.volume;
+        trackPlaybackInfo.balance = mainMidiChannelInfo.balance;
+        trackPlaybackInfo.port = port;
+        trackPlaybackInfo.program = mainMidiChannelInfo.program;
+        trackPlaybackInfo.primaryChannel = channel;
+        trackPlaybackInfo.secondaryChannel = effectChannel;
+        trackPlaybackInfo.isSolo = (flags & 0x10) !== 0;
+        trackPlaybackInfo.isMute = (flags & 0x20) !== 0;
+
+        if (GeneralMidi.isGuitar(trackPlaybackInfo.program)) {
+            mainStaff.displayTranspositionPitch = -12;
         }
+        newTrack.playbackInfo = trackPlaybackInfo;
+
         mainStaff.capo = IOHelper.readInt32LE(this.data);
         newTrack.color = GpBinaryHelpers.gpReadColor(this.data, false);
         if (this._versionNumber >= 500) {
@@ -1790,4 +1808,18 @@ class MixTableChange {
     public tempoName: string = '';
     public tempo: number = -1;
     public duration: number = -1;
+}
+
+/**
+ * The midi channel information
+ * @internal
+ */
+interface Gp3To5MidiChannelInfo {
+    program: number;
+    volume: number;
+    balance: number;
+    chorus: number;
+    reverb: number;
+    phase: number;
+    tremolo: number;
 }
