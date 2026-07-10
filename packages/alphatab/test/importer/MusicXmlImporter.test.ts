@@ -62,6 +62,14 @@ describe('MusicXmlImporterTests', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isTieDestination).toBe(true);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].tieOrigin).toBeTruthy();
 
+        // notes carry a <instrument id="..."/> reference purely to disambiguate the
+        // score-instrument (a pitched acoustic guitar) - this must not mark them as percussion.
+        for (const beat of score.tracks[0].staves[0].bars[0].voices[0].beats) {
+            for (const note of beat.notes) {
+                expect(note.isPercussion).toBe(false);
+            }
+        }
+
         score = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score));
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isTieOrigin).toBe(true);
@@ -287,6 +295,26 @@ describe('MusicXmlImporterTests', () => {
         expect(notes[1].displayValue).toBe(49);
         expect(notes[1].isPercussion).toBe(true);
         expect(notes[1].percussionArticulation).toBe(49);
+    });
+
+    it('percussion-instrument-vs-pitched', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile(
+            'test-data/musicxml4/percussion-instrument-vs-pitched.xml'
+        );
+        const notes = score.tracks[0].staves[0].bars[0].voices[0].beats.flatMap(b => b.notes);
+
+        expect(notes).toHaveLength(2);
+
+        // <pitch> note referencing a normal pitched instrument via <instrument id> just to
+        // disambiguate the score-instrument -> must NOT be treated as percussion.
+        expect(notes[0].isPercussion).toBe(false);
+        expect(Number.isNaN(notes[0].percussionArticulation)).toBe(true);
+        expect(notes[0].realValue).toBe(60); // C4
+
+        // <pitch> note referencing a score-instrument declared unpitched via
+        // <midi-instrument><midi-unpitched> -> IS a genuine percussion sound.
+        expect(notes[1].isPercussion).toBe(true);
+        expect(notes[1].percussionArticulation).toBeGreaterThanOrEqual(0);
     });
 
     describe('barnumberdisplay', async () => {

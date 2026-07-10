@@ -97,6 +97,11 @@ class InstrumentArticulationWithPlaybackInfo extends InstrumentArticulation {
      * The balance to use when playing the note (-1 if using the default track balance).
      */
     public outputBalance: number = -1;
+
+    /**
+     * Whether this instrument was declared as an unpitched/percussion sound via `<midi-unpitched>`.
+     */
+    public isUnpitched: boolean = false;
 }
 
 /**
@@ -188,6 +193,10 @@ class TrackInfo {
         this._instrumentIdToArticulationIndex.set(lookup, index);
         this.track.percussionArticulations.push(newArticulation);
         return index;
+    }
+
+    public isUnpitchedInstrument(instrumentId: string): boolean {
+        return this.instruments.has(instrumentId) && this.instruments.get(instrumentId)!.isUnpitched;
     }
 }
 
@@ -692,6 +701,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 case 'midi-unpitched':
                     articulation.outputMidiNumber = Number.parseInt(c.innerText, 10) - 1;
+                    articulation.isUnpitched = true;
                     break;
                 case 'volume':
                     articulation.outputVolume = MusicXmlImporter._interpolatePercent(Number.parseFloat(c.innerText));
@@ -2788,15 +2798,24 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         const trackInfo = this._indexToTrackInfo.get(track.index)!;
-        if (instrumentId !== null) {
+
+        if (!isPitched) {
+            // <unpitched> note -> always a percussion/unpitched sound
+            note.percussionArticulation = trackInfo.getOrCreateArticulation(instrumentId ?? '', note);
+            return;
+        }
+
+        // isPitched === true from here on: only treat as percussion if we have
+        // explicit evidence this is really an unpitched/percussion sound. A plain
+        // <instrument> reference on a pitched note can just be disambiguating between
+        // multiple pitched score-instruments in the same part and must not imply percussion.
+        if (instrumentId !== null && trackInfo.isUnpitchedInstrument(instrumentId)) {
             note.percussionArticulation = trackInfo.getOrCreateArticulation(instrumentId, note);
-        } else if (note.beat.voice.bar.staff.isPercussion && isPitched) {
+        } else if (note.beat.voice.bar.staff.isPercussion) {
             const knownArticulation = PercussionMapper.getArticulationById(note.displayValue);
             if (knownArticulation) {
                 note.percussionArticulation = knownArticulation.id;
             }
-        } else if (!isPitched) {
-            note.percussionArticulation = trackInfo.getOrCreateArticulation('', note);
         }
     }
 
