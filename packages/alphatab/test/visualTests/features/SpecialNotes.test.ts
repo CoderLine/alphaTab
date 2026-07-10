@@ -46,4 +46,15 @@ describe('SpecialNotesTests', () => {
     it('beaming-mode', async () => {
         await VisualTestHelper.runVisualTest('special-notes/beaming-mode.gp');
     });
+
+    it('full-bar-notes-rests', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+                C4 {slur s1} | C4 {slur s1} .1 | r.4 | r.1
+                \\ts(3 8) C4{slur S2}.4 {d} | C4 {slur S2} |
+                \\ts(4 4) C4{gr} C4.1
+            `,
+            'test-data/visual-tests/special-notes/full-bar-notes-rests.png'
+        );
+    });
 });

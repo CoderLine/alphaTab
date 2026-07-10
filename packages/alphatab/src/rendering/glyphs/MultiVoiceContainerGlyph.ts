@@ -60,9 +60,48 @@ export class MultiVoiceContainerGlyph extends Glyph {
         this._scaleToForce(force, true);
     }
 
+    /**
+     * `true` when every voice/track/staff contributes exactly one beat, of uniform duration,
+     * spanning the bar's entire duration - i.e. a single full-bar note/rest. Common engraving
+     * practice centers such notes horizontally within the bar rather than anchoring them right
+     * after the pre-beat content (Behind Bars, p. 41; see #2464).
+     */
+    private _isCenteredFullBar(): boolean {
+        // single spring which starts at start and spans the whole bar?
+        // also ensure we do not have any grace notes
+        const masterBar = this.renderer.bar.masterBar;
+        const layoutingInfo = this.renderer.layoutingInfo;
+        const springs = layoutingInfo.springs;
+        if (springs.size !== 1 || !springs.has(masterBar.start) || layoutingInfo.allGraceRods.size > 0) {
+            return false;
+        }
+
+        const spring = springs.get(masterBar.start)!;
+        return spring.allDurations.size === 1 && spring.longestDuration === masterBar.calculateDuration();
+    }
+
     /** `emit=false`: positioning-only path; final skyline emission runs later via {@link scaleToWidth}. */
     private _scaleToForce(force: number, emit: boolean): void {
         this.width = this.renderer.layoutingInfo.calculateVoiceWidth(force);
+
+        if (this._isCenteredFullBar()) {
+            // Sole full-bar beat: keep x=0/width=full-bar so bounds lookups, hit-testing and
+            // skyline emission still span the whole bar, and shift only the ink via
+            // applyCenterOffset instead of moving the container itself (which would leave the
+            // bar's left portion outside this beat's bounds).
+            const target = this.width / 2;
+            for (const beatGlyphs of this.beatGlyphs.values()) {
+                const soleBeatGlyph = beatGlyphs[0];
+                soleBeatGlyph.x = 0;
+                soleBeatGlyph.applyCenterOffset(target);
+                soleBeatGlyph.scaleToWidth(this.width);
+                if (emit) {
+                    this._emitBeatContainerSkyline(soleBeatGlyph);
+                }
+            }
+            return;
+        }
+
         const positions = this.renderer.layoutingInfo.buildOnTimePositions(force);
         for (const beatGlyphs of this.beatGlyphs.values()) {
             for (let i: number = 0, j: number = beatGlyphs.length; i < j; i++) {

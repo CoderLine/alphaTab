@@ -432,11 +432,7 @@ export class BarLayoutingInfo {
      * Pair-overlap + last-rod phantom-next-beat for a single band's rod list.
      * Called once per band by {@link _calculateSpringConstants}.
      */
-    private _applyOverlayRodConstraints(
-        rods: OverlayRod[],
-        sortedSprings: Spring[],
-        overlayPadding: number
-    ): void {
+    private _applyOverlayRodConstraints(rods: OverlayRod[], sortedSprings: Spring[], overlayPadding: number): void {
         if (rods.length === 0) {
             return;
         }
@@ -445,10 +441,7 @@ export class BarLayoutingInfo {
         // anchored in [A.timePosition, B.timePosition) and convert the required gap
         // `A.rightExtent + B.leftExtent + padding` to a force `requiredGap / invSum`.
         let springIdx = 0;
-        while (
-            springIdx < sortedSprings.length &&
-            sortedSprings[springIdx].timePosition !== rods[0].timePosition
-        ) {
+        while (springIdx < sortedSprings.length && sortedSprings[springIdx].timePosition !== rods[0].timePosition) {
             springIdx++;
         }
 
@@ -457,10 +450,7 @@ export class BarLayoutingInfo {
             const b = rods[r];
 
             let invSum = 0;
-            while (
-                springIdx < sortedSprings.length &&
-                sortedSprings[springIdx].timePosition !== b.timePosition
-            ) {
+            while (springIdx < sortedSprings.length && sortedSprings[springIdx].timePosition !== b.timePosition) {
                 invSum += 1 / sortedSprings[springIdx].springConstant;
                 springIdx++;
             }
@@ -483,8 +473,7 @@ export class BarLayoutingInfo {
             const overlayRightRequirement = lastRod.rightExtent + overlayPadding;
             const naturalRightBudget = lastSpring.postSpringWidth + this.postBeatSize;
             if (overlayRightRequirement > naturalRightBudget) {
-                const requiredForce =
-                    (overlayRightRequirement - this.postBeatSize) * lastSpring.springConstant;
+                const requiredForce = (overlayRightRequirement - this.postBeatSize) * lastSpring.springConstant;
                 this._updateMinStretchForce(requiredForce);
             }
         }
@@ -594,6 +583,7 @@ export class BarLayoutingInfo {
         if (sortedSprings.length === 0) {
             return positions;
         }
+
         let springX: number = sortedSprings[0].preSpringWidth;
         for (let i: number = 0; i < sortedSprings.length; i++) {
             positions.set(sortedSprings[i].timePosition, springX);
