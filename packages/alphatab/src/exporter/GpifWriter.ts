@@ -973,7 +973,8 @@ export class GpifWriter {
 
         scoreNode.addElement('ScoreZoomPolicy').innerText = 'Value';
         scoreNode.addElement('ScoreZoom').innerText = '1';
-        scoreNode.addElement('MultiVoice').innerText = '0';
+        // not fully clear at this point so we rather activate it
+        scoreNode.addElement('MultiVoice').innerText = '1>';
     }
 
     private _writeMasterTrackNode(parent: XmlNode, score: Score) {

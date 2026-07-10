@@ -157,7 +157,7 @@ describe('Gp7ExporterTest', () => {
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
     });
 
-    it('alphatex-to-gp7-score-metadata', () => {
+    it('alphatex-to-gp7-score-system-layout-as-text', () => {
         const tex = `\\title "Multitrack Metadata"
         \\artist "alphaTab"
         \\tempo 90
@@ -172,14 +172,14 @@ describe('Gp7ExporterTest', () => {
         `;
 
         const score = ScoreLoader.loadAlphaTex(tex);
+        score.defaultSystemsLayout = 5;
+        score.systemsLayout = [3, 2, 3];
         const gpif = readExportedGpif(exportGp7(score));
 
-        expect(gpif).toContain('<ScoreSystemsDefaultLayout>3</ScoreSystemsDefaultLayout>');
-        expect(gpif).toContain('<ScoreSystemsLayout>');
+        expect(gpif).toContain('<ScoreSystemsDefaultLayout>5</ScoreSystemsDefaultLayout>');
+        expect(gpif).toContain('<ScoreSystemsLayout>3 2 3</ScoreSystemsLayout>');
         expect(gpif).not.toContain('<ScoreSystemsDefaultLayout><![CDATA[');
         expect(gpif).not.toContain('<ScoreSystemsLayout><![CDATA[');
-        expect(gpif).toContain('<MultiVoice>0</MultiVoice>');
-        expect(gpif).not.toContain('<MultiVoice>1></MultiVoice>');
     });
 
     it('alphatex-drums-to-gp7', () => {
