@@ -552,4 +552,29 @@ describe('LayoutTests', () => {
                 ));
         });
     });
+
+    it('barnumbers', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            // anacrusis (no number)
+            \\ac 
+                C4.1 
+            | 
+            // standard bar number 1
+                C4 
+            | 
+            // custom text instead of bar number 2
+            \\barNumber "Hello" 
+                C4
+            |
+            // a jump to 10 
+            \\barNumber 10
+                C4
+            |
+            // now becomes 11 after the customization before
+                C4
+            `,
+            'test-data/visual-tests/layout/barnumbers.png'
+        );
+    });
 });
