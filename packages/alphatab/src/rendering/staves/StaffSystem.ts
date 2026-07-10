@@ -1222,6 +1222,19 @@ export class StaffSystem {
                     }
                 }
 
+                // the bracket spike curls into the first bar of whichever staff it is
+                // anchored on; register that horizontal footprint in the bar's own skyline
+                // so bar-attached content (e.g. the bar number) shifts out of its way
+                // instead of being drawn underneath it.
+                if (hasBracket && bracket!.firstVisibleStaffInBracket !== bracket!.lastVisibleStaffInBracket) {
+                    if (bracket!.firstVisibleStaffInBracket === staff) {
+                        this._registerBracketSpikeSkyline(staff, true);
+                    }
+                    if (bracket!.lastVisibleStaffInBracket === staff) {
+                        this._registerBracketSpikeSkyline(staff, false);
+                    }
+                }
+
                 staff.x = this.accoladeWidth;
                 staff.y = currentY;
                 if (!onlyFirstGroup) {
@@ -1273,6 +1286,41 @@ export class StaffSystem {
         this._contentHeight = currentY;
 
         return anyStaffVisible;
+    }
+
+    /**
+     * Registers the horizontal footprint of the bracket's top/bottom spike glyph (see
+     * `_paintBrackets`'s `spikeX`) into the first bar renderer's own skyline. The spike is
+     * anchored just left of the staff's content area but its glyph bbox extends `glyphWidth`
+     * to the right, which can reach past the accolade into the first bar. Without this, content
+     * placed at the top/bottom of that bar (e.g. the bar number) doesn't know to avoid it.
+     */
+    private _registerBracketSpikeSkyline(staff: RenderStaff, isTop: boolean): void {
+        if (staff.barRenderers.length === 0) {
+            return;
+        }
+
+        const settings = this.layout.renderer.settings;
+        const smufl = settings.display.resources.engravingSettings;
+        const symbol = isTop ? MusicFontSymbol.BracketTop : MusicFontSymbol.BracketBottom;
+        const glyphWidth = smufl.glyphWidths.get(symbol)!;
+        const glyphHeight = smufl.glyphHeights.get(symbol)!;
+        const barOffset = settings.display.accoladeBarPaddingRight;
+
+        const intrusion = glyphWidth - barOffset - smufl.bracketThickness;
+        if (intrusion <= 0) {
+            return;
+        }
+
+        // brackets typically overflow their content range by 1/4 staff-space (see `_paintBrackets`)
+        const height = glyphHeight + smufl.oneStaffSpace * 0.25;
+
+        const firstBar = staff.barRenderers[0];
+        if (isTop) {
+            firstBar.insertSkylineTop(0, intrusion, height);
+        } else {
+            firstBar.insertSkylineBottom(0, intrusion, height);
+        }
     }
 
     public buildBoundingsLookup(cx: number, cy: number): void {
