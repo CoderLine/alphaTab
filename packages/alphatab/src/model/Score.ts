@@ -430,12 +430,22 @@ export class Score {
 
     public finish(settings: Settings): void {
         const sharedDataBag = new Map<string, unknown>();
-        for (let i: number = 0, j: number = this.tracks.length; i < j; i++) {
-            this.tracks[i].finish(settings, sharedDataBag);
+        for (const t of this.tracks) {
+            t.finish(settings, sharedDataBag);
         }
 
-        // fixup masterbar starts to handle anacrusis lengths
+        let barNumber = 1;
         for (const mb of this.masterBars) {
+            if (mb.isAnacrusis) {
+                mb._realBarNumber = Number.NaN;
+            } else if (mb.customBarNumber) {
+                barNumber = mb.customBarNumber!;
+                mb._realBarNumber = barNumber;
+                barNumber++;
+            } else {
+                mb._realBarNumber = barNumber;
+                barNumber++;
+            }
             mb.finish(sharedDataBag);
         }
     }
