@@ -154,8 +154,7 @@ export const articulation: MetadataTagDefinition = {
         }
     ],
     examples: `
-        \\track "Drums"
-        \\instrument percussion
+        \\track "Drums" { instrument percussion }
         \\tempo 120
         \\clef neutral
         \\articulation defaults

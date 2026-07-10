@@ -184,8 +184,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('alphatex-drums-to-gp7', () => {
-        const tex = `\\track "Drums"
-        \\instrument percussion
+        const tex = `\\track "Drums" { instrument percussion }
         \\clef neutral
         \\articulation defaults
         \\articulation Kick 36
