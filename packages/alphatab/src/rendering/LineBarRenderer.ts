@@ -649,8 +649,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return this.calculateBeamYWithDirection(h, x, this.getBeamDirection(h));
     }
 
+    protected barNumberGlyph?: BarNumberGlyph;
+    public get barNumberWidth(): number {
+        return this.barNumberGlyph?.width ?? 0;
+    }
+
     protected override createPreBeatGlyphs(): void {
         super.createPreBeatGlyphs();
+        this.barNumberGlyph = undefined;
         this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         this.createLinePreBeatGlyphs();
         let hasSpaceAfterStartGlyphs = false;
@@ -659,7 +665,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
 
         if (this.shouldCreateBarNumber()) {
-            this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
+            const barNumberGlyph = new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1);
+            this.barNumberGlyph = barNumberGlyph;
+            this.addPreBeatGlyph(barNumberGlyph);
         } else if (!hasSpaceAfterStartGlyphs) {
             this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
         }

@@ -10,6 +10,7 @@ import type { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { StaffSide } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
@@ -89,7 +90,11 @@ export class MultiVoiceContainerGlyph extends Glyph {
             // skyline emission still span the whole bar, and shift only the ink via
             // applyCenterOffset instead of moving the container itself (which would leave the
             // bar's left portion outside this beat's bounds).
-            const target = this.width / 2;
+
+            // temporary workaround for https://github.com/CoderLine/alphaTab/issues/2780
+            const barNumberWidth = (this.renderer as LineBarRenderer).barNumberWidth;
+
+            const target = (this.width - barNumberWidth) / 2;
             for (const beatGlyphs of this.beatGlyphs.values()) {
                 const soleBeatGlyph = beatGlyphs[0];
                 soleBeatGlyph.x = 0;
