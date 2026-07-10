@@ -92,6 +92,7 @@ export class Gp3To5Importer extends ScoreImporter {
 
     private _directionLookup: Map<number, Direction[]> = new Map<number, Direction[]>();
     private _initialTempo: Automation | undefined;
+    private _stringEncoding = '';
 
     public get name(): string {
         return 'Guitar Pro 3-5';
@@ -99,6 +100,13 @@ export class Gp3To5Importer extends ScoreImporter {
 
     public readScore(): Score {
         this._directionLookup.clear();
+
+        // backwards compat: if users provide a custom encoding use it, otherwise use the new special ANSI encoding setting
+        if (this.settings.importer.encoding !== 'utf-8') {
+            this._stringEncoding = this.settings.importer.encoding;
+        } else {
+            this._stringEncoding = this.settings.importer.gp3To5encoding;
+        }
 
         this.readVersion();
         this._score = new Score();
@@ -128,7 +136,7 @@ export class Gp3To5Importer extends ScoreImporter {
             this.readPageSetup();
             this._initialTempo.text = GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
         }
@@ -220,7 +228,7 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readVersion(): void {
-        let version: string = GpBinaryHelpers.gpReadStringByteLength(this.data, 30, this.settings.importer.encoding);
+        let version: string = GpBinaryHelpers.gpReadStringByteLength(this.data, 30, this._stringEncoding);
         if (!version.startsWith(Gp3To5Importer._versionString)) {
             throw new UnsupportedFormatError('Unsupported format');
         }
@@ -234,50 +242,50 @@ export class Gp3To5Importer extends ScoreImporter {
     public readScoreInformation(): void {
         this._score.title = GpBinaryHelpers.gpReadStringIntUnused(
             this.data,
-            this.settings.importer.encoding,
+            this._stringEncoding,
             this.settings.importer.maxDecodingBufferSize
         );
         this._score.subTitle = GpBinaryHelpers.gpReadStringIntUnused(
             this.data,
-            this.settings.importer.encoding,
+            this._stringEncoding,
             this.settings.importer.maxDecodingBufferSize
         );
         this._score.artist = GpBinaryHelpers.gpReadStringIntUnused(
             this.data,
-            this.settings.importer.encoding,
+            this._stringEncoding,
             this.settings.importer.maxDecodingBufferSize
         );
         this._score.album = GpBinaryHelpers.gpReadStringIntUnused(
             this.data,
-            this.settings.importer.encoding,
+            this._stringEncoding,
             this.settings.importer.maxDecodingBufferSize
         );
         this._score.words = GpBinaryHelpers.gpReadStringIntUnused(
             this.data,
-            this.settings.importer.encoding,
+            this._stringEncoding,
             this.settings.importer.maxDecodingBufferSize
         );
         this._score.music =
             this._versionNumber >= 500
                 ? GpBinaryHelpers.gpReadStringIntUnused(
                       this.data,
-                      this.settings.importer.encoding,
+                      this._stringEncoding,
                       this.settings.importer.maxDecodingBufferSize
                   )
                 : this._score.words;
         this._score.copyright = GpBinaryHelpers.gpReadStringIntUnused(
             this.data,
-            this.settings.importer.encoding,
+            this._stringEncoding,
             this.settings.importer.maxDecodingBufferSize
         );
         this._score.tab = GpBinaryHelpers.gpReadStringIntUnused(
             this.data,
-            this.settings.importer.encoding,
+            this._stringEncoding,
             this.settings.importer.maxDecodingBufferSize
         );
         this._score.instructions = GpBinaryHelpers.gpReadStringIntUnused(
             this.data,
-            this.settings.importer.encoding,
+            this._stringEncoding,
             this.settings.importer.maxDecodingBufferSize
         );
         const noticeLines: number = IOHelper.readInt32LE(this.data);
@@ -289,7 +297,7 @@ export class Gp3To5Importer extends ScoreImporter {
             }
             notice += GpBinaryHelpers.gpReadStringIntUnused(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             )?.toString();
         }
@@ -305,7 +313,7 @@ export class Gp3To5Importer extends ScoreImporter {
 
     // I haven't encountered such a long song in the wild. beyond 1000 bars something is clearly off
     private static readonly _maxBarCount = 1000;
-    
+
     // I think GP5 itself limits already to ~10. 100 tracks is just unrealistic, proof me wrong
     private static readonly _maxTrackCount = 100;
 
@@ -331,7 +339,7 @@ export class Gp3To5Importer extends ScoreImporter {
             lyrics.startBar = IOHelper.readInt32LE(this.data) - 1;
             lyrics.text = GpBinaryHelpers.gpReadStringInt(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
             this._lyrics.push(lyrics);
@@ -354,7 +362,7 @@ export class Gp3To5Importer extends ScoreImporter {
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Title).template =
             GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
 
@@ -363,7 +371,7 @@ export class Gp3To5Importer extends ScoreImporter {
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.SubTitle).template =
             GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
 
@@ -372,7 +380,7 @@ export class Gp3To5Importer extends ScoreImporter {
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Artist).template =
             GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
 
@@ -381,7 +389,7 @@ export class Gp3To5Importer extends ScoreImporter {
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Album).template =
             GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
 
@@ -390,7 +398,7 @@ export class Gp3To5Importer extends ScoreImporter {
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Words).template =
             GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
 
@@ -399,7 +407,7 @@ export class Gp3To5Importer extends ScoreImporter {
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Music).template =
             GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
 
@@ -408,7 +416,7 @@ export class Gp3To5Importer extends ScoreImporter {
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.WordsAndMusic).template =
             GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
 
@@ -417,7 +425,7 @@ export class Gp3To5Importer extends ScoreImporter {
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Copyright).template =
             GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
 
@@ -426,13 +434,13 @@ export class Gp3To5Importer extends ScoreImporter {
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.CopyrightSecondLine).template =
             GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
         // page number format
         GpBinaryHelpers.gpReadStringIntByte(
             this.data,
-            this.settings.importer.encoding,
+            this._stringEncoding,
             this.settings.importer.maxDecodingBufferSize
         );
     }
@@ -519,7 +527,7 @@ export class Gp3To5Importer extends ScoreImporter {
             const section: Section = new Section();
             section.text = GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
             section.marker = '';
@@ -600,7 +608,7 @@ export class Gp3To5Importer extends ScoreImporter {
         // 128 - Show Tuning
 
         const flags: number = this.data.readByte();
-        newTrack.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this.settings.importer.encoding);
+        newTrack.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this._stringEncoding);
         if ((flags & 0x01) !== 0) {
             mainStaff.isPercussion = true;
         }
@@ -715,14 +723,14 @@ export class Gp3To5Importer extends ScoreImporter {
                 // RSE: effect name
                 GpBinaryHelpers.gpReadStringIntByte(
                     this.data,
-                    this.settings.importer.encoding,
+                    this._stringEncoding,
                     this.settings.importer.maxDecodingBufferSize
                 );
 
                 // RSE: effect category
                 GpBinaryHelpers.gpReadStringIntByte(
                     this.data,
-                    this.settings.importer.encoding,
+                    this._stringEncoding,
                     this.settings.importer.maxDecodingBufferSize
                 );
             }
@@ -868,7 +876,7 @@ export class Gp3To5Importer extends ScoreImporter {
         if ((flags & 0x04) !== 0) {
             const text = GpBinaryHelpers.gpReadStringIntUnused(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
             if (beatTextAsLyrics) {
@@ -990,7 +998,7 @@ export class Gp3To5Importer extends ScoreImporter {
         const chordId: string = ModelUtils.newGuid();
         if (this._versionNumber >= 500) {
             this.data.skip(17);
-            chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 21, this.settings.importer.encoding);
+            chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 21, this._stringEncoding);
             this.data.skip(4);
             chord.firstFret = IOHelper.readInt32LE(this.data);
             for (let i: number = 0; i < 7; i++) {
@@ -1019,7 +1027,7 @@ export class Gp3To5Importer extends ScoreImporter {
                     // Diminished/Augmented (4)
                     // Add (1)
                     this.data.skip(16);
-                    chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 21, this.settings.importer.encoding);
+                    chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 21, this._stringEncoding);
                     // Unused (2)
                     // Fifth (1)
                     // Ninth (1)
@@ -1048,7 +1056,7 @@ export class Gp3To5Importer extends ScoreImporter {
                 } else {
                     // unknown
                     this.data.skip(25);
-                    chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 34, this.settings.importer.encoding);
+                    chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 34, this._stringEncoding);
                     chord.firstFret = IOHelper.readInt32LE(this.data);
                     for (let i: number = 0; i < 6; i++) {
                         const fret: number = IOHelper.readInt32LE(this.data);
@@ -1063,7 +1071,7 @@ export class Gp3To5Importer extends ScoreImporter {
                 const strings: number = this._versionNumber >= 406 ? 7 : 6;
                 chord.name = GpBinaryHelpers.gpReadStringIntByte(
                     this.data,
-                    this.settings.importer.encoding,
+                    this._stringEncoding,
                     this.settings.importer.maxDecodingBufferSize
                 );
                 chord.firstFret = IOHelper.readInt32LE(this.data);
@@ -1252,7 +1260,7 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber >= 500) {
             tableChange.tempoName = GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
         }
@@ -1302,12 +1310,12 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber >= 510) {
             GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
             GpBinaryHelpers.gpReadStringIntByte(
                 this.data,
-                this.settings.importer.encoding,
+                this._stringEncoding,
                 this.settings.importer.maxDecodingBufferSize
             );
         }
