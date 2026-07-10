@@ -57,7 +57,6 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
 
         let preBends: BendNoteHeadGroupGlyph | null = null;
 
-
         let hasSimpleSlideIn = false;
 
         for (const note of this.container.beat.notes) {
@@ -107,7 +106,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                 }
             }
         }
-        
+
         if (hasSimpleSlideIn) {
             this.addNormal(
                 new SpacingGlyph(
@@ -168,19 +167,23 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         if (!ghost.isEmpty) {
             this.addEffect(ghost);
         }
+
+        // Behind bars:
+        // - if no accidental 2.5sp initial spacing (handled here)
+        // - if 1 accidental 1.5sp initial spacing (handled in the accidental glyph)
+        // - if more accidentals 1sp initial spacing (handled in the accidental glyph)
+        // the pre-beat glyphs already have a bit spacing, hence we have reduced values here
+
+        if (this.container.beat.index === 0) {
+            if (accidentals.isEmpty) {
+                this.addNormal(new SpacingGlyph(0, 0, 0.6 * this.renderer.smuflMetrics.oneStaffSpace));
+            }  else{
+                accidentals.applyInitialNotePadding = true;
+            }
+        }
+
         if (!accidentals.isEmpty) {
             this.accidentals = accidentals;
-            if (!this.isEmpty) {
-                this.addNormal(
-                    new SpacingGlyph(
-                        0,
-                        0,
-                        this.renderer.smuflMetrics.preNoteEffectPadding *
-                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                    )
-                );
-            }
-
             this.addNormal(accidentals);
             this.addNormal(
                 new SpacingGlyph(

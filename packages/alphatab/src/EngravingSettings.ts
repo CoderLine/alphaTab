@@ -518,7 +518,7 @@ export class EngravingSettings {
 
         this.tripletFeelBracketPadding = 0.2 * this.oneStaffSpace;
         this.accidentalPadding = 0.1 * this.oneStaffSpace;
-        this.preBeatGlyphSpacing = 0.5 * this.oneStaffSpace;
+        this.preBeatGlyphSpacing = 0.6 * this.oneStaffSpace;
         this.multiVoiceDisplacedNoteHeadSpacing = 0.2 * this.oneStaffSpace;
 
         this.tuningGlyphStringRowPadding = 0.2 * this.oneStaffSpace;

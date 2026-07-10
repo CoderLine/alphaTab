@@ -456,6 +456,7 @@ export class TabBarRenderer extends LineBarRenderer {
                 this.bar.masterBar.isFreeTime
             )
         );
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
     }
 
     protected override createVoiceGlyphs(v: Voice): void {

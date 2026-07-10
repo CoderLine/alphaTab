@@ -184,6 +184,7 @@ export class SlashBarRenderer extends LineBarRenderer {
         );
         g.barSubElement = BarSubElement.SlashTimeSignature;
         this.addPreBeatGlyph(g);
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
     }
 
     protected override createVoiceGlyphs(v: Voice): void {

@@ -401,7 +401,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         // canvas.color = Color.random();
-        // canvas.strokeRect(cx + this.x, cy + this.y, this.width, this.renderer.height);
+        // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.renderer.height);
         for (const v of this.voiceDrawOrder!) {
             const beatGlyphs = this.beatGlyphs.get(v)!;
             const voice = this.renderer.bar.voices[v];

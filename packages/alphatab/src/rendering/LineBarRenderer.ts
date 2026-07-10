@@ -651,13 +651,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         super.createPreBeatGlyphs();
         this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         this.createLinePreBeatGlyphs();
-        let hasSpaceAfterStartGlyphs = false;
-        if (this.index === 0) {
-            hasSpaceAfterStartGlyphs = this.createStartSpacing();
-        }
-        if (!hasSpaceAfterStartGlyphs) {
-            this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
-        }
+        this.createStartSpacing();
     }
 
     public resolveClefDisplay(): ElementDisplay {

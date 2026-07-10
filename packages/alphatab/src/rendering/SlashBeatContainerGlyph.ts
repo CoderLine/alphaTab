@@ -8,6 +8,7 @@ import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBas
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { SlashBeatGlyph } from '@coderline/alphatab/rendering/glyphs/SlashBeatGlyph';
 import { SlashTieGlyph } from '@coderline/alphatab/rendering/glyphs/SlashTieGlyph';
+import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRenderer';
 
 /**
@@ -16,7 +17,7 @@ import type { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRen
 export class SlashBeatContainerGlyph extends BeatContainerGlyph {
     private _tiedNoteTie: SlashTieGlyph | null = null;
 
-    public constructor(beat:Beat){
+    public constructor(beat: Beat) {
         super(beat);
         this.preNotes = new BeatGlyphBase();
         this.onNotes = new SlashBeatGlyph();
@@ -40,6 +41,7 @@ export class SlashBeatContainerGlyph extends BeatContainerGlyph {
             this._flagStretch = graceSpacing;
         }
 
+        this.preNotes.addNormal(new SpacingGlyph(0, 0, 0.6 * this.renderer.smuflMetrics.oneStaffSpace));
         super.doLayout();
     }
 
