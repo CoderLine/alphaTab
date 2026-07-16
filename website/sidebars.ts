@@ -21,7 +21,7 @@ const sidebars: SidebarsConfig = {
       "getting-started/installation-vite",
       "getting-started/configuration-web",
     ],
-    "Getting Started (.net)": [
+    "Getting Started (.NET)": [
       "getting-started/installation-net",
       "getting-started/configuration-net",
     ],

@@ -1,104 +1,116 @@
 ---
-title: Installation (.net)
+title: Installation (.NET)
+description: Install alphaTab in a .NET project via NuGet, then render or play music notation from a console app, WPF, or WinForms.
+keywords: alphaTab, .NET, NuGet, WPF, WinForms, C#, Skia
 ---
 
-The .net version of alphaTab can be used to render music notation either on servers, command line tools or on 
-Windows desktop applications. AlphaTab comes with a .net version for either .net standard 2.0 or .net 8.0.  
+alphaTab on .NET runs in console applications, servers, and Windows desktop UIs. It ships as two NuGet packages depending on where you need it.
 
-## Grab your Copy
+## Install
 
-### NuGet.org
+Two packages cover every .NET scenario:
 
-We provide NuGet packages based on the latest development version via NuGet.org.
-Install packages like usual:  
+- [`AlphaTab`](https://www.nuget.org/packages/AlphaTab/) targets .NET Standard 2.0. Use it for console tools, servers, and headless rendering.
+- [`AlphaTab.Windows`](https://www.nuget.org/packages/AlphaTab.Windows/) targets .NET 8.0 and adds WPF and WinForms UI controls. It brings in the base package as a dependency.
 
-**Core Package (.net standard 2.0)**
+Install through the .NET CLI:
 
-> https://www.nuget.org/packages/AlphaTab/
+```bash
+dotnet add package AlphaTab
+# or, for WPF / WinForms:
+dotnet add package AlphaTab.Windows
+```
 
-**Windows Package (.net core 8.0 - WPF/WinForms)**
+Or add the reference directly to your `.csproj`:
 
-> https://www.nuget.org/packages/AlphaTab.Windows/
+```xml
+<ItemGroup>
+    <PackageReference Include="AlphaTab" Version="1.6.1" />
+</ItemGroup>
+```
 
-### Local Copy
+## Render from a console app
 
-While not recommended, you can grab the latest DLLs by downloading the Nupkg and unzipping it to your local folder. 
-Afterwards you can reference the DLLs from this folder. 
+Console applications skip the UI controls and drive alphaTab through its low-level classes — `ScoreLoader` for parsing files, `ScoreRenderer` for producing images. This example loads a score, renders it to Skia images, and reports the total canvas size:
 
-## Initializing alphaTab
+```csharp
+using AlphaTab;
+using AlphaTab.Importer;
+using AlphaTab.Rendering;
+using SkiaSharp;
 
-### Console
+var score = ScoreLoader.LoadScoreFromBytes(File.ReadAllBytes(args[0]));
 
-For console applications you would start using the low level API of alphaTab like the `ScoreLoader` and `ScoreRenderer`.
-Usually, alphaTab provides controls UI platforms based on the `AlphaTabApi`. But for platforms where no UI is available,
-just start using the normal classes that alphaTab provides. You can refer to the samples in the GitHub repository for some kick-starter code.
-
-```cs
-// load score
-var score = AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(File.ReadAllBytes(args[0]));
-
-// render score with svg engine and desired rendering width
-var settings = new AlphaTab.Settings();
+var settings = new Settings();
 settings.Core.Engine = "skia";
-var renderer = new AlphaTab.Rendering.ScoreRenderer(settings)
+
+var renderer = new ScoreRenderer(settings)
 {
     Width = 970
 };
+
 var partialImages = new List<SKImage>();
 var totalWidth = 0;
 var totalHeight = 0;
-renderer.PartialRenderFinished.On(r => { images.Add((SKImage) r.RenderResult); });
+
+renderer.PartialRenderFinished.On(r =>
+{
+    partialImages.Add((SKImage)r.RenderResult);
+});
+
 renderer.RenderFinished.On(r =>
 {
-    totalWidth = (int) r.TotalWidth;
-    totalHeight = (int) r.TotalHeight;
+    totalWidth = (int)r.TotalWidth;
+    totalHeight = (int)r.TotalHeight;
 });
-renderer.RenderScore(score, new double[] { track.Index });
+
+renderer.RenderScore(score, new double[] { 0 });
 ```
 
-### WPF
+More console samples live at [github.com/CoderLine/alphaTabSamplesDotNet](https://github.com/CoderLine/alphaTabSamplesDotNet/).
 
-For WPF we provide a UI control with the core functionality of alphaTab:
+## Render in WPF
+
+The `AlphaTab.Windows` package ships a WPF control with the main functionality out of the box. Drop it into any XAML:
 
 ```xml
 <Window x:Class="AlphaTab.Samples.Wpf.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wpf="clr-namespace:AlphaTab.Wpf;assembly=AlphaTab.Windows"
-        Title="AlphaTab" Height="800" Width="600" WindowState="Maximized">
-    <wpf:AlphaTab Tracks="{Binding TracksToDisplay}">
-    </wpf:AlphaTab>
+        Title="alphaTab" Height="800" Width="600" WindowState="Maximized">
+    <wpf:AlphaTab Tracks="{Binding TracksToDisplay}" />
 </Window>
 ```
 
-```cs
+Expose the tracks to render from your view model:
+
+```csharp
 public IEnumerable<AlphaTab.Model.Track> TracksToDisplay { get; }
 ```
 
-### WinForms
+## Render in WinForms
 
-There is also a WinForms control that you can start using:
+The WinForms control is the counterpart for classic Windows Forms UIs. Instantiate it in code and add it to a form:
 
-```cs
-var control = new AlphaTab.WinForms.AlphaTabControl();
-control.Dock = System.Windows.Forms.DockStyle.Fill;
-this.Controls.Add(control);
-control.Tracks = new []{ score.Tracks[0] };
+```csharp
+using AlphaTab.WinForms;
+
+var control = new AlphaTabControl
+{
+    Dock = System.Windows.Forms.DockStyle.Fill
+};
+Controls.Add(control);
+control.Tracks = new[] { score.Tracks[0] };
 ```
 
-### Additional Notes
-
-You might want to check out the samples at https://github.com/CoderLine/alphaTabSamplesDotNet/ to get a small impression
-how to hook up things. 
+The WinForms control has a slightly reduced feature set compared to WPF. It cannot render semi-transparent cursors during playback because WinForms lacks proper transparency support. Display and audio playback themselves work identically.
 
 ## Dependencies
 
-For the .net Version alphaTab needs to rely on some 3rd party libraries to do certain operations. 
+alphaTab on .NET carries a small number of third-party dependencies:
 
-1. For rendering, either the built-in graphics library GDI+ can be used or alphaTab comes with a dependency to AlphaSkia for modern
-cross platform rendering of images. Skia is the graphics engine used in Chrome and is proven to be fast and reliable.
-We recommend using Skia as rendering engine over GDI+. 
+- **Rendering.** Either the built-in GDI+ graphics or [alphaSkia](https://github.com/CoderLine/alphaSkia), which wraps the Skia engine used by Chrome. alphaSkia is the recommended engine and is significantly faster and more consistent across platforms than GDI+.
+- **Audio.** [NAudio](https://github.com/naudio/NAudio) drives audio playback of the synthesised MIDI output.
 
-2. For audio playback alphaTab comes with a dependency to NAudio which is used to play the synthesized sound. 
-
-If you want to get support for other UI frameworks or audio libraries feel free to reach out to us. 
+Reach out on GitHub if you need alphaTab wired to a different UI framework or audio backend.

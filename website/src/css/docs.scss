@@ -377,26 +377,4 @@
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--at-line);
-
-  // Three "traffic light" dots in the header — purely decorative, matches
-  // the design's mono terminal aesthetic.
-  & > div:first-child {
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 30px;
-      height: 10px;
-      background:
-        radial-gradient(circle at 5px 5px, var(--at-muted) 4px, transparent 4.5px),
-        radial-gradient(circle at 15px 5px, var(--at-muted) 4px, transparent 4.5px),
-        radial-gradient(circle at 25px 5px, var(--at-muted) 4px, transparent 4.5px);
-      opacity: 0.5;
-      pointer-events: none;
-    }
-  }
 }

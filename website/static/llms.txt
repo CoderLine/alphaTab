@@ -1,0 +1,60 @@
+# alphaTab
+
+> alphaTab is an SDK for JavaScript, .NET, and Kotlin that renders and plays interactive music notation. It parses Guitar Pro, MusicXML, CapXML, and alphaTex files and produces engraved sheet music with playback in the browser, on the desktop, and on Android.
+
+alphaTab is not a drop-in widget — it exposes an API you build your own score UI on top of. The four internal modules are the data model, importers, render engine, and audio engine. The documentation is organised as a concept page (introduction), platform-specific getting-started tracks for Web, .NET, and Android, format and API references, and step-by-step tutorials.
+
+## Introduction
+
+- [Introduction](https://alphatab.net/docs/introduction): overview of alphaTab, its four internal modules, and the three supported platforms.
+- [Documentation style guide](https://alphatab.net/docs/style-guide): voice, structure, and code-sample rules every doc page follows.
+- [Contributing](https://alphatab.net/docs/contributing): how to contribute code, docs, and bug reports.
+
+## Getting Started (Web)
+
+- [Installation (Web)](https://alphatab.net/docs/getting-started/installation-web): install via npm, a CDN, or a local copy, then render your first score in the browser.
+- [Installation (WebPack)](https://alphatab.net/docs/getting-started/installation-webpack): configure WebPack 5 to bundle alphaTab, its Web Workers, Audio Worklets, and font and SoundFont assets.
+- [Installation (Vite)](https://alphatab.net/docs/getting-started/installation-vite): configure Vite to bundle alphaTab, its Web Workers, Audio Worklets, and font and SoundFont assets.
+- [Configuration (Web)](https://alphatab.net/docs/getting-started/configuration-web): mount the API, pass settings, subscribe to events, and drive playback from JavaScript.
+
+## Getting Started (.NET)
+
+- [Installation (.NET)](https://alphatab.net/docs/getting-started/installation-net): install AlphaTab or AlphaTab.Windows from NuGet, render from console, WPF, or WinForms.
+- [Configuration (.NET)](https://alphatab.net/docs/getting-started/configuration-net): set up the API on your host, pass settings, subscribe to events, drive playback from C#.
+
+## Getting Started (Android)
+
+- [Installation (Android)](https://alphatab.net/docs/getting-started/installation-android): install from Maven Central and render music notation with AlphaTabView.
+- [Configuration (Android)](https://alphatab.net/docs/getting-started/configuration-android): access the API, pass settings, subscribe to events, drive playback from Kotlin.
+
+## alphaTex
+
+- [Introduction to alphaTex](https://alphatab.net/docs/alphatex/introduction): text format optimised for authoring music notation by hand.
+- [Syntax](https://alphatab.net/docs/alphatex/syntax): full alphaTex syntax reference.
+- [Document structure](https://alphatab.net/docs/alphatex/document-structure): how an alphaTex file is organised.
+
+## API reference
+
+- [API](https://alphatab.net/docs/reference/api): the AlphaTabApi surface — every method, event, and property.
+- [Settings](https://alphatab.net/docs/reference/settings): every configurable setting alphaTab exposes, grouped by category.
+- [Data Model](https://alphatab.net/docs/reference/score): the Score, Track, Beat, and Note model classes.
+- [All Types](https://alphatab.net/docs/reference/types): index of every public type in the SDK.
+
+## Tutorials
+
+- [Tutorials overview](https://alphatab.net/docs/tutorials): guided walkthroughs for building a full alphaTab UI on each platform.
+- [Tutorial (Web)](https://alphatab.net/docs/tutorial-web/introduction): step-by-step web app tutorial from setup to playback.
+- [Tutorial (.NET)](https://alphatab.net/docs/tutorial-net/introduction): step-by-step .NET app tutorial from setup to playback.
+- [Tutorial (Android)](https://alphatab.net/docs/tutorial-android/introduction): step-by-step Android app tutorial from setup to playback.
+
+## Showcase and formats
+
+- [Showcase](https://alphatab.net/docs/showcase/introduction): rendered examples covering layouts, notation features, and effects.
+- [Guitar Pro 8](https://alphatab.net/docs/formats/guitar-pro-8): supported features and compatibility notes for the `.gp` format.
+- [MusicXML](https://alphatab.net/docs/formats/musicxml): supported features and compatibility notes for the MusicXML standard.
+
+## Optional
+
+- [Guides](https://alphatab.net/docs/guides): task-oriented guides for specific integrations and workflows.
+- [Migration](https://alphatab.net/docs/migration): version-to-version upgrade notes.
+- [Release notes](https://alphatab.net/docs/releases): per-version changes and additions.
