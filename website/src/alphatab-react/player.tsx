@@ -13,6 +13,7 @@ import { useColorMode } from '@docusaurus/theme-common';
 import { useAlphaTabModule } from './module';
 import { applyAlphaTabSettings } from './settings';
 import { AlphaTabStore, initialAlphaTabState, type AlphaTabState } from './store';
+import { SelectionHandles } from './selection-handles';
 
 interface AlphaTabContextValue {
     state: AlphaTabState;
@@ -58,7 +59,10 @@ export function AlphaTabPlayer({ children }: { children: ReactNode }) {
         applyAlphaTabSettings(module, settings, { colorMode: colorModeRef.current });
         settings.player.scrollElement = scrollNode;
         settings.player.playerMode = module.PlayerMode.EnabledAutomatic;
-        settings.player.scrollMode = module.ScrollMode.Continuous;
+        // Match the landing chrome's default flyout state (Layout = Page). The
+        // consumer's setLayoutMode() can switch to Horizontal + Continuous.
+        settings.display.layoutMode = module.LayoutMode.Page;
+        settings.player.scrollMode = module.ScrollMode.Off;
         settings.player.enableCursor = true;
         settings.player.enableElementHighlighting = true;
 
@@ -95,10 +99,25 @@ interface AlphaTabCanvasProps {
 }
 
 export function AlphaTabCanvas({ className }: AlphaTabCanvasProps) {
-    const { setMountElement, setScrollElement } = useAlphaTabContext();
+    const { setMountElement, setScrollElement, store } = useAlphaTabContext();
+    // Track the mount node so <SelectionHandles> can measure mouse coordinates
+    // against alphaTab's render surface.
+    const [mountNode, setLocalMountNode] = useState<HTMLDivElement | null>(null);
+    const combinedMountRef = useCallback((node: HTMLDivElement | null) => {
+        setLocalMountNode(node);
+        setMountElement(node);
+    }, [setMountElement]);
+    const api = store?.getApi();
+
     return (
         <div ref={setScrollElement} className={className}>
-            <div ref={setMountElement} />
+            {/* Positioning context so the selection-handle overlay's absolute
+                inset:0 covers the mount div's full render surface, not just the
+                scroll container's visible viewport. */}
+            <div style={{ position: 'relative' }}>
+                <div ref={combinedMountRef} />
+                <SelectionHandles api={api} mountElement={mountNode} />
+            </div>
         </div>
     );
 }

@@ -254,6 +254,18 @@ export class AlphaTabStore {
                 currentBar,
             });
         });
+        // alphaTab's built-in user interaction (drag-select on the score) sets
+        // this. Convert ticks back to bar indices so the scrubber overlay and
+        // flyout hint can reflect the user's actual selection.
+        this.api.playbackRangeChanged.on((e) => {
+            if (!e.playbackRange) {
+                this.update({ loopRangeBars: null });
+                return;
+            }
+            const from = this.findBarForTick(e.playbackRange.startTick);
+            const to = this.findBarForTick(e.playbackRange.endTick);
+            this.update({ loopRangeBars: { from, to } });
+        });
         this.api.soundFontLoad.on((e) => {
             const progress = e.total > 0 ? e.loaded / e.total : 0;
             this.update({ soundFontLoadProgress: progress });

@@ -18,8 +18,6 @@ import { SettingsFlyout, type SettingsFlyoutState, type SettingsFlyoutHandlers }
 import { DEMO_FILES } from './demo-files';
 import styles from './styles.module.scss';
 
-const DEFAULT_LOOP_FROM = 13;
-const DEFAULT_LOOP_TO = 16;
 const DEFAULT_VOLUME_PCT = 80;
 
 const TRACK_COLORS = [
@@ -100,8 +98,9 @@ const LandingPlayerStageInner: React.FC = () => {
     const isMobile = useIsMobile();
     const [activeFileIndex, setActiveFileIndex] = React.useState(0);
     const [settingsOpen, setSettingsOpen] = React.useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
 
-    const [layoutMode, setLayoutModeLocal] = React.useState<LayoutModeKey>('scroll');
+    const [layoutMode, setLayoutModeLocal] = React.useState<LayoutModeKey>('page');
     const [staveProfile, setStaveProfileLocal] = React.useState<StaveProfileKey>('scoreTab');
     const [zoomPct, setZoomPctLocal] = React.useState(100);
     const [masterVolumePct, setMasterVolumePctLocal] = React.useState(DEFAULT_VOLUME_PCT);
@@ -156,7 +155,8 @@ const LandingPlayerStageInner: React.FC = () => {
     const flyoutState: SettingsFlyoutState = {
         layoutMode, staveProfile, zoomPct, masterVolumePct, tempoPct,
         transposeSt, countIn, metronome, highlightCursor, loop,
-        loopHint: state.loopRangeBars ? `m.${state.loopRangeBars.from + 1}–${state.loopRangeBars.to + 1}` : null,
+        // `to` is exclusive (alphaTab's endTick = start-of-next-bar), so display it as the last-inclusive musical bar without a +1.
+        loopHint: state.loopRangeBars ? `m.${state.loopRangeBars.from + 1}–${state.loopRangeBars.to}` : null,
     };
 
     const flyoutHandlers: SettingsFlyoutHandlers = {
@@ -171,18 +171,13 @@ const LandingPlayerStageInner: React.FC = () => {
         setHighlightCursor: (b) => { setHighlightCursorLocal(b); controls?.setEnableHighlight(b); },
         setLoop: (b) => {
             setLoopLocal(b);
-            if (!controls) return;
-            controls.setLoopPlayback(b);
-            if (b) {
-                if (!state.loopRangeBars) controls.setLoopRangeBars(DEFAULT_LOOP_FROM, DEFAULT_LOOP_TO);
-            } else {
-                controls.setLoopRangeBars(null, null);
-            }
+            controls?.setLoopPlayback(b);
+            // Range comes from user drag-select on the score, not this toggle.
         },
         onReset: () => {
             if (!controls) return;
             controls.resetSettings();
-            setLayoutModeLocal('scroll');
+            setLayoutModeLocal('page');
             setStaveProfileLocal('scoreTab');
             setZoomPctLocal(100);
             setMasterVolumePctLocal(DEFAULT_VOLUME_PCT);
@@ -256,15 +251,28 @@ const LandingPlayerStageInner: React.FC = () => {
                 </div>
 
                 <div className={styles.frame}>
-                    <aside className={styles.sidebar}>
+                    <aside className={clsx(styles.sidebar, sidebarCollapsed && styles.sidebarCollapsed)}>
                         <div className={styles.sidebarSection}>
-                            <div className={styles.sidebarLabel}>Score</div>
-                            <div className={styles.scoreTitle}>{scoreTitle}</div>
-                            {scoreArtist && <div className={styles.scoreMeta}>{scoreArtist}</div>}
+                            <div className={styles.sidebarHeader}>
+                                <span className={clsx(styles.sidebarLabel, styles.expandedOnly)}>Score</span>
+                                <button
+                                    type="button"
+                                    className={styles.sidebarToggle}
+                                    onClick={() => setSidebarCollapsed((v) => !v)}
+                                    aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                                    aria-expanded={!sidebarCollapsed}
+                                >
+                                    <IconCaret size={10} className={styles.sidebarToggleIcon} aria-hidden="true" />
+                                </button>
+                            </div>
+                            <div className={styles.expandedOnly}>
+                                <div className={styles.scoreTitle}>{scoreTitle}</div>
+                                {scoreArtist && <div className={styles.scoreMeta}>{scoreArtist}</div>}
+                            </div>
                         </div>
 
                         <div className={styles.sidebarSection}>
-                            <div className={styles.sidebarLabel}>Tracks</div>
+                            <div className={clsx(styles.sidebarLabel, styles.expandedOnly)}>Tracks</div>
                             {state.tracks.map((tr, i) => {
                                 const active = renderedTrackIndexes.has(tr.index);
                                 return (
@@ -272,8 +280,13 @@ const LandingPlayerStageInner: React.FC = () => {
                                         key={tr.index}
                                         type="button"
                                         onClick={() => onTrackClick(tr)}
-                                        className={clsx(styles.trackRow, active && styles.trackRowActive)}
+                                        className={clsx(
+                                            styles.trackRow,
+                                            active && styles.trackRowActive,
+                                            sidebarCollapsed && styles.trackRowCollapsed,
+                                        )}
                                         style={{ '--track-color': trackColor(i) } as React.CSSProperties}
+                                        title={sidebarCollapsed ? tr.name : undefined}
                                     >
                                         <span className={styles.trackDot} />
                                         <span className={styles.trackName}>{tr.name}</span>
@@ -284,7 +297,7 @@ const LandingPlayerStageInner: React.FC = () => {
                             })}
                         </div>
 
-                        <div className={styles.sidebarSection}>
+                        <div className={clsx(styles.sidebarSection, styles.expandedOnly)}>
                             <div className={styles.sidebarLabel}>Score details</div>
                             <dl className={styles.detailsList}>
                                 <div className={styles.detailRow}>
