@@ -32,7 +32,8 @@ export {
     type IAlphaTexArgumentValue,
     type IAlphaTexAstNode,
     type IAlphaTexMetaDataTagPrefixNode,
-    type IAlphaTexNoteValueNode
+    type IAlphaTexNoteValueNode,
+    type IAlphaTexStringSeparatorNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 export { AlphaTexLexer } from '@coderline/alphatab/importer/alphaTex/AlphaTexLexer';
 export { AlphaTexParseMode, AlphaTexParser } from '@coderline/alphatab/importer/alphaTex/AlphaTexParser';

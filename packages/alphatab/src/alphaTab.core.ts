@@ -6,7 +6,13 @@ export { LayoutMode } from '@coderline/alphatab/LayoutMode';
 export { StaveProfile } from '@coderline/alphatab/StaveProfile';
 export { ImporterSettings } from '@coderline/alphatab/ImporterSettings';
 export { ExporterSettings } from '@coderline/alphatab/ExporterSettings';
-export { FingeringMode, NotationMode, NotationSettings, TabRhythmMode, NotationElement } from '@coderline/alphatab/NotationSettings';
+export {
+    FingeringMode,
+    NotationMode,
+    NotationSettings,
+    TabRhythmMode,
+    NotationElement
+} from '@coderline/alphatab/NotationSettings';
 export {
     PlayerSettings,
     ScrollMode,
@@ -21,7 +27,7 @@ export type {
     SmuflEngravingDefaults,
     SmuflGlyphBoundingBox,
     SmuflGlyphWithAnchor,
-    SmuflMetadata,
+    SmuflMetadata
 } from '@coderline/alphatab/SmuflMetadata';
 export {
     EngravingSettings,
@@ -44,6 +50,8 @@ export type { IScrollHandler } from '@coderline/alphatab/ScrollHandlers';
 export { WebPlatform } from '@coderline/alphatab/platform/javascript/WebPlatform';
 
 export { VersionInfo as meta } from '@coderline/alphatab/generated/VersionInfo';
+
+export type { ICursorHandler } from '@coderline/alphatab/CursorHandler';
 
 // alphaTab2.0: We should reliminate the big bundles but ship individual
 // modules which can be imported. e.g. import { Track } from '@coderline/alphatab/model/Track'
