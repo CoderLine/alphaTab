@@ -92,6 +92,15 @@ Every page has `title`, `description`, and `keywords` in the frontmatter. The `d
 ---
 title: Installation (Web)
 description: Install alphaTab in a web project via npm, a CDN, or a local copy, then render your first score.
-keywords: alphaTab, install, npm, CDN, web, browser, JavaScript
+keywords:
+  - alphaTab
+  - install
+  - npm
+  - CDN
+  - web
+  - browser
+  - JavaScript
 ---
 ```
+
+`keywords` must be a YAML array — either the block form shown above or the inline form `keywords: [alphaTab, install]`. A bare comma-separated string is rejected by Docusaurus.
