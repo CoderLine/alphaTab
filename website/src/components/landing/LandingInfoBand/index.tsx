@@ -28,11 +28,14 @@ const EXPORTS: FormatItem[] = [
   { name: 'Canvas', meta: 'live runtime', color: 'var(--at-muted)' },
 ];
 
+const PROJECT_START_YEAR = 2010;
+
 function buildStats(githubStars: string): Stat[] {
+  const years = Math.max(1, new Date().getFullYear() - PROJECT_START_YEAR);
   return [
-    { n: '15', l: 'years in production', s: 'since 2010' },
+    { n: String(years), l: 'years in production', s: `since ${PROJECT_START_YEAR}` },
     { n: '3', l: 'native runtimes', s: 'JS · .NET · Kotlin' },
-    { n: '312kB', l: 'gzipped bundle', s: 'tree-shakable' },
+    { n: '1', l: 'core, every platform', s: 'web · desktop · mobile' },
     // Live GitHub star count, sourced from shields.io with a build-time fallback.
     // See src/components/landing/use-github-stars.ts.
     { n: githubStars || '—', l: 'GitHub stars', s: 'MPL-2.0' },

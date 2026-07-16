@@ -4,6 +4,7 @@
  * work well for content-centric websites.
  */
 @use './highlight.scss';
+@use './docs.scss';
 
 @import "@fontsource/noto-sans/300.css";
 @import "@fontsource/noto-sans/400.css";
@@ -59,8 +60,33 @@
   --at-success: #2f8f6c;
   --at-code: #0d1626;
   --at-code-bg: #eef2f8;
+  --at-code-surface: #0d1626;
   --at-highlight: rgba(255, 214, 102, .35);
   --at-cursor: rgba(59, 109, 184, .7);
+
+  --at-track-purple: #7a5cc0;
+  --at-track-green: #208a73;
+  --at-track-orange: #c07a3e;
+  --at-track-violet: #a64570;
+  --at-track-blue: #3e8eb3;
+  --at-track-indigo: #5b76d8;
+
+  --at-radius-sm: 6px;
+  --at-radius: 10px;
+  --at-radius-lg: 14px;
+  --at-radius-xl: 18px;
+
+  --at-shadow-lg: 0 30px 80px -40px rgba(13, 22, 38, .25);
+  --at-shadow-md: 0 20px 40px -25px rgba(13, 22, 38, .25);
+  --at-shadow-sm: 0 4px 12px -6px rgba(13, 22, 38, .12);
+
+  --at-cta-bg: #0a1020;
+  --at-cta-ink: #eef2f8;
+  --at-cta-ink-soft: #bcc6d6;
+  --at-cta-accent: #6a98e3;
+  --at-cta-accent-ink: #0a1020;
+
+  --at-font-mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -79,17 +105,23 @@
   --at-ink: #eef2f8;
   --at-ink-soft: #bcc6d6;
   --at-ink-muted: #7e8aa0;
-  --at-muted: #697587;
+  --at-muted: #7e8aa0;
   --at-line: #1d2940;
   --at-line-soft: #15203a;
   --at-accent: #6a98e3;
   --at-accent-ink: #0a1020;
-  --at-accent-soft: rgba(106, 152, 227, .16) --at-accent-soft-strong: rgba(106, 152, 227, .28);
+  --at-accent-soft: rgba(106, 152, 227, .16);
+  --at-accent-soft-strong: rgba(106, 152, 227, .28);
   --at-success: #5cc398;
   --at-code: #eef2f8;
   --at-code-bg: #0c1424;
+  --at-code-surface: #0a1226;
   --at-highlight: rgba(255, 214, 102, .22);
-  --at-cursor: rgba(106, 152, 227, .85)
+  --at-cursor: rgba(106, 152, 227, .85);
+
+  --at-shadow-lg: 0 30px 80px -30px rgba(0, 0, 0, .7);
+  --at-shadow-md: 0 20px 40px -20px rgba(0, 0, 0, .6);
+  --at-shadow-sm: 0 4px 12px -6px rgba(0, 0, 0, .5);
 }
 
 body {
@@ -104,23 +136,35 @@ body {
 }
 
 
-[data-theme='light'] .DocSearch {
-  --docsearch-searchbox-background: rgb(238 242 248);
-  --docsearch-subtle-color: rgb(223, 229, 238);
-  --docsearch-key-background: #FFF;
+.DocSearch {
+  --docsearch-searchbox-background: var(--at-surface-alt);
+  --docsearch-subtle-color: var(--at-line);
+  --docsearch-key-background: var(--at-surface);
 }
 
-[data-theme='light'] .DocSearch-Button {
+.DocSearch-Button {
   border-radius: 8px;
-  color: rgb(105, 117, 135);
-  font-family: ui-monospace, "JetBrains Mono", monospace;
+  border: 1px solid var(--at-line);
+  background: var(--at-surface-alt);
+  color: var(--at-muted);
+  font-family: var(--at-font-mono);
   min-width: 200px;
   padding: 5px 12px 5px 10px;
-
   height: auto;
+  transition: border-color 120ms ease, background-color 120ms ease;
+
+  &:hover {
+    border-color: var(--at-accent);
+    background: var(--at-surface);
+    box-shadow: none;
+  }
 
   .DocSearch-Button-Key {
-    border: 1px solid rgb(223, 229, 238);
+    border: 1px solid var(--at-line);
+    background: var(--at-surface);
+    color: var(--at-muted);
+    box-shadow: none;
+    padding-bottom: 0;
   }
 
   .DocSearch-Button-Container {
@@ -129,22 +173,17 @@ body {
     gap: 8px;
   }
 
-
   .DocSearch-Button-Placeholder {
     font-size: 12px;
+    color: var(--at-muted);
   }
 
   .DocSearch-Search-Icon {
     width: 13px;
     height: 13px;
+    stroke: var(--at-muted);
   }
-
-
-
-  stroke: rgb(105, 117, 135)
 }
-
-[data-theme='dark'] .DocSearch {}
 
 
 
@@ -194,19 +233,8 @@ li.types-item .menu__link {
   white-space: nowrap;
 }
 
-.navbar__item.header-github-link {
-  display: flex;
-  align-items: center;
-}
-
-.header-github-link::before {
-  content: "";
-  width: 24px;
-  height: 24px;
-  display: flex;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E") no-repeat;
-  margin-right: 0.25rem;
-}
+// Icon is now rendered inline by the custom GitHubStarsLink React component
+// (src/theme/NavbarItem/GitHubStarsLink.tsx). No ::before pseudo needed.
 
 /* Styles for player */
 [data-theme="dark"] {

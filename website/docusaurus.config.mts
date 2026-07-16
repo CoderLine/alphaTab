@@ -18,6 +18,55 @@ const alphaTabVersionFull = JSON.parse(
     "utf8"
   )
 ).version;
+
+// Fetch the GitHub star count from shields.io at build time. Stored in
+// customFields as the initial value; the client-side GitHubStarsLink component
+// refreshes it on page load (shields.io's 30 min HTTP cache prevents per-visitor
+// chatter). shields.io's JSON endpoint is documented at
+// https://github.com/badges/shields/blob/master/doc/json-format.md
+async function fetchInitialGithubStars(
+  slug: string,
+  fallback: string,
+): Promise<string> {
+  try {
+    const ctrl = new AbortController();
+    const timeout = setTimeout(() => ctrl.abort(), 5000);
+    const res = await fetch(
+      `https://img.shields.io/github/stars/${slug}.json`,
+      { signal: ctrl.signal },
+    );
+    clearTimeout(timeout);
+    if (!res.ok) return fallback;
+    const data = (await res.json()) as { message?: string; value?: string };
+    return data.message ?? data.value ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+const githubRepo = "CoderLine/alphaTab";
+
+// Discover the latest release-notes page so the landing banner's "Release
+// notes" link always points to the newest release without manual edits.
+function findLatestReleaseNotesPath(): string {
+  const dir = path.join("docs", "releases");
+  const files = fs.readdirSync(dir);
+  // Filenames look like `release1_8.mdx`. Sort by the numeric suffix and pick
+  // the highest. Strip the extension for the docs URL.
+  const ranked = files
+    .map((f) => {
+      const m = f.match(/^release(\d+)_(\d+)\.(mdx?|md)$/);
+      if (!m) return null;
+      const major = parseInt(m[1], 10);
+      const minor = parseInt(m[2], 10);
+      const base = f.replace(/\.(mdx?|md)$/, "");
+      return { major, minor, base };
+    })
+    .filter((x): x is { major: number; minor: number; base: string } => x !== null)
+    .sort((a, b) => b.major - a.major || b.minor - a.minor);
+  const latest = ranked[0]?.base ?? "release1_0";
+  return `/docs/releases/${latest}`;
+}
+const latestReleaseNotesPath = findLatestReleaseNotesPath();
 const isPreRelease = alphaTabVersionFull.indexOf("-") >= 0;
 let alphaTabVersion;
 let algoliaAppId = '26AE6KNYRK';
@@ -86,7 +135,12 @@ function getSortValue(
   return undefined;
 }
 
-const config: Config = {
+// Docusaurus loads .mts configs via jiti, which does not support top-level
+// await. Wrap the config in an async default-export function so we can await
+// the shields.io fetch at build time.
+async function createConfig(): Promise<Config> {
+  const githubStarsInitial = await fetchInitialGithubStars(githubRepo, "1.7k");
+  return {
   title: "alphaTab",
   tagline: "Build modern music notation apps for web, desktop and mobile",
   url: "https://alphatab.net",
@@ -99,6 +153,9 @@ const config: Config = {
     isPreRelease: isPreRelease,
     alphaTabVersion: alphaTabVersion,
     alphaTabVersionFull: alphaTabVersionFull,
+    githubRepo: githubRepo,
+    githubStarsInitial: githubStarsInitial,
+    latestReleaseNotesPath: latestReleaseNotesPath,
   },
 
   markdown: {
@@ -234,12 +291,14 @@ const config: Config = {
           docId: "alphatex/introduction",
           position: "left",
           label: "alphaTex",
+          className: "navbar-link-secondary",
         },
         {
           type: "doc",
           docId: "showcase/introduction",
           position: "left",
           label: "Showcase",
+          className: "navbar-link-secondary",
         },
         {
           type: "doc",
@@ -267,40 +326,58 @@ const config: Config = {
             },
           ],
         },
+        // Custom navbar item type — see src/theme/NavbarItem/ComponentTypes.ts.
+        // Renders the GitHub icon + live star count from shields.io, falling
+        // back to the build-time fetched value in `customFields.githubStarsInitial`.
         {
-          href: "https://github.com/CoderLine/alphaTab",
-          label: "GitHub",
-          className: "header-github-link",
+          type: "custom-githubStarsLink",
           position: "right",
-        },
+          href: `https://github.com/${githubRepo}`,
+          className: "header-github-link",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
       ],
     },
     footer: {
-      style: "dark",
+      style: "light",
       links: [
         {
           title: "Docs",
           items: [
-            {
-              label: "Introduction",
-              to: "docs/introduction",
-            },
-            {
-              label: "Installation",
-              to: "docs/getting-started/installation-web",
-            },
-            {
-              label: "AlphaTex",
-              to: "docs/alphatex/introduction",
-            },
+            { label: "Getting started", to: "/docs/introduction" },
+            { label: "Web", to: "/docs/getting-started/installation-web" },
+            { label: ".NET", to: "/docs/getting-started/installation-net" },
+            { label: "Android", to: "/docs/getting-started/installation-android" },
+            { label: "Migration", to: "/docs/migration/breaking-changes-097-098" },
+          ],
+        },
+        {
+          title: "Learn",
+          items: [
+            { label: "Tutorial", to: "/docs/tutorials" },
+            { label: "alphaTex", to: "/docs/alphatex/introduction" },
+            { label: "Showcase", to: "/docs/showcase/introduction" },
+            { label: "Playground", to: "/docs/playground/playground" },
+          ],
+        },
+        {
+          title: "Project",
+          items: [
+            { label: "GitHub", href: "https://github.com/CoderLine/alphaTab" },
+            { label: "Release notes", to: latestReleaseNotesPath },
+            { label: "Contributing", to: "/docs/contributing" },
           ],
         },
         {
           title: "Community",
           items: [
             {
-              label: "GitHub",
-              href: "https://github.com/CoderLine/alphaTab",
+              label: "Discussions",
+              href: "https://github.com/CoderLine/alphaTab/discussions",
+            },
+            {
+              label: "Issues",
+              href: "https://github.com/CoderLine/alphaTab/issues",
             },
             {
               label: "Stack Overflow",
@@ -309,7 +386,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Daniel Kuschny and Contributors`,
+      copyright: `© 2010—${new Date().getFullYear()} alphaTab contributors · MPL-2.0`,
     },
     prism: {
       theme: prismThemes.github,
@@ -412,6 +489,7 @@ const config: Config = {
       },
     }),
   ],
-};
+  };
+}
 
-export default config;
+export default createConfig;
