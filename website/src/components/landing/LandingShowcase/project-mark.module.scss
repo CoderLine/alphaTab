@@ -1,0 +1,20 @@
+.mark {
+  width: var(--mark-size, 40px);
+  height: var(--mark-size, 40px);
+  border-radius: 10px;
+  background: linear-gradient(155deg, color-mix(in srgb, var(--mark-accent) 14%, transparent), color-mix(in srgb, var(--mark-accent) 6%, transparent));
+  border: 1px solid color-mix(in srgb, var(--mark-accent) 25%, transparent);
+  color: var(--mark-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: var(--mark-font, 20px);
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+
+.square {
+  border-radius: 8px;
+}

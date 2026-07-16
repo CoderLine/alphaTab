@@ -1,0 +1,38 @@
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  height: 110px;
+}
+
+.frame {
+  border: 1px solid var(--at-line);
+  border-radius: 6px;
+  padding: 6px;
+  background: var(--at-surface-alt);
+  position: relative;
+}
+
+.lines {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.line {
+  height: 1px;
+  background: var(--at-muted);
+  opacity: 0.35;
+}
+
+.label {
+  position: absolute;
+  bottom: -16px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--at-font-mono);
+  font-size: 10px;
+  color: var(--at-muted);
+}

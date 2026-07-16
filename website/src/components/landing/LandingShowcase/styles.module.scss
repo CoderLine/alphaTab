@@ -1,0 +1,175 @@
+@use '../breakpoints' as *;
+@use '../section' as *;
+
+.section {
+  background: var(--at-bg);
+  border-bottom: 1px solid var(--at-line);
+  @include section-tokens;
+}
+
+.inner {
+  @include section-container;
+  padding-top: var(--section-pad-y);
+  padding-bottom: var(--section-pad-y);
+}
+
+.seeAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--at-accent);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--at-accent);
+  }
+}
+
+.cardSlot {
+  position: relative;
+  animation: showcaseFade 700ms ease both;
+}
+
+@keyframes showcaseFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.switcher {
+  margin-top: 18px;
+  display: grid;
+  // Match the design literally — 11 equal columns at every viewport. Labels
+  // truncate with ellipsis on narrow screens so the row stays single-line.
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+  gap: 8px;
+
+  @include mobile { gap: 4px; }
+}
+
+.chip {
+  position: relative;
+  text-align: left;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-family: inherit;
+  color: var(--at-muted);
+  overflow: hidden;
+
+  @include mobile { padding: 8px 8px; }
+
+  &:hover {
+    color: var(--at-ink);
+  }
+}
+
+.chipActive {
+  background: var(--at-surface);
+  border-color: var(--at-line);
+  color: var(--at-ink);
+}
+
+.chipIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--story-accent);
+  opacity: 0.55;
+  flex-shrink: 0;
+
+  .chipActive & { opacity: 1; }
+
+  &[data-kind='quote'] {
+    font-family: Georgia, serif;
+    font-size: 13px;
+    line-height: 0.5;
+    padding-top: 3px;
+  }
+}
+
+.chipDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--story-accent);
+}
+
+.chipLabel {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @include mobile { font-size: 11px; }
+
+  .chipActive & { font-weight: 600; }
+}
+
+.chipProgress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: var(--story-accent);
+  animation: chip-progress var(--progress-duration, 6000ms) linear forwards;
+  animation-play-state: paused;
+
+  &[data-running='true'] {
+    animation-play-state: running;
+  }
+}
+
+@keyframes chip-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.legend {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-family: var(--at-font-mono);
+  font-size: 10.5px;
+  color: var(--at-muted);
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--at-muted);
+}
+
+.legendQuote {
+  font-family: Georgia, serif;
+  font-size: 13px;
+  line-height: 0.5;
+  padding-top: 2px;
+}

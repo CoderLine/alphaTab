@@ -1,0 +1,54 @@
+.block {
+  background: var(--at-code-surface);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--at-code-surface);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #7e8aa0;
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3a4761;
+}
+
+.filename {
+  margin-left: 8px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.code {
+  margin: 0;
+  padding: 16px 18px;
+  font-family: var(--at-font-mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: #e3eaf3;
+  overflow: auto;
+  white-space: pre;
+  background: transparent;
+}
+
+// Light-theme token palette
+.tok-plain { color: #e3eaf3; }
+.tok-comment { color: #7a869a; }
+.tok-string { color: #a4cba0; }
+.tok-kw { color: #9bb7e6; }
+.tok-num { color: #dba78a; }
+.tok-cls { color: #e3c995; }
+.tok-fn { color: #9bcfd2; }
+.tok-punc { color: #7e8aa0; }

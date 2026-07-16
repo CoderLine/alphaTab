@@ -1,0 +1,144 @@
+@use '../breakpoints' as *;
+@use '../section' as *;
+
+.section {
+  background: var(--at-surface-alt);
+  border-bottom: 1px solid var(--at-line);
+  @include section-tokens;
+}
+
+.inner {
+  @include section-container;
+  padding-top: var(--section-pad-y);
+  padding-bottom: var(--section-pad-y);
+}
+
+.headAction {
+  @include mobile { display: none; }
+}
+
+.frame {
+  background: var(--at-surface);
+  border: 1px solid var(--at-line);
+  border-radius: 14px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 440px 1fr;
+
+  @include not-desktop { grid-template-columns: 1fr; }
+}
+
+.editorPane {
+  background: var(--at-code-surface);
+  border-right: 1px solid var(--at-line);
+
+  @include not-desktop {
+    border-right: none;
+    border-bottom: 1px solid var(--at-line);
+  }
+}
+
+.editorHeader {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: #7e8aa0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.unsavedDot {
+  color: var(--at-success);
+}
+
+.editorCode {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.previewPane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.previewHeader {
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--at-line);
+  background: var(--at-surface-alt);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+}
+
+.compileMsg {
+  color: var(--at-success);
+}
+
+.previewMeta {
+  @include mobile { display: none; }
+}
+
+.spacer { flex: 1; }
+
+.previewBody {
+  padding: 22px 24px;
+  flex: 1;
+  min-width: 0;
+
+  @include mobile { padding: 16px; }
+}
+
+.notationWide {
+  @include mobile { display: none; }
+}
+
+.notationNarrow {
+  display: none;
+  @include mobile { display: block; }
+}
+
+.previewTransport {
+  padding: 10px 18px;
+  border-top: 1px solid var(--at-line);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--at-muted);
+  font-size: 12px;
+}
+
+.transportPlay {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--at-accent);
+  color: var(--at-accent-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.transportWave {
+  flex: 1;
+  min-width: 0;
+}
+
+.transportTime {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.mobileCta {
+  display: none;
+  margin-top: 18px;
+
+  @include mobile { display: block; }
+}

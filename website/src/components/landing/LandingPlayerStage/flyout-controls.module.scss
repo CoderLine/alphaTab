@@ -1,0 +1,187 @@
+.group {
+  padding: 10px 14px 14px;
+  border-bottom: 1px solid var(--at-line-soft);
+}
+
+.groupLast {
+  border-bottom: none;
+}
+
+.groupTitle {
+  font-family: var(--at-font-mono);
+  font-size: 10px;
+  color: var(--at-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+}
+
+.groupBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.rowLabel {
+  font-size: 12px;
+  color: var(--at-ink-soft);
+}
+
+// Segmented
+.segmented {
+  display: inline-flex;
+  padding: 2px;
+  background: var(--at-surface-alt);
+  border: 1px solid var(--at-line);
+  border-radius: 7px;
+  gap: 2px;
+  width: fit-content;
+}
+
+.segmentBtn {
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  color: var(--at-muted);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.segmentBtnActive {
+  background: var(--at-surface);
+  color: var(--at-ink);
+  box-shadow: 0 1px 0 var(--at-line);
+}
+
+// Slider
+.slider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sliderTrack {
+  position: relative;
+  flex: 1;
+  height: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.sliderBar {
+  width: 100%;
+  height: 4px;
+  background: var(--at-surface-alt);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sliderFill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--at-accent);
+  opacity: 0.85;
+}
+
+.sliderFillBipolar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--at-accent);
+  opacity: 0.85;
+}
+
+.sliderMidline {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  left: calc(50% - 0.5px);
+  width: 1px;
+  background: var(--at-line);
+}
+
+.sliderHandle {
+  position: absolute;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--at-surface);
+  border: 2px solid var(--at-accent);
+  box-shadow: 0 1px 2px rgba(13, 22, 38, 0.2);
+}
+
+.sliderValue {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-ink);
+  width: 44px;
+  text-align: right;
+}
+
+// Toggle
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggleLabel {
+  font-size: 12.5px;
+  color: var(--at-ink);
+  flex: 1;
+}
+
+.toggleHint {
+  font-size: 11px;
+  color: var(--at-accent);
+  font-family: var(--at-font-mono);
+}
+
+.toggleBtn {
+  width: 28px;
+  height: 16px;
+  border-radius: 999px;
+  position: relative;
+  border: 1px solid var(--at-line);
+  background: var(--at-surface-alt);
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+  padding: 0;
+}
+
+.toggleBtnActive {
+  border-color: var(--at-accent);
+  background: var(--at-accent);
+}
+
+.toggleKnob {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--at-surface);
+  transition: left 120ms ease, background 120ms ease;
+  box-shadow: 0 1px 2px rgba(13, 22, 38, 0.25);
+
+  .toggleBtnActive & {
+    left: 13px;
+    background: var(--at-accent-ink);
+  }
+}

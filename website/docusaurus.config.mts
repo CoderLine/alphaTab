@@ -249,6 +249,10 @@ const config: Config = {
         },
         // Right
         {
+          type: "search",
+          position: "right"
+        },
+        {
           type: "dropdown",
           position: "right",
           label: isPreRelease ? `${alphaTabVersion} 🚧` : alphaTabVersion,

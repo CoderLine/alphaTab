@@ -1,20 +1,9 @@
-/**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
- */
-
-.heroBanner {
-  padding: 2rem 0 4rem 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+.landing {
+  background: var(--at-bg);
+  color: var(--at-ink);
+  font-family: 'Noto Sans', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.1px;
+  font-feature-settings: 'ss01', 'cv11';
 }
 
 :global(.navbar__title) {

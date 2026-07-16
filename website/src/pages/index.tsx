@@ -1,53 +1,26 @@
-import React from "react";
-import clsx from "clsx";
-import Layout from "@theme/Layout";
-import Link from "@docusaurus/Link";
-import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
-import styles from "./index.module.scss";
-import { HomepageFeatures } from "@site/src/components/HomepageFeatures";
-import { AlphaTabFull } from "@site/src/components/AlphaTabFull";
+import React from 'react';
+import Layout from '@theme/Layout';
+import { LandingBanner } from '@site/src/components/landing/LandingBanner';
+import { LandingHero } from '@site/src/components/landing/LandingHero';
+import { LandingInfoBand } from '@site/src/components/landing/LandingInfoBand';
+import { LandingFeatures } from '@site/src/components/landing/LandingFeatures';
+import { LandingPlayground } from '@site/src/components/landing/LandingPlayground';
+import { LandingShowcase } from '@site/src/components/landing/LandingShowcase';
+import { LandingCta } from '@site/src/components/landing/LandingCta';
+import styles from './index.module.scss';
 
-function HomepageHeader() {
-  const { siteConfig } = useDocusaurusContext();
+export default function Home(): React.ReactElement {
   return (
-    <header className={clsx("hero hero--primary", styles.heroBanner)}>
-      <div className="container">
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/introduction"
-          >
-            Get Started
-          </Link>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/playground"
-          >
-            Explore Playground
-          </Link>
-        </div>
+    <Layout>
+      <div className={styles.landing}>
+        <LandingBanner />
+        <LandingHero />
+        <LandingInfoBand />
+        <LandingFeatures />
+        <LandingPlayground />
+        <LandingShowcase />
+        <LandingCta />
       </div>
-    </header>
-  );
-}
-
-export default function Home() {
-  const { siteConfig } = useDocusaurusContext();
-  return (
-    <Layout title={siteConfig.tagline} description={siteConfig.tagline}>
-      <HomepageHeader />
-      <main className="main-at">
-        <AlphaTabFull
-          settings={{
-            core: {
-              file: "/files/canon.gp",
-              tracks: [0],
-            },
-          }}
-        />
-        <HomepageFeatures />
-      </main>
     </Layout>
   );
 }

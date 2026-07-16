@@ -1,0 +1,402 @@
+// Docs page styling — applies the design's docs chrome to Docusaurus's
+// existing markup. Hybrid approach: pure CSS overrides, no swizzles unless
+// CSS can't reach the bit we need.
+
+// ─── Navbar ──────────────────────────────────────────────────────────
+.navbar {
+  --ifm-navbar-background-color: var(--at-surface);
+  --ifm-navbar-link-color: var(--at-ink-soft);
+  --ifm-navbar-link-hover-color: var(--at-ink);
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-height: 56px;
+  --ifm-navbar-padding-vertical: 0;
+  --ifm-navbar-item-padding-horizontal: 10px;
+
+  border-bottom: 1px solid var(--at-line);
+  padding: 0 24px;
+
+  @media (max-width: 996px) {
+    padding: 0 16px;
+  }
+
+  .navbar__inner {
+    height: 100%;
+  }
+
+  // Left side — primary nav links
+  .navbar__items:not(.navbar__items--right) {
+    gap: 4px;
+
+    .navbar__brand {
+      margin-right: 16px;
+    }
+
+    .navbar__item {
+      padding: 0;
+    }
+
+    .navbar__link {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      position: relative;
+      transition: background-color 120ms ease, color 120ms ease;
+
+      &:hover {
+        background: var(--at-surface-alt);
+      }
+
+      &--active {
+        color: var(--at-ink);
+
+        &::after {
+          content: '';
+          position: absolute;
+          left: 12px;
+          right: 12px;
+          bottom: -1px;
+          height: 2px;
+          background: var(--at-accent);
+        }
+
+        &:hover { background: var(--at-surface-alt); }
+      }
+    }
+  }
+
+  // Right side — search, version dropdown, github
+  .navbar__items--right {
+    gap: 10px;
+
+    .navbar__item {
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    // Version dropdown — pill-like
+    .navbar__link {
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 500;
+      font-family: var(--at-font-mono);
+      color: var(--at-muted);
+      border: 1px solid var(--at-line);
+      background: var(--at-surface-alt);
+
+      &:hover {
+        color: var(--at-ink);
+        background: var(--at-surface);
+      }
+    }
+  }
+
+  // .header-github-link styling is owned by the custom NavbarItem component
+  // (src/theme/NavbarItem/GitHubStarsLink.module.scss); we don't redeclare it here.
+
+  // Color-mode toggle
+  .clean-btn {
+    padding: 6px;
+    border-radius: 6px;
+
+    &:hover {
+      background: var(--at-surface-alt);
+    }
+  }
+
+  // The Docusaurus navbar collapses to a hamburger drawer at < 996 px. In the
+  // narrow band between 996 (full nav appears) and ~1100 the full nav is
+  // visible but cramped — condense it to match the design's tablet treatment.
+  @media (min-width: 997px) and (max-width: 1100px) {
+    padding: 0 16px;
+
+    // Hide secondary links (alphaTex / Showcase) — tagged in docusaurus.config.
+    .navbar-link-secondary { display: none; }
+
+    .navbar__items:not(.navbar__items--right) {
+      gap: 0;
+
+      .navbar__brand { margin-right: 12px; }
+      .navbar__link { padding: 8px 10px; font-size: 12.5px; }
+    }
+
+    .navbar__items--right {
+      gap: 6px;
+
+      // Shrink the search button to an icon-only pill
+      .DocSearch-Button {
+        min-width: 0;
+        padding: 6px 8px;
+
+        .DocSearch-Button-Placeholder,
+        .DocSearch-Button-Keys {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+// The GitHub link is rendered by the custom NavbarItem component
+// (src/theme/NavbarItem/GitHubStarsLink.tsx) which owns its own icon + count.
+// The `.header-github-link` class is kept on the anchor purely for the navbar
+// padding/hover rules above (.navbar { ... .header-github-link {...} }).
+
+// ─── Docs: sidebar ──────────────────────────────────────────────────
+.theme-doc-sidebar-container {
+  border-right-color: var(--at-line);
+}
+
+.theme-doc-sidebar-menu {
+  padding: 8px 0;
+
+  .menu__list {
+    .menu__list { padding-left: 8px; }
+  }
+
+  .menu__list-item-collapsible {
+    margin: 2px 0;
+  }
+
+  .menu__link {
+    font-size: 13.5px;
+    color: var(--at-ink-soft);
+    padding: 7px 10px 7px 12px;
+    border-radius: 6px;
+    border-left: 2px solid transparent;
+    transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+    font-weight: 500;
+
+    &:hover {
+      background: var(--at-surface-alt);
+      color: var(--at-ink);
+    }
+
+    &--active {
+      color: var(--at-accent);
+      background: var(--at-accent-soft);
+      border-left-color: var(--at-accent);
+      font-weight: 600;
+    }
+
+    &--sublist {
+      font-weight: 600;
+      color: var(--at-ink);
+    }
+  }
+}
+
+// ─── Docs: table of contents (right rail) ───────────────────────────
+.theme-doc-toc-desktop {
+  border-left-color: var(--at-line);
+  padding-left: 24px;
+
+  &::before {
+    content: 'On this page';
+    display: block;
+    font-family: var(--at-font-mono);
+    font-size: 11px;
+    color: var(--at-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 14px;
+  }
+}
+
+.table-of-contents {
+  border-left: none;
+  font-size: 13px;
+  padding-left: 0;
+
+  .table-of-contents__link {
+    color: var(--at-ink-soft);
+    padding-left: 10px;
+    border-left: 2px solid var(--at-line-soft);
+    transition: color 120ms ease, border-color 120ms ease;
+
+    &:hover {
+      color: var(--at-ink);
+    }
+
+    &--active {
+      color: var(--at-accent);
+      border-left-color: var(--at-accent);
+      font-weight: 500;
+    }
+  }
+}
+
+// ─── Docs: breadcrumbs ──────────────────────────────────────────────
+.theme-doc-breadcrumbs {
+  margin-bottom: 18px;
+
+  .breadcrumbs {
+    font-family: var(--at-font-mono);
+    font-size: 12px;
+    color: var(--at-muted);
+
+    &__item {
+      &::after {
+        background-image: none;
+        content: '/';
+        color: var(--at-line);
+        height: auto;
+        opacity: 1;
+        margin: 0 6px;
+      }
+
+      &:last-child::after { display: none; }
+
+      &--active .breadcrumbs__link {
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: var(--at-accent-soft);
+        color: var(--at-accent);
+        font-weight: 500;
+      }
+    }
+
+    &__link {
+      color: var(--at-muted);
+      background: transparent;
+      padding: 0;
+      transition: color 120ms ease;
+
+      &:hover {
+        color: var(--at-ink);
+        background: transparent;
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+// ─── Docs: body typography ──────────────────────────────────────────
+.theme-doc-markdown {
+  color: var(--at-ink-soft);
+
+  h1 {
+    font-size: 44px;
+    letter-spacing: -1.6px;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--at-ink);
+    margin-bottom: 28px;
+
+    @media (max-width: 996px) {
+      font-size: 36px;
+      letter-spacing: -1.2px;
+    }
+
+    @media (max-width: 640px) {
+      font-size: 30px;
+    }
+  }
+
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+    color: var(--at-ink);
+    margin-top: 36px;
+    margin-bottom: 14px;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--at-ink);
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 16px;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  li {
+    line-height: 1.75;
+  }
+
+  strong {
+    color: var(--at-ink);
+  }
+}
+
+// ─── Docs: admonitions / callouts ───────────────────────────────────
+.admonition,
+.theme-admonition {
+  border-radius: 10px;
+  border: 1px solid var(--at-line);
+  background: var(--at-surface-alt);
+  padding: 14px 18px;
+  margin: 20px 0;
+
+  &.admonition-note,
+  &.alert--info {
+    background: var(--at-accent-soft);
+    border-color: var(--at-accent-soft-strong);
+    color: var(--at-ink-soft);
+  }
+}
+
+// ─── Docs: prev / next cards ────────────────────────────────────────
+.pagination-nav__link {
+  border: 1px solid var(--at-line);
+  border-radius: 10px;
+  background: var(--at-surface);
+  padding: 16px;
+  transition: border-color 120ms ease, background-color 120ms ease;
+
+  &:hover {
+    border-color: var(--at-accent);
+    background: var(--at-surface);
+  }
+}
+
+.pagination-nav__sublabel {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+}
+
+.pagination-nav__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--at-ink);
+}
+
+// ─── Docs: code block chrome ────────────────────────────────────────
+.theme-code-block {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--at-line);
+
+  // Three "traffic light" dots in the header — purely decorative, matches
+  // the design's mono terminal aesthetic.
+  & > div:first-child {
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 10px;
+      background:
+        radial-gradient(circle at 5px 5px, var(--at-muted) 4px, transparent 4.5px),
+        radial-gradient(circle at 15px 5px, var(--at-muted) 4px, transparent 4.5px),
+        radial-gradient(circle at 25px 5px, var(--at-muted) 4px, transparent 4.5px);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+}

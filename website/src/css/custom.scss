@@ -42,6 +42,25 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.2);
 
   --ifm-font-family-base: "Noto Sans";
+
+  --at-bg: #f4f7fb;
+  --at-surface: #ffffff;
+  --at-surface-alt: #eef2f8;
+  --at-ink: #0d1626;
+  --at-ink-soft: #3a4761;
+  --at-ink-muted: #697587;
+  --at-muted: #697587;
+  --at-line: #dfe5ee;
+  --at-line-soft: #eaeef5;
+  --at-accent: #3b6db8;
+  --at-accent-ink: #ffffff;
+  --at-accent-soft: rgba(59, 109, 184, .10);
+  --at-accent-soft-strong: rgba(59, 109, 184, .18);
+  --at-success: #2f8f6c;
+  --at-code: #0d1626;
+  --at-code-bg: #eef2f8;
+  --at-highlight: rgba(255, 214, 102, .35);
+  --at-cursor: rgba(59, 109, 184, .7);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -53,7 +72,81 @@
   --ifm-color-primary-light: #4978ad;
   --ifm-color-primary-lighter: #4c7db4;
   --ifm-color-primary-lightest: #648ebe;
+
+  --at-bg: #0a1020;
+  --at-surface: #0f1729;
+  --at-surface-alt: #162033;
+  --at-ink: #eef2f8;
+  --at-ink-soft: #bcc6d6;
+  --at-ink-muted: #7e8aa0;
+  --at-muted: #697587;
+  --at-line: #1d2940;
+  --at-line-soft: #15203a;
+  --at-accent: #6a98e3;
+  --at-accent-ink: #0a1020;
+  --at-accent-soft: rgba(106, 152, 227, .16) --at-accent-soft-strong: rgba(106, 152, 227, .28);
+  --at-success: #5cc398;
+  --at-code: #eef2f8;
+  --at-code-bg: #0c1424;
+  --at-highlight: rgba(255, 214, 102, .22);
+  --at-cursor: rgba(106, 152, 227, .85)
 }
+
+body {
+  background: var(--at-bg);
+}
+
+.theme-layout-navbar {
+  .navbar__inner {
+    max-width: var(--ifm-container-width-xl);
+    margin: 0 auto;
+  }
+}
+
+
+[data-theme='light'] .DocSearch {
+  --docsearch-searchbox-background: rgb(238 242 248);
+  --docsearch-subtle-color: rgb(223, 229, 238);
+  --docsearch-key-background: #FFF;
+}
+
+[data-theme='light'] .DocSearch-Button {
+  border-radius: 8px;
+  color: rgb(105, 117, 135);
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  min-width: 200px;
+  padding: 5px 12px 5px 10px;
+
+  height: auto;
+
+  .DocSearch-Button-Key {
+    border: 1px solid rgb(223, 229, 238);
+  }
+
+  .DocSearch-Button-Container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+
+  .DocSearch-Button-Placeholder {
+    font-size: 12px;
+  }
+
+  .DocSearch-Search-Icon {
+    width: 13px;
+    height: 13px;
+  }
+
+
+
+  stroke: rgb(105, 117, 135)
+}
+
+[data-theme='dark'] .DocSearch {}
+
+
 
 .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.1);
