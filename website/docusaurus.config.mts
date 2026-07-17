@@ -434,13 +434,6 @@ async function createConfig(): Promise<Config> {
         },
         {
           type: "doc",
-          docId: "showcase/introduction",
-          position: "left",
-          label: "Showcase",
-          className: "navbar-link-secondary",
-        },
-        {
-          type: "doc",
           docId: "playground/playground",
           position: "left",
           label: "Playground",
@@ -495,7 +488,7 @@ async function createConfig(): Promise<Config> {
           items: [
             { label: "Tutorial", to: "/docs/tutorials" },
             { label: "alphaTex", to: "/docs/alphatex/introduction" },
-            { label: "Showcase", to: "/docs/showcase/introduction" },
+            { label: "Features", to: "/docs/features/" },
             { label: "Playground", to: "/docs/playground/playground" },
           ],
         },
@@ -544,6 +537,46 @@ async function createConfig(): Promise<Config> {
 
   plugins: [
     "docusaurus-plugin-sass",
+    [
+      "@docusaurus/plugin-client-redirects",
+      {
+        // Legacy /docs/showcase/* pages were folded into the feature catalog
+        // under /docs/features/render/. Keep external links alive by mapping
+        // each old slug to the closest new page. See docs/features/render/
+        // for the destinations.
+        redirects: [
+          { from: "/docs/showcase/introduction", to: "/docs/features/" },
+          {
+            from: "/docs/showcase/general",
+            to: "/docs/features/render/coverage-repeats",
+          },
+          {
+            from: "/docs/showcase/layouts",
+            to: "/docs/features/render/page-layout",
+          },
+          {
+            from: "/docs/showcase/music-notation",
+            to: "/docs/features/render/standard-notation",
+          },
+          {
+            from: "/docs/showcase/guitar-tabs",
+            to: "/docs/features/render/guitar-tablature",
+          },
+          {
+            from: "/docs/showcase/special-tracks",
+            to: "/docs/features/render/coverage-special-tracks",
+          },
+          {
+            from: "/docs/showcase/special-notes",
+            to: "/docs/features/render/coverage-special-notes",
+          },
+          {
+            from: "/docs/showcase/effects",
+            to: "/docs/features/render/coverage-effects-articulations",
+          },
+        ],
+      },
+    ],
     () => ({
       name: "docusaurus-customization",
       injectHtmlTags() {

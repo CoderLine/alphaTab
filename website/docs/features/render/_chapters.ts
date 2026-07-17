@@ -69,7 +69,7 @@ const chapters: FeatureChapter[] = [
     label: 'Notation coverage',
     anchor: 'coverage',
     description:
-      "alphaTab renders the full grammar of Western music notation and the guitar-specific effects Guitar Pro supports. Each entry below has a rendered example on the [Showcase](/docs/showcase/introduction) pages — the cards here are pointers into that gallery.",
+      "alphaTab renders the full grammar of Western music notation and the guitar-specific effects Guitar Pro supports. Each entry below has a rendered example — pick a category to jump straight to the demos.",
     defaultAccent: 'slate',
   },
 ];

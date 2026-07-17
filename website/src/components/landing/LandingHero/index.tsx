@@ -23,7 +23,7 @@ export const LandingHero: React.FC = () => {
           <Btn to="/docs/introduction" size="lg" iconRight={<IconArrow />}>
             Get started
           </Btn>
-          <Btn to="/docs/showcase/introduction" size="lg" variant="secondary">
+          <Btn to="/docs/features/" size="lg" variant="secondary">
             See live examples
           </Btn>
         </div>

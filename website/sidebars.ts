@@ -188,25 +188,7 @@ const sidebars: SidebarsConfig = {
       dirName: "features",
     },
   ],
-  showcase: [
-    {
-      type: "category",
-      label: "Showcase",
-      link: {
-        type: "doc",
-        id: "showcase/introduction"
-      },
-      items: [
-        "showcase/introduction",
-        "showcase/general",
-        "showcase/layouts",
-        "showcase/music-notation",
-        "showcase/guitar-tabs",
-        "showcase/special-tracks",
-        "showcase/special-notes",
-        "showcase/effects",
-      ],
-    },
+  formats: [
     {
       type: "category",
       label: "Formats",

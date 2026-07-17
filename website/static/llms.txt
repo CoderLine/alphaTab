@@ -166,9 +166,8 @@ alphaTab is not a drop-in widget — it exposes an API you build your own score 
 - [Tutorial (.NET)](https://alphatab.net/docs/tutorial-net/introduction): step-by-step .NET app tutorial from setup to playback.
 - [Tutorial (Android)](https://alphatab.net/docs/tutorial-android/introduction): step-by-step Android app tutorial from setup to playback.
 
-## Showcase and formats
+## Formats
 
-- [Showcase](https://alphatab.net/docs/showcase/introduction): rendered examples covering layouts, notation features, and effects.
 - [Guitar Pro 8](https://alphatab.net/docs/formats/guitar-pro-8): supported features and compatibility notes for the `.gp` format.
 - [MusicXML](https://alphatab.net/docs/formats/musicxml): supported features and compatibility notes for the MusicXML standard.
 
