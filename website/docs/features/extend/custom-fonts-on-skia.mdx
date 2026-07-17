@@ -1,0 +1,66 @@
+---
+title: "Custom fonts on Skia"
+description: "Register any font with the Skia rendering backend used on .NET and Android via Environment.registerAlphaSkiaCustomFont."
+sidebar_custom_props:
+  feature_chapter: fonts
+  feature_order: 20
+  feature_platforms: [net, android]
+keywords:
+  - alphaTab
+  - Skia
+  - custom font
+  - .NET
+  - Android
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+The Skia rendering backend that powers alphaTab on .NET and Android does not read fonts from the operating system's font store. Any font used for titles, lyrics, chord names, or fingerings must be registered with Skia explicitly first.
+
+<AlphaTab file="/files/canon.gp" />
+
+`Environment.registerAlphaSkiaCustomFont(bytes)` accepts the raw font file bytes and returns a `Font` descriptor that identifies the font inside alphaTab. Once registered, reference that font family name from `display.resources` like any other font.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const fontBytes = await loadFontBytes('/fonts/Roboto-Regular.ttf');
+const roboto = alphaTab.Environment.registerAlphaSkiaCustomFont(fontBytes);
+
+const settings = new alphaTab.Settings();
+settings.display.resources.titleFont = new alphaTab.model.Font(
+  roboto.family,
+  32,
+  alphaTab.model.FontStyle.Plain,
+  alphaTab.model.FontWeight.Bold,
+);
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, settings);
+```
+
+`loadFontBytes()` and `getAlphaTabContainer()` are placeholders for the platform-specific pieces. On .NET, read the font with `File.ReadAllBytes` or from an embedded resource stream. On Android, open it from `assets/` via `AssetManager` and copy into a `ByteArray`. Every line after registration runs unchanged on both runtimes.
+
+## What to register
+
+Register any font used through `display.resources`:
+
+- `titleFont`, `subTitleFont`, `wordsFont`, `musicFont` (only when replacing Bravura on Skia), `copyrightFont`
+- `barNumberFont`, `fingeringFont`, `graceFont`, `effectFont`, `markerFont`
+- `tablatureFont`, `numberedNotationFont`, `numberedNotationGraceFont`
+- `directionsFont`, `chordDiagramFont`, `stringTuningFont`
+- Any font referenced by a `Track`, `Bar`, `Beat`, or `Note` style override
+
+Register each font once at startup. Repeated registrations of the same bytes are harmless but wasteful.
+
+## Web parity
+
+On the Web backend, alphaTab reaches into the browser's font store and any `@font-face` rules on the page. No registration call is needed — the equivalent step is a CSS `@font-face` declaration served before alphaTab initializes. See [Custom text fonts](/docs/features/render/custom-text-fonts) for the web-side equivalent.
+
+## Where to look next
+
+- [Custom music (SMuFL) font](/docs/features/extend/custom-smufl-font) — swap the notation font itself, not just text fonts.
+- [Custom text fonts](/docs/features/render/custom-text-fonts) — the equivalent workflow on the web backend.
+- [`Environment.registerAlphaSkiaCustomFont`](/docs/reference/types/environment) in the reference.

@@ -60,6 +60,16 @@ import { Signature } from "@site/src/components/Signature";
      Whether the rendering should be done in a worker if possible.
   </td>
 </tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/importer/maxdecodingbuffersize">
+      <CodeBadge name="importer.maxDecodingBufferSize" type="all" />
+    </a>
+  </td>
+  <td>
+     This setting controls the escape hatch for handling potentially malicous or corrupt
+  </td>
+</tr>
     <tr><th colSpan="4">Core - JavaScript Specific</th></tr>
 <tr>
   <td>
@@ -169,7 +179,7 @@ import { Signature } from "@site/src/components/Signature";
     </a>
   </td>
   <td>
-     The padding between individual effect bands.
+     Clearance applied around each effect band on its staff-facing side:
   </td>
 </tr>
 <tr>
@@ -224,12 +234,12 @@ import { Signature } from "@site/src/components/Signature";
 </tr>
 <tr>
   <td>
-    <a href="/docs/reference/settings/display/justifylastsystem">
-      <CodeBadge name="display.justifyLastSystem" type="all" />
+    <a href="/docs/reference/settings/display/inlinetuningpaddingright">
+      <CodeBadge name="display.inlineTuningPaddingRight" type="all" />
     </a>
   </td>
   <td>
-     Whether to justify also the last system in page layouts.
+     The padding between inline tuning labels and the start of the tab staff.
   </td>
 </tr>
 <tr>
@@ -240,6 +250,16 @@ import { Signature } from "@site/src/components/Signature";
   </td>
   <td>
      The bottom padding applied to last main notation staff (standard, tabs, numbered, slash).
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/lastsystemfillthreshold">
+      <CodeBadge name="display.lastSystemFillThreshold" type="all" />
+    </a>
+  </td>
+  <td>
+     The minimum fullness ratio at which the last system in a flow is justified to fill the
   </td>
 </tr>
 <tr>
@@ -320,6 +340,16 @@ import { Signature } from "@site/src/components/Signature";
   </td>
   <td>
      The zoom level of the rendered notation.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/display/spacingratio">
+      <CodeBadge name="display.spacingRatio" type="all" />
+    </a>
+  </td>
+  <td>
+     The proportional spacing ratio between successive note durations.
   </td>
 </tr>
 <tr>
@@ -462,6 +492,16 @@ import { Signature } from "@site/src/components/Signature";
   </td>
   <td>
      The text encoding to use when decoding strings.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/importer/gp3to5encoding">
+      <CodeBadge name="importer.gp3To5encoding" type="all" />
+    </a>
+  </td>
+  <td>
+     The text encoding to use when decoding strings within GuitarPro3-5 files.
   </td>
 </tr>
 <tr>
@@ -628,6 +668,16 @@ import { Signature } from "@site/src/components/Signature";
 </tr>
 <tr>
   <td>
+    <a href="/docs/reference/settings/player/enableplaybackrangeselection">
+      <CodeBadge name="player.enablePlaybackRangeSelection" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether user click and drag results in a selection defining the playback range.
+  </td>
+</tr>
+<tr>
+  <td>
     <a href="/docs/reference/settings/player/enableplayer">
       <CodeBadge name="player.enablePlayer" type="all" />
     </a>
@@ -638,12 +688,12 @@ import { Signature } from "@site/src/components/Signature";
 </tr>
 <tr>
   <td>
-    <a href="/docs/reference/settings/player/enableuserinteraction">
-      <CodeBadge name="player.enableUserInteraction" type="all" />
+    <a href="/docs/reference/settings/player/enableseektoclick">
+      <CodeBadge name="player.enableSeekToClick" type="all" />
     </a>
   </td>
   <td>
-     Whether the default user interaction behavior should be active or not.
+     Whether the a click on the music sheet triggers a player seek to the note/beat at the
   </td>
 </tr>
 <tr>
@@ -674,6 +724,16 @@ import { Signature } from "@site/src/components/Signature";
   </td>
   <td>
      Whether the player should be enabled and which mode it should use.
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="/docs/reference/settings/player/resetplaybackrangeonclick">
+      <CodeBadge name="player.resetPlaybackRangeOnClick" type="all" />
+    </a>
+  </td>
+  <td>
+     Whether a simple click (no range drag) should reset the current playback range.
   </td>
 </tr>
 <tr>

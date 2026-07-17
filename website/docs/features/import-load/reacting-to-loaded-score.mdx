@@ -1,0 +1,61 @@
+---
+title: "Reacting to a loaded score"
+description: "`scoreLoaded` event, post-load setup patterns (apply styles, register handlers, adjust playback)."
+sidebar_custom_props:
+  feature_chapter: lifecycle
+  feature_order: 20
+keywords:
+  - alphaTab
+  - scoreLoaded
+  - lifecycle
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+`scoreLoaded` is the hook for anything that depends on the parsed score model — coloring, per-track settings, dynamic UI, SoundFont selection based on instruments. It fires once per successful load.
+
+<AlphaTab file="/files/canon.gp" />
+
+## When it fires and what you get
+
+The event delivers a `Score` — the root of the notation model, populated with tracks, staves, bars, voices, beats, and notes. It fires:
+
+- after the first successful load, whether the score came from `core.file`, `api.load()`, `api.loadAlphaTex()`, or `api.tex()`;
+- again on any subsequent `renderScore()` or `renderTracks()` call that switches to a different score.
+
+Do post-load setup here rather than after the constructor call. At constructor time the score is not yet parsed; `api.score` is `null`. Inside `scoreLoaded` the model is ready to inspect and mutate.
+
+Typical work for the handler:
+
+- **Read metadata** — score title, artist, track count, per-track instrument program — and mirror it into your UI.
+- **Apply per-element styles** — assign colors to sub-elements on the score, tracks, beats, and notes. See [Per-element colors](/docs/features/render/per-element-colors) for the full pattern.
+- **Register model-dependent handlers** — for example, wire click handlers that reference specific tracks or bars.
+- **Adjust playback** — set per-track volume, solo a track, load a matching SoundFont for the detected instruments.
+
+## Show it in code
+
+Subscribe once, right after constructing the API, and read the score off the event argument:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  console.log(`Loaded "${score.title}" with ${score.tracks.length} tracks`);
+  for (const track of score.tracks) {
+    console.log(` - ${track.name}`);
+  }
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Per-element colors](/docs/features/render/per-element-colors) — the reference example of a post-load setup that mutates the model.
+- [Traversing and mutating the model](/docs/features/extend/traversing-the-model) — walking tracks, bars, voices, beats, and notes safely.
+- [Handling load errors](./handling-load-errors) — the counterpart event for the failure path.

@@ -1,0 +1,71 @@
+---
+title: "Choosing a backend"
+description: "Decision guide comparing SVG / Canvas / Skia."
+sidebar_custom_props:
+  feature_chapter: backends
+  feature_order: 50
+keywords:
+  - alphaTab
+  - backend
+  - decision
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Three render backends ship with alphaTab. Each optimizes for a different constraint. Match the backend to the runtime you target and the output you want.
+
+<AlphaTab file="/files/canon.gp" settings={{ core: { engine: 'svg' } }} />
+
+## Pick by runtime first
+
+- **Web** — SVG (default) or HTML5 Canvas. Skia is not available in the browser.
+- **.NET** — Skia (default). SVG works too if you need scalable text output.
+- **Android** — Skia (default). SVG works too.
+- **Node.js** — SVG for text output; Skia (via [alphaSkia](https://github.com/CoderLine/alphaSkia)) for PNG.
+
+Leaving `core.engine` at `'default'` picks the right backend for the runtime you are on.
+
+## Then pick by workload
+
+**Reach for [SVG](svg-output) when:**
+
+- You need scalable output for zoom or print.
+- You want the rendered elements in the DOM for CSS styling, hit-testing, or accessibility.
+- You are on Web and the score has a normal number of bars.
+- You are on the server and want a text artifact you can post-process or embed in an HTML page.
+
+**Reach for [HTML5 Canvas](html5-canvas) when:**
+
+- You are on Web and the score is long or dense enough that thousands of SVG nodes slow down scrolling.
+- You do not need per-glyph DOM access — alphaTab's bounds lookup still supports mouse and touch on canvas.
+- You want HighDPI-aware raster output without leaving the browser.
+
+**Reach for [Skia](skia-backend) when:**
+
+- You are on .NET or Android and want the platform default — consistent output across Windows, macOS, Linux, and Android.
+- You need PNG or raster export from a headless environment (Node.js, CI, server pipelines).
+- You register custom `.ttf` / `.otf` fonts and want them applied via [`registerAlphaSkiaCustomFont`](/docs/features/extend/skia-fonts).
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: {
+    file: '/scores/canon.gp',
+    engine: 'default',
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target. `engine: 'default'` picks SVG on Web and Skia on .NET / Android. Replace with `'svg'`, `'html5'`, or `'skia'` when you want to override.
+
+## Where to look next
+
+- [SVG rendering](svg-output) — the vector default.
+- [HTML5 Canvas](html5-canvas) — Web-only raster.
+- [Skia rendering (.NET / Android)](skia-backend) — native raster off the Web.
+- [Node.js headless rendering](nodejs-headless-rendering) — server-side image pipelines.
+- [`core.engine`](/docs/reference/settings/core/engine) in the settings reference.

@@ -1,0 +1,54 @@
+---
+title: "Bravura and SMuFL"
+description: "The default music font, why SMuFL matters."
+sidebar_custom_props:
+  feature_chapter: fonts
+  feature_order: 10
+keywords:
+  - alphaTab
+  - Bravura
+  - SMuFL
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+alphaTab ships with [Bravura](https://github.com/steinbergmedia/bravura), Steinberg's SMuFL reference font, wired up out of the box.
+
+<AlphaTab tex={true}>{`
+\\title "Bravura at work"
+\\subtitle "The default SMuFL font ships with alphaTab"
+.
+:4 5.3 7.3 8.3 7.3 |
+:4 5.3 3.3 2.3 3.3
+`}</AlphaTab>
+
+## Why SMuFL
+
+SMuFL — the [Standard Music Font Layout](https://www.smufl.org/) — is the industry specification that maps every music-notation glyph to a fixed Unicode code point in the Private Use Area. Any SMuFL-compliant font can render any SMuFL-compliant score, and every renderer that follows the spec agrees on which glyph sits at which code point.
+
+Bravura is Steinberg's reference implementation of that spec and covers the full glyph range alphaTab needs. Because the layout is standardized, swapping Bravura for another SMuFL font — Petaluma, Leland, Sebastian — changes the look of every note, rest, clef, and accidental without changing a line of engraving code.
+
+Since 1.7.0, alphaTab follows SMuFL engraving metrics directly. The font supplies the drawing data and a `metadata.json` sidecar supplies the spacing, so the same score reflows automatically when you point at a different font.
+
+## Show it in code
+
+Bravura loads on its own — no settings are required. alphaTab resolves the font files from `core.fontDirectory`, which defaults to a `font/` subfolder next to the alphaTab script:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+Override `core.fontDirectory` if your bundler places the font files somewhere else, or set the global `ALPHATAB_FONT` before alphaTab loads. For finer control — a different format, an absolute URL, a custom SMuFL font entirely — see [Using a custom music font](/docs/features/render/custom-smufl-fonts).
+
+## Where to look next
+
+- [Using a custom music font](/docs/features/render/custom-smufl-fonts) — swap Bravura for another SMuFL font.
+- [Bravura on GitHub](https://github.com/steinbergmedia/bravura) — the source font and license.
+- [SMuFL specification](https://www.smufl.org/) — the standard alphaTab implements.

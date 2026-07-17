@@ -1,0 +1,64 @@
+---
+title: "NAudio (.NET)"
+description: "On .NET, alphaTab routes synthesized samples through NAudio's DirectSound output, with device enumeration exposed via the standard API."
+sidebar_custom_props:
+  feature_chapter: backends
+  feature_order: 20
+  feature_platforms: [net]
+keywords:
+  - alphaTab
+  - NAudio
+  - .NET
+  - DirectSound
+  - audio backend
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+This page describes the .NET-only audio backend. On the .NET runtime, alphaTab's synth pipeline ends at `NAudioSynthOutput` — a `WaveProvider32` implementation that hands 44.1 kHz stereo float samples to a `DirectSoundOut` device from [NAudio](https://github.com/naudio/NAudio). The demo below runs the web player because these docs are hosted in a browser; the code snippet is what you write on .NET.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## What runs on the audio thread
+
+`NAudioSynthOutput` extends `NAudio.Wave.WaveProvider32`. Under the hood:
+
+- Samples are buffered through a `CircularSampleBuffer` sized from the `player.bufferTimeInMilliseconds` setting, then multiplied by four to absorb NAudio's own internal buffering.
+- `DirectSoundOut` is initialized with a 40 ms latency target and pulls float samples on demand via `Read`.
+- Every read triggers `samplesPlayed`, which drives the alphaTab position cursor and the `midiEventsPlayed` event.
+
+You do not construct `NAudioSynthOutput` yourself — the WPF and WinForms controls wire it up when the player is enabled. What you can configure is which DirectSound device receives the audio.
+
+## Selecting an output device
+
+`AlphaTabApi.EnumerateOutputDevices` returns every DirectSound sink except the null GUID. `SetOutputDevice` tears down the current `DirectSoundOut` and rebuilds it against the chosen device, so live switching is supported.
+
+## Show it in code
+
+```csharp
+using AlphaTab;
+using AlphaTab.Synth;
+
+var api = GetAlphaTabApi(); // your WPF or WinForms AlphaTabApi instance
+
+api.PlayerReady.On(async () =>
+{
+    var devices = await api.EnumerateOutputDevices();
+    foreach (var device in devices)
+    {
+        Console.WriteLine($"{device.Label} (default: {device.IsDefault})");
+    }
+
+    // Route to a specific device; pass null to fall back to the system default.
+    var preferred = devices.FirstOrDefault(d => d.Label.Contains("Headphones"));
+    await api.SetOutputDevice(preferred);
+});
+```
+
+`GetAlphaTabApi()` is a placeholder for the platform-specific step of obtaining the API instance — on .NET you get one from the `AlphaTab` WPF control or the WinForms host you embedded.
+
+## Where to look next
+
+- [Audio buffer size](audio-buffer-size) — how `bufferTimeInMilliseconds` maps onto the NAudio buffer count.
+- [Selecting an output device (Web)](selecting-an-output-device) — the same shape of API on the browser side.
+- [`NAudioSynthOutput`](https://github.com/CoderLine/alphaTab/blob/develop/packages/csharp/src/AlphaTab.Windows/NAudioSynthOutput.cs) source on GitHub.

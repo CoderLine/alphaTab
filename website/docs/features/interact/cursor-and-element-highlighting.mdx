@@ -1,0 +1,70 @@
+---
+title: "Cursor and element highlighting"
+description: "The bar cursor, beat cursor, and beat highlight follow the music together — toggled by two flags and two events."
+sidebar_custom_props:
+  feature_chapter: cursor
+  feature_order: 10
+keywords:
+  - alphaTab
+  - cursor
+  - highlighting
+  - playedBeatChanged
+  - activeBeatsChanged
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+alphaTab paints a bar cursor, a beat cursor, and a per-beat highlight that all track the audio in real time. Press play to watch the score follow itself.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## The three overlays
+
+- **Bar cursor** — a rectangle behind the currently played bar. Marks the coarse position.
+- **Beat cursor** — a thin vertical line at the currently played beat. Slides forward as the beat plays out.
+- **Beat highlight** — the SVG groups belonging to the currently played beat get an `at-highlight` class. The notation itself tints.
+
+Two flags gate the overlays. `player.enableCursor` toggles both cursors together. `player.enableElementHighlighting` toggles the SVG highlight. Both default to `true` when the player is active.
+
+## Reacting to the played beat
+
+Two events stream the playback position into your UI:
+
+- `playedBeatChanged` fires once per beat with the currently played `Beat` on the rendered tracks. Use it to drive a chord readout, a lyrics line, or a diagram panel.
+- `activeBeatsChanged` fires with every beat currently sounding across every track and voice — including tracks you did not render. Use it when you need the full harmonic picture.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const chordReadout = document.getElementById('chord-readout');
+
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    enableCursor: true,
+    enableElementHighlighting: true,
+  },
+});
+
+api.playedBeatChanged.on((beat) => {
+  chordReadout.textContent = beat.chord?.name ?? '';
+});
+
+api.activeBeatsChanged.on((args) => {
+  console.log('sounding beats:', args.activeBeats.length);
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of
+obtaining the render target. Every other line runs unchanged on all three
+runtimes.
+
+## Where to look next
+
+- [Customizing cursor colors and animation](./customizing-cursor-colors-and-animation) — restyle the overlays with CSS.
+- [A custom cursor handler](./custom-cursor-handler) — replace the cursor placement logic entirely.
+- [`enableCursor`](/docs/reference/settings/player/enablecursor) and [`enableElementHighlighting`](/docs/reference/settings/player/enableelementhighlighting) in the settings reference.

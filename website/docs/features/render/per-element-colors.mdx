@@ -1,0 +1,69 @@
+---
+title: Per-element colors
+description: Color any note head, stem, beam, or effect via the `style.colors` map on the corresponding model class.
+sidebar_custom_props:
+  since: "1.5"
+  feature_chapter: coloring
+  feature_order: 10
+keywords:
+  - alphaTab
+  - color
+  - style
+  - sub-element
+  - highlight
+---
+
+import { ColoringExample } from '@site/src/components/ColoringExample';
+
+Every level of the score model — score, track, staff, bar, voice, beat, note — carries a `style` container. Assign a color to any sub-element and the render reflects it. Use it to highlight a wrong note in a tutor app, tint a specific voice, or theme the whole document.
+
+<ColoringExample showCode={false} />
+
+## Where the elements live
+
+Each level exposes its own `SubElement` enum of individually colorable parts:
+
+- `ScoreSubElement` — title, subtitle, artist, album, copyright, tempo mark.
+- `TrackSubElement` — track name, accolade bracket, string tuning.
+- `BarSubElement` — barlines, bar numbers, key and time signature glyphs.
+- `VoiceSubElement` — beam, tuplet bracket.
+- `BeatSubElement` — stem, flag, chord name, beat text.
+- `NoteSubElement` — note head, accidental, tab fret text, fingering, effect glyph.
+
+The full enumeration for each level lives in the [model reference](/docs/reference/types/model/).
+
+## Show it in code
+
+Coloring is applied post-load, so wire it in a `scoreLoaded` handler:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  score.style = new alphaTab.model.ScoreStyle();
+  score.style.colors.set(
+    alphaTab.model.ScoreSubElement.Title,
+    alphaTab.model.Color.fromJson('#426d9d')
+  );
+
+  for (const track of score.tracks) {
+    track.style = new alphaTab.model.TrackStyle();
+    track.style.colors.set(
+      alphaTab.model.TrackSubElement.StringTuning,
+      alphaTab.model.Color.fromJson('#e04c4c')
+    );
+  }
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Coloring guide](/docs/guides/coloring) — the deep walkthrough with every sub-element enumerated and worked examples.
+- [`Color`](/docs/reference/types/model/color) and the `SubElement` enums in the [model reference](/docs/reference/types/model/).

@@ -1,0 +1,64 @@
+---
+title: "Parchment layout"
+description: "LayoutMode.Parchment; respects the systems layout from the source file (Guitar Pro embedded layout), with per-bar displayScale for relative sizing."
+sidebar_custom_props:
+  feature_chapter: layout
+  feature_order: 30
+  since: "1.9"
+keywords:
+  - alphaTab
+  - layout
+  - parchment
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Parchment layout lays bars out page-style but honors the systems layout embedded in the source file — the row breaks and relative bar widths the engraver chose in Guitar Pro. Reach for it when you want the score to look the way the author intended, not the way alphaTab would pack it.
+
+<AlphaTab file="/files/canon.gp" settings={{ display: { layoutMode: 'parchment' } }} />
+
+## What Parchment reads from the score model
+
+Parchment consults per-track fields when a single track is rendered, and per-score fields when multiple tracks are:
+
+- **`systemsLayout`** — an array describing how many bars land in each row. Consumed row by row until the values run out.
+- **`defaultSystemsLayout`** — the fallback bars-per-row once `systemsLayout` is exhausted.
+- **`bar.displayScale`** (single track) / **`masterBar.displayScale`** (multi-track) — a relative weight controlling how the available row width is distributed across the bars in that row. Two bars with `displayScale = 1` share the row evenly; a bar with `displayScale = 2` gets twice the space of a `1`.
+
+Prefix and postfix glyphs — clef, key signature, time signature, barlines — keep their natural width. `displayScale` distributes what's left of the row.
+
+## The switch that reads the source
+
+The layout mode controls the storage; `display.systemsLayoutMode` controls whether alphaTab reads it:
+
+- `SystemsLayoutMode.Automatic` — alphaTab computes row breaks itself. This is the default for [Page layout](./page-layout).
+- `SystemsLayoutMode.UseModelLayout` — read the model fields listed above. Parchment sets this behavior implicitly.
+
+You can also mutate the model fields in a `scoreLoaded` handler to override what the file carried — useful when adapting an embedded layout for a smaller viewport.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  display: {
+    layoutMode: alphaTab.LayoutMode.Parchment,
+  },
+});
+
+api.scoreLoaded.on((score) => {
+  score.defaultSystemsLayout = 4;
+  score.masterBars[0].displayScale = 1.5;
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Page layout](./page-layout) — the automatic packing mode.
+- [Density and spacing](./density-and-spacing) — tune spacing when the model layout leaves you room to.
+- [`display.layoutMode`](/docs/reference/settings/display/layoutmode) and [`display.systemsLayoutMode`](/docs/reference/settings/display/systemslayoutmode) reference entries.

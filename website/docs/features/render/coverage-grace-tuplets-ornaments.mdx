@@ -1,0 +1,79 @@
+---
+title: "Grace notes, tuplets, and ornaments"
+description: "Grace positioning, tuplet brackets, trills, mordents, turns."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 40
+keywords:
+  - alphaTab
+  - grace notes
+  - tuplets
+  - ornaments
+  - trill
+  - mordent
+  - fingering
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Grace notes, tuplets, and ornaments carry the small performance details that give a passage its character. alphaTab renders each with the engraving conventions its readers expect.
+
+## Grace notes {#grace}
+
+Grace notes render as small noteheads before their principal beat. alphaTab honours the source file's on-beat vs before-beat placement and draws the acciaccatura slash where appropriate.
+
+<AlphaTab file="/files/features/GraceNotes.gp5" />
+
+## Tuplets {#tuplets}
+
+Tuplets — triplets, quintuplets, and other non-standard beat subdivisions — render with a bracket and ratio label above the beamed group. Beat-connected tuplets share the bracket span.
+
+<AlphaTab file="/files/features/Tuplets.gp5" />
+
+## Trills {#trills}
+
+Trills render with a `tr` glyph and, when the trill spans multiple beats, a wavy line above the staff indicating the duration.
+
+<AlphaTab file="/files/features/Trill.gp5" />
+
+## Mordents and turns {#ornaments}
+
+Mordents (upper and lower) and turns render as their standard glyphs above the notehead. The examples below use alphaTex to isolate each ornament type.
+
+<AlphaTab tex="true">{`
+:4 C4 { turn } D4 { iturn } E4 { umordent } F4 { lmordent }
+`}</AlphaTab>
+
+## Fingering annotations {#fingering}
+
+Left-hand and picking-hand fingering marks render as small digits or letters next to the affected notehead — useful for classical guitar and piano notation.
+
+<AlphaTab file="/files/features/Fingering.gp5" />
+
+## Show it in code
+
+Each ornament category maps to a `NotationElement` key. Toggle any of them off for a cleaner rendering:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  notation: {
+    elements: new Map([
+      [alphaTab.NotationElement.EffectTrill, false],
+      [alphaTab.NotationElement.EffectTurn, false],
+      [alphaTab.NotationElement.EffectMordent, false],
+    ]),
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+## Where to look next
+
+- [Toggling notation elements off](./coverage-toggle-elements) — the full pattern for hiding a category.
+- [Effects and articulations](./coverage-effects-articulations) — the sibling coverage page for bends, palm mute, slides, and taps.
+- [`NotationElement`](/docs/reference/types/notationelement) — the enumeration listing every togglable category.

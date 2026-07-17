@@ -1,0 +1,68 @@
+---
+title: "Chord diagrams and chord names"
+description: "Chord diagrams above bars and inline chord symbols."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 20
+keywords:
+  - alphaTab
+  - chord diagram
+  - chord name
+  - chord symbol
+  - fretboard
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Chord information lives at two levels in a score — the diagram that shows the fingering and the inline chord name over a beat. alphaTab renders both, and the source file decides which appear where.
+
+## Chord names on beats {#names}
+
+Any beat can carry a chord name. alphaTab renders the name in the chord font directly above the beat, respecting sharp, flat, and slash-bass characters.
+
+<AlphaTab file="/files/features/Chords.gp5" />
+
+## Chord diagrams above the first system {#diagrams}
+
+When a chord definition ships with a fretboard diagram, alphaTab draws it above the first system by default. The same score renders the diagrams inline above the beat if you disable the top-of-score layout.
+
+<AlphaTab file="/files/features/Chords.gp5" settings={{ display: { chordDiagramsOnTop: false } }} />
+
+## Show it in code
+
+Toggle whether diagrams collect above the first system or attach to each beat individually:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  display: {
+    chordDiagramsOnTop: true, // false to render each diagram above its beat
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+To hide chord names or diagrams entirely, disable them through `notation.elements`:
+
+```js
+api.settings.notation.elements.set(
+  alphaTab.NotationElement.EffectChordNames,
+  false,
+);
+api.settings.notation.elements.set(
+  alphaTab.NotationElement.EffectChordDiagrams,
+  false,
+);
+api.updateSettings();
+api.render();
+```
+
+## Where to look next
+
+- [Chord diagrams on top](./chord-diagrams-on-top) — the stylesheet policy that governs the diagrams-above-first-system layout.
+- [Toggling notation elements off](./coverage-toggle-elements) — hide chord names or diagrams score-wide.
+- [`NotationElement`](/docs/reference/types/notationelement) — every element key you can flip.

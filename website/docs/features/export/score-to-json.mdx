@@ -1,0 +1,78 @@
+---
+title: "Score to JSON and back"
+description: "Round-trip the in-memory `Score` model through JSON with `JsonConverter` for storage, transport, and web-worker messaging."
+sidebar_custom_props:
+  since: "1.2"
+  feature_chapter: serialization
+  feature_order: 10
+keywords:
+  - alphaTab
+  - JSON
+  - serialization
+  - score
+  - JsonConverter
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+`JsonConverter` turns the alphaTab `Score` object graph into a plain, cycle-free JavaScript object — and back. Persist the result in a database, ship it between a Web Worker and the main thread, or diff two versions of a score in a text editor.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+The score above is a live `Score` instance. Pass it through `JsonConverter.scoreToJsObject(...)` and you get a nested `Map` structure ready for `JSON.stringify`.
+
+## Round-trip in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+});
+
+api.scoreLoaded.on(() => {
+  // Serialize
+  const jsObject = alphaTab.model.JsonConverter.scoreToJsObject(api.score);
+  const jsonString = JSON.stringify(jsObject, (_, v) => {
+    if (v instanceof Map) return Object.fromEntries(v);
+    if (ArrayBuffer.isView(v)) return Array.from(v);
+    return v;
+  });
+  localStorage.setItem('alphaTab.score', jsonString);
+
+  // Deserialize
+  const stored = localStorage.getItem('alphaTab.score');
+  if (stored) {
+    const restored = alphaTab.model.JsonConverter.jsObjectToScore(JSON.parse(stored));
+    api.renderScore(restored);
+  }
+});
+```
+
+`getAlphaTabContainer()` is the platform-specific render target.
+
+On Web the short form `JsonConverter.scoreToJson(score)` / `JsonConverter.jsonToScore(jsonString)` skips the manual `JSON.stringify` step and applies the correct `Map` and typed-array replacer for you. Reach for `scoreToJsObject` / `jsObjectToScore` when you want the intermediate JavaScript object — for example to post it to a Web Worker with `structuredClone` semantics, or to store it in IndexedDB without an intermediate string.
+
+## What survives the round-trip
+
+`scoreToJsObject` walks every level of the model — score metadata, tracks, staves, bars, voices, beats, notes — and emits a plain object per node with:
+
+- All primitive and enum properties (durations, pitches, fret numbers, effect flags).
+- Style containers (`ScoreStyle`, `TrackStyle`, and so on) with their color maps.
+- Playback information, tuning, chord definitions, and lyric assignments.
+- Backing-track metadata (the raw audio buffer is included as a byte array).
+
+`jsObjectToScore` reconstructs the graph and calls `Score.finish(settings)` to relink parent references, rebuild caches, and validate durations. Pass a `Settings` instance if you want the reconstruction to apply your project's notation flags; omit it to accept defaults.
+
+## Use cases
+
+- **Persistent storage** — store user-authored scores in your database as JSON, hand them back to alphaTab on load.
+- **Web-Worker offloading** — build a `Score` in a worker, transfer the JS object to the main thread, render it there.
+- **Diff and version control** — the deterministic JSON output diffs cleanly, so score changes show up in a text-oriented workflow.
+
+## Where to look next
+
+- [Settings to JSON](settings-to-json) — the sibling call for `Settings`.
+- [Export to alphaTex](export-to-alphatex) — a human-readable text format for the same model.
+- [`JsonConverter`](/docs/reference/types/model/jsonconverter) in the API reference.

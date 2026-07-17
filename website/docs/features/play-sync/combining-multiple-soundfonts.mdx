@@ -1,0 +1,88 @@
+---
+title: "Combining multiple SoundFonts"
+description: "Layered SoundFonts via `append`."
+sidebar_custom_props:
+  feature_chapter: synthesis
+  feature_order: 30
+keywords:
+  - alphaTab
+  - SoundFont
+  - layered
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Load several SoundFonts into the same synth and alphaTab merges their preset banks. Pair a small drums-only SoundFont with a large guitar pack, or pull instrument files on demand once you know which tracks the loaded score needs.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## The `append` flag
+
+`api.loadSoundFont(data, append)` takes a second boolean argument. When it is `false` (the default) alphaTab replaces the currently loaded presets. When it is `true`, alphaTab merges the new file's presets on top of the existing ones. Preset conflicts resolve in load order — the later file wins.
+
+Layering shines when your instrument palette exceeds any single SoundFont, or when you want a per-track SoundFont strategy without shipping one giant file.
+
+## Slice the bank first
+
+The biggest win from layering is bandwidth: users only download the presets they need for the current score. Slice a monolithic SoundFont into targeted files with [Polyphone](https://www.polyphone-soundfonts.com/):
+
+1. Copy the SoundFont to two files, one per instrument family (for example `guitars.sf2` and `orchestra.sf2`).
+2. Open each copy and delete the presets that do not belong. Polyphone can trim unused instruments and samples automatically.
+3. Save each file. Combined size stays close to the original; per-file size drops dramatically.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+  },
+});
+
+const loaded = new Set();
+
+async function ensureSoundFont(url) {
+  if (loaded.has(url)) return;
+  loaded.add(url);
+  const bytes = await readScoreFile(url);
+  api.loadSoundFont(bytes, /* append */ true);
+}
+
+// After the score arrives, inspect the tracks and pull only the SoundFonts you need.
+api.scoreLoaded.on((score) => {
+  for (const track of score.tracks) {
+    const program = track.playbackInfo.program;
+    const isDrums = track.playbackInfo.primaryChannel === 9;
+    const isGuitar = program >= 24 && program <= 31;
+    if (isDrums || isGuitar) {
+      ensureSoundFont('/assets/guitars-and-drums.sf2');
+    } else {
+      ensureSoundFont('/assets/others.sf2');
+    }
+  }
+});
+
+// Drop the whole stack later to free memory before loading a different set.
+function reset() {
+  loaded.clear();
+  api.resetSoundFonts();
+}
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+`readScoreFile()` is a placeholder for the platform-specific step of producing a `Uint8Array` — `fs.promises.readFile` on Node.js, `System.IO.File.ReadAllBytes` on .NET, `ContentResolver.openInputStream` on Android, or `fetch(...).then(r => r.arrayBuffer())` in the browser. Track download progress there if the UI needs a loading bar.
+
+## Memory hygiene
+
+Every appended SoundFont stays resident in the synth. On long-running sessions where the user browses many scores, call `api.resetSoundFonts()` between loads to reclaim RAM, then re-append only what the next score needs. `soundFontLoaded` fires on each successful call, so hook it if you want to gate playback until every layer is ready.
+
+## Where to look next
+
+- [Custom SoundFonts](custom-soundfonts) — the single-file replacement path.
+- [SoundFont2 with TinySoundFont](soundfont2-with-tinysoundfont) — how the synth resolves preset banks.
+- [Reacting to a loaded score](/docs/features/import-load/reacting-to-loaded-score) — the `scoreLoaded` hook the layering strategy fires from.

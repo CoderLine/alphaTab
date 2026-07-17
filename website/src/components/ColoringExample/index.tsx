@@ -3,7 +3,11 @@ import react, { useEffect } from "react";
 import * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
 
-export const ColoringExample: react.FC = () => {
+export interface ColoringExampleProps {
+  showCode?: boolean;
+}
+
+export const ColoringExample: react.FC<ColoringExampleProps> = ({ showCode = true }) => {
   const tex = `
     \\title "Canon Rock"
     \\artist "JerryC"
@@ -158,7 +162,7 @@ export const ColoringExample: react.FC = () => {
   return (
     <div>
       <div ref={element}></div>
-      <CodeBlock language="js">{trimmed}</CodeBlock>
+      {showCode ? <CodeBlock language="js">{trimmed}</CodeBlock> : null}
     </div>
   );
 };

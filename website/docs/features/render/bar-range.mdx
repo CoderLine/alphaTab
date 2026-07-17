@@ -1,0 +1,56 @@
+---
+title: "Rendering a slice"
+description: "startBar / barCount to render partial scores."
+sidebar_custom_props:
+  feature_chapter: layout
+  feature_order: 70
+keywords:
+  - alphaTab
+  - partial
+  - slice
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+`display.startBar` and `display.barCount` render a window of consecutive bars out of a larger score. Reach for them to paginate a long piece, isolate a phrase for a tutorial page, or generate per-section previews without loading a different file each time.
+
+<AlphaTab file="/files/canon.gp" settings={{ display: { startBar: 4, barCount: 8 } }} />
+
+## The two knobs
+
+- **`display.startBar`** — the first bar to render, one-based. `1` is the beginning of the score (the default), `5` starts the render at bar 5.
+- **`display.barCount`** — how many consecutive bars to include. `-1` (the default) renders every bar from `startBar` to the end.
+
+The rest of the score model is still loaded and available for playback, event hooks, and bounds lookup — only the visible render is trimmed. Playback still traverses the full score unless you also constrain `player.playbackRange`.
+
+To change the visible slice at runtime, mutate `api.settings.display.startBar` and `api.settings.display.barCount`, then call `api.updateSettings()` followed by `api.render()`.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  display: {
+    startBar: 4,
+    barCount: 8,
+  },
+});
+
+// Later — page forward eight bars
+document.getElementById('next-page').addEventListener('click', () => {
+  api.settings.display.startBar += 8;
+  api.updateSettings();
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Page layout](./page-layout) — the wrapping mode this slice usually renders in.
+- [`display.startBar`](/docs/reference/settings/display/startbar) and [`display.barCount`](/docs/reference/settings/display/barcount) reference entries.
+- [`updateSettings`](/docs/reference/api/updatesettings) — apply setting mutations at runtime.

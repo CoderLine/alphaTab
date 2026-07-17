@@ -1,0 +1,64 @@
+---
+title: "Looping a section"
+description: "`playbackRange`, `isLooping`, live loop demo."
+sidebar_custom_props:
+  feature_chapter: transport
+  feature_order: 30
+keywords:
+  - alphaTab
+  - loop
+  - playback range
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Combine `playbackRange` and `isLooping` to repeat a bar, a phrase, or a chorus until the muscle memory sticks.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## The two properties
+
+- **`playbackRange`** — a `{ startTick, endTick }` object marking the tick bounds of the loop. Set it to `null` to release the constraint and play the whole score.
+- **`isLooping`** — a boolean. When `true`, playback wraps back to `startTick` on reaching `endTick`. When `false`, playback stops at `endTick`.
+
+Set `playbackRange` without `isLooping` to constrain playback to a section that plays once, then stops. Set `isLooping` without `playbackRange` to loop the entire score.
+
+## Converting bars to ticks
+
+`playbackRange` is tick-based, but users think in bars. The `tickCache` on the API exposes the tick position of any beat, so grabbing the first beat of the start bar and the last beat of the end bar gives you the range.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: { enablePlayer: true },
+});
+
+api.playerReady.on(() => {
+  const track = api.score.tracks[0];
+  const startBar = track.staves[0].bars[3];  // bar 4 (zero-based)
+  const endBar = track.staves[0].bars[7];    // bar 8
+
+  const startBeat = startBar.voices[0].beats[0];
+  const endBeat = endBar.voices[0].beats[endBar.voices[0].beats.length - 1];
+
+  api.playbackRange = {
+    startTick: api.tickCache.getBeatStart(startBeat),
+    endTick: api.tickCache.getBeatStart(endBeat),
+  };
+  api.isLooping = true;
+  api.play();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Seeking by tick and time](./seeking-by-tick-and-time) — the tick model that `playbackRange` lives in.
+- [Range selection](/docs/features/interact/range-selection) — turn a click-drag on the score into a loop range.
+- [`playbackRange`](/docs/reference/api/playbackrange) and [`isLooping`](/docs/reference/api/islooping) reference entries.

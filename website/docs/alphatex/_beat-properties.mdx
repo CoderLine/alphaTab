@@ -1137,3 +1137,24 @@ Following parameters have value limitations
 
 `}</AlphaTexSample>
 
+## `restDisplayPitch`
+
+```plain title="Syntax"
+restDisplayPitch pitch
+```
+
+**Description:** Define the pitch on which the rest symbol should be placed.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `pitch` | The note pitch defining the position, like C4 | `Ident` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+r.4{ restDisplayPitch C4 } C4
+
+`}</AlphaTexSample>
+

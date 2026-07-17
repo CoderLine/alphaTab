@@ -481,6 +481,38 @@ The `systemsLayout` and `defaultSystemsLayout` allow configuring the system layo
 
 `}</AlphaTexSample>
 
+## `\tuningDisplayMode`
+
+```plain title="Syntax"
+\tuningDisplayMode mode
+```
+
+**Description:** Sets where string tuning information is displayed.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `score\|staff` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["score","Display tuning information above the score."],["staff","Display tuning note names beside tab staff lines."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\tuningDisplayMode staff
+\\track "Guitar"
+    \\staff { score tabs }
+    0.6.4 2.6.4 3.6.4 0.5.4
+
+`}</AlphaTexSample>
+
 ## `\multiBarRest`
 
 ```plain title="Syntax"

@@ -1,0 +1,110 @@
+---
+title: "Programmatic score construction"
+description: "Instantiate the alphaTab model classes directly and render a score built entirely in code — no importer, no source file."
+sidebar_custom_props:
+  feature_chapter: model
+  feature_order: 10
+keywords:
+  - alphaTab
+  - model
+  - score
+  - programmatic
+  - Score
+  - Track
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+alphaTab's model is public. Instantiate `Score`, `Track`, `Staff`, `Bar`, `Voice`, `Beat`, and `Note`, wire them together, and hand the root `Score` to `api.renderScore()`. No file format, no importer, no round-trip through alphaTex.
+
+<AlphaTab tex={true}>{`
+\\title "Built in code"
+\\tempo 120
+.
+3.3.4 5.3 7.3 8.3 |
+8.3.4 7.3 5.3 3.3
+`}</AlphaTab>
+
+The demo above shows what one Track / one Staff / two Bars / eight beats worth of construction looks like when rendered. The same shape assembled through the model classes appears in the sample below.
+
+## Model shape
+
+Every score built from scratch follows the same tree:
+
+- `Score` — the root. Holds `masterBars` (shared time signature, tempo, repeats) and `tracks`.
+- `MasterBar` — one per bar of music, added to `Score.masterBars`. Sets time signature and tempo automations.
+- `Track` — one per instrument. Holds `staves`.
+- `Staff` — one per notation view (standard notation staff, tablature staff). Holds `bars` and tuning.
+- `Bar` — one per masterBar, added to `Staff.bars`. Holds `voices` and clef.
+- `Voice` — one per polyphonic voice within a bar. Holds `beats`.
+- `Beat` — one per rhythmic event. Holds `notes` (or is a rest) and carries `duration` and `dots`.
+- `Note` — one pitched note. Carries `string` + `fret` for tab, or `octave` + `tone` for pitched non-tab staves.
+
+Each level's collection has a corresponding `add*` method (`score.addTrack(track)`, `track.addStaff(staff)`, and so on) that also sets parent references and indices. Use the setters, not the arrays directly.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const score = new alphaTab.model.Score();
+score.title = 'Built in code';
+score.tempo = 120;
+
+// Two shared master bars — 4/4 time.
+for (let i = 0; i < 2; i++) {
+  const masterBar = new alphaTab.model.MasterBar();
+  masterBar.timeSignatureNumerator = 4;
+  masterBar.timeSignatureDenominator = 4;
+  score.addMasterBar(masterBar);
+}
+
+// One guitar track, one staff, standard six-string tuning.
+const track = new alphaTab.model.Track();
+track.name = 'Guitar';
+score.addTrack(track);
+
+const staff = new alphaTab.model.Staff();
+staff.stringTuning.tunings = [64, 59, 55, 50, 45, 40];
+track.addStaff(staff);
+
+// One bar per master bar, one voice per bar.
+for (let i = 0; i < score.masterBars.length; i++) {
+  const bar = new alphaTab.model.Bar();
+  staff.addBar(bar);
+
+  const voice = new alphaTab.model.Voice();
+  bar.addVoice(voice);
+
+  // Four quarter-note beats per bar, ascending then descending the third string.
+  const frets = i === 0 ? [3, 5, 7, 8] : [8, 7, 5, 3];
+  for (const fret of frets) {
+    const beat = new alphaTab.model.Beat();
+    beat.duration = alphaTab.model.Duration.Quarter;
+    voice.addBeat(beat);
+
+    const note = new alphaTab.model.Note();
+    note.string = 3;
+    note.fret = fret;
+    beat.addNote(note);
+  }
+}
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container);
+api.renderScore(score);
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+## Post-construction finalization
+
+alphaTab calls `Score.finish(settings)` internally when a score is rendered through `renderScore()`. That step derives ties, computes measure lengths, and links repeat groups. If you inspect the model between construction and render, some derived fields (`Note.realValue`, `Beat.duration` after tuplet resolution, master-bar end positions) are `NaN` or zero until finish runs.
+
+For scores handed straight to `renderScore()`, ignore this. For scores serialized to JSON before rendering, run `score.finish(settings)` first so the JSON snapshot carries the finalized model.
+
+## Where to look next
+
+- [Traversing and mutating the model](/docs/features/extend/traversing-and-mutating-the-model) — the mirror workflow: build once, mutate afterward.
+- [`Score`](/docs/reference/types/model/score), [`Track`](/docs/reference/types/model/track), [`Staff`](/docs/reference/types/model/staff), [`Bar`](/docs/reference/types/model/bar), [`Voice`](/docs/reference/types/model/voice), [`Beat`](/docs/reference/types/model/beat), and [`Note`](/docs/reference/types/model/note) in the model reference.
+- [`renderScore`](/docs/reference/api/renderscore) — the entry point that accepts a hand-built score.

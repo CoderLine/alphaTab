@@ -1,0 +1,64 @@
+---
+title: "Drum and percussion notation"
+description: "Percussion staff with 1/2/3 lines, drum piece heads."
+sidebar_custom_props:
+  feature_chapter: notation-types
+  feature_order: 50
+keywords:
+  - alphaTab
+  - drum
+  - percussion
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Percussion staves use fixed noteheads per piece — an *x* for cymbals, a filled oval for drums, a diamond for the ride bell — arranged on a staff whose line count matches the ensemble size.
+
+<AlphaTab file="/files/features/Drums.gp5" tex={false}>
+  Loading...
+</AlphaTab>
+
+## Choosing the line count
+
+`Staff.standardNotationLineCount` controls how many lines the staff draws for a percussion instrument. It replaces the western five-line default with a count that suits the kit:
+
+- **1 line** — hand-percussion parts (shaker, tambourine, cowbell) that only need a single pitch axis.
+- **2 lines** — split-part notation for a small kit, typically kick on the lower line and snare on the upper.
+- **3 lines** — a compact drumkit staff with kick, snare, and cymbals on their own lines.
+- **5 lines** — the traditional drumkit staff, the default when a Guitar Pro file already targets it.
+
+The line count is a per-`Staff` value so a single score can carry a five-line drumkit next to a one-line shaker part without a global setting getting in the way.
+
+## Articulations decide the notehead
+
+The `Track.percussionArticulations` list tells alphaTab which notehead, staff position, and MIDI value each drum piece maps to. Guitar Pro files ship a full set; alphaTex users register the standard General MIDI kit with `\articulation defaults` and then reference pieces by name (`KickHit`, `SnareHit`, `HiHatOpen`, `RideBell`, …). Custom articulations extend the list with your own piece definitions.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/drums.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  for (const track of score.tracks) {
+    for (const staff of track.staves) {
+      if (staff.isPercussion) {
+        staff.standardNotationLineCount = 3;
+      }
+    }
+  }
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Special tracks](/docs/features/render/coverage-special-tracks) — drums, percussion, piano, and unusual tunings gathered on one page.
+- [`Staff.standardNotationLineCount`](/docs/reference/types/model/staff) and [`Staff.isPercussion`](/docs/reference/types/model/staff) in the model reference.
+- [`\articulation`](/docs/alphatex/staff-metadata#articulation) — registering percussion pieces in alphaTex.

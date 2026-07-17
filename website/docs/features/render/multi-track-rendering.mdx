@@ -1,0 +1,60 @@
+---
+title: "Multi-track and grand staff"
+description: "Piano grand staff, multi-track rendering, multiple tunings displayed."
+sidebar_custom_props:
+  feature_chapter: notation-types
+  feature_order: 60
+keywords:
+  - alphaTab
+  - multi-track
+  - grand staff
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+alphaTab renders any number of tracks as a single vertical system, connects grand-staff instruments with a brace, and prints per-track tunings for stringed instruments.
+
+<AlphaTab file="/files/features/Skillet.gp5" tracks={[0, 1]} tex={false} settings={{ display: { barCount: 8 } }}>
+  Loading...
+</AlphaTab>
+
+## The grand staff for piano
+
+A piano `Track` carries two `Staff` entries — a treble staff and a bass staff, tied together with a curly brace. alphaTab detects this from the source file and renders them stacked; the brace comes from the default `bracketExtendMode` of `GroupStaves`. Keep `showStandardNotation` on for both staves and `showTablature` off (piano staves ship with no tuning, so the tab staff is hidden automatically).
+
+## Multiple tracks in one system
+
+Selecting more than one track renders them as a single vertical system: the top track sits on the first line, brackets group multi-staff tracks, and every track shares the same barlines. Two paths get you there:
+
+- **On the API constructor** — set `core.tracks` to an array of track indexes when you build the `AlphaTabApi`. The initial render includes exactly those tracks.
+- **At runtime** — call `api.renderTracks(tracks)` with an array of `Track` objects. Use it to switch which players are visible without reloading the file: focus on a single soloist, expand to the whole ensemble, or hide backing parts on demand.
+
+Each track keeps its own tuning label, transposition, and staff configuration. A score that mixes a 6-string guitar in standard tuning with a 5-string bass in drop-D prints both tunings above their respective staves at the start of the first system.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: {
+    file: '/scores/band.gp',
+    tracks: [0, 1],
+  },
+});
+
+api.scoreLoaded.on((score) => {
+  // Switch to the piano alone at runtime.
+  api.renderTracks([score.tracks[2]]);
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Selecting and switching tracks](/docs/features/import-load/selecting-and-switching-tracks) — the full lifecycle of loading, switching, and reacting to track changes.
+- [Bracket extend mode](/docs/features/render/bracket-extend-mode) — how brackets and braces group staves across tracks.
+- [Tuning display](/docs/features/render/tuning-display) — controlling the tuning block that appears above each track.
+- [`AlphaTabApiBase.renderTracks`](/docs/reference/api/rendertracks) and [`core.tracks`](/docs/reference/settings/core/tracks) in the API reference.

@@ -1,0 +1,85 @@
+---
+title: "Range selection"
+description: "Drive the playback-range highlight programmatically with `highlightPlaybackRange`, commit it to a loop with `applyPlaybackRangeFromHighlight`, and reset with `clearPlaybackRangeHighlight`."
+sidebar_custom_props:
+  feature_chapter: selection
+  feature_order: 10
+keywords:
+  - alphaTab
+  - selection
+  - range
+  - highlightPlaybackRange
+  - loop
+---
+
+import { SelectionHandleDemo } from '@site/src/components/SelectionHandleDemo';
+
+alphaTab renders a translucent selection overlay behind whatever range you mark, spanning across staff systems where needed. Three methods let you build custom selection UIs on top of it — drag handles, keyboard range extension, "loop this section" buttons — without touching the internal drag-select. Grab the handles in the demo below to reshape the range.
+
+<SelectionHandleDemo>{`
+\\title "Canon"
+\\tempo 90
+.
+:8 15.2 17.2 15.2 17.2 |
+15.2 17.2 15.2 17.2 |
+15.2 17.2 15.2 17.2 |
+15.2 17.2 15.2 17.2 |
+`}</SelectionHandleDemo>
+
+## The three methods
+
+- **`api.highlightPlaybackRange(startBeat, endBeat)`** — paints the highlight overlay between two beats. Pure visual: it does not change what plays.
+- **`api.applyPlaybackRangeFromHighlight()`** — reads the currently highlighted range, sets `api.playbackRange` to loop that span, and moves the tick position to the start.
+- **`api.clearPlaybackRangeHighlight()`** — clears the overlay. Also pure visual; it does not touch `playbackRange`.
+
+Split like this so a selection UI stays responsive during the drag (`highlightPlaybackRange` on every move), commits the loop only when the user releases (`applyPlaybackRangeFromHighlight` on drag-end), and clears cleanly (`clearPlaybackRangeHighlight` on escape or click-outside).
+
+## The editor pattern
+
+Wire your drag gesture to the three methods. During the drag, keep painting the range. On release, commit it to a playback loop.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    enableUserInteraction: false,
+  },
+});
+
+let dragStart = null;
+
+api.beatMouseDown.on((beat) => {
+  dragStart = beat;
+  api.highlightPlaybackRange(beat, beat);
+});
+
+api.beatMouseMove.on((beat) => {
+  if (!dragStart) {
+    return;
+  }
+  api.highlightPlaybackRange(dragStart, beat);
+});
+
+api.beatMouseUp.on((beat) => {
+  if (!dragStart || !beat || beat === dragStart) {
+    api.clearPlaybackRangeHighlight();
+    dragStart = null;
+    return;
+  }
+  api.applyPlaybackRangeFromHighlight();
+  api.isLooping = true;
+  dragStart = null;
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Selection change events](./selection-change-events) — the `playbackRangeHighlightChanged` event that streams selection updates while the user drags.
+- [Looping a section](/docs/features/play-sync/looping-a-section) — the underlying `playbackRange` and `isLooping` transport.
+- [`highlightPlaybackRange`](/docs/reference/api/highlightplaybackrange) and [`applyPlaybackRangeFromHighlight`](/docs/reference/api/applyplaybackrangefromhighlight) in the API reference.

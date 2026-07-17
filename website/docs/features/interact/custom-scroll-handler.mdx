@@ -1,0 +1,79 @@
+---
+title: "A custom scroll handler"
+description: "Assign an IScrollHandler to api.customScrollHandler to control scroll behavior with your own logic."
+sidebar_custom_props:
+  feature_chapter: scroll
+  feature_order: 30
+keywords:
+  - alphaTab
+  - scroll
+  - handler
+  - IScrollHandler
+  - customScrollHandler
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+The built-in scroll modes cover most integrations. When they do not, replace the whole strategy: assign an `IScrollHandler` to `api.customScrollHandler` and drive the scroll yourself.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## When to reach for it
+
+- The scroll target is not a DOM element — a virtualized list, a canvas overlay, an external component.
+- The scroll should keep two surfaces in lockstep — the score and a waveform, the score and a video timeline.
+- The layout scrolls in a way alphaTab does not model — paged pagination, snap points, an animation library.
+
+`IScrollHandler` has two methods. `forceScrollTo(beatBounds)` is invoked when alphaTab needs an instant scroll (`scrollToCursor()`, seek). `onBeatCursorUpdating(...)` fires each time the beat cursor advances and passes both the current beat bounds and the cursor's raw motion parameters — start X, end X, transition duration in milliseconds. Use those to sync a second surface to the cursor animation frame-for-frame.
+
+Setting `customScrollHandler` replaces alphaTab's default handler for the running session. Set it back to `undefined` to restore the built-in behavior.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },
+});
+
+const waveform = document.getElementById('waveform');
+
+api.customScrollHandler = {
+  forceScrollTo(currentBeatBounds) {
+    const y = currentBeatBounds.barBounds.masterBarBounds.realBounds.y;
+    window.scrollTo({ top: y, behavior: 'instant' });
+    waveform.scrollTop = y;
+  },
+
+  onBeatCursorUpdating(
+    startBeat,
+    endBeat,
+    cursorMode,
+    actualBeatCursorStartX,
+    actualBeatCursorEndX,
+    actualBeatCursorTransitionDuration,
+  ) {
+    const y = startBeat.barBounds.masterBarBounds.realBounds.y;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+    waveform.style.transition = `transform ${actualBeatCursorTransitionDuration}ms linear`;
+    waveform.style.transform = `translateX(${-actualBeatCursorEndX}px)`;
+  },
+
+  [Symbol.dispose]() {
+    waveform.style.transition = '';
+    waveform.style.transform = '';
+  },
+};
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of
+obtaining the render target. Every other line runs unchanged on all three
+runtimes.
+
+## Where to look next
+
+- [Auto-scroll modes](./auto-scroll-modes) and [Scroll target and offsets](./scroll-target-and-offsets) — the built-in strategies you are replacing.
+- [`customScrollHandler`](/docs/reference/api/customscrollhandler) and the [`IScrollHandler`](/docs/reference/types/iscrollhandler) interface reference.

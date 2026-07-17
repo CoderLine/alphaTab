@@ -1,0 +1,55 @@
+---
+title: "Playing a beat or a note"
+description: "`playBeat`, `playNote`; auditioning individual items in editor UIs."
+sidebar_custom_props:
+  feature_chapter: transport
+  feature_order: 50
+keywords:
+  - alphaTab
+  - playBeat
+  - playNote
+  - audition
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+`playBeat(beat)` and `playNote(note)` audition an individual item from the score without moving the main transport. Reach for them in editors, ear-training exercises, and score-review tools.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## The audition methods
+
+- **`playBeat(beat)`** — synthesize the notes of one beat and route them through the audio pipeline once. Chords, effects, and per-note articulations render exactly as they would during full playback.
+- **`playNote(note)`** — synthesize a single note in isolation. Useful when the reader needs to hear one voice out of a chord, or when the UI reacts to a hover instead of a full-beat selection.
+
+Both methods generate a one-time MIDI file and hand it to the synth. Any current playback is stopped. The main tick position, the cursor, and the `playerStateChanged` event stay put — the audition is a side-channel, not a seek.
+
+## Wiring auditions to clicks
+
+The `beatMouseDown` event fires with the `Beat` under the pointer whenever the user clicks the score. Pass it straight to `playBeat` for a click-to-hear editor UX. For per-note hover-to-audition, use `noteMouseDown` (or its `Move` variant) and hand the resulting `Note` to `playNote`.
+
+Auditioning a beat during active playback is safe: alphaTab pauses the current playback, plays the audition, and leaves the transport in the paused state.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: { enablePlayer: true },
+});
+
+api.beatMouseDown.on((beat) => {
+  api.playBeat(beat);
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Reacting to beat and note clicks](/docs/features/interact/beat-and-note-clicks) — the six mouse events that pair with audition.
+- [Play, pause, stop](./play-pause-stop) — the main-transport methods that these auditions run alongside.
+- [`playBeat`](/docs/reference/api/playbeat) and [`playNote`](/docs/reference/api/playnote) reference entries.

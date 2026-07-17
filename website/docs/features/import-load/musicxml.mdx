@@ -1,0 +1,52 @@
+---
+title: "MusicXML"
+description: "MusicXML support: part-group merging, chord diagrams, ties, track volume, tempo, lyrics."
+sidebar_custom_props:
+  feature_chapter: formats
+  feature_order: 20
+keywords:
+  - alphaTab
+  - MusicXML
+  - format
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+alphaTab imports MusicXML — the interchange format every major notation editor writes — with mature coverage of notation, playback, and layout hints.
+
+<AlphaTab file="/files/canon.gp" />
+
+## What alphaTab reads from a MusicXML file
+
+MusicXML lets any tool encode the same music in multiple ways, so the importer is intentionally permissive. It walks both the visual and the sound branches of the file and populates the alphaTab model from whichever the file supplies.
+
+- **Notes, rests, ties, and voices** — full support, including tied-note chains across bars and multi-voice parts. Tie handling was expanded in the 1.3 series.
+- **Chord diagrams** — the fretboard grids under chord symbols, read from `harmony` and `frame` elements. Coverage arrived in 1.3.
+- **Track volume, pan, and program** — per-instrument mixer settings from the `score-instrument` and `midi-instrument` blocks feed straight into the alphaTab mixer.
+- **Tempo and tempo changes** — read from `sound` and `metronome` markers so the score plays back at the intended feel.
+- **Lyrics** — multiple verses attached to notes via `lyric` elements are aligned to beats on import.
+- **Part groups** — braces and brackets grouping multiple parts. By default each part becomes a track. Set `importer.mergePartGroupsInMusicXml` to `true` to merge grouped parts into a single track with multiple staves (piano-style grand staff, for example).
+
+For the exhaustive element table, see the [MusicXML compatibility page](/docs/formats/musicxml).
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.musicxml' },
+  importer: {
+    mergePartGroupsInMusicXml: true,
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [MusicXML compatibility](/docs/formats/musicxml) — the full element-by-element support matrix.
+- [Tuning importer behavior](./tuning-importer-behavior) — the encoding hint, part-group merge flag, and other importer knobs in one place.
+- [Load from bytes](./load-from-bytes) — pass MusicXML content that already sits in memory rather than fetching a URL.

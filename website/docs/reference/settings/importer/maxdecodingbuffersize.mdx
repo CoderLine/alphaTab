@@ -1,0 +1,24 @@
+---
+title: importer.maxDecodingBufferSize
+sidebar_label: maxDecodingBufferSize
+sidebar_custom_props:
+  category: Core
+  since: 1.9.0
+---
+
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, PropertyDescription } from '@site/src/reference-commons'
+
+<SinceBadge since="1.9.0" />
+<PropertyDescription showJson={true} />
+This setting controls the escape hatch for handling potentially malicous or corrupt
+input files. At selected spots in the codebase, we use this buffer size as maximum
+allowed sizes. e.g. during unzipping or decoding strings.
+This prevents resource exhaustion, especially when alphaTab is used on server side.
+Increase this buffer size if you need to handle very big files.
+
+<Signature style="block"
+           js={[["identifier","maxDecodingBufferSize"],["token",":"],["whitespace"," "],["identifier","number"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","128000000"],["token",";"]]}
+           csharp={[["identifier","double"],["whitespace"," "],["identifier","MaxDecodingBufferSize"],["whitespace"," "],["token","{"],["whitespace"," "],["keyword","get"],["token",";"],["whitespace"," "],["keyword","set"],["token",";"],["whitespace"," "],["token","}"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","128000000"]]}
+           kotlin={[["keyword","var"],["whitespace"," "],["identifier","maxDecodingBufferSize"],["token",":"],["whitespace"," "],["identifier","Double"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","128000000"]]}
+/>
+

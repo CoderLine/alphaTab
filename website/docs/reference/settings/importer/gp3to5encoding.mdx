@@ -1,0 +1,22 @@
+---
+title: importer.gp3To5encoding
+sidebar_label: gp3To5encoding
+sidebar_custom_props:
+  category: Importer
+  since: 1.9.0
+---
+
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, PropertyDescription } from '@site/src/reference-commons'
+
+<SinceBadge since="1.9.0" />
+<PropertyDescription showJson={true} />
+The text encoding to use when decoding strings within GuitarPro3-5 files. Guitar Pro 3-5 encode strings as system specific ANSI encoding, typically Windows-1252 in western system cultures.
+This is different to the other typically used utf-8 encoding.
+Via this setting the Guitar Pro 3-5 specific decoding can be used.
+
+<Signature style="block"
+           js={[["identifier","gp3To5encoding"],["token",":"],["whitespace"," "],["identifier","string"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","windows-1252"],["token",";"]]}
+           csharp={[["identifier","string"],["whitespace"," "],["identifier","Gp3To5encoding"],["whitespace"," "],["token","{"],["whitespace"," "],["keyword","get"],["token",";"],["whitespace"," "],["keyword","set"],["token",";"],["whitespace"," "],["token","}"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","windows-1252"]]}
+           kotlin={[["keyword","var"],["whitespace"," "],["identifier","gp3To5encoding"],["token",":"],["whitespace"," "],["identifier","String"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","windows-1252"]]}
+/>
+

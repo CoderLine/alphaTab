@@ -1,0 +1,71 @@
+---
+title: "Custom bundler integration"
+description: "Going beyond the shipped Vite / webpack plugins."
+sidebar_custom_props:
+  feature_chapter: workers
+  feature_order: 20
+keywords:
+  - alphaTab
+  - bundler
+  - Vite
+  - webpack
+  - Rollup
+  - esbuild
+  - Parcel
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+The shipped [Vite](/docs/getting-started/installation-vite) and [webpack](/docs/getting-started/installation-webpack) plugins wire alphaTab into their host bundlers automatically. If you build with Rollup, esbuild, Parcel, or a bespoke pipeline, you replicate the same four responsibilities by hand and hand the worker and worklet URLs to alphaTab yourself.
+
+<AlphaTab file="/files/canon.gp" />
+
+## What the shipped plugins do
+
+Every alphaTab install has four moving parts that need to reach the browser. A custom bundler pipeline covers each one.
+
+- **Worker bundle.** Emit a separate bundle whose entry calls `Environment.initializeWorker()`. This is the script the browser loads inside a `Worker`. Ship it as a module worker so ES imports resolve.
+- **Worklet bundle.** Emit a separate bundle whose entry calls `Environment.initializeAudioWorklet()`. This is the script `audioWorklet.addModule(...)` loads. It must be a self-contained ES module.
+- **Static assets.** Copy the Bravura font files from `@coderline/alphatab/dist/font/` and the bundled SoundFont from `@coderline/alphatab/dist/soundfont/sonivox.sf3` into your output. Serve them at stable URLs — the defaults are `/font/` and `/soundfont/`, matching what the shipped plugins produce.
+- **Main-thread wiring.** In your application code, call [`Environment.initializeMain`](worker-and-worklet-initialization) before creating the `AlphaTabApi`. Pass factories that construct `new Worker(...)` and call `audioWorklet.addModule(...)` against the URLs your bundler emitted.
+
+## Show it in code
+
+The main-thread call looks the same regardless of bundler — you swap in the URLs your build produces:
+
+```js
+import * as alphaTab from '@coderline/alphatab/core';
+
+alphaTab.Environment.initializeMain(
+  (settings, nameHint) => new Worker(
+    new URL('./alphaTab.worker.js', import.meta.url),
+    { type: 'module', name: nameHint },
+  ),
+  (context, settings) => context.audioWorklet.addModule(
+    new URL('./alphaTab.worklet.js', import.meta.url),
+  ),
+);
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: {
+    file: '/scores/canon.gp',
+    fontDirectory: '/font/',
+  },
+  player: {
+    soundFont: '/soundfont/sonivox.sf3',
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web is the only relevant target for this page.
+
+## Verify the pipeline
+
+Load the app once and check the network tab. You should see a request for the worker script, a request for the worklet script, requests for the Bravura font files, and a request for the SoundFont. If any of these 404, the corresponding responsibility above is not wired.
+
+## Where to look next
+
+- [Worker and worklet initialization](worker-and-worklet-initialization) — the API contract for `initializeMain`, `initializeWorker`, `initializeAudioWorklet`.
+- [Installation (Vite)](/docs/getting-started/installation-vite) — reference implementation of every responsibility above, as a Vite plugin.
+- [Installation (webpack)](/docs/getting-started/installation-webpack) — the same responsibilities, as a webpack plugin.

@@ -1,0 +1,58 @@
+---
+title: "Selecting and switching tracks"
+description: "`core.tracks` for the initial render; `api.renderTracks()` for switching which tracks are visible at runtime (change instrument, focus on solo, etc.)."
+sidebar_custom_props:
+  feature_chapter: lifecycle
+  feature_order: 10
+keywords:
+  - alphaTab
+  - tracks
+  - renderTracks
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+A score can carry a dozen instruments; you usually render one or two. `core.tracks` picks the initial set, and `api.renderTracks()` swaps the visible tracks at runtime without reloading the file.
+
+<AlphaTab file="/files/canon-full.gp" tracks={[0]} />
+
+## Two places, one concept
+
+The initial track selection lives on `core.tracks` in the settings object. It accepts:
+
+- an array of zero-based track indices — `[0]` renders only the first track, `[0, 1]` renders the first two, and so on;
+- the literal string `"all"` to render every track in the score;
+- omitting the field, in which case alphaTab renders the first track only.
+
+Once the score is loaded, you switch which tracks are visible by calling `api.renderTracks(tracks)`. The argument is an array of `Track` model instances (not indices) — pull them from `api.score.tracks`. All tracks in the call must belong to the same score. The rendered set changes without re-parsing the file, so switching is cheap.
+
+Use the initial `core.tracks` for the first frame the reader sees. Use `renderTracks()` for interactive UIs — instrument switcher dropdowns, "solo this track" buttons, side-by-side comparison modes.
+
+## Show it in code
+
+Initial selection at load time, then a runtime switch triggered by a UI event:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: {
+    file: '/scores/song.gp',
+    tracks: [0],
+  },
+});
+
+// Later, in response to a user action:
+document.getElementById('show-both').addEventListener('click', () => {
+  api.renderTracks([api.score.tracks[0], api.score.tracks[1]]);
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Reacting to a loaded score](./reacting-to-loaded-score) — inspect `api.score.tracks` from the `scoreLoaded` event before wiring switcher UI.
+- [`renderTracks`](/docs/reference/api/rendertracks) — full signature including the optional `RenderHints` argument.
+- [`core.tracks`](/docs/reference/settings/core/tracks) — the initial-selection field in the settings reference.

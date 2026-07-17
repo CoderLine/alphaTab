@@ -1,0 +1,67 @@
+---
+title: "Scroll target and offsets"
+description: "Pick which element scrolls, add X/Y padding, and choose between native smooth scroll and alphaTab's timed animation."
+sidebar_custom_props:
+  feature_chapter: scroll
+  feature_order: 20
+keywords:
+  - alphaTab
+  - scroll
+  - offset
+  - scrollElement
+  - scrollSpeed
+  - nativeBrowserSmoothScroll
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Four `PlayerSettings` fields decide which element scrolls, where the played bar lands inside it, and how fast the motion is.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## Which element scrolls
+
+`player.scrollElement` names the element alphaTab scrolls. Two forms:
+
+- A **CSS selector string** — resolved once, at API construction time. Default is `html,body` so the browser window scrolls.
+- An **`HTMLElement`** — the direct reference. Use this when the container sits inside a scrollable panel: pass the panel, not the container.
+
+Point it at whichever ancestor actually has `overflow: auto`. Point it at the wrong element and the score stays put.
+
+## Offsets
+
+`player.scrollOffsetX` and `player.scrollOffsetY` add padding between the played bar and the edge of the scroll container. Positive values push the bar away from the top-left corner. Use them to leave room for a sticky toolbar, a chord chart, or a lyrics rail.
+
+## Native vs custom smoothing
+
+`player.nativeBrowserSmoothScroll` defaults to `true`. alphaTab hands the scroll to the browser's built-in smooth-scroll implementation. It respects the reader's `prefers-reduced-motion` and integrates with browser gestures.
+
+Set it to `false` and alphaTab animates the scroll itself over `player.scrollSpeed` milliseconds (default `300`). The custom animation is what `scrollSpeed` controls — with native smoothing on, the browser picks the duration and `scrollSpeed` has no effect.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    scrollElement: document.getElementById('score-scroll-pane'),
+    scrollOffsetY: -80,
+    nativeBrowserSmoothScroll: false,
+    scrollSpeed: 500,
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of
+obtaining the render target. Every other line runs unchanged on all three
+runtimes.
+
+## Where to look next
+
+- [Auto-scroll modes](./auto-scroll-modes) — pick when the scroll fires.
+- [A custom scroll handler](./custom-scroll-handler) — replace the scroll strategy.
+- [`scrollElement`](/docs/reference/settings/player/scrollelement), [`scrollOffsetX`](/docs/reference/settings/player/scrolloffsetx), [`scrollOffsetY`](/docs/reference/settings/player/scrolloffsety), [`scrollSpeed`](/docs/reference/settings/player/scrollspeed), [`nativeBrowserSmoothScroll`](/docs/reference/settings/player/nativebrowsersmoothscroll) in the reference.

@@ -1,0 +1,68 @@
+---
+title: "Density and spacing"
+description: "One page for spacing controls. In 1.9 the classical Gourlay stretchForce was replaced by a power-law model, new stretching / spacing options exist, and fillLastSystem now takes a fill-factor."
+sidebar_custom_props:
+  feature_chapter: layout
+  feature_order: 40
+  since: "1.9"
+keywords:
+  - alphaTab
+  - spacing
+  - density
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Three orthogonal knobs control how tightly music fits on the page: how the widths of successive note durations relate (`spacingRatio`), how densely alphaTab packs a row overall (`stretchForce`), and whether the last row of a page stretches to full width (`lastSystemFillThreshold`).
+
+<AlphaTab file="/files/canon.gp" settings={{ display: { spacingRatio: 1.5, stretchForce: 1.2 } }} />
+
+## Shape: `spacingRatio` *(new in 1.9)*
+
+`display.spacingRatio` controls the ratio between the width allocated to a note of duration *d* and one of duration *2d*. alphaTab uses a power-law model — the same approach as Dorico, MuseScore, and Finale. Reference values:
+
+- `Math.SQRT2` ≈ `1.414` (default, Dorico-style) — tight, efficient. Suits guitar tablature where rest bars and whole notes would otherwise dominate the row.
+- `1.5` (MuseScore-style) — balanced, general-purpose.
+- `1.618` (Finale-style, golden ratio) — loose, traditional engraving.
+
+Values are clamped to `[1.2, 2.0]`.
+
+## Density: `stretchForce`
+
+`display.stretchForce` scales the overall spring strength of the layout. Higher values pack fewer bars per row; lower values pack more. Defaults to `1`. Think of it as the density dial on top of `spacingRatio`'s shape:
+
+- **`spacingRatio` shapes** the proportions between long and short notes.
+- **`stretchForce` scales** the whole row up or down without changing those proportions.
+
+## Last-system fill: `lastSystemFillThreshold` *(1.9)*
+
+`display.lastSystemFillThreshold` decides when the final row of a page justifies to the full container width. The threshold compares the natural width of the last row to the container width:
+
+- `1` (default) — never justify. A three-bar tail on a page of six-bar rows renders at natural width.
+- `0` — always justify.
+- `0.4`–`0.7` — Dorico/MuseScore behavior: justify when the row is reasonably full, leave sparse tails compact.
+
+The legacy boolean `display.justifyLastSystem` still exists as a thin wrapper: `true` maps to `0`, `false` maps to `1`. Prefer `lastSystemFillThreshold` for anything more nuanced.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  display: {
+    spacingRatio: 1.5,
+    stretchForce: 1.2,
+    lastSystemFillThreshold: 0.5,
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Page layout](./page-layout) — where these knobs apply.
+- [`display.spacingRatio`](/docs/reference/settings/display/spacingratio), [`display.stretchForce`](/docs/reference/settings/display/stretchforce), and [`display.lastSystemFillThreshold`](/docs/reference/settings/display/lastsystemfillthreshold) reference entries.

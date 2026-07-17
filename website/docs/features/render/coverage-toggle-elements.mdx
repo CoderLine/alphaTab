@@ -1,0 +1,82 @@
+---
+title: "Toggling notation elements off"
+description: "Hide any notation category — bends, dynamics, markers, lyrics, tuning — through the `notation.elements` map."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 90
+keywords:
+  - alphaTab
+  - notation elements
+  - toggle
+  - hide
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+alphaTab draws every notation category by default. The `notation.elements` map lets you flip individual categories off — score title, tuning, bar numbers, palm-mute brackets, whammy annotations, lyrics, or any of the other entries in the [`NotationElement`](/docs/reference/types/notationelement) enumeration.
+
+<AlphaTab
+  file="/files/features/Bends.gp5"
+  settings={ { notation: { elements: { effectWhammyBar: false } } } }
+/>
+
+The demo above hides the whammy-bar effect band. The same score with `EffectWhammyBar` enabled shows a labeled band above each dip.
+
+## What you can toggle
+
+Every enum entry maps to one rendered piece of the score. The categories fall into four groups:
+
+- **Score info** — `ScoreTitle`, `ScoreSubTitle`, `ScoreArtist`, `ScoreAlbum`, `ScoreWords`, `ScoreMusic`, `ScoreWordsAndMusic`, `ScoreCopyright`.
+- **Track chrome** — `TrackNames`, `GuitarTuning`, `BarNumber`, `ChordDiagrams`, `ChordDiagramFretboardNumbers`, `RepeatCount`.
+- **Effect bands** — `EffectAlternateEndings`, `EffectChordNames`, `EffectDynamics`, `EffectFermata`, `EffectFingering`, `EffectHarmonics`, `EffectLetRing`, `EffectLyrics`, `EffectMarker`, `EffectOttavia`, `EffectPalmMute`, `EffectPickSlide`, `EffectPickStroke`, `EffectSlightBeatVibrato`, `EffectSlightNoteVibrato`, `EffectTap`, `EffectTempo`, `EffectText`, `EffectTrill`, `EffectTripletFeel`, `EffectWhammyBar`, `EffectWideBeatVibrato`, `EffectWideNoteVibrato`, `EffectLeftHandTap`, `EffectFreeTime`, `EffectSustainPedal`, `EffectGolpe`, `EffectWahPedal`, `EffectBeatBarre`, `EffectNoteOrnament`, `EffectRasgueado`, `EffectDirections`, `EffectBeatTimer`, `EffectCapo`, `EffectCrescendo`, `EffectFadeIn`.
+- **Notation glyphs** — `ScoreBendSlur`, `EffectWhammyBarLine`, `EffectNumberedNotationKeySignature`, `EffectHammerOnPullOffText`, `EffectSlideText`, `ParenthesisOnTiedBends`, `TabNotesOnTiedBends`, `ZerosOnDiveWhammys`.
+
+`ZerosOnDiveWhammys` is off by default; every other entry is on by default.
+
+## Show it in code
+
+Pass a `Map` (JavaScript / TypeScript) or a dictionary (JSON, .NET, Kotlin) keyed by the enum. Values are booleans:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  notation: {
+    elements: new Map([
+      [alphaTab.NotationElement.EffectWhammyBar, false],
+      [alphaTab.NotationElement.BarNumber, false],
+      [alphaTab.NotationElement.TrackNames, false],
+    ]),
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+For JSON input, use the camelCase enum name as the key:
+
+```js
+{
+  "notation": {
+    "elements": {
+      "effectWhammyBar": false,
+      "barNumber": false
+    }
+  }
+}
+```
+
+To flip an entry at runtime, mutate the map on `api.settings.notation.elements` and call `api.render()`:
+
+```js
+api.settings.notation.elements.set(alphaTab.NotationElement.EffectLyrics, false);
+api.render();
+```
+
+## Where to look next
+
+- [`NotationElement`](/docs/reference/types/notationelement) — the full enumeration with every value.
+- [`notation.elements`](/docs/reference/settings/notation/elements) — the setting reference.
+- [Effects and articulations](./coverage-effects-articulations) — see each effect band before you decide which to hide.

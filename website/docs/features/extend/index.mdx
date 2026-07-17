@@ -1,0 +1,30 @@
+---
+title: Extend
+description: Push alphaTab beyond its defaults — swap fonts, build scores in code, wire custom bundlers and workers, and embed the engine in your own host.
+keywords:
+  - alphaTab
+  - extend
+  - customization
+  - fonts
+  - workers
+  - hosting
+---
+
+import { FeatureChapterGrid } from '@site/src/components/FeatureChapterGrid';
+import chapters from './_chapters';
+
+alphaTab is designed to be embedded. When the shipped defaults are not enough, you can replace the music font, construct or mutate the score model directly, plug into your own bundler and worker setup, or host the engine in native UI frameworks.
+
+Every capability below is available on Web, .NET, and Android unless a card names specific platforms. Follow any card into the [reference](/docs/reference/api/) for the exact signature.
+
+{chapters.map((chapter) => (
+  <section key={chapter.id}>
+    <h2 id={chapter.anchor ?? chapter.id}>{chapter.label}</h2>
+    {chapter.description ? <p>{chapter.description}</p> : null}
+    <FeatureChapterGrid
+      group="extend"
+      chapter={chapter.id}
+      defaultAccent={chapter.defaultAccent}
+    />
+  </section>
+))}

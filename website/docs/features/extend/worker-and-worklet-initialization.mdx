@@ -1,0 +1,73 @@
+---
+title: "Worker and worklet initialization"
+description: "`initializeMain`, `initializeWorker`, `initializeAudioWorklet` for custom setups."
+sidebar_custom_props:
+  feature_chapter: workers
+  feature_order: 10
+keywords:
+  - alphaTab
+  - worker
+  - AudioWorklet
+  - Environment
+  - initializeMain
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+alphaTab drives its rendering pipeline and audio synthesis from a Web Worker and an Audio Worklet. When a bundler with a shipped plugin (Vite or webpack) is in use, those entry points are wired for you. Anywhere else, you tell alphaTab how to construct them via the three `Environment` statics on this page.
+
+<AlphaTab file="/files/canon.gp" />
+
+## The three statics
+
+`alphaTab.Environment` exposes three initialization entry points. Each script bundle you emit calls exactly one of them at load time.
+
+- `initializeMain(createWebWorker, createAudioWorklet)` — runs in the page. It registers two factory callbacks that alphaTab invokes when it needs a Web Worker for rendering / synthesis or an `AudioWorklet` for low-latency playback. Both callbacks receive the current `Settings` and return the worker or a `Promise` from `audioWorklet.addModule(...)`.
+- `initializeWorker()` — runs inside the worker script. It wires up the renderer and synth message loops. Call it from a dedicated bundle whose only job is to load and run inside a `Worker`.
+- `initializeAudioWorklet()` — runs inside the audio worklet. It registers the `AudioWorkletProcessor` for synth output. Call it from a bundle loaded via `audioWorklet.addModule(...)`.
+
+The prebuilt `alphaTab.mjs` entry point already dispatches to the right static based on the current global scope. You reach for these APIs when you build your own entry points — for example a custom worker bundle for an unsupported bundler, or a Node.js host that wraps rendering.
+
+## Show it in code
+
+Your main-thread bundle instantiates a worker and hands alphaTab a factory:
+
+```js
+import * as alphaTab from '@coderline/alphatab/core';
+
+alphaTab.Environment.initializeMain(
+  (settings, nameHint) => new Worker(
+    new URL('./alphaTab.worker.js', import.meta.url),
+    { type: 'module', name: nameHint },
+  ),
+  (context, settings) => context.audioWorklet.addModule(
+    new URL('./alphaTab.worklet.js', import.meta.url),
+  ),
+);
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+});
+```
+
+The worker bundle is a one-liner that ships the core and calls `initializeWorker`:
+
+```js
+import * as alphaTab from '@coderline/alphatab/core';
+alphaTab.Environment.initializeWorker();
+```
+
+The worklet bundle mirrors it for `initializeAudioWorklet`:
+
+```js
+import * as alphaTab from '@coderline/alphatab/core';
+alphaTab.Environment.initializeAudioWorklet();
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web is the only relevant target for this page.
+
+## Where to look next
+
+- [Custom bundler integration](custom-bundler-integration) — the checklist for wiring these entry points into Rollup, esbuild, or Parcel.
+- [Installation (Vite)](/docs/getting-started/installation-vite) and [Installation (webpack)](/docs/getting-started/installation-webpack) — the shipped plugins that do this wiring for you.

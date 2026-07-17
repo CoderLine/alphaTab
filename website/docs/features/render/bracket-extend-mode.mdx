@@ -1,0 +1,55 @@
+---
+title: "Bracket extend mode"
+description: "How instrument brackets span multiple staves."
+sidebar_custom_props:
+  feature_chapter: stylesheet
+  feature_order: 40
+keywords:
+  - alphaTab
+  - bracket
+  - stylesheet
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Instrument brackets and grand-staff braces sit at the left edge of every system, grouping staves that belong together. `bracketExtendMode` picks the grouping rule.
+
+<AlphaTab file="/files/features/Skillet.gp5" settings={{ display: { barCount: 12 } }} />
+
+## The three modes
+
+`score.stylesheet.bracketExtendMode` takes a `BracketExtendMode`:
+
+- `NoBrackets` — no brackets or braces are drawn. Use this for stripped-down handouts, single-track charts, or when brackets fight your custom left-margin layout.
+- `GroupStaves` — draws a bracket per track and a brace across the two staves of a grand-staff track (piano). This is the default and matches Guitar Pro's out-of-the-box look.
+- `GroupSimilarInstruments` — groups tracks that share the same MIDI program under a single bracket. Two distortion guitars end up under one bracket; a grand-staff piano still shows its brace and breaks any surrounding bracket. Grouping is program-based; there's no custom-group API today.
+
+## When to prefer each
+
+Pick `GroupStaves` for the traditional per-track look. Pick `GroupSimilarInstruments` for ensemble scores where multiple players share an instrument family and you want the reader to see that structure at a glance. Pick `NoBrackets` for single-track output or when the enclosing UI already communicates track grouping.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/band.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  score.stylesheet.bracketExtendMode =
+    alphaTab.model.BracketExtendMode.GroupSimilarInstruments;
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Track name policies](/docs/features/render/track-name-policies) — the label block that sits next to the bracket.
+- [Multi-bar rests](/docs/features/render/multi-bar-rests) — how the bracket interacts with hidden or collapsed staves.
+- [`BracketExtendMode`](/docs/reference/types/model/bracketextendmode) — the enum reference.
+- [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) — the full stylesheet reference.

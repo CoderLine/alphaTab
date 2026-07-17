@@ -1,0 +1,75 @@
+---
+title: "Special notes"
+description: "Harmonics, ghost notes, dead notes, tied notes."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 70
+keywords:
+  - alphaTab
+  - harmonics
+  - ghost notes
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Guitar and bass parts use several note types that go beyond a normal pitched note. alphaTab renders each with the head shape, glyph, or annotation its convention expects.
+
+## Natural harmonics {#natural-harmonics}
+
+Natural harmonics render with a diamond-shaped note head on the standard staff and a `N.H.` marker above the beat. The tab number stays on the touched fret.
+
+<AlphaTab tex="true">{`
+:4 3.3{nh} 5.3{nh} 7.3{nh} 12.3{nh}
+`}</AlphaTab>
+
+## Artificial and tap harmonics {#artificial-harmonics}
+
+Artificial (`A.H.`), pinch (`P.H.`), and tap (`T.H.`) harmonics use the same diamond head with distinct labels above the beat. The sounding fret appears in parentheses next to the touched fret.
+
+<AlphaTab tex="true">{`
+:4 3.3{ah} 5.3{ph} 7.3{th} 12.3{sh}
+`}</AlphaTab>
+
+## Ghost notes {#ghost-notes}
+
+Ghost notes render with the fret number wrapped in parentheses on the tab staff. On the standard staff the note head appears in its normal shape but is played more quietly.
+
+<AlphaTab file="/files/features/GhostNotes.gp5" />
+
+## Dead notes {#dead-notes}
+
+Dead notes render as an `x` in place of the fret number or note head. They represent a percussive muted attack with no defined pitch.
+
+<AlphaTab file="/files/features/DeadNotes.gp5" />
+
+## Tied notes across bars {#tied-notes}
+
+Tied notes render as curved slurs joining two note heads. When a tie crosses a barline and the second bar changes key, alphaTab draws the correct accidental on the tied note so the pitch stays unambiguous.
+
+<AlphaTab file="/files/features/TiedNotes.gp5" />
+
+## Show it in code
+
+The note types above are always drawn — they belong to the note itself. If you want to strip the effect band labels for harmonics (`N.H.`, `A.H.`, `T.H.`) from a compact printout, hide the `EffectHarmonics` element:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/etude.gp' },
+  notation: {
+    elements: new Map([
+      [alphaTab.NotationElement.EffectHarmonics, false],
+    ]),
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target.
+
+## Where to look next
+
+- [Effects and articulations](./coverage-effects-articulations) — bends, vibrato, palm mute, and other articulation labels.
+- [Toggling notation elements off](./coverage-toggle-elements) — hide any category globally.
+- [`notation.elements`](/docs/reference/settings/notation/elements) — the full element map.

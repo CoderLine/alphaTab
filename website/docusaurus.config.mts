@@ -180,6 +180,139 @@ async function createConfig(): Promise<Config> {
           }) {
             const sidebarItems = await defaultSidebarItemsGenerator(args);
 
+            // Tag feature-catalog stubs (external-link cards) with a CSS class
+            // that hides them from the sidebar UI, while keeping them in the
+            // sidebar tree so the auto-generated card grid can still read them.
+            // Docusaurus' built-in `unlisted: true` only takes effect in
+            // production builds and would also remove them from the tree.
+            const docsById = new Map<string, SidebarItemsGeneratorDoc>(
+              args.docs.map((d) => [d.id, d])
+            );
+            const isStub = (id: string) => {
+              const doc = docsById.get(id);
+              const fm = (doc as any)?.frontMatter ?? {};
+              return !!fm.sidebar_custom_props?.feature_external_link;
+            };
+            const tagStubs = (items: any[]): any[] =>
+              items.map((item) => {
+                if (item.type === "doc" && isStub(item.id)) {
+                  return {
+                    ...item,
+                    className: [item.className, "sidebar-hidden"]
+                      .filter(Boolean)
+                      .join(" "),
+                  };
+                }
+                if (item.type === "category") {
+                  return { ...item, items: tagStubs(item.items ?? []) };
+                }
+                return item;
+              });
+
+            // Group feature-catalog pages under their chapter — matching the
+            // card grid on the group index. Chapter order and labels come from
+            // `_chapters.ts` next to each group directory.
+            const featuresRoot = path.join("docs", "features");
+            const chaptersCache = new Map<
+              string,
+              { id: string; label: string }[]
+            >();
+            const parseChapters = (groupName: string) => {
+              if (chaptersCache.has(groupName)) {
+                return chaptersCache.get(groupName)!;
+              }
+              const filePath = path.join(
+                featuresRoot,
+                groupName,
+                "_chapters.ts"
+              );
+              const chapters: { id: string; label: string }[] = [];
+              if (fs.existsSync(filePath)) {
+                const text = fs.readFileSync(filePath, "utf-8");
+                const regex = /\{\s*id:\s*['"]([^'"]+)['"][\s\S]*?label:\s*['"]([^'"]+)['"]/g;
+                let m;
+                while ((m = regex.exec(text)) !== null) {
+                  chapters.push({ id: m[1], label: m[2] });
+                }
+              }
+              chaptersCache.set(groupName, chapters);
+              return chapters;
+            };
+            const featureChapter = (id: string): string | undefined => {
+              const doc = docsById.get(id);
+              return (doc as any)?.frontMatter?.sidebar_custom_props
+                ?.feature_chapter;
+            };
+            const featureOrder = (id: string): number => {
+              const doc = docsById.get(id);
+              const raw = (doc as any)?.frontMatter?.sidebar_custom_props
+                ?.feature_order;
+              return typeof raw === "number" ? raw : 999;
+            };
+            const groupByChapter = (item: any): any => {
+              if (item.type !== "category" || !Array.isArray(item.items)) {
+                return item;
+              }
+              // Detect a feature-group category by looking for a child doc id
+              // that starts with `features/<group>/`.
+              const docChild = item.items.find(
+                (c: any) => c.type === "doc" && typeof c.id === "string"
+              );
+              const match =
+                docChild &&
+                /^features\/([^/]+)\//.exec((docChild as any).id);
+              if (!match) return item;
+              const groupName = match[1];
+              const chapters = parseChapters(groupName);
+              if (chapters.length === 0) return item;
+
+              const indexId = `features/${groupName}/index`;
+              const indexItem = item.items.find(
+                (c: any) => c.type === "doc" && c.id === indexId
+              );
+              const buckets = new Map<string, any[]>();
+              chapters.forEach((c) => buckets.set(c.id, []));
+              const rest: any[] = [];
+              for (const child of item.items) {
+                if (child === indexItem) continue;
+                if (child.type !== "doc") {
+                  rest.push(child);
+                  continue;
+                }
+                const ch = featureChapter((child as any).id);
+                if (ch && buckets.has(ch)) {
+                  buckets.get(ch)!.push(child);
+                } else {
+                  rest.push(child);
+                }
+              }
+              for (const [, arr] of buckets) {
+                arr.sort(
+                  (a: any, b: any) =>
+                    featureOrder(a.id) - featureOrder(b.id)
+                );
+              }
+              const newItems: any[] = [];
+              if (indexItem) newItems.push(indexItem);
+              for (const chapter of chapters) {
+                const arr = buckets.get(chapter.id) || [];
+                if (arr.length === 0) continue;
+                newItems.push({
+                  type: "category",
+                  label: chapter.label,
+                  collapsed: false,
+                  collapsible: true,
+                  items: arr,
+                });
+              }
+              newItems.push(...rest);
+              return { ...item, items: newItems };
+            };
+
+            const processed = tagStubs(sidebarItems).map(groupByChapter);
+            sidebarItems.length = 0;
+            sidebarItems.push(...processed);
+
             if (Array.isArray(args.item.customProps?.["sort"])) {
               let props = args.item.customProps?.["sort"] as
                 | [string, string]
@@ -285,6 +418,12 @@ async function createConfig(): Promise<Config> {
           docId: "tutorials",
           position: "left",
           label: "Tutorial",
+        },
+        {
+          type: "doc",
+          docId: "features/index",
+          position: "left",
+          label: "Features",
         },
         {
           type: "doc",

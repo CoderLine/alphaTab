@@ -126,6 +126,8 @@
 
 body {
   background: var(--at-bg);
+  height: auto !important;
+  min-height: 100%;
 }
 
 .theme-layout-navbar {
@@ -417,4 +419,13 @@ body.playground {
   .codeBlockContainer .codeBlockLines {
     padding: 0.25rem;
   }
+}
+
+// Sidebar items marked with `sidebar-hidden` are removed from the sidebar UI
+// but stay in the sidebar tree so tools like FeatureChapterGrid can still read
+// their frontmatter. Applied by the custom sidebarItemsGenerator in
+// docusaurus.config.mts to feature-catalog external-link stubs.
+.theme-doc-sidebar-menu .menu__list-item:has(.sidebar-hidden),
+.theme-doc-sidebar-menu .menu__list-item > .sidebar-hidden {
+  display: none;
 }

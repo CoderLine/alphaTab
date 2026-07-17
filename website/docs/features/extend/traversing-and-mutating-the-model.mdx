@@ -1,0 +1,88 @@
+---
+title: "Traversing and mutating the model"
+description: "Walk the loaded score tree — tracks, staves, bars, voices, beats, notes — and apply changes before or after render."
+sidebar_custom_props:
+  feature_chapter: model
+  feature_order: 20
+keywords:
+  - alphaTab
+  - model
+  - mutation
+  - traversal
+  - scoreLoaded
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Once a score is loaded, its full tree — `Score → Track → Staff → Bar → Voice → Beat → Note` — is walkable and mutable in JavaScript. Iterate the arrays, change fields, call `api.render()`, and the render reflects the changes.
+
+<AlphaTab file="/files/canon.gp" />
+
+Three shapes cover most use cases:
+
+- **Analysis** — walk the tree read-only, collect statistics (note counts, effect usage, pitch range).
+- **Annotation** — walk the tree and set display-only fields (colors, styles, chord names) without changing the music.
+- **Batch transformation** — walk the tree and rewrite musical content (transpose every note, flip stems, insert grace notes).
+
+## The traversal pattern
+
+Every mutation follows the same structure: wait for `scoreLoaded`, walk from `Score` down to the level you care about, apply changes, call `api.render()` to redraw.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  // Transpose every note down one octave.
+  for (const track of score.tracks) {
+    for (const staff of track.staves) {
+      for (const bar of staff.bars) {
+        for (const voice of bar.voices) {
+          for (const beat of voice.beats) {
+            for (const note of beat.notes) {
+              if (!Number.isNaN(note.octave)) {
+                note.octave -= 1;
+              } else if (!Number.isNaN(note.fret)) {
+                note.fret = Math.max(0, note.fret - 12);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+## When to fire
+
+- **`scoreLoaded`** — fires once per load. Right for changes that apply to the whole score after import. Follow the mutation with `api.render()`.
+- **Before `renderScore`** — for hand-built scores, mutate the tree before you call `api.renderScore(score)` and skip the event.
+- **After `renderScore` / `render`** — safe as long as you re-render afterward. Mutations to a rendered score do not appear until the next render.
+
+## Traversal shortcuts
+
+Two shortcuts collapse the six-level loop:
+
+- **`score.tracks[i].staves[j].bars[k]`** is index-addressable at every level. Reach for a specific bar directly when you know its position.
+- **The `beat.previousBeat` / `beat.nextBeat` chain** walks beats across voice, bar, and staff boundaries after the score has been finished. Use it for anything that needs to look at the beat that follows or precedes across bar lines.
+
+For read-only analysis, a plain nested `for` loop is the clearest form and reads the whole score once. Do not build a generator or async iterator — the model is fully materialized in memory.
+
+## What triggers a re-render
+
+Changes to display-only fields (`style.colors`, chord names, `Beat.text`) require `api.render()` to appear. Changes to musical content (note pitch, duration, added or removed beats) require `api.render()` and — for scores that will be played — a follow-up `api.loadMidiForScore()` so the synth picks up the new pitches. Structural changes (adding bars, changing time signature) require finishing the score again with `score.finish(api.settings)` before the render.
+
+## Where to look next
+
+- [Per-element colors](/docs/features/render/per-element-colors) — the annotation use case: walk the tree and paint sub-elements.
+- [Programmatic score construction](/docs/features/extend/programmatic-score-construction) — the mirror workflow: build the tree in code instead of walking one that was loaded.
+- [Reacting to a loaded score](/docs/features/import-load/reacting-to-loaded-score) — the `scoreLoaded` event and adjacent post-load hooks.
+- The [model reference](/docs/reference/types/model/) — every field on every level.

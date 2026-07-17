@@ -1,0 +1,47 @@
+---
+title: "System sign separator"
+description: "Diagonal separator glyph between systems."
+sidebar_custom_props:
+  feature_chapter: stylesheet
+  feature_order: 60
+keywords:
+  - alphaTab
+  - system separator
+  - stylesheet
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Draw the traditional double-slash sign between systems on the same page. It gives the eye a hard break between the end of one system and the start of the next — helpful on dense multi-track pages where staves stack close together.
+
+<AlphaTab file="/files/canon.gp" settings={{ display: { barCount: 16 } }} />
+
+## What the flag does
+
+`score.stylesheet.useSystemSignSeparator` is a boolean, off by default. When `true`, the renderer draws a diagonal `//` glyph in the right margin between the end of a system and the start of the next one. The glyph is a visual cue only — layout, spacing, and bar numbering stay unchanged.
+
+Use it when systems are close together vertically and the reader might otherwise lose track of the line break. Skip it on parts with generous vertical padding, where the whitespace already signals the break.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  score.stylesheet.useSystemSignSeparator = true;
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Bracket extend mode](/docs/features/render/bracket-extend-mode) — the other left-edge marker of a system boundary.
+- [Density and spacing](/docs/features/render/density-and-spacing) — controls how much vertical space sits between systems.
+- [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) — the full stylesheet reference.

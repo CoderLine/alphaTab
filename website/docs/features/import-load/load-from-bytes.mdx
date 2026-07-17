@@ -1,0 +1,60 @@
+---
+title: "Load from bytes"
+description: "`Uint8Array` / `ArrayBuffer` after fetching or reading; the pattern for Node.js and post-fetch pipelines."
+sidebar_custom_props:
+  feature_chapter: loading
+  feature_order: 20
+keywords:
+  - alphaTab
+  - load
+  - bytes
+  - Uint8Array
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Read the score bytes yourself, hand them to alphaTab, and skip the built-in fetcher entirely.
+
+<AlphaTab file="/files/canon.gp" />
+
+## When the bytes come from you
+
+Any pipeline that already has the file in memory belongs here:
+
+- Node.js and server-side rendering — `fs.readFileSync` produces a `Buffer`.
+- Backends that stream from S3, a database blob column, or an internal API.
+- Browser code that fetched the file with a custom `fetch` (auth headers, retries, progress reporting).
+- Desktop and mobile hosts that read from the local filesystem or a content provider.
+
+`api.load()` accepts a `Uint8Array` or an `ArrayBuffer` on every runtime. alphaTab probes the leading bytes to pick an importer — Guitar Pro, MusicXML, Capella, or alphaTex — so you do not tell it what format you handed over.
+
+## Pair it with track selection
+
+The second argument to `api.load()` picks which tracks render on arrival. Pass `[0]` to open a multi-track file on the first track only, or `[0, 2, 5]` to render a subset. Omitting the argument uses whatever `core.tracks` was set to at construction time.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  // No core.file here — the bytes arrive after construction.
+});
+
+const bytes = await readScoreFile('canon.gp');
+api.load(bytes, [0]);
+
+api.scoreLoaded.on((score) => {
+  console.log(`Loaded ${score.title}, ${score.tracks.length} tracks total`);
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target. `readScoreFile()` is a placeholder for the platform-specific step of producing a `Uint8Array` — `fs.promises.readFile` on Node.js, `System.IO.File.ReadAllBytes` on .NET, `ContentResolver.openInputStream` on Android, or `fetch(...).then(r => r.arrayBuffer())` in the browser.
+
+## Where to look next
+
+- [Load from a URL](load-from-url) — the browser-only path when alphaTab does the fetch.
+- [Direct importer use](direct-importer-use) — build a `Score` from bytes without instantiating an API.
+- [Reacting to a loaded score](reacting-to-loaded-score) — the `scoreLoaded` event.
+- [`api.load()`](/docs/reference/api/load) in the reference.

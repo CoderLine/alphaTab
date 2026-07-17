@@ -1,0 +1,58 @@
+---
+title: "Play, pause, stop"
+description: "The basic transport, `playPause` toggle, live demo."
+sidebar_custom_props:
+  feature_chapter: transport
+  feature_order: 10
+keywords:
+  - alphaTab
+  - playback
+  - transport
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+`play()`, `pause()`, `stop()`, and `playPause()` drive the synthesizer through its two states. Wire them to a transport bar, keyboard shortcut, or any UI trigger.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## The transport methods
+
+- **`play()`** — start playback from the current tick. Returns `true` if playback actually started; `false` if the player is not yet ready or is already playing.
+- **`pause()`** — stop the audio but keep the current tick. Calling `play()` again resumes from the same position.
+- **`stop()`** — halt playback and reset the tick position to the start of the score (or the start of `playbackRange` if one is set).
+- **`playPause()`** — toggle between the two states. Bind this to a single button or the spacebar.
+
+## Reacting to state changes
+
+The `playerStateChanged` event fires every time the synth transitions between `PlayerState.Paused` and `PlayerState.Playing`. Use it to swap the play icon for a pause icon, disable a seek control, or persist the transport state to your store.
+
+`stop()` also fires the event with `stopped: true` so you can distinguish an explicit stop from an ordinary pause.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: { enablePlayer: true },
+});
+
+const button = document.getElementById('play-pause');
+button.addEventListener('click', () => api.playPause());
+
+api.playerStateChanged.on((args) => {
+  const playing = args.state === alphaTab.synth.PlayerState.Playing;
+  button.textContent = playing ? 'Pause' : 'Play';
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Playback speed](./playback-speed) — slow the transport down for practice.
+- [Seeking by tick and time](./seeking-by-tick-and-time) — move the playhead without leaving the current state.
+- [`play`](/docs/reference/api/play), [`pause`](/docs/reference/api/pause), [`stop`](/docs/reference/api/stop), [`playPause`](/docs/reference/api/playpause), and [`playerStateChanged`](/docs/reference/api/playerstatechanged) reference entries.

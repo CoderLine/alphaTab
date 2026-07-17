@@ -1,0 +1,30 @@
+---
+title: Export
+description: Send a loaded score back out — as Guitar Pro or alphaTex, as MIDI, as rendered audio, or as JSON for storage and diffing.
+keywords:
+  - alphaTab
+  - export
+  - Guitar Pro
+  - MIDI
+  - WAV
+  - JSON
+---
+
+import { FeatureChapterGrid } from '@site/src/components/FeatureChapterGrid';
+import chapters from './_chapters';
+
+alphaTab is a two-way street. Once a score is loaded, you can write it back out as a Guitar Pro file, round-trip it through alphaTex, render it to MIDI, bake the synth output to WAV, or serialize the whole model to JSON for storage and diffing.
+
+Every capability below is available on Web, .NET, and Android unless a card names specific platforms. Follow any card into the [reference](/docs/reference/api/) for the exact signature.
+
+{chapters.map((chapter) => (
+  <section key={chapter.id}>
+    <h2 id={chapter.anchor ?? chapter.id}>{chapter.label}</h2>
+    {chapter.description ? <p>{chapter.description}</p> : null}
+    <FeatureChapterGrid
+      group="export"
+      chapter={chapter.id}
+      defaultAccent={chapter.defaultAccent}
+    />
+  </section>
+))}

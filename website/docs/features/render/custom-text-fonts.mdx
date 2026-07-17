@@ -1,0 +1,90 @@
+---
+title: "Custom text fonts"
+description: "Configure title / subtitle / lyrics / chord / effect / marker fonts."
+sidebar_custom_props:
+  feature_chapter: fonts
+  feature_order: 30
+keywords:
+  - alphaTab
+  - text font
+  - resources
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Every piece of text alphaTab draws around the notation — titles, tempo marks, chord names, lyrics, fingerings — reads its font from `display.resources`.
+
+<AlphaTab
+  tex={true}
+  settings={{
+    display: {
+      resources: {
+        titleFont: 'bold 34px "Courier New", monospace',
+        subTitleFont: 'italic 18px "Courier New", monospace',
+      },
+    },
+  }}
+>{`
+\\title "Custom title font"
+\\subtitle "Every text element carries its own Font"
+.
+:4 5.3 7.3 8.3 7.3 |
+:4 5.3 3.3 2.3 3.3
+`}</AlphaTab>
+
+## The font fields
+
+`display.resources` exposes one `Font` per text element. Each accepts a CSS `font` shorthand string, a `Font` instance, or a JSON object with `families`, `size`, `style`, and `weight`.
+
+Score metadata (rendered at the top of the sheet):
+
+- `titleFont`, `subTitleFont`, `wordsFont`, `copyrightFont`
+
+Playback and timing marks:
+
+- `timerFont` — beat timers.
+- `directionsFont` — D.C., D.S., segno, coda text.
+- `markerFont` — section marker labels.
+
+Chords and fingering:
+
+- `fretboardNumberFont` — fret numbers inside chord diagrams.
+
+Alternate notations:
+
+- `tablatureFont` — fret numbers on the tablature staff.
+- `numberedNotationFont`, `numberedNotationGraceFont` — jiǎnpǔ digits and their grace notes.
+- `graceFont` — grace-note-related labels on standard notation.
+
+Every text element that appears in the score also has an entry in the `elementFonts` map keyed by `NotationElement` — the deprecated named getters (`titleFont`, `subTitleFont`, and friends) read and write through that map. Prefer `elementFonts` for new code; both keep the score in sync.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  display: {
+    resources: {
+      titleFont: 'bold 34px "Playfair Display", Georgia, serif',
+      subTitleFont: 'italic 18px "Playfair Display", Georgia, serif',
+      wordsFont: '14px "Inter", sans-serif',
+      copyrightFont: 'bold 11px "Inter", sans-serif',
+      tablatureFont: '13px "JetBrains Mono", monospace',
+      markerFont: 'bold 14px "Inter", sans-serif',
+    },
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+Ensure the fonts you reference are actually loaded on the page (as web fonts on the Web, registered with alphaSkia on .NET / Android). alphaTab does not fetch text fonts for you.
+
+## Where to look next
+
+- [Font family fallbacks](/docs/features/render/font-family-fallbacks) — list more than one family per field.
+- [Score-wide palette](/docs/features/render/score-wide-palette) — colors that pair with these fonts.
+- [`RenderingResources`](/docs/reference/types/renderingresources) in the reference.

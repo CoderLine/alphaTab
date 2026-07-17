@@ -1,0 +1,57 @@
+---
+title: "Enabling and disabling interaction"
+description: "The `player.enableUserInteraction` master toggle for the built-in seek and range-select behavior, and when to turn it off."
+sidebar_custom_props:
+  feature_chapter: mouse
+  feature_order: 20
+keywords:
+  - alphaTab
+  - interaction
+  - enableUserInteraction
+  - toggle
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+alphaTab ships with two default mouse behaviors when the player is active: click a beat to seek to it, and drag across beats to select a playback range. Both are controlled by a single flag — `player.enableUserInteraction`, on by default. Flip it off when a host UI owns the click routing.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## What the flag gates
+
+With `enableUserInteraction: true` (the default), alphaTab calls `preventDefault()` on left-button mouse events over the score, moves the transport on beat-down, and drives selection highlights on beat-move / beat-up.
+
+With `enableUserInteraction: false`, alphaTab still hit-tests the mouse and still fires every `beatMouseDown` / `Move` / `Up` and `noteMouseDown` / `Move` / `Up` event — but the built-in seek and range-select side-effects stop. Your handlers become the only source of behavior.
+
+## When to turn it off
+
+- **Read-only viewers.** A score preview that never seeks: leave the events unwired and disable the flag so clicks fall through to whatever surrounds the score.
+- **Host editors with their own routing.** An editor that treats clicks as note selection, drag as reordering, right-click as a menu. Take the raw events, route them yourself, keep the built-in seek out of the way.
+- **Custom transport UX.** A tutor UI where the transport advances beat-by-beat under teacher control. Bind `beatMouseDown` to your own state machine instead of jumping the tick position.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    enableUserInteraction: false,
+  },
+});
+
+api.beatMouseDown.on((beat) => {
+  routeBeatClickToEditor(beat);
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Reacting to beat and note clicks](./reacting-to-beat-and-note-clicks) — the events that keep firing after you disable the master toggle.
+- [Range selection](./range-selection) — the selection API you drive manually when the built-in drag-select is off.
+- [`enableUserInteraction`](/docs/reference/settings/player/enableuserinteraction) in the settings reference.

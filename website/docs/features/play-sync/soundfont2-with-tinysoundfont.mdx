@@ -1,0 +1,67 @@
+---
+title: "SoundFont2 with TinySoundFont"
+description: "How alphaTab makes sound, the bundled SoundFont, the synth pipeline."
+sidebar_custom_props:
+  feature_chapter: synthesis
+  feature_order: 10
+keywords:
+  - alphaTab
+  - SoundFont
+  - TinySoundFont
+  - synth
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+alphaTab does not ship sampled instrument recordings. It converts the score into MIDI, feeds that stream to an embedded software synth, and mixes the synth output into your platform's audio backend. That synth is a port of [TinySoundFont](https://github.com/schellingb/TinySoundFont), which renders any SoundFont 2 (`.sf2`) file into PCM in real time.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## The pipeline
+
+Every note you hear passes through four stages:
+
+1. **Score to MIDI.** alphaTab generates a MIDI stream from the loaded score — one channel per track, with pitch bends, program changes, and metronome events layered in.
+2. **MIDI to sample buffers.** TinySoundFont looks up the requested MIDI program and note in the loaded SoundFont, plays back the matching sample zone, and applies the SoundFont's envelope, filter, and modulation curves.
+3. **Sample buffers to the audio backend.** The synth hands finished PCM chunks (`bufferTimeInMilliseconds` worth at a time) to a platform-specific output.
+4. **The backend drives the speakers.** Web Audio through an AudioWorklet on the browser, `NAudio` on .NET, `AudioTrack` on Android.
+
+Everything upstream of stage 3 is portable across platforms. The backend at stage 4 is the only piece that swaps out per runtime.
+
+## The bundled SoundFont
+
+alphaTab ships with a compact, permissively-licensed SoundFont derived from the Sonivox General MIDI set. It covers the full GM instrument list plus drums and totals a few megabytes. That is enough to make any Guitar Pro or MusicXML file audible without extra downloads.
+
+For higher-quality guitars, orchestras, or drum kits, replace it with a purpose-built SoundFont — see [Custom SoundFonts](custom-soundfonts). To layer several instrument packs at once (guitars from one file, pianos from another), see [Combining multiple SoundFonts](combining-multiple-soundfonts).
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    // On Web the bundled SoundFont ships via the assets folder; the Vite / webpack
+    // plugin points this URL at the shipped file. Override to swap in your own.
+    soundFont: '/assets/sonivox.sf2',
+  },
+});
+
+api.soundFontLoaded.on(() => {
+  console.log('SoundFont ready — playback can start.');
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+On .NET and Android there is no automatic download step; call `api.loadSoundFont(bytes)` with the SoundFont bytes you read from disk or a resource. See [Custom SoundFonts](custom-soundfonts) for the byte-buffer pattern.
+
+## Where to look next
+
+- [Custom SoundFonts](custom-soundfonts) — swap the bundled synth voices for your own.
+- [Combining multiple SoundFonts](combining-multiple-soundfonts) — layer several `.sf2` files into one synth.
+- [Audio buffer size](audio-buffer-size) — the latency and stability trade-off for stage 3.
+- [Web Audio and AudioWorklet](web-audio-and-audioworklet), [NAudio (.NET)](naudio-net), [AudioTrack (Android)](audiotrack-android) — the per-platform backends at stage 4.

@@ -1,0 +1,49 @@
+---
+title: "Master and monitoring volumes"
+description: "`masterVolume`, `metronomeVolume`, `countInVolume` on one page."
+sidebar_custom_props:
+  feature_chapter: mixer
+  feature_order: 10
+keywords:
+  - alphaTab
+  - volume
+  - mixer
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Three top-level knobs control how loud the score, the metronome, and the count-in play. Each takes a value from `0` (silent) to `1` (unity gain).
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## The three knobs
+
+- **`masterVolume`** — the output gain applied to the whole mix after per-track fader stages. Use it for a global fade-in, a duck when a voice-over speaks, or the user's application-level volume slider.
+- **`metronomeVolume`** — the level of the click track that plays during song playback. `0` mutes the metronome entirely (which is the default); anything higher makes it audible. Pair with the [count-in and metronome](./count-in-and-metronome) settings that enable the click in the first place.
+- **`countInVolume`** — the level of the click track that plays before the song starts. Independent from `metronomeVolume`, so you can run a loud count-in and a silent (or subtle) metronome once the music kicks in.
+
+All three are live properties. Assigning during playback takes effect on the next audio buffer.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: { enablePlayer: true },
+});
+
+api.masterVolume = 0.8;
+api.metronomeVolume = 0.3;
+api.countInVolume = 1.0;
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Per-track mixing](./per-track-mixing) — the fader stages that feed into `masterVolume`.
+- [Count-in and metronome](./count-in-and-metronome) — the toggles that enable the click tracks these volumes govern.
+- [`masterVolume`](/docs/reference/api/mastervolume), [`metronomeVolume`](/docs/reference/api/metronomevolume), and [`countInVolume`](/docs/reference/api/countinvolume) reference entries.

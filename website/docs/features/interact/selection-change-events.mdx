@@ -1,0 +1,81 @@
+---
+title: "Selection change events"
+description: "Subscribe to `playbackRangeHighlightChanged` to stream selection updates — start beat, end beat, and per-line highlight rectangles — into your own UI."
+sidebar_custom_props:
+  feature_chapter: selection
+  feature_order: 20
+keywords:
+  - alphaTab
+  - selection
+  - events
+  - playbackRangeHighlightChanged
+---
+
+import { SelectionHandleDemo } from '@site/src/components/SelectionHandleDemo';
+
+Every time the highlight overlay changes — from a user drag, from `highlightPlaybackRange`, from a clear — alphaTab fires `playbackRangeHighlightChanged`. The event carries the current start and end beats plus the exact pixel rectangles being painted, so you can hang custom drag handles, badges, or annotations off the selection. The demo below wires drag handles to this event.
+
+<SelectionHandleDemo>{`
+\\title "Canon"
+\\tempo 90
+.
+:8 15.2 17.2 15.2 17.2 |
+15.2 17.2 15.2 17.2 |
+15.2 17.2 15.2 17.2 |
+15.2 17.2 15.2 17.2 |
+`}</SelectionHandleDemo>
+
+## The event payload
+
+The handler receives a `PlaybackHighlightChangeEventArgs` object. Every field is optional — an empty object arrives when the selection was cleared or the render has not settled yet.
+
+- **`startBeat`** — the `Beat` where the selection starts. `undefined` when there is no selection.
+- **`startBeatBounds`** — the `BeatBounds` for that beat, ready to position a marker.
+- **`endBeat`** — the `Beat` where the selection ends.
+- **`endBeatBounds`** — the `BeatBounds` for the end beat.
+- **`highlightBlocks`** — the array of `Bounds` rectangles that make up the overlay. A single-line selection has one entry; a selection spanning three staff systems has three. Each rectangle has `x`, `y`, `w`, `h` in render coordinates.
+
+The event fires during the drag, not only on release. Use it to keep drag handles pinned to the current edges without polling.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const startHandle = document.getElementById('selection-start-handle');
+const endHandle = document.getElementById('selection-end-handle');
+
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },
+});
+
+api.playbackRangeHighlightChanged.on((e) => {
+  if (!e.highlightBlocks || e.highlightBlocks.length === 0) {
+    startHandle.hidden = true;
+    endHandle.hidden = true;
+    return;
+  }
+
+  const first = e.highlightBlocks[0];
+  startHandle.hidden = false;
+  startHandle.style.left = `${first.x}px`;
+  startHandle.style.top = `${first.y}px`;
+  startHandle.style.height = `${first.h}px`;
+
+  const last = e.highlightBlocks[e.highlightBlocks.length - 1];
+  endHandle.hidden = false;
+  endHandle.style.left = `${last.x + last.w}px`;
+  endHandle.style.top = `${last.y}px`;
+  endHandle.style.height = `${last.h}px`;
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Range selection](./range-selection) — the three methods that drive the highlight the event reports on.
+- [Bounds lookup](./bounds-lookup) — the geometry system that produces the `highlightBlocks` rectangles.
+- [`playbackRangeHighlightChanged`](/docs/reference/api/playbackrangehighlightchanged) in the API reference.

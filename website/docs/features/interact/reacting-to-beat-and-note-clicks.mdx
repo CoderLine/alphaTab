@@ -1,0 +1,79 @@
+---
+title: "Reacting to beat and note clicks"
+description: "The six sibling events (`beatMouseDown` / `Move` / `Up`, `noteMouseDown` / `Move` / `Up`) with a click-to-seek demo and a per-note click hook demo."
+sidebar_custom_props:
+  feature_chapter: mouse
+  feature_order: 10
+keywords:
+  - alphaTab
+  - events
+  - click
+  - beatMouseDown
+  - noteMouseDown
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+alphaTab hit-tests every mouse press against the rendered score and fires typed events with the `Beat` or `Note` under the cursor. Click a beat in the demo below and watch the cursor snap to it — that is the built-in seek behavior wired through the same events you consume.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## The six events
+
+Beats always resolve. Notes resolve only when `core.includeNoteBounds` is enabled, since alphaTab skips per-note bounds capture by default for performance.
+
+- `beatMouseDown` — mouse pressed on a beat. Fires with the `Beat`.
+- `beatMouseMove` — cursor dragged over a new beat after a press. Fires with the `Beat`.
+- `beatMouseUp` — mouse released after a beat press. Fires with the `Beat` or `null` if the release landed outside a beat.
+- `noteMouseDown` — mouse pressed on a note head or tab number. Fires with the `Note`.
+- `noteMouseMove` — cursor dragged over a new note after a press. Fires with the `Note`.
+- `noteMouseUp` — mouse released after a note press. Fires with the `Note` or `null`.
+
+The underlying `IMouseEventArgs` reaches your platform bridge on the `on-<event>` DOM event and exposes `preventDefault()`, `isLeftMouseButton`, and relative `getX(container)` / `getY(container)` — call `preventDefault()` if you handle the click yourself and want to suppress the built-in seek and selection behavior.
+
+## Click to seek
+
+Set `tickPosition` to the beat's `absolutePlaybackStart` and playback jumps to that beat. This is the pattern alphaTab uses internally when `player.enableUserInteraction` is on; wire it yourself when the master toggle is off.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    enableUserInteraction: false,
+  },
+});
+
+api.beatMouseDown.on((beat) => {
+  api.tickPosition = beat.absolutePlaybackStart;
+});
+```
+
+## Per-note click hook
+
+Turn on `core.includeNoteBounds` first, then subscribe to `noteMouseDown`. Use it to audition a single note, popup a fingering hint, or route the note into an editor selection.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp', includeNoteBounds: true },
+  player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },
+});
+
+api.noteMouseDown.on((note) => {
+  api.playNote(note);
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Enabling and disabling interaction](./enabling-and-disabling-interaction) — the master toggle that gates the built-in seek and select behavior.
+- [Beat visibility and note bounds](./beat-visibility-and-note-bounds) — the `includeNoteBounds` opt-in that powers the note events.
+- [`beatMouseDown`](/docs/reference/api/beatmousedown) and [`noteMouseDown`](/docs/reference/api/notemousedown) in the API reference.

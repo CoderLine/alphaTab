@@ -1,0 +1,63 @@
+---
+title: "Slash notation"
+description: "Chord rhythm slashes, showSlash."
+sidebar_custom_props:
+  feature_chapter: notation-types
+  feature_order: 30
+keywords:
+  - alphaTab
+  - slash notation
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Slash notation replaces pitched noteheads with rhythm slashes on a single-line staff — the standard shorthand for chord-comping parts.
+
+<AlphaTab tex={true}>{`
+\\bracketextendmode nobrackets
+.
+\\staff {score tabs slash}
+1.6.4 1.6.8 1.6.8 1.6.2 |
+1.6.4 {tu 3} 1.6.4 {tu 3} 1.6.4 {tu 3} r.2 |
+5.5.1 | r.1
+`}</AlphaTab>
+
+## When to reach for slashes
+
+Slashes tell a player *play the chord in this rhythm* without pinning down voicing or inversion. Use them for:
+
+- Rhythm-section charts where the guitarist or pianist voices chords by feel.
+- Lead sheets that combine a melody staff on top and a slash comp staff below.
+- Backing parts in ensemble scores where fret-exact notation would be noisier than useful.
+
+The slash staff carries the same durations, flags, beams, ties, and rests as the standard staff. Chord names sit above it exactly as they do on any other staff. Set `showSlash = true` on a `Staff` and toggle `showStandardNotation` / `showTablature` off if you want a slash-only chart.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/chart.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  for (const track of score.tracks) {
+    for (const staff of track.staves) {
+      staff.showStandardNotation = false;
+      staff.showTablature = false;
+      staff.showSlash = true;
+    }
+  }
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Guitar tablature](/docs/features/render/guitar-tablature) — the other common comping notation.
+- [Numbered notation](/docs/features/render/numbered-notation) — cipher notation for the same chord parts.
+- [`Staff.showSlash`](/docs/reference/types/model/staff) and [`SlashStaffConfig`](/docs/reference/types/model/slashstaffconfig) in the model reference.

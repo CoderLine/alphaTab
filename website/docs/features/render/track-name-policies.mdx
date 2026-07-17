@@ -1,0 +1,87 @@
+---
+title: "Track name policies"
+description: "Where names appear (first-system vs every-system), format, orientation; one page for all four track-name fields."
+sidebar_custom_props:
+  feature_chapter: stylesheet
+  feature_order: 20
+keywords:
+  - alphaTab
+  - track name
+  - stylesheet
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Control where track names appear, whether they use the full or short form, and whether they render horizontally or rotated. Six fields on the stylesheet cover it, grouped into three pairs.
+
+<AlphaTab file="/files/features/Skillet.gp5" settings={{ display: { barCount: 12 } }} />
+
+## The three pairs
+
+The stylesheet splits track-name display along three axes: **policy** (where), **mode** (which text), and **orientation** (how it's rotated). Policy has one field per rendering context (single-track vs multi-track). Mode and orientation each have one field for the first system and one for every other system, because those two positions typically want different treatment.
+
+### Policy: single track vs multi track
+
+- `singleTrackTrackNamePolicy` — governs display when only one track is rendered.
+- `multiTrackTrackNamePolicy` — governs display when multiple tracks are rendered.
+
+Both take a `TrackNamePolicy`:
+
+- `Hidden` — never draw the name.
+- `FirstSystem` — draw only above the first system (default).
+- `AllSystems` — repeat the name on every system.
+
+Splitting the policy by render context lets you keep a compact single-track view while still labeling every system in an ensemble score.
+
+### Mode: full name vs abbreviation
+
+- `firstSystemTrackNameMode` — text used on the first system.
+- `otherSystemsTrackNameMode` — text used on subsequent systems.
+
+Both take a `TrackNameMode`:
+
+- `FullName` — uses `Track.name` (e.g. "Distortion Guitar").
+- `ShortName` — uses `Track.shortName` (e.g. "Dist. Gtr.", default on both).
+
+The typical engraver's choice is `FullName` on the first system and `ShortName` on the rest.
+
+### Orientation: horizontal vs vertical
+
+- `firstSystemTrackNameOrientation` — rotation for the first-system label.
+- `otherSystemsTrackNameOrientation` — rotation for subsequent-system labels.
+
+Both take a `TrackNameOrientation`:
+
+- `Horizontal` — left-to-right text.
+- `Vertical` — bottom-to-top rotated text (default on both).
+
+Vertical labels keep the left margin narrow; horizontal labels read faster but push the staves inward.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/ensemble.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  const s = score.stylesheet;
+  s.multiTrackTrackNamePolicy = alphaTab.model.TrackNamePolicy.AllSystems;
+  s.firstSystemTrackNameMode = alphaTab.model.TrackNameMode.FullName;
+  s.otherSystemsTrackNameMode = alphaTab.model.TrackNameMode.ShortName;
+  s.firstSystemTrackNameOrientation = alphaTab.model.TrackNameOrientation.Horizontal;
+  s.otherSystemsTrackNameOrientation = alphaTab.model.TrackNameOrientation.Vertical;
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Bracket extend mode](/docs/features/render/bracket-extend-mode) — pairs with track names to define the left-edge label block.
+- [`TrackNamePolicy`](/docs/reference/types/model/tracknamepolicy), [`TrackNameMode`](/docs/reference/types/model/tracknamemode), [`TrackNameOrientation`](/docs/reference/types/model/tracknameorientation) — the enum references.
+- [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) — the full stylesheet reference.

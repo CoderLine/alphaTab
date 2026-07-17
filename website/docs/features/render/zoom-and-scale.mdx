@@ -1,0 +1,51 @@
+---
+title: "Zoom and scale"
+description: "display.scale, live slider demo."
+sidebar_custom_props:
+  feature_chapter: layout
+  feature_order: 50
+keywords:
+  - alphaTab
+  - zoom
+  - scale
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+`display.scale` scales the entire rendered output. Set it once for a per-device zoom level, or drive it from a slider for a live zoom control.
+
+<AlphaTab file="/files/canon.gp" settings={{ display: { scale: 1.3 } }} />
+
+## What scale changes
+
+`display.scale` is a single multiplier applied to every glyph, staff line spacing, padding, and layout distance. A scale of `1.0` is the default; `1.5` renders everything 50% larger; `0.75` shrinks it.
+
+Because scale multiplies the whole layout, more bars fit per row at lower scales and fewer at higher scales — [Page layout](./page-layout) reflows accordingly. To change scale after load, mutate `api.settings.display.scale` and call `api.updateSettings()` followed by `api.render()` to trigger a full re-render.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  display: {
+    scale: 1.3,
+  },
+});
+
+// Later — respond to a zoom slider
+document.getElementById('zoom').addEventListener('input', (event) => {
+  api.settings.display.scale = Number(event.target.value);
+  api.updateSettings();
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Responsive resize](./responsive-resize) — combine scale with container-width-based rules to zoom automatically.
+- [`display.scale`](/docs/reference/settings/display/scale) and [`updateSettings`](/docs/reference/api/updatesettings) reference entries.

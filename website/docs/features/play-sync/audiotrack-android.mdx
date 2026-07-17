@@ -1,0 +1,59 @@
+---
+title: "AudioTrack (Android)"
+description: "On Android, alphaTab feeds synthesized samples into an AudioTrack via a background worker, with device selection through AudioManager."
+sidebar_custom_props:
+  feature_chapter: backends
+  feature_order: 30
+  feature_platforms: [android]
+keywords:
+  - alphaTab
+  - AudioTrack
+  - Android
+  - audio backend
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+This page describes the Android-only audio backend. On Android, alphaTab's synth pipeline ends at `AndroidSynthOutput` — an `ISynthOutput` implementation that pushes 44.1 kHz stereo float samples to an `android.media.AudioTrack` through a background worker thread. The demo below runs the web player because these docs are hosted in a browser; the code snippet is what you write on Android.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## What runs on the audio thread
+
+`AndroidSynthOutput` sits on top of a `CircularSampleBuffer` sized from `player.bufferTimeInMilliseconds`. A companion `AndroidAudioWorker` owns the `AudioTrack`, pulls samples via `read` in 4096-sample chunks, and writes them to the track. Every read triggers `samplesPlayed`, which drives the position cursor and `midiEventsPlayed`.
+
+Nothing about the backend needs configuration inside your app code. The `AlphaTabView` widget wires it up automatically when the player is enabled.
+
+## Selecting an output device
+
+`AlphaTabApi.enumerateOutputDevices` queries `AudioManager.GET_DEVICES_OUTPUTS` and returns every sink device. Each device exposes the Android `id` as `deviceId` and `productName` as `label`. `setOutputDevice` forwards to the underlying `AudioTrack.setPreferredDevice`, so switching output happens without tearing playback down.
+
+## Show it in code
+
+```kotlin
+import alphaTab.AlphaTabApi
+import alphaTab.synth.ISynthOutputDevice
+
+val api: AlphaTabApi = getAlphaTabApi() // your AlphaTabView-hosted instance
+
+api.playerReady.on {
+    lifecycleScope.launch {
+        val devices = api.enumerateOutputDevices()
+        devices.forEach { device ->
+            Log.d("alphaTab", "${device.label} (id=${device.deviceId})")
+        }
+
+        // Route to a specific device; pass null to fall back to the system default.
+        val preferred = devices.firstOrNull { it.label.contains("Bluetooth") }
+        api.setOutputDevice(preferred)
+    }
+}
+```
+
+`getAlphaTabApi()` is a placeholder for the platform-specific step of obtaining the API instance — on Android you get one from the `AlphaTabView` you embedded in your layout.
+
+## Where to look next
+
+- [Audio buffer size](audio-buffer-size) — how `bufferTimeInMilliseconds` maps onto the AudioTrack buffer count on Android.
+- [Selecting an output device (Web)](selecting-an-output-device) — the same shape of API on the browser side.
+- [`AlphaTabView` on Android](/docs/features/extend/alphatabview-on-android) — how the backend gets instantiated.

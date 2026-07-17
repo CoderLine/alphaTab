@@ -1,0 +1,73 @@
+---
+title: "Repeats and structural elements"
+description: "Repeats, alternate endings, D.C./D.S., segno, coda, markers."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 50
+keywords:
+  - alphaTab
+  - repeats
+  - structural
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Repeats, jumps, and section markers drive how a score reads across systems. alphaTab picks them up from the source file and renders each with its standard engraving convention.
+
+## Simple repeats {#repeats}
+
+Repeat barlines and repeat counts render as thick double bars with a dot pattern, and the count appears above the closing barline when the repeat plays more than twice.
+
+<AlphaTab file="/files/features/Repeats.gp5" settings={ { staveProfile: 'score' } } />
+
+## Alternate endings {#alternate-endings}
+
+Alternate endings render as numbered brackets above the affected bars. Each ending's numeric label indicates which pass through the repeat plays that bar.
+
+<AlphaTab file="/files/features/AlternateEndings.gp5" settings={ { staveProfile: 'score' } } />
+
+## D.C. and D.S. {#dc-ds}
+
+Da capo and dal segno directions render as text labels above the target barline. alphaTab honors `D.C.`, `D.C. al Fine`, `D.C. al Coda`, `D.S.`, `D.S. al Fine`, and `D.S. al Coda` from the source file.
+
+<AlphaTab file="/files/features/directions-simple.gp" />
+
+## Segno and coda {#segno-coda}
+
+Segno and coda symbols render above the staff at their target bars as the standard glyphs. Fine markers render as text.
+
+<AlphaTab file="/files/features/directions-simple.gp" />
+
+## Section markers {#markers}
+
+Section markers render as labeled text above the staff at the marked bar. Use them to name intro, verse, chorus, and bridge sections in the source file.
+
+<AlphaTab file="/files/features/Markers.gp5" />
+
+## Show it in code
+
+Every structural element above is on by default. To hide one category — for example, section markers in a compact printout — set its `notation.elements` entry to `false`:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  notation: {
+    elements: new Map([
+      [alphaTab.NotationElement.EffectMarker, false],
+      [alphaTab.NotationElement.EffectDirections, false],
+      [alphaTab.NotationElement.RepeatCount, false],
+    ]),
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target. See [`NotationElement`](/docs/reference/types/notationelement) for every togglable category.
+
+## Where to look next
+
+- [Toggling notation elements off](./coverage-toggle-elements) — hide any category globally.
+- [`notation.elements`](/docs/reference/settings/notation/elements) — the full element map.
+- [Rendering a slice](./bar-range) — pair `startBar` / `barCount` with repeats to preview a section.

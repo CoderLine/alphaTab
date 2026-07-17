@@ -1,0 +1,56 @@
+---
+title: "Triplet feel (swing)"
+description: "Enable swing on straight-eighth scores, live demo."
+sidebar_custom_props:
+  feature_chapter: feel
+  feature_order: 20
+keywords:
+  - alphaTab
+  - swing
+  - triplet feel
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Guitar Pro files carry a triplet-feel marker per section — 8ths, 16ths, dotted, or Scottish. alphaTab honors those markers at playback time, turning straight eighths into a shuffled swing without touching the notation on screen.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## What the switch does
+
+`player.playTripletFeel` is a boolean. When it is on (the default), the synth converts the notated eighth or sixteenth pairs into their triplet-feel equivalent as declared by the score. When it is off, alphaTab plays the notes exactly as written, so the display and the audio match note-for-note.
+
+The setting only changes playback. The score still shows the "shuffle" or "swing" marker above the staff either way. Reach for the toggle when:
+
+- You are building a practice tool and want the reader to hear the straight rhythm they see notated.
+- You want an A/B comparison for pedagogy.
+- The score's embedded triplet-feel marker fights with a backing track you also drive.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playTripletFeel: true,
+  },
+});
+
+// Later, flip it off for a straight playback.
+api.settings.player.playTripletFeel = false;
+api.updateSettings();
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+Call `api.updateSettings()` after mutating settings on the live instance so the player picks up the new value.
+
+## Where to look next
+
+- [`player.playTripletFeel`](/docs/reference/settings/player/playtripletfeel) in the settings reference.
+- [SongBook mode](songbook-mode) — a related notation-mode switch that also affects bend and dip timing.
+- [`TripletFeel`](/docs/reference/types/model/tripletfeel) in the model reference.

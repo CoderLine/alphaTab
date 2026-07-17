@@ -1,0 +1,83 @@
+---
+title: "A custom cursor handler"
+description: "Swap in your own ICursorHandler to place and animate the bar and beat cursors with custom logic."
+sidebar_custom_props:
+  feature_chapter: cursor
+  feature_order: 30
+keywords:
+  - alphaTab
+  - cursor
+  - handler
+  - ICursorHandler
+  - customCursorHandler
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+When the built-in cursor placement is not what you need — a follow-cam that lags behind the beat, a glow that pulses off the beat cursor, a cursor that morphs into a highlighter — assign your own handler to `api.customCursorHandler`.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## When to reach for it
+
+The CSS-level knobs cover most restyling. Reach for a custom handler when placement itself needs to change:
+
+- Extra DOM adornments that ride along with the cursor (a fingering pointer, a metronome ticker).
+- Animation curves the CSS transition cannot express (physics-driven follow, easing per cursor mode).
+- Coupling cursor motion to another surface (a scrubber on an external video track).
+
+The handler implements `ICursorHandler`: `onAttach`, `onDetach`, `placeBarCursor`, `placeBeatCursor`, and `transitionBeatCursor`. alphaTab still creates the cursor `IContainer` elements — your handler decides where they sit and how they move.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },
+});
+
+api.customCursorHandler = {
+  _adorner: undefined,
+
+  onAttach(cursors) {
+    this._adorner = document.createElement('div');
+    this._adorner.className = 'my-cursor-adorner';
+    cursors.cursorWrapper.element.appendChild(this._adorner);
+  },
+
+  onDetach(cursors) {
+    this._adorner?.remove();
+    this._adorner = undefined;
+  },
+
+  placeBarCursor(barCursor, beatBounds) {
+    const bar = beatBounds.barBounds.masterBarBounds.visualBounds;
+    barCursor.setBounds(bar.x, bar.y, bar.w, bar.h);
+  },
+
+  placeBeatCursor(beatCursor, beatBounds, startBeatX) {
+    const bar = beatBounds.barBounds.masterBarBounds.visualBounds;
+    beatCursor.transitionToX(0, startBeatX);
+    beatCursor.setBounds(startBeatX, bar.y, 1, bar.h);
+    this._adorner.style.transform = `translate(${startBeatX}px, ${bar.y - 12}px)`;
+  },
+
+  transitionBeatCursor(beatCursor, beatBounds, startBeatX, nextBeatX, duration, cursorMode) {
+    beatCursor.transitionToX(duration, nextBeatX);
+    this._adorner.style.transition = `transform ${duration}ms linear`;
+    this._adorner.style.transform = `translate(${nextBeatX}px, ${beatBounds.barBounds.masterBarBounds.visualBounds.y - 12}px)`;
+  },
+};
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of
+obtaining the render target. Every other line runs unchanged on all three
+runtimes.
+
+## Where to look next
+
+- [Customizing cursor colors and animation](./customizing-cursor-colors-and-animation) — restyle without replacing the handler.
+- [`customCursorHandler`](/docs/reference/api/customcursorhandler) and the [`ICursorHandler`](/docs/reference/types/platform/icursorhandler) interface reference.

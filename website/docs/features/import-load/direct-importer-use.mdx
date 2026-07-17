@@ -1,0 +1,75 @@
+---
+title: "Direct importer use"
+description: "`alphaTab.importer.*` classes (`ScoreLoader`, `Gp7To8Importer`, `MusicXmlImporter`, etc.) for advanced pipelines that bypass `AlphaTabApi`."
+sidebar_custom_props:
+  feature_chapter: loading
+  feature_order: 40
+keywords:
+  - alphaTab
+  - importer
+  - ScoreLoader
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Skip `AlphaTabApi` entirely, run the importer yourself, and get a `Score` model back for build pipelines, batch conversions, or model-only workflows.
+
+<AlphaTab file="/files/canon.gp" />
+
+## When you want a `Score`, not a rendered surface
+
+`AlphaTabApi` is the right entry point when you want alphaTab to render, play, and manage the visual surface. It is not the right entry point when you want the parsed model without any of that:
+
+- A CLI or build script that converts scores from Guitar Pro to alphaTex.
+- A backend that ingests uploaded `.gp` files and pulls out titles, artists, or track counts.
+- A test harness that constructs the model, mutates it, and inspects the result without a DOM.
+- A pipeline that hands the parsed `Score` to a custom renderer or exporter.
+
+`ScoreLoader` is the public entry point for these cases. It exposes three static methods that cover every input:
+
+- `ScoreLoader.loadScoreFromBytes(bytes, settings?)` — synchronous, format-detected, throws `UnsupportedFormatError` on failure.
+- `ScoreLoader.loadAlphaTex(text, settings?)` — synchronous, parses alphaTex directly.
+- `ScoreLoader.loadScoreAsync(url, success, error, settings?)` — the browser fetch path, callback-based.
+
+The bytes method is what you reach for on Node.js and every non-browser runtime.
+
+## The importer classes themselves
+
+`alphaTab.importer` publicly exports:
+
+- `ScoreLoader` — the format-detecting entry point above.
+- `ScoreImporter` — the abstract base every format-specific importer extends.
+- `AlphaTexImporter` — the alphaTex parser, exposed directly because its API is richer than `ScoreLoader.loadAlphaTex` (custom error handling, incremental parsing).
+- `AlphaTexErrorWithDiagnostics` — the error type raised on alphaTex parse failures, with line and column info.
+- `UnsupportedFormatError` — raised by `ScoreLoader` when no importer accepts the bytes.
+- `alphaTex` — a nested namespace with the lexer / parser primitives for advanced tooling.
+
+The format-specific importers (`Gp7To8Importer`, `Gp3To5Importer`, `MusicXmlImporter`, `CapellaImporter`, `GpxImporter`) are internal — `ScoreLoader.loadScoreFromBytes` selects and drives them for you. Instantiate a `ScoreLoader` or an `AlphaTexImporter`; leave the rest to the loader.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+import { readFile } from 'node:fs/promises';
+
+const bytes = new Uint8Array(await readFile('canon.gp'));
+const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(bytes);
+
+console.log(`${score.title} — ${score.tracks.length} tracks`);
+for (const track of score.tracks) {
+  console.log(`  ${track.name}, ${track.staves.length} staves`);
+}
+
+// Round-trip to alphaTex without ever creating an API instance.
+const exporter = new alphaTab.exporter.AlphaTexExporter();
+const tex = exporter.export(score);
+```
+
+No `getAlphaTabContainer()` here — this path never touches a rendering surface. Everything is model-in, model-out.
+
+## Where to look next
+
+- [Score to JSON and back](/docs/features/export/score-to-json) — pair direct-loader use with model serialization.
+- [Export to alphaTex](/docs/features/export/export-to-alphatex) — the exporter counterpart shown above.
+- [Programmatic score construction](/docs/features/extend/programmatic-score-construction) — build a `Score` without any importer.
+- [`ScoreLoader`](/docs/reference/types/importer/scoreloader), [`AlphaTexImporter`](/docs/reference/types/importer/alphateximporter), and [`UnsupportedFormatError`](/docs/reference/types/importer/unsupportedformaterror) in the reference.

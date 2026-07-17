@@ -1,0 +1,70 @@
+---
+title: "Backing-track audio"
+description: "Drive the alphaTab playback cursor from an embedded or external audio track instead of the synth."
+sidebar_custom_props:
+  feature_chapter: sync
+  feature_order: 10
+keywords:
+  - alphaTab
+  - backing track
+  - sync
+  - audio
+  - Guitar Pro 8
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Set the player to backing-track mode and the cursor follows an audio file instead of the built-in synth. Guitar Pro 8 files embed the audio and the sync points; for other scores you attach both on `score.backingTrack` before render. alphaTab plays **either** the synthesized audio or the backing track — the two do not mix.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## What alphaTab needs
+
+The backing-track pipeline expects three things on the score:
+
+- **`score.backingTrack.rawAudioFile`** — the audio bytes as a `Uint8Array`. OGG Vorbis and MP3 are the safe formats across browsers.
+- **Sync points on `MasterBar.syncPoints`** — automations of type `SyncPoint` that anchor bar positions to audio timestamps. Guitar Pro 8 files ship these; for other formats generate them with the [Media Sync Editor](/docs/playground/playground) or [set them at runtime](sync-points-at-runtime).
+- **`player.playerMode` set to `EnabledBackingTrack` or `EnabledAutomatic`** — `Automatic` picks the backing track when one is present and falls back to the synth otherwise.
+
+On the web, playback is driven by `AudioElementBackingTrackSynthOutput`, which owns a hidden `<audio>` element sourced from a blob URL of the raw audio.
+
+## Guitar Pro 8
+
+If the audio file is embedded in the `.gp` file, alphaTab loads and wires it automatically once you enable the backing-track mode. Nothing else to configure.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/my-song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    soundFont: '/soundfont/sonivox.sf2',
+  },
+});
+
+// For non-GP8 scores: attach the backing track before rendering.
+const response = await fetch('/audio/my-song.ogg');
+const audioBytes = new Uint8Array(await response.arrayBuffer());
+
+api.scoreLoaded.on((score) => {
+  score.backingTrack = new alphaTab.model.BackingTrack();
+  score.backingTrack.rawAudioFile = audioBytes;
+
+  // Point sync points at the score's masterbars — see the sync-points page
+  // for the runtime API.
+  api.updateSyncPoints();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+## Where to look next
+
+- [Video sync](video-sync) — the same pattern with an HTML5 video element or a YouTube iframe.
+- [Sync points at runtime](sync-points-at-runtime) — building and updating the sync-point list programmatically.
+- [Media Sync Editor](/docs/playground/playground) — the interactive tool for creating sync points against a waveform.
+- [`PlayerMode`](/docs/reference/settings/player/playermode) in the settings reference.

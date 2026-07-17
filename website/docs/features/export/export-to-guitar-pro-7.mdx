@@ -1,0 +1,69 @@
+---
+title: "Export to Guitar Pro 7"
+description: "Write `.gp` files with `Gp7Exporter`, wire the resulting bytes into a browser download."
+sidebar_custom_props:
+  since: "1.2"
+  feature_chapter: score-formats
+  feature_order: 10
+keywords:
+  - alphaTab
+  - Guitar Pro
+  - GP7
+  - export
+  - exporter
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+`Gp7Exporter` writes a loaded `Score` back to the Guitar Pro 7 / 8 container format. Point it at `api.score` and `api.settings`, and it hands you a `Uint8Array` ready to persist, upload, or offer as a download.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+The score above is what a Guitar Pro export produces. Round-tripping alphaTab-only features (custom sub-element colors, stylesheet flags Guitar Pro does not know) falls back to the closest GP7 approximation the format allows.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+});
+
+api.scoreLoaded.on(() => {
+  const exporter = new alphaTab.exporter.Gp7Exporter();
+  const data = exporter.export(api.score, api.settings);
+
+  const fileName = api.score.title
+    ? `${api.score.title}.gp`
+    : 'Untitled.gp';
+
+  const a = document.createElement('a');
+  a.download = fileName;
+  a.href = URL.createObjectURL(new Blob([data], { type: 'application/octet-stream' }));
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+});
+```
+
+`getAlphaTabContainer()` is the platform-specific step — a `<div>` on Web, an `AlphaTab` control on .NET, an `AlphaTabView` on Android. The exporter itself runs on every runtime; only the download link is browser-specific. On .NET or Android, write the byte array to disk with the native file API instead.
+
+## What the exporter emits
+
+`Gp7Exporter` builds the full `.gp` container:
+
+- `Content/score.gpif` — the GPIF XML with tracks, staves, bars, beats, notes, and effects.
+- `Content/BinaryStylesheet` — the score-level stylesheet Guitar Pro reads on load.
+- `Content/PartConfiguration` and `Content/LayoutConfiguration` — visibility and layout hints per part.
+- The backing-track asset, when the loaded score carries one.
+
+Guitar Pro 7 and Guitar Pro 8 both open the resulting file. Any GP8-only additions the source score used are downgraded to their GP7 equivalent where possible.
+
+## Where to look next
+
+- [Export to alphaTex](export-to-alphatex) — write the score as text instead of a binary container.
+- [Score to JSON and back](score-to-json) — round-trip the in-memory model for storage or transport.
+- [`Gp7Exporter`](/docs/reference/types/exporter/gp7exporter) in the API reference.

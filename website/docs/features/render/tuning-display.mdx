@@ -1,0 +1,64 @@
+---
+title: "Tuning display"
+description: "Show or hide guitar tuning at the start."
+sidebar_custom_props:
+  feature_chapter: stylesheet
+  feature_order: 70
+keywords:
+  - alphaTab
+  - tuning
+  - stylesheet
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Show the string tuning at the top of the score, hide it entirely, or move it beside the tab-staff lines. Two stylesheet fields — one score-wide, one per-track — cover every combination.
+
+<AlphaTab file="/files/features/Tuning.gp5" settings={{ display: { barCount: 12 } }} />
+
+## The knobs
+
+Three fields on `score.stylesheet` control tuning display:
+
+- `globalDisplayTuning` — a boolean, `true` by default. When `false`, no tuning label appears anywhere in the render.
+- `perTrackDisplayTuning` — a `Map<number, boolean>` keyed by track index. Add an entry to override the global flag for that specific track. Leave the map `null` (default) to apply the global flag uniformly.
+- `tuningDisplayMode` — a `TuningDisplayMode` enum controlling where the tuning is placed:
+  - `Score` — the tuning block sits above the first system, alongside title and artist info (default).
+  - `Staff` — each open-string pitch is written next to its tab-staff line, replacing the block header.
+
+`Staff` mode is useful when a score has multiple string instruments with different tunings; each label appears next to its own staff instead of one combined block. `Score` mode is cleaner for single-instrument charts.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  const s = score.stylesheet;
+  s.globalDisplayTuning = true;
+  s.tuningDisplayMode = alphaTab.model.TuningDisplayMode.Staff;
+
+  // Hide tuning on a specific track (e.g. a piano track that has none):
+  s.perTrackDisplayTuning = new Map();
+  for (const track of score.tracks) {
+    if (track.staves[0].tuning.length === 0) {
+      s.perTrackDisplayTuning.set(track.index, false);
+    }
+  }
+
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Guitar tablature](/docs/features/render/guitar-tablature) — the tab staff itself that this tuning label describes.
+- [`TuningDisplayMode`](/docs/reference/types/model/tuningdisplaymode) — the enum reference.
+- [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) — the full stylesheet reference.

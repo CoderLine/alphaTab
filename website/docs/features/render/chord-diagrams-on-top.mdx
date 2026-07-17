@@ -1,0 +1,52 @@
+---
+title: "Chord diagrams on top"
+description: "Position chord diagrams above the first system."
+sidebar_custom_props:
+  feature_chapter: stylesheet
+  feature_order: 50
+keywords:
+  - alphaTab
+  - chord diagram
+  - stylesheet
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Place the chord-diagram catalog above the first system, so every used voicing is visible before the reader hits the first bar. Turn it off to keep diagrams inline, where they appear only above the bars that reference them.
+
+<AlphaTab file="/files/features/Chords.gp5" settings={{ display: { barCount: 12 } }} />
+
+## Above the score vs inline
+
+`score.stylesheet.globalDisplayChordDiagramsOnTop` is a boolean that governs the top-of-score placement. When `true` (default), alphaTab collects every chord defined in the score and renders the diagram grid above the first system. When `false`, the grid disappears — chords still appear inline above the bars where they're first used, driven by `globalDisplayChordDiagramsInScore`.
+
+Two related fields sit alongside it:
+
+- `globalDisplayChordDiagramsInScore` — score-wide toggle for the inline diagrams above bars (off by default).
+- `perTrackChordDiagramsOnTop` — a `Map<number, boolean>` keyed by track index, overriding the global flag per track. Leave it `null` to fall back to the global setting.
+
+The typical songbook look combines the top grid (`on`) with inline diagrams (`off`); a Nashville-style chord chart flips both.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  score.stylesheet.globalDisplayChordDiagramsOnTop = false;
+  score.stylesheet.globalDisplayChordDiagramsInScore = true;
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Chord diagrams and chord names](/docs/features/render/coverage-chord-diagrams) — the notation coverage page for chord elements.
+- [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) — the full stylesheet reference.

@@ -1,0 +1,74 @@
+---
+title: "Using a custom music font"
+description: "Swap Bravura for Petaluma or Leland, live demo."
+sidebar_custom_props:
+  feature_chapter: fonts
+  feature_order: 20
+keywords:
+  - alphaTab
+  - SMuFL
+  - custom font
+---
+
+import { AlphaTabPetaluma } from '@site/src/components/AlphaTabPetaluma';
+
+Point alphaTab at any SMuFL-compliant font and every glyph in the score re-renders through it.
+
+<AlphaTabPetaluma>{`
+\\subtitle "alphaTab rendering with Petaluma instead of Bravura"
+5.3{h}.8{beam Down}
+7.3{sl}.8{beam Down}
+8.3{sl acc #}.8{beam Down}
+7.3{h}.8{beam Down}
+5.3{sl}.8{beam Down}
+3.3{h acc #}.8{beam Down}
+5.3{h}.8{beam Down}
+3.3{acc #}.8{beam Down}
+|
+7.3{tr (9 16)}.1{beam Down}
+|
+21.1{acc #}.8{ot 8va beam Down}
+21.1{acc #}.8{ot 8va beam Down}
+21.1{acc #}.8{ot 8va beam Down}
+21.1{acc #}.8{ot 8va beam Down}
+r.2
+`}</AlphaTabPetaluma>
+
+## Two pieces per font
+
+A SMuFL font has two halves and alphaTab needs both:
+
+- **The font file itself** — an `.otf`, `.woff`, or `.woff2` containing the glyphs. Point alphaTab at it via `core.smuflFontSources`, a `Map<FontFileFormat, string>` of URLs.
+- **The `metadata.json` sidecar** — engraving metrics that tell alphaTab how each glyph should be sized and spaced. Load the JSON yourself and hand it to `display.resources.engravingSettings.fillFromSmufl()`.
+
+Miss either half and the score renders with the wrong spacing, the wrong glyphs, or both. When `fillFromSmufl` finds glyphs the source file does not declare, it logs warnings — watch the console when you first wire up a new font.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const settings = new alphaTab.Settings();
+settings.core.smuflFontSources = new Map([
+  [alphaTab.FontFileFormat.OpenType, '/fonts/Petaluma.otf'],
+]);
+
+const metadata = await fetch('/fonts/petaluma_metadata.json').then(r => r.json());
+settings.display.resources.engravingSettings.fillFromSmufl(metadata);
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, settings);
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Limitations
+
+- **No live font swap.** Reassigning `smuflFontSources` on a running instance does not re-render with the new font. Destroy the `AlphaTabApi` and create a fresh one to switch fonts at runtime.
+- **Incomplete fonts.** Few SMuFL fonts cover the full glyph range alphaTab uses. alphaTab has no per-glyph fallback — missing glyphs render as gaps or as the font's own placeholder. Bravura, Petaluma, and Leland are the safest choices.
+
+## Where to look next
+
+- [Bravura and SMuFL](/docs/features/render/bravura-default) — the default font and why SMuFL matters.
+- [`CoreSettings.smuflFontSources`](/docs/reference/settings/core/smuflfontsources) and [`EngravingSettings.fillFromSmufl`](/docs/reference/types/engravingsettings) in the reference.
+- [Petaluma](https://github.com/steinbergmedia/petaluma) and [Leland](https://github.com/MuseScoreFonts/Leland) — two alternate SMuFL fonts that pair well with alphaTab.

@@ -1,0 +1,70 @@
+---
+title: "Sync points at runtime"
+description: "Attach or refresh backing-track sync points from code with FlatSyncPoint entries and api.updateSyncPoints()."
+sidebar_custom_props:
+  feature_chapter: sync
+  feature_order: 30
+keywords:
+  - alphaTab
+  - sync points
+  - FlatSyncPoint
+  - runtime
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Sync points align bar positions in the score with millisecond offsets in an external audio or video track. When the source file does not ship them — or your users adjust them in a UI — build them from code and push them into the score at runtime.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## The data shape
+
+A sync point lives on `MasterBar.syncPoints` as an `Automation` with type `SyncPoint`. For serialization and programmatic construction, use the flat form:
+
+- **`barIndex`** — the index of the target masterbar in `score.masterBars`.
+- **`barPosition`** — a `0..1` ratio inside the bar. `0` is the downbeat, `0.5` is the halfway point, `1` is the next barline.
+- **`barOccurence`** — the repeat count this sync point applies to (`0` for the first pass, `1` for the second pass through the same bar after a repeat).
+- **`millisecondOffset`** — the audio timestamp in milliseconds this point maps to.
+
+The `Score` model has two helpers for this shape: `applyFlatSyncPoints(list)` replaces every sync point on every masterbar with the entries you provide, and `exportFlatSyncPoints()` returns the reverse.
+
+## Refreshing after edits
+
+After applying the list, call `api.updateSyncPoints()` to regenerate the internal midi-time mapping. Without that call, alphaTab keeps using the sync points that existed at load time.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/my-song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledBackingTrack,
+    soundFont: '/soundfont/sonivox.sf2',
+  },
+});
+
+api.scoreLoaded.on((score) => {
+  const points = [
+    { barIndex: 0, barPosition: 0, barOccurence: 0, millisecondOffset: 0 },
+    { barIndex: 0, barPosition: 0, barOccurence: 0, millisecondOffset: 1500 },
+    { barIndex: 1, barPosition: 0, barOccurence: 0, millisecondOffset: 4075 },
+    { barIndex: 2, barPosition: 0, barOccurence: 0, millisecondOffset: 6475 },
+    { barIndex: 3, barPosition: 0, barOccurence: 0, millisecondOffset: 10223 },
+  ];
+
+  score.applyFlatSyncPoints(points);
+  api.updateSyncPoints();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+## Where to look next
+
+- [Backing-track audio](backing-track-audio) — the mode that consumes sync points.
+- [Video sync](video-sync) — the external-media variant that also relies on sync points.
+- [Media Sync Editor](/docs/playground/playground) — the interactive editor that produces `FlatSyncPoint` lists against a waveform.
+- [`SyncPointData`](/docs/reference/types/model/syncpointdata) and [`Automation`](/docs/reference/types/model/automation) in the model reference.

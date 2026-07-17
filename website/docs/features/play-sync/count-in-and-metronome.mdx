@@ -1,0 +1,60 @@
+---
+title: "Count-in and metronome"
+description: "One bar of clicks before playback, metronome during playback."
+sidebar_custom_props:
+  feature_chapter: feel
+  feature_order: 10
+keywords:
+  - alphaTab
+  - metronome
+  - count-in
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Ship the click a bandmate would give you. A count-in taps out one bar before the song starts so the reader knows the tempo; the metronome keeps clicking on every beat while the track runs.
+
+<AlphaTab file="/files/canon.gp" player={true} />
+
+## Two independent volumes
+
+alphaTab treats both clicks as monitoring channels rather than settings — you flip them on by raising their volume above zero.
+
+- `api.metronomeVolume` — the click that runs during playback. `0` mutes it (the default). `1` matches the master output; typical values sit between `0.3` and `0.8`.
+- `api.countInVolume` — the one-bar lead-in before the transport actually starts. Also defaults to `0`. When non-zero, alphaTab inserts a count of the loaded bar's time signature before playback begins, then hands off to the score.
+
+Both are floats in the `[0, 1]` range and can change at runtime. Wire them to a practice-mode toggle, a beginner switch, or a slider in your UI.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+  },
+});
+
+// Enable the metronome at half volume during playback.
+api.metronomeVolume = 0.5;
+
+// Give the reader a one-bar count-in before the track starts.
+api.countInVolume = 0.7;
+
+api.playPause();
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Reacting to each click
+
+Every metronome tick fires through `midiEventsPlayed` as an `AlphaTabMetronomeEvent`. Subscribe if you want a visual flash, a haptic pulse on mobile, or a beat counter overlay. See [The MIDI event stream](midi-event-stream) for the subscription pattern.
+
+## Where to look next
+
+- [Master and monitoring volumes](master-and-monitoring-volumes) — the mixer view of the same two volumes plus `masterVolume`.
+- [The MIDI event stream](midi-event-stream) — subscribe to `AlphaTabMetronomeEvent` for per-click hooks.
+- [`api.metronomeVolume`](/docs/reference/api/metronomevolume) and [`api.countInVolume`](/docs/reference/api/countinvolume) in the reference.
