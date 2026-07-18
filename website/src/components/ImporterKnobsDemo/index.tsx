@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+} from "@site/src/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface ImporterKnobsDemoProps {
@@ -11,18 +15,41 @@ const SOURCE_URL = "/files/features/Text.gp5";
 const ENCODINGS = ["utf-8", "windows-1252"] as const;
 type Encoding = (typeof ENCODINGS)[number];
 
-export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
-  showCode = true,
+interface InnerProps {
+  beatTextAsLyrics: boolean;
+  setBeatTextAsLyrics: (v: boolean) => void;
+  encoding: Encoding;
+  setEncoding: (v: Encoding) => void;
+}
+
+const Inner: React.FC<InnerProps> = ({
+  beatTextAsLyrics,
+  setBeatTextAsLyrics,
+  encoding,
+  setEncoding,
 }) => {
-  const [api, element] = useAlphaTab((s) => {
-    s.importer.beatTextAsLyrics = false;
-  });
-  const [beatTextAsLyrics, setBeatTextAsLyrics] = useState(false);
-  const [encoding, setEncoding] = useState<Encoding>("windows-1252");
+  const api = useAlphaTabApi();
   const bytesRef = useRef<Uint8Array | null>(null);
+
+  const applyAndLoad = useCallback(
+    (asLyrics: boolean, enc: Encoding) => {
+      if (!api || !bytesRef.current) {
+        return;
+      }
+      api.settings.importer.beatTextAsLyrics = asLyrics;
+      api.settings.importer.gp3To5encoding = enc;
+      api.updateSettings();
+      // Clone the bytes so alphaTab always sees a fresh buffer.
+      api.load(bytesRef.current.slice(), [0]);
+    },
+    [api],
+  );
 
   // fetch once
   useEffect(() => {
+    if (!api) {
+      return;
+    }
     let cancelled = false;
     fetch(SOURCE_URL)
       .then((r) => r.arrayBuffer())
@@ -38,20 +65,6 @@ export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [api]);
 
-  const applyAndLoad = useCallback(
-    (asLyrics: boolean, enc: Encoding) => {
-      if (!api || !bytesRef.current) {
-        return;
-      }
-      api.settings.importer.beatTextAsLyrics = asLyrics;
-      api.settings.importer.gp3To5encoding = enc;
-      api.updateSettings();
-      // Clone the bytes so alphaTab always sees a fresh buffer.
-      api.load(bytesRef.current.slice(), [0]);
-    },
-    [api]
-  );
-
   const toggleLyrics = () => {
     const next = !beatTextAsLyrics;
     setBeatTextAsLyrics(next);
@@ -64,18 +77,8 @@ export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
     applyAndLoad(beatTextAsLyrics, next);
   };
 
-  const code = `const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/oldfile.gp5' },
-  importer: {
-    beatTextAsLyrics: true,      // reinterpret beat text as lyric syllables
-    gp3To5encoding: 'windows-1252', // legacy GP3-5 code page
-    mergePartGroupsInMusicXml: true, // MusicXML-only
-    maxDecodingBufferSize: 128_000_000, // safety cap in bytes
-  },
-});`;
-
   return (
-    <div className={styles.demo}>
+    <>
       <div className={styles.controls}>
         <label className={styles.control}>
           <input
@@ -110,7 +113,40 @@ export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
           </span>
         </div>
       </div>
-      <div ref={element}></div>
+      <AlphaTabCanvas />
+    </>
+  );
+};
+
+export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
+  showCode = true,
+}) => {
+  const [beatTextAsLyrics, setBeatTextAsLyrics] = useState(false);
+  const [encoding, setEncoding] = useState<Encoding>("windows-1252");
+
+  const code = `const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/oldfile.gp5' },
+  importer: {
+    beatTextAsLyrics: true,      // reinterpret beat text as lyric syllables
+    gp3To5encoding: 'windows-1252', // legacy GP3-5 code page
+    mergePartGroupsInMusicXml: true, // MusicXML-only
+    maxDecodingBufferSize: 128_000_000, // safety cap in bytes
+  },
+});`;
+
+  return (
+    <div className={styles.demo}>
+      <AlphaTabPlayer
+        player={false}
+        settings={{ importer: { beatTextAsLyrics: false } }}
+      >
+        <Inner
+          beatTextAsLyrics={beatTextAsLyrics}
+          setBeatTextAsLyrics={setBeatTextAsLyrics}
+          encoding={encoding}
+          setEncoding={setEncoding}
+        />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

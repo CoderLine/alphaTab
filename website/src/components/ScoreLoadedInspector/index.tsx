@@ -1,63 +1,44 @@
-import React, { useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
+import React from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabControls,
+  useAlphaTabState,
+} from "@site/src/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface ScoreLoadedInspectorProps {
   showCode?: boolean;
 }
 
-interface ScoreInfo {
-  title: string;
-  artist: string;
-  tempo: number;
-  tracks: Array<{ name: string; staves: number }>;
-}
-
 const SOURCE_URL = "/files/features/Skillet.gp5";
 
-export const ScoreLoadedInspector: React.FC<ScoreLoadedInspectorProps> = ({
-  showCode = true,
-}) => {
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = SOURCE_URL;
-  });
-  const [info, setInfo] = useState<ScoreInfo | null>(null);
-
-  useAlphaTabEvent(api, "scoreLoaded", (score: alphaTab.model.Score) => {
-    setInfo({
-      title: score.title || "(untitled)",
-      artist: score.artist || "(unknown)",
-      tempo: score.tempo,
-      tracks: score.tracks.map((t) => ({
-        name: t.name || "(unnamed)",
-        staves: t.staves.length,
-      })),
-    });
-  });
+const Inner: React.FC = () => {
+  const state = useAlphaTabState();
+  const controls = useAlphaTabControls();
+  const score = state.currentScore;
+  const info = score
+    ? {
+        title: score.title || "(untitled)",
+        artist: score.artist || "(unknown)",
+        tempo: score.tempo,
+        tracks: score.tracks.map((t) => ({
+          name: t.name || "(unnamed)",
+          staves: t.staves.length,
+        })),
+      }
+    : null;
 
   const reload = () => {
-    if (!api) {
+    if (!controls) {
       return;
     }
-    setInfo(null);
-    api.load(SOURCE_URL);
+    void controls.loadScoreFromUrl(SOURCE_URL);
   };
 
-  const code = `const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/song.gp5' },
-});
-
-api.scoreLoaded.on((score) => {
-  panel.querySelector('.title').textContent = score.title;
-  panel.querySelector('.artist').textContent = score.artist;
-  panel.querySelector('.tempo').textContent = \`\${score.tempo} BPM\`;
-  panel.querySelector('.tracks').textContent = String(score.tracks.length);
-});`;
-
   return (
-    <div className={styles.demo}>
+    <>
       <div className={styles.panel}>
         <div className={styles.panelHeader}>
           <h4>Score info</h4>
@@ -65,7 +46,7 @@ api.scoreLoaded.on((score) => {
             type="button"
             className="button button--sm button--secondary"
             onClick={reload}
-            disabled={!api}
+            disabled={!controls}
           >
             Reload
           </button>
@@ -105,7 +86,30 @@ api.scoreLoaded.on((score) => {
           </p>
         )}
       </div>
-      <div ref={element}></div>
+      <AlphaTabCanvas />
+    </>
+  );
+};
+
+export const ScoreLoadedInspector: React.FC<ScoreLoadedInspectorProps> = ({
+  showCode = true,
+}) => {
+  const code = `const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp5' },
+});
+
+api.scoreLoaded.on((score) => {
+  panel.querySelector('.title').textContent = score.title;
+  panel.querySelector('.artist').textContent = score.artist;
+  panel.querySelector('.tempo').textContent = \`\${score.tempo} BPM\`;
+  panel.querySelector('.tracks').textContent = String(score.tracks.length);
+});`;
+
+  return (
+    <div className={styles.demo}>
+      <AlphaTabPlayer file={SOURCE_URL} player={false}>
+        <Inner />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

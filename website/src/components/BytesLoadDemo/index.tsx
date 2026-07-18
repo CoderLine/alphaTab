@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabState,
+} from "@site/src/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface BytesLoadDemoProps {
@@ -35,54 +39,47 @@ function probeFormat(bytes: Uint8Array): string {
   return "unknown";
 }
 
-export const BytesLoadDemo: React.FC<BytesLoadDemoProps> = ({
-  showCode = true,
-}) => {
-  const [api, element] = useAlphaTab(() => {});
-  const [byteCount, setByteCount] = useState<number | null>(null);
-  const [format, setFormat] = useState<string>("");
-  const [scoreInfo, setScoreInfo] = useState<{
-    title: string;
-    tempo: number;
-    firstTrack: string;
-  } | null>(null);
+interface InnerProps {
+  byteCount: number | null;
+  setByteCount: (n: number | null) => void;
+  format: string;
+  setFormat: (f: string) => void;
+}
 
-  useAlphaTabEvent(api, "scoreLoaded", (score: alphaTab.model.Score) => {
-    setScoreInfo({
-      title: score.title || "(untitled)",
-      tempo: score.tempo,
-      firstTrack: score.tracks[0]?.name ?? "(none)",
-    });
-  });
+const Inner: React.FC<InnerProps> = ({
+  byteCount,
+  setByteCount,
+  format,
+  setFormat,
+}) => {
+  const api = useAlphaTabApi();
+  const state = useAlphaTabState();
+  const score = state.currentScore;
+  const scoreInfo = score
+    ? {
+        title: score.title || "(untitled)",
+        tempo: score.tempo,
+        firstTrack: score.tracks[0]?.name ?? "(none)",
+      }
+    : null;
 
   const runFetchAndLoad = useCallback(async () => {
     if (!api) {
       return;
     }
-    setScoreInfo(null);
     const buffer = await fetch(SOURCE_URL).then((r) => r.arrayBuffer());
     const bytes = new Uint8Array(buffer);
     setByteCount(bytes.byteLength);
     setFormat(probeFormat(bytes));
     api.load(bytes, [0]);
-  }, [api]);
+  }, [api, setByteCount, setFormat]);
 
   useEffect(() => {
-    runFetchAndLoad();
+    void runFetchAndLoad();
   }, [runFetchAndLoad]);
 
-  const code = `const bytes = new Uint8Array(
-  await fetch('/scores/song.gp').then((r) => r.arrayBuffer())
-);
-console.log(\`Fetched \${bytes.byteLength} bytes\`);
-
-api.load(bytes, [0]);
-api.scoreLoaded.on((score) => {
-  console.log(\`Loaded \${score.title}, tempo \${score.tempo}\`);
-});`;
-
   return (
-    <div className={styles.demo}>
+    <>
       <div className={styles.status}>
         {byteCount === null ? (
           <span>Fetching bytes…</span>
@@ -112,13 +109,43 @@ api.scoreLoaded.on((score) => {
         <button
           type="button"
           className="button button--sm button--secondary"
-          onClick={() => runFetchAndLoad()}
+          onClick={() => void runFetchAndLoad()}
           disabled={!api}
         >
           Reload from bytes
         </button>
       </div>
-      <div ref={element}></div>
+      <AlphaTabCanvas />
+    </>
+  );
+};
+
+export const BytesLoadDemo: React.FC<BytesLoadDemoProps> = ({
+  showCode = true,
+}) => {
+  const [byteCount, setByteCount] = useState<number | null>(null);
+  const [format, setFormat] = useState<string>("");
+
+  const code = `const bytes = new Uint8Array(
+  await fetch('/scores/song.gp').then((r) => r.arrayBuffer())
+);
+console.log(\`Fetched \${bytes.byteLength} bytes\`);
+
+api.load(bytes, [0]);
+api.scoreLoaded.on((score) => {
+  console.log(\`Loaded \${score.title}, tempo \${score.tempo}\`);
+});`;
+
+  return (
+    <div className={styles.demo}>
+      <AlphaTabPlayer player={false}>
+        <Inner
+          byteCount={byteCount}
+          setByteCount={setByteCount}
+          format={format}
+          setFormat={setFormat}
+        />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

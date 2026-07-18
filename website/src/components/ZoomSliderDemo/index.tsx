@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabControls,
+} from "@site/src/alphatab-react";
 
 export interface ZoomSliderDemoProps {
   showCode?: boolean;
@@ -16,6 +20,16 @@ const DEFAULT_TEX = `\\title "Zoom demo"
   :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1)
 `;
 
+function ApplyScale({ scale }: { scale: number }) {
+  const controls = useAlphaTabControls();
+  useEffect(() => {
+    if (controls) {
+      controls.setScale(scale);
+    }
+  }, [controls, scale]);
+  return null;
+}
+
 export const ZoomSliderDemo: React.FC<ZoomSliderDemoProps> = ({
   showCode = true,
   file,
@@ -24,28 +38,11 @@ export const ZoomSliderDemo: React.FC<ZoomSliderDemoProps> = ({
   const [scale, setScale] = useState(1.3);
   const [pendingScale, setPendingScale] = useState(1.3);
 
-  const [api, element] = useAlphaTab((s) => {
-    if (file) {
-      s.core.file = file;
-    } else {
-      s.core.tex = true;
-    }
-    s.display.scale = 1.3;
-  });
-
   // Debounce: only apply zoom after the user pauses moving the slider.
   useEffect(() => {
     const handle = window.setTimeout(() => setScale(pendingScale), 200);
     return () => window.clearTimeout(handle);
   }, [pendingScale]);
-
-  useEffect(() => {
-    if (api) {
-      api.settings.display.scale = scale;
-      api.updateSettings();
-      api.render();
-    }
-  }, [api, scale]);
 
   const code = `import * as alphaTab from '@coderline/alphatab';
 
@@ -61,6 +58,8 @@ slider.addEventListener('change', (event) => {
   api.updateSettings();
   api.render();
 });`;
+
+  const texContent = file ? undefined : tex ?? DEFAULT_TEX;
 
   return (
     <div>
@@ -100,13 +99,20 @@ slider.addEventListener('change', (event) => {
         </span>
       </div>
       <div
-        ref={element}
         style={{
           transition: "opacity 120ms ease",
           opacity: pendingScale === scale ? 1 : 0.6,
         }}
       >
-        {file ? undefined : tex ?? DEFAULT_TEX}
+        <AlphaTabPlayer
+          file={file}
+          tex={texContent}
+          player={false}
+          settings={{ display: { scale: 1.3 } }}
+        >
+          <ApplyScale scale={scale} />
+          <AlphaTabCanvas />
+        </AlphaTabPlayer>
       </div>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>

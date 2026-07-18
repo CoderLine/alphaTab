@@ -1,6 +1,12 @@
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
 import React, { useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 
 const SCORE_URL = "/files/features/Chords.gp5";
 
@@ -40,13 +46,12 @@ function walkBeats(
   }
 }
 
-export const MutateModelExample: React.FC = () => {
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = SCORE_URL;
-  });
+const MutateModelInner: React.FC = () => {
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
   const [ready, setReady] = useState(false);
 
-  useAlphaTabEvent(api, "scoreLoaded", () => {
+  useAlphaTabEvent("scoreLoaded", () => {
     setReady(true);
   });
 
@@ -77,11 +82,11 @@ export const MutateModelExample: React.FC = () => {
   };
 
   const boostVelocities = () => {
-    if (!api?.score) return;
+    if (!api?.score || !module) return;
     walkBeats(api.score, (beat) => {
       const next = Math.min(
-        alphaTab.model.DynamicValue.FFF,
-        (beat.dynamics ?? alphaTab.model.DynamicValue.MF) + 1,
+        module.model.DynamicValue.FFF,
+        (beat.dynamics ?? module.model.DynamicValue.MF) + 1,
       );
       beat.dynamics = next;
     });
@@ -95,7 +100,7 @@ export const MutateModelExample: React.FC = () => {
   };
 
   return (
-    <div>
+    <>
       <div
         style={{
           display: "flex",
@@ -121,7 +126,7 @@ export const MutateModelExample: React.FC = () => {
         <button
           className="button button--primary"
           onClick={boostVelocities}
-          disabled={!ready}
+          disabled={!ready || !module}
         >
           Boost velocities
         </button>
@@ -142,7 +147,17 @@ export const MutateModelExample: React.FC = () => {
       >
         Each button walks the six-level tree, mutates one field, and re-renders.
       </p>
-      <div ref={element}></div>
+      <AlphaTabCanvas />
+    </>
+  );
+};
+
+export const MutateModelExample: React.FC = () => {
+  return (
+    <div>
+      <AlphaTabPlayer file={SCORE_URL}>
+        <MutateModelInner />
+      </AlphaTabPlayer>
     </div>
   );
 };

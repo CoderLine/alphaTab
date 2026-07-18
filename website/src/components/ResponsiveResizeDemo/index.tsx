@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+} from "@site/src/alphatab-react";
 
 export interface ResponsiveResizeDemoProps {
   showCode?: boolean;
@@ -8,30 +12,44 @@ export interface ResponsiveResizeDemoProps {
   minWidth?: number;
 }
 
+function TrackContainerWidth({
+  containerRef,
+  onWidthChange,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  onWidthChange: (n: number) => void;
+}) {
+  // alphaTab attaches its own ResizeObserver to the mount element and reflows
+  // automatically when the outer frame changes size. This observer only feeds
+  // the width readout above the score.
+  const api = useAlphaTabApi();
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        onWidthChange(Math.round(entry.contentRect.width));
+      }
+      // Some browsers debounce the internal observer more aggressively; give
+      // alphaTab a nudge via its low-level resize hook when we know a change
+      // has happened.
+      api?.renderer.resizeRender();
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [containerRef, api, onWidthChange]);
+  return null;
+}
+
 export const ResponsiveResizeDemo: React.FC<ResponsiveResizeDemoProps> = ({
   showCode = true,
   file = "/files/features/Chords.gp5",
   minWidth = 400,
 }) => {
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = file;
-  });
-
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
   const [displayWidth, setDisplayWidth] = useState(0);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setDisplayWidth(Math.round(entry.contentRect.width));
-      }
-    });
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     if (!dragging) return;
@@ -90,7 +108,13 @@ api.resize.on((args) => {
           userSelect: dragging ? "none" : "auto",
         }}
       >
-        <div ref={element} style={{ minHeight: "200px" }} />
+        <AlphaTabPlayer file={file} player={false}>
+          <TrackContainerWidth
+            containerRef={containerRef}
+            onWidthChange={setDisplayWidth}
+          />
+          <AlphaTabCanvas />
+        </AlphaTabPlayer>
         <div
           onMouseDown={(e) => {
             e.preventDefault();

@@ -1,8 +1,14 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import React, { useCallback, useEffect, useState } from "react";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+    AlphaTabPlayer,
+    AlphaTabCanvas,
+    useAlphaTabApi,
+    useAlphaTabEvent,
+    useAlphaTabState,
+} from "@site/src/alphatab-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import styles from "./styles.module.scss";
@@ -14,78 +20,62 @@ export interface VisibilityBoundsDemoProps {
     showCode?: boolean;
 }
 
-export const VisibilityBoundsDemo: React.FC<VisibilityBoundsDemoProps> = ({
-    file,
-    tex,
-    showNoteHeadOverlay = false,
-}) => {
-    const scrollRef = useRef<HTMLDivElement>(null);
-
-    const [api, element] = useAlphaTab((s) => {
-        if (tex) {
-            s.core.tex = true;
-        } else if (file) {
-            s.core.file = file;
-        }
-        s.core.includeNoteBounds = true;
-        s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
-        s.player.scrollMode = alphaTab.ScrollMode.Continuous;
-        s.player.scrollOffsetY = -40;
-    });
-
-    useEffect(() => {
-        if (!api || !scrollRef.current) return;
-        api.settings.player.scrollElement = scrollRef.current;
-        api.updateSettings();
-    }, [api]);
-
-    const [includeNotes, setIncludeNotes] = useState(true);
-    const [currentBeat, setCurrentBeat] = useState<alphaTab.model.Beat | null>(
-        null
-    );
-    const [isVisible, setIsVisible] = useState<boolean | null>(null);
-    const [isPlaying, setPlaying] = useState(false);
-
-    useAlphaTabEvent(
-        api,
-        "playerStateChanged",
-        (args: alphaTab.synth.PlayerStateChangedEventArgs) => {
-            setPlaying(args.state === alphaTab.synth.PlayerState.Playing);
-        }
-    );
-
+function ApplyIncludeNoteBounds({ includeNotes }: { includeNotes: boolean }) {
+    const api = useAlphaTabApi();
     useEffect(() => {
         if (!api) return;
         api.settings.core.includeNoteBounds = includeNotes;
         api.updateSettings();
         api.render();
     }, [api, includeNotes]);
+    return null;
+}
+
+interface InnerProps {
+    showNoteHeadOverlay: boolean;
+}
+
+const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
+    const api = useAlphaTabApi();
+    const state = useAlphaTabState();
+    const [includeNotes, setIncludeNotes] = useState(true);
+    const [currentBeat, setCurrentBeat] = useState<alphaTab.model.Beat | null>(null);
+    const [isVisible, setIsVisible] = useState<boolean | null>(null);
+
+    // The bounded scroll wrapper is the AlphaTabCanvas's outer div — alphaTab
+    // assigns it to `settings.player.scrollElement` during API construction.
+    const getScroller = useCallback((): HTMLElement | null => {
+        if (!api) return null;
+        const el = api.settings.player.scrollElement;
+        return el instanceof HTMLElement ? el : null;
+    }, [api]);
 
     const checkVisible = useCallback(
         (beat: alphaTab.model.Beat): boolean => {
-            if (!api || !scrollRef.current) return false;
+            if (!api) return false;
+            const scroller = getScroller();
+            if (!scroller) return false;
             const lookup = api.renderer.boundsLookup;
             if (!lookup) return false;
             const bounds = lookup.findBeat(beat);
             if (!bounds) return false;
-            const scroller = scrollRef.current;
             const top = scroller.scrollTop;
             const bottom = top + scroller.clientHeight;
             const beatTop = bounds.realBounds.y;
             const beatBottom = beatTop + bounds.realBounds.h;
             return beatBottom > top && beatTop < bottom;
         },
-        [api]
+        [api, getScroller]
     );
 
-    useAlphaTabEvent(api, "playedBeatChanged", (beat: alphaTab.model.Beat) => {
+    useAlphaTabEvent("playedBeatChanged", (beat: alphaTab.model.Beat) => {
         setCurrentBeat(beat);
         setIsVisible(checkVisible(beat));
-    });
+    }, [checkVisible]);
 
     // Recompute visibility on scroll so the readout stays fresh.
     useEffect(() => {
-        const scroller = scrollRef.current;
+        const scroller = getScroller();
         if (!scroller) return;
         const onScroll = () => {
             if (currentBeat) {
@@ -94,11 +84,19 @@ export const VisibilityBoundsDemo: React.FC<VisibilityBoundsDemoProps> = ({
         };
         scroller.addEventListener("scroll", onScroll, { passive: true });
         return () => scroller.removeEventListener("scroll", onScroll);
-    }, [currentBeat, checkVisible]);
+    }, [api, currentBeat, checkVisible, getScroller]);
 
     const drawOverlay = useCallback(() => {
-        if (!api || !element.current) return;
-        const container = element.current;
+        if (!api) return;
+        const scroller = getScroller();
+        if (!scroller) return;
+        // alphaTab's mount lives inside `<div style="position: relative">`
+        // inside the scroll element. Use it as the overlay parent so the
+        // absolute-positioned rectangles line up with the SVG chunks.
+        const relative = scroller.querySelector<HTMLDivElement>(
+            ':scope > div[style*="position: relative"]'
+        );
+        const container = relative ?? scroller;
         let overlay = container.querySelector<HTMLDivElement>(".vb-overlay");
         if (!overlay) {
             container.style.position = "relative";
@@ -150,11 +148,11 @@ export const VisibilityBoundsDemo: React.FC<VisibilityBoundsDemoProps> = ({
                 }
             }
         }
-    }, [api, element, includeNotes]);
+    }, [api, includeNotes, getScroller]);
 
-    useAlphaTabEvent(api, "postRenderFinished", () => {
+    useAlphaTabEvent("postRenderFinished", () => {
         if (showNoteHeadOverlay) drawOverlay();
-    });
+    }, [showNoteHeadOverlay, drawOverlay]);
 
     useEffect(() => {
         if (showNoteHeadOverlay) drawOverlay();
@@ -175,13 +173,13 @@ export const VisibilityBoundsDemo: React.FC<VisibilityBoundsDemoProps> = ({
                 <button
                     className="button button--primary"
                     onClick={() => api?.playPause()}
-                    aria-label={isPlaying ? "Pause" : "Play"}
+                    aria-label={state.isPlaying ? "Pause" : "Play"}
                 >
-                    <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
+                    <FontAwesomeIcon icon={state.isPlaying ? solid.faPause : solid.faPlay} />
                 </button>
                 <button
                     className="button button--secondary"
-                    onClick={() => scrollRef.current?.scrollTo({ top: 0 })}
+                    onClick={() => getScroller()?.scrollTo({ top: 0 })}
                 >
                     Scroll away from cursor
                 </button>
@@ -212,9 +210,28 @@ export const VisibilityBoundsDemo: React.FC<VisibilityBoundsDemoProps> = ({
                     {visibleLabel}
                 </strong>
             </div>
-            <div className={styles.scroller} ref={scrollRef}>
-                <div ref={element}>{tex}</div>
-            </div>
+            <ApplyIncludeNoteBounds includeNotes={includeNotes} />
+            <AlphaTabCanvas className={styles.scroller} />
         </div>
+    );
+};
+
+export const VisibilityBoundsDemo: React.FC<VisibilityBoundsDemoProps> = ({
+    file,
+    tex,
+    showNoteHeadOverlay = false,
+}) => {
+    const settings: alphaTab.json.SettingsJson = {
+        core: { includeNoteBounds: true },
+        player: {
+            scrollMode: "Continuous",
+            scrollOffsetY: -40,
+        },
+    };
+
+    return (
+        <AlphaTabPlayer file={file} tex={tex} settings={settings}>
+            <Inner showNoteHeadOverlay={showNoteHeadOverlay} />
+        </AlphaTabPlayer>
     );
 };

@@ -2,8 +2,17 @@ import type { Settings } from '@coderline/alphatab';
 import type { ColorMode } from '@docusaurus/theme-common';
 import type { AlphaTabModule } from './module';
 
+/**
+ * Which opinionated defaults to lay down on top of alphaTab's factory
+ * settings. `landing` matches the marketing page's chrome (Noto fonts,
+ * dark-mode aware colors). `docs` gives feature demos a neutral baseline
+ * that lets alphaTab's own defaults shine.
+ */
+export type AlphaTabPreset = 'landing' | 'docs';
+
 export interface AlphaTabPlayerSettings {
     colorMode: ColorMode;
+    preset?: AlphaTabPreset;
 }
 
 export function applyAlphaTabSettings(
@@ -11,6 +20,8 @@ export function applyAlphaTabSettings(
     settings: Settings,
     options: AlphaTabPlayerSettings,
 ): void {
+    const preset = options.preset ?? 'docs';
+
     settings.core.fontDirectory = '/font/';
     settings.player.soundFont = '/soundfont/sonivox.sf3';
     settings.player.scrollMode = module.ScrollMode.Off;
@@ -26,7 +37,9 @@ export function applyAlphaTabSettings(
     }
 
     applyThemeColors(module, settings, options.colorMode);
-    applyFontFamily(settings);
+    if (preset === 'landing') {
+        applyFontFamily(settings);
+    }
 }
 
 export function applyTheme(module: AlphaTabModule, settings: Settings, colorMode: ColorMode): void {

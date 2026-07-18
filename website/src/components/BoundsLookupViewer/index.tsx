@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
+import React, { useCallback, useEffect, useState } from "react";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 import styles from "./styles.module.scss";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
 
 enum GuideType {
   VisualBounds = 0,
@@ -21,33 +27,40 @@ export interface BoundsLookupViewerProps {
   children: string | React.ReactElement;
 }
 
-export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
-  children,
-}) => {
-  const [api, element] = useAlphaTab((s)=>{
-    s.core.tex = true;
-    s.core.tracks = "all";
-    s.core.includeNoteBounds = true;
-  });
+interface InnerProps {
+  selectedType: GuideType;
+  selectedElements: GuideElements;
+}
 
-  useAlphaTabEvent(api, "postRenderFinished", () => {
-    updateVisualGuides();
-  });
+/**
+ * Draws the bounds-lookup overlay on top of the rendered score after every
+ * layout pass. Uses the alphaTab mount element as the overlay parent so the
+ * absolute-positioned rectangles line up with the SVG chunks.
+ */
+const Overlay: React.FC<InnerProps> = ({ selectedType, selectedElements }) => {
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
 
-  const [selectedType, setSelectedType] = useState(GuideType.VisualBounds);
-  const [selectedElements, setSelectedElements] = useState(
-    GuideElements.StaffSystems
-  );
+  const getMountElement = useCallback((): HTMLElement | null => {
+    if (!api) return null;
+    const scroller = api.settings.player.scrollElement;
+    if (!(scroller instanceof HTMLElement)) return null;
+    // alphaTab's mount sits inside `<div style="position: relative">` inside
+    // the scroll wrapper (see AlphaTabCanvas).
+    const relative = scroller.querySelector<HTMLDivElement>(
+      ':scope > div[style*="position: relative"]'
+    );
+    return relative ?? scroller;
+  }, [api]);
 
-  const updateVisualGuides = () => {
-    if(!api) {
-      return;
-    }
+  const updateVisualGuides = useCallback(() => {
+    if (!api || !module) return;
+    const container = getMountElement();
+    if (!container) return;
 
-    const container = element.current;
-    let guidesWrapper = container!.querySelector<HTMLDivElement>(".at-guides");
+    let guidesWrapper = container.querySelector<HTMLDivElement>(".at-guides");
     if (!guidesWrapper) {
-      container!.style.position = "relative";
+      container.style.position = "relative";
       guidesWrapper = document.createElement("div");
       guidesWrapper.classList.add("at-guides");
       guidesWrapper.style.position = "absolute";
@@ -58,19 +71,23 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
       guidesWrapper.style.left = "0";
       guidesWrapper.style.right = "0";
       guidesWrapper.style.bottom = "0";
-      container!.insertBefore(guidesWrapper, container!.firstChild);
+      container.insertBefore(guidesWrapper, container.firstChild);
     } else {
       guidesWrapper.innerHTML = "";
     }
 
     if (api.renderer.boundsLookup) {
-      createStaveGroupGuides(guidesWrapper, api!.renderer.boundsLookup);
+      createStaveGroupGuides(guidesWrapper, api.renderer.boundsLookup);
     }
-  };
+  }, [api, module, getMountElement, selectedType, selectedElements]);
+
+  useAlphaTabEvent("postRenderFinished", () => {
+    updateVisualGuides();
+  }, [updateVisualGuides]);
 
   useEffect(() => {
     updateVisualGuides();
-  }, [selectedType, selectedElements]);
+  }, [updateVisualGuides]);
 
   const createStaveGroupGuides = (
     wrapper: HTMLDivElement,
@@ -115,9 +132,10 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
     wrapper: HTMLDivElement,
     bar: alphaTab.rendering.BarBounds
   ) => {
+    if (!module) return;
     for (const beat of bar.beats) {
-      if(selectedElements === GuideElements.BeatTime) {
-        const bounds = new alphaTab.rendering.Bounds();
+      if (selectedElements === GuideElements.BeatTime) {
+        const bounds = new module.rendering.Bounds();
         bounds.x = beat.onNotesX;
         bounds.y = beat.realBounds.y;
         bounds.w = 2;
@@ -178,6 +196,17 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
     return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255},${alpha})`;
   };
 
+  return null;
+};
+
+export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
+  children,
+}) => {
+  const [selectedType, setSelectedType] = useState(GuideType.VisualBounds);
+  const [selectedElements, setSelectedElements] = useState(
+    GuideElements.StaffSystems
+  );
+
   const typeClass = (ownType: GuideType) => {
     return ownType === selectedType ? " pills__item--active" : "";
   };
@@ -185,6 +214,8 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
   const elementClass = (ownElements: GuideElements) => {
     return ownElements === selectedElements ? " pills__item--active" : "";
   };
+
+  const tex = typeof children === "string" ? children : undefined;
 
   return (
     <>
@@ -236,7 +267,7 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
             onClick={() => setSelectedElements(GuideElements.BeatTime)}
           >
             Beat Time
-          </li>          
+          </li>
           <li
             className={`pills__item ${elementClass(GuideElements.Notes)}`}
             onClick={() => setSelectedElements(GuideElements.Notes)}
@@ -245,7 +276,18 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
           </li>
         </ul>
       </div>
-      <div ref={element}>{children}</div>
+      <AlphaTabPlayer
+        tex={tex}
+        tracks="all"
+        player={false}
+        settings={{ core: { includeNoteBounds: true } }}
+      >
+        <Overlay
+          selectedType={selectedType}
+          selectedElements={selectedElements}
+        />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
     </>
   );
 };

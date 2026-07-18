@@ -1,10 +1,38 @@
 import React, { useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabControls,
+} from "@site/src/alphatab-react";
 
 export interface SpacingSlidersDemoProps {
   showCode?: boolean;
   file?: string;
+}
+
+function ApplySpacing({
+  stretchForce,
+  spacingRatio,
+  lastSystemFillThreshold,
+}: {
+  stretchForce: number;
+  spacingRatio: number;
+  lastSystemFillThreshold: number;
+}) {
+  const controls = useAlphaTabControls();
+  useEffect(() => {
+    if (controls) {
+      controls.updateSettings({
+        display: {
+          stretchForce,
+          spacingRatio,
+          lastSystemFillThreshold,
+        },
+      });
+    }
+  }, [controls, stretchForce, spacingRatio, lastSystemFillThreshold]);
+  return null;
 }
 
 export const SpacingSlidersDemo: React.FC<SpacingSlidersDemoProps> = ({
@@ -14,23 +42,6 @@ export const SpacingSlidersDemo: React.FC<SpacingSlidersDemoProps> = ({
   const [stretchForce, setStretchForce] = useState(1.2);
   const [spacingRatio, setSpacingRatio] = useState(1.5);
   const [lastSystemFillThreshold, setLastSystemFillThreshold] = useState(0.5);
-
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = file;
-    s.display.stretchForce = 1.2;
-    s.display.spacingRatio = 1.5;
-    s.display.lastSystemFillThreshold = 0.5;
-  });
-
-  useEffect(() => {
-    if (api) {
-      api.settings.display.stretchForce = stretchForce;
-      api.settings.display.spacingRatio = spacingRatio;
-      api.settings.display.lastSystemFillThreshold = lastSystemFillThreshold;
-      api.updateSettings();
-      api.render();
-    }
-  }, [api, stretchForce, spacingRatio, lastSystemFillThreshold]);
 
   const code = `import * as alphaTab from '@coderline/alphatab';
 
@@ -117,7 +128,24 @@ const api = new alphaTab.AlphaTabApi(container, {
           </span>
         </div>
       </div>
-      <div ref={element} />
+      <AlphaTabPlayer
+        file={file}
+        player={false}
+        settings={{
+          display: {
+            stretchForce: 1.2,
+            spacingRatio: 1.5,
+            lastSystemFillThreshold: 0.5,
+          },
+        }}
+      >
+        <ApplySpacing
+          stretchForce={stretchForce}
+          spacingRatio={spacingRatio}
+          lastSystemFillThreshold={lastSystemFillThreshold}
+        />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

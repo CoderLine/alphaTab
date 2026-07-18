@@ -1,8 +1,12 @@
 'use client';
 
-import * as alphaTab from '@coderline/alphatab';
 import React, { useState, useEffect } from 'react';
-import { TransportControls } from './TransportControls';
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabControls,
+} from '@site/src/alphatab-react';
+import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
 export interface VolumeMixDemoProps {
@@ -11,27 +15,23 @@ export interface VolumeMixDemoProps {
   showCode?: boolean;
 }
 
-export const VolumeMixDemo: React.FC<VolumeMixDemoProps> = ({
-  file,
-  tex,
-  showCode = true,
-}) => {
-  const [api, setApi] = useState<alphaTab.AlphaTabApi>();
+const VolumeMixControls: React.FC = () => {
+  const controls = useAlphaTabControls();
   const [master, setMaster] = useState(1);
   const [metronome, setMetronome] = useState(0.3);
   const [countIn, setCountIn] = useState(0.7);
 
   useEffect(() => {
-    if (api) api.masterVolume = master;
-  }, [api, master]);
+    controls?.setMasterVolume(master);
+  }, [controls, master]);
 
   useEffect(() => {
-    if (api) api.metronomeVolume = metronome;
-  }, [api, metronome]);
+    controls?.setMetronomeVolume(metronome);
+  }, [controls, metronome]);
 
   useEffect(() => {
-    if (api) api.countInVolume = countIn;
-  }, [api, countIn]);
+    controls?.setCountInVolume(countIn);
+  }, [controls, countIn]);
 
   const slider = (label: string, val: number, set: (v: number) => void, id: string) => (
     <div className={styles.field}>
@@ -52,18 +52,21 @@ export const VolumeMixDemo: React.FC<VolumeMixDemoProps> = ({
   );
 
   return (
-    <TransportControls
-      file={file}
-      tex={tex}
-      showCode={showCode}
-      onApi={setApi}
-      renderExtras={() => (
-        <>
-          {slider('Master volume', master, setMaster, 'vol-master')}
-          {slider('Metronome volume', metronome, setMetronome, 'vol-metronome')}
-          {slider('Count-in volume', countIn, setCountIn, 'vol-countin')}
-        </>
-      )}
-    />
+    <div className={styles.extras}>
+      {slider('Master volume', master, setMaster, 'vol-master')}
+      {slider('Metronome volume', metronome, setMetronome, 'vol-metronome')}
+      {slider('Count-in volume', countIn, setCountIn, 'vol-countin')}
+    </div>
   );
 };
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const VolumeMixDemo: React.FC<VolumeMixDemoProps> = ({ file, tex, showCode = true }) => (
+  <div className={styles.wrapper}>
+    <AlphaTabPlayer file={file} tex={tex}>
+      <TransportBar />
+      <VolumeMixControls />
+      <AlphaTabCanvas />
+    </AlphaTabPlayer>
+  </div>
+);

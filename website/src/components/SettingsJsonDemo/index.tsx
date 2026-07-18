@@ -1,101 +1,19 @@
-import * as alphaTab from "@coderline/alphatab";
-import React, { useEffect, useState } from "react";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import React, { useCallback, useEffect, useState } from "react";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 export interface SettingsJsonDemoProps {
   showCode?: boolean;
 }
 
-const layoutModeOptions: {
-  label: string;
-  value: alphaTab.LayoutMode;
-}[] = [
-  { label: "Page", value: alphaTab.LayoutMode.Page },
-  { label: "Horizontal", value: alphaTab.LayoutMode.Horizontal },
-  { label: "Parchment", value: alphaTab.LayoutMode.Parchment },
-];
-
-export const SettingsJsonDemo: React.FC<SettingsJsonDemoProps> = ({
-  showCode = true,
-}) => {
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = "/files/features/Chords.gp5";
-    s.display.scale = 1.0;
-    s.player.playerMode = alphaTab.PlayerMode.Disabled;
-    s.player.scrollMode = alphaTab.ScrollMode.Off;
-    s.player.enableCursor = false;
-    s.player.enableUserInteraction = false;
-  });
-
-  const [layoutMode, setLayoutMode] = useState<alphaTab.LayoutMode>(
-    alphaTab.LayoutMode.Page,
-  );
-  const [scale, setScale] = useState<number>(1.0);
-  const [json, setJson] = useState<string>("");
-  const [copyStatus, setCopyStatus] = useState<string>();
-
-  function refreshJson(current: alphaTab.AlphaTabApi) {
-    try {
-      setJson(alphaTab.model.JsonConverter.settingsToJson(current.settings));
-    } catch (e) {
-      console.error("Could not serialize settings", e);
-    }
-  }
-
-  // Initial render of the JSON blob once the api is ready.
-  useAlphaTabEvent(api, "scoreLoaded", () => {
-    if (api) {
-      refreshJson(api);
-    }
-  });
-
-  useEffect(() => {
-    if (!api) {
-      return;
-    }
-    api.settings.display.layoutMode = layoutMode;
-    api.settings.display.scale = scale;
-    api.updateSettings();
-    api.render();
-    refreshJson(api);
-  }, [api, layoutMode, scale]);
-
-  function resetFromJson() {
-    if (!api) {
-      return;
-    }
-    try {
-      const restored = alphaTab.model.JsonConverter.jsonToSettings(json);
-      api.settings = restored;
-      api.updateSettings();
-      api.render();
-      setLayoutMode(restored.display.layoutMode);
-      setScale(restored.display.scale);
-      refreshJson(api);
-    } catch (e) {
-      console.error("Could not parse settings JSON", e);
-      alert(
-        "Could not parse the settings JSON, check the browser logs for details",
-      );
-    }
-  }
-
-  async function copyToClipboard() {
-    if (!json) {
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(json);
-      setCopyStatus("Copied");
-      window.setTimeout(() => setCopyStatus(undefined), 1500);
-    } catch (e) {
-      console.error("Clipboard write failed", e);
-      setCopyStatus("Copy failed");
-    }
-  }
-
-  const code = `import * as alphaTab from '@coderline/alphatab';
+const codeSample = `import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
@@ -125,6 +43,95 @@ document.querySelector('#reset').addEventListener('click', () => {
   api.render();
 });`;
 
+const SettingsJsonInner: React.FC = () => {
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
+
+  const layoutModeOptions = React.useMemo(() => {
+    if (!module) return [] as { label: string; value: alphaTab.LayoutMode }[];
+    return [
+      { label: "Page", value: module.LayoutMode.Page },
+      { label: "Horizontal", value: module.LayoutMode.Horizontal },
+      { label: "Parchment", value: module.LayoutMode.Parchment },
+    ];
+  }, [module]);
+
+  const [layoutMode, setLayoutMode] = useState<alphaTab.LayoutMode | null>(null);
+  const [scale, setScale] = useState<number>(1.0);
+  const [json, setJson] = useState<string>("");
+  const [copyStatus, setCopyStatus] = useState<string>();
+
+  // Initialize layoutMode default once the module is loaded.
+  useEffect(() => {
+    if (module && layoutMode === null) {
+      setLayoutMode(module.LayoutMode.Page);
+    }
+  }, [module, layoutMode]);
+
+  const refreshJson = useCallback(
+    (current: alphaTab.AlphaTabApi) => {
+      if (!module) return;
+      try {
+        setJson(module.model.JsonConverter.settingsToJson(current.settings));
+      } catch (e) {
+        console.error("Could not serialize settings", e);
+      }
+    },
+    [module],
+  );
+
+  // Initial render of the JSON blob once the api is ready.
+  useAlphaTabEvent("scoreLoaded", () => {
+    if (api) {
+      refreshJson(api);
+    }
+  }, [api, refreshJson]);
+
+  useEffect(() => {
+    if (!api || layoutMode === null) {
+      return;
+    }
+    api.settings.display.layoutMode = layoutMode;
+    api.settings.display.scale = scale;
+    api.updateSettings();
+    api.render();
+    refreshJson(api);
+  }, [api, layoutMode, scale, refreshJson]);
+
+  function resetFromJson() {
+    if (!api || !module) {
+      return;
+    }
+    try {
+      const restored = module.model.JsonConverter.jsonToSettings(json);
+      api.settings = restored;
+      api.updateSettings();
+      api.render();
+      setLayoutMode(restored.display.layoutMode);
+      setScale(restored.display.scale);
+      refreshJson(api);
+    } catch (e) {
+      console.error("Could not parse settings JSON", e);
+      alert(
+        "Could not parse the settings JSON, check the browser logs for details",
+      );
+    }
+  }
+
+  async function copyToClipboard() {
+    if (!json) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(json);
+      setCopyStatus("Copied");
+      window.setTimeout(() => setCopyStatus(undefined), 1500);
+    } catch (e) {
+      console.error("Clipboard write failed", e);
+      setCopyStatus("Copy failed");
+    }
+  }
+
   const controlRowStyle: React.CSSProperties = {
     display: "flex",
     flexWrap: "wrap",
@@ -145,7 +152,7 @@ document.querySelector('#reset').addEventListener('click', () => {
   };
 
   return (
-    <div>
+    <>
       <div style={controlRowStyle}>
         <div style={knobStyle}>
           <label htmlFor="settings-json-layout-mode" style={{ fontWeight: 600 }}>
@@ -153,8 +160,9 @@ document.querySelector('#reset').addEventListener('click', () => {
           </label>
           <select
             id="settings-json-layout-mode"
-            value={layoutMode}
+            value={layoutMode ?? ""}
             onChange={(e) => setLayoutMode(Number(e.target.value))}
+            disabled={!module}
           >
             {layoutModeOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -188,7 +196,7 @@ document.querySelector('#reset').addEventListener('click', () => {
           </span>
         </div>
       </div>
-      <div ref={element} />
+      <AlphaTabCanvas />
       <div
         style={{
           display: "flex",
@@ -242,7 +250,23 @@ document.querySelector('#reset').addEventListener('click', () => {
         }}
         placeholder="Live settings JSON will appear here."
       />
-      {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
+    </>
+  );
+};
+
+export const SettingsJsonDemo: React.FC<SettingsJsonDemoProps> = ({
+  showCode = true,
+}) => {
+  return (
+    <div>
+      <AlphaTabPlayer
+        file="/files/features/Chords.gp5"
+        player={false}
+        settings={{ display: { scale: 1.0 } }}
+      >
+        <SettingsJsonInner />
+      </AlphaTabPlayer>
+      {showCode ? <CodeBlock language="js">{codeSample}</CodeBlock> : null}
     </div>
   );
 };

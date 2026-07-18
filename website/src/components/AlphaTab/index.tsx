@@ -1,70 +1,44 @@
-import * as alphaTab from "@coderline/alphatab";
-import environment from "@site/src/environment";
-import React, { useState } from "react";
-import styles from "./styles.module.scss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as solid from "@fortawesome/free-solid-svg-icons";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import React from 'react';
+import type * as alphaTab from '@coderline/alphatab';
+import { AlphaTabScore } from '@site/src/alphatab-react';
 
 export interface AlphaTabProps {
-  settings?: alphaTab.json.SettingsJson;
   file?: string;
-  tracks?: number[] | "all";
-  tex: boolean;
-  children: string | React.ReactElement;
+  tex?: boolean | string;
+  tracks?: number[] | 'all';
+  settings?: alphaTab.json.SettingsJson;
   player?: boolean;
+  children?: string | React.ReactElement;
 }
 
+/**
+ * Backwards-compatible shim over `<AlphaTabScore>`. MDX pages import
+ * `<AlphaTab>` and pass alphaTex either as a string via `tex="..."` or
+ * flagged as `tex={true}` with the source as children. Both forms are
+ * normalized into the modern `AlphaTabScore` `tex` prop.
+ */
 export const AlphaTab: React.FC<AlphaTabProps> = ({
-  settings,
   file,
-  tracks,
   tex,
-  children,
+  tracks,
+  settings,
   player,
+  children,
 }) => {
-  const [api, element] = useAlphaTab((s) => {
-    if (file) {
-      s.core.file = file;
-    }
-    if (tex) {
-      s.core.tex = true;
-    }
-    if (tracks) {
-      s.core.tracks = tracks;
-    }
-
-    if (player) {
-      s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
-      s.player.scrollOffsetY = -50;
-      s.player.scrollMode = alphaTab.ScrollMode.Off;
-    }
-
-    if (settings) {
-      s.fillFromJson(settings);
-    }
-  });
-  const [isPlaying, setPlaying] = useState(false);
-
-  useAlphaTabEvent(
-    api,
-    "playerStateChanged",
-    (args: alphaTab.synth.PlayerStateChangedEventArgs) => {
-      setPlaying(args.state == alphaTab.synth.PlayerState.Playing);
-    }
-  );
+  const texContent =
+    typeof tex === 'string'
+      ? tex
+      : tex && typeof children === 'string'
+        ? children
+        : undefined;
 
   return (
-    <div className={styles.wrapper}>
-      {player && (
-        <button
-          className="button button--primary"
-          onClick={() => api?.playPause()}
-        >
-          <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
-        </button>
-      )}
-      <div ref={element}>{children}</div>
-    </div>
+    <AlphaTabScore
+      file={file}
+      tex={texContent}
+      tracks={tracks}
+      settings={settings}
+      player={player ?? false}
+    />
   );
 };

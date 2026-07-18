@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 type Placement = "Top" | "Inline";
@@ -9,35 +14,32 @@ export interface ChordDiagramLayoutSwitchProps {
   showCode?: boolean;
 }
 
+function ApplyPlacement({ placement }: { placement: Placement }) {
+  const api = useAlphaTabApi();
+  const apply = (score: alphaTab.model.Score, p: Placement) => {
+    score.stylesheet.globalDisplayChordDiagramsOnTop = p === "Top";
+    score.stylesheet.globalDisplayChordDiagramsInScore = p === "Inline";
+  };
+  useAlphaTabEvent(
+    "scoreLoaded",
+    (score: alphaTab.model.Score) => {
+      apply(score, placement);
+    },
+    [placement]
+  );
+  useEffect(() => {
+    if (api && api.score) {
+      apply(api.score, placement);
+      api.render();
+    }
+  }, [placement, api]);
+  return null;
+}
+
 export const ChordDiagramLayoutSwitch: React.FC<
   ChordDiagramLayoutSwitchProps
 > = ({ showCode = true }) => {
   const [placement, setPlacement] = useState<Placement>("Top");
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = "/files/features/Chords.gp5";
-    s.display.barCount = 12;
-  });
-
-  const applyPlacement = (score: alphaTab.model.Score, p: Placement) => {
-    score.stylesheet.globalDisplayChordDiagramsOnTop = p === "Top";
-    score.stylesheet.globalDisplayChordDiagramsInScore = p === "Inline";
-  };
-
-  useAlphaTabEvent(
-    api,
-    "scoreLoaded",
-    (score: alphaTab.model.Score) => {
-      applyPlacement(score, placement);
-    },
-    [placement]
-  );
-
-  useEffect(() => {
-    if (api && api.score) {
-      applyPlacement(api.score, placement);
-      api.render();
-    }
-  }, [placement, api]);
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.globalDisplayChordDiagramsOnTop = ${placement === "Top"};
@@ -65,7 +67,14 @@ export const ChordDiagramLayoutSwitch: React.FC<
           </li>
         ))}
       </ul>
-      <div ref={element}></div>
+      <AlphaTabPlayer
+        file="/files/features/Chords.gp5"
+        player={false}
+        settings={{ display: { barCount: 12 } }}
+      >
+        <ApplyPlacement placement={placement} />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

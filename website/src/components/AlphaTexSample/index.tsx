@@ -3,8 +3,7 @@
 import React from "react";
 import CodeBlock from "@theme/CodeBlock";
 import { AlphaTab } from "../AlphaTab";
-import * as alphaTab from "@coderline/alphatab";
-import {useDoc} from '@docusaurus/plugin-content-docs/client';
+import type * as alphaTab from "@coderline/alphatab";
 
 export interface AlphaTexSampleProps {
   tracks?: number[] | "all";

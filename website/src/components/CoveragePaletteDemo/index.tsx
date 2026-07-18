@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabControls,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 type Field =
@@ -30,41 +35,29 @@ export interface CoveragePaletteDemoProps {
   showCode?: boolean;
 }
 
+function ApplyPalette({ palette }: { palette: PaletteState }) {
+  const api = useAlphaTabApi();
+  const controls = useAlphaTabControls();
+  const module = useAlphaTabModule();
+  useEffect(() => {
+    if (!api || !controls || !module) return;
+    const r = api.settings.display.resources;
+    r.mainGlyphColor = module.model.Color.fromJson(palette.mainGlyphColor)!;
+    r.staffLineColor = module.model.Color.fromJson(palette.staffLineColor)!;
+    r.barSeparatorColor = module.model.Color.fromJson(
+      palette.barSeparatorColor
+    )!;
+    r.barNumberColor = module.model.Color.fromJson(palette.barNumberColor)!;
+    r.scoreInfoColor = module.model.Color.fromJson(palette.scoreInfoColor)!;
+    controls.updateSettings();
+  }, [api, controls, module, palette]);
+  return null;
+}
+
 export const CoveragePaletteDemo: React.FC<CoveragePaletteDemoProps> = ({
   showCode = true,
 }) => {
   const [palette, setPalette] = useState<PaletteState>(initial);
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = "/files/features/Chords.gp5";
-    s.display.resources.mainGlyphColor =
-      alphaTab.model.Color.fromJson(initial.mainGlyphColor)!;
-    s.display.resources.staffLineColor =
-      alphaTab.model.Color.fromJson(initial.staffLineColor)!;
-    s.display.resources.barSeparatorColor =
-      alphaTab.model.Color.fromJson(initial.barSeparatorColor)!;
-    s.display.resources.barNumberColor =
-      alphaTab.model.Color.fromJson(initial.barNumberColor)!;
-    s.display.resources.scoreInfoColor =
-      alphaTab.model.Color.fromJson(initial.scoreInfoColor)!;
-  });
-
-  useEffect(() => {
-    if (api) {
-      const r = api.settings.display.resources;
-      r.mainGlyphColor =
-        alphaTab.model.Color.fromJson(palette.mainGlyphColor)!;
-      r.staffLineColor =
-        alphaTab.model.Color.fromJson(palette.staffLineColor)!;
-      r.barSeparatorColor =
-        alphaTab.model.Color.fromJson(palette.barSeparatorColor)!;
-      r.barNumberColor =
-        alphaTab.model.Color.fromJson(palette.barNumberColor)!;
-      r.scoreInfoColor =
-        alphaTab.model.Color.fromJson(palette.scoreInfoColor)!;
-      api.updateSettings();
-      api.render();
-    }
-  }, [palette, api]);
 
   const set = (key: Field, value: string) => {
     setPalette((p) => ({ ...p, [key]: value }));
@@ -129,7 +122,24 @@ export const CoveragePaletteDemo: React.FC<CoveragePaletteDemoProps> = ({
           </label>
         ))}
       </div>
-      <div ref={element}></div>
+      <AlphaTabPlayer
+        file="/files/features/Chords.gp5"
+        player={false}
+        settings={{
+          display: {
+            resources: {
+              mainGlyphColor: initial.mainGlyphColor,
+              staffLineColor: initial.staffLineColor,
+              barSeparatorColor: initial.barSeparatorColor,
+              barNumberColor: initial.barNumberColor,
+              scoreInfoColor: initial.scoreInfoColor,
+            },
+          },
+        }}
+      >
+        <ApplyPalette palette={palette} />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

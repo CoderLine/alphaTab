@@ -1,9 +1,15 @@
 'use client';
 
-import * as alphaTab from '@coderline/alphatab';
 import React, { useState, useEffect } from 'react';
-import { TransportControls } from './TransportControls';
-import { useAlphaTabEvent } from '@site/src/hooks';
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabControls,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+  useAlphaTabModule,
+} from '@site/src/alphatab-react';
+import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
 export interface CountInMetronomeDemoProps {
@@ -14,93 +20,93 @@ export interface CountInMetronomeDemoProps {
 
 type PlaybackPhase = 'Stopped' | 'Count-in bar' | 'Playing' | 'Paused';
 
-export const CountInMetronomeDemo: React.FC<CountInMetronomeDemoProps> = ({
-  file,
-  tex,
-  showCode = true,
-}) => {
-  const [api, setApi] = useState<alphaTab.AlphaTabApi>();
+const CountInControls: React.FC = () => {
+  const controls = useAlphaTabControls();
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
   const [countIn, setCountIn] = useState(true);
   const [metronome, setMetronome] = useState(false);
   const [phase, setPhase] = useState<PlaybackPhase>('Stopped');
-  const [playerState, setPlayerState] = useState<alphaTab.synth.PlayerState>(
-    alphaTab.synth.PlayerState.Paused,
-  );
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    if (api) api.countInVolume = countIn ? 0.7 : 0;
-  }, [api, countIn]);
+    controls?.setCountInVolume(countIn ? 0.7 : 0);
+  }, [controls, countIn]);
 
   useEffect(() => {
-    if (api) api.metronomeVolume = metronome ? 0.7 : 0;
-  }, [api, metronome]);
+    controls?.setMetronomeVolume(metronome ? 0.7 : 0);
+  }, [controls, metronome]);
 
   useAlphaTabEvent(
-    api,
     'playerStateChanged',
-    (e: alphaTab.synth.PlayerStateChangedEventArgs) => {
-      setPlayerState(e.state);
+    (e) => {
+      if (!module) return;
+      const isPlaying = e.state === module.synth.PlayerState.Playing;
+      setPlaying(isPlaying);
       if (e.stopped) {
         setPhase('Stopped');
-      } else if (e.state === alphaTab.synth.PlayerState.Paused) {
+      } else if (!isPlaying) {
         setPhase('Paused');
       }
     },
+    [module],
   );
 
   // A negative currentTick means the count-in bar is currently playing.
   useAlphaTabEvent(
-    api,
     'playerPositionChanged',
-    (e: alphaTab.synth.PositionChangedEventArgs) => {
-      if (playerState === alphaTab.synth.PlayerState.Playing) {
+    (e) => {
+      if (playing) {
         setPhase(e.currentTick < 0 ? 'Count-in bar' : 'Playing');
       }
     },
-    [playerState],
+    [playing],
   );
 
   const restart = () => {
-    if (!api) return;
-    api.stop();
+    if (!controls) return;
+    controls.stop();
     // Give the player a beat to reset before pressing play again.
-    window.setTimeout(() => api.playPause(), 50);
+    window.setTimeout(() => controls.playPause(), 50);
   };
 
   return (
-    <TransportControls
-      file={file}
-      tex={tex}
-      showCode={showCode}
-      onApi={setApi}
-      renderExtras={() => (
-        <>
-          <label className={styles.fieldRow}>
-            <input
-              type="checkbox"
-              checked={countIn}
-              onChange={(e) => setCountIn(e.target.checked)}
-            />
-            One-bar count-in
-          </label>
-          <label className={styles.fieldRow}>
-            <input
-              type="checkbox"
-              checked={metronome}
-              onChange={(e) => setMetronome(e.target.checked)}
-            />
-            Metronome during playback
-          </label>
-          <button
-            className={styles.mixerBtn}
-            onClick={restart}
-            disabled={!api}
-          >
-            Restart from top
-          </button>
-          <span className={styles.badge}>Playback state: {phase}</span>
-        </>
-      )}
-    />
+    <div className={styles.extras}>
+      <label className={styles.fieldRow}>
+        <input
+          type="checkbox"
+          checked={countIn}
+          onChange={(e) => setCountIn(e.target.checked)}
+        />
+        One-bar count-in
+      </label>
+      <label className={styles.fieldRow}>
+        <input
+          type="checkbox"
+          checked={metronome}
+          onChange={(e) => setMetronome(e.target.checked)}
+        />
+        Metronome during playback
+      </label>
+      <button className={styles.mixerBtn} onClick={restart} disabled={!api}>
+        Restart from top
+      </button>
+      <span className={styles.badge}>Playback state: {phase}</span>
+    </div>
   );
 };
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const CountInMetronomeDemo: React.FC<CountInMetronomeDemoProps> = ({
+  file,
+  tex,
+  showCode = true,
+}) => (
+  <div className={styles.wrapper}>
+    <AlphaTabPlayer file={file} tex={tex}>
+      <TransportBar />
+      <CountInControls />
+      <AlphaTabCanvas />
+    </AlphaTabPlayer>
+  </div>
+);

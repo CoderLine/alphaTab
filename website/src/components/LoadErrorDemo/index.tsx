@@ -1,7 +1,14 @@
 import React, { useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
+import type * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+  useAlphaTabModule,
+  useAlphaTabState,
+} from "@site/src/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface LoadErrorDemoProps {
@@ -19,49 +26,82 @@ const WRONG_URL = "/files/does-not-exist.gp";
 const WRONG_FORMAT_URL = "/files/sonivox_musescore.sf2";
 const BAD_TEX = '\\title unterminated :garbage';
 
-function classifyErrorType(err: unknown): string {
+function classifyErrorType(
+  err: unknown,
+  AlphaTabErrorType: typeof alphaTab.AlphaTabErrorType | null,
+): string {
   const type = (err as { type?: unknown } | null)?.type;
   if (typeof type !== "number") {
     return "unknown";
   }
-  const name = alphaTab.AlphaTabErrorType[type as alphaTab.AlphaTabErrorType];
+  if (!AlphaTabErrorType) {
+    return String(type);
+  }
+  const name =
+    AlphaTabErrorType[type as alphaTab.AlphaTabErrorType];
   return typeof name === "string" ? name : String(type);
 }
 
-function classifyError(err: unknown): ErrorRecord {
-  const asError = err as { constructor?: { name?: string }; message?: string } | null;
+function classifyError(
+  err: unknown,
+  AlphaTabErrorType: typeof alphaTab.AlphaTabErrorType | null,
+): ErrorRecord {
+  const asError = err as {
+    constructor?: { name?: string };
+    message?: string;
+  } | null;
   return {
     className: asError?.constructor?.name ?? "Error",
     message: asError?.message ?? String(err),
-    typeName: classifyErrorType(err),
+    typeName: classifyErrorType(err, AlphaTabErrorType),
   };
 }
 
-export const LoadErrorDemo: React.FC<LoadErrorDemoProps> = ({
-  showCode = true,
+interface InnerProps {
+  record: ErrorRecord | null;
+  setRecord: (r: ErrorRecord | null) => void;
+  success: string | null;
+  setSuccess: (s: string | null) => void;
+}
+
+const Inner: React.FC<InnerProps> = ({
+  record,
+  setRecord,
+  success,
+  setSuccess,
 }) => {
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = VALID_URL;
-  });
-  const [record, setRecord] = useState<ErrorRecord | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
+  const state = useAlphaTabState();
+  const AlphaTabErrorType = module?.AlphaTabErrorType ?? null;
 
-  useAlphaTabEvent(api, "error", (err: Error) => {
-    setSuccess(null);
-    setRecord(classifyError(err));
-  });
+  useAlphaTabEvent(
+    "error",
+    (err: Error) => {
+      setSuccess(null);
+      setRecord(classifyError(err, AlphaTabErrorType));
+    },
+    [AlphaTabErrorType],
+  );
 
-  useAlphaTabEvent(api, "scoreLoaded", (score: alphaTab.model.Score) => {
-    setRecord(null);
-    setSuccess(`Loaded "${score.title || "(untitled)"}"`);
-  });
+  // Track successful loads via state.currentScore. Reset error when a
+  // fresh score arrives; the score identity from the store changes on
+  // every scoreLoaded emit.
+  const lastScoreRef = React.useRef(state.currentScore);
+  React.useEffect(() => {
+    if (state.currentScore && state.currentScore !== lastScoreRef.current) {
+      lastScoreRef.current = state.currentScore;
+      setRecord(null);
+      setSuccess(`Loaded "${state.currentScore.title || "(untitled)"}"`);
+    }
+  }, [state.currentScore, setRecord, setSuccess]);
 
   const safeCall = (fn: () => void) => {
     try {
       fn();
     } catch (err) {
       setSuccess(null);
-      setRecord(classifyError(err));
+      setRecord(classifyError(err, AlphaTabErrorType));
     }
   };
 
@@ -70,20 +110,8 @@ export const LoadErrorDemo: React.FC<LoadErrorDemoProps> = ({
   const loadWrongFormat = () => safeCall(() => api?.load(WRONG_FORMAT_URL));
   const loadBadTex = () => safeCall(() => api?.tex(BAD_TEX));
 
-  const code = `api.error.on((error) => {
-  if (error instanceof alphaTab.importer.UnsupportedFormatError) {
-    // wrong file type
-  } else if (error instanceof alphaTab.FormatError) {
-    // malformed content (bad alphaTex, corrupted GP archive)
-  } else if (error instanceof alphaTab.FileLoadError) {
-    // network / HTTP failure — inspect error.xhr.status
-  } else {
-    // render or generic API error
-  }
-});`;
-
   return (
-    <div className={styles.demo}>
+    <>
       <div className={styles.buttons}>
         <button
           type="button"
@@ -147,7 +175,39 @@ export const LoadErrorDemo: React.FC<LoadErrorDemoProps> = ({
           </span>
         )}
       </div>
-      <div ref={element}></div>
+      <AlphaTabCanvas />
+    </>
+  );
+};
+
+export const LoadErrorDemo: React.FC<LoadErrorDemoProps> = ({
+  showCode = true,
+}) => {
+  const [record, setRecord] = useState<ErrorRecord | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const code = `api.error.on((error) => {
+  if (error instanceof alphaTab.importer.UnsupportedFormatError) {
+    // wrong file type
+  } else if (error instanceof alphaTab.FormatError) {
+    // malformed content (bad alphaTex, corrupted GP archive)
+  } else if (error instanceof alphaTab.FileLoadError) {
+    // network / HTTP failure — inspect error.xhr.status
+  } else {
+    // render or generic API error
+  }
+});`;
+
+  return (
+    <div className={styles.demo}>
+      <AlphaTabPlayer file={VALID_URL} player={false}>
+        <Inner
+          record={record}
+          setRecord={setRecord}
+          success={success}
+          setSuccess={setSuccess}
+        />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

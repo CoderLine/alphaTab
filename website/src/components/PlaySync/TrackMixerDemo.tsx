@@ -1,9 +1,13 @@
 'use client';
 
-import * as alphaTab from '@coderline/alphatab';
-import React, { useState } from 'react';
-import { TransportControls } from './TransportControls';
-import { useAlphaTabEvent } from '@site/src/hooks';
+import React, { useState, useEffect } from 'react';
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabState,
+} from '@site/src/alphatab-react';
+import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
 interface TrackState {
@@ -18,22 +22,25 @@ export interface TrackMixerDemoProps {
   showCode?: boolean;
 }
 
-export const TrackMixerDemo: React.FC<TrackMixerDemoProps> = ({
-  file = '/files/features/Skillet.gp5',
-  showCode = true,
-}) => {
-  const [api, setApi] = useState<alphaTab.AlphaTabApi>();
-  const [tracks, setTracks] = useState<alphaTab.model.Track[]>([]);
+const TrackMixer: React.FC = () => {
+  const api = useAlphaTabApi();
+  const { tracks } = useAlphaTabState();
   const [state, setState] = useState<Map<number, TrackState>>(new Map());
 
-  useAlphaTabEvent(api, 'scoreLoaded', (score: alphaTab.model.Score) => {
-    setTracks(score.tracks);
-    const init = new Map<number, TrackState>();
-    for (const t of score.tracks) {
-      init.set(t.index, { volume: 1, solo: false, mute: false, transpose: 0 });
-    }
-    setState(init);
-  });
+  // Seed the mixer strip state whenever a new score is loaded.
+  useEffect(() => {
+    if (tracks.length === 0) return;
+    setState((prev) => {
+      const next = new Map<number, TrackState>();
+      for (const t of tracks) {
+        next.set(
+          t.index,
+          prev.get(t.index) ?? { volume: 1, solo: false, mute: false, transpose: 0 },
+        );
+      }
+      return next;
+    });
+  }, [tracks]);
 
   const update = (idx: number, patch: Partial<TrackState>) => {
     setState((prev) => {
@@ -55,69 +62,76 @@ export const TrackMixerDemo: React.FC<TrackMixerDemoProps> = ({
   };
 
   return (
-    <TransportControls
-      file={file}
-      showCode={showCode}
-      onApi={setApi}
-      renderExtras={() => (
-        <div style={{ width: '100%' }}>
-          {tracks.map((track) => {
-            const s = state.get(track.index) ?? {
-              volume: 1,
-              solo: false,
-              mute: false,
-              transpose: 0,
-            };
-            return (
-              <div key={track.index} className={styles.mixerRow}>
-                <span>{track.name}</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={2}
-                  step={0.05}
-                  value={s.volume}
-                  onChange={(e) =>
-                    update(track.index, { volume: parseFloat(e.target.value) })
-                  }
-                  aria-label={`Volume for ${track.name}`}
-                />
-                <button
-                  className={`${styles.mixerBtn} ${s.solo ? styles.active : ''}`}
-                  onClick={() => update(track.index, { solo: !s.solo })}
-                >
-                  Solo
-                </button>
-                <button
-                  className={`${styles.mixerBtn} ${s.mute ? styles.active : ''}`}
-                  onClick={() => update(track.index, { mute: !s.mute })}
-                >
-                  Mute
-                </button>
-                <span className={styles.transposeGroup}>
-                  <button
-                    className={styles.mixerBtn}
-                    onClick={() => update(track.index, { transpose: s.transpose - 1 })}
-                    aria-label="Transpose down"
-                  >
-                    −
-                  </button>
-                  <span className={styles.value} style={{ minWidth: '2.5rem', textAlign: 'center' }}>
-                    {s.transpose > 0 ? `+${s.transpose}` : s.transpose}
-                  </span>
-                  <button
-                    className={styles.mixerBtn}
-                    onClick={() => update(track.index, { transpose: s.transpose + 1 })}
-                    aria-label="Transpose up"
-                  >
-                    +
-                  </button>
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    />
+    <div className={styles.extras} style={{ display: 'block' }}>
+      {tracks.map((track) => {
+        const s = state.get(track.index) ?? {
+          volume: 1,
+          solo: false,
+          mute: false,
+          transpose: 0,
+        };
+        return (
+          <div key={track.index} className={styles.mixerRow}>
+            <span>{track.name}</span>
+            <input
+              type="range"
+              min={0}
+              max={2}
+              step={0.05}
+              value={s.volume}
+              onChange={(e) =>
+                update(track.index, { volume: parseFloat(e.target.value) })
+              }
+              aria-label={`Volume for ${track.name}`}
+            />
+            <button
+              className={`${styles.mixerBtn} ${s.solo ? styles.active : ''}`}
+              onClick={() => update(track.index, { solo: !s.solo })}
+            >
+              Solo
+            </button>
+            <button
+              className={`${styles.mixerBtn} ${s.mute ? styles.active : ''}`}
+              onClick={() => update(track.index, { mute: !s.mute })}
+            >
+              Mute
+            </button>
+            <span className={styles.transposeGroup}>
+              <button
+                className={styles.mixerBtn}
+                onClick={() => update(track.index, { transpose: s.transpose - 1 })}
+                aria-label="Transpose down"
+              >
+                −
+              </button>
+              <span className={styles.value} style={{ minWidth: '2.5rem', textAlign: 'center' }}>
+                {s.transpose > 0 ? `+${s.transpose}` : s.transpose}
+              </span>
+              <button
+                className={styles.mixerBtn}
+                onClick={() => update(track.index, { transpose: s.transpose + 1 })}
+                aria-label="Transpose up"
+              >
+                +
+              </button>
+            </span>
+          </div>
+        );
+      })}
+    </div>
   );
 };
+
+export const TrackMixerDemo: React.FC<TrackMixerDemoProps> = ({
+  file = '/files/features/Skillet.gp5',
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  showCode = true,
+}) => (
+  <div className={styles.wrapper}>
+    <AlphaTabPlayer file={file}>
+      <TransportBar />
+      <TrackMixer />
+      <AlphaTabCanvas />
+    </AlphaTabPlayer>
+  </div>
+);

@@ -1,37 +1,39 @@
-import React, { useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import React, { useEffect, useState } from "react";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 export interface HideDynamicsToggleProps {
   showCode?: boolean;
 }
 
-export const HideDynamicsToggle: React.FC<HideDynamicsToggleProps> = ({
-  showCode = true,
-}) => {
-  const [hidden, setHidden] = useState(false);
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = "/files/features/Dynamics.gp5";
-    s.display.barCount = 12;
-  });
-
+function ApplyHideDynamics({ hidden }: { hidden: boolean }) {
+  const api = useAlphaTabApi();
   useAlphaTabEvent(
-    api,
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
       score.stylesheet.hideDynamics = hidden;
     },
     [hidden]
   );
-
-  const toggle = (next: boolean) => {
-    setHidden(next);
+  useEffect(() => {
     if (api && api.score) {
-      api.score.stylesheet.hideDynamics = next;
+      api.score.stylesheet.hideDynamics = hidden;
       api.render();
     }
-  };
+  }, [api, hidden]);
+  return null;
+}
+
+export const HideDynamicsToggle: React.FC<HideDynamicsToggleProps> = ({
+  showCode = true,
+}) => {
+  const [hidden, setHidden] = useState(false);
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.hideDynamics = ${hidden};
@@ -45,13 +47,20 @@ export const HideDynamicsToggle: React.FC<HideDynamicsToggleProps> = ({
           <input
             type="checkbox"
             checked={hidden}
-            onChange={(e) => toggle(e.target.checked)}
+            onChange={(e) => setHidden(e.target.checked)}
             style={{ marginRight: "0.5rem" }}
           />
           Hide dynamics
         </label>
       </div>
-      <div ref={element}></div>
+      <AlphaTabPlayer
+        file="/files/features/Dynamics.gp5"
+        player={false}
+        settings={{ display: { barCount: 12 } }}
+      >
+        <ApplyHideDynamics hidden={hidden} />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

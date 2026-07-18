@@ -1,8 +1,13 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+    AlphaTabPlayer,
+    AlphaTabCanvas,
+    useAlphaTabApi,
+    useAlphaTabState,
+} from "@site/src/alphatab-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import styles from "./styles.module.scss";
@@ -14,61 +19,40 @@ export interface LazyLoadingDemoProps {
     showCode?: boolean;
 }
 
-export const LazyLoadingDemo: React.FC<LazyLoadingDemoProps> = ({
-    file,
-    tex,
-    renderCountVisible = true,
-}) => {
-    const scrollRef = useRef<HTMLDivElement>(null);
-
-    const [api, element] = useAlphaTab((s) => {
-        if (tex) {
-            s.core.tex = true;
-        } else if (file) {
-            s.core.file = file;
-        }
-        s.core.enableLazyLoading = true;
-        s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
-        s.player.scrollMode = alphaTab.ScrollMode.Off;
-    });
-
-    useEffect(() => {
-        if (!api || !scrollRef.current) return;
-        api.settings.player.scrollElement = scrollRef.current;
-        api.updateSettings();
-    }, [api]);
-
-    const [lazy, setLazy] = useState(true);
-    const [chunkCount, setChunkCount] = useState(0);
-    const [isPlaying, setPlaying] = useState(false);
-
-    useAlphaTabEvent(
-        api,
-        "playerStateChanged",
-        (args: alphaTab.synth.PlayerStateChangedEventArgs) => {
-            setPlaying(args.state === alphaTab.synth.PlayerState.Playing);
-        }
-    );
-
+function ApplyLazyLoading({ lazy }: { lazy: boolean }) {
+    const api = useAlphaTabApi();
     useEffect(() => {
         if (!api) return;
         api.settings.core.enableLazyLoading = lazy;
         api.updateSettings();
         api.render();
     }, [api, lazy]);
+    return null;
+}
+
+interface InnerProps {
+    renderCountVisible: boolean;
+}
+
+const Inner: React.FC<InnerProps> = ({ renderCountVisible }) => {
+    const api = useAlphaTabApi();
+    const state = useAlphaTabState();
+    const canvasWrapRef = useRef<HTMLDivElement>(null);
+    const [lazy, setLazy] = useState(true);
+    const [chunkCount, setChunkCount] = useState(0);
 
     // Count SVG chunks currently in the DOM.
     useEffect(() => {
-        if (!element.current) return;
-        const target = element.current;
+        const wrap = canvasWrapRef.current;
+        if (!wrap) return;
         const update = () => {
-            setChunkCount(target.querySelectorAll("svg").length);
+            setChunkCount(wrap.querySelectorAll("svg").length);
         };
         update();
         const observer = new MutationObserver(update);
-        observer.observe(target, { childList: true, subtree: true });
+        observer.observe(wrap, { childList: true, subtree: true });
         return () => observer.disconnect();
-    }, [element]);
+    }, []);
 
     return (
         <div className={styles.wrapper}>
@@ -76,9 +60,9 @@ export const LazyLoadingDemo: React.FC<LazyLoadingDemoProps> = ({
                 <button
                     className="button button--primary"
                     onClick={() => api?.playPause()}
-                    aria-label={isPlaying ? "Pause" : "Play"}
+                    aria-label={state.isPlaying ? "Pause" : "Play"}
                 >
-                    <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
+                    <FontAwesomeIcon icon={state.isPlaying ? solid.faPause : solid.faPlay} />
                 </button>
                 <ul className={`pills ${styles.pills}`}>
                     <li
@@ -104,9 +88,27 @@ export const LazyLoadingDemo: React.FC<LazyLoadingDemoProps> = ({
                     </div>
                 )}
             </div>
-            <div className={styles.scroller} ref={scrollRef}>
-                <div ref={element}>{tex}</div>
+            <ApplyLazyLoading lazy={lazy} />
+            <div ref={canvasWrapRef}>
+                <AlphaTabCanvas className={styles.scroller} />
             </div>
         </div>
+    );
+};
+
+export const LazyLoadingDemo: React.FC<LazyLoadingDemoProps> = ({
+    file,
+    tex,
+    renderCountVisible = true,
+}) => {
+    const settings: alphaTab.json.SettingsJson = {
+        core: { enableLazyLoading: true },
+        player: { scrollMode: "Off" },
+    };
+
+    return (
+        <AlphaTabPlayer file={file} tex={tex} settings={settings}>
+            <Inner renderCountVisible={renderCountVisible} />
+        </AlphaTabPlayer>
     );
 };

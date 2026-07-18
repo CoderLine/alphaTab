@@ -1,8 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+    AlphaTabPlayer,
+    AlphaTabCanvas,
+    useAlphaTabApi,
+    useAlphaTabEvent,
+    useAlphaTabState,
+} from "@site/src/alphatab-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import styles from "./styles.module.scss";
@@ -44,50 +50,38 @@ function formatNote(note: alphaTab.model.Note | null | undefined): string {
     return `fret ${note.fret}`;
 }
 
-export const ClickLogDemo: React.FC<ClickLogDemoProps> = ({
-    file,
-    tex,
-    showInteractionToggle = false,
-    includeNoteBounds = false,
-}) => {
-    const [api, element] = useAlphaTab((s) => {
-        if (tex) {
-            s.core.tex = true;
-        } else if (file) {
-            s.core.file = file;
-        }
-        s.core.includeNoteBounds = includeNoteBounds || showInteractionToggle;
-        s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
-        s.player.scrollMode = alphaTab.ScrollMode.Off;
-        s.player.enableSeekToClick = true;
-        s.player.enablePlaybackRangeSelection = true;
-    });
-
-    const [entries, setEntries] = useState<LogEntry[]>([]);
-    const [seekToClick, setSeekToClick] = useState(true);
-    const [playbackRangeSelection, setPlaybackRangeSelection] = useState(true);
-    const [isPlaying, setPlaying] = useState(false);
-    const idRef = useRef(0);
-
-    useAlphaTabEvent(
-        api,
-        "playerStateChanged",
-        (args: alphaTab.synth.PlayerStateChangedEventArgs) => {
-            setPlaying(args.state === alphaTab.synth.PlayerState.Playing);
-        }
-    );
-
+function ApplyInteractionSettings({
+    seekToClick,
+    playbackRangeSelection,
+}: {
+    seekToClick: boolean;
+    playbackRangeSelection: boolean;
+}) {
+    const api = useAlphaTabApi();
     useEffect(() => {
         if (!api) return;
         api.settings.player.enableSeekToClick = seekToClick;
         api.updateSettings();
     }, [api, seekToClick]);
-
     useEffect(() => {
         if (!api) return;
         api.settings.player.enablePlaybackRangeSelection = playbackRangeSelection;
         api.updateSettings();
     }, [api, playbackRangeSelection]);
+    return null;
+}
+
+interface InnerProps {
+    showInteractionToggle: boolean;
+}
+
+const Inner: React.FC<InnerProps> = ({ showInteractionToggle }) => {
+    const api = useAlphaTabApi();
+    const state = useAlphaTabState();
+    const [entries, setEntries] = useState<LogEntry[]>([]);
+    const [seekToClick, setSeekToClick] = useState(true);
+    const [playbackRangeSelection, setPlaybackRangeSelection] = useState(true);
+    const idRef = useRef(0);
 
     const pushEntry = (entry: Omit<LogEntry, "id">) => {
         idRef.current += 1;
@@ -106,26 +100,26 @@ export const ClickLogDemo: React.FC<ClickLogDemoProps> = ({
     const lastMoveBeatKeyRef = useRef<string | null>(null);
     const lastMoveNoteKeyRef = useRef<string | null>(null);
 
-    useAlphaTabEvent(api, "beatMouseDown", (beat: alphaTab.model.Beat) => {
+    useAlphaTabEvent("beatMouseDown", (beat: alphaTab.model.Beat) => {
         lastMoveBeatKeyRef.current = null;
         lastMoveNoteKeyRef.current = null;
         const { bar, beat: b } = formatBeat(beat);
         pushEntry({ event: "beatMouseDown", bar, beat: b });
     });
-    useAlphaTabEvent(api, "beatMouseMove", (beat: alphaTab.model.Beat) => {
+    useAlphaTabEvent("beatMouseMove", (beat: alphaTab.model.Beat) => {
         const { bar, beat: b } = formatBeat(beat);
         const key = `${bar}-${b}`;
         if (lastMoveBeatKeyRef.current === key) return;
         lastMoveBeatKeyRef.current = key;
         pushEntry({ event: "beatMouseMove", bar, beat: b });
     });
-    useAlphaTabEvent(api, "beatMouseUp", (beat: alphaTab.model.Beat | null) => {
+    useAlphaTabEvent("beatMouseUp", (beat: alphaTab.model.Beat | null) => {
         lastMoveBeatKeyRef.current = null;
         lastMoveNoteKeyRef.current = null;
         const { bar, beat: b } = formatBeat(beat);
         pushEntry({ event: "beatMouseUp", bar, beat: b });
     });
-    useAlphaTabEvent(api, "noteMouseDown", (note: alphaTab.model.Note) => {
+    useAlphaTabEvent("noteMouseDown", (note: alphaTab.model.Note) => {
         lastMoveBeatKeyRef.current = null;
         lastMoveNoteKeyRef.current = null;
         const { bar, beat: b } = formatBeat(note.beat);
@@ -136,7 +130,7 @@ export const ClickLogDemo: React.FC<ClickLogDemoProps> = ({
             detail: formatNote(note),
         });
     });
-    useAlphaTabEvent(api, "noteMouseMove", (note: alphaTab.model.Note) => {
+    useAlphaTabEvent("noteMouseMove", (note: alphaTab.model.Note) => {
         const { bar, beat: b } = formatBeat(note.beat);
         const detail = formatNote(note);
         const key = `${bar}-${b}-${detail}`;
@@ -144,7 +138,7 @@ export const ClickLogDemo: React.FC<ClickLogDemoProps> = ({
         lastMoveNoteKeyRef.current = key;
         pushEntry({ event: "noteMouseMove", bar, beat: b, detail });
     });
-    useAlphaTabEvent(api, "noteMouseUp", (note: alphaTab.model.Note | null) => {
+    useAlphaTabEvent("noteMouseUp", (note: alphaTab.model.Note | null) => {
         lastMoveBeatKeyRef.current = null;
         lastMoveNoteKeyRef.current = null;
         const { bar, beat: b } = formatBeat(note?.beat);
@@ -162,9 +156,9 @@ export const ClickLogDemo: React.FC<ClickLogDemoProps> = ({
                 <button
                     className="button button--primary"
                     onClick={() => api?.playPause()}
-                    aria-label={isPlaying ? "Pause" : "Play"}
+                    aria-label={state.isPlaying ? "Pause" : "Play"}
                 >
-                    <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
+                    <FontAwesomeIcon icon={state.isPlaying ? solid.faPause : solid.faPlay} />
                 </button>
                 {showInteractionToggle && (
                     <>
@@ -195,8 +189,14 @@ export const ClickLogDemo: React.FC<ClickLogDemoProps> = ({
                     Clear log
                 </button>
             </div>
+            {showInteractionToggle && (
+                <ApplyInteractionSettings
+                    seekToClick={seekToClick}
+                    playbackRangeSelection={playbackRangeSelection}
+                />
+            )}
             <div className={styles.grid}>
-                <div ref={element} className={styles.score}>{tex}</div>
+                <AlphaTabCanvas className={styles.score} />
                 <div className={styles.log}>
                     <div className={styles.logHeader}>Event log</div>
                     <pre className={styles.logBody}>
@@ -216,5 +216,27 @@ export const ClickLogDemo: React.FC<ClickLogDemoProps> = ({
                 </div>
             </div>
         </div>
+    );
+};
+
+export const ClickLogDemo: React.FC<ClickLogDemoProps> = ({
+    file,
+    tex,
+    showInteractionToggle = false,
+    includeNoteBounds = false,
+}) => {
+    const settings: alphaTab.json.SettingsJson = {
+        core: { includeNoteBounds: includeNoteBounds || showInteractionToggle },
+        player: {
+            scrollMode: "Off",
+            enableSeekToClick: true,
+            enablePlaybackRangeSelection: true,
+        },
+    };
+
+    return (
+        <AlphaTabPlayer file={file} tex={tex} settings={settings}>
+            <Inner showInteractionToggle={showInteractionToggle} />
+        </AlphaTabPlayer>
     );
 };

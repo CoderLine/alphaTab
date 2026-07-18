@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 export interface SystemSeparatorDemoProps {
@@ -32,30 +37,28 @@ const DEMO_TEX = `\\title "System sign separator"
   :4 3.4 5.4 :2 7.4
 `;
 
-export const SystemSeparatorDemo: React.FC<SystemSeparatorDemoProps> = ({
-  showCode = true,
-}) => {
-  const [enabled, setEnabled] = useState(true);
-  const [api, element] = useAlphaTab((s) => {
-    s.core.tex = true;
-    s.core.tracks = "all";
-  });
-
+function ApplySystemSeparator({ enabled }: { enabled: boolean }) {
+  const api = useAlphaTabApi();
   useAlphaTabEvent(
-    api,
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
       score.stylesheet.useSystemSignSeparator = enabled;
     },
     [enabled]
   );
-
   useEffect(() => {
     if (api && api.score) {
       api.score.stylesheet.useSystemSignSeparator = enabled;
       api.render();
     }
   }, [enabled, api]);
+  return null;
+}
+
+export const SystemSeparatorDemo: React.FC<SystemSeparatorDemoProps> = ({
+  showCode = true,
+}) => {
+  const [enabled, setEnabled] = useState(true);
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.useSystemSignSeparator = ${enabled};
@@ -75,7 +78,10 @@ export const SystemSeparatorDemo: React.FC<SystemSeparatorDemoProps> = ({
           Show system separator
         </label>
       </div>
-      <div ref={element}>{DEMO_TEX}</div>
+      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={false}>
+        <ApplySystemSeparator enabled={enabled} />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

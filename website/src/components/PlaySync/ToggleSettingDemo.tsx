@@ -1,8 +1,13 @@
 'use client';
 
-import * as alphaTab from '@coderline/alphatab';
 import React, { useState, useEffect } from 'react';
-import { TransportControls } from './TransportControls';
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabControls,
+  useAlphaTabApi,
+} from '@site/src/alphatab-react';
+import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
 export interface ToggleSettingDemoProps {
@@ -17,15 +22,55 @@ export interface ToggleSettingDemoProps {
   showCode?: boolean;
 }
 
-function setByPath(target: any, path: string, value: unknown) {
+function patchFromPath(path: string, value: unknown): Record<string, unknown> {
   const parts = path.split('.');
-  let cur = target;
+  const root: Record<string, unknown> = {};
+  let cur: Record<string, unknown> = root;
   for (let i = 0; i < parts.length - 1; i++) {
-    cur = cur[parts[i]];
-    if (cur === undefined || cur === null) return;
+    const next: Record<string, unknown> = {};
+    cur[parts[i]] = next;
+    cur = next;
   }
   cur[parts[parts.length - 1]] = value;
+  return root;
 }
+
+const ToggleControls: React.FC<{
+  settingPath: string;
+  label: string;
+  onValue: unknown;
+  offValue: unknown;
+  defaultOn: boolean;
+  reRender: boolean;
+}> = ({ settingPath, label, onValue, offValue, defaultOn, reRender }) => {
+  const controls = useAlphaTabControls();
+  const api = useAlphaTabApi();
+  const [on, setOn] = useState(defaultOn);
+
+  useEffect(() => {
+    if (!controls) return;
+    const patch = patchFromPath(settingPath, on ? onValue : offValue);
+    controls.updateSettings(patch);
+    if (reRender && api?.score) {
+      // updateSettings via the store already re-renders when a score is
+      // loaded, so `reRender` is effectively always honored — kept as a
+      // prop for API compatibility.
+    }
+  }, [controls, api, on, settingPath, onValue, offValue, reRender]);
+
+  return (
+    <div className={styles.extras}>
+      <label className={styles.fieldRow}>
+        <input
+          type="checkbox"
+          checked={on}
+          onChange={(e) => setOn(e.target.checked)}
+        />
+        {label}
+      </label>
+    </div>
+  );
+};
 
 export const ToggleSettingDemo: React.FC<ToggleSettingDemoProps> = ({
   file,
@@ -36,38 +81,25 @@ export const ToggleSettingDemo: React.FC<ToggleSettingDemoProps> = ({
   offValue,
   defaultOn = true,
   reRender = false,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showCode = true,
 }) => {
-  const [api, setApi] = useState<alphaTab.AlphaTabApi>();
-  const [on, setOn] = useState(defaultOn);
-
-  useEffect(() => {
-    if (!api) return;
-    setByPath(api.settings, settingPath, on ? onValue : offValue);
-    api.updateSettings();
-    if (reRender && api.score) {
-      api.render();
-    }
-  }, [api, on]);
-
   const resolvedFile = tex ? undefined : file ?? '/files/canon.gp';
 
   return (
-    <TransportControls
-      file={resolvedFile}
-      tex={tex}
-      showCode={showCode}
-      onApi={setApi}
-      renderExtras={() => (
-        <label className={styles.fieldRow}>
-          <input
-            type="checkbox"
-            checked={on}
-            onChange={(e) => setOn(e.target.checked)}
-          />
-          {label}
-        </label>
-      )}
-    />
+    <div className={styles.wrapper}>
+      <AlphaTabPlayer file={resolvedFile} tex={tex}>
+        <TransportBar />
+        <ToggleControls
+          settingPath={settingPath}
+          label={label}
+          onValue={onValue}
+          offValue={offValue}
+          defaultOn={defaultOn}
+          reRender={reRender}
+        />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
+    </div>
   );
 };

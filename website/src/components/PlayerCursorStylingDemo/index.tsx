@@ -1,6 +1,12 @@
 import React, { useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
@@ -75,64 +81,79 @@ export interface PlayerCursorStylingDemoProps {
   showCode?: boolean;
 }
 
+function PlayerStateWatcher({
+  onPlayingChange,
+}: {
+  onPlayingChange: (playing: boolean) => void;
+}) {
+  const module = useAlphaTabModule();
+  useAlphaTabEvent(
+    "playerStateChanged",
+    (args: alphaTab.synth.PlayerStateChangedEventArgs) => {
+      if (module) {
+        onPlayingChange(args.state === module.synth.PlayerState.Playing);
+      }
+    },
+    [module, onPlayingChange]
+  );
+  return null;
+}
+
+function PlayPauseButton({ isPlaying }: { isPlaying: boolean }) {
+  const api = useAlphaTabApi();
+  return (
+    <button
+      className="button button--primary"
+      onClick={() => api?.playPause()}
+      disabled={!api}
+    >
+      <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
+      <span style={{ marginLeft: "0.4rem" }}>
+        {isPlaying ? "Pause" : "Play"}
+      </span>
+    </button>
+  );
+}
+
 export const PlayerCursorStylingDemo: React.FC<
   PlayerCursorStylingDemoProps
 > = ({ showCode = true }) => {
   const [themeKey, setThemeKey] = useState<ThemeKey>("default");
   const [isPlaying, setPlaying] = useState(false);
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = "/files/features/Chords.gp5";
-    s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
-    s.player.scrollMode = alphaTab.ScrollMode.Off;
-  });
-
-  useAlphaTabEvent(
-    api,
-    "playerStateChanged",
-    (args: alphaTab.synth.PlayerStateChangedEventArgs) => {
-      setPlaying(args.state === alphaTab.synth.PlayerState.Playing);
-    }
-  );
 
   const activeCss = themes[themeKey].css;
 
   return (
     <div className="player-cursor-demo">
       <style>{activeCss}</style>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "0.5rem",
-          alignItems: "center",
-          marginBottom: "0.75rem",
-        }}
-      >
-        <button
-          className="button button--primary"
-          onClick={() => api?.playPause()}
-          disabled={!api}
+      <AlphaTabPlayer file="/files/features/Chords.gp5" player={true}>
+        <PlayerStateWatcher onPlayingChange={setPlaying} />
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "0.5rem",
+            alignItems: "center",
+            marginBottom: "0.75rem",
+          }}
         >
-          <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
-          <span style={{ marginLeft: "0.4rem" }}>
-            {isPlaying ? "Pause" : "Play"}
-          </span>
-        </button>
-        <ul className="pills" style={{ margin: 0 }}>
-          {(Object.keys(themes) as ThemeKey[]).map((k) => (
-            <li
-              key={k}
-              className={`pills__item${
-                themeKey === k ? " pills__item--active" : ""
-              }`}
-              onClick={() => setThemeKey(k)}
-            >
-              {themes[k].label}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div ref={element}></div>
+          <PlayPauseButton isPlaying={isPlaying} />
+          <ul className="pills" style={{ margin: 0 }}>
+            {(Object.keys(themes) as ThemeKey[]).map((k) => (
+              <li
+                key={k}
+                className={`pills__item${
+                  themeKey === k ? " pills__item--active" : ""
+                }`}
+                onClick={() => setThemeKey(k)}
+              >
+                {themes[k].label}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="css">{activeCss}</CodeBlock> : null}
     </div>
   );

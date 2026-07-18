@@ -1,51 +1,72 @@
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
-import react, { useEffect } from "react";
-import * as alphaTab from "@coderline/alphatab";
+import React, { useEffect } from "react";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabModule,
+  type AlphaTabModule,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
-export const FormattingTemplateSample: react.FC = () => {
-  const tex = `
+const tex = `
     \\title "Song Title"
     \\subtitle Subtitle
     \\artist Artist
     .
     `;
-  const [api, element] = useAlphaTab((s) => {});
 
-  function adjustStyle(score:alphaTab.model.Score) {
-    // ensure we have a score style 
-    if(!score.style) {
-        score.style = new alphaTab.model.ScoreStyle();
-    }
-
-    // set a new style for the title
-    score.style.headerAndFooter.set(
-        alphaTab.model.ScoreSubElement.Title,
-        new alphaTab.model.HeaderFooterStyle(
-            "%TITLE% - %SUBTITLE%", // text template
-            true, // visible? 
-            alphaTab.platform.TextAlign.Left
-        )
-    );
-    score.style.colors.set(
-        alphaTab.model.ScoreSubElement.Title,
-        alphaTab.model.Color.fromJson("#FF0000")
-    );
-
-    // hide the subtitle
-    score.style.headerAndFooter.set(
-        alphaTab.model.ScoreSubElement.SubTitle,
-        new alphaTab.model.HeaderFooterStyle(
-            "", // text template
-            false, // visible? 
-            alphaTab.platform.TextAlign.Left
-        )
-    );    
+function adjustStyle(module: AlphaTabModule, score: alphaTab.model.Score) {
+  // ensure we have a score style
+  if (!score.style) {
+    score.style = new module.model.ScoreStyle();
   }
 
+  // set a new style for the title
+  score.style.headerAndFooter.set(
+    module.model.ScoreSubElement.Title,
+    new module.model.HeaderFooterStyle(
+      "%TITLE% - %SUBTITLE%", // text template
+      true, // visible?
+      module.platform.TextAlign.Left,
+    ),
+  );
+  score.style.colors.set(
+    module.model.ScoreSubElement.Title,
+    module.model.Color.fromJson("#FF0000")!,
+  );
+
+  // hide the subtitle
+  score.style.headerAndFooter.set(
+    module.model.ScoreSubElement.SubTitle,
+    new module.model.HeaderFooterStyle(
+      "", // text template
+      false, // visible?
+      module.platform.TextAlign.Left,
+    ),
+  );
+}
+
+const FormattingTemplateInner: React.FC = () => {
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
+
+  useEffect(() => {
+    if (!api || !module) return;
+    const score = module.importer.ScoreLoader.loadScoreFromBytes(
+      new TextEncoder().encode(tex),
+    );
+    adjustStyle(module, score);
+    api.renderScore(score, [0]);
+  }, [api, module]);
+
+  return null;
+};
+
+export const FormattingTemplateSample: React.FC = () => {
   const codeLines = `
   function adjustStyle(score: alphaTab.model.Score) {
-      // ensure we have a score style 
+      // ensure we have a score style
       if(!score.style) {
           score.style = new alphaTab.model.ScoreStyle();
       }
@@ -55,7 +76,7 @@ export const FormattingTemplateSample: react.FC = () => {
           alphaTab.model.ScoreSubElement.Title,
           new alphaTab.model.HeaderFooterStyle(
               "%TITLE% - %SUBTITLE%", // text template
-              true, // visible? 
+              true, // visible?
               alphaTab.platform.TextAlign.Left
           )
       );
@@ -69,10 +90,10 @@ export const FormattingTemplateSample: react.FC = () => {
           alphaTab.model.ScoreSubElement.SubTitle,
           new alphaTab.model.HeaderFooterStyle(
               "", // text template
-              false, // visible? 
+              false, // visible?
               alphaTab.platform.TextAlign.Left
           )
-      );    
+      );
   }
 
   // Variant A: Adjust when the song is loaded manually
@@ -98,19 +119,12 @@ export const FormattingTemplateSample: react.FC = () => {
     .join("\n")
     .trim();
 
-  useEffect(() => {
-    if (api) {
-      const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
-        new TextEncoder().encode(tex)
-      );
-      adjustStyle(score);
-      api.renderScore(score, [0]);
-    }
-  }, [api]);
-
   return (
     <div>
-      <div ref={element}></div>
+      <AlphaTabPlayer player={false}>
+        <FormattingTemplateInner />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       <CodeBlock language="js">{trimmed}</CodeBlock>
     </div>
   );

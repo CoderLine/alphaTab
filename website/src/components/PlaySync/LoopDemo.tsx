@@ -1,9 +1,15 @@
 'use client';
 
-import * as alphaTab from '@coderline/alphatab';
 import React, { useState, useEffect } from 'react';
-import { TransportControls } from './TransportControls';
-import { useAlphaTabEvent } from '@site/src/hooks';
+import type * as alphaTab from '@coderline/alphatab';
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabControls,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+} from '@site/src/alphatab-react';
+import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
 export interface LoopDemoProps {
@@ -22,7 +28,7 @@ interface RangeReadout {
 
 const firstBeatOfBar = (
   score: alphaTab.model.Score,
-  barIndex: number
+  barIndex: number,
 ): alphaTab.model.Beat | null => {
   for (const track of score.tracks) {
     const bar = track.staves[0]?.bars[barIndex];
@@ -34,7 +40,7 @@ const firstBeatOfBar = (
 
 const lastBeatOfBar = (
   score: alphaTab.model.Score,
-  barIndex: number
+  barIndex: number,
 ): alphaTab.model.Beat | null => {
   for (const track of score.tracks) {
     const bar = track.staves[0]?.bars[barIndex];
@@ -44,19 +50,16 @@ const lastBeatOfBar = (
   return null;
 };
 
-export const LoopDemo: React.FC<LoopDemoProps> = ({
-  file,
-  tex,
-  showCode = true,
-}) => {
-  const [api, setApi] = useState<alphaTab.AlphaTabApi>();
+const LoopControls: React.FC = () => {
+  const controls = useAlphaTabControls();
+  const api = useAlphaTabApi();
   const [barCount, setBarCount] = useState(0);
   const [startBar, setStartBar] = useState(2);
   const [endBar, setEndBar] = useState(5);
   const [isLooping, setIsLooping] = useState(true);
   const [range, setRange] = useState<RangeReadout | null>(null);
 
-  useAlphaTabEvent(api, 'scoreLoaded', (score: alphaTab.model.Score) => {
+  useAlphaTabEvent('scoreLoaded', (score) => {
     setBarCount(score.masterBars.length);
     const maxIndex = score.masterBars.length - 1;
     setStartBar((v) => Math.min(v, maxIndex));
@@ -88,89 +91,85 @@ export const LoopDemo: React.FC<LoopDemoProps> = ({
   }, [api, startBar, endBar, barCount]);
 
   useEffect(() => {
-    if (api) api.isLooping = isLooping;
-  }, [api, isLooping]);
+    controls?.setLoopPlayback(isLooping);
+  }, [controls, isLooping]);
 
   // Reflect user-driven range drags in the info panel and the bar dropdowns.
-  useAlphaTabEvent(
-    api,
-    'playbackRangeHighlightChanged',
-    (e: alphaTab.PlaybackHighlightChangeEventArgs) => {
-      const startBeat = e.startBeat;
-      const endBeat = e.endBeat;
-      if (!startBeat || !endBeat || !api?.tickCache) {
-        return;
-      }
-      const startTick = api.tickCache.getBeatStart(startBeat);
-      const endTick = api.tickCache.getBeatStart(endBeat);
-      const startBarIndex = startBeat.voice.bar.index;
-      const endBarIndex = endBeat.voice.bar.index;
-      setRange({
-        startTick,
-        endTick,
-        startBarLabel: startBarIndex + 1,
-        endBarLabel: endBarIndex + 1,
-        source: 'drag',
-      });
-    }
-  );
+  useAlphaTabEvent('playbackRangeHighlightChanged', (e) => {
+    const startBeat = e.startBeat;
+    const endBeat = e.endBeat;
+    if (!startBeat || !endBeat || !api?.tickCache) return;
+    const startTick = api.tickCache.getBeatStart(startBeat);
+    const endTick = api.tickCache.getBeatStart(endBeat);
+    const startBarIndex = startBeat.voice.bar.index;
+    const endBarIndex = endBeat.voice.bar.index;
+    setRange({
+      startTick,
+      endTick,
+      startBarLabel: startBarIndex + 1,
+      endBarLabel: endBarIndex + 1,
+      source: 'drag',
+    });
+  });
 
   const barOptions = Array.from({ length: barCount }, (_, i) => i);
 
   return (
-    <TransportControls
-      file={file}
-      tex={tex}
-      showCode={showCode}
-      onApi={setApi}
-      renderExtras={() => (
-        <>
-          <div className={styles.fieldRow}>
-            <label>
-              Start bar:{' '}
-              <select
-                value={startBar}
-                onChange={(e) => setStartBar(parseInt(e.target.value, 10))}
-              >
-                {barOptions.map((i) => (
-                  <option key={i} value={i}>
-                    {i + 1}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              End bar:{' '}
-              <select
-                value={endBar}
-                onChange={(e) => setEndBar(parseInt(e.target.value, 10))}
-              >
-                {barOptions.map((i) => (
-                  <option key={i} value={i}>
-                    {i + 1}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className={styles.fieldRow}>
-              <input
-                type="checkbox"
-                checked={isLooping}
-                onChange={(e) => setIsLooping(e.target.checked)}
-              />
-              Loop
-            </label>
-          </div>
-          {range && (
-            <span className={styles.badge}>
-              playbackRange: bars {range.startBarLabel ?? startBar + 1}–
-              {range.endBarLabel ?? endBar + 1} (ticks {range.startTick}–
-              {range.endTick})
-              {range.source === 'drag' && ' — from drag'}
-            </span>
-          )}
-        </>
+    <div className={styles.extras}>
+      <div className={styles.fieldRow}>
+        <label>
+          Start bar:{' '}
+          <select
+            value={startBar}
+            onChange={(e) => setStartBar(parseInt(e.target.value, 10))}
+          >
+            {barOptions.map((i) => (
+              <option key={i} value={i}>
+                {i + 1}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          End bar:{' '}
+          <select
+            value={endBar}
+            onChange={(e) => setEndBar(parseInt(e.target.value, 10))}
+          >
+            {barOptions.map((i) => (
+              <option key={i} value={i}>
+                {i + 1}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={styles.fieldRow}>
+          <input
+            type="checkbox"
+            checked={isLooping}
+            onChange={(e) => setIsLooping(e.target.checked)}
+          />
+          Loop
+        </label>
+      </div>
+      {range && (
+        <span className={styles.badge}>
+          playbackRange: bars {range.startBarLabel ?? startBar + 1}–
+          {range.endBarLabel ?? endBar + 1} (ticks {range.startTick}–{range.endTick})
+          {range.source === 'drag' && ' — from drag'}
+        </span>
       )}
-    />
+    </div>
   );
 };
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const LoopDemo: React.FC<LoopDemoProps> = ({ file, tex, showCode = true }) => (
+  <div className={styles.wrapper}>
+    <AlphaTabPlayer file={file} tex={tex}>
+      <TransportBar />
+      <LoopControls />
+      <AlphaTabCanvas />
+    </AlphaTabPlayer>
+  </div>
+);

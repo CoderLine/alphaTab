@@ -1,7 +1,7 @@
 import type { AlphaTabApi, model, Settings } from '@coderline/alphatab';
 import type { ColorMode } from '@docusaurus/theme-common';
 import type { AlphaTabModule } from './module';
-import { applyAlphaTabSettings, applyTheme } from './settings';
+import { applyAlphaTabSettings, applyTheme, type AlphaTabPreset } from './settings';
 
 export interface TempoMarker {
     atBar: number;
@@ -59,13 +59,16 @@ export class AlphaTabStore {
     private pendingRender = false;
     private rafHandle = 0;
     private colorMode: ColorMode;
+    private preset: AlphaTabPreset;
 
     constructor(
         private readonly api: AlphaTabApi,
         private readonly module: AlphaTabModule,
         colorMode: ColorMode,
+        preset: AlphaTabPreset = 'docs',
     ) {
         this.colorMode = colorMode;
+        this.preset = preset;
         this.wireEvents();
         this.snapshot = { ...this.snapshot, isReady: true };
     }
@@ -125,6 +128,18 @@ export class AlphaTabStore {
         this.scheduleApply();
     }
 
+    /**
+     * Push arbitrary settings changes and re-render. Merges via
+     * `settings.fillFromJson`, then triggers `updateSettings()` + `render()`
+     * on the next animation frame (batched).
+     */
+    updateSettings(patch?: object): void {
+        if (patch) {
+            this.api.settings.fillFromJson(patch as never);
+        }
+        this.scheduleApply();
+    }
+
     applyColorMode(colorMode: ColorMode): void {
         if (this.colorMode === colorMode) return;
         this.colorMode = colorMode;
@@ -133,7 +148,10 @@ export class AlphaTabStore {
     }
 
     resetSettings(): void {
-        applyAlphaTabSettings(this.module, this.api.settings, { colorMode: this.colorMode });
+        applyAlphaTabSettings(this.module, this.api.settings, {
+            colorMode: this.colorMode,
+            preset: this.preset,
+        });
         this.scheduleApply();
         this.setMasterVolume(1);
         this.setPlaybackSpeed(1);
@@ -151,6 +169,10 @@ export class AlphaTabStore {
 
     seekToTick(tick: number): void {
         this.api.tickPosition = tick;
+    }
+
+    seekToTime(ms: number): void {
+        this.api.timePosition = ms;
     }
 
     seekToBar(bar: number): void {

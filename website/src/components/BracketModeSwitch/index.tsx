@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 type ModeName = "NoBrackets" | "GroupStaves" | "GroupSimilarInstruments";
@@ -30,32 +36,31 @@ const DEMO_TEX = `\\title "Bracket grouping"
   :4 F3 :8 G3 F3 :4 E3 D3
 `;
 
+function ApplyBracketMode({ mode }: { mode: ModeName }) {
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
+  useAlphaTabEvent(
+    "scoreLoaded",
+    (score: alphaTab.model.Score) => {
+      if (!module) return;
+      score.stylesheet.bracketExtendMode = module.model.BracketExtendMode[mode];
+    },
+    [mode, module]
+  );
+  useEffect(() => {
+    if (api && api.score && module) {
+      api.score.stylesheet.bracketExtendMode =
+        module.model.BracketExtendMode[mode];
+      api.render();
+    }
+  }, [mode, api, module]);
+  return null;
+}
+
 export const BracketModeSwitch: React.FC<BracketModeSwitchProps> = ({
   showCode = true,
 }) => {
   const [mode, setMode] = useState<ModeName>("GroupStaves");
-  const [api, element] = useAlphaTab((s) => {
-    s.core.tex = true;
-    s.core.tracks = "all";
-  });
-
-  useAlphaTabEvent(
-    api,
-    "scoreLoaded",
-    (score: alphaTab.model.Score) => {
-      score.stylesheet.bracketExtendMode =
-        alphaTab.model.BracketExtendMode[mode];
-    },
-    [mode]
-  );
-
-  useEffect(() => {
-    if (api && api.score) {
-      api.score.stylesheet.bracketExtendMode =
-        alphaTab.model.BracketExtendMode[mode];
-      api.render();
-    }
-  }, [mode, api]);
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.bracketExtendMode =
@@ -84,7 +89,10 @@ export const BracketModeSwitch: React.FC<BracketModeSwitchProps> = ({
           </li>
         ))}
       </ul>
-      <div ref={element}>{DEMO_TEX}</div>
+      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={false}>
+        <ApplyBracketMode mode={mode} />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 type ModeName = "Score" | "Staff";
@@ -9,37 +15,42 @@ export interface TuningModeSwitchProps {
   showCode?: boolean;
 }
 
-export const TuningModeSwitch: React.FC<TuningModeSwitchProps> = ({
-  showCode = true,
-}) => {
-  const [mode, setMode] = useState<ModeName>("Score");
-  const [hidden, setHidden] = useState(false);
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = "/files/features/Tuning.gp5";
-    s.display.barCount = 12;
-  });
-
+function ApplyTuning({
+  mode,
+  hidden,
+}: {
+  mode: ModeName;
+  hidden: boolean;
+}) {
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
   const apply = (score: alphaTab.model.Score) => {
+    if (!module) return;
     const s = score.stylesheet;
     s.globalDisplayTuning = !hidden;
-    s.tuningDisplayMode = alphaTab.model.TuningDisplayMode[mode];
+    s.tuningDisplayMode = module.model.TuningDisplayMode[mode];
   };
-
   useAlphaTabEvent(
-    api,
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
       apply(score);
     },
-    [mode, hidden]
+    [mode, hidden, module]
   );
-
   useEffect(() => {
     if (api && api.score) {
       apply(api.score);
       api.render();
     }
-  }, [mode, hidden, api]);
+  }, [mode, hidden, api, module]);
+  return null;
+}
+
+export const TuningModeSwitch: React.FC<TuningModeSwitchProps> = ({
+  showCode = true,
+}) => {
+  const [mode, setMode] = useState<ModeName>("Score");
+  const [hidden, setHidden] = useState(false);
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.globalDisplayTuning = ${!hidden};
@@ -87,7 +98,14 @@ export const TuningModeSwitch: React.FC<TuningModeSwitchProps> = ({
           Hide tuning globally
         </label>
       </div>
-      <div ref={element}></div>
+      <AlphaTabPlayer
+        file="/files/features/Tuning.gp5"
+        player={false}
+        settings={{ display: { barCount: 12 } }}
+      >
+        <ApplyTuning mode={mode} hidden={hidden} />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

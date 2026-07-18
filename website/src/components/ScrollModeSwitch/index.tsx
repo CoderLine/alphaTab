@@ -1,21 +1,20 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import React, { useEffect, useState } from "react";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+    AlphaTabPlayer,
+    AlphaTabCanvas,
+    useAlphaTabApi,
+    useAlphaTabModule,
+    useAlphaTabState,
+} from "@site/src/alphatab-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import styles from "./styles.module.scss";
 
 type BuiltInMode = "Continuous" | "OffScreen" | "Smooth" | "Off";
 type Mode = BuiltInMode | "Center bar";
-
-const BUILT_IN_MAP: Record<BuiltInMode, alphaTab.ScrollMode> = {
-    Continuous: alphaTab.ScrollMode.Continuous,
-    OffScreen: alphaTab.ScrollMode.OffScreen,
-    Smooth: alphaTab.ScrollMode.Smooth,
-    Off: alphaTab.ScrollMode.Off,
-};
 
 export interface ScrollModeSwitchProps {
     file?: string;
@@ -26,59 +25,22 @@ export interface ScrollModeSwitchProps {
     showCode?: boolean;
 }
 
-export const ScrollModeSwitch: React.FC<ScrollModeSwitchProps> = ({
-    file,
-    tex,
-    modes = ["Continuous", "OffScreen", "Smooth", "Off"],
-    showOffsetSliders = false,
-    customHandler,
-}) => {
-    const scrollRef = useRef<HTMLDivElement>(null);
-
-    const [api, element] = useAlphaTab((s) => {
-        if (tex) {
-            s.core.tex = true;
-        } else if (file) {
-            s.core.file = file;
-        }
-        s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
-        s.player.scrollMode = alphaTab.ScrollMode.Continuous;
-        s.player.scrollOffsetY = -40;
-        // Point scrollElement at the bounded wrapper. The alphaTab UI facade
-        // resolves and caches the scroll container during API construction,
-        // so this must be assigned here — a post-mount update is ignored.
-        if (scrollRef.current) {
-            s.player.scrollElement = scrollRef.current;
-        }
-    });
-
-    const pillModes: Mode[] =
-        customHandler === "center-bar" ? [...modes, "Center bar"] : modes;
-    const initialMode: Mode = showOffsetSliders ? "Continuous" : pillModes[0];
-    const [mode, setMode] = useState<Mode>(initialMode);
-    const [offsetX, setOffsetX] = useState(0);
-    const [offsetY, setOffsetY] = useState(-40);
-    const [nativeSmooth, setNativeSmooth] = useState(true);
-    const [isPlaying, setPlaying] = useState(false);
-
-    useAlphaTabEvent(
-        api,
-        "playerStateChanged",
-        (args: alphaTab.synth.PlayerStateChangedEventArgs) => {
-            setPlaying(args.state === alphaTab.synth.PlayerState.Playing);
-        }
-    );
-
+/**
+ * Switches between the built-in scroll modes and (optionally) a custom
+ * "Center bar" handler. When "Center bar" is active alphaTab keeps
+ * `scrollMode = Continuous` so its `onBeatCursorUpdating` dispatch still
+ * fires — the guard skips the callback when `scrollMode === Off`.
+ */
+function ApplyScrollMode({ mode }: { mode: Mode }) {
+    const api = useAlphaTabApi();
+    const module = useAlphaTabModule();
     useEffect(() => {
-        if (!api) return;
+        if (!api || !module) return;
         if (mode === "Center bar") {
-            // Keep scrollMode non-Off — alphaTab's dispatch guards
-            // `onBeatCursorUpdating` behind `scrollMode !== Off`, so a custom
-            // handler wouldn't fire otherwise. The `??` in the dispatch means
-            // the custom handler still takes precedence over the built-in one.
-            api.settings.player.scrollMode = alphaTab.ScrollMode.Continuous;
+            api.settings.player.scrollMode = module.ScrollMode.Continuous;
             api.updateSettings();
-            const scroller = scrollRef.current!;
+            const scroller = api.settings.player.scrollElement as HTMLElement | undefined;
+            if (!(scroller instanceof HTMLElement)) return;
             const centerBar = (
                 bounds: alphaTab.rendering.BeatBounds,
                 behavior: ScrollBehavior
@@ -104,29 +66,58 @@ export const ScrollModeSwitch: React.FC<ScrollModeSwitchProps> = ({
                 },
                 [Symbol.dispose]() {},
             };
-            // Clear the handler on mode switch or unmount so the built-in
-            // strategy resumes cleanly and no stale closure keeps firing.
             return () => {
                 api.customScrollHandler = undefined;
             };
         }
         api.customScrollHandler = undefined;
-        api.settings.player.scrollMode = BUILT_IN_MAP[mode];
+        api.settings.player.scrollMode = module.ScrollMode[mode];
         api.updateSettings();
-    }, [api, mode]);
+    }, [api, module, mode]);
+    return null;
+}
 
+function ApplyOffsets({
+    offsetX,
+    offsetY,
+    nativeSmooth,
+}: {
+    offsetX: number;
+    offsetY: number;
+    nativeSmooth: boolean;
+}) {
+    const api = useAlphaTabApi();
     useEffect(() => {
-        if (!api || !showOffsetSliders) return;
+        if (!api) return;
         api.settings.player.scrollOffsetX = offsetX;
         api.settings.player.scrollOffsetY = offsetY;
         api.updateSettings();
-    }, [api, offsetX, offsetY, showOffsetSliders]);
-
+    }, [api, offsetX, offsetY]);
     useEffect(() => {
-        if (!api || !showOffsetSliders) return;
+        if (!api) return;
         api.settings.player.nativeBrowserSmoothScroll = nativeSmooth;
         api.updateSettings();
-    }, [api, nativeSmooth, showOffsetSliders]);
+    }, [api, nativeSmooth]);
+    return null;
+}
+
+interface InnerProps {
+    modes: BuiltInMode[];
+    showOffsetSliders: boolean;
+    customHandler?: "center-bar";
+}
+
+const Inner: React.FC<InnerProps> = ({ modes, showOffsetSliders, customHandler }) => {
+    const api = useAlphaTabApi();
+    const state = useAlphaTabState();
+
+    const pillModes: Mode[] =
+        customHandler === "center-bar" ? [...modes, "Center bar"] : modes;
+    const initialMode: Mode = showOffsetSliders ? "Continuous" : pillModes[0];
+    const [mode, setMode] = useState<Mode>(initialMode);
+    const [offsetX, setOffsetX] = useState(0);
+    const [offsetY, setOffsetY] = useState(-40);
+    const [nativeSmooth, setNativeSmooth] = useState(true);
 
     return (
         <div className={styles.wrapper}>
@@ -134,9 +125,9 @@ export const ScrollModeSwitch: React.FC<ScrollModeSwitchProps> = ({
                 <button
                     className="button button--primary"
                     onClick={() => api?.playPause()}
-                    aria-label={isPlaying ? "Pause" : "Play"}
+                    aria-label={state.isPlaying ? "Pause" : "Play"}
                 >
-                    <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
+                    <FontAwesomeIcon icon={state.isPlaying ? solid.faPause : solid.faPlay} />
                 </button>
                 <button
                     className="button button--secondary"
@@ -202,9 +193,40 @@ export const ScrollModeSwitch: React.FC<ScrollModeSwitchProps> = ({
                     </ul>
                 </div>
             )}
-            <div className={styles.scroller} ref={scrollRef}>
-                <div ref={element}>{tex}</div>
-            </div>
+            <ApplyScrollMode mode={mode} />
+            {showOffsetSliders && (
+                <ApplyOffsets
+                    offsetX={offsetX}
+                    offsetY={offsetY}
+                    nativeSmooth={nativeSmooth}
+                />
+            )}
+            <AlphaTabCanvas className={styles.scroller} />
         </div>
+    );
+};
+
+export const ScrollModeSwitch: React.FC<ScrollModeSwitchProps> = ({
+    file,
+    tex,
+    modes = ["Continuous", "OffScreen", "Smooth", "Off"],
+    showOffsetSliders = false,
+    customHandler,
+}) => {
+    const settings: alphaTab.json.SettingsJson = {
+        player: {
+            scrollMode: "Continuous",
+            scrollOffsetY: -40,
+        },
+    };
+
+    return (
+        <AlphaTabPlayer file={file} tex={tex} settings={settings}>
+            <Inner
+                modes={modes}
+                showOffsetSliders={showOffsetSliders}
+                customHandler={customHandler}
+            />
+        </AlphaTabPlayer>
     );
 };

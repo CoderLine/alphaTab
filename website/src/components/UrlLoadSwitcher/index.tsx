@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabControls,
+  useAlphaTabState,
+} from "@site/src/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface UrlLoadSwitcherProps {
@@ -11,46 +15,32 @@ export interface UrlLoadSwitcherProps {
 const CHORDS_URL = "/files/features/Chords.gp5";
 const RHYTHM_URL = "/files/features/Rhythm.gp5";
 
-export const UrlLoadSwitcher: React.FC<UrlLoadSwitcherProps> = ({
-  showCode = true,
-}) => {
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = CHORDS_URL;
-  });
-  const [currentUrl, setCurrentUrl] = useState(CHORDS_URL);
-  const [meta, setMeta] = useState<{ title: string; artist: string } | null>(
-    null
-  );
+interface InnerProps {
+  currentUrl: string;
+  setCurrentUrl: (url: string) => void;
+}
 
-  useAlphaTabEvent(api, "scoreLoaded", (score: alphaTab.model.Score) => {
-    setMeta({
-      title: score.title || "(untitled)",
-      artist: score.artist || "(unknown)",
-    });
-  });
+const Inner: React.FC<InnerProps> = ({ currentUrl, setCurrentUrl }) => {
+  const controls = useAlphaTabControls();
+  const state = useAlphaTabState();
+  const score = state.currentScore;
+  const meta = score
+    ? {
+        title: score.title || "(untitled)",
+        artist: score.artist || "(unknown)",
+      }
+    : null;
 
   const loadUrl = (url: string) => {
-    if (!api) {
+    if (!controls) {
       return;
     }
-    setMeta(null);
     setCurrentUrl(url);
-    api.load(url);
+    void controls.loadScoreFromUrl(url);
   };
 
-  const code = `const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/chords.gp5' },
-});
-
-document.getElementById('load-chords').addEventListener('click', () => {
-  api.load('/scores/chords.gp5');
-});
-document.getElementById('load-rhythm').addEventListener('click', () => {
-  api.load('/scores/rhythm.gp5');
-});`;
-
   return (
-    <div className={styles.demo}>
+    <>
       <div className={styles.controls}>
         <button
           type="button"
@@ -80,7 +70,32 @@ document.getElementById('load-rhythm').addEventListener('click', () => {
           <span> — {meta.artist}</span>
         </div>
       )}
-      <div ref={element}></div>
+      <AlphaTabCanvas />
+    </>
+  );
+};
+
+export const UrlLoadSwitcher: React.FC<UrlLoadSwitcherProps> = ({
+  showCode = true,
+}) => {
+  const [currentUrl, setCurrentUrl] = useState(CHORDS_URL);
+
+  const code = `const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/chords.gp5' },
+});
+
+document.getElementById('load-chords').addEventListener('click', () => {
+  api.load('/scores/chords.gp5');
+});
+document.getElementById('load-rhythm').addEventListener('click', () => {
+  api.load('/scores/rhythm.gp5');
+});`;
+
+  return (
+    <div className={styles.demo}>
+      <AlphaTabPlayer file={CHORDS_URL} player={false}>
+        <Inner currentUrl={currentUrl} setCurrentUrl={setCurrentUrl} />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

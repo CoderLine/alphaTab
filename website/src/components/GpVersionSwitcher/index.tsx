@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabControls,
+  useAlphaTabState,
+} from "@site/src/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface GpVersionSwitcherProps {
@@ -36,40 +40,30 @@ const VARIANTS: Variant[] = [
   },
 ];
 
-export const GpVersionSwitcher: React.FC<GpVersionSwitcherProps> = ({
-  showCode = true,
-}) => {
-  const initial = VARIANTS[2];
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = initial.file;
-  });
-  const [active, setActive] = useState<Variant>(initial);
-  const [loadedTitle, setLoadedTitle] = useState<string | null>(null);
+const INITIAL_VARIANT = VARIANTS[2];
 
-  useAlphaTabEvent(api, "scoreLoaded", (score: alphaTab.model.Score) => {
-    setLoadedTitle(score.title || "(untitled)");
-  });
+interface InnerProps {
+  active: Variant;
+  setActive: (v: Variant) => void;
+}
+
+const Inner: React.FC<InnerProps> = ({ active, setActive }) => {
+  const controls = useAlphaTabControls();
+  const state = useAlphaTabState();
+  const loadedTitle = state.currentScore
+    ? state.currentScore.title || "(untitled)"
+    : null;
 
   const pick = (v: Variant) => {
-    if (!api || v.key === active.key) {
+    if (!controls || v.key === active.key) {
       return;
     }
     setActive(v);
-    setLoadedTitle(null);
-    api.load(v.file);
+    void controls.loadScoreFromUrl(v.file);
   };
 
-  const code = `const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/song.gp' }, // GP7/8 ZIP archive
-});
-
-// One call site, any version — alphaTab sniffs the bytes.
-api.load('/scores/older.gp5');   // GP3-5 binary
-api.load('/scores/legacy.gpx');  // GP6 container
-api.load('/scores/newer.gp');    // GP7/8 ZIP`;
-
   return (
-    <div className={styles.demo}>
+    <>
       <div className={styles.tabs} role="tablist">
         {VARIANTS.map((v) => (
           <button
@@ -92,7 +86,30 @@ api.load('/scores/newer.gp');    // GP7/8 ZIP`;
           </span>
         )}
       </div>
-      <div ref={element}></div>
+      <AlphaTabCanvas />
+    </>
+  );
+};
+
+export const GpVersionSwitcher: React.FC<GpVersionSwitcherProps> = ({
+  showCode = true,
+}) => {
+  const [active, setActive] = useState<Variant>(INITIAL_VARIANT);
+
+  const code = `const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' }, // GP7/8 ZIP archive
+});
+
+// One call site, any version — alphaTab sniffs the bytes.
+api.load('/scores/older.gp5');   // GP3-5 binary
+api.load('/scores/legacy.gpx');  // GP6 container
+api.load('/scores/newer.gp');    // GP7/8 ZIP`;
+
+  return (
+    <div className={styles.demo}>
+      <AlphaTabPlayer file={INITIAL_VARIANT.file} player={false}>
+        <Inner active={active} setActive={setActive} />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

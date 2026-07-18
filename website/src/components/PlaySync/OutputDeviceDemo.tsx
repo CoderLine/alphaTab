@@ -1,8 +1,13 @@
 'use client';
 
-import * as alphaTab from '@coderline/alphatab';
 import React, { useState, useCallback, useEffect } from 'react';
-import { TransportControls } from './TransportControls';
+import type * as alphaTab from '@coderline/alphatab';
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+} from '@site/src/alphatab-react';
+import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
 export interface OutputDeviceDemoProps {
@@ -16,12 +21,8 @@ const isSupported = () => {
   return 'AudioContext' in window && 'setSinkId' in (AudioContext.prototype as object);
 };
 
-export const OutputDeviceDemo: React.FC<OutputDeviceDemoProps> = ({
-  file,
-  tex,
-  showCode = true,
-}) => {
-  const [api, setApi] = useState<alphaTab.AlphaTabApi>();
+const OutputDeviceControls: React.FC = () => {
+  const api = useAlphaTabApi();
   const [devices, setDevices] = useState<alphaTab.synth.ISynthOutputDevice[]>([]);
   const [selectedId, setSelectedId] = useState<string>('');
   const [supported, setSupported] = useState(true);
@@ -56,43 +57,48 @@ export const OutputDeviceDemo: React.FC<OutputDeviceDemoProps> = ({
     }
   };
 
+  if (!supported) {
+    return (
+      <div className={styles.notice}>
+        This browser does not expose output-device selection (`AudioContext.setSinkId`).
+        Transport still works, but device switching is unavailable.
+      </div>
+    );
+  }
+
   return (
-    <TransportControls
-      file={file}
-      tex={tex}
-      showCode={showCode}
-      onApi={setApi}
-      renderExtras={() =>
-        !supported ? (
-          <div className={styles.notice}>
-            This browser does not expose output-device selection (`AudioContext.setSinkId`).
-            Transport still works, but device switching is unavailable.
-          </div>
-        ) : (
-          <>
-            <button className={styles.mixerBtn} onClick={refresh}>
-              Refresh devices
-            </button>
-            <label className={styles.fieldRow}>
-              Output device:
-              <select
-                value={selectedId}
-                onChange={(e) => onSelect(e.target.value)}
-                disabled={devices.length === 0}
-              >
-                {devices.length === 0 && <option value="">(none listed)</option>}
-                {devices.map((d) => (
-                  <option key={d.deviceId} value={d.deviceId}>
-                    {d.label || d.deviceId}
-                    {d.isDefault ? ' (default)' : ''}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <span className={styles.badge}>{status}</span>
-          </>
-        )
-      }
-    />
+    <div className={styles.extras}>
+      <button className={styles.mixerBtn} onClick={refresh} disabled={!api}>
+        Refresh devices
+      </button>
+      <label className={styles.fieldRow}>
+        Output device:
+        <select
+          value={selectedId}
+          onChange={(e) => onSelect(e.target.value)}
+          disabled={devices.length === 0}
+        >
+          {devices.length === 0 && <option value="">(none listed)</option>}
+          {devices.map((d) => (
+            <option key={d.deviceId} value={d.deviceId}>
+              {d.label || d.deviceId}
+              {d.isDefault ? ' (default)' : ''}
+            </option>
+          ))}
+        </select>
+      </label>
+      <span className={styles.badge}>{status}</span>
+    </div>
   );
 };
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const OutputDeviceDemo: React.FC<OutputDeviceDemoProps> = ({ file, tex, showCode = true }) => (
+  <div className={styles.wrapper}>
+    <AlphaTabPlayer file={file} tex={tex}>
+      <TransportBar />
+      <OutputDeviceControls />
+      <AlphaTabCanvas />
+    </AlphaTabPlayer>
+  </div>
+);

@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabControls,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 type ElementKey =
@@ -43,6 +49,28 @@ const DEMO_TEX = `\\title "Toggle catalogue"
   :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1)
 `;
 
+function ApplyElementVisibility({
+  visibility,
+}: {
+  visibility: Record<ElementKey, boolean>;
+}) {
+  const api = useAlphaTabApi();
+  const controls = useAlphaTabControls();
+  const module = useAlphaTabModule();
+  useEffect(() => {
+    if (!api || !controls || !module) return;
+    const map = api.settings.notation.elements;
+    for (const t of toggles) {
+      map.set(
+        module.NotationElement[t.key] as alphaTab.NotationElement,
+        visibility[t.key]
+      );
+    }
+    controls.updateSettings();
+  }, [api, controls, module, visibility]);
+  return null;
+}
+
 export const ToggleElementsDemo: React.FC<ToggleElementsDemoProps> = ({
   showCode = true,
 }) => {
@@ -55,33 +83,13 @@ export const ToggleElementsDemo: React.FC<ToggleElementsDemoProps> = ({
     EffectPalmMute: true,
   });
 
-  const [api, element] = useAlphaTab((s) => {
-    s.core.tex = true;
-  });
-
-  useEffect(() => {
-    if (api) {
-      const map = api.settings.notation.elements;
-      for (const t of toggles) {
-        map.set(
-          alphaTab.NotationElement[t.key] as alphaTab.NotationElement,
-          visibility[t.key]
-        );
-      }
-      api.updateSettings();
-      api.render();
-    }
-  }, [visibility, api]);
-
   const flip = (key: ElementKey) => {
     setVisibility((v) => ({ ...v, [key]: !v[key] }));
   };
 
   const disabledEntries = toggles
     .filter((t) => !visibility[t.key])
-    .map(
-      (t) => `  [alphaTab.NotationElement.${t.key}, false],`
-    )
+    .map((t) => `  [alphaTab.NotationElement.${t.key}, false],`)
     .join("\n");
 
   const code = `const api = new alphaTab.AlphaTabApi(container, {
@@ -123,7 +131,10 @@ ${disabledEntries || "      // every element visible"}
           </label>
         ))}
       </div>
-      <div ref={element}>{DEMO_TEX}</div>
+      <AlphaTabPlayer tex={DEMO_TEX} player={false}>
+        <ApplyElementVisibility visibility={visibility} />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

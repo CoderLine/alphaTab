@@ -1,6 +1,11 @@
-import * as alphaTab from "@coderline/alphatab";
 import React, { useState } from "react";
-import { useAlphaTab } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 export interface MidiExporterDemoProps {
@@ -14,14 +19,15 @@ function formatBytes(n: number): string {
 }
 
 function buildMidiBytes(
+  module: typeof import("@coderline/alphatab"),
   api: alphaTab.AlphaTabApi,
   format: alphaTab.midi.MidiFileFormat,
 ): Uint8Array {
-  const midiFile = new alphaTab.midi.MidiFile();
+  const midiFile = new module.midi.MidiFile();
   midiFile.format = format;
 
-  const handler = new alphaTab.midi.AlphaSynthMidiFileHandler(midiFile, true);
-  const generator = new alphaTab.midi.MidiFileGenerator(
+  const handler = new module.midi.AlphaSynthMidiFileHandler(midiFile, true);
+  const generator = new module.midi.MidiFileGenerator(
     api.score!,
     api.settings,
     handler,
@@ -30,25 +36,33 @@ function buildMidiBytes(
   return midiFile.toBinary();
 }
 
-export const MidiExporterDemo: React.FC<MidiExporterDemoProps> = ({
-  showCode = true,
-}) => {
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = "/files/features/Chords.gp5";
-    s.player.playerMode = alphaTab.PlayerMode.EnabledSynthesizer;
-    s.player.scrollMode = alphaTab.ScrollMode.Off;
-    s.player.enableCursor = false;
-    s.player.enableUserInteraction = false;
-  });
+const codeSample = `import * as alphaTab from '@coderline/alphatab';
 
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
+});
+
+api.scoreLoaded.on(() => {
+  // SMF Type 0 — single track, multi channel
+  api.downloadMidi(alphaTab.midi.MidiFileFormat.SingleTrackMultiChannel);
+
+  // SMF Type 1 — one MIDI track per alphaTab track
+  api.downloadMidi(alphaTab.midi.MidiFileFormat.MultiTrack);
+});`;
+
+const MidiExporterControls: React.FC = () => {
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
   const [captions, setCaptions] = useState<CaptionMap>({});
 
   function download(format: alphaTab.midi.MidiFileFormat) {
-    if (!api || !api.score) {
+    if (!api || !api.score || !module) {
       return;
     }
     try {
-      const bytes = buildMidiBytes(api, format);
+      const bytes = buildMidiBytes(module, api, format);
       const fileName = api.score.title
         ? `${api.score.title}.mid`
         : "File.mid";
@@ -67,24 +81,8 @@ export const MidiExporterDemo: React.FC<MidiExporterDemoProps> = ({
     }
   }
 
-  const code = `import * as alphaTab from '@coderline/alphatab';
-
-const container = getAlphaTabContainer();
-const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
-  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
-});
-
-api.scoreLoaded.on(() => {
-  // SMF Type 0 — single track, multi channel
-  api.downloadMidi(alphaTab.midi.MidiFileFormat.SingleTrackMultiChannel);
-
-  // SMF Type 1 — one MIDI track per alphaTab track
-  api.downloadMidi(alphaTab.midi.MidiFileFormat.MultiTrack);
-});`;
-
-  const type0 = alphaTab.midi.MidiFileFormat.SingleTrackMultiChannel;
-  const type1 = alphaTab.midi.MidiFileFormat.MultiTrack;
+  const type0 = module?.midi.MidiFileFormat.SingleTrackMultiChannel;
+  const type1 = module?.midi.MidiFileFormat.MultiTrack;
 
   const columnStyle: React.CSSProperties = {
     flex: 1,
@@ -102,42 +100,54 @@ api.scoreLoaded.on(() => {
   };
 
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "1rem",
-          marginBottom: "0.75rem",
-        }}
-      >
-        <div style={columnStyle}>
-          <button
-            className="button button--primary"
-            onClick={() => download(type0)}
-            type="button"
-          >
-            Download (SMF Type 0)
-          </button>
-          <span style={captionStyle}>
-            {captions[type0] ?? "Single track, multi channel"}
-          </span>
-        </div>
-        <div style={columnStyle}>
-          <button
-            className="button button--primary"
-            onClick={() => download(type1)}
-            type="button"
-          >
-            Download (SMF Type 1)
-          </button>
-          <span style={captionStyle}>
-            {captions[type1] ?? "One MIDI track per alphaTab track"}
-          </span>
-        </div>
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "1rem",
+        marginBottom: "0.75rem",
+      }}
+    >
+      <div style={columnStyle}>
+        <button
+          className="button button--primary"
+          onClick={() => type0 !== undefined && download(type0)}
+          type="button"
+          disabled={type0 === undefined}
+        >
+          Download (SMF Type 0)
+        </button>
+        <span style={captionStyle}>
+          {(type0 !== undefined && captions[type0]) || "Single track, multi channel"}
+        </span>
       </div>
-      <div ref={element} />
-      {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
+      <div style={columnStyle}>
+        <button
+          className="button button--primary"
+          onClick={() => type1 !== undefined && download(type1)}
+          type="button"
+          disabled={type1 === undefined}
+        >
+          Download (SMF Type 1)
+        </button>
+        <span style={captionStyle}>
+          {(type1 !== undefined && captions[type1]) || "One MIDI track per alphaTab track"}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+export const MidiExporterDemo: React.FC<MidiExporterDemoProps> = ({
+  showCode = true,
+}) => {
+  return (
+    <div>
+      <AlphaTabPlayer file="/files/features/Chords.gp5">
+        <MidiExporterControls />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
+      {showCode ? <CodeBlock language="js">{codeSample}</CodeBlock> : null}
     </div>
   );
 };

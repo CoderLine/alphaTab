@@ -1,8 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+    AlphaTabPlayer,
+    AlphaTabCanvas,
+    useAlphaTabApi,
+    useAlphaTabState,
+} from "@site/src/alphatab-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import styles from "./styles.module.scss";
@@ -24,67 +29,46 @@ const themeClass: Record<CursorTheme, string> = {
     highlighter: styles.themeHighlighter,
 };
 
-export const CursorToggleDemo: React.FC<CursorToggleDemoProps> = ({
-    file,
-    tex,
-    showThemeToggle = false,
-    showAnimationToggle = false,
-    showCustomHandlerToggle = false,
-}) => {
-    const [api, element] = useAlphaTab((s) => {
-        if (tex) {
-            s.core.tex = true;
-        } else if (file) {
-            s.core.file = file;
-        }
-        s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
-        s.player.scrollMode = alphaTab.ScrollMode.Continuous;
-        s.player.enableCursor = true;
-        s.player.enableElementHighlighting = true;
-        s.player.enableAnimatedBeatCursor = true;
-    });
-
-    const [enableCursor, setEnableCursor] = useState(true);
-    const [enableHighlight, setEnableHighlight] = useState(true);
-    const [enableAnimation, setEnableAnimation] = useState(true);
-    const [customHandlerAttached, setCustomHandlerAttached] = useState(
-        showCustomHandlerToggle
-    );
-    const [theme, setTheme] = useState<CursorTheme>("default");
-    const [isPlaying, setPlaying] = useState(false);
-
-    useAlphaTabEvent(
-        api,
-        "playerStateChanged",
-        (args: alphaTab.synth.PlayerStateChangedEventArgs) => {
-            setPlaying(args.state === alphaTab.synth.PlayerState.Playing);
-        }
-    );
-
+/**
+ * Applies the three cursor-related settings toggles. The animation toggle
+ * carries a library-bug workaround (see the comment below) that must stay
+ * until alphaTab 1.9.0 ships and refreshes the resolved cursor handler on
+ * `updateSettings()` alone.
+ */
+function ApplyCursorSettings({
+    enableCursor,
+    enableHighlight,
+    enableAnimation,
+    manageAnimation,
+}: {
+    enableCursor: boolean;
+    enableHighlight: boolean;
+    enableAnimation: boolean;
+    manageAnimation: boolean;
+}) {
+    const api = useAlphaTabApi();
     useEffect(() => {
         if (!api) return;
         api.settings.player.enableCursor = enableCursor;
         api.updateSettings();
     }, [api, enableCursor]);
-
     useEffect(() => {
         if (!api) return;
         api.settings.player.enableElementHighlighting = enableHighlight;
         api.updateSettings();
     }, [api, enableHighlight]);
-
     useEffect(() => {
-        if (!api) return;
-        if (showCustomHandlerToggle) return; // handled by the custom-handler effect
+        if (!api || !manageAnimation) return;
         api.settings.player.enableAnimatedBeatCursor = enableAnimation;
         api.updateSettings();
-        // WORKAROUND (upstream library bug): alphaTab caches the resolved
-        // cursor handler in `_updateCursorHandler` and does not re-evaluate
-        // when only `enableAnimatedBeatCursor` toggles, so calling
-        // `updateSettings()` alone leaves the animated behavior stuck.
-        // Reassigning `customCursorHandler` — even to `undefined` — forces
-        // the internal handler swap. Assign a non-animating placeholder when
-        // animation is off, clear it back to `undefined` when it's on.
+        // WORKAROUND (upstream library bug — remove once alphaTab 1.9.0 lands):
+        // alphaTab caches the resolved cursor handler in `_updateCursorHandler`
+        // and does not re-evaluate it when only `enableAnimatedBeatCursor`
+        // toggles, so calling `updateSettings()` alone leaves the animated
+        // behavior stuck. Reassigning `customCursorHandler` — even to
+        // `undefined` — forces the internal handler swap. Assign a
+        // non-animating placeholder when animation is off, clear it back to
+        // `undefined` when it's on.
         if (enableAnimation) {
             api.customCursorHandler = undefined;
         } else {
@@ -108,14 +92,20 @@ export const CursorToggleDemo: React.FC<CursorToggleDemoProps> = ({
             };
             api.customCursorHandler = nonAnimatingHandler as any;
         }
-    }, [api, enableAnimation, showCustomHandlerToggle]);
+    }, [api, enableAnimation, manageAnimation]);
+    return null;
+}
 
-    // Custom cursor handler: a bouncing pill adorner riding above the beat
-    // cursor. When attached, swaps out the default placement so the demo has a
-    // visibly different behavior.
+/**
+ * Custom cursor handler: a bouncing pill adorner riding above the beat
+ * cursor. When attached, swaps out the default placement so the demo has
+ * a visibly different behavior.
+ */
+function AttachCustomCursor({ attached }: { attached: boolean }) {
+    const api = useAlphaTabApi();
     useEffect(() => {
-        if (!api || !showCustomHandlerToggle) return;
-        if (!customHandlerAttached) {
+        if (!api) return;
+        if (!attached) {
             api.customCursorHandler = undefined;
             return;
         }
@@ -166,7 +156,31 @@ export const CursorToggleDemo: React.FC<CursorToggleDemoProps> = ({
         return () => {
             api.customCursorHandler = undefined;
         };
-    }, [api, customHandlerAttached, showCustomHandlerToggle]);
+    }, [api, attached]);
+    return null;
+}
+
+interface InnerProps {
+    showThemeToggle: boolean;
+    showAnimationToggle: boolean;
+    showCustomHandlerToggle: boolean;
+}
+
+const Inner: React.FC<InnerProps> = ({
+    showThemeToggle,
+    showAnimationToggle,
+    showCustomHandlerToggle,
+}) => {
+    const api = useAlphaTabApi();
+    const state = useAlphaTabState();
+
+    const [enableCursor, setEnableCursor] = useState(true);
+    const [enableHighlight, setEnableHighlight] = useState(true);
+    const [enableAnimation, setEnableAnimation] = useState(true);
+    const [customHandlerAttached, setCustomHandlerAttached] = useState(
+        showCustomHandlerToggle
+    );
+    const [theme, setTheme] = useState<CursorTheme>("default");
 
     return (
         <div className={`${styles.wrapper} ${themeClass[theme]}`}>
@@ -174,9 +188,9 @@ export const CursorToggleDemo: React.FC<CursorToggleDemoProps> = ({
                 <button
                     className="button button--primary"
                     onClick={() => api?.playPause()}
-                    aria-label={isPlaying ? "Pause" : "Play"}
+                    aria-label={state.isPlaying ? "Pause" : "Play"}
                 >
-                    <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
+                    <FontAwesomeIcon icon={state.isPlaying ? solid.faPause : solid.faPlay} />
                 </button>
                 <label className={styles.checkbox}>
                     <input
@@ -232,7 +246,44 @@ export const CursorToggleDemo: React.FC<CursorToggleDemoProps> = ({
                     </ul>
                 )}
             </div>
-            <div ref={element}>{tex}</div>
+            <ApplyCursorSettings
+                enableCursor={enableCursor}
+                enableHighlight={enableHighlight}
+                enableAnimation={enableAnimation}
+                manageAnimation={!showCustomHandlerToggle}
+            />
+            {showCustomHandlerToggle && (
+                <AttachCustomCursor attached={customHandlerAttached} />
+            )}
+            <AlphaTabCanvas />
         </div>
+    );
+};
+
+export const CursorToggleDemo: React.FC<CursorToggleDemoProps> = ({
+    file,
+    tex,
+    showThemeToggle = false,
+    showAnimationToggle = false,
+    showCustomHandlerToggle = false,
+}) => {
+    // Continuous scroll + animated beat cursor were the original defaults so
+    // the demo behaves the same as before the refactor. `enableCursor`/
+    // `enableElementHighlighting` are toggled at runtime by the inner effects.
+    const settings: alphaTab.json.SettingsJson = {
+        player: {
+            scrollMode: "Continuous",
+            enableAnimatedBeatCursor: true,
+        },
+    };
+
+    return (
+        <AlphaTabPlayer file={file} tex={tex} settings={settings}>
+            <Inner
+                showThemeToggle={showThemeToggle}
+                showAnimationToggle={showAnimationToggle}
+                showCustomHandlerToggle={showCustomHandlerToggle}
+            />
+        </AlphaTabPlayer>
     );
 };

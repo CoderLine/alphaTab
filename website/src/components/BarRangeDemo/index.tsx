@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabControls,
+  useAlphaTabState,
+} from "@site/src/alphatab-react";
 
 const DEFAULT_TEX = `\\title "Bar-range paging"
 \\tempo 100
@@ -40,6 +44,28 @@ export interface BarRangeDemoProps {
   step?: number;
 }
 
+function ApplyRange({
+  startBar,
+  barCount,
+  onTotalBarsChange,
+}: {
+  startBar: number;
+  barCount: number;
+  onTotalBarsChange: (n: number) => void;
+}) {
+  const controls = useAlphaTabControls();
+  const state = useAlphaTabState();
+  useEffect(() => {
+    if (controls) {
+      controls.updateSettings({ display: { startBar, barCount } });
+    }
+  }, [controls, startBar, barCount]);
+  useEffect(() => {
+    onTotalBarsChange(state.totalBars);
+  }, [state.totalBars, onTotalBarsChange]);
+  return null;
+}
+
 export const BarRangeDemo: React.FC<BarRangeDemoProps> = ({
   showCode = true,
   file,
@@ -51,30 +77,7 @@ export const BarRangeDemo: React.FC<BarRangeDemoProps> = ({
   const barCount = step;
 
   const useTex = !file;
-  const texContent = tex ?? DEFAULT_TEX;
-
-  const [api, element] = useAlphaTab((s) => {
-    if (file) {
-      s.core.file = file;
-    } else {
-      s.core.tex = true;
-    }
-    s.display.startBar = 1;
-    s.display.barCount = step;
-  });
-
-  useAlphaTabEvent(api, "scoreLoaded", (score: alphaTab.model.Score) => {
-    setTotalBars(score.masterBars.length);
-  });
-
-  useEffect(() => {
-    if (api) {
-      api.settings.display.startBar = startBar;
-      api.settings.display.barCount = barCount;
-      api.updateSettings();
-      api.render();
-    }
-  }, [api, startBar, barCount]);
+  const texContent = useTex ? tex ?? DEFAULT_TEX : undefined;
 
   const endBar =
     totalBars > 0
@@ -141,7 +144,19 @@ document.getElementById('next-page').addEventListener('click', () => {
           {totalBars > 0 ? ` of ${totalBars}` : ""}
         </span>
       </div>
-      <div ref={element}>{useTex ? texContent : undefined}</div>
+      <AlphaTabPlayer
+        file={file}
+        tex={texContent}
+        player={false}
+        settings={{ display: { startBar: 1, barCount: step } }}
+      >
+        <ApplyRange
+          startBar={startBar}
+          barCount={barCount}
+          onTotalBarsChange={setTotalBars}
+        />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 export interface MultiBarRestToggleProps {
@@ -28,30 +33,28 @@ const DEMO_TEX = `\\title "Multi-bar rests"
   :1 3.4
 `;
 
-export const MultiBarRestToggle: React.FC<MultiBarRestToggleProps> = ({
-  showCode = true,
-}) => {
-  const [enabled, setEnabled] = useState(true);
-  const [api, element] = useAlphaTab((s) => {
-    s.core.tex = true;
-    s.core.tracks = "all";
-  });
-
+function ApplyMultiBarRest({ enabled }: { enabled: boolean }) {
+  const api = useAlphaTabApi();
   useAlphaTabEvent(
-    api,
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
       score.stylesheet.multiTrackMultiBarRest = enabled;
     },
     [enabled]
   );
-
   useEffect(() => {
     if (api && api.score) {
       api.score.stylesheet.multiTrackMultiBarRest = enabled;
       api.render();
     }
   }, [enabled, api]);
+  return null;
+}
+
+export const MultiBarRestToggle: React.FC<MultiBarRestToggleProps> = ({
+  showCode = true,
+}) => {
+  const [enabled, setEnabled] = useState(true);
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.multiTrackMultiBarRest = ${enabled};
@@ -71,7 +74,10 @@ export const MultiBarRestToggle: React.FC<MultiBarRestToggleProps> = ({
           Collapse consecutive empty bars into a multi-bar rest
         </label>
       </div>
-      <div ref={element}>{DEMO_TEX}</div>
+      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={false}>
+        <ApplyMultiBarRest enabled={enabled} />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

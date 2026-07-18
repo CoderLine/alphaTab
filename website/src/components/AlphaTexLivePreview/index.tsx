@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabControls,
+} from "@site/src/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface AlphaTexLivePreviewProps {
@@ -13,25 +17,14 @@ const INITIAL_TEX = `\\title "Live alphaTex preview"
 :8 3.3 5.3 7.3 8.3 | 10.3 8.3 7.3 5.3 |
 :4 3.3.4 5.3.4 :8 7.3 8.3 10.3 8.3 |`;
 
-export const AlphaTexLivePreview: React.FC<AlphaTexLivePreviewProps> = ({
-  showCode = true,
-}) => {
-  const [api, element] = useAlphaTab((s) => {
-    s.core.tex = true;
-  });
-  const [text, setText] = useState(INITIAL_TEX);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const initialLoadedRef = useRef(false);
+interface InnerProps {
+  text: string;
+  setText: (value: string) => void;
+}
 
-  useEffect(() => {
-    if (!api) {
-      return;
-    }
-    if (!initialLoadedRef.current) {
-      initialLoadedRef.current = true;
-      api.tex(INITIAL_TEX);
-    }
-  }, [api]);
+const Inner: React.FC<InnerProps> = ({ text, setText }) => {
+  const controls = useAlphaTabControls();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const onChange = (value: string) => {
     setText(value);
@@ -39,9 +32,9 @@ export const AlphaTexLivePreview: React.FC<AlphaTexLivePreviewProps> = ({
       clearTimeout(debounceRef.current);
     }
     debounceRef.current = setTimeout(() => {
-      if (api) {
+      if (controls) {
         try {
-          api.tex(value);
+          controls.loadScoreFromTex(value);
         } catch {
           // parse errors surface through the api.error event
         }
@@ -57,6 +50,25 @@ export const AlphaTexLivePreview: React.FC<AlphaTexLivePreviewProps> = ({
     };
   }, []);
 
+  return (
+    <>
+      <textarea
+        className={styles.editor}
+        value={text}
+        rows={8}
+        spellCheck={false}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      <AlphaTabCanvas />
+    </>
+  );
+};
+
+export const AlphaTexLivePreview: React.FC<AlphaTexLivePreviewProps> = ({
+  showCode = true,
+}) => {
+  const [text, setText] = useState(INITIAL_TEX);
+
   const code = `const api = new alphaTab.AlphaTabApi(container, {});
 api.tex(\`
   \\\\title "Live alphaTex preview"
@@ -71,14 +83,9 @@ document.getElementById('tex-input').addEventListener('input', (e) => {
 
   return (
     <div className={styles.demo}>
-      <textarea
-        className={styles.editor}
-        value={text}
-        rows={8}
-        spellCheck={false}
-        onChange={(e) => onChange(e.target.value)}
-      />
-      <div ref={element}></div>
+      <AlphaTabPlayer tex={INITIAL_TEX} player={false}>
+        <Inner text={text} setText={setText} />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

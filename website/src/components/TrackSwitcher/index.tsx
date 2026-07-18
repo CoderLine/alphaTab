@@ -1,7 +1,12 @@
-import React, { useCallback, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
+import React, { useCallback, useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabControls,
+  useAlphaTabState,
+} from "@site/src/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface TrackSwitcherProps {
@@ -13,41 +18,43 @@ interface TrackInfo {
   name: string;
 }
 
-export const TrackSwitcher: React.FC<TrackSwitcherProps> = ({
-  showCode = true,
-}) => {
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = "/files/features/Skillet.gp5";
-    s.core.tracks = [0];
-  });
-  const [tracks, setTracks] = useState<TrackInfo[]>([]);
-  const [selected, setSelected] = useState<Set<number>>(new Set([0]));
+const Inner: React.FC = () => {
+  const api = useAlphaTabApi();
+  const controls = useAlphaTabControls();
+  const state = useAlphaTabState();
 
-  useAlphaTabEvent(api, "scoreLoaded", (score: alphaTab.model.Score) => {
-    setTracks(
-      score.tracks.map((t) => ({
+  const tracks: TrackInfo[] = React.useMemo(
+    () =>
+      state.tracks.map((t) => ({
         index: t.index,
         name: t.name || `Track ${t.index + 1}`,
-      }))
-    );
-  });
+      })),
+    [state.tracks],
+  );
+
+  const [selected, setSelected] = useState<Set<number>>(new Set([0]));
+
+  // When a new score is loaded, reflect the currently-rendered tracks.
+  useEffect(() => {
+    if (state.renderedTracks.length === 0) return;
+    setSelected(new Set(state.renderedTracks.map((t) => t.index)));
+  }, [state.renderedTracks]);
 
   const applySelection = useCallback(
     (nextIndices: number[]) => {
-      if (!api?.score) {
+      const score = api?.score;
+      if (!controls || !score) {
         return;
       }
       const cleaned = Array.from(new Set(nextIndices)).sort((a, b) => a - b);
       if (cleaned.length === 0) {
         return; // never render zero tracks
       }
-      const trackObjs = cleaned
-        .map((i) => api.score!.tracks[i])
-        .filter(Boolean);
+      const trackObjs = cleaned.map((i) => score.tracks[i]).filter(Boolean);
       setSelected(new Set(cleaned));
-      api.renderTracks(trackObjs);
+      controls.renderTracks(trackObjs);
     },
-    [api]
+    [api, controls],
   );
 
   const toggle = (i: number) => {
@@ -66,22 +73,8 @@ export const TrackSwitcher: React.FC<TrackSwitcherProps> = ({
   const showOnly = (indices: number[]) => applySelection(indices);
   const showAll = () => applySelection(tracks.map((t) => t.index));
 
-  const code = `const api = new alphaTab.AlphaTabApi(container, {
-  core: {
-    file: '/scores/song.gp5',
-    tracks: [0],
-  },
-});
-
-api.scoreLoaded.on((score) => {
-  renderCheckboxes(score.tracks);
-});
-
-// Later, when the user picks tracks:
-api.renderTracks([api.score.tracks[0], api.score.tracks[1]]);`;
-
   return (
-    <div className={styles.demo}>
+    <>
       <div className={styles.controls}>
         {tracks.length === 0 ? (
           <span className={styles.placeholder}>Loading tracks…</span>
@@ -125,7 +118,37 @@ api.renderTracks([api.score.tracks[0], api.score.tracks[1]]);`;
           </>
         )}
       </div>
-      <div ref={element}></div>
+      <AlphaTabCanvas />
+    </>
+  );
+};
+
+export const TrackSwitcher: React.FC<TrackSwitcherProps> = ({
+  showCode = true,
+}) => {
+  const code = `const api = new alphaTab.AlphaTabApi(container, {
+  core: {
+    file: '/scores/song.gp5',
+    tracks: [0],
+  },
+});
+
+api.scoreLoaded.on((score) => {
+  renderCheckboxes(score.tracks);
+});
+
+// Later, when the user picks tracks:
+api.renderTracks([api.score.tracks[0], api.score.tracks[1]]);`;
+
+  return (
+    <div className={styles.demo}>
+      <AlphaTabPlayer
+        file="/files/features/Skillet.gp5"
+        tracks={[0]}
+        player={false}
+      >
+        <Inner />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

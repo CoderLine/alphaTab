@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
-import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import type * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 type PolicyName = "Hidden" | "FirstSystem" | "AllSystems";
@@ -32,6 +38,45 @@ const DEMO_TEX = `\\title "Track name policies"
   :4 (D4 F4 A4) (C4 E4 G4) :2 (F4 A4 C5)
 `;
 
+function ApplyTrackNames({
+  policy,
+  mode,
+  orientation,
+}: {
+  policy: PolicyName;
+  mode: ModeName;
+  orientation: OrientationName;
+}) {
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
+  const applyStylesheet = (score: alphaTab.model.Score) => {
+    if (!module) return;
+    const s = score.stylesheet;
+    s.multiTrackTrackNamePolicy = module.model.TrackNamePolicy[policy];
+    s.singleTrackTrackNamePolicy = module.model.TrackNamePolicy[policy];
+    s.firstSystemTrackNameMode = module.model.TrackNameMode[mode];
+    s.otherSystemsTrackNameMode = module.model.TrackNameMode[mode];
+    s.firstSystemTrackNameOrientation =
+      module.model.TrackNameOrientation[orientation];
+    s.otherSystemsTrackNameOrientation =
+      module.model.TrackNameOrientation[orientation];
+  };
+  useAlphaTabEvent(
+    "scoreLoaded",
+    (score: alphaTab.model.Score) => {
+      applyStylesheet(score);
+    },
+    [policy, mode, orientation, module]
+  );
+  useEffect(() => {
+    if (api && api.score) {
+      applyStylesheet(api.score);
+      api.render();
+    }
+  }, [policy, mode, orientation, api, module]);
+  return null;
+}
+
 export const TrackNamePolicyDemo: React.FC<TrackNamePolicyDemoProps> = ({
   showCode = true,
 }) => {
@@ -39,39 +84,6 @@ export const TrackNamePolicyDemo: React.FC<TrackNamePolicyDemoProps> = ({
   const [mode, setMode] = useState<ModeName>("FullName");
   const [orientation, setOrientation] =
     useState<OrientationName>("Horizontal");
-
-  const [api, element] = useAlphaTab((s) => {
-    s.core.tex = true;
-    s.core.tracks = "all";
-  });
-
-  const applyStylesheet = (score: alphaTab.model.Score) => {
-    const s = score.stylesheet;
-    s.multiTrackTrackNamePolicy = alphaTab.model.TrackNamePolicy[policy];
-    s.singleTrackTrackNamePolicy = alphaTab.model.TrackNamePolicy[policy];
-    s.firstSystemTrackNameMode = alphaTab.model.TrackNameMode[mode];
-    s.otherSystemsTrackNameMode = alphaTab.model.TrackNameMode[mode];
-    s.firstSystemTrackNameOrientation =
-      alphaTab.model.TrackNameOrientation[orientation];
-    s.otherSystemsTrackNameOrientation =
-      alphaTab.model.TrackNameOrientation[orientation];
-  };
-
-  useAlphaTabEvent(
-    api,
-    "scoreLoaded",
-    (score: alphaTab.model.Score) => {
-      applyStylesheet(score);
-    },
-    [policy, mode, orientation]
-  );
-
-  useEffect(() => {
-    if (api && api.score) {
-      applyStylesheet(api.score);
-      api.render();
-    }
-  }, [policy, mode, orientation, api]);
 
   const code = `api.scoreLoaded.on((score) => {
   const s = score.stylesheet;
@@ -138,7 +150,14 @@ export const TrackNamePolicyDemo: React.FC<TrackNamePolicyDemoProps> = ({
           </select>
         </label>
       </div>
-      <div ref={element}>{DEMO_TEX}</div>
+      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={false}>
+        <ApplyTrackNames
+          policy={policy}
+          mode={mode}
+          orientation={orientation}
+        />
+        <AlphaTabCanvas />
+      </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

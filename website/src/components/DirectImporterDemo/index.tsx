@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
+import type { model } from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
-import { useAlphaTab } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface DirectImporterDemoProps {
@@ -16,7 +21,10 @@ interface InspectedScore {
   tracks: Array<{ name: string; bars: number; tuning: string }>;
 }
 
-function inspect(score: alphaTab.model.Score): InspectedScore {
+function inspect(
+  score: model.Score,
+  Tuning: typeof import("@coderline/alphatab").model.Tuning,
+): InspectedScore {
   return {
     title: score.title || "(untitled)",
     artist: score.artist || "(unknown)",
@@ -27,7 +35,7 @@ function inspect(score: alphaTab.model.Score): InspectedScore {
       const stringTunings = track.staves[0]?.stringTuning?.tunings ?? [];
       const tuningNames = [...stringTunings]
         .reverse()
-        .map((midi) => alphaTab.model.Tuning.getTextForTuning(midi, false))
+        .map((midi) => Tuning.getTextForTuning(midi, false))
         .join(" ");
       return {
         name: track.name || "(unnamed)",
@@ -38,33 +46,47 @@ function inspect(score: alphaTab.model.Score): InspectedScore {
   };
 }
 
-export const DirectImporterDemo: React.FC<DirectImporterDemoProps> = ({
-  showCode = true,
-}) => {
-  const [api, element] = useAlphaTab(() => {});
-  const [info, setInfo] = useState<InspectedScore | null>(null);
+interface InnerProps {
+  info: InspectedScore | null;
+  setInfo: (info: InspectedScore | null) => void;
+}
+
+const Inner: React.FC<InnerProps> = ({ setInfo }) => {
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
 
   useEffect(() => {
-    if (!api) {
+    if (!api || !module) {
       return;
     }
     let cancelled = false;
     (async () => {
       const buffer = await fetch("/files/features/Chords.gp5").then((r) =>
-        r.arrayBuffer()
+        r.arrayBuffer(),
       );
       if (cancelled) {
         return;
       }
       const bytes = new Uint8Array(buffer);
-      const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(bytes);
-      setInfo(inspect(score));
+      const score = module.importer.ScoreLoader.loadScoreFromBytes(
+        bytes,
+        api.settings,
+      );
+      setInfo(inspect(score, module.model.Tuning));
       api.renderScore(score, [0]);
     })();
     return () => {
       cancelled = true;
     };
-  }, [api]);
+  }, [api, module, setInfo]);
+
+  return <AlphaTabCanvas />;
+};
+
+export const DirectImporterDemo: React.FC<DirectImporterDemoProps> = ({
+  showCode = true,
+}) => {
+  const [info, setInfo] = useState<InspectedScore | null>(null);
 
   const code = `import * as alphaTab from '@coderline/alphatab';
 
@@ -85,7 +107,9 @@ api.renderScore(score, [0]);`;
     <div className={styles.demo}>
       <div className={styles.split}>
         <div className={styles.render}>
-          <div ref={element}></div>
+          <AlphaTabPlayer player={false}>
+            <Inner info={info} setInfo={setInfo} />
+          </AlphaTabPlayer>
         </div>
         <aside className={styles.inspection} aria-label="Score inspection">
           <h4>Score model (pre-render)</h4>
@@ -98,7 +122,7 @@ tracks:       ${info.trackCount}
 ${info.tracks
   .map(
     (t, i) =>
-      `  [${i}] ${t.name} — ${t.bars} bars, tuning: ${t.tuning}`
+      `  [${i}] ${t.name} — ${t.bars} bars, tuning: ${t.tuning}`,
   )
   .join("\n")}`}
             </pre>

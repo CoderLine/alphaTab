@@ -1,6 +1,10 @@
-import * as alphaTab from "@coderline/alphatab";
 import React, { useState } from "react";
-import { useAlphaTab } from "@site/src/hooks";
+import {
+  AlphaTabPlayer,
+  AlphaTabCanvas,
+  useAlphaTabApi,
+  useAlphaTabModule,
+} from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 export interface ScoreJsonDemoProps {
@@ -13,27 +17,36 @@ function formatSize(bytes: number, lines: number): string {
   return `${sizeLabel}, ${lines.toLocaleString()} lines`;
 }
 
-export const ScoreJsonDemo: React.FC<ScoreJsonDemoProps> = ({
-  showCode = true,
-}) => {
-  const [api, element] = useAlphaTab((s) => {
-    s.core.file = "/files/features/Chords.gp5";
-    s.player.playerMode = alphaTab.PlayerMode.Disabled;
-    s.player.scrollMode = alphaTab.ScrollMode.Off;
-    s.player.enableCursor = false;
-    s.player.enableUserInteraction = false;
-  });
+const codeSample = `import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/canon.gp' },
+});
+
+api.scoreLoaded.on(() => {
+  // Serialize
+  const jsonString = alphaTab.model.JsonConverter.scoreToJson(api.score);
+
+  // Round-trip
+  const restored = alphaTab.model.JsonConverter.jsonToScore(jsonString);
+  api.renderScore(restored);
+});`;
+
+const ScoreJsonControls: React.FC = () => {
+  const api = useAlphaTabApi();
+  const module = useAlphaTabModule();
 
   const [json, setJson] = useState<string>("");
   const [caption, setCaption] = useState<string>();
   const [copyStatus, setCopyStatus] = useState<string>();
 
   function serialize() {
-    if (!api || !api.score) {
+    if (!api || !api.score || !module) {
       return;
     }
     try {
-      const text = alphaTab.model.JsonConverter.scoreToJson(api.score);
+      const text = module.model.JsonConverter.scoreToJson(api.score);
       setJson(text);
       const bytes = new TextEncoder().encode(text).length;
       const lines = text.split("\n").length;
@@ -46,11 +59,11 @@ export const ScoreJsonDemo: React.FC<ScoreJsonDemoProps> = ({
   }
 
   function roundTrip() {
-    if (!api || !json) {
+    if (!api || !json || !module) {
       return;
     }
     try {
-      const restored = alphaTab.model.JsonConverter.jsonToScore(json);
+      const restored = module.model.JsonConverter.jsonToScore(json);
       api.renderScore(restored);
     } catch (e) {
       console.error("Round-trip failed", e);
@@ -72,25 +85,8 @@ export const ScoreJsonDemo: React.FC<ScoreJsonDemoProps> = ({
     }
   }
 
-  const code = `import * as alphaTab from '@coderline/alphatab';
-
-const container = getAlphaTabContainer();
-const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
-});
-
-api.scoreLoaded.on(() => {
-  // Serialize
-  const jsonString = alphaTab.model.JsonConverter.scoreToJson(api.score);
-
-  // Round-trip
-  const restored = alphaTab.model.JsonConverter.jsonToScore(jsonString);
-  api.renderScore(restored);
-});`;
-
   return (
-    <div>
-      <div ref={element} />
+    <>
       <div
         style={{
           display: "flex",
@@ -163,7 +159,20 @@ api.scoreLoaded.on(() => {
           {caption}
         </div>
       )}
-      {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
+    </>
+  );
+};
+
+export const ScoreJsonDemo: React.FC<ScoreJsonDemoProps> = ({
+  showCode = true,
+}) => {
+  return (
+    <div>
+      <AlphaTabPlayer file="/files/features/Chords.gp5" player={false}>
+        <AlphaTabCanvas />
+        <ScoreJsonControls />
+      </AlphaTabPlayer>
+      {showCode ? <CodeBlock language="js">{codeSample}</CodeBlock> : null}
     </div>
   );
 };
