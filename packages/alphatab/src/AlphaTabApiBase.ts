@@ -2227,6 +2227,7 @@ export class AlphaTabApiBase<TSettings> {
         } else {
             this._defaultCursorHandler = new NonAnimatingCursorHandler();
         }
+        this._cursorHandlerMode = cursorHandlerMode;
     }
 
     private _scrollHandlerMode = ScrollMode.Off;
