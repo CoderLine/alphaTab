@@ -12,11 +12,21 @@ keywords:
   - audio backend
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { TransportControls } from '@site/src/components/PlaySync';
 
 This page describes the Android-only audio backend. On Android, alphaTab's synth pipeline ends at `AndroidSynthOutput` — an `ISynthOutput` implementation that pushes 44.1 kHz stereo float samples to an `android.media.AudioTrack` through a background worker thread. The demo below runs the web player because these docs are hosted in a browser; the code snippet is what you write on Android.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<TransportControls
+  tex={`\\title "Android backend"
+\\tempo 104
+.
+\\track "Guitar"
+:4 3.5 5.4 7.3 5.4 |
+:2 7.3 :4 5.4 3.5 |
+:8 3.5 5.5 7.4 5.4 3.4 5.4 7.4 8.4 |
+:1 (0.5 2.4 3.3) |`}
+  showCode={false}
+/>
 
 ## What runs on the audio thread
 

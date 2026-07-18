@@ -10,11 +10,45 @@ keywords:
   - layered
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { TransportControls } from '@site/src/components/PlaySync';
+import CodeBlock from '@theme/CodeBlock';
 
 Load several SoundFonts into the same synth and alphaTab merges their preset banks. Pair a small drums-only SoundFont with a large guitar pack, or pull instrument files on demand once you know which tracks the loaded score needs.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<TransportControls
+  tex={`\\title "Layer target"
+\\tempo 96
+.
+\\track "Guitar"
+:8 3.3 5.3 7.3 5.3 3.3 5.3 7.3 8.3 |
+:4 (3.3 5.2 5.1) (5.3 7.2 7.1) :2 (7.3 8.2 9.1) |
+:8 3.4 5.4 :4 7.4 :2 5.4 |
+:1 (3.5 5.4 5.3) |`}
+  showCode={false}
+/>
+
+The player above renders with the bundled Sonivox SoundFont — the same one the [custom SoundFonts](custom-soundfonts) page swaps out. The snippet below is what turns a single-load pipeline into a layered stack: every extra `loadSoundFont(bytes, /* append */ true)` call merges its presets into the running synth instead of replacing them.
+
+<CodeBlock language="js">{`import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },
+});
+
+// First append — merges into the bundled Sonivox presets already loaded.
+const guitarBytes = await readScoreFile('/assets/guitars.sf2');
+api.loadSoundFont(guitarBytes, /* append */ true);
+
+// Second append — layers a drums-only SoundFont on top.
+// Preset conflicts resolve in load order; later wins.
+const drumBytes = await readScoreFile('/assets/drums.sf2');
+api.loadSoundFont(drumBytes, true);
+
+api.soundFontLoaded.on(() => {
+  console.log('Layer ready.');
+});
+`}</CodeBlock>
 
 ## The `append` flag
 

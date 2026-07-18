@@ -10,11 +10,24 @@ keywords:
   - SF2
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { SoundFontSwitcher } from '@site/src/components/PlaySync';
 
 The bundled Sonivox SoundFont covers General MIDI but is deliberately small. Replace it with a purpose-built `.sf2` when the score calls for richer guitars, a specific piano, or a genre-tuned drum kit.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<SoundFontSwitcher
+  tex={`\\title "Timbre showcase"
+\\tempo 72
+.
+\\track "Guitar"
+:8 0.4 3.3 2.2 3.1 2.2 3.3 0.4 3.3 |
+:8 2.4 5.3 4.2 5.1 4.2 5.3 2.4 5.3 |
+:8 5.4 7.3 5.2 7.1 5.2 7.3 5.4 7.3 |
+:1 (0.4 2.3 3.2 3.1) |`}
+  options={[{ label: 'Sonivox (bundled)' }]}
+  showCode={false}
+/>
+
+The player above uses the bundled Sonivox SoundFont. The same load path accepts any SoundFont URL or byte buffer — the demo keeps only the built-in option so the docs stay portable, and the snippet below shows how to point at your own file.
 
 ## Two ways to load one
 

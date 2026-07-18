@@ -16,7 +16,19 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 `AlphaTabView` is the Android control that hosts alphaTab inside a classic View-based layout. It is the same rendering and playback engine as the web build, wrapped in a Kotlin `View` you position through XML or programmatically.
 
-<AlphaTab file="/files/canon.gp" />
+<AlphaTab tex={true}>{`
+\\title "AlphaTabView"
+\\subtitle "Android host, same engine"
+\\tempo 112
+.
+\\track "Guitar"
+  :4 (5.5 7.4 9.3) (7.5 9.4 10.3) :2 (10.5 12.4 14.3) |
+  :8 7.6 9.6 10.6 12.6 10.6 9.6 7.6 5.6 |
+  :4 (5.5 7.4 8.3) (7.5 9.4 10.3) :2 (5.5 7.4 8.3) |
+  :2 (3.5 5.4 7.3) (5.5 7.4 9.3)
+`}</AlphaTab>
+
+Rendered here on the Web backend. On Android, `AlphaTabView` produces the identical output through the same `AlphaTabApi` surface — see the Kotlin below.
 
 ## Add the view to a layout
 
@@ -57,7 +69,7 @@ class MainActivity : ComponentActivity() {
         alphaTabView = findViewById(R.id.alphatab_view)
         val api = alphaTabView.api
 
-        api.load("file:///android_asset/scores/canon.gp")
+        api.load("file:///android_asset/scores/song.gp")
 
         api.scoreLoaded.on { score ->
             // apply styles, subscribe to playback events, adjust settings

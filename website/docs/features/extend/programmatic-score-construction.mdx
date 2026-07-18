@@ -13,19 +13,13 @@ keywords:
   - Track
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { ProgrammaticScoreExample } from '@site/src/components/ProgrammaticScoreExample';
 
 alphaTab's model is public. Instantiate `Score`, `Track`, `Staff`, `Bar`, `Voice`, `Beat`, and `Note`, wire them together, and hand the root `Score` to `api.renderScore()`. No file format, no importer, no round-trip through alphaTex.
 
-<AlphaTab tex={true}>{`
-\\title "Built in code"
-\\tempo 120
-.
-3.3.4 5.3 7.3 8.3 |
-8.3.4 7.3 5.3 3.3
-`}</AlphaTab>
+<ProgrammaticScoreExample showCode={false} />
 
-The demo above shows what one Track / one Staff / two Bars / eight beats worth of construction looks like when rendered. The same shape assembled through the model classes appears in the sample below.
+The demo above is built entirely from `new alphaTab.model.Score()` and its children — no file, no alphaTex, no importer. One Track, one Staff, two Bars, eight beats, then a single `api.renderScore(score)` call. The same construction, line for line, appears in the sample below.
 
 ## Model shape
 

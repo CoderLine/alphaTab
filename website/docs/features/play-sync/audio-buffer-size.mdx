@@ -10,11 +10,21 @@ keywords:
   - latency
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { BufferSizeDemo } from '@site/src/components/PlaySync';
 
 alphaTab's synth renders audio in chunks. The chunk size sets how much of the future the synth generates before the platform's audio backend consumes it. Smaller chunks respond to volume and seek changes faster; larger chunks survive slower CPUs without glitching.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<BufferSizeDemo
+  tex={`\\title "Buffer probe"
+\\tempo 110
+.
+\\track "Guitar"
+:8 3.4 5.4 3.4 5.4 3.4 5.4 3.4 5.4 |
+:8 5.4 7.4 5.4 7.4 5.4 7.4 5.4 7.4 |
+:8 3.4 5.4 7.4 5.4 3.4 5.4 7.4 8.4 |
+:4 7.4 5.4 :2 3.4 |`}
+  showCode={false}
+/>
 
 ## The knob
 

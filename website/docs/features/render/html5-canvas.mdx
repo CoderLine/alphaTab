@@ -15,7 +15,17 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 Draw the score into `<canvas>` elements instead of SVG. You trade the DOM tree for a flat pixel buffer — faster to paint on dense scores and lighter on layout when the reader scrolls a long piece.
 
-<AlphaTab file="/files/canon.gp" settings={{ core: { engine: 'html5' } }} />
+<AlphaTab tex={true} settings={{ core: { engine: 'html5' } }}>{`
+\\title "Canvas backend"
+\\subtitle "Raster output, one <canvas> per system"
+\\tempo 120
+.
+\\track "Guitar"
+  :8 5.5 7.5 8.5 10.5 8.5 7.5 5.5 3.5 |
+  :4 (5.5 7.4 9.3) (7.5 9.4 12.3) :2 (10.5 12.4 14.3) |
+  :8 3.6 5.6 7.6 8.6 10.6 8.6 7.6 5.6 |
+  :4 (3.5 5.4 7.3) (5.5 7.4 8.3) :2 (7.5 9.4 12.3)
+`}</AlphaTab>
 
 ## When Canvas is the right pick
 
@@ -35,7 +45,7 @@ import * as alphaTab from '@coderline/alphatab';
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
   core: {
-    file: '/scores/canon.gp',
+    file: '/scores/song.gp',
     engine: 'html5',
   },
 });

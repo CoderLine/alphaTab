@@ -13,11 +13,11 @@ keywords:
   - JsonConverter
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { ScoreJsonDemo } from '@site/src/components/ScoreJsonDemo';
 
 `JsonConverter` turns the alphaTab `Score` object graph into a plain, cycle-free JavaScript object — and back. Persist the result in a database, ship it between a Web Worker and the main thread, or diff two versions of a score in a text editor.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<ScoreJsonDemo showCode={false} />
 
 The score above is a live `Score` instance. Pass it through `JsonConverter.scoreToJsObject(...)` and you get a nested `Map` structure ready for `JSON.stringify`.
 

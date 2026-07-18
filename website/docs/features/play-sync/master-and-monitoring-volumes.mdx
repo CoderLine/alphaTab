@@ -10,11 +10,21 @@ keywords:
   - mixer
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { VolumeMixDemo } from '@site/src/components/PlaySync';
 
 Three top-level knobs control how loud the score, the metronome, and the count-in play. Each takes a value from `0` (silent) to `1` (unity gain).
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<VolumeMixDemo
+  tex={`\\title "Volume test"
+\\tempo 108
+.
+\\track "Guitar"
+:4 (3.3 5.2 7.1) (5.3 7.2 7.1) :2 (7.3 8.2 9.1) |
+:4 (5.3 7.2 7.1) :8 (3.3 5.2 7.1) (5.3 7.2 7.1) :4 (2.3 3.2 5.1) (3.3 5.2 5.1) |
+:4 (0.3 2.2 3.1) (2.3 3.2 5.1) :2 (3.3 5.2 5.1) |
+:1 (0.3 2.2 3.1) |`}
+  showCode={false}
+/>
 
 ## The three knobs
 

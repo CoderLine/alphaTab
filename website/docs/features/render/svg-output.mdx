@@ -12,9 +12,19 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-Render every glyph, staff line, and beam as SVG geometry. The result is a resolution-independent DOM tree you can zoom, style with CSS, hit-test, or hand to a printer without rasterization artifacts.
+Render every glyph, staff line, and beam as SVG geometry. The result is a resolution-independent DOM tree you can zoom, hit-test, or hand to a printer without rasterization artifacts.
 
-<AlphaTab file="/files/canon.gp" settings={{ core: { engine: 'svg' } }} />
+<AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{`
+\\title "Vector output"
+\\subtitle "Every glyph as SVG geometry"
+\\tempo 96
+.
+\\track "Guitar"
+  :4 (2.3 3.2 5.1) (4.3 5.2 7.1) :2 (7.3 8.2 10.1) |
+  :8 3.4 5.4 7.4 8.4 :4 (3.3 5.2 7.1) (2.3 3.2 5.1) |
+  :4 5.5 7.5 8.5 10.5 |
+  :2 (2.3 3.2 5.1) (5.3 7.2 8.1)
+`}</AlphaTab>
 
 ## When SVG is the right pick
 
@@ -22,7 +32,7 @@ SVG is the default backend on Web and the recommended output whenever the render
 
 - **Scales without loss.** Zoom or export at any DPI; the glyph outlines stay crisp.
 - **Prints cleanly.** Browsers rasterize SVG at printer resolution, so bar lines and note heads land pixel-accurate on paper.
-- **Accessible and searchable.** Each rendered element sits in the DOM with class names, so screen readers, custom overlays, and DOM queries all work.
+- **Hit-testable.** Each rendered element sits in the DOM, so custom overlays and DOM queries work directly against the score geometry.
 - **Available on every platform.** SVG runs the same on Web, .NET, and Android — pass `engine: 'svg'` anywhere and get identical output.
 
 The trade-off is throughput. On very dense scores (hundreds of bars in a single view) the DOM grows large and layout thrash can appear during scroll. For that case, reach for [HTML5 Canvas](html5-canvas) on Web or [Skia](skia-backend) on .NET / Android.
@@ -35,7 +45,7 @@ import * as alphaTab from '@coderline/alphatab';
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
   core: {
-    file: '/scores/canon.gp',
+    file: '/scores/song.gp',
     engine: 'svg',
   },
 });

@@ -19,7 +19,7 @@
   "dependencies": {
     "@coderline/alphatab": "^1.9.0-alpha.1861",
     "@docusaurus/core": "^3.9.2",
-    "@docusaurus/plugin-client-redirects": "^3.9.2",
+    "@docusaurus/plugin-client-redirects": "3.9.2",
     "@docusaurus/preset-classic": "^3.9.2",
     "@docusaurus/theme-mermaid": "^3.9.2",
     "@docusaurus/theme-search-algolia": "^3.9.2",

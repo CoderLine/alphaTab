@@ -14,11 +14,23 @@ keywords:
   - at-highlight
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { CursorToggleDemo } from '@site/src/components/CursorToggleDemo';
 
-On the Web platform the cursor and highlight overlays are regular DOM elements. Style them with the same CSS you use for the rest of your site.
+On the Web platform the cursor and highlight overlays are regular DOM elements. Style them with the same CSS you use for the rest of your site. Pick a theme in the demo below to see the classes swap under three different stylesheets, and toggle the beat-cursor animation to compare a slide against a hard tick.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<CursorToggleDemo showThemeToggle showAnimationToggle showCode={false} tex={`
+\\title "Cursor themes"
+\\tempo 104
+.
+\\track "Guitar"
+:4 5.4 7.3 8.3 10.3 | :8 12.3 10.3 8.3 7.3 :4 5.4 3.4 |
+:4 2.4 3.4 5.4 7.3 | :8 8.3 7.3 5.4 3.4 :4 2.4 0.4 |
+:4 3.4 5.4 7.3 8.3 | :8 10.3 12.3 10.3 8.3 :4 7.3 5.4 |
+:4 3.4 5.4 8.3 7.3 | :8 5.4 3.4 2.4 3.4 :4 5.4 7.3 |
+:4 8.3 10.3 12.3 14.2 | :8 12.3 10.3 8.3 7.3 :4 5.4 3.4 |
+:4 5.4 7.3 8.3 10.3 | :8 8.3 7.3 5.4 3.4 :4 2.4 3.4 |
+:2 5.4 3.4 | :1 (0.4 3.3 5.2) |
+`} />
 
 ## The four classes
 
@@ -31,7 +43,7 @@ alphaTab tags four overlay elements with stable classes. Target them from your s
 
 ## Animating or ticking the beat cursor
 
-The beat cursor can either slide smoothly across the beat's width or tick from beat to beat. `player.enableAnimatedBeatCursor` picks between the two. It defaults to `true`. Turn it off for editor UIs where a hard step is easier to read.
+The beat cursor can either slide smoothly across the beat's width or tick from beat to beat. `player.enableAnimatedBeatCursor` picks between the two. It defaults to `true`. Turn it off for editor UIs where a hard step is easier to read. The difference shows up during playback — press play in the demo above and toggle the checkbox to watch the beat cursor switch between a smooth slide and a hard step per beat.
 
 ## Show it in code
 
@@ -61,7 +73,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
     playerMode: alphaTab.PlayerMode.EnabledAutomatic,
     enableAnimatedBeatCursor: true,

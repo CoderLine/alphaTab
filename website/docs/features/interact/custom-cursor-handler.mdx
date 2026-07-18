@@ -12,11 +12,24 @@ keywords:
   - customCursorHandler
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { CursorToggleDemo } from '@site/src/components/CursorToggleDemo';
 
-When the built-in cursor placement is not what you need — a follow-cam that lags behind the beat, a glow that pulses off the beat cursor, a cursor that morphs into a highlighter — assign your own handler to `api.customCursorHandler`.
+When the built-in cursor placement is not what you need — a follow-cam that lags behind the beat, a glow that pulses off the beat cursor, a cursor that morphs into a highlighter — assign your own handler to `api.customCursorHandler`. Toggle the demo below to swap between the default cursor and a custom handler that rides a bouncing pill adorner above the beat.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<CursorToggleDemo showCustomHandlerToggle showCode={false} tex={`
+\\title "Cursor handler"
+\\tempo 92
+.
+\\track "Guitar"
+:4 3.3 5.3 7.3 8.3 | :8 10.3 12.3 10.3 8.3 :4 7.3 5.3 |
+:4 3.3 7.3 8.3 10.3 | :8 12.3 10.3 8.3 7.3 :4 5.3 3.3 |
+:4 2.3 5.3 7.3 9.3 | :8 10.3 9.3 7.3 5.3 :4 3.3 2.3 |
+:4 0.3 3.3 5.3 7.3 | :8 8.3 7.3 5.3 3.3 :4 2.3 0.3 |
+:4 3.3 5.3 8.3 7.3 | :8 5.3 3.3 5.3 7.3 :4 8.3 10.3 |
+:4 12.3 10.3 8.3 7.3 | :8 5.3 7.3 8.3 10.3 :4 8.3 5.3 |
+:4 3.3 2.3 3.3 5.3 | :8 7.3 5.3 3.3 2.3 :4 0.3 3.3 |
+:2 5.3 3.3 | :1 3.3 |
+`} />
 
 ## When to reach for it
 
@@ -35,7 +48,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },
 });
 

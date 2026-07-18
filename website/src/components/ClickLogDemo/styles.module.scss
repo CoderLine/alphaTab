@@ -1,0 +1,67 @@
+.wrapper {
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 90%;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+
+  input {
+    margin: 0;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(240px, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.score {
+  min-width: 0;
+}
+
+.log {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 4px;
+  background: var(--ifm-background-surface-color);
+}
+
+.logHeader {
+  padding: 0.35rem 0.6rem;
+  font-size: 80%;
+  font-weight: 600;
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-emphasis-800);
+}
+
+.logBody {
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  font-size: 12px;
+  line-height: 1.4;
+  max-height: 380px;
+  min-height: 200px;
+  overflow: auto;
+  white-space: pre;
+  background: transparent;
+}

@@ -14,7 +14,17 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 Three render backends ship with alphaTab. Each optimizes for a different constraint. Match the backend to the runtime you target and the output you want.
 
-<AlphaTab file="/files/canon.gp" settings={{ core: { engine: 'svg' } }} />
+<AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{`
+\\title "Three backends, one model"
+\\subtitle "SVG, Canvas, Skia"
+\\tempo 108
+.
+\\track "Guitar"
+  :4 (3.4 5.3 7.2) (5.4 7.3 9.2) :2 (7.4 9.3 12.2) |
+  :8 5.5 7.5 9.5 10.5 :4 (5.4 7.3 8.2) (3.4 5.3 7.2) |
+  :4 (7.5 9.4 10.3) (9.5 12.4 14.3) :2 (7.5 9.4 12.3) |
+  :2 (3.4 5.3 7.2) (2.4 3.3 5.2)
+`}</AlphaTab>
 
 ## Pick by runtime first
 
@@ -54,7 +64,7 @@ import * as alphaTab from '@coderline/alphatab';
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
   core: {
-    file: '/scores/canon.gp',
+    file: '/scores/song.gp',
     engine: 'default',
   },
 });

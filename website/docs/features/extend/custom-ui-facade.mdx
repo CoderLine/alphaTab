@@ -16,7 +16,19 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 `IUiFacade` is the contract alphaTab uses to talk to whichever UI framework is hosting it. Every shipped platform provides one: `BrowserUiFacade` on the web, WPF and WinForms facades on .NET, `AndroidUiFacade` on Android. Implement the interface to embed alphaTab in any other host — a game engine, a native desktop toolkit alphaTab does not know about, a custom canvas layer.
 
-<AlphaTab file="/files/canon.gp" />
+<AlphaTab tex={true}>{`
+\\title "IUiFacade"
+\\subtitle "The host-shaped contract"
+\\tempo 96
+.
+\\track "Guitar"
+  :4 (0.6 2.5 2.4) (2.6 4.5 4.4) :2 (4.6 5.5 6.4) |
+  :8 5.4 7.4 8.4 10.4 :4 (2.6 4.5 2.4) (0.6 2.5 2.4) |
+  :4 (3.6 5.5 7.4) (5.6 7.5 9.4) :2 (7.6 9.5 12.4) |
+  :2 (0.6 2.5 2.4) (0.6 4.5 3.4)
+`}</AlphaTab>
+
+The render above already goes through an `IUiFacade` implementation — [`BrowserUiFacade`](https://github.com/CoderLine/alphaTab/blob/main/packages/alphatab/src/platform/javascript/BrowserUiFacade.ts). This page is a meta demo: you are looking at the interface you will implement, as implemented by alphaTab for the browser.
 
 ## What the facade does
 

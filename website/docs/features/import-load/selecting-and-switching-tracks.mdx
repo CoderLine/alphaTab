@@ -10,11 +10,11 @@ keywords:
   - renderTracks
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { TrackSwitcher } from '@site/src/components/TrackSwitcher';
 
 A score can carry a dozen instruments; you usually render one or two. `core.tracks` picks the initial set, and `api.renderTracks()` swaps the visible tracks at runtime without reloading the file.
 
-<AlphaTab file="/files/canon-full.gp" tracks={[0]} />
+<TrackSwitcher showCode={false} />
 
 ## Two places, one concept
 

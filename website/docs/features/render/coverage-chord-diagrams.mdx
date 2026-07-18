@@ -24,7 +24,13 @@ Any beat can carry a chord name. alphaTab renders the name in the chord font dir
 
 ## Chord diagrams above the first system {#diagrams}
 
-When a chord definition ships with a fretboard diagram, alphaTab draws it above the first system by default. The same score renders the diagrams inline above the beat if you disable the top-of-score layout.
+When a chord definition ships with a fretboard diagram, alphaTab draws it above the first system by default. The same score renders the diagrams inline above each referencing bar if you disable the top-of-score layout.
+
+**Diagrams on top (default)**
+
+<AlphaTab file="/files/features/Chords.gp5" settings={{ display: { chordDiagramsOnTop: true } }} />
+
+**Diagrams inline above each bar**
 
 <AlphaTab file="/files/features/Chords.gp5" settings={{ display: { chordDiagramsOnTop: false } }} />
 

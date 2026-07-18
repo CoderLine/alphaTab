@@ -14,9 +14,11 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 Percussion staves use fixed noteheads per piece — an *x* for cymbals, a filled oval for drums, a diamond for the ride bell — arranged on a staff whose line count matches the ensemble size.
 
-<AlphaTab file="/files/features/Drums.gp5" tex={false}>
-  Loading...
-</AlphaTab>
+<AlphaTab
+  file="/files/features/Drums.gp5"
+  tex={false}
+  settings={{ display: { barCount: 8 } }}
+/>
 
 ## Choosing the line count
 

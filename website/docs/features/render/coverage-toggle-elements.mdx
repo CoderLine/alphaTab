@@ -11,16 +11,13 @@ keywords:
   - hide
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { ToggleElementsDemo } from '@site/src/components/ToggleElementsDemo';
 
 alphaTab draws every notation category by default. The `notation.elements` map lets you flip individual categories off — score title, tuning, bar numbers, palm-mute brackets, whammy annotations, lyrics, or any of the other entries in the [`NotationElement`](/docs/reference/types/notationelement) enumeration.
 
-<AlphaTab
-  file="/files/features/Bends.gp5"
-  settings={ { notation: { elements: { effectWhammyBar: false } } } }
-/>
+<ToggleElementsDemo showCode={false} />
 
-The demo above hides the whammy-bar effect band. The same score with `EffectWhammyBar` enabled shows a labeled band above each dip.
+Flip a checkbox to remove that category from the score. Each toggle maps to one `NotationElement` key on the `notation.elements` map.
 
 ## What you can toggle
 

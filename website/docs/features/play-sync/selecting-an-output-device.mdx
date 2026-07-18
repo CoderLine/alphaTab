@@ -11,11 +11,21 @@ keywords:
   - Web Audio
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { OutputDeviceDemo } from '@site/src/components/PlaySync';
 
 Route alphaTab's audio to a specific speaker, headset, or virtual sink. Users on desktops with several audio devices pick where their music plays; you build a dropdown, alphaTab targets the chosen device.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<OutputDeviceDemo
+  tex={`\\title "Device routing"
+\\tempo 100
+.
+\\track "Guitar"
+:4 3.4 5.4 7.4 5.4 |
+:2 7.4 :4 5.4 3.4 |
+:4 (3.4 5.3 7.2) (5.4 7.3 8.2) :2 (7.4 8.3 10.2) |
+:1 (0.4 2.3 3.2) |`}
+  showCode={false}
+/>
 
 **Web-only.** Runs against the browser's [Audio Output Devices API](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/sinkId) — the same experimental `setSinkId` support used by `<audio>` and `<video>` elements. Browser coverage is uneven; see [caniuse](https://caniuse.com/mdn-api_audiocontext_sinkid). On .NET the output device is chosen through [NAudio](naudio-net); on Android through [AudioTrack](audiotrack-android). Point native readers at those pages.
 

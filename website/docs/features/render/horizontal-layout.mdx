@@ -11,10 +11,22 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import { BoundedScoreFrame } from '@site/src/components/BoundedScoreFrame';
 
 Horizontal layout renders every bar on a single row and lets the container scroll sideways. Reach for it when you want a timeline-style view — a moving playback cursor sweeping left-to-right, an audio waveform pinned above a synchronized score, or a DAW-like track lane.
 
-<AlphaTab file="/files/canon.gp" settings={{ display: { layoutMode: 'horizontal' } }} />
+<BoundedScoreFrame maxHeight={420} overflow="x">
+  <AlphaTab tex={true} settings={{ display: { layoutMode: 'horizontal', stretchForce: 1.5 } }}>{`
+\\title "Horizontal layout"
+\\tempo 100
+.
+\\track "Guitar"
+  :4 (3.3 5.2 7.1) (5.3 7.2 9.1) :2 (7.3 9.2 12.1) |
+  :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1) |
+  :8 3.4 5.4 7.4 8.4 10.4 8.4 7.4 5.4 |
+  :4 (3.5 5.4 7.3) (5.5 7.4 9.3) :2 (7.5 9.4 12.3)
+`}</AlphaTab>
+</BoundedScoreFrame>
 
 ## What changes compared to page layout
 

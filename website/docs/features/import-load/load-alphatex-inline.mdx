@@ -10,17 +10,11 @@ keywords:
   - inline
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { AlphaTexLivePreview } from '@site/src/components/AlphaTexLivePreview';
 
 Write the score directly in your page or your code with alphaTex — no file, no importer plumbing.
 
-<AlphaTab tex={true}>{`
-\\title "A short lick"
-\\tempo 120
-.
-:8 3.3 5.3 7.3 8.3 |
-   10.3 8.3 7.3 5.3 |
-`}</AlphaTab>
+<AlphaTexLivePreview showCode={false} />
 
 ## Two ways to feed alphaTex
 

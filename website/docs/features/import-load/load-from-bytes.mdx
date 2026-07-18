@@ -11,11 +11,11 @@ keywords:
   - Uint8Array
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { BytesLoadDemo } from '@site/src/components/BytesLoadDemo';
 
 Read the score bytes yourself, hand them to alphaTab, and skip the built-in fetcher entirely.
 
-<AlphaTab file="/files/canon.gp" />
+<BytesLoadDemo showCode={false} />
 
 ## When the bytes come from you
 
@@ -42,7 +42,7 @@ const api = new alphaTab.AlphaTabApi(container, {
   // No core.file here — the bytes arrive after construction.
 });
 
-const bytes = await readScoreFile('canon.gp');
+const bytes = await readScoreFile('song.gp');
 api.load(bytes, [0]);
 
 api.scoreLoaded.on((score) => {

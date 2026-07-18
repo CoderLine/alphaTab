@@ -11,11 +11,21 @@ keywords:
   - synth
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { TransportControls } from '@site/src/components/PlaySync';
 
 alphaTab does not ship sampled instrument recordings. It converts the score into MIDI, feeds that stream to an embedded software synth, and mixes the synth output into your platform's audio backend. That synth is a port of [TinySoundFont](https://github.com/schellingb/TinySoundFont), which renders any SoundFont 2 (`.sf2`) file into PCM in real time.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<TransportControls
+  tex={`\\title "Synth pipeline"
+\\tempo 70
+.
+\\track "Guitar"
+:2 3.4 5.4 |
+:2 7.4 5.4 |
+:4 3.4 5.4 :2 7.4 |
+:1 (0.4 2.3 3.2) |`}
+  showCode={false}
+/>
 
 ## The pipeline
 

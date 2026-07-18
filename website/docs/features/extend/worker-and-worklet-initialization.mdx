@@ -16,7 +16,19 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 alphaTab drives its rendering pipeline and audio synthesis from a Web Worker and an Audio Worklet. When a bundler with a shipped plugin (Vite or webpack) is in use, those entry points are wired for you. Anywhere else, you tell alphaTab how to construct them via the three `Environment` statics on this page.
 
-<AlphaTab file="/files/canon.gp" />
+<AlphaTab tex={true} player={true}>{`
+\\title "Worker + Worklet"
+\\subtitle "Render off-thread, synth in the audio graph"
+\\tempo 128
+.
+\\track "Guitar"
+  :8 3.4 5.4 7.4 8.4 7.4 5.4 3.4 2.4 |
+  :4 (2.5 3.4 5.3) (4.5 5.4 7.3) :2 (5.5 7.4 8.3) |
+  :8 3.6 5.6 7.6 8.6 10.6 8.6 7.6 5.6 |
+  :2 (3.5 5.4 7.3) (2.5 3.4 5.3)
+`}</AlphaTab>
+
+This site's build uses the Vite plugin — the render engine runs in a Web Worker and the synth in an AudioWorklet. Hover the render and press play: everything you hear is proof the entry points on this page are alive.
 
 ## The three statics
 
@@ -47,7 +59,7 @@ alphaTab.Environment.initializeMain(
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
 });
 ```
 

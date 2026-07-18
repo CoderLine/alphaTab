@@ -1,0 +1,27 @@
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.5rem;
+  padding: 0.4rem 0.75rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85em;
+  background: var(--ifm-color-emphasis-100);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 0.375rem;
+
+  button {
+    margin-left: auto;
+    font-family: var(--ifm-font-family-base);
+  }
+}
+
+.divider {
+  color: var(--ifm-color-emphasis-500);
+}

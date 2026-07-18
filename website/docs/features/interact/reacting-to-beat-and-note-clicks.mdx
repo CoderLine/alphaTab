@@ -12,11 +12,24 @@ keywords:
   - noteMouseDown
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { ClickLogDemo } from '@site/src/components/ClickLogDemo';
 
-alphaTab hit-tests every mouse press against the rendered score and fires typed events with the `Beat` or `Note` under the cursor. Click a beat in the demo below and watch the cursor snap to it — that is the built-in seek behavior wired through the same events you consume.
+alphaTab hit-tests every mouse press against the rendered score and fires typed events with the `Beat` or `Note` under the cursor. Click a beat in the demo below and watch the cursor snap to it — that is the built-in seek behavior wired through the same events you consume. The log panel on the right shows every beat and note event as it fires.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<ClickLogDemo includeNoteBounds showCode={false} tex={`
+\\title "Click targets"
+\\tempo 92
+.
+\\track "Guitar"
+:4 (3.4 5.3 7.2) (5.4 7.3 8.2) (7.4 8.3 10.2) (8.4 10.3 12.2) |
+:8 (10.4 12.3 14.2) (8.4 10.3 12.2) (7.4 8.3 10.2) (5.4 7.3 8.2) :4 (3.4 5.3 7.2) (2.4 3.3 5.2) |
+:4 (3.4 5.3 7.2) (5.4 7.3 8.2) (7.4 8.3 10.2) (5.4 7.3 8.2) |
+:8 (3.4 5.3 7.2) (2.4 3.3 5.2) (0.4 2.3 3.2) (2.4 3.3 5.2) :4 (3.4 5.3 7.2) (5.4 7.3 8.2) |
+:4 (7.4 8.3 10.2) (8.4 10.3 12.2) (10.4 12.3 14.2) (8.4 10.3 12.2) |
+:8 (7.4 8.3 10.2) (5.4 7.3 8.2) (3.4 5.3 7.2) (2.4 3.3 5.2) :4 (3.4 5.3 7.2) (5.4 7.3 8.2) |
+:2 (3.4 5.3 7.2) (0.4 3.3 5.2) |
+:1 (3.4 5.3 7.2) |
+`} />
 
 ## The six events
 
@@ -33,17 +46,17 @@ The underlying `IMouseEventArgs` reaches your platform bridge on the `on-<event>
 
 ## Click to seek
 
-Set `tickPosition` to the beat's `absolutePlaybackStart` and playback jumps to that beat. This is the pattern alphaTab uses internally when `player.enableUserInteraction` is on; wire it yourself when the master toggle is off.
+Set `tickPosition` to the beat's `absolutePlaybackStart` and playback jumps to that beat. This is the pattern alphaTab uses internally when `player.enableSeekToClick` is on; wire it yourself when the flag is off.
 
 ```js
 import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
     playerMode: alphaTab.PlayerMode.EnabledAutomatic,
-    enableUserInteraction: false,
+    enableSeekToClick: false,
   },
 });
 
@@ -61,7 +74,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp', includeNoteBounds: true },
+  core: { file: '/scores/song.gp', includeNoteBounds: true },
   player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },
 });
 

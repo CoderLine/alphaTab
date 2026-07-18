@@ -27,12 +27,6 @@ export interface FeatureChapter {
 
 const chapters: FeatureChapter[] = [
   {
-    id: 'fonts',
-    label: 'Custom fonts',
-    anchor: 'fonts',
-    defaultAccent: 'slate',
-  },
-  {
     id: 'model',
     label: 'Model manipulation',
     anchor: 'model',

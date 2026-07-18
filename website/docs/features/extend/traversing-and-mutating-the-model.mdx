@@ -12,11 +12,11 @@ keywords:
   - scoreLoaded
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { MutateModelExample } from '@site/src/components/MutateModelExample';
 
 Once a score is loaded, its full tree — `Score → Track → Staff → Bar → Voice → Beat → Note` — is walkable and mutable in JavaScript. Iterate the arrays, change fields, call `api.render()`, and the render reflects the changes.
 
-<AlphaTab file="/files/canon.gp" />
+<MutateModelExample />
 
 Three shapes cover most use cases:
 

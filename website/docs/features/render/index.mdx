@@ -37,7 +37,17 @@ Every capability below is available on Web, .NET, and Android unless a card name
 
 The layout and stylesheet settings above compose freely. Try switching them live on the [playground](/docs/playground/playground):
 
-<AlphaTab file="/files/canon.gp" settings={{ display: { layoutMode: 'page' } }} />
+<AlphaTab tex={true} settings={{ display: { layoutMode: 'page' } }}>{`
+\\title "Render overview"
+\\subtitle "Layout, backend, notation, styling"
+\\tempo 100
+.
+\\track "Guitar"
+  :4 (0.4 2.3 2.2) (2.4 4.3 4.2) :2 (4.4 5.3 6.2) |
+  :8 5.3 7.3 8.3 10.3 8.3 7.3 5.3 3.3 |
+  :4 (3.5 5.4 7.3) (5.5 7.4 9.3) :2 (7.5 9.4 12.3) |
+  :4 (5.4 7.3 8.2) :8 (7.4 9.3 10.2) (5.4 7.3 8.2) :4 (3.4 5.3 7.2) (0.4 2.3 3.2)
+`}</AlphaTab>
 
 ## Adding a feature card {#adding-a-card}
 

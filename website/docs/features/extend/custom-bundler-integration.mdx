@@ -18,7 +18,19 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 The shipped [Vite](/docs/getting-started/installation-vite) and [webpack](/docs/getting-started/installation-webpack) plugins wire alphaTab into their host bundlers automatically. If you build with Rollup, esbuild, Parcel, or a bespoke pipeline, you replicate the same four responsibilities by hand and hand the worker and worklet URLs to alphaTab yourself.
 
-<AlphaTab file="/files/canon.gp" />
+<AlphaTab tex={true} player={true}>{`
+\\title "Bundler pipeline"
+\\subtitle "Worker, worklet, fonts, soundfont"
+\\tempo 120
+.
+\\track "Guitar"
+  :8 5.4 7.4 8.4 10.4 8.4 7.4 5.4 3.4 |
+  :4 (3.5 5.4 7.3) (5.5 7.4 9.3) :2 (7.5 9.4 12.3) |
+  :8 3.6 5.6 7.6 8.6 7.6 5.6 3.6 2.6 |
+  :2 (3.5 5.4 7.3) (2.5 3.4 5.3)
+`}</AlphaTab>
+
+The site itself is a working reference. Open DevTools and press play — the network tab shows the four moving parts the sections below enumerate: the worker bundle, the worklet bundle, the Bravura font files, and the SoundFont.
 
 ## What the shipped plugins do
 
@@ -49,7 +61,7 @@ alphaTab.Environment.initializeMain(
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
   core: {
-    file: '/scores/canon.gp',
+    file: '/scores/song.gp',
     fontDirectory: '/font/',
   },
   player: {

@@ -12,11 +12,32 @@ keywords:
   - scrollToCursor
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { ScrollModeSwitch } from '@site/src/components/ScrollModeSwitch';
 
-`player.scrollMode` decides when alphaTab moves the viewport during playback. Four modes, one setting.
+`player.scrollMode` decides when alphaTab moves the viewport during playback. Four modes, one setting. Pick a pill in the demo below to see the mode change while the score plays inside a bounded scroll pane.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<ScrollModeSwitch showCode={false} tex={`
+\\title "Scroll modes"
+\\tempo 108
+.
+\\track "Guitar"
+:8 (3.4 5.3) (5.4 7.3) (7.4 9.3) (5.4 7.3) (3.4 5.3) (2.4 3.3) (3.4 5.3) (5.4 7.3) |
+:8 (5.4 7.3) (7.4 9.3) (9.4 10.3) (7.4 9.3) (5.4 7.3) (3.4 5.3) (2.4 3.3) (0.4 2.3) |
+:8 (3.4 5.3) (5.4 7.3) (7.4 9.3) (9.4 10.3) (10.4 12.3) (7.4 9.3) (5.4 7.3) (3.4 5.3) |
+:4 (2.4 3.3) (3.4 5.3) (5.4 7.3) (7.4 9.3) |
+:8 (9.4 10.3) (10.4 12.3) (12.4 14.3) (10.4 12.3) (9.4 10.3) (7.4 9.3) (5.4 7.3) (3.4 5.3) |
+:8 (2.4 3.3) (3.4 5.3) (5.4 7.3) (7.4 9.3) (9.4 10.3) (7.4 9.3) (5.4 7.3) (3.4 5.3) |
+:4 (2.4 3.3) (5.4 7.3) (7.4 9.3) (9.4 10.3) |
+:8 (10.4 12.3) (12.4 14.3) (14.4 15.3) (12.4 14.3) (10.4 12.3) (9.4 10.3) (7.4 9.3) (5.4 7.3) |
+:8 (3.4 5.3) (5.4 7.3) (7.4 9.3) (9.4 10.3) (7.4 9.3) (5.4 7.3) (3.4 5.3) (2.4 3.3) |
+:4 (0.4 2.3) (3.4 5.3) (5.4 7.3) (7.4 9.3) |
+:8 (9.4 10.3) (10.4 12.3) (12.4 14.3) (14.4 15.3) (12.4 14.3) (10.4 12.3) (9.4 10.3) (7.4 9.3) |
+:8 (5.4 7.3) (3.4 5.3) (2.4 3.3) (3.4 5.3) (5.4 7.3) (7.4 9.3) (9.4 10.3) (10.4 12.3) |
+:4 (12.4 14.3) (10.4 12.3) (7.4 9.3) (5.4 7.3) |
+:8 (3.4 5.3) (2.4 3.3) (3.4 5.3) (5.4 7.3) (7.4 9.3) (9.4 10.3) (7.4 9.3) (5.4 7.3) |
+:4 (3.4 5.3) (5.4 7.3) (3.4 5.3) (2.4 3.3) |
+:1 (3.4 5.3) |
+`} />
 
 ## The four modes
 
@@ -40,7 +61,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
     playerMode: alphaTab.PlayerMode.EnabledAutomatic,
     scrollMode: alphaTab.ScrollMode.OffScreen,

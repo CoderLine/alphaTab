@@ -10,11 +10,30 @@ keywords:
   - bend
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as alphaTab from '@coderline/alphatab';
+import { ToggleSettingDemo } from '@site/src/components/PlaySync';
 
 Traditional songbooks notate bends and whammy dips as instant events at the start or end of a beat, not as gradual gestures spread across the note. Two millisecond-based settings control how snappy those events sound when the score's notation mode is `SongBook`.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<ToggleSettingDemo
+  tex={`\\title "Bend and grace showcase"
+\\tempo 90
+.
+\\track "Guitar"
+:4 5.3{b (0 4)} 7.3{b (0 4 0)} :2 5.3{b (0 4 4 0)} |
+:8 7.3 {gr bb} 5.3 7.3 {gr ob} 8.3 :4 7.3 :2 5.3{b (0 4)} |
+:4 5.3{sl} 7.3 5.3{sl} 3.3 |
+:4 5.3{b (0 8 0)} :2 3.3 :4 5.3 |
+:4 3.3 {gr bb} 5.3{b (0 4)} 7.3{b (0 4 4 0)} 5.3 |
+:1 3.3{b (0 4)} |`}
+  settingPath="notation.notationMode"
+  label="SongBook notation mode"
+  onValue={alphaTab.NotationMode.SongBook}
+  offValue={alphaTab.NotationMode.GuitarPro}
+  defaultOn={false}
+  reRender={true}
+  showCode={false}
+/>
 
 ## Two durations, always in milliseconds
 

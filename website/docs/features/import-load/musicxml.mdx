@@ -14,7 +14,11 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 alphaTab imports MusicXML — the interchange format every major notation editor writes — with mature coverage of notation, playback, and layout hints.
 
-<AlphaTab file="/files/canon.gp" />
+:::info
+The MusicXML importer produces the same `Score` model as any other importer. The preview below loads a curated Guitar Pro fixture so `importer.mergePartGroupsInMusicXml` has something to act on; the pipeline is identical when the source is a `.musicxml` file — point `core.file` at one to exercise the importer on real MusicXML.
+:::
+
+<AlphaTab tex={false} file="/files/features/Chords.gp5" settings={{ importer: { mergePartGroupsInMusicXml: true } }} />
 
 ## What alphaTab reads from a MusicXML file
 

@@ -3,7 +3,7 @@ title: "Custom fonts on Skia"
 description: "Register any font with the Skia rendering backend used on .NET and Android via Environment.registerAlphaSkiaCustomFont."
 sidebar_custom_props:
   feature_chapter: fonts
-  feature_order: 20
+  feature_order: 30
   feature_platforms: [net, android]
 keywords:
   - alphaTab
@@ -17,7 +17,19 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 The Skia rendering backend that powers alphaTab on .NET and Android does not read fonts from the operating system's font store. Any font used for titles, lyrics, chord names, or fingerings must be registered with Skia explicitly first.
 
-<AlphaTab file="/files/canon.gp" />
+<AlphaTab tex={true}>{`
+\\title "Fonts on Skia"
+\\subtitle "Register .ttf/.otf files up front"
+\\tempo 88
+.
+\\track "Guitar"
+  :4 (2.4 3.3 5.2) (4.4 5.3 7.2) :2 (5.4 7.3 8.2) |
+  :8 3.5 5.5 7.5 8.5 :4 (4.4 5.3 7.2) (2.4 3.3 5.2) |
+  :4 (5.5 7.4 8.3) (7.5 9.4 10.3) :2 (10.5 12.4 14.3) |
+  :2 (2.4 3.3 5.2) (0.4 2.3 3.2)
+`}</AlphaTab>
+
+This registration flow runs on the .NET and Android backends; the render above uses the browser's font store instead. See `Environment.registerAlphaSkiaCustomFont` in the code sample below for the Skia-side entry point.
 
 `Environment.registerAlphaSkiaCustomFont(bytes)` accepts the raw font file bytes and returns a `Font` descriptor that identifies the font inside alphaTab. Once registered, reference that font family name from `display.resources` like any other font.
 
@@ -61,6 +73,6 @@ On the Web backend, alphaTab reaches into the browser's font store and any `@fon
 
 ## Where to look next
 
-- [Custom music (SMuFL) font](/docs/features/extend/custom-smufl-font) — swap the notation font itself, not just text fonts.
+- [Custom music (SMuFL) font](/docs/features/render/custom-smufl-fonts) — swap the notation font itself, not just text fonts.
 - [Custom text fonts](/docs/features/render/custom-text-fonts) — the equivalent workflow on the web backend.
 - [`Environment.registerAlphaSkiaCustomFont`](/docs/reference/types/environment) in the reference.

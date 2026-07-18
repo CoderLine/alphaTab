@@ -11,11 +11,21 @@ keywords:
   - tempo
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { SpeedSliderDemo } from '@site/src/components/PlaySync';
 
 `playbackSpeed` scales the tempo without repitching the audio. Slow a passage down while a student learns the fingering, then step back up to performance speed.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<SpeedSliderDemo
+  tex={`\\title "Speed scale"
+\\tempo 100
+.
+\\track "Guitar"
+:4 5.3 7.2 8.1 :8 7.1 8.1 :4 7.2 5.3 |
+:4 3.3 5.3 :8 7.3 5.3 3.3 2.3 :4 0.3 3.3 |
+:8 5.3 7.3 8.3 7.3 :4 5.3 :8 5.3 7.3 :4 8.3 |
+:2 7.3 :4 5.3 3.3 |`}
+  showCode={false}
+/>
 
 ## The property
 

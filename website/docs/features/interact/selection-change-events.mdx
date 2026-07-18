@@ -15,7 +15,7 @@ import { SelectionHandleDemo } from '@site/src/components/SelectionHandleDemo';
 
 Every time the highlight overlay changes — from a user drag, from `highlightPlaybackRange`, from a clear — alphaTab fires `playbackRangeHighlightChanged`. The event carries the current start and end beats plus the exact pixel rectangles being painted, so you can hang custom drag handles, badges, or annotations off the selection. The demo below wires drag handles to this event.
 
-<SelectionHandleDemo>{`
+<SelectionHandleDemo showEventLog>{`
 \\title "Canon"
 \\tempo 90
 .
@@ -47,7 +47,7 @@ const startHandle = document.getElementById('selection-start-handle');
 const endHandle = document.getElementById('selection-end-handle');
 
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },
 });
 

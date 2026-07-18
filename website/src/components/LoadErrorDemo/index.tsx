@@ -1,0 +1,153 @@
+import React, { useState } from "react";
+import * as alphaTab from "@coderline/alphatab";
+import CodeBlock from "@theme/CodeBlock";
+import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
+import styles from "./styles.module.scss";
+
+export interface LoadErrorDemoProps {
+  showCode?: boolean;
+}
+
+interface ErrorRecord {
+  className: string;
+  message: string;
+  typeName: string;
+}
+
+const VALID_URL = "/files/features/Chords.gp5";
+const WRONG_URL = "/files/does-not-exist.gp";
+const WRONG_FORMAT_URL = "/files/sonivox_musescore.sf2";
+const BAD_TEX = '\\title unterminated :garbage';
+
+function classifyErrorType(err: any): string {
+  const type = err?.type;
+  if (typeof type !== "number") {
+    return "unknown";
+  }
+  const name = (alphaTab as any).AlphaTabErrorType?.[type];
+  return typeof name === "string" ? name : String(type);
+}
+
+function classifyError(err: any): ErrorRecord {
+  return {
+    className: err?.constructor?.name ?? "Error",
+    message: err?.message ?? String(err),
+    typeName: classifyErrorType(err),
+  };
+}
+
+export const LoadErrorDemo: React.FC<LoadErrorDemoProps> = ({
+  showCode = true,
+}) => {
+  const [api, element] = useAlphaTab((s) => {
+    s.core.file = VALID_URL;
+  });
+  const [record, setRecord] = useState<ErrorRecord | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  useAlphaTabEvent(api, "error", (err: Error) => {
+    setSuccess(null);
+    setRecord(classifyError(err));
+  });
+
+  useAlphaTabEvent(api, "scoreLoaded", (score: alphaTab.model.Score) => {
+    setRecord(null);
+    setSuccess(`Loaded "${score.title || "(untitled)"}"`);
+  });
+
+  const safeCall = (fn: () => void) => {
+    try {
+      fn();
+    } catch (err) {
+      setSuccess(null);
+      setRecord(classifyError(err));
+    }
+  };
+
+  const loadValid = () => safeCall(() => api?.load(VALID_URL));
+  const loadWrongUrl = () => safeCall(() => api?.load(WRONG_URL));
+  const loadWrongFormat = () => safeCall(() => api?.load(WRONG_FORMAT_URL));
+  const loadBadTex = () => safeCall(() => api?.tex(BAD_TEX));
+
+  const code = `api.error.on((error) => {
+  if (error instanceof alphaTab.importer.UnsupportedFormatError) {
+    // wrong file type
+  } else if (error instanceof alphaTab.FormatError) {
+    // malformed content (bad alphaTex, corrupted GP archive)
+  } else if (error instanceof alphaTab.FileLoadError) {
+    // network / HTTP failure — inspect error.xhr.status
+  } else {
+    // render or generic API error
+  }
+});`;
+
+  return (
+    <div className={styles.demo}>
+      <div className={styles.buttons}>
+        <button
+          type="button"
+          className="button button--sm button--primary"
+          onClick={loadValid}
+          disabled={!api}
+        >
+          Load valid file
+        </button>
+        <button
+          type="button"
+          className="button button--sm button--secondary"
+          onClick={loadWrongUrl}
+          disabled={!api}
+        >
+          Try wrong URL
+        </button>
+        <button
+          type="button"
+          className="button button--sm button--secondary"
+          onClick={loadWrongFormat}
+          disabled={!api}
+        >
+          Try wrong file type
+        </button>
+        <button
+          type="button"
+          className="button button--sm button--secondary"
+          onClick={loadBadTex}
+          disabled={!api}
+        >
+          Try malformed alphaTex
+        </button>
+      </div>
+      <div
+        className={`${styles.status} ${
+          record ? styles.statusError : success ? styles.statusOk : ""
+        }`}
+      >
+        {record ? (
+          <div className={styles.statusGrid}>
+            <div>
+              <span className={styles.statusLabel}>Last error</span>
+              <span className={styles.statusValue}>{record.className}</span>
+            </div>
+            <div>
+              <span className={styles.statusLabel}>Message</span>
+              <span className={styles.statusValue}>{record.message}</span>
+            </div>
+            <div>
+              <span className={styles.statusLabel}>Type</span>
+              <span className={styles.statusValue}>{record.typeName}</span>
+            </div>
+          </div>
+        ) : success ? (
+          <span>{success}</span>
+        ) : (
+          <span className={styles.placeholder}>
+            Trigger a button — the <code>error</code> event populates this
+            strip.
+          </span>
+        )}
+      </div>
+      <div ref={element}></div>
+      {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
+    </div>
+  );
+};

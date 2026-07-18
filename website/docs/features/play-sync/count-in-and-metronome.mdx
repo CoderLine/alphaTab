@@ -10,20 +10,45 @@ keywords:
   - count-in
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { CountInMetronomeDemo } from '@site/src/components/PlaySync';
 
 Ship the click a bandmate would give you. A count-in taps out one bar before the song starts so the reader knows the tempo; the metronome keeps clicking on every beat while the track runs.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<CountInMetronomeDemo
+  tex={`\\title "Pulse check"
+\\tempo 96
+.
+\\track "Guitar"
+:4 5.4 5.4 5.4 5.4 |
+:4 7.4 7.4 :2 5.4 |
+:4 8.4 7.4 5.4 3.4 |
+:2 5.4 :4 5.4 5.4 |`}
+  showCode={false}
+/>
 
-## Two independent volumes
+Hit play with the count-in enabled and the state readout flips to `Count-in bar` for one bar before advancing to `Playing`. The `Restart from top` button stops and re-plays without waiting for the song to end, so the lead-in fires again.
 
-alphaTab treats both clicks as monitoring channels rather than settings — you flip them on by raising their volume above zero.
+## The two toggles
+
+alphaTab treats both clicks as monitoring channels rather than settings — flip them on by raising their volume above zero.
 
 - `api.metronomeVolume` — the click that runs during playback. `0` mutes it (the default). `1` matches the master output; typical values sit between `0.3` and `0.8`.
 - `api.countInVolume` — the one-bar lead-in before the transport actually starts. Also defaults to `0`. When non-zero, alphaTab inserts a count of the loaded bar's time signature before playback begins, then hands off to the score.
 
 Both are floats in the `[0, 1]` range and can change at runtime. Wire them to a practice-mode toggle, a beginner switch, or a slider in your UI.
+
+## Detecting the count-in
+
+While the count-in is playing, `playerPositionChanged` reports a negative `currentTick`. The score's tick `0` is the first note of bar 1, so the count-in bar runs from a negative tick up to `0`. A UI can hide the playback cursor or show a "Count-in" badge during that window:
+
+```js
+api.playerPositionChanged.on((args) => {
+  const isCountIn = args.currentTick < 0;
+  document.body.classList.toggle('is-count-in', isCountIn);
+});
+```
+
+`playerStateChanged` still fires with `state = Playing` for the count-in; the negative-tick check is what distinguishes the lead-in from the song itself.
 
 ## Show it in code
 

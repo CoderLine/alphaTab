@@ -10,11 +10,25 @@ keywords:
   - playback range
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { LoopDemo } from '@site/src/components/PlaySync';
 
 Combine `playbackRange` and `isLooping` to repeat a bar, a phrase, or a chorus until the muscle memory sticks.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<LoopDemo
+  tex={`\\title "Loop phrase"
+\\tempo 110
+.
+\\track "Guitar"
+:4 (0.4 2.3 2.2) :8 (2.4 4.3 4.2) (4.4 5.3 4.2) :4 (0.4 2.3 2.2) (2.4 4.3 4.2) |
+:4 (4.4 5.3 4.2) :8 (2.4 4.3 4.2) (0.4 2.3 2.2) :2 (0.4 2.3 2.2) |
+:4 (0.4 2.3 2.2) :8 (2.4 4.3 4.2) (4.4 5.3 4.2) :4 (0.4 2.3 2.2) (2.4 4.3 4.2) |
+:4 (4.4 5.3 4.2) :8 (2.4 4.3 4.2) (0.4 2.3 2.2) :2 (0.4 2.3 2.2) |
+:4 (2.4 3.3 4.2) :8 (4.4 5.3 4.2) (5.4 7.3 7.2) :4 (7.4 9.3 9.2) (5.4 7.3 7.2) |
+:4 (4.4 5.3 4.2) :8 (2.4 4.3 4.2) (0.4 2.3 2.2) :2 (0.4 2.3 2.2) |
+:4 (0.4 2.3 2.2) :8 (2.4 4.3 4.2) (4.4 5.3 4.2) :4 (5.4 7.3 7.2) (4.4 5.3 4.2) |
+:4 (2.4 3.3 4.2) (0.4 2.3 2.2) :2 (0.4 2.3 2.2) |`}
+  showCode={false}
+/>
 
 ## The two properties
 

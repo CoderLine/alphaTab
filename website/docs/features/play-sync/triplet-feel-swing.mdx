@@ -10,11 +10,19 @@ keywords:
   - triplet feel
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { ToggleSettingDemo } from '@site/src/components/PlaySync';
 
 Guitar Pro files carry a triplet-feel marker per section — 8ths, 16ths, dotted, or Scottish. alphaTab honors those markers at playback time, turning straight eighths into a shuffled swing without touching the notation on screen.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<ToggleSettingDemo
+  file="/files/features/TripletFeel.gp5"
+  settingPath="player.playTripletFeel"
+  label="Swing (playTripletFeel)"
+  onValue={true}
+  offValue={false}
+  defaultOn={true}
+  showCode={false}
+/>
 
 ## What the switch does
 

@@ -12,11 +12,24 @@ keywords:
   - visibility
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { VisibilityBoundsDemo } from '@site/src/components/VisibilityBoundsDemo';
 
-Two orthogonal knobs sit next to `boundsLookup`. One tells you whether a beat is currently on-screen — useful for camera-aware overlays and playback readouts. The other opts alphaTab into recording per-note rectangles, unlocking note-level hit-testing at the cost of a slightly larger bounds table.
+Two orthogonal knobs sit next to `boundsLookup`. One tells you whether a beat is currently on-screen — useful for camera-aware overlays and playback readouts. The other opts alphaTab into recording per-note rectangles, unlocking note-level hit-testing at the cost of a slightly larger bounds table. The readout below reports `isVisible` per beat; the overlay swaps between beat rectangles and per-note-head rectangles as `includeNoteBounds` flips on and off.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<VisibilityBoundsDemo showNoteHeadOverlay showCode={false} tex={`
+\\title "Visibility probe"
+\\tempo 96
+.
+\\track "Guitar"
+:4 3.3 5.3 7.3 8.3 | :8 10.3 8.3 7.3 5.3 :4 3.3 7.3 |
+:4 5.3 7.3 8.3 10.3 | :8 12.3 10.3 8.3 7.3 :4 5.3 8.3 |
+:4 7.3 8.3 10.3 12.3 | :8 14.3 12.3 10.3 8.3 :4 7.3 10.3 |
+:4 8.3 10.3 12.3 14.3 | :8 15.3 14.3 12.3 10.3 :4 8.3 12.3 |
+:4 7.3 8.3 10.3 12.3 | :8 10.3 8.3 7.3 5.3 :4 3.3 7.3 |
+:4 5.3 7.3 8.3 10.3 | :8 8.3 7.3 5.3 3.3 :4 2.3 5.3 |
+:4 3.3 5.3 7.3 8.3 | :8 7.3 5.3 3.3 2.3 :4 0.3 3.3 |
+:2 5.3 8.3 | :1 3.3 |
+`} />
 
 ## `isVisible(beat)`
 
@@ -49,7 +62,7 @@ const chordReadout = document.getElementById('chord-readout');
 
 const api = new alphaTab.AlphaTabApi(container, {
   core: {
-    file: '/scores/canon.gp',
+    file: '/scores/song.gp',
     includeNoteBounds: true,
   },
   player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },

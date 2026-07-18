@@ -13,11 +13,11 @@ keywords:
   - exporter
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { Gp7ExporterDemo } from '@site/src/components/Gp7ExporterDemo';
 
 `Gp7Exporter` writes a loaded `Score` back to the Guitar Pro 7 / 8 container format. Point it at `api.score` and `api.settings`, and it hands you a `Uint8Array` ready to persist, upload, or offer as a download.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<Gp7ExporterDemo showCode={false} />
 
 The score above is what a Guitar Pro export produces. Round-tripping alphaTab-only features (custom sub-element colors, stylesheet flags Guitar Pro does not know) falls back to the closest GP7 approximation the format allows.
 

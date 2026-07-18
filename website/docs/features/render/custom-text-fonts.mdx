@@ -3,7 +3,7 @@ title: "Custom text fonts"
 description: "Configure title / subtitle / lyrics / chord / effect / marker fonts."
 sidebar_custom_props:
   feature_chapter: fonts
-  feature_order: 30
+  feature_order: 40
 keywords:
   - alphaTab
   - text font
@@ -21,15 +21,18 @@ Every piece of text alphaTab draws around the notation — titles, tempo marks, 
       resources: {
         titleFont: 'bold 34px "Courier New", monospace',
         subTitleFont: 'italic 18px "Courier New", monospace',
+        wordsFont: '16px "Georgia", serif',
+        markerFont: 'bold 14px "Courier New", monospace',
       },
     },
   }}
 >{`
-\\title "Custom title font"
-\\subtitle "Every text element carries its own Font"
+\\title "Custom Text Fonts"
+\\subtitle "Title, subtitle, lyrics, and markers restyled"
+\\track "Vocals"
+\\lyrics "Ly-rics ren-der in the words font"
 .
-:4 5.3 7.3 8.3 7.3 |
-:4 5.3 3.3 2.3 3.3
+\\section "Verse" :4 C4 D4 E4 F4 | G4 A4 B4 C5
 `}</AlphaTab>
 
 ## The font fields

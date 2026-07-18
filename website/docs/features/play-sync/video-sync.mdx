@@ -13,11 +13,25 @@ keywords:
   - external media
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { TransportControls } from '@site/src/components/PlaySync';
 
 Video sync uses the same infrastructure as backing-track audio, with one twist: alphaTab does not own the media element. You implement `IExternalMediaHandler`, alphaTab calls it for play, pause, seek, volume, and playback rate, and you feed the current time back through `player.output.updatePosition`. Works for `<video>` elements and for the YouTube IFrame Player API alike.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+:::note Live video demo not shipped here
+No matching video asset lives in the docs bundle yet. The transport below plays the synthesized version; the code sample further down is the actual `<video>`-driven wiring. The [backing-track-audio](./backing-track-audio) page runs the audio variant of the same pipeline live.
+:::
+
+<TransportControls
+  tex={`\\title "Video pair"
+\\tempo 96
+.
+\\track "Guitar"
+:4 5.3 7.3 5.3 3.3 |
+:2 2.3 :4 3.3 5.3 |
+:4 7.3 5.3 3.3 5.3 |
+:1 (0.3 2.2 3.1) |`}
+  showCode={false}
+/>
 
 ## The two-way contract
 

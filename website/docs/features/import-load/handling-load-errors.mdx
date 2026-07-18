@@ -10,11 +10,11 @@ keywords:
   - FormatError
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { LoadErrorDemo } from '@site/src/components/LoadErrorDemo';
 
 The `error` event is alphaTab's single funnel for anything that goes wrong — bad URLs, unreadable file formats, malformed content, rendering failures. Subscribe once and switch on the error type to show the reader something useful.
 
-<AlphaTab file="/files/canon.gp" />
+<LoadErrorDemo showCode={false} />
 
 ## The error types
 

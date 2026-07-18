@@ -14,7 +14,17 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 Run alphaTab in Node.js to produce SVG or PNG images from a score — for CI thumbnails, PDF pipelines, print-on-demand, or preview generation. No browser, no DOM, no user interface.
 
-<AlphaTab file="/files/canon.gp" settings={{ core: { engine: 'svg' } }} />
+<AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{`
+\\title "Server-side render"
+\\subtitle "SVG or PNG from a Node.js pipeline"
+\\tempo 92
+.
+\\track "Guitar"
+  :4 (0.6 2.5 2.4) (2.6 4.5 4.4) :2 (5.6 4.5 3.4) |
+  :8 3.4 5.4 6.4 3.5 :4 (2.6 4.5 2.4) (0.6 2.5 2.4) |
+  :4 (3.5 5.4 5.3) (5.5 7.4 7.3) :2 (7.5 9.4 9.3) |
+  :2 (0.6 2.5 2.4) (0.6 4.5 3.4)
+`}</AlphaTab>
 
 The live preview above renders in your browser. In a Node.js pipeline the same score comes out as an SVG string or, with [alphaSkia](https://github.com/CoderLine/alphaSkia) attached, as a PNG buffer you can write straight to disk.
 

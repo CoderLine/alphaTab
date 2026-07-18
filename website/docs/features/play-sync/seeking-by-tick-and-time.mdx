@@ -11,11 +11,37 @@ keywords:
   - time
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { SeekDemo } from '@site/src/components/PlaySync';
 
 alphaTab exposes the playhead in two units: MIDI ticks (score-relative) and milliseconds (wall-clock). Pick the one that matches the UI you're wiring up.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<SeekDemo
+  tex={`\\title "Seek target"
+\\tempo 90
+.
+\\track "Guitar"
+:4 3.5 5.4 7.3 5.4 |
+:4 3.5 5.4 :2 7.3 |
+:8 3.5 5.5 5.4 7.4 5.4 3.4 :4 3.5 |
+:2 5.4 :4 7.3 5.3 |
+:8 3.3 5.3 7.3 8.3 7.3 5.3 :4 3.3 |
+:4 2.4 3.4 5.4 3.4 |
+:4 0.4 3.4 :2 2.4 |
+:8 3.5 5.5 5.4 3.4 :2 0.4 |
+:4 (3.5 5.4 5.3) (5.5 7.4 7.3) :2 (7.5 8.4 9.3) |
+:2 (0.5 2.4 3.3) (5.5 7.4 7.3) |
+:8 3.5 5.4 7.3 8.3 :4 7.4 5.4 |
+:4 3.5 5.4 7.3 5.4 |
+:8 5.5 7.4 5.3 3.3 :2 5.4 |
+:4 3.4 5.4 7.4 8.4 |
+:8 3.5 5.5 7.5 5.5 :2 (3.5 5.4 5.3) |
+:4 5.4 7.4 :2 8.4 |
+:8 3.3 5.3 7.3 5.3 3.3 2.3 :2 0.3 |
+:4 (3.5 5.4 5.3) :2 (5.5 7.4 7.3) :4 (7.5 8.4 9.3) |
+:2 (5.5 7.4 7.3) (3.5 5.4 5.3) |
+:1 (0.5 2.4 3.3) |`}
+  showCode={false}
+/>
 
 ## Tick vs time
 

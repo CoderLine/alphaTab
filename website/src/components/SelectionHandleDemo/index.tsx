@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AlphaTab, AlphaTabProps } from "../AlphaTab";
 import styles from "./styles.module.scss";
 import * as alphaTab from "@coderline/alphatab";
@@ -8,6 +8,15 @@ import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
 
 export interface SelectionHandleDemoProps extends AlphaTabProps {
     children: string | React.ReactElement;
+    showEventLog?: boolean;
+}
+
+interface HighlightPayload {
+    startBar: number | null;
+    startBeat: number | null;
+    endBar: number | null;
+    endBeat: number | null;
+    blocks: number;
 }
 
 interface HandleDragState {
@@ -100,7 +109,7 @@ function getBeatFromEvent(
 }
 
 
-export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({ children }) => {
+export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({ children, showEventLog = false }) => {
     const [api, element] = useAlphaTab((s) => {
         s.core.tex = true;
         s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
@@ -110,6 +119,7 @@ export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({ childr
 
     const selectionHandleStart = useRef<HTMLDivElement>(null);
     const selectionHandleEnd = useRef<HTMLDivElement>(null);
+    const [payload, setPayload] = useState<HighlightPayload | null>(null);
 
     useEffect(() => {
         if (!api || !selectionHandleStart.current || !selectionHandleEnd.current) {
@@ -123,6 +133,7 @@ export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({ childr
             if (!e.highlightBlocks || e.highlightBlocks.length === 0) {
                 selectionHandleStart.current!.classList.remove(styles.active);
                 selectionHandleEnd.current!.classList.remove(styles.active);
+                setPayload(null);
                 return;
             }
 
@@ -136,6 +147,14 @@ export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({ childr
             selectionHandleEnd.current!.style.left = `${lastBlock.x + lastBlock.w}px`;
             selectionHandleEnd.current!.style.top = `${lastBlock.y}px`;
             selectionHandleEnd.current!.style.height = `${lastBlock.h}px`;
+
+            setPayload({
+                startBar: e.startBeat ? e.startBeat.voice.bar.index : null,
+                startBeat: e.startBeat ? e.startBeat.index : null,
+                endBar: e.endBeat ? e.endBeat.voice.bar.index : null,
+                endBeat: e.endBeat ? e.endBeat.index : null,
+                blocks: e.highlightBlocks.length,
+            });
         });
 
         const dragState: HandleDragState = { isDragging: undefined };
@@ -189,6 +208,9 @@ export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({ childr
     }, [api, selectionHandleStart.current, selectionHandleEnd.current]);
 
 
+    const formatBeatLabel = (bar: number | null, beat: number | null) =>
+        bar !== null && beat !== null ? `bar ${bar + 1} beat ${beat + 1}` : "—";
+
     return (
         <div className={styles.wrapper}>
             <div className={styles.atSelectionHandles}>
@@ -198,6 +220,15 @@ export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({ childr
                 </div>
             </div>
             <div ref={element}>{children}</div>
+            {showEventLog && (
+                <pre className={styles.eventLog}>
+{payload
+    ? `startBeat: ${formatBeatLabel(payload.startBar, payload.startBeat)}
+endBeat: ${formatBeatLabel(payload.endBar, payload.endBeat)}
+highlightBlocks: ${payload.blocks}`
+    : "startBeat: —\nendBeat: —\nhighlightBlocks: 0"}
+                </pre>
+            )}
         </div>
     );
 };

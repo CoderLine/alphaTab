@@ -10,11 +10,11 @@ keywords:
   - url
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { UrlLoadSwitcher } from '@site/src/components/UrlLoadSwitcher';
 
 Point alphaTab at a URL and it fetches the file, picks the right importer, and renders the score.
 
-<AlphaTab file="/files/canon.gp" />
+<UrlLoadSwitcher showCode={false} />
 
 ## Two entry points
 
@@ -39,7 +39,7 @@ import * as alphaTab from '@coderline/alphatab';
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
   core: {
-    file: '/scores/canon.gp',
+    file: '/scores/song.gp',
   },
 });
 

@@ -12,10 +12,27 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import { BoundedScoreFrame } from '@site/src/components/BoundedScoreFrame';
 
 Parchment layout lays bars out page-style but honors the systems layout embedded in the source file — the row breaks and relative bar widths the engraver chose in Guitar Pro. Reach for it when you want the score to look the way the author intended, not the way alphaTab would pack it.
 
-<AlphaTab file="/files/canon.gp" settings={{ display: { layoutMode: 'parchment' } }} />
+<BoundedScoreFrame>
+  <AlphaTab tex={true} settings={{ display: { layoutMode: 'parchment', systemsLayoutMode: 'UseModelLayout' } }}>{`
+\\title "Parchment layout"
+\\tempo 100
+.
+\\track "Guitar" { systemsLayout (1 3 2 4) defaultSystemsLayout 4 }
+  :4 (3.3 5.2 7.1) (5.3 7.2 9.1) :2 (7.3 9.2 12.1) |
+  :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1) |
+  :8 3.4 5.4 7.4 8.4 10.4 8.4 7.4 5.4 |
+  :4 (3.5 5.4 7.3) (5.5 7.4 9.3) :2 (7.5 9.4 12.3) |
+  :4 5.6 7.6 8.6 10.6 |
+  :4 (3.3 5.2 7.1) (5.3 7.2 9.1) :2 (7.3 9.2 12.1) |
+  :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1) |
+  :8 3.4 5.4 7.4 8.4 10.4 8.4 7.4 5.4 |
+  :2 (3.3 5.2 7.1) (5.3 7.2 8.1)
+`}</AlphaTab>
+</BoundedScoreFrame>
 
 ## What Parchment reads from the score model
 

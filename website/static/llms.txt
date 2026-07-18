@@ -64,6 +64,7 @@ alphaTab is not a drop-in widget — it exposes an API you build your own score 
 - [Choosing a backend](https://alphatab.net/docs/features/render/choosing-a-backend): Decision guide comparing SVG / Canvas / Skia.
 - [Bravura and SMuFL](https://alphatab.net/docs/features/render/bravura-default): The default music font, why SMuFL matters.
 - [Using a custom music font](https://alphatab.net/docs/features/render/custom-smufl-fonts): Swap Bravura for Petaluma or Leland, live demo.
+- [Custom fonts on Skia](https://alphatab.net/docs/features/render/custom-fonts-on-skia): Register any font with the Skia rendering backend used on .NET and Android via Environment.registerAlphaSkiaCustomFont.
 - [Custom text fonts](https://alphatab.net/docs/features/render/custom-text-fonts): Configure title / subtitle / lyrics / chord / effect / marker fonts.
 - [Font family fallbacks](https://alphatab.net/docs/features/render/font-family-fallbacks): Multiple families with graceful fallback.
 - [Hiding dynamics](https://alphatab.net/docs/features/render/hide-dynamics): Score-wide dynamics visibility, live toggle.
@@ -135,8 +136,6 @@ alphaTab is not a drop-in widget — it exposes an API you build your own score 
 - [Settings to JSON](https://alphatab.net/docs/features/export/settings-to-json): Serialize a `Settings` instance to JSON with `JsonConverter` for user preferences, defaults, and worker transport.
 
 - [Extend](https://alphatab.net/docs/features/extend/): Push alphaTab beyond its defaults — swap fonts, build scores in code, wire custom bundlers and workers, and embed the engine in your own host.
-- [Custom music (SMuFL) font](https://alphatab.net/docs/features/extend/custom-smufl-font): Register your own SMuFL-compliant font and swap out every notation glyph alphaTab draws.
-- [Custom fonts on Skia](https://alphatab.net/docs/features/extend/custom-fonts-on-skia): Register any font with the Skia rendering backend used on .NET and Android via Environment.registerAlphaSkiaCustomFont.
 - [Programmatic score construction](https://alphatab.net/docs/features/extend/programmatic-score-construction): Instantiate the alphaTab model classes directly and render a score built entirely in code — no importer, no source file.
 - [Traversing and mutating the model](https://alphatab.net/docs/features/extend/traversing-and-mutating-the-model): Walk the loaded score tree — tracks, staves, bars, voices, beats, notes — and apply changes before or after render.
 - [Worker and worklet initialization](https://alphatab.net/docs/features/extend/worker-and-worklet-initialization): `initializeMain`, `initializeWorker`, `initializeAudioWorklet` for custom setups.

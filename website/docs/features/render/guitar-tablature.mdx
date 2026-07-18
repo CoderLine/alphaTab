@@ -14,12 +14,15 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 Tablature draws each string as a horizontal line and prints fret numbers on top. Pair it with standard notation or render it on its own.
 
-<AlphaTab tex={true}>{`
+<AlphaTab
+  tex={true}
+  settings={{ notation: { rhythmMode: 'showWithBars' } }}
+>{`
 \\track "Guitar"
   \\staff{tabs}
-  1.6.4 3.6 5.6 7.6 | 3.5.4 5.5 7.5 8.5 |
-  3.4.4 5.4 7.4 (5.4 7.5).2 |
-  (3.5 5.4).1
+  :8 5.6 7.6 8.6 7.6 5.6 3.6 5.6 3.6 |
+  :4 (3.5 5.4 7.3) (5.5 7.4 9.3) :8 5.6 7.6 8.6 10.6 |
+  (3.4 5.3 7.2).1
 `}</AlphaTab>
 
 ## Showing rhythm on a tab-only staff

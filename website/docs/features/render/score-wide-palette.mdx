@@ -12,11 +12,11 @@ keywords:
   - theme
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { CoveragePaletteDemo } from '@site/src/components/CoveragePaletteDemo';
 
 Set the default color of every staff line, glyph, and text block from one place. The `display.resources` container holds a color field per element category, so a single settings object retints the whole document without touching individual notes.
 
-<AlphaTab file="/files/canon.gp" settings={{ display: { resources: { mainGlyphColor: '#e91e63', staffLineColor: '#3f51b5', barSeparatorColor: '#3f51b5', barNumberColor: '#3f51b5', scoreInfoColor: '#3f51b5' } } }} />
+<CoveragePaletteDemo showCode={false} />
 
 ## What each field paints
 

@@ -1,3 +1,19 @@
+.wrapper {
+    display: block;
+
     audio {
         width: 100%;
+        // Let the browser adapt the native audio controls to the active theme.
+        color-scheme: light dark;
+        border-radius: 6px;
+        background: var(--ifm-background-surface-color);
     }
+}
+
+[data-theme="dark"] .wrapper audio {
+    color-scheme: dark;
+}
+
+[data-theme="light"] .wrapper audio {
+    color-scheme: light;
+}

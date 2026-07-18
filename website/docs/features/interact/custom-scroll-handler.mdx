@@ -12,60 +12,78 @@ keywords:
   - customScrollHandler
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { ScrollModeSwitch } from '@site/src/components/ScrollModeSwitch';
 
-The built-in scroll modes cover most integrations. When they do not, replace the whole strategy: assign an `IScrollHandler` to `api.customScrollHandler` and drive the scroll yourself.
+The built-in scroll modes use a fixed top offset (`scrollOffsetY`). When you need scroll placement driven by container geometry — a common ask is "keep the active bar vertically centered no matter how tall the container is" — replace the whole strategy: assign an `IScrollHandler` to `api.customScrollHandler` and drive the scroll yourself. Pick "Center bar" in the mode pills below to switch from the built-in strategies to a handler that centers the current bar in the scroll container.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<ScrollModeSwitch customHandler="center-bar" showCode={false} tex={`
+\\title "Center the active bar"
+\\tempo 110
+.
+\\track "Guitar"
+:8 3.3 5.3 7.3 8.3 10.3 8.3 7.3 5.3 |
+:8 3.3 5.3 8.3 10.3 12.3 10.3 8.3 5.3 |
+:4 3.3 7.3 10.3 8.3 |
+:8 5.3 7.3 10.3 12.3 14.3 12.3 10.3 7.3 |
+:8 5.3 8.3 10.3 12.3 14.3 12.3 10.3 8.3 |
+:4 5.3 8.3 12.3 10.3 |
+:8 7.3 10.3 12.3 14.3 15.3 14.3 12.3 10.3 |
+:8 8.3 10.3 12.3 14.3 15.3 12.3 10.3 8.3 |
+:4 7.3 10.3 14.3 12.3 |
+:8 10.3 12.3 14.3 15.3 14.3 12.3 10.3 8.3 |
+:8 7.3 5.3 3.3 5.3 7.3 8.3 10.3 12.3 |
+:4 10.3 8.3 5.3 3.3 |
+:8 2.3 3.3 5.3 7.3 8.3 7.3 5.3 3.3 |
+:4 2.3 5.3 7.3 3.3 |
+:2 3.3 5.3 | :1 3.3 |
+`} />
 
 ## When to reach for it
 
+- The active bar should sit at a container-relative position — vertical center, one-third from the top, snapped to a grid — that the fixed `scrollOffsetY` cannot express because it depends on the container height at render time.
 - The scroll target is not a DOM element — a virtualized list, a canvas overlay, an external component.
-- The scroll should keep two surfaces in lockstep — the score and a waveform, the score and a video timeline.
 - The layout scrolls in a way alphaTab does not model — paged pagination, snap points, an animation library.
 
-`IScrollHandler` has two methods. `forceScrollTo(beatBounds)` is invoked when alphaTab needs an instant scroll (`scrollToCursor()`, seek). `onBeatCursorUpdating(...)` fires each time the beat cursor advances and passes both the current beat bounds and the cursor's raw motion parameters — start X, end X, transition duration in milliseconds. Use those to sync a second surface to the cursor animation frame-for-frame.
+`IScrollHandler` has two methods. `forceScrollTo(beatBounds)` is invoked when alphaTab needs an instant scroll (`scrollToCursor()`, seek). `onBeatCursorUpdating(...)` fires each time the beat cursor advances and passes the current bar bounds and the cursor's raw motion parameters. Both receive `beatBounds.barBounds.masterBarBounds.realBounds` — the pixel rectangle of the bar in the render target — which is enough to compute any container-relative target.
 
 Setting `customScrollHandler` replaces alphaTab's default handler for the running session. Set it back to `undefined` to restore the built-in behavior.
 
 ## Show it in code
 
+The example below centers the active bar vertically inside a bounded scroll container — the same logic the live demo uses.
+
 ```js
 import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
+const scroller = document.getElementById('scroller');
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
-  player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    scrollElement: scroller,
+  },
 });
 
-const waveform = document.getElementById('waveform');
+const centerBar = (beatBounds, behavior) => {
+  const bar = beatBounds.barBounds.masterBarBounds.realBounds;
+  const height = scroller.clientHeight;
+  const maxScroll = Math.max(0, scroller.scrollHeight - height);
+  const target = Math.min(
+    maxScroll,
+    Math.max(0, bar.y - (height - bar.h) / 2),
+  );
+  scroller.scrollTo({ top: target, behavior });
+};
 
 api.customScrollHandler = {
   forceScrollTo(currentBeatBounds) {
-    const y = currentBeatBounds.barBounds.masterBarBounds.realBounds.y;
-    window.scrollTo({ top: y, behavior: 'instant' });
-    waveform.scrollTop = y;
+    centerBar(currentBeatBounds, 'instant');
   },
-
-  onBeatCursorUpdating(
-    startBeat,
-    endBeat,
-    cursorMode,
-    actualBeatCursorStartX,
-    actualBeatCursorEndX,
-    actualBeatCursorTransitionDuration,
-  ) {
-    const y = startBeat.barBounds.masterBarBounds.realBounds.y;
-    window.scrollTo({ top: y, behavior: 'smooth' });
-    waveform.style.transition = `transform ${actualBeatCursorTransitionDuration}ms linear`;
-    waveform.style.transform = `translateX(${-actualBeatCursorEndX}px)`;
+  onBeatCursorUpdating(startBeat) {
+    centerBar(startBeat, 'smooth');
   },
-
-  [Symbol.dispose]() {
-    waveform.style.transition = '';
-    waveform.style.transform = '';
-  },
+  [Symbol.dispose]() {},
 };
 ```
 

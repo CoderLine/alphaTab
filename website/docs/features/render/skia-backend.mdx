@@ -14,7 +14,17 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 On .NET and Android, alphaTab renders through [alphaSkia](https://github.com/CoderLine/alphaSkia) — a thin wrapper around Google's [Skia](https://skia.org/) library. The result is high-quality raster output with identical glyph metrics across Windows, macOS, Linux, and Android.
 
-<AlphaTab file="/files/canon.gp" settings={{ core: { engine: 'svg' } }} />
+<AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{`
+\\title "Skia on .NET and Android"
+\\subtitle "Same output, native raster"
+\\tempo 104
+.
+\\track "Guitar"
+  :4 (0.5 2.4 2.3) (2.5 4.4 4.3) :2 (4.5 5.4 6.3) |
+  :8 5.4 7.4 8.4 5.5 :4 (2.5 4.4 4.3) (0.5 2.4 2.3) |
+  :4 (5.4 7.3 8.2) (7.4 9.3 10.2) :2 (10.4 12.3 14.2) |
+  :2 (2.5 4.4 4.3) (0.5 4.4 5.3)
+`}</AlphaTab>
 
 The live demo above uses SVG because Skia is not available in the browser — it targets native runtimes only. The code snippet below configures Skia on .NET or Android.
 
@@ -35,7 +45,7 @@ import * as alphaTab from '@coderline/alphatab';
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
   core: {
-    file: '/scores/canon.gp',
+    file: '/scores/song.gp',
     engine: 'skia',
   },
 });

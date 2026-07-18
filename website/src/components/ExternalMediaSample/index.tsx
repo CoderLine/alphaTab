@@ -1,7 +1,7 @@
 import * as alphaTab from "@coderline/alphatab";
 import React, { useEffect, useRef } from "react";
 import environment from "../../environment";
-import './styles.module.scss'
+import styles from './styles.module.scss';
 import CodeBlock from '@theme/CodeBlock';
 
 export type ExternalMediaSampleProps = {
@@ -117,7 +117,7 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCod
     }, []);
 
 
-    return <>
+    return <div className={styles.wrapper}>
         <audio ref={audio} src="/files/Bach_Prelude_BWV999_original.ogg" controls={true} autoPlay={false} />
         <div ref={alphaTabWithExternalMedia} />
         {showCode !== false && <CodeBlock language="typescript" title="TypeScript Code for this sample">
@@ -198,5 +198,5 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCod
                 "});",
             ].join('\n')}
         </CodeBlock>}
-    </>
+    </div>
 };

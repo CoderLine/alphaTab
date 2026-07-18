@@ -13,13 +13,13 @@ keywords:
   - preferences
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { SettingsJsonDemo } from '@site/src/components/SettingsJsonDemo';
 
 `JsonConverter` serializes a full `Settings` instance — every notation flag, display option, and player toggle — into a plain JavaScript object. Save user preferences to `localStorage`, ship defaults from a backend, or synchronize settings across worker boundaries without hand-rolling a schema.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<SettingsJsonDemo showCode={false} />
 
-The score above renders with alphaTab's default settings. The pattern below persists whatever the user tweaked and rehydrates it on the next visit.
+Tweak the knobs above and watch the JSON blob refresh in real time. The pattern below persists whatever the user changed and rehydrates it on the next visit.
 
 ## Round-trip in code
 

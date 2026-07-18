@@ -10,11 +10,11 @@ keywords:
   - ScoreLoader
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { DirectImporterDemo } from '@site/src/components/DirectImporterDemo';
 
 Skip `AlphaTabApi` entirely, run the importer yourself, and get a `Score` model back for build pipelines, batch conversions, or model-only workflows.
 
-<AlphaTab file="/files/canon.gp" />
+<DirectImporterDemo showCode={false} />
 
 ## When you want a `Score`, not a rendered surface
 
@@ -52,7 +52,7 @@ The format-specific importers (`Gp7To8Importer`, `Gp3To5Importer`, `MusicXmlImpo
 import * as alphaTab from '@coderline/alphatab';
 import { readFile } from 'node:fs/promises';
 
-const bytes = new Uint8Array(await readFile('canon.gp'));
+const bytes = new Uint8Array(await readFile('song.gp'));
 const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(bytes);
 
 console.log(`${score.title} — ${score.tracks.length} tracks`);

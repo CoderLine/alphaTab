@@ -12,11 +12,11 @@ keywords:
   - Guitar Pro 8
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { ExternalMediaSample } from '@site/src/components/ExternalMediaSample';
 
 Set the player to backing-track mode and the cursor follows an audio file instead of the built-in synth. Guitar Pro 8 files embed the audio and the sync points; for other scores you attach both on `score.backingTrack` before render. alphaTab plays **either** the synthesized audio or the backing track — the two do not mix.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<ExternalMediaSample showCode={false} />
 
 ## What alphaTab needs
 

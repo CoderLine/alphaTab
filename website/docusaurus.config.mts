@@ -574,6 +574,14 @@ async function createConfig(): Promise<Config> {
             from: "/docs/showcase/effects",
             to: "/docs/features/render/coverage-effects-articulations",
           },
+          {
+            from: "/docs/features/extend/custom-smufl-font",
+            to: "/docs/features/render/custom-smufl-fonts",
+          },
+          {
+            from: "/docs/features/extend/custom-fonts-on-skia",
+            to: "/docs/features/render/custom-fonts-on-skia",
+          },
         ],
       },
     ],

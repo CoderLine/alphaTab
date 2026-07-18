@@ -13,11 +13,21 @@ keywords:
   - events
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
+import { MidiEventLog } from '@site/src/components/PlaySync';
 
 Every event the synthesizer plays is available to your code — note-on, note-off, tempo changes, program changes, metronome ticks, and rests. Register a filter for the event types you care about, subscribe to `midiEventsPlayed`, and route the events to a visual metronome, a MIDI-out port, an external DAW bridge, or whatever comes next.
 
-<AlphaTab file="/files/canon.gp" player={true} />
+<MidiEventLog
+  tex={`\\title "Event firehose"
+\\tempo 120
+.
+\\track "Guitar"
+:8 3.4 5.4 7.4 5.4 3.4 5.4 7.4 8.4 |
+:8 10.4 8.4 7.4 5.4 7.4 8.4 10.4 12.4 |
+:8 10.4 12.4 10.4 8.4 7.4 8.4 10.4 8.4 |
+:8 7.4 5.4 7.4 3.4 5.4 3.4 5.4 7.4 |`}
+  showCode={false}
+/>
 
 ## Filter first, then subscribe
 
