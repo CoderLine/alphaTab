@@ -14,7 +14,7 @@ keywords:
 
 import { CursorToggleDemo } from '@site/src/components/CursorToggleDemo';
 
-alphaTab paints a bar cursor, a beat cursor, and a per-beat highlight that all track the audio in real time. Press play to watch the score follow itself, and flip the checkboxes to see each layer in isolation.
+Showing a student where they are in a lesson, wiring the score to a chord chart, driving a lyrics rail — all three lean on the same three overlays. alphaTab paints a bar cursor, a beat cursor, and a per-beat SVG highlight that track the audio in real time. Press play to watch them follow the music, and flip the checkboxes to see each layer in isolation.
 
 <CursorToggleDemo showCode={false} tex={`
 \\title "Cursor tour"
@@ -86,3 +86,4 @@ runtimes.
 - [Customizing cursor colors and animation](./customizing-cursor-colors-and-animation) — restyle the overlays with CSS.
 - [A custom cursor handler](./custom-cursor-handler) — replace the cursor placement logic entirely.
 - [`enableCursor`](/docs/reference/settings/player/enablecursor) and [`enableElementHighlighting`](/docs/reference/settings/player/enableelementhighlighting) in the settings reference.
+- [`playedBeatChanged`](/docs/reference/api/playedbeatchanged) and [`activeBeatsChanged`](/docs/reference/api/activebeatschanged) in the API reference.

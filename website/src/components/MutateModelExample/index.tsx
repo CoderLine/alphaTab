@@ -1,5 +1,5 @@
 import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
-import react, { useState } from "react";
+import React, { useState } from "react";
 import * as alphaTab from "@coderline/alphatab";
 
 const SCORE_URL = "/files/features/Chords.gp5";
@@ -40,7 +40,7 @@ function walkBeats(
   }
 }
 
-export const MutateModelExample: react.FC = () => {
+export const MutateModelExample: React.FC = () => {
   const [api, element] = useAlphaTab((s) => {
     s.core.file = SCORE_URL;
   });
@@ -56,7 +56,7 @@ export const MutateModelExample: react.FC = () => {
       if (beat.lyrics && beat.lyrics.length > 0) {
         beat.lyrics = beat.lyrics.map((l) => (l ?? "").toUpperCase());
       } else {
-        // Canon.gp has no lyrics — seed one so the mutation is visible.
+        // Seed a syllable on beats that carry none so the mutation is visible.
         beat.lyrics = ["LA"];
       }
     });

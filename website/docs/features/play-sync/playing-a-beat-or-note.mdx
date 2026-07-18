@@ -13,7 +13,7 @@ keywords:
 
 import { AuditionDemo } from '@site/src/components/PlaySync';
 
-`playBeat(beat)` and `playNote(note)` audition an individual item from the score without moving the main transport. Reach for them in editors, ear-training exercises, and score-review tools.
+A score editor lets the user click a chord and hear it. An ear-training drill previews the target note before it asks the student to sing it back. Both of those need the same thing: play one item from the score in isolation, without moving the main transport. That is what `playBeat(beat)` and `playNote(note)` do.
 
 <AuditionDemo file="/files/features/Chords.gp5" showCode={false} />
 
@@ -37,8 +37,8 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
-  player: { enablePlayer: true },
+  core: { file: '/scores/song.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
 });
 
 api.beatMouseDown.on((beat) => {
@@ -50,6 +50,6 @@ api.beatMouseDown.on((beat) => {
 
 ## Where to look next
 
-- [Reacting to beat and note clicks](/docs/features/interact/beat-and-note-clicks) — the six mouse events that pair with audition.
+- [Reacting to beat and note clicks](/docs/features/interact/reacting-to-beat-and-note-clicks) — the six mouse events that pair with audition.
 - [Play, pause, stop](./play-pause-stop) — the main-transport methods that these auditions run alongside.
 - [`playBeat`](/docs/reference/api/playbeat) and [`playNote`](/docs/reference/api/playnote) reference entries.

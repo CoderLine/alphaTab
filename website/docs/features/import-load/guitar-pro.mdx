@@ -12,7 +12,7 @@ keywords:
 
 import { GpVersionSwitcher } from '@site/src/components/GpVersionSwitcher';
 
-alphaTab reads every Guitar Pro file format shipped since GP3, from the original binary tablature through the modern ZIP-plus-XML archives.
+The files your users hand you may be any of GP3 through GP8 — three distinct container generations spanning two decades of Guitar Pro releases. One importer path handles all of them: point `core.file` at the file and alphaTab picks the matching importer from the bytes.
 
 <GpVersionSwitcher showCode={false} />
 
@@ -49,4 +49,5 @@ To load from bytes instead (fetched, uploaded, or read from disk), see [Load fro
 - [Guitar Pro 7 compatibility](/docs/formats/guitar-pro-7) — the same table for GP7.
 - [Guitar Pro 6 compatibility](/docs/formats/guitar-pro-6) — GPX-specific coverage notes.
 - [Guitar Pro 3-5 compatibility](/docs/formats/guitar-pro-3-5) — the binary generation, including format quirks.
-- [Tuning importer behavior](./tuning-importer-behavior) — `beatTextAsLyrics`, encoding hint, and the other importer knobs relevant to old GP files.
+- [Tuning importer behavior](./tuning-importer-behavior) — `beatTextAsLyrics`, encoding hints, and the other importer knobs relevant to old GP files.
+- [`core.file`](/docs/reference/settings/core/file) and [`api.load`](/docs/reference/api/load) in the reference.

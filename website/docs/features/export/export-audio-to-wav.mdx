@@ -16,7 +16,7 @@ keywords:
 
 import { AudioExportSample } from '@site/src/components/AudioExportSample';
 
-`AlphaTabApi.exportAudio(options)` runs the alphaTab synthesizer offline and hands you the raw PCM samples. alphaTab produces the samples; your code encodes them into whatever container you want. This page walks the full pipeline: configure the export, pull chunks, wrap them in a WAV header, download the result.
+Bake a slowed-down study track a student can loop in any audio player. Generate audio previews for every song in a catalogue so browsers can hear before they load the notation. Render backing tracks a live performer can trigger from a phone. `AlphaTabApi.exportAudio(options)` runs the alphaTab synthesizer offline and hands you the raw PCM samples — alphaTab produces the samples, your code encodes them into whatever container you want. This page walks the full pipeline: configure the export, pull chunks, wrap them in a WAV header, download the result.
 
 <AudioExportSample />
 
@@ -80,4 +80,5 @@ Hand the chunks to a codec library (LAME, OggEncoder, Opus) instead when you wan
 
 - [Play, pause, stop](/docs/features/play-sync/play-pause-stop) — the live playback counterpart to offline export.
 - [Backing-track audio](/docs/features/play-sync/backing-track-audio) — combine exported audio with sync points for hybrid playback.
-- [`AudioExportOptions`](/docs/reference/types/synth/audioexportoptions) and [`IAudioExporter`](/docs/reference/types/synth/iaudioexporter) in the API reference.
+- [`AlphaTabApi.exportAudio`](/docs/reference/api/exportaudio) and the [`player.playerMode`](/docs/reference/settings/player/playermode) that has to be enabled for it.
+- [`AudioExportOptions`](/docs/reference/types/synth/audioexportoptions), [`AudioExportChunk`](/docs/reference/types/synth/audioexportchunk), and [`IAudioExporter`](/docs/reference/types/synth/iaudioexporter) in the API reference.

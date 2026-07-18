@@ -13,7 +13,7 @@ keywords:
 import * as alphaTab from '@coderline/alphatab';
 import { ToggleSettingDemo } from '@site/src/components/PlaySync';
 
-Traditional songbooks notate bends and whammy dips as instant events at the start or end of a beat, not as gradual gestures spread across the note. Two millisecond-based settings control how snappy those events sound when the score's notation mode is `SongBook`.
+When the goal is a chart that reads like the Real Book — bends drawn as compact hooks, dips notated as instant events at the corner of a beat, chord symbols above the staff — flip on `SongBook` notation mode and alphaTab reshapes both the render and the playback to match. On the audio side, two millisecond-based settings control how snappy those bend and dip events sound when the mode is on.
 
 <ToggleSettingDemo
   tex={`\\title "Bend and grace showcase"
@@ -55,12 +55,12 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   notation: {
     notationMode: alphaTab.NotationMode.SongBook,
   },
   player: {
-    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
     songBookBendDuration: 60,
     songBookDipDuration: 120,
   },
@@ -73,4 +73,6 @@ const api = new alphaTab.AlphaTabApi(container, {
 
 - [`player.songBookBendDuration`](/docs/reference/settings/player/songbookbendduration) and [`player.songBookDipDuration`](/docs/reference/settings/player/songbookdipduration) in the settings reference.
 - [`notation.notationMode`](/docs/reference/settings/notation/notationmode) — the notation-mode switch that activates these values.
+- [`NotationMode`](/docs/reference/types/notationmode) enum — the `GuitarPro` and `SongBook` values the setting accepts.
 - [Vibrato and slide fine-tuning](vibrato-and-slide-fine-tuning) — related synth-timing knobs.
+- [Triplet feel (swing)](triplet-feel-swing) — the other playback-feel toggle in this chapter.

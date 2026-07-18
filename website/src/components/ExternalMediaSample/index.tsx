@@ -5,16 +5,14 @@ import styles from './styles.module.scss';
 import CodeBlock from '@theme/CodeBlock';
 
 export type ExternalMediaSampleProps = {
+    /** Render a copy-pasteable code block below the demo. Defaults to `true`. */
     showCode?: boolean
 }
-export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCode}) => {
+export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCode = true}) => {
 
     const alphaTabWithExternalMedia = useRef<HTMLDivElement>(null);
     const audio = useRef<HTMLAudioElement>(null);
     const updateTimer = useRef<number>(0);
-
-
-    const api = useRef<alphaTab.AlphaTabApi>(null);
 
     useEffect(() => {
         const settings = new alphaTab.Settings();
@@ -107,8 +105,6 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCod
 
         (newApi.player!.output as alphaTab.synth.IExternalMediaSynthOutput).handler = handler;
 
-        api.current = newApi;
-
         return () => {
             window.clearInterval(updateTimer.current);
             newApi.destroy();
@@ -120,7 +116,7 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCod
     return <div className={styles.wrapper}>
         <audio ref={audio} src="/files/Bach_Prelude_BWV999_original.ogg" controls={true} autoPlay={false} />
         <div ref={alphaTabWithExternalMedia} />
-        {showCode !== false && <CodeBlock language="typescript" title="TypeScript Code for this sample">
+        {showCode && <CodeBlock language="typescript" title="TypeScript Code for this sample">
             {[
                 "const audio = document.querySelector('#audio-element');",
                 "let updateTimer = 0;",

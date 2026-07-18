@@ -12,7 +12,7 @@ keywords:
 
 import { CountInMetronomeDemo } from '@site/src/components/PlaySync';
 
-Ship the click a bandmate would give you. A count-in taps out one bar before the song starts so the reader knows the tempo; the metronome keeps clicking on every beat while the track runs.
+Ship the click a bandmate would give you. Before the song starts, the count-in taps out one bar so the reader locks into the tempo; during playback, the metronome keeps clicking on every beat. Both are staples of any practice tool worth shipping.
 
 <CountInMetronomeDemo
   tex={`\\title "Pulse check"
@@ -57,9 +57,9 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
-    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
   },
 });
 
@@ -83,3 +83,4 @@ Every metronome tick fires through `midiEventsPlayed` as an `AlphaTabMetronomeEv
 - [Master and monitoring volumes](master-and-monitoring-volumes) — the mixer view of the same two volumes plus `masterVolume`.
 - [The MIDI event stream](midi-event-stream) — subscribe to `AlphaTabMetronomeEvent` for per-click hooks.
 - [`api.metronomeVolume`](/docs/reference/api/metronomevolume) and [`api.countInVolume`](/docs/reference/api/countinvolume) in the reference.
+- [`AlphaTabMetronomeEvent`](/docs/reference/types/midi/alphatabmetronomeevent) — the per-click event shape emitted through `midiEventsPlayed`.

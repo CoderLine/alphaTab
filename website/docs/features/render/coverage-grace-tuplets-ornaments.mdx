@@ -20,25 +20,25 @@ Grace notes, tuplets, and ornaments carry the small performance details that giv
 
 ## Grace notes {#grace}
 
-Grace notes render as small noteheads before their principal beat. alphaTab honours the source file's on-beat vs before-beat placement and draws the acciaccatura slash where appropriate.
+Grace notes are the small noteheads that lead into a principal beat — the flick of an appoggiatura or acciaccatura that gives a melody its lift. alphaTab honours the source file's on-beat vs before-beat placement and draws the acciaccatura slash where appropriate.
 
 <AlphaTab file="/files/features/GraceNotes.gp5" />
 
 ## Tuplets {#tuplets}
 
-Tuplets — triplets, quintuplets, and other non-standard beat subdivisions — render with a bracket and ratio label above the beamed group. Beat-connected tuplets share the bracket span.
+Tuplets — triplets, quintuplets, and other non-standard beat subdivisions — appear whenever a passage subdivides a beat outside the meter, from a shuffle triplet to a Chopin quintuplet run. alphaTab renders each with a bracket and ratio label above the beamed group; beat-connected tuplets share a single bracket span.
 
 <AlphaTab file="/files/features/Tuplets.gp5" />
 
 ## Trills {#trills}
 
-Trills render with a `tr` glyph and, when the trill spans multiple beats, a wavy line above the staff indicating the duration.
+Trills — the fast alternation between the written note and the pitch above, common on baroque violin lines and lead-guitar sustains — render with a `tr` glyph, and, when the trill spans multiple beats, a wavy line above the staff indicating the duration.
 
 <AlphaTab file="/files/features/Trill.gp5" />
 
 ## Mordents and turns {#ornaments}
 
-Mordents (upper and lower) and turns render as their standard glyphs above the notehead. The examples below use alphaTex to isolate each ornament type.
+Mordents and turns are the traditional ornamental figures that decorate a melodic note — a mordent taps the neighbour note once, a turn wraps around the note with its upper and lower neighbours. alphaTab renders upper mordents, lower mordents, and turns as their standard glyphs above the notehead. The example below uses alphaTex to isolate each ornament type.
 
 <AlphaTab tex="true">{`
 :4 C4 { turn } D4 { iturn } E4 { umordent } F4 { lmordent }
@@ -46,25 +46,25 @@ Mordents (upper and lower) and turns render as their standard glyphs above the n
 
 ## Fingering annotations {#fingering}
 
-Left-hand and picking-hand fingering marks render as small digits or letters next to the affected notehead — useful for classical guitar and piano notation.
+Fingering marks tell the player which finger to use — the small digits above classical-guitar and piano parts and the picking-hand letters (`p`, `i`, `m`, `a`) on fingerstyle scores. alphaTab renders left-hand and picking-hand fingering as small digits or letters next to the affected notehead.
 
 <AlphaTab file="/files/features/Fingering.gp5" />
 
 ## Show it in code
 
-Each ornament category maps to a `NotationElement` key. Toggle any of them off for a cleaner rendering:
+Trills and ornaments share the `EffectNoteOrnament` key; fingering has its own. Toggle any of them off for a cleaner rendering:
 
 ```js
 import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   notation: {
     elements: new Map([
       [alphaTab.NotationElement.EffectTrill, false],
-      [alphaTab.NotationElement.EffectTurn, false],
-      [alphaTab.NotationElement.EffectMordent, false],
+      [alphaTab.NotationElement.EffectNoteOrnament, false],
+      [alphaTab.NotationElement.EffectFingering, false],
     ]),
   },
 });
@@ -76,4 +76,6 @@ const api = new alphaTab.AlphaTabApi(container, {
 
 - [Toggling notation elements off](./coverage-toggle-elements) — the full pattern for hiding a category.
 - [Effects and articulations](./coverage-effects-articulations) — the sibling coverage page for bends, palm mute, slides, and taps.
+- [Special notes](./coverage-special-notes) — harmonics, ghost notes, and tied notes that pair with ornaments on lead lines.
+- [`notation.elements`](/docs/reference/settings/notation/elements) — the settings entry point for the element map.
 - [`NotationElement`](/docs/reference/types/notationelement) — the enumeration listing every togglable category.

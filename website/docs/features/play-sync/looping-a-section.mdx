@@ -12,7 +12,7 @@ keywords:
 
 import { LoopDemo } from '@site/src/components/PlaySync';
 
-Combine `playbackRange` and `isLooping` to repeat a bar, a phrase, or a chorus until the muscle memory sticks.
+"Loop the pre-chorus while I drill the chord voicing" is the classic practice-tool ask. Combine `playbackRange` (the tick bounds) and `isLooping` (the wrap flag) and you have a section that repeats until the muscle memory sticks.
 
 <LoopDemo
   tex={`\\title "Loop phrase"
@@ -48,8 +48,8 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
-  player: { enablePlayer: true },
+  core: { file: '/scores/song.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
 });
 
 api.playerReady.on(() => {
@@ -74,5 +74,7 @@ api.playerReady.on(() => {
 ## Where to look next
 
 - [Seeking by tick and time](./seeking-by-tick-and-time) — the tick model that `playbackRange` lives in.
+- [Playback speed](./playback-speed) — pair a slow speed with a tight loop for focused practice.
 - [Range selection](/docs/features/interact/range-selection) — turn a click-drag on the score into a loop range.
-- [`playbackRange`](/docs/reference/api/playbackrange) and [`isLooping`](/docs/reference/api/islooping) reference entries.
+- [`playbackRange`](/docs/reference/api/playbackrange), [`isLooping`](/docs/reference/api/islooping), and [`playbackRangeChanged`](/docs/reference/api/playbackrangechanged) reference entries.
+- [`PlaybackRange`](/docs/reference/types/synth/playbackrange) type — the `{ startTick, endTick }` shape the property expects.

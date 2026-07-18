@@ -13,7 +13,7 @@ keywords:
 
 import { ClickLogDemo } from '@site/src/components/ClickLogDemo';
 
-alphaTab ships with two default mouse behaviors when the player is active: click a beat to seek to it, and drag across beats to select a playback range. Each is gated by its own flag — `player.enableSeekToClick` for the click-to-seek behavior, `player.enablePlaybackRangeSelection` for the drag-select. Both default to `true`. Flip either off in the demo below and watch the events keep firing while the corresponding built-in side effect stops.
+A read-only thumbnail preview does not want random clicks moving its playhead. A practice UI with a fixed loop should not let a stray drag repaint the range. Two flags cover both scenarios: `player.enableSeekToClick` gates the click-to-seek behavior, and `player.enablePlaybackRangeSelection` gates the drag-select. Both default to `true` when the player is active. Flip either off in the demo below and watch the events keep firing while the corresponding built-in side effect stops.
 
 <ClickLogDemo showInteractionToggle showCode={false} tex={`
 \\title "Interaction toggle"

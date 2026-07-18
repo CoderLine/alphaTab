@@ -72,7 +72,7 @@ export const BytesLoadDemo: React.FC<BytesLoadDemoProps> = ({
   }, [runFetchAndLoad]);
 
   const code = `const bytes = new Uint8Array(
-  await fetch('/scores/canon.gp').then((r) => r.arrayBuffer())
+  await fetch('/scores/song.gp').then((r) => r.arrayBuffer())
 );
 console.log(\`Fetched \${bytes.byteLength} bytes\`);
 

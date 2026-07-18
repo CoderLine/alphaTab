@@ -15,7 +15,7 @@ keywords:
 
 import { TransportControls } from '@site/src/components/PlaySync';
 
-In the browser, alphaTab renders synthesized samples through an `AudioContext`. The default output feeds an `AudioWorkletNode` that runs the sample buffer on the audio thread; older browsers fall back to a `ScriptProcessorNode` on the main thread. This page covers what runs when, and the one setting that lets you steer that choice.
+When you build for the web, this is the backend that plays audio. In the browser, alphaTab renders synthesized samples through an `AudioContext` — the default output feeds an `AudioWorkletNode` that runs the sample buffer on the dedicated audio thread; older browsers fall back to a `ScriptProcessorNode` on the main thread. This page covers what runs when, and the one setting that lets you steer that choice.
 
 <TransportControls
   tex={`\\title "Web backend"
@@ -49,9 +49,9 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
-    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
     soundFont: '/soundfont/sonivox.sf2',
     // Force the ScriptProcessor path only when the host blocks AudioWorklet.
     outputMode: alphaTab.PlayerOutputMode.WebAudioAudioWorklets,
@@ -69,4 +69,5 @@ api.playerReady.on(() => {
 
 - [Audio buffer size](audio-buffer-size) — the latency vs stability knob for the circular sample buffer both modes share.
 - [Selecting an output device (Web)](selecting-an-output-device) — routing the resulting Web Audio stream to a specific sink.
-- [`PlayerOutputMode`](/docs/reference/types/playeroutputmode) in the settings reference.
+- [NAudio (.NET)](naudio-net) and [AudioTrack (Android)](audiotrack-android) — the sibling backends on the other runtimes.
+- [`PlayerOutputMode`](/docs/reference/types/playeroutputmode) and [`player.outputMode`](/docs/reference/settings/player/outputmode) in the reference.

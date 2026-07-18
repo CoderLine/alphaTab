@@ -14,7 +14,7 @@ keywords:
 
 import { ScrollModeSwitch } from '@site/src/components/ScrollModeSwitch';
 
-The built-in scroll modes use a fixed top offset (`scrollOffsetY`). When you need scroll placement driven by container geometry — a common ask is "keep the active bar vertically centered no matter how tall the container is" — replace the whole strategy: assign an `IScrollHandler` to `api.customScrollHandler` and drive the scroll yourself. Pick "Center bar" in the mode pills below to switch from the built-in strategies to a handler that centers the current bar in the scroll container.
+Keeping the active bar centered inside a container whose height changes with the viewport — a lesson player embedded in a resizable pane, a modal that stretches to fit its content — cannot be expressed as a fixed `scrollOffsetY`. Assign an `IScrollHandler` to `api.customScrollHandler` and drive the scroll yourself using the container geometry at scroll time. Pick "Center bar" in the mode pills below to switch from the built-in strategies to a handler that keeps the current bar vertically centered in the scroll container.
 
 <ScrollModeSwitch customHandler="center-bar" showCode={false} tex={`
 \\title "Center the active bar"

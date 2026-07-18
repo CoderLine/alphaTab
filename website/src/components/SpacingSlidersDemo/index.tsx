@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
 import { useAlphaTab } from "@site/src/hooks";
 
@@ -37,7 +36,7 @@ export const SpacingSlidersDemo: React.FC<SpacingSlidersDemoProps> = ({
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   display: {
     stretchForce: ${stretchForce.toFixed(2)},
     spacingRatio: ${spacingRatio.toFixed(2)},

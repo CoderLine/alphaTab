@@ -14,9 +14,9 @@ keywords:
 
 import { BoundsLookupViewer } from '@site/src/components/BoundsLookupViewer';
 
-After every render, alphaTab exposes a `BoundsLookup` on `api.boundsLookup`. It is a hierarchical index of the rendered geometry — staff systems, master bars, bars, beats, notes — with pixel-accurate rectangles for each. Use it to hit-test a mouse position, place an overlay on a beat, or draw a custom cursor on top of the notation.
+Live annotations pinned above a beat, a lasso selector across a phrase, a live-comment marker that follows the notation through re-layouts — any UI that has to line up with the rendered score reads from the same lookup. After every render, `api.boundsLookup` exposes a hierarchical index of the rendered geometry — staff systems, master bars, bars, beats, notes — with pixel-accurate rectangles at every level. Use it to hit-test a mouse position, place an overlay on a beat, or draw a custom marker on top of the notation.
 
-<BoundsLookupViewer tex="true" tracks="all">{`
+<BoundsLookupViewer>{`
 \\track "Guitar"
 :8 15.2 17.2 15.2 17.2 |
 15.2 17.2 15.2 17.2 |
@@ -79,4 +79,5 @@ api.postRenderFinished.on(() => {
 
 - [Beat visibility and note bounds](./beat-visibility-and-note-bounds) — opt into per-note precision and check whether a beat is on-screen.
 - [Reacting to beat and note clicks](./reacting-to-beat-and-note-clicks) — the same lookup powers the built-in click events.
-- [`BoundsLookup`](/docs/reference/types/rendering/boundslookup) in the reference.
+- [`boundsLookup`](/docs/reference/api/boundslookup) and [`postRenderFinished`](/docs/reference/api/postrenderfinished) in the API reference.
+- [`BoundsLookup`](/docs/reference/types/rendering/boundslookup), [`BeatBounds`](/docs/reference/types/rendering/beatbounds), [`MasterBarBounds`](/docs/reference/types/rendering/masterbarbounds), and [`Bounds`](/docs/reference/types/rendering/bounds) in the types reference.

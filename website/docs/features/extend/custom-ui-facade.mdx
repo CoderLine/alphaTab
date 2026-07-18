@@ -14,7 +14,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-`IUiFacade` is the contract alphaTab uses to talk to whichever UI framework is hosting it. Every shipped platform provides one: `BrowserUiFacade` on the web, WPF and WinForms facades on .NET, `AndroidUiFacade` on Android. Implement the interface to embed alphaTab in any other host — a game engine, a native desktop toolkit alphaTab does not know about, a custom canvas layer.
+Hosting alphaTab in a UI framework it does not know about — WinUI, MAUI, Avalonia, a mobile framework, a game engine, a custom canvas layer — means implementing `IUiFacade`, the contract alphaTab uses to talk to its host. Every shipped platform already provides one: `BrowserUiFacade` on the web, WPF and WinForms facades on .NET, `AndroidUiFacade` on Android. Ship your own facade to reach anywhere else.
 
 <AlphaTab tex={true}>{`
 \\title "IUiFacade"
@@ -28,7 +28,7 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
   :2 (0.6 2.5 2.4) (0.6 4.5 3.4)
 `}</AlphaTab>
 
-The render above already goes through an `IUiFacade` implementation — [`BrowserUiFacade`](https://github.com/CoderLine/alphaTab/blob/main/packages/alphatab/src/platform/javascript/BrowserUiFacade.ts). This page is a meta demo: you are looking at the interface you will implement, as implemented by alphaTab for the browser.
+Rendered here through [`BrowserUiFacade`](https://github.com/CoderLine/alphaTab/blob/main/packages/alphatab/src/platform/javascript/BrowserUiFacade.ts) — the browser's implementation of the interface. On any other host, your own `IUiFacade` produces the same output through the same `AlphaTabApiBase`. This page is a meta demo: you are looking at the interface you will implement, as implemented by alphaTab for the browser.
 
 ## What the facade does
 
@@ -89,6 +89,7 @@ const api = new alphaTab.AlphaTabApiBase(facade, new alphaTab.Settings());
 
 ## Where to look next
 
-- [`IUiFacade` in the reference](/docs/reference/types/platform/iuifacade) — every method, every property, every event.
+- [`IUiFacade`](/docs/reference/types/platform/iuifacade) — every method, every property, every event.
 - [`BrowserUiFacade` source](https://github.com/CoderLine/alphaTab/blob/main/packages/alphatab/src/platform/javascript/BrowserUiFacade.ts) — the reference implementation to model yours after.
-- [Worker and worklet initialization](worker-and-worklet-initialization) — if your host supports Web Workers, wire them here alongside the facade.
+- [AlphaTabView on Android](/docs/features/extend/alphatabview-android) and [WPF and WinForms controls](/docs/features/extend/wpf-and-winforms-controls) — the sibling native hosts, each backed by its own facade.
+- [Worker and worklet initialization](/docs/features/extend/worker-and-worklet-initialization) — if your host supports Web Workers, wire them here alongside the facade.

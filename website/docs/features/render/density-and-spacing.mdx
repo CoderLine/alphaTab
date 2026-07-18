@@ -13,7 +13,7 @@ keywords:
 
 import { SpacingSlidersDemo } from '@site/src/components/SpacingSlidersDemo';
 
-Three orthogonal knobs control how tightly music fits on the page: how the widths of successive note durations relate (`spacingRatio`), how densely alphaTab packs a row overall (`stretchForce`), and whether the last row of a page stretches to full width (`lastSystemFillThreshold`).
+Tune density when a chart needs to fit on a single printed page, when a projector view demands looser spacing for readability from across the room, or when the house engraving style calls for tighter or airier note spacing than the defaults. Three orthogonal knobs control the fit: how the widths of successive note durations relate (`spacingRatio`), how densely alphaTab packs a row overall (`stretchForce`), and whether the last row of a page stretches to full width (`lastSystemFillThreshold`).
 
 <SpacingSlidersDemo showCode={false} />
 
@@ -51,7 +51,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   display: {
     spacingRatio: 1.5,
     stretchForce: 1.2,

@@ -12,7 +12,7 @@ keywords:
 
 import { TransportControls } from '@site/src/components/PlaySync';
 
-alphaTab treats vibrato and slides as procedural gestures — the synth generates the wobble or the pitch sweep from parameters, not from a recorded sample. Adjust those parameters to shape how aggressive, how fast, and how far each effect travels.
+Matching the synth's expression to a specific guitar tone — a subtle bluesy vibrato for a Strat, a wide whammy sweep for a metal solo — comes down to tuning a handful of numbers. alphaTab treats vibrato and slides as procedural gestures: the synth generates the wobble or the pitch sweep from parameters, not from a recorded sample. Adjust those parameters to shape how aggressive, how fast, and how far each effect travels.
 
 <TransportControls file="/files/features/Vibrato.gp5" showCode={false} />
 
@@ -44,9 +44,9 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
-    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
     vibrato: {
       noteWideLength: 200,
       noteWideAmplitude: 1.5,
@@ -71,5 +71,6 @@ Both nested objects are mutable at runtime. Change a value on `api.settings.play
 ## Where to look next
 
 - [`player.vibrato`](/docs/reference/settings/player/vibrato) and [`player.slide`](/docs/reference/settings/player/slide) in the settings reference.
+- [Triplet feel (swing)](triplet-feel-swing) — the other playback-feel knob for rhythm interpretation.
 - [SongBook mode](songbook-mode) — related timing knobs for songbook-style bends and dips.
-- [Effects and articulations](/docs/features/render/coverage-effects) — the notation side of vibrato, slides, and their cousins.
+- [Effects and articulations](/docs/features/render/coverage-effects-articulations) — the notation side of vibrato, slides, and their cousins.

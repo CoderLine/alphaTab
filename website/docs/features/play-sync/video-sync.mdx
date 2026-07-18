@@ -15,7 +15,7 @@ keywords:
 
 import { TransportControls } from '@site/src/components/PlaySync';
 
-Video sync uses the same infrastructure as backing-track audio, with one twist: alphaTab does not own the media element. You implement `IExternalMediaHandler`, alphaTab calls it for play, pause, seek, volume, and playback rate, and you feed the current time back through `player.output.updatePosition`. Works for `<video>` elements and for the YouTube IFrame Player API alike.
+A YouTube guitar lesson synced to a printable score — the video plays and the notation scrolls alongside — has become a standard learning format. Video sync uses the same infrastructure as backing-track audio, with one twist: alphaTab does not own the media element. You implement `IExternalMediaHandler`, alphaTab calls it for play, pause, seek, volume, and playback rate, and you feed the current time back through `player.output.updatePosition`. The same handler shape drives an HTML5 `<video>` tag and the YouTube IFrame Player API alike.
 
 :::note Live video demo not shipped here
 No matching video asset lives in the docs bundle yet. The transport below plays the synthesized version; the code sample further down is the actual `<video>`-driven wiring. The [backing-track-audio](./backing-track-audio) page runs the audio variant of the same pipeline live.
@@ -55,7 +55,7 @@ const container = getAlphaTabContainer();
 const video = document.getElementById('video');
 
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/my-song.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
     playerMode: alphaTab.PlayerMode.EnabledExternalMedia,
     soundFont: '/soundfont/sonivox.sf2',
@@ -97,4 +97,5 @@ video.addEventListener('seeked', pushPosition);
 
 - [Backing-track audio](backing-track-audio) — when the audio lives inside the score file or you can control the audio element directly.
 - [Sync points at runtime](sync-points-at-runtime) — aligning the video's time axis with the score's bars.
-- [`PlayerMode.EnabledExternalMedia`](/docs/reference/settings/player/playermode) in the settings reference.
+- [Seeking by tick and time](seeking-by-tick-and-time) — the same `timePosition` axis your handler feeds back through `updatePosition`.
+- [`PlayerMode.EnabledExternalMedia`](/docs/reference/settings/player/playermode), [`IExternalMediaHandler`](/docs/reference/types/synth/iexternalmediahandler), and [`IExternalMediaSynthOutput`](/docs/reference/types/synth/iexternalmediasynthoutput) in the reference.

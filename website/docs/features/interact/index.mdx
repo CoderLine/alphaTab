@@ -13,7 +13,7 @@ keywords:
 import { FeatureChapterGrid } from '@site/src/components/FeatureChapterGrid';
 import chapters from './_chapters';
 
-alphaTab keeps the rendered score in lockstep with playback and with the reader's pointer. Cursors track the current beat, auto-scroll keeps that beat on screen, mouse and touch events surface every beat and note the user clicks, and the bounds lookup lets you draw overlays or run hit-tests against the same geometry the renderer produced.
+Anything a reader does with the score — following the beat during a lesson, dragging out a phrase to loop it, tapping a note to audition it, snapping the viewport back to the cursor — flows through the APIs in this chapter. Cursors track the current beat, auto-scroll keeps that beat on screen, mouse and touch events fire for every beat and note the user hits, and the bounds lookup returns the same pixel geometry the renderer produced so overlays and hit-tests line up exactly.
 
 Every capability below is available on Web, .NET, and Android unless a card names specific platforms. Follow any card into the [reference](/docs/reference/api/) for the exact signature.
 

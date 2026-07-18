@@ -14,7 +14,7 @@ keywords:
 
 import { ScrollModeSwitch } from '@site/src/components/ScrollModeSwitch';
 
-`player.scrollMode` decides when alphaTab moves the viewport during playback. Four modes, one setting. Pick a pill in the demo below to see the mode change while the score plays inside a bounded scroll pane.
+The scroll style that fits a follow-along viewer is different from what fits a practice page or a karaoke-style teleprompter. `player.scrollMode` picks between four strategies for keeping the played bar on screen — continuous flow, only-when-off-screen, smooth glide, or off entirely. Pick a pill in the demo below to see the mode change while the score plays inside a bounded scroll pane.
 
 <ScrollModeSwitch showCode={false} tex={`
 \\title "Scroll modes"
@@ -81,4 +81,5 @@ runtimes.
 
 - [Scroll target and offsets](./scroll-target-and-offsets) — choose the element that scrolls and tune the offsets.
 - [A custom scroll handler](./custom-scroll-handler) — replace the scroll strategy entirely.
-- [`ScrollMode`](/docs/reference/types/scrollmode) and [`scrollToCursor()`](/docs/reference/api/scrolltocursor) in the reference.
+- [Lazy loading](./lazy-loading) — how off-screen chunks stay out of the DOM until the scroll approaches them.
+- [`scrollMode`](/docs/reference/settings/player/scrollmode) and [`scrollToCursor()`](/docs/reference/api/scrolltocursor) in the reference, plus the [`ScrollMode`](/docs/reference/types/scrollmode) enum.

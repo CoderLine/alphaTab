@@ -15,7 +15,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-The `AlphaTab.Windows` NuGet ships two ready-made hosts for Windows desktop UIs: a WPF control for XAML apps and a `Control` subclass for classic WinForms. Both wrap the same core rendering and playback engine as the web and Android builds.
+Embedding alphaTab in a .NET desktop app is a NuGet install and a control declaration. `AlphaTab.Windows` ships two ready-made hosts: a WPF control for XAML apps and a `Control` subclass for classic WinForms. Both wrap the same core rendering and playback engine as the web and Android builds.
 
 <AlphaTab tex={true}>{`
 \\title "WPF + WinForms"
@@ -88,5 +88,7 @@ The WinForms control shares the WPF playback pipeline but cannot render semi-tra
 ## Where to look next
 
 - [Installation (.NET)](/docs/getting-started/installation-net) — package layout, console rendering, and dependency notes.
+- [Custom fonts on Skia](/docs/features/render/custom-fonts-on-skia) — how to register titles, lyrics, and fingering fonts on the Skia backend both controls use.
+- [AlphaTabView on Android](/docs/features/extend/alphatabview-android) — the sibling native host on Android.
+- [Custom UI facade](/docs/features/extend/custom-ui-facade) — for hosts .NET does not ship a control for, such as Avalonia or MAUI.
 - [alphaTabSamplesDotNet](https://github.com/CoderLine/alphaTabSamplesDotNet) — worked WPF and WinForms sample projects.
-- [Custom UI facade](custom-ui-facade) — for hosts .NET does not ship a control for, such as Avalonia or MAUI.

@@ -12,7 +12,7 @@ keywords:
 
 import { SoundFontSwitcher } from '@site/src/components/PlaySync';
 
-The bundled Sonivox SoundFont covers General MIDI but is deliberately small. Replace it with a purpose-built `.sf2` when the score calls for richer guitars, a specific piano, or a genre-tuned drum kit.
+The bundled Sonivox SoundFont covers General MIDI but is deliberately small. When the score needs a Steinway rather than a GM piano, a metal amp emulation rather than a clean guitar, or a rock drum kit rather than the stock kick and snare, swap in a purpose-built `.sf2` file. The synth pipeline stays identical — only the sample bank changes.
 
 <SoundFontSwitcher
   tex={`\\title "Timbre showcase"
@@ -43,9 +43,9 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
-    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
   },
 });
 
@@ -77,4 +77,5 @@ api.loadSoundFont(drums);
 
 - [Combining multiple SoundFonts](combining-multiple-soundfonts) — load several SoundFonts side by side.
 - [SoundFont2 with TinySoundFont](soundfont2-with-tinysoundfont) — how the synth pipeline uses the loaded file.
-- [`api.loadSoundFont()`](/docs/reference/api/loadsoundfont) and [`api.resetSoundFonts()`](/docs/reference/api/resetsoundfonts) in the reference.
+- [`api.loadSoundFont`](/docs/reference/api/loadsoundfont), [`api.resetSoundFonts`](/docs/reference/api/resetsoundfonts), and [`api.soundFontLoaded`](/docs/reference/api/soundfontloaded) in the reference.
+- [`player.soundFont`](/docs/reference/settings/player/soundfont) — the settings-side entry point for a single-file replacement.

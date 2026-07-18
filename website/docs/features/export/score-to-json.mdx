@@ -15,7 +15,7 @@ keywords:
 
 import { ScoreJsonDemo } from '@site/src/components/ScoreJsonDemo';
 
-`JsonConverter` turns the alphaTab `Score` object graph into a plain, cycle-free JavaScript object — and back. Persist the result in a database, ship it between a Web Worker and the main thread, or diff two versions of a score in a text editor.
+Persist a user-authored arrangement in your database so they can pick it up on any device. Embed a score directly inside a static HTML page — no extra HTTP request, no binary parsing. Ship a `Score` from a Web Worker to the main thread. Diff two versions of a piece in a text editor to see what a collaborator changed. `JsonConverter` turns the alphaTab `Score` object graph into a plain, cycle-free JavaScript object — and back.
 
 <ScoreJsonDemo showCode={false} />
 
@@ -75,4 +75,5 @@ On Web the short form `JsonConverter.scoreToJson(score)` / `JsonConverter.jsonTo
 
 - [Settings to JSON](settings-to-json) — the sibling call for `Settings`.
 - [Export to alphaTex](export-to-alphatex) — a human-readable text format for the same model.
-- [`JsonConverter`](/docs/reference/types/model/jsonconverter) in the API reference.
+- [`api.renderScore`](/docs/reference/api/renderscore) — hand the deserialized `Score` back to the renderer.
+- [`JsonConverter`](/docs/reference/types/model/jsonconverter) in the API reference — the methods `scoreToJson`, `jsonToScore`, and `scoreToJsObject` live here.

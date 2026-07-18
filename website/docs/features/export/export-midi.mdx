@@ -15,7 +15,7 @@ keywords:
 
 import { MidiExporterDemo } from '@site/src/components/MidiExporterDemo';
 
-alphaTab writes Standard MIDI File 1.0 output from any loaded score. Everything a MIDI player needs — tempo map, time signatures, program changes, note on/off with expression and pitch bend — comes out of the same `MidiFileGenerator` that drives the built-in synth.
+Hand the score to a DAW so a producer can layer a professional sampler on top. Drive an external hardware synth from a rendered `.mid`. Ship rehearsal tracks to a music-notation tool that speaks MIDI. alphaTab writes Standard MIDI File 1.0 output from any loaded score — tempo map, time signatures, program changes, note on/off with expression and pitch bend all come out of the same `MidiFileGenerator` that drives the built-in synth.
 
 <MidiExporterDemo showCode={false} />
 
@@ -92,5 +92,6 @@ generator.generate();
 ## Where to look next
 
 - [Export audio to WAV](export-audio-to-wav) — render synthesized audio instead of MIDI events.
+- [MIDI event stream](/docs/features/play-sync/midi-event-stream) — subscribe to the same events at play time instead of writing them to a file.
 - [`AlphaTabApi.downloadMidi`](/docs/reference/api/downloadmidi) in the API reference.
 - [`MidiFile`](/docs/reference/types/midi/midifile), [`MidiFileGenerator`](/docs/reference/types/midi/midifilegenerator), and [`MidiFileFormat`](/docs/reference/types/midi/midifileformat) in the API reference.

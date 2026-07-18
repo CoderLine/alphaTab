@@ -12,7 +12,7 @@ keywords:
 
 import { AlphaTexLivePreview } from '@site/src/components/AlphaTexLivePreview';
 
-Write the score directly in your page or your code with alphaTex — no file, no importer plumbing.
+Embed a short exercise into a lesson page, let an educator type notation into a CMS field, wire up a live-preview playground where the reader edits alphaTex and watches it render — you write the score directly in your page or your code, with no file and no importer plumbing.
 
 <AlphaTexLivePreview showCode={false} />
 
@@ -70,4 +70,6 @@ document.querySelector('#tex-input').addEventListener('input', (e) => {
 
 - [alphaTex introduction](/docs/alphatex/introduction) — full syntax reference.
 - [Direct importer use](direct-importer-use) — `ScoreLoader.loadAlphaTex()` returns a `Score` without an API.
-- [`core.tex`](/docs/reference/settings/core/tex) and [`api.load`](/docs/reference/api/load) in the reference. The `tex` method sits alongside `load` in the API reference.
+- [Reacting to a loaded score](reacting-to-loaded-score) — the `scoreLoaded` event fires the same way for `tex` input.
+- [`core.tex`](/docs/reference/settings/core/tex) and [`api.tex`](/docs/reference/api/tex) in the reference.
+- [`AlphaTexImporter`](/docs/reference/types/importer/alphateximporter) — the underlying parser.

@@ -15,7 +15,7 @@ keywords:
 
 import { AlphaTexExporterSample } from '@site/src/components/AlphaTexExporterSample';
 
-`AlphaTexExporter` writes a loaded `Score` back to [alphaTex](/docs/alphatex/introduction) source. Every construct the alphaTex importer understands round-trips through the exporter, so you can move a score into a text-editable format for versioning, embedding in HTML, or hand-editing.
+Turn a binary Guitar Pro file into a diff-friendly text blob you can commit to git. Embed a full piece inside a static HTML page without an extra HTTP request. Round-trip a score through a text editor for hand tweaks. `AlphaTexExporter` writes a loaded `Score` back to [alphaTex](/docs/alphatex/introduction) source, and every construct the alphaTex importer understands survives the trip.
 
 <AlphaTexExporterSample />
 
@@ -47,15 +47,16 @@ api.scoreLoaded.on(() => {
   console.log(tex);
 
   const bytes = exporter.export(api.score, exportSettings);
+  const fileName = (api.score.title || 'Untitled') + '.alphatex';
+  const url = URL.createObjectURL(new Blob([bytes], { type: 'text/plain' }));
+
   const a = document.createElement('a');
-  a.download = api.score.title
-    ? `${api.score.title}.alphatex`
-    : 'Untitled.alphatex';
-  a.href = URL.createObjectURL(new Blob([bytes], { type: 'text/plain' }));
+  a.download = fileName;
+  a.href = url;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(a.href);
+  URL.revokeObjectURL(url);
 });
 ```
 
@@ -72,4 +73,5 @@ api.scoreLoaded.on(() => {
 
 - [alphaTex introduction](/docs/alphatex/introduction) — the syntax the exporter emits.
 - [Load alphaTex inline](/docs/features/import-load/load-alphatex-inline) — feed the exported string straight back into a fresh API instance.
-- [`AlphaTexExporter`](/docs/reference/types/exporter/alphatexexporter) in the API reference.
+- [Export to Guitar Pro 7](export-to-guitar-pro-7) — the binary counterpart when your users need `.gp`.
+- [`AlphaTexExporter`](/docs/reference/types/exporter/alphatexexporter) in the API reference, and the [`ExporterSettings`](/docs/reference/types/exportersettings) that shape the output.

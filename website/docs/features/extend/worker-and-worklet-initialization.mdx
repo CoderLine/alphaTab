@@ -14,7 +14,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-alphaTab drives its rendering pipeline and audio synthesis from a Web Worker and an Audio Worklet. When a bundler with a shipped plugin (Vite or webpack) is in use, those entry points are wired for you. Anywhere else, you tell alphaTab how to construct them via the three `Environment` statics on this page.
+Hosting alphaTab inside an app with a custom bundler means understanding the worker/worklet split: rendering runs off the main thread in a Web Worker, and audio synthesis runs in an Audio Worklet inside the page's audio graph. The shipped Vite and webpack plugins wire both for you. Anywhere else — a Vite/webpack setup you built yourself, or a different bundler entirely — you tell alphaTab how to construct them via the three `Environment` statics on this page.
 
 <AlphaTab tex={true} player={true}>{`
 \\title "Worker + Worklet"
@@ -81,5 +81,8 @@ alphaTab.Environment.initializeAudioWorklet();
 
 ## Where to look next
 
-- [Custom bundler integration](custom-bundler-integration) — the checklist for wiring these entry points into Rollup, esbuild, or Parcel.
+- [Custom bundler integration](/docs/features/extend/custom-bundler-integration) — the checklist for wiring these entry points into Rollup, esbuild, or Parcel.
+- [`Environment`](/docs/reference/types/environment) — every static on the class, including `initializeMain`, `initializeWorker`, and `initializeAudioWorklet`.
+- [`core.useWorkers`](/docs/reference/settings/core/useworkers) — the setting that toggles worker rendering off entirely when you want a synchronous main-thread pipeline instead.
+- [`core.scriptFile`](/docs/reference/settings/core/scriptfile) — the legacy fallback for pointing alphaTab at a hosted script when factory injection is not available.
 - [Installation (Vite)](/docs/getting-started/installation-vite) and [Installation (webpack)](/docs/getting-started/installation-webpack) — the shipped plugins that do this wiring for you.

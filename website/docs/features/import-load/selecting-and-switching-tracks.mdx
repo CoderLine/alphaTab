@@ -12,7 +12,7 @@ keywords:
 
 import { TrackSwitcher } from '@site/src/components/TrackSwitcher';
 
-A score can carry a dozen instruments; you usually render one or two. `core.tracks` picks the initial set, and `api.renderTracks()` swaps the visible tracks at runtime without reloading the file.
+You open a full band score but show only the guitar on first render, then let the user flip to the piano, drums, or every track at once — `core.tracks` picks the initial set, and `api.renderTracks()` swaps the visible tracks at runtime without reloading the file.
 
 <TrackSwitcher showCode={false} />
 
@@ -54,5 +54,6 @@ document.getElementById('show-both').addEventListener('click', () => {
 ## Where to look next
 
 - [Reacting to a loaded score](./reacting-to-loaded-score) — inspect `api.score.tracks` from the `scoreLoaded` event before wiring switcher UI.
-- [`renderTracks`](/docs/reference/api/rendertracks) — full signature including the optional `RenderHints` argument.
+- [`api.renderTracks`](/docs/reference/api/rendertracks) — full signature including the optional `RenderHints` argument.
 - [`core.tracks`](/docs/reference/settings/core/tracks) — the initial-selection field in the settings reference.
+- [`Track`](/docs/reference/types/model/track) — the model type `renderTracks()` accepts.

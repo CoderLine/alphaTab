@@ -12,7 +12,7 @@ keywords:
 
 import { BarRangeDemo } from '@site/src/components/BarRangeDemo';
 
-`display.startBar` and `display.barCount` render a window of consecutive bars out of a larger score. Reach for them to paginate a long piece, isolate a phrase for a tutorial page, or generate per-section previews without loading a different file each time.
+`display.startBar` and `display.barCount` render a window of consecutive bars out of a larger score. Reach for them to build a practice UI that paginates a long piece four bars at a time, to isolate a phrase for a tutorial page, or to generate embedded thumbnails of specific passages — all without loading a different file each time.
 
 <BarRangeDemo showCode={false} />
 
@@ -32,7 +32,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   display: {
     startBar: 4,
     barCount: 8,

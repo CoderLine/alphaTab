@@ -13,7 +13,7 @@ keywords:
 
 import { LazyLoadingDemo } from '@site/src/components/LazyLoadingDemo';
 
-alphaTab renders the score in small chunks. With lazy loading on, the chunks only enter the DOM when they scroll close to the viewport. Large scores paint fast, and the browser holds less markup at any moment. Scroll the pane below and watch the SVG chunk count climb with lazy loading on, then flip it off to see every chunk mounted at once.
+A five-hundred-bar guitar piece rendered as SVG can push tens of thousands of nodes into the DOM. That is expensive to paint, expensive to keep in memory, and slow to open on a phone. Lazy loading holds the off-screen chunks back until an `IntersectionObserver` says they are about to become visible. Scroll the pane below and watch the SVG chunk count climb with lazy loading on, then flip it off to see every chunk mounted at once.
 
 <LazyLoadingDemo showCode={false} tex={`
 \\title "Lazy loading probe"

@@ -12,7 +12,7 @@ keywords:
 
 import { DirectImporterDemo } from '@site/src/components/DirectImporterDemo';
 
-Skip `AlphaTabApi` entirely, run the importer yourself, and get a `Score` model back for build pipelines, batch conversions, or model-only workflows.
+Server-side rendering, headless conversion pipelines, bulk model transforms — anywhere you want the parsed `Score` without a rendering surface, you skip `AlphaTabApi` and drive the importer yourself.
 
 <DirectImporterDemo showCode={false} />
 
@@ -72,4 +72,6 @@ No `getAlphaTabContainer()` here — this path never touches a rendering surface
 - [Score to JSON and back](/docs/features/export/score-to-json) — pair direct-loader use with model serialization.
 - [Export to alphaTex](/docs/features/export/export-to-alphatex) — the exporter counterpart shown above.
 - [Programmatic score construction](/docs/features/extend/programmatic-score-construction) — build a `Score` without any importer.
-- [`ScoreLoader`](/docs/reference/types/importer/scoreloader), [`AlphaTexImporter`](/docs/reference/types/importer/alphateximporter), and [`UnsupportedFormatError`](/docs/reference/types/importer/unsupportedformaterror) in the reference.
+- [Handling load errors](handling-load-errors) — errors surface as thrown exceptions here, not through the `error` event.
+- [`ScoreLoader`](/docs/reference/types/importer/scoreloader), [`ScoreImporter`](/docs/reference/types/importer/scoreimporter), [`AlphaTexImporter`](/docs/reference/types/importer/alphateximporter), [`AlphaTexErrorWithDiagnostics`](/docs/reference/types/importer/alphatexerrorwithdiagnostics), and [`UnsupportedFormatError`](/docs/reference/types/importer/unsupportedformaterror) in the reference.
+- [`Score`](/docs/reference/types/model/score), [`Track`](/docs/reference/types/model/track), and [`Staff`](/docs/reference/types/model/staff) — the returned model types.

@@ -9,13 +9,17 @@ import CodeBlock from '@theme/CodeBlock';
 import styles from './styles.module.scss';
 
 export interface TransportControlsProps {
+  /** URL of a score file to load. Mutually exclusive with `tex`. */
   file?: string;
+  /** Inline alphaTex source to load. Mutually exclusive with `file`. */
   tex?: string;
   settings?: alphaTab.json.SettingsJson;
   tracks?: number[] | 'all';
   renderExtras?: (api: alphaTab.AlphaTabApi | undefined) => React.ReactNode;
   onApi?: (api: alphaTab.AlphaTabApi) => void;
+  /** Render a copy-pasteable code block below the demo. Defaults to `true`. */
   showCode?: boolean;
+  /** Optional custom TypeScript snippet shown when `showCode` is true. */
   codeSample?: string;
   children?: React.ReactNode;
 }
@@ -38,6 +42,12 @@ export const TransportControls: React.FC<TransportControlsProps> = ({
   codeSample,
   children,
 }) => {
+  if (file && tex) {
+    throw new Error(
+      'TransportControls: pass either `file` or `tex`, not both.'
+    );
+  }
+
   const [api, element] = useAlphaTab((s) => {
     if (file) {
       s.core.file = file;
@@ -59,14 +69,9 @@ export const TransportControls: React.FC<TransportControlsProps> = ({
   const [isPlaying, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [endTime, setEndTime] = useState(1);
-  const [ready, setReady] = useState(false);
 
   useAlphaTabEvent(api, 'playerStateChanged', (e: alphaTab.synth.PlayerStateChangedEventArgs) => {
     setPlaying(e.state === alphaTab.synth.PlayerState.Playing);
-  });
-
-  useAlphaTabEvent(api, 'playerReady', () => {
-    setReady(true);
   });
 
   useAlphaTabEvent(api, 'playerPositionChanged', (e: alphaTab.synth.PositionChangedEventArgs) => {

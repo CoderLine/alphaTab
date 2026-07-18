@@ -78,9 +78,13 @@ export const CursorToggleDemo: React.FC<CursorToggleDemoProps> = ({
         if (showCustomHandlerToggle) return; // handled by the custom-handler effect
         api.settings.player.enableAnimatedBeatCursor = enableAnimation;
         api.updateSettings();
-        // Work around a library-side state cache in _updateCursorHandler: force
-        // the default handler swap by assigning a custom handler when animation
-        // is off, and clearing it when animation is on.
+        // WORKAROUND (upstream library bug): alphaTab caches the resolved
+        // cursor handler in `_updateCursorHandler` and does not re-evaluate
+        // when only `enableAnimatedBeatCursor` toggles, so calling
+        // `updateSettings()` alone leaves the animated behavior stuck.
+        // Reassigning `customCursorHandler` — even to `undefined` — forces
+        // the internal handler swap. Assign a non-animating placeholder when
+        // animation is off, clear it back to `undefined` when it's on.
         if (enableAnimation) {
             api.customCursorHandler = undefined;
         } else {

@@ -14,7 +14,7 @@ keywords:
 
 import { ClickLogDemo } from '@site/src/components/ClickLogDemo';
 
-alphaTab hit-tests every mouse press against the rendered score and fires typed events with the `Beat` or `Note` under the cursor. Click a beat in the demo below and watch the cursor snap to it — that is the built-in seek behavior wired through the same events you consume. The log panel on the right shows every beat and note event as it fires.
+Click-to-seek in a lesson viewer, hover a note to pop a tooltip, tap a note to audition it in a chord trainer — every one of these is a couple of lines against the six mouse events on the API. alphaTab hit-tests every mouse press against the rendered score and fires typed events with the `Beat` or `Note` under the cursor. Click a beat in the demo below and watch the cursor snap to it — that is the built-in seek behavior wired through the same events you subscribe to. The log panel on the right shows every beat and note event as it fires.
 
 <ClickLogDemo includeNoteBounds showCode={false} tex={`
 \\title "Click targets"
@@ -67,19 +67,32 @@ api.beatMouseDown.on((beat) => {
 
 ## Per-note click hook
 
-Turn on `core.includeNoteBounds` first, then subscribe to `noteMouseDown`. Use it to audition a single note, popup a fingering hint, or route the note into an editor selection.
+Turn on `core.includeNoteBounds` first, then subscribe to `noteMouseDown` — the event stays quiet without it. Use it to audition a single note, pop a fingering hint, or route the note into an editor selection.
 
 ```js
 import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
+const tooltip = document.getElementById('note-tooltip');
+
 const api = new alphaTab.AlphaTabApi(container, {
   core: { file: '/scores/song.gp', includeNoteBounds: true },
   player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },
 });
 
 api.noteMouseDown.on((note) => {
+  // Audition the note through the built-in synth.
   api.playNote(note);
+});
+
+api.noteMouseMove.on((note) => {
+  // Show a fingering / pitch hint tooltip next to the note.
+  tooltip.textContent = `string ${note.string} · fret ${note.fret}`;
+  tooltip.hidden = false;
+});
+
+api.noteMouseUp.on(() => {
+  tooltip.hidden = true;
 });
 ```
 
@@ -87,6 +100,7 @@ api.noteMouseDown.on((note) => {
 
 ## Where to look next
 
-- [Enabling and disabling interaction](./enabling-and-disabling-interaction) — the master toggle that gates the built-in seek and select behavior.
+- [Enabling and disabling interaction](./enabling-and-disabling-interaction) — the two flags that gate the built-in seek and select behavior.
 - [Beat visibility and note bounds](./beat-visibility-and-note-bounds) — the `includeNoteBounds` opt-in that powers the note events.
-- [`beatMouseDown`](/docs/reference/api/beatmousedown) and [`noteMouseDown`](/docs/reference/api/notemousedown) in the API reference.
+- [Seeking by tick and time](/docs/features/play-sync/seeking-by-tick-and-time) — the `tickPosition` and `timePosition` surface behind click-to-seek.
+- [`beatMouseDown`](/docs/reference/api/beatmousedown), [`beatMouseMove`](/docs/reference/api/beatmousemove), [`beatMouseUp`](/docs/reference/api/beatmouseup), [`noteMouseDown`](/docs/reference/api/notemousedown), [`noteMouseMove`](/docs/reference/api/notemousemove), and [`noteMouseUp`](/docs/reference/api/notemouseup) in the API reference.

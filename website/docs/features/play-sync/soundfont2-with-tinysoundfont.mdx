@@ -13,7 +13,7 @@ keywords:
 
 import { TransportControls } from '@site/src/components/PlaySync';
 
-alphaTab does not ship sampled instrument recordings. It converts the score into MIDI, feeds that stream to an embedded software synth, and mixes the synth output into your platform's audio backend. That synth is a port of [TinySoundFont](https://github.com/schellingb/TinySoundFont), which renders any SoundFont 2 (`.sf2`) file into PCM in real time.
+Every note you hear from alphaTab is synthesized on the fly — there are no pre-rendered instrument recordings in the box. alphaTab converts the score into MIDI, feeds that stream to an embedded software synth, and mixes the synth output into your platform's audio backend. The synth is a port of [TinySoundFont](https://github.com/schellingb/TinySoundFont), which renders any SoundFont 2 (`.sf2`) file into PCM in real time. Swap in a high-quality sampled piano, a genre-tuned drum kit, or a guitar amp emulation and the same pipeline produces very different audio.
 
 <TransportControls
   tex={`\\title "Synth pipeline"
@@ -51,9 +51,9 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
-    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
     // On Web the bundled SoundFont ships via the assets folder; the Vite / webpack
     // plugin points this URL at the shipped file. Override to swap in your own.
     soundFont: '/assets/sonivox.sf2',
@@ -75,3 +75,4 @@ On .NET and Android there is no automatic download step; call `api.loadSoundFont
 - [Combining multiple SoundFonts](combining-multiple-soundfonts) — layer several `.sf2` files into one synth.
 - [Audio buffer size](audio-buffer-size) — the latency and stability trade-off for stage 3.
 - [Web Audio and AudioWorklet](web-audio-and-audioworklet), [NAudio (.NET)](naudio-net), [AudioTrack (Android)](audiotrack-android) — the per-platform backends at stage 4.
+- [`api.loadSoundFont`](/docs/reference/api/loadsoundfont), [`api.soundFontLoaded`](/docs/reference/api/soundfontloaded), and [`player.soundFont`](/docs/reference/settings/player/soundfont) — the properties that drive the pipeline.

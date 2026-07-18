@@ -12,7 +12,7 @@ keywords:
 
 import { UrlLoadSwitcher } from '@site/src/components/UrlLoadSwitcher';
 
-Point alphaTab at a URL and it fetches the file, picks the right importer, and renders the score.
+Guitar Pro files hosted on your CDN, a library dropdown that lets learners jump between exercises, a shared-score link on a lesson page — anywhere the score lives at a URL, alphaTab fetches it, picks the right importer, and renders it.
 
 <UrlLoadSwitcher showCode={false} />
 
@@ -46,6 +46,9 @@ const api = new alphaTab.AlphaTabApi(container, {
 api.scoreLoaded.on((score) => {
   console.log(`Loaded ${score.title} by ${score.artist}`);
 });
+api.error.on((error) => {
+  console.warn('alphaTab could not load the score:', error.message);
+});
 
 // Later, swap to a different file without recreating the API.
 document.querySelector('#load-prelude').addEventListener('click', () => {
@@ -60,4 +63,4 @@ document.querySelector('#load-prelude').addEventListener('click', () => {
 - [Load from bytes](load-from-bytes) — the pattern for Node.js, backends, and post-fetch pipelines.
 - [Reacting to a loaded score](reacting-to-loaded-score) — the `scoreLoaded` event and post-load setup.
 - [Handling load errors](handling-load-errors) — what the `error` event delivers when a fetch fails.
-- [`core.file`](/docs/reference/settings/core/file) and [`api.load()`](/docs/reference/api/load) in the reference.
+- [`core.file`](/docs/reference/settings/core/file), [`api.load`](/docs/reference/api/load), and [`api.scoreLoaded`](/docs/reference/api/scoreloaded) in the reference.

@@ -14,7 +14,7 @@ keywords:
 
 import { TrackMixerDemo } from '@site/src/components/PlaySync';
 
-Four methods on `AlphaTabApi` control the per-track fader stage: volume, solo, mute, and transposition. Each accepts an array of tracks so you can adjust one, several, or all of them in a single call.
+A channel-strip mixer — one row per track, each with a volume fader, a Solo and a Mute button, plus a transpose readout — is a standard practice-tool feature. Mute the drums to hear the bass line alone. Solo the vocal against a click. Transpose the guitar track down a whole step to match a capo. Four methods on `AlphaTabApi` control that fader stage, each accepting an array of tracks so you can adjust one, several, or all of them in a single call.
 
 <TrackMixerDemo file="/files/features/Skillet.gp5" showCode={false} />
 
@@ -39,7 +39,7 @@ import * as alphaTab from '@coderline/alphatab';
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
   core: { file: '/scores/song.gp' },
-  player: { enablePlayer: true },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
 });
 
 api.scoreLoaded.on((score) => {

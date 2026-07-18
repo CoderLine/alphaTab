@@ -13,7 +13,7 @@ keywords:
 
 import { OutputDeviceDemo } from '@site/src/components/PlaySync';
 
-Route alphaTab's audio to a specific speaker, headset, or virtual sink. Users on desktops with several audio devices pick where their music plays; you build a dropdown, alphaTab targets the chosen device.
+A desktop user has a USB audio interface plugged in for practice, Bluetooth headphones for the couch, and the built-in speakers for casual listening — they want to pick where alphaTab's audio comes out. Build a device dropdown, hand the selection back to alphaTab, and the audio graph re-routes without stopping playback.
 
 <OutputDeviceDemo
   tex={`\\title "Device routing"
@@ -44,9 +44,9 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
-    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
   },
 });
 
@@ -79,6 +79,8 @@ buildDeviceDropdown(document.querySelector('#audio-out'));
 
 ## Where to look next
 
-- [`api.enumerateOutputDevices()`](/docs/reference/api/enumerateoutputdevices), [`api.setOutputDevice()`](/docs/reference/api/setoutputdevice), and [`api.getOutputDevice()`](/docs/reference/api/getoutputdevice) in the reference.
+- [`api.enumerateOutputDevices`](/docs/reference/api/enumerateoutputdevices), [`api.setOutputDevice`](/docs/reference/api/setoutputdevice), and [`api.getOutputDevice`](/docs/reference/api/getoutputdevice) in the reference.
+- [`ISynthOutputDevice`](/docs/reference/types/synth/isynthoutputdevice) — the shape of each entry returned by `enumerateOutputDevices`.
 - [Web Audio and AudioWorklet](web-audio-and-audioworklet) — the browser audio backend the routing decision applies to.
+- [NAudio (.NET)](naudio-net) and [AudioTrack (Android)](audiotrack-android) — the equivalent routing story on the other runtimes.
 - [Audio buffer size](audio-buffer-size) — pair a routing change with a matching buffer adjustment when latency matters.

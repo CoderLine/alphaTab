@@ -16,7 +16,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-The shipped [Vite](/docs/getting-started/installation-vite) and [webpack](/docs/getting-started/installation-webpack) plugins wire alphaTab into their host bundlers automatically. If you build with Rollup, esbuild, Parcel, or a bespoke pipeline, you replicate the same four responsibilities by hand and hand the worker and worklet URLs to alphaTab yourself.
+Wiring alphaTab into esbuild, Rollup, Parcel, or a bespoke build without the shipped [Vite](/docs/getting-started/installation-vite) and [webpack](/docs/getting-started/installation-webpack) plugins comes down to four responsibilities. The plugins handle each one automatically for their host bundler; everywhere else you replicate the pipeline by hand and hand the worker and worklet URLs to alphaTab yourself.
 
 <AlphaTab tex={true} player={true}>{`
 \\title "Bundler pipeline"
@@ -78,6 +78,8 @@ Load the app once and check the network tab. You should see a request for the wo
 
 ## Where to look next
 
-- [Worker and worklet initialization](worker-and-worklet-initialization) — the API contract for `initializeMain`, `initializeWorker`, `initializeAudioWorklet`.
+- [Worker and worklet initialization](/docs/features/extend/worker-and-worklet-initialization) — the API contract for `initializeMain`, `initializeWorker`, `initializeAudioWorklet`.
+- [`Environment`](/docs/reference/types/environment) — the class those three statics live on.
+- [`core.fontDirectory`](/docs/reference/settings/core/fontdirectory) and [`player.soundFont`](/docs/reference/settings/player/soundfont) — the two settings that point alphaTab at the static assets your bundler emitted.
 - [Installation (Vite)](/docs/getting-started/installation-vite) — reference implementation of every responsibility above, as a Vite plugin.
 - [Installation (webpack)](/docs/getting-started/installation-webpack) — the same responsibilities, as a webpack plugin.

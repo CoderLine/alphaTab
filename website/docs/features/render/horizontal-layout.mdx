@@ -13,7 +13,7 @@ keywords:
 import { AlphaTab } from '@site/src/components/AlphaTab';
 import { BoundedScoreFrame } from '@site/src/components/BoundedScoreFrame';
 
-Horizontal layout renders every bar on a single row and lets the container scroll sideways. Reach for it when you want a timeline-style view — a moving playback cursor sweeping left-to-right, an audio waveform pinned above a synchronized score, or a DAW-like track lane.
+Horizontal layout renders every bar on a single row and lets the container scroll sideways. Reach for it when you build a DAW timeline aligned to bar positions, a scrolling teleprompter view for live performance, or any view where a moving playback cursor should sweep the score left-to-right against an audio waveform pinned above it.
 
 <BoundedScoreFrame maxHeight={420} overflow="x">
   <AlphaTab tex={true} settings={{ display: { layoutMode: 'horizontal', stretchForce: 1.5 } }}>{`
@@ -43,7 +43,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   display: {
     layoutMode: alphaTab.LayoutMode.Horizontal,
   },

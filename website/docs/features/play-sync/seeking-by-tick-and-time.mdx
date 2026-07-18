@@ -13,7 +13,7 @@ keywords:
 
 import { SeekDemo } from '@site/src/components/PlaySync';
 
-alphaTab exposes the playhead in two units: MIDI ticks (score-relative) and milliseconds (wall-clock). Pick the one that matches the UI you're wiring up.
+Two very different UIs move the same playhead: a chapter-marker list that jumps to bar 12 wants ticks (a score coordinate that stays put across tempo changes), and a video cursor overlay that drives the score wants milliseconds (a wall-clock coordinate that tracks the video's own time base). alphaTab exposes the playhead in both units — pick the one that matches the UI you're wiring up.
 
 <SeekDemo
   tex={`\\title "Seek target"
@@ -63,8 +63,8 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
-  player: { enablePlayer: true },
+  core: { file: '/scores/song.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
 });
 
 const progress = document.getElementById('progress');
@@ -83,5 +83,6 @@ progress.addEventListener('input', () => {
 ## Where to look next
 
 - [Looping a section](./looping-a-section) — `playbackRange` uses the same tick coordinate system.
-- [Playback cursor](/docs/features/interact/cursor-and-highlighting) — the visual counterpart to `playerPositionChanged`.
-- [`tickPosition`](/docs/reference/api/tickposition), [`timePosition`](/docs/reference/api/timeposition), and [`playerPositionChanged`](/docs/reference/api/playerpositionchanged) reference entries.
+- [The MIDI event stream](./midi-event-stream) — subscribe to per-event ticks for finer-grained wiring than `playerPositionChanged`.
+- [Playback cursor](/docs/features/interact/cursor-and-element-highlighting) — the visual counterpart to `playerPositionChanged`.
+- [`tickPosition`](/docs/reference/api/tickposition), [`timePosition`](/docs/reference/api/timeposition), [`endTick`](/docs/reference/api/endtick), [`endTime`](/docs/reference/api/endtime), and [`playerPositionChanged`](/docs/reference/api/playerpositionchanged) reference entries.

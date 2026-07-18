@@ -104,11 +104,15 @@ export const ScrollModeSwitch: React.FC<ScrollModeSwitchProps> = ({
                 },
                 [Symbol.dispose]() {},
             };
-        } else {
-            api.customScrollHandler = undefined;
-            api.settings.player.scrollMode = BUILT_IN_MAP[mode];
-            api.updateSettings();
+            // Clear the handler on mode switch or unmount so the built-in
+            // strategy resumes cleanly and no stale closure keeps firing.
+            return () => {
+                api.customScrollHandler = undefined;
+            };
         }
+        api.customScrollHandler = undefined;
+        api.settings.player.scrollMode = BUILT_IN_MAP[mode];
+        api.updateSettings();
     }, [api, mode]);
 
     useEffect(() => {

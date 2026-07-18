@@ -12,7 +12,7 @@ keywords:
 
 import { VolumeMixDemo } from '@site/src/components/PlaySync';
 
-Three top-level knobs control how loud the score, the metronome, and the count-in play. Each takes a value from `0` (silent) to `1` (unity gain).
+Three separate audio channels feed the output: the score itself, a metronome click during playback, and a one-bar count-in before it. Every practice-tool UI has different treatment for the three — mute the metronome for a performance take, boost the count-in for a beginner, duck the master when a voice-over speaks. `masterVolume`, `metronomeVolume`, and `countInVolume` are the three properties behind those controls; each takes a value from `0` (silent) to `1` (unity gain).
 
 <VolumeMixDemo
   tex={`\\title "Volume test"
@@ -41,8 +41,8 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
-  player: { enablePlayer: true },
+  core: { file: '/scores/song.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
 });
 
 api.masterVolume = 0.8;

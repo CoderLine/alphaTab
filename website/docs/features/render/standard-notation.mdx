@@ -11,7 +11,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-Standard notation is the default rendering for every staff — five lines, clef, key signature, and pitched noteheads with stems.
+Standard notation is what most Western-trained readers expect — a five-line staff, clef, key signature, and pitched noteheads with stems. Use it for piano, vocal, or ensemble scores whose audience reads pitches directly; pair it with a tab staff for a guitar chart that has to serve both readers of the same file.
 
 <AlphaTab tex={true}>{`
 \\track "Guitar"
@@ -58,4 +58,5 @@ api.scoreLoaded.on((score) => {
 
 - [Guitar tablature](/docs/features/render/guitar-tablature) — pair the standard staff with a tab staff.
 - [Multi-track and grand staff](/docs/features/render/multi-track-rendering) — combining multiple standard staves for piano or ensemble scores.
-- [`Staff.showStandardNotation`](/docs/reference/types/model/staff) and [`Staff.standardNotationLineCount`](/docs/reference/types/model/staff) in the model reference.
+- [`Staff.showStandardNotation`](/docs/reference/types/model/staff), [`Staff.standardNotationLineCount`](/docs/reference/types/model/staff), and [`Staff.displayTranspositionPitch`](/docs/reference/types/model/staff) in the model reference.
+- [`display.staveProfile`](/docs/reference/settings/display/staveprofile) — pick a preset combination of staves at construction time.

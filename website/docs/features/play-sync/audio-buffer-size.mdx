@@ -12,7 +12,7 @@ keywords:
 
 import { BufferSizeDemo } from '@site/src/components/PlaySync';
 
-alphaTab's synth renders audio in chunks. The chunk size sets how much of the future the synth generates before the platform's audio backend consumes it. Smaller chunks respond to volume and seek changes faster; larger chunks survive slower CPUs without glitching.
+Latency-sensitive scenarios pull the buffer down: on iOS or a mobile browser under scroll load, a small buffer keeps a mixer's Solo button responsive. Stability-sensitive scenarios push it back up: on a shared desktop with a busy audio thread, a larger buffer prevents dropouts. alphaTab's synth renders audio in chunks, and `player.bufferTimeInMilliseconds` sets how much of the future the synth generates before the backend consumes it — smaller chunks respond to changes faster, larger chunks survive slower CPUs without glitching.
 
 <BufferSizeDemo
   tex={`\\title "Buffer probe"
@@ -46,9 +46,9 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
-    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
     bufferTimeInMilliseconds: 250,
   },
 });
@@ -73,3 +73,4 @@ function exitMixerMode() {
 - [`player.bufferTimeInMilliseconds`](/docs/reference/settings/player/buffertimeinmilliseconds) in the settings reference.
 - [Selecting an output device](selecting-an-output-device) — routing decisions that interact with buffer sizing.
 - [Web Audio and AudioWorklet](web-audio-and-audioworklet) — the browser backend that consumes the buffered samples.
+- [The MIDI event stream](midi-event-stream) — the buffer size directly governs how far behind the audio the event notifications arrive.

@@ -12,7 +12,7 @@ keywords:
 
 import { MultiBarRestToggle } from '@site/src/components/MultiBarRestToggle';
 
-Collapse runs of empty (or rest-only) bars into a single multi-bar rest glyph with a number over it. Ensemble parts get shorter, sight-readers get a clearer count, and the layout algorithm has fewer bars to fit on each row.
+Collapse runs of empty (or rest-only) bars into a single multi-bar rest glyph with a count above it — the traditional big-band notation for a horn section that sits out for eight bars, or a sight-reader's cue for how long an educational score's empty stretch runs. Ensemble parts get shorter, sight-readers get a clearer count, and the layout algorithm has fewer bars to squeeze onto each row.
 
 <MultiBarRestToggle showCode={false} />
 
@@ -20,8 +20,8 @@ Collapse runs of empty (or rest-only) bars into a single multi-bar rest glyph wi
 
 Two fields on `score.stylesheet` control the feature:
 
-- `multiTrackMultiBarRest` — a boolean. When `true` and multiple tracks are rendered together, subsequent bars that are empty on *every* rendered track collapse into one multi-bar rest.
-- `perTrackMultiBarRest` — a `Set<number>` of track indexes. Add a track's `index` to opt it in. When it is `null` (default), the score-wide rules apply as-is; when it holds indexes, only those tracks participate in multi-bar-rest collapsing.
+- [`multiTrackMultiBarRest`](/docs/reference/types/model/renderstylesheet/#multitrackmultibarrest) — a boolean. When `true` and multiple tracks are rendered together, subsequent bars that are empty on *every* rendered track collapse into one multi-bar rest.
+- [`perTrackMultiBarRest`](/docs/reference/types/model/renderstylesheet/#pertrackmultibarrest) — a `Set<number>` of track indexes. Add a track's `index` to opt it in. When it is `null` (default), the score-wide rules apply as-is; when it holds indexes, only those tracks participate in multi-bar-rest collapsing.
 
 The two work together. In a full-band render, `multiTrackMultiBarRest = true` collapses empty regions across the band. If you're rendering a subset — a solo transcription of the bass line — populate `perTrackMultiBarRest` with the track index to get the same behavior on a single-track render.
 
@@ -29,8 +29,8 @@ The two work together. In a full-band render, `multiTrackMultiBarRest = true` co
 
 If your goal is not to compress rests but to hide a track when it has nothing to say for a while, two adjacent flags do that instead:
 
-- `hideEmptyStaves` — hides staves whose entire content in a system is empty.
-- `hideEmptyStavesInFirstSystem` — extends the same behavior to the first system, which normally stays visible so the reader sees every part at least once.
+- [`hideEmptyStaves`](/docs/reference/types/model/renderstylesheet/#hideemptystaves) — hides staves whose entire content in a system is empty.
+- [`hideEmptyStavesInFirstSystem`](/docs/reference/types/model/renderstylesheet/#hideemptystavesinfirstsystem) — extends the same behavior to the first system, which normally stays visible so the reader sees every part at least once.
 
 These are independent from the multi-bar-rest flags and can be combined.
 
@@ -41,7 +41,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/band.gp' },
+  core: { file: '/scores/song.gp' },
 });
 
 api.scoreLoaded.on((score) => {
@@ -63,4 +63,6 @@ api.scoreLoaded.on((score) => {
 
 - [Bracket extend mode](/docs/features/render/bracket-extend-mode) — how the accolade bracket handles hidden or collapsed staves.
 - [Track name policies](/docs/features/render/track-name-policies) — labeling behavior around hidden staves.
-- [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) — the full stylesheet reference.
+- [Repeats and structural elements](/docs/features/render/coverage-repeats) — the counted glyph pairs with repeat structures on ensemble parts.
+- [`multiTrackMultiBarRest`](/docs/reference/types/model/renderstylesheet/#multitrackmultibarrest) and [`perTrackMultiBarRest`](/docs/reference/types/model/renderstylesheet/#pertrackmultibarrest) on the [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) reference.
+- [`scoreLoaded`](/docs/reference/api/scoreloaded) and [`render`](/docs/reference/api/render) — the API surface used above.

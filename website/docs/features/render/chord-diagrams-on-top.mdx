@@ -12,18 +12,18 @@ keywords:
 
 import { ChordDiagramLayoutSwitch } from '@site/src/components/ChordDiagramLayoutSwitch';
 
-Place the chord-diagram catalog above the first system, so every used voicing is visible before the reader hits the first bar. Turn it off to keep diagrams inline, where they appear only above the bars that reference them.
+Place the chord-diagram catalogue above the first system so every voicing is visible before the reader hits the first bar — the go-to layout for a chord-melody arrangement where the player wants each shape available up front. Turn the top grid off to keep diagrams inline, where each shape appears only above the bar that first references it — the layout most rhythm charts prefer.
 
 <ChordDiagramLayoutSwitch showCode={false} />
 
 ## Above the score vs inline
 
-`score.stylesheet.globalDisplayChordDiagramsOnTop` is a boolean that governs the top-of-score placement. When `true` (default), alphaTab collects every chord defined in the score and renders the diagram grid above the first system. When `false`, the grid disappears — chords still appear inline above the bars where they're first used, driven by `globalDisplayChordDiagramsInScore`.
+[`score.stylesheet.globalDisplayChordDiagramsOnTop`](/docs/reference/types/model/renderstylesheet/#globaldisplaychorddiagramsontop) is a boolean that governs the top-of-score placement. When `true` (default), alphaTab collects every chord defined in the score and renders the diagram grid above the first system. When `false`, the grid disappears — chords still appear inline above the bars where they are first used, driven by [`globalDisplayChordDiagramsInScore`](/docs/reference/types/model/renderstylesheet/#globaldisplaychorddiagramsinscore).
 
 Two related fields sit alongside it:
 
-- `globalDisplayChordDiagramsInScore` — score-wide toggle for the inline diagrams above bars (off by default).
-- `perTrackChordDiagramsOnTop` — a `Map<number, boolean>` keyed by track index, overriding the global flag per track. Leave it `null` to fall back to the global setting.
+- [`globalDisplayChordDiagramsInScore`](/docs/reference/types/model/renderstylesheet/#globaldisplaychorddiagramsinscore) — score-wide toggle for the inline diagrams above bars (off by default).
+- [`perTrackChordDiagramsOnTop`](/docs/reference/types/model/renderstylesheet/#pertrackchorddiagramsontop) — a `Map<number, boolean>` keyed by track index, overriding the global flag per track. Leave it `null` to fall back to the global setting.
 
 The typical songbook look combines the top grid (`on`) with inline diagrams (`off`); a Nashville-style chord chart flips both.
 
@@ -49,4 +49,6 @@ api.scoreLoaded.on((score) => {
 ## Where to look next
 
 - [Chord diagrams and chord names](/docs/features/render/coverage-chord-diagrams) — the notation coverage page for chord elements.
-- [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) — the full stylesheet reference.
+- [Toggling notation elements off](/docs/features/render/coverage-toggle-elements) — hide `EffectChordDiagrams` or `EffectChordNames` score-wide through `notation.elements`.
+- [`globalDisplayChordDiagramsOnTop`](/docs/reference/types/model/renderstylesheet/#globaldisplaychorddiagramsontop), [`globalDisplayChordDiagramsInScore`](/docs/reference/types/model/renderstylesheet/#globaldisplaychorddiagramsinscore), and [`perTrackChordDiagramsOnTop`](/docs/reference/types/model/renderstylesheet/#pertrackchorddiagramsontop) on the [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) reference.
+- [`scoreLoaded`](/docs/reference/api/scoreloaded) and [`render`](/docs/reference/api/render) — the API surface used above.

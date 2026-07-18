@@ -13,7 +13,7 @@ keywords:
 import { AlphaTab } from '@site/src/components/AlphaTab';
 import { BoundedScoreFrame } from '@site/src/components/BoundedScoreFrame';
 
-Page layout flows bars into rows and stacks the rows vertically, the way sheet music prints on paper. It is the default and the mode most reading and practice UIs want.
+Page layout flows bars into rows and stacks the rows vertically, the way sheet music prints on paper. Reach for it when publishing a lead sheet, when building a mobile viewer that has to reflow narrower on a phone, or any time the reader expects rows that wrap and a page that scrolls vertically. It is the default across every runtime.
 
 <BoundedScoreFrame>
   <AlphaTab tex={true} settings={{ display: { layoutMode: 'page' } }}>{`
@@ -45,7 +45,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   display: {
     layoutMode: alphaTab.LayoutMode.Page,
   },

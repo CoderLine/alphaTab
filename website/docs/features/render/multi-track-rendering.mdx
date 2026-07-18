@@ -12,7 +12,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-alphaTab renders any number of tracks as a single vertical system, connects grand-staff instruments with a brace, and prints per-track tunings for stringed instruments.
+alphaTab renders any number of tracks as a single vertical system, connects grand-staff instruments with a brace, and prints per-track tunings for stringed instruments. Reach for it whenever the reader needs to see how parts line up — a band-in-a-box view for a rehearsal app, a piano-and-voice pedagogical layout, or a full-score view of a jazz combo where soloists want the rhythm section on the same page.
 
 <AlphaTab tex={true} tracks="all">{`
 \\title "Multi-track ensemble"
@@ -52,7 +52,7 @@ import * as alphaTab from '@coderline/alphatab';
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
   core: {
-    file: '/scores/band.gp',
+    file: '/scores/song.gp',
     tracks: [0, 1],
   },
 });
@@ -70,4 +70,4 @@ api.scoreLoaded.on((score) => {
 - [Selecting and switching tracks](/docs/features/import-load/selecting-and-switching-tracks) — the full lifecycle of loading, switching, and reacting to track changes.
 - [Bracket extend mode](/docs/features/render/bracket-extend-mode) — how brackets and braces group staves across tracks.
 - [Tuning display](/docs/features/render/tuning-display) — controlling the tuning block that appears above each track.
-- [`AlphaTabApiBase.renderTracks`](/docs/reference/api/rendertracks) and [`core.tracks`](/docs/reference/settings/core/tracks) in the API reference.
+- [`AlphaTabApiBase.renderTracks`](/docs/reference/api/rendertracks), [`AlphaTabApiBase.tracks`](/docs/reference/api/tracks), and [`core.tracks`](/docs/reference/settings/core/tracks) in the API reference.

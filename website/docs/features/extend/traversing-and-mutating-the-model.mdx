@@ -14,7 +14,7 @@ keywords:
 
 import { MutateModelExample } from '@site/src/components/MutateModelExample';
 
-Once a score is loaded, its full tree — `Score → Track → Staff → Bar → Voice → Beat → Note` — is walkable and mutable in JavaScript. Iterate the arrays, change fields, call `api.render()`, and the render reflects the changes.
+Applying user-configured transposition, batch-tinting notes by scale degree for a music-theory viewer, algorithmically boosting velocities on a target passage — the moment a score is loaded, its full tree is walkable and mutable in JavaScript. Iterate `Score → Track → Staff → Bar → Voice → Beat → Note`, change fields, call `api.render()`, and the render reflects the changes.
 
 <MutateModelExample />
 
@@ -22,7 +22,7 @@ Three shapes cover most use cases:
 
 - **Analysis** — walk the tree read-only, collect statistics (note counts, effect usage, pitch range).
 - **Annotation** — walk the tree and set display-only fields (colors, styles, chord names) without changing the music.
-- **Batch transformation** — walk the tree and rewrite musical content (transpose every note, flip stems, insert grace notes).
+- **Batch transformation** — walk the tree and rewrite musical content (transpose every note, boost velocities across a passage, uppercase lyrics for a karaoke view).
 
 ## The traversal pattern
 
@@ -84,5 +84,7 @@ Changes to display-only fields (`style.colors`, chord names, `Beat.text`) requir
 
 - [Per-element colors](/docs/features/render/per-element-colors) — the annotation use case: walk the tree and paint sub-elements.
 - [Programmatic score construction](/docs/features/extend/programmatic-score-construction) — the mirror workflow: build the tree in code instead of walking one that was loaded.
-- [Reacting to a loaded score](/docs/features/import-load/reacting-to-loaded-score) — the `scoreLoaded` event and adjacent post-load hooks.
+- [Reacting to a loaded score](/docs/features/import-load/reacting-to-loaded-score) — the [`scoreLoaded`](/docs/reference/api/scoreloaded) event and adjacent post-load hooks.
+- [`render`](/docs/reference/api/render) and [`loadMidiForScore`](/docs/reference/api/loadmidiforscore) — the two calls that push mutations into the visual and audio pipelines.
+- [`DynamicValue`](/docs/reference/types/model/dynamicvalue) — the enum used by the velocity-boost example.
 - The [model reference](/docs/reference/types/model/) — every field on every level.

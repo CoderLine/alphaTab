@@ -15,7 +15,11 @@ keywords:
 
 import { TransportControls } from '@site/src/components/PlaySync';
 
-This page describes the .NET-only audio backend. On the .NET runtime, alphaTab's synth pipeline ends at `NAudioSynthOutput` — a `WaveProvider32` implementation that hands 44.1 kHz stereo float samples to a `DirectSoundOut` device from [NAudio](https://github.com/naudio/NAudio). The demo below runs the web player because these docs are hosted in a browser; the code snippet is what you write on .NET.
+:::note Runtime scope
+The in-browser demo below uses Web Audio because these docs live in a browser. The code snippet on this page applies on the .NET runtime.
+:::
+
+Understanding which backend runs where matters when you cross-compile a shared alphaTab integration to another runtime. On .NET, alphaTab's synth pipeline ends at `NAudioSynthOutput` — a `WaveProvider32` implementation that hands 44.1 kHz stereo float samples to a `DirectSoundOut` device from [NAudio](https://github.com/naudio/NAudio).
 
 <TransportControls
   tex={`\\title ".NET backend"
@@ -71,4 +75,6 @@ api.PlayerReady.On(async () =>
 
 - [Audio buffer size](audio-buffer-size) — how `bufferTimeInMilliseconds` maps onto the NAudio buffer count.
 - [Selecting an output device (Web)](selecting-an-output-device) — the same shape of API on the browser side.
+- [Web Audio and AudioWorklet](web-audio-and-audioworklet) and [AudioTrack (Android)](audiotrack-android) — the sibling backends on the other runtimes.
+- [`api.enumerateOutputDevices`](/docs/reference/api/enumerateoutputdevices) and [`api.setOutputDevice`](/docs/reference/api/setoutputdevice) — the routing API in the reference.
 - [`NAudioSynthOutput`](https://github.com/CoderLine/alphaTab/blob/develop/packages/csharp/src/AlphaTab.Windows/NAudioSynthOutput.cs) source on GitHub.

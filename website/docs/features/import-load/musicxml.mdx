@@ -12,7 +12,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-alphaTab imports MusicXML — the interchange format every major notation editor writes — with mature coverage of notation, playback, and layout hints.
+Interop with Sibelius, Finale, Dorico, MuseScore, and every other notation editor is what MusicXML exists for. alphaTab imports it with mature coverage of notation, playback, and layout hints — so a `.musicxml` file from any of those tools opens in the same viewer as your Guitar Pro sources.
 
 :::info
 The MusicXML importer produces the same `Score` model as any other importer. The preview below loads a curated Guitar Pro fixture so `importer.mergePartGroupsInMusicXml` has something to act on; the pipeline is identical when the source is a `.musicxml` file — point `core.file` at one to exercise the importer on real MusicXML.
@@ -54,3 +54,4 @@ const api = new alphaTab.AlphaTabApi(container, {
 - [MusicXML compatibility](/docs/formats/musicxml) — the full element-by-element support matrix.
 - [Tuning importer behavior](./tuning-importer-behavior) — the encoding hint, part-group merge flag, and other importer knobs in one place.
 - [Load from bytes](./load-from-bytes) — pass MusicXML content that already sits in memory rather than fetching a URL.
+- [`importer.mergePartGroupsInMusicXml`](/docs/reference/settings/importer/mergepartgroupsinmusicxml) and [`importer.encoding`](/docs/reference/settings/importer/encoding) in the reference.

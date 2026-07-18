@@ -69,7 +69,7 @@ export const DirectImporterDemo: React.FC<DirectImporterDemoProps> = ({
   const code = `import * as alphaTab from '@coderline/alphatab';
 
 const bytes = new Uint8Array(
-  await fetch('/scores/canon.gp').then((r) => r.arrayBuffer())
+  await fetch('/scores/song.gp').then((r) => r.arrayBuffer())
 );
 const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(bytes);
 

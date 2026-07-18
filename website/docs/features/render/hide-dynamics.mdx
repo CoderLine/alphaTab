@@ -12,15 +12,15 @@ keywords:
 
 import { HideDynamicsToggle } from '@site/src/components/HideDynamicsToggle';
 
-Toggle every dynamics marking (ppp through fff, plus hairpins) off in a single call — useful for distraction-free chord charts, teaching handouts, or capo diagrams where the volume script is noise.
+Hide every dynamics marking — `ppp` through `fff` and the crescendo / decrescendo hairpins — with a single stylesheet flag. Reach for it when you are generating a chord chart for a rhythm section where the dynamics are noise, a beginner-friendly view of a lesson score, or a print handout that leaves interpretation to the teacher.
 
 <HideDynamicsToggle showCode={false} />
 
 ## What the flag does
 
-`score.stylesheet.hideDynamics` is a score-wide boolean. When `true`, the renderer skips every dynamics glyph and hairpin during layout. Notes, rests, and articulations stay put; only the volume script disappears. The change is visual — playback still honors the underlying velocity data.
+[`score.stylesheet.hideDynamics`](/docs/reference/types/model/renderstylesheet/#hidedynamics) is a score-wide boolean. When `true`, the renderer skips every dynamics glyph and hairpin during layout. Notes, rests, and articulations stay put; only the volume script disappears. The change is visual — playback still honors the underlying velocity data.
 
-The flag lives on the stylesheet, so it belongs to the loaded `Score`, not to `Settings`. Set it after the score is parsed, then call `api.render()` to redraw.
+The flag lives on the stylesheet, so it belongs to the loaded [`Score`](/docs/reference/types/model/score), not to `Settings`. Set it after the score is parsed, then call [`api.render()`](/docs/reference/api/render) to redraw.
 
 ## Show it in code
 
@@ -43,5 +43,7 @@ api.scoreLoaded.on((score) => {
 ## Where to look next
 
 - [Dynamics, hairpins, and accents](/docs/features/render/coverage-dynamics) — the notation coverage page for the elements this flag hides.
-- [Toggling notation elements off](/docs/features/render/coverage-toggle-elements) — for finer-grained control over individual notation categories via `notation.elements`.
-- [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) — the full stylesheet reference.
+- [Toggling notation elements off](/docs/features/render/coverage-toggle-elements) — finer-grained control over individual notation categories via `notation.elements`.
+- [`hideDynamics`](/docs/reference/types/model/renderstylesheet/#hidedynamics) on the [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) reference.
+- [`notation.elements`](/docs/reference/settings/notation/elements) — the map that hides individual effect bands such as `EffectDynamics` and `EffectCrescendo`.
+- [`scoreLoaded`](/docs/reference/api/scoreloaded) and [`render`](/docs/reference/api/render) — the API surface used above.

@@ -13,7 +13,7 @@ keywords:
 import { TransportControls } from '@site/src/components/PlaySync';
 import CodeBlock from '@theme/CodeBlock';
 
-Load several SoundFonts into the same synth and alphaTab merges their preset banks. Pair a small drums-only SoundFont with a large guitar pack, or pull instrument files on demand once you know which tracks the loaded score needs.
+Pair a rock drum kit with an acoustic guitar pack. Layer a percussion library over a melodic-instrument SoundFont. Pull the horns file only when the loaded score has a brass track. Any of these is a case for loading several SoundFonts side by side — alphaTab merges their preset banks into a single synth and you spend bandwidth only on the instruments the current score actually needs.
 
 <TransportControls
   tex={`\\title "Layer target"
@@ -33,7 +33,7 @@ The player above renders with the bundled Sonivox SoundFont — the same one the
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  player: { playerMode: alphaTab.PlayerMode.EnabledAutomatic },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
 });
 
 // First append — merges into the bundled Sonivox presets already loaded.
@@ -71,9 +71,9 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
-    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
   },
 });
 
@@ -120,3 +120,4 @@ Every appended SoundFont stays resident in the synth. On long-running sessions w
 - [Custom SoundFonts](custom-soundfonts) — the single-file replacement path.
 - [SoundFont2 with TinySoundFont](soundfont2-with-tinysoundfont) — how the synth resolves preset banks.
 - [Reacting to a loaded score](/docs/features/import-load/reacting-to-loaded-score) — the `scoreLoaded` hook the layering strategy fires from.
+- [`api.loadSoundFont`](/docs/reference/api/loadsoundfont), [`api.resetSoundFonts`](/docs/reference/api/resetsoundfonts), and [`api.soundFontLoaded`](/docs/reference/api/soundfontloaded) in the reference.

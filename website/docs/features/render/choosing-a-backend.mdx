@@ -12,7 +12,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-Three render backends ship with alphaTab. Each optimizes for a different constraint. Match the backend to the runtime you target and the output you want.
+Three render backends ship with alphaTab, each optimizing for a different constraint. Use this page as a decision guide when you're not sure which engine matches your target platform and output. In most cases the platform default is the right call; the checklists below cover the times when it isn't.
 
 <AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{`
 \\title "Three backends, one model"
@@ -54,7 +54,7 @@ Leaving `core.engine` at `'default'` picks the right backend for the runtime you
 
 - You are on .NET or Android and want the platform default — consistent output across Windows, macOS, Linux, and Android.
 - You need PNG or raster export from a headless environment (Node.js, CI, server pipelines).
-- You register custom `.ttf` / `.otf` fonts and want them applied via [`registerAlphaSkiaCustomFont`](/docs/features/extend/skia-fonts).
+- You register custom `.ttf` / `.otf` fonts and want them applied via [`registerAlphaSkiaCustomFont`](/docs/features/render/custom-fonts-on-skia).
 
 ## Show it in code
 
@@ -70,7 +70,7 @@ const api = new alphaTab.AlphaTabApi(container, {
 });
 ```
 
-`getAlphaTabContainer()` is a placeholder for the platform-specific render target. `engine: 'default'` picks SVG on Web and Skia on .NET / Android. Replace with `'svg'`, `'html5'`, or `'skia'` when you want to override.
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. `engine: 'default'` picks SVG on Web and Skia on .NET / Android. Replace with `'svg'`, `'html5'`, or `'skia'` when you want to override.
 
 ## Where to look next
 

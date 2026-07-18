@@ -12,7 +12,7 @@ keywords:
 
 import { ZoomSliderDemo } from '@site/src/components/ZoomSliderDemo';
 
-`display.scale` scales the entire rendered output. Set it once for a per-device zoom level, or drive it from a slider for a live zoom control.
+`display.scale` scales the entire rendered output. Wire it to a zoom-in-for-practice button, drive it from a device-pixel-ratio calculation so a retina screen renders sharp, or lock it to a fixed pixel size when the score sits inside a chat widget with a hard-coded width.
 
 <ZoomSliderDemo showCode={false} />
 
@@ -29,7 +29,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   display: {
     scale: 1.3,
   },

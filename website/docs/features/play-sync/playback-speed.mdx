@@ -13,7 +13,7 @@ keywords:
 
 import { SpeedSliderDemo } from '@site/src/components/PlaySync';
 
-`playbackSpeed` scales the tempo without repitching the audio. Slow a passage down while a student learns the fingering, then step back up to performance speed.
+Learners work up to tempo. A slow-down button that pulls a tricky solo down to `0.5×` while the fingering settles in — then back up to `1.25×` for a stretch, then `1.0×` for the take — is table stakes for a practice tool. `playbackSpeed` is the single property behind that button. It scales the tempo without repitching the audio, so the note pitches stay put while the timing stretches.
 
 <SpeedSliderDemo
   tex={`\\title "Speed scale"
@@ -42,8 +42,8 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
-  player: { enablePlayer: true },
+  core: { file: '/scores/song.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
 });
 
 const slider = document.getElementById('speed');

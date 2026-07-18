@@ -15,7 +15,7 @@ keywords:
 
 import { SettingsJsonDemo } from '@site/src/components/SettingsJsonDemo';
 
-`JsonConverter` serializes a full `Settings` instance — every notation flag, display option, and player toggle — into a plain JavaScript object. Save user preferences to `localStorage`, ship defaults from a backend, or synchronize settings across worker boundaries without hand-rolling a schema.
+Remember a user's zoom, layout mode, and colour palette across sessions. Ship tenant-specific defaults from a backend so every reader in an organisation opens the same view. Synchronise settings from the main thread into a Web Worker without hand-rolling a schema. `JsonConverter` serializes a full `Settings` instance — every notation flag, display option, and player toggle — into a plain JavaScript object, and reads it back the same way.
 
 <SettingsJsonDemo showCode={false} />
 
@@ -57,27 +57,27 @@ The static entry points come in matched pairs:
 
 Under the hood both pairs route through `SettingsSerializer.toJson` and `SettingsSerializer.fromJson`, the generated serializer that mirrors every `Settings` property one-for-one.
 
-## Partial updates
+## Partial payloads
 
-`fromJson` merges into an existing `Settings` instance. Load your defaults, then apply the user's stored overrides on top:
+`jsObjectToSettings` (and its string sibling `jsonToSettings`) accepts a partial JSON payload — anything the object leaves out keeps the default from a freshly constructed `Settings`. That means a store of overrides only has to contain the properties the user actually changed:
 
 ```js
-const settings = new alphaTab.Settings();
-settings.display.scale = 1.0;
+// The stored payload only carries what the user tweaked.
+const overridesJson = '{"display":{"scale":1.4}}';
 
-const stored = localStorage.getItem('alphaTab.settings.override');
-if (stored) {
-  const overrides = JSON.parse(stored);
-  alphaTab.model.JsonConverter.jsObjectToSettings(overrides);
-  // Or, to merge into the existing settings without allocating a new one:
-  // alphaTab.generated.SettingsSerializer.fromJson(settings, overrides);
-}
+const settings = alphaTab.model.JsonConverter.jsonToSettings(overridesJson);
+// settings.display.scale === 1.4
+// every other property is the built-in default
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, settings);
 ```
 
-Properties absent from the JSON keep their current value. Enums come back as their numeric representation, matching the runtime enum values.
+Enums come back as their numeric representation, matching the runtime enum values — no manual coercion needed.
 
 ## Where to look next
 
 - [Score to JSON and back](score-to-json) — the sibling call for the `Score` model.
 - [`Settings`](/docs/reference/settings) — the full settings surface the serializer covers.
-- [`JsonConverter`](/docs/reference/types/model/jsonconverter) in the API reference.
+- [`api.settings`](/docs/reference/api/settings) — how to hand the deserialized instance back to a running API.
+- [`JsonConverter`](/docs/reference/types/model/jsonconverter) in the API reference — the methods `settingsToJson`, `jsonToSettings`, and `settingsToJsObject` live here.

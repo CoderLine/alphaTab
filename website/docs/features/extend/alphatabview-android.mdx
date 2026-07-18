@@ -14,7 +14,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-`AlphaTabView` is the Android control that hosts alphaTab inside a classic View-based layout. It is the same rendering and playback engine as the web build, wrapped in a Kotlin `View` you position through XML or programmatically.
+Embedding alphaTab in a native Android app goes through `AlphaTabView` — a Kotlin `View` you position via XML or code that hosts the same rendering and playback engine as the web build. Every score format alphaTab supports, every setting, and every event on `AlphaTabApi` is available exactly as it is elsewhere.
 
 <AlphaTab tex={true}>{`
 \\title "AlphaTabView"
@@ -97,5 +97,7 @@ fun AlphaTabScore(onReady: (alphaTab.AlphaTabView) -> Unit) {
 ## Where to look next
 
 - [Installation (Android)](/docs/getting-started/installation-android) — Gradle setup, Maven coordinates, and the first-render walkthrough.
+- [Custom fonts on Skia](/docs/features/render/custom-fonts-on-skia) — how to register titles, lyrics, and fingering fonts on the Android Skia backend.
+- [WPF and WinForms controls](/docs/features/extend/wpf-and-winforms-controls) — the sibling native hosts on .NET.
+- [Custom UI facade](/docs/features/extend/custom-ui-facade) — if you need alphaTab in a UI framework it has no shipped control for.
 - [alphaTabSamplesAndroid](https://github.com/CoderLine/alphaTabSamplesAndroid) — worked sample activities that exercise the full API surface.
-- [Custom UI facade](custom-ui-facade) — if you need alphaTab in a UI framework it has no shipped control for.

@@ -14,7 +14,7 @@ keywords:
 import { FeatureChapterGrid } from '@site/src/components/FeatureChapterGrid';
 import chapters from './_chapters';
 
-Every alphaTab session starts by turning a source file into an in-memory `Score`. The importer pipeline reads Guitar Pro, MusicXML, Capella, and alphaTab's own text format, then hands the parsed model to the render engine. This group covers every way to feed alphaTab a score and every hook you get once it is loaded.
+Every alphaTab session starts by turning a source file into an in-memory `Score`. The importer pipeline reads Guitar Pro (GP3 through GP8), MusicXML, Capella, and alphaTab's own alphaTex text format, then hands the parsed model to the render engine. This group covers every way to feed alphaTab a score, every format it accepts, the importer settings that adjust how it decodes them, and the load-lifecycle events you hook once the score arrives.
 
 Every capability below is available on Web, .NET, and Android unless a card names specific platforms. Follow any card into the [reference](/docs/reference/api/) for the exact signature.
 

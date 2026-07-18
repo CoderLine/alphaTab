@@ -1,5 +1,5 @@
 import * as alphaTab from "@coderline/alphatab";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAlphaTab } from "@site/src/hooks";
 import CodeBlock from "@theme/CodeBlock";
 
@@ -23,16 +23,6 @@ export const Gp7ExporterDemo: React.FC<Gp7ExporterDemoProps> = ({
   });
 
   const [status, setStatus] = useState<string>();
-  const [blobUrl, setBlobUrl] = useState<string>();
-
-  useEffect(() => {
-    const currentUrl = blobUrl;
-    return () => {
-      if (currentUrl) {
-        URL.revokeObjectURL(currentUrl);
-      }
-    };
-  }, [blobUrl]);
 
   function downloadGp() {
     if (!api || !api.score) {
@@ -42,9 +32,7 @@ export const Gp7ExporterDemo: React.FC<Gp7ExporterDemoProps> = ({
       const exporter = new alphaTab.exporter.Gp7Exporter();
       const data = exporter.export(api.score, api.settings);
 
-      const fileName = api.score.title
-        ? `${api.score.title}.gp`
-        : "Untitled.gp";
+      const fileName = (api.score.title || "Untitled") + ".gp";
 
       const blob = new Blob([data], { type: "application/octet-stream" });
       const href = URL.createObjectURL(blob);
@@ -55,8 +43,10 @@ export const Gp7ExporterDemo: React.FC<Gp7ExporterDemoProps> = ({
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      // Once the browser has kicked off the download, the blob URL is no
+      // longer needed — release it right away rather than holding onto it.
+      URL.revokeObjectURL(href);
 
-      setBlobUrl(href);
       setStatus(`Wrote ${fileName} — ${formatBytes(data.length)} bytes`);
     } catch (e) {
       console.error("Error during export", e);
@@ -75,17 +65,18 @@ api.scoreLoaded.on(() => {
   const exporter = new alphaTab.exporter.Gp7Exporter();
   const data = exporter.export(api.score, api.settings);
 
-  const fileName = api.score.title
-    ? \`\${api.score.title}.gp\`
-    : 'Untitled.gp';
+  const fileName = (api.score.title || 'Untitled') + '.gp';
+  const url = URL.createObjectURL(
+    new Blob([data], { type: 'application/octet-stream' })
+  );
 
   const a = document.createElement('a');
   a.download = fileName;
-  a.href = URL.createObjectURL(new Blob([data], { type: 'application/octet-stream' }));
+  a.href = url;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(a.href);
+  URL.revokeObjectURL(url);
 });`;
 
   return (

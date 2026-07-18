@@ -12,7 +12,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-Render every glyph, staff line, and beam as SVG geometry. The result is a resolution-independent DOM tree you can zoom, hit-test, or hand to a printer without rasterization artifacts.
+Render every glyph, staff line, and beam as SVG geometry. Reach for SVG when the score has to survive scaling and print — a hit-testable notation view that responds to clicks on individual notes, a print-preview page that generates a PDF from the DOM, or an embed inside a page whose readers zoom in for detail.
 
 <AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{`
 \\title "Vector output"

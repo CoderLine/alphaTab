@@ -13,7 +13,7 @@ keywords:
 
 import { TransportControls } from '@site/src/components/PlaySync';
 
-Sync points align bar positions in the score with millisecond offsets in an external audio or video track. When the source file does not ship them — or your users adjust them in a UI — build them from code and push them into the score at runtime.
+Aligning a backing track to a score means putting a timestamp on each barline. The [Media Sync Editor](/docs/playground/playground) is where that authoring workflow lives — load a waveform, tap the bar positions, save the resulting list of anchor points. Once you have that list (either from the editor or from your own UI), this page shows how to push it into a live alphaTab instance so playback follows the audio.
 
 :::note Editing sync points live
 A meaningful runtime editor for sync points rivals the [Media Sync Editor](/docs/playground/playground) in scope, so this page ships the code sample and lets the transport prove the synth path still works. Head to the playground to author sync points against a backing track.
@@ -33,7 +33,7 @@ A meaningful runtime editor for sync points rivals the [Media Sync Editor](/docs
 
 ## The data shape
 
-A sync point lives on `MasterBar.syncPoints` as an `Automation` with type `SyncPoint`. For serialization and programmatic construction, use the flat form:
+Each sync point lives on `MasterBar.syncPoints` as an `Automation` whose `type` is `AutomationType.SyncPoint`, with the timestamp on the automation's `value`. For serialization and programmatic construction, use the flat form (`FlatSyncPoint`), which flattens that model into a plain object with four fields:
 
 - **`barIndex`** — the index of the target masterbar in `score.masterBars`.
 - **`barPosition`** — a `0..1` ratio inside the bar. `0` is the downbeat, `0.5` is the halfway point, `1` is the next barline.
@@ -53,7 +53,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/my-song.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
     playerMode: alphaTab.PlayerMode.EnabledBackingTrack,
     soundFont: '/soundfont/sonivox.sf2',
@@ -81,4 +81,5 @@ api.scoreLoaded.on((score) => {
 - [Backing-track audio](backing-track-audio) — the mode that consumes sync points.
 - [Video sync](video-sync) — the external-media variant that also relies on sync points.
 - [Media Sync Editor](/docs/playground/playground) — the interactive editor that produces `FlatSyncPoint` lists against a waveform.
-- [`SyncPointData`](/docs/reference/types/model/syncpointdata) and [`Automation`](/docs/reference/types/model/automation) in the model reference.
+- [`api.updateSyncPoints`](/docs/reference/api/updatesyncpoints) — the refresh call in the reference.
+- [`FlatSyncPoint`](/docs/reference/types/model/flatsyncpoint), [`SyncPointData`](/docs/reference/types/model/syncpointdata), and [`Automation`](/docs/reference/types/model/automation) in the model reference.

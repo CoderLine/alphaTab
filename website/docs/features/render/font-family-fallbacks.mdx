@@ -13,7 +13,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-Give any text font a list of families. alphaTab walks the list until it finds one the platform has installed.
+Give any text font a list of families and alphaTab walks the list until it finds one the platform has installed. Use fallback chains whenever a preferred font may not load — a web font that a slow network never delivers, a font not yet registered on Skia, or a rare typeface that only some readers happen to have installed. The score stays readable instead of collapsing to a system default.
 
 <AlphaTab
   tex={true}
@@ -51,7 +51,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   display: {
     resources: {
       titleFont: 'bold 32px "Playfair Display", Georgia, "Times New Roman", serif',

@@ -12,7 +12,7 @@ keywords:
 
 import { ToggleSettingDemo } from '@site/src/components/PlaySync';
 
-Guitar Pro files carry a triplet-feel marker per section — 8ths, 16ths, dotted, or Scottish. alphaTab honors those markers at playback time, turning straight eighths into a shuffled swing without touching the notation on screen.
+Jazz charts are traditionally notated in straight eighths and swung at performance time — the shuffle lives in the player, not the page. Guitar Pro files carry a triplet-feel marker per section (8ths, 16ths, dotted, or Scottish) and alphaTab honors those markers at playback time, turning straight eighths into swung eighths without touching the notation on screen. Flip the toggle off to hear exactly what is written; flip it on to hear how it should feel.
 
 <ToggleSettingDemo
   file="/files/features/TripletFeel.gp5"
@@ -41,9 +41,9 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
-    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
     playTripletFeel: true,
   },
 });
@@ -61,4 +61,5 @@ Call `api.updateSettings()` after mutating settings on the live instance so the 
 
 - [`player.playTripletFeel`](/docs/reference/settings/player/playtripletfeel) in the settings reference.
 - [SongBook mode](songbook-mode) — a related notation-mode switch that also affects bend and dip timing.
+- [Vibrato and slide fine-tuning](vibrato-and-slide-fine-tuning) — the other playback-feel knobs shaping how the synth renders expression.
 - [`TripletFeel`](/docs/reference/types/model/tripletfeel) in the model reference.

@@ -13,7 +13,7 @@ keywords:
 
 import { BytesLoadDemo } from '@site/src/components/BytesLoadDemo';
 
-Read the score bytes yourself, hand them to alphaTab, and skip the built-in fetcher entirely.
+You already have the bytes — from a `fetch` with auth headers, a `<input type="file">` upload, an IndexedDB cache, or a Node.js `readFile` on the server. Hand the buffer to `api.load()` and skip the built-in fetcher entirely.
 
 <BytesLoadDemo showCode={false} />
 
@@ -57,4 +57,5 @@ api.scoreLoaded.on((score) => {
 - [Load from a URL](load-from-url) — the browser-only path when alphaTab does the fetch.
 - [Direct importer use](direct-importer-use) — build a `Score` from bytes without instantiating an API.
 - [Reacting to a loaded score](reacting-to-loaded-score) — the `scoreLoaded` event.
-- [`api.load()`](/docs/reference/api/load) in the reference.
+- [Selecting and switching tracks](selecting-and-switching-tracks) — the second argument to `api.load()`.
+- [`api.load`](/docs/reference/api/load) and [`core.tracks`](/docs/reference/settings/core/tracks) in the reference.

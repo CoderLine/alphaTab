@@ -15,7 +15,7 @@ keywords:
 
 import { MidiEventLog } from '@site/src/components/PlaySync';
 
-Every event the synthesizer plays is available to your code — note-on, note-off, tempo changes, program changes, metronome ticks, and rests. Register a filter for the event types you care about, subscribe to `midiEventsPlayed`, and route the events to a visual metronome, a MIDI-out port, an external DAW bridge, or whatever comes next.
+Feed a hardware synth over MIDI-out. Drive a stage-light show off the beat pulses. Log every note-on for post-session analysis. Anywhere you need something to happen the moment the audio plays it, subscribe to `midiEventsPlayed`. alphaTab surfaces every event the synthesizer sees — note-on, note-off, tempo changes, program changes, metronome ticks, and rests — filtered to only the types you asked for.
 
 <MidiEventLog
   tex={`\\title "Event firehose"
@@ -50,9 +50,9 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   player: {
-    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
     soundFont: '/soundfont/sonivox.sf2',
   },
 });
@@ -82,4 +82,6 @@ api.midiEventsPlayed.on((e) => {
 
 - [Count-in and metronome](count-in-and-metronome) — the built-in metronome that produces the `AlphaTabMetronome` events.
 - [Audio buffer size](audio-buffer-size) — the latency trade-off that governs event timing.
-- [`MidiEventType`](/docs/reference/types/midi/midieventtype) and [`MidiEvent`](/docs/reference/types/midi/midievent) in the model reference.
+- [Seeking by tick and time](seeking-by-tick-and-time) — the tick coordinate every event carries.
+- [`midiEventsPlayed`](/docs/reference/api/midieventsplayed), [`midiEventsPlayedFilter`](/docs/reference/api/midieventsplayedfilter), and [`downloadMidi`](/docs/reference/api/downloadmidi) in the API reference.
+- [`MidiEventType`](/docs/reference/types/midi/midieventtype), [`MidiEvent`](/docs/reference/types/midi/midievent), [`AlphaTabMetronomeEvent`](/docs/reference/types/midi/alphatabmetronomeevent), and [`AlphaTabRestEvent`](/docs/reference/types/midi/alphatabrestevent) in the model reference.

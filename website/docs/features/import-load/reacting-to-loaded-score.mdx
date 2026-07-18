@@ -12,7 +12,7 @@ keywords:
 
 import { ScoreLoadedInspector } from '@site/src/components/ScoreLoadedInspector';
 
-`scoreLoaded` is the hook for anything that depends on the parsed score model — coloring, per-track settings, dynamic UI, SoundFont selection based on instruments. It fires once per successful load.
+Populate a track picker, update a page header with the score title and artist, apply user-saved coloring, or swap the SoundFont to match the detected instruments — anywhere your code needs the parsed score model, `scoreLoaded` is the hook. It fires once per successful load.
 
 <ScoreLoadedInspector showCode={false} />
 
@@ -59,3 +59,5 @@ api.scoreLoaded.on((score) => {
 - [Per-element colors](/docs/features/render/per-element-colors) — the reference example of a post-load setup that mutates the model.
 - [Traversing and mutating the model](/docs/features/extend/traversing-the-model) — walking tracks, bars, voices, beats, and notes safely.
 - [Handling load errors](./handling-load-errors) — the counterpart event for the failure path.
+- [`api.scoreLoaded`](/docs/reference/api/scoreloaded) and [`api.score`](/docs/reference/api/score) in the reference.
+- [`Score`](/docs/reference/types/model/score) — the model type delivered by the event.

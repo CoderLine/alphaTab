@@ -44,7 +44,7 @@ export const AuditionDemo: React.FC<AuditionDemoProps> = ({
     <div className={styles.wrapper}>
       <div className={styles.extras}>
         <span>
-          Click a beat to hear it. Click one note in a chord to audition just that note.
+          Click a beat to hear it. Click one note in a chord to audition that single note.
         </span>
         <span className={styles.badge}>Last auditioned: {lastLabel}</span>
       </div>

@@ -13,7 +13,7 @@ keywords:
 
 import { SelectionHandleDemo } from '@site/src/components/SelectionHandleDemo';
 
-Every time the highlight overlay changes — from a user drag, from `highlightPlaybackRange`, from a clear — alphaTab fires `playbackRangeHighlightChanged`. The event carries the current start and end beats plus the exact pixel rectangles being painted, so you can hang custom drag handles, badges, or annotations off the selection. The demo below wires drag handles to this event.
+Sync a right-side properties inspector to the selected range. Move drag handles that ride the edges of the highlight. Show a "5 bars selected" pill above the range while the user drags. Every time the highlight overlay changes — from a user drag, from a programmatic `highlightPlaybackRange` call, from a clear — alphaTab fires `playbackRangeHighlightChanged` with the current start and end beats plus the pixel rectangles being painted. The demo below wires drag handles to this event; the event log on the side shows the payload each fire delivers.
 
 <SelectionHandleDemo showEventLog>{`
 \\title "Canon"
@@ -79,3 +79,4 @@ api.playbackRangeHighlightChanged.on((e) => {
 - [Range selection](./range-selection) — the three methods that drive the highlight the event reports on.
 - [Bounds lookup](./bounds-lookup) — the geometry system that produces the `highlightBlocks` rectangles.
 - [`playbackRangeHighlightChanged`](/docs/reference/api/playbackrangehighlightchanged) in the API reference.
+- [`PlaybackHighlightChangeEventArgs`](/docs/reference/types/playbackhighlightchangeeventargs) in the types reference.

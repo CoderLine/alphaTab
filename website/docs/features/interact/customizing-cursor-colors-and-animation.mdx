@@ -16,7 +16,7 @@ keywords:
 
 import { CursorToggleDemo } from '@site/src/components/CursorToggleDemo';
 
-On the Web platform the cursor and highlight overlays are regular DOM elements. Style them with the same CSS you use for the rest of your site. Pick a theme in the demo below to see the classes swap under three different stylesheets, and toggle the beat-cursor animation to compare a slide against a hard tick.
+Matching the cursor to a brand color, softening the animation for readers with `prefers-reduced-motion`, tuning the highlight to sit well against a dark theme — all of it happens in your own CSS. On the Web platform the cursor and highlight overlays are regular DOM elements tagged with stable class names. Pick a theme in the demo below to see the classes swap under three different stylesheets, and toggle the beat-cursor animation to compare a smooth slide against a hard per-beat tick.
 
 <CursorToggleDemo showThemeToggle showAnimationToggle showCode={false} tex={`
 \\title "Cursor themes"
@@ -43,7 +43,7 @@ alphaTab tags four overlay elements with stable classes. Target them from your s
 
 ## Animating or ticking the beat cursor
 
-The beat cursor can either slide smoothly across the beat's width or tick from beat to beat. `player.enableAnimatedBeatCursor` picks between the two. It defaults to `true`. Turn it off for editor UIs where a hard step is easier to read. The difference shows up during playback — press play in the demo above and toggle the checkbox to watch the beat cursor switch between a smooth slide and a hard step per beat.
+The beat cursor either slides across the beat's width or ticks from beat to beat. `player.enableAnimatedBeatCursor` picks between the two, and defaults to `true`. Turn it off for editor UIs where a hard step reads more clearly, or for accessibility surfaces that honor reduced-motion preferences. The difference shows up during playback — press play in the demo above and toggle the checkbox to watch the beat cursor switch between a smooth slide and a hard step per beat.
 
 ## Show it in code
 

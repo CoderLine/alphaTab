@@ -15,11 +15,11 @@ keywords:
 
 import { ProgrammaticScoreExample } from '@site/src/components/ProgrammaticScoreExample';
 
-alphaTab's model is public. Instantiate `Score`, `Track`, `Staff`, `Bar`, `Voice`, `Beat`, and `Note`, wire them together, and hand the root `Score` to `api.renderScore()`. No file format, no importer, no round-trip through alphaTex.
+Generating a warm-up exercise on the fly, converting a proprietary format into alphaTab's model, or emitting etudes from a music-theory tool — none of these have a source file to import. Instantiate `Score`, `Track`, `Staff`, `Bar`, `Voice`, `Beat`, and `Note`, wire them together, and hand the root `Score` to `api.renderScore()`. No file format, no importer, no round-trip through alphaTex.
 
 <ProgrammaticScoreExample showCode={false} />
 
-The demo above is built entirely from `new alphaTab.model.Score()` and its children — no file, no alphaTex, no importer. One Track, one Staff, two Bars, eight beats, then a single `api.renderScore(score)` call. The same construction, line for line, appears in the sample below.
+The demo above is built entirely from `new alphaTab.model.Score()` and its children — no file, no alphaTex, no importer. One `Track`, one `Staff`, two `Bar`s, eight beats, then a single `api.renderScore(score)` call. The same construction, line for line, appears in the sample below.
 
 ## Model shape
 
@@ -43,19 +43,23 @@ import * as alphaTab from '@coderline/alphatab';
 
 const score = new alphaTab.model.Score();
 score.title = 'Built in code';
-score.tempo = 120;
 
-// Two shared master bars — 4/4 time.
+// Two shared master bars in 4/4. The initial tempo lives on the first
+// master bar as a tempo automation — Score.tempo itself is derived.
 for (let i = 0; i < 2; i++) {
   const masterBar = new alphaTab.model.MasterBar();
   masterBar.timeSignatureNumerator = 4;
   masterBar.timeSignatureDenominator = 4;
   score.addMasterBar(masterBar);
 }
+score.masterBars[0].tempoAutomations.push(
+  alphaTab.model.Automation.buildTempoAutomation(false, 0, 120, 2),
+);
 
-// One guitar track, one staff, standard six-string tuning.
+// One guitar track, one staff, standard six-string tuning (high E → low E).
 const track = new alphaTab.model.Track();
 track.name = 'Guitar';
+track.shortName = 'Gtr';
 score.addTrack(track);
 
 const staff = new alphaTab.model.Staff();
@@ -71,6 +75,7 @@ for (let i = 0; i < score.masterBars.length; i++) {
   bar.addVoice(voice);
 
   // Four quarter-note beats per bar, ascending then descending the third string.
+  // Note.string is 1-based counted from the lowest string.
   const frets = i === 0 ? [3, 5, 7, 8] : [8, 7, 5, 3];
   for (const fret of frets) {
     const beat = new alphaTab.model.Beat();
@@ -78,7 +83,7 @@ for (let i = 0; i < score.masterBars.length; i++) {
     voice.addBeat(beat);
 
     const note = new alphaTab.model.Note();
-    note.string = 3;
+    note.string = 4;
     note.fret = fret;
     beat.addNote(note);
   }
@@ -86,6 +91,10 @@ for (let i = 0; i < score.masterBars.length; i++) {
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container);
+
+// Compute ties, tick positions, and other derived state before rendering.
+score.finish(api.settings);
+
 api.renderScore(score);
 ```
 
@@ -93,12 +102,13 @@ api.renderScore(score);
 
 ## Post-construction finalization
 
-alphaTab calls `Score.finish(settings)` internally when a score is rendered through `renderScore()`. That step derives ties, computes measure lengths, and links repeat groups. If you inspect the model between construction and render, some derived fields (`Note.realValue`, `Beat.duration` after tuplet resolution, master-bar end positions) are `NaN` or zero until finish runs.
+Calling `score.finish(settings)` derives ties, resolves tuplet durations, computes measure end positions, and links repeat groups. Until finish runs, fields like `Note.realValue`, resolved `Beat.duration`, and master-bar tick positions are unset. Run it explicitly before you hand the score to `renderScore()` — the sample above does this via `score.finish(api.settings)`.
 
-For scores handed straight to `renderScore()`, ignore this. For scores serialized to JSON before rendering, run `score.finish(settings)` first so the JSON snapshot carries the finalized model.
+For scores serialized to JSON, run `finish` first so the JSON snapshot carries the finalized model.
 
 ## Where to look next
 
-- [Traversing and mutating the model](/docs/features/extend/traversing-and-mutating-the-model) — the mirror workflow: build once, mutate afterward.
-- [`Score`](/docs/reference/types/model/score), [`Track`](/docs/reference/types/model/track), [`Staff`](/docs/reference/types/model/staff), [`Bar`](/docs/reference/types/model/bar), [`Voice`](/docs/reference/types/model/voice), [`Beat`](/docs/reference/types/model/beat), and [`Note`](/docs/reference/types/model/note) in the model reference.
+- [Traversing and mutating the model](/docs/features/extend/traversing-and-mutating-the-model) — the mirror workflow: walk and rewrite a loaded score instead of building one from scratch.
+- [`Score`](/docs/reference/types/model/score), [`MasterBar`](/docs/reference/types/model/masterbar), [`Track`](/docs/reference/types/model/track), [`Staff`](/docs/reference/types/model/staff), [`Bar`](/docs/reference/types/model/bar), [`Voice`](/docs/reference/types/model/voice), [`Beat`](/docs/reference/types/model/beat), and [`Note`](/docs/reference/types/model/note) in the model reference.
+- [`Duration`](/docs/reference/types/model/duration) and [`Automation`](/docs/reference/types/model/automation) — the enum used for `Beat.duration` and the helper behind the tempo automation on the first master bar.
 - [`renderScore`](/docs/reference/api/renderscore) — the entry point that accepts a hand-built score.

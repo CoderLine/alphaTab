@@ -19,13 +19,13 @@ Dynamics tell the reader how loud each passage is and how the volume changes ove
 
 ## Static dynamics {#static}
 
-Dynamic markings — `ppp`, `pp`, `p`, `mp`, `mf`, `f`, `ff`, `fff` — render in the dynamics italic font below the staff at the beat where they change.
+Dynamic markings — `ppp`, `pp`, `p`, `mp`, `mf`, `f`, `ff`, `fff` — are the italic Italian labels a composer uses to fix a passage's loudness. alphaTab renders them in the dynamics font below the staff at the beat where the volume changes.
 
 <AlphaTab file="/files/features/Dynamics.gp5" />
 
 ## Crescendo and decrescendo hairpins {#hairpins}
 
-Crescendo (`<`) and decrescendo (`>`) hairpins render below the staff, spanning every beat between their start and end.
+Crescendo (`<`) and decrescendo (`>`) hairpins draw the "grow louder" and "grow softer" contour between two dynamic marks — the standard way to score a swell or a fade. alphaTab renders each hairpin below the staff, spanning every beat between its start and end.
 
 <AlphaTab tex="true">{`
 :4 C4 { dy pp } C4 C4 C4 { cre } |
@@ -36,7 +36,7 @@ C4 C4 C4 C4 { dy pp }
 
 ## Accents {#accents}
 
-Single-note accents render as marks above or below the notehead. alphaTab supports three levels — normal accent (`>`), heavy accent (`^`), and tenuto (`—`).
+Single-note accents mark one note as louder or longer than its neighbours — the sudden punch on a syncopated beat, the tenuto sustain on a legato line. alphaTab renders them as marks above or below the notehead and supports three levels: normal accent (`>`), heavy accent (`^`), and tenuto (`—`).
 
 <AlphaTab tex="true">{`
 :4 3.3{ac} 5.3{hac} 7.3{ten} 8.3{ac}
@@ -51,7 +51,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
 });
 
 api.scoreLoaded.on((score) => {
@@ -64,6 +64,7 @@ api.scoreLoaded.on((score) => {
 
 ## Where to look next
 
-- [Hiding dynamics](./hide-dynamics) — the score-wide toggle in detail.
+- [Hiding dynamics](./hide-dynamics) — the score-wide toggle in detail, with a live checkbox.
 - [Toggling notation elements off](./coverage-toggle-elements) — hide accents or hairpins independently via `notation.elements`.
-- [`NotationElement`](/docs/reference/types/notationelement) — every element key, including `EffectDynamics` and `EffectCrescendo`.
+- [`hideDynamics`](/docs/reference/types/model/renderstylesheet/#hidedynamics) on the [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) reference.
+- [`notation.elements`](/docs/reference/settings/notation/elements) and [`NotationElement`](/docs/reference/types/notationelement) — the map and enum, including `EffectDynamics` and `EffectCrescendo`.

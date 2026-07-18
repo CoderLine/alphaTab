@@ -13,7 +13,7 @@ keywords:
 
 import { ToggleElementsDemo } from '@site/src/components/ToggleElementsDemo';
 
-alphaTab draws every notation category by default. The `notation.elements` map lets you flip individual categories off — score title, tuning, bar numbers, palm-mute brackets, whammy annotations, lyrics, or any of the other entries in the [`NotationElement`](/docs/reference/types/notationelement) enumeration.
+alphaTab draws every notation category by default. The [`notation.elements`](/docs/reference/settings/notation/elements) map lets you flip individual categories off — score title, tuning, bar numbers, palm-mute brackets, whammy annotations, lyrics, or any of the other entries in the [`NotationElement`](/docs/reference/types/notationelement) enumeration. Reach for it when a chart needs a compact printout, when your renderer already provides its own title bar, or when an editor UI needs to preview one element at a time.
 
 <ToggleElementsDemo showCode={false} />
 
@@ -39,7 +39,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   notation: {
     elements: new Map([
       [alphaTab.NotationElement.EffectWhammyBar, false],
@@ -65,7 +65,7 @@ For JSON input, use the camelCase enum name as the key:
 }
 ```
 
-To flip an entry at runtime, mutate the map on `api.settings.notation.elements` and call `api.render()`:
+To flip an entry at runtime, mutate the map on `api.settings.notation.elements` and call [`api.render()`](/docs/reference/api/render):
 
 ```js
 api.settings.notation.elements.set(alphaTab.NotationElement.EffectLyrics, false);
@@ -76,4 +76,7 @@ api.render();
 
 - [`NotationElement`](/docs/reference/types/notationelement) — the full enumeration with every value.
 - [`notation.elements`](/docs/reference/settings/notation/elements) — the setting reference.
-- [Effects and articulations](./coverage-effects-articulations) — see each effect band before you decide which to hide.
+- [Effects and articulations](./coverage-effects-articulations) — the effect bands you can flip individually.
+- [Dynamics, hairpins, and accents](./coverage-dynamics) — hide dynamics with the granular `EffectDynamics` toggle, or use the stylesheet-wide [`hideDynamics`](./hide-dynamics) shortcut.
+- [Hiding dynamics](./hide-dynamics) — the score-wide stylesheet shortcut for the dynamics category.
+- [`updateSettings`](/docs/reference/api/updatesettings) and [`render`](/docs/reference/api/render) — the API surface used when flipping toggles after load.

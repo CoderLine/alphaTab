@@ -15,7 +15,9 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-The Skia rendering backend that powers alphaTab on .NET and Android does not read fonts from the operating system's font store. Any font used for titles, lyrics, chord names, or fingerings must be registered with Skia explicitly first.
+Building a .NET desktop app or Android app that uses non-system fonts — a corporate typography brief for titles and lyrics, a language-specific font for East-Asian lyric text, or a hand-lettered wordmark for the score header? The Skia rendering backend that powers alphaTab on those runtimes does not read fonts from the operating system's font store. Every font used around the notation — titles, lyrics, chord names, fingerings — must be registered with Skia explicitly first.
+
+This registration flow is Skia-only. The preview below is a browser render for illustration; the code snippet configures the exact pipeline that runs inside a .NET or Android app.
 
 <AlphaTab tex={true}>{`
 \\title "Fonts on Skia"
@@ -28,8 +30,6 @@ The Skia rendering backend that powers alphaTab on .NET and Android does not rea
   :4 (5.5 7.4 8.3) (7.5 9.4 10.3) :2 (10.5 12.4 14.3) |
   :2 (2.4 3.3 5.2) (0.4 2.3 3.2)
 `}</AlphaTab>
-
-This registration flow runs on the .NET and Android backends; the render above uses the browser's font store instead. See `Environment.registerAlphaSkiaCustomFont` in the code sample below for the Skia-side entry point.
 
 `Environment.registerAlphaSkiaCustomFont(bytes)` accepts the raw font file bytes and returns a `Font` descriptor that identifies the font inside alphaTab. Once registered, reference that font family name from `display.resources` like any other font.
 
@@ -73,6 +73,6 @@ On the Web backend, alphaTab reaches into the browser's font store and any `@fon
 
 ## Where to look next
 
-- [Custom music (SMuFL) font](/docs/features/render/custom-smufl-fonts) — swap the notation font itself, not just text fonts.
+- [Custom music (SMuFL) font](/docs/features/render/custom-smufl-fonts) — swap the notation font itself, not only the text fonts.
 - [Custom text fonts](/docs/features/render/custom-text-fonts) — the equivalent workflow on the web backend.
 - [`Environment.registerAlphaSkiaCustomFont`](/docs/reference/types/environment) in the reference.

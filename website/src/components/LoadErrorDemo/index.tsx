@@ -19,19 +19,20 @@ const WRONG_URL = "/files/does-not-exist.gp";
 const WRONG_FORMAT_URL = "/files/sonivox_musescore.sf2";
 const BAD_TEX = '\\title unterminated :garbage';
 
-function classifyErrorType(err: any): string {
-  const type = err?.type;
+function classifyErrorType(err: unknown): string {
+  const type = (err as { type?: unknown } | null)?.type;
   if (typeof type !== "number") {
     return "unknown";
   }
-  const name = (alphaTab as any).AlphaTabErrorType?.[type];
+  const name = alphaTab.AlphaTabErrorType[type as alphaTab.AlphaTabErrorType];
   return typeof name === "string" ? name : String(type);
 }
 
-function classifyError(err: any): ErrorRecord {
+function classifyError(err: unknown): ErrorRecord {
+  const asError = err as { constructor?: { name?: string }; message?: string } | null;
   return {
-    className: err?.constructor?.name ?? "Error",
-    message: err?.message ?? String(err),
+    className: asError?.constructor?.name ?? "Error",
+    message: asError?.message ?? String(err),
     typeName: classifyErrorType(err),
   };
 }

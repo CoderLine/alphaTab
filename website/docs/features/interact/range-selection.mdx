@@ -14,7 +14,7 @@ keywords:
 
 import { SelectionHandleDemo } from '@site/src/components/SelectionHandleDemo';
 
-alphaTab renders a translucent selection overlay behind whatever range you mark, spanning across staff systems where needed. Three methods let you build custom selection UIs on top of it — drag handles, keyboard range extension, "loop this section" buttons — without touching the internal drag-select. Grab the handles in the demo below to reshape the range.
+Drag-select a phrase to loop it. Extend the range with keyboard arrows. Wire a "loop this section" button in a lesson toolbar. Three methods drive the highlight overlay — the translucent bar you see behind the selected range — from your own gesture code, and one convenience method turns whatever is highlighted into a real playback loop. Grab the handles in the demo below to reshape the range; release, and playback loops the newly selected span.
 
 <SelectionHandleDemo>{`
 \\title "Canon"
@@ -82,5 +82,6 @@ api.beatMouseUp.on((beat) => {
 ## Where to look next
 
 - [Selection change events](./selection-change-events) — the `playbackRangeHighlightChanged` event that streams selection updates while the user drags.
-- [Looping a section](/docs/features/play-sync/looping-a-section) — the underlying `playbackRange` and `isLooping` transport.
-- [`highlightPlaybackRange`](/docs/reference/api/highlightplaybackrange) and [`applyPlaybackRangeFromHighlight`](/docs/reference/api/applyplaybackrangefromhighlight) in the API reference.
+- [Enabling and disabling interaction](./enabling-and-disabling-interaction) — turn the built-in drag-select off when your own gesture code owns the range.
+- [Looping a section](/docs/features/play-sync/looping-a-section) — the underlying `playbackRange` and `isLooping` transport `applyPlaybackRangeFromHighlight` writes into.
+- [`highlightPlaybackRange`](/docs/reference/api/highlightplaybackrange), [`applyPlaybackRangeFromHighlight`](/docs/reference/api/applyplaybackrangefromhighlight), and [`clearPlaybackRangeHighlight`](/docs/reference/api/clearplaybackrangehighlight) in the API reference.

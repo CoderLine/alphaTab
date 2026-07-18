@@ -12,7 +12,7 @@ keywords:
 
 import { TrackNamePolicyDemo } from '@site/src/components/TrackNamePolicyDemo';
 
-Control where track names appear, whether they use the full or short form, and whether they render horizontally or rotated. Six fields on the stylesheet cover it, grouped into three pairs.
+Control where track names appear, whether each system uses the full or short form, and whether the label reads horizontally or rotated. Six stylesheet fields — grouped into three pairs — cover every combination, so a mobile view can drop names that no longer fit, and a printed songbook can spell out the instrument once and abbreviate it on every following system.
 
 <TrackNamePolicyDemo showCode={false} />
 
@@ -22,10 +22,10 @@ The stylesheet splits track-name display along three axes: **policy** (where), *
 
 ### Policy: single track vs multi track
 
-- `singleTrackTrackNamePolicy` — governs display when only one track is rendered.
-- `multiTrackTrackNamePolicy` — governs display when multiple tracks are rendered.
+- [`singleTrackTrackNamePolicy`](/docs/reference/types/model/renderstylesheet/#singletracktracknamepolicy) — governs display when only one track is rendered.
+- [`multiTrackTrackNamePolicy`](/docs/reference/types/model/renderstylesheet/#multitracktracknamepolicy) — governs display when multiple tracks are rendered.
 
-Both take a `TrackNamePolicy`:
+Both take a [`TrackNamePolicy`](/docs/reference/types/model/tracknamepolicy):
 
 - `Hidden` — never draw the name.
 - `FirstSystem` — draw only above the first system (default).
@@ -35,22 +35,22 @@ Splitting the policy by render context lets you keep a compact single-track view
 
 ### Mode: full name vs abbreviation
 
-- `firstSystemTrackNameMode` — text used on the first system.
-- `otherSystemsTrackNameMode` — text used on subsequent systems.
+- [`firstSystemTrackNameMode`](/docs/reference/types/model/renderstylesheet/#firstsystemtracknamemode) — text used on the first system.
+- [`otherSystemsTrackNameMode`](/docs/reference/types/model/renderstylesheet/#othersystemstracknamemode) — text used on subsequent systems.
 
-Both take a `TrackNameMode`:
+Both take a [`TrackNameMode`](/docs/reference/types/model/tracknamemode):
 
 - `FullName` — uses `Track.name` (e.g. "Distortion Guitar").
 - `ShortName` — uses `Track.shortName` (e.g. "Dist. Gtr.", default on both).
 
-The typical engraver's choice is `FullName` on the first system and `ShortName` on the rest.
+The typical engraver's choice is `FullName` on the first system and `ShortName` on the rest — the reader learns the instrument once and then reads the compact form the rest of the way.
 
 ### Orientation: horizontal vs vertical
 
-- `firstSystemTrackNameOrientation` — rotation for the first-system label.
-- `otherSystemsTrackNameOrientation` — rotation for subsequent-system labels.
+- [`firstSystemTrackNameOrientation`](/docs/reference/types/model/renderstylesheet/#firstsystemtracknameorientation) — rotation for the first-system label.
+- [`otherSystemsTrackNameOrientation`](/docs/reference/types/model/renderstylesheet/#othersystemstracknameorientation) — rotation for subsequent-system labels.
 
-Both take a `TrackNameOrientation`:
+Both take a [`TrackNameOrientation`](/docs/reference/types/model/tracknameorientation):
 
 - `Horizontal` — left-to-right text.
 - `Vertical` — bottom-to-top rotated text (default on both).
@@ -64,7 +64,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/ensemble.gp' },
+  core: { file: '/scores/song.gp' },
 });
 
 api.scoreLoaded.on((score) => {
@@ -83,5 +83,8 @@ api.scoreLoaded.on((score) => {
 ## Where to look next
 
 - [Bracket extend mode](/docs/features/render/bracket-extend-mode) — pairs with track names to define the left-edge label block.
+- [Tuning display](/docs/features/render/tuning-display) — the other stylesheet knob that shapes the label block next to each staff.
+- [Multi-bar rests](/docs/features/render/multi-bar-rests) — how the label block interacts with hidden or collapsed staves.
 - [`TrackNamePolicy`](/docs/reference/types/model/tracknamepolicy), [`TrackNameMode`](/docs/reference/types/model/tracknamemode), [`TrackNameOrientation`](/docs/reference/types/model/tracknameorientation) — the enum references.
 - [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) — the full stylesheet reference.
+- [`scoreLoaded`](/docs/reference/api/scoreloaded) and [`render`](/docs/reference/api/render) — the API surface used above.

@@ -30,18 +30,21 @@ const chapters: FeatureChapter[] = [
     id: 'model',
     label: 'Model manipulation',
     anchor: 'model',
+    description: 'Build a score from scratch in code, or walk the loaded tree and rewrite it — transpositions, per-note coloring, generated etudes, warm-up exercises on the fly.',
     defaultAccent: 'slate',
   },
   {
     id: 'workers',
     label: 'Custom bundling & workers',
     anchor: 'workers',
+    description: 'Wire the render worker and audio worklet by hand for bundlers alphaTab does not ship a plugin for — esbuild, Rollup, Parcel, or a bespoke pipeline.',
     defaultAccent: 'slate',
   },
   {
     id: 'hosting',
     label: 'Native platform hosting',
     anchor: 'hosting',
+    description: 'Embed alphaTab in native applications: Android views, WPF and WinForms controls, or any framework it has no shipped host for via the `IUiFacade` contract.',
     defaultAccent: 'slate',
   },
 ];

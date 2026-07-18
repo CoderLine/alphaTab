@@ -54,7 +54,7 @@ export const ResponsiveResizeDemo: React.FC<ResponsiveResizeDemoProps> = ({
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
 });
 
 // alphaTab attaches a ResizeObserver on Web — resize the container

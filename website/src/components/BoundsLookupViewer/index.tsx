@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import * as alphaTab from "@coderline/alphatab";
 import styles from "./styles.module.scss";
-import environment from "@site/src/environment";
 import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
 
 enum GuideType {
@@ -20,11 +19,6 @@ enum GuideElements {
 
 export interface BoundsLookupViewerProps {
   children: string | React.ReactElement;
-}
-
-export interface BoundsLookupViewersState {
-  selectedType: GuideType;
-  selectedElements: GuideElements;
 }
 
 export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
 import { useAlphaTab } from "@site/src/hooks";
 

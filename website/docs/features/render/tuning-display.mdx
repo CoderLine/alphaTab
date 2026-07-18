@@ -12,7 +12,7 @@ keywords:
 
 import { TuningModeSwitch } from '@site/src/components/TuningModeSwitch';
 
-Show the string tuning at the top of the score, hide it entirely, or move it beside the tab-staff lines. Two stylesheet fields — one score-wide, one per-track — cover every combination.
+Show the string tuning at the top of the score, hide it entirely, or move it beside each tab-staff line. Three stylesheet fields — one score-wide toggle, one per-track override, and a placement enum — cover every combination. Use them to hide the tuning on repeated systems where the header wastes space, or to show per-staff tuning in a multi-guitar chart where each track sits in a different tuning.
 
 <TuningModeSwitch showCode={false} />
 
@@ -20,13 +20,13 @@ Show the string tuning at the top of the score, hide it entirely, or move it bes
 
 Three fields on `score.stylesheet` control tuning display:
 
-- `globalDisplayTuning` — a boolean, `true` by default. When `false`, no tuning label appears anywhere in the render.
-- `perTrackDisplayTuning` — a `Map<number, boolean>` keyed by track index. Add an entry to override the global flag for that specific track. Leave the map `null` (default) to apply the global flag uniformly.
-- `tuningDisplayMode` — a `TuningDisplayMode` enum controlling where the tuning is placed:
+- [`globalDisplayTuning`](/docs/reference/types/model/renderstylesheet/#globaldisplaytuning) — a boolean, `true` by default. When `false`, no tuning label appears anywhere in the render.
+- [`perTrackDisplayTuning`](/docs/reference/types/model/renderstylesheet/#pertrackdisplaytuning) — a `Map<number, boolean>` keyed by track index. Add an entry to override the global flag for that specific track. Leave the map `null` (default) to apply the global flag uniformly.
+- [`tuningDisplayMode`](/docs/reference/types/model/renderstylesheet/#tuningdisplaymode) — a [`TuningDisplayMode`](/docs/reference/types/model/tuningdisplaymode) enum controlling where the tuning is placed:
   - `Score` — the tuning block sits above the first system, alongside title and artist info (default).
   - `Staff` — each open-string pitch is written next to its tab-staff line, replacing the block header.
 
-`Staff` mode is useful when a score has multiple string instruments with different tunings; each label appears next to its own staff instead of one combined block. `Score` mode is cleaner for single-instrument charts.
+`Staff` mode reads best when a score contains multiple string instruments with different tunings; each label appears next to its own staff instead of one combined block. `Score` mode is cleaner for single-instrument charts.
 
 ## Show it in code
 
@@ -59,6 +59,9 @@ api.scoreLoaded.on((score) => {
 
 ## Where to look next
 
-- [Guitar tablature](/docs/features/render/guitar-tablature) — the tab staff itself that this tuning label describes.
+- [Guitar tablature](/docs/features/render/guitar-tablature) — the tab staff that this tuning label describes.
+- [Special tracks](/docs/features/render/coverage-special-tracks) — how alternate tunings render across mixed instrument sets.
+- [Toggling notation elements off](/docs/features/render/coverage-toggle-elements) — hide the `GuitarTuning` element globally through `notation.elements`.
+- [`globalDisplayTuning`](/docs/reference/types/model/renderstylesheet/#globaldisplaytuning), [`perTrackDisplayTuning`](/docs/reference/types/model/renderstylesheet/#pertrackdisplaytuning), and [`tuningDisplayMode`](/docs/reference/types/model/renderstylesheet/#tuningdisplaymode) on the [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) reference.
 - [`TuningDisplayMode`](/docs/reference/types/model/tuningdisplaymode) — the enum reference.
-- [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) — the full stylesheet reference.
+- [`scoreLoaded`](/docs/reference/api/scoreloaded) and [`render`](/docs/reference/api/render) — the API surface used above.

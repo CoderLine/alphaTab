@@ -15,7 +15,7 @@ Lyrics render below the staff with each syllable positioned under the beat it be
 
 ## Aligning to beats {#alignment}
 
-Each lyric syllable sits under its target beat. Hyphens between syllables indicate a continuation across beats, and underscores extend a syllable across held notes.
+Each lyric syllable sits under its target beat — the way songbook vocal lines are typeset so a singer reads word and melody at the same glance. Hyphens between syllables indicate a continuation across beats, and underscores extend a syllable across held notes.
 
 <AlphaTab tex="true">{`
 \\track "Vocals"
@@ -25,7 +25,7 @@ Each lyric syllable sits under its target beat. Hyphens between syllables indica
 
 ## Multi-verse handling {#multi-verse}
 
-Multiple verses stack below the staff, one line per verse. alphaTab preserves the order the source file provides. Pass extra strings to alphaTex's `\lyrics` directive to add verses.
+Multiple verses stack below the staff, one line per verse — the way hymnals and folk songbooks fit two, three, or four sets of words under a single melodic line. alphaTab preserves the order the source file provides. Pass extra strings to alphaTex's `\lyrics` directive to add verses.
 
 <AlphaTab tex="true">{`
 \\track "Vocals"
@@ -36,7 +36,7 @@ Multiple verses stack below the staff, one line per verse. alphaTab preserves th
 
 ## Rendering fonts {#fonts}
 
-Lyrics use a dedicated font entry so you can restyle them without touching the rest of the score. Point `display.resources.wordsFont` at any registered family to change size, weight, or face.
+Lyrics use a dedicated font entry so a chart can restyle them without touching the rest of the score — the typical case for a hymnal that pairs a serif melody with a large sans-serif lyric line. Point `display.resources.wordsFont` at any registered family to change size, weight, or face.
 
 <AlphaTab tex="true"
   settings={ { display: { resources: { wordsFont: '20px "Georgia", serif' } } } }
@@ -57,7 +57,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/anthem.gp' },
+  core: { file: '/scores/song.gp' },
   notation: {
     elements: new Map([
       [alphaTab.NotationElement.EffectLyrics, false],
@@ -66,11 +66,12 @@ const api = new alphaTab.AlphaTabApi(container, {
 });
 ```
 
-`getAlphaTabContainer()` is a placeholder for the platform-specific render target. Lyrics can also be attached at runtime through the `Lyrics` model — see the [model reference](/docs/reference/types/model/) for the constructor.
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target. Lyrics can also be attached at runtime through the [`Lyrics`](/docs/reference/types/model/lyrics) model on the [model reference](/docs/reference/types/model/).
 
 ## Where to look next
 
 - [Toggling notation elements off](./coverage-toggle-elements) — hide any category globally.
 - [Custom text fonts](./custom-text-fonts) — configure the lyric font family and size.
 - [Font family fallbacks](./font-family-fallbacks) — handle missing font families gracefully.
-- [`notation.elements`](/docs/reference/settings/notation/elements) — the full element map.
+- [`notation.elements`](/docs/reference/settings/notation/elements) — the settings entry point for the element map.
+- [`Lyrics`](/docs/reference/types/model/lyrics) — the model type for attaching lyrics programmatically.

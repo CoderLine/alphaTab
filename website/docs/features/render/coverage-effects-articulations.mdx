@@ -20,19 +20,19 @@ Guitar and bass articulations carry as much of the performance as the pitches do
 
 ## Bends and whammy {#bends}
 
-String bends render as curved arrows above the tab and standard notation, annotated with the target pitch or interval. Whammy-bar dips draw as a bar-level effect band with the pitch envelope over time.
+String bends — the trademark expressive move of blues and rock lead guitar — render as curved arrows above the tab and standard notation, annotated with the target pitch or interval. Whammy-bar dips (the bar-pushed pitch waver on tremolo-arm guitars) draw as a bar-level effect band with the pitch envelope over time.
 
 <AlphaTab file="/files/features/Bends.gp5" />
 
 ## Vibrato {#vibrato}
 
-Beat-level and note-level vibrato both render as a wavy line — thin for a note vibrato, thick for a beat-wide "wide" vibrato.
+Vibrato — the finger-driven pitch waver that sustains a note — renders as a wavy line above the affected notes. alphaTab draws a thin line for note vibrato and a thick line for beat-wide "wide" vibrato, so a reader can distinguish a subtle sustain shake from the exaggerated one common on lead solos.
 
 <AlphaTab file="/files/features/Vibrato.gp5" />
 
 ## Palm mute and let ring {#palm-mute}
 
-Palm mute (`P.M.`) and let ring (`L.R.`) render as bracketed labels above the affected beats, showing exactly where the technique starts and stops.
+Palm mute (`P.M.`) — the muted-percussive strum common in metal riffs, punk, and funk — and let ring (`L.R.`) — the sustain instruction that keeps preceding notes ringing under new ones — render as bracketed labels above the affected beats, showing exactly where each technique starts and stops.
 
 <AlphaTab file="/files/features/PalmMute.gp5" />
 
@@ -40,13 +40,13 @@ Palm mute (`P.M.`) and let ring (`L.R.`) render as bracketed labels above the af
 
 ## Taps, slaps, and pops {#tap}
 
-Bass slap technique — thumb slaps (`S`), pops (`P`), and left-hand taps (`T`) — renders as letter markers above the notes. Two-handed tapping shares the same `T` notation.
+Bass slap technique drives funk and slap-metal grooves: thumb slaps (`S`), string pops (`P`), and left-hand taps (`T`) render as letter markers above the notes. Two-handed tapping — the shred technique popularised by Van Halen — shares the same `T` notation.
 
 <AlphaTab file="/files/features/Tap.gp5" />
 
 ## Dead slap {#dead-slap}
 
-A dead slap is a percussive strike across all strings with the fretting hand muted. alphaTab draws it as a stack of dead-note heads (`x`) on every string.
+A dead slap is a percussive strike across all strings with the fretting hand muted, often used on flamenco and funk rhythm guitar. alphaTab draws it as a stack of dead-note heads (`x`) on every string.
 
 <AlphaTab tex="true">{`
 ().4 {ds} ().4 {ds}
@@ -54,31 +54,31 @@ A dead slap is a percussive strike across all strings with the fretting hand mut
 
 ## Tremolo picking {#tremolo-picking}
 
-Tremolo picking — rapid repetition of a single note — renders as slashes through the stem, matching engraving conventions of the standard notation staff.
+Tremolo picking — rapid repetition of a single note, common on surf-rock leads and Iberian classical guitar — renders as slashes through the stem, matching the engraving convention of the standard notation staff.
 
 <AlphaTab file="/files/features/TremoloPicking.gp5" />
 
 ## Slides, hammer-ons, and pull-offs {#slides}
 
-Slide-in, slide-out, legato, and shift slides all render as slanted lines between fret positions. Hammer-ons and pull-offs render as curved slurs joining the linked notes.
+Slides move the fretting finger to a new position while the note rings; hammer-ons and pull-offs sound a new pitch from the fretting hand alone. alphaTab draws slide-in, slide-out, legato, and shift slides as slanted lines between fret positions, and hammer-ons and pull-offs as curved slurs joining the linked notes.
 
 <AlphaTab file="/files/features/Slides.gp5" />
 
 ## Trills {#trills}
 
-Trills render with a `tr` glyph above the notation staff and a wavy line indicating the duration.
+Trills — the fast alternation between the written note and the pitch above it, a staple ornament from Baroque violin to modern lead guitar — render with a `tr` glyph above the notation staff and a wavy line indicating the duration.
 
 <AlphaTab file="/files/features/Trill.gp5" />
 
 ## Pick strokes {#pick-stroke}
 
-Downstroke (`⊓`) and upstroke (`V`) pick-direction markers render above the beat on the tab staff.
+Downstroke (`⊓`) and upstroke (`V`) pick-direction markers tell a reader which way to strum each beat, useful for teaching charts where alternate picking or a strict downstroke pattern is the point.
 
 <AlphaTab file="/files/features/PickStroke.gp5" />
 
 ## Fade-in and volume swells {#fade}
 
-Fade-in and volume-swell markers render as text annotations paired with hairpins over the affected beats.
+Fade-in and volume-swell markers — the volume-pedal or pinkie-wheel swell used on ambient guitar leads — render as text annotations paired with hairpins over the affected beats.
 
 <AlphaTab file="/files/features/FadeIn.gp5" />
 
@@ -91,7 +91,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   notation: {
     elements: new Map([
       [alphaTab.NotationElement.EffectPalmMute, false],
@@ -106,5 +106,8 @@ const api = new alphaTab.AlphaTabApi(container, {
 ## Where to look next
 
 - [Toggling notation elements off](./coverage-toggle-elements) — hide any effect category globally.
+- [Special notes](./coverage-special-notes) — the sibling coverage page for harmonics, ghost notes, and tied notes.
+- [Grace notes, tuplets, and ornaments](./coverage-grace-tuplets-ornaments) — trills, mordents, and turns share the ornament territory with articulations here.
 - [`notation.elements`](/docs/reference/settings/notation/elements) — the full element map.
 - [`notation.notationMode`](/docs/reference/settings/notation/notationmode) — switch between Guitar Pro and SongBook conventions for how these effects are drawn.
+- [`NotationElement`](/docs/reference/types/notationelement) — every togglable element key.

@@ -11,7 +11,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-Slash notation replaces pitched noteheads with rhythm slashes on a single-line staff — the standard shorthand for chord-comping parts.
+Slash notation replaces pitched noteheads with rhythm slashes on a single-line staff — the standard shorthand for chord-comping parts. Use it for rhythm charts where the guitarist or pianist voices chords by feel, or for backing parts in an ensemble score where fret-exact notation would clutter more than it communicates.
 
 <AlphaTab tex={true}>{`
 \\bracketextendmode nobrackets
@@ -39,7 +39,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/chart.gp' },
+  core: { file: '/scores/song.gp' },
 });
 
 api.scoreLoaded.on((score) => {

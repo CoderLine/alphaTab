@@ -14,7 +14,7 @@ keywords:
 import { AlphaTab } from '@site/src/components/AlphaTab';
 import { BoundedScoreFrame } from '@site/src/components/BoundedScoreFrame';
 
-Parchment layout lays bars out page-style but honors the systems layout embedded in the source file — the row breaks and relative bar widths the engraver chose in Guitar Pro. Reach for it when you want the score to look the way the author intended, not the way alphaTab would pack it.
+Parchment layout lays bars out page-style but honors the systems layout embedded in the source file — the row breaks and relative bar widths the engraver chose in Guitar Pro. Reach for it when publishing method books, songbooks, or educational material where the author's line breaks *are* the story — a phrase intentionally left on its own row, a coda pinned to a fresh system. The alternative — letting alphaTab re-pack the bars — would silently rewrite that engraving choice.
 
 <BoundedScoreFrame>
   <AlphaTab tex={true} settings={{ display: { layoutMode: 'parchment', systemsLayoutMode: 'UseModelLayout' } }}>{`
@@ -60,7 +60,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   display: {
     layoutMode: alphaTab.LayoutMode.Parchment,
   },

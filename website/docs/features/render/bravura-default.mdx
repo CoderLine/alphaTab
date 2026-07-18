@@ -12,7 +12,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-alphaTab ships with [Bravura](https://github.com/steinbergmedia/bravura), Steinberg's SMuFL reference font, wired up out of the box.
+alphaTab ships with [Bravura](https://github.com/steinbergmedia/bravura), Steinberg's SMuFL reference font, wired up out of the box. Every notehead, clef, accidental, and dynamic in the score is drawn from this font — and because Bravura covers the full SMuFL glyph range, alphaTab renders correctly without any font configuration on your side.
 
 <AlphaTab tex={true}>{`
 \\title "Bravura at work"
@@ -39,7 +39,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
 });
 ```
 
@@ -50,5 +50,7 @@ Override `core.fontDirectory` if your bundler places the font files somewhere el
 ## Where to look next
 
 - [Using a custom music font](/docs/features/render/custom-smufl-fonts) — swap Bravura for another SMuFL font.
+- [Custom fonts on Skia](/docs/features/render/custom-fonts-on-skia) — the .NET / Android equivalent of the `@font-face` step.
+- [`core.fontDirectory`](/docs/reference/settings/core/fontdirectory) and [`core.smuflFontSources`](/docs/reference/settings/core/smuflfontsources) reference entries.
 - [Bravura on GitHub](https://github.com/steinbergmedia/bravura) — the source font and license.
 - [SMuFL specification](https://www.smufl.org/) — the standard alphaTab implements.

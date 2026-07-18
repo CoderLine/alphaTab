@@ -15,7 +15,7 @@ keywords:
 
 import { Gp7ExporterDemo } from '@site/src/components/Gp7ExporterDemo';
 
-`Gp7Exporter` writes a loaded `Score` back to the Guitar Pro 7 / 8 container format. Point it at `api.score` and `api.settings`, and it hands you a `Uint8Array` ready to persist, upload, or offer as a download.
+Let a user edit a score inside your app and hand them back a `.gp` file they can open in Guitar Pro. Convert an imported MusicXML archive into the format guitarists actually share. Save the currently loaded arrangement to your backend as a Guitar Pro container. `Gp7Exporter` covers each of those flows — point it at `api.score` and `api.settings`, and it returns a `Uint8Array` ready to persist, upload, or offer as a download.
 
 <Gp7ExporterDemo showCode={false} />
 
@@ -35,17 +35,18 @@ api.scoreLoaded.on(() => {
   const exporter = new alphaTab.exporter.Gp7Exporter();
   const data = exporter.export(api.score, api.settings);
 
-  const fileName = api.score.title
-    ? `${api.score.title}.gp`
-    : 'Untitled.gp';
+  const fileName = (api.score.title || 'Untitled') + '.gp';
+  const url = URL.createObjectURL(
+    new Blob([data], { type: 'application/octet-stream' })
+  );
 
   const a = document.createElement('a');
   a.download = fileName;
-  a.href = URL.createObjectURL(new Blob([data], { type: 'application/octet-stream' }));
+  a.href = url;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(a.href);
+  URL.revokeObjectURL(url);
 });
 ```
 
@@ -66,4 +67,5 @@ Guitar Pro 7 and Guitar Pro 8 both open the resulting file. Any GP8-only additio
 
 - [Export to alphaTex](export-to-alphatex) — write the score as text instead of a binary container.
 - [Score to JSON and back](score-to-json) — round-trip the in-memory model for storage or transport.
-- [`Gp7Exporter`](/docs/reference/types/exporter/gp7exporter) in the API reference.
+- [`api.score`](/docs/reference/api/score) and [`api.settings`](/docs/reference/api/settings) — the inputs the exporter reads.
+- [`Gp7Exporter`](/docs/reference/types/exporter/gp7exporter) and its base [`ScoreExporter`](/docs/reference/types/exporter/scoreexporter) in the API reference.

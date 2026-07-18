@@ -12,7 +12,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-Every piece of text alphaTab draws around the notation — titles, tempo marks, chord names, lyrics, fingerings — reads its font from `display.resources`.
+Every piece of text alphaTab draws around the notation — titles, tempo marks, chord names, lyrics, fingerings — reads its font from `display.resources`. Configure it to match a corporate typography brief, to use a language-specific font for lyric text (a CJK font for Mandarin lyrics, a serif with proper Cyrillic support for a Russian song), or to give a publishing catalogue a consistent visual voice across every score.
 
 <AlphaTab
   tex={true}
@@ -68,7 +68,7 @@ import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   display: {
     resources: {
       titleFont: 'bold 34px "Playfair Display", Georgia, serif',
