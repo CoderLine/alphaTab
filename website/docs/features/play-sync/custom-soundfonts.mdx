@@ -10,19 +10,14 @@ keywords:
   - SF2
 ---
 
-import { SoundFontSwitcher } from '@site/src/components/PlaySync';
+import { SoundFontSwitcher, Riffs } from '@site/src/components/PlaySync';
 
 The bundled Sonivox SoundFont covers General MIDI but is deliberately small. When the score needs a Steinway rather than a GM piano, a metal amp emulation rather than a clean guitar, or a rock drum kit rather than the stock kick and snare, swap in a purpose-built `.sf2` file. The synth pipeline stays identical — only the sample bank changes.
 
+The score below is the opening bars of Beethoven's *Ode to Joy* voiced as a chord-melody — long, sustained notes give the sample bank room to speak. Toggle the SoundFont to hear the same MIDI events re-rendered through a different bank.
+
 <SoundFontSwitcher
-  tex={`\\title "Timbre showcase"
-\\tempo 84
-.
-\\track "Guitar"
-:4 0.3 :8 2.3 3.3 :4 2.3 :8 0.3 2.3 :4 3.3 |
-:4 0.2 :8 1.2 3.2 :4 1.2 :8 0.2 1.2 :4 3.2 |
-:4 0.1 :8 3.1 0.1 :4 3.1 :8 0.1 3.1 :4 0.1 |
-:1 (0.3 0.2 0.1) |`}
+  tex={Riffs.ODE_TO_JOY}
   options={[
     { label: 'Sonivox (bundled default)' },
     { label: 'Sonivox MuseScore variant', url: '/files/sonivox_musescore.sf2' },
@@ -30,7 +25,7 @@ The bundled Sonivox SoundFont covers General MIDI but is deliberately small. Whe
   showCode={false}
 />
 
-Pick either preset to hear the score re-render through a different SoundFont. The two options in the demo are compact Sonivox variants the docs can ship in-repo — the difference is subtle but real. In your own app you would swap in a full-size orchestral or genre-specific SoundFont; the samples below cover both the URL and the bytes-based load paths.
+Both files in this demo are compact Sonivox variants the docs can ship in-repo, so the difference is deliberately subtle — a light stereo image, slightly warmer piano tone. The point is the swap, not the drama. In your own app you would drop in a full orchestral or genre-specific SoundFont for a much more dramatic timbre change; the code paths below cover both URL and bytes-based loads regardless of the file's size.
 
 ## Two ways to load one
 

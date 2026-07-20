@@ -10,12 +10,14 @@ keywords:
   - triplet feel
 ---
 
-import { ToggleSettingDemo } from '@site/src/components/PlaySync';
+import { ToggleSettingDemo, Riffs } from '@site/src/components/PlaySync';
 
 Jazz charts are traditionally notated in straight eighths and swung at performance time — the shuffle lives in the player, not the page. Guitar Pro files carry a triplet-feel marker per section (8ths, 16ths, dotted, or Scottish) and alphaTab honors those markers at playback time, turning straight eighths into swung eighths without touching the notation on screen. Flip the toggle off to hear exactly what is written; flip it on to hear how it should feel.
 
+The score below is a four-bar blues shuffle in A — a root/5th/6th/5th eighth-note figure over the classic I–IV–I–V changes. Every beat is a pair of straight eighth notes, which is exactly what triplet-feel needs to convert into a shuffle.
+
 <ToggleSettingDemo
-  file="/files/features/TripletFeel.gp5"
+  tex={Riffs.BLUES_SHUFFLE_A}
   settingPath="player.playTripletFeel"
   label="Swing (playTripletFeel)"
   onValue={true}
