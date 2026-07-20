@@ -13,25 +13,13 @@ keywords:
   - external media
 ---
 
-import { TransportControls } from '@site/src/components/PlaySync';
+import { ExternalMediaSample } from '@site/src/components/ExternalMediaSample';
 
 A YouTube guitar lesson synced to a printable score — the video plays and the notation scrolls alongside — has become a standard learning format. Video sync uses the same infrastructure as backing-track audio, with one twist: alphaTab does not own the media element. You implement `IExternalMediaHandler`, alphaTab calls it for play, pause, seek, volume, and playback rate, and you feed the current time back through `player.output.updatePosition`. The same handler shape drives an HTML5 `<video>` tag and the YouTube IFrame Player API alike.
 
-:::note Live video demo not shipped here
-No matching video asset lives in the docs bundle yet. The transport below plays the synthesized version; the code sample further down is the actual `<video>`-driven wiring. The [backing-track-audio](./backing-track-audio) page runs the audio variant of the same pipeline live.
-:::
+The demo below pairs the Bach BWV 999 score with a matching MP4 whose visualization is generated from the same audio stream — the on-screen waveform *is* the sound you hear, so nothing drifts between what you see and what plays. Press play on the video; the alphaTab cursor tracks the video's clock via the external-media handler shown further down.
 
-<TransportControls
-  tex={`\\title "Video pair"
-\\tempo 96
-.
-\\track "Guitar"
-:4 5.3 7.3 5.3 3.3 |
-:2 2.3 :4 3.3 5.3 |
-:4 7.3 5.3 3.3 5.3 |
-:1 (0.3 2.2 3.1) |`}
-  showCode={false}
-/>
+<ExternalMediaSample mediaType="video" showCode={false} />
 
 ## The two-way contract
 

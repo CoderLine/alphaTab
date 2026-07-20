@@ -17,7 +17,7 @@ Lyrics render below the staff with each syllable positioned under the beat it be
 
 Each lyric syllable sits under its target beat — the way songbook vocal lines are typeset so a singer reads word and melody at the same glance. Hyphens between syllables indicate a continuation across beats, and underscores extend a syllable across held notes.
 
-<AlphaTab tex="true">{`
+<AlphaTab tex={true}>{`
 \\track "Vocals"
 \\lyrics "Hel-lo world this is al-pha-Tab sing-ing a-long"
 :4 C4 D4 E4 F4 | G4 A4 B4 C5 | C5 B4 A4 G4 | F4 E4 D4 C4
@@ -27,7 +27,7 @@ Each lyric syllable sits under its target beat — the way songbook vocal lines 
 
 Multiple verses stack below the staff, one line per verse — the way hymnals and folk songbooks fit two, three, or four sets of words under a single melodic line. alphaTab preserves the order the source file provides. Pass extra strings to alphaTex's `\lyrics` directive to add verses.
 
-<AlphaTab tex="true">{`
+<AlphaTab tex={true}>{`
 \\track "Vocals"
 \\lyrics "Verse one syl-la-bles here"
 \\lyrics "Verse two matches the beats"
@@ -38,7 +38,7 @@ Multiple verses stack below the staff, one line per verse — the way hymnals an
 
 Lyrics use a dedicated font entry so a chart can restyle them without touching the rest of the score — the typical case for a hymnal that pairs a serif melody with a large sans-serif lyric line. Point `display.resources.wordsFont` at any registered family to change size, weight, or face.
 
-<AlphaTab tex="true"
+<AlphaTab tex={true}
   settings={ { display: { resources: { wordsFont: '20px "Georgia", serif' } } } }
 >{`
 \\track "Vocals"

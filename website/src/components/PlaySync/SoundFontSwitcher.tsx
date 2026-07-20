@@ -12,25 +12,42 @@ import styles from './styles.module.scss';
 
 export interface SoundFontOption {
   label: string;
-  url?: string; // undefined = bundled sonivox
+  /** URL of the SoundFont file. Omit to reset to the bundled default. */
+  url?: string;
 }
 
 export interface SoundFontSwitcherProps {
   file?: string;
   tex?: string;
+  /**
+   * Preset SoundFonts the reader can pick from. The default option (no
+   * `url`) resets to the bundled font shipped with the synth.
+   */
   options?: SoundFontOption[];
+  /**
+   * Show a text input for a user-supplied SoundFont URL. Handy for
+   * `custom-soundfonts` where the reader wants to test their own file.
+   */
+  allowCustomUrl?: boolean;
+  /**
+   * Load each button additively via `loadSoundFont(url, true)`. Used on the
+   * `combining-multiple-soundfonts` page where each click layers another
+   * bank on top of what is already loaded.
+   */
   append?: boolean;
   showCode?: boolean;
 }
 
 const DEFAULT_OPTIONS: SoundFontOption[] = [{ label: 'Sonivox (bundled)' }];
 
-const SoundFontControls: React.FC<{ options: SoundFontOption[]; append: boolean }> = ({
-  options,
-  append,
-}) => {
+const SoundFontControls: React.FC<{
+  options: SoundFontOption[];
+  allowCustomUrl: boolean;
+  append: boolean;
+}> = ({ options, allowCustomUrl, append }) => {
   const api = useAlphaTabApi();
   const [selected, setSelected] = useState(0);
+  const [customUrl, setCustomUrl] = useState('');
   const [status, setStatus] = useState('bundled Sonivox active');
   const [loading, setLoading] = useState(false);
 
@@ -38,29 +55,33 @@ const SoundFontControls: React.FC<{ options: SoundFontOption[]; append: boolean 
     'soundFontLoaded',
     () => {
       setLoading(false);
-      setStatus(`${options[selected].label} loaded`);
+      setStatus((prev) => prev.replace('loading ', 'loaded: '));
     },
-    [options, selected],
+    [],
   );
 
-  const loadFont = async (index: number) => {
-    setSelected(index);
-    const opt = options[index];
+  const loadFromUrl = async (url: string, label: string) => {
     if (!api) return;
-    if (!opt.url) {
-      // bundled — reset to defaults
-      api.resetSoundFonts();
-      setStatus('bundled Sonivox active');
-      return;
-    }
     setLoading(true);
-    setStatus(`loading ${opt.label}…`);
+    setStatus(`loading ${label}…`);
     try {
-      api.loadSoundFont(opt.url, append);
+      api.loadSoundFont(url, append);
     } catch (err) {
       setLoading(false);
       setStatus(`load failed: ${(err as Error).message}`);
     }
+  };
+
+  const chooseOption = (index: number) => {
+    setSelected(index);
+    const opt = options[index];
+    if (!api) return;
+    if (!opt.url) {
+      api.resetSoundFonts();
+      setStatus('bundled Sonivox active');
+      return;
+    }
+    void loadFromUrl(opt.url, opt.label);
   };
 
   const isSingle = options.length === 1;
@@ -73,7 +94,7 @@ const SoundFontControls: React.FC<{ options: SoundFontOption[]; append: boolean 
             <button
               key={i}
               className={styles.mixerBtn}
-              onClick={() => loadFont(i)}
+              onClick={() => chooseOption(i)}
               disabled={loading || !opt.url}
             >
               {opt.url ? `Load ${opt.label}` : opt.label}
@@ -85,7 +106,7 @@ const SoundFontControls: React.FC<{ options: SoundFontOption[]; append: boolean 
           SoundFont:
           <select
             value={selected}
-            onChange={(e) => loadFont(parseInt(e.target.value, 10))}
+            onChange={(e) => chooseOption(parseInt(e.target.value, 10))}
             disabled={loading || isSingle}
           >
             {options.map((opt, i) => (
@@ -96,6 +117,25 @@ const SoundFontControls: React.FC<{ options: SoundFontOption[]; append: boolean 
           </select>
         </label>
       )}
+      {allowCustomUrl && (
+        <div className={styles.fieldRow}>
+          <input
+            type="url"
+            placeholder="https://example.com/your.sf2"
+            value={customUrl}
+            onChange={(e) => setCustomUrl(e.target.value)}
+            disabled={loading}
+            style={{ flex: 1, minWidth: 240 }}
+          />
+          <button
+            className={styles.mixerBtn}
+            onClick={() => customUrl && loadFromUrl(customUrl, 'custom URL')}
+            disabled={loading || !customUrl}
+          >
+            Load URL
+          </button>
+        </div>
+      )}
       <span className={styles.badge}>{status}</span>
     </div>
   );
@@ -105,6 +145,7 @@ export const SoundFontSwitcher: React.FC<SoundFontSwitcherProps> = ({
   file,
   tex,
   options = DEFAULT_OPTIONS,
+  allowCustomUrl = false,
   append = false,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showCode = true,
@@ -112,7 +153,11 @@ export const SoundFontSwitcher: React.FC<SoundFontSwitcherProps> = ({
   <div className={styles.wrapper}>
     <AlphaTabPlayer file={file} tex={tex}>
       <TransportBar />
-      <SoundFontControls options={options} append={append} />
+      <SoundFontControls
+        options={options}
+        allowCustomUrl={allowCustomUrl}
+        append={append}
+      />
       <AlphaTabCanvas />
     </AlphaTabPlayer>
   </div>

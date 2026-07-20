@@ -76,6 +76,9 @@ const LoopControls: React.FC = () => {
     const endMb = api.score.masterBars[e];
     const endTick = endMb.start + endMb.calculateDuration();
     api.playbackRange = { startTick, endTick } as alphaTab.synth.PlaybackRange;
+    // Programmatic playbackRange changes do not seek the cursor; do it
+    // explicitly so the reader sees the cursor land on the loop start.
+    api.tickPosition = startTick;
     const startBeat = firstBeatOfBar(api.score, s);
     const endBeat = lastBeatOfBar(api.score, e);
     if (startBeat && endBeat) {

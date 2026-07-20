@@ -19,17 +19,18 @@ import { CursorToggleDemo } from '@site/src/components/CursorToggleDemo';
 Matching the cursor to a brand color, softening the animation for readers with `prefers-reduced-motion`, tuning the highlight to sit well against a dark theme — all of it happens in your own CSS. On the Web platform the cursor and highlight overlays are regular DOM elements tagged with stable class names. Pick a theme in the demo below to see the classes swap under three different stylesheets, and toggle the beat-cursor animation to compare a smooth slide against a hard per-beat tick.
 
 <CursorToggleDemo showThemeToggle showAnimationToggle showCode={false} tex={`
-\\title "Cursor themes"
+\\title "C major etude"
 \\tempo 104
 .
 \\track "Guitar"
-:4 5.4 7.3 8.3 10.3 | :8 12.3 10.3 8.3 7.3 :4 5.4 3.4 |
-:4 2.4 3.4 5.4 7.3 | :8 8.3 7.3 5.4 3.4 :4 2.4 0.4 |
-:4 3.4 5.4 7.3 8.3 | :8 10.3 12.3 10.3 8.3 :4 7.3 5.4 |
-:4 3.4 5.4 8.3 7.3 | :8 5.4 3.4 2.4 3.4 :4 5.4 7.3 |
-:4 8.3 10.3 12.3 14.2 | :8 12.3 10.3 8.3 7.3 :4 5.4 3.4 |
-:4 5.4 7.3 8.3 10.3 | :8 8.3 7.3 5.4 3.4 :4 2.4 3.4 |
-:2 5.4 3.4 | :1 (0.4 3.3 5.2) |
+:8 3.5 5.5 :4 0.4 2.4 :8 3.4 5.4 :4 0.3 |
+:8 0.3 2.3 :4 5.3 0.2 :8 1.2 3.2 :4 0.1 |
+:4 (3.5 2.4 0.3 1.2 0.1) :8 3.5 2.4 :4 0.3 1.2 |
+:4 (0.4 2.3 3.2 1.1) :8 0.4 2.3 :4 3.2 1.1 |
+:4 (0.5 2.4 2.3 1.2 0.1) :8 0.5 2.4 :4 2.3 1.2 |
+:4 (3.6 2.5 0.4 0.3 0.2 3.1) :8 3.6 2.5 :4 0.4 0.3 |
+:8 0.3 2.3 5.3 2.3 :4 0.3 :8 1.2 0.2 :4 0.1 |
+:1 (3.5 2.4 0.3 1.2 0.1) |
 `} />
 
 ## The four classes

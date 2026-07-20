@@ -19,6 +19,13 @@ export interface ToggleSettingDemoProps {
   offValue: unknown;
   defaultOn?: boolean;
   reRender?: boolean;
+  /**
+   * Reload the score after applying the setting change. Required for
+   * settings that alphaTab reads only at parse time — most notably
+   * `notation.notationMode`, which the renderer cannot switch mid-flight
+   * without producing stale beat bounds.
+   */
+  reload?: boolean;
   showCode?: boolean;
 }
 
@@ -42,21 +49,36 @@ const ToggleControls: React.FC<{
   offValue: unknown;
   defaultOn: boolean;
   reRender: boolean;
-}> = ({ settingPath, label, onValue, offValue, defaultOn, reRender }) => {
+  reload: boolean;
+  file?: string;
+  tex?: string;
+}> = ({
+  settingPath,
+  label,
+  onValue,
+  offValue,
+  defaultOn,
+  reRender,
+  reload,
+  file,
+  tex,
+}) => {
   const controls = useAlphaTabControls();
-  const api = useAlphaTabApi();
   const [on, setOn] = useState(defaultOn);
+  const isInitialRender = React.useRef(true);
 
   useEffect(() => {
     if (!controls) return;
     const patch = patchFromPath(settingPath, on ? onValue : offValue);
     controls.updateSettings(patch);
-    if (reRender && api?.score) {
-      // updateSettings via the store already re-renders when a score is
-      // loaded, so `reRender` is effectively always honored — kept as a
-      // prop for API compatibility.
+    // On the first mount the score is loaded fresh with the seed settings, so
+    // we only need to reload for subsequent toggles.
+    if (reload && !isInitialRender.current) {
+      if (tex) controls.loadScoreFromTex(tex);
+      else if (file) void controls.loadScoreFromUrl(file);
     }
-  }, [controls, api, on, settingPath, onValue, offValue, reRender]);
+    isInitialRender.current = false;
+  }, [controls, on, settingPath, onValue, offValue, reload, tex, file]);
 
   return (
     <div className={styles.extras}>
@@ -81,14 +103,18 @@ export const ToggleSettingDemo: React.FC<ToggleSettingDemoProps> = ({
   offValue,
   defaultOn = true,
   reRender = false,
+  reload = false,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showCode = true,
 }) => {
-  const resolvedFile = tex ? undefined : file ?? '/files/canon.gp';
+  const initialSetting = React.useMemo(
+    () => patchFromPath(settingPath, defaultOn ? onValue : offValue),
+    [settingPath, defaultOn, onValue, offValue],
+  );
 
   return (
     <div className={styles.wrapper}>
-      <AlphaTabPlayer file={resolvedFile} tex={tex}>
+      <AlphaTabPlayer file={file} tex={tex} settings={initialSetting}>
         <TransportBar />
         <ToggleControls
           settingPath={settingPath}
@@ -97,6 +123,9 @@ export const ToggleSettingDemo: React.FC<ToggleSettingDemoProps> = ({
           offValue={offValue}
           defaultOn={defaultOn}
           reRender={reRender}
+          reload={reload}
+          file={file}
+          tex={tex}
         />
         <AlphaTabCanvas />
       </AlphaTabPlayer>

@@ -1,19 +1,21 @@
 ---
-title: "SoundFont2 with TinySoundFont"
-description: "How alphaTab makes sound, the bundled SoundFont, the synth pipeline."
+title: "SoundFont 2 synthesizer"
+description: "The built-in MIDI synthesizer that turns scores into audio, powered by SoundFont 2 samples."
 sidebar_custom_props:
   feature_chapter: synthesis
   feature_order: 10
 keywords:
   - alphaTab
   - SoundFont
-  - TinySoundFont
   - synth
+  - MIDI
 ---
 
 import { TransportControls } from '@site/src/components/PlaySync';
 
-Every note you hear from alphaTab is synthesized on the fly — there are no pre-rendered instrument recordings in the box. alphaTab converts the score into MIDI, feeds that stream to an embedded software synth, and mixes the synth output into your platform's audio backend. The synth is a port of [TinySoundFont](https://github.com/schellingb/TinySoundFont), which renders any SoundFont 2 (`.sf2`) file into PCM in real time. Swap in a high-quality sampled piano, a genre-tuned drum kit, or a guitar amp emulation and the same pipeline produces very different audio.
+Every note you hear from alphaTab is synthesized on the fly — there are no pre-rendered instrument recordings in the box. alphaTab converts the score into MIDI, feeds that stream to a built-in software synthesizer that plays samples from a SoundFont 2 (`.sf2`) file, and mixes the synth output into the platform's audio backend. Swap in a high-quality sampled piano, a genre-tuned drum kit, or a guitar amp emulation and the same pipeline produces very different audio.
+
+The current synthesizer implementation is derived from [TinySoundFont](https://github.com/schellingb/TinySoundFont) — a huge thanks to Bernhard Schelling and the TinySoundFont contributors whose work made the initial synth possible. A next-generation synthesizer is in active development; both share the same public API surface, so anything on this page continues to hold when the new engine ships.
 
 <TransportControls
   tex={`\\title "Synth pipeline"

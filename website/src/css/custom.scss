@@ -429,3 +429,11 @@ body.playground {
 .theme-doc-sidebar-menu .menu__list-item > .sidebar-hidden {
   display: none;
 }
+
+// Infima's prose rule `.markdown li + li { margin-top: var(--ifm-list-item-margin); }`
+// applies to every non-first list item inside `.markdown`, including flex-row
+// pill selectors used across the demo components. In a flex row that shows up
+// as the first pill floating higher than the rest. Reset it here.
+.pills .pills__item {
+  margin-top: 0;
+}

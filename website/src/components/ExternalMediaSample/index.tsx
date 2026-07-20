@@ -9,53 +9,61 @@ import CodeBlock from '@theme/CodeBlock';
 import styles from './styles.module.scss';
 
 export type ExternalMediaSampleProps = {
+    /** Which media element to use for the sync source. Defaults to `'audio'`. */
+    mediaType?: 'audio' | 'video';
+    /** URL of the media file. Defaults to the bundled Bach recording. */
+    mediaSrc?: string;
+    /** URL of the score to render. Defaults to the bundled Bach score. */
+    scoreFile?: string;
     /** Render a copy-pasteable code block below the demo. Defaults to `true`. */
-    showCode?: boolean
+    showCode?: boolean;
 }
 
-const ExternalMediaBridge: React.FC<{ audio: React.RefObject<HTMLAudioElement | null> }> = ({ audio }) => {
+const ExternalMediaBridge: React.FC<{
+    media: React.RefObject<HTMLMediaElement | null>;
+}> = ({ media }) => {
     const api = useAlphaTabApi();
     const updateTimer = useRef<number>(0);
 
     useEffect(() => {
-        if (!api || !audio.current) return;
-        const audioEl = audio.current;
+        if (!api || !media.current) return;
+        const el = media.current;
 
-        // alphaTab works in milliseconds while HTML5 audio works with seconds
+        // alphaTab works in milliseconds while HTML5 media elements work in seconds
 
-        // handler for alphaTab -> audio tag updates
+        // handler for alphaTab -> media element updates
         const handler: alphaTab.synth.IExternalMediaHandler = {
             get backingTrackDuration() {
-                const duration = audioEl.duration ?? 0;
+                const duration = el.duration ?? 0;
                 return Number.isFinite(duration) ? duration * 1000 : 0;
             },
             get playbackRate() {
-                return audioEl.playbackRate ?? 1;
+                return el.playbackRate ?? 1;
             },
             set playbackRate(value) {
-                audioEl.playbackRate = value;
+                el.playbackRate = value;
             },
             get masterVolume() {
-                return audioEl.volume ?? 1;
+                return el.volume ?? 1;
             },
             set masterVolume(value) {
-                audioEl.volume = value;
+                el.volume = value;
             },
             seekTo(time) {
-                audioEl.currentTime = (time * audioEl.playbackRate) / 1000;
+                el.currentTime = (time * el.playbackRate) / 1000;
             },
             play() {
-                audioEl.play();
+                el.play();
             },
             pause() {
-                audioEl.pause();
+                el.pause();
             },
         };
 
-        // handlers for audio tag -> alphaTab updates
+        // handlers for media element -> alphaTab updates
         const onTimeUpdate = () => {
             (api.player!.output as alphaTab.synth.IExternalMediaSynthOutput).updatePosition(
-                (audioEl.currentTime / audioEl.playbackRate) * 1000,
+                (el.currentTime / el.playbackRate) * 1000,
             );
         };
 
@@ -74,126 +82,117 @@ const ExternalMediaBridge: React.FC<{ audio: React.RefObject<HTMLAudioElement | 
             window.clearInterval(updateTimer.current);
         };
         const onVolumeChange = () => {
-            api.masterVolume = audioEl.volume;
+            api.masterVolume = el.volume;
         };
         const onRateChange = () => {
-            api.playbackSpeed = audioEl.playbackRate;
+            api.playbackSpeed = el.playbackRate;
         };
 
-        audioEl.addEventListener('timeupdate', onTimeUpdate);
-        audioEl.addEventListener('seeked', onSeeked);
-        audioEl.addEventListener('play', onPlay);
-        audioEl.addEventListener('pause', onPause);
-        audioEl.addEventListener('ended', onEnded);
-        audioEl.addEventListener('volumechange', onVolumeChange);
-        audioEl.addEventListener('ratechange', onRateChange);
+        el.addEventListener('timeupdate', onTimeUpdate);
+        el.addEventListener('seeked', onSeeked);
+        el.addEventListener('play', onPlay);
+        el.addEventListener('pause', onPause);
+        el.addEventListener('ended', onEnded);
+        el.addEventListener('volumechange', onVolumeChange);
+        el.addEventListener('ratechange', onRateChange);
 
         (api.player!.output as alphaTab.synth.IExternalMediaSynthOutput).handler = handler;
 
         return () => {
             window.clearInterval(updateTimer.current);
-            audioEl.removeEventListener('timeupdate', onTimeUpdate);
-            audioEl.removeEventListener('seeked', onSeeked);
-            audioEl.removeEventListener('play', onPlay);
-            audioEl.removeEventListener('pause', onPause);
-            audioEl.removeEventListener('ended', onEnded);
-            audioEl.removeEventListener('volumechange', onVolumeChange);
-            audioEl.removeEventListener('ratechange', onRateChange);
+            el.removeEventListener('timeupdate', onTimeUpdate);
+            el.removeEventListener('seeked', onSeeked);
+            el.removeEventListener('play', onPlay);
+            el.removeEventListener('pause', onPause);
+            el.removeEventListener('ended', onEnded);
+            el.removeEventListener('volumechange', onVolumeChange);
+            el.removeEventListener('ratechange', onRateChange);
         };
-    }, [api, audio]);
+    }, [api, media]);
 
     return null;
 };
 
-export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({ showCode = true }) => {
-    const audio = useRef<HTMLAudioElement>(null);
+const DEFAULT_SCORE = '/files/Bach_Prelude_BWV999.gp';
+const DEFAULT_AUDIO = '/files/Bach_Prelude_BWV999_original.ogg';
+const DEFAULT_VIDEO = '/files/features/Bach_Prelude_BWV999.mp4';
+
+export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({
+    mediaType = 'audio',
+    mediaSrc,
+    scoreFile = DEFAULT_SCORE,
+    showCode = true,
+}) => {
+    const audioRef = useRef<HTMLAudioElement>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const src = mediaSrc ?? (mediaType === 'video' ? DEFAULT_VIDEO : DEFAULT_AUDIO);
+    const mediaRef = mediaType === 'video' ? videoRef : audioRef;
 
     return (
         <div className={styles.wrapper}>
-            <audio ref={audio} src="/files/Bach_Prelude_BWV999_original.ogg" controls={true} autoPlay={false} />
+            {mediaType === 'video' ? (
+                <video ref={videoRef} src={src} controls playsInline className={styles.video} />
+            ) : (
+                <audio ref={audioRef} src={src} controls autoPlay={false} />
+            )}
             <AlphaTabPlayer
-                file="/files/Bach_Prelude_BWV999.gp"
+                file={scoreFile}
                 settings={{ player: { playerMode: 'EnabledExternalMedia' } }}
             >
-                <ExternalMediaBridge audio={audio} />
+                <ExternalMediaBridge media={mediaRef} />
                 <AlphaTabCanvas />
             </AlphaTabPlayer>
             {showCode && <CodeBlock language="typescript" title="TypeScript Code for this sample">
                 {[
-                    "const audio = document.querySelector('#audio-element');",
+                    `const media = document.querySelector('#${mediaType}-element');`,
                     "let updateTimer = 0;",
                     "",
                     "const settings = new alphaTab.Settings();",
                     "// enable the external media control",
                     "settings.player.playerMode = alphaTab.PlayerMode.EnabledExternalMedia;",
                     "",
-                    "const api= new alphaTab.AlphaTabApi('#element', settings);",
+                    "const api = new alphaTab.AlphaTabApi('#element', settings);",
                     "",
-                    "// Note: alphaTab works in milliseconds while HTML5 audio works with seconds",
+                    "// Note: alphaTab works in milliseconds while HTML5 media elements work in seconds",
                     "",
-                    "//",
-                    "// handler for alphaTab -> audio tag updates",
+                    "// handler for alphaTab -> media element updates",
                     "const handler: alphaTab.synth.IExternalMediaHandler = {",
                     "    get backingTrackDuration() {",
-                    "        const duration = audio.duration;",
+                    "        const duration = media.duration;",
                     "        return Number.isFinite(duration) ? duration * 1000 : 0;",
                     "    },",
-                    "    get playbackRate() {",
-                    "        return audio.playbackRate;",
-                    "    },",
-                    "    set playbackRate(value) {",
-                    "        audio.playbackRate = value;",
-                    "    },",
-                    "    get masterVolume() {",
-                    "        return audio.volume;",
-                    "    },",
-                    "    set masterVolume(value) {",
-                    "        audio.volume = value;",
-                    "    },",
+                    "    get playbackRate() { return media.playbackRate; },",
+                    "    set playbackRate(value) { media.playbackRate = value; },",
+                    "    get masterVolume() { return media.volume; },",
+                    "    set masterVolume(value) { media.volume = value; },",
                     "    seekTo(time) {",
-                    "        audio.currentTime = (time * audio.playbackRate) / 1000;",
+                    "        media.currentTime = (time * media.playbackRate) / 1000;",
                     "    },",
-                    "    play() {",
-                    "        audio.play();",
-                    "    },",
-                    "    pause() {",
-                    "        audio.pause();",
-                    "    }",
+                    "    play() { media.play(); },",
+                    "    pause() { media.pause(); },",
                     "};",
                     "(api.player!.output as alphaTab.synth.IExternalMediaSynthOutput).handler = handler;",
                     "",
-                    "//",
-                    "// handlers for audio tag -> alphaTab updates",
+                    "// media element -> alphaTab position updates",
                     "const onTimeUpdate = () => {",
                     "    (api.player!.output as alphaTab.synth.IExternalMediaSynthOutput).updatePosition(",
-                    "        (audio.currentTime / audio.playbackRate) * 1000",
+                    "        (media.currentTime / media.playbackRate) * 1000",
                     "    );",
-                    "}",
+                    "};",
                     "",
-                    "// time updates",
-                    "audio.addEventListener('timeupdate', onTimeUpdate);",
-                    "audio.addEventListener('seeked', onTimeUpdate);",
-                    "audio.addEventListener('play', () => {",
+                    "media.addEventListener('timeupdate', onTimeUpdate);",
+                    "media.addEventListener('seeked', onTimeUpdate);",
+                    "media.addEventListener('play', () => {",
                     "    window.clearInterval(updateTimer);",
-                    "    newApi.play();",
+                    "    api.play();",
                     "    updateTimer = window.setInterval(onTimeUpdate, 50);",
                     "});",
-                    "",
-                    "// state updates",
-                    "audio.addEventListener('pause', () => {",
-                    "    newApi.pause();",
-                    "    window.clearInterval(updateTimer.current);",
+                    "media.addEventListener('pause', () => {",
+                    "    api.pause();",
+                    "    window.clearInterval(updateTimer);",
                     "});",
-                    "audio.addEventListener('ended', () => {",
-                    "    newApi.pause();",
-                    "    window.clearInterval(updateTimer.current);",
-                    "});",
-                    "audio.addEventListener('volumechange', () => {",
-                    "    newApi.masterVolume = audio.volume;",
-                    "});",
-                    "audio.addEventListener('ratechange', () => {",
-                    "    newApi.playbackSpeed = audio.playbackRate;",
-                    "});",
+                    "media.addEventListener('volumechange', () => { api.masterVolume = media.volume; });",
+                    "media.addEventListener('ratechange', () => { api.playbackSpeed = media.playbackRate; });",
                 ].join('\n')}
             </CodeBlock>}
         </div>

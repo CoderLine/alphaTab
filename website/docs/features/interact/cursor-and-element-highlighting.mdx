@@ -17,23 +17,18 @@ import { CursorToggleDemo } from '@site/src/components/CursorToggleDemo';
 Showing a student where they are in a lesson, wiring the score to a chord chart, driving a lyrics rail — all three lean on the same three overlays. alphaTab paints a bar cursor, a beat cursor, and a per-beat SVG highlight that track the audio in real time. Press play to watch them follow the music, and flip the checkboxes to see each layer in isolation.
 
 <CursorToggleDemo showCode={false} tex={`
-\\title "Cursor tour"
+\\title "G major ballad"
 \\tempo 100
 .
 \\track "Guitar"
-:4 (0.6 3.4) (2.6 5.4) (3.6 7.4) (5.6 8.4) |
-:8 (7.6 8.4) (5.6 7.4) (3.6 5.4) (2.6 3.4) :4 (0.6 2.4) (3.6 5.4) |
-:4 (5.6 7.4) (3.6 5.4) (2.6 3.4) (0.6 2.4) |
-:8 (2.6 3.4) (3.6 5.4) (5.6 7.4) (7.6 8.4) :4 (5.6 7.4) (3.6 5.4) |
-:4 (5.6 7.4) (7.6 8.4) (8.6 10.4) (10.6 12.4) |
-:8 (12.6 14.4) (10.6 12.4) (8.6 10.4) (7.6 8.4) :4 (5.6 7.4) (3.6 5.4) |
-:4 (2.6 3.4) (3.6 5.4) (5.6 7.4) (7.6 8.4) |
-:2 (5.6 7.4) (3.6 5.4) |
-:4 (0.6 3.4) (2.6 5.4) (3.6 7.4) (5.6 8.4) |
-:8 (7.6 8.4) (8.6 10.4) (10.6 12.4) (8.6 10.4) :4 (7.6 8.4) (5.6 7.4) |
-:4 (3.6 5.4) (2.6 3.4) (0.6 2.4) (2.6 3.4) |
-:8 (3.6 5.4) (5.6 7.4) (7.6 8.4) (5.6 7.4) :4 (3.6 5.4) (2.6 3.4) |
-:1 (0.6 3.4) |
+:2 (3.6 2.5 0.4 0.3 0.2 3.1) :4 0.3 2.3 |
+:2 (0.4 2.3 3.2 2.1) :4 2.3 0.3 |
+:2 (0.6 2.5 2.4 0.3 0.2 0.1) :4 0.3 2.3 |
+:2 (3.5 2.4 0.3 1.2 0.1) :4 0.2 1.2 |
+:4 4.3 5.3 7.3 5.3 | :4 4.3 2.3 0.3 4.3 |
+:2 (3.6 2.5 0.4 0.3 0.2 3.1) :4 2.3 0.3 |
+:2 (0.4 2.3 3.2 2.1) :4 4.3 2.3 |
+:1 (3.6 2.5 0.4 0.3 0.2 3.1) |
 `} />
 
 ## The three overlays

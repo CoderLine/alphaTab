@@ -1,19 +1,27 @@
 .wrapper {
     display: block;
 
-    audio {
+    audio,
+    .video {
         width: 100%;
-        // Let the browser adapt the native audio controls to the active theme.
+        // Let the browser adapt the native audio/video controls to the active theme.
         color-scheme: light dark;
         border-radius: 6px;
         background: var(--ifm-background-surface-color);
     }
+
+    .video {
+        max-height: 420px;
+        margin-bottom: 0.5rem;
+    }
 }
 
-[data-theme="dark"] .wrapper audio {
+[data-theme="dark"] .wrapper audio,
+[data-theme="dark"] .wrapper .video {
     color-scheme: dark;
 }
 
-[data-theme="light"] .wrapper audio {
+[data-theme="light"] .wrapper audio,
+[data-theme="light"] .wrapper .video {
     color-scheme: light;
 }

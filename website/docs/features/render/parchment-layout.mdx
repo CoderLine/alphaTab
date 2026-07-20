@@ -17,7 +17,7 @@ import { BoundedScoreFrame } from '@site/src/components/BoundedScoreFrame';
 Parchment layout lays bars out page-style but honors the systems layout embedded in the source file — the row breaks and relative bar widths the engraver chose in Guitar Pro. Reach for it when publishing method books, songbooks, or educational material where the author's line breaks *are* the story — a phrase intentionally left on its own row, a coda pinned to a fresh system. The alternative — letting alphaTab re-pack the bars — would silently rewrite that engraving choice.
 
 <BoundedScoreFrame>
-  <AlphaTab tex={true} settings={{ display: { layoutMode: 'parchment', systemsLayoutMode: 'UseModelLayout' } }}>{`
+  <AlphaTab tex={true} settings={{ display: { layoutMode: 'parchment' } }}>{`
 \\title "Parchment layout"
 \\tempo 100
 .
@@ -44,14 +44,9 @@ Parchment consults per-track fields when a single track is rendered, and per-sco
 
 Prefix and postfix glyphs — clef, key signature, time signature, barlines — keep their natural width. `displayScale` distributes what's left of the row.
 
-## The switch that reads the source
+## Overriding the source layout
 
-The layout mode controls the storage; `display.systemsLayoutMode` controls whether alphaTab reads it:
-
-- `SystemsLayoutMode.Automatic` — alphaTab computes row breaks itself. This is the default for [Page layout](./page-layout).
-- `SystemsLayoutMode.UseModelLayout` — read the model fields listed above. Parchment sets this behavior implicitly.
-
-You can also mutate the model fields in a `scoreLoaded` handler to override what the file carried — useful when adapting an embedded layout for a smaller viewport.
+Mutate the model fields in a `scoreLoaded` handler to override what the file carried — useful when adapting an embedded layout for a smaller viewport or when authoring a layout for a score that ships without one.
 
 ## Show it in code
 
@@ -78,4 +73,4 @@ api.scoreLoaded.on((score) => {
 
 - [Page layout](./page-layout) — the automatic packing mode.
 - [Density and spacing](./density-and-spacing) — tune spacing when the model layout leaves you room to.
-- [`display.layoutMode`](/docs/reference/settings/display/layoutmode) and [`display.systemsLayoutMode`](/docs/reference/settings/display/systemslayoutmode) reference entries.
+- [`display.layoutMode`](/docs/reference/settings/display/layoutmode) and [`LayoutMode`](/docs/reference/types/layoutmode) reference entries.

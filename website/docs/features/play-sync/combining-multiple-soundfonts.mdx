@@ -10,24 +10,28 @@ keywords:
   - layered
 ---
 
-import { TransportControls } from '@site/src/components/PlaySync';
+import { SoundFontSwitcher } from '@site/src/components/PlaySync';
 import CodeBlock from '@theme/CodeBlock';
 
 Pair a rock drum kit with an acoustic guitar pack. Layer a percussion library over a melodic-instrument SoundFont. Pull the horns file only when the loaded score has a brass track. Any of these is a case for loading several SoundFonts side by side — alphaTab merges their preset banks into a single synth and you spend bandwidth only on the instruments the current score actually needs.
 
-<TransportControls
+<SoundFontSwitcher
   tex={`\\title "Layer target"
-\\tempo 96
+\\tempo 84
 .
 \\track "Guitar"
-:8 3.3 5.3 7.3 5.3 3.3 5.3 7.3 8.3 |
-:4 (3.3 5.2 5.1) (5.3 7.2 7.1) :2 (7.3 8.2 9.1) |
-:8 3.4 5.4 :4 7.4 :2 5.4 |
-:1 (3.5 5.4 5.3) |`}
+:2 (3.6 2.5 0.4 0.3 0.2 3.1) :2 (3.5 2.4 0.3 1.2 0.1) |
+:2 (0.5 2.4 2.3 1.2 0.1) :2 (0.4 2.3 3.2 2.1) |
+:2 (3.6 2.5 0.4 0.3 0.2 3.1) :2 (3.5 2.4 0.3 1.2 0.1) |
+:2 (0.5 2.4 2.3 1.2 0.1) :1 (0.4 2.3 3.2 2.1) |`}
+  options={[
+    { label: 'Append Sonivox MuseScore variant', url: '/files/sonivox_musescore.sf2' },
+  ]}
+  append={true}
   showCode={false}
 />
 
-The player above renders with the bundled Sonivox SoundFont — the same one the [custom SoundFonts](custom-soundfonts) page swaps out. The snippet below is what turns a single-load pipeline into a layered stack: every extra `loadSoundFont(bytes, /* append */ true)` call merges its presets into the running synth instead of replacing them.
+Start playback on the bundled Sonivox, then click **Append** — the second SoundFont merges its presets on top without dropping the first. Each `loadSoundFont(url, /* append */ true)` call layers, not replaces. The demo layers a second variant of Sonivox so it can ship in-repo; in a real app you would stack a targeted `guitars.sf2` on top of `drums.sf2`, or fetch orchestra presets on demand once a brass track lands.
 
 <CodeBlock language="js">{`import * as alphaTab from '@coderline/alphatab';
 

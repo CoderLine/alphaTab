@@ -18,19 +18,23 @@ import { ScrollModeSwitch } from '@site/src/components/ScrollModeSwitch';
 A sticky toolbar above the score, a chord chart docked to the top, a lyrics rail on the side — every one of these shifts where the played bar should land inside the viewport. Four `PlayerSettings` fields cover it: which element scrolls, how much padding to leave around the target bar, and whether the browser or alphaTab drives the animation. Slide the offsets in the demo below to move the played bar's landing spot inside the bounded scroll pane.
 
 <ScrollModeSwitch showOffsetSliders showCode={false} tex={`
-\\title "Offset landing"
+\\title "E minor scroll offset"
 \\tempo 100
 .
 \\track "Guitar"
-:4 (3.5 5.4 7.3) (5.5 7.4 8.3) (7.5 8.4 10.3) (8.5 10.4 12.3) |
-:8 (10.5 12.4 14.3) (8.5 10.4 12.3) (7.5 8.4 10.3) (5.5 7.4 8.3) :4 (3.5 5.4 7.3) (2.5 3.4 5.3) |
-:4 (5.5 7.4 8.3) (3.5 5.4 7.3) (2.5 3.4 5.3) (0.5 2.4 3.3) |
-:8 (2.5 3.4 5.3) (3.5 5.4 7.3) (5.5 7.4 8.3) (7.5 8.4 10.3) :4 (8.5 10.4 12.3) (10.5 12.4 14.3) |
-:4 (12.5 14.4 15.3) (10.5 12.4 14.3) (8.5 10.4 12.3) (7.5 8.4 10.3) |
-:8 (5.5 7.4 8.3) (3.5 5.4 7.3) (2.5 3.4 5.3) (3.5 5.4 7.3) :4 (5.5 7.4 8.3) (3.5 5.4 7.3) |
-:4 (2.5 3.4 5.3) (5.5 7.4 8.3) (3.5 5.4 7.3) (0.5 3.4 5.3) |
-:2 (5.5 7.4 8.3) (3.5 5.4 7.3) |
-:1 (0.5 3.4 5.3) |
+:2 (0.6 2.5 2.4 0.3 0.2 0.1) :4 0.3 2.3 |
+:2 (3.6 2.5 0.4 0.3 0.2 3.1) :4 4.3 5.3 |
+:2 (0.4 2.3 3.2 2.1) :4 7.3 5.3 |
+:2 (3.5 2.4 0.3 1.2 0.1) :4 4.3 2.3 |
+:8 0.3 2.3 4.3 5.3 7.3 5.3 4.3 2.3 |
+:8 0.3 2.3 4.3 5.3 :4 7.3 9.3 |
+:8 9.3 7.3 5.3 4.3 :4 2.3 0.3 |
+:2 (0.6 2.5 2.4 0.3 0.2 0.1) :4 0.3 2.3 |
+:2 (3.6 2.5 0.4 0.3 0.2 3.1) :4 5.3 4.3 |
+:8 2.3 4.3 5.3 7.3 5.3 4.3 2.3 0.3 |
+:2 (0.4 2.3 3.2 2.1) :2 (3.5 2.4 0.3 1.2 0.1) |
+:2 (0.6 2.5 2.4 0.3 0.2 0.1) :2 (3.6 2.5 0.4 0.3 0.2 3.1) |
+:1 (0.6 2.5 2.4 0.3 0.2 0.1) |
 `} />
 
 ## Which element scrolls

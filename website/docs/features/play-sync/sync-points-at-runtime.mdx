@@ -11,25 +11,11 @@ keywords:
   - runtime
 ---
 
-import { TransportControls } from '@site/src/components/PlaySync';
+Aligning a backing track to a score means putting a timestamp on each barline. The [Media Sync Editor](/docs/guides/media-sync-editor) is where that authoring workflow lives — load a waveform, tap the bar positions, export the resulting list of anchor points. Once you have that list (either from the editor or from your own UI), this page shows how to push it into a live alphaTab instance so playback follows the audio.
 
-Aligning a backing track to a score means putting a timestamp on each barline. The [Media Sync Editor](/docs/playground/playground) is where that authoring workflow lives — load a waveform, tap the bar positions, save the resulting list of anchor points. Once you have that list (either from the editor or from your own UI), this page shows how to push it into a live alphaTab instance so playback follows the audio.
-
-:::note Editing sync points live
-A meaningful runtime editor for sync points rivals the [Media Sync Editor](/docs/playground/playground) in scope, so this page ships the code sample and lets the transport prove the synth path still works. Head to the playground to author sync points against a backing track.
+:::info Author sync points in the editor
+Building a full waveform-and-drag-handle editor from scratch rivals what the [Media Sync Editor](/docs/guides/media-sync-editor) already offers. The right workflow is: author sync points in the editor (or copy the exported list into your source), then use the runtime API below to load or refresh them on the running instance.
 :::
-
-<TransportControls
-  tex={`\\title "Sync sample"
-\\tempo 90
-.
-\\track "Guitar"
-:4 3.4 5.4 7.4 5.4 |
-:4 3.4 5.4 :2 7.4 |
-:4 5.4 3.4 :2 5.4 |
-:1 3.4 |`}
-  showCode={false}
-/>
 
 ## The data shape
 
@@ -80,6 +66,6 @@ api.scoreLoaded.on((score) => {
 
 - [Backing-track audio](backing-track-audio) — the mode that consumes sync points.
 - [Video sync](video-sync) — the external-media variant that also relies on sync points.
-- [Media Sync Editor](/docs/playground/playground) — the interactive editor that produces `FlatSyncPoint` lists against a waveform.
+- [Media Sync Editor](/docs/guides/media-sync-editor) — the interactive editor that produces `FlatSyncPoint` lists against a waveform.
 - [`api.updateSyncPoints`](/docs/reference/api/updatesyncpoints) — the refresh call in the reference.
 - [`FlatSyncPoint`](/docs/reference/types/model/flatsyncpoint), [`SyncPointData`](/docs/reference/types/model/syncpointdata), and [`Automation`](/docs/reference/types/model/automation) in the model reference.
