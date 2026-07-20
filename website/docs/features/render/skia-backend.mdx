@@ -11,22 +11,14 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Skia is the default rendering engine on .NET and Android — reach for it when building a WPF or MAUI desktop app, an Android app hosting `AlphaTabView`, or any pipeline where you need PNG bytes off a native runtime. alphaTab renders through [alphaSkia](https://github.com/CoderLine/alphaSkia), a thin wrapper around Google's [Skia](https://skia.org/) library, so the same score produces identical glyph metrics across Windows, macOS, Linux, and Android.
 
 The preview below is a browser-side SVG rendering; the code snippet configures the exact same pipeline on .NET or Android, where Skia takes over and produces raster output.
 
-<AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{`
-\\title "Skia on .NET and Android"
-\\subtitle "Same output, native raster"
-\\tempo 104
-.
-\\track "Guitar"
-  :4 (0.5 2.4 2.3) (2.5 4.4 4.3) :2 (4.5 5.4 6.3) |
-  :8 5.4 7.4 8.4 5.5 :4 (2.5 4.4 4.3) (0.5 2.4 2.3) |
-  :4 (5.4 7.3 8.2) (7.4 9.3 10.2) :2 (10.4 12.3 14.2) |
-  :2 (2.5 4.4 4.3) (0.5 4.4 5.3)
-`}</AlphaTab>
+<AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{Riffs.ODE_TO_JOY}</AlphaTab>
 
 ## What Skia gets you
 

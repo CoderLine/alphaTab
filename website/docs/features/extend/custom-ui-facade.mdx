@@ -13,20 +13,12 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Hosting alphaTab in a UI framework it does not know about — WinUI, MAUI, Avalonia, a mobile framework, a game engine, a custom canvas layer — means implementing `IUiFacade`, the contract alphaTab uses to talk to its host. Every shipped platform already provides one: `BrowserUiFacade` on the web, WPF and WinForms facades on .NET, `AndroidUiFacade` on Android. Ship your own facade to reach anywhere else.
 
-<AlphaTab tex={true}>{`
-\\title "IUiFacade"
-\\subtitle "The host-shaped contract"
-\\tempo 96
-.
-\\track "Guitar"
-  :4 (0.6 2.5 2.4) (2.6 4.5 4.4) :2 (4.6 5.5 6.4) |
-  :8 5.4 7.4 8.4 10.4 :4 (2.6 4.5 2.4) (0.6 2.5 2.4) |
-  :4 (3.6 5.5 7.4) (5.6 7.5 9.4) :2 (7.6 9.5 12.4) |
-  :2 (0.6 2.5 2.4) (0.6 4.5 3.4)
-`}</AlphaTab>
+<AlphaTab tex={true}>{Riffs.ODE_TO_JOY}</AlphaTab>
 
 Rendered here through [`BrowserUiFacade`](https://github.com/CoderLine/alphaTab/blob/main/packages/alphatab/src/platform/javascript/BrowserUiFacade.ts) — the browser's implementation of the interface. On any other host, your own `IUiFacade` produces the same output through the same `AlphaTabApiBase`. This page is a meta demo: you are looking at the interface you will implement, as implemented by alphaTab for the browser.
 

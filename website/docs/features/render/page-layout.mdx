@@ -11,23 +11,14 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
 import { BoundedScoreFrame } from '@site/src/components/BoundedScoreFrame';
 
 Page layout flows bars into rows and stacks the rows vertically, the way sheet music prints on paper. Reach for it when publishing a lead sheet, when building a mobile viewer that has to reflow narrower on a phone, or any time the reader expects rows that wrap and a page that scrolls vertically. It is the default across every runtime.
 
 <BoundedScoreFrame>
-  <AlphaTab tex={true} settings={{ display: { layoutMode: 'page' } }}>{`
-\\title "Page layout"
-\\tempo 100
-.
-\\track "Guitar"
-  :4 (3.3 5.2 7.1) (5.3 7.2 9.1) :2 (7.3 9.2 12.1) |
-  :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1) |
-  :8 3.4 5.4 7.4 8.4 10.4 8.4 7.4 5.4 |
-  :4 (3.5 5.4 7.3) (5.5 7.4 9.3) :2 (7.5 9.4 12.3) |
-  :4 5.6 7.6 8.6 10.6 |
-  :4 (3.5 5.4 7.3) (5.5 7.4 8.3) :2 (3.5 5.4 7.3)
-`}</AlphaTab>
+  <AlphaTab tex={true} settings={{ display: { layoutMode: 'page' } }}>{Riffs.BACH_PRELUDE_C_LONG}</AlphaTab>
 </BoundedScoreFrame>
 
 ## How the engine decides where a row ends

@@ -12,20 +12,15 @@ keywords:
 ---
 
 import { TransportControls } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Every note you hear from alphaTab is synthesized on the fly — there are no pre-rendered instrument recordings in the box. alphaTab converts the score into MIDI, feeds that stream to a built-in software synthesizer that plays samples from a SoundFont 2 (`.sf2`) file, and mixes the synth output into the platform's audio backend. Swap in a high-quality sampled piano, a genre-tuned drum kit, or a guitar amp emulation and the same pipeline produces very different audio.
 
 The current synthesizer implementation is derived from [TinySoundFont](https://github.com/schellingb/TinySoundFont) — a huge thanks to Bernhard Schelling and the TinySoundFont contributors whose work made the initial synth possible. A next-generation synthesizer is in active development; both share the same public API surface, so anything on this page continues to hold when the new engine ships.
 
 <TransportControls
-  tex={`\\title "Synth pipeline"
-\\tempo 70
-.
-\\track "Guitar"
-:2 3.4 5.4 |
-:2 7.4 5.4 |
-:4 3.4 5.4 :2 7.4 |
-:1 (0.4 2.3 3.2) |`}
+  tex={Riffs.ODE_TO_JOY}
   showCode={false}
 />
 

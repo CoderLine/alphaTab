@@ -11,18 +11,13 @@ keywords:
 ---
 
 import { CountInMetronomeDemo } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Ship the click a bandmate would give you. Before the song starts, the count-in taps out one bar so the reader locks into the tempo; during playback, the metronome keeps clicking on every beat. Both are staples of any practice tool worth shipping.
 
 <CountInMetronomeDemo
-  tex={`\\title "Pulse check"
-\\tempo 96
-.
-\\track "Guitar"
-:4 5.4 5.4 5.4 5.4 |
-:4 7.4 7.4 :2 5.4 |
-:4 8.4 7.4 5.4 3.4 |
-:2 5.4 :4 5.4 5.4 |`}
+  tex={Riffs.STEADY_PULSE}
   showCode={false}
 />
 

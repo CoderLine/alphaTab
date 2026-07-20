@@ -11,18 +11,13 @@ keywords:
 ---
 
 import { VolumeMixDemo } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Three separate audio channels feed the output: the score itself, a metronome click during playback, and a one-bar count-in before it. Every practice-tool UI has different treatment for the three — mute the metronome for a performance take, boost the count-in for a beginner, duck the master when a voice-over speaks. `masterVolume`, `metronomeVolume`, and `countInVolume` are the three properties behind those controls; each takes a value from `0` (silent) to `1` (unity gain).
 
 <VolumeMixDemo
-  tex={`\\title "Volume test"
-\\tempo 84
-.
-\\track "Guitar"
-:2 (3.5 2.4 0.3 1.2 0.1) :2 (3.6 2.5 0.4 0.3 0.2 3.1) |
-:2 (0.5 2.4 2.3 1.2 0.1) :2 (1.6 3.5 3.4 2.3 1.2 1.1) |
-:2 (3.5 2.4 0.3 1.2 0.1) :2 (3.6 2.5 0.4 0.3 0.2 3.1) |
-:2 (0.5 2.4 2.3 1.2 0.1) :1 (1.6 3.5 3.4 2.3 1.2 1.1) |`}
+  tex={Riffs.ODE_TO_JOY}
   showCode={false}
 />
 

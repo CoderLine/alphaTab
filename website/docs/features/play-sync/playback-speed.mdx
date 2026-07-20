@@ -12,18 +12,13 @@ keywords:
 ---
 
 import { SpeedSliderDemo } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Learners work up to tempo. A slow-down button that pulls a tricky solo down to `0.5×` while the fingering settles in — then back up to `1.25×` for a stretch, then `1.0×` for the take — is table stakes for a practice tool. `playbackSpeed` is the single property behind that button. It scales the tempo without repitching the audio, so the note pitches stay put while the timing stretches.
 
 <SpeedSliderDemo
-  tex={`\\title "Speed scale"
-\\tempo 108
-.
-\\track "Guitar"
-:8 0.3 2.3 3.3 :4 3.3 :8 3.3 2.3 :4 0.3 |
-:8 0.2 1.2 3.2 :4 3.2 :8 3.2 1.2 :4 0.2 |
-:8 0.1 3.1 :4 3.1 :8 3.1 0.1 3.2 :4 1.2 |
-:2 0.2 :4 3.3 0.3 |`}
+  tex={Riffs.FOLK_ARPEGGIO}
   showCode={false}
 />
 

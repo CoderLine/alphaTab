@@ -11,18 +11,13 @@ keywords:
 ---
 
 import { TransportControls } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Every practice tool starts with the same three-button transport. `play()`, `pause()`, `stop()`, and `playPause()` are the API surface behind them — wire a play button on a lesson page to `playPause()`, bind the spacebar, or step through the score from a keyboard shortcut and alphaTab handles the state machine underneath.
 
 <TransportControls
-  tex={`\\title "Transport demo"
-\\tempo 96
-.
-\\track "Guitar"
-:2 (3.6 2.5 0.4 0.3 0.2 3.1) :2 (0.4 2.3 3.2 2.1) |
-:2 (0.6 2.5 2.4 0.3 0.2 0.1) :2 (3.5 2.4 0.3 1.2 0.1) |
-:2 (3.6 2.5 0.4 0.3 0.2 3.1) :2 (0.4 2.3 3.2 2.1) |
-:2 (0.6 2.5 2.4 0.3 0.2 0.1) :1 (3.5 2.4 0.3 1.2 0.1) |`}
+  tex={Riffs.ODE_TO_JOY}
   showCode={false}
 />
 

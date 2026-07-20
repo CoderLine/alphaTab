@@ -41,7 +41,9 @@ Trills — the fast alternation between the written note and the pitch above, co
 Mordents and turns are the traditional ornamental figures that decorate a melodic note — a mordent taps the neighbour note once, a turn wraps around the note with its upper and lower neighbours. alphaTab renders upper mordents, lower mordents, and turns as their standard glyphs above the notehead. The example below uses alphaTex to isolate each ornament type.
 
 <AlphaTab tex={true}>{`
-:4 C4 { turn } D4 { iturn } E4 { umordent } F4 { lmordent }
+\\track "Guitar"
+:4 0.3 { turn } 2.3 { iturn } 4.3 { umordent } 5.3 { lmordent } |
+:4 7.3 5.3 :2 4.3
 `}</AlphaTab>
 
 ## Fingering annotations {#fingering}

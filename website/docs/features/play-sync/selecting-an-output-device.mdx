@@ -12,18 +12,13 @@ keywords:
 ---
 
 import { OutputDeviceDemo } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 A desktop user has a USB audio interface plugged in for practice, Bluetooth headphones for the couch, and the built-in speakers for casual listening — they want to pick where alphaTab's audio comes out. Build a device dropdown, hand the selection back to alphaTab, and the audio graph re-routes without stopping playback.
 
 <OutputDeviceDemo
-  tex={`\\title "Device routing"
-\\tempo 100
-.
-\\track "Guitar"
-:4 3.4 5.4 7.4 5.4 |
-:2 7.4 :4 5.4 3.4 |
-:2 (3.6 2.5 0.4 0.3 0.2 3.1) :2 (0.4 2.3 3.2 2.1) |
-:1 (0.6 2.5 2.4 0.3 0.2 0.1) |`}
+  tex={Riffs.ODE_TO_JOY}
   showCode={false}
 />
 

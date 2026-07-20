@@ -12,6 +12,8 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Give any text font a list of families and alphaTab walks the list until it finds one the platform has installed. Use fallback chains whenever a preferred font may not load — a web font that a slow network never delivers, a font not yet registered on Skia, or a rare typeface that only some readers happen to have installed. The score stays readable instead of collapsing to a system default.
 
@@ -25,12 +27,7 @@ Give any text font a list of families and alphaTab walks the list until it finds
       },
     },
   }}
->{`
-\\title "Fallback in action"
-\\subtitle "First family missing, second family wins"
-.
-:4 5.3 7.3 8.3 7.3
-`}</AlphaTab>
+>{Riffs.FOLK_ARPEGGIO}</AlphaTab>
 
 ## How the list is resolved
 

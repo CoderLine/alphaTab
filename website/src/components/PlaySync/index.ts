@@ -11,4 +11,4 @@ export { SoundFontSwitcher } from './SoundFontSwitcher';
 export { BufferSizeDemo } from './BufferSizeDemo';
 export { OutputDeviceDemo } from './OutputDeviceDemo';
 export { MidiEventLog } from './MidiEventLog';
-export * as Riffs from './riffs';
+export * as Riffs from '@site/src/tex-riffs';

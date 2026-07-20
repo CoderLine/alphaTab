@@ -13,23 +13,12 @@ keywords:
 ---
 
 import { CursorToggleDemo } from '@site/src/components/CursorToggleDemo';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 A bouncing pill above the current beat, a lyric bubble that hops from word to word, a companion animation that rides the notation — anything that has to move in lockstep with the cursor but is not the cursor. Assign an `ICursorHandler` to `api.customCursorHandler` and alphaTab hands you the cursor elements plus every placement callback. Toggle the demo below to swap between the default cursor and a handler that rides a bouncing pill adorner above the beat.
 
-<CursorToggleDemo showCustomHandlerToggle showCode={false} tex={`
-\\title "A minor waltz"
-\\tempo 92
-.
-\\track "Guitar"
-:4 (0.5 2.4 2.3 1.2 0.1) :8 0.3 2.3 :4 4.3 |
-:4 (0.6 2.5 2.4 0.3 0.2 0.1) :8 0.3 2.3 :4 0.3 |
-:4 (0.4 2.3 3.2 1.1) :8 4.3 2.3 :4 0.3 |
-:4 (3.5 2.4 0.3 1.2 0.1) :8 2.3 0.3 :4 0.4 |
-:8 0.3 2.3 4.3 5.3 :4 7.3 5.3 :8 4.3 2.3 |
-:4 0.3 2.3 4.3 :4 (0.5 2.4 2.3 1.2 0.1) |
-:8 0.4 2.4 0.4 2.3 4.3 2.3 0.3 4.3 |
-:1 (0.5 2.4 2.3 1.2 0.1) |
-`} />
+<CursorToggleDemo showCustomHandlerToggle showCode={false} tex={Riffs.AMAZING_GRACE} />
 
 ## When to reach for it
 

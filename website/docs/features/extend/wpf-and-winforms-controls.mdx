@@ -14,20 +14,12 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Embedding alphaTab in a .NET desktop app is a NuGet install and a control declaration. `AlphaTab.Windows` ships two ready-made hosts: a WPF control for XAML apps and a `Control` subclass for classic WinForms. Both wrap the same core rendering and playback engine as the web and Android builds.
 
-<AlphaTab tex={true}>{`
-\\title "WPF + WinForms"
-\\subtitle "Two hosts, one engine"
-\\tempo 100
-.
-\\track "Guitar"
-  :4 (0.5 2.4 4.3) (2.5 4.4 5.3) :2 (5.5 4.4 4.3) |
-  :8 5.3 7.3 8.3 5.4 :4 (2.5 4.4 5.3) (0.5 2.4 4.3) |
-  :4 (5.5 7.4 8.3) (7.5 9.4 10.3) :2 (10.5 12.4 14.3) |
-  :2 (2.5 4.4 5.3) (0.5 4.4 4.3)
-`}</AlphaTab>
+<AlphaTab tex={true}>{Riffs.FOLK_ARPEGGIO}</AlphaTab>
 
 Rendered here on the Web backend. On .NET, both the WPF `AlphaTab` control and the WinForms `AlphaTabControl` produce this output through the same engine — see the XAML and C# below.
 

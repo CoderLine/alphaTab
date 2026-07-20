@@ -11,22 +11,13 @@ keywords:
 ---
 
 import { LoopDemo } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 "Loop the pre-chorus while I drill the chord voicing" is the classic practice-tool ask. Combine `playbackRange` (the tick bounds) and `isLooping` (the wrap flag) and you have a section that repeats until the muscle memory sticks.
 
 <LoopDemo
-  tex={`\\title "Loop phrase"
-\\tempo 110
-.
-\\track "Guitar"
-:4 (0.4 2.3 2.2) :8 (2.4 4.3 4.2) (4.4 5.3 4.2) :4 (0.4 2.3 2.2) (2.4 4.3 4.2) |
-:4 (4.4 5.3 4.2) :8 (2.4 4.3 4.2) (0.4 2.3 2.2) :2 (0.4 2.3 2.2) |
-:4 (0.4 2.3 2.2) :8 (2.4 4.3 4.2) (4.4 5.3 4.2) :4 (0.4 2.3 2.2) (2.4 4.3 4.2) |
-:4 (4.4 5.3 4.2) :8 (2.4 4.3 4.2) (0.4 2.3 2.2) :2 (0.4 2.3 2.2) |
-:4 (2.4 3.3 4.2) :8 (4.4 5.3 4.2) (5.4 7.3 7.2) :4 (7.4 9.3 9.2) (5.4 7.3 7.2) |
-:4 (4.4 5.3 4.2) :8 (2.4 4.3 4.2) (0.4 2.3 2.2) :2 (0.4 2.3 2.2) |
-:4 (0.4 2.3 2.2) :8 (2.4 4.3 4.2) (4.4 5.3 4.2) :4 (5.4 7.3 7.2) (4.4 5.3 4.2) |
-:4 (2.4 3.3 4.2) (0.4 2.3 2.2) :2 (0.4 2.3 2.2) |`}
+  tex={Riffs.AM_VERSE_CHORUS}
   showCode={false}
 />
 

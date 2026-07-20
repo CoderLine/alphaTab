@@ -13,31 +13,12 @@ keywords:
 ---
 
 import { ScrollModeSwitch } from '@site/src/components/ScrollModeSwitch';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 The scroll style that fits a follow-along viewer is different from what fits a practice page or a karaoke-style teleprompter. `player.scrollMode` picks between four strategies for keeping the played bar on screen — continuous flow, only-when-off-screen, smooth glide, or off entirely. Pick a pill in the demo below to see the mode change while the score plays inside a bounded scroll pane.
 
-<ScrollModeSwitch showCode={false} tex={`
-\\title "D major scroll etude"
-\\tempo 108
-.
-\\track "Guitar"
-:8 0.4 2.4 4.4 5.4 :4 7.4 5.4 |
-:8 4.4 2.4 0.4 2.4 :4 4.4 5.4 |
-:8 7.4 9.4 11.4 12.4 :4 11.4 9.4 |
-:8 7.4 5.4 4.4 2.4 :4 0.4 4.4 |
-:2 (0.4 2.3 3.2 2.1) :4 5.4 7.4 |
-:2 (0.5 2.4 2.3 2.2 0.1) :4 0.5 2.4 |
-:8 5.4 7.4 9.4 11.4 12.4 11.4 9.4 7.4 |
-:8 5.4 4.4 2.4 4.4 5.4 7.4 9.4 11.4 |
-:4 12.4 11.4 9.4 7.4 |
-:4 5.4 4.4 2.4 0.4 |
-:2 (0.4 2.3 3.2 2.1) :4 2.4 4.4 |
-:2 (3.6 2.5 0.4 0.3 0.2 3.1) :4 5.4 4.4 |
-:8 2.4 4.4 5.4 7.4 :4 9.4 7.4 |
-:8 5.4 4.4 2.4 0.4 :4 2.4 4.4 |
-:2 (0.5 2.4 2.3 2.2 0.1) :2 (0.4 2.3 3.2 2.1) |
-:1 (0.4 2.3 3.2 2.1) |
-`} />
+<ScrollModeSwitch showCode={false} tex={Riffs.BACH_PRELUDE_C_LONG} />
 
 ## The four modes
 

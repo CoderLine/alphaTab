@@ -28,10 +28,11 @@ Dynamic markings — `ppp`, `pp`, `p`, `mp`, `mf`, `f`, `ff`, `fff` — are the 
 Crescendo (`<`) and decrescendo (`>`) hairpins draw the "grow louder" and "grow softer" contour between two dynamic marks — the standard way to score a swell or a fade. alphaTab renders each hairpin below the staff, spanning every beat between its start and end.
 
 <AlphaTab tex={true}>{`
-:4 C4 { dy pp } C4 C4 C4 { cre } |
-C4 C4 C4 C4 { dy ff } |
-C4 { dy ff } C4 C4 C4 { dec } |
-C4 C4 C4 C4 { dy pp }
+\\track "Guitar"
+:4 3.3 { dy pp } 5.3 7.3 8.3 { cre } |
+:4 7.3 8.3 10.3 12.3 { dy ff } |
+:4 12.3 { dec } 10.3 8.3 7.3 |
+:4 5.3 3.3 { dy pp } :2 5.3
 `}</AlphaTab>
 
 ## Accents {#accents}
@@ -39,7 +40,9 @@ C4 C4 C4 C4 { dy pp }
 Single-note accents mark one note as louder or longer than its neighbours — the sudden punch on a syncopated beat, the tenuto sustain on a legato line. alphaTab renders them as marks above or below the notehead and supports three levels: normal accent (`>`), heavy accent (`^`), and tenuto (`—`).
 
 <AlphaTab tex={true}>{`
-:4 3.3{ac} 5.3{hac} 7.3{ten} 8.3{ac}
+\\track "Guitar"
+:4 3.3{ac} :8 5.3 7.3 :4 8.3{hac} :8 7.3 5.3 |
+:4 5.3{ten} 3.3{ac} :2 3.3
 `}</AlphaTab>
 
 ## Show it in code

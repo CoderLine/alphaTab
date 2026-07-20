@@ -14,18 +14,13 @@ keywords:
 ---
 
 import { TransportControls } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 When you build for the web, this is the backend that plays audio. In the browser, alphaTab renders synthesized samples through an `AudioContext` — the default output feeds an `AudioWorkletNode` that runs the sample buffer on the dedicated audio thread; older browsers fall back to a `ScriptProcessorNode` on the main thread. This page covers what runs when, and the one setting that lets you steer that choice.
 
 <TransportControls
-  tex={`\\title "Web backend"
-\\tempo 108
-.
-\\track "Guitar"
-:4 3.4 5.4 7.4 8.4 |
-:4 10.4 8.4 :2 7.4 |
-:8 5.4 7.4 8.4 10.4 8.4 7.4 5.4 3.4 |
-:1 (0.4 2.3 3.2) |`}
+  tex={Riffs.FOLK_ARPEGGIO}
   showCode={false}
 />
 

@@ -14,22 +14,14 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Building a .NET desktop app or Android app that uses non-system fonts — a corporate typography brief for titles and lyrics, a language-specific font for East-Asian lyric text, or a hand-lettered wordmark for the score header? The Skia rendering backend that powers alphaTab on those runtimes does not read fonts from the operating system's font store. Every font used around the notation — titles, lyrics, chord names, fingerings — must be registered with Skia explicitly first.
 
 This registration flow is Skia-only. The preview below is a browser render for illustration; the code snippet configures the exact pipeline that runs inside a .NET or Android app.
 
-<AlphaTab tex={true}>{`
-\\title "Fonts on Skia"
-\\subtitle "Register .ttf/.otf files up front"
-\\tempo 88
-.
-\\track "Guitar"
-  :4 (2.4 3.3 5.2) (4.4 5.3 7.2) :2 (5.4 7.3 8.2) |
-  :8 3.5 5.5 7.5 8.5 :4 (4.4 5.3 7.2) (2.4 3.3 5.2) |
-  :4 (5.5 7.4 8.3) (7.5 9.4 10.3) :2 (10.5 12.4 14.3) |
-  :2 (2.4 3.3 5.2) (0.4 2.3 3.2)
-`}</AlphaTab>
+<AlphaTab tex={true}>{Riffs.AMAZING_GRACE}</AlphaTab>
 
 `Environment.registerAlphaSkiaCustomFont(bytes)` accepts the raw font file bytes and returns a `Font` descriptor that identifies the font inside alphaTab. Once registered, reference that font family name from `display.resources` like any other font.
 

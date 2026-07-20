@@ -18,9 +18,14 @@ Lyrics render below the staff with each syllable positioned under the beat it be
 Each lyric syllable sits under its target beat — the way songbook vocal lines are typeset so a singer reads word and melody at the same glance. Hyphens between syllables indicate a continuation across beats, and underscores extend a syllable across held notes.
 
 <AlphaTab tex={true}>{`
+\\title "Amazing Grace"
+\\tempo 76
+\\ts 3 4
 \\track "Vocals"
-\\lyrics "Hel-lo world this is al-pha-Tab sing-ing a-long"
-:4 C4 D4 E4 F4 | G4 A4 B4 C5 | C5 B4 A4 G4 | F4 E4 D4 C4
+\\lyrics "A-ma-zing grace how sweet the sound that saved a wretch like me"
+.
+:4 G3 :8 C4 :4 E4 | :4 D4 :8 C4 :4 E4 | :4 D4 :8 C4 :4 A3 | :2. G3 |
+:4 G3 :8 C4 :4 E4 | :4 D4 :8 C4 :4 E4 | :4 D4 :8 C4 :4 A3 | :2. G3
 `}</AlphaTab>
 
 ## Multi-verse handling {#multi-verse}
@@ -28,10 +33,13 @@ Each lyric syllable sits under its target beat — the way songbook vocal lines 
 Multiple verses stack below the staff, one line per verse — the way hymnals and folk songbooks fit two, three, or four sets of words under a single melodic line. alphaTab preserves the order the source file provides. Pass extra strings to alphaTex's `\lyrics` directive to add verses.
 
 <AlphaTab tex={true}>{`
+\\title "Two verses"
+\\tempo 80
 \\track "Vocals"
-\\lyrics "Verse one syl-la-bles here"
-\\lyrics "Verse two matches the beats"
-:4 C4 D4 E4 F4 | G4 A4 B4 C5
+\\lyrics "First verse falls on the down-beats"
+\\lyrics "Se-cond verse rides the same phrase"
+.
+:4 G3 :8 C4 :4 E4 D4 | :4 C4 :8 D4 :4 E4 C4
 `}</AlphaTab>
 
 ## Rendering fonts {#fonts}
@@ -41,9 +49,12 @@ Lyrics use a dedicated font entry so a chart can restyle them without touching t
 <AlphaTab tex={true}
   settings={ { display: { resources: { wordsFont: '20px "Georgia", serif' } } } }
 >{`
+\\title "Styled lyrics"
+\\tempo 80
 \\track "Vocals"
-\\lyrics "Sty-led ly-rics ren-der be-low"
-:4 C4 D4 E4 F4 | G4 A4 B4 C5
+\\lyrics "Ly-rics ren-der in Ge-or-gia se-rif be-low"
+.
+:4 G3 :8 C4 :4 E4 D4 | :4 C4 :8 D4 :4 E4 C4
 `}</AlphaTab>
 
 See [Custom text fonts](./custom-text-fonts) for the full list of font slots and [Font family fallbacks](./font-family-fallbacks) for handling missing families.

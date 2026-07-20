@@ -12,34 +12,13 @@ keywords:
 ---
 
 import { SeekDemo } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Two very different UIs move the same playhead: a chapter-marker list that jumps to bar 12 wants ticks (a score coordinate that stays put across tempo changes), and a video cursor overlay that drives the score wants milliseconds (a wall-clock coordinate that tracks the video's own time base). alphaTab exposes the playhead in both units — pick the one that matches the UI you're wiring up.
 
 <SeekDemo
-  tex={`\\title "Seek target"
-\\tempo 90
-.
-\\track "Guitar"
-:4 3.5 5.4 7.3 5.4 |
-:4 3.5 5.4 :2 7.3 |
-:8 3.5 5.5 5.4 7.4 5.4 3.4 :4 3.5 |
-:2 5.4 :4 7.3 5.3 |
-:8 3.3 5.3 7.3 8.3 7.3 5.3 :4 3.3 |
-:4 2.4 3.4 5.4 3.4 |
-:4 0.4 3.4 :2 2.4 |
-:8 3.5 5.5 5.4 3.4 :2 0.4 |
-:2 (3.5 2.4 0.3 1.2 0.1) :2 (3.6 2.5 0.4 0.3 0.2 3.1) |
-:2 (0.5 2.4 2.3 1.2 0.1) :2 (0.4 2.3 3.2 2.1) |
-:8 3.5 5.4 7.3 8.3 :4 7.4 5.4 |
-:4 3.5 5.4 7.3 5.4 |
-:8 5.5 7.4 5.3 3.3 :2 5.4 |
-:4 3.4 5.4 7.4 8.4 |
-:8 3.5 5.5 7.5 5.5 :2 (3.5 5.4 5.3) |
-:4 5.4 7.4 :2 8.4 |
-:8 3.3 5.3 7.3 5.3 3.3 2.3 :2 0.3 |
-:4 (3.5 5.4 5.3) :2 (5.5 7.4 7.3) :4 (7.5 8.4 9.3) |
-:2 (5.5 7.4 7.3) (3.5 5.4 5.3) |
-:1 (0.5 2.4 3.3) |`}
+  tex={Riffs.BACH_PRELUDE_C_LONG}
   showCode={false}
 />
 

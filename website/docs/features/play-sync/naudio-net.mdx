@@ -14,6 +14,8 @@ keywords:
 ---
 
 import { TransportControls } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 :::note Runtime scope
 The in-browser demo below uses Web Audio because these docs live in a browser. The code snippet on this page applies on the .NET runtime.
@@ -22,14 +24,7 @@ The in-browser demo below uses Web Audio because these docs live in a browser. T
 Understanding which backend runs where matters when you cross-compile a shared alphaTab integration to another runtime. On .NET, alphaTab's synth pipeline ends at `NAudioSynthOutput` — a `WaveProvider32` implementation that hands 44.1 kHz stereo float samples to a `DirectSoundOut` device from [NAudio](https://github.com/naudio/NAudio).
 
 <TransportControls
-  tex={`\\title ".NET backend"
-\\tempo 104
-.
-\\track "Guitar"
-:8 5.4 7.4 8.4 7.4 :4 5.4 3.4 |
-:8 3.4 5.4 7.4 8.4 :4 7.4 5.4 |
-:4 (3.6 2.5 0.4 0.3 0.2 3.1) (0.4 2.3 3.2 2.1) (0.6 2.5 2.4 0.3 0.2 0.1) (3.5 2.4 0.3 1.2 0.1) |
-:1 (3.6 2.5 0.4 0.3 0.2 3.1) |`}
+  tex={Riffs.AMAZING_GRACE}
   showCode={false}
 />
 

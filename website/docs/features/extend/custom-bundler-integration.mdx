@@ -15,20 +15,12 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Wiring alphaTab into esbuild, Rollup, Parcel, or a bespoke build without the shipped [Vite](/docs/getting-started/installation-vite) and [webpack](/docs/getting-started/installation-webpack) plugins comes down to four responsibilities. The plugins handle each one automatically for their host bundler; everywhere else you replicate the pipeline by hand and hand the worker and worklet URLs to alphaTab yourself.
 
-<AlphaTab tex={true} player={true}>{`
-\\title "Bundler pipeline"
-\\subtitle "Worker, worklet, fonts, soundfont"
-\\tempo 120
-.
-\\track "Guitar"
-  :8 5.4 7.4 8.4 10.4 8.4 7.4 5.4 3.4 |
-  :4 (3.5 5.4 7.3) (5.5 7.4 9.3) :2 (7.5 9.4 12.3) |
-  :8 3.6 5.6 7.6 8.6 7.6 5.6 3.6 2.6 |
-  :2 (3.5 5.4 7.3) (2.5 3.4 5.3)
-`}</AlphaTab>
+<AlphaTab tex={true} player={true}>{Riffs.FOLK_ARPEGGIO}</AlphaTab>
 
 The site itself is a working reference. Open DevTools and press play — the network tab shows the four moving parts the sections below enumerate: the worker bundle, the worklet bundle, the Bravura font files, and the SoundFont.
 

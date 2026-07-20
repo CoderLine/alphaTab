@@ -11,22 +11,14 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
 
 Run alphaTab in Node.js to produce SVG or PNG images from a score — for server-side PNG thumbnails, CI-generated screenshots that guard against layout regressions, print-on-demand PDF pipelines, or preview generation. No browser, no DOM, no user interface.
 
 The preview below is a browser-side SVG rendering; the Node.js pipeline described afterwards produces the same output — as an SVG string, or as a PNG buffer with alphaSkia wired in — on the server.
 
-<AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{`
-\\title "Server-side render"
-\\subtitle "SVG or PNG from a Node.js pipeline"
-\\tempo 92
-.
-\\track "Guitar"
-  :4 (0.6 2.5 2.4) (2.6 4.5 4.4) :2 (5.6 4.5 3.4) |
-  :8 3.4 5.4 6.4 3.5 :4 (2.6 4.5 2.4) (0.6 2.5 2.4) |
-  :4 (3.5 5.4 5.3) (5.5 7.4 7.3) :2 (7.5 9.4 9.3) |
-  :2 (0.6 2.5 2.4) (0.6 4.5 3.4)
-`}</AlphaTab>
+<AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{Riffs.ODE_TO_JOY}</AlphaTab>
 
 ## The Node.js pipeline
 
