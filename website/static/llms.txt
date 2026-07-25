@@ -151,18 +151,19 @@ alphaTab is not a drop-in widget — it exposes an API you build your own score 
 
 ## alphaTex
 
-- [Introduction to alphaTex](https://alphatab.net/docs/alphatex/introduction): text format optimised for authoring music notation by hand.
-- [Syntax](https://alphatab.net/docs/alphatex/syntax): full alphaTex syntax reference.
-- [Document structure](https://alphatab.net/docs/alphatex/document-structure): how an alphaTex file is organised.
-- [Structural metadata](https://alphatab.net/docs/alphatex/structural-metadata): declaring multiple tracks, staves, and voices.
-- [Score metadata](https://alphatab.net/docs/alphatex/score-metadata): tags affecting the whole song — title, artist, tempo, and similar.
-- [Staff metadata](https://alphatab.net/docs/alphatex/staff-metadata): tags on staff level — tuning, capo, instrument, and staff display.
-- [Bar metadata](https://alphatab.net/docs/alphatex/bar-metadata): tags on bar and masterbar level — time signatures, clefs, repeats, and similar.
-- [Beat properties](https://alphatab.net/docs/alphatex/beat-properties): effects and annotations applied to a beat.
-- [Note properties](https://alphatab.net/docs/alphatex/note-properties): effects and annotations applied to a single note.
+- [Introduction to alphaTex](https://alphatab.net/docs/alphatex/introduction): alphaTab's plain-text music notation format — write scores as source, load them through the `tex` option or the `tex()` API.
+- [Syntax](https://alphatab.net/docs/alphatex/syntax): how to write alphaTex — comments, strings, numbers, argument lists, properties, metadata tags, scopes, signatures, case rules, and fret-note notation. Anchors every other page cross-links into.
+- [Document structure](https://alphatab.net/docs/alphatex/document-structure): how an alphaTex file is organised — bars, beats, notes, tracks, staves, and voices, and where score-level metadata belongs.
+- [Structural metadata](https://alphatab.net/docs/alphatex/structural-metadata): reference for `\track`, `\staff`, and `\voice` — the metadata tags that open new tracks, staves, and voices.
+- [Score metadata](https://alphatab.net/docs/alphatex/score-metadata): reference for the song-wide metadata tags such as title, artist, tempo defaults, and other piece-level settings.
+- [Staff metadata](https://alphatab.net/docs/alphatex/staff-metadata): reference for the per-staff metadata tags — instrument, tuning, articulation tables, and other staff-level settings.
+- [Bar metadata](https://alphatab.net/docs/alphatex/bar-metadata): reference for the per-bar metadata tags — clefs, key signatures, time signatures, repeats, and other bar-level settings.
+- [Beat properties](https://alphatab.net/docs/alphatex/beat-properties): reference for the properties applied to a whole beat — effects and annotations that affect every note in the beat.
+- [Note properties](https://alphatab.net/docs/alphatex/note-properties): reference for the properties applied to a single note — bends, slides, ties, harmonics, and other per-note effects.
 - [Importer and parser](https://alphatab.net/docs/alphatex/importer): using the alphaTex importer and parser directly, including access to the syntax tree and diagnostics.
 - [Language server](https://alphatab.net/docs/alphatex/lsp): the `@coderline/alphatab-language-server` package for editor integrations.
 - [Monaco editor integration](https://alphatab.net/docs/alphatex/monaco): alphaTex editing with syntax highlighting and language-server features in Monaco.
+- [Troubleshooting](https://alphatab.net/docs/alphatex/troubleshooting): every alphaTex diagnostic alphaTab can raise, grouped by category, with a start-here guide for the failures musicians hit most often.
 
 ## API reference
 
