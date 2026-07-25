@@ -1,3 +1,5 @@
+import * as Riffs from '@site/src/tex-riffs';
+
 export type DemoFile =
     | {
           kind: 'url';
@@ -14,20 +16,11 @@ export type DemoFile =
           tex: string;
       };
 
-const SHRED_TEX = `\\title "Shred"
-\\tempo 160
-.
-\\track "Lead"
-:16 5.3 7.3 8.3 10.3 7.3 8.3 10.3 12.3
-    5.3 7.3 8.3 10.3 7.3 8.3 10.3 12.3 |
-:16 12.3 10.3 8.3 7.3 10.3 8.3 7.3 5.3
-    12.3 10.3 8.3 7.3 10.3 8.3 7.3 5.3 |`;
-
 export const DEMO_FILES: DemoFile[] = [
     {
         kind: 'url',
-        label: 'canon-rock.gp5',
-        ext: 'gp5',
+        label: 'canon-ensemble.gp',
+        ext: 'gp',
         trackColor: 'var(--at-accent)',
         url: '/files/pachelbel-canon-ensemble.gp',
     },
@@ -41,10 +34,10 @@ export const DEMO_FILES: DemoFile[] = [
     },
     {
         kind: 'tex',
-        label: 'shred.alphatex',
+        label: 'prelude.alphatex',
         ext: 'tex',
         trackColor: 'var(--at-track-green)',
-        tex: SHRED_TEX,
+        tex: Riffs.BACH_PRELUDE_C_LONG,
     },
     {
         kind: 'url',
