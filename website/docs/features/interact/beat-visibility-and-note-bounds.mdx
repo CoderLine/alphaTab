@@ -18,7 +18,7 @@ import * as Riffs from '@site/src/tex-riffs';
 
 Only redraw overlays for beats the reader can actually see. Turn a note-picker UI on and off without paying the memory cost the rest of the time. Two orthogonal knobs sit next to `boundsLookup` and cover both jobs. `api.isVisible(beat)` reports whether a beat is inside the current viewport — cheap to call from a played-beat handler. `core.includeNoteBounds` opts alphaTab into recording per-note rectangles, unlocking note-level hit-testing at the cost of a slightly larger bounds table. The readout below reports `isVisible` per beat; the overlay swaps between beat rectangles and per-note-head rectangles as `includeNoteBounds` flips on and off.
 
-<VisibilityBoundsDemo showNoteHeadOverlay showCode={false} tex={Riffs.ODE_TO_JOY} />
+<VisibilityBoundsDemo showNoteHeadOverlay showCode={false} tex={Riffs.PACHELBEL_CANON} />
 
 ## `isVisible(beat)`
 

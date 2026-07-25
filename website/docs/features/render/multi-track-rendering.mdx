@@ -11,25 +11,13 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import { MULTI_TRACK_ENSEMBLE } from '@site/src/tex-riffs';
 
 alphaTab renders any number of tracks as a single vertical system, connects grand-staff instruments with a brace, and prints per-track tunings for stringed instruments. Reach for it whenever the reader needs to see how parts line up — a band-in-a-box view for a rehearsal app, a piano-and-voice pedagogical layout, or a full-score view of a jazz combo where soloists want the rhythm section on the same page.
 
-<AlphaTab tex={true} tracks="all">{`
-\\title "Multi-track ensemble"
-\\tempo 100
-.
-\\track "Guitar"
-  \\staff { score tabs }
-  :4 (3.3 5.2 7.1) (5.3 7.2 9.1) :2 (7.3 9.2 12.1) |
-  :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1)
-\\track "Piano" \\instrument acousticpiano
-  \\staff \\instrument piano
-    :4 (C4 E4 G4) (D4 F4 A4) :2 (E4 G4 B4) |
-    :4 (F4 A4 C5) :8 (G4 B4 D5) (F4 A4 C5) :4 (E4 G4 B4) (D4 F4 A4)
-  \\staff \\instrument piano
-    :4 C3 G3 :2 C3 |
-    :4 F3 :8 G3 F3 :4 E3 D3
-`}</AlphaTab>
+The score below is the 8-bar ground of Pachelbel's Canon in D (c. 1680, PD) rendered as three tracks — Lead Guitar, Bass Guitar with proper 4-string tuning, and Piano with treble + bass staves — so every rendering feature that only shows up in multi-track scoring (bracket grouping, per-track tuning, grand-staff brace) is on display.
+
+<AlphaTab tex={true} tracks="all">{MULTI_TRACK_ENSEMBLE}</AlphaTab>
 
 ## The grand staff for piano
 
