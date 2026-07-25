@@ -1,4 +1,6 @@
 import path from 'node:path'
+import url from 'node:url'
+import fs from 'node:fs/promises'
 import { AlphaTexExample, documentation, MetadataTagDefinition, ParameterDefinition, PropertyDefinition, SignatureDefinition, WithSignatures } from '@coderline/alphatab-language-server'
 import * as alphaTab from '@coderline/alphatab'
 import { FileStream, openFileStream, rewriteLegacyDocLinks } from './util.mjs';
@@ -48,6 +50,238 @@ export async function generateAlphaTexDocs() {
         documentation.noteProperties,
         SCOPE_NOTE_PROPERTY
     )
+
+    await generateTroubleshootingPage(
+        path.join(outPath, '_troubleshooting.mdx')
+    );
+}
+
+interface DiagnosticEntry {
+    name: string;
+    code: number;
+    description: string;
+}
+
+interface DiagnosticCategory {
+    id: string;
+    heading: string;
+    intro: string;
+    severity: string;
+    from: number;
+    to: number;
+    entries: DiagnosticEntry[];
+}
+
+/**
+ * Reads the AlphaTexDiagnosticCode enum from the shipped `@coderline/alphatab`
+ * `.d.ts` (the enum ships as `declare const enum`-adjacent and is not on the
+ * runtime module surface). Emits the generated troubleshooting partial
+ * grouped by AT-code ranges, sorted by number within each group.
+ */
+async function generateTroubleshootingPage(file: string) {
+    const alphaTabEntry = url.fileURLToPath(
+        import.meta.resolve('@coderline/alphatab')
+    );
+    const dtsPath = path.resolve(alphaTabEntry, '..', 'alphaTab.d.ts');
+    const dts = await fs.readFile(dtsPath, 'utf8');
+
+    const entries = parseDiagnosticEnum(dts);
+
+    const categories: DiagnosticCategory[] = [
+        {
+            id: 'writing-errors',
+            heading: 'Writing errors',
+            severity: 'Error (Lexer)',
+            from: 1,
+            to: 199,
+            intro:
+                "These fire while alphaTab is still reading the raw characters of your file — before it even starts making sense of bars and notes. If your quote is unclosed or an escape sequence is malformed, you land here.",
+            entries: [],
+        },
+        {
+            id: 'structural-errors',
+            heading: 'Structural errors',
+            severity: 'Error (Parser)',
+            from: 200,
+            to: 299,
+            intro:
+                "The characters read fine, but the shape of your file does not. Missing values, unclosed groups, notes that do not fit the staff kind, arguments that do not match any known signature — all show up here.",
+            entries: [],
+        },
+        {
+            id: 'legacy-syntax-hints',
+            heading: 'Legacy syntax hints',
+            // Codes 300–399 surface as Warning; 400–499 surface as Hint.
+            // Both point at pre-1.7 forms and misplaced constructs, so they
+            // share a category; the per-code Severity line distinguishes them.
+            severity: '',
+            from: 300,
+            to: 499,
+            intro:
+                "Your file parses, but you are using a form that pre-dates alphaTex 1.7 or leaves redundant separators in place. alphaTab still accepts these; upgrading brings your notation in line with the current shape and unlocks better editor tooling.",
+            entries: [],
+        },
+    ];
+
+    for (const entry of entries) {
+        const bucket = categories.find(c => entry.code >= c.from && entry.code <= c.to);
+        if (!bucket) {
+            throw new Error(
+                `AlphaTexDiagnosticCode ${entry.name} (=${entry.code}) does not fall into any known range. ` +
+                'Update generateTroubleshootingPage() in scripts/generate-alphatex.mts.'
+            );
+        }
+        bucket.entries.push(entry);
+    }
+
+    for (const category of categories) {
+        category.entries.sort((a, b) => a.code - b.code);
+    }
+
+    await using stream = await openFileStream(file);
+
+    await stream.writeLine('{/* Generated from AlphaTexDiagnosticCode in @coderline/alphatab. Do not edit by hand — regenerate with `npm run generate-alphatabdoc`. Musician-facing enrichments live in _troubleshooting-extras.mdx. */}');
+    await stream.writeLine();
+
+    for (const category of categories) {
+        if (category.entries.length === 0) {
+            continue;
+        }
+
+        await stream.writeLine(`## ${category.heading} {#${category.id}}`);
+        await stream.writeLine();
+        await stream.writeLine(category.intro);
+        await stream.writeLine();
+
+        for (const entry of category.entries) {
+            const severity = category.severity || severityForCode(entry.code);
+            await writeDiagnosticEntry(stream, entry, severity);
+        }
+    }
+}
+
+function severityForCode(code: number): string {
+    if (code < 100) {
+        return 'Error (Lexer)';
+    }
+    if (code < 200) {
+        return 'Warning (Lexer)';
+    }
+    if (code < 300) {
+        return 'Error (Parser)';
+    }
+    if (code < 400) {
+        return 'Warning';
+    }
+    return 'Hint';
+}
+
+async function writeDiagnosticEntry(stream: FileStream, entry: DiagnosticEntry, severity: string) {
+    const anchor = entry.name.toLowerCase();
+    const headline = formatDiagnosticHeadline(entry.description);
+
+    await stream.writeLine(`### ${entry.name} — ${headline} {#${anchor}}`);
+    await stream.writeLine();
+    await stream.writeLine(`**Severity:** ${severity}`);
+    await stream.writeLine();
+
+    if (entry.description) {
+        await stream.writeLine(`**Parser message:** ${escapeMdx(entry.description)}`);
+    } else {
+        await stream.writeLine('**Parser message:** _(no TSDoc supplied — see the extras partial for details)_');
+    }
+    await stream.writeLine();
+}
+
+/**
+ * Distills a musician-facing headline from the parser's raw message template.
+ * Strips `%s` placeholders, collapses whitespace, and truncates to fit in a
+ * heading. The full templated message is emitted separately as "Parser message".
+ */
+function formatDiagnosticHeadline(description: string): string {
+    if (!description) {
+        return 'Diagnostic';
+    }
+    let text = description
+        .replace(/%s/g, 'value')
+        .replace(/\s+/g, ' ')
+        .trim();
+    // Cut at the first sentence terminator so the heading stays short.
+    const stop = text.search(/[.!?]/);
+    if (stop >= 0) {
+        text = text.slice(0, stop);
+    }
+    if (text.length > 90) {
+        text = text.slice(0, 87).trimEnd() + '...';
+    }
+    return text;
+}
+
+/**
+ * MDX passes most Markdown through, but curly braces are treated as JSX.
+ * Escape any that survive from the parser messages.
+ */
+function escapeMdx(s: string): string {
+    return s.replace(/\{/g, '\\{').replace(/\}/g, '\\}');
+}
+
+/**
+ * Scans the shipped `.d.ts` for the AlphaTexDiagnosticCode enum, capturing
+ * each member's TSDoc and numeric value. Uses regex on the NPM artefact —
+ * the enum is not on the runtime module surface (it ships inside the
+ * `alphaTex` namespace declaration and is stripped from `alphaTab.mjs`).
+ */
+function parseDiagnosticEnum(dts: string): DiagnosticEntry[] {
+    const enumStart = dts.indexOf('declare enum AlphaTexDiagnosticCode {');
+    if (enumStart < 0) {
+        throw new Error('Could not find AlphaTexDiagnosticCode enum in alphaTab.d.ts');
+    }
+    const bodyStart = dts.indexOf('{', enumStart) + 1;
+    const bodyEnd = dts.indexOf('}', bodyStart);
+    if (bodyEnd < 0) {
+        throw new Error('AlphaTexDiagnosticCode enum body not terminated in alphaTab.d.ts');
+    }
+    const body = dts.slice(bodyStart, bodyEnd);
+
+    // First pass: find every enum member and its position.
+    const memberRegex = /(AT\d+)\s*=\s*(\d+)/g;
+    const members: { name: string; code: number; index: number }[] = [];
+    for (const match of body.matchAll(memberRegex)) {
+        members.push({
+            name: match[1],
+            code: Number.parseInt(match[2], 10),
+            index: match.index!,
+        });
+    }
+
+    if (members.length === 0) {
+        throw new Error('AlphaTexDiagnosticCode enum appears to be empty — parser likely misaligned.');
+    }
+
+    // Second pass: attach the nearest preceding TSDoc block to each member.
+    const entries: DiagnosticEntry[] = [];
+    for (let i = 0; i < members.length; i++) {
+        const member = members[i];
+        const previousEnd = i === 0 ? 0 : members[i - 1].index + members[i - 1].name.length;
+        const preamble = body.slice(previousEnd, member.index);
+        const tsdocMatch = preamble.match(/\/\*\*([\s\S]*?)\*\/\s*$/);
+        entries.push({
+            name: member.name,
+            code: member.code,
+            description: tsdocMatch ? cleanTsDoc(tsdocMatch[1]) : '',
+        });
+    }
+
+    return entries;
+}
+
+function cleanTsDoc(raw: string): string {
+    return raw
+        .split('\n')
+        .map(line => line.replace(/^\s*\*\s?/, ''))
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
 }
 
 async function generatePropertiesDocs(file: string, props: Map<string, PropertyDefinition>, scope: Scope) {

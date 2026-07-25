@@ -180,6 +180,10 @@ const sidebars: SidebarsConfig = {
       },
       {
         type: 'doc',
+        id: "alphatex/troubleshooting"
+      },
+      {
+        type: 'doc',
         id: "alphatex/importer"
       },
       {
