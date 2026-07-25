@@ -3,36 +3,54 @@ import { AlphaTexExample, documentation, MetadataTagDefinition, ParameterDefinit
 import * as alphaTab from '@coderline/alphatab'
 import { FileStream, openFileStream, rewriteLegacyDocLinks } from './util.mjs';
 
+interface Scope {
+    label: string;
+    anchor: string;
+}
+
+const SCOPE_SCORE_METADATA: Scope = { label: 'Score metadata', anchor: 'score-metadata' };
+const SCOPE_STAFF_METADATA: Scope = { label: 'Staff metadata', anchor: 'staff-metadata' };
+const SCOPE_STRUCTURAL_METADATA: Scope = { label: 'Structural metadata', anchor: 'structural-metadata' };
+const SCOPE_BAR_METADATA: Scope = { label: 'Bar metadata', anchor: 'bar-metadata' };
+const SCOPE_BEAT_PROPERTY: Scope = { label: 'Beat property', anchor: 'beat-property' };
+const SCOPE_NOTE_PROPERTY: Scope = { label: 'Note property', anchor: 'note-property' };
+
 export async function generateAlphaTexDocs() {
     const outPath = path.resolve(import.meta.dirname, '../docs/alphatex');
     await generateMetaDataDocs(
         path.join(outPath, '_score-metadata.mdx'),
-        documentation.scoreMetaData
+        documentation.scoreMetaData,
+        SCOPE_SCORE_METADATA
     )
     await generateMetaDataDocs(
         path.join(outPath, '_staff-metadata.mdx'),
-        documentation.staffMetaData
+        documentation.staffMetaData,
+        SCOPE_STAFF_METADATA
     )
     await generateMetaDataDocs(
         path.join(outPath, '_structural-metadata.mdx'),
-        documentation.structuralMetaData
+        documentation.structuralMetaData,
+        SCOPE_STRUCTURAL_METADATA
     )
     await generateMetaDataDocs(
         path.join(outPath, '_bar-metadata.mdx'),
-        documentation.barMetaData
+        documentation.barMetaData,
+        SCOPE_BAR_METADATA
     )
 
     await generatePropertiesDocs(
         path.join(outPath, '_beat-properties.mdx'),
-        documentation.beatProperties
+        documentation.beatProperties,
+        SCOPE_BEAT_PROPERTY
     )
     await generatePropertiesDocs(
         path.join(outPath, '_note-properties.mdx'),
-        documentation.noteProperties
+        documentation.noteProperties,
+        SCOPE_NOTE_PROPERTY
     )
 }
 
-async function generatePropertiesDocs(file: string, props: Map<string, PropertyDefinition>) {
+async function generatePropertiesDocs(file: string, props: Map<string, PropertyDefinition>, scope: Scope) {
     await using stream = await openFileStream(file);
 
     await stream.writeLine("import { AlphaTexSample } from '@site/src/components/AlphaTexSample';");
@@ -44,11 +62,11 @@ async function generatePropertiesDocs(file: string, props: Map<string, PropertyD
         if (t.deprecated) {
             continue;
         }
-        await writePropertyDocs(stream, t);
+        await writePropertyDocs(stream, t, scope);
     }
 }
 
-async function generateMetaDataDocs(file: string, meta: Map<string, MetadataTagDefinition>) {
+async function generateMetaDataDocs(file: string, meta: Map<string, MetadataTagDefinition>, scope: Scope) {
     await using stream = await openFileStream(file);
 
     await stream.writeLine("import { AlphaTexSample } from '@site/src/components/AlphaTexSample';");
@@ -59,33 +77,35 @@ async function generateMetaDataDocs(file: string, meta: Map<string, MetadataTagD
         if (t.deprecated) {
             continue;
         }
-        await writeMetaDataDocs(stream, t);
+        await writeMetaDataDocs(stream, t, scope);
     }
 }
 
 
-async function writeMetaDataDocs(stream: FileStream, t: MetadataTagDefinition) {
-    await writeWithSignatureDocs(stream, t.tag, t);
+async function writeMetaDataDocs(stream: FileStream, t: MetadataTagDefinition, scope: Scope) {
+    await writeWithSignatureDocs(stream, t.tag, t, scope);
 
     if (t.properties) {
         await stream.writeLine(`**Properties:**`);
         await stream.writeLine();
 
         for (const p of t.properties.values()) {
-            await writePropertyDocs(stream, p, 3);
+            await writePropertyDocs(stream, p, scope, 3);
         }
     }
 }
 
-async function writePropertyDocs(stream: FileStream, t: PropertyDefinition, level: number = 2) {
-    await writeWithSignatureDocs(stream, t.property, t, level);
+async function writePropertyDocs(stream: FileStream, t: PropertyDefinition, scope: Scope, level: number = 2) {
+    await writeWithSignatureDocs(stream, t.property, t, scope, level);
 }
 
 
 async function writeWithSignatureDocs(stream: FileStream,
     name: string,
-    t: WithSignatures, level: number = 2) {
+    t: WithSignatures, scope: Scope, level: number = 2) {
     await stream.writeLine(`${'#'.repeat(level)} \`${name}\``)
+    await stream.writeLine();
+    await stream.writeLine(`**Scope:** [${scope.label}](./syntax#${scope.anchor})`);
     await stream.writeLine();
     await stream.writeLine('```plain title="Syntax"');
     for (const [i, s] of t.signatures.entries()) {
