@@ -59,11 +59,11 @@ export const ODE_TO_JOY = `\\title "Ode to Joy"
 :4 2.1 2.1 3.1 5.1 |
 :4 5.1 3.1 2.1 0.1 |
 :4 3.2 3.2 0.1 2.1 |
-:4. 2.1 :8 0.1 :2 0.1 |
+:4 2.1{d} :8 0.1 :2 0.1 |
 :4 2.1 2.1 3.1 5.1 |
 :4 5.1 3.1 2.1 0.1 |
 :4 3.2 3.2 0.1 2.1 |
-:4. 0.1 :8 3.2 :2 3.2 |`;
+:4 0.1{d} :8 3.2 :2 3.2 |`;
 
 /**
  * "Amazing Grace" — text John Newton 1779, tune "New Britain" first
@@ -80,13 +80,13 @@ export const AMAZING_GRACE = `\\title "Amazing Grace"
 .
 \\track "Guitar"
 :2 3.1 :4 7.1 |
-:4. 3.1 :8 7.1 :4 5.1 |
+:4 3.1{d} :8 7.1 :4 5.1 |
 :2 3.1 :4 0.1 |
-:2. 3.2 |
+:2 3.2{d} |
 :2 3.1 :4 7.1 |
-:4. 3.1 :8 7.1 :4 10.1 |
+:4 3.1{d} :8 7.1 :4 10.1 |
 :2 7.1 :4 5.1 |
-:2. 3.1 |`;
+:2 3.1{d} |`;
 
 /**
  * "Greensleeves" — traditional English, registered 1580 by Richard Jones.
@@ -103,14 +103,14 @@ export const GREENSLEEVES = `\\title "Greensleeves"
 .
 \\track "Guitar"
 :8 5.1 |
-:4 8.1 :8 10.1 :4. 12.1 |
+:4 8.1 :8 10.1 :4 12.1{d} |
 :8 13.1 12.1 :4 10.1 :8 7.1 |
-:4. 3.1 :8 5.1 7.1 5.1 |
-:4 5.1 :8 4.1 :4. 5.1 |
-:4 8.1 :8 10.1 :4. 12.1 |
+:4 3.1{d} :8 5.1 7.1 5.1 |
+:4 5.1 :8 4.1 :4 5.1{d} |
+:4 8.1 :8 10.1 :4 12.1{d} |
 :8 13.1 12.1 :4 10.1 :8 7.1 |
-:4. 3.1 :8 12.1 10.1 8.1 |
-:4 7.1 :8 4.1 :4. 5.1 |`;
+:4 3.1{d} :8 12.1 10.1 8.1 |
+:4 7.1 :8 4.1 :4 5.1{d} |`;
 
 /**
  * Bach's Prelude in C, BWV 846, bars 5–8 — the harmonically-rich middle
@@ -247,7 +247,7 @@ export const DYNAMICS_MELODY = `\\title "Ode to Joy — dynamic sweep"
 :4 2.1 { dy pp } 2.1 3.1 5.1 |
 :4 5.1 { cre } 3.1 2.1 0.1 |
 :4 3.2 { dy ff } 3.2 0.1 2.1 |
-:4. 2.1 { dec } :8 0.1 :2 0.1 |`;
+:4 2.1 { dec d } :8 0.1 :2 0.1 |`;
 
 /**
  * Bach / attributed to Christian Petzold, Minuet in G, BWV Anh. 114,

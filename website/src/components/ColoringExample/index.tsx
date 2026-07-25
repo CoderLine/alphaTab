@@ -6,22 +6,14 @@ import {
   useAlphaTabEvent,
   useAlphaTabModule,
 } from "@site/src/alphatab-react";
+import * as Riffs from "@site/src/tex-riffs";
 import CodeBlock from "@theme/CodeBlock";
 
 export interface ColoringExampleProps {
   showCode?: boolean;
 }
 
-const TEX = `
-    \\title "Canon Rock"
-    \\artist "JerryC"
-    \\tempo 90
-    .
-    12.2{v f} 14.2{v f}.4 :8 15.2 17.2 |
-    14.1.2 :8 17.2 15.1 14.1{h} 17.2 |
-    15.2{v d}.4 :16 17.2{h} 15.2 :8 14.2 14.1 17.1{b (0 4 4 0)}.4 |
-    15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2 14.2
-    `;
+const TEX = Riffs.GREENSLEEVES;
 
 function ApplyColors() {
   const module = useAlphaTabModule();
@@ -36,17 +28,19 @@ function ApplyColors() {
         module.model.Color.fromJson("#426d9d")!
       );
       score.style.colors.set(
-        module.model.ScoreSubElement.Artist,
+        module.model.ScoreSubElement.SubTitle,
         module.model.Color.fromJson("#4cb3d4")!
       );
 
       const fretColors: Record<number, alphaTab.model.Color> = {
-        12: module.model.Color.fromJson("#bb4648")!,
-        13: module.model.Color.fromJson("#ab519f")!,
-        14: module.model.Color.fromJson("#3953a5")!,
-        15: module.model.Color.fromJson("#70ccd6")!,
-        16: module.model.Color.fromJson("#6abd45")!,
-        17: module.model.Color.fromJson("#e1a90e")!,
+        3: module.model.Color.fromJson("#d13a3a")!,
+        4: module.model.Color.fromJson("#e17722")!,
+        5: module.model.Color.fromJson("#e1a90e")!,
+        7: module.model.Color.fromJson("#6abd45")!,
+        8: module.model.Color.fromJson("#70ccd6")!,
+        10: module.model.Color.fromJson("#3953a5")!,
+        12: module.model.Color.fromJson("#ab519f")!,
+        13: module.model.Color.fromJson("#d047a3")!,
       };
 
       // traverse hierarchy and apply colors as desired
@@ -109,17 +103,19 @@ export const ColoringExample: React.FC<ColoringExampleProps> = ({
       alphaTab.model.Color.fromJson("#426d9d")
     );
     score.style.colors.set(
-      alphaTab.model.ScoreSubElement.Artist,
+      alphaTab.model.ScoreSubElement.SubTitle,
       alphaTab.model.Color.fromJson("#4cb3d4")
     );
 
     const fretColors = {
-        12: alphaTab.model.Color.fromJson("#bb4648"),
-        13: alphaTab.model.Color.fromJson("#ab519f"),
-        14: alphaTab.model.Color.fromJson("#3953a5"),
-        15: alphaTab.model.Color.fromJson("#70ccd6"),
-        16: alphaTab.model.Color.fromJson("#6abd45"),
-        17: alphaTab.model.Color.fromJson("#e1a90e")
+        3: alphaTab.model.Color.fromJson("#d13a3a"),
+        4: alphaTab.model.Color.fromJson("#e17722"),
+        5: alphaTab.model.Color.fromJson("#e1a90e"),
+        7: alphaTab.model.Color.fromJson("#6abd45"),
+        8: alphaTab.model.Color.fromJson("#70ccd6"),
+        10: alphaTab.model.Color.fromJson("#3953a5"),
+        12: alphaTab.model.Color.fromJson("#ab519f"),
+        13: alphaTab.model.Color.fromJson("#d047a3")
     };
 
     // traverse hierarchy and apply colors as desired
