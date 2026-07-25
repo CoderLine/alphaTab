@@ -1,35 +1,41 @@
---- 
+---
 title: Language Server
+description: alphaTab ships an LSP-compliant alphaTex language server with diagnostics, completions, hovers, and signature help for editors that speak the protocol.
+keywords:
+  - alphaTex
+  - language server
+  - LSP
+  - diagnostics
+  - completions
+  - hover
 since: 1.7.0
 ---
 
-alphaTab provides an alphaTex language server via the NPM package [`@coderline/alphatab-language-server`](https://www.npmjs.com/package/@coderline/alphatab-language-server).
-The language server is written in TypeScript and made available as JavaScript executable. 
+alphaTab ships an alphaTex language server as the NPM package [`@coderline/alphatab-language-server`](https://www.npmjs.com/package/@coderline/alphatab-language-server). It is written in TypeScript and distributed as a JavaScript executable.
 
 > [!INFO]
-> To learn more about Language Servers and the Language Server Protocol head over to the website of Microsoft: 
+> For background on language servers and the Language Server Protocol, read Microsoft's overview:
 > https://microsoft.github.io/language-server-protocol/
 
-The language server is implemented using [`vscode-languageserver-node`](https://github.com/microsoft/vscode-languageserver-node) providing a base framework for creating language servers running in Node.js and in Browsers.
+The server builds on [`vscode-languageserver-node`](https://github.com/microsoft/vscode-languageserver-node), which provides the base framework for running language servers in Node.js and in browsers.
 
-Below you can find a description of the individual features provided by the language server and package. 
+The sections below describe the individual features the server and package deliver.
 
 ## Diagnostics
 
-The core feature of the language server is to listen for [document changes](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_synchronization) and parse the code of the documents. 
+The core job of the language server is to listen for [document changes](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_synchronization) and parse the source of each document.
 
-The language server provides [Pull Diagnostics](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_pullDiagnostics) but will not [Publish Diagnostics](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_publishDiagnostics).
+The server implements [Pull Diagnostics](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_pullDiagnostics). It does not [Publish Diagnostics](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_publishDiagnostics).
 
 <img src="/img/alphatex/lsp/diagnostics.png" />
 
 ## Code Completions
 
-The language server will provide contextual [code completions](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_completion). 
-This includes but is not limited to: 
+The server delivers contextual [code completions](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_completion), including:
 
-* Available Metadata Tags
-* Available Properties
-* Available Values (e.g. for enums)
+* Available [metadata tags](./syntax#metadata-tag)
+* Available [properties](./syntax#property)
+* Available values (enum members, for example)
 
 <img src="/img/alphatex/lsp/completions1.png" />
 <img src="/img/alphatex/lsp/completions2.png" />
@@ -37,15 +43,14 @@ This includes but is not limited to:
 
 ## Documentation Hovers
 
-For every documented element, the language server will also provide documentation hovers. Similar to when you write documentation comments in your programming language, 
-the editor will show descriptions when hovering the elements. No need to exit your editor to lookup the help of alphaTex, it is right there where you need it. 
+The server ships hover documentation for every documented element. The same way your editor surfaces doc comments for your host language, it now shows alphaTex descriptions inline — no context switch needed to look up a tag or property.
 
 <img src="/img/alphatex/lsp/hover1.png" />
 <img src="/img/alphatex/lsp/hover2.png" />
 
 ## Signature Help
 
-When passing arguments to metadata tags and properties the language server will provide a signature help to provide addtional guidance on what parameters and values exist:
+When you pass arguments to a metadata tag or a property, the server shows [signature help](./syntax#signature) with the [parameters](./syntax#parameter) and accepted values for each [overload](./syntax#overload).
 
 <img src="/img/alphatex/lsp/signature1.png" />
 <img src="/img/alphatex/lsp/signature2.png" />
@@ -54,8 +59,7 @@ When passing arguments to metadata tags and properties the language server will 
 
 ### TextMate Grammar
 
-To support syntax highlighting in VS Code and Monaco (and other compatible editors) the package also provides a basic TextMate grammar for the alphaTex syntax.
-The grammar is provided as JavaScript object and can be dumped into a JSON or passed directly to compatible components. 
+The package ships a basic TextMate grammar for alphaTex, so VS Code, Monaco, and any other TextMate-compatible editor can syntax-highlight the language. The grammar is exposed as a JavaScript object — write it to disk as JSON or pass it directly to compatible components.
 
 ```ts
 import { textMateGrammar } from '@coderline/alphatab-language-server';
@@ -66,7 +70,7 @@ await fs.promises.writeFile('alphatex.tmLanguage.json', JSON.stringify(textMateG
 
 ### Language Configuration
 
-Similar to the TextMate grammar the package also provides a [language configuration](https://code.visualstudio.com/api/language-extensions/language-configuration-guide) providing details about comments, brackets etc. 
+Alongside the grammar the package exports a [language configuration](https://code.visualstudio.com/api/language-extensions/language-configuration-guide) that describes comments, brackets, and related editor behaviour.
 
 ```ts
 import { languageConfiguration } from '@coderline/alphatab-language-server';
@@ -77,8 +81,7 @@ await fs.promises.writeFile('language-configuration.json', JSON.stringify(langua
 
 ### Documentation
 
-The package also provides raw access to all alphaTex language elements. These definitions are internally to provide documentation hovers but we also use
-them to generate language reference pages you can find in the sidemenu.
+The package also exports raw access to every alphaTex language element. These definitions power the documentation hovers inside the server, and they generate the reference pages listed in the side menu.
 
 
 ```ts

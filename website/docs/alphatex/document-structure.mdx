@@ -1,12 +1,20 @@
 ---
 title: Document Structure
+description: How an alphaTex file is organised — bars, beats, notes, tracks, staves, and voices, and where score-level metadata belongs.
+keywords:
+  - alphaTex
+  - document structure
+  - bars
+  - beats
+  - notes
+  - tracks
+  - staves
+  - voices
 ---
 
 import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
-An alphaTex file is simply a list of bars and every bar has metadata and contents. For organizational reasons we commend
-that metadata tags describing the general song information are added to the start of the file, and external media synchronization points are 
-added on the end of the file: 
+An alphaTex file is a list of bars. Each bar carries optional [metadata tags](./syntax#metadata-tag) followed by its beat content. Place song-wide metadata at the top of the file and any external media sync points at the bottom.
 
 ```title=General File Structure
 /* Song Metadata */
@@ -15,9 +23,9 @@ added on the end of the file:
 ```
 
 :::note
-Before alphaTex 1.7 the 3 sections needed to be separated by a `.` This was improved in 1.7 and the separation dots should now be omitted.
+Before alphaTex 1.7 the three sections had to be separated by a `.`. Since 1.7 the separator dots are optional and you should omit them.
 
-```title=Pre 1.7 General File Structure
+```title=Pre 1.7 File Structure
 /* Song Metadata */
 .
 /* Song Contents */
@@ -28,10 +36,9 @@ Before alphaTex 1.7 the 3 sections needed to be separated by a `.` This was impr
 
 ## Bars
 
-Bars (aka. measures) are starting with an optional list of metadata tags followed by the beats contained
-in the bar. See [Bar Metadata](./bar-metadata.mdx) for details on the tags which can be applied here.
+A bar (also called a measure) begins with an optional list of [bar metadata tags](./syntax#bar-metadata) and continues with the beats it contains. See [Bar Metadata](./bar-metadata) for the tags you can apply here.
 
-A bar is completed by a pipe `|` symbol
+Close a bar with a pipe `|`.
 
 <AlphaTexSample>{`
 // bar 1 metadata tags
@@ -47,10 +54,9 @@ A bar is completed by a pipe `|` symbol
 
 ## Beats
 
-Beats group a number of notes played at the same time. The general parts of a beat are 
+A beat groups notes that sound at the same time. The general shape of a beat is:
 
 * `duration-change content duration effects multiplier`
-
 
 <AlphaTexSample tracks={"all"}>{`
 :4
@@ -63,26 +69,25 @@ Beats group a number of notes played at the same time. The general parts of a be
 
 ### Duration change (optional)
 
-A duration change allows easy changing of the duration for all following beats. The syntax is:
+Change the duration for every following beat with `:Duration`, where `Duration` is one of:
 
-`:Duration` where `Duration` is a number describing the new duration:
 * `:-4` a Quadruple Whole Note
 * `:-2` a Double Note 
 * `:1` a Whole Note
 * `:2` a Half Note
 * `:4` a Quarter Note 
-* `:8` a 8th Note 
+* `:8` an 8th Note 
 * `:16` a 16th Note
-* `:32` a 32th Note
+* `:32` a 32nd Note
 * `:64` a 64th Note
 * `:128` a 128th Note 
 * `:256` a 256th Note 
 
-Optionally you can specify some properties afterwards the duration to specify tuplets.  
+You can attach a [property block](./syntax#property) after the duration to declare tuplets.
 
 `:4 {tu 3 2}`
 
-See [Tuplet Effect](./beat-properties.mdx#tu) for more details.
+See [Tuplet Effect](./beat-properties#tu) for details.
 
 <AlphaTexSample>{`
 :16 // 16th notes from here
@@ -100,20 +105,19 @@ See [Tuplet Effect](./beat-properties.mdx#tu) for more details.
 
 ### Beat Content (required)
 
-The most crucial and part is to describe the contents of a beat which can be one of these options:
+The content of a beat is one of:
 
 * A rest
-* Multiple notes played (grouped by parenthesis)
-* A single note played
+* Multiple notes played together (grouped by parentheses)
+* A single note
 
-A rest is simply indicated by specifying an `r`: 
+Write a rest as `r`.
 
 <AlphaTexSample>{`
 :4 r r r r
 `}</AlphaTexSample>
 
-Multiple [Notes](#notes) can be grouped with parenthesis `()`. Similar to the value lists, you can also just specify
-one note and omit the parenthesis. 
+Group multiple [Notes](#notes) with parentheses `()`. As with [argument lists](./syntax#argument-list), you can omit the parentheses when there is a single note.
 
 <AlphaTexSample>{`
 :4 
@@ -123,8 +127,8 @@ one note and omit the parenthesis.
 
 ### Beat Duration (optional)
 
-Another way of specifying beat duration is to append them after the beat content as `. duration`.
-Historically the new duration is also remembered for the next beat. Tuplets specified as beat effects will not be remembered.
+You can also set the beat duration after the beat content as `. duration`. The new duration is remembered for the next beat, but tuplet effects are not.
+
 <AlphaTexSample>{`
 C4 .4
 C4 .8
@@ -134,7 +138,7 @@ C4 .2
 
 ### Beat Effects (optional)
 
-Beat effects can be applied as properties after the beat. See [Beat Properties](./beat-properties.mdx) to learn about all available effects.
+Attach [beat properties](./syntax#beat-property) after the beat content. See [Beat Properties](./beat-properties) for the full list.
 
 <AlphaTexSample>{`
 :4
@@ -145,8 +149,7 @@ Beat effects can be applied as properties after the beat. See [Beat Properties](
 
 ### Beat Multiplier (optional)
 
-This feature allows repeating the same beat multiple times by "multiplying" them. 
-Simply specify `* times` after the beat with `times` being the number of copies you want.
+Repeat the same beat with `* times`, where `times` is the number of copies.
 
 <AlphaTexSample>{`
 :4
@@ -156,23 +159,21 @@ Simply specify `* times` after the beat with `times` being the number of copies 
 
 ## Notes
 
-Depending on the instrument played you can have one of 3 kinds of notes in your bars. 
-Mixing is not possible so be sure to specify all notes consistently:
+Depending on the instrument, a bar contains one of three note kinds. Do not mix them within a staff — pick one and stay with it:
 
-* Fretted and Stringed instruments like guitars have their notes as `fret.string`
-* Percussion/Drums have their notes as articulation names. 
-* Other pitched instruments have their notes as note names.
+* Fretted and stringed instruments (guitars and similar) use [`fret.string`](./syntax#fret-string).
+* Percussion and drums use articulation names.
+* Other pitched instruments use note names.
 
-After each note the note effects can optionally be specified as properties: `note-value {note-properties}`.
+After each note you can attach [note properties](./syntax#note-property) as `note-value {note-properties}`.
 
 :::info
-AlphaTab tries to detect which kind of staff you are writing based on the first note.
+alphaTab detects the staff kind from the first note it reads.
 :::
 
 ### Fretted Notes
 
-If the current staff is a stringed instrument (`\tuning` or `\instrument` specified accordingly), 
-notes are expressed as the fret and string the note is played on. The final note height is calculated. 
+When the current staff is a stringed instrument (`\tuning` or `\instrument` set accordingly), you write notes as [fret and string](./syntax#fret-string). alphaTab computes the resulting pitch.
 
 <AlphaTexSample>{`
 :1
@@ -182,10 +183,9 @@ notes are expressed as the fret and string the note is played on. The final note
 
 ### Percussion / Drum Notes
 
-On percussion instruments, you specify the articulation which should be played as note. 
-The percussion can be a quoted string or an identifier (name without quotes).
+On percussion instruments, write the articulation to play as the note value. Use a quoted string or an unquoted identifier.
 
-More details are described over at the [`\\articulation`](./staff-metadata.mdx#articulation) metadata docs.
+See the [`\\articulation`](./staff-metadata#articulation) metadata tag for details.
 
 <AlphaTexSample>{`
 \\instrument percussion
@@ -199,10 +199,10 @@ More details are described over at the [`\\articulation`](./staff-metadata.mdx#a
 
 ### Pitched notes
 
-Pitched notes are expressed in a combined name containing:
+A pitched note combines:
 
-* The tone (`C`,`D`,`E`,`F`,`G`,`A`,`B`,`C`)
-* The accidental (`#`, `b`, `bb`, `x`, `##`,..; see [Accidentals](./note-properties.mdx#acc) for details on accidental handling)
+* The tone (`C`, `D`, `E`, `F`, `G`, `A`, `B`, `C`)
+* The accidental (`#`, `b`, `bb`, `x`, `##`, …; see [Accidentals](./note-properties#acc) for details)
 * The octave (a number)
 
 <AlphaTexSample>{`
@@ -214,8 +214,7 @@ Dx5
 
 ### Note Effects
 
-See [Note Properties](./note-properties.mdx) for a list of all supported effects for notes. 
-
+See [Note Properties](./note-properties) for the full list of note-level effects.
 
 <AlphaTexSample>{`
 :2
@@ -226,7 +225,7 @@ See [Note Properties](./note-properties.mdx) for a list of all supported effects
     )
 `}</AlphaTexSample>
 
-If you only have 1 note in the beat, you can specify both note and beat effects in the same property list.
+When a beat holds a single note, you can combine note and beat properties in one block.
 
 <AlphaTexSample>{`
 :2
@@ -243,8 +242,7 @@ If you only have 1 note in the beat, you can specify both note and beat effects 
 
 ## Tracks, Staves and Voices
 
-A song might consist of multiple tracks and staves holding the song data. There are special metadata tags which mark the start
-of such new structures. See [Structural Metadata](./structural-metadata.mdx) for more details.
+A song can hold multiple tracks and staves. Dedicated [structural metadata tags](./syntax#structural-metadata) mark the start of each. See [Structural Metadata](./structural-metadata) for the full reference.
 
 <AlphaTexSample tracks={"all"}>{`
 \\track "Track 1"
@@ -259,7 +257,7 @@ of such new structures. See [Structural Metadata](./structural-metadata.mdx) for
      1.2 3.2 5.2 6.2
 `}</AlphaTexSample>
 
-You only need to specify these structural tags to start a new element. A first initial element is started implicitly.
+You only need to write these structural tags to start a new element. The initial track, staff, and voice are opened implicitly.
 
 <AlphaTexSample tracks={"all"}>{`
 // first track

@@ -1,20 +1,25 @@
---- 
+---
 title: Importer and Parser
+description: Use the alphaTex importer and parser directly to access diagnostics and the abstract syntax tree behind the loaded score.
+keywords:
+  - alphaTex
+  - importer
+  - parser
+  - AST
+  - diagnostics
 since: 1.7.0
 ---
 
-When importing alphaTex into alphaTab it directly loads the provided code and, if successful, provides the loaded [data model](/docs/reference/score.mdx).
-Using the alphatex importer and parser more directly, allows access to more detailed information like the abstract syntax tree. 
+When you import alphaTex into alphaTab, the loader parses the source and, on success, hands you the resulting [data model](/docs/reference/score.mdx). Calling the alphaTex importer and parser directly exposes more detail — including the abstract syntax tree.
 
-This information can be very useful when building certain tooling and integrations. The [alphaTab language server](./lsp.mdx) itself also uses these components.
+This lower-level access powers tooling and integrations built on top of alphaTex. The [alphaTab language server](./lsp) uses the same components.
 
 > [!NOTE]
-> The code samples here are written in TypeScript but the APIs are similar on C# and Kotlin and can easily be mapped by adjusting the naming conventions. 
+> The samples below are TypeScript. The C# and Kotlin APIs mirror them — adjust the naming conventions to match your language.
 
 ## Importer
 
-The importer is the main component for loading alphaTex into a full [data model](/docs/reference/score.mdx). It is available via `alphaTab.importers.AlphaTexImporter`. 
-The most basic usage of it is:
+The importer is the main component for loading alphaTex into a full [data model](/docs/reference/score.mdx). It is available via `alphaTab.importers.AlphaTexImporter`. A minimal use looks like:
 
 ```js
 import * as alphaTab from '@coderline/alphatab';
@@ -33,19 +38,16 @@ console.log(score.title); // will print "Hello World"
 
 ### Diagnostics 
 
-The importer undergoes two phases: 
+The importer runs in two phases:
 
-1. Parse the AST using `alphaTab.importer.alphaTex.AlphaTexImporter`
+1. Parse the AST using `alphaTab.importer.alphaTex.AlphaTexImporter`.
 2. Map the AST to the data model.
 
-If everything goes well the score will be provided and additional non-error diagnostics are available on the importer. 
-If something goes wrong during parsing or mapping, no score will be provided and an exception is thrown. 
+On success the importer returns the score and exposes non-error diagnostics for inspection. On failure it throws an exception and returns no score.
 
-The main Error/Exception thrown will always be a `alphaTab.importer.UnsupportedFormatError` with a basic textual description of what went wrong. 
-If the exceptoin was caused by error diagnostics (e.g. parse errors) the inner exception (`cause`) is a `alphaTab.importer.AlphaTexErrorWithDiagnostics`
-providing access to all diagnostics. 
+The exception is always an `alphaTab.importer.UnsupportedFormatError` with a short textual description of the failure. When the failure came from error diagnostics (parse errors, for example), the inner exception (`cause`) is an `alphaTab.importer.AlphaTexErrorWithDiagnostics` that exposes every diagnostic.
 
-These exceptions mainly exist for cases where the importer or parser is not used directly. The diagnostics are also available on the importer directly. 
+These exceptions exist for callers that go through the higher-level loader. When you call the importer or parser yourself, read the diagnostics off the importer directly.
 
 ```js
 import * as alphaTab from '@coderline/alphatab';
@@ -98,15 +100,13 @@ try {
 }
 ```
 
-Diagnostics give access to a range of information like the location in the code to which it maps,
-the severity, a technical code identifying the error and a textual error message.
+Each diagnostic carries the source range it maps to, a severity, a technical code identifying the error, and a textual message.
 
 ### AST
 
-The importer also allows access to the abstract syntax tree of the parsed code. The AST might also be available
-for only partially parsed code. 
+The importer also exposes the abstract syntax tree of the parsed source. The AST is available even for partially parsed code.
 
-The following code should give an idea on how to access the AST by printing the whole hiearchy of nodes to the console: 
+The example below walks the tree recursively and prints every node to the console:
 
 ```js
 import * as alphaTab from '@coderline/alphatab';
@@ -295,13 +295,11 @@ The output of the above code is:
      pipe: undefined
 ```
 
-From here it is up to you to decide what to do with this information. 
+From here, the AST is yours to walk however your tooling needs.
 
 ## Parser
 
-The next lower level below the importer is the parser available via `alphaTab.importer.alphaTex.AlphaTexParser`.
-
-The usage is fairly simple and the output will give you again access to the AST: 
+Below the importer sits the parser, available via `alphaTab.importer.alphaTex.AlphaTexParser`. It gives you the AST without running the semantic mapping to the data model:
 
 ```ts
 import * as alphaTab from '@coderline/alphatab';

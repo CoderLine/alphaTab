@@ -1,27 +1,31 @@
 ---
 title: Structural Metadata
+description: Reference for the alphaTex structural metadata tags — \track, \staff, and \voice — that open new tracks, staves, and voices.
+keywords:
+  - alphaTex
+  - structural metadata
+  - track
+  - staff
+  - voice
 ---
 
 import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
-For some songs you might want to define that the song has multiple tracks, staves or voices.
+This page documents the [structural metadata](./syntax#structural-metadata) scope — the [metadata tags](./syntax#metadata-tag) that open a new track, staff, or voice.
 
-* Multiple tracks are used when multiple instruments are playing together in one song.
-* Multiple staves are typically used to write grand staff piano notation (left hand/right hand) or 
-  splitup voices for readability. 
-* Multiple voices are typically used to write notation where multiple independent timings and pitches are played. 
-  This can be if multiple vocals are singing together (hence the name voices), or special playing techniques (playing a base rhythm and melody on the same instrument). 
+Use these tags when your song needs more than one of any of them:
 
-In alphaTex new tracks, staves and voices are started with their respective metadata tags specified at the start of a bar:
+* Multiple tracks — when several instruments play together in the same song.
+* Multiple staves — for grand staff piano notation (left hand / right hand) or for splitting voices apart for readability.
+* Multiple voices — for independent rhythms and pitches inside the same staff, such as vocal parts sung together or a bass line played under a melody on the same instrument.
+
+Start each new track, staff, or voice with the matching tag at the beginning of a bar:
 
 * `\track`
 * `\staff`
 * `\voice`
 
-alphaTab refers to these kind of metadata tags as "structural" tags as they define the general structure of the song.
-
-The initial track, staff or voice is implicitly started. Only on the "second" item you need to specify the tags. For clarity
-it is encouraged to also specify the initial item if there are multiple tracks, staves or voices.
+The first track, staff, and voice are opened implicitly, so you only need these tags from the second element onward. When a piece has more than one, name the first element explicitly for clarity.
 
 import Doc from './_structural-metadata.mdx';
 

@@ -1,36 +1,38 @@
---- 
+---
 title: Monaco Editor Integration
+description: Wire the alphaTab language server into the Monaco editor with the @coderline/alphatab-monaco package for syntax highlighting and LSP features.
+keywords:
+  - alphaTex
+  - Monaco
+  - editor
+  - language server
+  - TextMate
+  - Web Worker
 since: 1.7.0
 ---
 
-[Monaco](https://microsoft.github.io/monaco-editor/) is the code editor that powers Visual Studio Code providing advanced coding capabilities. 
-Unfortunately Monaco has no built-in support for language servers but ships its own APIs. 
+[Monaco](https://microsoft.github.io/monaco-editor/) is the code editor that powers Visual Studio Code. It has no built-in support for language servers and ships its own APIs instead.
 
-You can opt for advanced integrations like https://github.com/TypeFox/monaco-languageclient or rely on this more lightweight integration we ship in [`@coderline/alphatab-monaco`](https://www.npmjs.com/package/@coderline/alphatab-monaco)
+For a full-featured bridge you can use [monaco-languageclient](https://github.com/TypeFox/monaco-languageclient). For a lighter-weight path, alphaTab ships [`@coderline/alphatab-monaco`](https://www.npmjs.com/package/@coderline/alphatab-monaco).
 
-This package allows integrating Monaco with the alphaTab language server running in a Web Worker providing all its capabilities.
+This package wires Monaco to the alphaTab language server running inside a Web Worker, so the editor gets every feature the server provides.
 
-This guide here focuses on the integration with Monaco in a browser environment. We also assume that the dependencies imported are available 
-through some mechanism like bundlers.
+This guide focuses on Monaco in a browser environment. It assumes your bundler resolves the imported dependencies.
 
 > [!WARNING]
-> This integration is still experimental. It works fine with a single editor on the page but 
-> it has not yet been well integrated into more complex environments with multiple 
-> editors. 
+> This integration is still experimental. It works well with a single editor on the page. Complex layouts with multiple editors are not yet fully supported.
 
-We also use this module in our development playground. You can check out and test things by cloning alphaTab and opening it in VS Code (it will compile and start the playground). 
-Then open the `alphaTex Editor` in the menu. 
+The alphaTab development playground uses this same module. Clone alphaTab, open it in VS Code (it compiles and starts the playground automatically), and open the `alphaTex Editor` from the menu.
 
 <img src="/img/alphatex/monaco/playground.png" />
 
 
 ## TextMate grammar
 
-alphaTab ships a TextMate grammar, but Monaco does not support TextMate grammars out-of-the-box. 
-We use two packages from Microsoft bridge this gap: 
+alphaTab ships a TextMate grammar, but Monaco does not consume TextMate grammars out of the box. Two Microsoft packages bridge the gap:
 
-* `vscode-textmate` Manages the loading of TextMate grammars 
-* `vscode-oniguruma` Is the engine for Oniguruma Regular expressions used in TextMate grammars (via WebAssembly). 
+* `vscode-textmate` — loads TextMate grammars.
+* `vscode-oniguruma` — provides the Oniguruma regex engine that TextMate grammars rely on, via WebAssembly.
 
 ```ts
 //
@@ -69,19 +71,19 @@ const editor = monaco.editor.create(element!, {
 });
 ```
 
-At this point you should get an editor with syntax highlighting.
+At this point you have an editor with syntax highlighting.
 
 ## Starting the language server 
 
-To get the remaining capabilites into Monaco, we first have to launch the alphaTex language server in a web worker. 
+To bring the remaining capabilities into Monaco, launch the alphaTex language server in a Web Worker.
 
-The NPM package provides a module which can be spawned as web worker:
+The NPM package ships a module you can spawn as a Web Worker:
 
 ```ts
 const lspWorker = new Worker(new URL('@coderline/alphatab-monaco/dist/worker.mjs', import.meta.url));
 ```
 
-Alternatively you can also create an own worker file in your project and start the language server: 
+You can also create your own worker file in the project and start the language server from there:
 
 ```ts title="lsp.worker.ts"
 // Variant 1
@@ -112,6 +114,4 @@ await basicEditorLspIntegration(editor, lspWorker, { languageId: 'alphatex' });
 The alphaTex editor on the [alphaTab landing page](/) is built on this stack.
 
 > [!WARNING]
-> We noticed some strange Vite behaviors when spawning workers in our [development playground](https://github.com/CoderLine/alphaTab/blob/develop/packages/playground/alphatex-editor.ts).
-> Strangely Vite did not actually bundle the dependencies included in the worker leading to problems that the language server is not started.
-> We had to create an additional [wrapper script](https://github.com/CoderLine/alphaTab/blob/develop/packages/playground/alphatexLanguageServerWrap.ts) which then imports the [worker](https://github.com/CoderLine/alphaTab/blob/develop/packages/playground/alphatexLanguageServer.ts).
+> Vite behaves oddly when spawning workers inside the alphaTab [development playground](https://github.com/CoderLine/alphaTab/blob/develop/packages/playground/alphatex-editor.ts). It does not bundle the dependencies included in the worker, so the language server fails to start. The workaround is an extra [wrapper script](https://github.com/CoderLine/alphaTab/blob/develop/packages/playground/alphatexLanguageServerWrap.ts) that imports the [worker](https://github.com/CoderLine/alphaTab/blob/develop/packages/playground/alphatexLanguageServer.ts).
