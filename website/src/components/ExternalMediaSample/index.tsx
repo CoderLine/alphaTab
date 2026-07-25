@@ -4,9 +4,47 @@ import {
     AlphaTabPlayer,
     AlphaTabCanvas,
     useAlphaTabApi,
+    useAlphaTabEvent,
 } from "@site/src/alphatab-react";
 import CodeBlock from '@theme/CodeBlock';
 import styles from './styles.module.scss';
+
+/**
+ * Bach_Prelude_BWV999.gp is a 4-bar excerpt in 3/4 at tempo 80 → 9s of
+ * score-time. The paired Bach_Prelude_BWV999.mp4 is ~10.22s. Without any
+ * sync points on the score, the alphaTab cursor plays at score-tempo and
+ * drifts ~12% ahead of the video. This helper applies linear sync points
+ * that stretch the score's masterbars evenly across the media's actual
+ * duration, so the cursor visibly rides the video.
+ */
+const applyLinearSyncPoints = (
+    api: alphaTab.AlphaTabApi,
+    mediaDurationMs: number,
+) => {
+    const score = api.score;
+    if (!score || !mediaDurationMs || !Number.isFinite(mediaDurationMs)) return;
+    const barCount = score.masterBars.length;
+    if (barCount === 0) return;
+    const points: alphaTab.model.FlatSyncPoint[] = [];
+    for (let i = 0; i < barCount; i++) {
+        points.push({
+            barIndex: i,
+            barPosition: 0,
+            barOccurence: 0,
+            millisecondOffset: (i / barCount) * mediaDurationMs,
+        } as alphaTab.model.FlatSyncPoint);
+    }
+    // Anchor the tail so the last bar spans to the end of the media instead
+    // of dangling.
+    points.push({
+        barIndex: barCount - 1,
+        barPosition: 1,
+        barOccurence: 0,
+        millisecondOffset: mediaDurationMs,
+    } as alphaTab.model.FlatSyncPoint);
+    score.applyFlatSyncPoints(points);
+    api.updateSyncPoints();
+};
 
 export type ExternalMediaSampleProps = {
     /** Which media element to use for the sync source. Defaults to `'audio'`. */
@@ -24,6 +62,42 @@ const ExternalMediaBridge: React.FC<{
 }> = ({ media }) => {
     const api = useAlphaTabApi();
     const updateTimer = useRef<number>(0);
+
+    // Apply linear sync points once BOTH the score is loaded and the media
+    // element has reported a valid duration. The two events race, so cache
+    // whichever half arrives first and fire once both are present.
+    const scoreLoadedRef = useRef(false);
+    const durationMsRef = useRef(0);
+    const syncAppliedRef = useRef(false);
+    const tryApplySync = () => {
+        if (!api || syncAppliedRef.current) return;
+        if (!scoreLoadedRef.current || durationMsRef.current <= 0) return;
+        applyLinearSyncPoints(api, durationMsRef.current);
+        syncAppliedRef.current = true;
+    };
+    useAlphaTabEvent('scoreLoaded', () => {
+        scoreLoadedRef.current = true;
+        tryApplySync();
+    });
+    useEffect(() => {
+        const el = media.current;
+        if (!el) return;
+        const onLoadedMeta = () => {
+            const d = el.duration;
+            if (Number.isFinite(d) && d > 0) {
+                durationMsRef.current = d * 1000;
+                tryApplySync();
+            }
+        };
+        // Might already be ready
+        onLoadedMeta();
+        el.addEventListener('loadedmetadata', onLoadedMeta);
+        el.addEventListener('durationchange', onLoadedMeta);
+        return () => {
+            el.removeEventListener('loadedmetadata', onLoadedMeta);
+            el.removeEventListener('durationchange', onLoadedMeta);
+        };
+    }, [api, media]);
 
     useEffect(() => {
         if (!api || !media.current) return;
