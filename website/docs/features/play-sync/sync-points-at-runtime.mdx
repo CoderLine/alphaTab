@@ -11,7 +11,13 @@ keywords:
   - runtime
 ---
 
+import { SyncPointsRuntimeDemo } from '@site/src/components/SyncPointsRuntimeDemo';
+
 Aligning a backing track to a score means putting a timestamp on each barline. The [Media Sync Editor](/docs/guides/media-sync-editor) is where that authoring workflow lives — load a waveform, tap the bar positions, export the resulting list of anchor points. Once you have that list (either from the editor or from your own UI), this page shows how to push it into a live alphaTab instance so playback follows the audio.
+
+The demo below loads Bach's Prelude in D Minor (BWV 999) against its audio recording and lets you flip between two sync-point layouts at runtime. "Linear" stretches the 4 bars evenly across the audio; "back-loaded" spends 70% of the audio on the first two bars and rushes through the last two. Press play and toggle — the cursor re-aligns without a reload because `api.updateSyncPoints()` refreshes the mapping on the running instance.
+
+<SyncPointsRuntimeDemo />
 
 :::info Author sync points in the editor
 Building a full waveform-and-drag-handle editor from scratch rivals what the [Media Sync Editor](/docs/guides/media-sync-editor) already offers. The right workflow is: author sync points in the editor (or copy the exported list into your source), then use the runtime API below to load or refresh them on the running instance.
