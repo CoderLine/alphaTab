@@ -18,7 +18,7 @@ import * as Riffs from '@site/src/tex-riffs';
 
 Hosting alphaTab inside an app with a custom bundler means understanding the worker/worklet split: rendering runs off the main thread in a Web Worker, and audio synthesis runs in an Audio Worklet inside the page's audio graph. The shipped Vite and webpack plugins wire both for you. Anywhere else — a Vite/webpack setup you built yourself, or a different bundler entirely — you tell alphaTab how to construct them via the three `Environment` statics on this page.
 
-<AlphaTab tex={true} player={true}>{Riffs.BACH_PRELUDE_C_LONG}</AlphaTab>
+<AlphaTab tex={true} player={true}>{Riffs.ORNAMENTS_MELODY}</AlphaTab>
 
 This site's build uses the Vite plugin — the render engine runs in a Web Worker and the synth in an AudioWorklet. Hover the render and press play: everything you hear is proof the entry points on this page are alive.
 
