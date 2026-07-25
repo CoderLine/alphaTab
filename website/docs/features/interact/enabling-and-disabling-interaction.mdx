@@ -17,7 +17,7 @@ import * as Riffs from '@site/src/tex-riffs';
 
 A read-only thumbnail preview does not want random clicks moving its playhead. A practice UI with a fixed loop should not let a stray drag repaint the range. Two flags cover both scenarios: `player.enableSeekToClick` gates the click-to-seek behavior, and `player.enablePlaybackRangeSelection` gates the drag-select. Both default to `true` when the player is active. Flip either off in the demo below and watch the events keep firing while the corresponding built-in side effect stops.
 
-<ClickLogDemo showInteractionToggle showCode={false} tex={Riffs.FOLK_ARPEGGIO} />
+<ClickLogDemo showInteractionToggle showCode={false} tex={Riffs.ORNAMENTS_MELODY} />
 
 ## What the flags gate
 
