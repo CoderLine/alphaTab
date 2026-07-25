@@ -14,9 +14,9 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 Interop with Sibelius, Finale, Dorico, MuseScore, and every other notation editor is what MusicXML exists for. alphaTab imports it with mature coverage of notation, playback, and layout hints — so a `.musicxml` file from any of those tools opens in the same viewer as your Guitar Pro sources.
 
-The preview below loads a `.musicxml` file directly — Mozart's Twinkle theme (K.265, PD) as a piano grand staff wrapped in a MusicXML `<part-group>` brace. With `importer.mergePartGroupsInMusicXml = true` the two hands fold into a single piano track with two staves.
+Point `core.file` at a `.musicxml` file and it just loads — same one-line setup as a Guitar Pro source. The preview below reads Mozart's Twinkle theme (K.265, PD) as a piano grand staff.
 
-<AlphaTab tex={false} file="/files/features/twinkle-mozart.musicxml" settings={{ importer: { mergePartGroupsInMusicXml: true } }} />
+<AlphaTab tex={false} file="/files/features/twinkle-mozart.musicxml" />
 
 ## What alphaTab reads from a MusicXML file
 
