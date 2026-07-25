@@ -137,7 +137,7 @@ export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
   return (
     <div className={styles.demo}>
       <AlphaTabPlayer
-        player={false}
+        player={true}
         settings={{ importer: { beatTextAsLyrics: false } }}
       >
         <Inner

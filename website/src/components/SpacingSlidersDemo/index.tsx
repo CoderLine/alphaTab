@@ -130,7 +130,7 @@ const api = new alphaTab.AlphaTabApi(container, {
       </div>
       <AlphaTabPlayer
         file={file}
-        player={false}
+        player={true}
         settings={{
           display: {
             stretchForce: 1.2,

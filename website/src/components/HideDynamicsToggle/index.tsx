@@ -55,7 +55,7 @@ export const HideDynamicsToggle: React.FC<HideDynamicsToggleProps> = ({
       </div>
       <AlphaTabPlayer
         file="/files/features/Dynamics.gp5"
-        player={false}
+        player={true}
         settings={{ display: { barCount: 12 } }}
       >
         <ApplyHideDynamics hidden={hidden} />

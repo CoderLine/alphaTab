@@ -107,7 +107,7 @@ slider.addEventListener('change', (event) => {
         <AlphaTabPlayer
           file={file}
           tex={texContent}
-          player={false}
+          player={true}
           settings={{ display: { scale: 1.3 } }}
         >
           <ApplyScale scale={scale} />

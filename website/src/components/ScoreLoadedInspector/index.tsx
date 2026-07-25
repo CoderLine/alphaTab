@@ -107,7 +107,7 @@ api.scoreLoaded.on((score) => {
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer file={SOURCE_URL} player={false}>
+      <AlphaTabPlayer file={SOURCE_URL} player={true}>
         <Inner />
       </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}

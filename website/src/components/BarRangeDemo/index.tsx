@@ -147,7 +147,7 @@ document.getElementById('next-page').addEventListener('click', () => {
       <AlphaTabPlayer
         file={file}
         tex={texContent}
-        player={false}
+        player={true}
         settings={{ display: { startBar: 1, barCount: step } }}
       >
         <ApplyRange

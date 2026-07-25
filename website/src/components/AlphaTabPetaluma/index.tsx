@@ -39,7 +39,7 @@ export const AlphaTabPetaluma: React.FC<AlphaTabPetalumaProps> = ({
   return (
     <AlphaTabPlayer
       tex={tex}
-      player={false}
+      player={true}
       settings={{
         core: {
           // Plain object form is accepted by settings.fillFromJson at runtime;

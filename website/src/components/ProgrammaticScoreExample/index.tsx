@@ -141,7 +141,7 @@ export const ProgrammaticScoreExample: React.FC<ProgrammaticScoreExampleProps> =
 }) => {
   return (
     <div>
-      <AlphaTabPlayer player={false}>
+      <AlphaTabPlayer player={true}>
         <RenderBuiltScore />
         <AlphaTabCanvas />
       </AlphaTabPlayer>

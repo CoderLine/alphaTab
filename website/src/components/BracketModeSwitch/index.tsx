@@ -89,7 +89,7 @@ export const BracketModeSwitch: React.FC<BracketModeSwitchProps> = ({
           </li>
         ))}
       </ul>
-      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={false}>
+      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={true}>
         <ApplyBracketMode mode={mode} />
         <AlphaTabCanvas />
       </AlphaTabPlayer>

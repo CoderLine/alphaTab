@@ -93,7 +93,7 @@ document.getElementById('load-rhythm').addEventListener('click', () => {
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer file={CHORDS_URL} player={false}>
+      <AlphaTabPlayer file={CHORDS_URL} player={true}>
         <Inner currentUrl={currentUrl} setCurrentUrl={setCurrentUrl} />
       </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}

@@ -83,7 +83,7 @@ document.getElementById('tex-input').addEventListener('input', (e) => {
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer tex={INITIAL_TEX} player={false}>
+      <AlphaTabPlayer tex={INITIAL_TEX} player={true}>
         <Inner text={text} setText={setText} />
       </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}

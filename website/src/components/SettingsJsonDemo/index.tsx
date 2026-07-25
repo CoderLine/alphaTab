@@ -261,7 +261,7 @@ export const SettingsJsonDemo: React.FC<SettingsJsonDemoProps> = ({
     <div>
       <AlphaTabPlayer
         file="/files/features/Chords.gp5"
-        player={false}
+        player={true}
         settings={{ display: { scale: 1.0 } }}
       >
         <SettingsJsonInner />

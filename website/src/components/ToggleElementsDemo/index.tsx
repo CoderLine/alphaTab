@@ -131,7 +131,7 @@ ${disabledEntries || "      // every element visible"}
           </label>
         ))}
       </div>
-      <AlphaTabPlayer tex={DEMO_TEX} player={false}>
+      <AlphaTabPlayer tex={DEMO_TEX} player={true}>
         <ApplyElementVisibility visibility={visibility} />
         <AlphaTabCanvas />
       </AlphaTabPlayer>

@@ -150,7 +150,7 @@ export const TrackNamePolicyDemo: React.FC<TrackNamePolicyDemoProps> = ({
           </select>
         </label>
       </div>
-      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={false}>
+      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={true}>
         <ApplyTrackNames
           policy={policy}
           mode={mode}

@@ -107,7 +107,7 @@ api.load('/scores/newer.gp');    // GP7/8 ZIP`;
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer file={INITIAL_VARIANT.file} player={false}>
+      <AlphaTabPlayer file={INITIAL_VARIANT.file} player={true}>
         <Inner active={active} setActive={setActive} />
       </AlphaTabPlayer>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}

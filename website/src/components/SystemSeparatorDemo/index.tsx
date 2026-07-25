@@ -78,7 +78,7 @@ export const SystemSeparatorDemo: React.FC<SystemSeparatorDemoProps> = ({
           Show system separator
         </label>
       </div>
-      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={false}>
+      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={true}>
         <ApplySystemSeparator enabled={enabled} />
         <AlphaTabCanvas />
       </AlphaTabPlayer>

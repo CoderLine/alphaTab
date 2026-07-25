@@ -107,7 +107,7 @@ api.renderScore(score, [0]);`;
     <div className={styles.demo}>
       <div className={styles.split}>
         <div className={styles.render}>
-          <AlphaTabPlayer player={false}>
+          <AlphaTabPlayer player={true}>
             <Inner info={info} setInfo={setInfo} />
           </AlphaTabPlayer>
         </div>

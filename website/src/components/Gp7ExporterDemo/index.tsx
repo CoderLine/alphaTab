@@ -111,7 +111,7 @@ export const Gp7ExporterDemo: React.FC<Gp7ExporterDemoProps> = ({
 }) => {
   return (
     <div>
-      <AlphaTabPlayer file="/files/features/Chords.gp5" player={false}>
+      <AlphaTabPlayer file="/files/features/Chords.gp5" player={true}>
         <Gp7ExporterControls />
         <AlphaTabCanvas />
       </AlphaTabPlayer>

@@ -74,7 +74,7 @@ export const MultiBarRestToggle: React.FC<MultiBarRestToggleProps> = ({
           Collapse consecutive empty bars into a multi-bar rest
         </label>
       </div>
-      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={false}>
+      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={true}>
         <ApplyMultiBarRest enabled={enabled} />
         <AlphaTabCanvas />
       </AlphaTabPlayer>

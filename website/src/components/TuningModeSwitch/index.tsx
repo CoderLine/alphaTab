@@ -100,7 +100,7 @@ export const TuningModeSwitch: React.FC<TuningModeSwitchProps> = ({
       </div>
       <AlphaTabPlayer
         file="/files/features/Tuning.gp5"
-        player={false}
+        player={true}
         settings={{ display: { barCount: 12 } }}
       >
         <ApplyTuning mode={mode} hidden={hidden} />

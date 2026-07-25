@@ -171,7 +171,7 @@ export const ColoringExample: React.FC<ColoringExampleProps> = ({
 
   return (
     <div>
-      <AlphaTabPlayer tex={TEX} player={false}>
+      <AlphaTabPlayer tex={TEX} player={true}>
         <ApplyColors />
         <AlphaTabCanvas />
       </AlphaTabPlayer>

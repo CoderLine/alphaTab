@@ -108,7 +108,7 @@ api.resize.on((args) => {
           userSelect: dragging ? "none" : "auto",
         }}
       >
-        <AlphaTabPlayer file={file} player={false}>
+        <AlphaTabPlayer file={file} player={true}>
           <TrackContainerWidth
             containerRef={containerRef}
             onWidthChange={setDisplayWidth}

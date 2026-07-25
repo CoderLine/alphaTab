@@ -279,7 +279,7 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
       <AlphaTabPlayer
         tex={tex}
         tracks="all"
-        player={false}
+        player={true}
         settings={{ core: { includeNoteBounds: true } }}
       >
         <Overlay

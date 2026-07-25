@@ -200,7 +200,7 @@ export const LoadErrorDemo: React.FC<LoadErrorDemoProps> = ({
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer file={VALID_URL} player={false}>
+      <AlphaTabPlayer file={VALID_URL} player={true}>
         <Inner
           record={record}
           setRecord={setRecord}

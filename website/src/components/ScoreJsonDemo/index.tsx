@@ -168,7 +168,7 @@ export const ScoreJsonDemo: React.FC<ScoreJsonDemoProps> = ({
 }) => {
   return (
     <div>
-      <AlphaTabPlayer file="/files/features/Chords.gp5" player={false}>
+      <AlphaTabPlayer file="/files/features/Chords.gp5" player={true}>
         <AlphaTabCanvas />
         <ScoreJsonControls />
       </AlphaTabPlayer>

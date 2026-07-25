@@ -124,7 +124,7 @@ export const CoveragePaletteDemo: React.FC<CoveragePaletteDemoProps> = ({
       </div>
       <AlphaTabPlayer
         file="/files/features/Chords.gp5"
-        player={false}
+        player={true}
         settings={{
           display: {
             resources: {

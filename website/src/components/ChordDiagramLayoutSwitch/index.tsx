@@ -69,7 +69,7 @@ export const ChordDiagramLayoutSwitch: React.FC<
       </ul>
       <AlphaTabPlayer
         file="/files/features/Chords.gp5"
-        player={false}
+        player={true}
         settings={{ display: { barCount: 12 } }}
       >
         <ApplyPlacement placement={placement} />

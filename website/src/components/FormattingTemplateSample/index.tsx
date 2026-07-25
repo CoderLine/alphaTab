@@ -121,7 +121,7 @@ export const FormattingTemplateSample: React.FC = () => {
 
   return (
     <div>
-      <AlphaTabPlayer player={false}>
+      <AlphaTabPlayer player={true}>
         <FormattingTemplateInner />
         <AlphaTabCanvas />
       </AlphaTabPlayer>

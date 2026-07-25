@@ -138,7 +138,7 @@ api.scoreLoaded.on((score) => {
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer player={false}>
+      <AlphaTabPlayer player={true}>
         <Inner
           byteCount={byteCount}
           setByteCount={setByteCount}

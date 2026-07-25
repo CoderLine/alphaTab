@@ -145,7 +145,7 @@ api.renderTracks([api.score.tracks[0], api.score.tracks[1]]);`;
       <AlphaTabPlayer
         file="/files/features/Skillet.gp5"
         tracks={[0]}
-        player={false}
+        player={true}
       >
         <Inner />
       </AlphaTabPlayer>
