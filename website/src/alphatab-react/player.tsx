@@ -16,6 +16,7 @@ import { useAlphaTabModule } from './module';
 import { applyAlphaTabSettings, type AlphaTabPreset } from './settings';
 import { AlphaTabStore, initialAlphaTabState, type AlphaTabState } from './store';
 import { SelectionHandles } from './selection-handles';
+import { registerForSpacebar } from './spacebar-playback';
 
 interface AlphaTabContextValue {
     state: AlphaTabState;
@@ -146,6 +147,14 @@ export function AlphaTabPlayer({
     useEffect(() => {
         if (store) store.applyColorMode(colorMode);
     }, [store, colorMode]);
+
+    // Temporary: register with the global spacebar-playPause coordinator so
+    // authors can audibly step through demos without one focus target per
+    // player. Uses the scroll node as the "container" for visibility scoring.
+    useEffect(() => {
+        if (!api || !scrollNode) return;
+        return registerForSpacebar(scrollNode, api);
+    }, [api, scrollNode]);
 
     // Runtime file/tex switches after mount.
     const initialFile = useRef(file);

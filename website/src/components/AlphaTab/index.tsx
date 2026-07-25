@@ -38,7 +38,11 @@ export const AlphaTab: React.FC<AlphaTabProps> = ({
       tex={texContent}
       tracks={tracks}
       settings={settings}
-      player={player ?? false}
+      // Temporary: audio on for every feature demo so authors can verify each
+      // score sounds musically sensible. Revert to `player ?? false` once the
+      // sweep is done — feature demos that don't need audio shouldn't pay the
+      // audio-worklet + SoundFont cost by default.
+      player={player ?? true}
     />
   );
 };
