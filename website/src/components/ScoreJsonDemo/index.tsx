@@ -21,7 +21,7 @@ const codeSample = `import * as alphaTab from '@coderline/alphatab';
 
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
 });
 
 api.scoreLoaded.on(() => {

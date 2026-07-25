@@ -93,7 +93,7 @@ export const ToggleElementsDemo: React.FC<ToggleElementsDemoProps> = ({
     .join("\n");
 
   const code = `const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   notation: {
     elements: new Map([
 ${disabledEntries || "      // every element visible"}

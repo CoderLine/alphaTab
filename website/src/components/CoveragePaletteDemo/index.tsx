@@ -72,7 +72,7 @@ export const CoveragePaletteDemo: React.FC<CoveragePaletteDemoProps> = ({
   ];
 
   const code = `const api = new alphaTab.AlphaTabApi(container, {
-  core: { file: '/scores/canon.gp' },
+  core: { file: '/scores/song.gp' },
   display: {
     resources: {
       mainGlyphColor: '${palette.mainGlyphColor}',

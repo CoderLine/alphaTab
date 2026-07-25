@@ -29,7 +29,7 @@ export const DEMO_FILES: DemoFile[] = [
         label: 'canon-rock.gp5',
         ext: 'gp5',
         trackColor: 'var(--at-accent)',
-        url: '/files/canon-full.gp',
+        url: '/files/pachelbel-canon-ensemble.gp',
     },
     {
         kind: 'url',
