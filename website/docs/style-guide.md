@@ -104,3 +104,12 @@ keywords:
 ```
 
 `keywords` must be a YAML array — either the block form shown above or the inline form `keywords: [alphaTab, install]`. A bare comma-separated string is rejected by Docusaurus.
+
+## alphaTex terminology
+
+alphaTex pages use one term per concept. Do not swap in synonyms.
+
+- Use `metadata tag` for `\name`. Do not write `directive`, `command`, `keyword`, or `statement`.
+- Use `property` for a `{ name arguments }` entry. Do not write `attribute`.
+- Use `argument` for a value the writer supplies, `parameter` for the positional slot it fills, and `signature` for one accepted parameter list. A construct with more than one signature is `overloaded`.
+- Scopes are `structural`, `score`, `staff`, `bar`, `beat`, and `note`. Every scope has an anchor on [`alphatex/syntax`](alphatex/syntax).

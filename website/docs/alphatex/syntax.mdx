@@ -1,36 +1,50 @@
 ---
 title: Language Syntax
+description: How to write alphaTex — comments, strings, numbers, argument lists, properties, metadata tags, scopes, signatures, case rules, and fret-note notation.
+keywords:
+  - alphaTex
+  - syntax
+  - terminology
+  - metadata tag
+  - property
+  - signature
+  - scope
+  - fret notation
 ---
 
-If you compare alphaTex to programming or scripting languages, you will find similar constructs in this language. alphaTex (as the name implies) has borrowed
-some aspects from LaTeX, a well known language for writing documents. As alphaTex evolved it came up with various own syntax constructs described here. 
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
-When storing alphaTex to files, we recommend using the file extension `.atex`.
+This page describes the alphaTex source syntax and defines the vocabulary the rest of the reference uses. Every other page links back to the anchors here on first use of a term. Save alphaTex source with the file extension `.atex`.
 
-## Comments
+## Comments {#comments}
 
-Comments are supported in C-style comments via `// Single Line` and `/* Multi Line */`. You can use them anywhere within an alphaTex file
-to further annotate your written document for structural or organizational purposes.
+Use `//` for a line comment and `/* ... */` for a block comment. Place them anywhere in an alphaTex file to annotate your source.
 
-## Strings
+```title=Comments
+// This is a single-line comment.
+/* This is a
+   multi-line block comment. */
+```
 
-Textual values are expressed as quoted strings similar to most programming languages. Both single and double quotes are supported. 
+## Strings {#strings}
 
-* `"Double Quoted String"`
-* `'Single Quoted String'`
+Wrap textual values in double or single quotes.
 
-Additionally following escape sequences are supported:
+* `"Double quoted string"`
+* `'Single quoted string'`
 
-* `\n` Newline
-* `\r` Carriage Return
-* `\t` Tab
-* `\uXXXX` Unicode Character where XXXX is a 4 hex-digit number.
-* `\\` A backslash 
-* `\'` or `\"` a quote character 
+The following escape sequences are supported inside string literals:
 
-## Numbers
+* `\n` — newline
+* `\r` — carriage return
+* `\t` — tab
+* `\\` — a literal backslash
+* `\'` and `\"` — a literal quote
+* `\uXXXX` — a Unicode code point given as four hex digits
 
-alphaTex supports integer and decimal numbers.  Decimal numbers are only allowed in some dedicated places to avoid overlaps with some other syntax constructs.
+## Numbers {#numbers}
+
+alphaTex supports integer and decimal numbers. Decimal numbers are accepted only in the places where they cannot collide with fret-note notation or duration values.
 
 Examples:
 
@@ -39,68 +53,127 @@ Examples:
 * `0.5`
 * `-4.5`
 
-## Parameters / Argument Lists
+## Argument lists {#argument-lists}
 
-At various places parameters are used to describe values like time signatures or bend points. 
-Arguments should be wrapped with parenthesis `(values)` if there are multiple values. If there is only a single value, the parenthesis can be omitted. 
+<a id="argument-list"></a>
+An **argument list** is the group of values you pass into a metadata tag or a property. Wrap multiple values in parentheses. Omit the parentheses when you pass a single value.
 
-The individual values can be: 
+<a id="argument"></a><a id="parameter"></a>
+Each entry inside the list is called an **argument**. The reference tables describe the matching **parameters** — the positional slots that the language accepts for a given construct.
 
-* Integer numbers: `3`, `-10`
-* Decimal Numbers: `3.3`, `-10.5`
-* Strings: `"Hello"`, `'Hello'`
-* Special identifiers: `true`, `hide`, `x`
+An argument can be:
 
-Basic Examples 
+* An integer: `3`, `-10`
+* A decimal number: `3.3`, `-10.5`
+* A string: `"Hello"`, `'Hello'`
+* A reserved identifier: `true`, `hide`, `x`
 
-* `( 1 2 3 )`  A list of numbers
-* `("Test" 3 hide)` A list of mixed type values 
+Basic examples:
 
-Real examples
+* `(1 2 3)` — three numbers
+* `("Test" 3 hide)` — mixed types
 
-* `\ts (3 4)` A 3/4 time signature (specified on bar level)
-* `12.2 { b (0 4 0) }` A note bend describing a full note bend and release
-* `\title ("Song Title" "Title: %TITLE%" left)` A song title shown as `Title: Song Title` left aligned.
+Real examples:
 
-You can compare this syntax construct with calling a function in scripting or programming languages: `myFunction(value1, value2)`. The difference in alphaTex is that the individual arguments
-are separated by simple spaces and single argument calls do not need parentehsis.
+* `\ts (3 4)` — a 3/4 time signature at bar scope
+* `12.2 { b (0 4 0) }` — a full bend and release on a note
+* `\title ("Song Title" "Title: %TITLE%" left)` — a song title shown as `Title: Song Title`, left aligned
 
-## Properties
+Argument entries are separated by whitespace. Commas are not used.
 
-Properties are a list of key-valuelist pairs describing additional optional aspects of elements.
-They are used to add effects to notes and beats, what notations should be visible in a staff and more. 
+## Properties {#properties}
 
-Properties are always wrapped into curly braces. A property starts with an identifier describing the property, optionally followed by its values as value list. 
+<a id="property"></a>
+A **property** is a `name arguments` pair inside curly braces. Properties attach to beats, notes, and metadata tags to add effects, visibility flags, and other optional aspects.
 
-Examples: 
-* `\track "Track Name" { color "#FF0000"}`
-* `\staff {score}`
-* `C4 {b (0 4) v txt "Bend with Vibrato"}`
+Property names are case-insensitive. The argument list of a property follows the rules in [Argument lists](#argument-lists).
 
-Property identifiers are case-insensitive.
+```title=Properties on a track, a staff, and a note
+\track "Track Name" { color "#FF0000" }
+\staff { score }
+C4 { b (0 4) v txt "Bend with Vibrato" }
+```
 
-## Metadata Tags
+## Metadata tags {#metadata-tags}
 
-Metadata tags are the most similar construct to LaTeX. Metadata are used to describe various elements within the data model.
+<a id="metadata-tag"></a>
+A **metadata tag** is a backslash-prefixed construct of the form `\name arguments {properties}`. The argument list and the property block are both optional; individual tags decide which arguments and properties they accept.
 
-The main syntax of metadata tags is: `\tag parameters {properties}`.
-Both the `parameters` and `{properties}` are optional from a syntax perspective. Depending on the `tag` values might be expected to be specified.
+Metadata tag names are case-insensitive.
 
-Examples:
+```title=Metadata tags
+\title "Song Title"
+\track "Track Name" { color '#FF0000' }
+\ts (3 4)
+```
 
-* `\title "Song Title"`
-* `\track "Track Name" {color '#FF0000'}`
-* `\ts (3 4)`
+The arguments of a metadata tag follow [Argument lists](#argument-lists). Its properties follow [Properties](#properties).
 
-Metadata tags identifiers are case-insensitive.
+## Scopes {#scope}
 
-### Metadata tag parameters
+alphaTex constructs are grouped by where they appear in the source. This grouping is called **scope**. Each reference page in this section documents one scope.
 
-Metadata tags might have one or multiple values passed into them as arguments. The exact values supported (required or optional) depend on the tag.
-See [Arguments](#parameters--argument-lists) above for more details.
+Four scopes apply to metadata tags:
 
-### Metadata tag properties
+### Structural metadata {#structural-metadata}
 
-Metadata tags might have one or multiple properties. The exact values supported depend on the tag.
-See [Properties](#properties) above for more details.
+Tags that start a new track, staff, or voice: `\track`, `\staff`, `\voice`. Documented in [Structural Metadata](./structural-metadata.mdx).
 
+### Score metadata {#score-metadata}
+
+Song-wide tags that describe the piece — title, artist, tempo defaults, and so on. They belong at the top of the file, above the first bar. Documented in [Score Metadata](./score-metadata.mdx).
+
+### Staff metadata {#staff-metadata}
+
+Tags that configure a single staff — its instrument, tuning, articulation table, and related settings. Documented in [Staff Metadata](./staff-metadata.mdx).
+
+### Bar metadata {#bar-metadata}
+
+Tags that apply to a single bar — clef, key signature, time signature, repeats. Documented in [Bar Metadata](./bar-metadata.mdx).
+
+Two scopes apply to properties:
+
+### Beat property {#beat-property}
+
+A property attached to a beat, controlling effects or annotations that apply to every note in that beat. Documented in [Beat Properties](./beat-properties.mdx).
+
+### Note property {#note-property}
+
+A property attached to a single note, controlling effects specific to that note. Documented in [Note Properties](./note-properties.mdx).
+
+## Signatures and overloads {#signature}
+
+Every reference entry lists one or more **signatures**. A signature is one accepted parameter list for the construct — the parameters it names, their types, and their order. When you write a metadata tag or a property, your argument list must match exactly one of its signatures.
+
+<a id="overload"></a>
+A construct with more than one signature is **overloaded**. `\title`, for example, accepts a single string in one signature and a title-plus-template-plus-alignment triple in another. The reference page for each construct shows every signature it accepts.
+
+## Case sensitivity {#case-sensitivity}
+
+Metadata tag names, property names, and reserved identifiers such as `true`, `hide`, and `x` are case-insensitive. `\Title`, `\title`, and `\TITLE` all parse the same.
+
+The contents of string literals are case-sensitive. So is the tone letter of a pitched note — `C4` and `c4` are different notes. Accidentals use the case shown in [Pitched notes](./document-structure.mdx#pitched-notes) (`#`, `b`, `bb`, `x`, `##`).
+
+## Whitespace {#whitespace}
+
+Whitespace between tokens is not significant. Line breaks, tabs, and runs of spaces all separate tokens equally. Use whitespace freely to lay out your source for readability.
+
+Whitespace is not allowed inside a single value. Fret-note notation must be written as `fret.string` with no space around the dot, and a pitched-note value must be written as tone-accidental-octave with no space between the parts.
+
+## Fret-note notation {#fret-string}
+
+On a stringed instrument, a note is written as `fret.string`. The number before the dot is the fret. The number after the dot is the string, counted from the highest-pitched string down. String 1 is the top string when you read tab — the thinnest string on a guitar, sounding highest.
+
+```title=Fret-note notation
+5.6      // fret 5 on string 6 (the lowest string on a 6-string guitar)
+0.1      // an open note on string 1 (the highest string)
+12.3     // fret 12 on string 3
+```
+
+A G-major chord in standard tuning strums six strings at once:
+
+<AlphaTexSample>{`
+(3.6 2.5 0.4 0.3 0.2 3.1).4
+`}</AlphaTexSample>
+
+The whole chord is written as a parenthesised beat because six notes ring together. See [Argument lists](#argument-lists) for the parenthesis rules.
