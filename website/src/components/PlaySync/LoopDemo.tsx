@@ -58,6 +58,7 @@ const LoopControls: React.FC = () => {
   const [endBar, setEndBar] = useState(5);
   const [isLooping, setIsLooping] = useState(true);
   const [range, setRange] = useState<RangeReadout | null>(null);
+  const [playerReady, setPlayerReady] = useState(false);
 
   useAlphaTabEvent('scoreLoaded', (score) => {
     setBarCount(score.masterBars.length);
@@ -66,10 +67,16 @@ const LoopControls: React.FC = () => {
     setEndBar((v) => Math.min(v, maxIndex));
   });
 
+  // `playerReady` fires after the synth pipeline is fully initialized. Setting
+  // playbackRange before this event fires can be silently discarded by the
+  // synth (empirically confirmed on 1.9.0-alpha builds), so gate the effect
+  // on this flag as well as barCount.
+  useAlphaTabEvent('playerReady', () => setPlayerReady(true));
+
   // Apply the range from the bar dropdowns AND paint the highlight overlay so
   // the pre-configured loop is visible on the score from the first render.
   useEffect(() => {
-    if (!api || !api.score || barCount === 0) return;
+    if (!api || !api.score || barCount === 0 || !playerReady) return;
     const s = Math.max(0, Math.min(startBar, barCount - 1));
     const e = Math.max(s, Math.min(endBar, barCount - 1));
     const startTick = api.score.masterBars[s].start;
@@ -91,11 +98,12 @@ const LoopControls: React.FC = () => {
       endBarLabel: e + 1,
       source: 'controls',
     });
-  }, [api, startBar, endBar, barCount]);
+  }, [api, startBar, endBar, barCount, playerReady]);
 
   useEffect(() => {
-    controls?.setLoopPlayback(isLooping);
-  }, [controls, isLooping]);
+    if (!controls || !playerReady) return;
+    controls.setLoopPlayback(isLooping);
+  }, [controls, isLooping, playerReady]);
 
   // Reflect user-driven range drags in the info panel and the bar dropdowns.
   useAlphaTabEvent('playbackRangeHighlightChanged', (e) => {
