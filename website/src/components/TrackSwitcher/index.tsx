@@ -142,8 +142,9 @@ api.renderTracks([api.score.tracks[0], api.score.tracks[1]]);`;
 
   return (
     <div className={styles.demo}>
+      {/* Bach Prelude BWV 999 — PD single/multi-staff piece already shipped in the repo. */}
       <AlphaTabPlayer
-        file="/files/features/Skillet.gp5"
+        file="/files/Bach_Prelude_BWV999.gp"
         tracks={[0]}
         player={true}
       >

@@ -15,26 +15,10 @@ export interface BracketModeSwitchProps {
   showCode?: boolean;
 }
 
-const DEMO_TEX = `\\title "Bracket grouping"
-\\tempo 100
-.
-\\track "Guitar 1" "Gtr1" { instrument 30 }
-  :4 (3.3 5.2 7.1) (5.3 7.2 9.1) :2 (7.3 9.2 12.1) |
-  :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1)
-\\track "Guitar 2" "Gtr2" { instrument 30 }
-  :4 3.3 5.3 :2 7.3 |
-  :4 5.3 :8 7.3 5.3 :4 3.3 2.3
-\\track "Bass" "Bs" { instrument 33 }
-  :4 3.4 3.4 :2 3.4 |
-  :4 5.4 :8 5.4 5.4 :4 3.4 2.4
-\\track "Piano" "Pno"
-  \\staff{score} \\tuning piano \\instrument acousticgrandpiano
-  :4 (C4 E4 G4) (D4 F4 A4) :2 (E4 G4 B4) |
-  :4 (F4 A4 C5) :8 (G4 B4 D5) (F4 A4 C5) :4 (E4 G4 B4) (D4 F4 A4)
-  \\staff{score} \\tuning piano \\clef F4
-  :4 C3 G3 :2 C3 |
-  :4 F3 :8 G3 F3 :4 E3 D3
-`;
+import { MULTI_TRACK_ENSEMBLE } from "@site/src/tex-riffs";
+
+// Default sample: Pachelbel Canon in D 8-bar ensemble (PD, see tex-riffs.ts).
+const DEMO_TEX = MULTI_TRACK_ENSEMBLE;
 
 function ApplyBracketMode({ mode }: { mode: ModeName }) {
   const api = useAlphaTabApi();

@@ -123,7 +123,7 @@ const TrackMixer: React.FC = () => {
 };
 
 export const TrackMixerDemo: React.FC<TrackMixerDemoProps> = ({
-  file = '/files/features/Skillet.gp5',
+  file = '/files/Bach_Prelude_BWV999.gp',
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showCode = true,
 }) => (

@@ -5,11 +5,17 @@ import {
   AlphaTabCanvas,
   useAlphaTabControls,
 } from "@site/src/alphatab-react";
+import { BACH_PRELUDE_C_LONG } from "@site/src/tex-riffs";
 
 export interface SpacingSlidersDemoProps {
   showCode?: boolean;
   file?: string;
+  tex?: string;
 }
+
+// Default sample: Bach WTC I Prelude in C bars 1–12 (PD). 12 bars gives
+// enough content for spacing/stretch slider changes to have visible effect.
+const DEFAULT_TEX = BACH_PRELUDE_C_LONG;
 
 function ApplySpacing({
   stretchForce,
@@ -37,8 +43,10 @@ function ApplySpacing({
 
 export const SpacingSlidersDemo: React.FC<SpacingSlidersDemoProps> = ({
   showCode = true,
-  file = "/files/features/Chords.gp5",
+  file,
+  tex,
 }) => {
+  const texContent = file ? undefined : tex ?? DEFAULT_TEX;
   const [stretchForce, setStretchForce] = useState(1.2);
   const [spacingRatio, setSpacingRatio] = useState(1.5);
   const [lastSystemFillThreshold, setLastSystemFillThreshold] = useState(0.5);
@@ -130,6 +138,7 @@ const api = new alphaTab.AlphaTabApi(container, {
       </div>
       <AlphaTabPlayer
         file={file}
+        tex={texContent}
         player={true}
         settings={{
           display: {

@@ -12,25 +12,26 @@ export interface MultiBarRestToggleProps {
   showCode?: boolean;
 }
 
-// Both tracks share the same 10-bar structure. Bars 3-7 are empty on every
-// track so the multi-bar rest can collapse them when the flag is on.
+// Pachelbel Canon in D — arpeggio bars 1-2 (D, A), five whole-bar rests
+// (the multi-bar-rest target), then arpeggio bars 3-4 (Bm, F#m), then a
+// final tonic chord. Pitches 1:1 from Pachelbel's ground+chord tones
+// (Seiffert edition, PD; see tex-riffs.ts MULTI_TRACK_ENSEMBLE).
 const DEMO_TEX = `\\title "Multi-bar rests"
-\\tempo 100
+\\subtitle "Pachelbel Canon in D (PD)"
+\\tempo 88
 .
-\\track "Guitar" "Gtr" { instrument 30 }
-  :4 (3.3 5.2 7.1) (5.3 7.2 9.1) :2 (7.3 9.2 12.1) |
-  :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1) |
+\\track "Guitar" "Gtr" \\instrument 24
+  :8 0.4 4.4 2.3 3.2 2.3 4.4 2.3 4.4 |
+  :8 0.5 4.5 2.4 2.3 2.4 4.5 2.4 4.5 |
   r.1 | r.1 | r.1 | r.1 | r.1 |
-  :4 (3.3 5.2 7.1) (5.3 7.2 9.1) :2 (7.3 9.2 12.1) |
-  :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1) |
-  :1 (3.3 5.2 7.1)
-\\track "Bass" "Bs" { instrument 33 }
-  :4 3.4 5.4 :2 7.4 |
-  :4 5.4 :8 7.4 5.4 :4 3.4 2.4 |
+  :8 2.5 0.4 4.4 4.3 4.4 0.4 4.4 0.4 |
+  :8 4.4 2.3 2.2 7.2 2.2 2.3 2.2 2.3 |
+  :1 (0.4 4.4 2.3)
+\\track "Bass" "Bs" \\instrument 33
+  :1 0.4 | 0.5 |
   r.1 | r.1 | r.1 | r.1 | r.1 |
-  :4 3.4 5.4 :2 7.4 |
-  :4 5.4 :8 7.4 5.4 :4 3.4 2.4 |
-  :1 3.4
+  :1 2.5 | 4.4 |
+  :1 0.4
 `;
 
 function ApplyMultiBarRest({ enabled }: { enabled: boolean }) {

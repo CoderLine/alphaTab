@@ -275,3 +275,44 @@ export const ORNAMENTS_MELODY = `\\title "Minuet in G with baroque ornaments"
  * chord-melody bed. Points at the same Ode to Joy source.
  */
 export const CHORD_PROGRESSION_G = ODE_TO_JOY;
+
+// ─── Multi-track (8 bars, ensemble): track-name, bracket, rest demos ─────
+
+/**
+ * Pachelbel Canon in D (c. 1680) — 8-bar ground D–A–Bm–F#m–G–D–G–A
+ * rendered as an ensemble of Lead Guitar, Bass Guitar (4-string tuning),
+ * and Piano (treble + bass staves). Every pitch drawn 1:1 from the ground
+ * bass + chord tones Pachelbel's violin voices realize over each ground
+ * note (Max Seiffert edition, Denkmäler der Tonkunst in Bayern XXIII,
+ * 1929, PD; IMSLP #71872). The bass line stays at Pachelbel's original
+ * written pitches via a proper 4-string bass tuning.
+ * Public domain: Pachelbel d. 1706.
+ * Use as the ensemble target for track-name, bracket-mode, multi-bar-rest,
+ * and system-separator demos.
+ */
+export const MULTI_TRACK_ENSEMBLE = `\\title "Canon in D — ensemble"
+\\subtitle "J. Pachelbel (c. 1680), 8-bar ground D–A–Bm–F#m–G–D–G–A"
+\\tempo 72
+.
+\\track "Lead Guitar" "Gtr"
+\\instrument 24
+:8 0.4 4.4 2.3 3.2 2.3 4.4 2.3 4.4 |
+:8 0.5 4.5 2.4 2.3 2.4 4.5 2.4 4.5 |
+:8 2.5 0.4 4.4 4.3 4.4 0.4 4.4 0.4 |
+:8 4.4 2.3 2.2 7.2 2.2 2.3 2.2 2.3 |
+:8 3.6 2.5 0.4 0.3 0.4 2.5 0.4 2.5 |
+:8 0.4 4.4 2.3 3.2 2.3 4.4 2.3 4.4 |
+:8 3.6 2.5 0.4 0.3 0.4 2.5 0.4 2.5 |
+:8 0.5 4.5 2.4 2.3 2.4 4.5 2.4 4.5 |
+.
+\\track "Bass Guitar" "Bass"
+\\instrument 33
+\\tuning (G2 D2 A1 E1)
+:1 0.2 | 2.1 | 4.1 | 4.2 | 0.1 | 0.2 | 0.1 | 2.1 |
+.
+\\track "Piano" "Pno"
+\\staff{score} \\tuning piano \\instrument acousticgrandpiano
+(D4 F#4 A4).1 | (C#4 E4 A4).1 | (D4 F#4 B4).1 | (A3 C#4 F#4).1 |
+(G3 B3 D4).1  | (D4 F#4 A4).1 | (G3 B3 D4).1  | (C#4 E4 A4).1 |
+\\staff{score} \\tuning piano \\clef F4
+D2.1 | A2.1 | B2.1 | F#2.1 | G2.1 | D2.1 | G2.1 | A2.1 |`;

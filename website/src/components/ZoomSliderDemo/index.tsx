@@ -5,6 +5,7 @@ import {
   AlphaTabCanvas,
   useAlphaTabControls,
 } from "@site/src/alphatab-react";
+import { FOLK_ARPEGGIO } from "@site/src/tex-riffs";
 
 export interface ZoomSliderDemoProps {
   showCode?: boolean;
@@ -12,13 +13,10 @@ export interface ZoomSliderDemoProps {
   tex?: string;
 }
 
-const DEFAULT_TEX = `\\title "Zoom demo"
-\\tempo 100
-.
-\\track "Guitar"
-  :4 (3.3 5.2 7.1) (5.3 7.2 9.1) :2 (7.3 9.2 12.1) |
-  :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1)
-`;
+// Default sample: Bach, WTC I Prelude in C major BWV 846 bars 5–8 —
+// PD arpeggio-per-bar shape with strong chord context on every note.
+// See src/tex-riffs.ts for pitch verification.
+const DEFAULT_TEX = FOLK_ARPEGGIO;
 
 function ApplyScale({ scale }: { scale: number }) {
   const controls = useAlphaTabControls();

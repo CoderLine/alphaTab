@@ -12,7 +12,7 @@ export interface ScoreLoadedInspectorProps {
   showCode?: boolean;
 }
 
-const SOURCE_URL = "/files/features/Skillet.gp5";
+const SOURCE_URL = "/files/Bach_Prelude_BWV999.gp";
 
 const Inner: React.FC = () => {
   const state = useAlphaTabState();

@@ -17,26 +17,10 @@ export interface TrackNamePolicyDemoProps {
   showCode?: boolean;
 }
 
-const DEMO_TEX = `\\title "Track name policies"
-\\tempo 100
-.
-\\track "Lead Guitar" "Gtr" { instrument 30 }
-  :4 (3.3 5.2 7.1) (5.3 7.2 9.1) :2 (7.3 9.2 12.1) |
-  :4 (5.3 7.2 8.1) :8 (7.3 9.2 10.1) (5.3 7.2 8.1) :4 (3.3 5.2 7.1) (2.3 3.2 5.1) |
-  :8 3.4 5.4 7.4 8.4 10.4 8.4 7.4 5.4 |
-  :4 (3.5 5.4 7.3) (5.5 7.4 9.3) :2 (7.5 9.4 12.3)
-\\track "Rhythm Bass" "Bs" { instrument 33 }
-  :4 3.4 5.4 :2 7.4 |
-  :4 5.4 :8 7.4 5.4 :4 3.4 2.4 |
-  :8 3.4 5.4 7.4 8.4 :4 7.4 5.4 |
-  :4 3.4 5.4 :2 7.4
-\\track "Piano Voicing" "Pno"
-  \\staff{score} \\tuning piano \\instrument acousticgrandpiano
-  :4 (C4 E4 G4) (D4 F4 A4) :2 (E4 G4 B4) |
-  :4 (F4 A4 C5) :8 (G4 B4 D5) (F4 A4 C5) :4 (E4 G4 B4) (D4 F4 A4) |
-  :4 (C4 E4 G4) :8 (D4 F4 A4) (E4 G4 B4) :4 (F4 A4 C5) (E4 G4 B4) |
-  :4 (D4 F4 A4) (C4 E4 G4) :2 (F4 A4 C5)
-`;
+import { MULTI_TRACK_ENSEMBLE } from "@site/src/tex-riffs";
+
+// Default sample: Pachelbel Canon in D 8-bar ensemble (PD, see tex-riffs.ts).
+const DEMO_TEX = MULTI_TRACK_ENSEMBLE;
 
 function ApplyTrackNames({
   policy,
