@@ -5,17 +5,14 @@ import {
   AlphaTabCanvas,
   useAlphaTabControls,
 } from "@site/src/alphatab-react";
+import * as Riffs from "@site/src/tex-riffs";
 import styles from "./styles.module.scss";
 
 export interface AlphaTexLivePreviewProps {
   showCode?: boolean;
 }
 
-const INITIAL_TEX = `\\title "Live alphaTex preview"
-\\tempo 120
-.
-:8 3.3 5.3 7.3 8.3 | 10.3 8.3 7.3 5.3 |
-:4 3.3.4 5.3.4 :8 7.3 8.3 10.3 8.3 |`;
+const INITIAL_TEX = Riffs.STEADY_PULSE;
 
 interface InnerProps {
   text: string;
