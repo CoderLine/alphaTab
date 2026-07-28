@@ -127,10 +127,17 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             }
             this._shouldPaint = true;
         } else if (startNoteRenderer.staff !== endNoteRenderer!.staff) {
-            const firstRendererInStaff = startNoteRenderer.staff!.barRenderers[0];
-            this._startX = firstRendererInStaff!.x;
-
+            // continued tie/slur on a new system: start after the clef and
+            // key/time signatures instead of the very left edge of the staff.
+            // ties ending on the first beat can have their end sitting directly
+            // at the start of the beat area, keep a minimum length so the
+            // continuation curve stays visible in this case.
+            const firstRendererInStaff = endNoteRenderer!.staff!.barRenderers[0];
             this._endX = this.calculateEndX();
+            this._startX = Math.min(
+                firstRendererInStaff!.x + firstRendererInStaff!.beatGlyphsStart,
+                this._endX - 2 * firstRendererInStaff!.smuflMetrics.oneStaffSpace
+            );
 
             const startGlyph = startNoteRenderer.scoreRenderer.layout!.slurRegistry.completeMultiSystemSlur(this);
             if (startGlyph) {
@@ -852,7 +859,8 @@ export class ContinuationTieGlyph extends TieGlyph {
     }
 
     protected override calculateStartX(): number {
-        return this.renderer.staff!.barRenderers[0].x;
+        const first = this.renderer.staff!.barRenderers[0];
+        return first.x + first.beatGlyphsStart;
     }
 
     protected override calculateEndX(): number {
