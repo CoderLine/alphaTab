@@ -66,9 +66,9 @@
         "@types/node": "^26.0.0",
         "rimraf": "^6.1.3",
         "tslib": "^2.8.1",
-        "tsx": "^4.22.4",
+        "tsx": "^4.23.1",
         "typescript": "^6.0.3",
-        "vite": "^8.1.0",
+        "vite": "^8.1.5",
         "vite-plugin-static-copy": "^4.1.1",
         "vitest": "^4.1.10"
     },
