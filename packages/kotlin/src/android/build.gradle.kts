@@ -1,3 +1,4 @@
+import com.android.build.api.variant.HostTestBuilder
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
@@ -79,6 +80,15 @@ kotlin {
                 "-Xno-param-assertions"
             )
         )
+    }
+}
+
+// AGP 9 only generates unit-test tasks for the debug variant by default. Our
+// pipeline runs tests against the release variant (matches published artifact),
+// so enable the release host unit-test explicitly.
+androidComponents {
+    beforeVariants(selector().withBuildType("release")) { variantBuilder ->
+        variantBuilder.hostTests[HostTestBuilder.UNIT_TEST_TYPE]?.enable = true
     }
 }
 
