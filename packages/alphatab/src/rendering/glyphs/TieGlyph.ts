@@ -133,11 +133,13 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             // at the start of the beat area, keep a minimum length so the
             // continuation curve stays visible in this case.
             const firstRendererInStaff = endNoteRenderer!.staff!.barRenderers[0];
+            // padding to shift ties clearly before the first note (slight visual tuning)
+            const padding = 2 * firstRendererInStaff!.smuflMetrics.oneStaffSpace;
             this._endX = this.calculateEndX();
             this._startX = Math.min(
                 firstRendererInStaff!.x + firstRendererInStaff!.beatGlyphsStart,
-                this._endX - 2 * firstRendererInStaff!.smuflMetrics.oneStaffSpace
-            );
+                this._endX
+            ) - padding;
 
             const startGlyph = startNoteRenderer.scoreRenderer.layout!.slurRegistry.completeMultiSystemSlur(this);
             if (startGlyph) {
@@ -860,7 +862,7 @@ export class ContinuationTieGlyph extends TieGlyph {
 
     protected override calculateStartX(): number {
         const first = this.renderer.staff!.barRenderers[0];
-        return first.x + first.beatGlyphsStart;
+        return first.x + first.beatGlyphsStart - 2 * first.smuflMetrics.oneStaffSpace;
     }
 
     protected override calculateEndX(): number {
