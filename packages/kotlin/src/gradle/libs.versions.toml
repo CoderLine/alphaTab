@@ -11,7 +11,7 @@ appcompat = "1.7.1"
 coreKtx = "1.19.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
-alphaskia = "3.4.135"
+alphaskia = "3.5.147"
 mavenPublish = "0.34.0"
 klaxon = "5.6"
 
