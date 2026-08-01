@@ -62,7 +62,7 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: 'npm'
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8'
       - run: npm ci
@@ -90,7 +90,7 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: 'npm'
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v5.6.0
         with:
           java-version: '19'
           distribution: 'temurin'
