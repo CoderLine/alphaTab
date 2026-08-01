@@ -7,22 +7,68 @@ updates:
       - platform-javascript
     schedule:
       interval: "weekly"
-      
+    open-pull-requests-limit: 5
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+        patterns:
+          - "*"
+      development-dependencies:
+        dependency-type: "development"
+        patterns:
+          - "*"
+
   - package-ecosystem: "nuget"
-    directory: "/src.csharp"
+    directory: "/packages/csharp/src"
     labels:
       - area-dependencies
       - platform-net
     schedule:
       interval: "weekly"
-            
+    open-pull-requests-limit: 5
+    groups:
+      alphaskia-net:
+        patterns:
+          - "AlphaSkia*"
+      nuget-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
   - package-ecosystem: "gradle"
-    directory: "/src.kotlin/alphaTab"
+    directory: "/packages/kotlin/src"
     labels:
       - area-dependencies
       - platform-java
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      kotlin:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "org.jetbrains.kotlinx*"
+        update-types:
+          - "minor"
+          - "patch"
+      android:
+        patterns:
+          - "com.android.*"
+          - "androidx.*"
+        update-types:
+          - "minor"
+          - "patch"
+      alphaskia-android:
+        patterns:
+          - "net.alphatab:alphaSkia*"
+      gradle-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -31,3 +77,8 @@ updates:
       - platform-all
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns:
+          - "*"
