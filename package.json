@@ -47,6 +47,6 @@
         "nightly-publish": "node ./scripts/nightly.mts --mode publish"
     },
     "devDependencies": {
-        "concurrently": "^10.0.3"
+        "concurrently": "^10.0.4"
     }
 }

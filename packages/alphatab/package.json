@@ -59,16 +59,16 @@
         "test-accept-reference": "tsx scripts/accept-new-reference-files.ts"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.5.0",
+        "@biomejs/biome": "^2.5.6",
         "@coderline/alphaskia": "^3.5.147",
         "@coderline/alphaskia-linux": "^3.5.147",
         "@coderline/alphaskia-windows": "^3.5.147",
-        "@types/node": "^26.0.0",
+        "@types/node": "^26.1.2",
         "rimraf": "^6.1.3",
         "tslib": "^2.8.1",
-        "tsx": "^4.22.4",
-        "typescript": "^6.0.3",
-        "vite": "^8.1.0",
+        "tsx": "^4.23.1",
+        "typescript": "^7.0.2",
+        "vite": "^8.1.5",
         "vite-plugin-static-copy": "^4.1.1",
         "vitest": "^4.1.10"
     },

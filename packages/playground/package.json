@@ -24,8 +24,8 @@
     "devDependencies": {
         "split.js": "^1.6.5",
         "tslib": "^2.8.1",
-        "typescript": "^6.0.3",
-        "vite": "^8.1.0",
+        "typescript": "^7.0.2",
+        "vite": "^8.1.5",
         "vitest": "^4.1.10"
     }
 }
