@@ -4,8 +4,9 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
+    // AGP 9+ has built-in Kotlin support; a separate kotlin-android plugin is no
+    // longer applied. See https://issuetracker.google.com/438678642.
     alias(libs.plugins.android.library)
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.dokka)
     alias(libs.plugins.mavenPublish)
     `maven-publish`
@@ -83,13 +84,13 @@ kotlin {
 
 android {
     namespace = project.group.toString()
-    compileSdk = 34
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         aarMetadata {
-            minCompileSdk = 34
+            minCompileSdk = 37
         }
     }
 
