@@ -1,6 +1,6 @@
 import type * as alphaTab from '@coderline/alphatab';
-import type { createConnection as createBrowserConnection } from 'vscode-languageserver/lib/browser/main.js';
-import type { createConnection as createNodeConnection } from 'vscode-languageserver/lib/node/main.js';
+import type { createConnection as createBrowserConnection } from 'vscode-languageserver/browser';
+import type { createConnection as createNodeConnection } from 'vscode-languageserver/node';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 import type { Diagnostic } from '@coderline/alphatab-language-server/server/types';
 
