@@ -1,0 +1,47 @@
+name: Contribution rules triage
+
+# Applies workflow labels to incoming issues/PRs. All configurable values —
+# labels, patterns, disclosure token, message texts — live in
+# .github/scripts/triage-config.mjs. Rule + label logic lives in
+# .github/scripts/triage.mjs. This file only wires them together.
+#
+# Companion workflow auto-close-unaddressed.yml then posts a warning and
+# eventually closes anything labeled `state-needs-updates`.
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  pull_request_target:
+    # `synchronize` is intentionally excluded — new commits don't change the
+    # PR description, and re-running triage on every push would just re-apply
+    # the same label and re-post/no-op the same comment for no benefit.
+    types: [opened, edited, reopened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  triage:
+    # ─────────────────────────────────────────────────────────────────
+    # Skip maintainers. The rules apply to external contributions only;
+    # OWNER / COLLABORATOR / MEMBER submissions are trusted. This list
+    # is hardcoded so maintainer submissions don't even start a job.
+    # ─────────────────────────────────────────────────────────────────
+    if: >-
+      !contains(fromJSON('["OWNER","COLLABORATOR","MEMBER"]'),
+                github.event.issue.author_association
+                || github.event.pull_request.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+          sparse-checkout-cone-mode: false
+
+      - name: Apply labels
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { default: triage } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/triage.mjs`);
+            await triage({ github, context, core });
