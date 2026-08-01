@@ -60,14 +60,18 @@ export function configureWebWorker(
             }
         });
 
-        block.loc = expr.loc;
+        // webpack 5.109+ stops populating node.loc during traversal — consumers
+        // must call parser.getLocation(node) to derive it from the range. Older
+        // webpack lacks getLocation but does set expr.loc directly.
+        const loc = parser.getLocation ? parser.getLocation(expr) : expr.loc;
+        block.loc = loc;
 
         const workletBootstrap = webPackWithAlphaTab.alphaTab.createWebWorkerDependency(
             url.string,
             range,
             compiler.options.output.workerPublicPath
         );
-        workletBootstrap.loc = expr.loc!;
+        workletBootstrap.loc = loc;
         block.addDependency(workletBootstrap);
         parser.state.module.addBlock(block);
 
@@ -75,7 +79,7 @@ export function configureWebWorker(
             `{ type: ${compilation.options.output.module ? '"module"' : 'undefined'} }`,
             arg2.range!
         );
-        dep1.loc = expr.loc!;
+        dep1.loc = loc;
         parser.state.module.addPresentationalDependency(dep1);
 
         parser.walkExpression(expr.callee);

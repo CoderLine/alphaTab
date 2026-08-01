@@ -18,11 +18,11 @@ import {
     BrowserMessageReader,
     BrowserMessageWriter,
     createConnection as createBrowserConnection
-} from 'vscode-languageserver/lib/browser/main.js';
+} from 'vscode-languageserver/browser';
 import {
     createConnection as createNodeConnection,
     ProposedFeatures as NodeProposedFeatures
-} from 'vscode-languageserver/lib/node/main.js';
+} from 'vscode-languageserver/node';
 
 function startLanguageServer(serverConnection: Connection) {
     const documents = new TextDocuments<AlphaTexTextDocument>(TextDocument);

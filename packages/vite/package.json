@@ -44,7 +44,7 @@
         "test-web": "npm run test"
     },
     "dependencies": {
-        "magic-string": "^1.0.0"
+        "magic-string": "^1.1.0"
     },
     "peerDependencies": {
         "vite": "^7 || ^8"
