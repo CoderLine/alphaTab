@@ -14,12 +14,6 @@ Fixes #
 ### Proposed changes
 <!-- Describe the proposed changes. Explain WHY, not just WHAT. -->
 
-### Root-cause analysis
-<!-- alphaTab is a layered engine (model, importers, layout, rendering, MIDI,
-     player, platform bindings). A symptom in one layer is often a consequence of
-     behavior in another. Which layer actually causes the behavior, and why is
-     this the right layer to fix it in? -->
-
 ### Checklist
 - [ ] I consent that this change becomes part of alphaTab under its current or any future open source license
 - [ ] This PR is linked to an accepted issue (see above)
