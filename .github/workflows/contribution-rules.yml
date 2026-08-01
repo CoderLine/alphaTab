@@ -24,14 +24,18 @@ permissions:
 jobs:
   triage:
     # ─────────────────────────────────────────────────────────────────
-    # Skip maintainers. The rules apply to external contributions only;
-    # OWNER / COLLABORATOR / MEMBER submissions are trusted. This list
-    # is hardcoded so maintainer submissions don't even start a job.
+    # Skip maintainers and bot-authored submissions:
+    #   • OWNER / COLLABORATOR / MEMBER → maintainers, trusted; hardcoded
+    #     so a maintainer submission doesn't even start a job.
+    #   • user.type == 'Bot' → Dependabot, Renovate, and similar. They
+    #     don't fill in contributor templates and shouldn't be nudged.
     # ─────────────────────────────────────────────────────────────────
     if: >-
-      !contains(fromJSON('["OWNER","COLLABORATOR","MEMBER"]'),
-                github.event.issue.author_association
-                || github.event.pull_request.author_association)
+      github.event.issue.user.type != 'Bot'
+      && github.event.pull_request.user.type != 'Bot'
+      && !contains(fromJSON('["OWNER","COLLABORATOR","MEMBER"]'),
+                   github.event.issue.author_association
+                   || github.event.pull_request.author_association)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
