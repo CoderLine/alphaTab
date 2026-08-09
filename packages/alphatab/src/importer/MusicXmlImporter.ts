@@ -201,6 +201,19 @@ class TrackInfo {
 }
 
 /**
+ * Tracks how raw MusicXML voice numbers on a staff map into alphaTab's local
+ * (dense, 0-based) voice slots. Collapses MuseScore's sparse `staff*4+local`
+ * convention (staff 2 → voices 5..8) into dense per-staff indices.
+ * @internal
+ */
+class StaffVoicePacking {
+    // raw MusicXML voice string -> assigned local voice index on this staff
+    public readonly mapping: Map<string, number> = new Map<string, number>();
+    // raw voice strings kept in ascending numeric order (localIndex == index in this array)
+    public readonly sortedRawVoices: string[] = [];
+}
+
+/**
  * @internal
  */
 export class MusicXmlImporter extends ScoreImporter {
@@ -208,6 +221,7 @@ export class MusicXmlImporter extends ScoreImporter {
     private _idToTrackInfo: Map<string, TrackInfo> = new Map<string, TrackInfo>();
     private _indexToTrackInfo: Map<number, TrackInfo> = new Map<number, TrackInfo>();
     private _staffToContext: Map<Staff, StaffContext> = new Map<Staff, StaffContext>();
+    private _staffVoicePacking: Map<Staff, StaffVoicePacking> = new Map<Staff, StaffVoicePacking>();
 
     private _currentBarNumberDisplayPart?: BarNumberDisplay;
     private _currentBarNumberDisplayBar?: BarNumberDisplay;
@@ -2402,23 +2416,54 @@ export class MusicXmlImporter extends ScoreImporter {
         return staff.bars[masterBar.index];
     }
 
-    private _getOrCreateVoice(bar: Bar, voiceIndex: number): Voice {
-        let voicesCreated = false;
-        while (bar.voices.length <= voiceIndex) {
-            bar.addVoice(new Voice());
-            voicesCreated = true;
+    private _resolveAndPlaceVoice(staff: Staff, rawVoice: string, bar: Bar): Voice {
+        let packing: StaffVoicePacking;
+        if (this._staffVoicePacking.has(staff)) {
+            packing = this._staffVoicePacking.get(staff)!;
+        } else {
+            packing = new StaffVoicePacking();
+            this._staffVoicePacking.set(staff, packing);
         }
 
-        // ensure voices on all bars
-        if (voicesCreated) {
-            for (const b of bar.staff.bars) {
-                while (b.voices.length <= voiceIndex) {
-                    b.addVoice(new Voice());
-                }
+        if (packing.mapping.has(rawVoice)) {
+            return bar.voices[packing.mapping.get(rawVoice)!];
+        }
+
+        let newVoiceNumber = Number.parseInt(rawVoice, 10);
+        if (Number.isNaN(newVoiceNumber)) {
+            Logger.warning('MusicXML', 'Voices need to be specified as numbers');
+            newVoiceNumber = 0;
+        }
+
+        // find sorted-insertion position
+        let insertPos = packing.sortedRawVoices.length;
+        for (let i = 0; i < packing.sortedRawVoices.length; i++) {
+            const existing = Number.parseInt(packing.sortedRawVoices[i], 10);
+            const existingNumber = Number.isNaN(existing) ? 0 : existing;
+            if (existingNumber > newVoiceNumber) {
+                insertPos = i;
+                break;
             }
         }
 
-        return bar.voices[voiceIndex];
+        packing.sortedRawVoices.splice(insertPos, 0, rawVoice);
+
+        // insert a new Voice at insertPos in every bar of the staff, and re-index
+        for (const b of staff.bars) {
+            b.voices.splice(insertPos, 0, new Voice());
+            for (let i = insertPos; i < b.voices.length; i++) {
+                b.voices[i].index = i;
+                b.voices[i].bar = b;
+            }
+        }
+
+        // refresh mapping
+        packing.mapping.clear();
+        for (let i = 0; i < packing.sortedRawVoices.length; i++) {
+            packing.mapping.set(packing.sortedRawVoices[i], i);
+        }
+
+        return bar.voices[insertPos];
     }
 
     private _parseNote(element: XmlNode, masterBar: MasterBar, track: Track) {
@@ -2433,7 +2478,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let isChord = false;
 
         let staffIndex = 0;
-        let voiceIndex = 0;
+        let voiceRaw: string = '1';
 
         let durationInTicks = -1;
         let beatDuration: Duration | null = null;
@@ -2478,7 +2523,7 @@ export class MusicXmlImporter extends ScoreImporter {
             }
 
             const bar = this._getOrCreateBar(staff, masterBar);
-            const voice = this._getOrCreateVoice(bar, voiceIndex);
+            const voice = this._resolveAndPlaceVoice(staff, voiceRaw, bar);
 
             const actualMusicalPosition = voice.beats.length === 0 ? 0 : voice.beats[voice.beats.length - 1].displayEnd;
 
@@ -2664,15 +2709,11 @@ export class MusicXmlImporter extends ScoreImporter {
 
                 // case 'footnote': Ignored
                 // case 'level': Ignored
-                case 'voice':
-                    voiceIndex = Number.parseInt(c.innerText, 10);
-                    if (Number.isNaN(voiceIndex)) {
-                        Logger.warning('MusicXML', 'Voices need to be specified as numbers');
-                        voiceIndex = 0;
-                    } else {
-                        voiceIndex = voiceIndex - 1;
-                    }
+                case 'voice': {
+                    const trimmed = c.innerText.trim();
+                    voiceRaw = trimmed.length > 0 ? trimmed : '1';
                     break;
+                }
                 case 'type':
                     beatDuration = this._parseBeatDuration(c);
                     break;

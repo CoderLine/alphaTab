@@ -1,11 +1,12 @@
-import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
-
 import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
-
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
-import { OverflowError, type IReadable } from '@coderline/alphatab/io/IReadable';
+import { type IReadable, OverflowError } from '@coderline/alphatab/io/IReadable';
+import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
+import { Logger } from '@coderline/alphatab/Logger';
+import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
+import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
 import { Bar, BarLineStyle } from '@coderline/alphatab/model/Bar';
 import { Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
@@ -14,8 +15,10 @@ import { BrushType } from '@coderline/alphatab/model/BrushType';
 import { Chord } from '@coderline/alphatab/model/Chord';
 import { Clef } from '@coderline/alphatab/model/Clef';
 import { Color } from '@coderline/alphatab/model/Color';
+import { Direction } from '@coderline/alphatab/model/Direction';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { FadeType } from '@coderline/alphatab/model/FadeType';
 import type { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
@@ -23,29 +26,23 @@ import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import type { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
+import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import { Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
+import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Voice } from '@coderline/alphatab/model/Voice';
-
-import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
-import { Logger } from '@coderline/alphatab/Logger';
-import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
-import { Direction } from '@coderline/alphatab/model/Direction';
-import { FadeType } from '@coderline/alphatab/model/FadeType';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { Ottavia } from '@coderline/alphatab/model/Ottavia';
-import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
-import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
@@ -807,6 +804,33 @@ export class Gp3To5Importer extends ScoreImporter {
         if (beatCount === 0) {
             return;
         }
+
+        //
+        // fast path where we know we read the full voice
+        // - its the first voice to read
+        // - we are multivoice and know we can read all voices in full extend
+        const currentVoiceCount = bar.index === 0 ? 1 : bar.previousBar!.voices.length;
+        if (bar.voices.length === 0 || currentVoiceCount === 2) {
+            this._readAndChainVoice(track, bar, beatCount);
+            return;
+        }
+
+        //
+        // fallback to detection of empty voices we can skip.
+        // GP5 empty second voices are always a single beat with the isEmpty flag,
+        // so a beat count above 1 is guaranteed to be real content.
+        if (beatCount === 1 && this._skipEmptyVoice()) {
+            return;
+        }
+
+        //
+        // secondary fallback: the first filled second voice for this staff.
+        // we have to backfill and read fully.
+        ModelUtils.backfillStaffVoices(bar.staff, 2);
+        this._readAndChainVoice(track, bar, beatCount);
+    }
+
+    private _readAndChainVoice(track: Track, bar: Bar, beatCount: number) {
         const newVoice: Voice = new Voice();
         bar.addVoice(newVoice);
 
@@ -814,6 +838,38 @@ export class Gp3To5Importer extends ScoreImporter {
         for (let i: number = 0; i < beatCount; i++) {
             this.readBeat(track, bar, newVoice);
         }
+    }
+
+    /**
+     * Attempts to skip a fully empty voice.
+     * @returns true if we detected an empty voice, false if the beat was not empty and a full voice has to be read.
+     */
+    private _skipEmptyVoice(): boolean {
+        const startOfVoice = this.data.position;
+
+        // aligned with readBeat, find out if we are having an empty beat.
+        const flags = this.data.readByte();
+        let isEmpty = false;
+        if ((flags & 0x40) !== 0) {
+            const type = this.data.readByte();
+            isEmpty = (type & 0x02) === 0;
+        }
+
+        // NOTE: we don't check any of the other flags on an empty voice, we assume no effects are set to be read.
+
+        // seek back to start of voice for a full read; costs a duplicate read of these bytes.
+        if (!isEmpty) {
+            this.data.position = startOfVoice;
+            return false;
+        }
+
+        // read the remaining bytes of the empty beat to avoid input stream desync (aligned with readBeat).
+        this.data.skip(2); // duration + stringFlags
+        if (this._versionNumber >= 500) {
+            this.data.skip(2); // flags2
+        }
+
+        return true;
     }
 
     public readBeat(track: Track, bar: Bar, voice: Voice): void {

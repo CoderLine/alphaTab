@@ -1,5 +1,6 @@
 import { GpifSoundMapper } from '@coderline/alphatab/exporter/GpifSoundMapper';
 import { VersionInfo } from '@coderline/alphatab/generated/VersionInfo';
+import { Logger } from '@coderline/alphatab/Logger';
 import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
@@ -107,9 +108,9 @@ export class GpifWriter {
         for (const tracks of score.tracks) {
             for (const staff of tracks.staves) {
                 for (const bar of staff.bars) {
-                    this._writeBarNode(bars, bar);
+                    const activeVoices = this._writeBarNode(bars, bar);
 
-                    for (const voice of bar.voices) {
+                    for (const voice of activeVoices) {
                         this._writeVoiceNode(voices, voice);
 
                         for (const beat of voice.beats) {
@@ -1831,11 +1832,46 @@ export class GpifWriter {
         fermataNode.addElement('Offset').innerText = `${numerator}/${denominator}`;
     }
 
-    private _writeBarNode(parent: XmlNode, bar: Bar) {
+    private _writeBarNode(parent: XmlNode, bar: Bar): Voice[] {
         const barNode = parent.addElement('Bar');
         barNode.attributes.set('id', bar.id.toString());
 
-        barNode.addElement('Voices').innerText = bar.voices.map(v => (v.isEmpty ? '-1' : v.id.toString())).join(' ');
+        // Guitar Pro's format requires exactly 4 voice slots per bar. Preserve
+        // voice positions when they fit (index < 4); non-empty voices at index
+        // >= 4 (produced e.g. by MusicXML with sparse voice numbers) get placed
+        // into the first free slot. Empty voices at index < 4 keep their slot
+        // as '-1' so their beats are never written (avoids orphan <Beat> nodes).
+        const activeVoices: Voice[] = [];
+        const slots: string[] = ['-1', '-1', '-1', '-1'];
+        const overflowVoices: Voice[] = [];
+        for (let i = 0; i < bar.voices.length; i++) {
+            const v = bar.voices[i];
+            if (i < 4) {
+                if (!v.isEmpty) {
+                    slots[i] = v.id.toString();
+                    activeVoices.push(v);
+                }
+            } else if (!v.isEmpty) {
+                overflowVoices.push(v);
+            }
+        }
+        let dropped = 0;
+        for (const v of overflowVoices) {
+            const freeSlot = slots.indexOf('-1');
+            if (freeSlot >= 0) {
+                slots[freeSlot] = v.id.toString();
+                activeVoices.push(v);
+            } else {
+                dropped++;
+            }
+        }
+        if (dropped > 0) {
+            Logger.warning(
+                'GpifWriter',
+                `Bar ${bar.id} has ${activeVoices.length + dropped} non-empty voices; Guitar Pro supports max 4. Dropping ${dropped}.`
+            );
+        }
+        barNode.addElement('Voices').innerText = slots.join(' ');
         barNode.addElement('Clef').innerText = Clef[bar.clef];
         if (bar.clefOttava !== Ottavia.Regular) {
             barNode.addElement('Ottavia').innerText = Ottavia[bar.clefOttava].substr(1);
@@ -1843,6 +1879,7 @@ export class GpifWriter {
         if (bar.simileMark !== SimileMark.None) {
             barNode.addElement('SimileMark').innerText = SimileMark[bar.simileMark];
         }
+        return activeVoices;
     }
 
     private _writeVoiceNode(parent: XmlNode, voice: Voice) {
