@@ -19,6 +19,7 @@ import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
 import { FadeType } from '@coderline/alphatab/model/FadeType';
 import { type Fermata, FermataType } from '@coderline/alphatab/model/Fermata';
+import { FingeringAssigner } from '@coderline/alphatab/model/FingeringAssigner';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
@@ -34,6 +35,7 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -43,6 +45,7 @@ import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Track } from '@coderline/alphatab/model/Track';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
@@ -63,11 +66,13 @@ export class GpifWriter {
     private static readonly _sampleRate = 44100;
 
     private _rhythmIdLookup: Map<string, string> = new Map<string, string>();
+    private _tuningByStaff: Map<Staff, number[]> = new Map<Staff, number[]>();
 
     public writeXml(score: Score): string {
         const xmlDocument = new XmlDocument();
 
         this._rhythmIdLookup = new Map<string, string>();
+        this._tuningByStaff = new Map<Staff, number[]>();
 
         this._writeDom(xmlDocument, score);
 
@@ -107,13 +112,38 @@ export class GpifWriter {
 
         for (const tracks of score.tracks) {
             for (const staff of tracks.staves) {
+                const needsFingering = ModelUtils.staffNotesAreNotStringed(staff);
+                const assignersByVoiceIndex = needsFingering ? new Map<number, FingeringAssigner>() : null;
+                const stringedTuning = needsFingering ? this._tuningByStaff.get(staff)! : null;
+                // Once the assigner sets note.string/note.fret, note.realValue
+                // routes through staff.tuning — needs to match the tuning we
+                // gave the assigner. Save + restore below leaves the input
+                // model untouched.
+                const savedTunings = staff.tuning;
+                if (needsFingering && stringedTuning !== null && savedTunings.length === 0) {
+                    staff.stringTuning.tunings = stringedTuning.slice();
+                }
+
                 for (const bar of staff.bars) {
                     const activeVoices = this._writeBarNode(bars, bar);
 
                     for (const voice of activeVoices) {
+                        let assigner: FingeringAssigner | null = null;
+                        if (assignersByVoiceIndex !== null && stringedTuning !== null) {
+                            if (assignersByVoiceIndex.has(voice.index)) {
+                                assigner = assignersByVoiceIndex.get(voice.index)!;
+                            } else {
+                                assigner = new FingeringAssigner(stringedTuning, staff.capo, staff.transpositionPitch);
+                                assignersByVoiceIndex.set(voice.index, assigner);
+                            }
+                        }
+
                         this._writeVoiceNode(voices, voice);
 
                         for (const beat of voice.beats) {
+                            if (assigner !== null) {
+                                assigner.assign(beat);
+                            }
                             this._writeBeatNode(beats, beat, rhythms);
 
                             for (const note of beat.notes) {
@@ -122,6 +152,7 @@ export class GpifWriter {
                         }
                     }
                 }
+                staff.stringTuning.tunings = savedTunings;
             }
         }
     }
@@ -282,17 +313,19 @@ export class GpifWriter {
         this._writeConcertPitch(properties, note);
         this._writeTransposedPitch(properties, note);
 
-        if (note.isStringed) {
+        if (note.isPercussion) {
+            const art = PercussionMapper.getArticulation(note);
+            const midi = art !== null ? art.outputMidiNumber : 0;
+            this._writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
+            this._writeSimplePropertyNode(properties, 'Fret', 'Fret', midi.toString());
+            this._writeSimplePropertyNode(properties, 'Midi', 'Number', midi.toString());
+        } else if (note.isStringed) {
             this._writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
             this._writeSimplePropertyNode(properties, 'Fret', 'Fret', note.fret.toString());
             this._writeSimplePropertyNode(properties, 'Midi', 'Number', note.realValue.toString());
             if (note.showStringNumber) {
                 this._writeSimplePropertyNode(properties, 'ShowStringNumber', 'Enable', null);
             }
-        }
-
-        if (note.isPercussion) {
-            this._writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
         }
 
         if (note.isPiano) {
@@ -393,7 +426,7 @@ export class GpifWriter {
 
     private _writeTransposedPitch(properties: XmlNode, note: Note) {
         if (note.isPercussion) {
-            this._writePitch(properties, 'ConcertPitch', 'C', '-1', '');
+            this._writePitch(properties, 'TransposedPitch', 'C', '-1', '');
         } else {
             this._writePitchForValue(
                 properties,
@@ -998,7 +1031,7 @@ export class GpifWriter {
             initialTempoAutomation.addElement('Bar').innerText = '0';
             initialTempoAutomation.addElement('Position').innerText = '0';
             initialTempoAutomation.addElement('Visible').innerText = 'true';
-            initialTempoAutomation.addElement('Value').innerText = `${score.tempo} 2`;
+            initialTempoAutomation.addElement('Value').innerText = `${score.tempo | 0} 2`;
             if (score.tempoLabel) {
                 initialTempoAutomation.addElement('Text').innerText = score.tempoLabel;
             }
@@ -1024,7 +1057,7 @@ export class GpifWriter {
                 tempoAutomation.addElement('Bar').innerText = mb.index.toString();
                 tempoAutomation.addElement('Position').innerText = automation.ratioPosition.toString();
                 tempoAutomation.addElement('Visible').innerText = automation.isVisible ? 'true' : 'false';
-                tempoAutomation.addElement('Value').innerText = `${automation.value} 2`;
+                tempoAutomation.addElement('Value').innerText = `${automation.value | 0} 2`;
                 if (automation.text) {
                     tempoAutomation.addElement('Text').innerText = automation.text;
                 }
@@ -1271,15 +1304,34 @@ export class GpifWriter {
         this._writeSimplePropertyNode(properties, 'CapoFret', 'Fret', staff.capo.toString());
         this._writeSimplePropertyNode(properties, 'FretCount', 'Fret', '24');
 
-        if (staff.tuning.length > 0) {
+        // GP7/8 requires every staff to carry a stringed tuning.
+        let tuning = staff.tuning;
+        let tuningName = staff.tuningName;
+        if (tuning.length === 0) {
+            if (staff.isPercussion) {
+                tuning = [0, 0, 0, 0, 0, 0];
+                tuningName = '';
+            } else if (ModelUtils.staffNotesAreNotStringed(staff)) {
+                const staffTuning =
+                    staff.index === 0 ? Tuning.getDefaultTuningFor(6) : Tuning.getDefaultTuningFor(5);
+                tuning = staffTuning!.tunings;
+                tuningName = staffTuning!.name;
+            }
+        }
+        this._tuningByStaff.set(staff, tuning);
+
+        if (tuning.length > 0) {
             const tuningProperty = properties.addElement('Property');
             tuningProperty.attributes.set('name', 'Tuning');
-            tuningProperty.addElement('Pitches').innerText = staff.tuning.slice().reverse().join(' ');
-            tuningProperty.addElement('Label').setCData(staff.tuningName);
-            tuningProperty.addElement('LabelVisible').innerText = staff.tuningName ? 'true' : 'false';
+            tuningProperty.addElement('Pitches').innerText = tuning.slice().reverse().join(' ');
+            tuningProperty.addElement('Label').setCData(tuningName);
+            tuningProperty.addElement('LabelVisible').innerText = tuningName ? 'true' : 'false';
             tuningProperty.addElement('Flat');
 
-            switch (staff.tuning.length) {
+            if (staff.isPercussion) {
+                tuningProperty.addElement('Instrument').innerText = 'Undefined';
+            } else {
+                switch (tuning.length) {
                 case 3:
                     tuningProperty.addElement('Instrument').innerText = 'Shamisen';
                     break;
@@ -1324,6 +1376,7 @@ export class GpifWriter {
                 default:
                     tuningProperty.addElement('Instrument').innerText = 'Guitar';
                     break;
+                }
             }
         }
 

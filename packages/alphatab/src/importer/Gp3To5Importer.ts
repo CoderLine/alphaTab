@@ -30,6 +30,7 @@ import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
 import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
@@ -1480,9 +1481,13 @@ export class Gp3To5Importer extends ScoreImporter {
         }
 
         if (bar.staff.isPercussion) {
-            newNote.percussionArticulation = Gp3To5Importer._gp5PercussionInstrumentMap.has(newNote.fret)
+            const midi = Gp3To5Importer._gp5PercussionInstrumentMap.has(newNote.fret)
                 ? Gp3To5Importer._gp5PercussionInstrumentMap.get(newNote.fret)!
                 : newNote.fret;
+            const knownArticulation = PercussionMapper.getArticulationById(midi);
+            if (knownArticulation !== null) {
+                newNote.percussionArticulation = bar.staff.track.getOrRegisterPercussionArticulation(knownArticulation);
+            }
             newNote.fret = Number.NaN;
         }
         if (swapAccidentals) {

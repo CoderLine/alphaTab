@@ -20,6 +20,7 @@ import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
 import { FadeType } from '@coderline/alphatab/model/FadeType';
 import { Fermata, FermataType } from '@coderline/alphatab/model/Fermata';
+import { FingeringAssigner } from '@coderline/alphatab/model/FingeringAssigner';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
@@ -134,6 +135,9 @@ export class GpifParser {
     private _skipApplyLyrics: boolean = false;
     private _backingTrackPadding: number = 0;
 
+    /** Marks the input as a Guitar Pro 6 file. Also auto-detected from the GPIF header. */
+    public isGp6: boolean = false;
+
     private _doubleBars: Set<MasterBar> = new Set<MasterBar>();
     private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<
         number,
@@ -174,6 +178,9 @@ export class GpifParser {
         this._parseDom(dom);
         this._buildModel();
         ModelUtils.consolidate(this.score);
+        if (this.isGp6) {
+            this._assignFingeringForGp6();
+        }
         this.score.finish(settings);
         if (!this._skipApplyLyrics && this._lyricsByTrack.size > 0) {
             for (const [t, lyrics] of this._lyricsByTrack) {
@@ -197,6 +204,16 @@ export class GpifParser {
             // parse all children
             for (const n of root.childElements()) {
                 switch (n.localName) {
+                    case 'GPVersion':
+                        if (n.innerText === '6') {
+                            this.isGp6 = true;
+                        }
+                        break;
+                    case 'Encoding':
+                        if (n.findChildElement('EncodingDescription')?.innerText === 'GP6') {
+                            this.isGp6 = true;
+                        }
+                        break;
                     case 'Score':
                         this._parseScoreNode(n);
                         break;
@@ -2559,7 +2576,7 @@ export class GpifParser {
             note.addBendPoint(bendDestination);
         }
 
-        // map GP6 element and variation combos to midi numbers
+        // Temporary MIDI id; normalised to a track-local index in `_attachNoteToBeat`.
         if (element !== -1 && variation !== -1) {
             note.percussionArticulation = PercussionMapper.articulationFromElementVariation(element, variation);
         }
@@ -2732,6 +2749,63 @@ export class GpifParser {
         beat.addNote(note);
         if (this._tappedNotes.has(noteId)) {
             beat.tap = true;
+        }
+        // Normalise `percussionArticulation` to the track-local index.
+        if (staff.isPercussion && note.percussionArticulation >= 0) {
+            const trackArticulations = staff.track.percussionArticulations;
+            let known: InstrumentArticulation | null = null;
+            if (note.percussionArticulation < trackArticulations.length) {
+                known = trackArticulations[note.percussionArticulation];
+            } else {
+                known = PercussionMapper.getArticulationById(note.percussionArticulation);
+            }
+            if (known !== null) {
+                note.percussionArticulation = staff.track.getOrRegisterPercussionArticulation(known);
+            }
+        }
+    }
+
+    private _assignFingeringForGp6(): void {
+        for (const track of this.score.tracks) {
+            for (const staff of track.staves) {
+                const isPercussion = staff.isPercussion;
+                const isPitchedOnly =
+                    !isPercussion &&
+                    staff.stringTuning.tunings.length === 0 &&
+                    ModelUtils.staffNotesAreNotStringed(staff);
+                if (!isPercussion && !isPitchedOnly) {
+                    continue;
+                }
+
+                if (isPercussion) {
+                    staff.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
+                } else {
+                    const fallback =
+                        staff.index === 0 ? Tuning.getDefaultTuningFor(6) : Tuning.getDefaultTuningFor(5);
+                    if (fallback !== null) {
+                        staff.stringTuning.tunings = fallback.tunings.slice();
+                        staff.stringTuning.name = fallback.name;
+                    }
+                }
+
+                const assignersByVoiceIndex = new Map<number, FingeringAssigner>();
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        let assigner: FingeringAssigner | undefined = assignersByVoiceIndex.get(voice.index);
+                        if (assigner === undefined) {
+                            assigner = new FingeringAssigner(
+                                staff.stringTuning.tunings,
+                                staff.capo,
+                                staff.transpositionPitch
+                            );
+                            assignersByVoiceIndex.set(voice.index, assigner);
+                        }
+                        for (const beat of voice.beats) {
+                            assigner.assign(beat);
+                        }
+                    }
+                }
+            }
         }
     }
 

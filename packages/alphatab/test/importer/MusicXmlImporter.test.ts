@@ -286,15 +286,18 @@ describe('MusicXmlImporterTests', () => {
     it('percussion-articulation', async () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/percussion-articulation.xml');
         const notes = score.tracks[0].staves[0].bars[0].voices[0].beats.flatMap(b => b.notes);
+        const trackArticulations = score.tracks[0].percussionArticulations;
 
         expect(notes).toHaveLength(2);
         expect(notes[0].displayValue).toBe(38);
         expect(notes[0].isPercussion).toBe(true);
-        expect(notes[0].percussionArticulation).toBe(38);
+        expect(notes[0].percussionArticulation).toBe(0);
+        expect(trackArticulations[0].outputMidiNumber).toBe(38);
 
         expect(notes[1].displayValue).toBe(49);
         expect(notes[1].isPercussion).toBe(true);
-        expect(notes[1].percussionArticulation).toBe(49);
+        expect(notes[1].percussionArticulation).toBe(1);
+        expect(trackArticulations[1].outputMidiNumber).toBe(49);
     });
 
     it('percussion-instrument-vs-pitched', async () => {

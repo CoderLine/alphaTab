@@ -46,6 +46,10 @@ internal class RegExp {
         return _regex.matcher(s).find()
     }
 
+    public fun split(s: String): alphaTab.collections.List<String> {
+        return alphaTab.collections.List(_regex.split(s).toList())
+    }
+
     public fun replace(s: String, replacement: String): String {
         return if (_global)
             _regex.matcher(s).replaceAll(replacement)

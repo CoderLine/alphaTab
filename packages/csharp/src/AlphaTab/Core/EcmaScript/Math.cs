@@ -35,6 +35,11 @@ internal static class Math
         return items.Min();
     }
 
+    public static double Min(IEnumerable<double> items)
+    {
+        return items.Min();
+    }
+
     public static double Max(double a, double b)
     {
         return System.Math.Max(a, b);
