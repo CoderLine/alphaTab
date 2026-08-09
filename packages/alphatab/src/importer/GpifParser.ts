@@ -134,7 +134,9 @@ export class GpifParser {
     private _articulationByName!: Map<string, InstrumentArticulation>;
     private _skipApplyLyrics: boolean = false;
     private _backingTrackPadding: number = 0;
-    private _isGp6: boolean = false;
+
+    /** Marks the input as a Guitar Pro 6 file. Also auto-detected from the GPIF header. */
+    public isGp6: boolean = false;
 
     private _doubleBars: Set<MasterBar> = new Set<MasterBar>();
     private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<
@@ -176,7 +178,7 @@ export class GpifParser {
         this._parseDom(dom);
         this._buildModel();
         ModelUtils.consolidate(this.score);
-        if (this._isGp6) {
+        if (this.isGp6) {
             this._assignFingeringForGp6();
         }
         this.score.finish(settings);
@@ -199,18 +201,17 @@ export class GpifParser {
         // - after that we need to join up the information.
         if (root.localName === 'GPIF') {
             this.score = new Score();
-            this._isGp6 = false;
             // parse all children
             for (const n of root.childElements()) {
                 switch (n.localName) {
                     case 'GPVersion':
                         if (n.innerText === '6') {
-                            this._isGp6 = true;
+                            this.isGp6 = true;
                         }
                         break;
                     case 'Encoding':
                         if (n.findChildElement('EncodingDescription')?.innerText === 'GP6') {
-                            this._isGp6 = true;
+                            this.isGp6 = true;
                         }
                         break;
                     case 'Score':
