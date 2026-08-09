@@ -2809,13 +2809,13 @@ export class GpifParser {
                     for (const voiceId of voiceIds) {
                         if (voiceId === GpifParser._invalidId) {
                             pendingPlaceholders++;
-                            continue;
+                        } else {
+                            while (pendingPlaceholders > 0) {
+                                ModelUtils.appendPlaceholderVoice(bar);
+                                pendingPlaceholders--;
+                            }
+                            this._attachVoiceToBar(bar, voiceId, staff);
                         }
-                        while (pendingPlaceholders > 0) {
-                            ModelUtils.appendPlaceholderVoice(bar);
-                            pendingPlaceholders--;
-                        }
-                        this._attachVoiceToBar(bar, voiceId, staff);
                     }
                 }
                 this._equalizeVoiceCount(staff, bar, staffVoiceLimits);
