@@ -1,4 +1,5 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 
 /**
  * Cost-function weights for {@link FingeringAssigner}. Defaults tuned for
@@ -67,10 +68,7 @@ export class FingeringAssigner {
         this._lastStringByMidi.fill(-1);
     }
 
-    /**
-     * Assign (string, fret) to non-percussion notes of the beat. Tie-destination
-     * notes inherit from their origin.
-     */
+    /** Assigns `(string, fret)` to notes that don't already carry both. */
     public assign(beat: Beat): void {
         const notes = beat.notes;
         const K = notes.length;
@@ -83,12 +81,22 @@ export class FingeringAssigner {
         }
         const sortedIdx = this._sortedIdx;
 
-        // Pre-pass: skip percussion + inherit tie destinations. Insertion-sort
-        // remaining notes ascending by pitch into the scratch buffer.
         let n = 0;
         for (let i = 0; i < K; i++) {
             const note = notes[i];
+            if (note.isStringed) {
+                continue;
+            }
             if (note.isPercussion) {
+                const art = PercussionMapper.getArticulation(note);
+                if (art !== null) {
+                    if (Number.isNaN(note.string)) {
+                        note.string = Math.max(1, Math.min(6, 7 - art.staffLine));
+                    }
+                    if (Number.isNaN(note.fret)) {
+                        note.fret = art.outputMidiNumber;
+                    }
+                }
                 continue;
             }
             const tieOrigin = note.tieOrigin;

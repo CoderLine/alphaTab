@@ -1145,8 +1145,8 @@ export class ModelUtils {
             : ModelUtils._majorKeySignatureTonicDegrees[ksi];
     }
 
+    /** True iff the staff's first note isn't stringed. Empty staves return false. */
     public static staffNotesAreNotStringed(staff: Staff) {
-        // hunt for first actual note
         for (const bar of staff.bars) {
             for (const voice of bar.voices) {
                 for (const beat of voice.beats) {
@@ -1156,6 +1156,6 @@ export class ModelUtils {
                 }
             }
         }
-        return true;
+        return false;
     }
 }
