@@ -49,10 +49,30 @@
         "typescript": "^6.0.3",
         "vitest": "^4.1.10"
     },
-    "bin": "./dist/server.mjs",
-    "main": "./dist/server.mjs",
-    "types": "./dist/server.d.ts",
+    "bin": "./dist/index.node.mjs",
+    "main": "./dist/index.node.mjs",
+    "types": "./dist/index.node.d.ts",
     "type": "module",
+    "exports": {
+        ".": {
+            "browser": {
+                "types": "./dist/index.browser.d.ts",
+                "import": "./dist/index.browser.mjs"
+            },
+            "default": {
+                "types": "./dist/index.node.d.ts",
+                "import": "./dist/index.node.mjs"
+            }
+        },
+        "./server/browser": {
+            "types": "./dist/server/browser.d.ts",
+            "import": "./dist/server/browser.mjs"
+        },
+        "./server/node": {
+            "types": "./dist/server/node.d.ts",
+            "import": "./dist/server/node.mjs"
+        }
+    },
     "files": [
         "dist/",
         "!dist/types/",

@@ -8,7 +8,7 @@ import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@coderline/alphatab/model/Score';
-import { Staff } from '@coderline/alphatab/model/Staff';
+import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Track } from '@coderline/alphatab/model/Track';
 import { Voice } from '@coderline/alphatab/model/Voice';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -551,6 +551,24 @@ export class ModelUtils {
         return headerFooterStyle;
     }
 
+    public static backfillStaffVoices(staff: Staff, targetVoiceCount: number): void {
+        for (let bi = 0; bi < staff.bars.length - 1; bi++) {
+            const priorBar = staff.bars[bi];
+            while (priorBar.voices.length < targetVoiceCount) {
+                ModelUtils.appendPlaceholderVoice(priorBar);
+            }
+        }
+    }
+
+    public static appendPlaceholderVoice(bar: Bar): void {
+        const voice: Voice = new Voice();
+        bar.addVoice(voice);
+        const beat: Beat = new Beat();
+        beat.isEmpty = true;
+        beat.duration = Duration.Quarter;
+        voice.addBeat(beat);
+    }
+
     /**
      * Performs some general consolidations of inconsistencies on the given score like
      * missing bars, beats, duplicated midi channels etc
@@ -628,12 +646,7 @@ export class ModelUtils {
                     }
 
                     for (let i = 0; i < voiceCount; i++) {
-                        const v = new Voice();
-                        bar.addVoice(v);
-
-                        const emptyBeat: Beat = new Beat();
-                        emptyBeat.isEmpty = true;
-                        v.addBeat(emptyBeat);
+                        ModelUtils.appendPlaceholderVoice(bar);
                     }
                 }
             }
@@ -1131,14 +1144,13 @@ export class ModelUtils {
             ? ModelUtils._minorKeySignatureTonicDegrees[ksi]
             : ModelUtils._majorKeySignatureTonicDegrees[ksi];
     }
-    
 
-    public static staffNotesAreNotStringed(staff:Staff){
+    public static staffNotesAreNotStringed(staff: Staff) {
         // hunt for first actual note
-        for(const bar of staff.bars) {
-            for(const voice of bar.voices) {
-                for(const beat of voice.beats) {
-                    for(const note of beat.notes) {
+        for (const bar of staff.bars) {
+            for (const voice of bar.voices) {
+                for (const beat of voice.beats) {
+                    for (const note of beat.notes) {
                         return !note.isStringed;
                     }
                 }

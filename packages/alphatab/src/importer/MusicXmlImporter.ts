@@ -2709,9 +2709,11 @@ export class MusicXmlImporter extends ScoreImporter {
 
                 // case 'footnote': Ignored
                 // case 'level': Ignored
-                case 'voice':
-                    voiceRaw = c.innerText.trim() || '1';
+                case 'voice': {
+                    const trimmed = c.innerText.trim();
+                    voiceRaw = trimmed.length > 0 ? trimmed : '1';
                     break;
+                }
                 case 'type':
                     beatDuration = this._parseBeatDuration(c);
                     break;
