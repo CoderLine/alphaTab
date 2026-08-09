@@ -1601,15 +1601,42 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeExpression(s.expression);
         this.writeLine(')');
 
-        if (cs.isBlock(s.statement)) {
-            this.writeStatement(s.statement);
-        } else {
-            this._indent++;
-            this.writeStatement(s.statement);
-            this._indent--;
+        this._forLoopIncrementors.push(undefined);
+        try {
+            if (cs.isBlock(s.statement)) {
+                this.writeStatement(s.statement);
+            } else {
+                this._indent++;
+                this.writeStatement(s.statement);
+                this._indent--;
+            }
+        } finally {
+            this._forLoopIncrementors.pop();
         }
     }
 
+    protected override writeWhileStatement(s: cs.WhileStatement) {
+        this._forLoopIncrementors.push(undefined);
+        try {
+            super.writeWhileStatement(s);
+        } finally {
+            this._forLoopIncrementors.pop();
+        }
+    }
+
+    protected override writeDoStatement(s: cs.DoStatement) {
+        this._forLoopIncrementors.push(undefined);
+        try {
+            super.writeDoStatement(s);
+        } finally {
+            this._forLoopIncrementors.pop();
+        }
+    }
+
+    // Stack of pending step-expressions for enclosing C-style `for` loops
+    // lowered to `while`. Non-loop scopes never push; nested `for-of`, `for-in`,
+    // `while`, and `do-while` push `undefined` so a `continue` inside them
+    // targets the inner loop and skips the outer's step injection.
     private _forLoopIncrementors: (cs.Expression | undefined)[] = [];
 
     protected writeForStatement(s: cs.ForStatement) {
