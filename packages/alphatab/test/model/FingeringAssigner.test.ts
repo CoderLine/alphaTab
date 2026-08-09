@@ -322,14 +322,19 @@ describe('FingeringAssignerTests', () => {
             expect(beat.notes.length).toBe(0);
         });
 
+        // Percussion mapping: fret = articulation MIDI, string derived from
+        // articulation.staffLine via clamp(7 - staffLine, 1, 6).
+        // Snare (id 38, staffLine 3) → string 4, fret 38.
+        // Charley closed (id 42, staffLine -1) → string 6 (clamp), fret 42.
+        // Kick Drum (id 36, staffLine 7) → string 1 (clamp), fret 36.
         it('E2 all-percussion-beat', () => {
-            const beat = buildBeat([38, 42], { tuning: GUITAR_6, percussionIndices: [0, 1] });
-            const a = new FingeringAssigner(GUITAR_6, 0, 0);
+            const beat = buildBeat([38, 42], { tuning: [0, 0, 0, 0, 0, 0], percussionIndices: [0, 1] });
+            const a = new FingeringAssigner([0, 0, 0, 0, 0, 0], 0, 0);
             a.assign(beat);
-            for (const n of beat.notes) {
-                expect(Number.isNaN(n.string)).toBe(true);
-                expect(Number.isNaN(n.fret)).toBe(true);
-            }
+            expect(beat.notes[0].string).toBe(4);
+            expect(beat.notes[0].fret).toBe(38);
+            expect(beat.notes[1].string).toBe(6);
+            expect(beat.notes[1].fret).toBe(42);
         });
 
         it('E3 mixed-percussion-pitched', () => {
@@ -337,10 +342,19 @@ describe('FingeringAssignerTests', () => {
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
-            expect(Number.isNaN(beat.notes[0].string)).toBe(true);
+            expect(beat.notes[0].string).toBe(4);
+            expect(beat.notes[0].fret).toBe(38);
             expect(Number.isNaN(beat.notes[1].string)).toBe(false);
             const stringPitch = GUITAR_6[GUITAR_6.length - beat.notes[1].string];
             expect(stringPitch + beat.notes[1].fret).toBe(midi[1]);
+        });
+
+        it('E3b percussion-kick-lands-on-bottom-string', () => {
+            const beat = buildBeat([36], { tuning: [0, 0, 0, 0, 0, 0], percussionIndices: [0] });
+            const a = new FingeringAssigner([0, 0, 0, 0, 0, 0], 0, 0);
+            a.assign(beat);
+            expect(beat.notes[0].string).toBe(1);
+            expect(beat.notes[0].fret).toBe(36);
         });
 
         it('E4 pitch-below-range', () => {

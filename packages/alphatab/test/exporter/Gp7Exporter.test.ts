@@ -9,14 +9,10 @@ import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
-import { Beat } from '@coderline/alphatab/model/Beat';
-import { Duration } from '@coderline/alphatab/model/Duration';
 import { TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Score } from '@coderline/alphatab/model/Score';
-import { Tuning } from '@coderline/alphatab/model/Tuning';
-import { Voice } from '@coderline/alphatab/model/Voice';
 import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
@@ -51,46 +47,6 @@ describe('Gp7ExporterTest', () => {
         return IOHelper.toString(gpifData, settings.importer.encoding);
     }
 
-    // Guitar Pro's format requires exactly 4 voice slots per bar. On import, the
-    // GpifParser materializes empty '-1' slots as placeholder voices (see
-    // GpifParser._parseBars). Scores loaded from formats that don't enforce
-    // 4 voices (AlphaTex, MusicXML, GP3-5) therefore normalize to 4 voices
-    // after any GP round-trip. This helper mimics that normalization on the
-    // "expected" side so round-trip equality checks reflect real semantics.
-    function padVoicesForGpRoundTrip(score: Score): void {
-        for (const track of score.tracks) {
-            for (const staff of track.staves) {
-                for (const bar of staff.bars) {
-                    while (bar.voices.length < 4) {
-                        const voice = new Voice();
-                        bar.addVoice(voice);
-                        const beat = new Beat();
-                        beat.isEmpty = true;
-                        beat.duration = Duration.Quarter;
-                        voice.addBeat(beat);
-                        beat.updateDurations();
-                    }
-                }
-            }
-        }
-    }
-
-    // GP7/8 always writes a stringed tuning; empty-tuning staves get the
-    // synthetic default on export, so the expected side must mirror that.
-    function padTuningForGpRoundTrip(score: Score): void {
-        for (const track of score.tracks) {
-            for (const staff of track.staves) {
-                if (staff.tuning.length !== 0 || staff.isPercussion) {
-                    continue;
-                }
-                const fallback = staff.index === 0 ? Tuning.getDefaultTuningFor(6)! : Tuning.getDefaultTuningFor(5)!;
-                staff.stringTuning.tunings = fallback.tunings.slice();
-                staff.stringTuning.name = fallback.name;
-                staff.stringTuning.isStandard = fallback.isStandard;
-            }
-        }
-    }
-
     async function testRoundTripEqual(name: string, ignoreKeys: string[] | null): Promise<void> {
         const expected = await loadScore(name);
         if (!expected) {
@@ -100,9 +56,6 @@ describe('Gp7ExporterTest', () => {
         const fileName = name.substr(name.lastIndexOf('/') + 1);
         const exported = exportGp7(expected);
         const actual = prepareImporterWithBytes(exported).readScore();
-
-        padVoicesForGpRoundTrip(expected);
-        padTuningForGpRoundTrip(expected);
 
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
@@ -198,8 +151,6 @@ describe('Gp7ExporterTest', () => {
 
         const actual = prepareImporterWithBytes(exported).readScore();
 
-        padVoicesForGpRoundTrip(expected);
-
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
@@ -245,8 +196,6 @@ describe('Gp7ExporterTest', () => {
         const exported = exportGp7(expected);
 
         const actual = prepareImporterWithBytes(exported).readScore();
-
-        padVoicesForGpRoundTrip(expected);
 
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
