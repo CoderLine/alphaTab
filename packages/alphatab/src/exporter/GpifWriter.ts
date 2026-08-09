@@ -35,6 +35,7 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -312,17 +313,19 @@ export class GpifWriter {
         this._writeConcertPitch(properties, note);
         this._writeTransposedPitch(properties, note);
 
-        if (note.isStringed) {
+        if (note.isPercussion) {
+            const art = PercussionMapper.getArticulation(note);
+            const midi = art !== null ? art.outputMidiNumber : 0;
+            this._writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
+            this._writeSimplePropertyNode(properties, 'Fret', 'Fret', midi.toString());
+            this._writeSimplePropertyNode(properties, 'Midi', 'Number', midi.toString());
+        } else if (note.isStringed) {
             this._writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
             this._writeSimplePropertyNode(properties, 'Fret', 'Fret', note.fret.toString());
             this._writeSimplePropertyNode(properties, 'Midi', 'Number', note.realValue.toString());
             if (note.showStringNumber) {
                 this._writeSimplePropertyNode(properties, 'ShowStringNumber', 'Enable', null);
             }
-        }
-
-        if (note.isPercussion) {
-            this._writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
         }
 
         if (note.isPiano) {
@@ -423,7 +426,7 @@ export class GpifWriter {
 
     private _writeTransposedPitch(properties: XmlNode, note: Note) {
         if (note.isPercussion) {
-            this._writePitch(properties, 'ConcertPitch', 'C', '-1', '');
+            this._writePitch(properties, 'TransposedPitch', 'C', '-1', '');
         } else {
             this._writePitchForValue(
                 properties,
@@ -1301,15 +1304,19 @@ export class GpifWriter {
         this._writeSimplePropertyNode(properties, 'CapoFret', 'Fret', staff.capo.toString());
         this._writeSimplePropertyNode(properties, 'FretCount', 'Fret', '24');
 
+        // GP7/8 requires every staff to carry a stringed tuning.
         let tuning = staff.tuning;
         let tuningName = staff.tuningName;
         if (tuning.length === 0) {
-            // GP7 again handles staves always as stringed staves.
-            // Only GP6 had pure "pitched" staves. to ensure correct export
-            // we go for the default grand piano tuning style.
-            const staffTuning = staff.index === 0 ? Tuning.getDefaultTuningFor(6) : Tuning.getDefaultTuningFor(5);
-            tuning = staffTuning!.tunings;
-            tuningName = staffTuning!.name;
+            if (staff.isPercussion) {
+                tuning = [0, 0, 0, 0, 0, 0];
+                tuningName = '';
+            } else if (ModelUtils.staffNotesAreNotStringed(staff)) {
+                const staffTuning =
+                    staff.index === 0 ? Tuning.getDefaultTuningFor(6) : Tuning.getDefaultTuningFor(5);
+                tuning = staffTuning!.tunings;
+                tuningName = staffTuning!.name;
+            }
         }
         this._tuningByStaff.set(staff, tuning);
 
@@ -1321,7 +1328,10 @@ export class GpifWriter {
             tuningProperty.addElement('LabelVisible').innerText = tuningName ? 'true' : 'false';
             tuningProperty.addElement('Flat');
 
-            switch (tuning.length) {
+            if (staff.isPercussion) {
+                tuningProperty.addElement('Instrument').innerText = 'Undefined';
+            } else {
+                switch (tuning.length) {
                 case 3:
                     tuningProperty.addElement('Instrument').innerText = 'Shamisen';
                     break;
@@ -1366,6 +1376,7 @@ export class GpifWriter {
                 default:
                     tuningProperty.addElement('Instrument').innerText = 'Guitar';
                     break;
+                }
             }
         }
 
