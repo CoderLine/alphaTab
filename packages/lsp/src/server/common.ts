@@ -13,18 +13,7 @@ import {
     TextDocuments
 } from '@coderline/alphatab-language-server/server/types';
 
-// the only place where we should import specif vscode-languageserver packages
-import {
-    BrowserMessageReader,
-    BrowserMessageWriter,
-    createConnection as createBrowserConnection
-} from 'vscode-languageserver/browser';
-import {
-    createConnection as createNodeConnection,
-    ProposedFeatures as NodeProposedFeatures
-} from 'vscode-languageserver/node';
-
-function startLanguageServer(serverConnection: Connection) {
+export function startLanguageServer(serverConnection: Connection) {
     const documents = new TextDocuments<AlphaTexTextDocument>(TextDocument);
 
     serverConnection.onInitialize((params: InitializeParams) => {
@@ -66,31 +55,4 @@ function startLanguageServer(serverConnection: Connection) {
 
     documents.listen(serverConnection);
     serverConnection.listen();
-}
-
-
-type Port = ConstructorParameters<typeof BrowserMessageReader>[0];
-
-/**
- * Starts a new language server communicating via WebWorker.
- * @param readerPort The port used to reading incoming language server messages
- * @param writerPort The port used to writer outgoing language server messages
- */
-export function startWebWorkerLanguageServer(
-    readerPort: Port,
-    writerPort: Port
-) {
-    startLanguageServer(
-        createBrowserConnection(
-            new BrowserMessageReader(readerPort),
-            new BrowserMessageWriter(writerPort)
-        )
-    );
-}
-
-/**
- * Starts a new language server communicating from a Node.js process with a parent Node.js.
- */
-export function startNodeLanguageServer() {
-    startLanguageServer(createNodeConnection(NodeProposedFeatures.all));
 }

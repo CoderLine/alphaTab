@@ -7,7 +7,10 @@ export default defineConfig(() => {
     config.resolve ??= {};
     config.resolve.mainFields = defaultClientMainFields.filter(f => f !== 'browser');
 
-    esm(config, import.meta.dirname, 'server', 'src/index.ts');
+    esm(config, import.meta.dirname, 'index.browser', 'src/index.browser.ts');
+    esm(config, import.meta.dirname, 'index.node', 'src/index.node.ts', { withMin: false });
+    esm(config, import.meta.dirname, 'server/browser', 'src/server/browser.ts', { withMin: false });
+    esm(config, import.meta.dirname, 'server/node', 'src/server/node.ts', { withMin: false });
     (config.build!.rollupOptions!.external as (RegExp | string)[]).push('@coderline/alphatab');
     addDts(config, import.meta.dirname);
     return config;
