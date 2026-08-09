@@ -8,6 +8,7 @@ import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { Staff } from '@coderline/alphatab/model/Staff';
 import type { Track } from '@coderline/alphatab/model/Track';
 import { Voice } from '@coderline/alphatab/model/Voice';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -1129,5 +1130,20 @@ export class ModelUtils {
         return keySignatureType === KeySignatureType.Minor
             ? ModelUtils._minorKeySignatureTonicDegrees[ksi]
             : ModelUtils._majorKeySignatureTonicDegrees[ksi];
+    }
+    
+
+    public static staffNotesAreNotStringed(staff:Staff){
+        // hunt for first actual note
+        for(const bar of staff.bars) {
+            for(const voice of bar.voices) {
+                for(const beat of voice.beats) {
+                    for(const note of beat.notes) {
+                        return !note.isStringed;
+                    }
+                }
+            }
+        }
+        return true;
     }
 }
