@@ -2855,7 +2855,7 @@ export class MusicXmlImporter extends ScoreImporter {
         } else if (note.beat.voice.bar.staff.isPercussion) {
             const knownArticulation = PercussionMapper.getArticulationById(note.displayValue);
             if (knownArticulation) {
-                note.percussionArticulation = knownArticulation.id;
+                note.percussionArticulation = track.getOrRegisterPercussionArticulation(knownArticulation);
             }
         }
     }
