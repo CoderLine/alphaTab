@@ -79,6 +79,10 @@ internal class Math {
             return v.max()
         }
 
+        public fun min(vararg v: Double): Double {
+            return v.min()
+        }
+
         public fun random(): Double {
             return kotlin.random.Random.nextDouble()
         }

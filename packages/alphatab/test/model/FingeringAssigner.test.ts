@@ -7,6 +7,10 @@ import { Track } from '@coderline/alphatab/model/Track';
 import { Voice } from '@coderline/alphatab/model/Voice';
 import { describe, expect, it } from 'vitest';
 
+/**
+ * @record
+ * @internal
+ */
 interface BuildOptions {
     transposition?: number;
     percussionIndices?: number[];
@@ -23,9 +27,7 @@ function buildBeat(pitches: number[], opts?: BuildOptions): Beat {
     if (opts?.tuning) {
         staff.stringTuning.tunings = opts.tuning.slice();
     }
-    if (opts?.capo !== undefined) {
-        staff.capo = opts.capo;
-    }
+    staff.capo = opts?.capo ?? 0;
     track.addStaff(staff);
     const bar = new Bar();
     staff.addBar(bar);
@@ -33,11 +35,11 @@ function buildBeat(pitches: number[], opts?: BuildOptions): Beat {
     bar.addVoice(voice);
     const beat = new Beat();
     voice.addBeat(beat);
-    const percussionSet = new Set(opts?.percussionIndices ?? []);
+    const percussionIndices = opts?.percussionIndices ?? [];
     for (let i = 0; i < pitches.length; i++) {
         const midi = pitches[i];
         const note = new Note();
-        if (percussionSet.has(i)) {
+        if (percussionIndices.indexOf(i) >= 0) {
             note.percussionArticulation = midi;
         } else {
             note.octave = Math.floor(midi / 12);
@@ -75,7 +77,7 @@ function expectPitchIdentity(beat: Beat, tuning: number[], originalMidi: number[
 describe('FingeringAssignerTests', () => {
     describe('A pitch identity', () => {
         it('A1 single-note-guitar-range', () => {
-            const beat = buildBeat([60], { tuning: GUITAR_6 });
+            const beat = buildBeat([60], { tuning: GUITAR_6 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
@@ -86,17 +88,19 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('A2 chord-3-notes-guitar', () => {
-            const beat = buildBeat([55, 62, 67], { tuning: GUITAR_6 });
+            const beat = buildBeat([55, 62, 67], { tuning: GUITAR_6 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
             expectPitchIdentity(beat, GUITAR_6, midi);
             const strings = beat.notes.map(n => n.string);
-            expect(new Set(strings).size).toBe(3);
+            const uniqStrings3: Map<number, boolean> = new Map<number, boolean>();
+            for (const s of strings) { uniqStrings3.set(s, true); }
+            expect(uniqStrings3.size).toBe(3);
         });
 
         it('A3 chord-6-notes-guitar-open-tuning', () => {
-            const beat = buildBeat([40, 45, 50, 55, 59, 64], { tuning: GUITAR_6 });
+            const beat = buildBeat([40, 45, 50, 55, 59, 64], { tuning: GUITAR_6 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
@@ -104,12 +108,12 @@ describe('FingeringAssignerTests', () => {
             for (const n of beat.notes) {
                 expect(n.fret).toBe(0);
             }
-            const strings = beat.notes.map(n => n.string).sort((x, y) => x - y);
+            const strings = beat.notes.map(n => n.string).sort();
             expect(strings).toEqual([1, 2, 3, 4, 5, 6]);
         });
 
         it('A4 capo-non-zero', () => {
-            const beat = buildBeat([63], { tuning: GUITAR_6, capo: 3 });
+            const beat = buildBeat([63], { tuning: GUITAR_6, capo: 3 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 3, 0);
             a.assign(beat);
@@ -117,7 +121,7 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('A5 transposition-non-zero', () => {
-            const beat = buildBeat([60], { tuning: GUITAR_6, transposition: -12 });
+            const beat = buildBeat([60], { tuning: GUITAR_6, transposition: -12 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 0, -12);
             a.assign(beat);
@@ -125,7 +129,7 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('A6 capo-and-transposition', () => {
-            const beat = buildBeat([60], { tuning: GUITAR_6, capo: 2, transposition: -12 });
+            const beat = buildBeat([60], { tuning: GUITAR_6, capo: 2, transposition: -12 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 2, -12);
             a.assign(beat);
@@ -133,7 +137,7 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('A7 bass-5-string', () => {
-            const beat = buildBeat([40], { tuning: BASS_5 });
+            const beat = buildBeat([40], { tuning: BASS_5 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(BASS_5, 0, 0);
             a.assign(beat);
@@ -143,10 +147,10 @@ describe('FingeringAssignerTests', () => {
 
     describe('B chord voicing quality', () => {
         it('B1 power-chord-clusters', () => {
-            const beat = buildBeat([55, 62, 67], { tuning: GUITAR_6 });
+            const beat = buildBeat([55, 62, 67], { tuning: GUITAR_6 } as BuildOptions);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
-            const strings = beat.notes.map(n => n.string).sort((x, y) => x - y);
+            const strings = beat.notes.map(n => n.string).sort();
             expect(strings[1] - strings[0]).toBe(1);
             expect(strings[2] - strings[1]).toBe(1);
             const frets = beat.notes.map(n => n.fret);
@@ -154,19 +158,21 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('B2 wide-piano-chord', () => {
-            const beat = buildBeat([48, 52, 55, 60], { tuning: GUITAR_6 });
+            const beat = buildBeat([48, 52, 55, 60], { tuning: GUITAR_6 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
             expectPitchIdentity(beat, GUITAR_6, midi);
             const strings = beat.notes.map(n => n.string);
-            expect(new Set(strings).size).toBe(4);
+            const uniqStrings4: Map<number, boolean> = new Map<number, boolean>();
+            for (const s of strings) { uniqStrings4.set(s, true); }
+            expect(uniqStrings4.size).toBe(4);
             const frets = beat.notes.map(n => n.fret);
             expect(Math.max(...frets) - Math.min(...frets)).toBeLessThanOrEqual(7);
         });
 
         it('B3 chord-with-open-strings', () => {
-            const beat = buildBeat([40, 55, 64], { tuning: GUITAR_6 });
+            const beat = buildBeat([40, 55, 64], { tuning: GUITAR_6 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
@@ -190,7 +196,7 @@ describe('FingeringAssignerTests', () => {
 
     describe('C streaming state', () => {
         it('C1 initial-hand-position', () => {
-            const beat = buildBeat([62], { tuning: GUITAR_6 });
+            const beat = buildBeat([62], { tuning: GUITAR_6 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
@@ -202,8 +208,8 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('C2 hysteresis-holds', () => {
-            const b1 = buildBeat([62], { tuning: GUITAR_6 });
-            const b2 = buildBeat([62], { tuning: GUITAR_6 });
+            const b1 = buildBeat([62], { tuning: GUITAR_6 } as BuildOptions);
+            const b2 = buildBeat([62], { tuning: GUITAR_6 } as BuildOptions);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(b1);
             a.assign(b2);
@@ -212,9 +218,9 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('C3 same-pitch-across-beats', () => {
-            const b1 = buildBeat([60], { tuning: GUITAR_6 });
-            const b2 = buildBeat([60], { tuning: GUITAR_6 });
-            const b3 = buildBeat([60], { tuning: GUITAR_6 });
+            const b1 = buildBeat([60], { tuning: GUITAR_6 } as BuildOptions);
+            const b2 = buildBeat([60], { tuning: GUITAR_6 } as BuildOptions);
+            const b3 = buildBeat([60], { tuning: GUITAR_6 } as BuildOptions);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(b1);
             a.assign(b2);
@@ -227,15 +233,15 @@ describe('FingeringAssignerTests', () => {
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             const pre: Beat[] = [];
             for (let i = 0; i < 4; i++) {
-                const b = buildBeat([50], { tuning: GUITAR_6 });
+                const b = buildBeat([50], { tuning: GUITAR_6 } as BuildOptions);
                 a.assign(b);
                 pre.push(b);
             }
-            const spike = buildBeat([84], { tuning: GUITAR_6 });
+            const spike = buildBeat([84], { tuning: GUITAR_6 } as BuildOptions);
             a.assign(spike);
             const post: Beat[] = [];
             for (let i = 0; i < 4; i++) {
-                const b = buildBeat([50], { tuning: GUITAR_6 });
+                const b = buildBeat([50], { tuning: GUITAR_6 } as BuildOptions);
                 a.assign(b);
                 post.push(b);
             }
@@ -250,13 +256,13 @@ describe('FingeringAssignerTests', () => {
 
         it('C5 reset-clears-state', () => {
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
-            a.assign(buildBeat([84], { tuning: GUITAR_6 }));
+            a.assign(buildBeat([84], { tuning: GUITAR_6 } as BuildOptions));
             a.reset();
-            const fresh = buildBeat([60], { tuning: GUITAR_6 });
+            const fresh = buildBeat([60], { tuning: GUITAR_6 } as BuildOptions);
             a.assign(fresh);
 
             const control = new FingeringAssigner(GUITAR_6, 0, 0);
-            const controlBeat = buildBeat([60], { tuning: GUITAR_6 });
+            const controlBeat = buildBeat([60], { tuning: GUITAR_6 } as BuildOptions);
             control.assign(controlBeat);
             expect(fresh.notes[0].string).toBe(controlBeat.notes[0].string);
             expect(fresh.notes[0].fret).toBe(controlBeat.notes[0].fret);
@@ -264,11 +270,11 @@ describe('FingeringAssignerTests', () => {
 
         it('C6 open-only-chord-preserves-hand', () => {
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
-            a.assign(buildBeat([60, 64, 67], { tuning: GUITAR_6 }));
+            a.assign(buildBeat([60, 64, 67], { tuning: GUITAR_6 } as BuildOptions));
             // All-open chord: none of these notes has a non-zero fret. Anchor
             // must not slide back to preferredHandPosition.
-            a.assign(buildBeat([40, 45, 50, 55, 59, 64], { tuning: GUITAR_6 }));
-            const probe = buildBeat([62], { tuning: GUITAR_6 });
+            a.assign(buildBeat([40, 45, 50, 55, 59, 64], { tuning: GUITAR_6 } as BuildOptions));
+            const probe = buildBeat([62], { tuning: GUITAR_6 } as BuildOptions);
             a.assign(probe);
             // Following note reflects an elevated hand position (not near 3).
             expect(probe.notes[0].fret).toBeGreaterThanOrEqual(3);
@@ -277,7 +283,7 @@ describe('FingeringAssignerTests', () => {
 
     describe('D ties', () => {
         it('D1 tie-destination-inherits', () => {
-            const b1 = buildBeat([60], { tuning: GUITAR_6 });
+            const b1 = buildBeat([60], { tuning: GUITAR_6 } as BuildOptions);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(b1);
             const origin = b1.notes[0];
@@ -285,9 +291,9 @@ describe('FingeringAssignerTests', () => {
             const originFret = origin.fret;
 
             // Push hand position elsewhere so a fresh greedy would differ.
-            a.assign(buildBeat([84], { tuning: GUITAR_6 }));
+            a.assign(buildBeat([84], { tuning: GUITAR_6 } as BuildOptions));
 
-            const b2 = buildBeat([60], { tuning: GUITAR_6 });
+            const b2 = buildBeat([60], { tuning: GUITAR_6 } as BuildOptions);
             const dest = b2.notes[0];
             dest.tieOrigin = origin;
             dest.isTieDestination = true;
@@ -298,11 +304,11 @@ describe('FingeringAssignerTests', () => {
 
         it('D2 tie-destination-without-stringed-origin', () => {
             // Origin is a piano note (no string/fret) — normal assignment path.
-            const originBeat = buildBeat([60], { tuning: GUITAR_6 });
+            const originBeat = buildBeat([60], { tuning: GUITAR_6 } as BuildOptions);
             const origin = originBeat.notes[0];
             expect(origin.isStringed).toBe(false);
 
-            const b2 = buildBeat([60], { tuning: GUITAR_6 });
+            const b2 = buildBeat([60], { tuning: GUITAR_6 } as BuildOptions);
             const midi = capturePitches(b2);
             const dest = b2.notes[0];
             dest.tieOrigin = origin;
@@ -316,7 +322,7 @@ describe('FingeringAssignerTests', () => {
 
     describe('E edge cases', () => {
         it('E1 empty-beat', () => {
-            const beat = buildBeat([], { tuning: GUITAR_6 });
+            const beat = buildBeat([], { tuning: GUITAR_6 } as BuildOptions);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
             expect(beat.notes.length).toBe(0);
@@ -328,7 +334,7 @@ describe('FingeringAssignerTests', () => {
         // Charley closed (id 42, staffLine -1) → string 6 (clamp), fret 42.
         // Kick Drum (id 36, staffLine 7) → string 1 (clamp), fret 36.
         it('E2 all-percussion-beat', () => {
-            const beat = buildBeat([38, 42], { tuning: [0, 0, 0, 0, 0, 0], percussionIndices: [0, 1] });
+            const beat = buildBeat([38, 42], { tuning: [0, 0, 0, 0, 0, 0], percussionIndices: [0, 1] } as BuildOptions);
             const a = new FingeringAssigner([0, 0, 0, 0, 0, 0], 0, 0);
             a.assign(beat);
             expect(beat.notes[0].string).toBe(4);
@@ -338,7 +344,7 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('E3 mixed-percussion-pitched', () => {
-            const beat = buildBeat([38, 60], { tuning: GUITAR_6, percussionIndices: [0] });
+            const beat = buildBeat([38, 60], { tuning: GUITAR_6, percussionIndices: [0] } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
@@ -350,7 +356,7 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('E3b percussion-kick-lands-on-bottom-string', () => {
-            const beat = buildBeat([36], { tuning: [0, 0, 0, 0, 0, 0], percussionIndices: [0] });
+            const beat = buildBeat([36], { tuning: [0, 0, 0, 0, 0, 0], percussionIndices: [0] } as BuildOptions);
             const a = new FingeringAssigner([0, 0, 0, 0, 0, 0], 0, 0);
             a.assign(beat);
             expect(beat.notes[0].string).toBe(1);
@@ -358,7 +364,7 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('E4 pitch-below-range', () => {
-            const beat = buildBeat([20], { tuning: GUITAR_6 });
+            const beat = buildBeat([20], { tuning: GUITAR_6 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
@@ -367,7 +373,7 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('E5 pitch-above-range', () => {
-            const beat = buildBeat([120], { tuning: GUITAR_6 });
+            const beat = buildBeat([120], { tuning: GUITAR_6 } as BuildOptions);
             const midi = capturePitches(beat);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
@@ -376,15 +382,16 @@ describe('FingeringAssignerTests', () => {
         });
 
         it('E6 chord-overflow-collides', () => {
-            const beat = buildBeat([40, 45, 50, 55, 59, 64, 67, 72], { tuning: GUITAR_6 });
+            const beat = buildBeat([40, 45, 50, 55, 59, 64, 67, 72], { tuning: GUITAR_6 } as BuildOptions);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
             for (const n of beat.notes) {
                 expect(Number.isNaN(n.string)).toBe(false);
                 expect(Number.isNaN(n.fret)).toBe(false);
             }
-            const keys = new Set(beat.notes.map(n => `${n.string},${n.fret}`));
-            expect(keys.size).toBe(beat.notes.length);
+            const uniqKeys: Map<string, boolean> = new Map<string, boolean>();
+            for (const n of beat.notes) { uniqKeys.set(`${n.string},${n.fret}`, true); }
+            expect(uniqKeys.size).toBe(beat.notes.length);
         });
 
         it('E7 sortedidx-buffer-growth', () => {
@@ -392,7 +399,7 @@ describe('FingeringAssignerTests', () => {
             for (let i = 0; i < 20; i++) {
                 pitches.push(40 + i);
             }
-            const beat = buildBeat(pitches, { tuning: GUITAR_6 });
+            const beat = buildBeat(pitches, { tuning: GUITAR_6 } as BuildOptions);
             const a = new FingeringAssigner(GUITAR_6, 0, 0);
             a.assign(beat);
             for (const n of beat.notes) {
@@ -414,19 +421,19 @@ describe('FingeringAssignerTests', () => {
 
         it('F3 tuning-min-boundary', () => {
             const a = new FingeringAssigner([40], 0, 0);
-            const beat = buildBeat([40], { tuning: [40] });
+            const beat = buildBeat([40], { tuning: [40] } as BuildOptions);
             a.assign(beat);
             expect(beat.notes[0].string).toBe(1);
             expect(beat.notes[0].fret).toBe(0);
         });
 
         it('F4 tuning-max-boundary', () => {
-            const wide = new Array<number>(30);
+            const wide: number[] = [];
             for (let i = 0; i < 30; i++) {
-                wide[i] = 60 - i;
+                wide.push(60 - i);
             }
             const a = new FingeringAssigner(wide, 0, 0);
-            const beat = buildBeat([50], { tuning: wide });
+            const beat = buildBeat([50], { tuning: wide } as BuildOptions);
             a.assign(beat);
             expect(Number.isNaN(beat.notes[0].string)).toBe(false);
             expect(Number.isNaN(beat.notes[0].fret)).toBe(false);
@@ -438,7 +445,7 @@ describe('FingeringAssignerTests', () => {
             const opts = new FingeringOptions();
             opts.openStringBonus = -20;
             const a = new FingeringAssigner(GUITAR_6, 0, 0, opts);
-            const beat = buildBeat([64], { tuning: GUITAR_6 });
+            const beat = buildBeat([64], { tuning: GUITAR_6 } as BuildOptions);
             a.assign(beat);
             expect(beat.notes[0].fret).toBe(0);
             expect(beat.notes[0].string).toBe(6);

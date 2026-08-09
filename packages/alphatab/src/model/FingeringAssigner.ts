@@ -39,7 +39,8 @@ export class FingeringAssigner {
     private readonly _options: FingeringOptions;
 
     private _handPosition: number;
-    private readonly _lastStringByMidi: Int8Array;
+    // string numbers are 1-indexed so 0 doubles as the "not yet seen" sentinel
+    private readonly _lastStringByMidi: Uint8Array;
     private _sortedIdx: Int32Array;
 
     /**
@@ -57,15 +58,14 @@ export class FingeringAssigner {
         this._options = options ?? new FingeringOptions();
 
         this._handPosition = this._options.preferredHandPosition;
-        this._lastStringByMidi = new Int8Array(128);
-        this._lastStringByMidi.fill(-1);
+        this._lastStringByMidi = new Uint8Array(128);
         this._sortedIdx = new Int32Array(16);
     }
 
     /** Reset the hand-position anchor and per-pitch continuity memory. */
     public reset(): void {
         this._handPosition = this._options.preferredHandPosition;
-        this._lastStringByMidi.fill(-1);
+        this._lastStringByMidi.fill(0);
     }
 
     /** Assigns `(string, fret)` to notes that don't already carry both. */
@@ -128,7 +128,7 @@ export class FingeringAssigner {
             const note = notes[sortedIdx[k]];
             const realValue = note.realValue;
             const target = realValue + this._transpositionPitch;
-            const continuityString = realValue >= 0 && realValue < 128 ? this._lastStringByMidi[realValue] : -1;
+            const continuityString = realValue >= 0 && realValue < 128 ? this._lastStringByMidi[realValue] : 0;
 
             let bestString = 1;
             let bestFret = 0;
