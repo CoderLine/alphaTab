@@ -1,8 +1,9 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
 import { AlphaTexErrorWithDiagnostics } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import type { Score } from '@coderline/alphatab/model/Score';
+import { TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 import { Settings } from '@coderline/alphatab/Settings';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { TestPlatform } from 'test/TestPlatform';
@@ -126,6 +127,20 @@ describe('AlphaTexExporterTest', () => {
         } else {
             await TestPlatform.deleteFile('test-data/exporter/notation-legend-formatted.atex.new');
         }
+    });
+
+    it('exports-tuning-accidental-mode', () => {
+        const score = ScoreLoader.loadAlphaTex('\\tuning E4 B3 F#3 D3 Gb2 E2 . r.4');
+
+        expect(score.tracks[0].staves[0].stringTuning.accidentalModes).toEqual([
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Sharp,
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Flat
+        ]);
+        expect(exportAlphaTex(score)).toContain('\\tuning (E4 B3 F#3 D3 Gb2 E2)');
     });
 
     // Note: we just test all our importer and visual tests to cover all features

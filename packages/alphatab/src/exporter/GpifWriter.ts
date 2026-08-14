@@ -45,7 +45,7 @@ import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Track } from '@coderline/alphatab/model/Track';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
-import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { Tuning, TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
@@ -1300,6 +1300,7 @@ export class GpifWriter {
     private _writeStaffNode(parent: XmlNode, staff: Staff) {
         const staffNode = parent.addElement('Staff');
         const properties = staffNode.addElement('Properties');
+        const tuningAccidentalMode = this._getTuningAccidentalMode(staff);
 
         this._writeSimplePropertyNode(properties, 'CapoFret', 'Fret', staff.capo.toString());
         this._writeSimplePropertyNode(properties, 'FretCount', 'Fret', '24');
@@ -1326,7 +1327,9 @@ export class GpifWriter {
             tuningProperty.addElement('Pitches').innerText = tuning.slice().reverse().join(' ');
             tuningProperty.addElement('Label').setCData(tuningName);
             tuningProperty.addElement('LabelVisible').innerText = tuningName ? 'true' : 'false';
-            tuningProperty.addElement('Flat');
+            if (tuningAccidentalMode !== TuningAccidentalMode.Sharp) {
+                tuningProperty.addElement('Flat');
+            }
 
             if (staff.isPercussion) {
                 tuningProperty.addElement('Instrument').innerText = 'Undefined';
@@ -1388,10 +1391,36 @@ export class GpifWriter {
             staff.tuning.map(_ => '0').join('')
         );
 
-        this._writeSimplePropertyNode(properties, 'TuningFlat', 'Enable', null);
+        if (tuningAccidentalMode !== TuningAccidentalMode.Sharp) {
+            this._writeSimplePropertyNode(properties, 'TuningFlat', 'Enable', null);
+        }
 
         this._writeDiagramCollection(properties, staff, 'DiagramCollection');
         this._writeDiagramCollection(properties, staff, 'DiagramWorkingSet');
+    }
+
+    private _getTuningAccidentalMode(staff: Staff): TuningAccidentalMode | undefined {
+        if (staff.stringTuning.accidentalModes === undefined) {
+            return undefined;
+        }
+        let mode: TuningAccidentalMode | null = null;
+        for (let i = 0; i < staff.tuning.length; i++) {
+            const flatName = Tuning.getTextForTuning(staff.tuning[i], false, TuningAccidentalMode.Flat);
+            const sharpName = Tuning.getTextForTuning(staff.tuning[i], false, TuningAccidentalMode.Sharp);
+            if (flatName === sharpName) {
+                continue;
+            }
+
+            const stringMode = staff.stringTuning.getAccidentalMode(i);
+            if (mode === null) {
+                mode = stringMode;
+            } else if (mode !== stringMode) {
+                // GPIF has one alteration preference for the whole tuning.
+                // Keep the legacy flat output when the model contains mixed modes.
+                return TuningAccidentalMode.Flat;
+            }
+        }
+        return mode ?? undefined;
     }
 
     private _writeDiagramCollection(properties: XmlNode, staff: Staff, name: string) {

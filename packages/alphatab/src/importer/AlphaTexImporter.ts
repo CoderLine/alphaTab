@@ -785,6 +785,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 staff.isPercussion = true;
                 staff.stringTuning.reset();
                 staff.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
+                staff.stringTuning.accidentalModes = undefined;
                 if (!this._state.staffHasExplicitDisplayTransposition.has(staff)) {
                     staff.displayTranspositionPitch = 0;
                 }
