@@ -59,7 +59,7 @@ export class Tuning {
     public static getDefaultTuningFor(stringCount: number): Tuning | null {
         if (Tuning._defaultTunings.has(stringCount)) {
             const d = Tuning._defaultTunings.get(stringCount)!;
-            return new Tuning(d.name, d.tunings, d.isStandard);
+            return new Tuning(d.name, d.tunings, d.isStandard, d.accidentalModes);
         }
         return null;
     }
@@ -160,7 +160,7 @@ export class Tuning {
                 }
             }
             if (equals) {
-                return new Tuning(tuning.name, tuning.tunings, tuning.isStandard);
+                return new Tuning(tuning.name, tuning.tunings, tuning.isStandard, tuning.accidentalModes);
             }
         }
         return null;
@@ -182,23 +182,46 @@ export class Tuning {
     public tunings: number[];
 
     /**
+     * Gets or sets the optional accidental style used to display each string tuning.
+     * The entries use the same top-string-first order as {@link tunings}.
+     * If omitted, the legacy display fallback is used.
+     * @since 1.10.0
+     */
+    public accidentalModes: TuningAccidentalMode[] | undefined;
+
+    /**
      * Initializes a new instance of the {@link Tuning} class.
      * @param name The name.
      * @param tuning The tuning.
      * @param isStandard if set to`true`[is standard].
+     * @param accidentalModes The accidental style for each tuning value.
      */
-    public constructor(name: string = '', tuning: number[] | null = null, isStandard: boolean = false) {
+    public constructor(
+        name: string = '',
+        tuning: number[] | null = null,
+        isStandard: boolean = false,
+        accidentalModes?: TuningAccidentalMode[] | null
+    ) {
         this.isStandard = isStandard;
         this.name = name;
         this.tunings = tuning ?? [];
+        this.accidentalModes = accidentalModes?.slice();
+    }
+
+    /**
+     * Gets the accidental style for a string, falling back to {@link TuningAccidentalMode.Flat} for missing entries.
+     * @param index The top-string-first tuning index.
+     */
+    public getAccidentalMode(index: number): TuningAccidentalMode {
+        return this.accidentalModes?.[index] ?? TuningAccidentalMode.Flat;
     }
 
     public reset() {
         this.isStandard = false;
         this.name = '';
         this.tunings = [];
+        this.accidentalModes = undefined;
     }
-    
 
     /**
      * Tries to detect the name and standard flag of the tuning from a known tuning list based

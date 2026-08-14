@@ -516,8 +516,7 @@ export class AlphaTexExporter extends ScoreExporter {
                     data,
                     undefined,
                     0,
-                    false,
-                    this.settings.display.tuningAccidentalMode
+                    false
                 ),
                 beats: [],
                 pipe: undefined
@@ -543,8 +542,7 @@ export class AlphaTexExporter extends ScoreExporter {
                 data.staff,
                 data,
                 voiceIndex,
-                isMultiVoice,
-                this.settings.display.tuningAccidentalMode
+                isMultiVoice
             ),
             beats: [],
             pipe: undefined
@@ -691,8 +689,7 @@ export class AlphaTexExporter extends ScoreExporter {
                 nodeType: AlphaTexNodeType.Ident,
                 text: Tuning.getTextForTuning(
                     data.realValueWithoutHarmonic,
-                    true,
-                    this.settings.display.tuningAccidentalMode
+                    true
                 )
             } as AlphaTexIdentifier;
         } else if (data.isStringed) {

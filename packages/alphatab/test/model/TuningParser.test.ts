@@ -21,4 +21,21 @@ describe('TuningParserTest', () => {
         expect(Tuning.getTextForTuning(tuning, true)).toBe('Gb2');
         expect(Tuning.getTextForTuning(tuning, true, TuningAccidentalMode.Sharp)).toBe('F#2');
     });
+
+    it('stores-accidental-mode-per-string', () => {
+        const tuning = new Tuning('Mixed', [66, 59, 54], false, [TuningAccidentalMode.Sharp]);
+
+        expect(tuning.getAccidentalMode(0)).toBe(TuningAccidentalMode.Sharp);
+        expect(tuning.getAccidentalMode(1)).toBe(TuningAccidentalMode.Flat);
+        expect(tuning.getAccidentalMode(2)).toBe(TuningAccidentalMode.Flat);
+        expect(Tuning.getTextForTuning(tuning.tunings[0], true, tuning.getAccidentalMode(0))).toBe('F#4');
+        expect(Tuning.getTextForTuning(tuning.tunings[1], true, tuning.getAccidentalMode(1))).toBe('B3');
+    });
+
+    it('keeps-accidental-mode-opt-in', () => {
+        const tuning = new Tuning('Legacy', [66, 59, 54]);
+
+        expect(tuning.accidentalModes).toBeUndefined();
+        expect(tuning.getAccidentalMode(0)).toBe(TuningAccidentalMode.Flat);
+    });
 });

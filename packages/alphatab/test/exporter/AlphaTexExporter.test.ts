@@ -130,14 +130,17 @@ describe('AlphaTexExporterTest', () => {
     });
 
     it('exports-tuning-accidental-mode', () => {
-        const score = ScoreLoader.loadAlphaTex('\\tuning E4 B3 G3 D3 A2 Gb2 . r.4');
+        const score = ScoreLoader.loadAlphaTex('\\tuning E4 B3 F#3 D3 Gb2 E2 . r.4');
 
-        expect(exportAlphaTex(score)).toContain('\\tuning (E4 B3 G3 D3 A2 Gb2)');
-
-        const settings = new Settings();
-        settings.display.tuningAccidentalMode = TuningAccidentalMode.Sharp;
-
-        expect(exportAlphaTex(score, settings)).toContain('\\tuning (E4 B3 G3 D3 A2 F#2)');
+        expect(score.tracks[0].staves[0].stringTuning.accidentalModes).toEqual([
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Sharp,
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Flat
+        ]);
+        expect(exportAlphaTex(score)).toContain('\\tuning (E4 B3 F#3 D3 Gb2 E2)');
     });
 
     // Note: we just test all our importer and visual tests to cover all features

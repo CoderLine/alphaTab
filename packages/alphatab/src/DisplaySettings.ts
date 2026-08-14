@@ -2,7 +2,6 @@ import { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import type { Staff } from '@coderline/alphatab/model/Staff';
-import { TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 
 /**
  * Lists the different modes in which the staves and systems are arranged.
@@ -331,14 +330,6 @@ export class DisplaySettings {
      * @defaultValue `5`
      */
     public inlineTuningPaddingRight: number = 5;
-
-    /**
-     * The accidental style used to display tuning note names.
-     * @since 1.9.0
-     * @category Display
-     * @defaultValue `TuningAccidentalMode.Flat`
-     */
-    public tuningAccidentalMode: TuningAccidentalMode = TuningAccidentalMode.Flat;
 
     // Staff padding
 

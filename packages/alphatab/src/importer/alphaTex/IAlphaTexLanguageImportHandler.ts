@@ -5,7 +5,6 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { Staff } from '@coderline/alphatab/model/Staff';
-import type { TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 
 /**
  * @internal
@@ -55,8 +54,7 @@ export interface IAlphaTexLanguageImportHandler {
         staff: Staff,
         bar: Bar | undefined,
         voice: number,
-        isMultiVoice: boolean,
-        tuningAccidentalMode: TuningAccidentalMode
+        isMultiVoice: boolean
     ): AlphaTexMetaDataNode[];
     buildSyncPointNodes(score: Score): AlphaTexMetaDataNode[];
     buildBeatEffects(beat: Beat): AlphaTexPropertyNode[];

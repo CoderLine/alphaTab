@@ -362,6 +362,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'tuning':
                 const tuning: number[] = [];
+                const accidentalModes: TuningAccidentalMode[] = [];
+                let hasExplicitAccidental = false;
                 let hideTuning = false;
                 let tuningName = '';
                 for (let i = 0; i < metaData.arguments!.arguments.length; i++) {
@@ -389,6 +391,21 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             const t = ModelUtils.parseTuning(text);
                             if (t) {
                                 tuning.push(t.realValue);
+                                switch (t.tone.accidentalMode) {
+                                    case NoteAccidentalMode.ForceSharp:
+                                    case NoteAccidentalMode.ForceDoubleSharp:
+                                        accidentalModes.push(TuningAccidentalMode.Sharp);
+                                        hasExplicitAccidental = true;
+                                        break;
+                                    case NoteAccidentalMode.ForceFlat:
+                                    case NoteAccidentalMode.ForceDoubleFlat:
+                                        accidentalModes.push(TuningAccidentalMode.Flat);
+                                        hasExplicitAccidental = true;
+                                        break;
+                                    default:
+                                        accidentalModes.push(TuningAccidentalMode.Flat);
+                                        break;
+                                }
                             } else if (i === metaData.arguments!.arguments.length - 1 && tuning.length > 0) {
                                 tuningName = text;
                                 importer.addSemanticDiagnostic({
@@ -417,6 +434,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 importer.state.staffTuningApplied.delete(staff);
                 staff.stringTuning = new Tuning();
                 staff.stringTuning.tunings = tuning;
+                staff.stringTuning.accidentalModes = hasExplicitAccidental ? accidentalModes : undefined;
                 staff.stringTuning.name = tuningName;
 
                 this._tuningProperties(importer, staff, staff.stringTuning, metaData);
@@ -2780,8 +2798,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         staff: Staff,
         bar: Bar | undefined,
         voice: number,
-        isMultiVoice: boolean,
-        tuningAccidentalMode: TuningAccidentalMode
+        isMultiVoice: boolean
     ): AlphaTexMetaDataNode[] {
         const nodes: AlphaTexMetaDataNode[] = [];
 
@@ -2790,8 +2807,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             staff,
             nodes,
             isMultiVoice,
-            voice,
-            tuningAccidentalMode
+            voice
         );
         if (!bar) {
             return nodes;
@@ -2890,8 +2906,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     }
     private static _buildStaffMetaDataNodes(
         nodes: AlphaTexMetaDataNode[],
-        staff: Staff,
-        tuningAccidentalMode: TuningAccidentalMode
+        staff: Staff
     ) {
         const firstStaffMetaIndex = nodes.length;
 
@@ -2905,7 +2920,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 'tuning',
                 Atnf.args(
                     staff.stringTuning.tunings.map(
-                        t => Atnf.ident(Tuning.getTextForTuning(t, true, tuningAccidentalMode)) as IAlphaTexArgumentValue
+                        (t, i) =>
+                            Atnf.ident(
+                                Tuning.getTextForTuning(t, true, staff.stringTuning.getAccidentalMode(i))
+                            ) as IAlphaTexArgumentValue
                     )
                 )
             );
@@ -3103,8 +3121,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         staff: Staff,
         nodes: AlphaTexMetaDataNode[],
         isMultiVoice: boolean,
-        voice: number,
-        tuningAccidentalMode: TuningAccidentalMode
+        voice: number
     ) {
         if (bar === undefined || bar.index === 0) {
             if (voice === 0) {
@@ -3112,7 +3129,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     nodes.push(AlphaTex1LanguageHandler._buildNewTrackNode(staff.track));
                 }
                 nodes.push(AlphaTex1LanguageHandler._buildNewStaffNode(staff));
-                AlphaTex1LanguageHandler._buildStaffMetaDataNodes(nodes, staff, tuningAccidentalMode);
+                AlphaTex1LanguageHandler._buildStaffMetaDataNodes(nodes, staff);
             }
 
             if (isMultiVoice) {

@@ -179,6 +179,21 @@ describe('LayoutTests', () => {
         );
     });
 
+    it('inline-tuning-mixed-accidentals', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\tuning F#4 B3 G#3 D3 Ab2 E2
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-mixed-accidentals.png',
+            settings
+        );
+    });
+
     it('inline-tuning-per-track-hidden', async () => {
         const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
