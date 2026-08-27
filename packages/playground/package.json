@@ -10,7 +10,7 @@
         "@fontsource/noto-serif": "^5.3.0",
         "@popperjs/core": "^2.11.8",
         "@types/serve-static": "^2.2.0",
-        "lucide": "^1.31.0",
+        "lucide": "^1.33.0",
         "monaco-editor": "^0.56.0",
         "serve-static": "^2.2.1"
     },
