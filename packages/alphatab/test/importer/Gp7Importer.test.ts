@@ -20,6 +20,7 @@ import { TestPlatform } from 'test/TestPlatform';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 
 describe('Gp7ImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {
@@ -50,6 +51,22 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks.length).toBe(2);
         expect(score.tracks[0].name).toBe('Track 1');
         expect(score.tracks[1].name).toBe('Track 2');
+    });
+
+    it('tuning-accidental-mode', async () => {
+        const naturalScore = (await prepareImporterWithFile('guitarpro7/strings.gp')).readScore();
+        const naturalTuning = naturalScore.tracks[0].staves[0].stringTuning;
+        expect(naturalTuning.accidentalModes).toBeUndefined();
+        expect(Array.from({ length: naturalTuning.tunings.length }, (_, i) => naturalTuning.getAccidentalMode(i))).toEqual(
+            new Array<TuningAccidentalMode>(naturalTuning.tunings.length).fill(TuningAccidentalMode.Flat)
+        );
+
+        const flatScore = (await prepareImporterWithFile('guitarpro7/bends-advanced.gp')).readScore();
+        const flatTuning = flatScore.tracks[0].staves[0].stringTuning;
+        expect(flatTuning.accidentalModes).toBeUndefined();
+        expect(Array.from({ length: flatTuning.tunings.length }, (_, i) => flatTuning.getAccidentalMode(i))).toEqual(
+            new Array<TuningAccidentalMode>(flatTuning.tunings.length).fill(TuningAccidentalMode.Flat)
+        );
     });
 
     it('notes', async () => {

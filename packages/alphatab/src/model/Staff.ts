@@ -152,6 +152,7 @@ export class Staff {
         if (this.isPercussion) {
             this.displayTranspositionPitch = 0;
             this.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
+            this.stringTuning.accidentalModes = undefined;
         }
         if (this.stringTuning.tunings.length === 0) {
             this.showTablature = false;

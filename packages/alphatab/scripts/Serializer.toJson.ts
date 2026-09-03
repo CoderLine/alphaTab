@@ -76,7 +76,35 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
             }
         } else if (prop.type.isArray) {
             const arrayItemType = prop.type.arrayItemType!;
-            if (arrayItemType.isOwnType && !arrayItemType.isEnumType) {
+            if (arrayItemType.isEnumType) {
+                const serializeStatement = createNodeFromSource<ts.ExpressionStatement>(
+                    `
+                    o.set(${JSON.stringify(jsonName)}, obj.${fieldName});
+                `,
+                    ts.SyntaxKind.ExpressionStatement
+                );
+                if (prop.type.isNullable) {
+                    propertyStatements.push(
+                        createNodeFromSource<ts.IfStatement>(
+                            `if(obj.${fieldName} !== null) {
+                                o.set(${JSON.stringify(jsonName)}, obj.${fieldName});
+                            }`,
+                            ts.SyntaxKind.IfStatement
+                        )
+                    );
+                } else if (prop.type.isOptional) {
+                    propertyStatements.push(
+                        createNodeFromSource<ts.IfStatement>(
+                            `if(obj.${fieldName} !== undefined) {
+                                o.set(${JSON.stringify(jsonName)}, obj.${fieldName});
+                            }`,
+                            ts.SyntaxKind.IfStatement
+                        )
+                    );
+                } else {
+                    propertyStatements.push(serializeStatement);
+                }
+            } else if (arrayItemType.isOwnType) {
                 const itemSerializer = `${arrayItemType.typeAsString}Serializer`;
                 importer(itemSerializer, findSerializerModule(arrayItemType));
                 if (prop.type.isNullable) {
