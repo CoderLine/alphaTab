@@ -12,7 +12,7 @@
     "devDependencies": {
         "@microsoft/api-extractor": "^7.59.0",
         "@rollup/plugin-terser": "^1.0.0",
-        "magic-string": "^1.2.2",
+        "magic-string": "^1.2.3",
         "rollup-plugin-license": "^3.7.0",
         "rollup-plugin-node-externals": "^9.0.1",
         "typescript": "^6.0.3",
