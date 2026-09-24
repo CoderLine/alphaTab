@@ -118,7 +118,6 @@ export class ControlApp implements Mountable {
                     </div>
                 </div>
                 <div class="cmp-footer"></div>
-                <div class="cmp-selection-handles"></div>
             </div>
         `);
 
@@ -138,11 +137,8 @@ export class ControlApp implements Mountable {
             '.cmp-footer',
             new Footer(this.api, { trackList: this.sidebar.trackList })
         );
-        this.selectionHandles = mount(
-            this.root,
-            '.cmp-selection-handles',
-            new SelectionHandles(this.api, viewport)
-        );
+        this.selectionHandles = new SelectionHandles(this.api, viewport, canvas);
+        canvas.appendChild(this.selectionHandles.root);
         this.crosshair = new Crosshair();
         this.dragDrop = new DragDrop(this.api, {
             onEnter: () => this.overlay.enterDrag(),
