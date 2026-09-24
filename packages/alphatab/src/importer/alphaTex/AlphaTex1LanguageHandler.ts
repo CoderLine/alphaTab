@@ -1708,7 +1708,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 let tbi = 0;
                 let typeAndStyle = true;
                 let typeSet = false;
-                while (typeAndStyle) {
+                while (typeAndStyle && tbi < (p.arguments?.arguments.length ?? 0)) {
                     switch (p.arguments!.arguments[tbi].nodeType) {
                         case AlphaTexNodeType.Ident:
                         case AlphaTexNodeType.String:
@@ -2141,7 +2141,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
                 let typeAndStyle = true;
                 let typeSet = false;
-                while (typeAndStyle) {
+                while (typeAndStyle && tbi < (p.arguments?.arguments.length ?? 0)) {
                     switch (p.arguments!.arguments[tbi].nodeType) {
                         case AlphaTexNodeType.Ident:
                         case AlphaTexNodeType.String:
@@ -2411,9 +2411,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         argStartIndex: number,
         exact: boolean
     ): BendPoint[] | undefined {
-        let args = p.arguments!.arguments;
+        if (!p.arguments) {
+            return undefined;
+        }
+
+        let args = p.arguments.arguments;
         let remainingArgs = args.length - argStartIndex;
-        let errorNode: AlphaTexAstNode = p.arguments!;
+        let errorNode: AlphaTexAstNode = p.arguments;
 
         // unwrap value list
         if (remainingArgs > 0 && args[argStartIndex].nodeType === AlphaTexNodeType.Arguments) {
