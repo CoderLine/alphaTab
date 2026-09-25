@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { GpxImporter } from '@coderline/alphatab/importer/GpxImporter';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
@@ -133,5 +134,23 @@ describe('LyricsTests', () => {
         testLyrics('[AAA BBB\r\nCCC DDD]AAA BBB', ['AAA', 'BBB']);
         testLyrics('[AAA BBB\r\nCCC DDD] AAA BBB', ['', 'AAA', 'BBB']);
         testLyrics('[AAA] AAA [BBB] BBB [CCC] CCC [DDD] DDD', ['', 'AAA', '', 'BBB', '', 'CCC', '', 'DDD']);
+    });
+
+    it('skip-tie-destination-beat', () => {
+        const importer: AlphaTexImporter = new AlphaTexImporter();
+        importer.initFromString('\\track "V" 3.3.4 -.3.4 5.3.4 |', new Settings());
+        const score = importer.readScore();
+
+        const lyrics = new Lyrics();
+        lyrics.text = 'AAA BBB';
+        lyrics.startBar = 0;
+        score.tracks[0].applyLyrics([lyrics]);
+
+        const beats = score.tracks[0].staves[0].bars[0].voices[0].beats;
+        expect(beats[1].notes[0].isTieDestination).toBe(true);
+
+        expect(beats[0].lyrics![0]).toBe('AAA');
+        expect(beats[1].lyrics).not.toBeTruthy();
+        expect(beats[2].lyrics![0]).toBe('BBB');
     });
 });

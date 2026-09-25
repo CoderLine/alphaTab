@@ -190,6 +190,10 @@ export class Track {
         }
     }
 
+    private _isPureTieDestinationBeat(beat: Beat): boolean {
+        return beat.notes.length > 0 && beat.notes.every(n => n.isTieDestination);
+    }
+
     public applyLyrics(lyrics: Lyrics[]): void {
         for (const lyric of lyrics) {
             lyric.finish();
@@ -200,8 +204,8 @@ export class Track {
             if (lyric.startBar >= 0 && lyric.startBar < staff.bars.length) {
                 let beat: Beat | null = staff.bars[lyric.startBar].voices[0].beats[0];
                 for (let ci: number = 0; ci < lyric.chunks.length && beat; ci++) {
-                    // skip rests and empty beats
-                    while (beat && (beat.isEmpty || beat.isRest)) {
+                    // skip rests, empty beats, and pure tie-destination beats (no new syllable attack)
+                    while (beat && (beat.isEmpty || beat.isRest || this._isPureTieDestinationBeat(beat))) {
                         beat = beat.nextBeat;
                     }
                     // mismatch between chunks and beats might lead to missing beats
