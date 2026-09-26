@@ -13,12 +13,12 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 export class InlineTuningGlyph extends Glyph {
     public readonly staff: RenderStaff;
 
-    private readonly _tunings: number[];
+    private readonly _tuning: Tuning;
 
     public constructor(staff: RenderStaff) {
         super(0, 0);
         this.staff = staff;
-        this._tunings = staff.modelStaff.stringTuning.tunings;
+        this._tuning = staff.modelStaff.stringTuning;
     }
 
     public override doLayout(): void {
@@ -27,8 +27,17 @@ export class InlineTuningGlyph extends Glyph {
         canvas.font = this.renderer.resources.elementFonts.get(NotationElement.GuitarTuning)!;
 
         let textWidth = 0;
-        for (const tuning of this._tunings) {
-            textWidth = Math.max(textWidth, canvas.measureText(Tuning.getTextForTuning(tuning, false)).width);
+        for (let i = 0, j = this._tuning.tunings.length; i < j; i++) {
+            textWidth = Math.max(
+                textWidth,
+                canvas.measureText(
+                    Tuning.getTextForTuning(
+                        this._tuning.tunings[i],
+                        false,
+                        this._tuning.getAccidentalMode(i)
+                    )
+                ).width
+            );
         }
 
         canvas.font = oldFont;
@@ -54,9 +63,9 @@ export class InlineTuningGlyph extends Glyph {
 
         using _ = ElementStyleHelper.track(canvas, TrackSubElement.StringTuning, this.staff.modelStaff.track, true);
 
-        for (let i = 0, j = this._tunings.length; i < j; i++) {
+        for (let i = 0, j = this._tuning.tunings.length; i < j; i++) {
             canvas.fillText(
-                Tuning.getTextForTuning(this._tunings[i], false),
+                Tuning.getTextForTuning(this._tuning.tunings[i], false, this._tuning.getAccidentalMode(i)),
                 textEndX,
                 cy + this.renderer.y + (this.renderer as LineBarRenderer).getLineY(i)
             );

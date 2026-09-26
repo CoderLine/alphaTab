@@ -179,6 +179,21 @@ describe('LayoutTests', () => {
         );
     });
 
+    it('inline-tuning-mixed-accidentals', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\tuning F#4 B3 G#3 D3 Ab2 E2
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-mixed-accidentals.png',
+            settings
+        );
+    });
+
     it('inline-tuning-per-track-hidden', async () => {
         const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
@@ -207,9 +222,9 @@ describe('LayoutTests', () => {
         await VisualTestHelper.runVisualTestTex(
             `
             \\track { defaultSystemsLayout 3 }
-            \\scale 0.25 :1 c4 | \\scale 0.5 c4 | \\scale 0.25 c4 | 
+            \\scale 0.25 :1 c4 | \\scale 0.5 c4 | \\scale 0.25 c4 |
             \\scale 0.5 c4 | \\scale 2 c4 | \\scale 0.5 c4 |
-            c4 | c4  
+            c4 | c4
         `,
             'test-data/visual-tests/layout/system-layout-tex.png',
             settings
@@ -247,9 +262,9 @@ describe('LayoutTests', () => {
     it('multi-system-slur-scale-down', async () => {
         await VisualTestHelper.runVisualTestTex(
             `
-            C4 {slur S1} 
+            C4 {slur S1}
             | r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r
-            A4 {slur S1} 
+            A4 {slur S1}
             `,
             '',
             undefined,
@@ -268,9 +283,9 @@ describe('LayoutTests', () => {
     it('multi-system-slur-scale-up', async () => {
         await VisualTestHelper.runVisualTestTex(
             `
-            C4 {slur S1} 
+            C4 {slur S1}
             | r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r| r
-            A4 {slur S1} 
+            A4 {slur S1}
             `,
             '',
             undefined,
@@ -309,16 +324,16 @@ describe('LayoutTests', () => {
             \\track "T1"
             C4.4 *4 | r.1 | r.1 |
                 r.1 | r.1 | r.1 |
-                r.1 | r.1 | r.1 | 
-                r.1 | r.1 | r.1 |  
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
                 r.1 | C4 |
-            
+
             \\track "T2"
             \\clef C3
-                r.1 | r.1 | r.1 | 
-                r.1 | r.1 | r.1 | 
-                r.1 | c4 | r.1 | 
-                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | c4 | r.1 |
+                r.1 | r.1 | r.1 |
                 r.1 | C4 |
             `,
             'test-data/visual-tests/layout/hide-empty-staves.png',
@@ -341,16 +356,16 @@ describe('LayoutTests', () => {
             \\track "T1"
             C4.4 *4 | r.1 | r.1 |
                 r.1 | r.1 | r.1 |
-                r.1 | r.1 | r.1 | 
-                r.1 | r.1 | r.1 |  
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
                 r.1 | C4 |
-            
+
             \\track "T2"
             \\clef C3
-                r.1 | r.1 | r.1 | 
-                r.1 | r.1 | r.1 | 
-                r.1 | c4 | r.1 | 
-                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | c4 | r.1 |
+                r.1 | r.1 | r.1 |
                 r.1 | C4 |
             `,
             'test-data/visual-tests/layout/hide-empty-staves-in-first.png',
@@ -373,15 +388,15 @@ describe('LayoutTests', () => {
             \\staff {score}
             C4.4 *4 | r.1 | r.1 |
                 r.1 | r.1 | r.1 |
-                r.1 | r.1 | r.1 | 
-                r.1 | r.1 | r.1 |  
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
                 r.1 | C4 |
             \\staff {score}
                 \\clef C3
-                r.1 | r.1 | r.1 | 
-                r.1 | r.1 | r.1 | 
-                r.1 | c4 | r.1 | 
-                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | c4 | r.1 |
+                r.1 | r.1 | r.1 |
                 r.1 | C4 |
             `,
             'test-data/visual-tests/layout/single-staff-brackets-show.png',
@@ -401,15 +416,15 @@ describe('LayoutTests', () => {
             \\staff {score}
             C4.4 *4 | r.1 | r.1 |
                 r.1 | r.1 | r.1 |
-                r.1 | r.1 | r.1 | 
-                r.1 | r.1 | r.1 |  
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
                 r.1 | C4 |
             \\staff {score}
                 \\clef C3
-                r.1 | r.1 | r.1 | 
-                r.1 | r.1 | r.1 | 
-                r.1 | c4 | r.1 | 
-                r.1 | r.1 | r.1 | 
+                r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 |
+                r.1 | c4 | r.1 |
+                r.1 | r.1 | r.1 |
                 r.1 | C4 |
             `,
             'test-data/visual-tests/layout/single-staff-brackets-hide.png',
@@ -488,7 +503,7 @@ describe('LayoutTests', () => {
                     `
                     \\defaultBarNumberDisplay allBars
                     C4.1 | C4.1 | C4.1 |
-                    C4.1 | C4.1 | C4.1 
+                    C4.1 | C4.1 | C4.1
                     `,
                     'test-data/visual-tests/layout/barnumberdisplay-stylesheet-all.png',
                     undefined,
@@ -501,7 +516,7 @@ describe('LayoutTests', () => {
                     `
                     \\defaultBarNumberDisplay firstOfSystem
                     C4.1 | C4.1 | C4.1 |
-                    C4.1 | C4.1 | C4.1 
+                    C4.1 | C4.1 | C4.1
                     `,
                     'test-data/visual-tests/layout/barnumberdisplay-stylesheet-first.png',
                     undefined,
@@ -514,7 +529,7 @@ describe('LayoutTests', () => {
                     `
                     \\defaultBarNumberDisplay hide
                     C4.1 | C4.1 | C4.1 |
-                    C4.1 | C4.1 | C4.1 
+                    C4.1 | C4.1 | C4.1
                     `,
                     'test-data/visual-tests/layout/barnumberdisplay-stylesheet-hide.png',
                     undefined,
@@ -530,7 +545,7 @@ describe('LayoutTests', () => {
                     `
                     \\defaultBarNumberDisplay allBars
                     C4.1 | \\barNumberDisplay hide C4.1 | C4.1 |
-                    C4.1 | C4.1 | C4.1 
+                    C4.1 | C4.1 | C4.1
                     `,
                     'test-data/visual-tests/layout/barnumberdisplay-bar-override-all.png',
                     undefined,
@@ -543,7 +558,7 @@ describe('LayoutTests', () => {
                     `
                     \\defaultBarNumberDisplay firstOfSystem
                     C4.1 | \\barNumberDisplay allBars C4.1 | C4.1 |
-                    \\barNumberDisplay hide C4.1 | C4.1 | C4.1 
+                    \\barNumberDisplay hide C4.1 | C4.1 | C4.1
                     `,
                     'test-data/visual-tests/layout/barnumberdisplay-bar-override-first.png',
                     undefined,
@@ -556,7 +571,7 @@ describe('LayoutTests', () => {
                     `
                     \\defaultBarNumberDisplay hide
                     C4.1 | \\barNumberDisplay allBars C4.1 | C4.1 |
-                    \\barNumberDisplay firstOfSystem C4.1 | \\barNumberDisplay firstOfSystem C4.1 | C4.1 
+                    \\barNumberDisplay firstOfSystem C4.1 | \\barNumberDisplay firstOfSystem C4.1 | C4.1
                     `,
                     'test-data/visual-tests/layout/barnumberdisplay-bar-override-hide.png',
                     undefined,

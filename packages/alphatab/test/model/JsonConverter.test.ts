@@ -7,6 +7,7 @@ import { Color } from '@coderline/alphatab/model/Color';
 import { Font, FontStyle } from '@coderline/alphatab/model/Font';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
+import { TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 import { FingeringMode, NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestPlatform } from 'test/TestPlatform';
@@ -210,5 +211,26 @@ describe('JsonConverterTest', () => {
         expect(settings.display.resources.mainGlyphColor.r).toBe(255);
         expect(settings.display.resources.mainGlyphColor.g).toBe(0);
         expect(settings.display.resources.mainGlyphColor.b).toBe(0);
+    });
+
+    it('tuning-accidental-modes', () => {
+        const score = ScoreLoader.loadAlphaTex('\\tuning E4 B3 F#3 D3 Gb2 E2 . r.4');
+        const roundTrip = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score));
+
+        expect(roundTrip.tracks[0].staves[0].stringTuning.accidentalModes).toEqual([0, 0, 1, 0, 0, 0]);
+    });
+
+    it('tuning-accidental-modes-legacy-json', () => {
+        const score = ScoreLoader.loadAlphaTex('\\tuning E4 B3 G3 D3 A2 E2 . r.4');
+        const json = JSON.parse(JsonConverter.scoreToJson(score)) as {
+            tracks: Array<{ staves: Array<{ stringtuning: Record<string, unknown> }> }>;
+        };
+        expect(json.tracks[0].staves[0].stringtuning.accidentalmodes).toBeUndefined();
+
+        const legacyScore = JsonConverter.jsonToScore(JSON.stringify(json));
+        const tuning = legacyScore.tracks[0].staves[0].stringTuning;
+        expect(Array.from({ length: 6 }, (_, i) => tuning.getAccidentalMode(i))).toEqual(
+            new Array<TuningAccidentalMode>(6).fill(TuningAccidentalMode.Flat)
+        );
     });
 });

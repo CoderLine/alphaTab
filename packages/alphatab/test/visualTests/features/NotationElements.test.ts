@@ -99,6 +99,20 @@ describe('NotationElements', () => {
         );
     });
 
+    it('guitar-tuning-mixed-accidentals', async () => {
+        const tex = '\\tuning F#4 B3 G#3 D3 Ab2 E2 . 3.3*4';
+
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Page;
+
+        settings.notation.elements.set(NotationElement.GuitarTuning, true);
+        await VisualTestHelper.runVisualTestTex(
+            tex,
+            'test-data/visual-tests/notation-elements/guitar-tuning-mixed-accidentals.png',
+            settings
+        );
+    });
+
     it('guitar-tuning-off', async () => {
         const tex = '\\tuning d5 b4 g4 d4 a3 d3 . 3.3*4';
 

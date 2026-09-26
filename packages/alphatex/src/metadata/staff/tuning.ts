@@ -6,7 +6,7 @@ export const tuning: MetadataTagDefinition = {
     tag: '\\tuning',
     snippet: '\\tuning {$1}$0',
     shortDescription: 'Set the string tuning for the staff.',
-    longDescription: `Defines the number of strings and their tuning for stringed (and fretted) instruments.`,
+    longDescription: `Defines the number of strings and their tuning for stringed (and fretted) instruments. Explicit sharp and flat accidentals, such as F# or Gb, are retained for the corresponding string when the tuning is rendered or exported.`,
     signatures: [
         {
             parameters: [
@@ -44,7 +44,7 @@ export const tuning: MetadataTagDefinition = {
                 {
                     name: 'strings',
                     shortDescription: 'The tuning values as pitched notes',
-                    longDescription: `The tuning values as [pitched notes](https://alphatab.net/docs/alphatex/document-structure#pitched-notes)`,
+                    longDescription: `The tuning values as [pitched notes](https://alphatab.net/docs/alphatex/document-structure#pitched-notes). Include an explicit # or b when the tuning should retain a sharp or flat preference for that string.`,
                     type: alphaTab.importer.alphaTex.AlphaTexNodeType.Ident,
                     allowAllStringTypes: true,
                     parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.ValueListWithoutParenthesis

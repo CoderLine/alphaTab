@@ -40,6 +40,7 @@ import { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
 import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
+import { TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Voice } from '@coderline/alphatab/model/Voice';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
@@ -1879,7 +1880,15 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
         const tuning: number = ModelUtils.getTuningForText(tuningStep + tuningOctave) + tuningAlter;
-        staff.tuning[staff.tuning.length - line] = tuning;
+        const tuningIndex = staff.tuning.length - line;
+        staff.tuning[tuningIndex] = tuning;
+        if (tuningAlter !== 0) {
+            staff.stringTuning.accidentalModes ??= new Array<TuningAccidentalMode>(
+                staff.standardNotationLineCount
+            ).fill(TuningAccidentalMode.Flat);
+            staff.stringTuning.accidentalModes[tuningIndex] =
+                tuningAlter > 0 ? TuningAccidentalMode.Sharp : TuningAccidentalMode.Flat;
+        }
     }
 
     private _parseClef(element: XmlNode, bar: Bar): void {

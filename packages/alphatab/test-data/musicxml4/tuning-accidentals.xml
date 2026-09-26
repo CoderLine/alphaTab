@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list>
+    <score-part id="P1">
+      <part-name>Guitar</part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>TAB</sign>
+          <line>5</line>
+        </clef>
+        <staff-details>
+          <staff-lines>2</staff-lines>
+          <staff-tuning line="1">
+            <tuning-step>F</tuning-step>
+            <tuning-alter>1</tuning-alter>
+            <tuning-octave>3</tuning-octave>
+          </staff-tuning>
+          <staff-tuning line="2">
+            <tuning-step>G</tuning-step>
+            <tuning-alter>-1</tuning-alter>
+            <tuning-octave>3</tuning-octave>
+          </staff-tuning>
+        </staff-details>
+      </attributes>
+    </measure>
+  </part>
+</score-partwise>

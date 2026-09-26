@@ -63,7 +63,7 @@ export { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 export { Staff } from '@coderline/alphatab/model/Staff';
 export { Track, TrackSubElement, TrackStyle } from '@coderline/alphatab/model/Track';
 export { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
-export { Tuning } from '@coderline/alphatab/model/Tuning';
+export { Tuning, TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 export { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
 export { VibratoType } from '@coderline/alphatab/model/VibratoType';
 export { Voice, VoiceSubElement, VoiceStyle } from '@coderline/alphatab/model/Voice';
