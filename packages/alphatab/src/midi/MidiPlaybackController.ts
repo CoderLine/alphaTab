@@ -12,6 +12,9 @@ class Repeat {
     public opening: MasterBar;
     public iterations: number[];
     public closingIndex: number = 0;
+    // Issue #2885: Unified repeat pass tracking across alternate endings
+    public pass: number = 0;
+    public isAlternateEndings: boolean = false;
 
     public constructor(group: RepeatGroup, opening: MasterBar) {
         this.group = group;
@@ -19,6 +22,7 @@ class Repeat {
         // sort ascending according to index
         group.closings = group.closings.sort((a, b) => a.index - b.index);
         this.iterations = group.closings.map(_ => 0);
+        this.isAlternateEndings = group.masterBars.some(m => m.alternateEndings > 0);
     }
 }
 
@@ -104,7 +108,8 @@ export class MidiPlaybackController {
                 this.shouldPlay = true;
             } else {
                 const repeat = this._repeatStack[this._repeatStack.length - 1];
-                const iteration = repeat.iterations[repeat.closingIndex];
+                // Issue #2885: For alternate endings, evaluate the bitmask against the group pass counter
+                const iteration = repeat.isAlternateEndings ? repeat.pass : repeat.iterations[repeat.closingIndex];
                 this._previousAlternateEndings = masterBarAlternateEndings;
 
                 // do we need to skip this section?
@@ -399,36 +404,56 @@ export class MidiPlaybackController {
         const masterBarRepeatCount: number = masterBar.repeatCount - 1;
         // if we encounter a repeat end...
         if (this._repeatStack.length > 0 && masterBarRepeatCount > 0) {
-            // ...more repeats required?
             const repeat = this._repeatStack[this._repeatStack.length - 1];
-            const iteration = repeat.iterations[repeat.closingIndex];
-
-            // -> if yes, increase the iteration and jump back to start
-            if (iteration < masterBarRepeatCount) {
-                // jump to start
-                this.index = repeat.opening.index;
-                repeat.iterations[repeat.closingIndex]++;
-
-                // clear iterations for previous closings and start over all repeats
-                // this ensures on scenarios like "open, bar, close, bar, close"
-                // that the second close will repeat again the first repeat.
-                for (let i = 0; i < repeat.closingIndex; i++) {
-                    repeat.iterations[i] = 0;
-                }
-                repeat.closingIndex = 0;
-                this._previousAlternateEndings = 0;
-            } else {
-                // if we don't have further iterations left but we have additional closings in this group
-                // proceed heading to the next close but keep the repeat group active
-                if (repeat.closingIndex < repeat.group.closings.length - 1) {
-                    repeat.closingIndex++;
-                    this.index++; // go to next bar after current close
+            // Issue #2885: Unified repeat pass tracking across alternate endings
+            if (repeat.isAlternateEndings) {
+                const isLastClosing = masterBar === repeat.group.closings[repeat.group.closings.length - 1];
+                if (this.shouldPlay || isLastClosing) {
+                    if (repeat.pass < masterBarRepeatCount) {
+                        this.index = repeat.opening.index;
+                        repeat.pass++;
+                        this._previousAlternateEndings = 0;
+                    } else if (isLastClosing) {
+                        this._repeatStack.pop();
+                        this._groupsOnStack.delete(repeat.group);
+                        this.index++;
+                    } else {
+                        this.index++;
+                    }
                 } else {
-                    // if there are no further closings in the current group, we consider the current repeat done and handled
-                    this._repeatStack.pop();
-                    this._groupsOnStack.delete(repeat.group);
+                    this.index++;
+                }
+            } else {
+                // ...more repeats required?
+                const iteration = repeat.iterations[repeat.closingIndex];
 
-                    this.index++; // go to next bar after current close
+                // -> if yes, increase the iteration and jump back to start
+                if (iteration < masterBarRepeatCount) {
+                    // jump to start
+                    this.index = repeat.opening.index;
+                    repeat.iterations[repeat.closingIndex]++;
+
+                    // clear iterations for previous closings and start over all repeats
+                    // this ensures on scenarios like "open, bar, close, bar, close"
+                    // that the second close will repeat again the first repeat.
+                    for (let i = 0; i < repeat.closingIndex; i++) {
+                        repeat.iterations[i] = 0;
+                    }
+                    repeat.closingIndex = 0;
+                    this._previousAlternateEndings = 0;
+                } else {
+                    // if we don't have further iterations left but we have additional closings in this group
+                    // proceed heading to the next close but keep the repeat group active
+                    if (repeat.closingIndex < repeat.group.closings.length - 1) {
+                        repeat.closingIndex++;
+                        this.index++; // go to next bar after current close
+                    } else {
+                        // if there are no further closings in the current group, we consider the current repeat done and handled
+                        this._repeatStack.pop();
+                        this._groupsOnStack.delete(repeat.group);
+
+                        this.index++; // go to next bar after current close
+                    }
                 }
             }
         } else {

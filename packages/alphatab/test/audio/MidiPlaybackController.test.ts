@@ -165,6 +165,19 @@ describe('MidiPlaybackControllerTest', () => {
         testAlphaTexRepeat(tex, expectedBars, 50);
     });
 
+    it('repeat-sign-in-both-alternate-endings', () => {
+        const tex: string = ' . \\ro :1 0.6 | \\ae 1 \\rc 2 :1 1.6 | \\ae 2 \\rc 2 :1 2.6 | :1 3.6';
+        const expectedBars: number[] = [0, 1, 0, 2, 3];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('repeat-sign-in-all-alternate-endings-multi', () => {
+        const tex: string =
+            ' . \\ro :1 0.6 | \\ae 1 \\rc 3 :1 1.6 | \\ae 2 \\rc 3 :1 2.6 | \\ae 3 \\rc 3 :1 3.6 | :1 4.6';
+        const expectedBars: number[] = [0, 1, 0, 2, 0, 3, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
     // Da Capo
 
     it('da-capo', () => {
