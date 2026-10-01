@@ -36,8 +36,8 @@
     },
     "dependencies": {
         "@coderline/alphatab": "^1.9.0",
-        "vscode-languageserver": "^10.1.1",
-        "vscode-languageserver-textdocument": "^1.0.14"
+        "vscode-languageserver": "^10.1.2",
+        "vscode-languageserver-textdocument": "^1.0.15"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.5.14",
