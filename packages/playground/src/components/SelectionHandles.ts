@@ -70,7 +70,8 @@ export class SelectionHandles implements Mountable {
 
     constructor(
         private api: alphaTab.AlphaTabApi,
-        private viewportEl: HTMLElement
+        private viewportEl: HTMLElement,
+        private canvasEl: HTMLElement
     ) {
         this.root = parseHtml(html`
             <div class="at-selection-handles">
@@ -127,9 +128,14 @@ export class SelectionHandles implements Mountable {
     }
 
     private beatFromEvent(e: MouseEvent): alphaTab.model.Beat | undefined {
-        const rect = this.viewportEl.getBoundingClientRect();
-        const relX = e.clientX - rect.left;
-        const relY = e.clientY - rect.top;
+        const surface = this.canvasEl.querySelector<HTMLElement>('.at-surface');
+        if (!surface) {
+            return undefined;
+        }
+        // Bounds are relative to the score surface, not the scrolled viewport.
+        const rect = surface.getBoundingClientRect();
+        const relX = (e.clientX - rect.left) * (surface.offsetWidth / rect.width);
+        const relY = (e.clientY - rect.top) * (surface.offsetHeight / rect.height);
         const beat = this.api.boundsLookup?.getBeatAtPos(relX, relY);
         if (!beat) {
             return undefined;
