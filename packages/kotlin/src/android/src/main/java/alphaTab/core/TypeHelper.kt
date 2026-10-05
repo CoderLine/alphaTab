@@ -164,7 +164,7 @@ internal class TypeHelper {
                 }
 
                 else -> {
-                    throw _root_ide_package_.kotlin.ClassCastException(
+                    throw ClassCastException(
                         "Cannot cast ${v.javaClass.name} to number"
                     )
                 }

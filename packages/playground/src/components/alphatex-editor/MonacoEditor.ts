@@ -4,7 +4,7 @@ import { basicEditorLspIntegration } from '@coderline/alphatab-monaco/lsp';
 import { addTextMateGrammarSupport } from '@coderline/alphatab-monaco/textmate';
 import * as monaco from 'monaco-editor';
 // @ts-expect-error worker import handled by Vite
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import editorWorker from 'monaco-editor/editor/editor.worker?worker';
 import { type Mountable, css, html, injectStyles, parseHtml } from '../../util/Dom';
 
 injectStyles(

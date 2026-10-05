@@ -669,7 +669,8 @@ export class Note {
         }
 
         if (this.isPercussion) {
-            return this.percussionArticulation;
+            const art = PercussionMapper.getArticulation(this);
+            return art !== null ? art.outputMidiNumber : this.percussionArticulation;
         }
         if (this.isStringed) {
             return this.fret + this.stringTuning - transpositionPitch;

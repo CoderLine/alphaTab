@@ -32,6 +32,43 @@ Beside that:
 * Check if your topic has already been covered. Use the search function and respond to an existing issue instead of opening a new one if you find a match.
 * Double check you are using the right template. We get a lot of feature requests or bug reports as via the question template. If something is not yet available or not working, it is very likely not a question but rather a missing feature or misbehavior.
 
+## AI-assisted contributions
+
+AI coding assistants (Copilot, Cursor, Claude, Codex, ChatGPT and similar) are
+welcome here as tools that help you contribute. Used well, they can be great at
+reproducing a bug, drafting a clear description, or writing a first pass of
+tests. Used less well, they can produce plausible-sounding content that doesn't
+actually match what's happening in your project — which then costs both of us
+time in review.
+
+If an AI helped you draft an issue or pull request, please:
+
+- **Focus the description on what you observe, not on the code.** Symptoms, expected
+  behavior, reproduction steps, environment info — that's what lets us understand
+  and fix the problem. Diffs and "the bug is at line X" claims are usually shallow
+  when they come from a source-code scan, and they take our attention away from
+  the actual issue.
+- **Make sure every value in the bug template comes from your real environment.**
+  Please copy actual output from `alphaTab.Environment.printEnvironmentInfo()` or
+  debug logs rather than letting the AI guess.
+- **Only open a PR against an accepted issue.** alphaTab is a layered engine
+  (model, importers, layout, rendering, MIDI, player, platform bindings). A
+  symptom in one layer is often a correct consequence of behavior in another,
+  so we like to agree on the direction of a fix in an issue first. It saves you
+  from writing a patch we later have to ask you to redo.
+- **Be able to explain the change in your own words.** If you can, the PR is
+  ready. If not, spend a bit more time with it before submitting.
+- **Please leave the AI-authored disclosure in.** If any part of the issue or PR
+  was drafted by an AI, the mandatory disclosure block from
+  [AGENTS.md § Mandatory disclosure](./AGENTS.md#mandatory-disclosure-read-this-first)
+  should appear at the top. It contains the token `alphatab-ai-authored-v1` and
+  it's how our automation routes AI-assisted submissions to the right review
+  checklist. It isn't a mark of shame — it's a trust signal that helps us give
+  your submission the review it needs.
+
+The full rules for AI agents themselves live in [AGENTS.md](./AGENTS.md). If
+you'd like your AI to follow them, point it at that file before you start.
+
 ## Contributing Code
 
 The [docs page for contributing](https://www.alphatab.net/docs/contributing) is a good thing to read for new contributors.

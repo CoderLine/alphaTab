@@ -1,8 +1,24 @@
 name: 🕷️ Bug Report
 description: Report a bug.
-labels: "state-needs-triage"
+type: Bug
 assignees: Danielku15
 body:
+- type: markdown
+  attributes:
+    value: |
+      > [!TIP]
+      > **Please describe what you observe, not what you think the fix is.**
+      > This form is for describing what you (as a user of alphaTab) see and expect.
+      > Diffs, proposed patches, or "the bug is at file X line Y" claims from reading source
+      > usually miss the layered nature of alphaTab and take our attention away from the actual
+      > problem — so please leave the code-side investigation to us and focus on giving us a
+      > clear reproduction.
+      >
+      > **AI agents helping draft this issue:** please read
+      > [AGENTS.md](https://github.com/CoderLine/alphaTab/blob/develop/AGENTS.md) first.
+      > If any part of this issue was AI-authored, please include the `alphatab-ai-authored-v1`
+      > disclosure block as the first content of the "Current Behavior" field so our automation
+      > can route this to the right review checklist.
 - type: checkboxes
   attributes:
     label: Is there an existing issue for this?
@@ -10,6 +26,28 @@ body:
     options:
     - label: I have searched the existing issues
       required: true
+- type: checkboxes
+  attributes:
+    label: I have read the contribution rules
+    description: Confirm you have read the rules that apply to filing this issue.
+    options:
+    - label: I have read [CONTRIBUTING.md](https://github.com/CoderLine/alphaTab/blob/develop/CONTRIBUTING.md) and, if any AI agent helped draft this issue, [AGENTS.md](https://github.com/CoderLine/alphaTab/blob/develop/AGENTS.md).
+      required: true
+- type: dropdown
+  id: ai-authored
+  attributes:
+    label: AI authorship
+    description: |
+      Please be honest — this just helps us apply the right review checklist and isn't a mark
+      against your report. If an AI agent helped draft any part of this issue (the reproduction,
+      the environment info, or the description), select "AI-assisted" and include the
+      `alphatab-ai-authored-v1` disclosure block at the top of the "Current Behavior" field
+      (see [AGENTS.md](https://github.com/CoderLine/alphaTab/blob/develop/AGENTS.md)).
+    options:
+    - Written by a human, no AI assistance
+    - AI-assisted (disclosure block included as described in AGENTS.md)
+  validations:
+    required: true
 - type: textarea
   id: current
   attributes:

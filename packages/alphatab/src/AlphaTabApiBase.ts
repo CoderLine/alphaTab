@@ -2227,6 +2227,7 @@ export class AlphaTabApiBase<TSettings> {
         } else {
             this._defaultCursorHandler = new NonAnimatingCursorHandler();
         }
+        this._cursorHandlerMode = cursorHandlerMode;
     }
 
     private _scrollHandlerMode = ScrollMode.Off;
@@ -2494,18 +2495,18 @@ export class AlphaTabApiBase<TSettings> {
             shouldNotifyBeatChange = true;
         }
 
-        if (shouldScroll && !this._isBeatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {
-            const handler = this.customScrollHandler ?? this._defaultScrollHandler;
-            if (handler) {
-                handler.onBeatCursorUpdating(
-                    beatBoundings,
-                    nextBeatBoundings === null ? undefined : nextBeatBoundings,
-                    cursorMode,
-                    startBeatX,
-                    nextBeatX,
-                    duration
-                );
-            }
+
+
+        const handler = this.customScrollHandler ?? this._defaultScrollHandler;
+        if (shouldScroll && !this._isBeatMouseDown && handler) {
+            handler.onBeatCursorUpdating(
+                beatBoundings,
+                nextBeatBoundings === null ? undefined : nextBeatBoundings,
+                cursorMode,
+                startBeatX,
+                nextBeatX,
+                duration
+            );
         }
 
         // trigger an event for others to indicate which beat/bar is played

@@ -286,6 +286,20 @@ describe('LayoutTests', () => {
         );
     });
 
+    it('multi-system-tie-first-beat', async () => {
+        // tie ending on the first beat of a new system: the continuation
+        // stub must start after the clef and keep a minimum visible length
+        const settings: Settings = new Settings();
+        settings.display.barsPerRow = 1;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            :1 C4 | -
+            `,
+            'test-data/visual-tests/layout/multi-system-tie-first-beat.png',
+            settings
+        );
+    });
+
     it('hide-empty-staves', async () => {
         await VisualTestHelper.runVisualTestTex(
             `

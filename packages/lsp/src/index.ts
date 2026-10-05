@@ -7,7 +7,6 @@ import {
     staffMetaData,
     structuralMetaData
 } from '@coderline/alphatab-alphatex/definitions';
-import { startNodeLanguageServer, startWebWorkerLanguageServer } from '@coderline/alphatab-language-server/server';
 
 const documentation = {
     structuralMetaData,
@@ -46,11 +45,7 @@ const textMateGrammar: any = textMateGrammarJson;
 const languageConfiguration: any = languageConfigurationJson;
 
 export {
-    documentation, languageConfiguration, startNodeLanguageServer,
-    startWebWorkerLanguageServer, textMateGrammar, type AlphaTexExample,
+    documentation, languageConfiguration, textMateGrammar,
+    type AlphaTexExample,
     type MetadataTagDefinition, type ParameterDefinition, type ParameterValueDefinition, type PropertyDefinition, type SignatureDefinition, type WithDescription, type WithSignatures
 };
-
-if (import.meta.main) {
-    startNodeLanguageServer();
-}

@@ -46,7 +46,7 @@
         "nightly-pack": "node ./scripts/nightly.mts --mode pack",
         "nightly-publish": "node ./scripts/nightly.mts --mode publish"
     },
-    "devDependencies": {
-        "concurrently": "^10.0.3"
+    "overrides": {
+        "dompurify": "^3.4.12"
     }
 }

@@ -49,7 +49,7 @@ export type MonacoLocation = Pick<
 export function lspToMonacoMarker(diagnostic: Diagnostic): monaco.editor.IMarkerData {
     return {
         severity: lspToMonacoSeverity(diagnostic.severity),
-        message: diagnostic.message,
+        message: typeof diagnostic.message === 'string' ? diagnostic.message : diagnostic.message.value,
         ...lspToMonacoRange(diagnostic.range),
         code: diagnostic.code?.toString(),
         tags: diagnostic.tags,

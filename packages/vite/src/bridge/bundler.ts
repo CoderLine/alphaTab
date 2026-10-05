@@ -7,7 +7,7 @@ import type { ResolvedConfig } from './config';
 /**
  * @internal
  */
-export const enum BundlerKind {
+export enum BundlerKind {
     Rollup = 'rollup',
     Rolldown = 'rolldown'
 }

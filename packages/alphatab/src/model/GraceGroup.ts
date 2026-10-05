@@ -33,7 +33,7 @@ export class GraceGroup {
 
     public finish() {
         if (this.beats.length > 0) {
-            this.id = `${this.beats[0].absoluteDisplayStart}_${this.beats[0].voice.index}`;
+            this.id = `${this.beats[0].voice.bar.id}_${this.beats[0].voice.index}_${this.beats[0].absoluteDisplayStart}`;
         }
     }
 }

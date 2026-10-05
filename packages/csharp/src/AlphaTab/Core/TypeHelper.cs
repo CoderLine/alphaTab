@@ -296,7 +296,7 @@ namespace AlphaTab.Core
             return data;
         }
 
-        public static void Sort<T>(this IList<T> data)
+        public static IList<T> Sort<T>(this IList<T> data)
         {
             switch (data)
             {
@@ -310,6 +310,7 @@ namespace AlphaTab.Core
                     throw new NotSupportedException("Cannot sort list of type " +
                                                     data.GetType().FullName);
             }
+            return data;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -311,6 +311,26 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
     }
 
     fun toEqual(expected: Any?, message: String? = null) {
+        val a = actual
+        // Sequences compare element-wise; runtime List types don't override equals.
+        if (a is Iterable<*> && expected is Iterable<*>) {
+            val ai = a.iterator()
+            val ei = expected.iterator()
+            var i = 0
+            while (true) {
+                val aHas = ai.hasNext()
+                val eHas = ei.hasNext()
+                if (!aHas && !eHas) {
+                    return
+                }
+                if (aHas != eHas) {
+                    Assert.fail(message ?: this.message ?: "Sequence length mismatch at index $i")
+                    return
+                }
+                Assert.assertEquals(message ?: this.message ?: "Element $i", ei.next(), ai.next())
+                i++
+            }
+        }
         equal(expected, message)
     }
 
@@ -374,6 +394,10 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
 
     fun toThrow(expected: KClass<out Throwable>) {
         `throw`(expected)
+    }
+
+    fun toThrow() {
+        `throw`(Throwable::class)
     }
 
     fun `throw`(expected: KClass<out Throwable>) {

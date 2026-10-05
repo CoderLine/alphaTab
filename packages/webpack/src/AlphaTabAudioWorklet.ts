@@ -58,14 +58,18 @@ export function configureAudioWorklet(
             }
         });
 
-        block.loc = expr.loc;
+        // webpack 5.109+ stops populating node.loc during traversal — consumers
+        // must call parser.getLocation(node) to derive it from the range. Older
+        // webpack lacks getLocation but does set expr.loc directly.
+        const loc = parser.getLocation ? parser.getLocation(expr) : expr.loc;
+        block.loc = loc;
 
         const workletBootstrap = webPackWithAlphaTab.alphaTab.createWorkletDependency(
             url.string,
             [expr.range![0], expr.range![1]],
             compiler.options.output.workerPublicPath
         );
-        workletBootstrap.loc = expr.loc!;
+        workletBootstrap.loc = loc;
         block.addDependency(workletBootstrap);
         parser.state.module.addBlock(block);
 

@@ -58,6 +58,10 @@ internal inline fun String.splitBy(separator: String): List<String> {
     return List(this.split(separator))
 }
 
+internal fun String.splitBy(pattern: RegExp): List<String> {
+    return pattern.split(this)
+}
+
 internal inline fun String.replace(pattern: RegExp, replacement: String): String {
     return pattern.replace(this, replacement)
 }

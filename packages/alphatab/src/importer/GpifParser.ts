@@ -1,7 +1,13 @@
+import { BeatCloner } from '@coderline/alphatab/generated/model/BeatCloner';
+import { NoteCloner } from '@coderline/alphatab/generated/model/NoteCloner';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
+import { Logger } from '@coderline/alphatab/Logger';
+import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { Automation, AutomationType, SyncPointData } from '@coderline/alphatab/model/Automation';
+import { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
 import { Bar, BarLineStyle, SustainPedalMarker, SustainPedalMarkerType } from '@coderline/alphatab/model/Bar';
+import { BarreShape } from '@coderline/alphatab/model/BarreShape';
 import { Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { BrushType } from '@coderline/alphatab/model/BrushType';
@@ -9,19 +15,30 @@ import { Chord } from '@coderline/alphatab/model/Chord';
 import { Clef } from '@coderline/alphatab/model/Clef';
 import { Color } from '@coderline/alphatab/model/Color';
 import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
+import { Direction } from '@coderline/alphatab/model/Direction';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { FadeType } from '@coderline/alphatab/model/FadeType';
 import { Fermata, FermataType } from '@coderline/alphatab/model/Fermata';
+import { FingeringAssigner } from '@coderline/alphatab/model/FingeringAssigner';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
+import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { InstrumentArticulation, TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
 import { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
 import { BeamingRules, MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { Note } from '@coderline/alphatab/model/Note';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
+import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import { Score } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
@@ -29,32 +46,15 @@ import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
+import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Voice } from '@coderline/alphatab/model/Voice';
-import type { Settings } from '@coderline/alphatab/Settings';
-import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
-
-import { BeatCloner } from '@coderline/alphatab/generated/model/BeatCloner';
-import { NoteCloner } from '@coderline/alphatab/generated/model/NoteCloner';
-import { Logger } from '@coderline/alphatab/Logger';
-import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
-import { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
-import { BarreShape } from '@coderline/alphatab/model/BarreShape';
-import { Direction } from '@coderline/alphatab/model/Direction';
-import { FadeType } from '@coderline/alphatab/model/FadeType';
-import { GolpeType } from '@coderline/alphatab/model/GolpeType';
-import { InstrumentArticulation, TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
-import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
-import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
-import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
-import { Tuning } from '@coderline/alphatab/model/Tuning';
-import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import type { Settings } from '@coderline/alphatab/Settings';
+import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { type XmlNode, XmlNodeType } from '@coderline/alphatab/xml/XmlNode';
 
 /**
@@ -127,13 +127,16 @@ export class GpifParser {
     private _rhythmById!: Map<string, GpifRhythm>;
     private _noteById!: Map<string, Note>;
     private _notesOfBeat!: Map<string, string[]>;
-    private _tappedNotes!: Map<string, boolean>;
+    private _tappedNotes!: Set<string>;
     private _lyricsByTrack!: Map<string, Lyrics[]>;
     private _soundsByTrack!: Map<string, Map<string, GpifSound>>;
     private _hasAnacrusis: boolean = false;
     private _articulationByName!: Map<string, InstrumentArticulation>;
     private _skipApplyLyrics: boolean = false;
     private _backingTrackPadding: number = 0;
+
+    /** Marks the input as a Guitar Pro 6 file. Also auto-detected from the GPIF header. */
+    public isGp6: boolean = false;
 
     private _doubleBars: Set<MasterBar> = new Set<MasterBar>();
     private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<
@@ -160,7 +163,7 @@ export class GpifParser {
         this._rhythmById = new Map<string, GpifRhythm>();
         this._notesOfBeat = new Map<string, string[]>();
         this._noteById = new Map<string, Note>();
-        this._tappedNotes = new Map<string, boolean>();
+        this._tappedNotes = new Set<string>();
         this._lyricsByTrack = new Map<string, Lyrics[]>();
         this._soundsByTrack = new Map<string, Map<string, GpifSound>>();
         this._skipApplyLyrics = false;
@@ -175,6 +178,9 @@ export class GpifParser {
         this._parseDom(dom);
         this._buildModel();
         ModelUtils.consolidate(this.score);
+        if (this.isGp6) {
+            this._assignFingeringForGp6();
+        }
         this.score.finish(settings);
         if (!this._skipApplyLyrics && this._lyricsByTrack.size > 0) {
             for (const [t, lyrics] of this._lyricsByTrack) {
@@ -198,6 +204,16 @@ export class GpifParser {
             // parse all children
             for (const n of root.childElements()) {
                 switch (n.localName) {
+                    case 'GPVersion':
+                        if (n.innerText === '6') {
+                            this.isGp6 = true;
+                        }
+                        break;
+                    case 'Encoding':
+                        if (n.findChildElement('EncodingDescription')?.innerText === 'GP6') {
+                            this.isGp6 = true;
+                        }
+                        break;
                     case 'Score':
                         this._parseScoreNode(n);
                         break;
@@ -2380,7 +2396,7 @@ export class GpifParser {
                             variation = GpifParser._parseIntSafe(c.findChildElement('Variation')?.innerText, 0);
                             break;
                         case 'Tapped':
-                            this._tappedNotes.set(noteId, true);
+                            this._tappedNotes.add(noteId);
                             break;
                         case 'HarmonicType':
                             const htype = c.findChildElement('HType');
@@ -2560,7 +2576,7 @@ export class GpifParser {
             note.addBendPoint(bendDestination);
         }
 
-        // map GP6 element and variation combos to midi numbers
+        // Temporary MIDI id; normalised to a track-local index in `_attachNoteToBeat`.
         if (element !== -1 && variation !== -1) {
             note.percussionArticulation = PercussionMapper.articulationFromElementVariation(element, variation);
         }
@@ -2668,6 +2684,131 @@ export class GpifParser {
         this._rhythmById.set(rhythmId, rhythm);
     }
 
+    private _keyFor(trackId: string, base: [KeySignature, KeySignatureType]): [KeySignature, KeySignatureType] {
+        if (!this._transposeKeySignaturePerTrack.has(trackId)) {
+            return base;
+        }
+        return [ModelUtils.transposeKey(base[0], this._transposeKeySignaturePerTrack.get(trackId)!), base[1]];
+    }
+
+    private _equalizeVoiceCount(staff: Staff, bar: Bar, staffVoiceLimits: Map<Staff, number>): void {
+        const previousMax = staffVoiceLimits.get(staff) ?? 0;
+        const target = Math.max(previousMax, bar.voices.length, 1);
+        if (target > previousMax) {
+            staffVoiceLimits.set(staff, target);
+            ModelUtils.backfillStaffVoices(staff, target);
+        }
+        while (bar.voices.length < target) {
+            ModelUtils.appendPlaceholderVoice(bar);
+        }
+    }
+
+    private _attachVoiceToBar(bar: Bar, voiceId: string, staff: Staff): void {
+        const voice: Voice = this._voiceById.get(voiceId)!;
+        bar.addVoice(voice);
+        const beatIds = this._beatsOfVoice.get(voiceId);
+        if (!beatIds) {
+            return;
+        }
+        for (const beatId of beatIds) {
+            if (beatId !== GpifParser._invalidId) {
+                this._attachBeatToVoice(voice, beatId, staff);
+            }
+        }
+    }
+
+    // Beat objects in the parser scratch are shared across bars in gp6, so
+    // every attachment gets a fresh clone before being wired into the model.
+    private _attachBeatToVoice(voice: Voice, beatId: string, staff: Staff): void {
+        const beat: Beat = BeatCloner.clone(this._beatById.get(beatId)!);
+        voice.addBeat(beat);
+        const rhythmId: string = this._rhythmOfBeat.get(beatId)!;
+        const rhythm: GpifRhythm = this._rhythmById.get(rhythmId)!;
+        beat.duration = rhythm.value;
+        beat.dots = rhythm.dots;
+        beat.tupletNumerator = rhythm.tupletNumerator;
+        beat.tupletDenominator = rhythm.tupletDenominator;
+        const noteIds = this._notesOfBeat.get(beatId);
+        if (!noteIds) {
+            return;
+        }
+        for (const noteId of noteIds) {
+            if (noteId !== GpifParser._invalidId) {
+                this._attachNoteToBeat(beat, noteId, staff);
+            }
+        }
+    }
+
+    private _attachNoteToBeat(beat: Beat, noteId: string, staff: Staff): void {
+        const note = NoteCloner.clone(this._noteById.get(noteId)!);
+        if (staff.isPercussion) {
+            note.fret = Number.NaN;
+        } else {
+            note.percussionArticulation = Number.NaN;
+        }
+        beat.addNote(note);
+        if (this._tappedNotes.has(noteId)) {
+            beat.tap = true;
+        }
+        // Normalise `percussionArticulation` to the track-local index.
+        if (staff.isPercussion && note.percussionArticulation >= 0) {
+            const trackArticulations = staff.track.percussionArticulations;
+            let known: InstrumentArticulation | null = null;
+            if (note.percussionArticulation < trackArticulations.length) {
+                known = trackArticulations[note.percussionArticulation];
+            } else {
+                known = PercussionMapper.getArticulationById(note.percussionArticulation);
+            }
+            if (known !== null) {
+                note.percussionArticulation = staff.track.getOrRegisterPercussionArticulation(known);
+            }
+        }
+    }
+
+    private _assignFingeringForGp6(): void {
+        for (const track of this.score.tracks) {
+            for (const staff of track.staves) {
+                const isPercussion = staff.isPercussion;
+                const isPitchedOnly =
+                    !isPercussion &&
+                    staff.stringTuning.tunings.length === 0 &&
+                    ModelUtils.staffNotesAreNotStringed(staff);
+                if (!isPercussion && !isPitchedOnly) {
+                    continue;
+                }
+
+                if (isPercussion) {
+                    staff.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
+                } else {
+                    const fallback =
+                        staff.index === 0 ? Tuning.getDefaultTuningFor(6) : Tuning.getDefaultTuningFor(5);
+                    if (fallback !== null) {
+                        staff.stringTuning.tunings = fallback.tunings.slice();
+                        staff.stringTuning.name = fallback.name;
+                    }
+                }
+
+                const assignersByVoiceIndex = new Map<number, FingeringAssigner>();
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        let assigner: FingeringAssigner | undefined = assignersByVoiceIndex.get(voice.index);
+                        if (assigner === undefined) {
+                            assigner = new FingeringAssigner(
+                                staff.stringTuning.tunings,
+                                staff.capo,
+                                staff.transpositionPitch
+                            );
+                            assignersByVoiceIndex.set(voice.index, assigner);
+                        }
+                        for (const beat of voice.beats) {
+                            assigner.assign(beat);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private _buildModel(): void {
         // build score
         for (let i: number = 0, j: number = this._masterBars.length; i < j; i++) {
@@ -2693,6 +2834,9 @@ export class GpifParser {
             this.score.addTrack(track);
             trackIndexToTrackId.push(trackId);
         }
+
+        const staffVoiceLimits = new Map<Staff, number>();
+
         // process all masterbars
         let keySignature: [KeySignature, KeySignatureType];
 
@@ -2701,16 +2845,7 @@ export class GpifParser {
             let staffIndex = 0;
             let trackIndex = 0;
 
-            keySignature = [KeySignature.C, KeySignatureType.Major];
-            if (this._transposeKeySignaturePerTrack.has(trackIndexToTrackId[0])) {
-                keySignature = [
-                    ModelUtils.transposeKey(
-                        keySignature[0],
-                        this._transposeKeySignaturePerTrack.get(trackIndexToTrackId[0])!
-                    ),
-                    keySignature[1]
-                ];
-            }
+            keySignature = this._keyFor(trackIndexToTrackId[0], [KeySignature.C, KeySignatureType.Major]);
 
             for (
                 let barIndex: number = 0;
@@ -2718,110 +2853,56 @@ export class GpifParser {
                 barIndex++
             ) {
                 const barId: string = barIds[barIndex];
-                if (barId !== GpifParser._invalidId) {
-                    const bar: Bar = this._barsById.get(barId)!;
-                    const track: Track = this.score.tracks[trackIndex];
-                    const staff: Staff = track.staves[staffIndex];
-                    staff.addBar(bar);
-
-                    const masterBarIndex = staff.bars.length - 1;
-                    if (this._keySignatures.has(masterBarIndex)) {
-                        keySignature = this._keySignatures.get(masterBarIndex)!;
-                        if (this._transposeKeySignaturePerTrack.has(trackIndexToTrackId[trackIndex])) {
-                            keySignature = [
-                                ModelUtils.transposeKey(
-                                    keySignature[0],
-                                    this._transposeKeySignaturePerTrack.get(trackIndexToTrackId[trackIndex])!
-                                ),
-                                keySignature[1]
-                            ];
-                        }
-                    }
-
-                    bar.keySignature = keySignature[0];
-                    bar.keySignatureType = keySignature[1];
-
-                    if (this._doubleBars.has(bar.masterBar)) {
-                        bar.barLineRight = BarLineStyle.LightLight;
-                    }
-
-                    if (this._voicesOfBar.has(barId)) {
-                        // add voices to bars
-                        for (const voiceId of this._voicesOfBar.get(barId)!) {
-                            if (voiceId !== GpifParser._invalidId) {
-                                const voice: Voice = this._voiceById.get(voiceId)!;
-                                bar.addVoice(voice);
-                                if (this._beatsOfVoice.has(voiceId)) {
-                                    // add beats to voices
-                                    for (const beatId of this._beatsOfVoice.get(voiceId)!) {
-                                        if (beatId !== GpifParser._invalidId) {
-                                            // important! we clone the beat because beats get reused
-                                            // in gp6, our model needs to have unique beats.
-                                            const beat: Beat = BeatCloner.clone(this._beatById.get(beatId)!);
-                                            voice.addBeat(beat);
-                                            const rhythmId: string = this._rhythmOfBeat.get(beatId)!;
-                                            const rhythm: GpifRhythm = this._rhythmById.get(rhythmId)!;
-                                            // set beat duration
-                                            beat.duration = rhythm.value;
-                                            beat.dots = rhythm.dots;
-                                            beat.tupletNumerator = rhythm.tupletNumerator;
-                                            beat.tupletDenominator = rhythm.tupletDenominator;
-                                            // add notes to beat
-                                            if (this._notesOfBeat.has(beatId)) {
-                                                for (const noteId of this._notesOfBeat.get(beatId)!) {
-                                                    if (noteId !== GpifParser._invalidId) {
-                                                        const note = NoteCloner.clone(this._noteById.get(noteId)!);
-                                                        if (staff.isPercussion) {
-                                                            note.fret = Number.NaN;
-                                                        } else {
-                                                            note.percussionArticulation = Number.NaN;
-                                                        }
-                                                        beat.addNote(note);
-                                                        if (this._tappedNotes.has(noteId)) {
-                                                            beat.tap = true;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            } else {
-                                // invalid voice -> empty voice
-                                const voice: Voice = new Voice();
-                                bar.addVoice(voice);
-                                const beat: Beat = new Beat();
-                                beat.isEmpty = true;
-                                beat.duration = Duration.Quarter;
-                                voice.addBeat(beat);
-                            }
-                        }
-                    }
-                    // stave is full? -> next track
-                    if (staffIndex === track.staves.length - 1) {
-                        trackIndex++;
-                        staffIndex = 0;
-                    } else {
-                        staffIndex++;
-                    }
-
-                    keySignature = [KeySignature.C, KeySignatureType.Major];
-                    if (
-                        trackIndex < trackIndexToTrackId.length &&
-                        this._transposeKeySignaturePerTrack.has(trackIndexToTrackId[trackIndex])
-                    ) {
-                        keySignature = [
-                            ModelUtils.transposeKey(
-                                keySignature[0],
-                                this._transposeKeySignaturePerTrack.get(trackIndexToTrackId[trackIndex])!
-                            ),
-                            keySignature[1]
-                        ];
-                    }
-                } else {
-                    // no bar for track
+                if (barId === GpifParser._invalidId) {
                     trackIndex++;
+                    continue;
                 }
+                const bar: Bar = this._barsById.get(barId)!;
+                const track: Track = this.score.tracks[trackIndex];
+                const staff: Staff = track.staves[staffIndex];
+                staff.addBar(bar);
+
+                const masterBarIndex = staff.bars.length - 1;
+                if (this._keySignatures.has(masterBarIndex)) {
+                    keySignature = this._keyFor(
+                        trackIndexToTrackId[trackIndex],
+                        this._keySignatures.get(masterBarIndex)!
+                    );
+                }
+
+                bar.keySignature = keySignature[0];
+                bar.keySignatureType = keySignature[1];
+
+                if (this._doubleBars.has(bar.masterBar)) {
+                    bar.barLineRight = BarLineStyle.LightLight;
+                }
+
+                const voiceIds = this._voicesOfBar.get(barId);
+                if (voiceIds) {
+                    let pendingPlaceholders = 0;
+                    for (const voiceId of voiceIds) {
+                        if (voiceId === GpifParser._invalidId) {
+                            pendingPlaceholders++;
+                        } else {
+                            while (pendingPlaceholders > 0) {
+                                ModelUtils.appendPlaceholderVoice(bar);
+                                pendingPlaceholders--;
+                            }
+                            this._attachVoiceToBar(bar, voiceId, staff);
+                        }
+                    }
+                }
+                this._equalizeVoiceCount(staff, bar, staffVoiceLimits);
+                staffIndex++;
+                if (staffIndex >= track.staves.length) {
+                    trackIndex++;
+                    staffIndex = 0;
+                }
+
+                keySignature =
+                    trackIndex < trackIndexToTrackId.length
+                        ? this._keyFor(trackIndexToTrackId[trackIndex], [KeySignature.C, KeySignatureType.Major])
+                        : [KeySignature.C, KeySignatureType.Major];
             }
         }
 

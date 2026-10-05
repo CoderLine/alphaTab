@@ -47,6 +47,10 @@ internal class Int32Array : Iterable<Int> {
         _data.fill(i)
     }
 
+    public fun fill(i: Double) {
+        _data.fill(i.toInt())
+    }
+
     override fun iterator(): IntIterator {
         return ArrayIntIterator(this)
     }

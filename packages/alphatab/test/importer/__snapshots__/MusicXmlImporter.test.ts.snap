@@ -31,7 +31,7 @@ Map {
               "voices" => [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 0,
+                  "id" => 1,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -57,6 +57,19 @@ Map {
                       "displayduration" => 960,
                       "playbackduration" => 960,
                       "overridedisplayduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
                     },
                   ],
                 },
@@ -600,7 +613,7 @@ Map {
               "voices" => [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 0,
+                  "id" => 1,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -693,6 +706,19 @@ Map {
                       "displayduration" => 960,
                       "playbackduration" => 960,
                       "overridedisplayduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
                     },
                   ],
                 },
@@ -1397,7 +1423,7 @@ Map {
               "voices" => [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 0,
+                  "id" => 1,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1478,6 +1504,19 @@ Map {
                     },
                   ],
                 },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 28,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
               ],
             },
             Map {
@@ -1486,7 +1525,7 @@ Map {
               "voices" => [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 3,
+                  "id" => 5,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1557,6 +1596,19 @@ Map {
                     },
                   ],
                 },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 29,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
               ],
             },
           ],
@@ -1571,7 +1623,7 @@ Map {
               "voices" => [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 1,
+                  "id" => 3,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1603,7 +1655,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 2,
+                  "id" => 4,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1634,6 +1686,19 @@ Map {
                     },
                   ],
                 },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 30,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
               ],
             },
             Map {
@@ -1642,7 +1707,7 @@ Map {
               "voices" => [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 4,
+                  "id" => 7,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1674,7 +1739,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 5,
+                  "id" => 8,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1705,6 +1770,19 @@ Map {
                     },
                   ],
                 },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 9,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 31,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
               ],
             },
           ],
@@ -1729,7 +1807,7 @@ Map {
               "voices" => [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 6,
+                  "id" => 11,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1772,7 +1850,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 7,
+                  "id" => 12,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1804,7 +1882,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 8,
+                  "id" => 13,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1835,6 +1913,19 @@ Map {
                     },
                   ],
                 },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 10,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 32,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
               ],
               "keysignature" => 4,
             },
@@ -1844,7 +1935,7 @@ Map {
               "voices" => [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 9,
+                  "id" => 14,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1877,7 +1968,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 10,
+                  "id" => 15,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1909,7 +2000,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 11,
+                  "id" => 16,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -1937,6 +2028,19 @@ Map {
                       "displayduration" => 480,
                       "playbackduration" => 480,
                       "overridedisplayduration" => 480,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 17,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 33,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
                     },
                   ],
                 },
@@ -1993,7 +2097,7 @@ Map {
               "voices" => [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 0,
+                  "id" => 2,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -2107,6 +2211,19 @@ Map {
                     },
                   ],
                 },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 47,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
               ],
               "keysignature" => 4,
             },
@@ -2123,7 +2240,7 @@ Map {
               "voices" => [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 1,
+                  "id" => 3,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -2360,46 +2477,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 2,
-                  "beats" => [
-                    Map {
-                      "__kind" => "Beat",
-                      "id" => 47,
-                      "isempty" => true,
-                      "displayduration" => 960,
-                      "playbackduration" => 960,
-                    },
-                  ],
-                },
-                Map {
-                  "__kind" => "Voice",
-                  "id" => 3,
-                  "beats" => [
-                    Map {
-                      "__kind" => "Beat",
-                      "id" => 48,
-                      "isempty" => true,
-                      "displayduration" => 960,
-                      "playbackduration" => 960,
-                    },
-                  ],
-                },
-                Map {
-                  "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => [
-                    Map {
-                      "__kind" => "Beat",
-                      "id" => 49,
-                      "isempty" => true,
-                      "displayduration" => 960,
-                      "playbackduration" => 960,
-                    },
-                  ],
-                },
-                Map {
-                  "__kind" => "Voice",
-                  "id" => 5,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -2567,6 +2645,19 @@ Map {
                       "overridedisplayduration" => 480,
                       "preferredbeamdirection" => 1,
                       "beamingmode" => 1,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 48,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
                     },
                   ],
                 },
@@ -2768,6 +2859,19 @@ Map {
                     },
                   ],
                 },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 49,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
               ],
             },
           ],
@@ -2782,7 +2886,7 @@ Map {
               "voices" => [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 7,
+                  "id" => 8,
                   "beats" => [
                     Map {
                       "__kind" => "Beat",
@@ -2983,6 +3087,19 @@ Map {
                       "overridedisplayduration" => 240,
                       "preferredbeamdirection" => 0,
                       "beamingmode" => 2,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 50,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
                     },
                   ],
                 },

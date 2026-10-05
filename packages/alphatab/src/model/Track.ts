@@ -158,6 +158,23 @@ export class Track {
         this.staves.push(staff);
     }
 
+    /**
+     * Returns the index of {@link articulation} in {@link percussionArticulations},
+     * appending it (deduplicated by `uniqueId`) when not yet present. Callers store the
+     * returned index in {@link Note.percussionArticulation}.
+     */
+    public getOrRegisterPercussionArticulation(articulation: InstrumentArticulation): number {
+        const uniqueId = articulation.uniqueId;
+        for (let i = 0; i < this.percussionArticulations.length; i++) {
+            if (this.percussionArticulations[i].uniqueId === uniqueId) {
+                return i;
+            }
+        }
+        const index = this.percussionArticulations.length;
+        this.percussionArticulations.push(articulation);
+        return index;
+    }
+
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         if (!this.shortName) {
             this.shortName = this.name;

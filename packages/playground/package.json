@@ -6,12 +6,12 @@
     "type": "module",
     "dependencies": {
         "@coderline/alphatab": "*",
-        "@fontsource/noto-sans": "^5.2.10",
-        "@fontsource/noto-serif": "^5.2.9",
+        "@fontsource/noto-sans": "^5.3.0",
+        "@fontsource/noto-serif": "^5.3.0",
         "@popperjs/core": "^2.11.8",
         "@types/serve-static": "^2.2.0",
-        "lucide": "^1.23.0",
-        "monaco-editor": "^0.55.1",
+        "lucide": "^1.48.0",
+        "monaco-editor": "^0.57.0",
         "serve-static": "^2.2.1"
     },
     "scripts": {
@@ -25,7 +25,7 @@
         "split.js": "^1.6.5",
         "tslib": "^2.8.1",
         "typescript": "^6.0.3",
-        "vite": "^8.1.0",
-        "vitest": "^4.1.10"
+        "vite": "^8.3.0",
+        "vitest": "^5.0.1"
     }
 }

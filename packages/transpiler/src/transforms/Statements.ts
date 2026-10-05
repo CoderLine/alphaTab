@@ -34,9 +34,9 @@ export function visitStatement(state: AstTransformer, parent: cs.Node, s: ts.Sta
         case ts.SyntaxKind.ForInStatement:
             return visitForInStatement(state, s as ts.ForInStatement);
         case ts.SyntaxKind.BreakStatement:
-            return visitBreakStatement(parent, s as ts.BreakStatement);
+            return visitBreakStatement(state, parent, s as ts.BreakStatement);
         case ts.SyntaxKind.ContinueStatement:
-            return visitContinueStatement(parent, s as ts.ContinueStatement);
+            return visitContinueStatement(state, parent, s as ts.ContinueStatement);
         case ts.SyntaxKind.ReturnStatement:
             return visitReturnStatement(state, parent, s as ts.ReturnStatement);
         case ts.SyntaxKind.WithStatement:
@@ -373,11 +373,17 @@ function visitForInStatement(state: AstTransformer, s: ts.ForInStatement): null 
     return null;
 }
 
-function visitBreakStatement(parent: cs.Node, s: ts.BreakStatement): cs.BreakStatement {
+function visitBreakStatement(state: AstTransformer, parent: cs.Node, s: ts.BreakStatement): cs.BreakStatement {
+    if (s.label) {
+        state.context.addTsNodeDiagnostics(s, 'Labeled break is not supported', ts.DiagnosticCategory.Error);
+    }
     return { nodeType: cs.SyntaxKind.BreakStatement, parent, tsNode: s };
 }
 
-function visitContinueStatement(parent: cs.Node, s: ts.ContinueStatement): cs.ContinueStatement {
+function visitContinueStatement(state: AstTransformer, parent: cs.Node, s: ts.ContinueStatement): cs.ContinueStatement {
+    if (s.label) {
+        state.context.addTsNodeDiagnostics(s, 'Labeled continue is not supported', ts.DiagnosticCategory.Error);
+    }
     return { nodeType: cs.SyntaxKind.ContinueStatement, parent, tsNode: s };
 }
 

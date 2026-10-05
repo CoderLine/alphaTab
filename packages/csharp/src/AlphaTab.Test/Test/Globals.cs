@@ -398,6 +398,30 @@ internal class Expector<T>
         var expectedType = expected.GetType();
         var actualType = _actual.GetType();
 
+        // Sequences compare element-wise, ignoring capacity and other implementation details.
+        if (expected is System.Collections.IEnumerable expectedSeq && _actual is System.Collections.IEnumerable actualSeq)
+        {
+            var e = expectedSeq.GetEnumerator();
+            var a = actualSeq.GetEnumerator();
+            var i = 0;
+            while (true)
+            {
+                var eNext = e.MoveNext();
+                var aNext = a.MoveNext();
+                if (!eNext && !aNext)
+                {
+                    return;
+                }
+                if (eNext != aNext)
+                {
+                    Assert.Fail(message ?? _message ?? $"Sequence length mismatch at index {i}");
+                    return;
+                }
+                Assert.AreEqual(e.Current, a.Current, message ?? _message ?? $"Element {i}");
+                i++;
+            }
+        }
+
         if (expectedType == actualType)
         {
             Assert.AreEqual(expected, _actual, message ?? _message);
@@ -428,6 +452,11 @@ internal class Expector<T>
     public void ToThrow(Type expected)
     {
         Throw(expected);
+    }
+
+    public void ToThrow()
+    {
+        Throw(typeof(Exception));
     }
 
     public void Ok()

@@ -125,8 +125,9 @@ public class DoubleList : IDoubleIterable {
         return DoubleList(copy, copy.size)
     }
 
-    public fun sort() {
+    public fun sort(): DoubleList {
         _items.sort(0, _size)
+        return this
     }
 
     internal fun sortDescending() {
