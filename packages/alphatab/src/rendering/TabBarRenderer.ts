@@ -13,7 +13,6 @@ import {
     BeatContainerGlyph,
     type BeatContainerGlyphBase
 } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import { TabBeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TabBeatContainerGlyph';
 import type { TabBeatGlyph } from '@coderline/alphatab/rendering/glyphs/TabBeatGlyph';
 import { TabClefGlyph } from '@coderline/alphatab/rendering/glyphs/TabClefGlyph';
@@ -419,7 +418,6 @@ export class TabBarRenderer extends LineBarRenderer {
         const clefDisplay = this.resolveClefDisplay();
         if (StaffDisplayResolver.isPrimaryForElement(this.staff!, clefDisplay) && this.isFirstOfStaff) {
             const center: number = (this.bar.staff.tuning.length - 1) / 2;
-            this.createStartSpacing();
             this.addPreBeatGlyph(new TabClefGlyph(0, this.getLineY(center)));
         }
         // Time Signature
@@ -437,14 +435,11 @@ export class TabBarRenderer extends LineBarRenderer {
                     this.bar.masterBar.isFreeTime &&
                     this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime))
         ) {
-            this.createStartSpacing();
             this._createTimeSignatureGlyphs();
         }
     }
 
     private _createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
-
         const lines = (this.bar.staff.tuning.length + 1) / 2 - 1;
         this.addPreBeatGlyph(
             new TabTimeSignatureGlyph(
@@ -456,7 +451,6 @@ export class TabBarRenderer extends LineBarRenderer {
                 this.bar.masterBar.isFreeTime
             )
         );
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
     }
 
     protected override createVoiceGlyphs(v: Voice): void {

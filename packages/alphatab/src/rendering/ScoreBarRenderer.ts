@@ -17,7 +17,6 @@ import { ClefGlyph } from '@coderline/alphatab/rendering/glyphs/ClefGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { KeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/KeySignatureGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
@@ -239,10 +238,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                     offset = 6;
                     break;
             }
-            this.createStartSpacing();
-
             this.addPreBeatGlyph(new ClefGlyph(0, this.getScoreY(offset), this.bar.clef, this.bar.clefOttava));
-            this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
             hasClef = true;
         }
         // Key signature
@@ -253,7 +249,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 (this.index === 0 && this.bar.keySignature !== KeySignature.C) ||
                 (this.bar.previousBar && this.bar.keySignature !== this.bar.previousBar.keySignature))
         ) {
-            this.createStartSpacing();
             this._createKeySignatureGlyphs();
         }
         // Time Signature
@@ -271,7 +266,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
                     this.bar.masterBar.isFreeTime &&
                     this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime))
         ) {
-            this.createStartSpacing();
             this._createTimeSignatureGlyphs();
         }
     }
@@ -347,10 +341,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         this.addPreBeatGlyph(glyph);
-
-        if (!glyph.isEmpty) {
-            this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
-        }
     }
 
     private _createTimeSignatureGlyphs(): void {
@@ -365,7 +355,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.bar.masterBar.isFreeTime
             )
         );
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
     }
 
     protected override createVoiceGlyphs(v: Voice): void {

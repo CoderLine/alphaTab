@@ -9,7 +9,6 @@ import { LineBarRenderer } from '@coderline/alphatab/rendering//LineBarRenderer'
 import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { SlashBeatContainerGlyph } from '@coderline/alphatab/rendering/SlashBeatContainerGlyph';
 import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
@@ -163,14 +162,11 @@ export class SlashBarRenderer extends LineBarRenderer {
                     this.bar.masterBar.isFreeTime &&
                     this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime))
         ) {
-            this.createStartSpacing();
             this._createTimeSignatureGlyphs();
         }
     }
 
     private _createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
-
         const masterBar = this.bar.masterBar;
         const g = new ScoreTimeSignatureGlyph(
             0,
@@ -184,7 +180,6 @@ export class SlashBarRenderer extends LineBarRenderer {
         );
         g.barSubElement = BarSubElement.SlashTimeSignature;
         this.addPreBeatGlyph(g);
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
     }
 
     protected override createVoiceGlyphs(v: Voice): void {

@@ -305,7 +305,7 @@ export class StaffSystem {
             return null;
         }
         this.masterBarsRenderers.push(renderers);
-        renderers.layoutingInfo.preBeatSize = 0;
+        renderers.layoutingInfo.resetHeaderRods();
         let src: number = 0;
 
         let firstVisibleStaff: RenderStaff | undefined = undefined;

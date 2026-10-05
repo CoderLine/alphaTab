@@ -16,7 +16,7 @@ import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { RepeatCountGlyph } from '@coderline/alphatab/rendering/glyphs/RepeatCountGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
+import { StartSpacingGlyph } from '@coderline/alphatab/rendering/glyphs/StartSpacingGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { BeamingHelper, type BeamingHelperDrawInfo } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -43,7 +43,6 @@ interface BeamingBounds {
  */
 export abstract class LineBarRenderer extends BarRendererBase {
     protected firstLineY: number = 0;
-    private _startSpacing = false;
     public tupletSize: number = 0;
 
     public get lineOffset(): number {
@@ -185,15 +184,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // override in subclasses
     }
 
-    protected createStartSpacing(): boolean {
-        if (this._startSpacing) {
-            return false;
-        }
+    protected createStartSpacing(): void {
         const padding =
             this.index === 0 ? this.settings.display.firstStaffPaddingLeft : this.settings.display.staffPaddingLeft;
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, padding));
-        this._startSpacing = true;
-        return true;
+        this.addPreBeatGlyph(new StartSpacingGlyph(0, 0, padding));
     }
 
     protected paintTuplets(
@@ -638,11 +632,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
         canvas: ICanvas
     ): void;
 
-    protected override recreatePreBeatGlyphs(): void {
-        this._startSpacing = false;
-        super.recreatePreBeatGlyphs();
-    }
-
     public calculateBeamY(h: BeamingHelper, x: number): number {
         return this.calculateBeamYWithDirection(h, x, this.getBeamDirection(h));
     }
@@ -650,8 +639,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected override createPreBeatGlyphs(): void {
         super.createPreBeatGlyphs();
         this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
-        this.createLinePreBeatGlyphs();
         this.createStartSpacing();
+        this.createLinePreBeatGlyphs();
     }
 
     public resolveClefDisplay(): ElementDisplay {
