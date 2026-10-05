@@ -2201,7 +2201,10 @@ export class MusicXmlImporter extends ScoreImporter {
                     }
                     break;
                 case 'metronome':
-                    this._parseMetronome(direction, masterBar, getRatioPosition());
+                    // <sound tempo> is the authoritative playback tempo, the metronome is only its visual counterpart
+                    if (tempo <= 0) {
+                        this._parseMetronome(direction, masterBar, getRatioPosition());
+                    }
                     break;
                 case 'octave-shift':
                     this._nextBeatOttavia = this._parseOctaveShift(direction);
@@ -2260,13 +2263,16 @@ export class MusicXmlImporter extends ScoreImporter {
     }
     private _parseMetronome(element: XmlNode, masterBar: MasterBar, ratioPosition: number) {
         let unit: Duration | null = null;
+        let dots = 0;
         let perMinute: number = -1;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'beat-unit':
                     unit = this._parseBeatDuration(c);
                     break;
-                //  case 'beat-unit-dot' not supported
+                case 'beat-unit-dot':
+                    dots++;
+                    break;
                 //  case 'beat-unit-tied' not supported
                 case 'per-minute':
                     perMinute = Number.parseFloat(c.innerText);
@@ -2280,7 +2286,9 @@ export class MusicXmlImporter extends ScoreImporter {
         if (unit !== null && perMinute > 0) {
             const tempoAutomation: Automation = new Automation();
             tempoAutomation.type = AutomationType.Tempo;
-            tempoAutomation.value = perMinute * (unit / 4);
+            // alphaTab tempos are quarter notes per minute
+            const quartersPerUnit = (MidiUtils.toTicks(unit) / MidiUtils.QuarterTime) * (2 - Math.pow(0.5, dots));
+            tempoAutomation.value = perMinute * quartersPerUnit;
             tempoAutomation.ratioPosition = ratioPosition;
 
             if (!this._hasSameTempo(masterBar, tempoAutomation)) {
