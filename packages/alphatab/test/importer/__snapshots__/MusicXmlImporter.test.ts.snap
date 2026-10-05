@@ -6,7 +6,6 @@ Map {
   "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 1,
       "tempoautomations" => [
         Map {
           "islinear" => false,
@@ -86,7 +85,6 @@ Map {
   "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 1,
       "timesignaturecommon" => true,
       "tempoautomations" => [
         Map {
@@ -101,87 +99,70 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 2,
       "start" => 3840,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 3,
       "start" => 7680,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 4,
       "start" => 11520,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 5,
       "start" => 15360,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 6,
       "start" => 19200,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 7,
       "start" => 23040,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 8,
       "start" => 26880,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 9,
       "start" => 30720,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 10,
       "start" => 34560,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 11,
       "start" => 38400,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 12,
       "start" => 42240,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 13,
       "start" => 46080,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 14,
       "start" => 49920,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 15,
       "start" => 53760,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 16,
       "start" => 57600,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 17,
       "start" => 61440,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 18,
       "start" => 65280,
     },
   ],
@@ -594,7 +575,6 @@ Map {
   "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 1,
       "tempoautomations" => [
         Map {
           "islinear" => false,
@@ -763,11 +743,9 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 1,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 2,
       "start" => 3840,
     },
     Map {
@@ -777,7 +755,6 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 3,
       "start" => 7680,
     },
   ],
@@ -1100,7 +1077,6 @@ Map {
   "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 1,
       "tempoautomations" => [
         Map {
           "islinear" => false,
@@ -1114,12 +1090,10 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 2,
       "start" => 3840,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 3,
       "start" => 7680,
     },
   ],
@@ -1393,7 +1367,6 @@ Map {
   "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 1,
       "timesignaturecommon" => true,
       "tempoautomations" => [
         Map {
@@ -1408,7 +1381,6 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 2,
       "start" => 3840,
     },
   ],
@@ -1995,7 +1967,6 @@ Map {
   "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 1,
       "timesignaturecommon" => true,
       "tempoautomations" => [
         Map {
@@ -3062,11 +3033,9 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 1,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 2,
       "start" => 3840,
     },
     Map {
@@ -3076,7 +3045,6 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 3,
       "start" => 7680,
     },
   ],
@@ -3399,7 +3367,6 @@ Map {
   "masterbars" => [
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 1,
       "tempoautomations" => [
         Map {
           "islinear" => false,
@@ -3413,12 +3380,10 @@ Map {
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 2,
       "start" => 3840,
     },
     Map {
       "__kind" => "MasterBar",
-      "custombarnumber" => 3,
       "start" => 7680,
     },
   ],

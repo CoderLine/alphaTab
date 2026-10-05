@@ -211,6 +211,11 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private _currentBarNumberDisplayPart?: BarNumberDisplay;
     private _currentBarNumberDisplayBar?: BarNumberDisplay;
+    /**
+     * The bar number the next (non-implicit) master bar gets by sequential counting.
+     * Used to only store custom bar numbers where the measure number differs from it.
+     */
+    private _nextBarNumber: number = 1;
 
     private _divisionsPerQuarterNote: number = 1;
     private _currentDynamics = DynamicValue.F;
@@ -228,6 +233,7 @@ export class MusicXmlImporter extends ScoreImporter {
             throw new UnsupportedFormatError('Unsupported format', e as Error);
         }
         this._score = new Score();
+        this._nextBarNumber = 1;
         this._score.stylesheet.hideDynamics = true;
 
         this._parseDom(dom);
@@ -920,11 +926,17 @@ export class MusicXmlImporter extends ScoreImporter {
             if (implicit) {
                 newMasterBar.isAnacrusis = true;
             } else {
+                // only store custom numbers which differ from the sequential counting
+                // (same counting as Score.finish: implicit bars do not count, custom texts do)
                 const number = Number.parseInt(measureNumber, 10);
                 if (!Number.isNaN(number)) {
-                    newMasterBar.customBarNumber = number;
+                    if (number !== this._nextBarNumber) {
+                        newMasterBar.customBarNumber = number;
+                    }
+                    this._nextBarNumber = number + 1;
                 } else {
                     newMasterBar.customBarNumberText = measureNumber;
+                    this._nextBarNumber++;
                 }
             }
 
