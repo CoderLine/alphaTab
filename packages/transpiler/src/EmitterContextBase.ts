@@ -241,7 +241,14 @@ export default class EmitterContextBase {
             enclosingClass.isStatic === true &&
             !this._enclosingClassIsWrapper(expr, enclosingClass.name)
         ) {
-            return `${enclosingClass.name}.${csSymbol.name}`;
+            // Same file: same namespace, the wrapper name is enough (like _resolveTopLevelWrapperName).
+            // Other file: the wrapper might live in another namespace, fully qualify it.
+            const declFile = csSymbol.tsNode?.getSourceFile();
+            const isSameFile = !!declFile && expr.tsNode?.getSourceFile() === declFile;
+            const wrapperName = isSameFile
+                ? enclosingClass.name
+                : this.getFullName(enclosingClass, expr) || enclosingClass.name;
+            return `${wrapperName}.${csSymbol.name}`;
         }
         return csSymbol.name;
     }

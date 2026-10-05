@@ -5,7 +5,7 @@ import * as csf from '../ir/IrFactory';
 import { createLazyTypeRef } from '../TransformerHelpers';
 import { AlphaTabCore } from '../typeRegistry';
 import { makeMemberAccess } from './ExprHelpers';
-import { makeParameter } from './Members';
+import { makeParameter, visitTopLevelFunctionDeclaration } from './Members';
 
 export function visitFunctionExpression(state: AstTransformer, parent: cs.Node, expression: ts.FunctionExpression) {
     if (expression.name) {
@@ -92,6 +92,11 @@ export function visitArrowExpression(state: AstTransformer, parent: cs.Node, exp
 }
 
 export function visitFunctionDeclaration(state: AstTransformer, parent: cs.Node, expression: ts.FunctionDeclaration) {
+    // top-level functions are emitted as static methods of the per-file <FileName>Globals wrapper
+    if (cs.isClassDeclaration(parent)) {
+        return visitTopLevelFunctionDeclaration(state, parent, expression);
+    }
+
     const localFunction: cs.LocalFunctionDeclaration = {
         name: (expression.name as ts.Identifier)?.text,
         nodeType: cs.SyntaxKind.LocalFunction,
