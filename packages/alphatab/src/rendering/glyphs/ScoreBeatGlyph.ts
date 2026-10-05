@@ -447,7 +447,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (n.accentuated === AccentuationType.Tenuto && !belowBeatEffects.has('Tenuto')) {
             outsideBeatEffects.set('Tenuto', new AccentuationGlyph(0, 0, n));
         }
-        if (n.showStringNumber && n.isStringed) {
+        if (n.showStringNumber && !Number.isNaN(n.string)) {
             let container: StringNumberContainerGlyph;
             if (!aboveBeatEffects.has('StringNumber')) {
                 container = new StringNumberContainerGlyph(0, 0);

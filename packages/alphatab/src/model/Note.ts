@@ -217,11 +217,14 @@ export class Note {
      * Gets or sets the string number where the note is placed.
      * 1 is the lowest string on the guitar and the bottom line on the tablature.
      * It then increases the the number of strings on available on the track.
+     * On pitched notes (no fret) the string is only an annotation shown via {@link showStringNumber}
+     * and has no effect on playback. Staves without tuning assume a standard 6 string instrument for this case.
      */
     public string: number = Number.NaN;
 
     /**
      * Gets or sets whether the string number for this note should be shown.
+     * For pitched notes this requires {@link string} to be set.
      */
     public showStringNumber: boolean = false;
 
@@ -637,6 +640,20 @@ export class Note {
             return staff.tuning[staff.tuning.length - (noteString - 1) - 1];
         }
         return 0;
+    }
+
+    /**
+     * The number of strings assumed for string number annotations on staves without tuning.
+     */
+    private static readonly _defaultAnnotationStringCount: number = 6;
+
+    /**
+     * Gets the number of strings to which {@link string} relates on the given staff.
+     * Staves without tuning assume a standard 6 string instrument (used for string number annotations on pitched notes).
+     * @internal
+     */
+    public static getStringCount(staff: Staff): number {
+        return staff.tuning.length > 0 ? staff.tuning.length : Note._defaultAnnotationStringCount;
     }
 
     public get realValue(): number {

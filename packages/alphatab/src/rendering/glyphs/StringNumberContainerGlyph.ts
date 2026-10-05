@@ -1,5 +1,6 @@
 import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { Note } from '@coderline/alphatab/model/Note';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
 
 /**
@@ -20,13 +21,13 @@ export class StringNumberContainerGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const tuningLength = this.renderer.bar.staff.tuning.length;
+        const stringCount = Note.getStringCount(this.renderer.bar.staff);
 
         let y = 0;
         const circleHeight =
             this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.GuitarString0)! * this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
         for (const s of this._strings) {
-            const stringValue = tuningLength - s;
+            const stringValue = stringCount - s;
             const symbol = ((MusicFontSymbol.GuitarString1 as number) + stringValue) as MusicFontSymbol;
             CanvasHelper.fillMusicFontSymbolSafe(canvas,
                 cx + this.x,
