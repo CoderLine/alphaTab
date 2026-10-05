@@ -1,5 +1,7 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { Settings } from '@coderline/alphatab/Settings';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
 
@@ -58,6 +60,27 @@ describe('LayoutTests', () => {
         settings.display.startBar = 5;
         settings.display.barCount = 4;
         await VisualTestHelper.runVisualTest('layout/horizontal-layout-5to8.gp', settings);
+    });
+
+    it('horizontal-layout-scale', () => {
+        const totalWidths: number[] = [];
+        for (const scale of [1, 2]) {
+            const settings = new Settings();
+            settings.display.layoutMode = LayoutMode.Horizontal;
+            settings.display.scale = scale;
+            // padding is not scaled
+            settings.display.padding = [0];
+
+            const renderer = new ScoreRenderer(settings);
+            renderer.width = 1300;
+            renderer.renderFinished.on(e => {
+                totalWidths.push(e.totalWidth);
+            });
+            renderer.renderScore(ScoreLoader.loadAlphaTex('C4 D4 E4 F4 | C4 D4 E4 F4', settings), [0]);
+        }
+
+        expect(totalWidths.length).toBe(2);
+        expect(totalWidths[1]).toBeCloseTo(totalWidths[0] * 2, 0);
     });
 
     it('brackets-braces-none', async () => {
