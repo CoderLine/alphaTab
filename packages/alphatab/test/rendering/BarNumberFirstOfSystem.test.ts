@@ -89,7 +89,11 @@ class BarNumberFirstOfSystemHelper {
     public static collectSystemStarts(api: AlphaTabApiBase<unknown>): number[] {
         const wrapper = api.renderer as unknown as ScoreRendererWrapper;
         const inner = wrapper.instance as unknown as ScoreRenderer;
-        return inner.layout!.systems.map(s => s.firstBarIndex);
+        const starts: number[] = [];
+        for (const system of inner.layout!.systems) {
+            starts.push(system.firstBarIndex);
+        }
+        return starts;
     }
 
     /**
@@ -234,12 +238,14 @@ describe('BarNumberFirstOfSystem', () => {
         );
         score.tracks[0].staves[0].bars[5].scoreDisplay = { barNumber: BarNumberDisplay.AllBars };
         await BarNumberFirstOfSystemHelper.render(score, [600, 1300], api => {
-            const starts = BarNumberFirstOfSystemHelper.collectSystemStarts(api);
-            if (starts.indexOf(5) === -1) {
-                starts.push(5);
-                starts.sort((a, b) => a - b);
+            const starts = new Set<number>(BarNumberFirstOfSystemHelper.collectSystemStarts(api));
+            const expected: number[] = [];
+            for (const barIndex of BarNumberFirstOfSystemHelper.allBars(api)) {
+                if (barIndex === 5 || starts.has(barIndex)) {
+                    expected.push(barIndex);
+                }
             }
-            return starts;
+            return expected;
         });
     });
 
@@ -250,8 +256,14 @@ describe('BarNumberFirstOfSystem', () => {
             BarNumberDisplay.AllBars
         );
         score.tracks[0].staves[0].bars[5].scoreDisplay = { barNumber: BarNumberDisplay.Hide };
-        await BarNumberFirstOfSystemHelper.render(score, [600, 1300], api =>
-            BarNumberFirstOfSystemHelper.allBars(api).filter(i => i !== 5)
-        );
+        await BarNumberFirstOfSystemHelper.render(score, [600, 1300], api => {
+            const expected: number[] = [];
+            for (const barIndex of BarNumberFirstOfSystemHelper.allBars(api)) {
+                if (barIndex !== 5) {
+                    expected.push(barIndex);
+                }
+            }
+            return expected;
+        });
     });
 });
