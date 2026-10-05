@@ -1,6 +1,6 @@
 [versions]
-agp = "9.4.0"
-kotlin = "2.4.10"
+agp = "9.4.1"
+kotlin = "2.4.20"
 
 kotlinx-coroutines = "1.11.0"
 dokka = "2.2.0"
@@ -8,7 +8,7 @@ dokka = "2.2.0"
 espressoCore = "3.7.0"
 appcompat = "1.8.0"
 
-coreKtx = "1.19.0"
+coreKtx = "1.19.1"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 alphaskia = "3.5.147"
