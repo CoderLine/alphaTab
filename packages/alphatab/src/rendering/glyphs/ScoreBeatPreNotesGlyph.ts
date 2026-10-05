@@ -23,6 +23,13 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
  * @internal
  */
 export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
+    /**
+     * The initial spacing (in stave-spaces) before the first beat of a bar without accidentals.
+     * Behind Bars recommends 2.5sp after a clef/key signature (1sp after a barline), but the pre-beat
+     * glyphs already have a bit spacing, hence it is a reduced value.
+     */
+    private static readonly _initialBeatSpacing: number = 0.6;
+
     private _prebends: BendNoteHeadGroupGlyph | null = null;
     public get prebendNoteHeadOffset(): number {
         return this._prebends ? this._prebends.x + this._prebends.onTimeX : 0;
@@ -41,6 +48,15 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     public override doLayout(): void {
         if (!this.container.beat.isRest) {
             this._createGlyphs();
+        } else if (this.container.beat.index === 0 && !this.container.beat.isEmpty) {
+            // rests need the same initial spacing as notes (empty beats show no rest)
+            this.addNormal(
+                new SpacingGlyph(
+                    0,
+                    0,
+                    ScoreBeatPreNotesGlyph._initialBeatSpacing * this.renderer.smuflMetrics.oneStaffSpace
+                )
+            );
         }
         super.doLayout();
     }
@@ -176,7 +192,13 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
 
         if (this.container.beat.index === 0) {
             if (accidentals.isEmpty) {
-                this.addNormal(new SpacingGlyph(0, 0, 0.6 * this.renderer.smuflMetrics.oneStaffSpace));
+                this.addNormal(
+                    new SpacingGlyph(
+                        0,
+                        0,
+                        ScoreBeatPreNotesGlyph._initialBeatSpacing * this.renderer.smuflMetrics.oneStaffSpace
+                    )
+                );
             }  else{
                 accidentals.applyInitialNotePadding = true;
             }
