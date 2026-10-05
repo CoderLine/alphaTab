@@ -2463,6 +2463,13 @@ export class MusicXmlImporter extends ScoreImporter {
             newVoiceNumber = 0;
         }
 
+        // the first voice on the staff takes the initial voice which every bar is created with
+        if (packing.sortedRawVoices.length === 0) {
+            packing.sortedRawVoices.push(rawVoice);
+            packing.mapping.set(rawVoice, 0);
+            return bar.voices[0];
+        }
+
         // find sorted-insertion position
         let insertPos = packing.sortedRawVoices.length;
         for (let i = 0; i < packing.sortedRawVoices.length; i++) {
