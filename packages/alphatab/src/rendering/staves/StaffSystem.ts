@@ -1193,6 +1193,48 @@ export class StaffSystem {
         Profiler.end('layout.finalizeSystem');
     }
 
+    /**
+     * Calculates the additional vertical space needed between two adjacent staves so that
+     * their content (skylines) keeps at least the given padding.
+     * @param upper The upper staff (already positioned and finalized).
+     * @param lower The lower staff (finalized, positioned directly below `upper`).
+     * @param padding The minimum padding between the content of the staves.
+     * @returns The additional space to add between the staves (0 if the existing space is enough).
+     */
+    private static _requiredStaffContentPadding(upper: RenderStaff, lower: RenderStaff, padding: number): number {
+        const upperSky = upper.systemSkyline.downSky;
+        const lowerSky = lower.systemSkyline.upSky;
+
+        // the maximum combined extent of both staves into the space between them
+        let contentExtent = 0;
+        for (let i = 0, n = upperSky.segmentCount; i < n; i++) {
+            const h = upperSky.segmentHeight(i);
+            if (h > 0) {
+                const combined = h + lowerSky.maxHeightInRange(upperSky.segmentXStart(i), upperSky.segmentXEnd(i));
+                if (combined > contentExtent) {
+                    contentExtent = combined;
+                }
+            }
+        }
+        for (let i = 0, n = lowerSky.segmentCount; i < n; i++) {
+            const h = lowerSky.segmentHeight(i);
+            if (h > 0) {
+                const combined = h + upperSky.maxHeightInRange(lowerSky.segmentXStart(i), lowerSky.segmentXEnd(i));
+                if (combined > contentExtent) {
+                    contentExtent = combined;
+                }
+            }
+        }
+
+        if (contentExtent <= 0) {
+            return 0;
+        }
+
+        const available = lower.contentTop - upper.contentBottom;
+        const missing = contentExtent + padding - available;
+        return missing > 0 ? Math.ceil(missing) : 0;
+    }
+
     private _finalizeTrackGroups(onlyFirstGroup: boolean = false) {
         let currentY: number = 0;
         const settings = this.layout.renderer.settings;
@@ -1242,6 +1284,20 @@ export class StaffSystem {
                 }
 
                 if (staff.isVisible) {
+                    // ensure the content of adjacent staves keeps a minimum padding
+                    // (only adds space where the content actually comes too close)
+                    if (previousStaff !== undefined && !onlyFirstGroup) {
+                        const extra = StaffSystem._requiredStaffContentPadding(
+                            previousStaff,
+                            staff,
+                            smufl.staffContentPadding
+                        );
+                        if (extra > 0) {
+                            staff.y += extra;
+                            currentY += extra;
+                        }
+                    }
+
                     currentY += staff.height;
 
                     anyStaffVisible = true;

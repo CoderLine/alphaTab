@@ -155,6 +155,7 @@ export class EngravingSettingsSerializer {
         o.set("tuningglyphstringrowpadding", obj.tuningGlyphStringRowPadding);
         o.set("directionsscale", obj.directionsScale);
         o.set("multivoicedisplacednoteheadspacing", obj.multiVoiceDisplacedNoteHeadSpacing);
+        o.set("staffcontentpadding", obj.staffContentPadding);
         {
             const m = new Map<string, unknown>();
             o.set("stemflagheight", m);
@@ -442,6 +443,9 @@ export class EngravingSettingsSerializer {
                 return true;
             case "multivoicedisplacednoteheadspacing":
                 obj.multiVoiceDisplacedNoteHeadSpacing = v! as number;
+                return true;
+            case "staffcontentpadding":
+                obj.staffContentPadding = v! as number;
                 return true;
             case "stemflagheight":
                 obj.stemFlagHeight = new Map<Duration, number>();

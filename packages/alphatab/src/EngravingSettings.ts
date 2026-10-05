@@ -520,6 +520,7 @@ export class EngravingSettings {
         this.accidentalPadding = 0.1 * this.oneStaffSpace;
         this.preBeatGlyphSpacing = 0.6 * this.oneStaffSpace;
         this.multiVoiceDisplacedNoteHeadSpacing = 0.2 * this.oneStaffSpace;
+        this.staffContentPadding = 1 * this.oneStaffSpace;
 
         this.tuningGlyphStringRowPadding = 0.2 * this.oneStaffSpace;
     }
@@ -779,6 +780,15 @@ export class EngravingSettings {
      * in case of multi-voice note head overlaps.
      */
     public multiVoiceDisplacedNoteHeadSpacing = 0;
+
+    /**
+     * The minimum vertical padding between the content of two adjacent staves
+     * (e.g. a stem below one staff and a fret number above the next one).
+     * Additional space is only added between staves where their content would come closer than this.
+     * @remarks
+     * Behind Bars: characters should not be closer than 1/2 stave-space and never collide.
+     */
+    public staffContentPadding = 0;
 
     /**
      * Calculates the stem height for a note of the given duration.

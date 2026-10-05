@@ -401,6 +401,14 @@ export interface EngravingSettingsJson {
      */
     multiVoiceDisplacedNoteHeadSpacing?: number;
     /**
+     * The minimum vertical padding between the content of two adjacent staves
+     * (e.g. a stem below one staff and a fret number above the next one).
+     * Additional space is only added between staves where their content would come closer than this.
+     * @remarks
+     * Behind Bars: characters should not be closer than 1/2 stave-space and never collide.
+     */
+    staffContentPadding?: number;
+    /**
      * The space needed by flags on the stem-side from top to bottom to place.
      */
     stemFlagHeight?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
