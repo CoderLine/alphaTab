@@ -3,6 +3,8 @@ import { BendType } from '@coderline/alphatab/model/BendType';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
+import { TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
 
 describe('MusicXmlImporterTests', () => {
@@ -231,6 +233,23 @@ describe('MusicXmlImporterTests', () => {
     it('partwise-basic', async () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/partwise-basic.xml');
         expect(score).toMatchSnapshot();
+    });
+
+    it('tuning-alter-selects-accidental-mode', async () => {
+        let score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/tuning-accidentals.xml');
+        const tuning = score.tracks[0].staves[0].stringTuning;
+
+        expect(tuning.tunings).toEqual([
+            ModelUtils.getTuningForText('G3') - 1,
+            ModelUtils.getTuningForText('F3') + 1
+        ]);
+        expect(tuning.accidentalModes).toEqual([TuningAccidentalMode.Flat, TuningAccidentalMode.Sharp]);
+
+        score = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score));
+        expect(score.tracks[0].staves[0].stringTuning.accidentalModes).toEqual([
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Sharp
+        ]);
     });
 
     it('timewise-basic', async () => {

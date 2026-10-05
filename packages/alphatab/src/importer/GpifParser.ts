@@ -48,7 +48,7 @@ import type { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
 import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
-import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { Tuning, TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Voice } from '@coderline/alphatab/model/Voice';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
@@ -82,6 +82,12 @@ class GpifSound {
 
     public program: number = 0;
     public bank: number = 0;
+}
+
+interface GpifTuningData {
+    tunings: number[];
+    accidentalMode?: TuningAccidentalMode;
+    label: string;
 }
 
 /**
@@ -623,6 +629,7 @@ export class GpifParser {
         const track: Track = new Track();
         track.ensureStaveCount(1);
         const trackId: string = node.getAttribute('id');
+        let trackTuning: GpifTuningData | null = null;
 
         for (const c of node.childElements()) {
             switch (c.localName) {
@@ -664,7 +671,7 @@ export class GpifParser {
                     this._parseLyrics(trackId, c);
                     break;
                 case 'Properties':
-                    this._parseTrackProperties(track, c);
+                    trackTuning = this._parseTrackProperties(track, c) ?? trackTuning;
                     break;
                 case 'GeneralMidi':
                 case 'MidiConnection':
@@ -696,6 +703,19 @@ export class GpifParser {
                     break;
             }
         }
+
+        if (trackTuning) {
+            for (const staff of track.staves) {
+                if (staff.stringTuning.tunings.length === 0) {
+                    staff.stringTuning.tunings = trackTuning.tunings.slice();
+                    staff.stringTuning.accidentalModes = this._getTuningAccidentalModes(trackTuning);
+                    if (trackTuning.label.length > 0) {
+                        staff.stringTuning.name = trackTuning.label;
+                    }
+                }
+            }
+        }
+
         this._tracksById.set(trackId, track);
     }
 
@@ -962,11 +982,29 @@ export class GpifParser {
     }
 
     private _parseStaffProperties(staff: Staff, node: XmlNode): void {
-        for (const c of node.childElements()) {
+        const properties = Array.from(node.childElements());
+        const tuningProperty = properties.find(c => c.localName === 'Property' && c.getAttribute('name') === 'Tuning');
+        const tuningFlatProperty = properties.find(
+            c => c.localName === 'Property' && c.getAttribute('name') === 'TuningFlat'
+        );
+
+        for (const c of properties) {
+            if (c === tuningProperty || c === tuningFlatProperty) {
+                continue;
+            }
             switch (c.localName) {
                 case 'Property':
                     this._parseStaffProperty(staff, c);
                     break;
+            }
+        }
+
+        if (tuningProperty) {
+            const tuning = this._parseTuningProperty(tuningProperty, tuningFlatProperty);
+            staff.stringTuning.tunings = tuning.tunings;
+            staff.stringTuning.accidentalModes = this._getTuningAccidentalModes(tuning);
+            if (tuning.label.length > 0) {
+                staff.stringTuning.name = tuning.label;
             }
         }
     }
@@ -974,26 +1012,6 @@ export class GpifParser {
     private _parseStaffProperty(staff: Staff, node: XmlNode): void {
         const propertyName: string = node.getAttribute('name');
         switch (propertyName) {
-            case 'Tuning':
-                for (const c of node.childElements()) {
-                    switch (c.localName) {
-                        case 'Pitches':
-                            const tuningParts: string[] = GpifParser._splitSafe(
-                                node.findChildElement('Pitches')?.innerText
-                            );
-                            const tuning = new Array<number>(tuningParts.length);
-                            for (let i: number = 0; i < tuning.length; i++) {
-                                tuning[tuning.length - 1 - i] = GpifParser._parseIntSafe(tuningParts[i], 0);
-                            }
-                            staff.stringTuning.tunings = tuning;
-                            break;
-                        case 'Label':
-                            staff.stringTuning.name = c.innerText;
-                            break;
-                    }
-                }
-
-                break;
             case 'DiagramCollection':
             case 'ChordCollection':
                 this._parseDiagramCollectionForStaff(staff, node);
@@ -1150,29 +1168,30 @@ export class GpifParser {
         }
     }
 
-    private _parseTrackProperties(track: Track, node: XmlNode): void {
-        for (const c of node.childElements()) {
+    private _parseTrackProperties(track: Track, node: XmlNode): GpifTuningData | null {
+        const properties = Array.from(node.childElements());
+        const tuningProperty = properties.find(c => c.localName === 'Property' && c.getAttribute('name') === 'Tuning');
+        const tuningFlatProperty = properties.find(
+            c => c.localName === 'Property' && c.getAttribute('name') === 'TuningFlat'
+        );
+
+        for (const c of properties) {
+            if (c === tuningProperty || c === tuningFlatProperty) {
+                continue;
+            }
             switch (c.localName) {
                 case 'Property':
                     this._parseTrackProperty(track, c);
                     break;
             }
         }
+
+        return tuningProperty ? this._parseTuningProperty(tuningProperty, tuningFlatProperty) : null;
     }
 
     private _parseTrackProperty(track: Track, node: XmlNode): void {
         const propertyName: string = node.getAttribute('name');
         switch (propertyName) {
-            case 'Tuning':
-                const tuningParts: string[] = GpifParser._splitSafe(node.findChildElement('Pitches')?.innerText);
-                const tuning = new Array<number>(tuningParts.length);
-                for (let i: number = 0; i < tuning.length; i++) {
-                    tuning[tuning.length - 1 - i] = GpifParser._parseIntSafe(tuningParts[i], 0);
-                }
-                for (const staff of track.staves) {
-                    staff.stringTuning.tunings = tuning;
-                }
-                break;
             case 'DiagramCollection':
             case 'ChordCollection':
                 this._parseDiagramCollectionForTrack(track, node);
@@ -1184,6 +1203,40 @@ export class GpifParser {
                 }
                 break;
         }
+    }
+
+    private _parseTuningProperty(node: XmlNode, tuningFlatProperty: XmlNode | undefined): GpifTuningData {
+        const tuningParts: string[] = GpifParser._splitSafe(node.findChildElement('Pitches')?.innerText);
+        const tunings = new Array<number>(tuningParts.length);
+        for (let i: number = 0; i < tunings.length; i++) {
+            tunings[tunings.length - 1 - i] = GpifParser._parseIntSafe(tuningParts[i], 0);
+        }
+
+        const isFlat =
+            node.findChildElement('Flat') !== null ||
+            (tuningFlatProperty !== undefined && tuningFlatProperty.findChildElement('Enable') !== null);
+        return {
+            tunings,
+            accidentalMode: isFlat ? TuningAccidentalMode.Flat : undefined,
+            label: node.findChildElement('Label')?.innerText ?? ''
+        };
+    }
+
+    private _getTuningAccidentalModes(tuning: GpifTuningData): TuningAccidentalMode[] | undefined {
+        const accidentalMode = tuning.accidentalMode;
+        if (accidentalMode === undefined) {
+            return undefined;
+        }
+        let hasEnharmonicTuning = false;
+        const modes = tuning.tunings.map(value => {
+            const flatName = Tuning.getTextForTuning(value, false, TuningAccidentalMode.Flat);
+            const sharpName = Tuning.getTextForTuning(value, false, TuningAccidentalMode.Sharp);
+            if (flatName !== sharpName) {
+                hasEnharmonicTuning = true;
+            }
+            return flatName === sharpName ? TuningAccidentalMode.Flat : accidentalMode;
+        });
+        return hasEnharmonicTuning ? modes : undefined;
     }
 
     private _parseGeneralMidi(track: Track, node: XmlNode): void {

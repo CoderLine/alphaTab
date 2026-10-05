@@ -5,6 +5,7 @@
 // </auto-generated>
 import { Tuning } from "@coderline/alphatab/model/Tuning";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { TuningAccidentalMode } from "@coderline/alphatab/model/Tuning";
 /**
  * @internal
  */
@@ -23,6 +24,9 @@ export class TuningSerializer {
         o.set("isstandard", obj.isStandard);
         o.set("name", obj.name);
         o.set("tunings", obj.tunings);
+        if (obj.accidentalModes !== undefined) {
+            o.set("accidentalmodes", obj.accidentalModes);
+        }
         return o;
     }
     public static setProperty(obj: Tuning, property: string, v: unknown): boolean {
@@ -35,6 +39,11 @@ export class TuningSerializer {
                 return true;
             case "tunings":
                 obj.tunings = v! as number[];
+                return true;
+            case "accidentalmodes":
+                if (v) {
+                    obj.accidentalModes = (v as number[]).map(i => JsonHelper.parseEnum<TuningAccidentalMode>(i, TuningAccidentalMode)!);
+                }
                 return true;
         }
         return false;

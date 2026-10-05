@@ -1,5 +1,5 @@
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { Tuning, TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
@@ -81,9 +81,23 @@ export class TuningGlyph extends GlyphGroup {
         const circleHeight = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.GuitarString0)! * circleScale;
 
         this.renderer.scoreRenderer.canvas!.font = res.elementFonts.get(NotationElement.GuitarTuning)!;
+        const hasExplicitSharp = tuning.accidentalModes?.some(mode => mode === TuningAccidentalMode.Sharp) ?? false;
+        let tuningLabelWidth: number;
+        if (hasExplicitSharp && !tuning.isStandard && tuning.tunings.length > 0) {
+            tuningLabelWidth = 0;
+            for (let i = 0; i < tuning.tunings.length; i++) {
+                const labelWidth = this.renderer.scoreRenderer.canvas!.measureText(
+                    ` = ${Tuning.getTextForTuning(tuning.tunings[i], false, tuning.getAccidentalMode(i))}`
+                ).width;
+                if (labelWidth > tuningLabelWidth) {
+                    tuningLabelWidth = labelWidth;
+                }
+            }
+        } else {
+            tuningLabelWidth = this.renderer.scoreRenderer.canvas!.measureText(' = Gb').width;
+        }
         const stringColumnWidth =
-            (circleHeight + this.renderer.scoreRenderer.canvas!.measureText(' = Gb').width) *
-            res.engravingSettings.tuningGlyphStringColumnScale;
+            (circleHeight + tuningLabelWidth) * res.engravingSettings.tuningGlyphStringColumnScale;
 
         this.width = Math.max(
             this.renderer.scoreRenderer.canvas!.measureText(this._trackLabel).width,
@@ -100,7 +114,11 @@ export class TuningGlyph extends GlyphGroup {
                 const symbol = ((MusicFontSymbol.GuitarString0 as number) + (i + 1)) as MusicFontSymbol;
                 this.addGlyph(new MusicFontGlyph(currentX, currentY + circleHeight, circleScale, symbol));
 
-                const str: string = ` = ${Tuning.getTextForTuning(tuning.tunings[i], false)}`;
+                const str: string = ` = ${Tuning.getTextForTuning(
+                    tuning.tunings[i],
+                    false,
+                    tuning.getAccidentalMode(i)
+                )}`;
                 this.addGlyph(
                     new TextGlyph(
                         currentX + circleHeight,

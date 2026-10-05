@@ -95,47 +95,67 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
         } else if (prop.type.isArray) {
             const arrayItemType = prop.type.arrayItemType!;
-            const collectionAddMethod =
-                (prop.jsDocTags.filter(t => t.tagName.text === 'json_add').map(t => t.comment ?? '')[0] as string) ??
-                `${fieldName}.push`;
-
-            // obj.fieldName = [];
-            // for(const i of value) {
-            //    obj.addFieldName(Type.FromJson(i));
-            // }
-            // or
-            // for(const __li of value) {
-            //    obj.fieldName.push(Type.FromJson(__li));
-            // }
-
-            const itemSerializer = `${arrayItemType.typeAsString}Serializer`;
-            importer(itemSerializer, findSerializerModule(arrayItemType));
-            importer(arrayItemType.typeAsString, arrayItemType.modulePath);
-
-            const loopItems = [
-                createNodeFromSource<ts.ExpressionStatement>(
-                    `obj.${fieldName} = [];`,
+            if (arrayItemType.isEnumType) {
+                importer(arrayItemType.typeAsString, arrayItemType.modulePath);
+                importer('JsonHelper', '@coderline/alphatab/io/JsonHelper');
+                const parseEnumArray = createNodeFromSource<ts.ExpressionStatement>(
+                    `obj.${fieldName} = (v as number[]).map(i => JsonHelper.parseEnum<${arrayItemType.typeAsString}>(i, ${arrayItemType.typeAsString})!);`,
                     ts.SyntaxKind.ExpressionStatement
-                ),
-                createNodeFromSource<ts.ForOfStatement>(
-                    `for(const o of (v as (Map<string, unknown> | null)[])) {
-                        const i = new ${arrayItemType.typeAsString}();
-                        ${itemSerializer}.fromJson(i, o);
-                        obj.${collectionAddMethod}(i)
-                    }`,
-                    ts.SyntaxKind.ForOfStatement
-                )
-            ];
-
-            if (prop.type.isNullable || prop.type.isOptional) {
-                caseStatements.push(
-                    ts.factory.createIfStatement(
-                        ts.factory.createIdentifier('v'),
-                        ts.factory.createBlock(loopItems, true)
-                    )
                 );
+                if (prop.type.isNullable || prop.type.isOptional) {
+                    caseStatements.push(
+                        ts.factory.createIfStatement(
+                            ts.factory.createIdentifier('v'),
+                            ts.factory.createBlock([parseEnumArray], true)
+                        )
+                    );
+                } else {
+                    caseStatements.push(parseEnumArray);
+                }
             } else {
-                caseStatements.push(...loopItems);
+                const collectionAddMethod =
+                    (prop.jsDocTags.filter(t => t.tagName.text === 'json_add').map(t => t.comment ?? '')[
+                        0
+                    ] as string) ?? `${fieldName}.push`;
+
+                // obj.fieldName = [];
+                // for(const i of value) {
+                //    obj.addFieldName(Type.FromJson(i));
+                // }
+                // or
+                // for(const __li of value) {
+                //    obj.fieldName.push(Type.FromJson(__li));
+                // }
+
+                const itemSerializer = `${arrayItemType.typeAsString}Serializer`;
+                importer(itemSerializer, findSerializerModule(arrayItemType));
+                importer(arrayItemType.typeAsString, arrayItemType.modulePath);
+
+                const loopItems = [
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `obj.${fieldName} = [];`,
+                        ts.SyntaxKind.ExpressionStatement
+                    ),
+                    createNodeFromSource<ts.ForOfStatement>(
+                        `for(const o of (v as (Map<string, unknown> | null)[])) {
+                            const i = new ${arrayItemType.typeAsString}();
+                            ${itemSerializer}.fromJson(i, o);
+                            obj.${collectionAddMethod}(i)
+                        }`,
+                        ts.SyntaxKind.ForOfStatement
+                    )
+                ];
+
+                if (prop.type.isNullable || prop.type.isOptional) {
+                    caseStatements.push(
+                        ts.factory.createIfStatement(
+                            ts.factory.createIdentifier('v'),
+                            ts.factory.createBlock(loopItems, true)
+                        )
+                    );
+                } else {
+                    caseStatements.push(...loopItems);
+                }
             }
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
         } else if (prop.type.isMap) {

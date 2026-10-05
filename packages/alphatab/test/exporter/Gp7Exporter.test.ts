@@ -13,6 +13,7 @@ import { TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentAr
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Score } from '@coderline/alphatab/model/Score';
+import { TuningAccidentalMode } from '@coderline/alphatab/model/Tuning';
 import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
@@ -722,5 +723,40 @@ describe('Gp7ExporterTest', () => {
         expect(actualInstrumentSet.elements.length).toBe(expectedInstrumentSet.elements.length);
 
         // await TestPlatform.saveFile('test-data/exporter/articulations.exported.gp', exported);
+    });
+
+    it('tuning-accidental-mode', () => {
+        const sharpScore = ScoreLoader.loadAlphaTex('\\tuning F#4 B3 G#3 D3 A2 E2 . r.4');
+        const sharpGpif = readExportedGpif(exportGp7(sharpScore));
+        expect(sharpGpif).not.toContain('<Flat');
+        expect(sharpGpif).not.toContain('TuningFlat');
+        const importedSharpScore = prepareImporterWithBytes(exportGp7(sharpScore)).readScore();
+        const importedSharpTuning = importedSharpScore.tracks[0].staves[0].stringTuning;
+        expect(importedSharpTuning.accidentalModes).toBeUndefined();
+        expect(Array.from({ length: importedSharpTuning.tunings.length }, (_, i) => importedSharpTuning.getAccidentalMode(i))).toEqual(
+            new Array<TuningAccidentalMode>(importedSharpTuning.tunings.length).fill(TuningAccidentalMode.Flat)
+        );
+
+        const flatScore = ScoreLoader.loadAlphaTex('\\tuning Gb4 Bb3 Eb3 Ab2 Db2 Gb2 . r.4');
+        const flatGpif = readExportedGpif(exportGp7(flatScore));
+        expect(flatGpif).toContain('<Flat');
+        expect(flatGpif).toContain('TuningFlat');
+
+        const mixedScore = ScoreLoader.loadAlphaTex('\\tuning F#4 B3 G#3 D3 Ab2 E2 . r.4');
+        expect(mixedScore.tracks[0].staves[0].stringTuning.accidentalModes).toEqual([
+            TuningAccidentalMode.Sharp,
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Sharp,
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Flat,
+            TuningAccidentalMode.Flat
+        ]);
+        const mixedGpif = readExportedGpif(exportGp7(mixedScore));
+        expect(mixedGpif).toContain('<Flat');
+        expect(mixedGpif).toContain('TuningFlat');
+        const importedMixedScore = prepareImporterWithBytes(exportGp7(mixedScore)).readScore();
+        expect(importedMixedScore.tracks[0].staves[0].stringTuning.accidentalModes).toEqual(
+            new Array<TuningAccidentalMode>(6).fill(TuningAccidentalMode.Flat)
+        );
     });
 });

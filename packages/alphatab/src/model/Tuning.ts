@@ -1,4 +1,20 @@
 /**
+ * Lists the different accidental styles used to format tuning note names.
+ * @public
+ */
+export enum TuningAccidentalMode {
+    /**
+     * Use flat note names for enharmonic tuning notes.
+     */
+    Flat = 0,
+
+    /**
+     * Use sharp note names for enharmonic tuning notes.
+     */
+    Sharp = 1
+}
+
+/**
  * This public class represents a predefined string tuning.
  * @json
  * @json_strict
@@ -11,17 +27,27 @@ export class Tuning {
     private static _fourStrings: Tuning[] = [];
     private static _defaultTunings: Map<number, Tuning> = new Map();
 
-    public static readonly noteNames: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+    public static readonly flatNoteNames: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+    public static readonly sharpNoteNames: string[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    public static readonly noteNames: string[] = Tuning.flatNoteNames;
 
-    public static getTextForTuning(tuning: number, includeOctave: boolean): string {
-        const parts = Tuning.getTextPartsForTuning(tuning);
+    public static getTextForTuning(
+        tuning: number,
+        includeOctave: boolean,
+        accidentalMode: TuningAccidentalMode = TuningAccidentalMode.Flat
+    ): string {
+        const parts = Tuning.getTextPartsForTuning(tuning, -1, accidentalMode);
         return includeOctave ? parts.join('') : parts[0];
     }
 
-    public static getTextPartsForTuning(tuning: number, octaveShift: number = -1): string[] {
+    public static getTextPartsForTuning(
+        tuning: number,
+        octaveShift: number = -1,
+        accidentalMode: TuningAccidentalMode = TuningAccidentalMode.Flat
+    ): string[] {
         const octave: number = (tuning / 12) | 0;
         const note: number = tuning % 12;
-        const notes: string[] = Tuning.noteNames;
+        const notes = accidentalMode === TuningAccidentalMode.Sharp ? Tuning.sharpNoteNames : Tuning.flatNoteNames;
         return [notes[note], (octave + octaveShift).toString()];
     }
 
@@ -33,7 +59,7 @@ export class Tuning {
     public static getDefaultTuningFor(stringCount: number): Tuning | null {
         if (Tuning._defaultTunings.has(stringCount)) {
             const d = Tuning._defaultTunings.get(stringCount)!;
-            return new Tuning(d.name, d.tunings, d.isStandard);
+            return new Tuning(d.name, d.tunings, d.isStandard, d.accidentalModes);
         }
         return null;
     }
@@ -134,7 +160,7 @@ export class Tuning {
                 }
             }
             if (equals) {
-                return new Tuning(tuning.name, tuning.tunings, tuning.isStandard);
+                return new Tuning(tuning.name, tuning.tunings, tuning.isStandard, tuning.accidentalModes);
             }
         }
         return null;
@@ -156,23 +182,46 @@ export class Tuning {
     public tunings: number[];
 
     /**
+     * Gets or sets the optional accidental style used to display each string tuning.
+     * The entries use the same top-string-first order as {@link tunings}.
+     * If omitted, the legacy display fallback is used.
+     * @since 1.10.0
+     */
+    public accidentalModes: TuningAccidentalMode[] | undefined;
+
+    /**
      * Initializes a new instance of the {@link Tuning} class.
      * @param name The name.
      * @param tuning The tuning.
      * @param isStandard if set to`true`[is standard].
+     * @param accidentalModes The accidental style for each tuning value.
      */
-    public constructor(name: string = '', tuning: number[] | null = null, isStandard: boolean = false) {
+    public constructor(
+        name: string = '',
+        tuning: number[] | null = null,
+        isStandard: boolean = false,
+        accidentalModes?: TuningAccidentalMode[] | null
+    ) {
         this.isStandard = isStandard;
         this.name = name;
         this.tunings = tuning ?? [];
+        this.accidentalModes = accidentalModes?.slice();
+    }
+
+    /**
+     * Gets the accidental style for a string, falling back to {@link TuningAccidentalMode.Flat} for missing entries.
+     * @param index The top-string-first tuning index.
+     */
+    public getAccidentalMode(index: number): TuningAccidentalMode {
+        return this.accidentalModes?.[index] ?? TuningAccidentalMode.Flat;
     }
 
     public reset() {
         this.isStandard = false;
         this.name = '';
         this.tunings = [];
+        this.accidentalModes = undefined;
     }
-    
 
     /**
      * Tries to detect the name and standard flag of the tuning from a known tuning list based
