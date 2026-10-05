@@ -4,6 +4,9 @@ import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
+import { FlatMidiEventGenerator, FlatTempoEvent } from 'test/audio/FlatMidiEventGenerator';
 
 describe('MusicXmlImporterTests', () => {
     it('track-volume', async () => {
@@ -45,11 +48,12 @@ describe('MusicXmlImporterTests', () => {
             'test-data/musicxml3/first-bar-tempo.musicxml'
         );
 
-        expect(score.tempo).toBe(60);
+        // dotted quarter = 60
+        expect(score.tempo).toBe(90);
         expect(score.masterBars[0].tempoAutomations.length).toBe(1);
-        expect(score.masterBars[0].tempoAutomations[0]?.value).toBe(60);
+        expect(score.masterBars[0].tempoAutomations[0]?.value).toBe(90);
         expect(score.masterBars[1].tempoAutomations.length).toBe(1);
-        expect(score.masterBars[1].tempoAutomations[0].value).toBe(60);
+        expect(score.masterBars[1].tempoAutomations[0].value).toBe(90);
     });
     it('tie-destination', async () => {
         let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
@@ -363,6 +367,78 @@ describe('MusicXmlImporterTests', () => {
             expect(score.tracks[1].staves[0].bars[0].barNumberDisplay).toBe(BarNumberDisplay.Hide);
             expect(score.tracks[1].staves[0].bars[1].barNumberDisplay).toBeUndefined();
             expect(score.tracks[1].staves[0].bars[3].barNumberDisplay).toBe(BarNumberDisplay.Hide);
+        });
+    });
+
+    describe('metronome-tempo', () => {
+        function loadMetronome(beatUnit: string, dots: number, perMinute: number, soundTempo: number = -1): Score {
+            let beatUnitDots = '';
+            for (let i = 0; i < dots; i++) {
+                beatUnitDots += '<beat-unit-dot/>';
+            }
+            const sound = soundTempo > 0 ? `<sound tempo="${soundTempo}"/>` : '';
+            const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list><score-part id="P1"><part-name>Music</part-name></score-part></part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>2</divisions>
+        <time><beats>6</beats><beat-type>8</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <direction placement="above">
+        <direction-type>
+          <metronome><beat-unit>${beatUnit}</beat-unit>${beatUnitDots}<per-minute>${perMinute}</per-minute></metronome>
+        </direction-type>
+        ${sound}
+      </direction>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>3</duration><type>quarter</type><dot/></note>
+      <note><pitch><step>D</step><octave>4</octave></pitch><duration>3</duration><type>quarter</type><dot/></note>
+    </measure>
+  </part>
+</score-partwise>`;
+            return MusicXmlImporterTestHelper.prepareImporterWithBytes(IOHelper.stringToBytes(xml)).readScore();
+        }
+
+        function expectTempo(score: Score, expected: number) {
+            expect(score.masterBars[0].tempoAutomations.length).toBe(1);
+            expect(score.masterBars[0].tempoAutomations[0].value).toBe(expected);
+            expect(score.tempo).toBe(expected);
+        }
+
+        it('quarter', () => expectTempo(loadMetronome('quarter', 0, 120), 120));
+        it('eighth', () => expectTempo(loadMetronome('eighth', 0, 120), 60));
+        it('16th', () => expectTempo(loadMetronome('16th', 0, 240), 60));
+        it('half', () => expectTempo(loadMetronome('half', 0, 60), 120));
+        it('whole', () => expectTempo(loadMetronome('whole', 0, 30), 120));
+        it('breve', () => expectTempo(loadMetronome('breve', 0, 15), 120));
+
+        it('dotted-quarter', () => expectTempo(loadMetronome('quarter', 1, 40), 60));
+        it('dotted-eighth', () => expectTempo(loadMetronome('eighth', 1, 120), 90));
+        it('dotted-half', () => expectTempo(loadMetronome('half', 1, 60), 180));
+        it('double-dotted-quarter', () => expectTempo(loadMetronome('quarter', 2, 40), 70));
+
+        it('sound-tempo-matching', () => expectTempo(loadMetronome('eighth', 0, 120, 60), 60));
+        it('sound-tempo-precedence', () => expectTempo(loadMetronome('eighth', 0, 120, 200), 200));
+
+        it('playback-tempo', () => {
+            const score = loadMetronome('eighth', 0, 120);
+
+            const handler = new FlatMidiEventGenerator();
+            const generator = new MidiFileGenerator(score, null, handler);
+            generator.generate();
+
+            const tempoChanges: FlatTempoEvent[] = [];
+            for (const evt of handler.midiEvents) {
+                if (evt instanceof FlatTempoEvent) {
+                    tempoChanges.push(evt as FlatTempoEvent);
+                }
+            }
+
+            expect(tempoChanges.length).toBe(1);
+            expect(tempoChanges[0].tick).toBe(0);
+            expect(tempoChanges[0].tempo).toBe(60);
         });
     });
 });
