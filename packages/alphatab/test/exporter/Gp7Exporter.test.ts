@@ -63,15 +63,13 @@ describe('Gp7ExporterTest', () => {
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${fileName}>`, ignoreKeys);
     }
 
-    async function testRoundTripFolderEqual(
-        name: string,
-        ignoredFiles?: string[],
-        ignoreKeys: string[] | null = null
-    ): Promise<void> {
+    // other formats (e.g. MusicXML) have too many differences to the Guitar Pro data model for a full roundtrip
+    const roundTripExtensions = ['.gp3', '.gp4', '.gp5', '.gpx', '.gp'];
+
+    async function testRoundTripFolderEqual(name: string, ignoreKeys: string[] | null = null): Promise<void> {
         const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
-        const ignoredFilesLookup = new Set<string>(ignoredFiles);
         for (const file of files) {
-            if (!ignoredFilesLookup.has(file) && !file.endsWith('.png')) {
+            if (roundTripExtensions.some(e => file.endsWith(e))) {
                 await testRoundTripEqual(`${name}/${file}`, ignoreKeys);
             }
         }
@@ -84,7 +82,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('visual-effects-and-annotations', async () => {
-        await testRoundTripFolderEqual('visual-tests/effects-and-annotations', ['hidden-dots.mxml']);
+        await testRoundTripFolderEqual('visual-tests/effects-and-annotations');
     });
 
     it('visual-general', async () => {
@@ -96,11 +94,11 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('visual-layout', async () => {
-        await testRoundTripFolderEqual('visual-tests/layout', ['extended-barlines.xml']);
+        await testRoundTripFolderEqual('visual-tests/layout');
     });
 
     it('visual-music-notation', async () => {
-        await testRoundTripFolderEqual('visual-tests/music-notation', ['barlines.xml']);
+        await testRoundTripFolderEqual('visual-tests/music-notation');
     });
 
     it('visual-notation-legend', async () => {
@@ -214,7 +212,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('gp8', async () => {
-        await testRoundTripFolderEqual('guitarpro8', undefined, ['bendpoints', 'bendtype']);
+        await testRoundTripFolderEqual('guitarpro8', ['bendpoints', 'bendtype']);
     });
 
     // Regression: MusicXML using MuseScore's `staff*4+localVoice` convention
