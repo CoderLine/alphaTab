@@ -556,6 +556,7 @@ describe('LayoutTests', () => {
     it('barnumbers', async () => {
         await VisualTestHelper.runVisualTestTex(
             `
+            \\defaultBarNumberDisplay allBars
             // anacrusis (no number)
             \\ac 
                 C4.1 

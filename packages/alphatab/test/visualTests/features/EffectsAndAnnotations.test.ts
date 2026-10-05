@@ -179,6 +179,7 @@ describe('EffectsAndAnnotationsTests', () => {
         const settings = new Settings();
         const score = ScoreLoader.loadAlphaTex(
             `
+        \\defaultBarNumberDisplay allBars
         \\tempo 120
         \\track "pno."
         :8 G4 { spd } G4 G4 { spu } G4 G4 { spd } G4 {spu} G4 G4 {spd} |

@@ -2703,7 +2703,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(Atnf.meta('showSingleStaffBrackets'));
         }
 
-        if (stylesheet.barNumberDisplay !== BarNumberDisplay.AllBars) {
+        if (stylesheet.barNumberDisplay !== BarNumberDisplay.FirstOfSystem) {
             nodes.push(Atnf.identMeta('defaultBarNumberDisplay', BarNumberDisplay[stylesheet.barNumberDisplay]));
         }
 
