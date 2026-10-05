@@ -27,12 +27,16 @@ jobs:
     # Skip maintainers and bot-authored submissions:
     #   • OWNER / COLLABORATOR / MEMBER → maintainers, trusted; hardcoded
     #     so a maintainer submission doesn't even start a job.
-    #   • user.type == 'Bot' → Dependabot, Renovate, and similar. They
-    #     don't fill in contributor templates and shouldn't be nudged.
+    #   • Dependency/automation bots (Dependabot, Renovate, Actions) →
+    #     they don't fill in contributor templates and shouldn't be nudged.
+    #     This is an explicit allowlist, NOT a blanket `user.type == 'Bot'`
+    #     check: AI agents acting as GitHub Apps (e.g. Devin) are also
+    #     type 'Bot' and must go through triage like everyone else.
     # ─────────────────────────────────────────────────────────────────
     if: >-
-      github.event.issue.user.type != 'Bot'
-      && github.event.pull_request.user.type != 'Bot'
+      !contains(fromJSON('["dependabot[bot]","renovate[bot]","github-actions[bot]"]'),
+                github.event.issue.user.login
+                || github.event.pull_request.user.login)
       && !contains(fromJSON('["OWNER","COLLABORATOR","MEMBER"]'),
                    github.event.issue.author_association
                    || github.event.pull_request.author_association)
