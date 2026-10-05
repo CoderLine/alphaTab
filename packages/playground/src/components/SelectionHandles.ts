@@ -24,6 +24,9 @@ injectStyles(
         transition: opacity 150ms ease-in-out;
         display: none;
     }
+    .at-selection-handle-end {
+        transform: translateX(-100%);
+    }
     .at-selection-handle:hover,
     .at-selection-handle.dragging {
         opacity: 1;
@@ -41,6 +44,7 @@ export class SelectionHandles implements Mountable {
     private endHandle: HTMLElement;
     private currentHighlight: alphaTab.PlaybackHighlightChangeEventArgs | undefined;
     private dragging: DragSide | undefined;
+    private dragAnchor: alphaTab.model.Beat | undefined;
     private unsubHighlight: () => void;
 
     private onMouseMove = (e: MouseEvent) => {
@@ -48,15 +52,13 @@ export class SelectionHandles implements Mountable {
             return;
         }
         e.preventDefault();
-        const beat = this.beatFromEvent(e);
-        if (!beat || !this.currentHighlight) {
+        const anchor = this.dragAnchor;
+        const beat = anchor ? this.beatFromEvent(e, anchor) : undefined;
+        // the API treats a range of a single beat as no selection, keep the last range instead
+        if (!anchor || !beat || beat === anchor) {
             return;
         }
-        if (this.dragging === 'start') {
-            this.api.highlightPlaybackRange(beat, this.currentHighlight.endBeat!);
-        } else {
-            this.api.highlightPlaybackRange(this.currentHighlight.startBeat!, beat);
-        }
+        this.api.highlightPlaybackRange(anchor, beat);
     };
 
     private onMouseUp = (e: MouseEvent) => {
@@ -93,6 +95,8 @@ export class SelectionHandles implements Mountable {
     private beginDrag(e: MouseEvent, side: DragSide): void {
         e.preventDefault();
         this.dragging = side;
+        // the opposite edge stays fixed while dragging
+        this.dragAnchor = side === 'start' ? this.currentHighlight?.endBeat : this.currentHighlight?.startBeat;
         this.viewportEl.classList.add('at-selection-handle-drag');
         const handle = side === 'start' ? this.startHandle : this.endHandle;
         handle.classList.add('dragging');
@@ -106,28 +110,31 @@ export class SelectionHandles implements Mountable {
         handle.classList.remove('dragging');
         this.viewportEl.classList.remove('at-selection-handle-drag');
         this.dragging = undefined;
+        this.dragAnchor = undefined;
     }
 
     private update(e: alphaTab.PlaybackHighlightChangeEventArgs): void {
         this.currentHighlight = e;
-        if (!e.startBeat || !e.endBeat) {
+        const blocks = e.highlightBlocks;
+        if (!e.startBeat || !e.endBeat || !blocks || blocks.length === 0) {
             this.startHandle.classList.remove('active');
             this.endHandle.classList.remove('active');
             return;
         }
-        const startBounds = e.startBeatBounds!;
-        const endBounds = e.endBeatBounds!;
+        // Align with the drawn highlight, which may extend to the bar edges.
+        const startBlock = blocks[0];
+        const endBlock = blocks[blocks.length - 1];
         this.startHandle.classList.add('active');
-        this.startHandle.style.left = `${startBounds.realBounds.x}px`;
-        this.startHandle.style.top = `${startBounds.barBounds.masterBarBounds.visualBounds.y}px`;
-        this.startHandle.style.height = `${startBounds.barBounds.masterBarBounds.visualBounds.h}px`;
+        this.startHandle.style.left = `${startBlock.x}px`;
+        this.startHandle.style.top = `${startBlock.y}px`;
+        this.startHandle.style.height = `${startBlock.h}px`;
         this.endHandle.classList.add('active');
-        this.endHandle.style.left = `${endBounds.realBounds.x + endBounds.realBounds.w}px`;
-        this.endHandle.style.top = `${endBounds.barBounds.masterBarBounds.visualBounds.y}px`;
-        this.endHandle.style.height = `${endBounds.barBounds.masterBarBounds.visualBounds.h}px`;
+        this.endHandle.style.left = `${endBlock.x + endBlock.w}px`;
+        this.endHandle.style.top = `${endBlock.y}px`;
+        this.endHandle.style.height = `${endBlock.h}px`;
     }
 
-    private beatFromEvent(e: MouseEvent): alphaTab.model.Beat | undefined {
+    private beatFromEvent(e: MouseEvent, anchor: alphaTab.model.Beat): alphaTab.model.Beat | undefined {
         const surface = this.canvasEl.querySelector<HTMLElement>('.at-surface');
         if (!surface) {
             return undefined;
@@ -144,12 +151,14 @@ export class SelectionHandles implements Mountable {
         if (!bounds) {
             return undefined;
         }
-        const visualEnd = bounds.visualBounds.x + bounds.visualBounds.w;
-        const realEnd = bounds.realBounds.x + bounds.realBounds.w;
-        if (relX < visualEnd || relX > realEnd) {
-            return undefined;
+        // A beat joins the selection once the pointer passes the center of its glyph:
+        // after the anchor the edge is the end of a beat, before it the start of one.
+        const isAfterAnchor = beat.absolutePlaybackStart >= anchor.absolutePlaybackStart;
+        const isRightHalf = relX >= bounds.visualBounds.x + bounds.visualBounds.w / 2;
+        if (isAfterAnchor) {
+            return (isRightHalf ? beat : beat.previousBeat) ?? undefined;
         }
-        return beat;
+        return (isRightHalf ? beat.nextBeat : beat) ?? undefined;
     }
 
     dispose(): void {
