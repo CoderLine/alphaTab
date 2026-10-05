@@ -31,23 +31,33 @@ export class BarNumberGlyph extends EffectGlyph {
         this.renderer.insertSkylineFromBbox(this);
     }
 
-    /** Collapse bbox on non-first staves so the per-x skyline doesn't see a phantom obstacle. */
+    /**
+     * The glyph is created for every bar which may carry a bar number, but whether it is displayed
+     * depends on the position of the bar in the layout (e.g. first bar of the system).
+     * Hidden bar numbers report no extent (NaN bounds) so they do not take part in the placement.
+     */
+    private get _isVisible(): boolean {
+        return (this.renderer as LineBarRenderer).isBarNumberVisible;
+    }
+
     public override getBoundingBoxLeft(): number {
-        if (!this.renderer.staff!.isFirstInSystem) {
-            return this.x;
-        }
-        return super.getBoundingBoxLeft();
+        return this._isVisible ? super.getBoundingBoxLeft() : Number.NaN;
     }
 
     public override getBoundingBoxRight(): number {
-        if (!this.renderer.staff!.isFirstInSystem) {
-            return this.x;
-        }
-        return super.getBoundingBoxRight();
+        return this._isVisible ? super.getBoundingBoxRight() : Number.NaN;
+    }
+
+    public override getBoundingBoxTop(): number {
+        return this._isVisible ? super.getBoundingBoxTop() : Number.NaN;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        return this._isVisible ? super.getBoundingBoxBottom() : Number.NaN;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        if (!this.renderer.staff!.isFirstInSystem) {
+        if (!this._isVisible) {
             return;
         }
 

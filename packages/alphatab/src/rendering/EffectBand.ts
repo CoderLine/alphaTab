@@ -144,6 +144,10 @@ export class EffectBand extends Glyph {
             for (const g of v) {
                 const left = g.getBoundingBoxLeft();
                 const right = g.getBoundingBoxRight();
+                if (Number.isNaN(left) || Number.isNaN(right)) {
+                    // glyph has no extent in the current layout (NaN convention, cf. ModelUtils.minBoundingBox)
+                    continue;
+                }
                 if (!found) {
                     min = left;
                     max = right;
@@ -400,7 +404,9 @@ export class EffectBand extends Glyph {
      * Writes the renderer-local x range into `out`. Unions glyph paint
      * extents (effect glyphs often have width=0, so x/width is not enough)
      * with cross-renderer spans from {@link publishSpanRange}. Returns
-     * `false` when the band has no usable range.
+     * `false` when the band has no usable range. Glyphs reporting `NaN`
+     * horizontal bounds have no extent in the current layout; if no glyph has
+     * an extent, the band does not take part in the placement.
      */
     public computeLocalXRange(out: EffectBandXRange): boolean {
         if (this.isEmpty) {

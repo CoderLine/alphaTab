@@ -16,7 +16,7 @@ export const barNumberEffectInfo: EffectInfo = {
     hideOnMultiTrack: true,
     sizingMode: EffectBarGlyphSizing.SingleStartBar,
     shouldCreateGlyph: (renderer: BarRendererBase, beat: Beat): boolean => {
-        return beat.voice.index === 0 && beat.index === 0 && (renderer as LineBarRenderer).shouldCreateBarNumber();
+        return beat.voice.index === 0 && beat.index === 0 && (renderer as LineBarRenderer).hasBarNumber;
     },
     createNewGlyph: (_renderer: BarRendererBase, beat: Beat): EffectGlyph => {
         const masterBar = beat.voice.bar.masterBar;

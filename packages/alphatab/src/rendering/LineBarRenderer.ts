@@ -674,19 +674,27 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return TabRhythmMode.Hidden;
     }
 
-    public shouldCreateBarNumber(): boolean {
-        if (!this.settings.notation.isNotationElementVisible(NotationElement.BarNumber)) {
+    /**
+     * Whether this bar may carry a bar number at all. Depends only on the model and settings
+     * (not on the position of the bar within the layout), hence it is safe to use during glyph creation.
+     */
+    public get hasBarNumber(): boolean {
+        return (
+            this.settings.notation.isNotationElementVisible(NotationElement.BarNumber) &&
+            this.resolveBarNumberDisplay() !== BarNumberDisplay.Hide
+        );
+    }
+
+    /**
+     * Whether the bar number is displayed in the current layout. Depends on the position of the bar
+     * within the layout (first visible staff, first bar of the system) and must therefore only be evaluated
+     * once the system is assembled (e.g. during placement and painting).
+     */
+    public get isBarNumberVisible(): boolean {
+        if (!this.hasBarNumber || !this.staff!.isFirstInSystem) {
             return false;
         }
-        switch (this.resolveBarNumberDisplay()) {
-            case BarNumberDisplay.AllBars:
-                return true;
-            case BarNumberDisplay.FirstOfSystem:
-                return this.isFirstOfStaff;
-            case BarNumberDisplay.Hide:
-                return false;
-        }
-        return true;
+        return this.resolveBarNumberDisplay() !== BarNumberDisplay.FirstOfSystem || this.isFirstOfStaff;
     }
 
     protected abstract createLinePreBeatGlyphs(): void;
