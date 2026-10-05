@@ -21,6 +21,10 @@ export class BarNumberGlyph extends EffectGlyph {
         const size = this.renderer.scoreRenderer.canvas!.measureText(this._barNumberText);
         this.width = size.width;
         this.height = size.height;
+        // Center the number over the start barline (Behind Bars) rather than
+        // left-aligning to it, so it reads as belonging to the barline. The x-range this
+        // produces also feeds collision placement, so half the glyph sits left of the bar.
+        this.x = -this.width / 2;
     }
 
     public override populateSkyline(): void {

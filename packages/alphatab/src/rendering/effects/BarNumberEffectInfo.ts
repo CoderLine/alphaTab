@@ -23,5 +23,9 @@ export const barNumberEffectInfo: EffectInfo = {
         return new BarNumberGlyph(0, 0, masterBar.barNumberText);
     },
     canExpand: (_from: Beat, _to: Beat): boolean => false,
-    placementCategory: EffectBandPlacementCategory.NoteAttached
+    placementCategory: EffectBandPlacementCategory.NoteAttached,
+    // A bar number sits at the barline over the clef/key/time; those are fixed
+    // fixtures already accounted for in the staff's vertical layout, so the
+    // number is placed against content only and never shoved up by them.
+    ignoresStructuralHeader: true
 };

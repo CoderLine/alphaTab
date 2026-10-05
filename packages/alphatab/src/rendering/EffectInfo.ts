@@ -86,6 +86,21 @@ export interface EffectInfo {
     /** Default {@link EffectBandPlacementCategory.NoteAttached} keeps unknown effects close to the staff. */
     readonly placementCategory: EffectBandPlacementCategory;
 
+    /**
+     * When `true`, this band is placed against the content-only skyline
+     * ({@link import('@coderline/alphatab/rendering/staves/RenderStaff').RenderStaff.contentSkyline}),
+     * i.e. it ignores the structural bar header (clef, key signature, time
+     * signature, barlines, repeat counts) when finding its vertical position.
+     *
+     * This is for elements that conceptually live *within* the header's own
+     * reserved band rather than stacked above the whole engraving — chiefly bar
+     * numbers, which sit at the barline over the clef and must not be shoved up
+     * by it (the header's height is already priced into the staff via scalar
+     * overflow). The band is still inserted into the full skyline, so later
+     * bands stack above it correctly. Defaults to `false` (respects the header).
+     */
+    readonly ignoresStructuralHeader?: boolean;
+
     /** When `true`, the band feeds each beat-glyph's paint extent into the rhythmic-spacing solver. */
     readonly contributesToBeatSpacing?: boolean;
 

@@ -173,7 +173,16 @@ export class BarRendererBase {
     private _preBeatLocalSkyline: BarLocalSkyline | null = null;
     private _postBeatLocalSkyline: BarLocalSkyline | null = null;
 
-    /** Per-bar local skyline of non-effect-band glyphs (renderer-local x). */
+    /**
+     * Per-bar local skyline of the bar's musical content (notes, stems, beams,
+     * flags, ties, beat effects). Renderer-local x. This is the "content"
+     * surface: it deliberately excludes the structural bar header (clef, key
+     * signature, time signature, barlines, repeat counts), which lives in
+     * {@link preBeatLocalSkyline}/{@link postBeatLocalSkyline}. Effect bands that
+     * conceptually sit within the header's own reserved band rather than above
+     * the whole engraving (e.g. bar numbers) are placed against this surface
+     * only — see {@link EffectInfo.ignoresStructuralHeader}.
+     */
     public get barLocalSkyline(): BarLocalSkyline {
         if (!this._barLocalSkyline) {
             this._barLocalSkyline = new BarLocalSkyline(
@@ -185,7 +194,12 @@ export class BarRendererBase {
         return this._barLocalSkyline;
     }
 
-    /** Pre-beat glyphs' skyline contribution. Separate from {@link barLocalSkyline} so the latter's per-cycle reset doesn't wipe it. */
+    /**
+     * Pre-beat (structural header) glyphs' skyline contribution: clef, key
+     * signature, time signature. Kept separate from {@link barLocalSkyline} so
+     * (a) the latter's per-cycle reset doesn't wipe it, and (b) the header can
+     * be excluded from the collision surface for bands that ignore it.
+     */
     public get preBeatLocalSkyline(): BarLocalSkyline {
         if (!this._preBeatLocalSkyline) {
             this._preBeatLocalSkyline = new BarLocalSkyline(
@@ -197,7 +211,7 @@ export class BarRendererBase {
         return this._preBeatLocalSkyline;
     }
 
-    /** Post-beat glyphs' skyline in post-beat-group-local x; shifted by {@link postBeatGroupOffset} when unioned. */
+    /** Post-beat (barlines, repeat counts) skyline in post-beat-group-local x; shifted by {@link postBeatGroupOffset} when unioned. */
     public get postBeatLocalSkyline(): BarLocalSkyline {
         if (!this._postBeatLocalSkyline) {
             this._postBeatLocalSkyline = new BarLocalSkyline(
@@ -710,10 +724,11 @@ export class BarRendererBase {
     }
 
     protected calculateOverflows(_rendererTop: number, rendererBottom: number) {
-        // Re-emit pre/post-beat skylines from scratch each pass. Pre-beat
-        // group x = 0 so its local x equals bar-local x; post-beat x is
-        // not final until scaleToWidth, so the staff-skyline union shifts
-        // it later.
+        // Re-emit pre/post-beat (structural header) skylines from scratch each
+        // pass. Pre-beat group x = 0 so its local x equals bar-local x; post-beat
+        // x is not final until scaleToWidth, so the staff-skyline union shifts it
+        // later. These are kept separate from barLocalSkyline (the content
+        // surface) so a band can be placed against content-only.
         this.preBeatLocalSkyline.reset();
         this.postBeatLocalSkyline.reset();
 

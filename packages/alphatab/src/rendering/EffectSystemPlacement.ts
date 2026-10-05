@@ -69,8 +69,12 @@ export class EffectSystemPlacement {
         EffectSystemPlacement._sortByPriority(top);
         EffectSystemPlacement._sortByPriority(bottom);
 
-        this._placeSide(top, sky.upSky, pad, /* isTop */ true);
-        this._placeSide(bottom, sky.downSky, pad, /* isTop */ false);
+        // Content-only surface for bands that ignore the structural header (bar
+        // numbers). Null when no such band exists, in which case every band is
+        // placed against the full skyline exactly as before.
+        const contentSky = staff.placesAgainstContentOnly ? staff.contentSkyline : null;
+        this._placeSide(top, sky.upSky, contentSky ? contentSky.upSky : null, pad, /* isTop */ true);
+        this._placeSide(bottom, sky.downSky, contentSky ? contentSky.downSky : null, pad, /* isTop */ false);
 
         for (let i = 0; i < staff.barRenderers.length; i++) {
             const r = staff.barRenderers[i];
@@ -98,7 +102,13 @@ export class EffectSystemPlacement {
         bands.sort((a, b) => a.sortKey - b.sortKey);
     }
 
-    private _placeSide(bands: EffectBand[], sky: Skyline, pad: number, isTop: boolean): void {
+    private _placeSide(
+        bands: EffectBand[],
+        sky: Skyline,
+        contentSky: Skyline | null,
+        pad: number,
+        isTop: boolean
+    ): void {
         const groupBands = this._groupBands;
         const groupXStarts = this._groupXStarts;
         const groupXEnds = this._groupXEnds;
@@ -132,6 +142,11 @@ export class EffectSystemPlacement {
                 }
             }
 
+            // Whole group shares one effectId/info, so the header policy is uniform.
+            // Header-ignoring bands (bar numbers) query the content-only surface; the
+            // clef/key/time never enters their magnitude.
+            const querySky = contentSky !== null && band.info.ignoresStructuralHeader === true ? contentSky : sky;
+
             groupBands.splice(0, groupBands.length);
             groupXStarts.splice(0, groupXStarts.length);
             groupXEnds.splice(0, groupXEnds.length);
@@ -145,8 +160,8 @@ export class EffectSystemPlacement {
                 const xStart = m.renderer.x + xRange.xStart;
                 const xEnd = m.renderer.x + xRange.xEnd;
                 const mag = isTop
-                    ? sky.placeAbove(xStart, xEnd, m.height, pad)
-                    : sky.placeBelow(xStart, xEnd, m.height, pad);
+                    ? querySky.placeAbove(xStart, xEnd, m.height, pad)
+                    : querySky.placeBelow(xStart, xEnd, m.height, pad);
                 if (mag > groupMagnitude) {
                     groupMagnitude = mag;
                 }
@@ -157,7 +172,14 @@ export class EffectSystemPlacement {
             for (let k = 0; k < groupBands.length; k++) {
                 const b = groupBands[k];
                 b.placedMagnitude = groupMagnitude;
+                // Always publish into the full skyline so later bands stack above this
+                // one; mirror into the content surface (when present) so it stays a
+                // faithful "content + placed bands, minus header" view for any later
+                // header-ignoring band.
                 sky.insert(groupXStarts[k], groupXEnds[k], groupMagnitude + b.height, pad);
+                if (contentSky !== null) {
+                    contentSky.insert(groupXStarts[k], groupXEnds[k], groupMagnitude + b.height, pad);
+                }
             }
             i = groupEnd;
         }
