@@ -405,6 +405,20 @@ describe('Gp7ExporterTest', () => {
         expect(noteCount).toBe(4);
     });
 
+    it('export-keeps-score-untouched', () => {
+        const score = ScoreLoader.loadAlphaTex('\\instrument piano \\tuning piano . c4 d4 e4 f4');
+        const before = JsonConverter.scoreToJsObject(score);
+
+        // pitched staves need string and fret assigned during export, the input score must not change
+        const first = readExportedGpif(exportGp7(score));
+        ComparisonHelpers.expectJsonEqual(before, JsonConverter.scoreToJsObject(score), '<score>', null);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].realValue).toBe(60);
+
+        // a repeated export must produce the same file
+        const second = readExportedGpif(exportGp7(score));
+        expect(second).toBe(first);
+    });
+
     /**
      * This test generates the articulations code needed for the PercussionMapper.
      * To update the code there, run this test and copy the source code from the written file.
