@@ -2837,6 +2837,29 @@ export class MusicXmlImporter extends ScoreImporter {
             // beat/voice/bar/staff tree (e.g. percussion clef context on the resolved staff).
             // Therefore this must run after ensureBeat() and after transposition has been applied.
             this._finalizeImportedNote(note, track, instrumentId, isPitched, noteIsVisible);
+            this._finalizeStringNumber(note);
+        }
+    }
+
+    /**
+     * Validates the string parsed from `<technical><string>` and decides whether it is a
+     * tab position (string + fret) or a string number annotation on a pitched note.
+     */
+    private _finalizeStringNumber(note: Note) {
+        if (Number.isNaN(note.string)) {
+            return;
+        }
+
+        const stringCount = Note.getStringCount(note.beat.voice.bar.staff);
+        if (note.string < 1 || note.string > stringCount) {
+            Logger.warning('MusicXML', `Ignoring <string> outside of the available ${stringCount} strings`);
+            note.string = Number.NaN;
+            note.fret = Number.NaN;
+            return;
+        }
+
+        if (!note.isStringed && !note.isPercussion) {
+            note.showStringNumber = true;
         }
     }
 
@@ -3601,12 +3624,18 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'snap-pizzicato':  Not supported
                 case 'fret':
                     if (note) {
-                        note.fret = Number.parseInt(c.innerText, 10);
+                        if (beat.voice.bar.staff.tuning.length > 0) {
+                            note.fret = Number.parseInt(c.innerText, 10);
+                        } else {
+                            // without tuning the fret has no meaning, the pitch defines the note
+                            Logger.warning('MusicXML', 'Ignoring <fret> on staff without tuning');
+                        }
                     }
                     break;
                 case 'string':
                     if (note) {
-                        note.string = beat.voice.bar.staff.tuning.length - Number.parseInt(c.innerText, 10) + 1;
+                        // on staves without tuning the string is only an annotation (e.g. classical guitar string indications)
+                        note.string = Note.getStringCount(beat.voice.bar.staff) - Number.parseInt(c.innerText, 10) + 1;
                     }
                     break;
                 case 'hammer-on':
