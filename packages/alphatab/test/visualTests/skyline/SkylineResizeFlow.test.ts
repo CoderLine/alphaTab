@@ -29,6 +29,7 @@ interface StaffSkylineResizeSnapshot {
     staffKey: string;
     upMax: number;
     downMax: number;
+    barIndices: number[];
     barUpMaxes: number[];
     barDownMaxes: number[];
     barWidths: number[];
@@ -82,6 +83,7 @@ class SkylineResizeFlowHelper {
                         staffKey: `${staff.staffTrackGroup.track.index}/${staff.staffId}`,
                         upMax: staff.systemSkyline.upSky.maxHeight(),
                         downMax: staff.systemSkyline.downSky.maxHeight(),
+                        barIndices: staff.barRenderers.map(r => r.bar.index),
                         barUpMaxes: staff.barRenderers.map(r => r.barLocalSkyline.upSky.maxHeight()),
                         barDownMaxes: staff.barRenderers.map(r => r.barLocalSkyline.downSky.maxHeight()),
                         barWidths: staff.barRenderers.map(r => r.width),
@@ -227,17 +229,19 @@ class SkylineResizeFlowHelper {
         return total;
     }
 
-    public static sumMagnitudes(snapshot: StaffSkylineResizeSnapshot[]): number {
-        let total = 0;
+    /**
+     * The bar-local skyline magnitudes (up + down max) per bar, keyed by staff and bar index.
+     * Bars starting a system are excluded: they carry system-level content (e.g. the bracket spike)
+     * which legitimately depends on the system layout.
+     */
+    public static barMagnitudes(snapshot: StaffSkylineResizeSnapshot[]): Map<string, number> {
+        const result = new Map<string, number>();
         for (const st of snapshot) {
-            for (const v of st.barUpMaxes) {
-                total += v;
-            }
-            for (const v of st.barDownMaxes) {
-                total += v;
+            for (let i = 1; i < st.barIndices.length; i++) {
+                result.set(`${st.staffKey}/${st.barIndices[i]}`, st.barUpMaxes[i] + st.barDownMaxes[i]);
             }
         }
-        return total;
+        return result;
     }
 
     public static maxOrZero(values: number[]): number {
@@ -363,9 +367,16 @@ describe('SkylineResizeFlow', () => {
 
     it('single resize narrow→wide preserves bar-local envelopes', async () => {
         const snapshots = await SkylineResizeFlowHelper.renderWithResize(resizeTex, 600, 900);
-        const sumInitial = SkylineResizeFlowHelper.sumMagnitudes(snapshots.initial);
-        const sumResized = SkylineResizeFlowHelper.sumMagnitudes(snapshots.resized);
-        expect(sumResized).toBeCloseTo(sumInitial, 5);
+        const initial = SkylineResizeFlowHelper.barMagnitudes(snapshots.initial);
+        const resized = SkylineResizeFlowHelper.barMagnitudes(snapshots.resized);
+        let compared = 0;
+        for (const [key, value] of initial) {
+            if (resized.has(key)) {
+                expect(resized.get(key)!, key).toBeCloseTo(value, 5);
+                compared++;
+            }
+        }
+        expect(compared).toBeGreaterThan(0);
     });
 
     it('bars in each staff are contiguous (no gaps or overlaps) after resize', async () => {
