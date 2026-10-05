@@ -3,32 +3,22 @@ import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
-import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
  */
-export class CapoEffectInfo extends EffectInfo {
-    public get notationElement(): NotationElement {
-        return NotationElement.EffectCapo;
-    }
-
-    public get hideOnMultiTrack(): boolean {
-        return false;
-    }
-
-    public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.SingleOnBeat;
-    }
-
-    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
+export const capoEffectInfo: EffectInfo = {
+    effectId: 'EffectCapo',
+    notationElement: NotationElement.EffectCapo,
+    hideOnMultiTrack: false,
+    sizingMode: EffectBarGlyphSizing.SingleOnBeat,
+    shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
         return beat.index === 0 && beat.voice.bar.index === 0 && beat.voice.bar.staff.capo !== 0;
-    }
-
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    },
+    createNewGlyph: (renderer: BarRendererBase, beat: Beat): EffectGlyph => {
         return new TextGlyph(
             0,
             0,
@@ -36,9 +26,9 @@ export class CapoEffectInfo extends EffectInfo {
             renderer.resources.elementFonts.get(NotationElement.EffectCapo)!,
             TextAlign.Left
         );
-    }
-
-    public canExpand(_from: Beat, _to: Beat): boolean {
+    },
+    canExpand: (_from: Beat, _to: Beat): boolean => {
         return false;
-    }
-}
+    },
+    placementCategory: EffectBandPlacementCategory.NoteAttached
+};

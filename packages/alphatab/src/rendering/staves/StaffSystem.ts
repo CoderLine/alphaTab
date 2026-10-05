@@ -305,7 +305,7 @@ export class StaffSystem {
             return null;
         }
         this.masterBarsRenderers.push(renderers);
-        renderers.layoutingInfo.preBeatSize = 0;
+        renderers.layoutingInfo.resetHeaderRods();
         let src: number = 0;
 
         let firstVisibleStaff: RenderStaff | undefined = undefined;
@@ -1193,6 +1193,48 @@ export class StaffSystem {
         Profiler.end('layout.finalizeSystem');
     }
 
+    /**
+     * Calculates the additional vertical space needed between two adjacent staves so that
+     * their content (skylines) keeps at least the given padding.
+     * @param upper The upper staff (already positioned and finalized).
+     * @param lower The lower staff (finalized, positioned directly below `upper`).
+     * @param padding The minimum padding between the content of the staves.
+     * @returns The additional space to add between the staves (0 if the existing space is enough).
+     */
+    private static _requiredStaffContentPadding(upper: RenderStaff, lower: RenderStaff, padding: number): number {
+        const upperSky = upper.systemSkyline.downSky;
+        const lowerSky = lower.systemSkyline.upSky;
+
+        // the maximum combined extent of both staves into the space between them
+        let contentExtent = 0;
+        for (let i = 0, n = upperSky.segmentCount; i < n; i++) {
+            const h = upperSky.segmentHeight(i);
+            if (h > 0) {
+                const combined = h + lowerSky.maxHeightInRange(upperSky.segmentXStart(i), upperSky.segmentXEnd(i));
+                if (combined > contentExtent) {
+                    contentExtent = combined;
+                }
+            }
+        }
+        for (let i = 0, n = lowerSky.segmentCount; i < n; i++) {
+            const h = lowerSky.segmentHeight(i);
+            if (h > 0) {
+                const combined = h + upperSky.maxHeightInRange(lowerSky.segmentXStart(i), lowerSky.segmentXEnd(i));
+                if (combined > contentExtent) {
+                    contentExtent = combined;
+                }
+            }
+        }
+
+        if (contentExtent <= 0) {
+            return 0;
+        }
+
+        const available = lower.contentTop - upper.contentBottom;
+        const missing = contentExtent + padding - available;
+        return missing > 0 ? Math.ceil(missing) : 0;
+    }
+
     private _finalizeTrackGroups(onlyFirstGroup: boolean = false) {
         let currentY: number = 0;
         const settings = this.layout.renderer.settings;
@@ -1222,6 +1264,19 @@ export class StaffSystem {
                     }
                 }
 
+                // the bracket spike curls into the first bar of whichever staff it is
+                // anchored on; register that horizontal footprint in the bar's own skyline
+                // so bar-attached content (e.g. the bar number) shifts out of its way
+                // instead of being drawn underneath it.
+                if (hasBracket && bracket!.firstVisibleStaffInBracket !== bracket!.lastVisibleStaffInBracket) {
+                    if (bracket!.firstVisibleStaffInBracket === staff) {
+                        this._registerBracketSpikeSkyline(staff, true);
+                    }
+                    if (bracket!.lastVisibleStaffInBracket === staff) {
+                        this._registerBracketSpikeSkyline(staff, false);
+                    }
+                }
+
                 staff.x = this.accoladeWidth;
                 staff.y = currentY;
                 if (!onlyFirstGroup) {
@@ -1229,6 +1284,20 @@ export class StaffSystem {
                 }
 
                 if (staff.isVisible) {
+                    // ensure the content of adjacent staves keeps a minimum padding
+                    // (only adds space where the content actually comes too close)
+                    if (previousStaff !== undefined && !onlyFirstGroup) {
+                        const extra = StaffSystem._requiredStaffContentPadding(
+                            previousStaff,
+                            staff,
+                            smufl.staffContentPadding
+                        );
+                        if (extra > 0) {
+                            staff.y += extra;
+                            currentY += extra;
+                        }
+                    }
+
                     currentY += staff.height;
 
                     anyStaffVisible = true;
@@ -1273,6 +1342,41 @@ export class StaffSystem {
         this._contentHeight = currentY;
 
         return anyStaffVisible;
+    }
+
+    /**
+     * Registers the horizontal footprint of the bracket's top/bottom spike glyph (see
+     * `_paintBrackets`'s `spikeX`) into the first bar renderer's own skyline. The spike is
+     * anchored just left of the staff's content area but its glyph bbox extends `glyphWidth`
+     * to the right, which can reach past the accolade into the first bar. Without this, content
+     * placed at the top/bottom of that bar (e.g. the bar number) doesn't know to avoid it.
+     */
+    private _registerBracketSpikeSkyline(staff: RenderStaff, isTop: boolean): void {
+        if (staff.barRenderers.length === 0) {
+            return;
+        }
+
+        const settings = this.layout.renderer.settings;
+        const smufl = settings.display.resources.engravingSettings;
+        const symbol = isTop ? MusicFontSymbol.BracketTop : MusicFontSymbol.BracketBottom;
+        const glyphWidth = smufl.glyphWidths.get(symbol)!;
+        const glyphHeight = smufl.glyphHeights.get(symbol)!;
+        const barOffset = settings.display.accoladeBarPaddingRight;
+
+        const intrusion = glyphWidth - barOffset - smufl.bracketThickness;
+        if (intrusion <= 0) {
+            return;
+        }
+
+        // brackets typically overflow their content range by 1/4 staff-space (see `_paintBrackets`)
+        const height = glyphHeight + smufl.oneStaffSpace * 0.25;
+
+        const firstBar = staff.barRenderers[0];
+        if (isTop) {
+            firstBar.insertSkylineTop(0, intrusion, height);
+        } else {
+            firstBar.insertSkylineBottom(0, intrusion, height);
+        }
     }
 
     public buildBoundingsLookup(cx: number, cy: number): void {

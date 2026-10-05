@@ -3,31 +3,22 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectBandPlacementCategory } from '@coderline/alphatab/rendering/EffectInfo';
-import { NoteEffectInfoBase } from '@coderline/alphatab/rendering/effects/NoteEffectInfoBase';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { createNoteShouldCreateGlyph } from '@coderline/alphatab/rendering/effects/NoteEffectInfoBase';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@coderline/alphatab/rendering/glyphs/LineRangedGlyph';
 
 /**
  * @internal
  */
-export class PalmMuteEffectInfo extends NoteEffectInfoBase {
-    public get notationElement(): NotationElement {
-        return NotationElement.EffectPalmMute;
-    }
-
-    protected shouldCreateGlyphForNote(note: Note): boolean {
-        return note.isPalmMute;
-    }
-
-    public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.GroupedOnBeat;
-    }
-
-    public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new LineRangedGlyph('P.M.', NotationElement.EffectPalmMute);
-    }
-    public override get placementCategory(): EffectBandPlacementCategory {
-        return EffectBandPlacementCategory.Span;
-    }
-}
+export const palmMuteEffectInfo: EffectInfo = {
+    effectId: 'EffectPalmMute',
+    notationElement: NotationElement.EffectPalmMute,
+    hideOnMultiTrack: false,
+    sizingMode: EffectBarGlyphSizing.GroupedOnBeat,
+    shouldCreateGlyph: createNoteShouldCreateGlyph((note: Note): boolean => note.isPalmMute),
+    createNewGlyph: (_renderer: BarRendererBase, _beat: Beat): EffectGlyph =>
+        new LineRangedGlyph('P.M.', NotationElement.EffectPalmMute),
+    canExpand: (_from: Beat, _to: Beat): boolean => true,
+    placementCategory: EffectBandPlacementCategory.Span
+};

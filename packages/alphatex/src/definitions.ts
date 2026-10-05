@@ -160,6 +160,7 @@ import type { AlphaTexExample, WithDescription, WithSignatures } from '@coderlin
 import { barNumberDisplay } from '@coderline/alphatab-alphatex/metadata/bar/barnumberdisplay';
 import { beaming } from '@coderline/alphatab-alphatex/metadata/bar/beamingRule';
 import { restDisplayPitch } from '@coderline/alphatab-alphatex/properties/beat/restDisplayPitch';
+import { barNumber } from '@coderline/alphatab-alphatex/metadata/bar/barNumber';
 
 export const structuralMetaData = metadata(track, staff, voice);
 export const scoreMetaData = metadata(
@@ -235,7 +236,8 @@ export const barMetaData = metadata(
     db,
     voiceMode,
     barNumberDisplay,
-    beaming
+    beaming,
+    barNumber
 );
 
 export const allMetadata = new Map([

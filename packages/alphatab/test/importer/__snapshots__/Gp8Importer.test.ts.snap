@@ -1397,6 +1397,19 @@ Map {
   "stylesheet" => Map {
     "hidedynamics" => true,
     "bracketextendmode" => 0,
+    "barnumberdisplay" => 0,
+    "scoreconfig" => Map {
+      "barnumber" => 0,
+    },
+    "tabconfig" => Map {
+      "barnumber" => 0,
+    },
+    "slashconfig" => Map {
+      "barnumber" => 0,
+    },
+    "numberedconfig" => Map {
+      "barnumber" => 0,
+    },
   },
   "backingtrack" => Map {},
   "style" => Map {

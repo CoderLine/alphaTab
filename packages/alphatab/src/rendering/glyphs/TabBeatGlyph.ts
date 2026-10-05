@@ -198,12 +198,13 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
 
         this.renderer.collisionHelper.reserveBeatSlot(this.container.beat, topY, bottomY);
 
+        // minString/maxString track the topmost/bottommost used line (not the string number)
         const minString = tr.minString;
         const maxString = tr.maxString;
-        if (Number.isNaN(minString) || minString < n.string) {
+        if (Number.isNaN(minString) || l < minString) {
             tr.minString = l;
         }
-        if (Number.isNaN(maxString) || maxString > n.string) {
+        if (Number.isNaN(maxString) || l > maxString) {
             tr.maxString = l;
         }
     }

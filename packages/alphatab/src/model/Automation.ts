@@ -26,7 +26,7 @@ export enum AutomationType {
     /**
      * Midi Bank change.
      */
-    Bank = 4
+    Bank = 5
 }
 
 /**

@@ -6,11 +6,17 @@ import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 
 /**
  * @internal
  */
 export class ClefGlyph extends MusicFontGlyph {
+    /**
+     * The bar header column of clefs (shared with {@link TabClefGlyph}).
+     */
+    public static readonly HeaderRank: number = 200;
+
     private _clef: Clef;
     private _clefOttava: Ottavia;
     private _ottavaGlyph?: MusicFontGlyph;
@@ -95,6 +101,15 @@ export class ClefGlyph extends MusicFontGlyph {
         this._ottavaGlyph!.center = true;
         this._ottavaGlyph!.renderer = this.renderer;
         this._ottavaGlyph!.doLayout();
+    }
+
+    public override registerHeaderRod(info: BarLayoutingInfo): void {
+        // left aligned
+        info.addHeaderRod(ClefGlyph.HeaderRank, 0, this.width + this.renderer.smuflMetrics.preBeatGlyphSpacing);
+    }
+
+    public override applyHeaderRod(info: BarLayoutingInfo): void {
+        this.x = info.getHeaderRodX(ClefGlyph.HeaderRank, 0);
     }
 
     private static _getSymbol(clef: Clef, clefOttava: Ottavia): MusicFontSymbol {

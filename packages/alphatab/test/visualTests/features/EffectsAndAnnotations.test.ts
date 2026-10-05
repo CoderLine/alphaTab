@@ -1,7 +1,7 @@
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
-import { BeatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
+import { toRoman } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
@@ -179,6 +179,7 @@ describe('EffectsAndAnnotationsTests', () => {
         const settings = new Settings();
         const score = ScoreLoader.loadAlphaTex(
             `
+        \\defaultBarNumberDisplay allBars
         \\tempo 120
         \\track "pno."
         :8 G4 { spd } G4 G4 { spu } G4 G4 { spd } G4 {spu} G4 G4 {spd} |
@@ -220,36 +221,36 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('roman-numbers', () => {
-        expect(BeatBarreEffectInfo.toRoman(0)).toBe('');
-        expect(BeatBarreEffectInfo.toRoman(1)).toBe('I');
-        expect(BeatBarreEffectInfo.toRoman(2)).toBe('II');
-        expect(BeatBarreEffectInfo.toRoman(3)).toBe('III');
-        expect(BeatBarreEffectInfo.toRoman(4)).toBe('IV');
-        expect(BeatBarreEffectInfo.toRoman(5)).toBe('V');
-        expect(BeatBarreEffectInfo.toRoman(6)).toBe('VI');
-        expect(BeatBarreEffectInfo.toRoman(7)).toBe('VII');
-        expect(BeatBarreEffectInfo.toRoman(8)).toBe('VIII');
-        expect(BeatBarreEffectInfo.toRoman(9)).toBe('IX');
-        expect(BeatBarreEffectInfo.toRoman(10)).toBe('X');
-        expect(BeatBarreEffectInfo.toRoman(11)).toBe('XI');
-        expect(BeatBarreEffectInfo.toRoman(12)).toBe('XII');
-        expect(BeatBarreEffectInfo.toRoman(13)).toBe('XIII');
-        expect(BeatBarreEffectInfo.toRoman(14)).toBe('XIV');
-        expect(BeatBarreEffectInfo.toRoman(15)).toBe('XV');
-        expect(BeatBarreEffectInfo.toRoman(16)).toBe('XVI');
-        expect(BeatBarreEffectInfo.toRoman(17)).toBe('XVII');
-        expect(BeatBarreEffectInfo.toRoman(18)).toBe('XVIII');
-        expect(BeatBarreEffectInfo.toRoman(19)).toBe('XIX');
-        expect(BeatBarreEffectInfo.toRoman(20)).toBe('XX');
-        expect(BeatBarreEffectInfo.toRoman(21)).toBe('XXI');
-        expect(BeatBarreEffectInfo.toRoman(22)).toBe('XXII');
-        expect(BeatBarreEffectInfo.toRoman(23)).toBe('XXIII');
-        expect(BeatBarreEffectInfo.toRoman(24)).toBe('XXIV');
-        expect(BeatBarreEffectInfo.toRoman(25)).toBe('XXV');
-        expect(BeatBarreEffectInfo.toRoman(26)).toBe('XXVI');
-        expect(BeatBarreEffectInfo.toRoman(27)).toBe('XXVII');
-        expect(BeatBarreEffectInfo.toRoman(28)).toBe('XXVIII');
-        expect(BeatBarreEffectInfo.toRoman(29)).toBe('XXIX');
+        expect(toRoman(0)).toBe('');
+        expect(toRoman(1)).toBe('I');
+        expect(toRoman(2)).toBe('II');
+        expect(toRoman(3)).toBe('III');
+        expect(toRoman(4)).toBe('IV');
+        expect(toRoman(5)).toBe('V');
+        expect(toRoman(6)).toBe('VI');
+        expect(toRoman(7)).toBe('VII');
+        expect(toRoman(8)).toBe('VIII');
+        expect(toRoman(9)).toBe('IX');
+        expect(toRoman(10)).toBe('X');
+        expect(toRoman(11)).toBe('XI');
+        expect(toRoman(12)).toBe('XII');
+        expect(toRoman(13)).toBe('XIII');
+        expect(toRoman(14)).toBe('XIV');
+        expect(toRoman(15)).toBe('XV');
+        expect(toRoman(16)).toBe('XVI');
+        expect(toRoman(17)).toBe('XVII');
+        expect(toRoman(18)).toBe('XVIII');
+        expect(toRoman(19)).toBe('XIX');
+        expect(toRoman(20)).toBe('XX');
+        expect(toRoman(21)).toBe('XXI');
+        expect(toRoman(22)).toBe('XXII');
+        expect(toRoman(23)).toBe('XXIII');
+        expect(toRoman(24)).toBe('XXIV');
+        expect(toRoman(25)).toBe('XXV');
+        expect(toRoman(26)).toBe('XXVI');
+        expect(toRoman(27)).toBe('XXVII');
+        expect(toRoman(28)).toBe('XXVIII');
+        expect(toRoman(29)).toBe('XXIX');
     });
 
     it('barre', async () => {

@@ -1,5 +1,6 @@
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 
 /**
  * A glyph is a single symbol which can be added to a GlyphBarRenderer for automated
@@ -44,6 +45,22 @@ export class Glyph {
 
     /** Hook for glyphs whose bbox is only final after `scaleToWidth`. Default no-op. */
     public populateSkyline(): void {
+        // to be implemented in subclass
+    }
+
+    /**
+     * Hook for bar header glyphs (clef, key signature, time signature ...) to register
+     * their column extents via {@link BarLayoutingInfo.addHeaderRod}. Default no-op.
+     */
+    public registerHeaderRod(_info: BarLayoutingInfo): void {
+        // to be implemented in subclass
+    }
+
+    /**
+     * Hook for bar header glyphs to apply their aligned position via
+     * {@link BarLayoutingInfo.getHeaderRodX}. Default no-op.
+     */
+    public applyHeaderRod(_info: BarLayoutingInfo): void {
         // to be implemented in subclass
     }
 

@@ -2,7 +2,7 @@
     type AlphaTexAsteriskTokenNode,
     type AlphaTexAstNode,
     type AlphaTexAstNodeLocation,
-    AlphaTexAtTokenNode,
+    type AlphaTexAtTokenNode,
     type AlphaTexBackSlashTokenNode,
     type AlphaTexBraceCloseTokenNode,
     type AlphaTexBraceOpenTokenNode,

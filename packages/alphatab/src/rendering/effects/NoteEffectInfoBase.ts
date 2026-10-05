@@ -1,32 +1,14 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
-import type { Settings } from '@coderline/alphatab/Settings';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 
 /**
+ * Builds a `shouldCreateGlyph` for note-based effects: it creates a glyph
+ * as soon as any note on the beat matches the given predicate.
  * @internal
  */
-export abstract class NoteEffectInfoBase extends EffectInfo {
-    protected lastCreateInfo: Note[] | null = null;
-
-    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
-        this.lastCreateInfo = [];
-        for (let i: number = 0, j: number = beat.notes.length; i < j; i++) {
-            const n: Note = beat.notes[i];
-            if (this.shouldCreateGlyphForNote(n)) {
-                this.lastCreateInfo.push(n);
-            }
-        }
-        return this.lastCreateInfo.length > 0;
-    }
-
-    protected abstract shouldCreateGlyphForNote(note: Note): boolean;
-
-    public get hideOnMultiTrack(): boolean {
-        return false;
-    }
-
-    public canExpand(_from: Beat, _to: Beat): boolean {
-        return true;
-    }
+export function createNoteShouldCreateGlyph(
+    shouldCreateGlyphForNote: (note: Note) => boolean
+): (renderer: BarRendererBase, beat: Beat) => boolean {
+    return (_renderer: BarRendererBase, beat: Beat): boolean => beat.notes.some(shouldCreateGlyphForNote);
 }

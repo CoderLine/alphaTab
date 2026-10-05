@@ -225,6 +225,11 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private _currentBarNumberDisplayPart?: BarNumberDisplay;
     private _currentBarNumberDisplayBar?: BarNumberDisplay;
+    /**
+     * The bar number the next (non-implicit) master bar gets by sequential counting.
+     * Used to only store custom bar numbers where the measure number differs from it.
+     */
+    private _nextBarNumber: number = 1;
 
     private _divisionsPerQuarterNote: number = 1;
     private _currentDynamics = DynamicValue.F;
@@ -242,6 +247,7 @@ export class MusicXmlImporter extends ScoreImporter {
             throw new UnsupportedFormatError('Unsupported format', e as Error);
         }
         this._score = new Score();
+        this._nextBarNumber = 1;
         this._score.stylesheet.hideDynamics = true;
 
         this._parseDom(dom);
@@ -902,14 +908,14 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private _parsePartwiseMeasure(element: XmlNode, track: Track, index: number) {
-        const masterBar = this._getOrCreateMasterBar(element, index);
+        const masterBar = this._getOrCreateMasterBar(element, index, element.getAttribute('number'));
         const implicit = element.attributes.get('implicit') === 'yes';
         this._parsePartMeasure(element, masterBar, track, implicit, true);
         this._currentBarNumberDisplayBar = undefined;
     }
 
     private _parseTimewiseMeasure(element: XmlNode, index: number) {
-        const masterBar = this._getOrCreateMasterBar(element, index);
+        const masterBar = this._getOrCreateMasterBar(element, index, element.getAttribute('number'));
         const implicit = element.attributes.get('implicit') === 'yes';
 
         for (const c of element.childElements()) {
@@ -927,13 +933,27 @@ export class MusicXmlImporter extends ScoreImporter {
         this._currentBarNumberDisplayBar = undefined;
     }
 
-    private _getOrCreateMasterBar(element: XmlNode, index: number) {
+    private _getOrCreateMasterBar(element: XmlNode, index: number, measureNumber: string) {
         const implicit = element.attributes.get('implicit') === 'yes';
         while (this._score.masterBars.length <= index) {
             const newMasterBar = new MasterBar();
             if (implicit) {
                 newMasterBar.isAnacrusis = true;
+            } else {
+                // only store custom numbers which differ from the sequential counting
+                // (same counting as Score.finish: implicit bars do not count, custom texts do)
+                const number = Number.parseInt(measureNumber, 10);
+                if (!Number.isNaN(number)) {
+                    if (number !== this._nextBarNumber) {
+                        newMasterBar.customBarNumber = number;
+                    }
+                    this._nextBarNumber = number + 1;
+                } else {
+                    newMasterBar.customBarNumberText = measureNumber;
+                    this._nextBarNumber++;
+                }
             }
+
             this._score.addMasterBar(newMasterBar);
             if (newMasterBar.index > 0) {
                 newMasterBar.timeSignatureDenominator = newMasterBar.previousMasterBar!.timeSignatureDenominator;

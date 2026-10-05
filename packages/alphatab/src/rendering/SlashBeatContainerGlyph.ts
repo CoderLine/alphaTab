@@ -4,9 +4,9 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
-import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { SlashBeatGlyph } from '@coderline/alphatab/rendering/glyphs/SlashBeatGlyph';
+import { SlashBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/SlashBeatPreNotesGlyph';
 import { SlashTieGlyph } from '@coderline/alphatab/rendering/glyphs/SlashTieGlyph';
 import type { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRenderer';
 
@@ -16,9 +16,9 @@ import type { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRen
 export class SlashBeatContainerGlyph extends BeatContainerGlyph {
     private _tiedNoteTie: SlashTieGlyph | null = null;
 
-    public constructor(beat:Beat){
+    public constructor(beat: Beat) {
         super(beat);
-        this.preNotes = new BeatGlyphBase();
+        this.preNotes = new SlashBeatPreNotesGlyph();
         this.onNotes = new SlashBeatGlyph();
     }
 

@@ -109,8 +109,9 @@ export function runFixture(target: Target, dir: string): FixtureRunResult {
     // fixture dir so `path.relative(dir, input.ts)` resolves to `input.ts`.
     options.configFilePath = path.join(dir, 'tsconfig.json');
     const host = ts.createCompilerHost(options);
+    // every .ts file of the fixture is part of the program (e.g. cross-file references)
     const program = ts.createProgram({
-        rootNames: [inputFile],
+        rootNames: collectFixtureSources(dir),
         options,
         host
     });
@@ -134,6 +135,19 @@ export function runFixture(target: Target, dir: string): FixtureRunResult {
 
     const files = readAllFiles(tempRoot);
     return { tempRoot, tsDiagnostics, emitDiagnostics, files };
+}
+
+function collectFixtureSources(dir: string): string[] {
+    const sources: string[] = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const abs = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            sources.push(...collectFixtureSources(abs));
+        } else if (entry.name.endsWith('.ts')) {
+            sources.push(abs);
+        }
+    }
+    return sources.sort();
 }
 
 function readAllFiles(root: string): Map<string, string> {

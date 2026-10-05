@@ -399,7 +399,7 @@ export class DisplaySettings {
      * @category Display
      * @defaultValue `2`
      */
-    public staffPaddingLeft: number = 2;
+    public staffPaddingLeft: number = 6;
 
     /**
      * Clearance applied around each effect band on its staff-facing side:

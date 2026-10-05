@@ -30,6 +30,19 @@ interface OverlayRod {
 }
 
 /**
+ * One column of the bar header (start barline, staff inset, clef, key signature,
+ * time signature ...) shared by all staves of a master bar. Header glyphs register
+ * their extents around their anchor; the column takes the maximum of all staves.
+ * @internal
+ */
+class HeaderRod {
+    public rank: number = 0;
+    public pre: number = 0;
+    public post: number = 0;
+    public offset: number = 0;
+}
+
+/**
  * This public class stores size information about a stave.
  * It is used by the layout engine to collect the sizes of score parts
  * to align the parts across multiple staves.
@@ -100,7 +113,110 @@ export class BarLayoutingInfo {
      */
     public version: number = 0;
 
-    public preBeatSize: number = 0;
+    /**
+     * Header columns sorted by rank. Instances are pooled across resize cycles:
+     * only the first {@link _headerRodCount} entries are valid.
+     */
+    private _headerRods: HeaderRod[] = [];
+    private _headerRodCount: number = 0;
+    private _headerRodsDirty: boolean = false;
+    private _preBeatSize: number = 0;
+
+    /**
+     * The total width of the bar header (all header columns), shared across all staves.
+     */
+    public get preBeatSize(): number {
+        if (this._headerRodsDirty) {
+            this._updateHeaderRods();
+        }
+        return this._preBeatSize;
+    }
+
+    /**
+     * Clears all header columns. Called at the start of each layout cycle of a system,
+     * the bar renderers re-register their header glyphs afterwards.
+     */
+    public resetHeaderRods(): void {
+        this._headerRodCount = 0;
+        this._preBeatSize = 0;
+        this._headerRodsDirty = false;
+    }
+
+    /**
+     * Registers the extents of a header glyph around its anchor for the column identified by `rank`.
+     * Columns are ordered by their rank, the same rank across staves forms one aligned column.
+     * @param rank The rank identifying (and ordering) the column.
+     * @param pre The extent left of the anchor.
+     * @param post The extent right of the anchor (including the glyph's trailing spacing).
+     */
+    public addHeaderRod(rank: number, pre: number, post: number): void {
+        const rods = this._headerRods;
+        const count = this._headerRodCount;
+        let insertPos = 0;
+        while (insertPos < count && rods[insertPos].rank < rank) {
+            insertPos++;
+        }
+
+        this._headerRodsDirty = true;
+        if (insertPos < count && rods[insertPos].rank === rank) {
+            const existing = rods[insertPos];
+            if (existing.pre < pre) {
+                existing.pre = pre;
+            }
+            if (existing.post < post) {
+                existing.post = post;
+            }
+            return;
+        }
+
+        // reuse a pooled instance (from a previous cycle) if available
+        let rod: HeaderRod;
+        if (count < rods.length) {
+            rod = rods[count];
+            rods.splice(count, 1);
+        } else {
+            rod = new HeaderRod();
+        }
+        rod.rank = rank;
+        rod.pre = pre;
+        rod.post = post;
+        rod.offset = 0;
+        rods.splice(insertPos, 0, rod);
+        this._headerRodCount = count + 1;
+    }
+
+    /**
+     * Gets the x-position (relative to the header start) for a header glyph registered with
+     * {@link addHeaderRod}, aligning its anchor with the anchors of the other staves.
+     * @param rank The rank of the column.
+     * @param ownPre The extent left of the anchor the glyph registered.
+     */
+    public getHeaderRodX(rank: number, ownPre: number): number {
+        if (this._headerRodsDirty) {
+            this._updateHeaderRods();
+        }
+        const rods = this._headerRods;
+        for (let i = 0; i < this._headerRodCount; i++) {
+            const rod = rods[i];
+            if (rod.rank === rank) {
+                return rod.offset + rod.pre - ownPre;
+            }
+        }
+        return 0;
+    }
+
+    private _updateHeaderRods(): void {
+        const rods = this._headerRods;
+        let x = 0;
+        for (let i = 0; i < this._headerRodCount; i++) {
+            const rod = rods[i];
+            rod.offset = x;
+            x += rod.pre + rod.post;
+        }
+        this._preBeatSize = x;
+        this._headerRodsDirty = false;
+    }
+
     public postBeatSize: number = 0;
     public minStretchForce: number = 0;
     public totalSpringConstant: number = 0;

@@ -23,6 +23,13 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
  * @internal
  */
 export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
+    /**
+     * The initial spacing (in stave-spaces) before the first beat of a bar without accidentals.
+     * Behind Bars recommends 2.5sp after a clef/key signature (1sp after a barline), but the pre-beat
+     * glyphs already have a bit spacing, hence it is a reduced value.
+     */
+    private static readonly _initialBeatSpacing: number = 0.6;
+
     private _prebends: BendNoteHeadGroupGlyph | null = null;
     public get prebendNoteHeadOffset(): number {
         return this._prebends ? this._prebends.x + this._prebends.onTimeX : 0;
@@ -41,6 +48,15 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     public override doLayout(): void {
         if (!this.container.beat.isRest) {
             this._createGlyphs();
+        } else if (this.container.beat.index === 0 && !this.container.beat.isEmpty) {
+            // rests need the same initial spacing as notes (empty beats show no rest)
+            this.addNormal(
+                new SpacingGlyph(
+                    0,
+                    0,
+                    ScoreBeatPreNotesGlyph._initialBeatSpacing * this.renderer.smuflMetrics.oneStaffSpace
+                )
+            );
         }
         super.doLayout();
     }
@@ -56,7 +72,6 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         ghost.renderer = this.renderer;
 
         let preBends: BendNoteHeadGroupGlyph | null = null;
-
 
         let hasSimpleSlideIn = false;
 
@@ -107,7 +122,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                 }
             }
         }
-        
+
         if (hasSimpleSlideIn) {
             this.addNormal(
                 new SpacingGlyph(
@@ -168,19 +183,29 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         if (!ghost.isEmpty) {
             this.addEffect(ghost);
         }
-        if (!accidentals.isEmpty) {
-            this.accidentals = accidentals;
-            if (!this.isEmpty) {
+
+        // Behind bars:
+        // - if no accidental 2.5sp initial spacing (handled here)
+        // - if 1 accidental 1.5sp initial spacing (handled in the accidental glyph)
+        // - if more accidentals 1sp initial spacing (handled in the accidental glyph)
+        // the pre-beat glyphs already have a bit spacing, hence we have reduced values here
+
+        if (this.container.beat.index === 0) {
+            if (accidentals.isEmpty) {
                 this.addNormal(
                     new SpacingGlyph(
                         0,
                         0,
-                        this.renderer.smuflMetrics.preNoteEffectPadding *
-                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
+                        ScoreBeatPreNotesGlyph._initialBeatSpacing * this.renderer.smuflMetrics.oneStaffSpace
                     )
                 );
+            }  else{
+                accidentals.applyInitialNotePadding = true;
             }
+        }
 
+        if (!accidentals.isEmpty) {
+            this.accidentals = accidentals;
             this.addNormal(accidentals);
             this.addNormal(
                 new SpacingGlyph(
