@@ -882,7 +882,7 @@ export class AlphaTex1LanguageDefinitions {
         ['iturn', null],
         ['umordent', null],
         ['lmordent', null],
-        ['string', null],
+        ['string', [[], [[[106], 0]]]],
         ['hide', null],
         [
             'b',

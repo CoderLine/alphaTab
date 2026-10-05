@@ -198,6 +198,11 @@ export enum AlphaTexDiagnosticCode {
     AT220 = 220,
 
     /**
+     * A string number can only be specified on pitched notes, use the 'fret.string' syntax to specify the string of fretted notes.
+     */
+    AT221 = 221,
+
+    /**
      * Expected no arguments, but found some.
      */
     AT300 = 300,

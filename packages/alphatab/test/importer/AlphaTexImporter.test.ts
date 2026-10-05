@@ -1,6 +1,6 @@
 import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
 import { TremoloPickingEffectSerializer } from '@coderline/alphatab/generated/model/TremoloPickingEffectSerializer';
-import { AlphaTexStaffNoteKind } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import { AlphaTexDiagnosticCode, AlphaTexStaffNoteKind } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
@@ -1915,6 +1915,71 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].showStringNumber).toBe(true);
         testExportRoundtrip(score);
+    });
+
+    it('note-show-string-pitched', () => {
+        const score = parseTex(`
+            \\instrument piano
+            \\tuning piano
+            .
+            :8 a4{ string 1 } c4{ string 6 } e4
+        `);
+
+        const beats = score.tracks[0].staves[0].bars[0].voices[0].beats;
+        const first = beats[0].notes[0];
+        expect(first.isPiano).toBe(true);
+        expect(first.isStringed).toBe(false);
+        expect(first.showStringNumber).toBe(true);
+        expect(first.string).toBe(6);
+        expect(first.realValue).toBe(69);
+
+        const second = beats[1].notes[0];
+        expect(second.showStringNumber).toBe(true);
+        expect(second.string).toBe(1);
+        expect(second.realValue).toBe(60);
+
+        const third = beats[2].notes[0];
+        expect(third.showStringNumber).toBe(false);
+        expect(Number.isNaN(third.string)).toBe(true);
+
+        testExportRoundtrip(score);
+    });
+
+    function expectSemanticError(tex: string, code: AlphaTexDiagnosticCode) {
+        const importer: AlphaTexImporter = new AlphaTexImporter();
+        importer.initFromString(tex, new Settings());
+        try {
+            importer.readScore();
+        } catch {
+            // checked below
+        }
+        expect(importer.semanticDiagnostics.errors.map(d => d.code)).toContain(code);
+    }
+
+    it('note-show-string-pitched-out-of-range', () => {
+        expectSemanticError(
+            `
+            \\tuning piano
+            .
+            :8 a4{ string 7 }
+        `,
+            AlphaTexDiagnosticCode.AT211
+        );
+    });
+
+    it('note-show-string-value-on-fretted', () => {
+        expectSemanticError(`:8 3.3{ string 1 }`, AlphaTexDiagnosticCode.AT221);
+    });
+
+    it('note-show-string-value-on-percussion', () => {
+        expectSemanticError(
+            `
+            \\instrument "percussion"
+            .
+            30{ string 1 }
+        `,
+            AlphaTexDiagnosticCode.AT221
+        );
     });
 
     it('note-hide', () => {

@@ -65,7 +65,7 @@ import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
 import { BeamingRules, type MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import type { Note } from '@coderline/alphatab/model/Note';
+import { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
@@ -2368,6 +2368,33 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 note.ornament = NoteOrnament.LowerMordent;
                 return ApplyNodeResult.Applied;
             case 'string':
+                if (p.arguments && p.arguments.arguments.length > 0) {
+                    const stringArg = p.arguments.arguments[0] as AlphaTexNumberLiteral;
+                    if (!note.isPiano) {
+                        importer.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT221,
+                            message: `A string number can only be specified on pitched notes, use the 'fret.string' syntax to specify the string of fretted notes.`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: stringArg.start,
+                            end: stringArg.end
+                        });
+                        return ApplyNodeResult.NotAppliedSemanticError;
+                    }
+
+                    const stringCount = Note.getStringCount(note.beat.voice.bar.staff);
+                    const stringNumber = stringArg.value;
+                    if (stringNumber < 1 || stringNumber > stringCount) {
+                        importer.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT211,
+                            message: `Value is out of valid range. Allowed range: 1-${stringCount}, Actual Value: ${stringNumber}`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: stringArg.start,
+                            end: stringArg.end
+                        });
+                        return ApplyNodeResult.NotAppliedSemanticError;
+                    }
+                    note.string = stringCount - stringNumber + 1;
+                }
                 note.showStringNumber = true;
                 return ApplyNodeResult.Applied;
             case 'hide':
@@ -3291,7 +3318,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (note.showStringNumber) {
-            Atnf.prop(properties, 'string');
+            if (note.isPiano && !Number.isNaN(note.string)) {
+                const stringNumber = Note.getStringCount(note.beat.voice.bar.staff) - note.string + 1;
+                Atnf.prop(properties, 'string', Atnf.numberValue(stringNumber));
+            } else {
+                Atnf.prop(properties, 'string');
+            }
         }
 
         if (note.isTrill) {
