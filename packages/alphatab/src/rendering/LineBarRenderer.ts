@@ -1006,13 +1006,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
             return;
         }
 
+        const firstBeat = h.beats[0];
+        const lastBeat = h.beats[h.beats.length - 1];
+
         // Tuplet brackets/numbers are painted through a separate code path (per
         // TupletGroup, not per BeamingHelper) with their own horizontal footprint
         // that doesn't necessarily line up with `h.beats`, so leave those on the
         // conservative pre/post-notes span below.
         if (!this.shouldPaintBeamingHelper(h) || h.hasTuplet) {
-            const firstBeat = h.beats[0];
-            const lastBeat = h.beats[h.beats.length - 1];
             const xStart = this.getBeatX(firstBeat, BeatXPosition.PreNotes);
             const xEnd = this.getBeatX(lastBeat, BeatXPosition.PostNotes);
             if (out.topY < 0) {
@@ -1024,8 +1025,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
             return;
         }
 
-        const firstBeat = h.beats[0];
-        const lastBeat = h.beats[h.beats.length - 1];
         const direction = this.getBeamDirection(h);
         const stemStartX = this.getBeatX(firstBeat, BeatXPosition.Stem);
 

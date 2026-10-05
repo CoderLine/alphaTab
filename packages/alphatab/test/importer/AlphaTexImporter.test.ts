@@ -2636,7 +2636,7 @@ describe('AlphaTexImporterTest', () => {
                     C4
         `);
 
-        expect(score.masterBars[0].barNumber).toBeNaN();
+        expect(Number.isNaN(score.masterBars[0].barNumber)).toBe(true);
         expect(score.masterBars[0].barNumberText).toBe('');
         expect(score.masterBars[0].customBarNumber).toBeUndefined();
         expect(score.masterBars[0].customBarNumberText).toBeUndefined();

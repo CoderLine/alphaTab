@@ -305,7 +305,8 @@ export class RenderStaff implements IStaffDisplayContext {
             }
             this._placesAgainstContentOnly = found;
         }
-        return this._placesAgainstContentOnly;
+        // explicit comparison: the cached value is nullable (bool? on C#)
+        return this._placesAgainstContentOnly === true;
     }
 
     private _unionBarLocalIntoStaffSkyline(renderer: BarRendererBase): void {

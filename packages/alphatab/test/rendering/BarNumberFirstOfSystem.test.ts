@@ -120,10 +120,12 @@ class BarNumberFirstOfSystemHelper {
                         errors.push(`render ${renders}: expected wrapping into multiple systems`);
                     }
 
-                    let firstStaffBars: number[] = [];
+                    const firstStaffBars: number[] = [];
                     for (const staff of staves) {
                         if (staff.isFirstVisibleStaff) {
-                            firstStaffBars = firstStaffBars.concat(staff.barIndices);
+                            for (const barIndex of staff.barIndices) {
+                                firstStaffBars.push(barIndex);
+                            }
                         } else if (staff.barIndices.length > 0) {
                             errors.push(`render ${renders}: bar numbers on non-first staff: ${staff.barIndices}`);
                         }
@@ -163,7 +165,7 @@ class BarNumberFirstOfSystemHelper {
             api.destroy();
         }
 
-        expect(errors).toEqual([]);
+        expect(errors.join('\n')).toBe('');
     }
 
     public static allBars(api: AlphaTabApiBase<unknown>): number[] {
