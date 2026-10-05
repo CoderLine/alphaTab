@@ -21,10 +21,10 @@ import {
     AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
-    type IAlphaTexImporter,
-    type IAlphaTexImporterState,
     AlphaTexStaffNoteKind,
-    AlphaTexVoiceMode
+    AlphaTexVoiceMode,
+    type IAlphaTexImporter,
+    type IAlphaTexImporterState
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import {
     ApplyNodeResult,

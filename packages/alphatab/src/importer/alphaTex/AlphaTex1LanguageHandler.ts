@@ -934,6 +934,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         bar.masterBar.customBarNumberText = (metaData.arguments!.arguments[0] as AlphaTexTextNode).text;
                         break;
                 }
+
+                bar.scoreDisplay ??= {};
+                bar.scoreDisplay!.barNumber = BarNumberDisplay.AllBars;
+                bar.tabDisplay ??= {};
+                bar.tabDisplay!.barNumber = BarNumberDisplay.AllBars;
+                bar.slashDisplay ??= {};
+                bar.slashDisplay!.barNumber = BarNumberDisplay.AllBars;
+                bar.numberedDisplay ??= {};
+                bar.numberedDisplay!.barNumber = BarNumberDisplay.AllBars;
                 return ApplyNodeResult.Applied;
             default:
                 return ApplyNodeResult.NotAppliedUnrecognizedMarker;
