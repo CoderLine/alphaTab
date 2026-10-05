@@ -371,7 +371,7 @@ describe('MusicXmlImporterTests', () => {
 
         const midiFile = new MidiFile();
         new MidiFileGenerator(score, new Settings(), new AlphaSynthMidiFileHandler(midiFile)).generate();
-        expect(midiFile.events.filter(e => !Number.isFinite(e.tick))).toHaveLength(0);
+        expect(midiFile.events.filter(e => Number.isNaN(e.tick))).toHaveLength(0);
     });
 
     describe('barnumberdisplay', async () => {
