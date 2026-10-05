@@ -2895,7 +2895,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             ];
         }
 
-        if (bar.barNumberDisplay !== undefined) {
+        if (
+            bar.barNumberDisplay !== undefined &&
+            !AlphaTex1LanguageHandler._isImpliedBarNumberDisplay(staff, bar, voice)
+        ) {
             nodes.push(Atnf.identMeta('barNumberDisplay', BarNumberDisplay[bar.barNumberDisplay]));
         }
 
@@ -2984,6 +2987,21 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         return chordNode;
+    }
+
+    /**
+     * A custom bar number (`\barNumber`) implies a forced bar number display on the bar it is written on
+     * (the first staff of the first track). In this case the display does not need to be exported.
+     */
+    private static _isImpliedBarNumberDisplay(staff: Staff, bar: Bar, voice: number): boolean {
+        const masterBar = bar.masterBar;
+        return (
+            voice === 0 &&
+            staff.index === 0 &&
+            staff.track.index === 0 &&
+            (masterBar.customBarNumber !== undefined || masterBar.customBarNumberText !== undefined) &&
+            bar.barNumberDisplay === BarNumberDisplay.AllBars
+        );
     }
 
     private static _buildMasterBarMetaDataNodes(nodes: AlphaTexMetaDataNode[], masterBar: MasterBar) {
