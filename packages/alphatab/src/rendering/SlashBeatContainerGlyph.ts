@@ -4,11 +4,10 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
-import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { SlashBeatGlyph } from '@coderline/alphatab/rendering/glyphs/SlashBeatGlyph';
+import { SlashBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/SlashBeatPreNotesGlyph';
 import { SlashTieGlyph } from '@coderline/alphatab/rendering/glyphs/SlashTieGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRenderer';
 
 /**
@@ -19,7 +18,7 @@ export class SlashBeatContainerGlyph extends BeatContainerGlyph {
 
     public constructor(beat: Beat) {
         super(beat);
-        this.preNotes = new BeatGlyphBase();
+        this.preNotes = new SlashBeatPreNotesGlyph();
         this.onNotes = new SlashBeatGlyph();
     }
 
@@ -41,7 +40,6 @@ export class SlashBeatContainerGlyph extends BeatContainerGlyph {
             this._flagStretch = graceSpacing;
         }
 
-        this.preNotes.addNormal(new SpacingGlyph(0, 0, 0.6 * this.renderer.smuflMetrics.oneStaffSpace));
         super.doLayout();
     }
 
