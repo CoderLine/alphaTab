@@ -1008,15 +1008,140 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (out.topY >= 0 && out.bottomY <= rendererBottom) {
             return;
         }
+
+        // Tuplet brackets/numbers are painted through a separate code path (per
+        // TupletGroup, not per BeamingHelper) with their own horizontal footprint
+        // that doesn't necessarily line up with `h.beats`, so leave those on the
+        // conservative pre/post-notes span below.
+        if (!this.shouldPaintBeamingHelper(h) || h.hasTuplet) {
+            const firstBeat = h.beats[0];
+            const lastBeat = h.beats[h.beats.length - 1];
+            const xStart = this.getBeatX(firstBeat, BeatXPosition.PreNotes);
+            const xEnd = this.getBeatX(lastBeat, BeatXPosition.PostNotes);
+            if (out.topY < 0) {
+                this.insertSkylineTop(xStart, xEnd, -out.topY);
+            }
+            if (out.bottomY > rendererBottom) {
+                this.insertSkylineBottom(xStart, xEnd, out.bottomY - rendererBottom);
+            }
+            return;
+        }
+
         const firstBeat = h.beats[0];
         const lastBeat = h.beats[h.beats.length - 1];
-        const xStart = this.getBeatX(firstBeat, BeatXPosition.PreNotes);
-        const xEnd = this.getBeatX(lastBeat, BeatXPosition.PostNotes);
-        if (out.topY < 0) {
-            this.insertSkylineTop(xStart, xEnd, Math.abs(out.topY));
+        const direction = this.getBeamDirection(h);
+        const stemStartX = this.getBeatX(firstBeat, BeatXPosition.Stem);
+
+        if (h.beats.length === 1) {
+            // Single stem, no beam. Its only horizontal extent past the stem is a flag,
+            // which is anchored at the stem and never reaches left of it (confirmed via
+            // the Bravura flag bboxes, for both up and down). Height is a single value
+            // (flag tip / stem tip), so a flat rect is exact.
+            const flagOverflow = this.smuflMetrics.stemFlagOffsets.get(firstBeat.duration)!;
+            let xEnd: number;
+            if (flagOverflow !== 0) {
+                const symbol = FlagGlyph.getSymbol(firstBeat.duration, direction, firstBeat.graceType !== GraceType.None);
+                xEnd = stemStartX + this.smuflMetrics.glyphWidths.get(symbol)!;
+            } else {
+                xEnd = stemStartX + this.smuflMetrics.stemThickness;
+            }
+            if (out.topY < 0) {
+                this.insertSkylineTop(stemStartX, xEnd, -out.topY);
+            }
+            if (out.bottomY > rendererBottom) {
+                this.insertSkylineBottom(stemStartX, xEnd, out.bottomY - rendererBottom);
+            }
+            return;
         }
-        if (out.bottomY > rendererBottom) {
-            this.insertSkylineBottom(xStart, xEnd, Math.abs(out.bottomY) - rendererBottom);
+
+        // Real beam spanning >1 stem. Two independent edges, each registered along its true
+        // shape instead of one flat rectangle at the group's extreme (the "flat box despite
+        // a sloped shape" problem):
+        //  - beam side (top for up-stems, bottom for down-stems): a straight, usually sloped
+        //    line -> trace it as a stair-step following the slope;
+        //  - note side (opposite the beam): the noteheads sit at per-beat heights (a melodic
+        //    contour) -> register each notehead's own x-extent at its own height.
+        const stemEndX = this.getBeatX(lastBeat, BeatXPosition.Stem) + this.smuflMetrics.stemThickness;
+        if (direction === BeamDirection.Up) {
+            if (out.topY < 0) {
+                this._emitSlopedBeamEdge(h, stemStartX, stemEndX, /* isTop */ true, rendererBottom);
+            }
+            if (out.bottomY > rendererBottom) {
+                this._emitPerBeatNoteEdge(h, /* isTop */ false, rendererBottom);
+            }
+        } else {
+            if (out.bottomY > rendererBottom) {
+                this._emitSlopedBeamEdge(h, stemStartX, stemEndX, /* isTop */ false, rendererBottom);
+            }
+            if (out.topY < 0) {
+                this._emitPerBeatNoteEdge(h, /* isTop */ true, rendererBottom);
+            }
+        }
+    }
+
+    /**
+     * Registers the note side of a beamed group per beat: each notehead's own x-extent at
+     * its own height, so an ascending/descending run registers as a matching contour rather
+     * than one flat rectangle at the highest/lowest note across the whole group.
+     */
+    private _emitPerBeatNoteEdge(h: BeamingHelper, isTop: boolean, rendererBottom: number): void {
+        for (const beat of h.beats) {
+            const xL = this.getBeatX(beat, BeatXPosition.OnNotes);
+            const xR = this.getBeatX(beat, BeatXPosition.PostNotes);
+            if (xR <= xL) {
+                continue;
+            }
+            if (isTop) {
+                const y = this.voiceContainer.getHighestNoteY(beat, NoteYPosition.Top);
+                if (y < 0) {
+                    this.insertSkylineTop(xL, xR, -y);
+                }
+            } else {
+                const y = this.voiceContainer.getLowestNoteY(beat, NoteYPosition.Bottom);
+                if (y > rendererBottom) {
+                    this.insertSkylineBottom(xL, xR, y - rendererBottom);
+                }
+            }
+        }
+    }
+
+    /**
+     * Registers the (linear) beam edge between `xStart` and `xEnd` as a stair-step that
+     * follows its slope. Each step is raised to the outer (highest for top / lowest for
+     * bottom) beam-y within that step, so the skyline never under-reaches the beam yet
+     * doesn't claim the beam's peak height across its whole width. Step count scales with
+     * the slope's total rise (flat beam → one segment).
+     */
+    private _emitSlopedBeamEdge(
+        h: BeamingHelper,
+        xStart: number,
+        xEnd: number,
+        isTop: boolean,
+        rendererBottom: number
+    ): void {
+        const span = xEnd - xStart;
+        if (span <= 0) {
+            return;
+        }
+        const yStart = this.calculateBeamY(h, xStart);
+        const yEnd = this.calculateBeamY(h, xEnd);
+        const steps = Math.max(1, Math.min(16, Math.ceil(Math.abs(yEnd - yStart) / 2)));
+        for (let i = 0; i < steps; i++) {
+            const xa = xStart + (span * i) / steps;
+            const xb = xStart + (span * (i + 1)) / steps;
+            const ya = yStart + ((yEnd - yStart) * i) / steps;
+            const yb = yStart + ((yEnd - yStart) * (i + 1)) / steps;
+            if (isTop) {
+                const ov = Math.max(-ya, -yb);
+                if (ov > 0) {
+                    this.insertSkylineTop(xa, xb, ov);
+                }
+            } else {
+                const ov = Math.max(ya, yb) - rendererBottom;
+                if (ov > 0) {
+                    this.insertSkylineBottom(xa, xb, ov);
+                }
+            }
         }
     }
 
