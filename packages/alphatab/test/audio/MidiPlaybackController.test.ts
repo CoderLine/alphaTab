@@ -165,16 +165,124 @@ describe('MidiPlaybackControllerTest', () => {
         testAlphaTexRepeat(tex, expectedBars, 50);
     });
 
-    it('repeat-sign-in-both-alternate-endings', () => {
-        const tex: string = ' . \\ro :1 0.6 | \\ae 1 \\rc 2 :1 1.6 | \\ae 2 \\rc 2 :1 2.6 | :1 3.6';
+    // Alternate endings (sequences as played by Guitar Pro 8)
+
+    it('alternate-endings-repeat-sign-in-all-endings', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 \\rc 2 r | \\ae 2 \\rc 2 r | r
+        `;
         const expectedBars: number[] = [0, 1, 0, 2, 3];
         testAlphaTexRepeat(tex, expectedBars, 50);
     });
 
-    it('repeat-sign-in-all-alternate-endings-multi', () => {
-        const tex: string =
-            ' . \\ro :1 0.6 | \\ae 1 \\rc 3 :1 1.6 | \\ae 2 \\rc 3 :1 2.6 | \\ae 3 \\rc 3 :1 3.6 | :1 4.6';
+    it('alternate-endings-three-endings-repeat-sign-in-all-endings', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 \\rc 3 r | \\ae 2 \\rc 3 r | \\ae 3 \\rc 3 r | r
+        `;
         const expectedBars: number[] = [0, 1, 0, 2, 0, 3, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('alternate-endings-three-endings-last-without-repeat-sign', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 \\rc 3 r | \\ae 2 \\rc 3 r | \\ae 3 r | r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 2, 0, 3, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('alternate-endings-combined-ending', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae (1 2) \\rc 3 r | \\ae 3 r | r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 1, 0, 2, 3];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('alternate-endings-multi-bar-first-ending', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 r | \\ae 1 \\rc 2 r | \\ae 2 r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 0, 3, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('alternate-endings-multi-bar-second-ending-with-repeat-sign', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 \\rc 2 r | \\ae 2 r | \\ae 2 \\rc 2 r | r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 2, 3, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('alternate-endings-repeat-sign-only-in-last-ending', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 r | \\ae 2 r | \\ae 3 \\rc 3 r | r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 2, 0, 3, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('alternate-endings-at-score-end', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 \\rc 2 r | \\ae 2 r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 2];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('alternate-endings-without-repeat-start', () => {
+        const tex: string = `
+        .
+        :1 r | \\ae 1 \\rc 2 r | \\ae 2 r | r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 2, 3];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('alternate-endings-without-repeat-end', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 r | \\ae 2 r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 3];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    // Repeat edge cases
+
+    it('repeat-start-without-end', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('repeat-start-without-end-followed-by-repeat', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | r | \\ro r | \\rc 2 r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 3, 2, 3, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('repeat-end-on-first-bar', () => {
+        const tex: string = `
+        .
+        \\rc 2 :1 r | r
+        `;
+        const expectedBars: number[] = [0, 0, 1];
         testAlphaTexRepeat(tex, expectedBars, 50);
     });
 
@@ -426,6 +534,33 @@ describe('MidiPlaybackControllerTest', () => {
         const tex: string = `
         .
         \\ro :1 r | \\jump Segno r | \\ae 1 \\rc 2 r | \\ae 2 r | \\jump DalSegno r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 0, 1, 3, 4, 1, 3, 4, 5];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('da-capo-after-alternate-endings-with-repeat-sign-in-all-endings', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 \\rc 2 r | \\ae 2 \\rc 2 r | \\jump DaCapo r | r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 2, 3, 0, 2, 3, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('da-capo-after-multi-bar-first-ending', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 r | \\ae 1 \\rc 2 r | \\ae 2 r | \\jump DaCapo r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 0, 3, 4, 0, 3, 4, 5];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('dal-segno-into-alternate-endings-with-repeat-sign-in-all-endings', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\jump Segno r | \\ae 1 \\rc 2 r | \\ae 2 \\rc 2 r | \\jump DalSegno r | r
         `;
         const expectedBars: number[] = [0, 1, 2, 0, 1, 3, 4, 1, 3, 4, 5];
         testAlphaTexRepeat(tex, expectedBars, 50);
