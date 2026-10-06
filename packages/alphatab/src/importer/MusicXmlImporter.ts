@@ -2883,9 +2883,33 @@ export class MusicXmlImporter extends ScoreImporter {
             return;
         }
 
+        // dead notes are commonly written without fret (e.g. Guitar Pro 5), the string still defines the tab position
+        if (!note.isStringed && note.isDead && note.beat.voice.bar.staff.tuning.length > 0) {
+            note.fret = Math.max(0, this._calculatePitchedNoteValue(note) - note.stringTuning);
+        }
+
         if (!note.isStringed && !note.isPercussion) {
             note.showStringNumber = true;
         }
+    }
+
+    /**
+     * Whether the note is played on a fretted instrument, which decides whether an x notehead or a mute is a dead note.
+     * MusicXML has no dedicated element for dead notes. Applications encode them as x notehead (MuseScore, TuxGuitar, Guitar Pro)
+     * or mute (TuxGuitar, Guitar Pro) which have other meanings on other instruments (e.g. hi-hats on percussion, spoken notes).
+     * The whole part is checked as the tuning is often only specified on the tablature staff while the x notehead
+     * is on the standard notation staff.
+     */
+    private _isFrettedInstrumentNote(note: Note): boolean {
+        if (note.isPercussion) {
+            return false;
+        }
+        for (const staff of note.beat.voice.bar.staff.track.staves) {
+            if (staff.isStringed) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -2940,8 +2964,19 @@ export class MusicXmlImporter extends ScoreImporter {
             switch (c.localName) {
                 // case 'ipa': Ignored
                 case 'mute':
-                    if (note && c.innerText === 'palm') {
-                        note.isPalmMute = true;
+                    if (note) {
+                        switch (c.innerText) {
+                            case 'palm':
+                                note.isPalmMute = true;
+                                break;
+                            // an undifferentiated or straight mute (e.g. TuxGuitar, Guitar Pro) on a fretted instrument is a dead note
+                            case 'on':
+                            case 'straight':
+                                if (this._isFrettedInstrumentNote(note)) {
+                                    note.isDead = true;
+                                }
+                                break;
+                        }
                     }
                     break;
                 case 'semi-pitched':
@@ -3265,6 +3300,9 @@ export class MusicXmlImporter extends ScoreImporter {
                     MusicFontSymbol.NoteheadXHalf,
                     MusicFontSymbol.NoteheadXBlack
                 );
+                if (this._isFrettedInstrumentNote(note)) {
+                    note.isDead = true;
+                }
                 break;
         }
     }
