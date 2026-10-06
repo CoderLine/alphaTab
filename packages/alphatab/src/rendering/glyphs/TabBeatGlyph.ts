@@ -136,7 +136,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
 
             let beatEffects: Map<string, Glyph>;
 
-            if (this.container.beat.slashed && !this.container.beat.notes.some(x => x.isTieDestination as boolean)) {
+            if (this.container.beat.slashed) {
                 const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
                 const slashY = tabRenderer.getLineY(line);
                 const slashNoteHead = new SlashNoteHeadGlyph(0, slashY, this.container.beat);
