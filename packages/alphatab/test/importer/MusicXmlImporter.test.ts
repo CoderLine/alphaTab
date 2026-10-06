@@ -327,6 +327,17 @@ describe('MusicXmlImporterTests', () => {
         expect(notes[1].percussionArticulation).toBeGreaterThanOrEqual(0);
     });
 
+    it('transposed-tie', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/transposed-tie.xml');
+        const notes = score.tracks[0].staves[0].bars[0].voices[0].beats.map(b => b.notes[0]);
+
+        // ties without number are matched by pitch, this must respect the staff transposition
+        expect(notes[0].isTieOrigin).toBe(true);
+        expect(notes[0].tieDestination).toBe(notes[1]);
+        expect(notes[1].isTieDestination).toBe(true);
+        expect(notes[1].tieOrigin).toBe(notes[0]);
+    });
+
     it('string-annotation', async () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/string-annotation.xml');
 
