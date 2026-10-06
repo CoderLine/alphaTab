@@ -365,7 +365,7 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int CharCodeAt(this string s, double index)
+        public static double CharCodeAt(this string s, double index)
         {
             return s[(int)index];
         }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+    <part-list>
+        <score-part id="P1">
+            <part-name>Guitar</part-name>
+        </score-part>
+    </part-list>
+    <part id="P1">
+        <measure number="1">
+            <attributes>
+                <divisions>1</divisions>
+                <time>
+                    <beats>2</beats>
+                    <beat-type>4</beat-type>
+                </time>
+                <clef>
+                    <sign>G</sign>
+                    <line>2</line>
+                    <clef-octave-change>-1</clef-octave-change>
+                </clef>
+                <transpose>
+                    <diatonic>0</diatonic>
+                    <chromatic>0</chromatic>
+                    <octave-change>-1</octave-change>
+                </transpose>
+            </attributes>
+            <note>
+                <pitch>
+                    <step>A</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <tie type="start" />
+                <voice>1</voice>
+                <type>quarter</type>
+                <notations>
+                    <tied type="start" />
+                </notations>
+            </note>
+            <note>
+                <pitch>
+                    <step>A</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <tie type="stop" />
+                <voice>1</voice>
+                <type>quarter</type>
+                <notations>
+                    <tied type="stop" />
+                </notations>
+            </note>
+        </measure>
+    </part>
+</score-partwise>

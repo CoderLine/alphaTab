@@ -22,47 +22,39 @@ export class XmlWriter {
 
     public writeNode(xml: XmlNode) {
         switch (xml.nodeType) {
-            case XmlNodeType.None:
-                break;
             case XmlNodeType.Element:
                 if (this._result.length > 0) {
                     this._writeLine();
                 }
                 this._write(`<${xml.localName}`);
-                for (const [name, value] of xml.attributes) {
-                    this._write(` ${name}="`);
-                    this._writeAttributeValue(value);
-                    this._write('"');
+                if (xml.hasAttributes) {
+                    for (const [name, value] of xml.attributes) {
+                        this._write(` ${name}="`);
+                        this._writeEscaped(value, true);
+                        this._write('"');
+                    }
                 }
 
-                if (xml.childNodes.length === 0) {
+                const children = xml.childNodes;
+                if (children.length > 0) {
+                    this._write('>');
+                    this._indent();
+                    for (const child of children) {
+                        this.writeNode(child);
+                    }
+                    this._unindend();
+                    this._writeLine();
+                    this._write(`</${xml.localName}>`);
+                } else if (!xml.hasText) {
                     this._write('/>');
                 } else {
                     this._write('>');
-                    if (xml.childNodes.length === 1 && !xml.firstElement) {
-                        this.writeNode(xml.childNodes[0]);
+                    if (xml.isCData) {
+                        this._write(`<![CDATA[${xml.innerText}]]>`);
                     } else {
-                        this._indent();
-                        for (const child of xml.childNodes) {
-                            // skip text nodes in case of multiple children
-                            if (child.nodeType === XmlNodeType.Element || child.nodeType === XmlNodeType.Comment) {
-                                this.writeNode(child);
-                            }
-                        }
-                        this._unindend();
-                        this._writeLine();
+                        this._writeEscaped(xml.innerText, false);
                     }
                     this._write(`</${xml.localName}>`);
-                }
-                break;
-            case XmlNodeType.Text:
-                if (xml.value) {
-                    this._write(xml.value);
-                }
-                break;
-            case XmlNodeType.CDATA:
-                if (xml.value !== null) {
-                    this._write(`<![CDATA[${xml.value}]]>`);
                 }
                 break;
             case XmlNodeType.Document:
@@ -74,10 +66,12 @@ export class XmlWriter {
                 }
                 break;
             case XmlNodeType.DocumentType:
-                this._write(`<!DOCTYPE ${xml.value}>`);
+                this._writeLine();
+                this._write(`<!DOCTYPE ${xml.innerText}>`);
                 break;
             case XmlNodeType.Comment:
-                this._write(`<!-- ${xml.value} -->`);
+                this._writeLine();
+                this._write(`<!-- ${xml.innerText} -->`);
                 break;
         }
     }
@@ -92,7 +86,7 @@ export class XmlWriter {
         this._currentIndention += this._indention;
     }
 
-    private _writeAttributeValue(value: string) {
+    private _writeEscaped(value: string, isAttribute: boolean) {
         for (let i = 0; i < value.length; i++) {
             const c = value.charAt(i);
             switch (c) {
@@ -100,16 +94,17 @@ export class XmlWriter {
                     this._result.push('&lt;');
                     break;
                 case '>':
-                    this._result.push('&gt;');
+                    // only required in attributes, in text it is kept as written (e.g. Guitar Pro writes <MultiVoice>1></MultiVoice>)
+                    this._result.push(isAttribute ? '&gt;' : c);
                     break;
                 case '&':
                     this._result.push('&amp;');
                     break;
                 case "'":
-                    this._result.push('&apos;');
+                    this._result.push(isAttribute ? '&apos;' : c);
                     break;
                 case '"':
-                    this._result.push('&quot;');
+                    this._result.push(isAttribute ? '&quot;' : c);
                     break;
                 default:
                     this._result.push(c);
@@ -123,7 +118,7 @@ export class XmlWriter {
         writer.writeNode(xml);
         return writer.toString();
     }
-    
+
     private _write(s: string) {
         if (this._isStartOfLine) {
             this._result.push(this._currentIndention);

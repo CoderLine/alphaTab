@@ -327,6 +327,58 @@ describe('MusicXmlImporterTests', () => {
         expect(notes[1].percussionArticulation).toBeGreaterThanOrEqual(0);
     });
 
+    it('transposed-tie', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/transposed-tie.xml');
+        const notes = score.tracks[0].staves[0].bars[0].voices[0].beats.map(b => b.notes[0]);
+
+        // ties without number are matched by pitch, this must respect the staff transposition
+        expect(notes[0].isTieOrigin).toBe(true);
+        expect(notes[0].tieDestination).toBe(notes[1]);
+        expect(notes[1].isTieDestination).toBe(true);
+        expect(notes[1].tieOrigin).toBe(notes[0]);
+    });
+
+    it('dead-note', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/dead-note.xml');
+        const notes = (track: number, staff: number) =>
+            score.tracks[track].staves[staff].bars[0].voices[0].beats.flatMap(b => b.notes);
+
+        // tab staff: x notehead
+        const tab = notes(0, 0);
+        expect(tab[0].isDead).toBe(false);
+        expect(tab[1].isDead).toBe(true);
+        expect(tab[1].fret).toBe(2);
+
+        // MuseScore: x notehead on notation and tab staff, tuning only on the tab staff
+        expect(notes(1, 0)[0].isDead).toBe(true);
+        expect(notes(1, 1)[0].isDead).toBe(true);
+
+        // TuxGuitar: x notehead and mute on notation staff, only mute on the tab staff
+        expect(notes(2, 0)[0].isDead).toBe(true);
+        expect(notes(2, 1)[0].isDead).toBe(true);
+
+        // Guitar Pro 5: x notehead with string but without fret
+        const gp5 = notes(3, 0)[0];
+        expect(gp5.isDead).toBe(true);
+        expect(gp5.isStringed).toBe(true);
+        expect(gp5.string).toBe(4);
+        expect(gp5.fret).toBe(2);
+        expect(gp5.showStringNumber).toBe(false);
+
+        // drums: x notehead is a hi-hat
+        const drums = notes(4, 0)[0];
+        expect(drums.isPercussion).toBe(true);
+        expect(drums.isDead).toBe(false);
+
+        // voice: x notehead
+        expect(notes(5, 0)[0].isDead).toBe(false);
+
+        // trumpet: straight mute
+        const trumpet = notes(6, 0)[0];
+        expect(trumpet.isDead).toBe(false);
+        expect(trumpet.isPalmMute).toBe(false);
+    });
+
     it('string-annotation', async () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/string-annotation.xml');
 

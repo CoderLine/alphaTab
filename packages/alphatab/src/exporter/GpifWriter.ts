@@ -91,9 +91,8 @@ export class GpifWriter {
         const encoding = gpif.addElement('Encoding');
         encoding.addElement('EncodingDescription').innerText = 'GP8';
 
-        const alphaTabComment = new XmlNode();
-        alphaTabComment.nodeType = XmlNodeType.Comment;
-        alphaTabComment.value = `Written by alphaTab ${VersionInfo.version} (${VersionInfo.commit})`;
+        const alphaTabComment = new XmlNode(XmlNodeType.Comment);
+        alphaTabComment.innerText = `Written by alphaTab ${VersionInfo.version} (${VersionInfo.commit})`;
         encoding.addChild(alphaTabComment);
 
         this._writeScoreNode(gpif, score);
