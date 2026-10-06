@@ -432,6 +432,89 @@ describe('MidiPlaybackControllerTest', () => {
         testAlphaTexRepeat(tex, expectedBars, 50);
     });
 
+    // Jumps within repeats (only taken on the final pass of the repeat)
+
+    it('da-capo-al-coda-on-repeat-end', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\jump DaCoda r | \\rc 2 \\jump DaCapoAlCoda r | \\jump Coda r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 0, 1, 2, 0, 1, 3];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('da-capo-on-repeat-end', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\rc 3 \\jump DaCapo r | r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 1, 0, 1, 0, 1, 2];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('dal-segno-on-repeat-end', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\jump Segno r | \\rc 2 \\jump DalSegno r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 0, 1, 2, 1, 2, 3];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('da-capo-al-fine-on-repeat-end', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\jump Fine r | \\rc 2 \\jump DaCapoAlFine r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 0, 1, 2, 0, 1];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('dal-segno-al-coda-on-repeat-end', () => {
+        const tex: string = `
+        .
+        :1 r | \\ro \\jump Segno r | \\jump DaCoda r | \\rc 2 \\jump DalSegnoAlCoda r | \\jump Coda r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 3, 1, 2, 3, 1, 2, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('da-capo-inside-repeat', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\jump DaCapo r | \\rc 2 r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 0, 1, 0, 1, 2, 3];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('fine-on-repeat-end-after-da-capo', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\rc 2 \\jump Fine r | \\jump DaCapoAlFine r | r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 1, 2, 0, 1];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('to-coda-on-repeat-end-after-da-capo', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\rc 2 \\jump DaCoda r | \\jump DaCapoAlCoda r | \\jump Coda r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 1, 2, 0, 1, 3];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('da-capo-in-first-ending-not-taken', () => {
+        const tex: string = `
+        .
+        :1 r | \\ro r | \\ae 1 \\rc 2 \\jump DaCapo r | \\ae 2 r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 1, 3, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
     // Jumps reached again
 
     it('da-capo-al-coda-reached-again', () => {
@@ -620,6 +703,8 @@ describe('MidiPlaybackControllerTest', () => {
         \\ro :1 r | \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda r | r | \\jump DalSegnoAlCoda r | r | \\jump Coda r | \\rc 2 r | r | \\ro \\rc 2 r
         `;
         const expectedBars: number[] = [
+            0, 1, 2, 2, 3, 4, 5, 6, 7, 8,
+
             0, 1, 2, 2, 3, 4, 5,
 
             1, 2, 3, 7, 8, 9, 10, 10

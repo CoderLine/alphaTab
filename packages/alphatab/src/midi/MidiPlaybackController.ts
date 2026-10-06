@@ -191,6 +191,28 @@ export class MidiPlaybackController {
         }
     }
 
+    /**
+     * Checks whether the given bar is played the last time, meaning no started repeat will jump back
+     * over it anymore. Jumps (D.C./D.S.) within repeats are only taken on this final pass.
+     */
+    private _isFinalPass(masterBar: MasterBar): boolean {
+        for (const repeat of this._repeatStack) {
+            const closings = repeat.group.closings;
+            for (let i = 0; i < closings.length; i++) {
+                const closing = closings[i];
+                if (closing.index < masterBar.index) {
+                    continue;
+                }
+
+                const repeatsDone = repeat.hasAlternateEndings ? repeat.pass : repeat.iterations[i];
+                if (repeatsDone < closing.repeatCount - 1) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private _handleDaCapo(directions: Set<Direction>, daCapo: Direction, newState: MidiPlaybackControllerState): boolean {
         if (directions.has(daCapo)) {
             this._takenJumps.add(this._score.masterBars[this.index]);
@@ -259,8 +281,9 @@ export class MidiPlaybackController {
 
         switch (this._state) {
             case MidiPlaybackControllerState.PlayingNormally:
-                // jump already taken (e.g. reached again after the coda) -> continue normal playback
-                if (this._takenJumps.has(masterBar)) {
+                // jump already taken (e.g. reached again after the coda) or we're within a repeat
+                // which is not on its final pass yet -> continue normal playback
+                if (this._takenJumps.has(masterBar) || !this._isFinalPass(masterBar)) {
                     return false;
                 }
 
