@@ -62,6 +62,11 @@ export class MidiPlaybackController {
     private _groupsOnStack: Set<RepeatGroup> = new Set<RepeatGroup>();
     private _previousAlternateEndings: number = 0;
 
+    /**
+     * The bars on which a D.C./D.S. jump was already taken. Each jump is only taken once.
+     */
+    private _takenJumps: Set<MasterBar> = new Set<MasterBar>();
+
     private _state: MidiPlaybackControllerState = MidiPlaybackControllerState.PlayingNormally;
 
     public shouldPlay: boolean = true;
@@ -139,6 +144,7 @@ export class MidiPlaybackController {
 
     private _handleDaCapo(directions: Set<Direction>, daCapo: Direction, newState: MidiPlaybackControllerState): boolean {
         if (directions.has(daCapo)) {
+            this._takenJumps.add(this._score.masterBars[this.index]);
             this.index = 0; // jump to start
             this._state = newState;
             this._resetRepeats();
@@ -160,6 +166,7 @@ export class MidiPlaybackController {
                 return false;
             }
 
+            this._takenJumps.add(this._score.masterBars[this.index]);
             this.index = segno;
             this._state = newState;
             this._resetRepeats();
@@ -214,6 +221,11 @@ export class MidiPlaybackController {
 
         switch (this._state) {
             case MidiPlaybackControllerState.PlayingNormally:
+                // jump already taken (e.g. reached again after the coda) -> continue normal playback
+                if (this._takenJumps.has(masterBar)) {
+                    return false;
+                }
+
                 // Da capo Jumps (to start)
                 // prettier-ignore
                 if (
