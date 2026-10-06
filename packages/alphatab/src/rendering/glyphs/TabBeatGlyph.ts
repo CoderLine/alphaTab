@@ -13,6 +13,7 @@ import { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteC
 import { TabRestGlyph } from '@coderline/alphatab/rendering/glyphs/TabRestGlyph';
 import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 
 /**
@@ -46,35 +47,64 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+        if (TabBeatGlyph._isStemEnd(requestedPosition)) {
+            return this._getStemEndY(requestedPosition);
+        }
+        if (this.slash) {
+            return this.slash.getNoteHeadY(this.renderer.smuflMetrics, requestedPosition);
+        }
         return this.noteNumbers ? this.noteNumbers.getNoteY(note, requestedPosition) : 0;
     }
 
-    public override getRestY(requestedPosition: NoteYPosition): number {
-        const g = this.restGlyph;
-        if (g) {
-            switch (requestedPosition) {
-                case NoteYPosition.TopWithStem:
-                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.getStemLength(Duration.Quarter, true);
-                case NoteYPosition.Top:
-                    return g.getBoundingBoxTop();
-                case NoteYPosition.Center:
-                case NoteYPosition.StemUp:
-                case NoteYPosition.StemDown:
-                    return g.getBoundingBoxTop() + g.height / 2;
-                case NoteYPosition.Bottom:
-                    return g.getBoundingBoxTop();
-                case NoteYPosition.BottomWithStem:
-                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.getStemLength(Duration.Quarter, true);
-            }
+    private static _isStemEnd(requestedPosition: NoteYPosition): boolean {
+        return requestedPosition === NoteYPosition.TopWithStem || requestedPosition === NoteYPosition.BottomWithStem;
+    }
+
+    /**
+     * Stems end in the rhythm area above or below the staff, independent of the notes.
+     */
+    private _getStemEndY(requestedPosition: NoteYPosition): number {
+        const rhythmHeight = this.renderer.settings.notation.rhythmHeight;
+        const tremoloHeight = this._calculateTremoloHeightForStem();
+        return requestedPosition === NoteYPosition.TopWithStem
+            ? -rhythmHeight - tremoloHeight
+            : this.renderer.height + rhythmHeight + tremoloHeight;
+    }
+
+    private _calculateTremoloHeightForStem(): number {
+        const beat = this.container.beat;
+        if (!beat.isTremolo) {
+            return 0;
         }
-        return 0;
+        if (beat.duration <= Duration.Quarter) {
+            return 0;
+        }
+        const symbol = TremoloPickingGlyph._getSymbol(beat.tremoloPicking!);
+        const smufl = this.renderer.smuflMetrics;
+        return smufl.glyphHeights.has(symbol) ? smufl.glyphHeights.get(symbol)! : 0;
+    }
+
+    public override getRestY(requestedPosition: NoteYPosition): number {
+        return this.getRestGlyphY(this.restGlyph, requestedPosition);
     }
 
     public override getLowestNoteY(requestedPosition: NoteYPosition): number {
+        if (TabBeatGlyph._isStemEnd(requestedPosition)) {
+            return this._getStemEndY(requestedPosition);
+        }
+        if (this.slash) {
+            return this.slash.getNoteHeadY(this.renderer.smuflMetrics, requestedPosition);
+        }
         return this.noteNumbers ? this.noteNumbers.getLowestNoteY(requestedPosition) : 0;
     }
 
     public override getHighestNoteY(requestedPosition: NoteYPosition): number {
+        if (TabBeatGlyph._isStemEnd(requestedPosition)) {
+            return this._getStemEndY(requestedPosition);
+        }
+        if (this.slash) {
+            return this.slash.getNoteHeadY(this.renderer.smuflMetrics, requestedPosition);
+        }
         return this.noteNumbers ? this.noteNumbers.getHighestNoteY(requestedPosition) : 0;
     }
 
@@ -96,7 +126,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
 
             let beatEffects: Map<string, Glyph>;
 
-            if (this.container.beat.slashed && !this.container.beat.notes.some(x => x.isTieDestination as boolean)) {
+            if (this.container.beat.slashed) {
                 const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
                 const slashY = tabRenderer.getLineY(line);
                 const slashNoteHead = new SlashNoteHeadGlyph(0, slashY, this.container.beat);
@@ -178,10 +208,22 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             this.onTimeX = this.slash!.x + this.slash!.width / 2;
         }
         this.middleX = this.onTimeX;
-        this.stemX = this.middleX;
+        // slashes attach the stem like regular note heads (SMuFL stem anchor)
+        this.stemX = this.slash ? this.slash.x + this.slash.stemX : this.middleX;
 
+        if (this.slash) {
+            // reserve the slash area so stems are not painted through it
+            this.renderer.collisionHelper.reserveBeatSlot(
+                this.container.beat,
+                this.slash.getNoteHeadY(this.renderer.smuflMetrics, NoteYPosition.Top),
+                this.slash.getNoteHeadY(this.renderer.smuflMetrics, NoteYPosition.Bottom)
+            );
+        }
+
+        // effects like tremolos sit on the (potentially hidden) stem
+        const effectX = BeamingHelper.beatHasStem(this.container.beat) ? this.stemX : this.onTimeX;
         for (const g of centeredEffectGlyphs) {
-            g.x = this.onTimeX;
+            g.x = effectX;
         }
     }
 

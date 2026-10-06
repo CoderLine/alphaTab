@@ -7,7 +7,6 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -69,15 +68,7 @@ export class SlashNoteHeadGlyph extends NoteHeadGlyphBase {
             lr.registerBeatEffectOverflowsForBeat(this.beat!, minEffectY, maxEffectY);
         }
 
-        const direction = lr.getBeatDirection(this.beat!);
-        const symbol = this.symbol;
-        if (direction === BeamDirection.Up) {
-            const stemInfoUp = lr.smuflMetrics.stemUp.has(symbol) ? lr.smuflMetrics.stemUp.get(symbol)!.x : 0;
-            this.stemX = stemInfoUp;
-        } else {
-            const stemInfoDown = lr.smuflMetrics.stemDown.has(symbol) ? lr.smuflMetrics.stemDown.get(symbol)!.x : 0;
-            this.stemX = stemInfoDown;
-        }
+        this.stemX = this.getStemX(lr.smuflMetrics, lr.getBeatDirection(this.beat!));
     }
 
     public static getSymbol(duration: Duration): MusicFontSymbol {

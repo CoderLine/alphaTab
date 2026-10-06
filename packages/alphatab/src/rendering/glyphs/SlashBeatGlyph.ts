@@ -1,8 +1,5 @@
-import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
-import { GraceType } from '@coderline/alphatab/model/GraceType';
-import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
@@ -82,24 +79,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     public override getRestY(requestedPosition: NoteYPosition): number {
-        const g = this.restGlyph;
-        if (g) {
-            switch (requestedPosition) {
-                case NoteYPosition.TopWithStem:
-                    return g.getBoundingBoxTop() - this.renderer.smuflMetrics.getStemLength(Duration.Quarter, true);
-                case NoteYPosition.Top:
-                    return g.getBoundingBoxTop();
-                case NoteYPosition.Center:
-                case NoteYPosition.StemUp:
-                case NoteYPosition.StemDown:
-                    return g.getBoundingBoxTop() + g.height / 2;
-                case NoteYPosition.Bottom:
-                    return g.getBoundingBoxBottom();
-                case NoteYPosition.BottomWithStem:
-                    return g.getBoundingBoxBottom() + this.renderer.smuflMetrics.getStemLength(Duration.Quarter, true);
-            }
-        }
-        return 0;
+        return this.getRestGlyphY(this.restGlyph, requestedPosition);
     }
 
     public override getNoteY(_note: Note, requestedPosition: NoteYPosition): number {
@@ -107,73 +87,42 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     public _internalGetNoteY(requestedPosition: NoteYPosition): number {
-        let g: Glyph | null = null;
-        let symbol: MusicFontSymbol = MusicFontSymbol.None;
-        let hasStem = false;
-        if (this.noteHeads) {
-            g = this.noteHeads;
-            symbol = SlashNoteHeadGlyph.getSymbol(this.container.beat.duration);
-            hasStem = true;
-        } else if (this.deadSlapped) {
-            g = this.deadSlapped;
-        }
-
-        if (g) {
-            let pos = this.y + g.y;
+        const noteHeads = this.noteHeads;
+        if (noteHeads) {
             const sr = this.renderer as SlashBarRenderer;
             const beat = this.container.beat;
-            const scale = beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
-
             switch (requestedPosition) {
                 case NoteYPosition.TopWithStem:
-                    if (hasStem) {
-                        // stem start
-                        pos -=
-                            (sr.smuflMetrics.stemUp.has(symbol) ? sr.smuflMetrics.stemUp.get(symbol)!.bottomY : 0) *
-                            scale;
-
-                        // stem size according to duration
-                        pos -= sr.smuflMetrics.getStemLength(beat.duration, sr.hasFlag(beat)) * scale;
-                        pos -= this._stemLengthExtension;
-                    } else {
-                        pos -= g.height / 2;
-                    }
-                    return pos;
-                case NoteYPosition.Top:
-                    pos -= g.height / 2;
-                    break;
-                case NoteYPosition.Center:
-                    break;
-                case NoteYPosition.Bottom:
-                    pos += g.height / 2;
-                    break;
+                    // stem start and size according to duration
+                    return (
+                        this.y +
+                        noteHeads.getNoteHeadY(sr.smuflMetrics, NoteYPosition.StemUp) -
+                        sr.smuflMetrics.getStemLength(beat.duration, sr.hasFlag(beat)) * noteHeads.glyphScale -
+                        this._stemLengthExtension
+                    );
                 case NoteYPosition.BottomWithStem:
-                    if (hasStem) {
-                        pos -=
-                            (sr.smuflMetrics.stemDown.has(symbol)
-                                ? sr.smuflMetrics.stemDown.get(symbol)!.topY
-                                : -sr.smuflMetrics.glyphHeights.get(symbol)! / 2) * scale;
-
-                        // stem size according to duration
-                        pos += sr.smuflMetrics.getStemLength(beat.duration, sr.hasFlag(beat)) * scale;
-                        pos += this._stemLengthExtension;
-                    } else {
-                        pos += g.height / 2;
-                    }
-                    return pos;
-
-                case NoteYPosition.StemUp:
-                    pos -= this.renderer.smuflMetrics.stemUp.has(symbol)
-                        ? this.renderer.smuflMetrics.stemUp.get(symbol)!.bottomY
-                        : 0;
-                    break;
-                case NoteYPosition.StemDown:
-                    pos -= this.renderer.smuflMetrics.stemDown.has(symbol)
-                        ? this.renderer.smuflMetrics.stemDown.get(symbol)!.topY
-                        : 0;
-                    break;
+                    return (
+                        this.y +
+                        noteHeads.getNoteHeadY(sr.smuflMetrics, NoteYPosition.StemDown) +
+                        sr.smuflMetrics.getStemLength(beat.duration, sr.hasFlag(beat)) * noteHeads.glyphScale +
+                        this._stemLengthExtension
+                    );
             }
+            return this.y + noteHeads.getNoteHeadY(sr.smuflMetrics, requestedPosition);
+        }
 
+        const g = this.deadSlapped;
+        if (g) {
+            // no stems
+            const pos = this.y + g.y;
+            switch (requestedPosition) {
+                case NoteYPosition.TopWithStem:
+                case NoteYPosition.Top:
+                    return pos - g.height / 2;
+                case NoteYPosition.BottomWithStem:
+                case NoteYPosition.Bottom:
+                    return pos + g.height / 2;
+            }
             return pos;
         }
         return 0;
